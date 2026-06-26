@@ -8,6 +8,7 @@ import BsOffcanvas from '../../Bootstrap/Offcanvas.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import LehreinheitenModule from '../../DropdownModes/LehreinheitenModule.js';
 import MobilityLegende from '../../Mobility/Legende.js';
+import NotenlisteLinks from "./NotenlisteLinks.js";
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import {debounce} from "../../../helpers/debounce.js";
 import {centeredTextFormatter} from "../../../tabulator/formatter/centered.js";
@@ -19,6 +20,7 @@ export const Benotungstool = {
 		BsOffcanvas,
 		CoreFilterCmpt,
 		MobilityLegende,
+		NotenlisteLinks,
 		Dropdown: primevue.dropdown,
 		Divider: primevue.divider,
 		InputNumber: primevue.inputnumber,
@@ -49,6 +51,11 @@ export const Benotungstool = {
 			sortRestored: false,
 			stateRestored: false,
 			persistenceID: 'notenToolTable2026-02-16',
+			freezePersistenceID: 'notenToolStickyCols',
+			// the identity columns the user may pin to the left while scrolling the pruefungs columns
+			freezableColumnFields: ['selectCol', 'uid', 'vorname', 'nachname'],
+			// which of those are currently sticky (per-column selection, persisted)
+			stickyColumnSelection: JSON.parse(localStorage.getItem('notenToolStickyCols') ?? '["selectCol","uid"]'),
 			debouncedFetchPunkteForPruefung: null,
 			config: null, // cis config
 			neuesPruefungsdatumModalVisible: false,
@@ -59,14 +66,19 @@ export const Benotungstool = {
 			selectedPruefungNote: null,
 			selectedPruefungDate: new Date(), // v-model for pruefung edit datepicker
 			selectedPruefungPunkte: null,
+			pruefungNoteLocked: false, // grade read-only when a later/higher pruefung exists (date stays editable)
+			pruefungDateMin: null,
+			pruefungDateMax: null,
 			distinctPruefungsDates: null,
 			pruefungStudent: null,
 			pruefung: null,
 			password: '',
 			changedNotenCounter: 0,
+			tableVersion: 0, // incremented on table sort/filter/data changes so getStudentenOptions mirrors the table
 			tabulatorUuid: Vue.ref(0),
 			domain: '',
-			importString: '',
+			importString: '', // Prüfungsimport textarea (uid + date + note)
+			importStringNoten: '', // legacy Notenimport textarea (uid + note)
 			teilnoten: null,
 			lv: null,
 			studenten: null,
@@ -101,7 +113,7 @@ export const Benotungstool = {
 				event: "cellEdited",
 				handler: async (cell) => {
 					const field = cell.getField()
-					
+
 					if(field === 'note_vorschlag') {
 						const rowData = cell.getRow().getData();
 						const newValue = cell.getValue();
@@ -112,12 +124,50 @@ export const Benotungstool = {
 							// revert value
 							cell.setValue(original, true);
 						}
-						
+
 						delete rowData._originalNoteVorschlag; // Clean up
-						
+
 						const row = cell.getRow()
 						row.reformat() // trigger reformat of arrow
+
+						this.detachNoteVorschlagToggle()
 					}
+				}
+			},
+			{
+				event: "cellEditing",
+				handler: (cell) => {
+					if(cell.getField() !== 'note_vorschlag') return
+					const el = cell.getElement()
+					if(!el) return
+
+					this.detachNoteVorschlagToggle() // drop any stale listener
+
+					// clicking the already-open cell again should close the editor. Ignore clicks on the
+					// dropdown options themselves so selecting a value still works.
+					const listener = (ev) => {
+						if(ev.target?.closest && ev.target.closest('.tabulator-edit-list')) return
+						ev.stopPropagation()
+						try { cell.cancelEdit() } catch(e) {}
+						// the options popup is rendered outside the cell and lingers after cancelEdit -> remove it
+						document.querySelectorAll('.tabulator-edit-list').forEach(list => list.remove())
+					}
+					this._nvCloseEl = el
+					this._nvCloseListener = listener
+					// defer so the very click that opened the editor doesn't immediately close it again.
+					// capture phase so it still fires if the editor's input stops propagation.
+					setTimeout(() => {
+						if(this._nvCloseEl === el && this._nvCloseListener === listener) {
+							el.addEventListener('mousedown', listener, true)
+						}
+					}, 0)
+				}
+			},
+			{
+				event: "cellEditCancelled",
+				handler: (cell) => {
+					if(cell.getField() !== 'note_vorschlag') return
+					this.detachNoteVorschlagToggle()
 				}
 			},
 			{
@@ -139,7 +189,8 @@ export const Benotungstool = {
 				handler: (filters, rows) => {
 					this.filteredRows = rows;
 					this.filteredcount = rows.length;
-					
+					this.tableVersion++; // keep the "neue Prüfung" dropdown in sync with the filtered table
+
 					if (!this.selectedUids.length) return;
 
 					const visibleData = new Set(rows.map(r => r.getData()));
@@ -196,6 +247,48 @@ export const Benotungstool = {
 
 			localStorage.setItem(this.persistenceID, JSON.stringify(state));
 		},
+		stickyClass(field) {
+			// the freezable identity columns always carry the sticky-col class; whether they are
+			// actually sticky is toggled per column via container classes (see applyStickyColumnState),
+			// which avoids re-running updateDefinition on columns that have reactive (Vue.computed) titles
+			return this.freezableColumnFields.includes(field) ? 'sticky-col' : undefined
+		},
+		recomputeStickyOffsets() {
+			// position each sticky column at the cumulative width of the preceding sticky columns
+			// so multiple sticky columns stack next to each other instead of overlapping at left:0
+			const table = this.$refs.notenTable?.tabulator
+			const el = document.getElementById('notentable')
+			if(!table || !el) return
+
+			let offset = 0
+			// iterate in actual display order so column reordering is respected
+			table.getColumns().forEach(col => {
+				const field = col.getField()
+				if(!this.freezableColumnFields.includes(field)) return
+
+				if(this.stickyColumnSelection.includes(field)) {
+					el.style.setProperty('--sl-' + field, offset + 'px')
+					offset += col.getWidth()
+				} else {
+					el.style.setProperty('--sl-' + field, '0px')
+				}
+			})
+		},
+		applyStickyColumnState() {
+			// reflect the current per-column sticky selection onto the table container
+			// (a `sticky-on-<field>` class enables position:sticky for that column in CSS) + offsets
+			const el = document.getElementById('notentable')
+			if(!el) return
+			this.freezableColumnFields.forEach(field => {
+				el.classList.toggle('sticky-on-' + field, this.stickyColumnSelection.includes(field))
+			})
+			this.recomputeStickyOffsets()
+		},
+		onStickySelectionChange() {
+			// MultiSelect change handler: persist + apply (instant, no table rebuild required)
+			try { localStorage.setItem(this.freezePersistenceID, JSON.stringify(this.stickyColumnSelection)) } catch(e) {}
+			this.applyStickyColumnState()
+		},
 		handleTableBuilt() {
 			const table = this.$refs.notenTable.tabulator;
 
@@ -214,8 +307,19 @@ export const Benotungstool = {
 				table.on(eventName, () => this.saveState(table));
 			});
 
+			// keep the sticky-column offsets in sync when columns are resized / moved / shown-hidden
+			["columnResized", "columnMoved", "columnVisibilityChanged"].forEach(eventName => {
+				table.on(eventName, () => this.recomputeStickyOffsets());
+			});
+
+			// keep the "neue Prüfung" dropdown order in sync with the table's current sort
+			table.on("dataSorted", () => this.tableVersion++);
+
 			// renderComplete restore state logic
 			table.on("renderComplete", () => {
+				// widths are settled here, so (re)apply the sticky container classes + cumulative offsets
+				this.applyStickyColumnState();
+
 				if (this.stateRestored) return;
 
 				// layout restore should be happening in setupData()
@@ -260,6 +364,14 @@ export const Benotungstool = {
 			if(row.isSelected()) {
 				row.deselect();
 			}
+		},
+		detachNoteVorschlagToggle() {
+			// remove the "click again to close" listener attached while a note_vorschlag editor is open
+			if(this._nvCloseEl && this._nvCloseListener) {
+				this._nvCloseEl.removeEventListener('mousedown', this._nvCloseListener, true)
+			}
+			this._nvCloseEl = null
+			this._nvCloseListener = null
 		},
 		// using this to expose input event of editor element properly, tabulator makes it hard to access on default editor
 		// implemented after tabulator/src/js/modules/edit/defaults/editors/number.js
@@ -357,11 +469,10 @@ export const Benotungstool = {
 					return
 				}
 
-				if(!student.note) {
-					this.$fhcAlert.alertWarning('Student ' + student.uid + ' hat noch keine Zeugnis Note eingetragen! Es wird keine Prüfung angelegt.')
-					return
-				}
-				
+				// note: a missing Zeugnisnote is intentionally allowed here so that a dated import can
+				// create the first attempt for not-yet-graded students (Termin1 falls back to
+				// "noch nicht eingetragen" server-side). Only the LV-note is mandatory.
+
 				// check if student antrittCount is too high already
 				if(student.hoechsterAntritt >= this.maxAntrittCount) {
 					this.$fhcAlert.alertWarning('Student ' + student.uid + ' hat bereits ' + student.hoechsterAntritt + ' Prüfungsantritte abgelegt. Die Zeile wurde übersprungen.')
@@ -409,7 +520,7 @@ export const Benotungstool = {
 
 				// find notenoption and check if its allowed to use in lehre
 				const notenOption = this.notenOptions.find(n => n.note == note)
-				if(!notenOption.lehre) {
+				if(!notenOption?.lehre) {
 					this.$fhcAlert.alertWarning(this.$p.t('benotungstool/c4importNoGradeFoundForIdInRow', [rowParts[0], rowNum]))
 					return
 				}
@@ -451,13 +562,13 @@ export const Benotungstool = {
 			let punkte = null
 			let note = null
 			if(this.config?.CIS_GESAMTNOTE_PUNKTE) {
-				punkte = Number.parseFloat(rowParts[1]) 
+				punkte = Number.parseFloat(rowParts[2]) 
 			} else {
-				note = rowParts[1]
+				note = rowParts[2]
 
 				// find notenoption and check if its allowed to use in lehre
 				const notenOption = this.notenOptions.find(n => n.note == note)
-				if(!notenOption.lehre) {
+				if(!notenOption?.lehre) {
 					this.$fhcAlert.alertWarning(this.$p.t('benotungstool/c4importNoGradeFoundForIdInRow', [rowParts[0], rowNum]))
 					return
 				}
@@ -662,9 +773,15 @@ export const Benotungstool = {
 			rowComponent.reformat()
 		},
 		correctOldTerminTypenForStudent(student, saved) {
-			// check if student has a preceding pruefung from same type and remove it since in this case 
-			// the new pruefung will have overwritten the old one
-			const oldP = student.pruefungen.find(p => p.pruefungstyp_kurzbz == saved.pruefungstyp_kurzbz)
+			// check if student has a preceding pruefung from same type and remove it since in this case
+			// the new pruefung will have overwritten the old one.
+			// EXCEPTION: an "entschuldigt" Termin must remain as its own dated entry (it was not an
+			// attempt, so the new pruefung is an additional dated record, not an overwrite of it).
+			const oldP = student.pruefungen.find(p =>
+				p.pruefungstyp_kurzbz == saved.pruefungstyp_kurzbz
+				&& p.pruefung_id != saved.pruefung_id
+				&& !(this.config?.NOTE_ENTSCHULDIGT != null && p.note == this.config.NOTE_ENTSCHULDIGT)
+			)
 			if(oldP) {
 				delete student[oldP.datum] // delete the variable col value
 
@@ -685,35 +802,50 @@ export const Benotungstool = {
 				}
 			}
 		},
-		importNoten() {
+		importPruefungen() {
+			// Prüfungsimport: every row must carry a date: "UID/Matrikelnr <TAB> Datum <TAB> Note".
+			// Each row creates a dated exam attempt.
 			const rows = this.importString.split('\n')
 			const bulk = []
-			let mode = ''
-			// read the lines
-			rows.forEach((r,i) => {
+
+			rows.forEach((r, i) => {
+				if(r.trim() === '') return // ignore empty/trailing lines
 				const rowParts = r.split('\t')
+				const rowNum = i + 1
 				if(rowParts.length === 3) {
-					this.parsePruefung(rowParts, bulk, i)
-					mode = 'pruefung' // if line parts are not uniform we are in trouble
-				} else if(rowParts.length === 2) {
-					this.parseNote(rowParts, bulk, i)
-					mode = 'note'
+					this.parsePruefung(rowParts, bulk, rowNum)
+				} else {
+					this.$fhcAlert.alertWarning(this.$p.t('benotungstool/c4importRowNotDateFormat', [rowNum]))
 				}
 			})
-			
-			// parsers check for notenOption.lehre === true and if student uid/matrikelnr matches
-			
-			// pruefungen check for younger pruefungen, so there are no further antritte with 
-			// previous dates from automatic imports 
-			if(mode === 'note') {
-				this.validateNotenBulk(bulk)
-				this.saveNotenBulk(bulk)
-			}
-			else if (mode === 'pruefung') {
-				this.validatePruefungBulk(bulk)
-				this.savePruefungBulk(bulk)
-			}
-			
+
+			// parsePruefung validates date + grade and resolves uid/matrikelnr;
+			// validatePruefungBulk additionally checks antritte and that no earlier-dated antritt is created
+			this.validatePruefungBulk(bulk)
+			this.savePruefungBulk(bulk)
+
+			this.$refs.modalContainerPruefungImport.hide()
+		},
+		importNoten() {
+			// classic Notenimport (legacy, config gated): "UID/Matrikelnr <TAB> Note" per row,
+			// writes the LV grade directly without creating a pruefung.
+			const rows = this.importStringNoten.split('\n')
+			const bulk = []
+
+			rows.forEach((r, i) => {
+				if(r.trim() === '') return // ignore empty/trailing lines
+				const rowParts = r.split('\t')
+				const rowNum = i + 1
+				if(rowParts.length === 2) {
+					this.parseNote(rowParts, bulk, rowNum)
+				} else {
+					this.$fhcAlert.alertWarning(this.$p.t('benotungstool/c4importRowNotNoteFormat', [rowNum]))
+				}
+			})
+
+			this.validateNotenBulk(bulk)
+			this.saveNotenBulk(bulk)
+
 			this.$refs.modalContainerNotenImport.hide()
 		},
 		selectionArraysAreEqual(arr1, arr2) {
@@ -740,7 +872,7 @@ export const Benotungstool = {
 			return {
 				height: 700,
 				virtualDom: true,
-				virtualDomBuffer: 5000,
+				renderVerticalBuffer: 1000,
 				index: 'uid',
 				layout: 'fitData',
 				placeholder: this.$capitalize(this.$p.t('global/noDataAvailable')),
@@ -774,6 +906,9 @@ export const Benotungstool = {
 					let checkbox = document.createElement("input");
 					checkbox.type = "checkbox";
 
+					// reflect the row's actual selection state so it survives re-renders (e.g. sorting/filtering)
+					checkbox.checked = cell.getRow().isSelected();
+
 					// Handle select manually
 					checkbox.addEventListener("click", (e) => {
 						e.stopPropagation();
@@ -790,6 +925,12 @@ export const Benotungstool = {
 					// create the built-in checkbox
 					let checkbox = document.createElement("input");
 					checkbox.type = "checkbox";
+
+					// reflect "all selectable rows selected" so the header box survives re-renders too
+					onRendered(() => {
+						const allowed = (cell.getTable().getRows("active") || []).filter(r => r.getData().selectable);
+						checkbox.checked = allowed.length > 0 && allowed.every(r => r.isSelected());
+					});
 
 					// Handle "select all" manually
 					checkbox.addEventListener("click", (e) => {
@@ -812,15 +953,15 @@ export const Benotungstool = {
 					handleClick: this.selectAllHandler
 				},
 				width: 50,
-				cssClass: 'sticky-col',
+				cssClass: this.stickyClass('selectCol'),
 				field: 'selectCol',
 				title: ''
 			})
-			columns.push({title: 'UID', field: 'uid', tooltip: false,  topCalc: this.sumCalcFunc, formatter: centeredTextFormatter, cssClass: 'sticky-col'})
+			columns.push({title: 'UID', field: 'uid', tooltip: false,  topCalc: this.sumCalcFunc, formatter: centeredTextFormatter, cssClass: this.stickyClass('uid')})
 			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4mail'))), field: 'email', formatter: this.mailFormatter, tooltip: false,  visible: false, variableHeight: true})
 			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4antrittCountv2'))), field: 'hoechsterAntritt', formatter: centeredTextFormatter, tooltip: false})
-			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4vorname'))), field: 'vorname', formatter: centeredTextFormatter, headerFilter: true, tooltip: false})
-			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4nachname'))), field: 'nachname', formatter: centeredTextFormatter, headerFilter: true})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4vorname'))), field: 'vorname', formatter: centeredTextFormatter, headerFilter: true, tooltip: false, cssClass: this.stickyClass('vorname')})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4nachname'))), field: 'nachname', formatter: centeredTextFormatter, headerFilter: true, cssClass: this.stickyClass('nachname')})
 			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4anwesenheitsquote'))), field: 'anwquote', formatter: this.percentFormatter})
 			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4mobility'))), field: 'mobility_zusatz', formatter: centeredTextFormatter, headerFilter: true, visible: false})
 			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE) {
@@ -1115,10 +1256,36 @@ export const Benotungstool = {
 		},
 		teilnotenFormatter(cell) {
 			const val = cell.getValue()
-			
+
 			let style = 'white-space: pre-line;'
-			
+
 			return '<div style="">'+val+'</div>'
+		},
+		pruefungAttemptRank(typ) {
+			// ranking of the attempt types so we can compare "höhere" pruefungen
+			switch(typ) {
+				case 'Termin1':   return 1
+				case 'Termin2':   return 2
+				case 'Termin3':   return 3
+				case 'kommPruef': return 4
+				default:          return 0
+			}
+		},
+		hasLaterOrHigherPruefung(student, pruefung) {
+			// a Termin2/3 grade may no longer be changed once the student already has a
+			// later-dated exam OR an exam of a higher attempt (e.g. a Termin3/kommPruef
+			// exists while looking at the Termin2). Mirrors the add-button's youngerPruefung guard.
+			if(!pruefung) return false
+			const currentRank = this.pruefungAttemptRank(pruefung.pruefungstyp_kurzbz)
+			const currentDate = (pruefung.datum ?? '').slice(0, 10)
+
+			return (student.pruefungen ?? []).some(p => {
+				if(p === pruefung) return false
+				if(p.pruefung_id != null && pruefung.pruefung_id != null && p.pruefung_id === pruefung.pruefung_id) return false
+				const laterDate = (p.datum ?? '').slice(0, 10) > currentDate
+				const higherRank = this.pruefungAttemptRank(p.pruefungstyp_kurzbz) > currentRank
+				return laterDate || higherRank
+			})
 		},
 		pruefungFormatter(cell) {
 			const data = cell.getData()
@@ -1152,8 +1319,12 @@ export const Benotungstool = {
 			rowDiv.style.alignItems = 'center';
 			rowDiv.style.height = '100%';
 			
+			let attemptLabel = ''
+			let attemptClass = ''
 			if(studentPruefung) {
 				let color = ''
+				
+				
 				switch(studentPruefung.pruefungstyp_kurzbz) {
 					case 'Termin1':
 						color = 'green'
@@ -1169,9 +1340,16 @@ export const Benotungstool = {
 						break
 				}
 
-				rowDiv.style.borderLeft = `4px solid ${color}`;
+				// rowDiv.style.borderLeft = `4px solid ${color}`;
 				rowDiv.style.marginLeft = "6px";     // small indent so text doesn't overlap
 				rowDiv.style.boxSizing = "border-box";
+
+				switch(studentPruefung.pruefungstyp_kurzbz) {
+					case 'Termin1':   attemptLabel = '1'; attemptClass = 'attempt-t1'; break
+					case 'Termin2':   attemptLabel = '2'; attemptClass = 'attempt-t2'; break
+					case 'Termin3':   attemptLabel = '3'; attemptClass = 'attempt-t3'; break
+					case 'kommPruef': attemptLabel = 'K'; attemptClass = 'attempt-k';  break
+				}
 			}
 			
 			function createCol(content, classParam) {
@@ -1195,6 +1373,9 @@ export const Benotungstool = {
 
 				const noteDefEntry = data.note ? this.notenOptions.find(n => n.note == data[field].note) : null
 
+				if(attemptClass) rowDiv.classList.add('pruefung-badge', attemptClass);
+				if(attemptLabel) rowDiv.setAttribute('data-attempt', attemptLabel);
+				
 				// Second column (note_bezeichnung)
 				rowDiv.appendChild(createCol(noteDefEntry.bezeichnung || '', 'col-auto d-flex justify-content-center align-items-center'));
 				
@@ -1205,10 +1386,18 @@ export const Benotungstool = {
 				} 
 				
 				if(data[field]?.pruefungstyp_kurzbz !== 'Termin1') {
+					// once a later-dated or higher-attempt pruefung exists (e.g. a Termin3/kommPruef has
+					// already been entered) the GRADE is locked, but the exam DATE may still be corrected
+					// (within the neighbouring exam dates) -> keep the button enabled, lock the note in the modal
+					const noteLocked = this.hasLaterOrHigherPruefung(data, data[field])
+
 					// Third column (button)
 					const button = document.createElement('button');
 					button.className = 'btn btn-outline-secondary';
 					button.textContent = this.$capitalize(this.$p.t('benotungstool/changePruefungButtonText'));
+					if(noteLocked) {
+						button.title = this.$capitalize(this.$p.t('benotungstool/pruefungNoteLockedHint'))
+					}
 					button.addEventListener('click', () => {
 						this.openPruefungModal(data, data[field], field);
 					});
@@ -1237,25 +1426,60 @@ export const Benotungstool = {
 				return ''
 			}
 		},
+		parseISODate(iso) {
+			const parts = (iso ?? '').slice(0, 10).split('-')
+			if(parts.length !== 3) return null
+			return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]))
+		},
+		addDays(date, days) {
+			const d = new Date(date)
+			d.setDate(d.getDate() + days)
+			return d
+		},
+		getPruefungDateBounds(student, pruefung, fallbackDate) {
+			// the exam date must stay strictly between the dates of the chronologically adjacent
+			// pruefungen so the attempt order is preserved. Returns inclusive datepicker bounds.
+			const refDate = (pruefung?.datum ?? fallbackDate ?? '').slice(0, 10)
+			let lower = null, upper = null;
+			(student.pruefungen ?? []).forEach(p => {
+				if(pruefung && p.pruefung_id != null && pruefung.pruefung_id != null && p.pruefung_id === pruefung.pruefung_id) return
+				const d = (p.datum ?? '').slice(0, 10)
+				if(!d) return
+				if(d < refDate) { if(lower === null || d > lower) lower = d }
+				else if(d > refDate) { if(upper === null || d < upper) upper = d }
+			})
+			return {
+				min: lower ? this.addDays(this.parseISODate(lower), 1) : null,
+				max: upper ? this.addDays(this.parseISODate(upper), -1) : null
+			}
+		},
 		openPruefungModal(student, pruefung = null, field) {
 			this.pruefungStudent = student
 			this.pruefung = pruefung
 			const dateStr = this.pruefung?.datum ?? field
-		
+
 			const pruefungDateParts = dateStr.split('-')
-			
+
 			const newDate = new Date(Number(pruefungDateParts[0]), Number(pruefungDateParts[1]) - 1, Number(pruefungDateParts[2]))
 			this.selectedPruefungDate = newDate
-			
-			
+
+			// grade is locked once a later/higher pruefung exists; only the date may be corrected
+			this.pruefungNoteLocked = !!(pruefung && this.hasLaterOrHigherPruefung(student, pruefung))
+
+			// constrain the date to stay between the neighbouring exam dates
+			const bounds = this.getPruefungDateBounds(student, pruefung, field)
+			this.pruefungDateMin = bounds.min
+			this.pruefungDateMax = bounds.max
+
+
 			if(this.pruefung?.note) {
 				this.selectedPruefungNote = this.notenOptions.find(n => n.note == this.pruefung.note)
 			} else {
 				this.selectedPruefungNote = null
 			}
-			
+
 			this.selectedPruefungPunkte = this.pruefung?.punkte ?? null
-			
+
 			this.$refs.modalContainerPruefung.show()
 		},
 		pruefungTitleFormatter(cell) {
@@ -1326,7 +1550,8 @@ export const Benotungstool = {
 			this.studenten = data[0] ?? []
 			this.studenten.forEach(s => {
 				s.pruefungen = []
-				s.infoString = `${s.vorname} ${s.nachname}`// (${s.semester}${s.verband}${s.gruppe}) Mat.: ${s.matrikelnr}`// used for multiselect
+				// fallback label; the full label incl. Antritte is set once hoechsterAntritt is known (below)
+				s.infoString = `${s.uid} – ${s.nachname} ${s.vorname}`// used for multiselect (uid first); full label incl. Antritte set below
 			})
 			this.pruefungen = data[1] ?? []
 			this.domain = data[2]
@@ -1384,6 +1609,9 @@ export const Benotungstool = {
 				})
 
 				s.hoechsterAntritt = this.getAntrittCountStudent(s)
+				// multiselect label, uid first: "uid – Nachname Vorname – Antritte: n"
+				// (order in the dropdown mirrors the table, see getStudentenOptions)
+				s.infoString = `${s.uid} – ${s.nachname} ${s.vorname} – ${this.$capitalize(this.$p.t('benotungstool/c4antrittCountv2'))}: ${s.hoechsterAntritt}`
 				s.email = this.buildMailToLink(s)
 				s.lv_note = this.teilnoten[s.uid].note_lv
 				s.freigabedatum = this.parseDate(this.teilnoten[s.uid]['freigabedatum'])
@@ -1396,7 +1624,8 @@ export const Benotungstool = {
 				s.teilnote = ''
 				s.mobility_zusatz = this.teilnoten[s.uid].mobility_zusatz
 				grades.forEach(g => {
-					const notenOption = this.notenOptions.find(n=>n.note == g.grade)
+					// some moodle noten are numeric, some are strings like "Sehr Gut", "Bestanden" etc...
+					const notenOption = this.notenOptions.find(n=>n.note == g.grade || n.bezeichnung == g.grade)
 					if(notenOption.positiv) s.teilnote += ('<span>'+g.text +'</span>'+ '<br/>')
 					else s.teilnote += ('<span style="color: red;">'+g.text +'</span>'+ '<br/>')
 				})
@@ -1503,19 +1732,33 @@ export const Benotungstool = {
 			}
 
 			const colsFinal = colsUsed ?? cols
-			this.loading = false
-			
+
 			this.$refs.notenTable.tabulator.setColumns(colsFinal)
 			this.$refs.notenTable.tabulator.setData(this.studenten);
 			this.$refs.notenTable.tabulator.redraw(true);
+
+			// reflect the sticky-column selection on the freshly (re)built columns
+			this.applyStickyColumnState()
+
+			// refresh the "neue Prüfung" dropdown options for the freshly loaded data
+			this.tableVersion++
+
+			// keep the loading overlay up until the browser has actually painted the rebuilt table
+			// (the caller, loadNoten, awaits setupData before clearing `loading`)
+			await new Promise(requestAnimationFrame)
 		},
 		loadNoten(lv_id, sem_kurzbz) {
 			if (!lv_id || !sem_kurzbz) return
 			this.loading = true
 			this.$api.call(ApiNoten.getStudentenNoten(lv_id, sem_kurzbz))
-				.then(res => {
-					if(res?.data) this.setupData(res.data)
-					if(res?.meta?.getExternalGradesError) this.$fhcAlert.alertError(res.meta.getExternalGradesError)
+				.then(async res => {
+					if(res?.data) await this.setupData(res.data)
+					else {
+						this.$fhcAlert.alertError('no data found')
+						this.$refs.notenTable.tabulator.setData([]);
+						this.$refs.notenTable.tabulator.redraw(true);
+					}
+					if(res?.meta?.getExternalGradesError) this.$fhcAlert.alertError(this.$p.t('benotungstool/c4moodleTeilnotenError', [res.meta.getExternalGradesError]))
 				}).finally(()=> {
 					this.loading = false
 			})
@@ -1582,7 +1825,7 @@ export const Benotungstool = {
 			LehreinheitenModule.bindParams(Vue.ref(Vue.computed(() => this.LeDropdownParams)));
 			
 			// fetch noten dropdown
-			this.$api.call(ApiNoten.getNoten()).then(async res => {
+			await this.$api.call(ApiNoten.getNoten()).then(async res => {
 				this.notenOptions = res.data
 				this.notenOptionsLehre = res.data.filter(n => n.lehre === true)
 				
@@ -1634,7 +1877,7 @@ export const Benotungstool = {
 				if (lvId) {
 					this.loadNoten(lvId, sem)
 				} else if (this.$refs.notenTable?.tabulator) {
-					this.$refs.notenTable.tabulator.setData([]) // no matching LV -> clear
+					this.$refs.notenTable.tabulator.setData([])
 				}
 			}).finally(() => this.loading = false)
 		},
@@ -1664,18 +1907,30 @@ export const Benotungstool = {
 			}
 		},
 		savePruefungEingabe() {
+			// keep the date within the neighbouring exam dates (a typed value can bypass the picker bounds)
+			if((this.pruefungDateMin && this.selectedPruefungDate < this.pruefungDateMin) ||
+				(this.pruefungDateMax && this.selectedPruefungDate > this.pruefungDateMax)) {
+				this.$fhcAlert.alertWarning(this.$capitalize(this.$p.t('benotungstool/pruefungDatumOutOfRangeHint')))
+				return
+			}
+
 			const year = this.selectedPruefungDate.getFullYear();
 			const month = String(this.selectedPruefungDate.getMonth() + 1).padStart(2, '0'); // Months are 0-based
 			const day = String(this.selectedPruefungDate.getDate()).padStart(2, '0');
 			const dateStr = `${year}-${month}-${day}`;
-			
+
 			// first pruefung is always "Termin2" since normal note counts as Termin1
 			// const pOffset = this.pruefung === null && this.pruefungStudent.pruefungen.length === 0 ? 2 : 1
 
 			const typ = this.pruefung ? this.pruefung.pruefungstyp_kurzbz : this.getPruefungstypForStudentByAntritt(this.pruefungStudent)
-			const note = this.selectedPruefungNote?.note ?? 9 // noch nicht eingetragen
-			const punkte = this.selectedPruefungPunkte ?? 0
-			
+			// when the grade is locked (later/higher pruefung exists) keep the existing note untouched
+			const note = this.pruefungNoteLocked && this.pruefung
+				? this.pruefung.note
+				: (this.selectedPruefungNote?.note ?? 9) // noch nicht eingetragen
+			const punkte = this.pruefungNoteLocked && this.pruefung
+				? (this.pruefung.punkte ?? 0)
+				: (this.selectedPruefungPunkte ?? 0)
+
 			this.loading = true
 			this.$api.call(ApiNoten.saveStudentPruefung(
 				this.pruefungStudent.uid,
@@ -1685,7 +1940,8 @@ export const Benotungstool = {
 				this.lv_id,
 				this.pruefungStudent.lehreinheit_id,
 				this.sem_kurzbz,
-				typ
+				typ,
+				this.pruefung?.pruefung_id ?? null // null = adding a new pruefung, otherwise edit of this record
 			)).then(res => {
 				if(res.meta.status === 'success') { //'Prüfung für Student ' + this.pruefungStudent.uid + ' bearbeitet oder angelegt'
 					this.$fhcAlert.alertDefault(
@@ -1873,11 +2129,13 @@ export const Benotungstool = {
 					return !(kP || student.hoechsterAntritt >= vueThis.maxAntrittCount)
 				},
 				set() {
-					// empty setter so tabulator doesnt scream	
+					// empty setter so tabulator doesnt scream
 				},
 				enumerable: true,
 				configurable: true
 			})
+			// a student's selectability may have changed -> refresh the "neue Prüfung" dropdown options
+			this.tableVersion++
 		},
 		saveNoteneingabe() {
 			this.loading = true
@@ -1912,6 +2170,9 @@ export const Benotungstool = {
 		},
 		openNewPruefungsdatumModal() {
 			this.$refs.modalContainerNeuesPruefungsdatum.show()
+		},
+		openPruefungImportModal() {
+			this.$refs.modalContainerPruefungImport.show()
 		},
 		openNotenImportModal() {
 			this.$refs.modalContainerNotenImport.show()
@@ -2033,6 +2294,7 @@ export const Benotungstool = {
 			for(let i = 0; i < pLen; i++) {
 				const p = student.pruefungen[i]
 
+				// TODO: filter for limit here but in a perfect world they should never be able to exceed that anyway
 				const isDefinedAsAntrittsloseNote = this.config.NOTEN_OHNE_ANTRITT.find(n_pk => n_pk == p.note)
 				if(!isDefinedAsAntrittsloseNote) pruefungsAntrittCount++
 			}
@@ -2074,11 +2336,18 @@ export const Benotungstool = {
 			});
 		},
 		selectedLehreinheit(newVal) {
-			if(!this.$refs.notenTable) return
-			this.$refs.notenTable.tabulator.getFilters()
-				.filter(f => f.field === 'lehreinheit_id')
-				.forEach(() => table.removeFilter("lehreinheit_id", "=", undefined))
-			if(newVal) this.$refs.notenTable.tabulator.setFilter("lehreinheit_id", "=", newVal.lehreinheit_id);
+			const table = this.$refs.notenTable?.tabulator
+			if (!table) return
+
+			const others = table.getFilters().filter(f => f.field !== 'lehreinheit_id')
+
+			table.clearFilter()
+
+			const next = newVal
+				? [...others, { field: 'lehreinheit_id', type: '=', value: newVal.lehreinheit_id }]
+				: others
+
+			if (next.length) table.setFilter(next)
 		},
 		selectedLehrveranstaltung(newVal, oldVal) {
 			if (this.selectedLehreinheit) {
@@ -2093,6 +2362,39 @@ export const Benotungstool = {
 			} else if(this.$refs.notenTable?.tabulator && newVal == 0) {
 				const kommPruefCol = this.$refs.notenTable?.tabulator.getColumn("kommPruef")
 				kommPruefCol.hide()
+			}
+		},
+		selectedPruefungNote(newVal, oldVal) {
+			if (!newVal || !this.pruefungStudent) return
+
+			const limitMap = this.config?.NOTEN_OCCURANCE_LIMIT_MAP
+			if (!limitMap) return
+			console.log(limitMap)
+			
+			const note = newVal.note
+			const limit = limitMap[note]
+			if (limit == null) return
+
+			// all fixed antritte: Termin1/2/3 sit in pruefungen, kommPruef is separate
+			const allPruefungen = [...this.pruefungStudent.pruefungen]
+			if (this.pruefungStudent.kommPruef) allPruefungen.push(this.pruefungStudent.kommPruef)
+
+			// count existing occurrences of this note, excluding the pruefung being edited
+			// (its note is about to be replaced by this very selection)
+			const existingCount = allPruefungen.reduce((acc, p) => {
+				if (this.pruefung && p.pruefung_id === this.pruefung.pruefung_id) return acc
+				if (p.note == note) acc++
+				return acc
+			}, 0)
+
+			// this selection adds one more occurrence -> would it cross the limit?
+			if (existingCount + 1 > limit) {
+				// TODO: phrase
+				this.$fhcAlert.alertWarning(
+					'Note "' + newVal.bezeichnung + '" darf bei ' + this.pruefungStudent.uid +
+					' maximal ' + limit + ' mal vergeben werden. Auswahl wurde zurückgesetzt.'
+				)
+				this.selectedPruefungNote = oldVal // revert to last valid choice
 			}
 		}
 	},
@@ -2133,7 +2435,20 @@ export const Benotungstool = {
 			}
 		},	
 		getStudentenOptions() {
-			return this.studenten ? this.studenten.filter(s => s.selectable) : []
+			// the "neue Prüfung" multiselect mirrors the table: same row order (current sort + filter)
+			// and the same selectable set. tableVersion is bumped on sort/filter/data changes so this
+			// recomputes whenever the table order changes.
+			const _ = this.tableVersion // reactive dependency
+			const table = this.$refs.notenTable?.tabulator
+
+			if(!table) {
+				return this.studenten ? this.studenten.filter(s => s.selectable) : []
+			}
+
+			// getRows("active") returns the rows in their current display order (after sort + filter)
+			return table.getRows("active")
+				.map(r => r.getData())
+				.filter(s => s.selectable)
 		},
 		getKommPruefCount(){
 			let counter = 0
@@ -2168,8 +2483,20 @@ export const Benotungstool = {
 		getNotenfreigabeHinweistext() {
 			return this.$capitalize(this.$p.t('benotungstool/notenfreigabeHinweistextv4'))
 		},
+		getPruefungimportHinweistext() {
+			return this.$capitalize(this.$p.t('benotungstool/notenimportHinweistextv6'))
+		},
 		getNotenimportHinweistext() {
 			return this.$capitalize(this.$p.t('benotungstool/notenimportHinweistextv5'))
+		},
+		freezableColumnOptions() {
+			// the identity columns the user may pin to the left (matches freezableColumnFields)
+			return [
+				{ field: 'selectCol', label: this.$capitalize(this.$p.t('benotungstool/c4selection')) },
+				{ field: 'uid',       label: 'UID' },
+				{ field: 'vorname',   label: this.$capitalize(this.$p.t('benotungstool/c4vorname')) },
+				{ field: 'nachname',  label: this.$capitalize(this.$p.t('benotungstool/c4nachname')) }
+			]
 		}
 	},
 	created() {
@@ -2179,6 +2506,31 @@ export const Benotungstool = {
 		this.setupMounted()
 	},
 	template: `
+		<bs-modal ref="modalContainerPruefungImport" class="bootstrap-prompt" dialogClass="modal-lg" bodyClass="px-4 py-4">
+			<template v-slot:title>{{$capitalize($p.t('benotungstool/c4pruefungImportieren'))}}</template>
+			<template v-slot:default>
+				<div class="row justify-content-center">
+					<div class="col-12" v-html="getPruefungimportHinweistext"></div>
+				</div>
+				<div class="row mt-3 justify-content-center">
+					<div class="col-12">
+						<Textarea v-model="importString" rows="5" class="w-100" :placeholder="$p.t('benotungstool/c4importPlaceholder')"></Textarea>
+					</div>
+				</div>
+				<div class="row mt-3 justify-content-center">
+					<div class="col-12">
+						<NotenlisteLinks
+							:lehrveranstaltung="selectedLehrveranstaltung"
+							:sem_kurzbz="selectedSemester?.studiensemester_kurzbz"
+							:selected-lehreinheit="selectedLehreinheit" />
+					</div>
+				</div>
+			</template>
+			<template v-slot:footer>
+				<button type="button" class="btn btn-primary" @click="importPruefungen">{{ $capitalize($p.t('benotungstool/c4import')) }}</button>
+			</template>
+		</bs-modal>
+
 		<bs-modal ref="modalContainerNotenImport" class="bootstrap-prompt" dialogClass="modal-lg" bodyClass="px-4 py-4">
 			<template v-slot:title>{{$capitalize($p.t('benotungstool/c4notenImportieren'))}}</template>
 			<template v-slot:default>
@@ -2187,7 +2539,15 @@ export const Benotungstool = {
 				</div>
 				<div class="row mt-3 justify-content-center">
 					<div class="col-12">
-						<Textarea v-model="importString" rows="5" class="w-100"></Textarea>
+						<Textarea v-model="importStringNoten" rows="5" class="w-100" :placeholder="$p.t('benotungstool/c4importNotePlaceholder')"></Textarea>
+					</div>
+				</div>
+				<div class="row mt-3 justify-content-center">
+					<div class="col-12">
+						<NotenlisteLinks
+							:lehrveranstaltung="selectedLehrveranstaltung"
+							:sem_kurzbz="selectedSemester?.studiensemester_kurzbz"
+							:selected-lehreinheit="selectedLehreinheit" />
 					</div>
 				</div>
 			</template>
@@ -2208,6 +2568,7 @@ export const Benotungstool = {
 							v-model="selectedPruefungDate"
 							:clearable="false"
 							format="dd.MM.yyyy"
+							placeholder="TT.MM.JJJJ"
 							:enableTimePicker="false"
 							:text-input="true"
 							:auto-apply="true">
@@ -2262,10 +2623,16 @@ export const Benotungstool = {
 							:clearable="false"
 							:enableTimePicker="false"
 							format="dd.MM.yyyy"
+							placeholder="TT.MM.JJJJ"
+							:min-date="pruefungDateMin"
+							:max-date="pruefungDateMax"
 							:text-input="true"
 							:auto-apply="true">
 						</datepicker>
 					</div>
+				</div>
+				<div v-if="pruefungNoteLocked" class="row mt-2 justify-content-center">
+					<div class="col-9 text-center text-muted small">{{$capitalize($p.t('benotungstool/pruefungNoteLockedHint'))}}</div>
 				</div>
 				<div v-if="config?.CIS_GESAMTNOTE_PUNKTE == true" class="row mt-3 align-items-center justify-content-center">
 					<div class="col-3 text-center">{{$capitalize($p.t('benotungstool/c4punkte'))}}:</div>
@@ -2273,6 +2640,7 @@ export const Benotungstool = {
 						<InputNumber
 							v-model="selectedPruefungPunkte"
 							@input="debouncedFetchPunkteForPruefung"
+							:disabled="pruefungNoteLocked"
 							inputId="selectedPruefungInput" :min="0" :max="100000"
 							class="w-100">
 						</InputNumber>
@@ -2282,7 +2650,7 @@ export const Benotungstool = {
 					<div class="col-3 text-center">{{$capitalize($p.t('lehre/note'))}}:</div>
 					<div class="col-6">
 						<Dropdown :placeholder="$capitalize($p.t('lehre/note'))"
-							:disabled="config?.CIS_GESAMTNOTE_PUNKTE == true"
+							:disabled="config?.CIS_GESAMTNOTE_PUNKTE == true || pruefungNoteLocked"
 							:style="{'width': '100%'}" :optionLabel="getOptionLabelNotePruefung"
 							v-model="selectedPruefungNote" :options="notenOptionsLehre" showClear>
 							<template #optionsgroup="slotProps">
@@ -2316,10 +2684,10 @@ export const Benotungstool = {
 
 		<FhcOverlay :active="loading"></FhcOverlay>
 
-		<div class="row align-items-center">
+		<div class="row">
 			<div class="col-auto me-auto">
 				<h2>{{$capitalize($p.t('benotungstool/benotungstoolTitle'))}}</h2>
-				<h4>{{ selectedLehrveranstaltung?.lv_bezeichnung }}</h4>
+				<h5>{{ selectedLehrveranstaltung?.lv_bezeichnung }}</h5>
 			</div>
 		
 			<div class="col-auto d-none d-xxl-flex">
@@ -2339,7 +2707,7 @@ export const Benotungstool = {
 				<label class="col-form-label">{{$capitalize($p.t('lehre/lehreinheit'))}}:</label>
 			</div>
 			<div class="col-2">
-				<Dropdown @change="leChanged" :style="{'width': '100%'}" v-bind="LehreinheitenModule"
+				<Dropdown :style="{'width': '100%'}" v-bind="LehreinheitenModule"
 					v-model="selectedLehreinheit" showClear appendTo="self">
 					<template #option="slotProps">
 						<div>
@@ -2365,7 +2733,6 @@ export const Benotungstool = {
 				</Dropdown>
 			</div>
 		</div>
-		<hr>
 		
 		<div id="notentable" class="row" :style="'overflow-x: auto;'">
 			<core-filter-cmpt
@@ -2382,14 +2749,27 @@ export const Benotungstool = {
 				:sideMenu="false"
 			>
 				 <template #actions>
-					
+
+					<Multiselect
+						v-model="stickyColumnSelection"
+						:options="freezableColumnOptions"
+						optionLabel="label" optionValue="field"
+						:placeholder="$capitalize($p.t('benotungstool/freezeColumnsToggle'))"
+						:maxSelectedLabels="0"
+						:selectedItemsLabel="$capitalize($p.t('benotungstool/freezeColumnsLabel'))"
+						showToggleAll
+						@change="onStickySelectionChange"
+						class="ml-2"
+						style="min-width: 12rem" />
+
 					<button @click="openNewPruefungsdatumModal" role="button" :class="getNewBtnClass">
 						{{$capitalize($p.t('benotungstool/c4addNewPruefung'))}} <i class="fa fa-plus"></i>
 					</button>
 					
-					<Divider layout="vertical" style="transform: translateY(12px)"/>
-					
-					<button @click="openNotenImportModal" role="button" :class="getNotenImportBtnClass">
+					<button v-if="config?.CIS_GESAMTNOTE_PRUEFUNGSIMPORT" @click="openPruefungImportModal" role="button" :class="getNotenImportBtnClass">
+						{{$capitalize($p.t('benotungstool/c4pruefungImportieren'))}} <i class="fa fa-file-import"></i>
+					</button>
+					<button v-if="config?.CIS_GESAMTNOTE_NOTENIMPORT" @click="openNotenImportModal" role="button" :class="getNotenImportBtnClass">
 						{{$capitalize($p.t('benotungstool/c4notenImportieren'))}} <i class="fa fa-file-import"></i>
 					</button>
 					<button @click="openSaveModal" role="button" :class="getSaveBtnClass">

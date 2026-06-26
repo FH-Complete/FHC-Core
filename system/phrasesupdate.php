@@ -58381,6 +58381,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'benotungstool',
+		'phrase' => 'c4pruefungImportieren',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfungsimport',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Import Exams',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
 		'phrase' => 'c4import',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -59161,6 +59181,226 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'benotungstool',
+		'phrase' => 'pruefungNoteLocked',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Note für Studierenden {0} kann nicht mehr geändert werden, da bereits eine spätere Prüfung oder eine Prüfung mit höherem Antritt existiert. Das Prüfungsdatum kann weiterhin angepasst werden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The grade for student {0} can no longer be changed because a later exam or an exam of a higher attempt already exists. The exam date can still be adjusted.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'pruefungNoteLockedHint',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Note gesperrt (spätere Prüfung bzw. höherer Antritt vorhanden) – nur das Prüfungsdatum kann angepasst werden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Grade locked (a later exam or higher attempt exists) – only the exam date can be adjusted.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'pruefungDatumOutOfRange',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Prüfungsdatum für Studierenden {0} muss zwischen dem vorherigen und dem nachfolgenden Prüfungstermin liegen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The exam date for student {0} must be between the previous and the following exam date.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'pruefungDatumOutOfRangeHint',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Prüfungsdatum muss zwischen dem vorherigen und dem nachfolgenden Prüfungstermin liegen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The exam date must be between the previous and the following exam date.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'freezeColumnsToggle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Spalten fixieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Freeze columns',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'freezeColumnsLabel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{0} Spalten fixiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{0} columns frozen',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4selection',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Auswahl',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Selection',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4importRowNotDateFormat',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zeile {0} wurde übersprungen: erwartet wird Personenkennzeichen, Datum (TT.MM.JJJJ) und Note (Tab-getrennt).',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Row {0} was skipped: expected Person ID, date (DD.MM.YYYY) and grade (tab separated).',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4importPlaceholder',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Personenkennzeichen ⇥ TT.MM.JJJJ ⇥ Note',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Person ID ⇥ DD.MM.YYYY ⇥ Grade',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4importNotePlaceholder',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Personenkennzeichen ⇥ Note',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Person ID ⇥ Grade',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4importRowNotNoteFormat',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zeile {0} wurde übersprungen: erwartet wird Personenkennzeichen und Note (Tab-getrennt).',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Row {0} was skipped: expected Person ID and grade (tab separated).',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
 		'phrase' => 'notenfreigabe',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -59213,22 +59453,52 @@ I have been informed that I am under no obligation to consent to the transmissio
 			array(
 				'sprache' => 'German',
 				'text' => '• Laden Sie sich die Notenliste im Excel-Format unter CIS → Lehrveranstaltungen → Anwesenheits- und Notenlisten → Notenliste herunter.<br>
-					• Tragen Sie die Noten in das Dokument und speichern Sie dieses.<br>
-					• Markieren Sie im Excel-Dokument die Inhalte der Spalten Personenkennzeichen und Note für jene Studierende, deren Noten Sie importieren möchten (ohne Überschrift !)<br>
+					• Tragen Sie die Noten in das Dokument ein.<br>
+					• Markieren Sie die Inhalte der Spalten Personenkennzeichen und Note für jene Studierende, deren Noten Sie importieren möchten (ohne Überschrift !)<br>
 					• Kopieren Sie die markierten Inhalte mittels strg + c oder Bearbeiten → Kopieren in die Zwischenablage<br>
 					• Einfügen der Inhalte mittels strg + v oder Bearbeiten → Einfügen<br>
-					• Mit einem Klick auf Import werden die Noten übernommen.<br>',
+					• Mit einem Klick auf Importieren werden die Noten übernommen.<br>',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
 				'text' => '• Download the grade list in Excel format from CIS → Courses → Attendance and Grade Lists → Grade List.<br>
-					• Enter the grades into the document and save it.<br>
-					• In the Excel document, select the contents of the Person ID and Grade columns for the students whose grades you want to import (without headings!).<br>
+					• Enter the grades into the document.<br>
+					• Select the contents of the Person ID and Grade columns for the students whose grades you want to import (without headings!).<br>
 					• Copy the selected content to the clipboard using Ctrl + c or Edit → Copy.<br>
 					• Paste the content using Ctrl + v or Edit → Paste.<br>
 					• Click Import to import the grades.<br>',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'notenimportHinweistextv6',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '• Laden Sie sich die Notenliste im Excel-Format unter CIS → Lehrveranstaltungen → Anwesenheits- und Notenlisten → Notenliste herunter.<br>
+					• Tragen Sie pro Studierendem das Prüfungsdatum und die Note ein.<br>
+					• Jeder Import legt eine datierte Prüfung an (Prüfungsimport) – das Datum ist daher verpflichtend.<br>
+					• Format pro Zeile (Tab-getrennt, ohne Überschrift): Personenkennzeichen &nbsp;⇥&nbsp; Datum (TT.MM.JJJJ) &nbsp;⇥&nbsp; Note<br>
+					• Markieren Sie die entsprechenden Spalten, kopieren Sie sie (Strg + c) und fügen Sie sie oben ein (Strg + v).<br>
+					• Mit einem Klick auf Importieren werden die Prüfungen übernommen.<br>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '• Download the grade list in Excel format from CIS → Courses → Attendance and Grade Lists → Grade List.<br>
+					• For each student, enter the exam date and the grade.<br>
+					• Every import creates a dated exam (exam import) – the date is therefore mandatory.<br>
+					• Format per line (tab separated, without headings): Person ID &nbsp;⇥&nbsp; date (DD.MM.YYYY) &nbsp;⇥&nbsp; grade<br>
+					• Select the relevant columns, copy them (Ctrl + c) and paste them above (Ctrl + v).<br>
+					• Click Import to import the exams.<br>',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -59389,6 +59659,86 @@ I have been informed that I am under no obligation to consent to the transmissio
 			array(
 				'sprache' => 'English',
 				'text' => 'Invalid date found for ID {0} in row no. {1}. Please use the format "DD.MM.YYYY". The row has been skipped.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4moodleTeilnotenError',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Moodle Addon Teilnotenimport fehlgeschlagen: {0}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Moodle Addon partial grades import failed: {0}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4notenlisten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Notenlisten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Grading Sheets',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4gesamtliste',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gesamtliste',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Full Course Grading Sheet',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4keineStudentenGefunden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Studenten gefunden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No students found.',
 				'description' => '',
 				'insertvon' => 'system'
 			)

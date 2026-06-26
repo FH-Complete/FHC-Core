@@ -85,6 +85,8 @@ class Noten extends FHCAPI_Controller
 
 	public function getCisConfig() {
 		$NOTEN_OHNE_ANTRITT = $this->config->item('NOTEN_OHNE_ANTRITT');
+		$NOTEN_OCCURANCE_LIMIT_MAP = $this->config->item('NOTEN_OCCURANCE_LIMIT_MAP');
+		$NOTE_ENTSCHULDIGT = $this->config->item('NOTE_ENTSCHULDIGT');
 		
 		$this->terminateWithSuccess(
 			array(
@@ -117,11 +119,21 @@ class Noten extends FHCAPI_Controller
 				
 				// toggles availability of the teilnoten column... existas but do we really need this?
 				'CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE' => CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE,
+
+				// availability of the two import flows (application/config/noten.php); when both are
+				// true they are shown separately
+				'CIS_GESAMTNOTE_PRUEFUNGSIMPORT' => $this->config->item('CIS_GESAMTNOTE_PRUEFUNGSIMPORT'),
+				'CIS_GESAMTNOTE_NOTENIMPORT' => $this->config->item('CIS_GESAMTNOTE_NOTENIMPORT'),
 				
 				// send a mail when approving grades
 				'CIS_GESAMTNOTE_FREIGABEMAIL_NOTE' => CIS_GESAMTNOTE_FREIGABEMAIL_NOTE,
 				
-				'NOTEN_OHNE_ANTRITT' => $NOTEN_OHNE_ANTRITT
+				'NOTEN_OHNE_ANTRITT' => $NOTEN_OHNE_ANTRITT,
+
+				'NOTEN_OCCURANCE_LIMIT_MAP' => $NOTEN_OCCURANCE_LIMIT_MAP,
+
+				// pk of the 'entschuldigt' note; used to preserve excused Termine on new pruefung creation
+				'NOTE_ENTSCHULDIGT' => $NOTE_ENTSCHULDIGT
 			)
 		);
 	}
@@ -180,7 +192,7 @@ class Noten extends FHCAPI_Controller
 			$grades[$uid]['grades'] = [];
 
 			$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lv_id, $uid, $sem_kurzbz);
-			$this->addMeta($uid.'getLvGesamtNoten', $result);
+//			$this->addMeta($uid.'getLvGesamtNoten', $result);
 			if(!isError($result) && hasData($result)) {
 				$lvgesamtnote = getData($result)[0];
 				$grades[$uid]['note_lv'] = $lvgesamtnote->note;
@@ -209,6 +221,7 @@ class Noten extends FHCAPI_Controller
 				]
 			);
 		} catch (Throwable $t) {
+//			$this->addMeta('throwable', $t->getTrace());
 			$this->addMeta('getExternalGradesError', $t->getMessage());
 		}
 		
@@ -369,7 +382,7 @@ class Noten extends FHCAPI_Controller
 		foreach($result->noten as $note) {
 
 			$resultLVGes = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lv_id, $note->uid, $sem_kurzbz);
-			$this->addMeta($note->uid.'$resultLVGes', $resultLVGes);
+//			$this->addMeta($note->uid.'$resultLVGes', $resultLVGes);
 			if (!isError($resultLVGes) && hasData($resultLVGes))
 			{
 				$lvgesamtnote = getData($resultLVGes)[0];
@@ -521,10 +534,12 @@ class Noten extends FHCAPI_Controller
 		$datum = $result->datum;
 		$lva_id = $result->lva_id;
 		$lehreinheit_id = $result->lehreinheit_id;
-		
+		// pruefung_id identifies the record being edited; null when a new pruefung is added
+		$pruefung_id = property_exists($result, 'pruefung_id') ? $result->pruefung_id : null;
+
 		$stsem = $result->sem_kurzbz;
 		$typ = $result->typ;
-		
+
 		$jetzt = date("Y-m-d H:i:s");
 
 		if(CIS_GESAMTNOTE_PUNKTE && isset($punkte) && $punkte >= 0) {
@@ -549,6 +564,14 @@ class Noten extends FHCAPI_Controller
 			$note = getData($result)[0]->note;
 		}
 
+		// validate the edit before any write: the date must stay between the neighbouring exams and,
+		// once a later/higher pruefung exists, the grade may no longer be changed (only the date).
+		// only applies when editing an existing record ($pruefung_id set)
+		$editError = $this->validatePruefungEdit($student_uid, $lva_id, $stsem, $note, $datum, $pruefung_id);
+		if($editError !== null) {
+			$this->terminateWithError($editError, 'general');
+		}
+
 
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
@@ -566,6 +589,10 @@ class Noten extends FHCAPI_Controller
 		
 
 		$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lva_id, $student_uid, $stsem);
+
+		$origLvNote = null;
+		$origLvPunkte = null;
+		$origBenotungsdatum = null;
 		if(!isError($result) && !hasData($result)) {
 			
 			$id = $this->LvgesamtnoteModel->insert(
@@ -601,6 +628,11 @@ class Noten extends FHCAPI_Controller
 		{
 			$lvgesamtnote = getData($result)[0];
 
+			$orig = getData($result)[0];
+			$origLvNote = $lvgesamtnote->note;
+			$origLvPunkte = $lvgesamtnote->punkte;
+			$origBenotungsdatum = $lvgesamtnote->benotungsdatum;
+			
 			$id = $this->LvgesamtnoteModel->update(
 				[$lvgesamtnote->student_uid, $lvgesamtnote->studiensemester_kurzbz, $lvgesamtnote->lehrveranstaltung_id],
 				array(
@@ -624,7 +656,7 @@ class Noten extends FHCAPI_Controller
 		}
 		
 		// save pruefung after updating lvnote, since pruefungspunkte get loaded by lv punkte 
-		$pruefungenChanged = $this->savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum);
+		$pruefungenChanged = $this->savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum, $origLvNote, $origLvPunkte, $origBenotungsdatum);
 
 		$savedPruefung = $pruefungenChanged['savedPruefung'] ?? null;
 		$extraPruefung = $pruefungenChanged['extraPruefung'] ?? null;
@@ -638,17 +670,17 @@ class Noten extends FHCAPI_Controller
 	/**
 	 * private helper method to update/insert pruefungstermine 
 	 */
-	private function savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte = '', $datum) 
+	private function savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte = '', $datum, $origLvNote = null, $origLvPunkte = null, $origBenotungsdatum = null) 
 	{
 
 		// extra check if the student has lvnote and a zeugnisnote in the relevant lva
 		$resultLV = $this->LvgesamtnoteModel->getLvGesamtNoten($lva_id, $student_uid, $stsem);
 		$lvgesamtnoteData = getData($resultLV);
-		$this->addMeta('lvgesamtnoteData', $lvgesamtnoteData);
+//		$this->addMeta('lvgesamtnoteData', $lvgesamtnoteData);
 		
 		// allocating pruefungen before lv note is forbidden
 		if($lvgesamtnoteData == null) return $this->p->t('benotungstool', 'c4keineLvNoteEingetragen');
-		
+
 		$status = [];
 		
 		// send $grades reference to moodle addon
@@ -691,7 +723,12 @@ class Noten extends FHCAPI_Controller
 				$resultLV = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lva_id, $student_uid, $stsem);
 				
 				// update Termin1 note
-				if (hasData($resultLV))
+				if ($origLvNote !== null) {
+					$pr_note = $origLvNote;
+					$pr_punkte = $origLvPunkte;
+					$benotungsdatum = $origBenotungsdatum ?? $jetzt;
+				} 
+				else if (hasData($resultLV))
 				{
 					$lvgesamtnote = getData($resultLV)[0];
 					$pr_note = $lvgesamtnote->note;
@@ -736,12 +773,20 @@ class Noten extends FHCAPI_Controller
 			
 
 
-			// Die Pruefung wird als Termin2 eingetragen
+			// Die Pruefung wird als Termin2 eingetragen.
+			// Ein bestehender "entschuldigt"-Termin2 bleibt erhalten: in diesem Fall wird die neue
+			// Pruefung als eigener Datensatz angelegt statt den entschuldigten zu ueberschreiben.
 			$result2 = $this->LePruefungModel->getPruefungenByUidTypLvStudiensemester($student_uid, "Termin2", $lva_id, $stsem);
-			// if there is a termin 2 entry already update it
+
+			$termin2 = null;
 			if(!isError($result2) && hasData($result2)) {
-				// update
-				$termin2 = getData($result2)[0];
+				foreach(getData($result2) as $t2) {
+					if(!$this->isEntschuldigtNote($t2->note)) { $termin2 = $t2; break; }
+				}
+			}
+
+			if($termin2 !== null) {
+				// update existing (non-excused) Termin2
 				$id = $this->LePruefungModel->update(
 					$termin2->pruefung_id,
 					array(
@@ -761,8 +806,8 @@ class Noten extends FHCAPI_Controller
 				$this->logLib->logInfoDB(array('termin2 updated',$res, getAuthUID(), getAuthPersonId()));
 
 
-			} else if(!isError($result2) && !hasData($result2)) {
-				// new entry termin 2
+			} else if(!isError($result2)) {
+				// no editable Termin2 (none yet, or only an entschuldigt one) -> insert new, excused stays
 
 				$id = $this->LePruefungModel->insert(
 					array(
@@ -790,15 +835,20 @@ class Noten extends FHCAPI_Controller
 
 			}
 
-		} else if($typ == "Termin3" && defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3) 
+		} else if($typ == "Termin3" && defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
 		{
-
+			// same entschuldigt-preservation handling as Termin2
 			$result3 = $this->LePruefungModel->getPruefungenByUidTypLvStudiensemester($student_uid, "Termin3", $lva_id, $stsem);
 
+			$termin3 = null;
 			if(!isError($result3) && hasData($result3)) {
-				// update
-				$termin3 = getData($result3)[0];
+				foreach(getData($result3) as $t3) {
+					if(!$this->isEntschuldigtNote($t3->note)) { $termin3 = $t3; break; }
+				}
+			}
 
+			if($termin3 !== null) {
+				// update existing (non-excused) Termin3
 				$id = $this->LePruefungModel->update(
 					$termin3->pruefung_id,
 					array(
@@ -817,8 +867,8 @@ class Noten extends FHCAPI_Controller
 
 				$this->logLib->logInfoDB(array('termin3 updated',$res, getAuthUID(), getAuthPersonId()));
 
-			} else if(!isError($result3) && !hasData($result3)) {
-				// insert new termin3
+			} else if(!isError($result3)) {
+				// no editable Termin3 (none yet, or only an entschuldigt one) -> insert new, excused stays
 
 				$id = $this->LePruefungModel->insert(
 					array(
@@ -853,6 +903,105 @@ class Noten extends FHCAPI_Controller
 	}
 
 	/**
+	 * ranking of the pruefung attempt types, used to detect whether a "höhere"
+	 * (later attempt) pruefung exists for a student
+	 */
+	private function pruefungAttemptRank($typ)
+	{
+		switch($typ) {
+			case 'Termin1':   return 1;
+			case 'Termin2':   return 2;
+			case 'Termin3':   return 3;
+			case 'kommPruef': return 4;
+			default:          return 0;
+		}
+	}
+
+	/**
+	 * whether a note is the configured 'entschuldigt' note. Such Termine are preserved as their
+	 * own dated entry instead of being overwritten when a new pruefung of the same type is created.
+	 */
+	private function isEntschuldigtNote($note)
+	{
+		$entschuldigt = $this->config->item('NOTE_ENTSCHULDIGT');
+		return $entschuldigt !== null && $note == $entschuldigt;
+	}
+
+	/**
+	 * Validates an edit to an existing Termin2/Termin3 pruefung. Returns a localized error
+	 * string if the edit is not allowed, or null if it is. Mirrors the frontend guards so a
+	 * disallowed edit cannot be forced through the API.
+	 *
+	 * Rules:
+	 *  - The new $datum must stay strictly between the dates of the chronologically adjacent
+	 *    pruefungen so the attempt order is preserved.
+	 *  - Once a later-dated or higher-attempt pruefung already exists the grade may no longer be
+	 *    changed (only the datum may be corrected within the bounds above).
+	 *
+	 * Only guards EDITS: $pruefung_id identifies the record being edited; when it is null (a new
+	 * attempt is being added) nothing is restricted here (adds are validated client-side).
+	 *
+	 * @param string $student_uid
+	 * @param int    $lva_id
+	 * @param string $stsem
+	 * @param int    $newNote      the (already resolved) note being saved
+	 * @param string $newDatum     the datum being saved (Y-m-d)
+	 * @param int    $pruefung_id  pk of the record being edited, or null for an add
+	 * @return string|null
+	 */
+	private function validatePruefungEdit($student_uid, $lva_id, $stsem, $newNote, $newDatum, $pruefung_id)
+	{
+		if($pruefung_id === null || $pruefung_id === '') return null; // add, not an edit
+
+		$result = $this->LePruefungModel->getPruefungenByUidTypLvStudiensemester($student_uid, null, $lva_id, $stsem);
+		if(isError($result) || !hasData($result)) return null;
+
+		$pruefungen = getData($result);
+
+		// the record being edited
+		$current = null;
+		foreach($pruefungen as $p) {
+			if($p->pruefung_id == $pruefung_id) { $current = $p; break; }
+		}
+		if($current === null) return null;
+
+		// only the changeable resit grades are guarded
+		if($current->pruefungstyp_kurzbz !== 'Termin2' && $current->pruefungstyp_kurzbz !== 'Termin3') return null;
+
+		$currentRank = $this->pruefungAttemptRank($current->pruefungstyp_kurzbz);
+		$currentDate = substr((string)$current->datum, 0, 10);
+		$new         = substr((string)$newDatum, 0, 10);
+
+		// chronological bounds from the immediate date-neighbours + detect later/higher pruefung
+		$lower = null; $upper = null; $hasLaterOrHigher = false;
+		foreach($pruefungen as $p) {
+			if($p->pruefung_id == $current->pruefung_id) continue;
+
+			$d = substr((string)$p->datum, 0, 10);
+			if($d !== '') {
+				if($d < $currentDate) { if($lower === null || $d > $lower) $lower = $d; }
+				elseif($d > $currentDate) { if($upper === null || $d < $upper) $upper = $d; }
+			}
+
+			if($d > $currentDate || $this->pruefungAttemptRank($p->pruefungstyp_kurzbz) > $currentRank) {
+				$hasLaterOrHigher = true;
+			}
+		}
+
+		// grade is locked once a later/higher pruefung exists
+		if($hasLaterOrHigher && $newNote != $current->note) {
+			return $this->p->t('benotungstool', 'pruefungNoteLocked', [$student_uid]);
+		}
+
+		// datum must stay strictly between the neighbouring exam dates
+		if(($lower !== null && $new <= $lower) || ($upper !== null && $new >= $upper)) {
+			return $this->p->t('benotungstool', 'pruefungDatumOutOfRange', [$student_uid]);
+		}
+
+		return null;
+	}
+
+	/**
 	 * POST METHOD
 	 * expects 'sem_kurzbz', 'lv_id', 'student_uid', 'note'
 	 * Method that sets lv_note of student in lva and semester from provided Points/Grade Selection.
@@ -874,7 +1023,7 @@ class Noten extends FHCAPI_Controller
 		
 		$result = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lv_id, $student_uid, $sem_kurzbz);
 
-		$this->addMeta('LvgesamtnoteModelresult', $result);
+//		$this->addMeta('LvgesamtnoteModelresult', $result);
 		
 		if(!isError($result) && hasData($result)) {
 			$lvgesamtnote = getData($result)[0];
@@ -950,12 +1099,12 @@ class Noten extends FHCAPI_Controller
 		{
 
 			$result = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lv_id, $note->uid, $sem_kurzbz);
-			$this->addMeta($note->uid.'$result', $result);
+//			$this->addMeta($note->uid.'$result', $result);
 			
 			if(CIS_GESAMTNOTE_PUNKTE) {
 				$resultNote = $this->NotenschluesselaufteilungModel->getNote($note->punkte, $lv_id, $sem_kurzbz);
 				$note->note = $this->getDataOrTerminateWithError($resultNote);
-				$this->addMeta($note->uid.'note', $note);
+//				$this->addMeta($note->uid.'note', $note);
 			}
 			
 			if(!isError($result) && hasData($result)) {
@@ -1074,9 +1223,9 @@ class Noten extends FHCAPI_Controller
 			
 			if(CIS_GESAMTNOTE_PUNKTE) {
 				$result = $this->NotenschluesselaufteilungModel->getNote($pruefung->punkte, $lv_id, $sem_kurzbz);
-				$this->addMeta($pruefung->uid."result", $result);
+//				$this->addMeta($pruefung->uid."result", $result);
 				$pruefung->note = $this->getDataOrTerminateWithError($result);
-				$this->addMeta($pruefung->uid."note", $pruefung->note);
+//				$this->addMeta($pruefung->uid."note", $pruefung->note);
 			}
 			
 			$student_uid = $pruefung->uid;

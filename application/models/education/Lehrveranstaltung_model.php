@@ -1350,6 +1350,7 @@ class Lehrveranstaltung_model extends DB_Model
 	public function getLvForLektorInSemester($sem_kurzbz, $uid) {
 		$qry = "SELECT DISTINCT (tbl_lehrveranstaltung.lehrveranstaltung_id),
 				UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg_kurzbz,
+				tbl_studiengang.studiengang_kz,
 				tbl_lehrveranstaltung.semester as lv_semester,
 				tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
 				(SELECT kurzbz FROM public.tbl_mitarbeiter

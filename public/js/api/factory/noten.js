@@ -49,11 +49,11 @@ export default {
 			params: { lv_id, sem_kurzbz, student_uid, note, punkte }
 		};
 	},
-	saveStudentPruefung(student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, typ){
+	saveStudentPruefung(student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, typ, pruefung_id = null){
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/Noten/saveStudentPruefung',
-			params: { student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, typ }
+			params: { student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, typ, pruefung_id }
 		};
 	},
 	createPruefungen(uids, datum, lva_id, sem_kurzbz){
