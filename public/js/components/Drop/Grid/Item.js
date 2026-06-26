@@ -1,4 +1,5 @@
 export default {
+	name:'GridItem',
 	components: {
 	},
 	inject: {
@@ -8,10 +9,16 @@ export default {
 		active: Boolean
 	},
 	emits: [
+		"mouseDown",
+		"mouseUp",
 		"startMove",
 		"startResize",
+		"dragging",
 		"endDrag",
-		"dropDrag"
+		"dropDrag",
+		"item",
+		"touchStart",
+		"touchEnd",
 	],
 	data() {
 		return {
@@ -23,6 +30,7 @@ export default {
 	},
 	methods: {
 		registerDragAction(evt) {
+			this.$emit('mouseDown', evt);
 			if (evt.target.hasAttribute('drag-action')) {
 				this.dragAction = evt.target.getAttribute('drag-action');
 			} else {
@@ -47,26 +55,34 @@ export default {
 		},
 		touchDragEnd(evt) {
 			if (!this.dragging)
-				//return evt.preventDefault();
-                                return;
+				return;
 			this.dragging = false;
-			this.$emit('dropDrag', evt);
+			this.$emit('touchEnd', evt);
 		},
-		test(evt) {
-			let dragAction = this.dragAction || evt.target.getAttribute('drag-action');
-			if (dragAction) {
-				this.dragging = true;
+		touchStart(event){
+			this.$emit('touchStart', event); 
+			this.registerDragAction(event); 
+			this.tryDragStart(event, this.item);
+		},
+		touchMove(event){
+			if(this.dragging){
+				event.preventDefault();
+				this.$emit('dragging', event);
 			}
 		}
+		
 	},
 	template: `
 	<div class="drop-grid-item"
 		@mousedown="registerDragAction"
-		@touchstart="tryDragStart($event, item)"
+		@mouseup="$emit('mouseUp', $event)"
+		@touchstart="touchStart"
 		@touchend="touchDragEnd"
 		@dragstart="tryDragStart($event, item)"
-		@dragend="$emit('endDrag', $event)"
-		:draggable="active">
+		@drag="$emit('dragging',$event)"
+		@touchmove="touchMove"
+		@dragend="$emit('endDrag', $event); dragging = false"
+		:draggable="active && !item.placeholder">
 		<slot v-bind="item"></slot>
 	</div>`
 }

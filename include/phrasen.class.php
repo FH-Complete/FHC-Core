@@ -121,7 +121,7 @@ class phrasen extends basis_db
 	 * Wobei x durch den Index+1 im Array zu ersetzten ist. zB "%2$s" um die Variable $value[1] auszugeben
 	 * naehere Infos siehe sprintf  
 	 * 
-	 * @param $key Key der Phrase
+	 * @param $key String Key der Phrase
 	 * @param $value Array mit Parametern fuer die Phrase
 	 */
 	public function t($key, $value=array())

@@ -4,6 +4,7 @@ import CoreForm from "../../../../Form/Form.js";
 import FormValidation from "../../../../Form/Validation.js";
 import FormInput from "../../../../Form/Input.js";
 
+import ApiKonto from '../../../../../api/factory/stv/konto.js';
 
 export default {
 	components: {
@@ -16,8 +17,8 @@ export default {
 		lists: {
 			from: 'lists'
 		},
-		defaultSemester: {
-			from: 'defaultSemester'
+		currentSemester: {
+			from: 'currentSemester'
 		}
 	},
 	props: {
@@ -37,7 +38,7 @@ export default {
 	data() {
 		return {
 			loading: false,
-			data: {}
+			data: {},
 		};
 	},
 	computed: {
@@ -46,7 +47,7 @@ export default {
 		},
 		activeBuchungstypen() {
 			return this.lists.buchungstypen.filter(e => e.aktiv);
-		}
+		},
 	},
 	methods: {
 		save() {
@@ -59,7 +60,7 @@ export default {
 			}, ...this.data};
 
 			this.$refs.form
-				.factory.stv.konto.checkDoubles(data)
+				.call(ApiKonto.checkDoubles(data))
 				.then(result => result.data
 					? Promise.all(
 						result.errors
@@ -68,7 +69,7 @@ export default {
 					)
 					: Promise.resolve())
 				.then(() => data)
-				.then(this.$refs.form.factory.stv.konto.insert)
+				.then(data => this.$refs.form.call(ApiKonto.insert(data)))
 				.then(result => {
 					this.$emit('saved', result.data);
 					this.loading = false;
@@ -82,13 +83,15 @@ export default {
 				});
 		},
 		open() {
+
+			this.getBuchungstypen(this.currentSemester);
 			this.data = {
 				buchungstyp_kurzbz: '',
 				betrag: '-0.00',
 				buchungsdatum: new Date(),
 				buchungstext: '',
 				mahnspanne: 30,
-				studiensemester_kurzbz: this.defaultSemester,
+				studiensemester_kurzbz: this.currentSemester,
 				credit_points: null,
 				anmerkung: ''
 			};
@@ -104,7 +107,7 @@ export default {
 			const text = typ.standardtext || '';
 			const creditpoints = typ.credit_points || '';
 
-			if (!this.data.betrag || this.data.betrag == '-0.00')
+			if (!this.data.betrag || this.data.betrag == '-0.00' || this.data.betrag !== amount)
 				this.data.betrag = amount;
 
 			if (!this.data.buchungstext)
@@ -112,7 +115,18 @@ export default {
 
 			if (this.config.showCreditpoints && (this.data.credit_points == '0.00' || this.data.credit_points === null))
 				this.data.credit_points = creditpoints;
-		}
+		},
+		getBuchungstypen(studiensemester_kurzbz)
+		{
+			this.$api
+				.call(ApiKonto.getBuchungstypen(studiensemester_kurzbz))
+				.then(result => {
+					this.lists.buchungstypen = result.data;
+					if (this.data.buchungstyp_kurzbz)
+						this.checkDefaultBetrag(this.data.buchungstyp_kurzbz);
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
 	},
 	template: `
 	<core-form ref="form" class="stv-details-konto-edit" @submit.prevent="save">
@@ -124,7 +138,7 @@ export default {
 					type="select"
 					v-model="data.buchungstyp_kurzbz"
 					name="buchungstyp_kurzbz"
-					:label="$p.t('konto/buchungstyp')"
+					:label="$p.t('konto/buchungstyp') + ' *'"
 					@update:model-value="checkDefaultBetrag"
 					>
 					<option v-for="typ in activeBuchungstypen" :key="typ.buchungstyp_kurzbz" :value="typ.buchungstyp_kurzbz" :class="typ.aktiv ? '' : 'text-decoration-line-through text-muted'">
@@ -143,9 +157,12 @@ export default {
 					name="buchungsdatum"
 					:label="$p.t('konto/buchungsdatum')"
 					:enable-time-picker="false"
+					text-input
+					format="dd.MM.yyyy"
 					auto-apply
 					>
 				</form-input>
+
 				<form-input
 					v-model="data.buchungstext"
 					name="buchungstext"
@@ -162,6 +179,7 @@ export default {
 				<form-input
 					type="select"
 					v-model="data.studiensemester_kurzbz"
+					@change="getBuchungstypen(data.studiensemester_kurzbz)"
 					name="studiensemester_kurzbz"
 					:label="$p.t('lehre/studiensemester')"
 					>

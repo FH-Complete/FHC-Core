@@ -1,5 +1,6 @@
 <?php
 
+
 $raum_contentmittitel_xslt_xhtml=  <<<EOD
 <xsl:stylesheet version="1.0" xmlns:fo="http://www.w3.org/1999/XSL/Format"
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
@@ -8,27 +9,56 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 		<head>
 			<title><xsl:value-of select="titel" /></title>
 			<link rel="stylesheet" href="../skin/style.css.php" type="text/css"  />
-            <link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.0.7/css/tabulator.min.css" rel="stylesheet" />
-            <script type="text/javascript" src="https://c3p0.ma0594.technikum-wien.at/fh-core/vendor/olifolkerd/tabulator5/dist/js/tabulator.min.js?2019102903"></script>
+			<link rel="stylesheet" href="../skin/jquery.css" type="text/css" />
+			<link rel="stylesheet" type="text/css" href="../skin/jquery-ui-1.9.2.custom.min.css" />
+			<script type="text/javascript" src="../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
+			<script type="text/javascript" src="../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+			<script type="text/javascript" src="../vendor/components/jqueryui/jquery-ui.min.js"></script>
+			<script type="text/javascript" src="../include/js/jquery.ui.datepicker.translation.js"></script>
+			<script type="text/javascript" src="../vendor/jquery/sizzle/sizzle.js"></script>
+			<link rel="stylesheet" href="../skin/tablesort.css" type="text/css"/>
 			<script type="text/javascript">
 
-            document.addEventListener("DOMContentLoaded", function() 
-			{
-				let tables = document.getElementsByClassName("tablesorter");
-				for(table of tables){
-					new Tabulator(table, {
-						layout:"fitDataFill",
-						autoResize:true,
-						resizableRows:true,
-						columnDefaults:{
-							formatter:"html",
-							resizable:true,
-						}
-					})
-				}
-			});
+				$(document).ready(function()
+				{
+					$(".tablesorter").each(function()
+					{
+						var col=0;
+						var sort=0;
+						var no_sort=1;
+						var classes = $(this).attr("class");
+						var class_arr = classes.split(" ");
+						var headersobj={};
+		
+						for(i in class_arr)
+						{
+							if(class_arr[i].indexOf("tablesorter_col_")!=-1)
+							{
+								col = class_arr[i].substr(16);
+							}
+						
+							if(class_arr[i].indexOf("tablesorter_sort_")!=-1)
+							{
+								sort = class_arr[i].substr(17);
+							}
 
+							if(class_arr[i].indexOf("tablesorter_no_sort_")!=-1)
+							{
+								no_sort = class_arr[i].substr(20);
+								headersobj[no_sort]={sorter:false};
+							}
+						}
+		
+						$(this).tablesorter(
+						{
+							sortList: [[col,sort]],
+							widgets: ["zebra"],
+							headers: headersobj
+						});
+					});
+				});
 			</script>
+			
 		</head>
 		<body>
 	    <h1><xsl:value-of select="titel" /></h1>

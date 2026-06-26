@@ -2,12 +2,12 @@ import {CoreRESTClient} from '../../../RESTClient.js';
 
 export default {
 	emits: [
-		'changed'
+		'update:studiensemesterKurzbz'
 	],
 	props: {
-		default: {
+		studiensemesterKurzbz: {
 			type: String,
-			default: ''
+			required: true
 		}
 	},
 	data() {
@@ -68,13 +68,18 @@ export default {
 				})
 				.then(() => {
 					this.loading = false;
-					this.$emit('changed', this.list[this.current]);
+					this.$emit('update:studiensemesterKurzbz', this.list[this.current]);
 				})
 				.catch(error => {
 					this.current = fallback;
 					this.loading = false;
 					this.$fhcAlert.handleFormValidation(error);
 				});
+		}
+	},
+	watch: {
+		'studiensemesterKurzbz': function () {
+			this.current = this.list.indexOf(this.studiensemesterKurzbz);
 		}
 	},
 	created() {
@@ -84,7 +89,7 @@ export default {
 			.then(result => {
 				this.list = result.map(el => el.studiensemester_kurzbz);
 				this.loading = false;
-				this.current = this.list.indexOf(this.default);
+				this.current = this.list.indexOf(this.studiensemesterKurzbz);
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},

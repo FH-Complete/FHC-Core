@@ -18,6 +18,14 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+//require_once('../../../include/studiengang.class.php');
+//require_once('../../../include/student.class.php');
+//require_once('../../../include/datum.class.php');
+//require_once('../../../include/mail.class.php');
+//require_once('../../../include/benutzerberechtigung.class.php');
+//require_once('../../../include/phrasen.class.php');
+//require_once('../../../include/projektarbeit.class.php');
+//require_once('../../../include/projektbetreuer.class.php');
 
 class Lehre extends FHCAPI_Controller
 {
@@ -30,10 +38,9 @@ class Lehre extends FHCAPI_Controller
 		parent::__construct([
 			'lvStudentenMail' => self::PERM_LOGGED,
 			'LV' => self::PERM_LOGGED,
+			'Pruefungen' => self::PERM_LOGGED
 		]);
-
 		
-
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -76,10 +83,22 @@ class Lehre extends FHCAPI_Controller
 		
 		$this->terminateWithSuccess($result);
 	}
-	
 
-	
+	/**
+	 * fetches all Pruefungen of a student for a specific lehrveranstaltung
+	 * if the student passed the Pruefung on the first attempt, no information about the Pruefungen is stored in the database 
+	 * @param mixed $lehrveranstaltung_id
+	 * @return void
+	 */
+	public function Pruefungen($lehrveranstaltung_id)
+	{
+		$this->load->model('education/Pruefung_model', 'PruefungModel');
 
-	
+		$result = $this->PruefungModel->getByStudentAndLv(getAuthUID(), $lehrveranstaltung_id, getUserLanguage());
+
+		$result = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($result);
+	}
 }
 

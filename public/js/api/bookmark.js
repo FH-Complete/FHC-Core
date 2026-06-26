@@ -14,6 +14,16 @@ export default {
       ); 
     },
 
+	update: function ({ bookmark_id, url, title, tag=null}) {
+		return this.$fhcApi.post(
+			`/api/frontend/v1/Bookmark/update/${bookmark_id}`
+			, {
+				url: url,
+				title: title
+			}
+		);
+	},
+
     insert: function ({url, title, tag}) {
       return this.$fhcApi.post(
         `/api/frontend/v1/Bookmark/insert`

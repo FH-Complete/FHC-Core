@@ -122,6 +122,7 @@ class PhrasesLib
 								$tmpText = substr($tmpText, 0, strlen($tmpText) - 4);
 							}
 						}
+						$tmpText = str_replace(['<span class="caps">', '</span>'], '', $tmpText);
 
 						$result->retval[$i]->text = $tmpText;
 					}

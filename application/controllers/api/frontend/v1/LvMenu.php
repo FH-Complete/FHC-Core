@@ -51,12 +51,28 @@ class LvMenu extends FHCAPI_Controller
 
 		$this->load->library("PermissionLib", null, 'PermissionLib');
 
-		$this->load->library("PhrasesLib");
+		$this->load->library("PhrasesLib", null, 'PhrasesLib');
 		$this->loadPhrases(array('global', 'lehre'));
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
+
+
+	/**
+	 * alternative function to get multiple lvMenus with a single http request
+	 */
+	public function getMultipleLvMenu($lvMenuOptionList){
+		$result =[];
+		foreach($lvMenuOptionList as $lvMenuOptions){
+			$lvMenu = $this->getLvMenu($lvMenuOptions['lvid'],$lvMenuOptions['studiensemester_kurzbz']);
+			if(isError($lvMenu)){
+				// TODO: some lvMenu threw an error, handle error here
+			}
+			$result[$lvMenuOptions['lvid']]=$lvMenu;
+		}
+		$this->terminateWithSuccess($result);
+	}
 
 	/**
 	 * 
@@ -91,20 +107,24 @@ class LvMenu extends FHCAPI_Controller
 		$lvres = $this->Lehrveranstaltung_model->load($lvid);
 		if(!hasData($lvres)) 
 		{
-		    $this->terminateWithError('LV ' . $lvid . ' not found.');
+			$this->terminateWithError('LV ' . $lvid . ' not found.');
 		}
 		$lv = (getData($lvres))[0];
-
+		$this->addMeta('lvInfo',$lv);
 		// define studiengang_kz / semester / lehrverzeichnis
 		$studiengang_kz = $lv->studiengang_kz;
 		$semester = $lv->semester;
 		$short = $lv->lehreverzeichnis;
+		// return empty menu for studiengang_kz = 0
+		if($studiengang_kz == 0){
+			$this->terminateWithSuccess("organisatorische_einheit");
+		}
 
 		// load studiengang
-		$stgres = $this->Studiengang_model->load($lv->studiengang_kz);
+		$stgres = $this->Studiengang_model->load(strval($studiengang_kz));
 		if(!hasData($stgres))
 		{
-		    $this->terminateWithError('Stg ' . $lv->studiengang_kz . ' nof found.');
+		    $this->terminateWithError('Stg ' . $lv->studiengang_kz . ' not found.');
 		}
 		$stg = (getData($stgres))[0];
 		$kurzbz = strtoupper($stg->typ . $stg->kurzbz);
@@ -249,6 +269,8 @@ class LvMenu extends FHCAPI_Controller
 			'lehrfach_id'=>$lehrfach_id,
 			'lektor_der_lv'=>$lektor_der_lv,
 			'lehrfach_oe_kurzbz_arr'=>$lehrfach_oe_kurzbz_arr,
+			'permissionLib' => &$this->PermissionLib,
+			'phrasesLib' => &$this->PhrasesLib
 		];
 		
 		Events::trigger('lvMenuBuild', 
@@ -284,24 +306,6 @@ class LvMenu extends FHCAPI_Controller
 
 	}
 
-
-	private function fhc_menu_digitale_anwesenheiten(&$menu, $angemeldet, $studiengang_kz, $semester, $lvid, $angezeigtes_stsem){
-		
-		// DIGITALE ANWESENHEITEN
-		if (defined('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN') && CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN && $angemeldet) {
-
-			$menu[] = array
-			(
-				'id' => 'core_menu_digitale_anwesenheitslisten',
-				'position' => '50',
-				'name' => $this->p->t('lehre', 'digiAnw'),
-				'c4_icon' => base_url('skin/images/button_kreuzerltool.png'),
-				'c4_link' => base_url("index.ci.php/extensions/FHC-Core-Anwesenheiten/?stg_kz=$studiengang_kz&sem=$semester&lvid=$lvid&sem_kurzbz=$angezeigtes_stsem&nav=false"),
-				'c4_linkList' => []
-			);
-		}
-	}
-
 	private function fhc_menu_lvinfo(&$menu, $lvid, $studiengang_kz, $lektor_der_lv, $is_lector, $lehrfach_oe_kurzbz_arr){
 		
 		// LVINFO
@@ -329,6 +333,7 @@ class LvMenu extends FHCAPI_Controller
 				'id'=>'core_menu_lvinfo',
 				'position'=>'10',
 				'name'=>$this->p->t('lehre', 'lehrveranstaltungsinformation'),
+				'phrase' => 'lehre/lehrveranstaltungsinformation',
 				'icon'=>'../../../skin/images/button_lvinfo.png',
 				'link'=>'',
 				'c4_icon'=> base_url('skin/images/button_lvinfo.png'),
@@ -347,6 +352,7 @@ class LvMenu extends FHCAPI_Controller
 				'id'=>'core_menu_feedback',
 				'position'=>'60',
 				'name'=>$this->p->t('lehre', 'feedback'),
+				'phrase' => 'lehre/feedback',
 				'c4_icon'=> base_url('skin/images/button_feedback.png'),
 				'c4_link'=> base_url('feedback.php?lvid='.$lvid),
 			);
@@ -364,6 +370,7 @@ class LvMenu extends FHCAPI_Controller
 					'id'=>'core_menu_gesamtnote',
 					'position'=>'80',
 					'name'=>$this->p->t('lehre', 'gesamtnote'),
+					'phrase' => 'lehre/gesamtnote',
 					'c4_icon'=> base_url('skin/images/button_endnote.png'),
 					'c4_link'=> base_url('cis/private/lehre/benotungstool/lvgesamtnoteverwalten.php?lvid='.urlencode($lvid).'&stsem='.urlencode($angezeigtes_stsem))
 					//'c4_link'=> base_url('benotungstool/lvgesamtnoteverwalten.php?lvid='.urlencode($lvid).'&stsem='.urlencode($angezeigtes_stsem))
@@ -376,6 +383,7 @@ class LvMenu extends FHCAPI_Controller
 					'id'=>'core_menu_gesamtnote',
 					'position'=>'80',
 					'name'=>$this->p->t('lehre', 'gesamtnote'),
+					'phrase'=>'lehre/gesamtnote',
 					'c4_icon'=>base_url('skin/images/button_endnote.png'),
 					'c4_link'=>'#',
 					'c4_linkList'=>[[$this->p->t('lehre', 'noteneingabedeaktiviert'),'#']],
@@ -448,6 +456,7 @@ class LvMenu extends FHCAPI_Controller
 				'id'=>'core_menu_mailanstudierende',
 				'position'=>'100',
 				'name'=>$this->p->t('lehre', 'mail'),
+				'phrase' => 'lehre/mail',
 				'c4_icon'=>base_url('skin/images/button_feedback.png'),
 				'c4_icon2' => 'fa-regular fa-envelope',
 				'c4_link'=>$mailto,
@@ -472,6 +481,7 @@ class LvMenu extends FHCAPI_Controller
 						'id'=>'core_menu_abmeldung',
 						'position'=>'120',
 						'name'=>$this->p->t('lehre', 'abmelden'),
+						'phrase'=>'lehre/abmelden',
 						'c4_icon'=>base_url('skin/images/button_studiupload.png'),
 						'c4_link'=>base_url('abmeldung.php?lvid='.urlencode($lvid).'&stsem='.urlencode($angezeigtes_stsem)),
 					);
@@ -506,6 +516,7 @@ class LvMenu extends FHCAPI_Controller
 				'id' => 'core_menu_anerkennungNachgewiesenerKenntnisse',
 				'position' => '128',
 				'name' => $this->p->t('lehre', 'anrechnung'),
+				'phrase' => 'lehre/anrechnung',
 				'c4_icon' => base_url('skin/images/button_listen.png'),
 				'c4_icon2' => 'fa-regular fa-folder-open',
 				'c4_link' => base_url('cis.php/lehre/anrechnung/RequestAnrechnung?studiensemester='.urlencode($angezeigtes_stsem).'&lv_id='.urlencode($lvid))
@@ -523,6 +534,7 @@ class LvMenu extends FHCAPI_Controller
 				'id' => 'core_menu_anerkennungNachgewiesenerKenntnisse_empfehlen',
 				'position' => '128',
 				'name' => $this->p->t('lehre', 'anrechnungen'),
+				'phrase' => 'lehre/anrechnung',
 				'c4_icon'=> base_url('skin/images/button_listen.png'),
 				'c4_icon2' => 'fa-regular fa-folder-open',
 				'c4_link' => base_url('cis.php/lehre/anrechnung/ReviewAnrechnungUebersicht?studiensemester='.urlencode($angezeigtes_stsem))

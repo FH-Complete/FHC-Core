@@ -9,7 +9,6 @@
 
                         <i class="me-2 fa fa-lg fa-info-circle" aria-hidden="true"></i>&ensp;
 						<?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoFristenTitle'); ?>
-
                     </div>
                 </div>
             </h2>

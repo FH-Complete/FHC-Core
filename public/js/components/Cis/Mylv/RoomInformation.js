@@ -1,163 +1,63 @@
-import FhcCalendar from "../../Calendar/Calendar.js";
-import CalendarDate from "../../../composables/CalendarDate.js";
-import LvModal from "../../../components/Cis/Mylv/LvModal.js";
-import LvInfo from "../../../components/Cis/Mylv/LvInfo.js"
+import FhcCalendar from "../../Calendar/LvPlan.js";
 
-export default{
-    props:{
-        ort_kurzbz: {
-            type: String,
-            required: true,
-        }
-    },
+import ApiLvPlan from '../../../api/factory/lvPlan.js';
+
+export const DEFAULT_MODE_RAUMINFO = 'Week'
+
+export default {
+	name: "RoomInformation",
 	components: {
-		FhcCalendar,
-		LvModal,
-		LvInfo,
+		FhcCalendar
 	},
-	data() {
-		return {
-			events: null,
-			calendarDate: new CalendarDate(new Date()),
-			currentlySelectedEvent: null,
-			currentDay: new Date(),
-			minimized: false,
-            
-        }
+	props:{
+		viewData: Object, // NOTE(chris): this is inherited from router-view
+		propsViewData: Object
 	},
-    computed:{
-        currentDate: function(){
-            return new Date(this.calendarWeek.y, this.calendarWeek.m, this.calendarWeek.d);
-        },
-		weekFirstDay: function () {
-			return this.calendarDateToString(this.calendarDate.cdFirstDayOfWeek);
+	computed: {
+		currentDay() {
+			return this.propsViewData?.focus_date || luxon.DateTime.now().setZone(this.viewData.timezone).toISODate();
 		},
-		weekLastDay: function () {
-			return this.calendarDateToString(this.calendarDate.cdLastDayOfWeek);
+		currentMode() {
+			return this.propsViewData?.mode || DEFAULT_MODE_RAUMINFO;
+		}
+	},
+	methods:{
+		handleChangeDate(day, newMode) {
+			return this.handleChangeMode(newMode, day);
 		},
-		monthFirstDay: function () {
-			return this.calendarDateToString(this.calendarDate.cdFirstDayOfCalendarMonth);
-		},
-		monthLastDay: function () {
-			return this.calendarDateToString(this.calendarDate.cdLastDayOfCalendarMonth);
-		},
-    },
-    methods:{
-		setSelectedEvent: function(event){
-			this.currentlySelectedEvent = event;
-		},
-		getLvID: function () {
-			this.lv_id = window.location.pathname
-		},
-		selectDay: function (day) {
-			this.currentDay = day;
-		},
-		showModal: function (event) {
-			this.currentlySelectedEvent = event;
-			Vue.nextTick(() => {
-				this.$refs.lvmodal.show();
+		handleChangeMode(newMode, day) {
+			const mode = newMode[0].toUpperCase() + newMode.slice(1)
+			const focus_date = day.toISODate();
+
+			this.$router.push({
+				name: "RoomInformation",
+				params: {
+					mode,
+					focus_date,
+					ort_kurzbz: this.propsViewData.ort_kurzbz
+				}
 			});
-			
 		},
-		updateRange: function ({ start, end }) {
-
-			let checkDate = (date) => {
-				return date.m != this.calendarDate.m || date.y != this.calendarDate.y;
-			}
-
-			// only load month data if the month or year has changed
-			if (checkDate(new CalendarDate(start)) && checkDate(new CalendarDate(end))) {
-				// reset the events before querying the new events to activate the loading spinner
-				this.events = null;
-				this.calendarDate = new CalendarDate(end);
-				Vue.nextTick(() => {
-					this.loadEvents();
-				});
-			}
-		},
-		calendarDateToString: function (calendarDate) {
-			return calendarDate instanceof CalendarDate ?
-				[calendarDate.y, calendarDate.m + 1, calendarDate.d].join('-') :
-				null;
-
-		},
-		loadEvents: function(){
-
-			// bundles the room_events and the reservierungen together into the this.events array
-			Promise.allSettled([
-				this.$fhcApi.factory.stundenplan.getRoomInfo(this.ort_kurzbz, this.monthFirstDay, this.monthLastDay),
-				this.$fhcApi.factory.stundenplan.getOrtReservierungen(this.ort_kurzbz, this.monthFirstDay, this.monthLastDay)
-			]).then((result) => {
-				let promise_events = [];
-				result.forEach((promise_result) => {
-					if(promise_result.status === 'fulfilled' && promise_result.value.meta.status === "success"){
-						
-						let data = promise_result.value.data;
-						// adding additional information to the events 
-						if (data && data.forEach) {
-							data.forEach((el, i) => {
-								el.id = i;
-								if (el.type === 'reservierung') {
-									el.color = '#' + (el.farbe || 'FFFFFF');
-								} else {
-									el.color = '#' + (el.farbe || 'CCCCCC');
-								}
-
-								el.start = new Date(el.datum + ' ' + el.beginn);
-								el.end = new Date(el.datum + ' ' + el.ende);
-								
-							});
-						}
-						promise_events = promise_events.concat(data);
-					}
-				})
-				this.events = promise_events;
-			})
-		},
-    },
-	created() {
-		this.loadEvents();
+		getPromiseFunc(start, end) {
+			return [
+				this.$api.call(ApiLvPlan.getRoomInfo(this.propsViewData.ort_kurzbz, start.toISODate(), end.toISODate())),
+				this.$api.call(ApiLvPlan.getOrtReservierungen(this.propsViewData.ort_kurzbz, start.toISODate(), end.toISODate()))
+			];
+		}
 	},
-    template: /*html*/`
-		<lv-modal v-if="currentlySelectedEvent" :showMenu="false" :event="currentlySelectedEvent" ref="lvmodal" />
-		<fhc-calendar @selectedEvent="setSelectedEvent" :initial-date="currentDay" @change:range="updateRange" :events="events" initial-mode="week" show-weeks @select:day="selectDay" v-model:minimized="minimized">
-            <template #monthPage="{event,day,isSelected}">
-				<span class="fhc-entry" :class="{'selectedEvent':isSelected}" style="color:white" :style="{'background-color': event.color}">
-					{{event.topic}}
-				</span>
-			</template>
-			<template #weekPage="{event,day,isSelected}">
-				<div @click="showModal(event?.orig)" type="button" :class="{'selectedEvent':isSelected}" class="fhc-entry border border-secondary border d-flex flex-column align-items-center justify-content-evenly h-100">
-					<span>{{event?.orig.topic}}</span>
-					<span v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</span>
-					<span>{{event?.orig.ort_kurzbz}}</span>
-				</div>
-			</template>
-			<template #dayPage="{event,day,mobile}">
-				<div @click="mobile? showModal(event?.orig):null" type="button" class="fhc-entry border border-secondary border row h-100 justify-content-center align-items-center text-center">
-					<div class="col ">
-						<p>Lehrveranstaltung:</p>
-						<p class="m-0">{{event?.orig.topic}}</p>
-					</div>
-					<div class="col ">
-						<p>Lektor:</p>
-						<p class="m-0" v-for="lektor in event?.orig.lektor">{{lektor.kurzbz}}</p>
-					</div>
-					<div class="col ">
-						<p>Ort: </p>
-						<p class="m-0">{{event?.orig.ort_kurzbz}}</p>
-					</div>
-				</div>
-			</template>
-			<template #pageMobilContent>
-				<h3 >{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}</h3>
-				<div class="w-100">
-					<lv-info  :event="currentlySelectedEvent" />
-				</div>
-			</template>
-			<template #pageMobilContentEmpty >
-				<h3>Keine Raum Reservierung</h3>
-			</template>
-        </fhc-calendar>
-    `,
+	template: /*html*/`
+	<div class="fhc-roominformation d-flex flex-column h-100">
+		<h2>{{ $p.t('rauminfo/rauminfo') }} {{ propsViewData.ort_kurzbz }}</h2>
+		<hr>
+		<fhc-calendar 
+			ref="calendar"
+			:timezone="viewData.timezone"
+			:get-promise-func="getPromiseFunc"
+			:date="currentDay"
+			:mode="currentMode"
+			@update:date="handleChangeDate"
+			@update:mode="handleChangeMode"
+			class="responsive-calendar"
+		></fhc-calendar>
+	</div>`
 };

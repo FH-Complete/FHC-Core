@@ -38,6 +38,14 @@ require_once('../../include/authentication.class.php');
 require_once('../../include/addon.class.php');
 require_once('../../include/'.EXT_FKT_PATH.'/serviceterminal.inc.php');
 
+// 2025-02-05 ma0080 add query parameter to force login e.g. when used in iframe in CIS4.0 begin
+if( isset($_GET['forcelogin']) && !isset($_SERVER['PHP_AUTH_USER']) ) {
+  header('WWW-Authenticate: Basic Realm="' . AUTH_NAME . '"');
+  http_response_code(401);
+  die();
+}
+// 2025-02-05 ma0080 add query parameter to force login e.g. when used in iframe in CIS4.0 end
+
 	if (!$db = new basis_db())
 		$db=false;
 
@@ -835,7 +843,6 @@ function meine_uid_informationen_detail($db,$uid,$count=0)
 
 		$aktiv=$db->db_result($erg,0,"aktiv");
 
-		$svnr=$db->db_result($erg,0,"svnr");
 
 		$titelpre=$db->db_result($erg,0,"titelpre");
 		$titelpost=$db->db_result($erg,0,"titelpost");

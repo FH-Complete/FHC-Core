@@ -95,10 +95,9 @@ var FHC_DialogLib = {
 	 */
 	_displayDialog: function(heading, message, icon, colorClass)
 	{
-		var html = "<p class='dialogmessage'><i class='glyphicon glyphicon-"+icon+"'></i>&nbsp;&nbsp;"+message+"</p>";
+		var html = "<p class='dialogmessage'>"+message+"</p>";
 		FHC_DialogLib.alertDefault(heading, html);
-		$(".ui-dialog-titlebar").addClass(colorClass+" text-center");
-		$(".glyphicon-"+icon).addClass(colorClass);
+		$(".ui-dialog-titlebar").addClass(colorClass+" alert text-center");
 		FHC_DialogLib._formatShortDialog();
 	},
 
@@ -113,7 +112,6 @@ var FHC_DialogLib = {
 		$(".ui-dialog-buttonpane.ui-widget-content").css("padding", ".3em .4em .5em .4em");
 		$(".ui-dialog .ui-dialog-content").css("padding", "0");
 		$(".ui-dialog-buttonset button").css("margin", "0");
-		$(".dialogmessage i.glyphicon").css("background-color", "transparent");
 	}
 
 };

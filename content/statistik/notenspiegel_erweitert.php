@@ -64,6 +64,11 @@ if (!$rechte->isBerechtigt('student/noten', $studiengang_kz, 's'))
 $semester = isset($_GET['semester']) ? $_GET['semester'] : '';
 $typ = isset($_GET['typ']) ? $_GET['typ'] : '';
 
+if(isset($_GET['studiensemester']) && preg_match('/[WS]S[0-9]{4}/', $_GET['studiensemester']))
+{
+	$semester_aktuell = $_GET['studiensemester'];
+}
+
 if ($semester == '')
 	die('Bitte ein Semester auswaehlen');
 
@@ -90,37 +95,37 @@ foreach ($result_student as $row)
 if ($uids == '')
 	die('Es befinden sich keine Studierende in diesem Semester');
 
-$qry = "SELECT 
-			lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, ects
-		FROM 
-			lehre.tbl_lehrveranstaltung 
-        WHERE 
-        	lehrveranstaltung_id IN 
-        	(
-				SELECT 
-					distinct lehrveranstaltung_id 
-				FROM 
-					campus.vw_student_lehrveranstaltung, public.tbl_studentlehrverband
-	        	WHERE 
-	        		tbl_studentlehrverband.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND 
-	        		tbl_studentlehrverband.semester=".$db->db_add_param($semester, FHC_INTEGER)." AND 
-	        		vw_student_lehrveranstaltung.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
-	        		uid=student_uid AND 
-	        		vw_student_lehrveranstaltung.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz
+$qry = "SELECT
+		lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, ects
+	FROM
+		lehre.tbl_lehrveranstaltung
+        WHERE
+		lehrveranstaltung_id IN (
+			SELECT
+				DISTINCT lehrveranstaltung_id
+			FROM
+				campus.vw_student_lehrveranstaltung
+				JOIN public.tbl_studentlehrverband ON(student_uid = uid)
+			WHERE
+				tbl_studentlehrverband.studiengang_kz = ".$db->db_add_param($studiengang_kz, FHC_INTEGER)."
+				AND tbl_studentlehrverband.semester = ".$db->db_add_param($semester, FHC_INTEGER)."
+				AND vw_student_lehrveranstaltung.studiensemester_kurzbz = ".$db->db_add_param($semester_aktuell)."
+				AND vw_student_lehrveranstaltung.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz
 	        ) 
-	        AND studiengang_kz<>0
+	        AND studiengang_kz != 0
 	        AND zeugnis
-	    UNION
-	    SELECT
-	    	lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, ects
-	    FROM
-	    	lehre.tbl_lehrveranstaltung JOIN lehre.tbl_zeugnisnote USING(lehrveranstaltung_id)
-	    WHERE
-	    	tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
-	    	tbl_zeugnisnote.student_uid in($uids) AND
-	    	tbl_zeugnisnote.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
-	    	zeugnis
-		ORDER BY bezeichnung";
+	UNION
+	SELECT
+		lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, ects
+	FROM
+	    lehre.tbl_lehrveranstaltung
+	    JOIN lehre.tbl_zeugnisnote USING(lehrveranstaltung_id)
+	WHERE
+	    tbl_lehrveranstaltung.studiengang_kz = ".$db->db_add_param($studiengang_kz, FHC_INTEGER)."
+	    AND tbl_zeugnisnote.student_uid IN ($uids)
+	    AND tbl_zeugnisnote.studiensemester_kurzbz = ".$db->db_add_param($semester_aktuell)."
+	    AND zeugnis
+    ORDER BY bezeichnung";
 
 if (!$result_lva = $db->db_query($qry))
 	die('Fehler beim Ermitteln der Lehrveranstaltungen');
@@ -333,6 +338,10 @@ if ($typ == 'xls')
 	}
 	$anzahl_lvspalten = $spalte - 2;
 
+	$worksheet->write($zeile, ++$spalte, 'ECTS Summe zugeteilt', $format_bold);
+	$maxlength[$spalte] = 20;
+	$worksheet->write($zeile, ++$spalte, 'ECTS Summe gewichtet', $format_bold);
+	$maxlength[$spalte] = 20;
 	$worksheet->write($zeile, ++$spalte, 'Notendurchschnitt', $format_bold);
 	$maxlength[$spalte] = 15;
 	$worksheet->write($zeile, ++$spalte, "Gewichteter\nNotendurchschnitt", $format_bold_wrap);
@@ -367,9 +376,12 @@ if ($typ == 'xls')
 		$worksheet->write($zeile, ++$spalte, $row_student->gruppe, $format_bold_left);
 		$worksheet->write($zeile, ++$spalte, $row_student->matrikelnr, $format_bold);
 
-		//Alle Zeugnisnoten des Studierenden holen
+		// Alle Zeugnisnoten des Studierenden holen
 		$noten = array();
-		$qry = "SELECT * FROM lehre.tbl_zeugnisnote WHERE student_uid=".$db->db_add_param($row_student->uid)." AND studiensemester_kurzbz=".$db->db_add_param($semester_aktuell);
+		$qry = "SELECT lehrveranstaltung_id, note
+			FROM lehre.tbl_zeugnisnote
+			WHERE student_uid = ".$db->db_add_param($row_student->uid)."
+			AND studiensemester_kurzbz = ".$db->db_add_param($semester_aktuell);
 		if ($result = $db->db_query($qry))
 			while ($row = $db->db_fetch_object($result))
 				$noten[$row->lehrveranstaltung_id] = $row->note;
@@ -377,15 +389,16 @@ if ($typ == 'xls')
 		//Zu jeder Lehrveranstaltungsnote Prüfungstyp (Anzahl der Antritte) holen
 		$pruefungstypen = array();
 		$qry = "SELECT tbl_lehrveranstaltung.lehrveranstaltung_id, pruefungstyp_kurzbz, sort, datum
-					FROM
-						lehre.tbl_pruefung
- 					JOIN
- 						lehre.tbl_lehreinheit using(lehreinheit_id)
- 					JOIN
- 						lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id)
- 					WHERE 
- 						student_uid=".$db->db_add_param($row_student->uid)." AND studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
- 					ORDER BY lehrveranstaltung_id, sort, datum";
+			FROM
+				lehre.tbl_pruefung
+			JOIN
+				lehre.tbl_lehreinheit USING(lehreinheit_id)
+			JOIN
+				lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+			WHERE
+				student_uid = ".$db->db_add_param($row_student->uid)."
+				AND studiensemester_kurzbz = ".$db->db_add_param($semester_aktuell)."
+			ORDER BY lehrveranstaltung_id, sort, datum";
 		if ($result = $db->db_query($qry))
 		{
 			while ($row = $db->db_fetch_object($result))
@@ -394,15 +407,14 @@ if ($typ == 'xls')
 			}
 		}
 
-		//Alle LVs holen zu denen der Studierende zugeteilt ist
+		// Alle LVs holen zu denen der Studierende zugeteilt ist
 		$zugeteilte_lvs = array();
-		$qry = "SELECT distinct lehrveranstaltung_id
-					FROM 
-						campus.vw_student_lehrveranstaltung 
-					WHERE 
-						uid=".$db->db_add_param($row_student->uid)." AND 
-						studiensemester_kurzbz=".$db->db_add_param($semester_aktuell);
-
+		$qry = "SELECT DISTINCT lehrveranstaltung_id
+			FROM
+				campus.vw_student_lehrveranstaltung
+			WHERE
+				uid = ".$db->db_add_param($row_student->uid)."
+				AND studiensemester_kurzbz = ".$db->db_add_param($semester_aktuell);
 		if ($result = $db->db_query($qry))
 			while ($row = $db->db_fetch_object($result))
 				$zugeteilte_lvs[] = $row->lehrveranstaltung_id;
@@ -411,17 +423,20 @@ if ($typ == 'xls')
 		$summe = 0;
 		$rowcount = 0;
 		$summeects = 0;
+		$total_ects = 0;
 		$gewichtetenote = 0;
 
 		while ($rowcount < $db->db_num_rows($result_lva))
 		{
 			$row_lva = $db->db_fetch_object($result_lva, $rowcount);
 			$rowcount++;
+
 			//wenn es eine Note gibt
 			if (isset($noten[$row_lva->lehrveranstaltung_id]))
 			{
 				$note = $noten[$row_lva->lehrveranstaltung_id];
 				$format = 0;
+				$total_ects += $row_lva->ects;
 
 				//wenn für die LV der Studierende eine Nachprüfung hat (z.B. 2 Termin, kommissionelle...)
 				if (isset($pruefungstypen[$row_lva->lehrveranstaltung_id]))
@@ -467,6 +482,7 @@ if ($typ == 'xls')
 				//Keine Note fuer diese LV vorhanden
 				if (in_array($row_lva->lehrveranstaltung_id, $zugeteilte_lvs))
 				{
+					$total_ects += $row_lva->ects;
 					$worksheet->write($zeile, ++$spalte, '', $format_colored_nichteingetragen);
 				}
 				else
@@ -484,6 +500,8 @@ if ($typ == 'xls')
 		if ($summeects != 0)
 			$gewichtetenote /= $summeects;
 
+		$worksheet->write($zeile, ++$spalte, sprintf("%.2f", $total_ects), $format_number);
+		$worksheet->write($zeile, ++$spalte, sprintf("%.2f", $summeects), $format_number);
 		$worksheet->write($zeile, ++$spalte, sprintf("%.2f", $schnitt), $format_number);
 		$worksheet->write($zeile, ++$spalte, sprintf("%.2f", $gewichtetenote), $format_number);
 		if ($gewichtetenote != 0)
@@ -524,6 +542,8 @@ if ($typ == 'xls')
 		$schnitt = $summe_schnitt / $anzahl_schnitt;
 	else
 		$schnitt = 0;
+	$worksheet->write($zeile, ++$spalte, '-', $format_bold_center);
+	$worksheet->write($zeile, ++$spalte, '-', $format_bold_center);
 	$worksheet->write($zeile, ++$spalte, sprintf("%.2f", $schnitt), $format_number);
 	if ($anzahlgewichtet != 0)
 		$summegewichtet = $summegewichtet / $anzahlgewichtet;

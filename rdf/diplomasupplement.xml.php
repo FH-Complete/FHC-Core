@@ -386,6 +386,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo '		<titel_en>'.$titel_en.'</titel_en>';
 		$praktikum = false;
 		$auslandssemester = false;
+		$internationalskills = false;
 		$qry = "SELECT
 					projektarbeit_id
 				FROM
@@ -400,6 +401,56 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			{
 				echo "		<praktikum>Berufspraktikum/Internship: absolviert/completed</praktikum>";
 				$praktikum = true;
+			}
+		}
+
+		if ($row->typ === 'b')
+		{
+			//check if extension international skills is active
+			$qry = "SELECT 1
+					FROM information_schema.tables
+					WHERE table_schema = 'extension' AND table_name = 'tbl_internat_massnahme'";
+
+			if($result = $db->db_query($qry))
+			{
+				if ($db->db_num_rows($result) === 1)
+				{
+					$qry = "SELECT bezeichnung_mehrsprachig[1] as \"internationalskill_deutsch\",
+									bezeichnung_mehrsprachig[2] as \"internationalskill_english\"
+							FROM extension.tbl_internat_massnahme_zuordnung zuordnung
+									 JOIN extension.tbl_internat_massnahme massnahme ON zuordnung.massnahme_id = massnahme.massnahme_id
+									 JOIN extension.tbl_internat_massnahme_zuordnung_status zstatus ON zuordnung.massnahme_zuordnung_id = zstatus.massnahme_zuordnung_id
+									 JOIN tbl_prestudent ON zuordnung.prestudent_id = tbl_prestudent.prestudent_id
+									 JOIN tbl_student ON tbl_prestudent.prestudent_id = tbl_student.prestudent_id
+							WHERE zstatus.massnahme_status_kurzbz = 'confirmed'
+							  AND tbl_student.student_uid = ".$db->db_add_param($uid_arr[$i])."
+							  AND zstatus.massnahme_zuordnung_status_id = (
+								SELECT MAX(sub_zstatus.massnahme_zuordnung_status_id)
+								FROM extension.tbl_internat_massnahme_zuordnung_status sub_zstatus
+								WHERE sub_zstatus.massnahme_zuordnung_id = zuordnung.massnahme_zuordnung_id
+							)
+							GROUP BY zuordnung.massnahme_zuordnung_id, tbl_student.student_uid, tbl_prestudent.prestudent_id, tbl_prestudent.studiengang_kz, bezeichnung_mehrsprachig;";
+
+					if($db->db_query($qry))
+					{
+						if($db->db_num_rows() > 0)
+						{
+							$internationalskills = true;
+							echo "<internationalskills>";
+							while($row1 = $db->db_fetch_object())
+							{
+								echo "<internationalskillsdeutsch>";
+								echo "<internationalskilldeutsch><![CDATA[$row1->internationalskill_deutsch]]></internationalskilldeutsch>";
+								echo "</internationalskillsdeutsch>";
+
+								echo "<internationalskillsenglisch>";
+								echo "<internationalskillenglish><![CDATA[$row1->internationalskill_english]]></internationalskillenglish>";
+								echo "</internationalskillsenglisch>";
+							}
+							echo "</internationalskills>";
+						}
+					}
+				}
 			}
 		}
 
@@ -461,6 +512,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$abschlusspruefungsdatum = '';
 		$abschlussbeurteilung='';
 		$pruefungstyp_kurzbz='';
+		$abschlussbeurteilung_deutsch = '';
 
 		if($db->db_query($qry))
 		{
@@ -653,7 +705,72 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		}
 		echo ' </anrechnungen>';
 
+		//Berufliche Kompetenzen
+		$studienplan = new studienplan();
+		$studienplan->loadStudienplan($studienplan_id);
+		$regelstudiendauer = $studienplan->regelstudiendauer;
+		$studienplan_ects = $studienplan->ects_stpl;
+		$ects_berufliche_kompetenzen = 0;
+
+		//bei masterlehrgängen und $studienplan_ects >= 120 ECTS: Andruck der beruflichen Kompetenzen, wenn die Lv angerechnet wurde
+		//TODO(Manu) check if rule still valid
+		if ($row->typ == 'l' && $regelstudiendauer >= 4)
+		{
+			$ects_berufliche_kompetenzen = 0;
+			echo '<berufliche_kompetenzen>';
+			echo '<header_berufliche_kompetenz>Validierung von beruflich erworbenen Kompetenzen</header_berufliche_kompetenz>';
+
+			$qry_sem_0="
+				SELECT
+					lehrveranstaltung_id,
+					lehrform_kurzbz,
+					sws,
+					lehre.tbl_lehrveranstaltung.bezeichnung,
+					bezeichnung_english,
+					ects,
+					benotungsdatum,
+					note,
+					positiv,
+					offiziell,
+					note.anmerkung
+				FROM
+					lehre.tbl_zeugnisnote zeugnis
+					JOIN lehre.tbl_note note USING(note)
+					JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+					JOIN public.tbl_student student USING(student_uid)
+				WHERE
+				    student_uid =".$db->db_add_param($uid_arr[$i])."
+				AND
+					lehre.tbl_lehrveranstaltung.semester = '0'
+					";
+
+			if($result_sem_0 = $db->db_query($qry_sem_0))
+			{
+				while ($row_sem_0 = $db->db_fetch_object($result_sem_0))
+				{
+					$benotungsdatum = $datum->formatDatum($row_sem_0->benotungsdatum, 'd/m/Y');
+					$note = $db->db_parse_bool($row_sem_0->offiziell) ?  $row_sem_0->anmerkung : $row_sem_0->note;
+					$ects_berufliche_kompetenzen += $row_sem_0->ects;
+
+					echo '<lv_sem0>
+						<lv_id>' . $row_sem_0->lehrveranstaltung_id . '</lv_id>
+						<lehrform_kurzbz>' . $row_sem_0->lehrform_kurzbz . '</lehrform_kurzbz>
+						<bezeichnung><![CDATA[' . $row_sem_0->bezeichnung . ']]></bezeichnung>
+						<bezeichnung_englisch><![CDATA[' . $row_sem_0->bezeichnung_english . ']]></bezeichnung_englisch>
+						<sws_lv>'.$row_sem_0->sws.'</sws_lv>
+						<ects>'.$row_sem_0->ects.'</ects>
+						<note_positiv>'.$db->db_parse_bool($row_sem_0->positiv).'</note_positiv>
+						<note>'.$note.'</note>
+						<benotungsdatum>'.$benotungsdatum.'</benotungsdatum>
+						</lv_sem0>';
+				}
+			}
+			echo '<ects_berufliche_kompetenz>'.$ects_berufliche_kompetenzen.'</ects_berufliche_kompetenz>';
+			echo '</berufliche_kompetenzen>';
+		}
+
 		echo "<studiensemester>";
+
 		for($start = $semesterNumberStart; $start <= $semesterNumberEnd; $start++)
 		{
 			$semester_ects = 0;
@@ -676,6 +793,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				AND zeugnis = true
 				AND status.ausbildungssemester = ".$db->db_add_param($start)."
 				AND status.status_kurzbz NOT IN('Unterbrecher', 'Interessent','Bewerber','Aufgenommener','Abgewiesener','Wartender')
+				--AND	lehre.tbl_lehrveranstaltung.semester != '0'
 			ORDER BY datum ASC";
 
 			$semester_kurzbz = array();
@@ -724,6 +842,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			WHERE
 				student_uid = ".$db->db_add_param($uid_arr[$i])."
 				AND zeugnis = true
+				AND	lehre.tbl_lehrveranstaltung.semester != '0'
 				AND studiensemester_kurzbz in (".$sqlStudent->implode4SQL($aktuellesSemester).")";
 
 			if (defined('ZEUGNISNOTE_NICHT_ANZEIGEN'))
@@ -1082,10 +1201,19 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					}
 				}
 			}
+
 			echo '<ects_gesamt>'.$semester_ects.'</ects_gesamt>';
 			echo '<ects_gesamt_positiv>'.$semester_ects_positiv.'</ects_gesamt_positiv>';
 			echo "</semesters>";
 		}
+
+		//TODO(Manu) check if rule still valid
+		if ($row->typ == 'l' && $regelstudiendauer >= 4)
+		{
+			$ects_total += $ects_berufliche_kompetenzen;
+			$ects_total_positiv += $ects_berufliche_kompetenzen;
+		}
+
 		echo "</studiensemester>";
 		echo " <ects_total>$ects_total</ects_total>";
 		echo " <ects_total_positiv>$ects_total_positiv</ects_total_positiv>";
@@ -1108,12 +1236,13 @@ function checkNote($note_alt, $note_neu)
 		'4' => 'ea',
 		'5' => 'tg',
 		'6' => 'met',
-		'7' => 'ar',
-		'8' => 'nb',
-		'9' => '5',
-		'10' => 'nea');
+		'7' => 'b',
+		'8' => 'ar',
+		'9' => 'nb',
+		'10' => '5',
+		'11' => 'nea');
 
-	for($i = 0; $i<=9; $i++)
+	for($i = 0; $i<=11; $i++)
 	{
 		if($note_alt == $arrayNotenPriority[$i])
 			$priority_alt = $i;

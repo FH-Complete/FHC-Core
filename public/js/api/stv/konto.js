@@ -14,19 +14,19 @@ export default {
 
 		return config;
 	},
-	checkDoubles(data) {
-		return this.$fhcApi.post('api/frontend/v1/stv/konto/checkDoubles', data, {
+	checkDoubles(form, data) {
+		return this.$fhcApi.post(form, 'api/frontend/v1/stv/konto/checkDoubles', data, {
 			confirmErrorHandler: error => true
 		});
 	},
-	insert(data) {
-		return this.$fhcApi.post('api/frontend/v1/stv/konto/insert', data);
+	insert(form, data) {
+		return this.$fhcApi.post(form, 'api/frontend/v1/stv/konto/insert', data);
 	},
 	counter(data) {
 		return this.$fhcApi.post('api/frontend/v1/stv/konto/counter', data);
 	},
-	edit(data) {
-		return this.$fhcApi.post('api/frontend/v1/stv/konto/update', data);
+	edit(form, data) {
+		return this.$fhcApi.post(form, 'api/frontend/v1/stv/konto/update', data);
 	},
 	delete(buchungsnr) {
 		return this.$fhcApi.post('api/frontend/v1/stv/konto/delete', {buchungsnr});

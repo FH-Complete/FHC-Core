@@ -1,4 +1,4 @@
-import AbstractWidget from './Abstract';
+import AbstractWidget from './Abstract.js';
 export default {
 	mixins: [
 		AbstractWidget
