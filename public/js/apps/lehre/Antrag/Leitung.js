@@ -7,6 +7,9 @@ const app = Vue.createApp({
 		StudierendenantragLeitung
 	}
 });
+
+FhcApps.makeExtendable(app);
+
 app
 	.use(PluginsPhrasen)
 	.use(primevue.config.default,{zIndex: {overlay: 9999}})

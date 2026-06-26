@@ -8,15 +8,8 @@ import ApiStudiensemester from '../../../api/factory/studiensemester.js';
 import AbgabeterminStatusLegende from "./StatusLegende.js";
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import { splitMailsHelper } from "../../../helpers/EmailHelpers.js"
-
-// spoofed date testing
-// const todayISO = '2025-08-08'
-// const today = new Date(todayISO)
-// const now = luxon.DateTime.fromISO(todayISO)
-
-// prod code
-const today = new Date()
-const now = luxon.DateTime.now()
+import { getDateStyleClass} from "./getDateStyleClass.js";
+import { dateFilter } from '../../../tabulator/filters/Dates.js';
 
 export const AbgabetoolAssistenz = {
 	name: "AbgabetoolAssistenz",
@@ -187,7 +180,7 @@ export const AbgabetoolAssistenz = {
 					// 	frozen: true,
 					// 	width: 40
 					// },
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.formAction, tooltip:false, minWidth: 150, cssClass: 'sticky-col'},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', headerFilter: false, headerSort: false, formatter: this.formAction, tooltip:false, minWidth: 100, cssClass: 'sticky-col'},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, widthGrow: 1, tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'student_vorname', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'student_nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
@@ -199,20 +192,47 @@ export const AbgabetoolAssistenz = {
 						 formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true,  formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuer'))), field: 'erstbetreuer', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuer'))), field: 'zweitbetreuer', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4prevAbgabetermin'))), headerFilter: true, field: 'prevTermin', formatter: this.abgabterminFormatter, widthGrow: 1, width: 220, tooltip: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nextAbgabetermin'))), headerFilter: true, field: 'nextTermin', formatter: this.abgabterminFormatter, widthGrow: 1, width: 220, tooltip: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate1Status'))), headerFilter: true, field: 'qgate1Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate2Status'))), headerFilter: true, field: 'qgate2Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerv2'))), field: 'erstbetreuer', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
+					
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerTitelPre'))), field: 'betreuer_titelpre', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerVorname'))), field: 'betreuer_vorname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerNachname'))), field: 'betreuer_nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerTitelPost'))), field: 'betreuer_titelpost', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
+
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerv2'))), field: 'zweitbetreuer', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
+
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerTitelPre'))), field: 'zweitbetreuer_titelpre', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerVorname'))), field: 'zweitbetreuer_vorname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerNachname'))), field: 'zweitbetreuer_nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerTitelPost'))), field: 'zweitbetreuer_titelpost', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
+
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4prevAbgabetermin'))),
+						headerFilter: dateFilter,
+						headerFilterFunc: this.headerFilterTerminCol,
+						sorter: this.sortFuncTerminCol,
+						field: 'prevTermin', formatter: this.abgabterminFormatter, widthGrow: 1, width: 250, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nextAbgabetermin'))), field: 'nextTermin',
+						headerFilter: dateFilter,
+						headerFilterFunc: this.headerFilterTerminCol,
+						sorter: this.sortFuncTerminCol,
+						formatter: this.abgabterminFormatter, widthGrow: 1, width: 250, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate1Status'))),
+						headerFilter: 'list',
+						headerFilterParams: { valuesLookup: this.getQGateStatusList },
+						field: 'qgate1Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate2Status'))),
+						headerFilter: 'list',
+						headerFilterParams: { valuesLookup: this.getQGateStatusList },
+						field: 'qgate2Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
 				],
 				persistence: false,
-				persistenceID: "abgabetool_2025_12"
+				persistenceID: "abgabetool_2026_03_16"
 			},
 			abgabeTableEventHandlers: [
 			{
 				event: "rowSelectionChanged",
-				handler: async(data) => {
+				handler: async(data) => 
+				{
 					this.selectedData.filter(sd => !data.includes(sd)).forEach(fsd => {
 						if(fsd.checkbox) fsd.checkbox.checked = false
 					})
@@ -220,19 +240,86 @@ export const AbgabetoolAssistenz = {
 					data.forEach(d => {
 						if(d.checkbox) d.checkbox.checked = true
 					})
-
+					
 					this.selectedData = data
 				}
 			}
 			]};
 	},
 	methods: {
-		sammelMailStudent(param) {
+		handlePaUpdated(projektarbeit) {
+			this.checkAbgabetermineProjektarbeit(projektarbeit)
+			this.$refs.abgabeTable.tabulator.redraw(true)
+		},
+		getQGateStatusList() {
+			return [
+				this.$p.t('abgabetool/c4keinTerminVorhanden'),
+				this.$p.t('abgabetool/c4positivBenotet'),
+				this.$p.t('abgabetool/c4negativBenotet'),
+				this.$p.t('abgabetool/c4notYetGraded'),
+				this.$p.t('abgabetool/c4notSubmitted'),
+				this.$p.t('abgabetool/c4notHappenedYet')
+			]	
+		},
+		sortFuncTerminCol(a, b, aRow, bRow, column, dir, params) {
+			if (a === null || typeof a === "undefined") return 1;
+			if (b === null || typeof b === "undefined") return -1;
 			
-			const emails = this.selectedData
-				.map(row => `${row.student_uid}@${this.domain}`)
-				.join(',');
-			const uniqueRecipients = [...new Set(emails)];
+			// try to handle the prev/next interpretation consistently
+			// can only make this wrong UX whise so whatever
+			if(column._column.field == 'prevTermin') {
+				return Math.abs(b.diffMs) - Math.abs(a.diffMs)
+			} else if (column._column.field == 'nextTermin') {
+				return Math.abs(a.diffMs) - Math.abs(b.diffMs)
+			}
+			
+			// just in case someone reuses this
+			return Math.abs(b.diffMs) - Math.abs(a.diffMs) 
+		},
+		headerFilterTerminCol(filterVal, rowVal) {
+			if (!rowVal || !rowVal.luxonDate || !rowVal.luxonDate.isValid) {
+				return false;
+			}
+
+			const rowDate = rowVal.luxonDate;
+
+			const toLuxon = (val) => {
+				if (!val) return null;
+				let dt;
+				if (val instanceof Date) {
+					dt = luxon.DateTime.fromJSDate(val);
+				} else if (typeof val === "string") {
+					dt = luxon.DateTime.fromISO(val);
+				} else { // fallback
+					dt = luxon.DateTime.fromMillis(Number(val));
+				}
+
+				return dt.isValid ? dt : null;
+			};
+
+			const von = toLuxon(filterVal[0]);
+			const bis = toLuxon(filterVal[1]);
+
+			// specific day
+			if (von && !bis) {
+				return rowDate.hasSame(von, "day");
+			}
+
+			// range case
+			if (von && bis) {
+				return rowDate >= von.startOf("day") && rowDate <= bis.endOf("day");
+			}
+
+			return false
+		},
+		sammelMailStudent(param) {
+
+			const recipientList = [];
+			this.selectedData.forEach(d => {
+				recipientList.push(`${d.student_uid}@${this.domain}`)
+			})
+
+			const uniqueRecipients = [...new Set(recipientList)];
 			const subject = this.$p.t('abgabetool/c4sammelmailStudentBetreff', [this.selectedStudiengangOption?.bezeichnung]);
 			splitMailsHelper(uniqueRecipients, param.originalEvent, subject, this.$fhcAlert, this.$p)
 		},
@@ -281,7 +368,6 @@ export const AbgabetoolAssistenz = {
 			return false;
 		},
 		checkQualityGateStatus(projekt) {
-			// TODO: might refine the representation of these states and maybe refactor code a little
 			const qgate1Termine = []
 			const qgate2Termine = []
 			
@@ -301,7 +387,7 @@ export const AbgabetoolAssistenz = {
 			// reuse luxon calculated diffMs (termin.datum in relation to today) from previous datestyle check 
 			qgate1Termine.forEach(qgate => {
 				if(qgate.note != null && projekt.qgate1StatusRank <= 5) {
-					const noteOpt = this.notenOptions.find(opt => opt.note == qgate.note)
+					const noteOpt = typeof qgate.note !== 'object' ? this.notenOptions.find(opt => opt.note == qgate.note) : qgate.note
 					if(noteOpt.positiv) {
 						projekt.qgate1Status = this.$p.t('abgabetool/c4positivBenotet')
 						projekt.qgate1StatusRank = 5
@@ -323,7 +409,7 @@ export const AbgabetoolAssistenz = {
 
 			qgate2Termine.forEach(qgate => {
 				if(qgate.note != null && projekt.qgate1StatusRank <= 5) {
-					const noteOpt = this.notenOptions.find(opt => opt.note == qgate.note)
+					const noteOpt = typeof qgate.note !== 'object' ? this.notenOptions.find(opt => opt.note == qgate.note) : qgate.note
 					if(noteOpt.positiv) {
 						projekt.qgate2Status = this.$p.t('abgabetool/c4positivBenotet')
 						projekt.qgate2StatusRank = 5
@@ -385,14 +471,18 @@ export const AbgabetoolAssistenz = {
 			
 		},
 		checkAbgabetermineProjektarbeit(projekt) {
+			const now = luxon.DateTime.now()
+			
 			// calculate Abgabetermin time diff to now and assign last and next to projekt
 			projekt.abgabetermine.forEach(termin => {
-				
+
+				termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
 				
 				// while already looping through each termin, calculate datestyle beforehand
-				termin.dateStyle = this.getDateStyleClass(termin)
+				termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
 
-				const date = luxon.DateTime.fromISO(termin.datum)
+				const date = luxon.DateTime.fromISO(termin.datum).endOf('day')
+				termin.luxonDate = date
 				termin.diffMs = date.toMillis() - now.toMillis(); // positive = future, negative = past
 
 				if (termin.diffMs < 0) {
@@ -555,7 +645,7 @@ export const AbgabetoolAssistenz = {
 			actionButtons.className = "d-flex gap-3"; // you can keep Bootstrap gap if loaded
 			actionButtons.style.display = "flex";
 			actionButtons.style.alignItems = "stretch"; // buttons stretch to full height
-			actionButtons.style.justifyContent = "center";
+			actionButtons.style.justifyContent = "start";
 			actionButtons.style.height = "100%"; // full grid cell height
 
 			const val = cell.getValue();
@@ -585,7 +675,19 @@ export const AbgabetoolAssistenz = {
 				createButton('fa fa-timeline', 'abgabetool/c4termineTimeLine', () => this.openTimeline(val))
 			);
 
+			if(val.latestTerminWithUpload) {
+				actionButtons.append(
+					createButton('fa fa-download', 'abgabetool/c4downloadLatestAbgabe', () => this.downloadAbgabe(val.latestTerminWithUpload.paabgabe_id, val.student_uid, val.projektarbeit_id))
+				)
+			}
+
 			return actionButtons;
+		},
+		downloadAbgabe(paabgabe_id, student_uid, projektarbeit_id) {
+			const url = `/api/frontend/v1/Abgabe/getStudentProjektarbeitAbgabeFile?paabgabe_id=${paabgabe_id}&student_uid=${student_uid}&projektarbeit_id=${projektarbeit_id}`;
+
+			window.open(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + url)
+			// this.$api.call(ApiAbgabe.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid))
 		},
 
 		undoSelection(cell) {
@@ -612,6 +714,9 @@ export const AbgabetoolAssistenz = {
 		},
 		addSeries() {
 			const pids = this.selectedData?.map(projekt => projekt.projektarbeit_id)
+			
+			const preserveSelected = [...this.selectedData]
+			
 			this.saving = true
 			this.serienTermin.fixtermin = !this.serienTermin.invertedFixtermin
 			this.$api.call(ApiAbgabe.postSerientermin(
@@ -644,14 +749,27 @@ export const AbgabetoolAssistenz = {
 				})
 				
 				// reset selection to empty
-				this.$refs.abgabeTable.tabulator.deselectRow()
-
-				const mappedData = this.mapProjekteToTableData(this.projektarbeiten)
+				// this.$refs.abgabeTable.tabulator.deselectRow()
+				const table = this.$refs.abgabeTable.tabulator;
+				const scrollX = table.rowManager.scrollLeft;
+				const scrollY = table.rowManager.scrollTop;
 				
-				this.$refs.abgabeTable.tabulator.setData(mappedData)
-				this.$refs.abgabeTable.tabulator.redraw(true)
+				const mappedData = this.mapProjekteToTableData(this.projektarbeiten)
+
+				table.setData(mappedData)
+				table.redraw(true)
+
+				Vue.nextTick(()=> {
+					const table = this.$refs.abgabeTable?.tabulator.element.querySelector('.tabulator-tableholder')
+					if(table) {
+						table.scrollLeft = scrollX;
+						table.scrollTop = scrollY;
+					}
+				})
+				
 			}).finally(()=>{
 				this.saving = false
+				this.selectedData = preserveSelected
 			})
 
 			this.$refs.modalContainerAddSeries.hide()
@@ -674,6 +792,8 @@ export const AbgabetoolAssistenz = {
 					// TODO: mehrsprachig englisch
 					projekt.note_bez = opt.bezeichnung
 				}
+
+				const latestTerminWithUpload = this.findLatestTerminWithUpload(projekt)
 				
 				return {
 					...projekt,
@@ -681,6 +801,7 @@ export const AbgabetoolAssistenz = {
 					details: {
 						student_uid: projekt.student_uid,
 						projektarbeit_id: projekt.projektarbeit_id,
+						latestTerminWithUpload: latestTerminWithUpload ?? null
 					},
 					pkz: this.buildPKZ(projekt),
 					beurteilung: projekt.beurteilungLink ?? null,
@@ -694,6 +815,15 @@ export const AbgabetoolAssistenz = {
 				}
 			})
 		},
+		findLatestTerminWithUpload(projekt) {
+			const withAbgabedatumSorted = projekt?.abgabetermine?.filter(t => t.abgabedatum != null)?.sort((a,b) => a < b)
+
+			if(withAbgabedatumSorted.length) {
+				return withAbgabedatumSorted[0]
+			}
+
+			return null
+		},
 		createInfoString(data) {
 			let str = '';
 
@@ -705,10 +835,11 @@ export const AbgabetoolAssistenz = {
 			return str
 		},
 		isPastDate(date) {
-			return new Date(date) < new Date(Date.now())
+			const deadline = luxon.DateTime.fromISO(date, { zone: 'Europe/Vienna' }).endOf('day');
+			const nowInVienna = luxon.DateTime.now().setZone('Europe/Vienna');
+			return nowInVienna > deadline;
 		},
 		setDetailComponent(details){
-			
 			const pa = this.projektarbeiten.find(projektarbeit => projektarbeit.projektarbeit_id == details.projektarbeit_id)
 
 			if(pa?.abgabetermine?.length) {
@@ -729,6 +860,11 @@ export const AbgabetoolAssistenz = {
 				if(typeof termin.note !== 'object') {
 					termin.note = this.allowedNotenOptions.find(opt => opt.note == termin.note)
 				}
+
+				// only set this if it has not been set yet and abgabetermin has a note (qgate)
+				if(!termin.noteBackend && termin.note) {
+					termin.noteBackend = termin.note
+				}
 				
 				termin.file = []
 
@@ -738,9 +874,7 @@ export const AbgabetoolAssistenz = {
 
 				// assistenz are not allowed to delete deadlines with existing submissions
 				termin.allowedToDelete = paIsBenotet ? false : !termin.abgabedatum
-
-				termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
-
+				
 			})
 			
 			const vorname = pa.vorname ?? pa.student_vorname
@@ -748,51 +882,7 @@ export const AbgabetoolAssistenz = {
 			pa.student = `${vorname} ${nachname}`
 
 			this.selectedProjektarbeit = pa
-
 			this.$refs.modalContainerAbgabeDetail.show()
-		},
-		dateDiffInDays(datum){
-			const dateToday = luxon.DateTime.now().startOf('day');
-
-			const dateDatum = luxon.DateTime.fromISO(datum).startOf('day');
-
-			const duration = dateDatum.diff(dateToday, 'days');
-
-			return duration.values.days;
-		},
-		getDateStyleClass(termin) {
-			const datum = new Date(termin.datum)
-			const abgabedatum = new Date(termin.abgabedatum)
-
-			termin.diffindays = this.dateDiffInDays(termin.datum)
-
-			const isLate = termin.abgabedatum && abgabedatum > datum;
-
-			// GRADE STATUS
-			if (termin.note) {
-				if (termin.note.positiv) return 'bestanden';
-				return 'nichtbestanden';
-			}
-
-			// ACTION REQUIRED FOR GRADE
-			if (termin.bezeichnung?.benotbar && datum < today) {
-				return 'beurteilungerforderlich';
-			}
-
-			// SUBMISSION STATUS
-			if (termin.upload_allowed) {
-				if (termin.abgabedatum) {
-					return isLate ? 'verspaetet' : 'abgegeben';
-				}
-
-				// no submission yet
-				if (datum < today) return 'verpasst';
-				if (termin.diffindays <= 12) return 'abzugeben';
-				return 'standard';
-			}
-
-			// GENERIC STATUS
-			return datum < today ? 'verpasst' : 'standard';
 		},
 		openTimeline(val) {
 			const projekt = this.projektarbeiten.find(p => p.projektarbeit_id == val.projektarbeit_id)
@@ -864,7 +954,7 @@ export const AbgabetoolAssistenz = {
 					case 'abgegeben':
 						icon = '<i class="fa-solid fa-paperclip"></i>'
 						break
-					case 'beurteilungerfolderlich':
+					case 'beurteilungerforderlich':
 						icon = '<i class="fa-solid fa-list-check"></i>'
 						break
 					case 'bestanden':
@@ -984,7 +1074,7 @@ export const AbgabetoolAssistenz = {
 			
 			if(this.ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER) {
 				menu.push({
-					label: this.$p.t('abgabetool/c4sendEmailBetreuerv2', [this.uniqueBetreuerEmailCount]),
+					label: this.$p.t('abgabetool/c4sendEmailBetreuerv3', [this.uniqueBetreuerEmailCount]),
 					command: this.sammelMailBetreuer
 				})
 			}
@@ -1034,6 +1124,24 @@ export const AbgabetoolAssistenz = {
 			if(this.notenOptionFilter !== null && this.selectedStudiengangOption !== null) {
 				this.loadProjektarbeiten()
 			}
+		},
+		selectedData(newVal) {
+			const table = this.$refs.abgabeTable?.tabulator
+			if(!table) return
+
+			const allRows = table.getRows();
+
+			newVal.forEach(selected => {
+				const row = allRows.find(r => {
+					const data = r.getData()
+					if (data.projektarbeit_id == selected.projektarbeit_id) return r
+				}) 	
+				
+				row.select()
+				const cb = row.getElement().children[0]?.children[0]?.children[0]
+				if(cb) cb.checked = true
+			})
+
 		}
 	},
 	created() {
@@ -1145,15 +1253,16 @@ export const AbgabetoolAssistenz = {
 			
 				<div class="row mt-2">
 					<div class="col-12 col-md-3 align-content-center">
-						<div class="row fw-bold" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
+						<div class="row fw-bold" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4zieldatumv2') )}}</div>
 					</div>
 					<div class="col-12 col-md-9">
 						<VueDatePicker
 							style="width: 95%;"
 							v-model="serienTermin.datum"
 							:clearable="false"
+							locale="de"
+							format="dd.MM.yyyy"
 							:enable-time-picker="false"
-							:format="formatDate"
 							:text-input="true"
 							auto-apply>
 						</VueDatePicker>
@@ -1186,7 +1295,7 @@ export const AbgabetoolAssistenz = {
 				</div>
 				
 				<div class="row mt-2">
-					<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabekurzbz') )}}</div>
+					<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabekurzbzv2') )}}</div>
 					<div class="col-12 col-md-9">
 						<Textarea style="margin-bottom: 4px;" v-model="serienTermin.kurzbz" rows="1" class="w-100"></Textarea>
 					</div>
@@ -1207,7 +1316,13 @@ export const AbgabetoolAssistenz = {
 				</div>
 			</template>
 			<template v-slot:default>
-				<AbgabeDetail :projektarbeit="selectedProjektarbeit" :isFullscreen="detailIsFullscreen" :assistenzMode="true"></AbgabeDetail>
+				<AbgabeDetail 
+					:projektarbeit="selectedProjektarbeit" 
+					:isFullscreen="detailIsFullscreen" 
+					:assistenzMode="true"
+					@paUpdated="handlePaUpdated">
+				
+				</AbgabeDetail>
 				
 			</template>
 		</bs-modal>	
@@ -1279,7 +1394,7 @@ export const AbgabetoolAssistenz = {
 				<template #opposite="slotProps">
 					<div class="row g-1">
 						<div class="col-5 fw-semibold text-end">
-							{{ $capitalize($p.t('abgabetool/c4zieldatum')) }}:
+							{{ $capitalize($p.t('abgabetool/c4zieldatumv2')) }}:
 						</div>
 						<div class="col-7">
 							{{ formatDate(slotProps.item.datum) }}
@@ -1322,8 +1437,11 @@ export const AbgabetoolAssistenz = {
 		
 		<div id="abgabetable" style="max-height:40vw;">
 			<div class="row">
-				<div class="col-auto">
+				<div class="col-auto me-auto">
 					<h2 tabindex="1">{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
+				</div>
+				<div class="col-auto">
+					<label class="col-form-label">{{$capitalize($p.t('lehre/studiengang'))}}:</label>
 				</div>
 				<div class="col-3">
 					<Dropdown
@@ -1338,6 +1456,9 @@ export const AbgabetoolAssistenz = {
 							<div> {{ option.kurzbzlang }} {{ option.bezeichnung }} </div>
 						</template>
 					</Dropdown>
+				</div>
+				<div class="col-auto">
+					<label class="col-form-label">{{$capitalize($p.t('lehre/note'))}}:</label>
 				</div>
 				<div class="col-3">
 					<Dropdown

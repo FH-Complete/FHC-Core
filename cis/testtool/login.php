@@ -142,7 +142,9 @@ if (isset($_REQUEST['prestudent']))
 		}
 		if ($reihungstest_id != '' && $rt->load($reihungstest_id))
 		{
-			if ($rt->freigeschaltet)
+			$pruefling_exist = new Pruefling();
+			$alreadyInRT = $pruefling_exist->personAlreadyInRT($ps->person_id, $rt->reihungstest_id, $ps->prestudent_id);
+			if ($rt->freigeschaltet && !$alreadyInRT)
 			{
 				// regenerate Session ID after Login
 				session_regenerate_id();
@@ -282,7 +284,14 @@ if (isset($_REQUEST['prestudent']))
 			}
 			else
 			{
-				$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestNichtFreigeschalten').'</div>';
+				if ($alreadyInRT)
+				{
+					$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestNichtRegistriert').'</div>';
+				}
+				else
+				{
+					$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestNichtFreigeschalten').'</div>';
+				}
 			}
 		}
 		else
@@ -340,13 +349,26 @@ else
 	}
 }
 
-if ((isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']) &&
-	!isset($_SESSION['confirmation_needed']) && !isset($_SESSION['confirmed_code'])) ||
-	(isset($_SESSION['confirmation_needed']) && $_SESSION['confirmation_needed'] === true &&
-	isset($_SESSION['confirmed_code']) && $_SESSION['confirmed_code'] === true &&
-	isset($_SESSION['externe_ueberwachung']) && $_SESSION['externe_ueberwachung'] === true &&
-	isset($_SESSION['externe_ueberwachung_verified']) && $_SESSION['externe_ueberwachung_verified'] === true &&
-	isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id'])))
+if (
+	(
+		isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']) &&
+		!isset($_SESSION['confirmation_needed']) && !isset($_SESSION['confirmed_code']) &&
+		!isset($_SESSION['externe_ueberwachung']) && !isset($_SESSION['externe_ueberwachung_verified'])
+	)
+	||
+	(
+		isset($_SESSION['confirmation_needed']) && $_SESSION['confirmation_needed'] === true &&
+		isset($_SESSION['confirmed_code']) && $_SESSION['confirmed_code'] === true &&
+		isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id'])
+	)
+	||
+	(
+		isset($_SESSION['externe_ueberwachung']) && $_SESSION['externe_ueberwachung'] === true &&
+		isset($_SESSION['externe_ueberwachung_verified']) && $_SESSION['externe_ueberwachung_verified'] === true &&
+		isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id'])
+	)
+
+)
 {
 	$pruefling = new pruefling();
 

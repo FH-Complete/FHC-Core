@@ -26,37 +26,8 @@ export default{
 		}
 	},
 	computed: {
-		prestudentIds() {
-			if (this.modelValue.prestudent_id)
-			{
-				return [this.modelValue.prestudent_id];
-			}
-			return this.modelValue.map(e => e.prestudent_id);
-		},
-		showToolbarStudent() {
-			if (Array.isArray(this.modelValue)) {
-				if (!this.modelValue.length)
-					return false;
-				return this.modelValue.every(item => item.uid);
-			}
-			return !!this.modelValue.uid;
-		},
-		showToolbarInteressent() {
-			if (Array.isArray(this.modelValue)) {
-				if (!this.modelValue.length)
-					return false;
-				return !this.modelValue.some(item => item.uid);
-			}
-			return !this.modelValue.uid;
-		}
-	},
-	props: {
-		modelValue: Object,
-		config: Object,
-	},
-	data() {
-		return {
-			tabulatorOptions: {
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(ApiStvPrestudent.getHistoryPrestudent(this.modelValue.prestudent_id)),
 				ajaxResponse: (url, params, response) => response.data,
@@ -164,7 +135,7 @@ export default{
 						}
 					},
 					{title: "UpdateVon", field: "updatevon", visible: false},
-/*					{title: "Aufnahmestufe", field: "aufnahmestufe", visible: false},*/
+					/*					{title: "Aufnahmestufe", field: "aufnahmestufe", visible: false},*/
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
@@ -207,8 +178,8 @@ export default{
 							button.addEventListener('click', () =>
 								this.actionEditStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
 							);
-/*							if (this.dataMeldestichtag && this.dataMeldestichtag > data.datum && !this.hasPermissionToSkipStatusCheck)
-								button.disabled = true;*/
+							/*							if (this.dataMeldestichtag && this.dataMeldestichtag > data.datum && !this.hasPermissionToSkipStatusCheck)
+															button.disabled = true;*/
 							container.append(button);
 
 							button = document.createElement('button');
@@ -237,68 +208,78 @@ export default{
 				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
-				selectable: false,
+				selectableRows: false,
 				index: 'statusId',
-				persistenceID: 'stv-multistatus-2025112401'
-			},
-			tabulatorEvents: [
+				persistenceID: 'stv-multistatus-20260217'
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'tableBuilt',
 					handler: async () => {
 						await this.$p.loadCategory(['lehre','global','person','ui']);
 
-						let cm = this.$refs.table.tabulator.columnManager;
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('lehrverband').component.updateDefinition({
-									title: this.$p.t('lehre', 'lehrverband')
-								});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
 
-						cm.getColumnByField('bestaetigtam').component.updateDefinition({
-							title: this.$p.t('lehre', 'bestaetigt_am')
-						});
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
 
-						cm.getColumnByField('bewerbung_abgeschicktamum').component.updateDefinition({
-							title: this.$p.t('lehre', 'bewerbung_abgeschickt_am')
-						});
-
-						cm.getColumnByField('bezeichnung').component.updateDefinition({
-							title: this.$p.t('lehre', 'studienplan')
-						});
-
-						cm.getColumnByField('actions').component.updateDefinition({
-							title: this.$p.t('global', 'aktionen')
-						});
-
-						cm.getColumnByField('datum').component.updateDefinition({
-							title: this.$p.t('global', 'datum')
-						});
-
-						cm.getColumnByField('anmerkung').component.updateDefinition({
-							title: this.$p.t('global', 'anmerkung')
-						});
-
-						cm.getColumnByField('bestaetigtvon').component.updateDefinition({
-							title: this.$p.t('lehre', 'bestaetigt_von')
-						});
-
-						cm.getColumnByField('insertamum').component.updateDefinition({
-							title: this.$p.t('lehre', 'insert_am')
-						});
-
-						cm.getColumnByField('insertvon').component.updateDefinition({
-							title: this.$p.t('lehre', 'insert_von')
-						});
-
-						cm.getColumnByField('prestudent_id').component.updateDefinition({
-							title: this.$p.t('ui', 'prestudent_id')
-						});
-
-						cm.getColumnByField('studienplan_id').component.updateDefinition({
-							title: this.$p.t('ui', 'studienplan_id')
-						});
-					}
+						setHeader('lehrverband', this.$p.t('lehre', 'lehrverband'));
+						setHeader('bestaetigtam', this.$p.t('lehre', 'bestaetigt_am'));
+						setHeader('bewerbung_abgeschicktamum', this.$p.t('lehre', 'bewerbung_abgeschickt_am'));
+						setHeader('bezeichnung', this.$p.t('lehre', 'studienplan'));
+						setHeader('actions', this.$p.t('global', 'aktionen'));
+						setHeader('datum', this.$p.t('global', 'datum'));
+						setHeader('anmerkung', this.$p.t('global', 'anmerkung'));
+						setHeader('bestaetigtvon', this.$p.t('lehre', 'bestaetigt_von'));
+						setHeader('insertamum', this.$p.t('lehre', 'insert_am'));
+						setHeader('insertvon', this.$p.t('lehre', 'insert_von'));
+						setHeader('prestudent_id', this.$p.t('ui', 'prestudent_id'));
+						setHeader('studienplan_id', this.$p.t('ui', 'studienplan_id'));					}
 				}
-			],
+			];
+			return events;
+		},
+		prestudentIds() {
+			if (this.modelValue.prestudent_id)
+			{
+				return [this.modelValue.prestudent_id];
+			}
+			return this.modelValue.map(e => e.prestudent_id);
+		},
+		showToolbarStudent() {
+			if (Array.isArray(this.modelValue)) {
+				if (!this.modelValue.length)
+					return false;
+				return this.modelValue.every(item => item.uid);
+			}
+			return !!this.modelValue.uid;
+		},
+		showToolbarInteressent() {
+			if (Array.isArray(this.modelValue)) {
+				if (!this.modelValue.length)
+					return false;
+				return !this.modelValue.some(item => item.uid);
+			}
+			return !this.modelValue.uid;
+		}
+	},
+	props: {
+		modelValue: Object,
+		config: Object,
+	},
+	data() {
+		return {
 			statusData: {},
 			statusId: {},
 			dataMeldestichtag: null,
@@ -420,7 +401,7 @@ export default{
 			@saved="reload"
 			>
 		</status-modal>
-			
+	
 		<core-filter-cmpt
 			v-if="!this.modelValue.length"
 			ref="table"
@@ -433,8 +414,7 @@ export default{
 			new-btn-show
 			:new-btn-label="this.$p.t('global', 'status')"
 			@click:new="actionNewStatus"
-			>
-			
+			>			
 			<template #actions="{updateData2}">
 				<!-- SingleSelectButton-->
 				<status-dropdown 
