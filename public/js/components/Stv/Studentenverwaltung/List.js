@@ -1,7 +1,7 @@
 import { CoreFilterCmpt } from "../../filter/Filter.js";
 import ListNew from "./List/New.js";
 import CoreTag from "../../Tag/Tag.js";
-import { tagHeaderFilter } from "../../../tabulator/filters/extendedHeaderFilter.js";
+import { buildTagHeaderFilterExpression, buildTagOptionsFromRows, customTagFilter, setTagHeaderFilterValue, tagHeaderFilter } from "../../../tabulator/filters/extendedHeaderFilter.js";
 import {
   addTagInTable,
   deleteTagInTable,
@@ -64,8 +64,11 @@ export default {
     }
 
     return {
-      initialTagData: [],
-      selectedTagOptions: [],
+      tagFilterState: {
+        initialOptions: [],
+        selectedOptions: [],
+      },
+      selectedColumnValues: [],
       tabulatorOptions: {
         columns: [
           { title: "UID", field: "uid", headerFilter: true },
@@ -398,7 +401,7 @@ export default {
         {
           event: "dataProcessed",
           handler: (data) => {
-            console.log("dataProcessed", data);
+            //console.log("dataProcessed", data);
             this.getAllRows();
             this.autoSelectRows(data);
           },
@@ -406,7 +409,7 @@ export default {
         {
           event: "dataLoaded",
           handler: (data) => {
-            console.log("dataLoaded", data);
+            //console.log("dataLoaded", data);
             if (Array.isArray(data)) {
               this.count = data.length;
               this.allPrestudents = data.map((item) => item.prestudent_id);
@@ -414,12 +417,13 @@ export default {
               this.count = 0;
               this.allPrestudents = [];
             }
+            this.refreshTagHeaderFilterInitialOptions(Array.isArray(data) ? data : []);
           },
         },
         {
           event: "dataFiltered",
           handler: (filters, rows) => {
-            console.log("dataFiltered", filters, rows);
+            //console.log("dataFiltered", filters, rows);
             this.filteredcount = rows.length;
           },
         },
@@ -430,14 +434,14 @@ export default {
         {
           event: "dataTreeRowExpanded",
           handler: (data) => {
-            console.log("dataTreeRowExpanded", data);
+            //console.log("dataTreeRowExpanded", data);
             this.getExpandedRows();
           },
         },
         {
           event: "dataTreeRowCollapsed",
           handler: (data) => {
-            console.log("dataTreeRowCollapsed", data);
+            //console.log("dataTreeRowCollapsed", data);
             this.getExpandedRows();
           },
         },
@@ -448,7 +452,7 @@ export default {
         {
           event: "columnWidth",
           handler: (column) => {
-            console.log("columnWidth", column);
+            //console.log("columnWidth", column);
             if (column.getField() !== "tags") return;
 
             column.getCells().forEach((cell) => {
@@ -465,7 +469,6 @@ export default {
       selectedcount: 0,
       //tags
       expanded: [],
-      selectedColumnValues: [],
       tagEndpoint: ApiTag,
       currentEndpoint: null,
       headerFilterActive: false,
@@ -561,175 +564,13 @@ export default {
         title: "Tags",
         field: "tags",
         tooltip: false,
-        headerFilter: "list",
+        headerFilter: customTagFilter,
         headerFilterParams: {
-          valuesLookup: () => {
-            console.log("headerFilterParams.valuesLookup called");
-            const options = new Map();
-
-            this.$refs.table.tabulator.getData("active").forEach((row) => {
-              let tags = row.tags;
-
-              if (typeof tags === "string") {
-                try {
-                  tags = JSON.parse(tags);
-                } catch {
-                  return;
-                }
-              }
-
-              if (!Array.isArray(tags)) return;
-
-              tags
-                .filter((tag) => tag && tag.done !== true)
-                .forEach((tag) => {
-                  options.set(tag.beschreibung, {
-                    label: tag.beschreibung,
-                    value: tag.beschreibung,
-                    style: tag.style,
-                  });
-                });
-            });
-
-            return [
-              {
-                isHeader: true,
-                label: "test",
-                subOptions: [...options.values()],
-              },
-            ];
-          },
-          itemFormatter: (value, label, item) => {
-            console.log("value, label, item", value, label, item);
-            if (!item.isHeader) return "<span class='m-0 p-0'></span>";
-
-            let table = document.createElement("table");
-            table.className = "table table-sm mb-0";
-            table.appendChild(document.createElement("thead"));
-            table
-              .querySelector("thead")
-              .appendChild(document.createElement("tr"));
-
-            let firstHeading = document.createElement("th");
-            firstHeading.innerHTML = "<strong>" + value + "</strong>";
-            table.querySelector("tr").appendChild(firstHeading);
-
-            let secondHeading = document.createElement("th");
-            secondHeading.innerHTML = "<strong>AND</strong>";
-            table.querySelector("tr").appendChild(secondHeading);
-
-            let thirdHeading = document.createElement("th");
-            thirdHeading.innerHTML = "<strong>OR</strong>";
-            table.querySelector("tr").appendChild(thirdHeading);
-
-            let fourthHeading = document.createElement("th");
-            fourthHeading.innerHTML = "<strong>NOT</strong>";
-            table.querySelector("tr").appendChild(fourthHeading);
-
-            table.appendChild(document.createElement("tbody"));
-
-            item.subOptions.forEach((option) => {
-              let row = document.createElement("tr");
-
-              let firstColumn = document.createElement("td");
-
-              let optionLabel = document.createElement("span");
-              optionLabel.className = "tag " + option.style;
-              optionLabel.innerText = option.label;
-              firstColumn.appendChild(optionLabel);
-              row.appendChild(firstColumn);
-
-              let secondColumn = document.createElement("td");
-              let firstCheckbox = document.createElement("input");
-              firstCheckbox.type = "checkbox";
-              firstCheckbox.label = "test";
-              firstCheckbox.style.cursor = "pointer";
-              firstCheckbox.checked = this.selectedTagOptions.some(
-                (tag) => tag.value === option.value && tag.connector === "AND",
-              );
-              firstCheckbox.addEventListener("click", (event) => {
-                event.stopPropagation();
-                if (event.target.checked) {
-                  this.selectedTagOptions.push({
-                    label: option.label,
-                    value: option.value,
-                    connector: "AND",
-                  });
-                } else {
-                  this.selectedTagOptions = this.selectedTagOptions.filter(
-                    (tag) =>
-                      tag.value !== option.value || tag.connector !== "AND",
-                  );
-                }
-                console.log("selectedTagOptions", this.selectedTagOptions);
-              });
-              secondColumn.appendChild(firstCheckbox);
-              row.appendChild(secondColumn);
-
-              let thirdColumn = document.createElement("td");
-              let secondCheckbox = document.createElement("input");
-              secondCheckbox.type = "checkbox";
-              secondCheckbox.label = "test";
-              secondCheckbox.style.cursor = "pointer";
-              secondCheckbox.checked = this.selectedTagOptions.some(
-                (tag) => tag.value === option.value && tag.connector === "OR",
-              );
-              secondCheckbox.addEventListener("click", (event) => {
-                event.stopPropagation();
-                if (event.target.checked) {
-                  this.selectedTagOptions.push({
-                    label: option.label,
-                    value: option.value,
-                    connector: "OR",
-                  });
-                } else {
-                  this.selectedTagOptions = this.selectedTagOptions.filter(
-                    (tag) =>
-                      tag.value !== option.value || tag.connector !== "OR",
-                  );
-                }
-              });
-              thirdColumn.appendChild(secondCheckbox);
-              row.appendChild(thirdColumn);
-
-              let fourthColumn = document.createElement("td");
-              let thirdCheckbox = document.createElement("input");
-              thirdCheckbox.type = "checkbox";
-              thirdCheckbox.label = "test";
-              thirdCheckbox.style.cursor = "pointer";
-              thirdCheckbox.checked = this.selectedTagOptions.some(
-                (tag) => tag.value === option.value && tag.connector === "NOT",
-              );
-              thirdCheckbox.addEventListener("click", (event) => {
-                event.stopPropagation();
-                console.log(event.target.checked);
-                if (event.target.checked) {
-                  this.selectedTagOptions.push({
-                    label: option.label,
-                    value: option.value,
-                    connector: "NOT",
-                  });
-                } else {
-                  this.selectedTagOptions = this.selectedTagOptions.filter(
-                    (tag) =>
-                      tag.value !== option.value || tag.connector !== "NOT",
-                  );
-                }
-              });
-              fourthColumn.appendChild(thirdCheckbox);
-              row.appendChild(fourthColumn);
-
-              row.addEventListener("click", (event) => {
-                event.stopPropagation();
-              });
-
-              table.querySelector("tbody").appendChild(row);
-            });
-            return table;
-          },
           listOnEmpty: true,
           autocomplete: true,
           sort: "asc",
+          initialOptions: this.tagFilterState.initialOptions,
+          selectedOptions: this.tagFilterState.selectedOptions,
         },
         headerFilterFunc: tagHeaderFilter,
         headerFilterFuncParams: { field: "tags" },
@@ -746,33 +587,18 @@ export default {
         this.translateTabulator();
       }
     },
-    selectedTagOptions: {
+    "tagFilterState.selectedOptions": {
       handler() {
-        let combinedFilterStatement = null;
+        const selectedOptions = this.tagFilterState.selectedOptions;
+        const combinedFilterStatement = buildTagHeaderFilterExpression(
+          selectedOptions,
+        );
 
-        this.selectedTagOptions.forEach((tagOption) => {
-          const { value, connector } = tagOption;
-          
-          let mappedConnector = connector === "AND" ? "&&" : connector === "OR" ? "||" : "!";
-          if (connector === "NOT") {
-            combinedFilterStatement = combinedFilterStatement
-              ? `${combinedFilterStatement} && ${mappedConnector + value}`
-              : value;
-          }
-          else {
-            combinedFilterStatement = combinedFilterStatement
-              ? `${combinedFilterStatement} ${mappedConnector} ${value}`
-              : value;
-          }
-        });
-
-        this.$refs.table.tabulator.setHeaderFilterValue(
-          "tags",
+        setTagHeaderFilterValue(
+          this.$refs.table.tabulator,
           combinedFilterStatement,
         );
-        this.$emit("filterActive", this.selectedTagOptions.length > 0);
-        console.log("selectedTagOptions changed:");
-        console.log(combinedFilterStatement);
+        this.$emit("filterActive", selectedOptions.length > 0);
       },
       deep: true,
     },
@@ -868,7 +694,7 @@ export default {
       this.$refs.new.open();
     },
     rowSelectionChanged(data, rows, selected, deselected) {
-      console.log("rowSelectionChanged", data, rows, selected, deselected);
+      //console.log("rowSelectionChanged", data, rows, selected, deselected);
       this.selectedcount = data.length;
 
       if (selected.length > 0 || deselected.length > 0) {
@@ -915,8 +741,8 @@ export default {
     updateUrl(endpoint, first) {
       this.lastSelected = first ? undefined : this.selected;
 
-      /*			console.log('function param endpoint: ' + JSON.stringify(endpoint));
-			console.log('current endpoint: ' + JSON.stringify(this.currentEndpoint));*/
+      /*			//console.log('function param endpoint: ' + JSON.stringify(endpoint));
+			//console.log('current endpoint: ' + JSON.stringify(this.currentEndpoint));*/
 
       if (endpoint === undefined && this.currentEndpoint === null) {
         endpoint = { url: "" };
@@ -1021,7 +847,7 @@ export default {
       }
     },
     handleRowClick(e, row) {
-      console.log("handleRowClick", e, row);
+      //console.log("handleRowClick", e, row);
       // TODO(chris): this should be in the filter component
       if (this.focusObj) {
         let el = row.getElement();
@@ -1035,12 +861,34 @@ export default {
     //methods tags
     addedTag(addedTag) {
       addTagInTable(addedTag, this.allRows, "prestudent_id");
+      this.refreshTagHeaderFilterInitialOptions();
     },
     deletedTag(deletedTag) {
+      console.log("deletedTag", deletedTag);
       deleteTagInTable(deletedTag, this.allRows);
+      this.refreshTagHeaderFilterInitialOptions();
     },
     updatedTag(updatedTag) {
       updateTagInTable(updatedTag, this.allRows);
+      this.refreshTagHeaderFilterInitialOptions();
+    },
+    refreshTagHeaderFilterInitialOptions(rows) {
+      const data =
+        rows || this.$refs.table?.tabulator?.getData() || [];
+
+      const options = buildTagOptionsFromRows(data);
+      this.tagFilterState.initialOptions.splice(
+        0,
+        this.tagFilterState.initialOptions.length,
+        ...options,
+      );
+
+      const availableValues = new Set(options.map((option) => option.value));
+      for (let i = this.tagFilterState.selectedOptions.length - 1; i >= 0; i--) {
+        if (!availableValues.has(this.tagFilterState.selectedOptions[i].value)) {
+          this.tagFilterState.selectedOptions.splice(i, 1);
+        }
+      }
     },
     getAllRows() {
       this.allRows = this.$refs.table.tabulator.getRows();
@@ -1053,7 +901,7 @@ export default {
       this.headerFilterActive = filterActive;
     },
     handleMouseDown(e, row) {
-      console.log("handleMouseDown", e, row);
+      //console.log("handleMouseDown", e, row);
       let data = row.getData();
       let id = data.uid ?? data.prestudent_id ?? data.person_id;
 
@@ -1065,12 +913,12 @@ export default {
         isAlreadySelected && this.selected?.length ? this.selected : [data];
     },
     handleDataLoading() {
-      console.log("handleDataLoading");
+      //console.log("handleDataLoading");
       this.oldScrollLeft = this.$refs.table.tabulator.rowManager.scrollLeft;
       this.oldScrollTop = this.$refs.table.tabulator.rowManager.scrollTop;
     },
     handleRenderComplete() {
-      console.log("handleRenderComplete");
+      //console.log("handleRenderComplete");
       const table = this.$refs.table.tabulator.element.querySelector(
         ".tabulator-tableholder",
       );
