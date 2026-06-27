@@ -1,7 +1,13 @@
 import { CoreFilterCmpt } from "../../filter/Filter.js";
 import ListNew from "./List/New.js";
 import CoreTag from "../../Tag/Tag.js";
-import { buildTagHeaderFilterExpression, buildTagOptionsFromRows, customTagFilter, setTagHeaderFilterValue, tagHeaderFilter } from "../../../tabulator/filters/extendedHeaderFilter.js";
+import {
+  buildTagHeaderFilterExpression,
+  buildTagOptionsFromRows,
+  customTagFilter,
+  setTagHeaderFilterValue,
+  tagHeaderFilter,
+} from "../../../tabulator/filters/extendedHeaderFilter.js";
 import {
   addTagInTable,
   deleteTagInTable,
@@ -67,6 +73,15 @@ export default {
       tagFilterState: {
         initialOptions: [],
         selectedOptions: [],
+      },
+      tagFilterLabels: {
+        tag: "Tag",
+        clear: "Clear",
+        connectors: {
+          AND: "AND",
+          OR: "OR",
+          NOT: "NOT",
+        },
       },
       selectedColumnValues: [],
       tabulatorOptions: {
@@ -383,7 +398,15 @@ export default {
         selectableRows: true,
         selectableRowsRangeMode: "click",
         index: "prestudent_id",
-        persistence: false,
+        persistence: {
+          sort: true,
+          columns: ["width", "visible"],
+          filter: false,
+          headerFilter: false,
+          group: false,
+          page: false,
+        },
+        persistenceID: "stv-studentenverwaltung-list-2",
       },
       tabulatorEvents: [
         {
@@ -401,7 +424,6 @@ export default {
         {
           event: "dataProcessed",
           handler: (data) => {
-            //console.log("dataProcessed", data);
             this.getAllRows();
             this.autoSelectRows(data);
           },
@@ -409,7 +431,6 @@ export default {
         {
           event: "dataLoaded",
           handler: (data) => {
-            //console.log("dataLoaded", data);
             if (Array.isArray(data)) {
               this.count = data.length;
               this.allPrestudents = data.map((item) => item.prestudent_id);
@@ -417,14 +438,16 @@ export default {
               this.count = 0;
               this.allPrestudents = [];
             }
-            this.refreshTagHeaderFilterInitialOptions(Array.isArray(data) ? data : []);
+            this.refreshTagHeaderFilterInitialOptions(
+              Array.isArray(data) ? data : [],
+            );
           },
         },
         {
           event: "dataFiltered",
           handler: (filters, rows) => {
-            //console.log("dataFiltered", filters, rows);
             this.filteredcount = rows.length;
+            this.syncSelectedTagOptionsWithHeaderFilters(filters);
           },
         },
         {
@@ -434,14 +457,12 @@ export default {
         {
           event: "dataTreeRowExpanded",
           handler: (data) => {
-            //console.log("dataTreeRowExpanded", data);
             this.getExpandedRows();
           },
         },
         {
           event: "dataTreeRowCollapsed",
           handler: (data) => {
-            //console.log("dataTreeRowCollapsed", data);
             this.getExpandedRows();
           },
         },
@@ -452,7 +473,6 @@ export default {
         {
           event: "columnWidth",
           handler: (column) => {
-            //console.log("columnWidth", column);
             if (column.getField() !== "tags") return;
 
             column.getCells().forEach((cell) => {
@@ -558,29 +578,6 @@ export default {
       );
     },
   },
-  created: function () {
-    if (this.tagsEnabled) {
-      const coltags = {
-        title: "Tags",
-        field: "tags",
-        tooltip: false,
-        headerFilter: customTagFilter,
-        headerFilterParams: {
-          listOnEmpty: true,
-          autocomplete: true,
-          sort: "asc",
-          initialOptions: this.tagFilterState.initialOptions,
-          selectedOptions: this.tagFilterState.selectedOptions,
-        },
-        headerFilterFunc: tagHeaderFilter,
-        headerFilterFuncParams: { field: "tags" },
-        formatter: (cell, formatterParams, onRendered) =>
-          tagFormatter(cell, this.$refs.tagComponent, onRendered),
-        width: 150,
-      };
-      this.tabulatorOptions.columns.splice(2, 0, coltags);
-    }
-  },
   watch: {
     "$p.user_language.value"(n, o) {
       if (n !== o && o !== undefined && this.$refs.table.tableBuilt) {
@@ -590,9 +587,8 @@ export default {
     "tagFilterState.selectedOptions": {
       handler() {
         const selectedOptions = this.tagFilterState.selectedOptions;
-        const combinedFilterStatement = buildTagHeaderFilterExpression(
-          selectedOptions,
-        );
+        const combinedFilterStatement =
+          buildTagHeaderFilterExpression(selectedOptions);
 
         setTagHeaderFilterValue(
           this.$refs.table.tabulator,
@@ -616,6 +612,8 @@ export default {
           "stv",
         ])
         .then(() => {
+          this.updateTagFilterLabels();
+
           const translations = {
             uid: capitalize(this.$p.t("person/uid")),
             titelpre: capitalize(this.$p.t("person/titelpre")),
@@ -694,13 +692,11 @@ export default {
       this.$refs.new.open();
     },
     rowSelectionChanged(data, rows, selected, deselected) {
-      //console.log("rowSelectionChanged", data, rows, selected, deselected);
       this.selectedcount = data.length;
 
       if (selected.length > 0 || deselected.length > 0) {
         this.lastSelected = this.selected;
 
-        //for tags
         this.selectedRows = this.$refs.table.tabulator.getSelectedRows();
         this.selectedColumnValues = this.selectedRows
           .filter(
@@ -738,11 +734,15 @@ export default {
       this.$emit("filterActive", filter);
       this.updateUrl();
     },
+    updateTagFilterLabels() {
+      this.tagFilterLabels.clear = this.$p.t("ui/filterdelete");
+      this.tagFilterLabels.tag = 'Tag';
+      this.tagFilterLabels.connectors.AND = this.$p.t("ui/andCondition").toUpperCase();
+      this.tagFilterLabels.connectors.OR = this.$p.t("ui/orCondition").toUpperCase();
+      this.tagFilterLabels.connectors.NOT = this.$p.t("ui/notCondition").toUpperCase();
+    },
     updateUrl(endpoint, first) {
       this.lastSelected = first ? undefined : this.selected;
-
-      /*			//console.log('function param endpoint: ' + JSON.stringify(endpoint));
-			//console.log('current endpoint: ' + JSON.stringify(this.currentEndpoint));*/
 
       if (endpoint === undefined && this.currentEndpoint === null) {
         endpoint = { url: "" };
@@ -847,7 +847,6 @@ export default {
       }
     },
     handleRowClick(e, row) {
-      //console.log("handleRowClick", e, row);
       // TODO(chris): this should be in the filter component
       if (this.focusObj) {
         let el = row.getElement();
@@ -864,7 +863,6 @@ export default {
       this.refreshTagHeaderFilterInitialOptions();
     },
     deletedTag(deletedTag) {
-      console.log("deletedTag", deletedTag);
       deleteTagInTable(deletedTag, this.allRows);
       this.refreshTagHeaderFilterInitialOptions();
     },
@@ -873,8 +871,7 @@ export default {
       this.refreshTagHeaderFilterInitialOptions();
     },
     refreshTagHeaderFilterInitialOptions(rows) {
-      const data =
-        rows || this.$refs.table?.tabulator?.getData() || [];
+      const data = rows || this.$refs.table?.tabulator?.getData() || [];
 
       const options = buildTagOptionsFromRows(data);
       this.tagFilterState.initialOptions.splice(
@@ -884,8 +881,14 @@ export default {
       );
 
       const availableValues = new Set(options.map((option) => option.value));
-      for (let i = this.tagFilterState.selectedOptions.length - 1; i >= 0; i--) {
-        if (!availableValues.has(this.tagFilterState.selectedOptions[i].value)) {
+      for (
+        let i = this.tagFilterState.selectedOptions.length - 1;
+        i >= 0;
+        i--
+      ) {
+        if (
+          !availableValues.has(this.tagFilterState.selectedOptions[i].value)
+        ) {
           this.tagFilterState.selectedOptions.splice(i, 1);
         }
       }
@@ -894,14 +897,37 @@ export default {
       this.allRows = this.$refs.table.tabulator.getRows();
     },
     resetFilter() {
+      this.clearSelectedTagHeaderFilters();
       this.$refs.listfilter.resetFilter();
       this.$refs.table.clearFilters();
+    },
+    clearSelectedTagHeaderFilters() {
+      this.tagFilterState.selectedOptions.splice(
+        0,
+        this.tagFilterState.selectedOptions.length,
+      );
+    },
+    syncSelectedTagOptionsWithHeaderFilters(filters) {
+      if (!this.tagsEnabled || !this.tagFilterState.selectedOptions.length) {
+        return;
+      }
+
+      const hasActiveTagFilter = filters.some(
+        (filter) =>
+          filter.field === "tags" &&
+          filter.value !== "" &&
+          filter.value !== null &&
+          filter.value !== undefined,
+      );
+
+      if (!hasActiveTagFilter) {
+        this.clearSelectedTagHeaderFilters();
+      }
     },
     handleHeaderFilter(filterActive) {
       this.headerFilterActive = filterActive;
     },
     handleMouseDown(e, row) {
-      //console.log("handleMouseDown", e, row);
       let data = row.getData();
       let id = data.uid ?? data.prestudent_id ?? data.person_id;
 
@@ -913,12 +939,10 @@ export default {
         isAlreadySelected && this.selected?.length ? this.selected : [data];
     },
     handleDataLoading() {
-      //console.log("handleDataLoading");
       this.oldScrollLeft = this.$refs.table.tabulator.rowManager.scrollLeft;
       this.oldScrollTop = this.$refs.table.tabulator.rowManager.scrollTop;
     },
     handleRenderComplete() {
-      //console.log("handleRenderComplete");
       const table = this.$refs.table.tabulator.element.querySelector(
         ".tabulator-tableholder",
       );
@@ -934,6 +958,33 @@ export default {
         this.oldScrollUrl = this.$refs.table.tabulator.getAjaxUrl();
       }
     },
+  },
+  created: function () {
+    if (this.tagsEnabled) {
+      const coltags = {
+        title: "Tags",
+        field: "tags",
+        tooltip: false,
+        headerFilter: customTagFilter,
+        headerFilterParams: {
+          listOnEmpty: true,
+          autocomplete: true,
+          sort: "asc",
+          initialOptions: this.tagFilterState.initialOptions,
+          selectedOptions: this.tagFilterState.selectedOptions,
+          labels: this.tagFilterLabels,
+        },
+        headerFilterFunc: tagHeaderFilter,
+        headerFilterFuncParams: { field: "tags" },
+        formatter: (cell, formatterParams, onRendered) =>
+          tagFormatter(cell, this.$refs.tagComponent, onRendered),
+        width: 150,
+      };
+      this.tabulatorOptions.columns.splice(2, 0, coltags);
+      this.$p.loadCategory("ui").then(() => {
+        this.updateTagFilterLabels();
+      });
+    }
   },
   // TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
   // TODO(chris): filter component column chooser has no accessibilty features

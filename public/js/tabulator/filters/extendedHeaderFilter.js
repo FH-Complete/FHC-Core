@@ -22,6 +22,10 @@ const TAG_FILTER_CONNECTOR_ORDER = [
   TAG_FILTER_CONNECTORS.NOT,
 ];
 
+function getConnectorLabel(connector, labels) {
+  return labels?.connectors?.[connector.key] || connector.label;
+}
+
 export function setTagHeaderFilterValue(tabulator, value) {
   tabulator?.setHeaderFilterValue("tags", value);
 
@@ -147,7 +151,7 @@ export function customTagFilter(cell, onRendered, success, cancel, params) {
     closeDropdown();
   };
 
-  const clearFilter = () => {
+  const clearFilter = ({ closeDropdownAfterClear = true } = {}) => {
     input.value = "";
 
     if (Array.isArray(params.selectedOptions)) {
@@ -158,7 +162,10 @@ export function customTagFilter(cell, onRendered, success, cancel, params) {
     }
 
     success("");
-    closeDropdown();
+
+    if (closeDropdownAfterClear) {
+      closeDropdown();
+    }
   };
 
   input.addEventListener("input", () => {
@@ -184,6 +191,8 @@ export function customTagFilter(cell, onRendered, success, cancel, params) {
     dropdownMenu = getRebuiltDropdown(
       params.initialOptions,
       params.selectedOptions,
+      params.labels,
+      clearFilter,
     );
     dropdownMenu.addEventListener("mousedown", (event) => {
       event.stopPropagation();
@@ -207,21 +216,48 @@ export function customTagFilter(cell, onRendered, success, cancel, params) {
   return container;
 }
 
-function getRebuiltDropdown(initialOptions, selectedOptions) {
-  let dropdownTable = generateDropdownTable(
+function getRebuiltDropdown(
+  initialOptions,
+  selectedOptions,
+  labels,
+  clearFilter,
+) {
+  const dropdownTable = generateDropdownTable(
     initialOptions || [],
     selectedOptions || [],
+    labels,
   );
 
   const menu = document.createElement("div");
-  menu.className = "dropdown-menu show";
+  menu.className = "dropdown-menu show py-3 px-1";
 
+  const clearButton = document.createElement("button");
+  clearButton.type = "button";
+  clearButton.className =
+    "btn btn-link btn-sm p-0 position-absolute top-0 end-0 m-1";
+  clearButton.title = labels?.clear || "Clear";
+  clearButton.setAttribute("aria-label", labels?.clear || "Clear");
+
+  const clearIcon = document.createElement("i");
+  clearIcon.className = "fa-solid fa-filter-circle-xmark";
+  clearButton.appendChild(clearIcon);
+
+  clearButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    clearFilter({ closeDropdownAfterClear: false });
+    menu.querySelectorAll("input[type='checkbox']").forEach((checkbox) => {
+      checkbox.checked = false;
+    });
+  });
+
+  menu.appendChild(clearButton);
   menu.appendChild(dropdownTable);
 
   return menu;
 }
 
-function generateDropdownTable(options, selectedTagOptions) {
+function generateDropdownTable(options, selectedTagOptions, labels) {
   const table = document.createElement("table");
   table.className = "table table-sm mb-0";
 
@@ -230,13 +266,21 @@ function generateDropdownTable(options, selectedTagOptions) {
   const headRow = document.createElement("tr");
 
   const headers = [
-    "Tag",
-    ...TAG_FILTER_CONNECTOR_ORDER.map((connector) => connector.label),
+    labels?.tag || "Tag",
+    ...TAG_FILTER_CONNECTOR_ORDER.map((connector) =>
+      getConnectorLabel(connector, labels),
+    ),
   ];
 
-  headers.forEach((h) => {
+  headers.forEach((h, index) => {
     const th = document.createElement("th");
-    th.innerHTML = `<strong>${h}</strong>`;
+    if (index > 0) {
+      th.className = "text-center";
+    }
+
+    const strong = document.createElement("strong");
+    strong.textContent = h;
+    th.appendChild(strong);
     headRow.appendChild(th);
   });
 
@@ -259,6 +303,8 @@ function generateDropdownTable(options, selectedTagOptions) {
     function makeCheckbox(connector) {
       const td = document.createElement("td");
       const cb = document.createElement("input");
+
+      td.className = "text-center align-middle";
 
       cb.type = "checkbox";
       cb.style.cursor = "pointer";

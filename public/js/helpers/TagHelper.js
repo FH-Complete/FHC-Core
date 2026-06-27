@@ -15,7 +15,12 @@ export function addTagInTable(addedTag, rows, matchKey, tagsKey = "tags")
 
 			let tags;
 			try {
-				tags = JSON.parse(rowData[tagsKey] || "[]");
+				let initialTags = rowData[tagsKey] || "[]";
+				if (typeof initialTags === 'string') {
+					tags = JSON.parse(initialTags);
+				} else {
+					tags = initialTags;
+				}
 			} catch (e) {
 				tags = [];
 			}
@@ -53,7 +58,12 @@ export function deleteTagInTable(deletedTag, rows, tagsKeys = ['tags'])
 			let tags;
 
 			try {
-				tags = JSON.parse(rowData[key] || "[]");
+				let initialTags = rowData[key] || "[]";
+				if (typeof initialTags === 'string') {
+					tags = JSON.parse(initialTags);
+				} else {
+					tags = initialTags;
+				}
 			} catch (e) {
 				tags = [];
 			}
@@ -62,7 +72,6 @@ export function deleteTagInTable(deletedTag, rows, tagsKeys = ['tags'])
 				return;
 
 			let filtered = tags.filter(tag => tag?.id !== deletedTag);
-
 			if (filtered.length !== tags.length)
 			{
 				updates[key] = JSON.stringify(filtered);
@@ -95,7 +104,12 @@ export function updateTagInTable(updatedTag, rows, fields = ['tags'])
 
 			let fieldData;
 			try {
-				fieldData = JSON.parse(rowData[field] || "[]");
+				let initialTags = rowData[field] || "[]";
+				if (typeof initialTags === 'string') {
+					fieldData = JSON.parse(initialTags);
+				} else {
+					fieldData = initialTags;
+				}
 			} catch (e) {
 				return;
 			}

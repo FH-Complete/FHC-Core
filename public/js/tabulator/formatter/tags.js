@@ -122,7 +122,6 @@ export function tagFormatter(cell, tagComponent, onRendered) {
     });
   }
 
-  console.log("tagFormatter called with:")
   renderTags();
   return container;
 }
