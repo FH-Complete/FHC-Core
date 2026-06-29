@@ -82,6 +82,61 @@ export function buildTagOptionsFromRows(rows = []) {
   return tags;
 }
 
+export function syncTagHeaderFilterOptions(
+  rows = [],
+  initialOptions = [],
+  selectedOptions = [],
+) {
+  const options = buildTagOptionsFromRows(rows) || [];
+
+  if (Array.isArray(initialOptions)) {
+    initialOptions.splice(
+      0,
+      initialOptions.length,
+      ...options,
+    );
+  }
+
+  if (Array.isArray(selectedOptions)) {
+    const availableValues = new Set(options.map((option) => option.value));
+
+    for (let i = selectedOptions.length - 1; i >= 0; i--) {
+      if (!availableValues.has(selectedOptions[i].value)) {
+        selectedOptions.splice(i, 1);
+      }
+    }
+  }
+
+  return options;
+}
+
+export function syncSelectedTagOptionsWithHeaderFilters(
+  filters = [],
+  selectedOptions = [],
+  tagsEnabled = true,
+  field = "tags",
+) {
+  if (!tagsEnabled || !Array.isArray(selectedOptions) || !selectedOptions.length) {
+    return false;
+  }
+
+  const hasActiveTagFilter = filters.some(
+    (filter) =>
+      filter.field === field &&
+      filter.value !== "" &&
+      filter.value !== null &&
+      filter.value !== undefined,
+  );
+
+  if (hasActiveTagFilter) {
+    return false;
+  }
+
+  selectedOptions.splice(0, selectedOptions.length);
+
+  return true;
+}
+
 export function getRawTagValuesFromRows(rows = []) {
   let tags = [];
 

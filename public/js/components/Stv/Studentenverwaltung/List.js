@@ -3,9 +3,10 @@ import ListNew from "./List/New.js";
 import CoreTag from "../../Tag/Tag.js";
 import {
   buildTagHeaderFilterExpression,
-  buildTagOptionsFromRows,
   customTagFilter,
   setTagHeaderFilterValue,
+  syncSelectedTagOptionsWithHeaderFilters,
+  syncTagHeaderFilterOptions,
   tagHeaderFilter,
 } from "../../../tabulator/filters/extendedHeaderFilter.js";
 import {
@@ -438,8 +439,10 @@ export default {
               this.count = 0;
               this.allPrestudents = [];
             }
-            this.refreshTagHeaderFilterInitialOptions(
+            syncTagHeaderFilterOptions(
               Array.isArray(data) ? data : [],
+              this.tagFilterState.initialOptions,
+              this.tagFilterState.selectedOptions,
             );
           },
         },
@@ -447,7 +450,11 @@ export default {
           event: "dataFiltered",
           handler: (filters, rows) => {
             this.filteredcount = rows.length;
-            this.syncSelectedTagOptionsWithHeaderFilters(filters);
+            syncSelectedTagOptionsWithHeaderFilters(
+              filters,
+              this.tagFilterState.selectedOptions,
+              this.tagsEnabled,
+            );
           },
         },
         {
@@ -594,7 +601,6 @@ export default {
           this.$refs.table.tabulator,
           combinedFilterStatement,
         );
-        this.$emit("filterActive", selectedOptions.length > 0);
       },
       deep: true,
     },
@@ -866,38 +872,27 @@ export default {
     //methods tags
     addedTag(addedTag) {
       addTagInTable(addedTag, this.allRows, "prestudent_id");
-      this.refreshTagHeaderFilterInitialOptions();
+      syncTagHeaderFilterOptions(
+        this.$refs.table?.tabulator?.getData() || [],
+        this.tagFilterState.initialOptions,
+        this.tagFilterState.selectedOptions,
+      );
     },
     deletedTag(deletedTag) {
       deleteTagInTable(deletedTag, this.allRows);
-      this.refreshTagHeaderFilterInitialOptions();
+      syncTagHeaderFilterOptions(
+        this.$refs.table?.tabulator?.getData() || [],
+        this.tagFilterState.initialOptions,
+        this.tagFilterState.selectedOptions,
+      );
     },
     updatedTag(updatedTag) {
       updateTagInTable(updatedTag, this.allRows);
-      this.refreshTagHeaderFilterInitialOptions();
-    },
-    refreshTagHeaderFilterInitialOptions(rows) {
-      const data = rows || this.$refs.table?.tabulator?.getData() || [];
-
-      const options = buildTagOptionsFromRows(data);
-      this.tagFilterState.initialOptions.splice(
-        0,
-        this.tagFilterState.initialOptions.length,
-        ...options,
+      syncTagHeaderFilterOptions(
+        this.$refs.table?.tabulator?.getData() || [],
+        this.tagFilterState.initialOptions,
+        this.tagFilterState.selectedOptions,
       );
-
-      const availableValues = new Set(options.map((option) => option.value));
-      for (
-        let i = this.tagFilterState.selectedOptions.length - 1;
-        i >= 0;
-        i--
-      ) {
-        if (
-          !availableValues.has(this.tagFilterState.selectedOptions[i].value)
-        ) {
-          this.tagFilterState.selectedOptions.splice(i, 1);
-        }
-      }
     },
     getAllRows() {
       this.allRows = this.$refs.table.tabulator.getRows();
@@ -912,23 +907,6 @@ export default {
         0,
         this.tagFilterState.selectedOptions.length,
       );
-    },
-    syncSelectedTagOptionsWithHeaderFilters(filters) {
-      if (!this.tagsEnabled || !this.tagFilterState.selectedOptions.length) {
-        return;
-      }
-
-      const hasActiveTagFilter = filters.some(
-        (filter) =>
-          filter.field === "tags" &&
-          filter.value !== "" &&
-          filter.value !== null &&
-          filter.value !== undefined,
-      );
-
-      if (!hasActiveTagFilter) {
-        this.clearSelectedTagHeaderFilters();
-      }
     },
     handleHeaderFilter(filterActive) {
       this.headerFilterActive = filterActive;
