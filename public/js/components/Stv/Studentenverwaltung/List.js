@@ -736,10 +736,16 @@ export default {
     },
     updateTagFilterLabels() {
       this.tagFilterLabels.clear = this.$p.t("ui/filterdelete");
-      this.tagFilterLabels.tag = 'Tag';
-      this.tagFilterLabels.connectors.AND = this.$p.t("ui/andCondition").toUpperCase();
-      this.tagFilterLabels.connectors.OR = this.$p.t("ui/orCondition").toUpperCase();
-      this.tagFilterLabels.connectors.NOT = this.$p.t("ui/notCondition").toUpperCase();
+      this.tagFilterLabels.tag = "Tag";
+      this.tagFilterLabels.connectors.AND = this.$p
+        .t("ui/andCondition")
+        .toUpperCase();
+      this.tagFilterLabels.connectors.OR = this.$p
+        .t("ui/orCondition")
+        .toUpperCase();
+      this.tagFilterLabels.connectors.NOT = this.$p
+        .t("ui/notCondition")
+        .toUpperCase();
     },
     updateUrl(endpoint, first) {
       this.lastSelected = first ? undefined : this.selected;

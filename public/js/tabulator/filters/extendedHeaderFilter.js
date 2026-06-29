@@ -61,33 +61,55 @@ export function buildTagHeaderFilterExpression(selectedTagOptions) {
 }
 
 export function buildTagOptionsFromRows(rows = []) {
-  const options = new Map();
+  let options = [];
+
+  let tags = [
+    ...new Map(
+      getRawTagValuesFromRows(rows)
+        .filter((tag) => tag && tag.done !== true)
+        .map((tag) => {
+          return {
+            label: tag.beschreibung || tag.typ_kurzbz,
+            value: tag.beschreibung || tag.typ_kurzbz,
+            style: tag.style,
+          };
+        })
+        .map((obj) => [JSON.stringify(obj), obj]),
+    ).values(),
+  ];
+  if (!Array.isArray(tags)) return;
+
+  return tags;
+}
+
+export function getRawTagValuesFromRows(rows = []) {
+  let tags = [];
 
   rows.forEach((row) => {
-    let tags = row.tags;
+    if (!row || (!row.tags?.length && !row._children?.length)) return;
 
-    if (typeof tags === "string") {
-      try {
-        tags = JSON.parse(tags);
-      } catch {
-        return;
-      }
-    }
+    let newTags = row.tags?.length
+      ? [row.tags]
+      : getRawTagValuesFromRows(row._children);
 
-    if (!Array.isArray(tags)) return;
+    newTags = newTags
+      .map((newTag) => {
+        if (typeof newTag === "string") {
+          try {
+            newTag = JSON.parse(newTag);
+          } catch {
+            return null;
+          }
+        }
 
-    tags
-      .filter((tag) => tag && tag.done !== true)
-      .forEach((tag) => {
-        options.set(tag.beschreibung, {
-          label: tag.beschreibung,
-          value: tag.beschreibung,
-          style: tag.style,
-        });
-      });
+        return newTag;
+      })
+      .filter((newTag) => newTag !== null);
+
+    tags = tags.concat(newTags);
   });
 
-  return [...options.values()];
+  return tags.flat();
 }
 
 export function customTagFilter(cell, onRendered, success, cancel, params) {
@@ -155,10 +177,7 @@ export function customTagFilter(cell, onRendered, success, cancel, params) {
     input.value = "";
 
     if (Array.isArray(params.selectedOptions)) {
-      params.selectedOptions.splice(
-        0,
-        params.selectedOptions.length,
-      );
+      params.selectedOptions.splice(0, params.selectedOptions.length);
     }
 
     success("");
@@ -205,7 +224,7 @@ export function customTagFilter(cell, onRendered, success, cancel, params) {
     event.preventDefault();
     event.stopPropagation();
 
-    clearFilter({closeDropdownAfterClear: false});
+    clearFilter({ closeDropdownAfterClear: false });
 
     openDropdown();
   });
@@ -335,7 +354,6 @@ function generateDropdownTable(options, selectedTagOptions, labels) {
             selectedTagOptions.splice(idx, 1);
           }
         }
-
       });
 
       td.appendChild(cb);
