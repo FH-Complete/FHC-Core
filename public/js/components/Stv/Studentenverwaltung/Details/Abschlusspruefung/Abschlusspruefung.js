@@ -78,7 +78,7 @@ export default {
 			layout: 'fitDataStretchFrozen',
 			layoutColumnsOnNewData: false,
 			height: 'auto',
-			minHeight: '200',
+			minHeight: '200'
 		}
 	},
 	computed: {
@@ -437,20 +437,37 @@ export default {
 		},
 		async addNewAbschlusspruefungMulti(){
 			try {
-				for (const student of this.studentUids) {
+				const arraySuccessfullySent = [];
+				const arrayError = [];
 
-					await this.$refs.formFinalExam.call(
-						ApiStvAbschlusspruefung.addNewAbschlusspruefung({
-							uid: student,
-							formData: this.formData
-						})
-					);
+				for (const student of this.studentUids) {
+					try {
+						await this.$refs.formFinalExam.call(
+							ApiStvAbschlusspruefung.addNewAbschlusspruefung({
+								uid: student,
+								formData: this.formData
+							})
+						);
+						arraySuccessfullySent.push(student);
+					} catch (error) {
+						arrayError.push(student);
+					}
 				}
-				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-				//save formData fields in LocalStorage
-				this.saveOrUpdateLocalStorage();
-				this.hideModal('finalexamModal');
-				this.resetForm();
+				if (arraySuccessfullySent.length) {
+					//this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					//TODO(Manu) check if really needed in case of success
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave') + ': Uids: ' + arraySuccessfullySent.join(", "));
+				}
+
+				if (arrayError.length) {
+					this.$fhcAlert.alertError(this.$p.t('ui', 'errorSavingData') + ': Uids: ' + arrayError.join(", "));
+				}
+
+				if (arraySuccessfullySent.length) {
+					this.saveOrUpdateLocalStorage();
+					this.hideModal("finalexamModal");
+					this.resetForm();
+				}
 			} catch (error) {
 				this.$fhcAlert.handleSystemError(error);
 			}
