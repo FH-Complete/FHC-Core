@@ -94,12 +94,13 @@ export function tagFormatter(cell, tagComponent, onRendered) {
       return;
     }
 
+    let widthBuffer = 15;
     maxVisibleTags = parsedTags.length;
     renderTags();
 
     while (
       maxVisibleTags > 0 &&
-      container.scrollWidth > container.clientWidth
+      container.scrollWidth > (container.clientWidth + widthBuffer)
     ) {
       maxVisibleTags--;
       renderTags();
