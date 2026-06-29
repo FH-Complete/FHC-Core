@@ -168,22 +168,7 @@ export function customTagFilter(cell, onRendered, success, cancel, params) {
     }
   };
 
-  input.addEventListener("input", () => {
-    success(input.value);
-  });
-  input.addEventListener("change", () => {
-    success(input.value);
-  });
-  input.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape") return;
-
-    event.preventDefault();
-    event.stopPropagation();
-    clearFilter();
-  });
-  input.addEventListener("focus", (e) => {
-    e.stopPropagation();
-
+  const openDropdown = () => {
     if (activeTagDropdownCleanup) {
       activeTagDropdownCleanup();
     }
@@ -206,9 +191,28 @@ export function customTagFilter(cell, onRendered, success, cancel, params) {
     window.addEventListener("scroll", positionDropdown, true);
     window.addEventListener("resize", positionDropdown);
     document.addEventListener("mousedown", handleOutsideClick, true);
-  });
+  };
 
-  input.addEventListener("blur", (e) => {
+  input.addEventListener("input", () => {
+    success(input.value);
+  });
+  input.addEventListener("change", () => {
+    success(input.value);
+  });
+  input.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    clearFilter({closeDropdownAfterClear: false});
+
+    openDropdown();
+  });
+  input.addEventListener("focus", (e) => {
+    e.stopPropagation();
+
+    openDropdown();
   });
 
   container.appendChild(input);

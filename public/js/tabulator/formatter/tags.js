@@ -94,7 +94,7 @@ export function tagFormatter(cell, tagComponent, onRendered) {
       return;
     }
 
-    let widthBuffer = 15;
+    let widthBuffer = 10;
     maxVisibleTags = parsedTags.length;
     renderTags();
 
