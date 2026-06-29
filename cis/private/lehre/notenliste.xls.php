@@ -36,6 +36,7 @@ require_once('../../../include/notenschluessel.class.php');
 require_once('../../../include/Excel/excel.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/pruefung.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 $uid = get_uid();
 
@@ -90,18 +91,19 @@ if(isset($_GET['lehreinheit_id']))
 else
 	$lehreinheit_id = '';
 
-// Checks if the logged lector belongs to this teaching unit
-$qry = "SELECT DISTINCT 1
-	FROM campus.vw_lehreinheit vwl
-	WHERE lehrveranstaltung_id = ".$db->db_add_param($lvid, FHC_INTEGER)."
-	AND studiensemester_kurzbz = ".$db->db_add_param($stsem)."
-	AND vwl.mitarbeiter_uid = ".$db->db_add_param($uid);
-if ($lehreinheit_id != '')
-	$qry .= " AND lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER);
+// Permissions
+$berechtigung = new benutzerberechtigung();
+$berechtigung->getBerechtigungen($uid);
 
-if (!$result = $db->db_query($qry))
-	die($p->t('tools/fehlerBeimAuslesenDerNoten'));
-if (!$db->db_fetch_object($result))
+// LV load
+$lvobj = new lehrveranstaltung($lvid);
+
+// Check permissions
+if (!$berechtigung->isBerechtigt('admin')
+	&& !$berechtigung->isBerechtigt('assistenz')
+	&& !$berechtigung->isBerechtigt('lehre', $lvobj->oe_kurzbz, 's')
+	&& !check_lektor_lehrveranstaltung($uid, $lvid, $stsem)
+)
 	die('Sie haben keine Berechtigung fuer diese Seite');
 
 /*
@@ -156,8 +158,6 @@ if (!$db->db_fetch_object($result))
 //	$format_title->setFgColor('blue');
 	// let's merge
 	$format_title->setAlign('merge');
-
-	$lvobj = new lehrveranstaltung($lvid);
 
 	$worksheet->write(0,0,$p->t('anwesenheitsliste/notenliste')." ".($sprache=='English'?$lvobj->bezeichnung_english:$lvobj->bezeichnung),$format_bold);
 
