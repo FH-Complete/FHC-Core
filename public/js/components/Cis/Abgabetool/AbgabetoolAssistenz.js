@@ -1231,7 +1231,7 @@ export const AbgabetoolAssistenz = {
 
 			// custom select all logic
 			const allowed = rows.filter(r => r.getData().selectable);
-			const selected = rows.every(r => r.isSelected());
+			const selected = allowed.length > 0 && allowed.every(r => r.isSelected());
 
 			if(selected){
 				allowed.forEach(r => r.deselect());
@@ -1988,28 +1988,28 @@ export const AbgabetoolAssistenz = {
 				let icon = ''
 				switch(dateStyle) {
 					case 'verspaetet':
-						icon = '<i class="fa-solid fa-triangle-exclamation"></i>'
+						icon = '<i style="color: #000000 !important;" class="fa-solid fa-triangle-exclamation"></i>'
 						break
 					case 'verpasst':
-						icon = '<i class="fa-solid fa-calendar-xmark"></i>'
+						icon = '<i style="color: #000000 !important;" class="fa-solid fa-calendar-xmark"></i>'
 						break
 					case 'abzugeben':
-						icon = '<i class="fa-solid fa-hourglass-half"></i>'
+						icon = '<i style="color: #000000 !important;" class="fa-solid fa-hourglass-half"></i>'
 						break
 					case 'standard':
-						icon = '<i class="fa-solid fa-clock"></i>'
+						icon = '<i style="color: #000000 !important;" class="fa-solid fa-clock"></i>'
 						break
 					case 'abgegeben':
-						icon = '<i class="fa-solid fa-paperclip"></i>'
+						icon = '<i style="color: #000000 !important;" class="fa-solid fa-paperclip"></i>'
 						break
 					case 'beurteilungerforderlich':
-						icon = '<i class="fa-solid fa-list-check"></i>'
+						icon = '<i style="color: #000000 !important;" class="fa-solid fa-list-check"></i>'
 						break
 					case 'bestanden':
-						icon = '<i class="fa-solid fa-check"></i>'
+						icon = '<i style="color: #000000 !important;" class="fa-solid fa-check"></i>'
 						break
 					case 'nichtbestanden':
-						icon = '<i class="fa-solid fa-circle-exclamation"></i>'
+						icon = '<i style="color: #000000 !important;" class="fa-solid fa-circle-exclamation"></i>'
 						break
 				}
 				
@@ -2407,7 +2407,7 @@ export const AbgabetoolAssistenz = {
 		bodyClass="px-4 py-4">
 		<template v-slot:title>
 			<div>{{ $p.t('abgabetool/c4editTerminserie') }}</div>
-			<div class="text-muted" style="font-size: 0.9rem;">
+			<div style="font-size: 0.9rem;">
 				{{ $p.t('abgabetool/c4nSelected', [selectedDataFlat.length]) }}
 			</div>
 		</template>

@@ -236,7 +236,7 @@ export const AbgabeStudentTimeline = {
 				class="btn btn-link btn-sm p-0 text-muted text-decoration-none d-flex align-items-center gap-1"
 				@click="legendExpanded = !legendExpanded"
 			>
-				<i :class="legendExpanded ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'" style="font-size: 0.7rem;"></i>
+				<i :class="legendExpanded ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'" style="font-size: 0.7rem;"></i>
 				Legende
 			</button>
 			<div v-show="legendExpanded" class="mt-2">

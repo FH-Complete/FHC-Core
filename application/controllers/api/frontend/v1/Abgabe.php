@@ -539,12 +539,23 @@ class Abgabe extends FHCAPI_Controller
 		$assignedStudentUid = getData($res)[0]->uid;
 
 		// A student may only update their own title; assistenz is covered by checkZuordnung
-		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID());
+
+		$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
+		if(isError($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingStudentForProjektarbeitID'), 'general');
+		}
+
+		if(!hasData($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'), 'general');
+		}
+		$data = getData($res)[0];
+		$student_uid = $data->uid;
+		$studiengang_kz = $data->studiengang_kz;
+		
+		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID(), $student_uid, $studiengang_kz);
 		if (getAuthUID() !== $assignedStudentUid && !$zugeordnet) {
 			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'), 'general');
 		}
-
-		
 		
 		$result = $this->ProjektarbeitModel->load($projektarbeit_id);
 		$data = getData($result);
@@ -1018,7 +1029,20 @@ class Abgabe extends FHCAPI_Controller
 
 			$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
 
-			$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID());
+			// load the $student_uid by $projektarbeit_id so we dont need any post params
+			$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+			$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
+			if(isError($res)) {
+				$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingStudentForProjektarbeitID'), 'general');
+			}
+			if(!hasData($res)) {
+				$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'), 'general');
+			}
+			$data = getData($res)[0];
+			$student_uid = $data->uid;
+			$studiengang_kz = $data->studiengang_kz;
+			
+			$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID(), $student_uid, $studiengang_kz);
 			if (!$zugeordnet) {
 				$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'), 'general');
 			}
@@ -1127,7 +1151,21 @@ class Abgabe extends FHCAPI_Controller
 
 			$this->checkProjektarbeitForFinishedStatus($this->getProjektarbeitIDForPaabgabeID($paabgabe_id));
 
-			$zugeordnet = $this->checkZuordnungByPaabgabe($paabgabe_id, getAuthUID());
+			$projektarbeit_id = $this->getProjektarbeitIDForPaabgabeID($paabgabe_id);
+
+			$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+			$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
+			if(isError($res)) {
+				$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingStudentForProjektarbeitID'), 'general');
+			}
+			if(!hasData($res)) {
+				$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'), 'general');
+			}
+			$data = getData($res)[0];
+			$student_uid = $data->uid;
+			$studiengang_kz = $data->studiengang_kz;
+
+			$zugeordnet = $this->checkZuordnungByPaabgabe($paabgabe_id, getAuthUID(), $student_uid, $studiengang_kz);
 
 			if (!$zugeordnet) {
 				$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'), 'general');
@@ -1610,17 +1648,28 @@ class Abgabe extends FHCAPI_Controller
 	public function sendZweitbetreuerTokenMail() {
 		$projektarbeit_id = $this->input->post('projektarbeit_id');
 		$bperson_id = $this->input->post('bperson_id');
-		$student_uid = $this->input->post('student_uid');
+
 		
 		if ($projektarbeit_id === NULL || trim((string)$projektarbeit_id) === ''
-			|| $bperson_id === NULL || trim((string)$bperson_id) === ''
-			|| $student_uid === NULL || trim((string)$student_uid) === '') {
+			|| $bperson_id === NULL || trim((string)$bperson_id) === '') {
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		}
 
 		$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
 
-		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID());
+		$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
+		if(isError($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingStudentForProjektarbeitID'), 'general');
+		}
+
+		if(!hasData($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'), 'general');
+		}
+		$data = getData($res)[0];
+		$student_uid = $data->uid;
+		$studiengang_kz = $data->studiengang_kz;
+		
+		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID(), $student_uid, $studiengang_kz);
 		if(!$zugeordnet) {
 			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'));
 		}
