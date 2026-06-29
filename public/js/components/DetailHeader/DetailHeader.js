@@ -293,8 +293,10 @@ export default {
 					this.semesterDates.ende
 				);
 
-			this.$refs.tagWrapper.innerHTML = '';
-			this.$refs.tagWrapper.appendChild(container);
+			if(this.headerData.length == 1) {
+				this.$refs.tagWrapper.innerHTML = '';
+				this.$refs.tagWrapper.appendChild(container);
+			}
 		},
 		getAllTags(prestudent_id){
 			return this.$api
