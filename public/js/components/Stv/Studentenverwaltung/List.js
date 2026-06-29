@@ -420,8 +420,12 @@ export default {
 		rowSelectionChanged(data, rows, selected, deselected) {
 			this.selectedcount = data.length;
 
-			if(selected.length > 0 || deselected.length > 0){
+			//in case of empty selection (eg. in future or past semester of selected student without sem)
+			if(selected.length == 0 ) {
 				this.lastSelected = this.selected;
+			}
+
+			if(selected.length > 0 || deselected.length > 0){
 
 				//for tags
 				this.selectedRows = this.$refs.table.tabulator.getSelectedRows();
