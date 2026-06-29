@@ -1378,7 +1378,7 @@ export const AbgabetoolAssistenz = {
 
 				// only set this if it has not been set yet and abgabetermin has a note (qgate)
 				if(!termin.noteBackend && termin.note) {
-					termin.noteBackend = termin.note
+					termin.noteBackend = this.notenOptions.find(opt => opt.note == termin.note)
 				}
 				
 				termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)

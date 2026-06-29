@@ -370,7 +370,15 @@ class Projektarbeit_model extends DB_Model
 					tbl_projektarbeit.titel, tbl_projektarbeit.projektarbeit_id, tbl_projektarbeit.note,
 					student_benutzer.uid, tbl_student.matrikelnr, tbl_lehreinheit.studiensemester_kurzbz, public.tbl_student.student_uid,
 		
-		
+					lehre.tbl_projektarbeit.sprache,
+					 lehre.tbl_projektarbeit.seitenanzahl,
+					 lehre.tbl_projektarbeit.kontrollschlagwoerter,
+					 lehre.tbl_projektarbeit.schlagwoerter,
+					 lehre.tbl_projektarbeit.schlagwoerter_en,
+					 lehre.tbl_projektarbeit.abstract,
+					 lehre.tbl_projektarbeit.abstract_en,
+					 lehre.tbl_projektarbeit.insertamum,
+					 
 					 (
 						 SELECT orgform_kurzbz
 						 FROM public.tbl_prestudentstatus

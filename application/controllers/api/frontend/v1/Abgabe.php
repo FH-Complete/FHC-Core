@@ -1644,7 +1644,7 @@ class Abgabe extends FHCAPI_Controller
 		};
 		Events::trigger('projektarbeit_is_current', $projektarbeit_id, $returnFunc);
 		if(!$projektarbeitIsCurrent) {
-			$this->terminateWithError($this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeitv2'), 'general');
+			$this->terminateWithError($this->p->t('abgabetool','c4fehlerPAIsNotCurrent'), 'general');
 		}
 
 		$path = $this->config->item('URL_MITARBEITER');
@@ -1720,7 +1720,7 @@ class Abgabe extends FHCAPI_Controller
 		};
 		Events::trigger('projektarbeit_is_current', $projektarbeit_id, $returnFunc);
 		if(!$projektarbeitIsCurrent) {
-			$this->terminateWithError($this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeitv2'), 'general');
+			$this->terminateWithError($this->p->t('abgabetool','c4fehlerPAIsNotCurrent'), 'general');
 		}
 		
 		if ($zweitbegutachterRetval && count($zweitbegutachterRetval) > 0)
@@ -1877,7 +1877,7 @@ class Abgabe extends FHCAPI_Controller
 		$data = getData($res)[0];
 		if($data->note !== NULL) {
 			// hardcode this error msg cause phrasen arent reliable and people keep bugging why the cant edit old entries they definitely shouldnt update
-			$message = $this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeitv2');
+			$message = $this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeitv3');
 			if(strpos($message, "<<") === 0) { // phrase could not be loaded
 				$this->terminateWithError('Die Projektarbeit wurde bereits benotet, Sie dürfen deshalb keine weiteren Termine anlegen oder bearbeiten.', 'general');
 			} else {
