@@ -319,6 +319,7 @@ export const AbgabetoolAssistenz = {
 				layout: 'fitColumns',
 				placeholder: Vue.computed(() => this.$capitalize(this.$p.t('global/noDataAvailable'))),
 				selectable: true,
+				selectableCheck: this.selectionCheckFlat,
 				renderVerticalBuffer: 400,
 				columns: [
 					{
@@ -1721,6 +1722,9 @@ export const AbgabetoolAssistenz = {
 			// currently assistenz is allowed to select everything in projektarbeit table
 			
 			return true
+		},
+		selectionCheckFlat(row) {
+			return row.getData().selectable
 		},
 		showDeadlines(){
 			const link = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router
