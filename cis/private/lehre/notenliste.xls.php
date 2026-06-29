@@ -36,6 +36,7 @@ require_once('../../../include/notenschluessel.class.php');
 require_once('../../../include/Excel/excel.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/pruefung.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 $uid = get_uid();
 
@@ -44,7 +45,7 @@ $uid = get_uid();
 $sprache = getSprache();
 $p = new phrasen($sprache);
 
-if(!check_lektor($uid))
+if (!check_lektor($uid))
 	die('Sie haben keine Berechtigung fuer diese Seite');
 
 if (!$db = new basis_db())
@@ -89,6 +90,21 @@ if(isset($_GET['lehreinheit_id']))
 	$lehreinheit_id = $_GET['lehreinheit_id'];
 else
 	$lehreinheit_id = '';
+
+// Permissions
+$berechtigung = new benutzerberechtigung();
+$berechtigung->getBerechtigungen($uid);
+
+// LV load
+$lvobj = new lehrveranstaltung($lvid);
+
+// Check permissions
+if (!$berechtigung->isBerechtigt('admin')
+	&& !$berechtigung->isBerechtigt('assistenz')
+	&& !$berechtigung->isBerechtigt('lehre', $lvobj->oe_kurzbz, 's')
+	&& !check_lektor_lehrveranstaltung($uid, $lvid, $stsem)
+)
+	die('Sie haben keine Berechtigung fuer diese Seite');
 
 /*
  * Create Excel File
@@ -142,8 +158,6 @@ else
 //	$format_title->setFgColor('blue');
 	// let's merge
 	$format_title->setAlign('merge');
-
-	$lvobj = new lehrveranstaltung($lvid);
 
 	$worksheet->write(0,0,$p->t('anwesenheitsliste/notenliste')." ".($sprache=='English'?$lvobj->bezeichnung_english:$lvobj->bezeichnung),$format_bold);
 
