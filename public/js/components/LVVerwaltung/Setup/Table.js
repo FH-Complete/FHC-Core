@@ -2,8 +2,16 @@ import {CoreFilterCmpt} from "../../filter/Filter.js";
 import BsModal from "../../Bootstrap/Modal.js";
 import DetailsForm from "../Details/Form.js";
 import CoreTag from '../../Tag/Tag.js';
-import { tagHeaderFilter } from '../../../../js/tabulator/filters/extendedHeaderFilter.js';
-import { extendedHeaderFilter } from "../../../../js/tabulator/filters/extendedHeaderFilter.js";
+import {
+  buildTagHeaderFilterExpression,
+  buildTagOptionsFromRows,
+  customTagFilter,
+  setTagHeaderFilterValue,
+  tagHeaderFilter,
+  extendedHeaderFilter,
+  syncTagHeaderFilterOptions,
+  syncSelectedTagOptionsWithHeaderFilters
+} from "../../../../js/tabulator/filters/extendedHeaderFilter.js";
 import { tagFormatter } from "../../../../js/tabulator/formatter/tags.js";
 import { addTagInTable, deleteTagInTable, updateTagInTable } from "../../../../js/helpers/TagHelper.js";
 
@@ -65,7 +73,20 @@ export default {
 				this.lv_info_default.studiensemester_kurzbz = newVal
 				this.lv_info = false;
 			}
-		}
+		},
+		"tagFilterState.selectedOptions": {
+			handler() {
+				const selectedOptions = this.tagFilterState.selectedOptions;
+				const combinedFilterStatement =
+				buildTagHeaderFilterExpression(selectedOptions);
+
+				setTagHeaderFilterValue(
+					this.$refs.table.tabulator,
+					combinedFilterStatement,
+				);
+			},
+			deep: true,
+		},
 	},
 	data() {
 		return {
@@ -96,8 +117,37 @@ export default {
 					handler: (data) => {
 						this.getExpandedRows()
 					}
-				}
+				},
+				{
+					event: "dataLoaded",
+					handler: (data) => {
+						syncTagHeaderFilterOptions(
+							Array.isArray(data) ? data : [],
+							this.tagFilterState.initialOptions,
+							this.tagFilterState.selectedOptions,
+						);
+					},
+				},
+				{
+					event: "dataFiltered",
+					handler: (filters, rows) => {
+						syncSelectedTagOptionsWithHeaderFilters(
+							filters,
+							this.tagFilterState.selectedOptions,
+							this.tagsEnabled,
+						);
+					},
+				},
+				{
+					event: "columnWidth",
+					handler: (column) => {
+						if (column.getField() !== "tags") return;
 
+						column.getCells().forEach((cell) => {
+						cell.getElement().firstElementChild?.fitTags?.();
+						});
+					},
+				},
 			],
 			formData: {},
 			lv_info: false,
@@ -111,7 +161,20 @@ export default {
 				raumtypalternativ: this.lehreinheitRaumtypAlternativeDefault,
 				lehrfach_id: ''
 
-			}
+			},
+			tagFilterState: {
+				initialOptions: [],
+				selectedOptions: [],
+			},
+			tagFilterLabels: {
+				tag: "Tag",
+				clear: "Clear",
+				connectors: {
+				AND: "AND",
+				OR: "OR",
+				NOT: "NOT",
+				},
+			},
 		}
 	},
 	computed: {
@@ -140,6 +203,14 @@ export default {
 					headerFilterFunc: extendedHeaderFilter,
 				},
 				layout: 'fitDataStretch',
+				persistence: {
+					sort: true,
+					columns: ["width", "visible"],
+					filter: false,
+					headerFilter: false,
+					group: false,
+					page: false,
+				},
 				persistenceID: 'lehrveranstaltungen_2025_07_31_v1',
 				selectableRowsRangeMode: 'click',
 				selectableRows: true,
@@ -222,10 +293,18 @@ export default {
 						title: 'Tags',
 						field: 'tags',
 						tooltip: false,
-						headerFilter: "input",
+						headerFilter: customTagFilter,
+						headerFilterParams: {
+							listOnEmpty: true,
+							autocomplete: true,
+							sort: "asc",
+							initialOptions: this.tagFilterState.initialOptions,
+							selectedOptions: this.tagFilterState.selectedOptions,
+							labels: this.tagFilterLabels,
+						},
 						headerFilterFunc: tagHeaderFilter,
 						headerFilterFuncParams: {field: 'tags'},
-						formatter: (cell) => tagFormatter(cell, this.$refs.tagComponent),
+						formatter: (cell, formatterParams, onRendered) => tagFormatter(cell, this.$refs.tagComponent, onRendered),
 						width: 150,
 					},
 					{
@@ -381,16 +460,31 @@ export default {
 		},
 		addedTag(addedTag)
 		{
-			addTagInTable(addedTag, this.allRows, 'lehreinheit_id')
+			addTagInTable(addedTag, this.allRows, 'lehreinheit_id');
+			syncTagHeaderFilterOptions(
+				this.$refs.table?.tabulator?.getData() || [],
+				this.tagFilterState.initialOptions,
+				this.tagFilterState.selectedOptions,
+			);
 		},
 		deletedTag(deletedTag)
 		{
 			deleteTagInTable(deletedTag, this.allRows);
+			syncTagHeaderFilterOptions(
+				this.$refs.table?.tabulator?.getData() || [],
+				this.tagFilterState.initialOptions,
+				this.tagFilterState.selectedOptions,
+			);
 		},
 
 		updatedTag(updatedTag)
 		{
 			updateTagInTable(updatedTag, this.allRows);
+			syncTagHeaderFilterOptions(
+				this.$refs.table?.tabulator?.getData() || [],
+				this.tagFilterState.initialOptions,
+				this.tagFilterState.selectedOptions,
+			);
 		},
 		async copyLehreinheit(row, art)
 		{
