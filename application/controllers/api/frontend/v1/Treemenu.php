@@ -19,6 +19,8 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use \ReflectionMethod as ReflectionMethod;
+
 /**
  * This controller operates between (interface) the JS (GUI) and the back-end
  * Provides data to the ajax get calls about menues
@@ -28,14 +30,28 @@ class Treemenu extends FHCAPI_Controller
 {
 	public function __construct()
 	{
-		$permissions = [];
+		// Load Router
 		$router = load_class('Router');
-		// TODO(chris): permission
-		$permissions[$router->method] = ['admin:r', 'assistenz:r'];
-		parent::__construct($permissions);
 
 		// Load Config
-		$this->config->load('menubuilder');
+		$config = load_class('Config');
+		$config->load('treemenu');
+
+		// Get Treemenu name & config
+		$name = $router->method;
+		$conf = $config->item($name);
+		
+		// Get Permissions from config
+		$permissions = $conf['permissions'] ?? self::PERM_ANONYMOUS;
+
+		// Call constructor
+		parent::__construct([
+			$name => $permissions
+		]);
+
+		// Load Library
+		$libraryName = $conf['library'] ?? null;
+		$this->load->library($libraryName, null, 'treemenulib');
 	}
 	
 	/**
@@ -46,13 +62,69 @@ class Treemenu extends FHCAPI_Controller
 	 */
 	public function _remap($method, $params = [])
 	{
-		$this->load->library($this->config->item($method), null, 'menulib');
-		
-		if (!$this->menulib)
+		if (!$this->treemenulib)
 			show_404();
-		
-		$submenu = $this->menulib->build($params);
 
-		$this->terminateWithSuccess($submenu);
+		$this->addMeta('ci_method', $method);
+		$this->addMeta('ci_params', $params);
+		
+		$params = $this->uri->uri_to_assoc(6); // 6 = start of $params
+		$config = $this->treemenulib->config;
+
+		foreach (array_keys($params) as $key) {
+			if (!isset($config[$key]) || !$config[$key])
+				show_404();
+
+			$config = $config[$key];
+		}
+
+		// Prepare aliases
+		$argumentaliases = [];
+		if (property_exists($this->treemenulib, 'path_to_argument'))
+			$argumentaliases = array_flip($this->treemenulib->path_to_argument);
+		$methodaliases = [];
+		if (property_exists($this->treemenulib, 'redirect_method'))
+			$methodaliases = $this->treemenulib->redirect_method;
+		
+		$items = [];
+		foreach ($config as $uripart => $children) {
+			if (!is_array($children)) {
+				$uripart = $children;
+				$children = [];
+			}
+
+			$methodName = $uripart;
+			if (isset($methodaliases[$methodName])) {
+				$methodName = $methodaliases[$methodName];
+			} elseif (strpbrk($methodName, ' _-') !== false) {
+				$methodName = lcfirst(str_replace([' ', '_', '-'], '', ucwords($methodName, " \t\r\n\f\v_-")));
+			}
+
+			// Prepare arguments
+			$reflection = new ReflectionMethod($this->treemenulib, $methodName);
+			$arguments = [];
+			foreach ($reflection->getParameters() as $arg) {
+				if ($arg->name == 'path_template') {
+					$path = $params;
+					$path[$uripart] = '%s';
+					$arguments[] = $this->uri->assoc_to_uri($path);
+				} elseif ($arg->name == 'has_children') {
+					$arguments[] = $children;
+				} elseif ($arg->name == 'original_method') {
+					$arguments[] = $uripart;
+				} elseif (isset($argumentaliases[$arg->name]) && isset($params[$argumentaliases[$arg->name]])) {
+					$arguments[] = $params[$argumentaliases[$arg->name]];
+				} elseif (isset($params[$arg->name])) {
+					$arguments[] = $params[$arg->name];
+				} else {
+					$arguments[] = null;
+				}
+			}
+
+			// Call function from lib
+			$items = array_merge($items, call_user_func_array([$this->treemenulib, $methodName], $arguments));
+		}
+
+		$this->terminateWithSuccess($items);
 	}
 }

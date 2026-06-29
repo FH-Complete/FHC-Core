@@ -19,10 +19,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-$config['stv'] = "menu/StvMenuLib";
-
-$CI =& get_instance();
-
-$CI->load->config('menubuilder/config_stg_based');
-
-$config['config_stg_based'] = $CI->config->item('config_stg_based');
+$config['stv'] = [
+	"library" => "treemenu/StudVwLib",
+	"permissions" => ["admin:r", "assistenz:r"]
+];
