@@ -59,10 +59,6 @@ export default {
 			from: 'configStvTagsEnabled',
 			default: false
 		},
-		currentSemester: {
-			from: 'currentSemester',
-			required: true
-		},
 		lists: {
 			from: 'lists',
 			required: true
