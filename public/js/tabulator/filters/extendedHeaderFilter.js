@@ -293,10 +293,6 @@ export function customTagFilter(cell, onRendered, success, cancel, params) {
     e.stopPropagation();
     openDropdown();
   });
-  input.addEventListener("blur", (e) => {
-    e.stopPropagation();
-   clearFilter();
-  });
 
   container.appendChild(input);
 
