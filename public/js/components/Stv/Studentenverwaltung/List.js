@@ -514,6 +514,14 @@ export default {
 			this.$reloadList();
 		},
 		onKeydown(e) { // TODO(chris): this should be in the filter component
+
+			if ((e.ctrlKey || e.metaKey) && e.code === "KeyA") {
+				e.preventDefault();
+
+				this.$refs.table.tabulator.deselectRow();
+				this.$refs.table.tabulator.selectRow();
+			}
+
 			if (!this.focusObj)
 				return;
 
