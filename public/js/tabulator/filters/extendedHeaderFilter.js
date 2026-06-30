@@ -291,8 +291,11 @@ export function customTagFilter(cell, onRendered, success, cancel, params) {
   });
   input.addEventListener("focus", (e) => {
     e.stopPropagation();
-
     openDropdown();
+  });
+  input.addEventListener("blur", (e) => {
+    e.stopPropagation();
+   clearFilter();
   });
 
   container.appendChild(input);
