@@ -300,6 +300,31 @@ export const AbgabetoolStudent = {
 				return 'mailto:'+projektarbeit.email
 			} else return ''
 		},
+		getZweitbetreuerMailLink(projektarbeit) {
+			if(projektarbeit.zweitbetreuer_mail) {
+				return 'mailto:'+projektarbeit.zweitbetreuer_mail
+			} else return ''
+		},
+		hasZweitbetreuer(projektarbeit) {
+			return !!(projektarbeit.zweitbetreuer_person_id || projektarbeit.zweitbetreuer)
+		},
+		getErstbetreuerEmailLabel(projektarbeit) {
+			// with only one betreuer keep the generic label; with multiple betreuer
+			// distinguish the email rows by their betreuungsart bezeichnung
+			if(!this.hasZweitbetreuer(projektarbeit)) {
+				return this.$capitalize(this.$p.t('abgabetool/c4betreuerEmailKontaktv2'))
+			}
+			const art = projektarbeit.betreuerart_kurzbz
+				? this.$p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz)
+				: this.$p.t('abgabetool/c4betreuerv2')
+			return this.$capitalize(this.$p.t('abgabetool/c4emailBetreuungsart', [art]))
+		},
+		getZweitbetreuerEmailLabel(projektarbeit) {
+			const art = projektarbeit.zweitbetreuer_betreuerart_kurzbz
+				? this.$p.t('abgabetool/c4betrart' + projektarbeit.zweitbetreuer_betreuerart_kurzbz)
+				: ''
+			return this.$capitalize(this.$p.t('abgabetool/c4emailBetreuungsart', [art]))
+		},
 		getNoteBezeichnung(projektarbeit) {
 			if(projektarbeit.note && this.notenOptions) {
 				const noteOpt = this.notenOptions.find(opt => opt.note == projektarbeit.note)
@@ -491,7 +516,7 @@ export const AbgabetoolStudent = {
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4betreuerEmailKontaktv2') )}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{ getErstbetreuerEmailLabel(projektarbeit) }}</div>
 					<div class="col-8 col-md-9">
 						<a :href="getMailLink(projektarbeit)"><i class="fa fa-envelope" style="color:#00649C"></i></a>
 					</div>
@@ -500,6 +525,13 @@ export const AbgabetoolStudent = {
 					<div class="col-4 col-md-3 fw-bold">{{ projektarbeit.zweitbetreuer_betreuerart_kurzbz ? $p.t('abgabetool/c4betrart' + projektarbeit.zweitbetreuer_betreuerart_kurzbz) : '' }}</div>
 					<div class="col-8 col-md-9">
 						{{ projektarbeit.zweitbetreuer?.first }}
+					</div>
+				</div>
+				<div v-if="projektarbeit.zweitbetreuer_person_id || projektarbeit.zweitbetreuer" class="row mt-2">
+					<div class="col-4 col-md-3 fw-bold">{{ getZweitbetreuerEmailLabel(projektarbeit) }}</div>
+					<div class="col-8 col-md-9">
+						<a v-if="projektarbeit.zweitbetreuer_mail" :href="getZweitbetreuerMailLink(projektarbeit)"><i class="fa fa-envelope" style="color:#00649C"></i></a>
+						<span v-else>-</span>
 					</div>
 				</div>
 				<div class="row mt-2">

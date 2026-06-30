@@ -1900,7 +1900,6 @@ export const AbgabetoolAssistenz = {
 		openTimeline(val) {
 			
 			this.$api.call(ApiAbgabe.fetchProjektarbeitenHistory(val.student_uid)).then(res => {
-				console.log(res)
 
 				res.data.forEach(projekt => {
 					projekt.abgabetermine?.forEach(termin => {
@@ -1923,29 +1922,6 @@ export const AbgabetoolAssistenz = {
 				this.$refs.drawer.show()
 			})
 		},
-		// openTimeline(val) {
-		//	
-		// 	this.$api.call(ApiAbgabe.fetchProjektarbeitenHistory(val.student_uid)).then(res => {
-		// 		console.log(res)
-		// 	})
-		//	
-		// 	const projekt = this.projektarbeiten.find(p => p.projektarbeit_id == val.projektarbeit_id)
-		// 	if(!projekt) {
-		//
-		// 		this.$fhcAlert.alertInfo('Keine projektarbeit gefunden')
-		//		
-		// 		return
-		// 	}
-		//	
-		// 	projekt.abgabetermine.forEach(termin => {
-		// 		// show note only on termine with abgabetypen which are benotbar
-		// 		const terminTypOpt = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz == termin.paabgabetyp_kurzbz)
-		// 		termin.benotbar = terminTypOpt.benotbar 
-		// 	})
-		//	
-		// 	this.timelineProjekt = projekt
-		// 	this.$refs.drawer.show()
-		// },
 		paabgabetypFormatter(cell) {
 			const key = cell.getValue()
 			return this.$p.t('abgabetool/c4paatyp' + key)

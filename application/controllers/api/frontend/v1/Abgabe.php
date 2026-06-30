@@ -293,6 +293,8 @@ class Abgabe extends FHCAPI_Controller
 					if(count($data) > 0) {
 						$pa->zweitbetreuer = $data[0];
 					}
+
+					$pa->zweitbetreuer_mail = $this->getProjektbetreuerEmailByPersonID($pa->zweitbetreuer_person_id);
 				}
 			}
 		}
