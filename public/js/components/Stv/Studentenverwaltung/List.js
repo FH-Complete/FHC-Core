@@ -283,7 +283,6 @@ export default {
 				};
 			});
 		},
-		//TODO(Manu) check: replace download or additional entry?
 		downloadConfig() {
 			return {
 				csv: {
@@ -292,8 +291,9 @@ export default {
 					options: {
 						delimiter: ';',
 						bom: true,
-					}
-				}
+					},
+					rowRange: this.selectedcount > 0 ? "selected" : "all",
+				},
 			};
 		},
 		fileString() {
@@ -650,7 +650,7 @@ export default {
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
-	<div class="stv-list h-100 pt-3">	
+	<div class="stv-list h-100 pt-3">
 		<div
 			class="tabulator-container d-flex flex-column h-100"
 			:class="{'has-filter': filter.length}"
