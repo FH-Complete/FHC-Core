@@ -59,7 +59,7 @@ export function idTagFormatter (id, tagData, tagComponent, typeId, semesterStart
 			let bdone = b.done ? 1 : 0;
 
 			if (adone !== bdone) return adone - bdone;
-			return b.id - a.id;
+			return a.prioritaet - b.prioritaet;
 		});
 
 		const tagsToShow = expanded

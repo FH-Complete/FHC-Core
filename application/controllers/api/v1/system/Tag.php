@@ -37,6 +37,7 @@ class Tag extends API_Controller
 
 		if (isset($tag))
 		{
+			$this->TagModel->addJoin('public.tbl_notiz_typ', 'typ_kurzbz', 'typ_kurzbz');
 			$result = $this->TagModel->load($tag);
 
 			$this->response($result, REST_Controller::HTTP_OK);

@@ -35,7 +35,7 @@ export function tagFormatter(cell, tagComponent, onRendered) {
       if (adone !== bbone) {
         return adone - bbone;
       }
-      return b.id - a.id;
+      return a.prioritaet - b.prioritaet;
     });
     const tagsToShow = rowData._tagExpanded
       ? parsedTags

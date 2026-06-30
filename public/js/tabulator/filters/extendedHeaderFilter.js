@@ -4,20 +4,23 @@ const TAG_FILTER_CONNECTORS = {
     key: "AND",
     label: "AND",
     operator: "&&",
+    isVisible: false,
   },
   OR: {
     key: "OR",
     label: "OR",
     operator: "||",
+    isVisible: true,
   },
   NOT: {
     key: "NOT",
     label: "NOT",
     operator: "!",
+    isVisible: true,
   },
 };
 const TAG_FILTER_CONNECTOR_ORDER = [
-  TAG_FILTER_CONNECTORS.AND,
+  //TAG_FILTER_CONNECTORS.AND,
   TAG_FILTER_CONNECTORS.OR,
   TAG_FILTER_CONNECTORS.NOT,
 ];
@@ -67,6 +70,9 @@ export function buildTagOptionsFromRows(rows = []) {
     ...new Map(
       getRawTagValuesFromRows(rows)
         .filter((tag) => tag && tag.done !== true)
+        .sort((a, b) => {
+          return a.prioritaet - b.prioritaet;
+        })
         .map((tag) => {
           return {
             label: tag.beschreibung || tag.typ_kurzbz,
@@ -90,11 +96,7 @@ export function syncTagHeaderFilterOptions(
   const options = buildTagOptionsFromRows(rows) || [];
 
   if (Array.isArray(initialOptions)) {
-    initialOptions.splice(
-      0,
-      initialOptions.length,
-      ...options,
-    );
+    initialOptions.splice(0, initialOptions.length, ...options);
   }
 
   if (Array.isArray(selectedOptions)) {
@@ -116,7 +118,11 @@ export function syncSelectedTagOptionsWithHeaderFilters(
   tagsEnabled = true,
   field = "tags",
 ) {
-  if (!tagsEnabled || !Array.isArray(selectedOptions) || !selectedOptions.length) {
+  if (
+    !tagsEnabled ||
+    !Array.isArray(selectedOptions) ||
+    !selectedOptions.length
+  ) {
     return false;
   }
 

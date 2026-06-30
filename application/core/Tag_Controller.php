@@ -70,6 +70,7 @@ class Tag_Controller extends FHCAPI_Controller
 			tbl_notiz.notiz_id,
 			tbl_notiz_typ.style,
 			tbl_notiz_typ.automatisiert,
+			tbl_notiz_typ.prioritaet,
 			tbl_notiz.erledigt as done,
 			tbl_notiz.insertamum,
 			tbl_notiz.updateamum,
@@ -103,7 +104,8 @@ class Tag_Controller extends FHCAPI_Controller
 			style,
 			beschreibung,
 			tag,
-			automatisiert
+			automatisiert,
+			prioritaet
 			"
 		);
 		$this->NotiztypModel->addOrder('prioritaet');
@@ -311,6 +313,7 @@ class Tag_Controller extends FHCAPI_Controller
 			tbl_notiz.notiz_id,
 			tbl_notiz_typ.style,
 			tbl_notiz_typ.automatisiert,
+			tbl_notiz_typ.prioritaet,
 			tbl_notiz.erledigt as done,
 			tbl_notiz.insertamum,
 			tbl_notiz.updateamum,
@@ -330,6 +333,8 @@ class Tag_Controller extends FHCAPI_Controller
 
 		$this->NotizModel->addJoin('public.tbl_notizzuordnung notizzuordnung', 'tbl_notiz.notiz_id = notizzuordnung.notiz_id');
 
+		$this->NotizModel->addOrder('done');
+		$this->NotizModel->addOrder('tbl_notiz_typ.prioritaet');
 		$notiz = $this->NotizModel->loadWhere(array('prestudent_id' => $prestudent_id));
 
 

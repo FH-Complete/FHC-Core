@@ -300,7 +300,15 @@ export default {
 			return this.$api
 				.call(ApiTag.getAllTagsPrestudent({prestudent_id}))
 				.then(result => {
-					this.tagData = result.data;
+					this.tagData = result.data.sort((a, b) => {
+						let adone = a.done ? 1 : 0;
+						let bdone = b.done ? 1 : 0;
+
+						if (adone !== bdone) {
+							return adone - bdone;
+						}
+						return a.prioritaet - b.prioritaet;
+					});
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},

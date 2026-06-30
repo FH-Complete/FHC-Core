@@ -33,8 +33,14 @@ export function addTagInTable(addedTag, rows, matchKey, tagsKey = "tags")
 
 			let newTag = { ...addedTag, id: tag.id };
 
-			tags.unshift(newTag);
+			tags.push(newTag);
+			tags.sort((a, b) => {
+				let adone = a.done ? 1 : 0;
+				let bdone = b.done ? 1 : 0;
 
+				if (adone !== bdone) return adone - bdone;
+				return a.prioritaet - b.prioritaet;
+			});
 			rowData[tagsKey] = JSON.stringify(tags);
 			updated = true;
 		});
@@ -122,6 +128,14 @@ export function updateTagInTable(updatedTag, rows, fields = ['tags'])
 			if (index !== -1)
 			{
 				fieldData[index] = { ...updatedTag };
+				fieldData.sort((a, b) => {
+					let adone = a.done ? 1 : 0;
+					let bdone = b.done ? 1 : 0;
+
+					if (adone !== bdone) return adone - bdone;
+					return a.prioritaet - b.prioritaet;
+				});
+
 				let updatedFieldData = JSON.stringify(fieldData);
 
 				if (updatedFieldData !== rowData[field])

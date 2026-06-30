@@ -719,7 +719,7 @@ EOSQL;
 		return "tag_data_agg AS (
 					SELECT
 						lehreinheit_id,
-						COALESCE(json_agg(tag ORDER BY done), '[]'::json) AS tags
+						COALESCE(json_agg(tag ORDER BY done, prioritaet), '[]'::json) AS tags
 					FROM (
 							SELECT DISTINCT ON (public.tbl_notiz.notiz_id)
 								tbl_notiz.notiz_id AS id,
@@ -728,7 +728,8 @@ EOSQL;
 								text AS notiz,
 								style,
 								erledigt AS done,
-								lehreinheit_id
+								lehreinheit_id,
+								prioritaet
 							FROM public.tbl_notizzuordnung
 								JOIN public.tbl_notiz ON tbl_notizzuordnung.notiz_id = tbl_notiz.notiz_id
 								JOIN public.tbl_notiz_typ ON tbl_notiz.typ = tbl_notiz_typ.typ_kurzbz
