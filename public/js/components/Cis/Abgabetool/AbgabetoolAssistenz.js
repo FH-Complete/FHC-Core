@@ -233,13 +233,13 @@ export const AbgabetoolAssistenz = {
 						headerFilterFunc: this.headerFilterTerminCol,
 						sorter: this.sortFuncTerminCol,
 						tooltip: this.toolTipFuncPrevTermin,
-						field: 'prevTermin', formatter: this.abgabterminFormatter, width: 250, visible: false},
+						field: 'prevTermin', formatter: this.abgabeterminFormatter, width: 250, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nextAbgabetermin'))), field: 'nextTermin',
 						headerFilter: dateFilter,
 						headerFilterFunc: this.headerFilterTerminCol,
 						sorter: this.sortFuncTerminCol,
 						tooltip: this.toolTipFuncNextTermin,
-						formatter: this.abgabterminFormatter, width: 250, visible: true},
+						formatter: this.abgabeterminFormatter, width: 250, visible: true},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate1Status'))),
 						headerFilter: this.qgateHeaderFilterEditor,
 						headerFilterFunc: this.qgateHeaderFilterFunc,
@@ -421,7 +421,7 @@ export const AbgabetoolAssistenz = {
 						headerFilter: this.statusHeaderFilterEditor,
 						headerFilterFunc: this.statusHeaderFilterFunc,
 						headerFilterParams: {},
-						formatter: this.abgabterminFormatter,
+						formatter: this.abgabeterminFormatter,
 						formatterParams: { iconOnly: true },
 						width: 70,
 						tooltip: (e, cell) => this.mapDateStyleToTabulatorTooltip(cell.getValue())
@@ -1643,7 +1643,7 @@ export const AbgabetoolAssistenz = {
 			this.detailIsFullscreen = !this.detailIsFullscreen
 		},
 		getOptionLabelAbgabetyp(option){
-			return option.bezeichnung
+			return this.$p.t('abgabetool/c4paatyp' + option.paabgabetyp_kurzbz)
 		},
 		getOptionLabelStg(option){
 			return option.kurzbzlang + ' ' + option.bezeichnung
@@ -1979,7 +1979,7 @@ export const AbgabetoolAssistenz = {
 			return '<div style="display: flex; justify-content: start; align-items: center; height: 100%">' +
 				'<a style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">'+val+'</a></div>'
 		},
-		abgabterminFormatter(cell, formatterParams, onRendered,) {
+		abgabeterminFormatter(cell, formatterParams, onRendered,) {
 			const val = cell.getValue()
 			const dateStyle = val?.dateStyle ?? val
 			
@@ -2012,8 +2012,9 @@ export const AbgabetoolAssistenz = {
 						icon = '<i style="color: #000000 !important;" class="fa-solid fa-circle-exclamation"></i>'
 						break
 				}
-				
-				const bezeichnung = val.bezeichnung?.bezeichnung ?? val.bezeichnung
+
+				const typKurzbz = val.paabgabetyp_kurzbz ?? val.bezeichnung?.paabgabetyp_kurzbz
+				const bezeichnung = this.$p.t('abgabetool/c4paatyp' + typKurzbz)
 				
 				if(formatterParams?.iconOnly) {
 					return '<div style="display: flex; height: 20px;">' +

@@ -167,13 +167,13 @@ export const AbgabetoolMitarbeiter = {
 						headerFilterFunc: this.headerFilterTerminCol,
 						sorter: this.sortFuncTerminCol,
 						tooltip: this.toolTipFuncPrevTermin,
-						field: 'prevTermin', formatter: this.abgabterminFormatter, width: 250, visible: false},
+						field: 'prevTermin', formatter: this.abgabeterminFormatter, width: 250, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nextAbgabetermin'))), field: 'nextTermin',
 						headerFilter: dateFilter,
 						headerFilterFunc: this.headerFilterTerminCol,
 						sorter: this.sortFuncTerminCol,
 						tooltip: this.toolTipFuncNextTermin,
-						formatter: this.abgabterminFormatter, width: 250, visible: true},
+						formatter: this.abgabeterminFormatter, width: 250, visible: true},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate1Status'))),
 						headerFilter: this.qgateHeaderFilterEditor,
 						headerFilterFunc: this.qgateHeaderFilterFunc,
@@ -927,7 +927,7 @@ export const AbgabetoolMitarbeiter = {
 			// seperate check for quality gates
 			this.checkQualityGateStatus(projekt)
 		},
-		abgabterminFormatter(cell) {
+		abgabeterminFormatter(cell) {
 			const val = cell.getValue()
 
 			if(val) {
@@ -959,7 +959,8 @@ export const AbgabetoolMitarbeiter = {
 						break
 				}
 
-				const bezeichnung = val.bezeichnung?.bezeichnung ?? val.bezeichnung
+				const typKurzbz = val.paabgabetyp_kurzbz ?? val.bezeichnung?.paabgabetyp_kurzbz
+				const bezeichnung = this.$p.t('abgabetool/c4paatyp' + typKurzbz)
 
 				return '<div style="display: flex; height: 100%">' +
 					'<div class=' + val.dateStyle + "-header" + ' style="min-width:48px; height: 100%; padding: 0px; display: flex; align-items: center; justify-content: center;">' +
@@ -1013,7 +1014,7 @@ export const AbgabetoolMitarbeiter = {
 			this.detailIsFullscreen = !this.detailIsFullscreen
 		},
 		getOptionLabelAbgabetyp(option){
-			return option.bezeichnung
+			return this.$p.t('abgabetool/c4paatyp' + option.paabgabetyp_kurzbz)
 		},
 		formatDate(dateParam) {
 			return formatISODate(dateParam);
