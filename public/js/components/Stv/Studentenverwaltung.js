@@ -484,6 +484,12 @@ export default {
 		},
 		showAlertNoGroupChosen(){
 			this.$fhcAlert.alertError(this.$p.t('ui', 'alert_chooseGroupSem'));
+		},
+		showMenu(refName) {
+			bootstrap.Dropdown.getOrCreateInstance(this.$refs[refName]).show();
+		},
+		hideMenu(refName) {
+			bootstrap.Dropdown.getOrCreateInstance(this.$refs[refName]).hide();
 		}
 	},
 	created() {
@@ -659,8 +665,12 @@ export default {
 					</div>
 					<div class="offcanvas-body">
 						<app-menu app-identifier="stv">
-							<li :class="{ dropend: appMenuExtraItems.length }">
+							<li :class="{ dropend: appMenuExtraItems.length }"
+								@mouseenter="showMenu('gradeReportToggle')"
+								@mouseleave="hideMenu('gradeReportToggle')"
+							>
 								<a
+									ref="gradeReportToggle"
 									v-if="appMenuExtraItems.length"
 									class="dropdown-toggle"
 									href="#"
@@ -689,8 +699,12 @@ export default {
 									</li>
 								</ul>
 							</li>
-							<li :class="{ dropend: appMenuExtraItems.length }">
+							<li :class="{ dropend: appMenuExtraItems.length }"
+								@mouseenter="showMenu('lvPlanungToggle')"
+								@mouseleave="hideMenu('lvPlanungToggle')"
+							>
 								<a
+									ref="lvPlanungToggle"
 									v-if="appMenuExtraItems.length"
 									class="dropdown-toggle"
 									href="#"
