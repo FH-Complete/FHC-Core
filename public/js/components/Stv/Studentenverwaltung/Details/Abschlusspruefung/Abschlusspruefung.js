@@ -454,9 +454,9 @@ export default {
 					}
 				}
 				if (arraySuccessfullySent.length) {
-					//this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					//TODO(Manu) check if really needed in case of success
-					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave') + ': Uids: ' + arraySuccessfullySent.join(", "));
+					//this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave') + ': Uids: ' + arraySuccessfullySent.join(", "));
 				}
 
 				if (arrayError.length) {
@@ -699,7 +699,12 @@ export default {
 			<template #title>
 				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('abschlusspruefung', 'abschluessPruefungAnlegen')}}</p>
 				<p v-else class="fw-bold mt-3">{{$p.t('abschlusspruefung', 'abschluessPruefungBearbeiten')}}</p>
-				<small v-if="this.student.length" class="text-muted">{{studentNames}}</small>
+				<div
+					v-if="this.student.length"
+					class="stv-details-abschlusspruefung-student-names"
+				>
+				<small class="text-muted">{{studentNames}}</small>
+				</div>
 			</template>
 
 			<form-form ref="formFinalExam" @submit.prevent>
