@@ -22,6 +22,12 @@ export default {
 			url: '/api/frontend/v1/treemenu/' + config + '/' + path
 		};
 	},
+	data(config, path = '') {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/treemenudata/' + config + '/' + path
+		};
+	},
 	// TODO(chris): handle favorites per config
 	favorites: {
 		get() {

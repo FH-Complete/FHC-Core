@@ -26,6 +26,7 @@ import StvDetails from "./Studentenverwaltung/Details.js";
 import StvStudiensemester from "./Studentenverwaltung/Studiensemester.js";
 
 import ApiSearchbar from "../../api/factory/searchbar.js";
+import ApiTreemenu from "../../api/factory/treemenu.js";
 import ApiStv from "../../api/factory/stv.js";
 import ApiStvVerband from '../../api/factory/stv/verband.js';
 import ApiStvConfig from '../../api/factory/stv/config.js';
@@ -277,7 +278,8 @@ export default {
 			{
 				urlpath = 'CURRENT_SEMESTER' + '/' + urlpath;
 			}*/
-			this.$refs.stvList.updateUrl(ApiStv.students.verband(urlpath));
+			urlpath = 'stdsem/' + this.studiensemesterKurzbz + '/' + urlpath;
+			this.$refs.stvList.updateUrl(ApiTreemenu.data('stv', urlpath));
 
 			this.studiengangKz = studiengang_kz;
 			this.selected_semester = semester;

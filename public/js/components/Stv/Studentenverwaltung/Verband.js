@@ -41,8 +41,8 @@ export default {
 	},
 	methods: {
 		onSelectTreeNode(node) {
-			if (node.link)
-				this.$emit('selectVerband', {link: node.link, studiengang_kz: node.stg_kz, semester: node.semester, orgform_kurzbz: node.orgform_kurzbz});
+			if (node.path)
+				this.$emit('selectVerband', {link: node.path, studiengang_kz: node.stg_kz, semester: node.semester, orgform_kurzbz: node.orgform_kurzbz});
 		},
 		getStudentAjaxId(student) {
 			let res = student.id;

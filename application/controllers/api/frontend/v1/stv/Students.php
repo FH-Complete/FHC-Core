@@ -247,47 +247,51 @@ class Students extends FHCAPI_Controller
 	}
 
 	public function getPrestudents(
-		$studiengang_kz,
+		$studiengang_typ_kurzbz,
 		$studiensemester_kurzbz = null,
 		$filter = null
 	) {
 		$this->addMeta('ci_method', __FUNCTION__);
 		$this->addMeta('ci_params', array(
-			'studiengang_kz' => $studiengang_kz,
+			'studiengang_typ_kurzbz' => $studiengang_typ_kurzbz,
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'filter' => $filter
 		));
 		
-		$this->fetchPrestudents($studiengang_kz, $studiensemester_kurzbz, $filter);
+		$this->fetchPrestudents($studiengang_typ_kurzbz, $studiensemester_kurzbz, $filter);
 	}
 
 	public function getPrestudentsOrgform(
-		$studiengang_kz,
+		$studiengang_typ_kurzbz,
 		$orgform_kurzbz,
 		$studiensemester_kurzbz = null,
 		$filter = null
 	) {
 		$this->addMeta('ci_method', __FUNCTION__);
 		$this->addMeta('ci_params', array(
-			'studiengang_kz' => $studiengang_kz,
+			'studiengang_typ_kurzbz' => $studiengang_typ_kurzbz,
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'filter' => $filter,
 			'orgform_kurzbz' => $orgform_kurzbz
 		));
 		
-		$this->fetchPrestudents($studiengang_kz, $studiensemester_kurzbz, $filter, $orgform_kurzbz);
+		$this->fetchPrestudents($studiengang_typ_kurzbz, $studiensemester_kurzbz, $filter, $orgform_kurzbz);
 	}
 
 	/**
-	 * @param integer		$studiengang_kz
+	 * @param string		$studiengang_typ_kurzbz
 	 * @param string		$studiensemester_kurzbz			(optional)
 	 * @param string		$filter							(optional)
 	 * @param string		$orgform_kurzbz					(optional)
 	 *
 	 * @return void
 	 */
-	protected function fetchPrestudents($studiengang_kz, $studiensemester_kurzbz = null, $filter = null, $orgform_kurzbz = null)
+	protected function fetchPrestudents($studiengang_typ_kurzbz, $studiensemester_kurzbz = null, $filter = null, $orgform_kurzbz = null)
 	{
+		$studiengang_kz = $this->getStudiengangKz($studiengang_typ_kurzbz);
+		$studiensemester_kurzbz = $this->getStudiensemesterKurzbz($studiensemester_kurzbz);
+		$orgform_kurzbz = $this->getOrgformKurzbz($orgform_kurzbz);
+
 		$stdsemEsc = $studiensemester_kurzbz ? $this->PrestudentModel->escape($studiensemester_kurzbz) : 'NULL';
 
 		$selectRT = "
@@ -451,7 +455,7 @@ class Students extends FHCAPI_Controller
 
 	public function getStudents(
 		$studiensemester_kurzbz,
-		$studiengang_kz,
+		$studiengang_typ_kurzbz,
 		$semester = null,
 		$verband = null,
 		$gruppe = null
@@ -459,18 +463,18 @@ class Students extends FHCAPI_Controller
 		$this->addMeta('ci_method', __FUNCTION__);
 		$this->addMeta('ci_params', array(
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'studiengang_kz' => $studiengang_kz,
+			'studiengang_typ_kurzbz' => $studiengang_typ_kurzbz,
 			'semester' => $semester,
 			'verband' => $verband,
 			'gruppe' => $gruppe
 		));
 		
-		$this->fetchStudents($studiensemester_kurzbz, $studiengang_kz, $semester, $verband, $gruppe, null, null);
+		$this->fetchStudents($studiensemester_kurzbz, $studiengang_typ_kurzbz, $semester, $verband, $gruppe, null, null);
 	}
 
 	public function getStudentsOrgform(
 		$studiensemester_kurzbz,
-		$studiengang_kz,
+		$studiengang_typ_kurzbz,
 		$orgform_kurzbz,
 		$semester = null,
 		$verband = null,
@@ -479,37 +483,37 @@ class Students extends FHCAPI_Controller
 		$this->addMeta('ci_method', __FUNCTION__);
 		$this->addMeta('ci_params', array(
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'studiengang_kz' => $studiengang_kz,
+			'studiengang_typ_kurzbz' => $studiengang_typ_kurzbz,
 			'orgform_kurzbz' => $orgform_kurzbz,
 			'semester' => $semester,
 			'verband' => $verband,
 			'gruppe' => $gruppe
 		));
 		
-		$this->fetchStudents($studiensemester_kurzbz, $studiengang_kz, $semester, $verband, $gruppe, null, $orgform_kurzbz);
+		$this->fetchStudents($studiensemester_kurzbz, $studiengang_typ_kurzbzstudiengang_typ_kurzbz, $semester, $verband, $gruppe, null, $orgform_kurzbz);
 	}
 
 	public function getStudentsSpezialgruppe(
 		$studiensemester_kurzbz,
-		$studiengang_kz,
+		$studiengang_typ_kurzbz,
 		$semester,
 		$gruppe_kurzbz
 	) {
 		$this->addMeta('ci_method', __FUNCTION__);
 		$this->addMeta('ci_params', array(
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'studiengang_kz' => $studiengang_kz,
+			'studiengang_typ_kurzbz' => $studiengang_typ_kurzbz,
 			'semester' => $semester,
 			'gruppe_kurzbz' => $gruppe_kurzbz
 		));
 		
-		$this->fetchStudents($studiensemester_kurzbz, $studiengang_kz, $semester, null, null, $gruppe_kurzbz, null);
+		$this->fetchStudents($studiensemester_kurzbz, $studiengang_typ_kurzbz, $semester, null, null, $gruppe_kurzbz, null);
 	}
 
 	public function getStudentsOrgformSpezialgruppe(
 		$studiensemester_kurzbz,
 		$orgform_kurzbz,
-		$studiengang_kz,
+		$studiengang_typ_kurzbz,
 		$semester,
 		$gruppe_kurzbz
 	) {
@@ -517,17 +521,17 @@ class Students extends FHCAPI_Controller
 		$this->addMeta('ci_params', array(
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'orgform_kurzbz' => $orgform_kurzbz,
-			'studiengang_kz' => $studiengang_kz,
+			'studiengang_typ_kurzbz' => $studiengang_typ_kurzbz,
 			'semester' => $semester,
 			'gruppe_kurzbz' => $gruppe_kurzbz
 		));
 		
-		$this->fetchStudents($studiensemester_kurzbz, $studiengang_kz, $semester, null, null, $gruppe_kurzbz, $orgform_kurzbz);
+		$this->fetchStudents($studiensemester_kurzbz, $studiengang_typ_kurzbz, $semester, null, null, $gruppe_kurzbz, $orgform_kurzbz);
 	}
 
 	/**
-	 * @param integer		$studiengang_kz
 	 * @param string		$studiensemester_kurzbz
+	 * @param string		$studiengang_typ_kurzbz
 	 * @param integer		$semester						(optional)
 	 * @param string		$verband						(optional)
 	 * @param integer		$gruppe							(optional)
@@ -538,13 +542,17 @@ class Students extends FHCAPI_Controller
 	 */
 	protected function fetchStudents(
 		$studiensemester_kurzbz,
-		$studiengang_kz,
+		$studiengang_typ_kurzbz,
 		$semester = null,
 		$verband = null,
 		$gruppe = null,
 		$gruppe_kurzbz = null,
 		$orgform_kurzbz = null
 	) {
+		$studiensemester_kurzbz = $this->getStudiensemesterKurzbz($studiensemester_kurzbz);
+		$studiengang_kz = $this->getStudiengangKz($studiengang_typ_kurzbz);
+		$orgform_kurzbz = $this->getOrgformKurzbz($orgform_kurzbz);
+
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		if (!$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
@@ -801,5 +809,56 @@ class Students extends FHCAPI_Controller
 				return;
 			}
 		}
+	}
+
+	protected function getStudiengangKz($studiengang_typ_kurzbz)
+	{
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$result = $this->StudiengangModel->loadWhere([
+			'LOWER(CONCAT(typ, kurzbz)) =' => strtolower($studiengang_typ_kurzbz)
+		]);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		if (!$data)
+			return null;
+
+		return current($data)->studiengang_kz;
+	}
+
+	protected function getStudiensemesterKurzbz($studiensemester_kurzbz)
+	{
+		if ($studiensemester_kurzbz === null)
+			return null;
+
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		$result = $this->StudiensemesterModel->loadWhere([
+			'LOWER(studiensemester_kurzbz) =' => strtolower($studiensemester_kurzbz)
+		]);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		if (!$data)
+			return $studiensemester_kurzbz;
+
+		return current($data)->studiensemester_kurzbz;
+	}
+
+	protected function getOrgformKurzbz($orgform_kurzbz)
+	{
+		if ($orgform_kurzbz === null)
+			return null;
+
+		$this->load->model('codex/Orgform_model', 'OrgformModel');
+		$result = $this->OrgformModel->loadWhere([
+			'LOWER(orgform_kurzbz) =' => strtolower($orgform_kurzbz)
+		]);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		if (!$data)
+			return $orgform_kurzbz;
+
+		return current($data)->orgform_kurzbz;
 	}
 }
