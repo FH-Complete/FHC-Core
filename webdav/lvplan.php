@@ -1,7 +1,7 @@
 <?php
 
 // Files we need
-require_once '../include/sabredav/lib/Sabre/autoload.php';
+require_once dirname(__DIR__).'/vendor/autoload.php';
 require_once 'auth.class.php';
 require_once 'Caldav_Backend.php';
 require_once('Principal.php');
@@ -49,4 +49,3 @@ $server->addPlugin($browser);
 
 // And off we go!
 $server->exec();
-
