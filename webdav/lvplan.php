@@ -19,7 +19,7 @@ $calendarBackend = new MySabre_CalDAV_Backend($authBackend);
 
 $tree = array(
 	new \Sabre\CalDAV\Principal\Collection($principalBackend),
-	new \Sabre\CalDAV\CalendarRootNode($principalBackend, $calendarBackend)
+	new \Sabre\CalDAV\CalendarRoot($principalBackend, $calendarBackend)
 );
 
 // The object tree needs in turn to be passed to the server class
@@ -32,7 +32,8 @@ $path = str_replace($_SERVER['DOCUMENT_ROOT'],'',__FILE__).'/';
 $server->setBaseUri($path);
 
 // Authentication plugin
-$authPlugin = new \Sabre\DAV\Auth\Plugin($authBackend,'SabreDAV');
+$authBackend->setRealm('SabreDAV');
+$authPlugin = new \Sabre\DAV\Auth\Plugin($authBackend);
 $server->addPlugin($authPlugin);
 
 // CalDAV plugin
