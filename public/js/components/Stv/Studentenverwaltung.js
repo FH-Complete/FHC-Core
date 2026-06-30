@@ -666,8 +666,8 @@ export default {
 					<div class="offcanvas-body">
 						<app-menu app-identifier="stv">
 							<li :class="{ dropend: appMenuExtraItems.length }"
-								@mouseenter="showMenu('gradeReportToggle')"
-								@mouseleave="hideMenu('gradeReportToggle')"
+								@mouseenter="appMenuExtraItems.length && showMenu('gradeReportToggle')"
+								@mouseleave="appMenuExtraItems.length && hideMenu('gradeReportToggle')"
 							>
 								<a
 									ref="gradeReportToggle"
@@ -700,8 +700,8 @@ export default {
 								</ul>
 							</li>
 							<li :class="{ dropend: appMenuExtraItems.length }"
-								@mouseenter="showMenu('lvPlanungToggle')"
-								@mouseleave="hideMenu('lvPlanungToggle')"
+								@mouseenter="appMenuExtraItems.length && showMenu('lvPlanungToggle')"
+								@mouseleave="appMenuExtraItems.length && hideMenu('lvPlanungToggle')"
 							>
 								<a
 									ref="lvPlanungToggle"
