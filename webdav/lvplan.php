@@ -5,6 +5,7 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 require_once 'auth.class.php';
 require_once 'Caldav_Backend.php';
 require_once('Principal.php');
+require_once 'MySabre_DAV_Browser_NoProperties.php';
 /*
 //PHP Error To Exception
 function exception_error_handler($errno, $errstr, $errfile, $errline ) {
@@ -45,7 +46,7 @@ $aclPlugin = new \Sabre\DAVACL\Plugin();
 $server->addPlugin($aclPlugin);
 
 // Support for html frontend
-$browser = new \Sabre\DAV\Browser\Plugin();
+$browser = new MySabre_DAV_Browser_NoProperties();
 $server->addPlugin($browser);
 
 // And off we go!
