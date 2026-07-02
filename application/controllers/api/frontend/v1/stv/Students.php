@@ -619,6 +619,8 @@ class Students extends FHCAPI_Controller
 			'prestudent_id' => $prestudent_id,
 		));
 
+		$studiensemester_kurzbz = $this->getStudiensemesterKurzbz($studiensemester_kurzbz);
+
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		if (!$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
@@ -663,6 +665,8 @@ class Students extends FHCAPI_Controller
 			'student_uid' => $student_uid,
 		));
 
+		$studiensemester_kurzbz = $this->getStudiensemesterKurzbz($studiensemester_kurzbz);
+
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		if (!$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
@@ -696,6 +700,8 @@ class Students extends FHCAPI_Controller
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'person_id' => $person_id,
 		));
+
+		$studiensemester_kurzbz = $this->getStudiensemesterKurzbz($studiensemester_kurzbz);
 
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 

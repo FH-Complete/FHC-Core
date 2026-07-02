@@ -101,6 +101,12 @@ $route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/stg/(:any)/semester/(:any
 
 $route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/stg/(:any)/orgform/(:any)/semester/(:any)/group/(:any)'] = 'api/frontend/v1/stv/students/getStudentsOrgformSpezialgruppe/$1/$3/$2/$4/$5';
 
+$route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/prestudent/(:any)'] = 'api/frontend/v1/stv/students/getPrestudent/$1/$2';
+
+$route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/student/(:any)'] = 'api/frontend/v1/stv/students/getStudent/$1/$2';
+
+$route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/person/(:any)'] = 'api/frontend/v1/stv/students/getPerson/$1/$2';
+
 $route['api/frontend/v1/treemenudata/stv/.*'] = 'api/frontend/v1/stv/students/index';
 
 
