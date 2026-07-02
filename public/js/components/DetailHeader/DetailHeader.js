@@ -460,6 +460,13 @@ export default {
 					<span v-else>
 						<pv-skeleton width="10rem"></pv-skeleton>
 					</span>
+					<strong class="text-muted"> | {{$p.t('ui', 'private')}} </strong>
+					<span v-if="!isLoading">
+						<a :href="'mailto:'+headerData[0]?.mail_privat">{{headerData[0].mail_privat}}</a>
+					</span>
+					<span v-else>
+						<pv-skeleton width="10rem"></pv-skeleton>
+					</span>
 					<strong class="text-muted"> | Status </strong>
 					<span v-if="noCurrentStatus">
 						<strong class="text-danger">{{$p.t('lehre', 'textNoStatusInSem', { sem: currentSemester}) }}</strong>
