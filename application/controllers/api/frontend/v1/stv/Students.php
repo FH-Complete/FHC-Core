@@ -292,6 +292,9 @@ class Students extends FHCAPI_Controller
 		$studiensemester_kurzbz = $this->getStudiensemesterKurzbz($studiensemester_kurzbz);
 		$orgform_kurzbz = $this->getOrgformKurzbz($orgform_kurzbz);
 
+		if ($studiengang_kz === null)
+			show_404();
+
 		$stdsemEsc = $studiensemester_kurzbz ? $this->PrestudentModel->escape($studiensemester_kurzbz) : 'NULL';
 
 		$selectRT = "
@@ -552,6 +555,9 @@ class Students extends FHCAPI_Controller
 		$studiensemester_kurzbz = $this->getStudiensemesterKurzbz($studiensemester_kurzbz);
 		$studiengang_kz = $this->getStudiengangKz($studiengang_typ_kurzbz);
 		$orgform_kurzbz = $this->getOrgformKurzbz($orgform_kurzbz);
+
+		if ($studiengang_kz === null)
+			show_404();
 
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
