@@ -72,7 +72,7 @@ class StudentListLib
 		$this->addSelect('pls.bestaetigtam AS status_bestaetigung');
 		$this->addSelect("
 			CASE
-				WHEN pls.status_kurzbz = 'Interessent'
+				WHEN pls.status_kurzbz IN ('Interessent','Aufgenommener','Bewerber','Wartender')
 				THEN pls.ausbildungssemester
 				ELSE s.semester
 			END AS semester_berechnet

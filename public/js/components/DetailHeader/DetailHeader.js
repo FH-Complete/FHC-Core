@@ -435,6 +435,12 @@ export default {
 							{{headerData[0].verband}}
 						<strong v-if="headerData[0].gruppe !== null && headerData[0].gruppe != ' '" class="text-muted"> | {{$p.t('lehre', 'gruppe')}} </strong>
 							{{headerData[0].gruppe}}
+						<strong v-if="headerData[0].status=='Interessent'
+							|| headerData[0].status=='Aufgenommener'
+							|| headerData[0].status=='Bewerber'
+							|| headerData[0].status=='Wartender'"
+							class="text-muted"> | Einstiegssemester {{headerData[0].semester_berechnet}}
+						</strong>
 					</template>
 					<template v-else>
 					<strong class="text-muted"> | {{$p.t('lehre', 'semester')}} </strong>
