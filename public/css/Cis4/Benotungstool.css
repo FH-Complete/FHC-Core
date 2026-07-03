@@ -1,26 +1,33 @@
-/* 1. Stick the Header */
-#notentable .tabulator-header .tabulator-col.sticky-col {
-	position: sticky;
-	left: 0;
-	z-index: 10; /* Must be higher than other headers */
-	background-color: #fff; /* Opaque background is required */
-	border-right: 2px solid #ddd; /* Optional: Separator line */
-}
-
-/* 2. Stick the Data Cells */
+/* Sticky identity columns. The four freezable columns (selection/uid/Vorname/Nachname) always carry
+   the .sticky-col class for the opaque background; whether a column is actually pinned is toggled
+   per column via a `sticky-on-<field>` class on #notentable (set in JS from the user's selection).
+   The cumulative left offsets (--sl-<field>) are computed in JS (recomputeStickyOffsets) so that
+   multiple sticky columns stack next to each other instead of overlapping at left:0. */
+#notentable .tabulator-header .tabulator-col.sticky-col,
 #notentable .tabulator-tableholder .tabulator-row .tabulator-cell.sticky-col {
-	position: sticky;
-	left: 0;
-	z-index: 10; /* Ensure it floats above other cells */
-	background-color: #fff; /* Match your row background color */
-	border-right: 2px solid #ddd; /* Optional: Separator line */
+	background-color: #fff;       /* opaque so scrolled cells don't show through */
 }
 
-/* 3. Fix for Hover Effects (Optional) */
-/* If you use hover rows, you need to ensure the sticky cell matches the hover color */
+/* keep sticky cells opaque on row hover */
 #notentable .tabulator-row:hover .tabulator-cell.sticky-col {
-	background-color: #ccc; /* Match your existing hover color */
+	background-color: #ccc;
 }
+
+/* enable pinning per column only when the container opts the field in.
+   left offset comes from the matching --sl-<field> CSS variable (set on #notentable from JS). */
+#notentable.sticky-on-selectCol .sticky-col[tabulator-field="selectCol"],
+#notentable.sticky-on-uid .sticky-col[tabulator-field="uid"],
+#notentable.sticky-on-vorname .sticky-col[tabulator-field="vorname"],
+#notentable.sticky-on-nachname .sticky-col[tabulator-field="nachname"] {
+	position: sticky;
+	z-index: 10;                  /* float above the scrolling pruefungs columns */
+	border-right: 1px solid #ddd; /* separator on the sticky block */
+}
+
+#notentable.sticky-on-selectCol .sticky-col[tabulator-field="selectCol"] { left: var(--sl-selectCol, 0); }
+#notentable.sticky-on-uid       .sticky-col[tabulator-field="uid"]       { left: var(--sl-uid, 0); }
+#notentable.sticky-on-vorname   .sticky-col[tabulator-field="vorname"]   { left: var(--sl-vorname, 0); }
+#notentable.sticky-on-nachname  .sticky-col[tabulator-field="nachname"]  { left: var(--sl-nachname, 0); }
 
 
 /* styling for points input column for notenvorschläge in benotungstool*/
@@ -39,9 +46,45 @@
 #notentable .tabulator-tableholder .tabulator-editable[tabulator-field="note_vorschlag"]::after {
 	content: "▾";
 	position: absolute;
-	right: 6px;
-	color: rgba(176, 176, 106, 0.73);;
-	font-size: x-large;
-	bottom: 6px;
+	right: 8px;
+	top: 50%;
+	transform: translateY(-50%) rotate(0deg);
+	transform-origin: center;
+	color: rgba(120, 120, 60, 0.85);
+	font-size: 0.9rem;
+	line-height: 1;
 	pointer-events: none;
+	transition: transform 0.15s ease;
 }
+
+/* rotate the indicator up while the dropdown editor is open */
+#notentable .tabulator-tableholder .tabulator-cell.tabulator-editing[tabulator-field="note_vorschlag"]::after {
+	transform: translateY(-50%) rotate(180deg);
+}
+
+.pruefung-badge {
+	position: relative;
+	padding-left: 32px; /* badge width (20) + its left offset (6) + gap (6) */
+}
+
+.pruefung-badge::before {
+	content: attr(data-attempt);
+	position: absolute;
+	left: 6px;
+	top: 50%;
+	transform: translateY(-50%);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	color: #fff;
+	font-size: 0.75rem;
+	font-weight: bold;
+}
+
+.pruefung-badge.attempt-t1::before { background: #0072B2; }
+.pruefung-badge.attempt-t2::before { background: #E69F00; }
+.pruefung-badge.attempt-t3::before { background: #CC79A7; }
+.pruefung-badge.attempt-k::before  { background: #D55E00; }
