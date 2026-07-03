@@ -23,12 +23,12 @@ export default {
 		<router-link v-if="this.isCompatLink()"
 			:to="this.calcCompatRouterLink()"
 		>
-			<slot></slot> (routerlink)
+			<slot></slot>
 		</router-link>
 		<a v-else 
 			:href="this.href"
 		>
-			<slot></slot> (ahref)
+			<slot></slot>
 		</a>
 	`
 };
