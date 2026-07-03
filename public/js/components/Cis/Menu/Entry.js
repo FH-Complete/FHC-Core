@@ -1,5 +1,10 @@
+import CisMenuLink from "./Link.js";
+
 export default {
     name: 'CisMenuEntry',
+	components: {
+		CisMenuLink
+	},
     props: {
         entry: Object,
         level: {
@@ -170,7 +175,7 @@ export default {
     <template v-else>
         <template v-if="hasChilds">
 			<div class="btn-group w-100">
- 				<a :target="target" 
+ 				<cis-menu-link :target="target"
  					:href="(entry.menu_open && hasFullLink) ? entry.url : null"
 					@click="toggleCollapse"
                     :class="{
@@ -179,7 +184,7 @@ export default {
 						'fw-bold':active
                     }">
                     {{ entry.titel }}
-                </a>
+                </cis-menu-link>
                 <button @click.prevent="toggleCollapse" :aria-expanded="entry.menu_open"
                     :class="{
                         'btn btn-default rounded-0 dropdown-toggle dropdown-toggle-split flex-grow-0': true,
@@ -193,7 +198,7 @@ export default {
                 <cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeContent" v-for="child in entry.childs" :key="child" :entry="child" :level="level + 1"/>
             </ul>
         </template>
-		<a v-else
+		<cis-menu-link v-else
             :href="entry.url"
             :target="target"
             :class="{
@@ -203,6 +208,6 @@ export default {
             }"
             @mouseup="setActiveEntry(entry.content_id)">
             {{ entry.titel }}
-        </a>
+        </cis-menu-link>
     </template>`
 };
