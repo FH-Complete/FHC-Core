@@ -24,167 +24,26 @@ import PluginsPhrasen from "../plugins/Phrasen.js";
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
 const router = VueRouter.createRouter({
-	history: VueRouter.createWebHistory(),
+	history: VueRouter.createWebHistory('/' + ciPath),
 	routes: [
 		{
 			name: 'index',
-			path: `/${ciPath}/studentenverwaltung`,
-			component: FhcStudentenverwaltung
-		},
-		{
-			name: 'studiensemester',
-			path: `/${ciPath}/studentenverwaltung/:studiensemester_kurzbz`,
+			path: '/studvw',
 			component: FhcStudentenverwaltung,
-			props: (route) => {
-				return {
-					url_studiensemester_kurzbz: route.params.studiensemester_kurzbz
-				};
-			},
-			beforeEnter: (to, from, next) => {
-				const isSemester = /^[WS]S\d{4}$/.test(to.params.studiensemester_kurzbz);
-				if (!isSemester) {
-					return next({name: 'index'});
+			children: [
+				{
+					name: 'stdsem',
+					path: 'stdsem/:stdsem',
+					children: [
+						{ name: 'search', path: 'search/:query' },
+						{ name: 'searchtypes', path: 'search/:types/:query' },
+						{ name: 'prestudent', path: 'prestudent/:prestudent_id' },
+						{ name: 'student', path: 'student/:student_uid' },
+						{ name: 'person', path: 'person/:person_id' },
+						{ name: 'treemenu', path: ':treemenu(.*)*' }
+					]
 				}
-				next();
-			}
-		},
-		{
-			name: 'studiengang',
-			path: `/${ciPath}/studentenverwaltung/:studiensemester_kurzbz/:studiengang`,
-			component: FhcStudentenverwaltung,
-			props: (route) => {
-				return {
-					url_studiensemester_kurzbz: route.params.studiensemester_kurzbz,
-					url_studiengang: route.params.studiengang,
-				};
-			},
-			beforeEnter: (to, from, next) => {
-				const isSemester = /^[WS]S\d{4}$/.test(to.params.studiensemester_kurzbz);
-				if (!isSemester) {
-					return next({name: 'index'});
-				}
-				const isStudiengang = /^[A-Z]{3}/.test(to.params.studiengang);
-				if (!isStudiengang) {
-					return next({
-						name: 'studiensemester',
-						params: {
-							studiensemester_kurzbz: to.params.studiensemester_kurzbz
-						}
-					});
-				}
-				next();
-			}
-		},
-		{
-			path: `/${ciPath}/studentenverwaltung/:studiensemester_kurzbz/prestudent/:prestudent_id`,
-			component: FhcStudentenverwaltung,
-			props: (route) => {
-				return {
-					url_studiensemester_kurzbz: route.params.studiensemester_kurzbz,
-					url_mode: 'prestudent',
-					url_prestudent_id: route.params.prestudent_id
-				};
-			},
-			beforeEnter: (to, from, next) => {
-				const isSemester = /^[WS]S\d{4}$/.test(to.params.studiensemester_kurzbz);
-				if (!isSemester) {
-					return next({name: 'index'});
-				}
-				next();
-			}
-		},
-		{
-			path: `/${ciPath}/studentenverwaltung/:studiensemester_kurzbz/prestudent/:prestudent_id/:tab`,
-			component: FhcStudentenverwaltung,
-			props: (route) => {
-				return {
-					url_studiensemester_kurzbz: route.params.studiensemester_kurzbz,
-					url_mode: 'prestudent',
-					url_prestudent_id: route.params.prestudent_id,
-					url_tab: route.params.tab
-				};
-			},
-			beforeEnter: (to, from, next) => {
-				const isSemester = /^[WS]S\d{4}$/.test(to.params.studiensemester_kurzbz);
-				if (!isSemester) {
-					return next({name: 'index'});
-				}
-				next();
-			}
-		},
-		{
-			path: `/${ciPath}/studentenverwaltung/:studiensemester_kurzbz/student/:id`,
-			component: FhcStudentenverwaltung,
-			props: (route) => {
-				return {
-					url_studiensemester_kurzbz: route.params.studiensemester_kurzbz,
-					url_mode: 'student',
-					url_student_id: route.params.id
-				};
-			},
-			beforeEnter: (to, from, next) => {
-				const isSemester = /^[WS]S\d{4}$/.test(to.params.studiensemester_kurzbz);
-				if (!isSemester) {
-					return next({name: 'index'});
-				}
-				next();
-			}
-		},
-		{
-			path: `/${ciPath}/studentenverwaltung/:studiensemester_kurzbz/person/:person_id`,
-			component: FhcStudentenverwaltung,
-			props: (route) => {
-				return {
-					url_studiensemester_kurzbz: route.params.studiensemester_kurzbz,
-					url_mode: 'person',
-					url_prestudent_id: route.params.person_id
-				};
-			},
-			beforeEnter: (to, from, next) => {
-				const isSemester = /^[WS]S\d{4}$/.test(to.params.studiensemester_kurzbz);
-				if (!isSemester) {
-					return next({name: 'index'});
-				}
-				next();
-			}
-		},
-		{
-			name: 'search',
-			path: `/${ciPath}/studentenverwaltung/:studiensemester_kurzbz/search/:searchstr`,
-			component: FhcStudentenverwaltung,
-			props(route) {
-				return {
-					url_studiensemester_kurzbz: route.params.studiensemester_kurzbz,
-					url_mode: 'search',
-					url_prestudent_id: route.params.searchstr
-				};
-			},
-			beforeEnter(to, from, next) {
-				const isSemester = /^[WS]S\d{4}$/.test(to.params.studiensemester_kurzbz);
-				if (!isSemester) {
-					return next({name: 'index'});
-				}
-				next();
-			}
-		},
-		{
-			name: 'search_w_types',
-			path: `/${ciPath}/studentenverwaltung/:studiensemester_kurzbz/search/:types/:searchstr`,
-			component: FhcStudentenverwaltung,
-			props(route) {
-				return {
-					url_studiensemester_kurzbz: route.params.studiensemester_kurzbz,
-					url_mode: 'search',
-					url_prestudent_id: route.params.type + '/' + route.params.searchstr
-				};
-			},
-			beforeEnter(to, from, next) {
-				const isSemester = /^[WS]S\d{4}$/.test(to.params.studiensemester_kurzbz);
-				if (!isSemester) {
-					return next({name: 'index'});
-				}
-				next();
-			}
+			]
 		},
 		{
 			path: '/:pathMatch(.*)*',
@@ -197,11 +56,16 @@ const router = VueRouter.createRouter({
 
 router.afterEach((to, from, failure) => {
 	let title = 'Studierendenverwaltung FH-Complete';
-	if (to.params.studiengang) {
-		title = to.params.studiengang + ' ' + title;
+	if (to.params.treemenu) {
+		const index = to.params.treemenu.findIndex(
+			(e, i) => i%2 == 0 && e == 'stg'
+		);
+		if (index >= 0) {
+			title = to.params.treemenu[index + 1].toUpperCase() + ' ' + title;
+		}
 	}
-	if (to.params.studiensemester_kurzbz) {
-		title = to.params.studiensemester_kurzbz + ' ' + title;
+	if (to.params.stdsem) {
+		title = to.params.stdsem.toUpperCase() + ' ' + title;
 	}
 	document.title = title;
 });

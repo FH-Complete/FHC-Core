@@ -28,7 +28,7 @@ export default {
 	],
 	props: {
 		preselectedKey: {
-			type: String,
+			type: Array,
 			default: null
 		}
 	},

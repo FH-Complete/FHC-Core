@@ -23,7 +23,7 @@ export default {
 			required: true,
 		},
 		preselectedKey: {
-			type: String,
+			type: Array,
 			default: null
 		}
 	},
@@ -156,18 +156,17 @@ export default {
 		},
 		async setPreselection()
 		{
-			if (!this.preselectedKey)
+			if (!this.preselectedKey || !this.preselectedKey.length)
 			{
 				this.selectedKey = null;
 				return;
 			}
 
-			let rawKey = this.preselectedKey
-
-			if (!rawKey || typeof rawKey !== 'string')
+			if (!this.preselectedKey || !Array.isArray(this.preselectedKey))
 				return;
 
-			const parts = this.preselectedKey.split('/');
+			// [1, 2, 3, 4, ...] => ['1-2', '3-4', ...]
+			const parts = this.preselectedKey.reduce((r, c, i, a) => (i%2 && r.push(a[i-1] + '-' + c), r), []);
 			let currentKey = parts[0];
 			let currentNode = this.findNodeByKey(currentKey);
 

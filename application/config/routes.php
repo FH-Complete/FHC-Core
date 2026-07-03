@@ -72,6 +72,17 @@ $route['Abgabetool/Student'] = 'Cis/Abgabetool/Student';
 $route['Abgabetool/Student/(:any)'] = 'Cis/Abgabetool/Student/$1';
 $route['Abgabetool/Deadlines'] = 'Cis/Abgabetool/Deadlines';
 
+// Studierendenverwaltung App Routes
+$route['studvw'] = 'studentenverwaltung/index';
+$route['studvw/.*'] = 'studentenverwaltung/index';
+// Old routes
+$route['studentenverwaltung'] = 'redirect/301/studvw';
+$route['studentenverwaltung/(:any)'] = 'redirect/301/studvw/stdsem/$1';
+$route['studentenverwaltung/(:any)/(prestudent|student|person|search)/(:any)'] = 'redirect/301/studvw/stdsem/$1/$2/$3';
+$route['studentenverwaltung/(:any)/prestudent/(:any)/tab/:any'] = 'redirect/301/studvw/stdsem/$1/prestudent/$2';
+$route['studentenverwaltung/(:any)/search/(:any)/(:any)'] = 'redirect/301/studvw/stdsem/$1/search/$2/$3';
+$route['studentenverwaltung/(:any)/(:any)'] = 'redirect/301/studvw/stdsem/$1/stg/$2';
+
 // Studierendenverwaltung List Routes
 $route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/inout/1/incoming/1'] = 'api/frontend/v1/stv/students/getIncoming/$1';
 $route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/inout/1/outgoing/1'] = 'api/frontend/v1/stv/students/getOutgoing/$1';
