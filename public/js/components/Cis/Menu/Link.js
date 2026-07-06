@@ -9,6 +9,10 @@ export default {
 		}
 	},
 	methods: {
+		isRouterHandled() {
+			let isrouterhandled = this.$route.matched.length > 0;
+			return isrouterhandled;
+		},
 		isCompatLink() {
 			if(this.href === null) {
 				return false;
@@ -20,7 +24,7 @@ export default {
 		}
 	},
 	template: `
-		<router-link v-if="this.isCompatLink()"
+		<router-link v-if="this.isRouterHandled() && this.isCompatLink()"
 			:to="this.calcCompatRouterLink()"
 		>
 			<slot></slot>
