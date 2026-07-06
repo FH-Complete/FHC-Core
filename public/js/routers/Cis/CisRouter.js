@@ -252,6 +252,9 @@ const router = VueRouter.createRouter({
 			component: FhcDashboard,
 			props: {dashboard: 'CIS'},
 		},
+/*
+ *	TODO(ma0080): 2026-07-06: commented out => check if needed
+ *
 		{
 			path: '/:pathMatch(.*)*',
 			name: 'Fallback',
@@ -266,6 +269,7 @@ const router = VueRouter.createRouter({
 				};
 			},
 		},
+ */
 		{
 			path: `/Cis/Zeitsperren`,
 			name: 'Zeitsperren',
