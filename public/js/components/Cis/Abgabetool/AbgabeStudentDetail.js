@@ -392,7 +392,7 @@ export const AbgabeStudentDetail = {
 			if(this.isViewMode) {
 				return { value: this.$capitalize(this.$p.t('abgabetool/c4studentAbgabeNotAllowedInViewMode')), class: "custom-tooltip" }
 			} else {
-				return { value: this.$capitalize(this.$p.t('abgabetool/c4studentAbgabeNotAllowedRegular')), class: "custom-tooltip" }
+				return { value: this.$capitalize(this.$p.t('abgabetool/c4studentAbgabeNotAllowedRegularv2')), class: "custom-tooltip" }
 			}
 		},
 		getTooltipBeurteilungerforderlich() {

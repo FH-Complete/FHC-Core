@@ -45742,14 +45742,16 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4studentAbgabeNotAllowedRegular',
+		'phrase' => 'c4studentAbgabeNotAllowedRegularv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
 				'text' => "Verspätete Projektabgabe ist bei Terminen, welche von der Studiengangsassistenz für den gesamten Studiengang fixiert wurden nicht erlaubt!
 
-				Um einen Endupload durchführen zu können, müssen Sie ein positiv benotetes Quality Gate 1 & Quality Gate 2 in der relevanten Projektarbeit absolviert haben.",
+				Um einen Endupload durchführen zu können, müssen Sie ein positiv benotetes Quality Gate 1 & Quality Gate 2 in der relevanten Projektarbeit absolviert haben.
+				
+				Uploads sind für bereits benotete Projektarbeiten gesperrt. Sollten Sie trotzdem etwas hochladen wollen, wenden Sie sich bitte an Ihre Studiengangsassistenz.",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -45757,7 +45759,9 @@ array(
 				'sprache' => 'English',
 				'text' => 'Late project submissions are not permitted for deadlines set by the program assistant for the entire program!
 
-				To be able to complete a final upload, you must have successfully completed Quality Gate 1 and Quality Gate 2 for the relevant project work.',
+				To be able to complete a final upload, you must have successfully completed Quality Gate 1 and Quality Gate 2 for the relevant project work.
+				
+				Uploads are blocked for already graded project work. If you still wish to upload something, please contact your program assistant.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
