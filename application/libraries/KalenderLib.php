@@ -5,9 +5,17 @@ if (! defined("BASEPATH")) exit("No direct script access allowed");
 class KalenderLib
 {
 	private $_ci;
-	public function __construct()
+	private $_uid;
+
+	public function __construct($params)
 	{
 		$this->_ci =& get_instance();
+		
+		if (isset($params['uid']) && !isEmptyString($params['uid'])){
+			$this->_uid = $params['uid'];
+		} else {
+			show_error('uid of logged user not passed!');
+		}
 
 		$this->_ci->load->model('ressource/Kalender_model', 'KalenderModel');
 		$this->_ci->load->model('ressource/Kalender_Lehreinheit_model', 'KalenderLehreinheitModel');
@@ -22,7 +30,7 @@ class KalenderLib
 		$this->_ci->load->model('organisation/gruppe_model', 'GruppeModel');
 		$this->_ci->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
 
-		$this->_ci->load->library('CollisionChecker');
+		$this->_ci->load->library('CollisionChecker', ['uid' => $this->_uid]);
 		$this->_ci->load->library('PhrasesLib', array('ui'));
 
 	}
@@ -180,7 +188,8 @@ class KalenderLib
 					'beschreibung' => isset($row->beschreibung) ? $row->beschreibung : '',
 					'topic' => (isset($row->lehrfach_kurzbz) ? $row->lehrfach_kurzbz : '').' '.(isset($row->lehrform_kurzbz) ? $row->lehrform_kurzbz : ''),
 					'collisions' => false,
-					'has_assigned_resources' => isset($row->has_assigned_resources) ? $row->has_assigned_resources : false
+					'has_assigned_resources' => isset($row->has_assigned_resources) ? $row->has_assigned_resources : false,
+					'updateamum' => isset($row->updateamum) ? $row->updateamum : null,
 				];
 			}
 
@@ -376,6 +385,134 @@ class KalenderLib
 		return $this->_mapEvents($data);
 	}
 
+	public function getPlanForStudentByStudent($start_date, $end_date, $userUID)
+	{
+		$this->_getBasePlan($start_date, $end_date);
+
+		$escapedUserUID = $this->_ci->KalenderModel->db->escape($userUID);
+
+		$benutzerExists = "EXISTS (
+			SELECT 1
+			FROM public.tbl_benutzer student_benutzer
+			WHERE student_benutzer.uid = $escapedUserUID
+		)";
+
+		$directEventTeilnehmerExists = "EXISTS (
+			SELECT 1
+			FROM lehre.tbl_kalender_event_teilnehmer event_teilnehmer
+			WHERE event_teilnehmer.kalender_id = tbl_kalender.kalender_id
+				AND event_teilnehmer.rolle_kurzbz = 'teilnehmer'
+				AND event_teilnehmer.uid = $escapedUserUID
+		)";
+
+		$eventBenutzergruppeExists = "EXISTS (
+			SELECT 1
+			FROM lehre.tbl_kalender_event_teilnehmer event_gruppe
+			JOIN public.tbl_benutzergruppe event_benutzergruppe
+				ON event_benutzergruppe.gruppe_kurzbz = event_gruppe.gruppe_kurzbz
+				AND (
+					event_gruppe.studiensemester_kurzbz IS NULL
+					OR event_benutzergruppe.studiensemester_kurzbz = event_gruppe.studiensemester_kurzbz
+				)
+			WHERE event_gruppe.kalender_id = tbl_kalender.kalender_id
+				AND event_gruppe.rolle_kurzbz = 'teilnehmer'
+				AND event_gruppe.gruppe_kurzbz IS NOT NULL
+				AND event_benutzergruppe.uid = $escapedUserUID
+		)";
+
+		$eventStudentlehrverbandExists = "EXISTS (
+			SELECT 1
+			FROM lehre.tbl_kalender_event_teilnehmer event_lehrverband
+			JOIN public.tbl_studentlehrverband event_studentlehrverband
+				ON event_studentlehrverband.student_uid = $escapedUserUID
+				AND event_studentlehrverband.studiengang_kz = event_lehrverband.studiengang_kz
+				AND (
+					event_lehrverband.studiensemester_kurzbz IS NULL
+					OR event_studentlehrverband.studiensemester_kurzbz = event_lehrverband.studiensemester_kurzbz
+				)
+				AND (
+					event_lehrverband.semester IS NULL
+					OR event_studentlehrverband.semester = event_lehrverband.semester
+				)
+				AND (
+					event_lehrverband.verband = event_studentlehrverband.verband
+					OR event_lehrverband.verband IS NULL
+					OR btrim(event_lehrverband.verband::text) = ''
+					OR event_studentlehrverband.verband IS NULL
+				)
+				AND (
+					event_lehrverband.gruppe = event_studentlehrverband.gruppe
+					OR event_lehrverband.gruppe IS NULL
+					OR btrim(event_lehrverband.gruppe::text) = ''
+					OR event_studentlehrverband.gruppe IS NULL
+				)
+			WHERE event_lehrverband.kalender_id = tbl_kalender.kalender_id
+				AND event_lehrverband.rolle_kurzbz = 'teilnehmer'
+				AND event_lehrverband.gruppe_kurzbz IS NULL
+				AND event_lehrverband.studiengang_kz IS NOT NULL
+		)";
+
+		$lehreinheitBenutzergruppeExists = "EXISTS (
+			SELECT 1
+			FROM lehre.tbl_kalender_lehreinheit student_kalender_lehreinheit
+			JOIN lehre.tbl_lehreinheit student_lehreinheit
+				ON student_lehreinheit.lehreinheit_id = student_kalender_lehreinheit.lehreinheit_id
+			JOIN lehre.tbl_lehreinheitgruppe student_lehreinheitgruppe
+				ON student_lehreinheitgruppe.lehreinheit_id = student_lehreinheit.lehreinheit_id
+			JOIN public.tbl_gruppe student_gruppe
+				ON student_gruppe.studiengang_kz = student_lehreinheitgruppe.studiengang_kz
+				AND student_gruppe.semester = student_lehreinheitgruppe.semester
+				AND student_gruppe.gruppe_kurzbz = student_lehreinheitgruppe.gruppe_kurzbz
+			JOIN public.tbl_benutzergruppe student_benutzergruppe
+				ON student_benutzergruppe.gruppe_kurzbz = student_gruppe.gruppe_kurzbz
+				AND student_benutzergruppe.studiensemester_kurzbz = student_lehreinheit.studiensemester_kurzbz
+			WHERE student_kalender_lehreinheit.kalender_id = tbl_kalender.kalender_id
+				AND student_lehreinheitgruppe.gruppe_kurzbz IS NOT NULL
+				AND student_benutzergruppe.uid = $escapedUserUID
+		)";
+
+		$lehreinheitStudentlehrverbandExists = "EXISTS (
+			SELECT 1
+			FROM lehre.tbl_kalender_lehreinheit student_kalender_lehreinheit
+			JOIN lehre.tbl_lehreinheit student_lehreinheit
+				ON student_lehreinheit.lehreinheit_id = student_kalender_lehreinheit.lehreinheit_id
+			JOIN lehre.tbl_lehreinheitgruppe student_lehreinheitgruppe
+				ON student_lehreinheitgruppe.lehreinheit_id = student_lehreinheit.lehreinheit_id
+			JOIN public.tbl_studentlehrverband student_lehrverband
+				ON student_lehrverband.student_uid = $escapedUserUID
+				AND student_lehrverband.studiengang_kz = student_lehreinheitgruppe.studiengang_kz
+				AND student_lehrverband.semester = student_lehreinheitgruppe.semester
+				AND student_lehrverband.studiensemester_kurzbz = student_lehreinheit.studiensemester_kurzbz
+				AND (
+					student_lehreinheitgruppe.verband = student_lehrverband.verband
+					OR student_lehreinheitgruppe.verband IS NULL
+					OR btrim(student_lehreinheitgruppe.verband::text) = ''
+					OR student_lehrverband.verband IS NULL
+				)
+				AND (
+					student_lehreinheitgruppe.gruppe = student_lehrverband.gruppe
+					OR student_lehreinheitgruppe.gruppe IS NULL
+					OR btrim(student_lehreinheitgruppe.gruppe::text) = ''
+					OR student_lehrverband.gruppe IS NULL
+				)
+			WHERE student_kalender_lehreinheit.kalender_id = tbl_kalender.kalender_id
+				AND student_lehreinheitgruppe.gruppe_kurzbz IS NULL
+		)";
+
+		$this->_ci->KalenderModel->db->where('status_kurzbz', 'live');
+		$this->_ci->KalenderModel->db->where($benutzerExists, null, false);
+		$this->_ci->KalenderModel->db->group_start();
+		$this->_ci->KalenderModel->db->where($directEventTeilnehmerExists, null, false);
+		$this->_ci->KalenderModel->db->or_where($eventBenutzergruppeExists, null, false);
+		$this->_ci->KalenderModel->db->or_where($eventStudentlehrverbandExists, null, false);
+		$this->_ci->KalenderModel->db->or_where($lehreinheitBenutzergruppeExists, null, false);
+		$this->_ci->KalenderModel->db->or_where($lehreinheitStudentlehrverbandExists, null, false);
+		$this->_ci->KalenderModel->db->group_end();
+
+		$data = $this->_ci->KalenderModel->load();
+
+		return $this->_mapEvents($data);
+	}
 
 	public function getPlanForLecturer($start_date, $end_date)
 	{
@@ -395,6 +532,42 @@ class KalenderLib
 
 		return $this->_mapEvents($data);
 	}
+
+	public function getPlanForLecturerByLecturer($start_date, $end_date, $userUID)
+	{
+		$this->_getBasePlan($start_date, $end_date);
+
+		$escapedUserUID = $this->_ci->KalenderModel->db->escape($userUID);
+
+		$lehreinheitMitarbeiterExists = "EXISTS (
+			SELECT 1
+			FROM lehre.tbl_kalender_lehreinheit lecturer_kalender_lehreinheit
+			JOIN lehre.tbl_lehreinheit lecturer_lehreinheit
+				ON lecturer_lehreinheit.lehreinheit_id = lecturer_kalender_lehreinheit.lehreinheit_id
+			JOIN lehre.tbl_lehreinheitmitarbeiter lecturer_lehreinheitmitarbeiter
+				ON lecturer_lehreinheitmitarbeiter.lehreinheit_id = lecturer_lehreinheit.lehreinheit_id
+			WHERE lecturer_kalender_lehreinheit.kalender_id = tbl_kalender.kalender_id
+				AND lecturer_lehreinheitmitarbeiter.mitarbeiter_uid = $escapedUserUID
+		)";
+
+		$eventTeilnehmerExists = "EXISTS (
+			SELECT 1
+			FROM lehre.tbl_kalender_event_teilnehmer lecturer_event_teilnehmer
+			WHERE lecturer_event_teilnehmer.kalender_id = tbl_kalender.kalender_id
+				AND lecturer_event_teilnehmer.uid = $escapedUserUID
+		)";
+
+		$this->_ci->KalenderModel->db->where('tbl_kalender.status_kurzbz', 'live');
+		$this->_ci->KalenderModel->db->group_start();
+		$this->_ci->KalenderModel->db->where($lehreinheitMitarbeiterExists, null, false);
+		$this->_ci->KalenderModel->db->or_where($eventTeilnehmerExists, null, false);
+		$this->_ci->KalenderModel->db->group_end();
+		
+		$data = $this->_ci->KalenderModel->load();
+
+		return $this->_mapEvents($data);
+	}
+
 	public function getZeitsperren($start_date, $end_date, $emp)
 	{
 		$db = new DB_Model();
@@ -593,6 +766,7 @@ class KalenderLib
 				'bis' => $end_date,
 				'typ' => 'reservierung',
 				'status_kurzbz' => 'live',
+				'eindeutige_gruppen_id' => $this->_ci->KalenderModel->generateUniqueGroupId(),
 				'insertvon' => getAuthUID(),
 				'insertamum' => date('Y-m-d H:i:s')
 			)

@@ -38,8 +38,8 @@ class Kalender extends FHCAPI_Controller
 
 		$this->_ci->load->library('LogLib');
 		$this->_ci->load->library('form_validation');
-		$this->_ci->load->library('KalenderLib');
-		$this->_ci->load->library('RaumvorschlagLib');
+		$this->_ci->load->library('KalenderLib', ["uid" => getAuthUID()]);
+		$this->_ci->load->library('RaumvorschlagLib', ["uid" => getAuthUID()]);
 		$this->loadPhrases([
 			'ui'
 		]);

@@ -14,9 +14,9 @@ class VariableLib
 	/**
 	 * VariableLib constructor.
 	 * Loads variable of logged in user.
-	 * @param $loggeduid
+	 * @param $params
 	 */
-	public function __construct($loggeduid)
+	public function __construct($params)
 	{
 		$this->_ci =& get_instance();
 
@@ -25,8 +25,8 @@ class VariableLib
 		$this->_ci->load->model('system/Variable_model', 'VariableModel');
 		$this->_ci->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
 
-		if (isset($loggeduid['uid']) && !isEmptyString($loggeduid['uid']))
-			$this->_setVariables($loggeduid['uid']);
+		if (isset($params['uid']) && !isEmptyString($params['uid']))
+			$this->_setVariables($params['uid']);
 		else
 		{
 			show_error('uid of logged user not passed!');

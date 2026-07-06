@@ -7,9 +7,17 @@ use CI3_Events as Events;
 class RaumvorschlagLib
 {
 	private $_ci;
-	public function __construct()
+	private $_uid;
+
+	public function __construct($params)
 	{
 		$this->_ci =& get_instance();
+
+		if (isset($params['uid']) && !isEmptyString($params['uid'])){
+			$this->_uid = $params['uid'];
+		} else {
+			show_error('uid of logged user not passed!');
+		}
 
 		$this->_ci->load->model('ressource/Kalender_model', 'KalenderModel');
 		$this->_ci->load->model('ressource/Kalender_Lehreinheit_model', 'KalenderLehreinheitModel');
@@ -26,8 +34,8 @@ class RaumvorschlagLib
 		$this->_ci->load->model('education/Lehreinheitgruppe_model', 'LehreinheitgruppeModel');
 		$this->_ci->load->model('education/Lehreinheitgruppe_model', 'LehreinheitgruppeModel');
 
-		$this->_ci->load->library('CollisionChecker');
-		$this->_ci->load->library('KalenderLib');
+		$this->_ci->load->library('CollisionChecker', ["uid" => getAuthUID()]);
+		$this->_ci->load->library('KalenderLib', ["uid" => getAuthUID()]);
 		$this->_ci->load->library('PhrasesLib', array('ui'));
 	}
 
