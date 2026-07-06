@@ -124,13 +124,15 @@ export default {
 	template: /*html*/ `
 	<div class="h-100 d-flex flex-column gap-2">
 		<h2 class="m-0">Coodle</h2>
-		<div class="d-flex flex-row gap-2 w-100">
+		<div class="d-flex flex-row gap-2 w-100 overflow-x-auto">
 			<div
 				@click="switchToTab('activeSurveysTable')"
 				:class="getTabStylingClass(view === 'activeSurveysTable')"
 				class="btn d-flex flex-row gap-2 align-items-center py-2"
 			>
-				<i class="fa-solid fa-person-booth fa-lg"></i>
+				<div>
+					<i class="fa-solid fa-person-booth fa-lg"></i>
+				</div>
 				<span class="text-nowrap">{{ "Active surveys" }}</span>
 			</div>
 			<div
@@ -138,7 +140,9 @@ export default {
 				:class="getTabStylingClass(view === 'pastSurveysTable')"
 				class="btn d-flex flex-row gap-2 align-items-center py-2"
 			>
-				<i class="fa-solid fa-flag-checkered fa-lg"></i>
+				<div>
+					<i class="fa-solid fa-flag-checkered fa-lg"></i>
+				</div>
 				<span class="text-nowrap">{{ "Past surveys" }}</span>
 			</div>
 			<div
@@ -146,7 +150,9 @@ export default {
 				:class="getTabStylingClass(view === 'survey' && !survey?.id)"
 				class="btn d-flex flex-row gap-2 align-items-center py-2"
 			>
-				<i class="fa-solid fa-circle-plus fa-lg"></i>
+				<div>
+					<i class="fa-solid fa-circle-plus fa-lg"></i>
+				</div>
 				<span class="text-nowrap">{{ "Create new survey" }}</span>
 			</div>
 			<div
@@ -154,7 +160,9 @@ export default {
 				:class="getTabStylingClass(view === 'freeBusySettings')"
 				class="btn d-flex flex-row gap-2 align-items-center py-2"
 			>
-				<i class="fa-solid fa-gear fa-lg"></i>
+				<div>
+					<i class="fa-solid fa-gear fa-lg"></i>
+				</div>
 				<span class="text-nowrap">{{ "FreeBusy Settings" }}</span>
 			</div>
 		</div>

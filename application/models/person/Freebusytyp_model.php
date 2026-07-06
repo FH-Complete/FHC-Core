@@ -16,4 +16,9 @@ class Freebusytyp_model extends DB_Model
 	{
 		return $this->execReadOnlyQuery("SELECT * FROM " . $this->dbTable);
 	}
+
+	public function getActiveFreeBusyTypes()
+	{
+		return $this->execReadOnlyQuery("SELECT * FROM " . $this->dbTable . " WHERE is_active");
+	}
 }

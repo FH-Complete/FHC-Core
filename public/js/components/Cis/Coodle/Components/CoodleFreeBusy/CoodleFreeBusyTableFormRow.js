@@ -2,7 +2,7 @@ export default {
 	name: "CoodleFreeBusyTableFormRow",
 	props: {
 		scheduleFormDataModelValue: Object,
-		scheduleTypeOptions: Array,
+		scheduleTypes: Array,
 		uid: Number | null,
 	},
 	emits: ["update:scheduleFormDataModelValue", "submitForm", "cancelForm"],
@@ -19,10 +19,10 @@ export default {
 	watch: {
 		"scheduleFormData.type": {
 			handler(newValue) {
-				if (newValue.toLowerCase() !== "sogo") return;
+				const type = this.$props.scheduleTypes.find((type) => type.value === newValue);
+				if (!type || !type.urlDefault?.length) return;
 
-				// todo: use base urls from db if appropriate
-				this.scheduleFormData.url = "sogo url placeholder";
+				this.scheduleFormData.url = type.urlDefault;
 			},
 		},
 	},
@@ -34,7 +34,7 @@ export default {
 		<td class="border-1 py-2 px-2">
 			<select v-model="scheduleFormData.type" id="scheduleTypeInput" class="w-100 h-100">
 				<option value="null">{{ "--Select--" }}</option>
-				<option v-for="option in $props.scheduleTypeOptions" :value="option.value">{{ option.text }}</option>
+				<option v-for="type in $props.scheduleTypes" :value="type.value">{{ type.text }}</option>
 			</select>
 		</td>
 		<td class="border-1 py-2 px-2">

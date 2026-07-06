@@ -24,12 +24,12 @@ export default {
 			externalSchedules: [],
 			scheduleEditIndex: null,
 			scheduleFormData: null,
-			scheduleTypeOptions: [],
+			scheduleTypes: [],
 		};
 	},
 	methods: {
 		getScheduleTypeText(value) {
-			let type = this.scheduleTypeOptions.find(
+			let type = this.scheduleTypes.find(
 				(type) => type.value === value,
 			);
 			return type?.text ?? "Other";
@@ -95,11 +95,12 @@ export default {
 			const freeBusyTypesResponse = await this.$api.call(
 				FreeBusyApi.getFreeBusyTypes(),
 			);
-			this.scheduleTypeOptions = freeBusyTypesResponse.data.map(
+			this.scheduleTypes = freeBusyTypesResponse.data.map(
 				(type) => {
 					return {
 						value: type.freebusytyp_kurzbz,
 						text: type.bezeichnung,
+						urlDefault: type.url_default,
 					};
 				},
 			);
@@ -110,19 +111,10 @@ export default {
 			);
 			this.externalSchedules = freeBusyEntriesResponse.data.map(
 				(freeBusySchedule) => {
-					// todo: remove type defaulting if switch to using all types
-					let type = this.scheduleTypeOptions.find((type) => {
-						return (
-							type.value === freeBusySchedule.freebusytyp_kurzbz
-						);
-					})
-						? freeBusySchedule.freebusytyp_kurzbz
-						: "Sonstiges";
-
 					return {
 						id: freeBusySchedule.freebusy_id,
 						description: freeBusySchedule.bezeichnung,
-						type,
+						type: freeBusySchedule.freebusytyp_kurzbz,
 						url: freeBusySchedule.url,
 						isActive: freeBusySchedule.aktiv,
 					};
@@ -152,34 +144,56 @@ export default {
 						{{ "To effectively use FreeBusy, you must carefully enter and update your calendar data. Your base schedule and planned absences will be displayed by default, but you can add additional schedules (Google, SOGo, etc)." }}
 					</span>
 				</div>
-				<table id="freeBusyTable">
-					<tr>
-						<th class="border-1 py-1 px-2 fw-bold">{{ "Description" }}</th>
-						<th class="border-1 py-1 px-2 fw-bold">{{ "Type" }}</th>
-						<th class="border-1 py-1 px-2 fw-bold" style="width: 50%;">{{ "URL" }}</th>
-						<th class="border-1 py-1 px-2 fw-bold">{{ "Active" }}</th>
-						<th class="border-1 py-1 px-2 fw-bold">{{ "Actions" }}</th>
-					</tr>
-					<tr v-for="defaultSchedule in defaultSchedules">
-						<td class="border-1 py-1 px-2">{{ defaultSchedule.description }}</td>
-						<td class="border-1 py-1 px-2">{{ defaultSchedule.type }}</td>
-						<td class="border-1 py-1 px-2"></td>
-						<td class="border-1 py-1 px-2">{{ "Yes" }}</td>
-						<td class="border-1 py-1 px-2"></td>
-					</tr>
-					<template v-for="(schedule, index) in externalSchedules">
-						<tr v-if="scheduleEditIndex !== index">
-							<td class="border-1 py-1 px-2">{{ schedule.description }}</td>
-							<td class="border-1 py-1 px-2">{{ getScheduleTypeText(schedule.type) }}</td>
-							<td class="border-1 py-1 px-2">{{ schedule.url }}</td>
-							<td class="border-1 py-1 px-2">{{ schedule.isActive ? "Yes" : "No" }}</td>
-							<td class="border-1 py-1 px-2">
-								<div class="w-100 d-flex flex-row gap-1 align-items-center justify-content-evenly">
-									<div @click="openScheduleForm(index)" type="button" class="action py-1 px-1">
-										<i class="fa-solid fa-pen-to-square"></i>
+				<div class="overflow-x-auto">
+					<table id="freeBusyTable" style="min-width:500px;">
+						<tr>
+							<th class="border-1 py-1 px-2 fw-bold">{{ "Description" }}</th>
+							<th class="border-1 py-1 px-2 fw-bold">{{ "Type" }}</th>
+							<th class="border-1 py-1 px-2 fw-bold" style="width: 50%;">{{ "URL" }}</th>
+							<th class="border-1 py-1 px-2 fw-bold">{{ "Active" }}</th>
+							<th class="border-1 py-1 px-2 fw-bold">{{ "Actions" }}</th>
+						</tr>
+						<tr v-for="defaultSchedule in defaultSchedules">
+							<td class="border-1 py-1 px-2">{{ defaultSchedule.description }}</td>
+							<td class="border-1 py-1 px-2">{{ defaultSchedule.type }}</td>
+							<td class="border-1 py-1 px-2"></td>
+							<td class="border-1 py-1 px-2">{{ "Yes" }}</td>
+							<td class="border-1 py-1 px-2"></td>
+						</tr>
+						<template v-for="(schedule, index) in externalSchedules">
+							<tr v-if="scheduleEditIndex !== index">
+								<td class="border-1 py-1 px-2">{{ schedule.description }}</td>
+								<td class="border-1 py-1 px-2">{{ getScheduleTypeText(schedule.type) }}</td>
+								<td class="border-1 py-1 px-2">{{ schedule.url }}</td>
+								<td class="border-1 py-1 px-2">{{ schedule.isActive ? "Yes" : "No" }}</td>
+								<td class="border-1 py-1 px-2">
+									<div class="w-100 d-flex flex-row gap-1 align-items-center justify-content-evenly">
+										<div @click="openScheduleForm(index)" type="button" class="action py-1 px-1">
+											<i class="fa-solid fa-pen-to-square"></i>
+										</div>
+										<div @click="deleteSchedule(schedule)" type="button" class="action py-1 px-1">
+											<i class="fa-solid fa-trash-can"></i>
+										</div>
 									</div>
-									<div @click="deleteSchedule(schedule)" type="button" class="action py-1 px-1">
-										<i class="fa-solid fa-trash-can"></i>
+								</td>
+							</tr>
+							<coodle-free-busy-table-form-row
+								v-else
+								v-model:scheduleFormDataModelValue="scheduleFormData"
+								@cancelForm="closeScheduleForm()"
+								@submitForm="submitScheduleForm()"
+								:scheduleTypes="scheduleTypes"
+							/>
+						</template>
+						<tr v-if="scheduleEditIndex !== -1">
+							<td colspan="5" class="border-1">
+								<div
+									@click="openScheduleForm(-1)"
+									type="button"
+									class="action w-100 d-flex flex-row align-items-center justify-content-center py-2"
+								>
+									<div>
+										<i class="fa-solid fa-circle-plus fa-xl"></i>
 									</div>
 								</div>
 							</td>
@@ -189,31 +203,11 @@ export default {
 							v-model:scheduleFormDataModelValue="scheduleFormData"
 							@cancelForm="closeScheduleForm()"
 							@submitForm="submitScheduleForm()"
-							:scheduleTypeOptions="scheduleTypeOptions"
+							:scheduleTypes="scheduleTypes"
+							:uid="$props.uid"
 						/>
-					</template>
-					<tr v-if="scheduleEditIndex !== -1">
-						<td colspan="5" class="border-1">
-							<div
-								@click="openScheduleForm(-1)"
-								type="button"
-								class="action w-100 d-flex flex-row align-items-center justify-content-center py-2"
-							>
-								<div>
-									<i class="fa-solid fa-circle-plus fa-xl"></i>
-								</div>
-							</div>
-						</td>
-					</tr>
-					<coodle-free-busy-table-form-row
-						v-else
-						v-model:scheduleFormDataModelValue="scheduleFormData"
-						@cancelForm="closeScheduleForm()"
-						@submitForm="submitScheduleForm()"
-						:scheduleTypeOptions="scheduleTypeOptions"
-						:uid="$props.uid"
-					/>
-				</table>
+					</table>
+				</div>
 			</div>
 		</div>
 	</div>

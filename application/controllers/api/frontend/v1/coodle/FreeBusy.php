@@ -44,13 +44,9 @@ class FreeBusy extends FHCAPI_Controller
 
 	public function getFreeBusyTypes()
 	{
-		$freeBusyTypesResult = $this->FreeBusyTypeModel->getAllFreeBusyTypes();
+		$freeBusyTypesResult = $this->FreeBusyTypeModel->getActiveFreeBusyTypes();
 		$freeBusyTypes = $this->getDataOrTerminateWithError($freeBusyTypesResult);
-		// todo: are we using all types? are we changing base urls? are we changing tables?
-		// tentatively filtering out most types, leaving only sogo and other
-		$freeBusyTypes = array_values(array_filter($freeBusyTypes, function ($freeBusyType) {
-			return in_array($freeBusyType->freebusytyp_kurzbz, ["Sonstiges", "SoGo"]);
-		}));
+		$freeBusyTypes = $this->formatDefaultUrlsInFreeBusyTypes($freeBusyTypes);
 		$this->terminateWithSuccess($freeBusyTypes);
 
 	}
@@ -66,7 +62,6 @@ class FreeBusy extends FHCAPI_Controller
 	public function createFreeBusyEntry()
 	{
 		$description = $this->input->post("description");
-		// todo: check if defaulting to other is fine
 		$type = $this->input->post("type") ?? "Sonstiges";
 		$url = $this->input->post("url");
 		$isActive = $this->input->post("isActive");
@@ -93,7 +88,6 @@ class FreeBusy extends FHCAPI_Controller
 	{
 		$id = $this->input->post("id");
 		$description = $this->input->post("description");
-		// todo: check if defaulting to other is fine
 		$type = $this->input->post("type") ?? "Sonstiges";
 		$url = $this->input->post("url");
 		$isActive = $this->input->post("isActive");
@@ -145,5 +139,21 @@ class FreeBusy extends FHCAPI_Controller
 	private function isValid($url)
 	{
 		return !!@fopen($url, "r");
+	}
+
+	private function formatDefaultUrlsInFreeBusyTypes($freeBusyTypes)
+	{
+		$uid = getAuthUID();
+		return array_map(function ($freeBusyType) use ($uid) {
+			if (!$freeBusyType->url_vorlage || !strlen($freeBusyType->url_vorlage)) {
+				$freeBusyType->url_default = null;
+				unset($freeBusyType->url_vorlage);
+				return $freeBusyType;
+			}
+
+			$freeBusyType->url_default = str_replace('$uid', $uid, $freeBusyType->url_vorlage);
+			unset($freeBusyType->url_vorlage);
+			return $freeBusyType;
+		}, $freeBusyTypes);
 	}
 }
