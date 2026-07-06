@@ -95,6 +95,7 @@ require_once('dbupdate_3.4/71645_studvw_messagetab_ladezeit.php');
 require_once('dbupdate_3.4/71566_studienordnungsdokument_neuer_organisationseinheitstyp_programm.php');
 require_once('dbupdate_3.4/70376_lohnguide.php');
 require_once('dbupdate_3.4/75888_reihungstest_mehrfachdurchfuehrung.php');
+require_once('dbupdate_3.4/63132_Berechtigungssystem_Rollen_in_Rollen.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -436,7 +437,7 @@ $tabellen=array(
 	"system.tbl_jobtypes" => array("type", "description"),
 	"system.tbl_phrase" => array("phrase_id","app","phrase","insertamum","insertvon","category"),
 	"system.tbl_phrasentext" => array("phrasentext_id","phrase_id","sprache","orgeinheit_kurzbz","orgform_kurzbz","text","description","insertamum","insertvon"),
-	"system.tbl_rolle"  => array("rolle_kurzbz","beschreibung"),
+	"system.tbl_rolle"  => array("rolle_kurzbz","beschreibung","lange_beschreibung"),
 	"system.tbl_rolleberechtigung"  => array("berechtigung_kurzbz","rolle_kurzbz","art","anmerkung","insertamum","insertvon"),
 	"system.tbl_verarbeitungstaetigkeit" => array("taetigkeit_kurzbz", "bezeichnung", "bezeichnung_mehrsprachig","aktiv"),
 	"system.tbl_webservicelog"  => array("webservicelog_id","webservicetyp_kurzbz","request_id","beschreibung","request_data","execute_time","execute_user"),

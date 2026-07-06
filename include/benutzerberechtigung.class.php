@@ -410,13 +410,16 @@ EOSQL;
 		UNION
 		Berechtigung ueber Rolle
 		UNION
+		Berechtigung ueber Rolle in roles
+		UNION
 		Berechtigung ueber Funktion
 		UNION
 		Berechtigung ueber Funktion Mitarbeiter
 		UNION
 		Berechtigung ueber Funktion Student
 		*/
-		$qry = "SELECT
+		$qry = "	-- Direkte Berechtigungszuordnung
+				SELECT
 					benutzerberechtigung_id, tbl_benutzerrolle.uid, tbl_benutzerrolle.funktion_kurzbz,
 					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
 					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
@@ -428,6 +431,7 @@ EOSQL;
 
 				UNION
 
+				-- Berechtigung ueber Rolle
 				SELECT
 					benutzerberechtigung_id, tbl_benutzerrolle.uid, tbl_benutzerrolle.funktion_kurzbz,
 					tbl_benutzerrolle.rolle_kurzbz, tbl_berechtigung.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_rolleberechtigung.art art1,
@@ -442,20 +446,24 @@ EOSQL;
 
 				UNION
 
+				-- Berechtigung ueber Rollen in Rollen
 				SELECT
-					benutzerberechtigung_id, tbl_benutzerfunktion.uid, tbl_benutzerrolle.funktion_kurzbz,
-					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
-					tbl_benutzerfunktion.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
+					benutzerberechtigung_id, tbl_benutzerrolle.uid, tbl_benutzerrolle.funktion_kurzbz,
+					tbl_rolle_rolle.basic_rolle_kurzbz, tbl_berechtigung.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_rolleberechtigung.art art1,
+					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
 					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
 				FROM
-					system.tbl_benutzerrolle JOIN public.tbl_benutzerfunktion USING(funktion_kurzbz)
-				WHERE tbl_benutzerfunktion.uid=".$this->db_add_param($uid)."
-					AND (tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now())
-					AND (tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now())
+					system.tbl_benutzerrolle
+					JOIN system.tbl_rolle USING(rolle_kurzbz)
+					JOIN system.tbl_rolle_rolle ON system.tbl_rolle_rolle.main_rolle_kurzbz = system.tbl_rolle.rolle_kurzbz
+					JOIN system.tbl_rolleberechtigung ON system.tbl_rolleberechtigung.rolle_kurzbz = system.tbl_rolle_rolle.basic_rolle_kurzbz
+					JOIN system.tbl_berechtigung ON(tbl_rolleberechtigung.berechtigung_kurzbz=tbl_berechtigung.berechtigung_kurzbz)
+				WHERE uid=".$this->db_add_param($uid)."
 
 				UNION
 
+				-- Berechtigung ueber Funktion
 				SELECT
 					benutzerberechtigung_id, tbl_benutzerfunktion.uid, tbl_benutzerrolle.funktion_kurzbz,
 					tbl_benutzerrolle.rolle_kurzbz, tbl_rolleberechtigung.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_rolleberechtigung.art art1,
@@ -472,6 +480,7 @@ EOSQL;
 
 				UNION
 
+				-- Berechtigung ueber Funktion Mitarbeiter
 				SELECT
 					benutzerberechtigung_id, '', tbl_benutzerrolle.funktion_kurzbz,
 					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
@@ -486,6 +495,7 @@ EOSQL;
 
 				UNION
 
+				-- Berechtigung ueber Funktion Student
 				SELECT
 					benutzerberechtigung_id, '', tbl_benutzerrolle.funktion_kurzbz,
 					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
