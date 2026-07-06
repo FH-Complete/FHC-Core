@@ -37,7 +37,7 @@ const app = Vue.createApp({
 			if (target && this.isInternalRoute(target.href)) {
 				const url = new URL(target.href)
 
-				const path = url.pathname
+				const path = url.pathname + url.search;
 				const base = this.$router.options.history.base
 				const route = path.replace(base, '') || '/'
 

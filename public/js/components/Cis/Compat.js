@@ -30,6 +30,9 @@ export default {
 			let url = this.buildSrcUrl();
 			if(this.lastLoadediFrameURL !== url) {
 				this.srcUrl = url;
+				if(this.srcUrl === url) {
+					this.$refs.compatiframe.contentWindow.location.href = url;
+				}
 			}
 		}
 	},
