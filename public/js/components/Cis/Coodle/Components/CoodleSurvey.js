@@ -7,6 +7,8 @@ import CoodleSurveyHeader from "./CoodleSurvey/CoodleSurveyHeader.js";
 
 import { formatDate, numberPadding } from "../../../../helpers/DateHelpers.js";
 
+import CoodleApi from "../../../../api/factory/coodle.js";
+
 export default {
 	name: "CoodleSurvey",
 	components: {
@@ -21,50 +23,50 @@ export default {
 		survey: { type: Object | null },
 		uid: { type: String | null },
 	},
-	emits: ["surveyCreationCanceled"],
+	emits: ["surveyCreationCanceled", "surveyCreated", "surveyUpdated"],
 	data() {
 		return {
 			surveyFormData: null,
 			participantScheduleColors: [
 				{
 					uid: null,
-					color: "#FF0000"
+					color: "#FF0000",
 				},
 				{
 					uid: null,
-					color: "#00FF00"
+					color: "#00FF00",
 				},
 				{
 					uid: null,
-					color: "#0000FF"
+					color: "#0000FF",
 				},
 				{
 					uid: null,
-					color: "#FF00FF"
+					color: "#FF00FF",
 				},
 				{
 					uid: null,
-					color: "#00FFFF"
+					color: "#00FFFF",
 				},
 				{
 					uid: null,
-					color: "#FFFF00"
+					color: "#FFFF00",
 				},
 				{
 					uid: null,
-					color: "#FFA500"
+					color: "#FFA500",
 				},
 				{
 					uid: null,
-					color: "#800080"
+					color: "#800080",
 				},
 				{
 					uid: null,
-					color: "#228B22"
+					color: "#228B22",
 				},
 				{
 					uid: null,
-					color: "#B87333"
+					color: "#B87333",
 				},
 			],
 			isEditInProgress: false,
@@ -176,7 +178,7 @@ export default {
 
 			this.participantScheduleColors.forEach((participantColor) => {
 				participantColor.uid = null;
-			})
+			});
 		},
 		parseTimeslotForDisplay(timeslot) {
 			const timeslotStartsAt = new Date(timeslot.startsAt);
@@ -203,15 +205,86 @@ export default {
 					numberPadding(timeslotEndsAt.getMinutes()),
 			};
 		},
-		submitForm() {
-			console.log("submitting...");
-			console.log(this.surveyFormData);
-			// todo
-		},
 		cancelEditForm() {
 			this.isEditInProgress = false;
 			if (!this.$props.survey?.id) {
 				this.$emit("surveyCreationCanceled");
+			}
+		},
+		submitForm() {
+			if (
+				!this.surveyFormData.title?.length ||
+				!this.surveyFormData.endsAt?.length ||
+				!this.surveyFormData.timeslotDuration
+			) {
+				window.alert("Check your inputs!");
+				return;
+			}
+
+			if (!this.surveyFormData.participants.length) {
+				if (
+					!window.confirm(
+						"You haven't added any participants. Are you sure you want to proceed?",
+					)
+				) {
+					return;
+				}
+			}
+
+			if (!this.surveyFormData.timeslots.length) {
+				if (
+					!window.confirm(
+						"You haven't added any proposed appointments. Are you sure you want to proceed?",
+					)
+				) {
+					return;
+				}
+			}
+
+			let surveyData = this.formatOutgoingSurveyData(this.surveyFormData);
+			if (this.surveyFormData.id) {
+				this.updateSurvey(surveyData);
+			} else {
+				this.createSurvey(surveyData);
+			}
+		},
+		formatOutgoingSurveyData(surveyFormData) {
+			return {
+				id: surveyFormData.id,
+				title: surveyFormData.title,
+				description: surveyFormData.description,
+				timeslotDuration: surveyFormData.timeslotDuration,
+				maxSelections: surveyFormData.maxSelections,
+				areParticipantsAnonymized:
+					surveyFormData.areParticipantsAnonymized,
+				areSelectionsAnonymized: surveyFormData.areSelectionsAnonymized,
+				endsAt: surveyFormData.endsAt,
+				timeslots: surveyFormData.timeslots,
+				participants: surveyFormData.participants.map((participant) => {
+					return {
+						uid: participant.uid,
+					};
+				}),
+			};
+		},
+		async createSurvey(surveyData) {
+			const surveyCreationResponse = await this.$api.call(
+				CoodleApi.createSurvey(surveyData),
+			);
+			if (surveyCreationResponse.meta.status === "success") {
+				this.$emit("surveyCreated", {
+					surveyId: surveyCreationResponse.data,
+				});
+			}
+		},
+		async updateSurvey(surveyData) {
+			const surveyUpdateResponse = await this.$api.call(
+				CoodleApi.updateSurvey(surveyData),
+			);
+			if (surveyUpdateResponse.meta.status === "success") {
+				this.$emit("surveyUpdated", {
+					surveyId: surveyData.id,
+				});
 			}
 		},
 	},

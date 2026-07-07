@@ -38,6 +38,8 @@ class FreeBusy extends FHCAPI_Controller
 
 		$this->load->model('person/Freebusy_model', 'FreeBusyModel');
 		$this->load->model('person/Freebusytyp_model', 'FreeBusyTypeModel');
+
+		$this->load->library('FreeBusyLib');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -141,6 +143,8 @@ class FreeBusy extends FHCAPI_Controller
 		foreach ($freeBusyEntries as $freeBusyEntry) {
 			// 
 		}
+		$this->addMeta("freebusy", $freeBusyEntries);
+		// todo
 
 		$this->terminateWithSuccess($freeBusyEntries);
 	}
@@ -167,5 +171,37 @@ class FreeBusy extends FHCAPI_Controller
 			unset($freeBusyType->url_vorlage);
 			return $freeBusyType;
 		}, $freeBusyTypes);
+	}
+
+	// todo: remove
+	private function _getFreeBusySchedule($uid)
+	{
+		$fp = fopen(APP_ROOT . 'cis/public/freebusy.php/' . $uid, 'r');
+		if (!$fp) {
+			//Load Failed
+		} else {
+			$doc = '';
+			while (!feof($fp)) {
+				$line = fgets($fp);
+				$doc .= $line;
+			}
+			fclose($fp);
+
+			//FreeBusy Parsen
+			$ical = new ical();
+			$ical->parseFreeBusy($doc);
+
+			$events = [];
+			foreach ($ical->dtresult as $row) {
+				$item['id'] = $uid . $row['dtstart'] . $row['dtend'];
+				$item['title'] = $uid;
+				$item['start'] = fixDate($row['dtstart']);
+				$item['end'] = fixDate($row['dtend']);
+				$item['allDay'] = false;
+				$item['editable'] = false;
+				$events[] = $item;
+			}
+			return $events;
+		}
 	}
 }

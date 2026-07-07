@@ -2,6 +2,7 @@ import CoodleSurvey from "./Components/CoodleSurvey.js";
 import CoodleFreeBusy from "./Components/CoodleFreeBusy.js";
 
 import ApiAuthinfo from "../../../api/factory/authinfo.js";
+import CoodleApi from "../../../api/factory/coodle.js";
 
 export default {
 	name: "Coodle",
@@ -12,79 +13,6 @@ export default {
 			// todo: revert to default view active when dev done
 			view: "survey",
 			survey: null,
-			// todo: delete example survey after dev
-			// survey: {
-			// 	id: 1,
-			// 	creator: {
-			// 		uid: "ma1434",
-			// 		name: "Adis Posko",
-			// 	},
-			// 	title: "Test Meeting",
-			// 	description:
-			// 		"To discuss many important matters.\nAnother line of the description.",
-			// 	timeslotDuration: 75,
-			// 	maxSelections: 2,
-			// 	areParticipantsAnonymized: false,
-			// 	areSelectionsAnonymized: false,
-			// 	selectedTimeslotId: null,
-			// 	endsAt: "2026-06-23",
-			// 	completedAt: null,
-			// 	canceledAt: null,
-			// 	createdAt: "2026-06-14 23:30:30",
-			// 	updatedAt: "2026-06-15 16:00:00",
-			// 	timeslots: [
-			// 		{
-			// 			id: 1,
-			// 			startsAt: "2026-06-26 12:30:00",
-			// 		},
-			// 		{
-			// 			id: 2,
-			// 			startsAt: "2026-06-26 14:00:00",
-			// 		},
-			// 		{
-			// 			id: 3,
-			// 			startsAt: "2026-06-25 07:00:00",
-			// 		},
-			// 		{
-			// 			id: 4,
-			// 			startsAt: "2026-06-24 09:00:00",
-			// 		},
-			// 		{
-			// 			id: 5,
-			// 			startsAt: "2026-06-27 12:30:00",
-			// 		},
-			// 	],
-			// 	participants: [
-			// 		{
-			// 			uid: "ma1434",
-			// 			name: "Adis Posko",
-			// 			selection: [2],
-			// 		},
-			// 		{
-			// 			uid: "ma1435",
-			// 			name: "Test User 1",
-			// 			selection: [],
-			// 		},
-			// 		{
-			// 			uid: "ma1436",
-			// 			name: "Test Userrr 2",
-			// 			selection: null,
-			// 		},
-			// 		{
-			// 			uid: "ma1437",
-			// 			name: "Test Userrrrr 3",
-			// 			selection: [2, 3],
-			// 		},
-			// 	],
-			// 	sums: {
-			// 		1: 0,
-			// 		2: 2,
-			// 		3: 1,
-			// 		4: 0,
-			// 		5: 0,
-			// 		none: 1,
-			// 	},
-			// },
 		};
 	},
 	computed: {
@@ -117,9 +45,43 @@ export default {
 			);
 			this.uid = authUidResponse.data.uid;
 		},
+		async showSurvey(surveyId) {
+			const surveyResponse = await this.$api.call(
+				CoodleApi.getSurvey(surveyId),
+			);
+			this.survey = this.parseIncomingSurveyData(surveyResponse.data);
+			this.view = "survey";
+		},
+		parseIncomingSurveyData(surveyData) {
+			return {
+				id: surveyData.id,
+				creator: surveyData.creator,
+				title: surveyData.title,
+				description: surveyData.description,
+				timeslotDuration: surveyData.timeslot_duration,
+				maxSelections: surveyData.max_selections,
+				areParticipantsAnonymized: surveyData.description,
+				areSelectionsAnonymized: surveyData.description,
+				selectedTimeslotId: surveyData.description,
+				endsAt: surveyData.ends_at,
+				completedAt: surveyData.completed_at,
+				canceledAt: surveyData.canceled_at,
+				createdAt: surveyData.created_at.split(".")[0],
+				updatedAt: surveyData.updated_at.split(".")[0],
+				timeslots: surveyData.timeslots.map((timeslot) => {
+					return {
+						id: timeslot.id,
+						startsAt: timeslot.starts_at,
+					};
+				}),
+				participants: surveyData.participants,
+				voteTallies: surveyData.vote_tallies,
+			};
+		},
 	},
 	async created() {
 		await this.getAuthUid();
+		this.showSurvey(26);
 	},
 	template: /*html*/ `
 	<div class="h-100 d-flex flex-column gap-2">
@@ -172,6 +134,8 @@ export default {
 			<coodle-survey
 				v-else-if="view === 'survey'"
 				@surveyCreationCanceled="switchToTab('activeSurveysTable')"
+				@surveyCreated="showSurvey($event.surveyId)"
+				@surveyUpdated="showSurvey($event.surveyId)"
 				:survey="survey"
 				:uid="uid"
 			/>

@@ -19,7 +19,7 @@
 if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
-class Coodle extends FHCAPI_Controller
+class CoodleSurvey extends FHCAPI_Controller
 {
 
 	/**
@@ -28,16 +28,142 @@ class Coodle extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
+			'getSurvey' => self::PERM_LOGGED,
+			'createSurvey' => self::PERM_LOGGED,
+			'updateSurvey' => self::PERM_LOGGED,
 			'searchParticipants' => self::PERM_LOGGED,
 		]);
 
 		$this->load->library('PermissionLib');
 
-		$this->load->model('person/Benutzer_model', 'BenutzerModel');
+		$this->load->model('person/Person_model', 'PersonModel');
+		$this->load->model('ressource/CoodleSurvey_model', 'CoodleSurveyModel');
+		$this->load->model('ressource/CoodleSurveyTimeslot_model', 'CoodleSurveyTimeslotModel');
+		$this->load->model('ressource/CoodleSurveyParticipant_model', 'CoodleSurveyParticipantModel');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
+
+
+	public function getSurvey()
+	{
+		$surveyId = $this->input->post("surveyId");
+		$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
+
+		$timeslots = $this->CoodleSurveyTimeslotModel->getTimeslots($surveyId);
+		$survey->timeslots = $timeslots;
+
+		$participants = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
+		$participants = array_map(function ($participant) {
+			if ($participant->selection) {
+				$participant->selection = json_decode($participant->selection);
+			}
+			return $participant;
+		}, $participants);
+
+		$timeslotIds = array_map(function ($timeslot) {
+			return $timeslot->id;
+		}, $timeslots);
+		$voteTallies = ["none" => 0];
+		foreach ($timeslotIds as $timeslotId) {
+			$voteTallies[$timeslotId] = 0;
+		}
+
+		$individualVotes = [];
+		foreach ($participants as $participant) {
+			if ($participant->selection === null)
+				continue;
+
+			if (!count($participant->selection)) {
+				$individualVotes[] = "none";
+				continue;
+			}
+
+			$individualVotes = array_merge($individualVotes, $participant->selection);
+		}
+		foreach ($individualVotes as $vote) {
+			$voteTallies[$vote]++;
+		}
+
+		$authUserUID = getAuthUID();
+		$authUserFilteredParticipants = array_values(array_filter(
+			$participants,
+			function ($participant) use ($authUserUID) {
+				return $participant->uid === $authUserUID;
+			}
+		));
+		$authUserParticipant = count($authUserFilteredParticipants) ? $authUserFilteredParticipants[0] : null;
+
+		$isAuthUserSurveyCreator = $survey->creator_uid === $authUserUID;
+
+		if (!$authUserParticipant && !$isAuthUserSurveyCreator) {
+			$this->terminateWithError("You are not authorized to view this survey!");
+		}
+
+		$areParticipantsAnonymized = $survey->are_participants_anonymized;
+		$areSelectionsAnonymized = $survey->are_selections_anonymized;
+
+		if ($isAuthUserSurveyCreator || !$areSelectionsAnonymized) {
+			$survey->vote_tallies = $voteTallies;
+		} else {
+			$survey->vote_tallies = null;
+		}
+
+		if (!$isAuthUserSurveyCreator) {
+			if ($areParticipantsAnonymized && $areSelectionsAnonymized) {
+				$participants = $authUserFilteredParticipants;
+			} else if ($areParticipantsAnonymized) {
+				$participants = array_map(
+					function ($participant) use ($authUserUID) {
+						if ($participant->uid !== $authUserUID) {
+							$participant->uid = null;
+							$participant->name = null;
+						}
+						return $participant;
+					},
+					$participants
+				);
+			} else if ($areSelectionsAnonymized) {
+				$participants = array_map(
+					function ($participant) use ($authUserUID) {
+						if ($participant->uid !== $authUserUID) {
+							$participant->selection = null;
+						}
+						return $participant;
+					},
+					$participants
+				);
+			}
+		}
+
+		$survey->participants = $participants;
+
+		$survey->creator = [
+			"uid" => $survey->creator_uid,
+			"name" => $this->PersonModel->getFullName($survey->creator_uid)->retval,
+		];
+		unset($survey->creator_uid);
+
+		$this->terminateWithSuccess($survey);
+	}
+	public function createSurvey()
+	{
+		$surveyData = $this->input->post("surveyData");
+		// todo: form validation
+
+		$surveyId = $this->CoodleSurveyModel->createSurvey($surveyData, getAuthUID())->retval;
+		$this->CoodleSurveyTimeslotModel->updateTimeslots($surveyId, $surveyData["timeslots"]);
+		$timeslots = $this->CoodleSurveyTimeslotModel->getTimeslots($surveyId);
+		$this->CoodleSurveyParticipantModel->updateParticipants($surveyId, $surveyData["participants"], $timeslots);
+
+		$this->terminateWithSuccess($surveyId);
+	}
+
+	public function updateSurvey()
+	{
+		// todo: update survey
+	}
 
 	public function searchParticipants()
 	{
@@ -129,7 +255,7 @@ class Coodle extends FHCAPI_Controller
 			return $group->name;
 		}, $groups);
 
-	
+
 		$userGroupsQuery = "
 			SELECT
 				benutzerGruppe.uid as uid,

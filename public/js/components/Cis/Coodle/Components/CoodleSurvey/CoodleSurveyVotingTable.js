@@ -328,16 +328,16 @@ export default {
 								</div>
 							</td>
 						</tr>
-						<tr v-if="$props.survey.sums" class="fw-bold">
+						<tr v-if="$props.survey.voteTallies" class="fw-bold">
 							<td class="border-1 px-2 py-1">{{ "Vote tally" }}</td>
 							<td v-for="timeslot in $props.timeslots" class="border-1">
 								<div class="d-flex flex-row justify-content-center">
-									{{ $props.survey.sums[timeslot.id] }}
+									{{ $props.survey.voteTallies[timeslot.id] }}
 								</div>
 							</td>
 							<td class="border-1">
 								<div class="d-flex flex-row justify-content-center">
-									{{ $props.survey.sums.none }}
+									{{ $props.survey.voteTallies.none }}
 								</div>
 							</td>
 						</tr>

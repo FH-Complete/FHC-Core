@@ -98,7 +98,7 @@ if (!$result = @$db->db_query("SELECT 1 FROM campus.tbl_coodle_survey_participan
 
 if (!$result = @$db->db_query("SELECT 1 FROM campus.tbl_coodle_survey_timeslots LIMIT 1")) {
 	$qry = "CREATE TABLE campus.tbl_coodle_survey_timeslots (
-		id int NOT NULL,
+		id int GENERATED ALWAYS AS IDENTITY,
 		survey_id int NOT NULL,
 		starts_at timestamp NOT NULL,
 		CONSTRAINT tbl_coodle_survey_timeslots_id_pk PRIMARY KEY(id),

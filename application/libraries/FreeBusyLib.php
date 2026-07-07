@@ -1,3 +1,4 @@
+<?php
 /**
  * Copyright (C) 2026 fhcomplete.org
  *
@@ -15,41 +16,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export default {
-	searchParticipants(searchString) {
-		return {
-			method: "post",
-			url: "/api/frontend/v1/coodle/CoodleSurvey/searchParticipants",
-			params: {
-				searchString,
-			},
-		};
-	},
-	createSurvey(surveyData) {
-		return {
-			method: "post",
-			url: "/api/frontend/v1/coodle/CoodleSurvey/createSurvey",
-			params: {
-				surveyData,
-			},
-		};
-	},
-	updateSurvey(surveyData) {
-		return {
-			method: "post",
-			url: "/api/frontend/v1/coodle/CoodleSurvey/updateSurvey",
-			params: {
-				survey,
-			},
-		};
-	},
-	getSurvey(surveyId) {
-		return {
-			method: "post",
-			url: "/api/frontend/v1/coodle/CoodleSurvey/getSurvey",
-			params: {
-				surveyId,
-			},
-		};
-	},
-};
+if (! defined('BASEPATH')) exit('No direct script access allowed');
+
+/**
+ * NavigationWidget logic
+ */
+class FreeBusyLib
+{
+
+	public function __construct()
+	{
+		
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Public methods
+
+	
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Private methods
+
+	
+}
