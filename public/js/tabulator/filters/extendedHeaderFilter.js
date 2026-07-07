@@ -276,6 +276,14 @@ export function customTagFilter(cell, onRendered, success, cancel, params) {
     document.addEventListener("mousedown", handleOutsideClick, true);
   };
 
+  const stopHeaderFilterGesture = (event) => {
+    event.stopPropagation();
+  };
+
+  input.addEventListener("pointerdown", stopHeaderFilterGesture);
+  input.addEventListener("mousedown", stopHeaderFilterGesture);
+  input.addEventListener("touchstart", stopHeaderFilterGesture);
+  input.addEventListener("click", stopHeaderFilterGesture);
   input.addEventListener("input", () => {
     success(input.value);
   });
