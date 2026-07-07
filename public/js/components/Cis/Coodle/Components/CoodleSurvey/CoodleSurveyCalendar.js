@@ -3,6 +3,8 @@ import FhcCalendar from "../../../../Calendar/Base.js";
 import ModeWeek from "../../../../Calendar/Mode/Week.js";
 import ModeDay from "../../../../Calendar/Mode/Day.js";
 
+import FreeBusyApi from "../../../../../api/factory/freeBusy.js";
+
 import { numberPadding } from "../../../../../helpers/DateHelpers.js";
 
 export default {
@@ -30,7 +32,7 @@ export default {
 				},
 			},
 			timeslotCalendarEvents: [],
-			cachedParticipantSchedules: {},
+			participantSchedules: {},
 			isTimeslotCardEditInProgress: false,
 		};
 	},
@@ -61,7 +63,7 @@ export default {
 				);
 			participantsWithDisplayedSchedules.forEach((participant) => {
 				let participantEvents =
-					this.cachedParticipantSchedules[participant.uid] ?? [];
+					this.participantSchedules[participant.uid] ?? [];
 				participantEvents = participantEvents.map((event) => {
 					event.farbe =
 						this.$props.participantScheduleColors.find(
@@ -160,15 +162,7 @@ export default {
 		},
 		surveyFormDataParticipants: {
 			handler() {
-				let participantsWithDisplayedSchedules =
-					this.$props.surveyFormDataParticipants.filter(
-						(participant) => participant.isCalendarShown,
-					);
-				participantsWithDisplayedSchedules.forEach((participant) => {
-					if (!this.cachedParticipantSchedules[participant.uid]) {
-						this.fetchParticipantSchedule(participant.uid);
-					}
-				});
+				this.updateDisplayedSchedules();
 			},
 			deep: true,
 		},
@@ -305,16 +299,31 @@ export default {
 			);
 			this.isTimeslotCardEditInProgress = false;
 		},
-		fetchParticipantSchedule(uid) {
-			// todo: fetch, format as events, add as array with uid as key to cachedParticipantSchedules
-		},
 		getEventStyle(event) {
 			if (!event.farbe) return undefined;
 			return "--event-bg:#" + event.farbe;
 		},
 		onEventClick(clickEvent) {
-			console.log(clickEvent);
-			console.log(document.querySelector("#coodleCalendar .grid-body"));
+			// todo: remove
+			// console.log(clickEvent);
+			// console.log(document.querySelector("#coodleCalendar .grid-body"));
+		},
+		updateDisplayedSchedules() {
+			let participantsWithDisplayedSchedules =
+				this.$props.surveyFormDataParticipants.filter(
+					(participant) => participant.isCalendarShown,
+				);
+			participantsWithDisplayedSchedules.forEach((participant) => {
+				if (!(participant.uid in this.participantSchedules)) {
+					this.fetchFreeBusySchedule(participant.uid);
+				}
+			});
+		},
+		async fetchFreeBusySchedule(uid) {
+			this.participantSchedules[uid] = null;
+			const freeBusyScheduleResponse = await this.$api.call(
+				FreeBusyApi.getFreeBusySchedule(uid, 1, 1),
+			);
 		},
 	},
 	created() {

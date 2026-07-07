@@ -10,7 +10,7 @@ export default {
 		return {
 			uid: null,
 			// todo: revert to default view active when dev done
-			view: "freeBusySettings",
+			view: "survey",
 			survey: null,
 			// todo: delete example survey after dev
 			// survey: {

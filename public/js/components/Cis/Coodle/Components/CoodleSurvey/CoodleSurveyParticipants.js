@@ -22,7 +22,6 @@ export default {
 			// todo: increase depending on feedback
 			warningGroupSize: 10,
 			searchParticipantsAbortController: null,
-			// todo: increase
 			searchParticipants: debounce(async () => {
 				if (this.searchInput.length < 2) return;
 
@@ -116,6 +115,8 @@ export default {
 					? searchResult.users
 					: [searchResult];
 			this.addParticipants(addedParticipants);
+			this.searchInput = "";
+			this.searchResults = [];
 		},
 		addParticipants(newParticipants) {
 			newParticipants = newParticipants

@@ -33,6 +33,7 @@ class FreeBusy extends FHCAPI_Controller
 			'createFreeBusyEntry' => self::PERM_LOGGED,
 			'updateFreeBusyEntry' => self::PERM_LOGGED,
 			'deleteFreeBusyEntry' => self::PERM_LOGGED,
+			'getFreeBusySchedule' => self::PERM_LOGGED,
 		]);
 
 		$this->load->model('person/Freebusy_model', 'FreeBusyModel');
@@ -66,10 +67,9 @@ class FreeBusy extends FHCAPI_Controller
 		$url = $this->input->post("url");
 		$isActive = $this->input->post("isActive");
 
-		if (!$this->isValid($url)) {
+		if (!$this->isUrlValid($url)) {
 			$this->terminateWithError("Could not open the provided URL!");
 		}
-		$this->addMeta("isValidUrl", $this->isValid($url));
 
 		$this->FreeBusyModel->insert(
 			[
@@ -92,7 +92,7 @@ class FreeBusy extends FHCAPI_Controller
 		$url = $this->input->post("url");
 		$isActive = $this->input->post("isActive");
 
-		if (!$this->isValid($url)) {
+		if (!$this->isUrlValid($url)) {
 			$this->terminateWithError("Could not open the provided URL!");
 		}
 
@@ -133,10 +133,22 @@ class FreeBusy extends FHCAPI_Controller
 		$this->terminateWithSuccess();
 	}
 
+	public function getFreeBusySchedule()
+	{
+		$uid = $this->input->post("uid");
+		$freeBusyEntries = $this->FreeBusyModel->loadWhere(["uid" => $uid, "aktiv" => true]);
+		$freeBusyEntries = $this->getDataOrTerminateWithError($freeBusyEntries);
+		foreach ($freeBusyEntries as $freeBusyEntry) {
+			// 
+		}
+
+		$this->terminateWithSuccess($freeBusyEntries);
+	}
+
 	// -----------------------------------------------------------------------------------------------------------------
 	// Private methods
 
-	private function isValid($url)
+	private function isUrlValid($url)
 	{
 		return !!@fopen($url, "r");
 	}

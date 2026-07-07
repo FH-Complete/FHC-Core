@@ -16,39 +16,30 @@
  */
 
 export default {
-	searchParticipants(searchString) {
-		return {
-			method: "post",
-			url: `/api/frontend/v1/coodle/Coodle/searchParticipants`,
-			params: {
-				searchString,
-			},
-		};
-	},
 	getFreeBusyEntries() {
 		return {
 			method: "get",
-			url: `/api/frontend/v1/coodle/FreeBusy/getFreeBusyEntries`,
+			url: "/api/frontend/v1/coodle/FreeBusy/getFreeBusyEntries",
 		};
 	},
 	createFreeBusyEntry(params) {
 		return {
 			method: "post",
-			url: `/api/frontend/v1/coodle/FreeBusy/createFreeBusyEntry`,
+			url: "/api/frontend/v1/coodle/FreeBusy/createFreeBusyEntry",
 			params,
 		};
 	},
 	updateFreeBusyEntry(params) {
 		return {
 			method: "post",
-			url: `/api/frontend/v1/coodle/FreeBusy/updateFreeBusyEntry`,
+			url: "/api/frontend/v1/coodle/FreeBusy/updateFreeBusyEntry",
 			params,
 		};
 	},
 	deleteFreeBusyEntry(id) {
 		return {
 			method: "post",
-			url: `/api/frontend/v1/coodle/FreeBusy/deleteFreeBusyEntry`,
+			url: "/api/frontend/v1/coodle/FreeBusy/deleteFreeBusyEntry",
 			params: {
 				id,
 			},
@@ -57,7 +48,16 @@ export default {
 	getFreeBusyTypes() {
 		return {
 			method: "get",
-			url: `/api/frontend/v1/coodle/FreeBusy/getFreeBusyTypes`,
+			url: "/api/frontend/v1/coodle/FreeBusy/getFreeBusyTypes",
+		};
+	},
+	getFreeBusySchedule(uid) {
+		return {
+			method: "post",
+			url: "/api/frontend/v1/coodle/FreeBusy/getFreeBusySchedule",
+			params: {
+				uid,
+			},
 		};
 	},
 };
