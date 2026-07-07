@@ -796,6 +796,7 @@ class Abgabe extends FHCAPI_Controller
 			Events::trigger('projektbeurteilung_formular_link', $own_betreuerart_kurzbz, APP_ROOT, $pa->projektarbeit_id, $pa->student_uid, $returnFunc);
 			$pa->beurteilungLinkNew = $newLink;
 			$pa->beurteilungLinkOld = $oldLink;
+			$pa->betreuerart_kurzbz = $own_betreuerart_kurzbz;
 
 			// has previously been retrieved via getStudentProjektabgaben but is fetched in advance to avoid having to reload abgaben
 			$projektarbeitIsCurrent = false;

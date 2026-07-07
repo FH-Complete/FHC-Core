@@ -161,6 +161,7 @@ export const AbgabetoolMitarbeiter = {
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerVorname'))), field: 'zweitbetreuer_vorname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerNachname'))), field: 'zweitbetreuer_nachname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerTitelPost'))), field: 'zweitbetreuer_titelpost', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4betreuerartv2'))), field: 'betreuerart_kurzbz', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
 
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4prevAbgabetermin'))),
 						headerFilter: dateFilter,
