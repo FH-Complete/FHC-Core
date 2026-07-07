@@ -62,7 +62,7 @@ export default {
 			const vm = this;
 			tinymce.init({
 				target: this.$refs.editor.$refs.input, //Important: not selector: to enable multiple import of component
-				//height: 800,
+				min_height: 300,
 				//plugins: ['lists'],
 				toolbar: 'styleselect | bold italic underline | alignleft aligncenter alignright alignjustify | link',
 				plugins: 'link',
