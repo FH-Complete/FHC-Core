@@ -961,6 +961,7 @@ export default {
         formatter: (cell, formatterParams, onRendered) =>
           tagFormatter(cell, this.$refs.tagComponent, onRendered),
         width: 150,
+        headerSort: false,
       };
       this.tabulatorOptions.columns.splice(2, 0, coltags);
       this.$p.loadCategory("ui").then(() => {

@@ -306,6 +306,7 @@ export default {
 						headerFilterFuncParams: {field: 'tags'},
 						formatter: (cell, formatterParams, onRendered) => tagFormatter(cell, this.$refs.tagComponent, onRendered),
 						width: 150,
+						headerSort: false,
 					},
 					{
 						title: this.$p.t('lehre', 'lehrveranstaltung_id'),
