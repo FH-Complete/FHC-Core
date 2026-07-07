@@ -12,7 +12,12 @@ class SabreDAVCalDAVBackend extends \Sabre\CalDAV\Backend\AbstractBackend
 	CONST CALENDAR_NAME = 'LVPlan';
 	CONST CAL_CATEGORY_STUNDENPLAN = 'Stundenplan';
 	CONST CAL_CATEGORY_STUNDENPLAN_EXAM = 'StundenplanExam';
-	CONST CAL_CATEGORY_STUNDENPLAN_ONLINE = 'StundenplanOnline';
+	CONST CAL_CATEGORY_STUNDENPLAN_REMOTE = 'StundenplanRemote';
+
+	CONST CAL_CATEGORY_STUNDENPLAN_EXAM_ICON = '📝';
+	CONST CAL_CATEGORY_STUNDENPLAN_ON_SITE_ICON = '🏫';
+	CONST CAL_CATEGORY_STUNDENPLAN_REMOTE_ICON = '📍';
+	CONST CAL_CATEGORY_RESERVATION_ICON = '📌';
 	/**
      * Creates the backend
      *
@@ -221,6 +226,7 @@ class SabreDAVCalDAVBackend extends \Sabre\CalDAV\Backend\AbstractBackend
 
 	protected function buildCalendarDataFragment($item)
 	{
+		$summaryIcon = '';
 		$summary = $item->type == 'reservierung' ? $item->titel : $item->topic;
 
 		$description = "";
@@ -238,14 +244,20 @@ class SabreDAVCalDAVBackend extends \Sabre\CalDAV\Backend\AbstractBackend
 		$category = self::CAL_CATEGORY_STUNDENPLAN;
 		if ($item->type === 'lehreinheit') {
 			if ($item->lehrform === 'EXAM') {
+				$summaryIcon = self::CAL_CATEGORY_STUNDENPLAN_EXAM_ICON;
 				$category = self::CAL_CATEGORY_STUNDENPLAN_EXAM;
 			} else if (!isset($item->ko_ort_kurzbz) || $item->ko_ort_kurzbz === '') {
-				$category = self::CAL_CATEGORY_STUNDENPLAN_ONLINE;
+				$summaryIcon = self::CAL_CATEGORY_STUNDENPLAN_REMOTE_ICON;
+				$category = self::CAL_CATEGORY_STUNDENPLAN_REMOTE;
 			}
 		} else if ($item->type === 'reservierung' && (!isset($item->ko_ort_kurzbz) || $item->ko_ort_kurzbz === '')) {
-			$category = self::CAL_CATEGORY_STUNDENPLAN_ONLINE;
+			$summaryIcon = self::CAL_CATEGORY_RESERVATION_ICON;
+			$category = self::CAL_CATEGORY_STUNDENPLAN_REMOTE;
 		}
 		
+		if ($summaryIcon !== '') {
+			$summary = $summaryIcon . ' ' . $summary;
+		}
 
 		$parsedStartDate = $this->formatICalLocalDateTime($item->isostart);
 		$parsedEndDate = $this->formatICalLocalDateTime($item->isoend);

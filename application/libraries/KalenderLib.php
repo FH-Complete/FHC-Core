@@ -405,7 +405,6 @@ class KalenderLib
 			SELECT 1
 			FROM lehre.tbl_kalender_event_teilnehmer event_teilnehmer
 			WHERE event_teilnehmer.kalender_id = tbl_kalender.kalender_id
-				AND event_teilnehmer.rolle_kurzbz = 'teilnehmer'
 				AND event_teilnehmer.uid = $escapedUserUID
 		)";
 
@@ -419,7 +418,6 @@ class KalenderLib
 					OR event_benutzergruppe.studiensemester_kurzbz = event_gruppe.studiensemester_kurzbz
 				)
 			WHERE event_gruppe.kalender_id = tbl_kalender.kalender_id
-				AND event_gruppe.rolle_kurzbz = 'teilnehmer'
 				AND event_gruppe.gruppe_kurzbz IS NOT NULL
 				AND event_benutzergruppe.uid = $escapedUserUID
 		)";
@@ -451,7 +449,6 @@ class KalenderLib
 					OR event_studentlehrverband.gruppe IS NULL
 				)
 			WHERE event_lehrverband.kalender_id = tbl_kalender.kalender_id
-				AND event_lehrverband.rolle_kurzbz = 'teilnehmer'
 				AND event_lehrverband.gruppe_kurzbz IS NULL
 				AND event_lehrverband.studiengang_kz IS NOT NULL
 		)";
@@ -561,10 +558,25 @@ class KalenderLib
 				AND lecturer_event_teilnehmer.uid = $escapedUserUID
 		)";
 
+		$eventBenutzergruppeExists = "EXISTS (
+			SELECT 1
+			FROM lehre.tbl_kalender_event_teilnehmer lecturer_event_gruppe
+			JOIN public.tbl_benutzergruppe lecturer_benutzergruppe
+				ON lecturer_benutzergruppe.gruppe_kurzbz = lecturer_event_gruppe.gruppe_kurzbz
+				AND (
+					lecturer_event_gruppe.studiensemester_kurzbz IS NULL
+					OR lecturer_benutzergruppe.studiensemester_kurzbz = lecturer_event_gruppe.studiensemester_kurzbz
+				)
+			WHERE lecturer_event_gruppe.kalender_id = tbl_kalender.kalender_id
+				AND lecturer_event_gruppe.gruppe_kurzbz IS NOT NULL
+				AND lecturer_benutzergruppe.uid = $escapedUserUID
+		)";
+
 		$this->_ci->KalenderModel->db->where('tbl_kalender.status_kurzbz', 'live');
 		$this->_ci->KalenderModel->db->group_start();
 		$this->_ci->KalenderModel->db->where($lehreinheitMitarbeiterExists, null, false);
 		$this->_ci->KalenderModel->db->or_where($eventTeilnehmerExists, null, false);
+		$this->_ci->KalenderModel->db->or_where($eventBenutzergruppeExists, null, false);
 		$this->_ci->KalenderModel->db->group_end();
 		
 		$data = $this->_ci->KalenderModel->load();
