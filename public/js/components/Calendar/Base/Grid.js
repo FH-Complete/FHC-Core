@@ -398,7 +398,8 @@ export default {
 			this.onDrop?.({
 				item: [obj],
 				start: dropStart.toISO(),
-				end: dropEnd.toISO()
+				end: dropEnd.toISO(),
+				ctrlKey: !!(evt?.ctrlKey || evt?.metaKey)
 			});
 		},
 
@@ -437,7 +438,8 @@ export default {
 			this.onDrop?.({
 				item: [obj],
 				start: dropStart.toISO(),
-				end: dropEnd.toISO()
+				end: dropEnd.toISO(),
+				ctrlKey: !!(evt?.ctrlKey || evt?.metaKey)
 			});
 		},
 		handleResizeStart({ edge, evt, el, event })

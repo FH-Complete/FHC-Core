@@ -49,7 +49,10 @@ export default {
 				return this.event.ende;
 			}
 			return numberPadding(this.event.ende.getHours()) + ":" + numberPadding(this.event.ende.getMinutes());
-		}
+		},
+		ortString() {
+			return Array.isArray(this.event.ort_kurzbz) ? this.event.ort_kurzbz.join(', ') : this.event.ort_kurzbz;
+		},
 	},
 	methods: {
 		mehtodNumberPadding: function (number) {
@@ -106,7 +109,7 @@ export default {
 						}}</th>
 						<td>
 							<a v-if="event.ort_content_id" :aria-label="$p.t('global','raum')" :title="$p.t('global','raum')" :href="getOrtContentLink"><i class="fa fa-arrow-up-right-from-square me-1" aria-hidden="true" style="color:#00649C"></i></a>
-							{{event.ort_kurzbz}}
+							{{ortString}}
 						</td>
 					</tr>
 					<tr>

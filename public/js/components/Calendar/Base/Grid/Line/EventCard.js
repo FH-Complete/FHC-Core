@@ -13,6 +13,9 @@ export default {
 		dragKalenderCollection() {
 			return this.event
 		},
+		topicString() {
+			return Array.isArray(this.event.orig.topic) ? this.event.orig.topic.join(', ') : this.event.orig.topic;
+		},
 	},
 	template: `
 	<div
@@ -21,7 +24,7 @@ export default {
 		style="border:1px"
 	>
 		<div class="title">
-			{{ event.orig.topic || event.orig.titel || event.orig.lehrfach }}
+			{{ topicString || event.orig.titel || event.orig.lehrfach }}
 		</div>
 		<div>
 			{{ event.orig.datum }} {{ event.orig.beginn }}–{{ event.orig.ende }}

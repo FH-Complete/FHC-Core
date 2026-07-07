@@ -65,7 +65,9 @@ export default {
 		"update:mode",
 		"update:range",
 		"drop",
-		"resize"
+		"resize",
+		"event-hover",
+		"event-unhover"
 	],
 
 	data() {
@@ -156,7 +158,12 @@ export default {
 		resetEventLoader() {
 			this.reset();
 		},
-
+		navigatePrev() {
+			this.$refs.calendar.clickPrev();
+		},
+		navigateNext() {
+			this.$refs.calendar.clickNext();
+		},
 	},
 	setup(props, context) {
 		const rangeInterval = Vue.ref(null);
@@ -223,6 +230,8 @@ export default {
 				:class="['event-type-' + event.type + ' ' + mode + 'PageContainer', { 'event--parked': parkedEvents.has(String(event.kalender_id)) }]"
 				:type="mode == 'day' ? 'button' : undefined"
  				:style="eventStyle(event)"
+				@mouseenter="$emit('event-hover', event)"
+				@mouseleave="$emit('event-unhover', event)"
 			>
 				<component
 					v-if="mode == 'event'"

@@ -164,7 +164,7 @@ export default {
 						res.start = luxon.DateTime.fromMillis(res.start, { zone: this.timezone, locale: this.locale });
 					else if (res.start instanceof Date)
 						res.start = luxon.DateTime.fromJSDate(res.start, { zone: this.timezone, locale: this.locale });
-					else if (typeof res.start === 
+					else if (typeof res.start ===
 						'string' || res.start instanceof String)
 						res.start = luxon.DateTime.fromISO(res.start, { zone: this.timezone, locale: this.locale });
 				}
@@ -173,7 +173,7 @@ export default {
 						res.end = luxon.DateTime.fromMillis(res.end, { zone: this.timezone, locale: this.locale });
 					else if (res.end instanceof Date)
 						res.end = luxon.DateTime.fromJSDate(res.end, { zone: this.timezone, locale: this.locale });
-					else if (typeof res.end === 
+					else if (typeof res.end ===
 						'string' || res.end instanceof String)
 						res.end = luxon.DateTime.fromISO(res.end, { zone: this.timezone, locale: this.locale });
 				}
@@ -199,7 +199,10 @@ export default {
 			// choose default mode
 			let mode = this.mode;
 			if (mode)
-				mode = mode.toLowerCase();
+			{
+				const lower = mode.toLowerCase();
+				mode = Object.keys(this.modes).find(key => key.toLowerCase() === lower) || null;
+			}
 			if (!mode || !this.modes[mode])
 				mode = Object.keys(this.modes).find(Boolean); // start with first entry as active mode
 			return mode || '';

@@ -1,10 +1,12 @@
 import draggable from '../../../../../directives/draggable.js';
+import drop from '../../../../../directives/drop.js';
 import CalClick from '../../../../../directives/Calendar/Click.js';
 
 export default {
 	name: "GridLineEvent",
 	directives: {
 		draggable,
+		drop,
 		CalClick
 	},
 	emits: [
@@ -29,6 +31,10 @@ export default {
 		contextMenuActions: {
 			from: "contextMenuActions",
 			default: () => ({})
+		},
+		onDrop: {
+			from: "onDrop",
+			default: () => null
 		}
 	},
 	props: {
@@ -60,6 +66,8 @@ export default {
 				if (this.event.endsHere)
 					classes.push('event-end');
 			}
+
+			classes.push(`calender_id-${this.event.orig.kalender_id}`);
 			return classes;
 		},
 		dragKalenderCollection() {
@@ -102,16 +110,43 @@ export default {
 			evt.dataTransfer.setData('fhc-grab-offset-y', evt.clientY - rect.top);
 			evt.dataTransfer.setData('fhc-grab-offset-x', evt.clientX - rect.left);
 		},
+		onDropOnCard(evt, items) {
+			if (this.isHeaderOrFooter || !this.onDrop)
+				return;
+
+			const list = Array.isArray(items) ? items : [items];
+			const obj = list[0];
+			if (!obj)
+				return;
+
+			if ((evt.ctrlKey || evt.metaKey) && obj.type === 'lehreinheit')
+			{
+				return this.onDrop({
+					item: [obj],
+					ctrlKey: true,
+					targetKalenderId: this.event.orig?.kalender_id ?? null
+				});
+			}
+
+			return this.onDrop({
+				item: [obj],
+				start: this.event.start.toISO(),
+				end: this.event.end.toISO(),
+				ctrlKey: false,
+				targetKalenderId: null
+			});
+		},
 	},
 	template:`
 	<div
 		class="fhc-calendar-base-grid-line-event event"
 		:class="classes"
-		style="z-index: 2"
+		style="z-index: 11"
 		:draggable="draggable"
 		ref="eventEl"
 		@dragstart="onDragStart"
 		v-draggable:move.noimage="draggable ? dragKalenderCollection : {}"
+		v-drop:move.lehreinheit.kalender.reservierung="onDropOnCard"
 		v-cal-click:event="isHeaderOrFooter ? event : event.orig"
 		@contextmenu.prevent="onRightClick"
 	>

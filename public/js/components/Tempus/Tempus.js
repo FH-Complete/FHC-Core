@@ -37,6 +37,10 @@ import ApiStudiengangTree from "../../api/lehrveranstaltung/studiengangtree.js";
 import StvStudiensemester from "../Stv/Studentenverwaltung/Studiensemester.js";
 import FormInput from "../../../js/components/Form/Input.js";
 import Reservierung from "./Reservierung.js";
+import { getTempusShortcuts } from "./shortcuts.js";
+import KeyboardShortcuts from "./KeyboardShortcuts.js";
+import { useContextMenuActions } from "../../composables/Tempus/ContextMenuActions.js";
+import MultiWeekPlanModal from "./MultiWeekPlanModal.js";
 
 export default {
 	name: "Tempus",
@@ -55,7 +59,9 @@ export default {
 		StvStudiensemester,
 		Multiselect: primevue.multiselect,
 		FormInput,
-		Reservierung
+		Reservierung,
+		KeyboardShortcuts,
+		MultiWeekPlanModal
 	},
 	props: {
 		defaultSemester: String,
@@ -78,12 +84,23 @@ export default {
 			currentSemester: this.defaultSemester,
 			renderers: Vue.computed(() => this.renderers),
 			appConfig: Vue.computed(() => this.appconfig),
-			contextMenuActions: Vue.computed(() => this.contextMenuActions),
+			contextMenuActions: useContextMenuActions({
+				openRaumauswahl: (orig) => this.openRaumauswahl(orig),
+				openHistory: (orig) => this.openHistory(orig),
+				deleteEntry: (orig) => this.deleteEntry(orig),
+				syncToLecturer: (orig) => this.syncToLecturer(orig),
+				syncToStudent: (orig) => this.syncToStudent(orig),
+			}),
+			tableActions: {
+				deleteEntries: (origList) => this.deleteEntries(origList),
+				openRaumauswahl: (orig) => this.openRaumauswahl(orig),
+			},
 		}
 	},
 	data() {
 		return {
 			appconfig: {},
+			currentMode: 'week',
 			configEndpoints: ApiTempusConfig,
 			endpoint: ApiStudiengangTree,
 			raumVorschlaege: [],
@@ -123,6 +140,7 @@ export default {
 			events: null,
 			minimized: false,
 			currentlySelectedEvent: null,
+			hoveredEvent: null,
 			//currentDay: new Date(),
 			studiensemesterKurzbz: this.defaultSemester,
 			lists: {
@@ -153,53 +171,19 @@ export default {
 			selectedStudiensemester: this.studiensemester_kurzbz ?? this.defaultSemester,
 			calendarDate: luxon.DateTime.now().setZone(this.config.timezone).toISODate(),
 			historyEntries: [],
-			previewRole: 'planer'
+			previewRole: 'planer',
+			multiWeekModal: {
+				show: false,
+				lehreinheitId: null,
+				ortKurzbz: null,
+				startTime: null,
+				endTime: null,
+			},
 		}
 	},
 	computed: {
-		contextMenuActions() {
-			return {
-				lehreinheit: [
-					{
-						label: 'Raumauswahl',
-						icon: 'fa-solid fa-door-open',
-						action: this.openRaumauswahl
-					},
-					{
-						label: 'Freischalten für Voransicht',
-						icon: 'fa-solid fa-chalkboard-user',
-						action: (orig) => this.$api.call(ApiKalender.syncToLecturer(orig.kalender_id)).then(() => this.$refs.calendar.resetEventLoader())
-					},
-					{
-						label: 'Freischalten für Live',
-						icon: 'fa-solid fa-user-graduate',
-						action: (orig) => this.$api.call(ApiKalender.syncToStudent(orig.kalender_id)).then(() => this.$refs.calendar.resetEventLoader())
-					},
-					{
-						label: 'History',
-						icon: 'fa-solid fa-clock-rotate-left',
-						action: this.openHistory
-					},
-					{
-						label: 'Delete',
-						icon: 'fa-solid fa-calendar-xmark',
-						action: this.deleteEntry
-					},
-				],
-				reservierung: [
-					{
-						label: 'Delete',
-						icon: 'fa-solid fa-calendar-xmark',
-						action: this.deleteEntry
-					},
-				]
-			};
-		},
 		currentDay() {
 			return luxon.DateTime.now().setZone(this.config.timezone).toISODate();
-		},
-		currentMode() {
-			return 'week';
 		},
 		visibleLecturerUids() {
 			if (!this.lecturers.length)
@@ -213,6 +197,9 @@ export default {
 			if (this.visibleStatus.includes('all'))
 				return this.visibleStatusOptions.filter(visibleStatus => visibleStatus.key === 'all');
 			return this.visibleStatus.map(status => ({ key: status, label: this.visibleStatusArray[status] }));
+		},
+		keyboardShortcuts() {
+			return getTempusShortcuts(this);
 		},
 	},
 	methods: {
@@ -234,10 +221,26 @@ export default {
 			if (!orig?.kalender_id)
 				return;
 
+			await this.deleteEntryCall(orig);
+			this.$refs.calendar.resetEventLoader();
+			this.$refs.coursepicker.reload();
+		},
+		async deleteEntries(origList)
+		{
+			let validList = (origList ?? []).filter(orig => orig?.kalender_id);
+			if (!validList.length)
+				return;
+
+			await Promise.allSettled(validList.map(orig => this.deleteEntryCall(orig)));
+			this.$refs.calendar.resetEventLoader();
+			this.$refs.coursepicker.reload();
+		},
+		async deleteEntryCall(orig)
+		{
 			await this.$api.call(ApiKalender.deleteEntry(
-				orig?.kalender_id
-			)).then(result => {
-				this.$refs.calendar.resetEventLoader();
+				orig.kalender_id
+			)).then(() => {
+				this.$refs.parking.unpark({ type: orig.type, id: orig.kalender_id });
 			});
 		},
 		async openHistory(orig)
@@ -250,6 +253,18 @@ export default {
 				this.historyEntries = result.data ?? [];
 				this.$refs.historyModel.show();
 			});
+		},
+		syncToLecturer(orig) {
+			if (!orig?.kalender_id)
+				return;
+			return this.$api.call(ApiKalender.syncToLecturer(orig.kalender_id))
+				.then(() => this.$refs.calendar.resetEventLoader());
+		},
+		syncToStudent(orig) {
+			if (!orig?.kalender_id)
+				return;
+			return this.$api.call(ApiKalender.syncToStudent(orig.kalender_id))
+				.then(() => this.$refs.calendar.resetEventLoader());
 		},
 		async selectRaum(ort_kurzbz) {
 			const orig = this.raumModal;
@@ -322,8 +337,12 @@ export default {
 			if (newDate && luxon.DateTime.isDateTime(newDate) && newDate.isValid)
 				this.calendarDate = newDate.toISODate();
 		},
-		handleChangeMode() {
-			console.log("handleChangeMode")
+		handleChangeMode(newMode, newDate) {
+			if (!newMode)
+				return;
+			this.currentMode = newMode;
+			if (newDate && luxon.DateTime.isDateTime(newDate) && newDate.isValid)
+				this.calendarDate = newDate.toISODate();
 		},
 		toggleStatus(selected) {
 			if (!selected || selected.length === 0) {
@@ -467,6 +486,7 @@ export default {
 
 			return this._updateKalenderEvent(obj, dates.startDT, dates.endDT, dates.start_time, dates.end_time, () => {
 				this.$refs.calendar.resetEventLoader();
+				this.$refs.coursepicker.reload();
 			});
 		},
 
@@ -481,6 +501,19 @@ export default {
 			if (!obj?.type)
 				return alert("Unbekannter Drop-Typ");
 
+			if (payload.targetKalenderId)
+			{
+				if (obj.type !== 'lehreinheit' || !obj.orig?.lehreinheit_id)
+					return alert("Nur Lehreinheiten können einem Termin hinzugefügt werden");
+
+				return this.$api.call(
+					ApiKalender.addToKalenderEvent(payload.targetKalenderId, obj.orig.lehreinheit_id)
+				).then(() => {
+					this.$refs.calendar.resetEventLoader();
+					this.bcc.postMessage('dropped');
+				});
+			}
+
 			const dates = this._parseDates(start, end);
 			if (!dates) return;
 
@@ -493,17 +526,30 @@ export default {
 			}
 			else if (obj.type === 'lehreinheit')
 			{
-				return this.$api.call(
-					ApiKalender.addKalenderEvent(
+				if (obj.multiweek)
+				{
+					this.openMultiWeekPreview(
 						obj.orig.lehreinheit_id,
 						this.ort_kurzbz ? this.ort_kurzbz : obj.orig.ort_kurzbz,
 						start_time,
 						end_time
-					)
-				).then(() => {
-					this.$refs.calendar.resetEventLoader();
-					this.bcc.postMessage('dropped');
-				});
+					);
+					return;
+				}
+
+				return this.$api.call(
+						ApiKalender.addKalenderEvent(
+							obj.orig.lehreinheit_id,
+							this.ort_kurzbz ? this.ort_kurzbz : obj.orig.ort_kurzbz,
+							start_time,
+							end_time
+						))
+					.then(result => result.data)
+					.then(result => {
+						this.$refs.calendar.resetEventLoader();
+						this.$refs.coursepicker.reload();
+						this.bcc.postMessage('dropped');
+					});
 			}
 			else if (obj.type === 'kalender')
 			{
@@ -519,6 +565,21 @@ export default {
 			{
 				alert("Unbekannter Drop-Typ: " + obj.type);
 			}
+		},
+		openMultiWeekPreview(lehreinheit_id, ort_kurzbz, start_time, end_time) {
+			this.multiWeekModal.lehreinheitId = lehreinheit_id;
+			this.multiWeekModal.ortKurzbz = ort_kurzbz;
+			this.multiWeekModal.startTime = start_time;
+			this.multiWeekModal.endTime = end_time;
+			this.multiWeekModal.show = true;
+		},
+		closeMultiWeekModal() {
+			this.multiWeekModal.show = false;
+		},
+		onMultiWeekConfirmed() {
+			this.$refs.calendar.resetEventLoader();
+			this.$refs.coursepicker.reload();
+			this.bcc.postMessage('dropped');
 		},
 		handleRange(range) {
 			if (!range?.start || !range?.end)
@@ -645,7 +706,48 @@ export default {
 		triggerSync()
 		{
 			this.$api.call(ApiKalender.sync()).then(this.$refs.calendar.resetEventLoader())
-		}
+		},
+		onEventHover(event) {
+			this.hoveredEvent = event;
+		},
+		onEventUnhover(event)
+		{
+			if (this.hoveredEvent?.kalender_id === event?.kalender_id) {
+				this.hoveredEvent = null;
+			}
+		},
+		parkHoveredEvent()
+		{
+			const event = this.hoveredEvent;
+			if (!event?.kalender_id)
+				return;
+
+			if (this.$refs.parking.isParked(event.kalender_id))
+			{
+				this.$refs.parking.unpark({ type: event.type, id: event.kalender_id });
+			}
+			else
+			{
+				this.$refs.parking.park(null, {
+					type: 'kalender',
+					id: event.kalender_id,
+					orig: event
+				});
+			}
+		},
+		deleteHoveredEvent() {
+			const event = this.hoveredEvent;
+			if (!event?.kalender_id)
+				return;
+
+			this.deleteEntry(event);
+		},
+		clearHoveredEvent() {
+			this.hoveredEvent = null;
+		},
+		focusSearchbar() {
+			this.$refs.searchbar?.$refs?.input.focus()
+		},
 	},
 	watch: {
 		lecturers: {
@@ -714,6 +816,7 @@ export default {
 	},
 	template: `
 	<div class="tempus">
+		<keyboard-shortcuts :shortcuts="keyboardShortcuts" />
 		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
 			<div class="col-md-4 col-lg-3 col-xl-2 d-flex align-items-center">
 				<button
@@ -909,7 +1012,7 @@ export default {
 							v-model:parked-keys="parkedKeys"
 						></parking-slot>
 						
-						<fhc-coursepicker :stg="stg" @select-lecturer="setEmp" @select-kw="jumpToKw" :studiensemester="selectedStudiensemester"></fhc-coursepicker>
+						<fhc-coursepicker ref="coursepicker" :stg="stg" @select-lecturer="setEmp" @select-kw="jumpToKw" :studiensemester="selectedStudiensemester"></fhc-coursepicker>
 
 					</div>
 					<stv-studiensemester v-model:studiensemester-kurzbz="selectedStudiensemester"></stv-studiensemester>
@@ -929,6 +1032,8 @@ export default {
 						@resize="resizeHandler"
 						@update:date="handleChangeDate"
 						@update:mode="handleChangeMode"
+						@event-hover="onEventHover"
+						@event-unhover="onEventUnhover"
 						:extra-backgrounds="extraBackgrounds"
 						@update:range="handleRange"
 						class="responsive-calendar"
@@ -994,5 +1099,14 @@ export default {
 			:ort-kurzbz="ort_kurzbz"
 			@saved="reservierungPending = false; $refs.calendar.resetEventLoader()"
 		></reservierung>
+		<multi-week-plan-modal
+			:show="multiWeekModal.show"
+			:lehreinheit-id="multiWeekModal.lehreinheitId"
+			:ort-kurzbz="multiWeekModal.ortKurzbz"
+			:start-time="multiWeekModal.startTime"
+			:end-time="multiWeekModal.endTime"
+			@close="closeMultiWeekModal"
+			@confirmed="onMultiWeekConfirmed"
+		/>
 	</div>`
 };

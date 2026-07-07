@@ -8,7 +8,8 @@ export default {
 	name: "TableView",
 	inject: {
 		events: "events",
-		timezone: "timezone"
+		timezone: "timezone",
+		tableActions: "tableActions",
 	},
 	components: {
 		CoreFilterCmpt,
@@ -91,6 +92,19 @@ export default {
 	{
 		openModal() {
 			this.$refs.raumModal.show();
+		},
+		async deleteSelected() {
+			let selected = this.$refs.tableViewTable?.tabulator?.getSelectedData() ?? [];
+
+			if (!selected.length) return;
+
+			let isConfirmed = await this.$fhcAlert.confirmDelete();
+
+			if (!isConfirmed) return;
+
+			await this.tableActions?.deleteEntries(selected)
+
+			this.$refs.tableViewTable.tabulator.deselectRow();
 		}
 	},
 	watch: {
@@ -98,7 +112,7 @@ export default {
 			this.$refs.tableViewTable?.tabulator?.setData(newData);
 		}
 	},
-	mounted() {
+/*	mounted() {
 
 		this.$api.call(ApiDetails.getRaumtyp())
 			.then(result => {
@@ -106,7 +120,7 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
-	},
+	},*/
 	template: /* html */`
 	<div class="fhc-calendar-mode-table-view h-100 overflow-auto">
 		<core-filter-cmpt
@@ -117,12 +131,13 @@ export default {
 			:download="true"
 		>
 			<template #actions>
+				<button @click="deleteSelected" class="btn btn-outline-danger btn-sm">Löschen</button>
 				<button class="btn btn-outline-secondary btn-sm">Verschieben</button>
 				<button @click="openModal" class="btn btn-outline-secondary btn-sm">Raum wechsel</button>
 			</template>
 		</core-filter-cmpt>
 		
-		<bs-modal ref="raumModal" class="bootstrap-prompt" dialogClass="modal-lg">
+		<!--<bs-modal ref="raumModal" class="bootstrap-prompt" dialogClass="modal-lg">
 			<template #title>Raum verschiebung</template>
 				<form-input
 					:label="$p.t('lehre', 'raumtyp')"
@@ -141,7 +156,7 @@ export default {
 			<template #footer>
 				<button type="button" class="btn btn-primary">{{ $p.t('ui', 'speichern') }}</button>
 			</template>
-		</bs-modal>
+		</bs-modal>-->
 	</div>
 	`
 }

@@ -24,21 +24,56 @@ export default {
 		return {
 			searchparam: '',
 			allCourses: [],
+			sortBy: null,
+			multiWeekIds: new Set()
 		}
 	},
 	computed: {
 		courses() {
 			const query = (this.searchparam ?? '').trim().toLowerCase();
-			if (!query)
-				return this.allCourses;
 
-			return this.allCourses.filter(course =>
-				course.showname.toLowerCase().includes(query) ||
-				course.lektoren?.some(l =>
-					l.name.toLowerCase().includes(query) ||
-					l.kurzbz.toLowerCase().includes(query)
-				)
-			);
+			let result;
+			if (query)
+			{
+				result = this.allCourses.filter(course =>
+					course.showname.toLowerCase().includes(query) ||
+					course.lektoren?.some(lektor =>
+						lektor.name.toLowerCase().includes(query) ||
+						lektor.kurzbz.toLowerCase().includes(query)
+					)
+				);
+			}
+			else
+				result = this.allCourses;
+
+			if (this.sortBy === 'lektor-asc' || this.sortBy === 'lektor-desc')
+			{
+				let dir = this.sortBy === 'lektor-asc' ? 1 : -1;
+
+				return result.sort((a, b) => {
+					let an = a.lektoren?.[0]?.kurzbz ?? '';
+					let bn = b.lektoren?.[0]?.kurzbz ?? '';
+					return an.localeCompare(bn) * dir;
+				});
+			}
+			else if (this.sortBy === 'kw-asc')
+			{
+				return result.sort((a, b) => (a.start_kw ?? 0) - (b.start_kw ?? 0));
+			}
+			else if (this.sortBy === 'kw-desc')
+			{
+				return result.sort((a, b) => (b.start_kw ?? 0) - (a.start_kw ?? 0));
+			}
+			else if (this.sortBy === 'stunden-asc')
+			{
+				return result.sort((a, b) => (a.offenestunden ?? 0) - (b.offenestunden ?? 0));
+			}
+			else if (this.sortBy === 'stunden-desc')
+			{
+				return result.sort((a, b) => (b.offenestunden ?? 0) - (a.offenestunden ?? 0));
+			}
+
+			return result;
 		}
 	},
 	watch: {
@@ -94,6 +129,7 @@ export default {
 				id: orig.lehreinheit_id,
 				orig: orig,
 				stundenblockung: course.stundenblockung,
+				multiweek: this.isMultiWeek(course),
 			};
 		},
 		courseStyle(course) {
@@ -104,7 +140,44 @@ export default {
 		},
 		selectLecturer(lektor) {
 			this.$emit('select-lecturer', lektor);
-		}
+		},
+		setSort(field) {
+			if (this.sortBy === `${field}-asc`)
+				this.sortBy = `${field}-desc`;
+			else if (this.sortBy === `${field}-desc`)
+				this.sortBy = null;
+			else
+				this.sortBy = `${field}-asc`;
+		},
+		sortIcon(field) {
+			if (this.sortBy === `${field}-asc`)
+				return 'fa-arrow-up';
+			if (this.sortBy === `${field}-desc`)
+				return 'fa-arrow-down';
+			return 'fa-sort';
+		},
+		isSortActive(field) {
+			return this.sortBy === `${field}-asc` || this.sortBy === `${field}-desc`;
+		},
+		reload()
+		{
+			this.loadCoursesByStg(this.stg);
+		},
+		toggleMultiWeek(course)
+		{
+			let id = course.lehreinheit_id[0];
+			let weekIds = new Set(this.multiWeekIds);
+			if (weekIds.has(id))
+				weekIds.delete(id);
+			else
+				weekIds.add(id);
+
+			this.multiWeekIds = weekIds;
+		},
+		isMultiWeek(course)
+		{
+			return this.multiWeekIds.has(course.lehreinheit_id[0]);
+		},
 	},
 	template: `
 	<div class="course-picker d-flex flex-column h-100">
@@ -114,6 +187,36 @@ export default {
 				type="text"
 				v-model="searchparam"
 			/>
+			<div class="d-flex gap-1 mt-2">
+				<button
+					type="button"
+					class="btn btn-sm btn-outline-secondary"
+					:disabled="!stg"
+					@click="reload">
+					<i class="fa fa-rotate-right"></i>
+				</button>
+				<button
+					type="button"
+					class="btn btn-sm"
+					:class="isSortActive('lektor') ? 'btn-primary' : 'btn-outline-secondary'"
+					@click="setSort('lektor')">
+					Lkt <i class="fa" :class="sortIcon('lektor')"></i>
+				</button>
+				<button
+					type="button"
+					class="btn btn-sm"
+					:class="isSortActive('kw') ? 'btn-primary' : 'btn-outline-secondary'"
+					@click="setSort('kw')">
+					KW <i class="fa" :class="sortIcon('kw')"></i>
+				</button>
+				<button
+					type="button"
+					class="btn btn-sm"
+					:class="isSortActive('stunden') ? 'btn-primary' : 'btn-outline-secondary'"
+					@click="setSort('stunden')">
+					Std <i class="fa" :class="sortIcon('stunden')"></i>
+				</button>
+			</div>
 		</div>
 		<div v-if="!stg" class="d-flex flex-column align-items-center justify-content-center text-center text-muted py-5 px-3 h-100">
 			<span class="small fw-semibold mb-1">Keine Lehreinheiten</span>
@@ -123,6 +226,7 @@ export default {
 			<div
 				v-for="course in courses"
 				:key="course.lehreinheit_id"
+				style="cursor:grab"
 				:style="courseStyle(course)"
 				class="course-picker-row"
 				v-draggable:move.noimage="dragLehreinheitCollection(course)"
@@ -131,6 +235,13 @@ export default {
 				<div class="d-flex gap-1">
 					<span class="fw-semibold small w-50" v-tooltip="course.lehrfach_bez">{{ course.lehrfach }} {{ course.lehrform }}</span>
 					<span class="fw-semibold small w-50" v-tooltip="course.raumtypalternativ">{{ course.raumtyp }}</span>
+					<i
+						class="fa fa-calendar-week"
+						:class="isMultiWeek(course) ? 'text-primary' : 'text-muted'"
+						style="cursor:pointer"
+						v-tooltip="isMultiWeek(course) ? 'MultiWeek aktiv' : 'MultiWeek Verplanung aktivieren'"
+						@click.stop="toggleMultiWeek(course)"
+					></i>
 				</div>
 				
 				<!--TODO(david) entfernen, dient nur für das mappen mit der lvverwaltung-->

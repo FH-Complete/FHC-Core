@@ -88,6 +88,28 @@ export default {
 			params: { lehreinheit_id, ort_kurzbz, start_date, end_date}
 		};
 	},
+	calculateMultiWeekPlan(lehreinheit_id, ort_kurzbz, start_date, end_date) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/tempus/Kalender/calculateMultiWeekPlan',
+			params: { lehreinheit_id, ort_kurzbz, start_date, end_date }
+		};
+	},
+	confirmMultiWeekPlan(plan, lehreinheit_id ) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/tempus/Kalender/confirmMultiWeekPlan',
+			params: { plan, lehreinheit_id }
+		};
+	},
+
+	addToKalenderEvent(target_kalender_id, lehreinheit_id ) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/tempus/Kalender/addToKalenderEvent',
+			params: { target_kalender_id, lehreinheit_id }
+		};
+	},
 	getRaumvorschlag(kalender_id) {
 		return {
 			method: 'get',
