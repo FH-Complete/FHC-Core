@@ -62,6 +62,7 @@ $configArray = [
 			logout-url="<?= site_url('Cis/Auth/logout'); ?>"
 			:permissions="<?= htmlspecialchars(json_encode($permissions)); ?>"
 			:config="<?=  htmlspecialchars(json_encode($configArray)); ?>"
+			auth-uid="<?= getAuthUID()?>"
 			>
 		</router-view>
 	</div>

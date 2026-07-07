@@ -40,6 +40,80 @@ export async function splitMailsHelper(mails, event, subject, alertPluginRef, ph
 				window.location.href = mailLink;
 			}
 		}
-
 	}
+}
+
+
+/**
+ * just splits the list of mails
+ *
+ * @param mails emailadresses
+ * @param subject subject
+ * @param useBcc useBcc
+ * @returns array of links for splitted mails
+ */
+export function splitMailLinks(mails, subject = "", useBcc = false, uidCC= "", maxLength = 2024) {
+	if (!Array.isArray(mails) || mails.length === 0) {
+		return [];
+	}
+
+	const separator = ",";
+	const encodedSubject = subject ? encodeURIComponent(subject) : "";
+
+	// reserve space for the subject parameter
+	const subjectLength = encodedSubject
+		? `?subject=${encodedSubject}`.length
+		: 0;
+
+	const limit = maxLength - subjectLength;
+
+	const links = [];
+	let currentRecipients = [];
+
+	for (const mail of mails) {
+		if (!mail) continue;
+
+		const testRecipients = [...currentRecipients, mail];
+		const recipientString = testRecipients.join(separator);
+
+		if (recipientString.length > limit && currentRecipients.length > 0) {
+
+			links.push(createMailto(
+				currentRecipients.join(separator),
+				encodedSubject,
+				useBcc,
+				uidCC
+			));
+
+			currentRecipients = [mail];
+		}
+		else {
+			currentRecipients.push(mail);
+		}
+	}
+
+	if (currentRecipients.length > 0) {
+		links.push(createMailto(
+			currentRecipients.join(separator),
+			encodedSubject,
+			useBcc,
+			uidCC
+		));
+	}
+
+	return links;
+}
+
+function createMailto(recipients, encodedSubject, useBcc, uidCC) {
+	let mailadressUid = uidCC + '@technikum-wien.at';
+
+	let link = useBcc
+		? `mailto:${encodeURIComponent(mailadressUid)}?cc=${encodeURIComponent(mailadressUid)}&bcc=${encodeURIComponent(recipients)}`
+		: `mailto:${encodeURIComponent(recipients)}`;
+
+	if (encodedSubject) {
+		link += `${useBcc ? "&" : "?"}subject=${encodedSubject}`;
+	}
+
+	return link;
 }

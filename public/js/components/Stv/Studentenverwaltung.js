@@ -57,7 +57,8 @@ export default {
 		url_mode: String,
 		url_prestudent_id: String,
 		url_tab: String,
-		url_studiengang: String
+		url_studiengang: String,
+		authUid: String
 	},
 	provide() {
 		return {
@@ -91,6 +92,7 @@ export default {
 			hasZGVMasterPermission: this.permissions['student/editMakkZgv'],
 			hasZGVDoctorPermission: this.permissions['student/editDokZgv'],
 			hasBismeldenPermission: this.permissions['student/editBismelden'],
+			authUid: this.authUid
 
 		}
 	},
