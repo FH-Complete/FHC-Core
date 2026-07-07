@@ -120,8 +120,8 @@ $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/prestudent/(:num)'] = 'a
 $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/person/(:num)'] = 'api/frontend/v1/stv/Students/getPerson/$1/$2';
 
 
-$route['test'] = 'Test';
-$route['test/.*'] = 'Test';
+$route['lvplan/caldav'] = 'LvPlanCalDAV';
+$route['lvplan/caldav/.*'] = 'LvPlanCalDAV';
 
 // load routes from extensions, also look for environment-specific configs
 $subdirs = ['application/config/extensions', 'application/config/' . ENVIRONMENT . '/extensions'];

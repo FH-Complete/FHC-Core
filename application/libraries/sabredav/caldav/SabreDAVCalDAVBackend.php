@@ -9,6 +9,10 @@ class SabreDAVCalDAVBackend extends \Sabre\CalDAV\Backend\AbstractBackend
 
 	protected $CI;
 
+	CONST CALENDAR_NAME = 'LVPlan';
+	CONST CAL_CATEGORY_STUNDENPLAN = 'Stundenplan';
+	CONST CAL_CATEGORY_STUNDENPLAN_EXAM = 'StundenplanExam';
+	CONST CAL_CATEGORY_STUNDENPLAN_ONLINE = 'StundenplanOnline';
 	/**
      * Creates the backend
      *
@@ -52,11 +56,11 @@ class SabreDAVCalDAVBackend extends \Sabre\CalDAV\Backend\AbstractBackend
         $calendars = array();
 		$calendar = array(
 			'id' => $user,
-			'uri' => 'LVPlan-'.$user,
+			'uri' => self::CALENDAR_NAME.'-'.$user,
 			'principaluri' => 'principals/'.$user,
 			'{' . \Sabre\CalDAV\Plugin::NS_CALENDARSERVER . '}getctag' => $this->buildCalendarCtag($user),
 			'{' . \Sabre\CalDAV\Plugin::NS_CALDAV . '}supported-calendar-component-set' => new \Sabre\CalDAV\Xml\Property\SupportedCalendarComponentSet(array('VEVENT')),
-			'{DAV:}displayname'                          => 'LVPlan',
+			'{DAV:}displayname'                          => self::CALENDAR_NAME,
 			'{urn:ietf:params:xml:ns:caldav}calendar-description' => 'description comes here',
 			'{urn:ietf:params:xml:ns:caldav}calendar-timezone'    => 'Europe/Vienna',
 			'{http://apple.com/ns/ical/}calendar-order'  => '1',
@@ -226,9 +230,22 @@ class SabreDAVCalDAVBackend extends \Sabre\CalDAV\Backend\AbstractBackend
 			$description = $item->lehrfach_bez . "\r\n";
 
 			if (isset($item->lektor) && is_array($item->lektor) && count($item->lektor) > 0) {
-				$description .= "Lehrer: " . join(", ", array_map(function($teacher) { return $teacher["kurzbz"]; }, $item->lektor)) . "\r\n";
+				$description .= "Lektor*in: " . join(", ", array_map(function($teacher) { return $teacher["kurzbz"]; }, $item->lektor)) . "\r\n";
 			}
 		}
+
+
+		$category = self::CAL_CATEGORY_STUNDENPLAN;
+		if ($item->type === 'lehreinheit') {
+			if ($item->lehrform === 'EXAM') {
+				$category = self::CAL_CATEGORY_STUNDENPLAN_EXAM;
+			} else if (!isset($item->ko_ort_kurzbz) || $item->ko_ort_kurzbz === '') {
+				$category = self::CAL_CATEGORY_STUNDENPLAN_ONLINE;
+			}
+		} else if ($item->type === 'reservierung' && (!isset($item->ko_ort_kurzbz) || $item->ko_ort_kurzbz === '')) {
+			$category = self::CAL_CATEGORY_STUNDENPLAN_ONLINE;
+		}
+		
 
 		$parsedStartDate = $this->formatICalLocalDateTime($item->isostart);
 		$parsedEndDate = $this->formatICalLocalDateTime($item->isoend);
@@ -244,7 +261,7 @@ class SabreDAVCalDAVBackend extends \Sabre\CalDAV\Backend\AbstractBackend
 			.$this->buildICalTextLine('SUMMARY', $summary)
 			.$this->buildICalTextLine('DESCRIPTION', $description)
 			.$this->buildICalTextLine('LOCATION', isset($item->ort_kurzbz) ? $item->ort_kurzbz : '')
-			.$this->buildICalTextLine('CATEGORIES', 'Stundenplans')
+			.$this->buildICalTextLine('CATEGORIES', $category)
 			.$this->buildICalLine('DTSTART', $parsedStartDate, array('TZID' => 'Europe/Vienna'))
 			.$this->buildICalLine('DTEND', $parsedEndDate, array('TZID' => 'Europe/Vienna'));
 
@@ -271,7 +288,7 @@ class SabreDAVCalDAVBackend extends \Sabre\CalDAV\Backend\AbstractBackend
 		}
 
 		sort($fragments, SORT_STRING);
-		return 'LVPlan-'.$userUID.'-'.md5(implode('|', $fragments));
+		return self::CALENDAR_NAME.'-'.$userUID.'-'.md5(implode('|', $fragments));
 	}
 
 	protected function buildICalTextLine($name, $value, array $parameters = array())

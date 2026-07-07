@@ -4,7 +4,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  */
-class Test extends FHC_Controller
+class LvPlanCalDAV extends FHC_Controller
 {
 	/**
 	 * Constructor
@@ -27,13 +27,18 @@ class Test extends FHC_Controller
 
         $tree = array(
             new \Sabre\CalDAV\Principal\Collection($principalBackend),
-            new SabreDAVReadOnlyCalendarRoot($principalBackend, $calendarBackend)
+            new \Sabre\CalDAV\CalendarRoot($principalBackend, $calendarBackend)
         );
 
         $server = new \Sabre\DAV\Server($tree);
 
-        $path = "/ma1433/core/FHC-Core/index.ci.php/test"; 
-        $server->setBaseUri($path);
+        $baseUri = '/' . implode('/', array_filter([
+            trim(BASE_LOCATION, '/'),
+            trim($this->config->item('index_page'), '/'),
+            'lvplan',
+            'caldav'
+        ]));
+        $server->setBaseUri($baseUri);
 
         $authBackend->setRealm('SabreDAV');
         $authPlugin = new \Sabre\DAV\Auth\Plugin($authBackend);
