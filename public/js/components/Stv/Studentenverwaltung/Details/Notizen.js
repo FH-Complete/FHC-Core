@@ -57,7 +57,7 @@ type-id: id to which table the notizdata should be connected... eg. person_id, p
 notizLayout: "classicFas", "twoColumnsFormLeft", twoColumnsFormRight, popupModal"
 
 showErweitert: if true: section with following fields will be displayed:
-	'verfasser', 'bearbeiter', 'von', 'bis'
+	'verfasser', 'bearbeiter', 'von', 'bis' and 'erledigt'; is now configurable in config/stv.php
 
 showDocument: if true: section with documentHandling will be displayed
 
