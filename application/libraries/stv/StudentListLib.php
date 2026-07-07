@@ -331,6 +331,7 @@ class StudentListLib
 						nt.style,
 						n.erledigt AS done,
 						nt.prioritaet AS prioritaet,
+						nt.automatisiert AS automatisiert,
 						nz.prestudent_id,
 						n.start,
 						n.ende

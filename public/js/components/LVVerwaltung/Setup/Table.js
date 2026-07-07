@@ -81,8 +81,8 @@ export default {
 				buildTagHeaderFilterExpression(selectedOptions);
 
 				setTagHeaderFilterValue(
-					this.$refs.table.tabulator,
 					combinedFilterStatement,
+					this.$refs.table.tabulator
 				);
 			},
 			deep: true,

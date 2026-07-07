@@ -494,7 +494,6 @@ export default {
       count: 0,
       filteredcount: 0,
       selectedcount: 0,
-      //tags
       expanded: [],
       tagEndpoint: ApiTag,
       currentEndpoint: null,
@@ -598,8 +597,8 @@ export default {
           buildTagHeaderFilterExpression(selectedOptions);
 
         setTagHeaderFilterValue(
-          this.$refs.table.tabulator,
           combinedFilterStatement,
+          this.$refs.table.tabulator,
         );
       },
       deep: true,
@@ -869,7 +868,6 @@ export default {
       this.lastSelected = [];
       this.$emit("update:selected", []);
     },
-    //methods tags
     addedTag(addedTag) {
       addTagInTable(addedTag, this.allRows, "prestudent_id");
       syncTagHeaderFilterOptions(

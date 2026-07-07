@@ -1,5 +1,5 @@
-export function tagFormatter(cell, tagComponent, onRendered) {
-  const mappedData = tagComponent.tags.map((tag) => ({
+export function tagFormatter(cell, tagComponent, onRendered, tagKey = "tags") {
+  const mappedData = tagComponent[tagKey]?.map((tag) => ({
     typ_kurzbz: tag.tag_typ_kurzbz,
     automatisiert: tag.automatisiert,
   }));
@@ -49,7 +49,7 @@ export function tagFormatter(cell, tagComponent, onRendered) {
       tagElement.className = "tag " + tag.style;
       if (tag.done) tagElement.className += " tag_done";
 
-      const tagDef = mappedData.find((t) => t.typ_kurzbz === tag.typ_kurzbz);
+      const tagDef = mappedData?.find((t) => t.typ_kurzbz === tag.typ_kurzbz);
 
       if (
         (!tagDef && tag.typ_kurzbz?.includes("_auto")) ||

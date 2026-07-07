@@ -729,7 +729,8 @@ EOSQL;
 								style,
 								erledigt AS done,
 								lehreinheit_id,
-								prioritaet
+								prioritaet,
+								automatisiert
 							FROM public.tbl_notizzuordnung
 								JOIN public.tbl_notiz ON tbl_notizzuordnung.notiz_id = tbl_notiz.notiz_id
 								JOIN public.tbl_notiz_typ ON tbl_notiz.typ = tbl_notiz_typ.typ_kurzbz

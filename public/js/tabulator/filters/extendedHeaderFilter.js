@@ -29,11 +29,11 @@ function getConnectorLabel(connector, labels) {
   return labels?.connectors?.[connector.key] || connector.label;
 }
 
-export function setTagHeaderFilterValue(tabulator, value) {
-  tabulator?.setHeaderFilterValue("tags", value);
+export function setTagHeaderFilterValue(value, tabulator, columnField = "tags") {
+  tabulator?.setHeaderFilterValue(columnField, value);
 
   const input = tabulator
-    ?.getColumn("tags")
+    ?.getColumn(columnField)
     ?.getElement()
     ?.querySelector(".tabulator-header-filter input");
 
@@ -63,12 +63,12 @@ export function buildTagHeaderFilterExpression(selectedTagOptions) {
   return expression;
 }
 
-export function buildTagOptionsFromRows(rows = []) {
+export function buildTagOptionsFromRows(rows, field = "tags") {
   let options = [];
 
-  let tags = [
+  let parsedTags = [
     ...new Map(
-      getRawTagValuesFromRows(rows)
+      getRawTagValuesFromRows(rows, field)
         .filter((tag) => tag && tag.done !== true)
         .sort((a, b) => {
           return a.prioritaet - b.prioritaet;
@@ -78,22 +78,25 @@ export function buildTagOptionsFromRows(rows = []) {
             label: tag.beschreibung || tag.typ_kurzbz,
             value: tag.beschreibung || tag.typ_kurzbz,
             style: tag.style,
+            automatisiert: tag.automatisiert,
+            done: tag.done,
           };
         })
         .map((obj) => [JSON.stringify(obj), obj]),
     ).values(),
   ];
-  if (!Array.isArray(tags)) return;
+  if (!Array.isArray(parsedTags)) return;
 
-  return tags;
+  return parsedTags;
 }
 
 export function syncTagHeaderFilterOptions(
   rows = [],
   initialOptions = [],
   selectedOptions = [],
+  field = "tags"
 ) {
-  const options = buildTagOptionsFromRows(rows) || [];
+  const options = buildTagOptionsFromRows(rows, field) || [];
 
   if (Array.isArray(initialOptions)) {
     initialOptions.splice(0, initialOptions.length, ...options);
@@ -143,15 +146,15 @@ export function syncSelectedTagOptionsWithHeaderFilters(
   return true;
 }
 
-export function getRawTagValuesFromRows(rows = []) {
-  let tags = [];
+export function getRawTagValuesFromRows(rows = [], field = "tags") {
+  let parsedTags = [];
 
   rows.forEach((row) => {
-    if (!row || (!row.tags?.length && !row._children?.length)) return;
+    if (!row || (!row[field]?.length && !row._children?.length)) return;
 
-    let newTags = row.tags?.length
-      ? [row.tags]
-      : getRawTagValuesFromRows(row._children);
+    let newTags = row[field]?.length
+      ? [row[field]]
+      : getRawTagValuesFromRows(row._children, field);
 
     newTags = newTags
       .map((newTag) => {
@@ -167,10 +170,10 @@ export function getRawTagValuesFromRows(rows = []) {
       })
       .filter((newTag) => newTag !== null);
 
-    tags = tags.concat(newTags);
+    parsedTags = parsedTags.concat(newTags);
   });
 
-  return tags.flat();
+  return parsedTags.flat();
 }
 
 export function customTagFilter(cell, onRendered, success, cancel, params) {
@@ -380,6 +383,12 @@ function generateDropdownTable(options, selectedTagOptions, labels) {
     const label = document.createElement("span");
     label.className = "tag " + option.style;
     label.innerText = option.label;
+
+    if (option.automatisiert) {
+      label.innerHTML = "<i class='fa-solid fa-lock'></i> " + option.label;
+      label.className += " tag_auto";
+    }
+
     labelTd.appendChild(label);
     row.appendChild(labelTd);
 
