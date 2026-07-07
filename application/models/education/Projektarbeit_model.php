@@ -332,7 +332,6 @@ class Projektarbeit_model extends DB_Model
 						 LEFT JOIN  public.tbl_benutzer    b  ON b.person_id          = p.person_id
 						 LEFT JOIN  lehre.tbl_betreuerart  ba ON ba.betreuerart_kurzbz = pb.betreuerart_kurzbz
 				WHERE pb.betreuerart_kurzbz = ANY('{Zweitbetreuer,Zweitbegutachter,Senatsmitglied}')
-					AND pb.person_id = ?
 				ORDER BY pb.projektarbeit_id
 			),
 			primary_betreuer AS (
@@ -356,7 +355,6 @@ class Projektarbeit_model extends DB_Model
 				LEFT JOIN  public.tbl_benutzer    b  ON b.person_id          = p.person_id
 				LEFT JOIN  lehre.tbl_betreuerart  ba ON ba.betreuerart_kurzbz = pb.betreuerart_kurzbz
 				WHERE pb.betreuerart_kurzbz = ANY('{Begutachter, Betreuer, Erstbetreuer,Erstbegutachter,Senatsvorsitz}')
-					AND pb.person_id = ?
 				ORDER BY pb.projektarbeit_id
 		)
 	
@@ -446,7 +444,7 @@ class Projektarbeit_model extends DB_Model
 					ORDER BY tbl_projektarbeit.projektarbeit_id, betreuerart_kurzbz desc) as xy
 				ORDER BY nachname;";
 
-		return $this->execReadOnlyQuery($qry, array($person_id, $person_id, $person_id, $person_id));
+		return $this->execReadOnlyQuery($qry, array($person_id, $person_id));
 	}
 
 	/**
