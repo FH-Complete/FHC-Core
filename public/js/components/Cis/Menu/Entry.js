@@ -68,41 +68,8 @@ export default {
 				return false;
 			}
 		},
-        link() {
-            if (this.entry.template_kurzbz == 'redirect') {
-                if (!this.entry.content)
-                    return '';
-                let xmlDoc = (new DOMParser()).parseFromString(this.entry.content,"text/xml");
-                let url = xmlDoc.getElementsByTagName('url')[0];
-
-                if (!url)
-                    return '';
-                // TODO(chris): replace get params
-                url = url.childNodes[0].nodeValue + "";
-				if (url.includes("../cms/news.php")) {
-					let news_regex = new RegExp("^\.\./cms/news\.php");
-					url = url.replace(news_regex, FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/CisVue/Cms/news');
-				}
-				else if (url.includes("../cms/content.php?")) {
-					let content_regex = new RegExp("^\.\./cms/content.php\\?content_id=([0-9]+)");
-					let content_regex_result = content_regex.exec(url);
-					// content_regex_result[1] will be the first matched group
-					return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/CisVue/Cms/content/' + content_regex_result[1];
-				}
-				else if(url.includes("../index.ci.php")){
-					let index_regex = new RegExp("^\.\./index\.ci\.php");
-					url = url.replace(index_regex, FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router);
-				}
-				else if (url.includes("../")) {
-					let relative_regex = new RegExp("^\.\./");
-					url = url.replace(relative_regex, FHC_JS_DATA_STORAGE_OBJECT.app_root);
-				}
-				return url;
-            }
-            return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/CisVue/Cms/content/' + this.entry.content_id;
-        },
 		hasFullLink() {
-			return this.link.startsWith(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router)
+			return this.entry.url.startsWith(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router)
 		},
         target() {
             if (this.entry.template_kurzbz == 'redirect') {
@@ -145,7 +112,7 @@ export default {
 			this.addUrlCount(count);
 		},
 		checkActiveUrl(url){
-			this.getUrlMatchPoints(url,this.link);
+			this.getUrlMatchPoints(url,this.entry.url);
 			
 			let url_hash_spaceSymbol_regex = new RegExp("%20","gi");
 			let url_hash_sharpSymbol_regex = new RegExp("^#");
@@ -155,7 +122,7 @@ export default {
 			// if the url hash contains the titel of the menu 
 			// or if the url equals the link of a menu 
 			// then set the menu active 
-			if (url_hash == this.entry.titel || url.href == this.link) {
+			if (url_hash == this.entry.titel || url.href == this.entry.url) {
 					this.setActiveEntry(this.entry.content_id);
 			}
 		},
@@ -204,7 +171,7 @@ export default {
         <template v-if="hasChilds">
 			<div class="btn-group w-100">
  				<a :target="target" 
- 					:href="(entry.menu_open && hasFullLink)?link:null"
+ 					:href="(entry.menu_open && hasFullLink) ? entry.url : null"
 					@click="toggleCollapse"
                     :class="{
                         'btn btn-default rounded-0 text-start': true,
@@ -227,7 +194,7 @@ export default {
             </ul>
         </template>
 		<a v-else
-            :href="link"
+            :href="entry.url"
             :target="target"
             :class="{
                 'btn btn-default rounded-0 w-100 text-start': true,
