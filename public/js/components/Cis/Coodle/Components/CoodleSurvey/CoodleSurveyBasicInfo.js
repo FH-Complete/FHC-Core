@@ -230,7 +230,7 @@ export default {
 										v-model="surveyFormData.areParticipantsAnonymized"
 										id="surveyAreParticipantsAnonymizedInput"
 										type="checkbox"
-										style="height:15px;width:15px;"
+										style="min-height:15px;min-width:15px;"
 									/>
 								</div>
 								<div class="col-12 col-lg-6 d-flex flex-row align-items-center gap-2 pb-2">
@@ -244,7 +244,7 @@ export default {
 										v-model="surveyFormData.areSelectionsAnonymized"
 										id="surveyAreSelectionsAnonymizedInput"
 										type="checkbox"
-										style="height:15px;width:15px;"
+										style="min-height:15px;min-width:15px;"
 									/>
 								</div>
 							</div>
