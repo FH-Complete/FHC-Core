@@ -4,6 +4,7 @@ import Alert from "../../../components/Bootstrap/Alert.js";
 import Loading from "../../../components/Loader.js";
 
 import ApiProfilUpdate from '../../../api/factory/profilUpdate.js';
+import { dateFilter } from '../../../tabulator/filters/Dates.js';
 
 const sortProfilUpdates = (ele1, ele2, thisPointer) => {
   let result = 0;
@@ -45,7 +46,6 @@ export default {
       loading: false,
       filter: "Pending",
       profil_update_id: Number(this.id),
-
   };
   },
 	computed: {
@@ -59,6 +59,10 @@ export default {
 		},
 		profilUpdateOptions: function () {
 			return {
+				persistence: {
+					columns: ["width", "visible", "frozen"],
+				},
+				persistenceID: 'cis-profilupdate-2025121702',
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: (url, config, params) => {
 					return this.$api.call(ApiProfilUpdate.getProfilUpdateWithPermission(params.filter));
@@ -184,13 +188,13 @@ export default {
         },
 
         height: 600,
-        layout: "fitColumns",
+        layout: "fitDataStretchFrozen",
 
         columns: [
           {
             title: this.$p.t("profilUpdate", "UID"),
             field: "uid",
-            minWidth: 200,
+            minWidth: 100,
             resizable: true,
             headerFilter: true,
             //responsive:0,
@@ -204,26 +208,64 @@ export default {
             //responsive:0,
           },
           {
+            title: this.$p.t("profil", "stg_short") + ' (' + this.$p.t("profil", "studentIn") + ')',
+            field: "studiengang",
+            minWidth: 50,
+            resizable: true,
+            headerFilter: "list",
+            headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"},
+            //responsive:0,
+          },
+		  {
+			title: this.$p.t("profil", "sem_short") + ' (' + this.$p.t("profil", "studentIn") + ')',
+			field: "semester",
+			headerFilter: "list",
+			headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}
+		  },
+		  {
+            title: this.$p.t("profil", "orgform_short") + ' (' + this.$p.t("profil", "studentIn") + ')',
+            field: "orgform",
+            minWidth: 50,
+            resizable: true,
+            headerFilter: "list",
+            headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"},
+            //responsive:0,
+          },
+		  {
+            title: this.$p.t("profil", "orgeinheit_short") + ' (' + this.$p.t("profil", "mitarbeiterIn") + ')',
+            field: "oezuordnung",
+            minWidth: 200,
+            resizable: true,
+            headerFilter: "list",
+            headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"},
+            //responsive:0,
+          },
+		  {
             title: this.$p.t("profilUpdate", "Topic"),
             field: "topic",
             resizable: true,
             minWidth: 200,
-            headerFilter: true,
+            headerFilter: "list",
+            headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"},
             //responsive:0,
           },
-          {
+		  {
             title: this.$p.t("profilUpdate", "insertamum"),
-            field: "insertamum",
+            field: "insertamum_iso",
             resizable: true,
-            headerFilter: true,
+			headerFilterFunc: 'dates',
+			headerFilter: dateFilter,
             minWidth: 200,
+			formatter:"datetime",
+			formatterParams: this.datetimeFormatterParams(),
             //responsive:0,
           },
-          {
+		  {
             title: this.$p.t("profilUpdate", "Status"),
             field: "status_translated",
             hozAlign: "center",
-            headerFilter: true,
+            headerFilter: "list",
+            headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"},
             formatter: (cell, para) => {
               let iconClasses = "";
               let status = cell.getRow().getData().status;
@@ -240,7 +282,6 @@ export default {
               }
               return `<div class='row justify-content-center'><div class='col-2'><i class='${iconClasses}'></i></div> <div class='col-4'><span>${cell.getValue()}</span></div></div>`;
             },
-
             resizable: true,
             minWidth: 200,
             //responsive:0,
@@ -248,20 +289,11 @@ export default {
           {
             title: this.$p.t("profilUpdate", "actions"),
             headerSort: false,
+			frozen: true,
             formatter: (cell, params) => {
-              let STATUS_PENDING =
-                cell.getRow().getData().status ==
-                this.profilUpdateStates["Pending"];
-
+              let details = this.$p.t('global', 'details');
               let html = `<div class="d-flex justify-content-evenly align-items-center">
-                <button class="btn border-primary border-2" id="showButton"><i class="fa-solid fa-eye fhc-primary-color"></i></button>
-                ${
-                  STATUS_PENDING ?
-                  `<button class="btn border-success border-2" id="acceptButton"><i class='fa fa-lg fa-circle-check text-success'></i></button>
-                  <button class="btn border-danger border-2" id="denyButton"><i class=' fa fa-lg fa-circle-xmark text-danger'></i></button>`
-                  :
-                  ``
-                }
+                <button class="btn btn-secondary" id="showButton">${details}</button>
               </div>`;
 
               // Convert the HTML string to an HTML node
@@ -276,19 +308,6 @@ export default {
                   this.showAcceptDenyModal(cell.getRow().getData());
                 });
 
-              if (STATUS_PENDING) {
-                node
-                  .querySelector("#acceptButton")
-                  .addEventListener("click", () => {
-                    this.acceptProfilUpdate(cell.getRow().getData());
-                  });
-                node
-                  .querySelector("#denyButton")
-                  .addEventListener("click", () => {
-                    this.denyProfilUpdate(cell.getRow().getData());
-                  });
-              }
-
               return node;
             },
             minWidth: 200,
@@ -298,7 +317,6 @@ export default {
         ],
       };
     }
-    
   },
   methods: {
     denyProfilUpdate: function (data) {
@@ -340,7 +358,6 @@ export default {
       this.showModal = false;
       this.modalData = null;
     },
-
     showAcceptDenyModal(value) {
       this.modalData = value;
       if (!this.modalData) {
@@ -353,7 +370,6 @@ export default {
         this.$refs.AcceptDenyModal.show();
       });
     },
-
     updateData: function (event) {
       this.$refs.UpdatesTable.tabulator.setData();
       //? store the selected view in the session storage of the browser
@@ -370,6 +386,15 @@ export default {
 					this.showAcceptDenyModal(arrayRowData[0]);
 				}
 			}
+		},
+		datetimeFormatterParams: function() {
+			const params = {
+				inputFormat:"yyyy-MM-dd",
+				outputFormat:"dd.MM.yyyy",
+				invalidPlaceholder:"(invalid date)",
+				timezone:FHC_JS_DATA_STORAGE_OBJECT.timezone
+			};
+			return params;
 		}
   },
   watch: {
@@ -382,7 +407,7 @@ export default {
     },
   },
   created() {
-    this.$p.loadCategory("profilUpdate").then(() => {
+    this.$p.loadCategory(["profilUpdate", "lehre", "profil", "global"]).then(() => {
       this.categoryLoaded = true;
     });
   },
@@ -395,22 +420,30 @@ export default {
   },
   template: /*html*/ `
     <div>
-   
-    <accept-deny-update :title="$p.t('profilUpdate','profilUpdateRequest')" v-if="showModal" ref="AcceptDenyModal" @hideBsModal="hideAcceptDenyModal" :value="JSON.parse(JSON.stringify(modalData))" :setLoading="setLoading" ></accept-deny-update>
-    <div  class="form-underline flex-fill ">
-      <div class="form-underline-titel">{{$p.t('ui','anzeigen')}} </div>
-      
-      <select class="mb-4 form-select" v-model="filter" @change="updateData" aria-label="Profil updates display selection">
-        <option :selected="true" :value="profilUpdateStates['Pending']" >{{$p.t('profilUpdate','pendingRequests')}}</option>
-        <option :value="profilUpdateStates['Accepted']">{{$p.t('profilUpdate','acceptedRequests')}}</option>
-        <option :value="profilUpdateStates['Rejected']">{{$p.t('profilUpdate','rejectedRequests')}}</option>
-        <option :value="'Alle'">{{$p.t('profilUpdate','allRequests')}}</option>
-      </select>
-  
-    </div>
-    <loading ref="loadingModalRef" :timeout="0"></loading>
-    
-    <core-filter-cmpt v-if="profilUpdateStates && categoryLoaded" :title="$p.t('profilUpdate','profilUpdateRequests')"  ref="UpdatesTable" :tabulatorEvents="profilUpdateEvents" :tabulator-options="profilUpdateOptions" tableOnly :sideMenu="false" />
+		<accept-deny-update :title="$p.t('profilUpdate','profilUpdateRequest')" v-if="showModal" ref="AcceptDenyModal" @hideBsModal="hideAcceptDenyModal" :value="JSON.parse(JSON.stringify(modalData))" :setLoading="setLoading" ></accept-deny-update>
+		<h3>{{$p.t('profilUpdate', 'profilUpdateRequests')}}</h3>
+		<loading ref="loadingModalRef" :timeout="0"></loading>
 
-    </div>`,
+		<core-filter-cmpt
+			v-if="profilUpdateStates && categoryLoaded"
+			ref="UpdatesTable"
+			:tabulatorEvents="profilUpdateEvents"
+			:tabulator-options="profilUpdateOptions"
+			table-only
+			:sideMenu="false">
+				  <template #actions>
+					<div style="width: 94vw;" class="d-flex justify-content-end">
+						<div>
+						  <select class="mb-4 form-select" v-model="filter" @change="updateData" aria-label="Profil updates display selection">
+							<option :selected="true" :value="profilUpdateStates['Pending']" >{{$p.t('profilUpdate','pendingRequests')}}</option>
+							<option :value="profilUpdateStates['Accepted']">{{$p.t('profilUpdate','acceptedRequests')}}</option>
+							<option :value="profilUpdateStates['Rejected']">{{$p.t('profilUpdate','rejectedRequests')}}</option>
+							<option :value="'Alle'">{{$p.t('profilUpdate','allRequests')}}</option>
+						  </select>
+						 </div>
+					</div>
+				</template>
+		</core-filter-cmpt>
+
+	</div>`,
 };

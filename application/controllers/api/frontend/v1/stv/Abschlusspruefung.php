@@ -20,8 +20,6 @@ class Abschlusspruefung extends FHCAPI_Controller
 			'getBeurteilungen' => ['admin:rw', 'assistenz:rw'],
 			'getAkadGrade' => ['admin:rw', 'assistenz:rw'],
 			'getMitarbeiter' => ['admin:rw', 'assistenz:rw'],
-			'getAllMitarbeiter' => ['admin:rw', 'assistenz:rw'],
-			'getAllPersons' => ['admin:rw', 'assistenz:rw'],
 			'getPruefer' => ['admin:rw', 'assistenz:rw'],
 			'getTypStudiengang' => ['admin:rw', 'assistenz:rw'],
 			'checkForExistingExams' => ['admin:rw', 'assistenz:rw'],
@@ -102,35 +100,45 @@ class Abschlusspruefung extends FHCAPI_Controller
 	{
 		$abschlusspruefung_id = $this->input->post('id');
 
-		$this->AbschlusspruefungModel->addSelect('lehre.tbl_abschlusspruefung.*');
-		$this->AbschlusspruefungModel->addSelect("
-			CASE
-				WHEN pruefer1 IS NOT NULL
-				THEN CONCAT(p1.nachname, ' ', p1.vorname, COALESCE(' ' || p1.titelpre, ''))
-				ELSE NULL
-   			 END AS p1
-   		");
-		$this->AbschlusspruefungModel->addSelect("
-			CASE
-				WHEN pruefer2 IS NOT NULL
-				THEN CONCAT(p2.nachname, ' ', p2.vorname, COALESCE(' ' || p2.titelpre, ''))
-				ELSE NULL
-   			 END AS p2
-		");
-		$this->AbschlusspruefungModel->addSelect("
-			CASE
-				WHEN pruefer3 IS NOT NULL
-				THEN CONCAT(p3.nachname, ' ', p3.vorname, COALESCE(' ' || p3.titelpre, ''))
-				ELSE NULL
-   			 END AS p3
-		");
-		$this->AbschlusspruefungModel->addSelect("
-			CASE
-				WHEN vorsitz IS NOT NULL
-				THEN CONCAT(pv.nachname, ' ', pv.vorname, COALESCE(' ' || pv.titelpre, ''), ' (', ben.uid , ')' )
-				ELSE NULL
-   			 END AS pv
-		");
+		$this->AbschlusspruefungModel->addSelect(
+			'lehre.tbl_abschlusspruefung.*,
+			p1.person_id AS p1_person_id, p1.vorname AS p1_vorname, p1.nachname AS p1_nachname,
+			p1.titelpre AS p1_titelpre, p1.titelpost AS p1_titelpost,
+			p2.person_id AS p2_person_id, p2.vorname AS p2_vorname, p2.nachname AS p2_nachname,
+			p2.titelpre AS p2_titelpre, p2.titelpost AS p2_titelpost,
+			p3.person_id AS p3_person_id, p3.vorname AS p3_vorname, p3.nachname AS p3_nachname,
+			p3.titelpre AS p3_titelpre, p3.titelpost AS p3_titelpost,
+			pv.person_id AS pv_person_id, pv.vorname AS pv_vorname, pv.nachname AS pv_nachname,
+			pv.titelpre AS pv_titelpre, pv.titelpost AS pv_titelpost, ben.uid AS pv_uid'
+		);
+		//~ $this->AbschlusspruefungModel->addSelect("
+			//~ CASE
+				//~ WHEN pruefer1 IS NOT NULL
+				//~ THEN CONCAT(p1.nachname, ' ', p1.vorname, COALESCE(' ' || p1.titelpre, ''))
+				//~ ELSE NULL
+   			 //~ END AS p1
+   		//~ ");
+		//~ $this->AbschlusspruefungModel->addSelect("
+			//~ CASE
+				//~ WHEN pruefer2 IS NOT NULL
+				//~ THEN CONCAT(p2.nachname, ' ', p2.vorname, COALESCE(' ' || p2.titelpre, ''))
+				//~ ELSE NULL
+   			 //~ END AS p2
+		//~ ");
+		//~ $this->AbschlusspruefungModel->addSelect("
+			//~ CASE
+				//~ WHEN pruefer3 IS NOT NULL
+				//~ THEN CONCAT(p3.nachname, ' ', p3.vorname, COALESCE(' ' || p3.titelpre, ''))
+				//~ ELSE NULL
+   			 //~ END AS p3
+		//~ ");
+		//~ $this->AbschlusspruefungModel->addSelect("
+			//~ CASE
+				//~ WHEN vorsitz IS NOT NULL
+				//~ THEN CONCAT(pv.nachname, ' ', pv.vorname, COALESCE(' ' || pv.titelpre, ''), ' (', ben.uid , ')' )
+				//~ ELSE NULL
+   			 //~ END AS pv
+		//~ ");
 		$this->AbschlusspruefungModel->addJoin('public.tbl_benutzer ben', 'ON (ben.uid = lehre.tbl_abschlusspruefung.vorsitz)', 'LEFT');
 		$this->AbschlusspruefungModel->addJoin('public.tbl_person pv', 'ON (pv.person_id = ben.person_id)', 'LEFT');
 		$this->AbschlusspruefungModel->addJoin('public.tbl_person p1', 'ON (p1.person_id = lehre.tbl_abschlusspruefung.pruefer1)', 'LEFT');
@@ -220,8 +228,10 @@ class Abschlusspruefung extends FHCAPI_Controller
 		$this->terminateWithSuccess($typStudiengang);
 	}
 
-	public function getMitarbeiter($searchString)
+	public function getMitarbeiter()
 	{
+		$searchString = $this->input->get('searchString') ?? '';
+
 		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 
 		$result = $this->MitarbeiterModel->searchMitarbeiter($searchString, 'mitAkadGrad');
@@ -232,8 +242,10 @@ class Abschlusspruefung extends FHCAPI_Controller
 		$this->terminateWithSuccess($result ?: []);
 	}
 
-	public function getPruefer($searchString)
+	public function getPruefer()
 	{
+		$searchString = $this->input->get('searchString') ?? '';
+
 		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 
 		$result = $this->MitarbeiterModel->searchMitarbeiter($searchString, 'ohneMaUid');
@@ -443,59 +455,5 @@ class Abschlusspruefung extends FHCAPI_Controller
 			return $this->terminateWithError($this->p->t('abschlusspruefung', 'error_studentOhneFinalExam', ['id'=> $uids]), self::ERROR_TYPE_GENERAL);
 		}
 		$this->terminateWithSuccess('step3');
-	}
-
-	/*
-	* returns list of all Mitarbeiter
-	* as key value list to be used in select or autocomplete
-	*/
-	public function getAllMitarbeiter()
-	{
-		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
-
-		$sql = "
-			SELECT
-			    ma.mitarbeiter_uid as mitarbeiter_uid,
-				CONCAT(p.nachname, ' ', p.vorname, ' (', ma.mitarbeiter_uid, ')') as label
-			FROM
-			  public.tbl_mitarbeiter ma
-			  JOIN public.tbl_benutzer bn ON (bn.uid = ma.mitarbeiter_uid)
-			  JOIN public.tbl_person p ON (p.person_id = bn.person_id)
-			ORDER BY
-			p.nachname ASC
-			";
-
-		$result = $this->MitarbeiterModel->execReadOnlyQuery($sql);
-		$data = $this->getDataOrTerminateWithError($result);
-
-		$this->terminateWithSuccess($data);
-	}
-
-	/*
-	* returns list of all Persons
-	* as key value list to be used in select or autocomplete
-	*/
-	public function getAllPersons()
-	{
-		$this->load->model('person/Person_model', 'PersonModel');
-
-		$sql = "
-			SELECT
-			    p.vorname, p.nachname, p.person_id,
-				CONCAT(p.nachname, ' ', p.vorname) as label
-			FROM
-			  public.tbl_person p
-			 -- JOIN public.tbl_benutzer bn ON (p.person_id = bn.person_id)
-			  -- and bn.aktiv = 'true'
-			ORDER BY
-			p.nachname ASC
-			";
-
-		//TODO(manu) check if filter active benutzer
-
-		$result = $this->PersonModel->execReadOnlyQuery($sql);
-		$data = $this->getDataOrTerminateWithError($result);
-
-		$this->terminateWithSuccess($data);
 	}
 }

@@ -513,6 +513,7 @@ class statistik extends basis_db
 		$this->json=array();
 		$this->countRows=0;
 		set_time_limit(600);
+		$parseHtml = (strpos($this->preferences, 'parseHTML: true') !== false);
 
 		// In case a decryption function is used then perform password substitution
 		$this->sql = $this->replaceSQLDecryptionPassword($this->sql);
@@ -565,7 +566,13 @@ class statistik extends basis_db
 					for($spalte=0;$spalte<$anzahl_spalten;$spalte++)
 					{
 						$name = $this->db_field_name($this->data,$spalte);
-						$this->html.= '<td>'.$this->convert_html_chars($row->$name).'</td>';
+						if ($parseHtml) {
+							// HTML direkt rendern
+							$this->html .= '<td>'.($row->$name).'</td>';
+						} else {
+							// wie bisher escapen
+							$this->html .= '<td>'.$this->convert_html_chars($row->$name).'</td>';
+						}
 						// Umwandeln von Punkt in Komma bei Float-Werten
 						if (is_numeric($row->$name))
 						{

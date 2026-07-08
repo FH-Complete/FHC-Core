@@ -27,7 +27,7 @@ export default {
 	<li class="form-upload-dms-item">
 		<span class="col-auto"><i class="fa fa-file me-1"></i></span>
 		<span class="col">{{ modelValue.name }}</span>
-		<a v-if="preview" :href="preview" target="_blank" class="col-auto btn btn-outline-secondary btn-p-0 me-1">
+		<a v-if="preview" :href="preview" target="_blank" class="col-auto btn btn-outline-secondary btn-p-0 me-2">
 			<i class="fa fa-download"></i>
 		</a>
 		<button class="col-auto btn btn-outline-secondary btn-p-0" @click="$emit('delete')">

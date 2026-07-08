@@ -63,6 +63,7 @@ class Profil_update_model extends DB_Model
 		$this->addSelect(["public.tbl_profil_update.*", "public.tbl_person.vorname"]);
 		$this->addJoin("public.tbl_benutzer", "public.tbl_benutzer.uid = public.tbl_profil_update.uid");
 		$this->addJoin("public.tbl_person", "public.tbl_person.person_id = public.tbl_benutzer.person_id");
+		$this->db->order_by('COALESCE(public.tbl_profil_update.updateamum, public.tbl_profil_update.insertamum)', 'DESC', false);
 		$res = $this->loadWhere($whereClause);
 		if (isError($res)) {
 			return $res;
@@ -118,13 +119,48 @@ class Profil_update_model extends DB_Model
 			$parameters = [];
 			$query = "
 			SELECT
-			profil_update_id, tbl_profil_update.uid, (tbl_person.vorname || ' ' || tbl_person.nachname) AS name , topic, requested_change, tbl_profil_update.updateamum, tbl_profil_update.updatevon, tbl_profil_update.insertamum, tbl_profil_update.insertvon, status, public.tbl_profil_update_status.bezeichnung_mehrsprachig[(" . $lang . ")] as status_translated, status_timestamp, status_message, attachment_id 
+				profil_update_id,
+				tbl_profil_update.uid,
+				(tbl_person.vorname || ' ' || tbl_person.nachname) AS name ,
+				topic,
+				requested_change,
+				tbl_profil_update.updateamum,
+				tbl_profil_update.updatevon,
+				tbl_profil_update.insertamum,
+				tbl_profil_update.insertvon,
+				status,
+				public.tbl_profil_update_status.bezeichnung_mehrsprachig[(" . $lang . ")] as status_translated,
+				status_timestamp,
+				status_message,
+				attachment_id,
+				UPPER(public.tbl_studiengang.typ || public.tbl_studiengang.kurzbz) AS studiengang,
+				COALESCE(of.orgform_kurzbz, public.tbl_studiengang.orgform_kurzbz) AS orgform,
+				NULL as oezuordnung,
+				tbl_student.semester
 			FROM public.tbl_profil_update
 			JOIN public.tbl_profil_update_status ON public.tbl_profil_update_status.status_kurzbz = public.tbl_profil_update.status 
 			JOIN public.tbl_student ON public.tbl_student.student_uid=public.tbl_profil_update.uid
 			JOIN public.tbl_benutzer ON public.tbl_benutzer.uid = public.tbl_student.student_uid
 			JOIN public.tbl_person ON public.tbl_benutzer.person_id=public.tbl_person.person_id
 			JOIN public.tbl_studiengang ON public.tbl_studiengang.studiengang_kz=public.tbl_student.studiengang_kz
+			LEFT JOIN (
+				select
+					pss.prestudent_id, COALESCE(sp.orgform_kurzbz, pss.orgform_kurzbz) as orgform_kurzbz
+				from (
+					select
+						prestudent_id, max(insertamum) as insertamum
+					from
+						public.tbl_prestudentstatus
+					where
+						datum <= NOW()
+					group by
+						prestudent_id
+				) mpss
+				join
+					public.tbl_prestudentstatus pss on pss.prestudent_id  = mpss.prestudent_id and pss.insertamum = mpss.insertamum
+				left join
+					lehre.tbl_studienplan sp on pss.studienplan_id = sp.studienplan_id
+			) of ON of.prestudent_id = public.tbl_student.prestudent_id
 			Where public.tbl_studiengang.oe_kurzbz IN ? ";
 			$parameters[] = $oe_berechtigung;
 			if ($whereClause) {
@@ -144,12 +180,33 @@ class Profil_update_model extends DB_Model
 			}
 		}
 		if ($mitarbeiterBerechtigung) {
-			$this->addSelect(["profil_update_id", "tbl_profil_update.uid", "(tbl_person.vorname || ' ' || tbl_person.nachname) AS name", "topic", "requested_change", "tbl_profil_update.updateamum", "tbl_profil_update.updatevon", "tbl_profil_update.insertamum", "tbl_profil_update.insertvon", "status", "public.tbl_profil_update_status.bezeichnung_mehrsprachig[(" . $lang . ")] AS status_translated", "status_timestamp", "status_message", "attachment_id"]);
+			$this->addSelect([
+				"profil_update_id",
+				"tbl_profil_update.uid",
+				"(tbl_person.vorname || ' ' || tbl_person.nachname) AS name",
+				"topic",
+				"requested_change",
+				"tbl_profil_update.updateamum",
+				"tbl_profil_update.updatevon",
+				"tbl_profil_update.insertamum",
+				"tbl_profil_update.insertvon",
+				"status",
+				"public.tbl_profil_update_status.bezeichnung_mehrsprachig[(" . $lang . ")] AS status_translated",
+				"status_timestamp",
+				"status_message",
+				"attachment_id",
+				"COALESCE(NULL) as studiengang",
+				"COALESCE(NULL) as orgform",
+				"oe.bezeichnung as oezuordnung"
+			]);
 			$this->addJoin('tbl_profil_update_status', 'tbl_profil_update_status.status_kurzbz=tbl_profil_update.status');
 			$this->addJoin('tbl_mitarbeiter', 'tbl_mitarbeiter.mitarbeiter_uid=tbl_profil_update.uid');
 			$this->addJoin('tbl_benutzer', 'tbl_benutzer.uid=tbl_profil_update.uid');
 			$this->addJoin('tbl_person', 'tbl_benutzer.person_id=tbl_person.person_id');
+			$this->addJoin('tbl_benutzerfunktion bf', 'bf.uid = tbl_benutzer.uid AND bf.funktion_kurzbz = \'oezuordnung\' AND NOW() >= COALESCE(bf.datum_von, \'1970-01-01\'::date) AND NOW() <= COALESCE(bf.datum_bis, \'2170-12-31\'::date)', 'LEFT');
+			$this->addJoin('tbl_organisationseinheit oe', 'oe.oe_kurzbz = bf.oe_kurzbz', 'LEFT');
 			$mitarbeiterRequests = $this->loadWhere($whereClause);
+
 			if (isError($mitarbeiterRequests))
 				return error("db error: " . getData($mitarbeiterRequests));
 			$mitarbeiterRequests = getData($mitarbeiterRequests) ?: [];
@@ -179,8 +236,11 @@ class Profil_update_model extends DB_Model
 	private function formatProfilRequest($request)
 	{
 		$request->requested_change = json_decode($request->requested_change);
+		$request->insertamum_iso = !is_null($request->insertamum) ? date_create($request->insertamum)->format('Y-m-d') : null;
 		$request->insertamum = !is_null($request->insertamum) ? date_create($request->insertamum)->format('d.m.Y') : null;
+		$request->updateamum_iso = !is_null($request->updateamum) ? date_create($request->updateamum)->format('Y-m-d') : null;
 		$request->updateamum = !is_null($request->updateamum) ? date_create($request->updateamum)->format('d.m.Y') : null;
+		$request->status_timestamp_iso = !is_null($request->status_timestamp) ? date_create($request->status_timestamp)->format('Y-m-d') : null;
 		$request->status_timestamp = !is_null($request->status_timestamp) ? date_create($request->status_timestamp)->format('d.m.Y') : null;
 	}
 

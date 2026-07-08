@@ -13,7 +13,7 @@ class ProfilUpdate extends Auth_Controller
 	{
 		parent::__construct([
 			'index' => ['student/stammdaten:r', 'mitarbeiter/stammdaten:r'],
-			'show' => ['basis/cis:r'],
+			'show' => ['student/stammdaten:r', 'mitarbeiter/stammdaten:r', 'basis/cis:r'],
 			'id' => ['student/stammdaten:r', 'mitarbeiter/stammdaten:r']
 		]);
 

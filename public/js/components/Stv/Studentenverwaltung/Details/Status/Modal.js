@@ -185,27 +185,13 @@ export default{
 			.then(result => this.statusgruende = result.data)
 			.catch(this.$fhcAlert.handleSystemError);
 
-		//TODO(Manu) check why it is/was hard coded
 		this.$api
 			.call(ApiStvStatus.getStati())
 			.then(result => this.stati = result.data)
 			.catch(this.$fhcAlert.handleSystemError);
-/*		this.stati = [
-			{ status_kurzbz: 'Interessent', bezeichnung: 'Interessent'},
-			{ status_kurzbz: 'Bewerber', bezeichnung: 'Bewerber'},
-			{ status_kurzbz: 'Aufgenommener', bezeichnung: 'Aufgenommener'},
-			{ status_kurzbz: 'Student', bezeichnung: 'Student'},
-			{ status_kurzbz: 'Unterbrecher', bezeichnung: 'Unterbrecher'},
-			{ status_kurzbz: 'Diplomand', bezeichnung: 'Diplomand'},
-			{ status_kurzbz: 'Incoming', bezeichnung: 'Incoming'},
-			{ status_kurzbz: 'Absolvent', bezeichnung: 'Absolvent'},
-			{ status_kurzbz: 'Abbrecher', bezeichnung: 'Abbrecher'},
-			{ status_kurzbz: 'Abgewiesener', bezeichnung: 'Abgewiesener'},
-			{ status_kurzbz: 'Wartender', bezeichnung: 'Wartender'}
-		];*/
 	},
 	template: `
-	<bs-modal class="stv-status-modal" ref="modal">
+	<bs-modal class="stv-status-modal" ref="modal" dialog-class="modal-dialog-scrollable">
 		<template #title>
 			{{ $p.t('lehre', statusNew ? 'status_new' : 'status_edit', prestudent) }}
 		</template>
@@ -220,7 +206,7 @@ export default{
 			<p v-if="bisLocked && isStatusBeforeStudent">
 				<b>{{$p.t('bismeldestichtag', 'info_MeldestichtagStatusgrundSemester')}}</b>
 			</p>
-			
+
 			<form-input
 				container-class="mb-3"
 				type="select"
@@ -353,7 +339,6 @@ export default{
 				v-model="formData.anmerkung"
 				name="anmerkung"
 				:label="$p.t('global/anmerkung')"
-				:disabled="bisLocked"
 				>
 			</form-input>
 			<form-input

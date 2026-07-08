@@ -9,6 +9,8 @@
 	$title = isset($title) ? $title : null;
 	$refresh = isset($refresh) ? $refresh : null;
 	$customCSSs = isset($customCSSs) ? $customCSSs : null;
+	$customJSs = isset($customJSs) ? $customJSs : null;
+	$customJSModules = isset($customJSModules) ? $customJSModules : null;
 	$skipID = isset($skipID) ? $skipID : null;
 ?>
 <!-- Header start -->
@@ -132,8 +134,11 @@
 			//Tags
 			if ($tags === true) generateCSSsInclude('public/css/tags.css');
 
+			$extapphelper = ExtendableAppsHelper::getInstance();
+			$extapphelper->init($customCSSs, $customJSs, $customJSModules);
+
 			// Eventually required CSS
-			generateCSSsInclude($customCSSs); // Eventually required CSS
+			generateCSSsInclude($extapphelper->getCustomCSSs()); // Eventually required CSS
 		?>
 	</head>
 	<body>

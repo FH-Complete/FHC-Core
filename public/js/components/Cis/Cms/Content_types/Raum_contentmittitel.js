@@ -100,6 +100,11 @@ export default {
 				link_element.href = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/CisVue/Cms/getRoomInformation/" + room_name;
 				link_element.appendChild(title.cloneNode(true));
 				title.replaceWith(link_element);
+
+				let lvplanlinks = document.querySelectorAll('.menubox a[href*="stpl_week.php"]');
+				for(let lvplanlink of lvplanlinks) {
+					lvplanlink.href = link_element.href;
+				}
 			}
 			else
 			{

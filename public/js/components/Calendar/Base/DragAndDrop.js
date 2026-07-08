@@ -20,7 +20,8 @@ export default {
 	},
 	inject: {
 		mode: "mode",
-		dropableEvents: "dropableEvents"
+		dropableEvents: "dropableEvents",
+		timezone: "timezone"
 	},
 	props: {
 		events: Array,
@@ -96,8 +97,11 @@ export default {
 	},
 	methods: {
 		onDragstart(evt) {
-			DragAndDrop.setTransferData(evt.detail.originalEvent, evt.detail.item.orig);
-			this.draggedInternalEvent = evt.detail.item;
+			const data = DragAndDrop.convertToTransferData(evt.detail.item.orig);
+			if (DragAndDrop.isValidDragObject(data)) {
+				DragAndDrop.setTransferData(evt.detail.originalEvent, data);
+				this.draggedInternalEvent = evt.detail.item;
+			}
 		},
 		onDragend() {
 			this.draggedInternalEvent = null;

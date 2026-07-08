@@ -169,6 +169,10 @@ class Lehreinheit extends FHCAPI_Controller
 		{
 			$value = $this->input->post($field);
 
+			if ($field === 'lehre')
+			{
+				$value = (bool)$value;
+			}
 			if ($value !== null)
 			{
 				$updateData[$field] = $value;
@@ -281,15 +285,43 @@ class Lehreinheit extends FHCAPI_Controller
 	public function delete()
 	{
 		$lehreinheit_id = $this->input->post('lehreinheit_id');
-		$lehreinheit = $this->checkLehreinheit($lehreinheit_id);
-		$this->checkPermission($lehreinheit->lehreinheit_id);
 
-		$result = $this->_ci->LehreinheitModel->deleteLehreinheit($lehreinheit->lehreinheit_id);
+		$errors = array();
+		if (is_array($lehreinheit_id))
+		{
+			foreach ($lehreinheit_id as $le_id)
+			{
+				$lehreinheit = $this->checkLehreinheit($le_id);
+				$this->checkPermission($lehreinheit->lehreinheit_id);
 
-		if (isError($result))
-			$this->terminateWithValidationErrors(getError($result));
+				$result = $this->_ci->LehreinheitModel->deleteLehreinheit($lehreinheit->lehreinheit_id);
 
-		$this->terminateWithSuccess('Erfolgreich geloescht');
+				if (isError($result))
+				{
+					$errors[] = getError($result);
+				}
+			}
+		}
+		else
+		{
+			$lehreinheit = $this->checkLehreinheit($lehreinheit_id);
+			$this->checkPermission($lehreinheit->lehreinheit_id);
+
+			$result = $this->_ci->LehreinheitModel->deleteLehreinheit($lehreinheit->lehreinheit_id);
+
+			if (isError($result))
+				$this->terminateWithError(getError($result));
+		}
+
+		if (!isEmptyArray($errors))
+		{
+			if (count($errors) !== count($lehreinheit_id))
+				$this->terminateWithSuccess(array('errors' => $errors));
+			else
+				$this->terminateWithError($errors);
+		}
+		else
+			$this->terminateWithSuccess('Erfolgreich geloescht');
 	}
 
 	public function update()

@@ -170,6 +170,7 @@ export default {
 				return this.$attrs.modelValue;
 			},
 			set(v) {
+				this.clearValidationForThisName()
 				if (!this.$attrs.hasOwnProperty('modelValue'))
 					this.modelValueDummy = v;
 				this.$emit('update:modelValue', v);
@@ -242,9 +243,9 @@ export default {
 	template: `
 	<component :is="!hasContainer ? 'FhcFragment' : 'div'" class="position-relative" :class="autoContainerClass">
 		<label v-if="label && lcType != 'radio' && lcType != 'checkbox'" :class="!noAutoClass && 'form-label'" :for="idCmp">{{label}}</label>
-		<input v-if="tag == 'input'" :type="lcType" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)">
-		<textarea v-else-if="tag == 'textarea'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)"></textarea>
-		<select v-else-if="tag == 'select'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)">
+		<input v-if="tag == 'input'" :type="lcType" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="$emit('input', $event)">
+		<textarea v-else-if="tag == 'textarea'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="$emit('input', $event)"></textarea>
+		<select v-else-if="tag == 'select'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="$emit('input', $event)">
 			<slot></slot>
 		</select>
 		<component
@@ -280,6 +281,7 @@ export default {
 			<template #chip="data"><slot name="chip" v-bind="data"></slot></template>
 			<template #header="data"><slot name="header" v-bind="data"></slot></template>
 			<template #footer="data"><slot name="footer" v-bind="data"></slot></template>
+			<template #selectedItem="data"><slot name="selectedItem" v-bind="data"></slot></template>
 			<template #option="data"><slot name="option" v-bind="data"></slot></template>
 			<template #optiongroup="data"><slot name="optiongroup" v-bind="data"></slot></template>
 			<template #content="data"><slot name="content" v-bind="data"></slot></template>

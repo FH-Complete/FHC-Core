@@ -286,7 +286,13 @@ EOSQL;
 			foreach( $rows as $row ) {
 				$tmpgb = new Gehaltsbestandteil();
 				$tmpgb->hydrateByStdClass($row, true);
-				
+
+				if ($row->betrag_valorisiert != null && $row->valorisierungsdatum != null 
+					&& $row->valorisierungsdatum == $row->von) {
+					// neuer Gehaltsbestandteil mit Valorisierungsdatum aber auch valorisiert
+					$tmpgb->setGrundbetrag($row->betrag_valorisiert);
+				}
+
 				// prevent duplication (caused by the join with historic values)
 				if (!isset($lastRecords[(string)$row->gehaltsbestandteil_id])) {
 					$gehaltsbestandteile[] = $tmpgb;

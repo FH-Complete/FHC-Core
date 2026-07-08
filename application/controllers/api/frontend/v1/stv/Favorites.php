@@ -60,17 +60,6 @@ class Favorites extends FHCAPI_Controller
 
 		$favorites = $this->input->post('favorites');
 
-		$removed = [];
-		while (strlen($favorites) > 64) {
-			$favObj = json_decode($favorites);
-			if (!$favObj->list)
-				break;
-			$removed[] = array_shift($favObj->list);
-			$favorites = json_encode($favObj);
-		}
-		if ($removed)
-			$this->addMeta('removed', $removed);
-
 		$result = $this->VariableModel->setVariable(getAuthUID(), 'stv_favorites', $favorites);
 
 		$this->getDataOrTerminateWithError($result);

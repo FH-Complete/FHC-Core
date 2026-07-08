@@ -243,4 +243,20 @@ class Organisationseinheit_model extends DB_Model
 
 		return $this->execReadOnlyQuery($qry, array($oe_kurzbz));
 	}
+	
+	public function getAssistenzForOE($oe_kurzbz) {
+		$qry = "
+			SELECT person_id, uid, benutzerfunktion_id, funktion_kurzbz, oe_kurzbz, alias, 
+       			anrede, trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first
+			FROM tbl_benutzerfunktion
+					 JOIN public.tbl_benutzer USING(uid)
+					 JOIN public.tbl_person USING(person_id)
+			WHERE funktion_kurzbz = 'ass'
+				AND oe_kurzbz = ?
+				AND (datum_bis IS NULL OR NOW() <= datum_bis)
+				AND public.tbl_benutzer.aktiv = true
+		";
+
+		return $this->execReadOnlyQuery($qry, array($oe_kurzbz));
+	}
 }

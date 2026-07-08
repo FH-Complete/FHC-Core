@@ -26,16 +26,6 @@ export default {
 			default: true
 		}
 	},
-	computed: {
-		formattedAnmerkung: {
-			get() {
-				return (this.data.anmerkung || '').replace(/\\n/g, '\n');
-			},
-			set(value) {
-				this.data.anmerkung = (value || '').replace(/\n/g, '\\n');
-			}
-		}
-	},
 	template: `
 	<div>
 		<div class="row mb-3">
@@ -74,7 +64,7 @@ export default {
 				:label="$p.t('lehre', 'detailanmerkung')"
 				type="textarea"
 				container-class="col-3"
-				v-model="formattedAnmerkung"
+				v-model="data.anmerkung"
 				name="anmerkung"
 				id="anmerkung"
 				rows="10"

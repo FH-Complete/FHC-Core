@@ -46,11 +46,12 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 	<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css">
-	<script type="text/javascript" src="../../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
-	<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
 	<script type="text/javascript" src="../../../vendor/jquery/sizzle/sizzle.js"></script>';
+
+	include('../../../include/meta/jquery.php');
+	include('../../../include/meta/jquery-tablesorter.php');
 
 const MOODLE_ADDON_KURZBZ = 'moodle';
 
@@ -71,7 +72,7 @@ echo '
 			    $("#myTable").tablesorter(
 				{
 					sortList: [[0,0],[1,0]],
-					widgets: [\'zebra\']
+					widgets: [\'zebra\',\'filter\']
 				});
 			}
 		);
@@ -151,8 +152,9 @@ foreach($service->result as $row)
 		$person = new person();
 		$person->getPersonFromBenutzer($row->operativ_uid);
 		$operativ = $person->nachname.' '.$person->vorname;
+		$oeBez = new organisationseinheit($row->oe_kurzbz);
 		echo '<tr>';
-		echo '<td>',$row->oe_kurzbz,'</td>';
+		echo '<td>',$oeBez->bezeichnung,'</td>';
 		echo '<td><b>'.$row->bezeichnung.'</b></td>';
 		echo '<td>',$row->beschreibung,'</td>';
 		echo '<td><nobr><a href="../profile/index.php?uid='.$row->design_uid.'">',$design,'</a></nobr></td>';

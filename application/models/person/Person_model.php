@@ -151,12 +151,21 @@ class Person_model extends DB_Model
 	 */
 	public function searchPerson($filter)
 	{
-		$this->addSelect('vorname, nachname, gebdatum, person_id');
+		$this->addSelect('vorname, nachname, gebdatum, person_id, titelpre, titelpost');
+		$this->addSelect("CASE
+				WHEN EXISTS
+					(SELECT 1 FROM public.tbl_benutzer JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid) WHERE person_id=tbl_person.person_id)
+				THEN 'Mitarbeiter'
+				WHEN EXISTS
+					(SELECT 1 FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE person_id=tbl_person.person_id)
+				THEN 'Student'
+				ELSE 'Person'
+			END AS status");
 		$result = $this->loadWhere(
-			'lower(nachname) like '.$this->db->escape('%'.$filter.'%')."
+			'lower(nachname) like '.$this->db->escape('%'.mb_strtolower($filter).'%')."
 			OR lower(vorname) like ".$this->db->escape('%'.$filter.'%')."
-			OR lower(nachname || ' ' || vorname) like ".$this->db->escape('%'.$filter.'%')."
-			OR lower(vorname || ' ' || nachname) like ".$this->db->escape('%'.$filter.'%')
+			OR lower(nachname || ' ' || vorname) like ".$this->db->escape('%'.mb_strtolower($filter).'%')."
+			OR lower(vorname || ' ' || nachname) like ".$this->db->escape('%'.mb_strtolower($filter).'%')
 		);
 
 		return $result;
@@ -410,5 +419,18 @@ class Person_model extends DB_Model
 		} else if (isSuccess($result) && hasData($result)) {
 			return success($result);
 		}
+	}
+
+	public function loadAllStudentUIDSForPersonID($person_id) {
+		$qry = "SELECT
+			CONCAT(tp.vorname, ' ', tp.nachname) AS name,
+			ARRAY_AGG(DISTINCT b.uid ORDER BY b.uid) AS uids
+		FROM public.tbl_student s
+				 JOIN public.tbl_benutzer b ON s.student_uid = b.uid
+				 JOIN public.tbl_person tp ON b.person_id = tp.person_id
+		GROUP BY tp.vorname, tp.nachname, b.aktiv, b.person_id
+		HAVING b.person_id = ? AND b.aktiv IS TRUE;";
+		
+		return $this->execReadOnlyQuery($qry, [$person_id]);
 	}
 }

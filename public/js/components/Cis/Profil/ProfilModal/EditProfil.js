@@ -14,6 +14,10 @@ export default {
 	},
 	mixins: [BsModal],
 	props: {
+		isMitarbeiter: {
+			type: Boolean,
+			default: false
+		},
 		value: Object,
 		titel: String,
 		zustelladressenCount: Function,
@@ -47,6 +51,7 @@ export default {
 	provide() {
 		return {
 			updateFileID: this.updateFileIDFunction,
+			isMitarbeiter: this.isMitarbeiter
 		};
 	},
 

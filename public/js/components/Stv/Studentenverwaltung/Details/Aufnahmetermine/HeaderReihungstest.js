@@ -50,11 +50,24 @@ export default {
 					this.listAufnahmetermine = result.data;
 
 					const listAufnahmetermineFiltered = this.listAufnahmetermine
-						.filter(item => item.studiengangkurzbzlang == this.student.studiengang)
+						.filter(item => item.studiengang_kz_ber == this.student.studiengang_kz)
 						.sort((a, b) => this.parseSemester(b.studiensemester) - this.parseSemester(a.studiensemester));
-					const elementSemYoungest = listAufnahmetermineFiltered[0];
 
-					this.formData.rt_gesamtpunkte = elementSemYoungest.punkte;
+					let pointsSemStg = 0;
+
+					if(listAufnahmetermineFiltered.length > 0){
+
+						const youngestSemester = listAufnahmetermineFiltered[0].studiensemester;
+
+						//sum of all rt-points of studiengang of youngest sem
+						pointsSemStg = listAufnahmetermineFiltered
+							.filter(item => item.studiensemester === youngestSemester)
+							.reduce((sum, item) => sum + (Number(item.punkte) || 0), 0);
+					}
+					else
+						pointsSemStg = 0;
+
+					this.formData.rt_gesamtpunkte = pointsSemStg;
 
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -91,8 +104,8 @@ export default {
 	},
 	template: `
 		<div class="stv-details-admission-header-placement h-100 pb-3">
-			<h4>{{ $p.t('lehre', 'studiengang') }}</h4>
-						
+			<h4>{{ $p.t('lehre', 'studiengang') }}</h4> {{student.studiengang}}
+
 			<form-form class="mt-3" ref="formRtGesamtData" @submit.prevent>
 				<div v-if="showAufnahmegruppen" class="row mb-3">
 					<div class="col-1">

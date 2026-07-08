@@ -1,0 +1,30 @@
+.fhc-app-menu {
+	display: flex;
+	flex-direction: column;
+	padding-left: 0;
+	margin: calc(var(--bs-offcanvas-padding-y) * -1) calc(var(--bs-offcanvas-padding-x) * -1);
+}
+.fhc-app-menu li {
+	display: block;
+	border: var(--bs-border-width) solid var(--bs-border-color);
+}
+.fhc-app-menu li + li {
+	border-top-width: 0;
+}
+.fhc-app-menu li a {
+	display: block;
+	padding: .5rem 1rem;
+	text-decoration: none;
+}
+.fhc-app-menu li a.disabled {
+	--bs-link-opacity: .5;
+}
+.fhc-app-menu li a.active,
+.fhc-app-menu li a:hover {
+	--bs-link-color-rgb: var(--bs-link-hover-color-rgb);
+	background: var(--surface-hover);
+}
+.fhc-app-menu li a.disabled,
+.fhc-app-menu li a.active {
+	pointer-events: none;
+}

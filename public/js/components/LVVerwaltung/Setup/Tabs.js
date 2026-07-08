@@ -47,6 +47,7 @@ export default {
 				<fhc-tabs 
 					v-if="lv.length === 1"
 					ref="tabs"
+					:useprimevue="true"
 					:modelValue="lv[0]"
 					:config="configLVTabs"
 					:default="$route.params.tab"

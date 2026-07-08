@@ -1172,8 +1172,8 @@ if ($frage_id != '')
 	echo "</td></tr>";
 	//Vorschau fuer das Text-Feld
 	echo "<tr><td style='width: 50%'>Vorschau:<br />
-			<div id='vorschau_frage' style='border: 1px solid black' align='center'>$frage->text</div></td>
-			<td style='width: 50%'>Derzeit:<br /><div id='aktuell' style='border: 1px solid black' align='center'>$frage->text</div>
+			<div id='vorschau_frage' style='border: 1px solid black; padding: 5px' align='center'>$frage->text</div></td>
+			<td style='width: 50%'>Derzeit:<br /><div id='aktuell' style='border: 1px solid black; padding: 5px' align='center'>$frage->text</div>
 			</td></tr>";
 	echo "</table>";
 	echo '</td><td style="border-left: 1px solid black" valign="top">';
@@ -1280,8 +1280,8 @@ if ($frage_id != '')
 	echo "/></td></tr>";
 	echo "<tr><td colspan='2' align='right'><input type='submit' name='submitvorschlag' value='Speichern' />".($vorschlag_id != ''?"<input type='button' value='Abbrechen' onclick=\"document.location.href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$nummer&amp;frage_id=$frage->frage_id'\" />":'')."</td></tr>";
 	//Vorschau fuer das Text-Feld
-	echo "<tr><td colspan='2'>Vorschau:<br /><div id='vorschau_vorschlag' style='border: 1px solid black' align='center'>$vorschlag->text</div>
-			Derzeit:<br /><div id='aktuellvorschlag' style='border: 1px solid black' align='center'>$vorschlag->text</div></td></tr>";
+	echo "<tr><td colspan='2'>Vorschau:<br /><div id='vorschau_vorschlag' style='border: 1px solid black; padding: 5px' align='center'>$vorschlag->text</div>
+			Derzeit:<br /><div id='aktuellvorschlag' style='border: 1px solid black; padding: 5px' align='center'>$vorschlag->text</div></td></tr>";
 	echo "</table>";
 	echo "</form>";
 	echo '</td></tr></table>';
