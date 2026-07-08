@@ -1,11 +1,12 @@
-import FhcSearchbar from "../components/searchbar/searchbar.js";
-import CisMenu from "../components/Cis/Menu.js";
-import PluginsPhrasen from '../plugins/Phrasen.js';
-import ApiSearchbar from '../api/factory/searchbar.js';
-import Theme from "../plugins/Theme.js";
+import FhcSearchbar from "../../components/searchbar/searchbar.js";
+import CisMenu from "../../components/Cis/Menu.js";
+import PluginsPhrasen from '../../plugins/Phrasen.js';
+import Theme from "../../plugins/Theme.js";
+import ApiSearchbar from '../../api/factory/searchbar.js';
+import ApiLvPlan from "../../api/factory/lvPlan.js";
 
 const app = Vue.createApp({
-    name: 'CisApp',
+    name: 'CisMenuApp',
     components: {
         FhcSearchbar,
         CisMenu
@@ -133,14 +134,61 @@ const app = Vue.createApp({
 						childactions: []
 					}
                 }
-            }
+            },
+			windowWidth: 0,
         };
     },
+	provide() {
+		return {
+			isNarrow: Vue.computed(() => this.windowWidth < 992),
+			isMobile: Vue.computed(() => this.windowWidth < 767),
+		}
+	},
     methods: {
         searchfunction: function(searchsettings) {
         	return this.$api.call(ApiSearchbar.searchCis(searchsettings));
-        }
-    }
+        },
+		handleWindowResize() {
+			this.windowWidth = window.innerWidth;
+		},
+    },
+	created() {
+		this.windowWidth = window.innerWidth;
+	},
+	async mounted() {
+		const openOtherLvPlanAction = {
+			label: Vue.computed(() => this.$p.t("lehre/stundenplan")),
+			icon: "fas fa-calendar-days",
+			type: "link",
+			action: function (data) {
+				const uid = JSON.parse(data.data).uid;
+				const link =
+					FHC_JS_DATA_STORAGE_OBJECT.app_root +
+					FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+					"/Cis/OtherLvPlan/" +
+					uid;
+				return link;
+			},
+		};
+		let checkPermissionOtherLvPlanResult = await this.$api.call(
+			ApiLvPlan.checkPermissionOtherLvPlan(),
+		);
+		if (
+			checkPermissionOtherLvPlanResult.meta.status === "success" &&
+			checkPermissionOtherLvPlanResult.data
+		) {
+			this.searchbaroptions.actions.employee.childactions.push(
+				openOtherLvPlanAction,
+			);
+			this.searchbaroptions.actions.student.childactions.push(
+				openOtherLvPlanAction,
+			);
+		}
+		window.addEventListener("resize", this.handleWindowResize);
+	},
+	beforeUnmount() {
+		window.removeEventListener("resize", this.handleWindowResize);
+	},
 });
 
 FhcApps.makeExtendable(app);
