@@ -81,7 +81,7 @@ export default {
 		</div>
 		<div class="event-text" v-tooltip="tooltipString">
 			<span class="event-topic">{{ event.topic }}</span>
-			<span class="event-place">{{ event.ort_kurzbz }}</span>
+			<span data-cy="calendar-event-room" class="event-place">{{ event.ort_kurzbz }}</span>
 			<span
 				v-for="(lektor,index) in event.lektor.slice(0, 3)"
 				class="event-lectors"

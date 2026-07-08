@@ -86,7 +86,7 @@ export default {
 			>
 				... +{{ event.lektor.length - 3 }}
 			</span>
-			<span class="event-place">{{ event.ort_kurzbz }}</span>
+			<span data-cy="calendar-event-room" class="event-place">{{ event.ort_kurzbz }}</span>
 		</div>
 	</div>
 	`,

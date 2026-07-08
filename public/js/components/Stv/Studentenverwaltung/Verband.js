@@ -360,6 +360,7 @@ export default {
 						:title="node.data.studiengang_kz"
 						v-drag-click="() => toggleTreeNode(node)"
 						v-drop:link-strict.student-collection="(evt, students) => dropStudents(node, students)"
+						data-cy="course-tree-row"
 					>
 						{{ node.data.name }}
 					</span>
@@ -368,6 +369,7 @@ export default {
 						:data-tree-item-key="node.key"
 						:title="node.data.studiengang_kz"
 						v-drag-click="() => toggleTreeNode(node)"
+						data-cy="course-tree-row"
 					>
 						{{ node.data.name }}
 					</span>

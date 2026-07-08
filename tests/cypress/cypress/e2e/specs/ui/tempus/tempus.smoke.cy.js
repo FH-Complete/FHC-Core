@@ -44,7 +44,7 @@ context("Tempus smoke tests", () => {
     tempusPage.getEventContextMenu().should("be.visible");
   });
 
-  it("shows Raumauswahl modal when selecting Raumauswahl from event context menu", () => {
+  it("shows room selection modal when selecting 'room selection' from event context menu", () => {
     tempusPage.waitForCalendarToFinishLoading();
     tempusPage
       .getCalendarEventsWithLehreinheit()
@@ -54,7 +54,7 @@ context("Tempus smoke tests", () => {
     tempusPage.getEventContextMenuOption("Raumauswahl").click({ force: true });
     waitForOk("@fetchRoomSuggestions");
 
-    tempusPage.getRaumauswahlModal().should("be.visible");
+    tempusPage.getRoomSelectionModal().should("be.visible");
   });
 
   it("shows resources modal when selecting Ressourcen zuordnen from event context menu", () => {

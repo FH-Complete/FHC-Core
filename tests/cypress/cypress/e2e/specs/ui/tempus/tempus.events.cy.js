@@ -1,5 +1,4 @@
 import { waitForOk } from "../../../../support/helpers/network";
-import { getDateForDay } from "../../../../support/helpers/date";
 import { tempusApi } from "../../../../support/api/tempusApi";
 import {
   LEKTOR,
@@ -13,13 +12,7 @@ context("Tempus event mutation tests", () => {
   beforeEach(() => {
     tempusPage.visitAndWaitForPlanner();
 
-    tempusApi
-      .getPlannerEvents(getDateForDay("monday"), getDateForDay("monday"))
-      .then((events) => {
-        events.forEach((event) => {
-          tempusApi.deleteKalenderEvent(event.kalender_id);
-        });
-      });
+    tempusApi.deletePlannerEventsForDay("monday");
   });
 
   it("room change on planner preview updates planner event, but keeps original room on other previews", () => {
@@ -51,52 +44,16 @@ context("Tempus event mutation tests", () => {
 
         tempusPage.expectCalendarEventRoom(eventId, originalRoom);
 
-        tempusPage
-          .getCalendarEventById(eventId)
-          .should("be.visible")
-          .rightclick();
-        tempusPage.getEventContextMenuOption("Raumauswahl").click({ force: true });
-        waitForOk("@fetchRoomSuggestions");
+        tempusPage.changeEventRoom(eventId, originalRoom).then((result) => {
+          const { newRoom, updatedEventId } = result;
 
-        tempusPage
-          .getRaumauswahlRoomOptions()
-          .should("have.length.greaterThan", 0)
-          .then(($roomOptions) => {
-            const roomOption = [...$roomOptions].find((option) => {
-              const room = option.innerText.trim();
+          tempusPage.expectCalendarEventRoom(updatedEventId, newRoom);
 
-              return room && room !== originalRoom;
-            });
+          tempusPage.selectRoleAndWait(LEKTOR);
+          tempusPage.expectCalendarEventRoom(eventId, originalRoom);
 
-            expect(roomOption, "different room suggestion").to.exist;
-
-            cy.wrap(roomOption.innerText.trim()).as("newRoom");
-            cy.wrap(roomOption).click();
-          });
-
-        cy.wait("@updateCalendarEvent").then((interception) => {
-          expect(interception.response.statusCode).to.eq(200);
-
-          const updatedEventId = tempusPage.getUpdatedKalenderId(interception);
-          expect(updatedEventId, "updated planner event id").to.exist;
-
-          cy.wrap(updatedEventId).as("updatedEventId");
-        });
-        waitForOk("@fetchPlanData");
-        tempusPage.waitForCalendarToFinishLoading();
-
-        cy.get("@newRoom").then((newRoom) => {
-          console.log(eventId)
-          console.log(newRoom)
-          cy.get("@updatedEventId").then((updatedEventId) => {
-            tempusPage.expectCalendarEventRoom(updatedEventId, newRoom);
-
-            tempusPage.selectRoleAndWait(LEKTOR);
-            tempusPage.expectCalendarEventRoom(eventId, originalRoom);
-
-            tempusPage.selectRoleAndWait(STUDENT);
-            tempusPage.expectCalendarEventRoom(eventId, originalRoom);
-          });
+          tempusPage.selectRoleAndWait(STUDENT);
+          tempusPage.expectCalendarEventRoom(eventId, originalRoom);
         });
       });
   });
@@ -128,54 +85,19 @@ context("Tempus event mutation tests", () => {
         expect(originalRoom, "original event room").to.be.a("string").and.not.be
           .empty;
 
-        tempusPage
-          .getCalendarEventById(eventId)
-          .scrollIntoView()
-          .should("be.visible")
-          .rightclick();
-        tempusPage.getEventContextMenuOption("Raumauswahl").click({ force: true });
-        waitForOk("@fetchRoomSuggestions");
+        tempusPage.changeEventRoom(eventId, originalRoom).then((result) => {
+          const { newRoom, updatedEventId } = result;
 
-        tempusPage
-          .getRaumauswahlRoomOptions()
-          .should("have.length.greaterThan", 0)
-          .then(($roomOptions) => {
-            const roomOption = [...$roomOptions].find((option) => {
-              const room = option.innerText.trim();
+          tempusPage.expectCalendarEventRoom(updatedEventId, newRoom);
 
-              return room && room !== originalRoom;
-            });
+          tempusPage.syncAndReloadPlanner();
+          tempusPage.expectCalendarEventRoom(updatedEventId, newRoom);
 
-            expect(roomOption, "different room suggestion").to.exist;
+          tempusPage.selectRoleAndWait(LEKTOR);
+          tempusPage.expectCalendarEventRoom(updatedEventId, newRoom);
 
-            cy.wrap(roomOption.innerText.trim()).as("newRoom");
-            cy.wrap(roomOption).click();
-          });
-
-        cy.wait("@updateCalendarEvent").then((interception) => {
-          expect(interception.response.statusCode).to.eq(200);
-
-          const updatedEventId = tempusPage.getUpdatedKalenderId(interception);
-          expect(updatedEventId, "updated planner event id").to.exist;
-
-          cy.wrap(updatedEventId).as("updatedEventId");
-        });
-        waitForOk("@fetchPlanData");
-        tempusPage.waitForCalendarToFinishLoading();
-
-        cy.get("@newRoom").then((newRoom) => {
-          cy.get("@updatedEventId").then((updatedEventId) => {
-            tempusPage.expectCalendarEventRoom(updatedEventId, newRoom);
-
-            tempusPage.syncAndReloadPlanner();
-            tempusPage.expectCalendarEventRoom(updatedEventId, newRoom);
-
-            tempusPage.selectRoleAndWait(LEKTOR);
-            tempusPage.expectCalendarEventRoom(updatedEventId, newRoom);
-
-            tempusPage.selectRoleAndWait(STUDENT);
-            tempusPage.expectCalendarEventRoom(updatedEventId, newRoom);
-          });
+          tempusPage.selectRoleAndWait(STUDENT);
+          tempusPage.expectCalendarEventRoom(updatedEventId, newRoom);
         });
       });
   });

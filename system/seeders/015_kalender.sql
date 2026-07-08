@@ -177,9 +177,9 @@ VALUES
 (51006, 31),
 (51004, 32);
 
-INSERT INTO public.tbl_variablenname
-(name, defaultwert)
-VALUES('ignore_resources_collisions', 'false');
+-- INSERT INTO public.tbl_variablenname
+-- (name, defaultwert)
+-- VALUES('ignore_resources_collisions', 'false');
 
 INSERT INTO public.tbl_variable
 (name, uid, wert)

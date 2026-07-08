@@ -116,6 +116,7 @@ export default {
 		v-draggable:move.noimage="draggable ? dragKalenderCollection : {}"
 		v-cal-click:event="isHeaderOrFooter ? event : event.orig"
 		@contextmenu.prevent="onRightClick"
+		data-cy="calendar-event"
 	>
 		<div
 			v-if="resizable"

@@ -45,7 +45,7 @@ context("Tempus filter tests", () => {
             selectedRoom,
           );
           cy.wrap($event)
-            .find(".event-place")
+            .find("[data-cy='calendar-event-room']")
             .invoke("text")
             .then((eventPlace) => {
               expect(eventPlace.trim(), "event body room").to.eq(selectedRoom);

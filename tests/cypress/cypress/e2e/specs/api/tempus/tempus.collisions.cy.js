@@ -1,68 +1,34 @@
 import { tempusApi } from "../../../../support/api/tempusApi";
 import { getDateForDay } from "../../../../support/helpers/date";
+import {
+  getTempusTestSemester,
+  TEMPUS_TEST_STUDY_PLAN_SHORT_CODE,
+} from "../../../../support/helpers/tempusTestData";
 
-const TARGETED_STUDY_PLAN_SHORT_CODE = "STG5";
-
-const resetEventsBeforeTest = () => {
-  tempusApi
-    .getPlannerEvents(getDateForDay("monday"), getDateForDay("monday"))
-    .then((events) => {
-      events.forEach((event) => {
-        tempusApi.deleteKalenderEvent(event.kalender_id);
-      });
-    });
-  tempusApi
-    .getPlannerEvents(getDateForDay("tuesday"), getDateForDay("tuesday"))
-    .then((events) => {
-      events.forEach((event) => {
-        if (
-          event.type === "lehreinheit" &&
-          event.beginn === "20:15:00" &&
-          event.ende === "21:00:00"
-        ) {
-          tempusApi.updateKalenderEvent(
-            event.kalender_id,
-            `${event.datum} 19:30`,
-            `${event.datum} 20:15`,
-          );
-        }
-      });
-    });
-  tempusApi
-    .getPlannerEvents(getDateForDay("sunday"), getDateForDay("sunday"))
-    .then((events) => {
-      events.forEach((event) => {
-        if (
-          event.type === "lehreinheit" &&
-          event.beginn === "18:35:00" &&
-          event.ende === "19:20:00" &&
-          event.lektor.some((lector) => lector.kurzbz === "DemoLKT1")
-        ) {
-          tempusApi.updateKalenderEvent(
-            event.kalender_id,
-            `${event.datum} 17:50`,
-            `${event.datum} 18:35`,
-          );
-        }
-      });
-    });
-};
+let TEMPUS_TEST_SEMESTER;
 
 describe("Tempus Kalender API", () => {
+  before(() => {
+    cy.login();
+    getTempusTestSemester().then((semester) => {
+      TEMPUS_TEST_SEMESTER = semester;
+    });
+  });
+
   beforeEach(() => {
     cy.login();
-    resetEventsBeforeTest();
+    tempusApi.resetTempusScenario();
   });
 
   it("event creation works for non collision case", () => {
     tempusApi.getStudyPlansTree().then((stgTree) => {
       let studyPlan = stgTree.find((plan) =>
-        plan.name.includes(TARGETED_STUDY_PLAN_SHORT_CODE),
+        plan.name.includes(TEMPUS_TEST_STUDY_PLAN_SHORT_CODE),
       );
       expect(studyPlan, "study plan for test event creation").to.exist;
 
       tempusApi
-        .getCoursesByStudyPlan(studyPlan.studiengang_kz, "SS2026")
+        .getCoursesByStudyPlan(studyPlan.studiengang_kz, TEMPUS_TEST_SEMESTER)
         .then((courses) => {
           let course = courses.find((course) => course.lehrfach === "MAT");
           expect(course, "course for test event creation").to.exist;
@@ -94,12 +60,12 @@ describe("Tempus Kalender API", () => {
   it("prohibited event creation due to zeitsperre collision", () => {
     tempusApi.getStudyPlansTree().then((stgTree) => {
       let studyPlan = stgTree.find((plan) =>
-        plan.name.includes(TARGETED_STUDY_PLAN_SHORT_CODE),
+        plan.name.includes(TEMPUS_TEST_STUDY_PLAN_SHORT_CODE),
       );
       expect(studyPlan, "study plan for test event creation").to.exist;
 
       tempusApi
-        .getCoursesByStudyPlan(studyPlan.studiengang_kz, "SS2026")
+        .getCoursesByStudyPlan(studyPlan.studiengang_kz, TEMPUS_TEST_SEMESTER)
         .then((courses) => {
           let course = courses.find((course) =>
             course.lektoren.some((lector) => lector.kurzbz === "DemoLKT1"),
@@ -142,12 +108,12 @@ describe("Tempus Kalender API", () => {
   it("prohibited event creation due to student group collision", () => {
     tempusApi.getStudyPlansTree().then((stgTree) => {
       let studyPlan = stgTree.find((plan) =>
-        plan.name.includes(TARGETED_STUDY_PLAN_SHORT_CODE),
+        plan.name.includes(TEMPUS_TEST_STUDY_PLAN_SHORT_CODE),
       );
       expect(studyPlan, "study plan for test event creation").to.exist;
 
       tempusApi
-        .getCoursesByStudyPlan(studyPlan.studiengang_kz, "SS2026")
+        .getCoursesByStudyPlan(studyPlan.studiengang_kz, TEMPUS_TEST_SEMESTER)
         .then((courses) => {
           let course = courses.find(
             (course) =>
@@ -194,12 +160,12 @@ describe("Tempus Kalender API", () => {
 
     tempusApi.getStudyPlansTree().then((stgTree) => {
       let studyPlan = stgTree.find((plan) =>
-        plan.name.includes(TARGETED_STUDY_PLAN_SHORT_CODE),
+        plan.name.includes(TEMPUS_TEST_STUDY_PLAN_SHORT_CODE),
       );
       expect(studyPlan, "study plan for test event creation").to.exist;
 
       tempusApi
-        .getCoursesByStudyPlan(studyPlan.studiengang_kz, "SS2026")
+        .getCoursesByStudyPlan(studyPlan.studiengang_kz, TEMPUS_TEST_SEMESTER)
         .then((courses) => {
           let course = courses.find(
             (course) =>
@@ -252,12 +218,12 @@ describe("Tempus Kalender API", () => {
   it("prohibited event creation due to lector collision", () => {
     tempusApi.getStudyPlansTree().then((stgTree) => {
       let studyPlan = stgTree.find((plan) =>
-        plan.name.includes(TARGETED_STUDY_PLAN_SHORT_CODE),
+        plan.name.includes(TEMPUS_TEST_STUDY_PLAN_SHORT_CODE),
       );
       expect(studyPlan, "study plan for test event creation").to.exist;
 
       tempusApi
-        .getCoursesByStudyPlan(studyPlan.studiengang_kz, "SS2026")
+        .getCoursesByStudyPlan(studyPlan.studiengang_kz, TEMPUS_TEST_SEMESTER)
         .then((courses) => {
           let course = courses.find((course) =>
             course.lektoren.some((lector) => lector.kurzbz === "DemoLKT4"),

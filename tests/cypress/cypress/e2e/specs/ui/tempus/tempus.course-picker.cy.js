@@ -1,18 +1,8 @@
 import { waitForOk } from "../../../../support/helpers/network";
-import { getDateForDay } from "../../../../support/helpers/date";
 import { tempusPage } from "../../../../support/pages/tempus.po";
 import { tempusApi } from "../../../../support/api/tempusApi";
 
 const TARGETED_STUDY_PLAN_SHORT_CODE = "STG5";
-
-const deleteMondayEvents = () =>
-  tempusApi
-    .getPlannerEvents(getDateForDay("monday"), getDateForDay("monday"))
-    .then((events) => {
-      events.forEach((event) => {
-        tempusApi.deleteKalenderEvent(event.kalender_id);
-      });
-    });
 
 context("Tempus course picker tests", () => {
   before(() => {
@@ -61,7 +51,7 @@ context("Tempus course picker tests", () => {
   });
 
   it("can drag and drop one course event into the calendar", () => {
-    deleteMondayEvents();
+    tempusApi.deletePlannerEventsForDay("monday");
     tempusPage.getCalendarSection().should("exist");
     tempusPage.waitForCalendarToFinishLoading();
 
