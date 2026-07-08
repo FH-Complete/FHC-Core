@@ -340,6 +340,40 @@ class benutzerberechtigung extends basis_db
 		return true;
 	}
 
+	protected function hasPreStudentStatusInGracePeriod($uid)
+	{
+		$period = defined('STUDENTS_KEEP_PERMISSIONS_AFTER_USER_INACTIVE_PERIOD')
+				? STUDENTS_KEEP_PERMISSIONS_AFTER_USER_INACTIVE_PERIOD
+				: '0 days';
+		$mapfunc = function($val) {
+			return $this->db_add_param($val);
+		};
+		$roles = defined('STUDENTS_KEEP_PERMISSIONS_AFTER_USER_INACTIVE_ROLES')
+				? implode(', ', array_map($mapfunc, unserialize(STUDENTS_KEEP_PERMISSIONS_AFTER_USER_INACTIVE_ROLES)))
+				: 'NO_DEFINED_ROLE';
+
+		$sql = <<<EOSQL
+			SELECT 
+				1
+			FROM
+				campus.vw_student vs 
+			WHERE
+				vs.uid = {$this->db_add_param($uid)}
+				AND
+				vs.aktiv = false
+				AND
+				public.get_rolle_prestudent(vs.prestudent_id, null) IN ({$roles})
+				AND
+				(vs.updateaktivam + INTERVAL {$this->db_add_param($period)})::date >= CURRENT_DATE
+EOSQL;
+		$result = $this->db_query($sql);
+		if($result && $this->db_num_rows($result) > 0)
+		{
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Laedt die Berechtigungen eines Users
 	 * @param $uid
@@ -355,7 +389,8 @@ class benutzerberechtigung extends basis_db
 			if($row = $this->db_fetch_object($result))
 			{
 				// Wenn die Person nicht aktiv ist dann hat diese auch keine Rechte
-				if($this->db_parse_bool($row->aktiv) == false)
+				if($this->db_parse_bool($row->aktiv) == false
+					&& $this->hasPreStudentStatusInGracePeriod($uid) === false)
 					return false;
 			}
 			else

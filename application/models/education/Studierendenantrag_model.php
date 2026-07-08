@@ -149,6 +149,7 @@ class Studierendenantrag_model extends DB_Model
 		$this->addSelect($this->dbTable . '.grund AS grund');
 		$this->addSelect('s.studierendenantrag_statustyp_kurzbz status');
 		$this->addSelect('s.insertvon status_insertvon');
+		$this->addSelect('s.grund AS status_grund');
 		$this->addSelect('t.bezeichnung[(' . $lang . ')] statustyp');
 		$this->addSelect('p.unruly AS unruly');
 		$this->addSelect($this->dbTable . '.insertamum AS insertamum');
@@ -269,6 +270,7 @@ class Studierendenantrag_model extends DB_Model
 		$this->addSelect($this->dbTable . '.grund');
 		$this->addSelect($this->dbTable . '.dms_id');
 		$this->addSelect('s.insertvon AS status_insertvon');
+		$this->addSelect('s.grund AS status_grund');
 		$this->addSelect(
 			"(SELECT count(1) FROM campus.tbl_studierendenantrag_status WHERE studierendenantrag_id = " .
 			$this->dbTable .
