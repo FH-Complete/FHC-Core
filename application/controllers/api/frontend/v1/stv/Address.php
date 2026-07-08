@@ -31,6 +31,11 @@ class Address extends FHCAPI_Controller
 			'getNations' => self::PERM_LOGGED,
 			'getPlaces' => self::PERM_LOGGED
 		]);
+
+		// Load language phrases
+		$this->loadPhrases([
+			'ui'
+		]);
 	}
 
 	public function getNations()
@@ -53,7 +58,11 @@ class Address extends FHCAPI_Controller
 		
 		$this->form_validation->set_data(['address.plz' => $plz]);
 
-		$this->form_validation->set_rules('address.plz', 'PLZ', 'required|numeric|less_than[10000]');
+		$this->form_validation->set_rules('address.plz', 'PLZ', 'required|numeric|less_than[10000]', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'PLZ']),
+			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'PLZ']),
+			'less_than' => $this->p->t('ui', 'error_fieldLessThan10000', ['field' => 'PLZ'])
+		]);
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());

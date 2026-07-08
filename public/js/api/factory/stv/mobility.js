@@ -51,7 +51,8 @@ export default {
 	deleteMobility(bisio_id) {
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/stv/mobility/deleteMobility/' + bisio_id
+			url: 'api/frontend/v1/stv/mobility/deleteMobility/',
+			params: { bisio_id }
 		};
 	},
 	getLVList(studiengang_kz) {
@@ -108,7 +109,7 @@ export default {
 		return {
 			method: 'post',
 			url: 'api/frontend/v1/stv/mobility/addMobilityPurpose/' + params.bisio_id,
-			params
+			params: params
 		};
 	},
 	deleteMobilitySupport(params) {

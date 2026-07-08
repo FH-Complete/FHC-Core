@@ -24,7 +24,6 @@ class GehaltsbestandteilLib
 		$this->CI = get_instance();
 		$this->CI->load->model('vertragsbestandteil/Gehaltsbestandteil_model', 
 			'GehaltsbestandteilModel');
-		$this->CI->load->library('extensions/FHC-Core-Personalverwaltung/abrechnung/GehaltsLib');
 		$this->GehaltsbestandteilModel = $this->CI->GehaltsbestandteilModel;
 	}
 
@@ -121,10 +120,6 @@ class GehaltsbestandteilLib
 	{
 		$this->setUIDtoPGSQL();
 
-		// delete Gehaltsabrechnung
-		$ret = $this->CI->gehaltslib->deleteAbrechnung($gehaltsbestandteil);
-
-		//
 		$ret = $this->GehaltsbestandteilModel->delete($gehaltsbestandteil->getGehaltsbestandteil_id());
 		
 		if (isError($ret))

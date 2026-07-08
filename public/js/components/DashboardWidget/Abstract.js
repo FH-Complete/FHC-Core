@@ -4,7 +4,10 @@ export default {
 		"width",
 		"height",
 		"configMode",
-		"sharedData"
+		"sharedData",
+		"widgetInfo",
+		"widgetId",
+		"item_data"
 	],
 	emits: [
 		"setConfig",
@@ -24,7 +27,7 @@ export default {
 			set(value) {
 				this.$emit('update:sharedData', value);
 			}
-		}
+		},
 	},
 	methods: {
 		formatDateTime: function(dateTime) {

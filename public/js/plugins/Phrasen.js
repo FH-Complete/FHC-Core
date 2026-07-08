@@ -87,8 +87,10 @@ const phrasen = {
 
 export default {
 	install(app, options) {
-		app.use(OldFhcApi); // TODO(chris): remove at some point
-		app.use(PluginsApi);
+		if (!app.config.globalProperties.$fhcApi)
+			app.use(OldFhcApi); // TODO(chris): remove at some point
+		if (!app.config.globalProperties.$api)
+			app.use(PluginsApi);
 		app.config.globalProperties.$p = {
 			t: phrasen.t,
 			loadCategory: cat => phrasen.loadCategory.call(app, cat),

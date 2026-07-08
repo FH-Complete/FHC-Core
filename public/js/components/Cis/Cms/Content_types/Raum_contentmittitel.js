@@ -12,7 +12,7 @@ export default {
           required:true,
       },
 	  content_id:{
-		type:Number,
+		type: [Number, String],
 	  }
     },
 	methods: {
@@ -100,6 +100,11 @@ export default {
 				link_element.href = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/CisVue/Cms/getRoomInformation/" + room_name;
 				link_element.appendChild(title.cloneNode(true));
 				title.replaceWith(link_element);
+
+				let lvplanlinks = document.querySelectorAll('.menubox a[href*="stpl_week.php"]');
+				for(let lvplanlink of lvplanlinks) {
+					lvplanlink.href = link_element.href;
+				}
 			}
 			else
 			{
@@ -129,7 +134,7 @@ export default {
     template: /*html*/ `
       <!-- div that contains the content -->
 <!--       TODO: test with more img content from cms-->
-      <div v-if="imgContent"><img v-bind="imgContent"></img></div>
+      <div v-if="imgContent"><img v-bind="imgContent"/></div>
       <div v-html="content" v-else-if="content" ></div>
       <p v-else>Content was not found</p>
       `,

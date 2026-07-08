@@ -26,7 +26,7 @@ $vater_bildungsstaat = isset($uhstatData->vater_bildungsstaat) ? $uhstatData->va
 $vater_bildungmax = isset($uhstatData->vater_bildungmax) ? $uhstatData->vater_bildungmax : set_value('vater_bildungmax');
 $readOnly = isset($formMetaData['readOnly']);
 $disabled = $readOnly ? ' disabled' : '';
-$editPermission = isset($formMetaData['editPermission']) && $formMetaData['editPermission'] === true;
+$savePermission = isset($formMetaData['savePermission']) && $formMetaData['savePermission'] === true;
 $deletePermission = isset($formMetaData['deletePermission']) && $formMetaData['deletePermission'] === true;
 $saved = isset($saved) && $saved === true;
 ?>
@@ -51,7 +51,7 @@ $saved = isset($saved) && $saved === true;
 			<?php echo $this->p->t('uhstat', 'uhstat1EinleitungSvnrtext') ?>
 		</p>
 		<br>
-		<?php if ($editPermission): ?>
+		<?php if ($savePermission): ?>
 			<?php if (isset($successMessage) && !isEmptyString($successMessage)): ?>
 				<div class="alert alert-success" id="uhstat_success_alert">
 					<button type="button" class="close" data-dismiss="alert">x</button>
@@ -288,7 +288,7 @@ $saved = isset($saved) && $saved === true;
 					</div>
 				</div>
 			</fieldset>
-			<?php if ($editPermission && !$readOnly): ?>
+			<?php if ($savePermission && !$readOnly): ?>
 				<br>
 				<fieldset>
 					<div class="form-group">

@@ -16,7 +16,10 @@
  */
 
 import person from "./notiz/person.js";
+import lehreinheit from "./notiz/lehreinheit.js";
+
 
 export default {
-    person
+	person,
+	lehreinheit
 };

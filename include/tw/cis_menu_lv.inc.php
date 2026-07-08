@@ -244,10 +244,10 @@ function checkZeilenUmbruch()
 	if(defined('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN') && CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN && $angemeldet
 		&& (!defined('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN_STG') || in_array($lv->studiengang_kz, unserialize(CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN_STG)))
 		&& (!defined('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN_LVA') || in_array($lv->lehrveranstaltung_id, unserialize(CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN_LVA)))
-		&& ($rechte->isBerechtigt('extension/anw_ent_admin')
-				|| $rechte->isBerechtigt('extension/anwesenheit_lektor')
-				|| $rechte->isBerechtigt('extension/anwesenheit_student')
-				|| $rechte->isBerechtigt('extension/anwesenheit_admin')))
+		&& ($rechte->isBerechtigt('extension/anw_r_ent_assistenz')
+				|| $rechte->isBerechtigt('extension/anw_r_lektor')
+				|| $rechte->isBerechtigt('extension/anw_r_student')
+				|| $rechte->isBerechtigt('extension/anw_r_full_assistenz')))
 	{
 		$link='';
 		$text='';
@@ -500,6 +500,27 @@ if((!defined('CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN') || CIS_LEHRVERANSTALTU
 	);
 }
 
+// LV-Evaluierung NEU
+if(defined('CIS_LEHRVERANSTALTUNG_EVALUIERUNG_ANZEIGEN')
+	&& CIS_LEHRVERANSTALTUNG_EVALUIERUNG_ANZEIGEN
+	&& $angemeldet
+	&& (!defined('CIS_EVALUIERUNG_ANZEIGEN_STG') || in_array($lv->studiengang_kz, unserialize(CIS_EVALUIERUNG_ANZEIGEN_STG)))
+	&& ($rechte->isBerechtigt('extension/lvevaluierung_init')))
+{
+	$text='(Pilotphase)';
+
+	$link= APP_ROOT. 'index.ci.php/extensions/FHC-Core-Evaluierung/Initiierung?lehrveranstaltung_id='. urlencode($lv->lehrveranstaltung_id).'&studiensemester_kurzbz='.urlencode($angezeigtes_stsem);
+
+	$menu[]=array
+	(
+		'id'=>'extension_lvevaluierung_menu_initiierung',
+		'position'=>'140',
+		'name'=>$p->t('lvevaluierung/lvevaluierung'). ' - '. strtoupper($p->t('global/neu')),
+		'icon'=>'../../../skin/images/button_lvevaluierung.png',
+		'link'=> $link,
+		'text'=>$text
+	);
+}
 
 //************* Menuepunkte anzeigen ****************
 

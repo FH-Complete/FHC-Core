@@ -20,6 +20,10 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class AuthInfo extends FHCAPI_Controller
 {
+	protected $uid;
+	protected $pid;
+	protected $isMitarbeiter;
+	protected $isStudent;
 
 	/**
 	 * Object initialization
@@ -28,10 +32,16 @@ class AuthInfo extends FHCAPI_Controller
 	{
 		parent::__construct([
 			'getAuthUID' => self::PERM_LOGGED,
+			'getAuthInfo' => self::PERM_LOGGED,
 		]);
+
+		$this->load->model('crm/Student_model', 'StudentModel');
+		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 
 		$this->uid = getAuthUID();
 		$this->pid = getAuthPersonID();
+		$this->isMitarbeiter = getData($this->MitarbeiterModel->isMitarbeiter($this->uid)) ?? false;
+		$this->isStudent = getData($this->StudentModel->isStudent($this->uid)) ?? false;
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -47,6 +57,14 @@ class AuthInfo extends FHCAPI_Controller
 		$this->terminateWithSuccess(['uid'=>$this->uid]);
 	}
 	
-	
+	public function getAuthInfo()
+	{
+		$data = (object) array(
+				'uid' => $this->uid,
+				'isMitarbeiter' => $this->isMitarbeiter,
+				'isStudent' => $this->isStudent
+		);
+		$this->terminateWithSuccess($data);
+	}
 }
 

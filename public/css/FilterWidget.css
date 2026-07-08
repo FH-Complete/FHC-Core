@@ -1,8 +1,15 @@
+:root{
+	--filter-widget-border: var(--fhc-dark, black);
+	--filter-widget-color: var(--fhc-dark, black);
+	--filter-widget-primary: var(--fhc-primary, #428bca);
+	--filter-widget-border-light: var(--fhc-border, #ddd);
+}
+
 .filter-name-title {
 	font-family: inherit;
 	font-size: 16px;
 	line-height: 1.1;
-	color: black;
+	color: var(--filter-widget-color);
 }
 
 .panel-title {
@@ -26,7 +33,7 @@
 }
 
 .drag-and-drop-fields-span {
-	border: 1px solid black;
+	border: 1px solid var(--filter-widget-border);
 	border-radius: 7px;
 	margin-right: 6px;
 	margin-bottom: 10px;
@@ -64,7 +71,7 @@
 	right: 100%;
 	height: 100%;
 	margin-right: 3px;
-	border-left: 2px solid #428bca;
+	border-left: 2px solid var(--filter-widget-primary);
 }
 
 .selection-after::after {
@@ -74,7 +81,7 @@
 	left: 100%;
 	height: 100%;
 	margin-left: 3px;
-	border-right: 2px solid #428bca;
+	border-right: 2px solid var(--filter-widget-primary);
 }
 
 .applied-filter-operation {
@@ -139,10 +146,10 @@
 
 .up-down-border {
 	border-top-width: 1px;
-	border-top-color: #ddd;
+	border-top-color: var(--filter-widget-border-light);
 	border-top-style: solid;
 	border-bottom-width: 1px;
-	border-bottom-color: #ddd;
+	border-bottom-color: var(--filter-widget-border-light);
 	border-bottom-style: solid;
 }
 

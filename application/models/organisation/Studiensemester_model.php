@@ -341,4 +341,10 @@ class Studiensemester_model extends DB_Model
 		WHERE studiensemester_kurzbz = ?",[$studiensemester_kurzbz]);
 
 	}
+
+	public function isValidStudiensemester($studiensemester_kurzbz)
+	{
+		$result = $this->load($studiensemester_kurzbz);
+		return hasData($result);
+	}
 }

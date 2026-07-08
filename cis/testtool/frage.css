@@ -1,0 +1,30 @@
+.proctoring-blocker
+{
+	position: fixed;
+	inset: 0;
+	z-index: 99999;
+	backdrop-filter: blur(6px);
+	pointer-events: all;
+	user-select: none;
+}
+
+.proctoring-blocker.hidden
+{
+	display: none !important;
+}
+
+.proctoring-text
+{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: #fff;
+	font-size: 16px;
+	font-family: sans-serif;
+}
+
+.proctoring-blur-fallback
+{
+	filter: blur(6px);
+}

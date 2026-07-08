@@ -550,6 +550,8 @@ if($orgform_kurzbz != -1)
 
 if($lehrveranstaltung_id != '')
 	$sql_query.= " AND tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
+elseif(isset($_GET['delete_lvid']))
+	$sql_query.= " AND tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param(intval($_GET['delete_lvid']), FHC_INTEGER);
 
 if($lehrveranstaltung_name != '')
 {

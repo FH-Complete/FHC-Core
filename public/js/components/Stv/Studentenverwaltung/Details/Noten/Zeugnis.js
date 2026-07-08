@@ -5,14 +5,22 @@ import ZeugnisDocuments from './Zeugnis/Documents.js';
 import ApiStvGrades from '../../../../../api/factory/stv/grades.js';
 
 export default {
+	name: 'Zeugnis',
 	components: {
 		CoreFilterCmpt,
 		ZeugnisActions,
 		ZeugnisDocuments
 	},
-	inject: [
-		'config'
-	],
+	inject: {
+		config: {
+			from: 'config',
+			required: true
+		},
+		currentSemester: {
+			from: 'currentSemester',
+			required: true
+		}
+	},
 	props: {
 		student: Object,
 		allSemester: Boolean
@@ -103,7 +111,8 @@ export default {
 									.call(
 										ApiStvGrades.getGradeFromPoints(
 											filterTerm,
-											cell.getData().lehrveranstaltung_id
+											cell.getData().lehrveranstaltung_id,
+											this.currentSemester
 										),
 										{ errorHandling: false }
 									)
@@ -139,8 +148,38 @@ export default {
 				{ field: 'zeugnis', title: this.$p.t('stv/grades_zeugnis'), formatter: 'tickCross' },
 				{ field: 'lehrveranstaltung_bezeichnung', title: this.$p.t('lehre/lehrveranstaltung') },
 				gradeField,
-				{ field: 'uebernahmedatum', title: this.$p.t('stv/grades_takeoverdate'), visible: false },
-				{ field: 'benotungsdatum', title: this.$p.t('stv/grades_gradingdate'), visible: false },
+				{ field: 'uebernahmedatum', title: this.$p.t('stv/grades_takeoverdate'), visible: false,
+					formatter: function (cell) {
+						const dateStr = cell.getValue();
+						if (!dateStr) return "";
+
+						const date = new Date(dateStr);
+						return date.toLocaleString("de-DE", {
+							day: "2-digit",
+							month: "2-digit",
+							year: "numeric",
+							hour: "2-digit",
+							minute: "2-digit",
+							second: "2-digit",
+							hour12: false
+						});
+					}},
+				{ field: 'benotungsdatum', title: this.$p.t('stv/grades_gradingdate'), visible: false,
+					formatter: function (cell) {
+						const dateStr = cell.getValue();
+						if (!dateStr) return "";
+
+						const date = new Date(dateStr);
+						return date.toLocaleString("de-DE", {
+							day: "2-digit",
+							month: "2-digit",
+							year: "numeric",
+							hour: "2-digit",
+							minute: "2-digit",
+							second: "2-digit",
+							hour12: false
+						});
+					}},
 				{ field: 'studiensemester_kurzbz', title: this.$p.t('lehre/studiensemester'), visible: false },
 				{ field: 'note_number', title: this.$p.t('stv/grades_numericgrade'), visible: false, formatter: cell => cell.getData().note, tooltip: (evt, cell) => cell.getData().note },
 				{ field: 'lehrveranstaltung_id', title: this.$p.t('lehre/lehrveranstaltung_id'), visible: false },
@@ -201,16 +240,20 @@ export default {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(ApiStvGrades.getCertificate(
 					this.student.prestudent_id,
-					this.allSemester
+						(!this.allSemester ? this.currentSemester : null)
 				)),
 				ajaxResponse: (url, params, response) => {
 					return response.data || [];
 				},
 				columns,
 				height: '100%',
-				selectable: 1,
-				selectableRangeMode: 'click',
-				persistenceID: 'stv-details-noten-zeugnis'
+				layout: 'fitDataStretchFrozen',
+				selectableRows: 1,
+				selectableRowsRangeMode: 'click',
+				persistenceID: 'stv-details-noten-zeugnis-20260217',
+				persistence:{
+					columns: ["width", "visible", "frozen"]
+				}
 			};
 		}
 	},
@@ -264,6 +307,7 @@ export default {
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			>
 			<template v-if="['both', 'header'].includes(config.edit) || ['both', 'header'].includes(config.delete)" #actions="{selected}">
 				<zeugnis-actions :selected="selected" @set-grade="setGrade" @delete-grade="deleteGrade"></zeugnis-actions>

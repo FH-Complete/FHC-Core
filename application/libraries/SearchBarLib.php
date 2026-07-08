@@ -115,6 +115,7 @@ class SearchBarLib
 
 		$sql = '
 			SELECT
+				\'employee\' AS renderer,
 				\''.$type.'\' AS type,
 				b.uid AS uid,
 				p.person_id AS person_id,
@@ -205,6 +206,7 @@ EOSC;
 
 		$employees = $dbModel->execReadOnlyQuery('
 			SELECT
+				\'employee\' AS renderer,
 				\''.$type.'\' AS type,
 				b.uid AS uid,
 				p.person_id AS person_id,
@@ -268,6 +270,7 @@ EOSC;
 
 		$ous = $dbModel->execReadOnlyQuery('
 			SELECT
+				\'' . $type . '\' AS renderer,
 				\''.$type.'\' AS type,
 				o.oe_kurzbz AS oe_kurzbz,
 				\'[\' || ot.bezeichnung || \'] \' || o.bezeichnung AS name,
@@ -365,6 +368,7 @@ EOSC;
 		$gesperrtes_foto = base64_encode(file_get_contents(DOC_ROOT.'skin/images/profilbild_dummy.jpg'));
 		$students = $dbModel->execReadOnlyQuery('
 		SELECT
+			\'' . $type . '\' AS renderer,
 			\''.$type.'\' AS type,
 			s.student_uid AS uid,
 			CONCAT(s.student_uid,\'@'.DOMAIN.'\') AS email,
@@ -413,6 +417,7 @@ EOSC;
 
 		$students = $dbModel->execReadOnlyQuery('
 		SELECT
+			\'student\' AS renderer,
 			\''.$type.'\' AS type,
 			s.student_uid AS uid,
 			s.matrikelnr,
@@ -458,6 +463,7 @@ EOSC;
 
 		$prestudent = $dbModel->execReadOnlyQuery('
 		SELECT
+			\'' . $type . '\' AS renderer,
 			\''.$type.'\' AS type,
 			ps.prestudent_id,
 			ps.studiengang_kz,
@@ -517,6 +523,7 @@ EOSC;
 
 		$rooms = $dbModel->execReadOnlyQuery('
 			SELECT
+				\'room\' AS renderer,
 				\''.$type.'\' AS type,
 				COALESCE(ort.ort_kurzbz, \'N/A\') as ort_kurzbz,
 				COALESCE(ort.gebteil, \'N/A\') as building,

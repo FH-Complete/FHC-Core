@@ -1,5 +1,3 @@
-// TODO(chris): Comments
-
 import GridItem from './Grid/Item.js';
 import GridLogic from '../../composables/GridLogic.js';
 
@@ -10,64 +8,128 @@ const MODE_RESIZE = 2;
 export default {
 	name: 'Grid',
 	components: {
-		GridItem
-	},
-	inject: {
+		GridItem,
 	},
 	props: {
 		cols: Number,
 		items: Array,
-		resizeLimit: Function,
+		itemsSetup: Object,
 		active: {
 			type: Boolean,
 			default: true
 		},
-		marginForExtraRow: {
-			type: Number,
-			default: 0
-		},
-		placeholders: {
-			type: Array,
-			default: () => []
+		additionalRow: {
+			type: Boolean,
+			default: false
 		}
 	},
 	emits: [
 		"rearrangeItems",
-		"newItem",
 		"gridHeight"
 	],
 	data() {
 		return {
+			// gridlogic
+			grid: null,
+			tempPositionUpdates: null,
+			correctedPositionUpdates: null,
+			// dragging
+			mode: MODE_IDLE,
+			draggedOffset: [0, 0],
+			draggedItem: null,
+			overwriteRows: null,
+			clonedWidget: null, // ghost image
+			// tile coordinates while dragging
 			x: -1,
 			y: -1,
-			mode: MODE_IDLE,
-			grid: null,
-			dragGrid: null,
-			permUpdates: [],
-			positionUpdates: null,
-			fixedPositionUpdates: null,
-			draggedOffset: [0,0],
-			draggedItem: null,
-			additionalRow: null
-		}
+			// mouse coordinates while dragging
+			clientX: 0,
+			clientY: 0
+		};
 	},
 	computed: {
+		// gridlogic
 		rows() {
-			if ((this.mode == MODE_MOVE || this.mode == MODE_RESIZE) && this.dragGrid)
-				return this.dragGrid.h;
-			return this.grid ? this.grid.h : 1;
+			const gridH = this.grid?.h || 1;
+
+			if (this.overwriteRows !== null && this.overwriteRows > gridH)
+				return this.overwriteRows;
+			
+			if (this.additionalRow)
+				return this.grid ? gridH + 1 : 1;
+			
+			return gridH;
 		},
 		gridStyle() {
-			const addH = this.active ? this.marginForExtraRow : 0;
 			return {
-				'--fhc-dg-row-height': 100/(this.rows + addH) + '%',
+				'--fhc-dg-row-height': 100/this.rows + '%',
 				'--fhc-dg-col-width': 100/this.cols + '%',
-				'--fhc-dg-item-padding-horizontal': '0.25%',
-				'--fhc-dg-item-padding-top': '0.5%',
-				'padding-bottom': 100 * (this.rows + addH)/this.cols + '%'
-			}
+				'--fhc-dg-item-padding':
+					'var(--fhc-dg-item-py, var(--fhc-dg-item-p, .25%))' +
+					' ' +
+					'var(--fhc-dg-item-px, var(--fhc-dg-item-p, .25%))',
+				'padding-bottom': 100 * this.rows/this.cols + '%'
+			};
 		},
-		indexedItems() {
+		// dragging
+		sizeLimits() {
+			return Object.fromEntries(Object.entries(this.itemsSetup).map(([type, { setup }]) => {
+				const result = {}; // work on a copy
+				if (setup.height === undefined)
+					result.height = { min: 1, max: undefined };
+				else if (Number.isInteger(setup.height))
+					result.height = { min: setup.height, max: setup.height };
+				else
+					result.height = {
+						min: setup.height.min ?? 1,
+						max: setup.height.max
+					};
+
+				if (setup.width === undefined)
+					result.width = { min: 1, max: undefined };
+				else if (Number.isInteger(setup.width))
+					result.width = { min: setup.width, max: setup.width };
+				else
+					result.width = {
+						min: setup.width.min ?? 1,
+						max: setup.width.max
+					};
+
+				return [type, result];
+			}));
+		},
+		// item pipeline
+		placeholders() { // empty tiles
+			let placeholders = this.grid.getFreeSlots().map((item, index) => {
+				return {
+					x: item.x,
+					y: item.y,
+					h: 1,
+					w: 1,
+					placeholder: true,
+					data: {
+						id: 'placeholder_' + index
+					}
+				};
+			});
+
+			if (this.additionalRow) {
+				for (var x = 0; x < this.cols; x++)
+					placeholders.push({
+						x,
+						y: this.grid.h,
+						h: 1,
+						w: 1,
+						placeholder: true,
+						data: {
+							id: 'placeholder_' + placeholders.length
+						}
+					});
+			}
+
+			return placeholders;
+		},
+		indexedItems() { // indexed
 			return this.items.map(
 				(item, index) => {
 					return {
@@ -76,114 +138,133 @@ export default {
 						y: item.y,
 						w: item.w,
 						h: item.h,
+						pinned: item.pinned,
 						weight: item.weight || 0,
 						data: item
 					}
 				}
 			);
 		},
-		prePlacedItems() {
-			if (!this.fixedPositionUpdates)
+		prePlacedItems() { // indexed & corrected
+			if (!this.correctedPositionUpdates)
 				return this.indexedItems;
 			return this.indexedItems.map(item => {
-				if (!this.fixedPositionUpdates[item.index])
+				if (!this.correctedPositionUpdates[item.index])
 					return item;
 				return {
 					index: item.index,
 					weight: item.weight,
 					data: item.data,
-					x: this.fixedPositionUpdates[item.index].x === undefined ? item.x : this.fixedPositionUpdates[item.index].x,
-					y: this.fixedPositionUpdates[item.index].y === undefined ? item.y : this.fixedPositionUpdates[item.index].y,
-					w: this.fixedPositionUpdates[item.index].w === undefined ? item.w : this.fixedPositionUpdates[item.index].w,
-					h: this.fixedPositionUpdates[item.index].h === undefined ? item.h : this.fixedPositionUpdates[item.index].h
+					x: this.correctedPositionUpdates[item.index].x === undefined ? item.x : this.correctedPositionUpdates[item.index].x,
+					y: this.correctedPositionUpdates[item.index].y === undefined ? item.y : this.correctedPositionUpdates[item.index].y,
+					w: this.correctedPositionUpdates[item.index].w === undefined ? item.w : this.correctedPositionUpdates[item.index].w,
+					h: this.correctedPositionUpdates[item.index].h === undefined ? item.h : this.correctedPositionUpdates[item.index].h,
+					pinned: item.pinned
 				};
 			});
 		},
-		placedItems() {
-			if (!this.positionUpdates)
+		placedItems() { // indexed & corrected & dragging
+			if (!this.tempPositionUpdates)
 				return this.prePlacedItems;
 			return this.prePlacedItems.map(item => {
-				if (!this.positionUpdates[item.index])
+				if (!this.tempPositionUpdates[item.index])
 					return item;
+
 				return {
 					index: item.index,
 					weight: item.weight,
 					data: item.data,
-					x: this.positionUpdates[item.index].x === undefined ? item.x : this.positionUpdates[item.index].x,
-					y: this.positionUpdates[item.index].y === undefined ? item.y : this.positionUpdates[item.index].y,
-					w: this.positionUpdates[item.index].w === undefined ? item.w : this.positionUpdates[item.index].w,
-					h: this.positionUpdates[item.index].h === undefined ? item.h : this.positionUpdates[item.index].h
+					x: this.tempPositionUpdates[item.index].x === undefined ? item.x : this.tempPositionUpdates[item.index].x,
+					y: this.tempPositionUpdates[item.index].y === undefined ? item.y : this.tempPositionUpdates[item.index].y,
+					w: this.tempPositionUpdates[item.index].w === undefined ? item.w : this.tempPositionUpdates[item.index].w,
+					h: this.tempPositionUpdates[item.index].h === undefined ? item.h : this.tempPositionUpdates[item.index].h,
+					pinned: item.pinned
 				};
 			});
 		},
-		placedItems_withPlaceholders(){
-			return [...this.placedItems,...this.placeholders];
-		},
-		showEmptyTileHover() {
-			if (!this.active || !this.grid || this.mode != MODE_IDLE || this.x < 0 || this.y < 0 || this.x >= this.cols || this.y >= this.rows)
-				return false;
-			return this.grid.isFreeSlot(this.x, this.y);
+		currentItems() { // final items with classes
+			if (this.mode == MODE_IDLE && this.active)
+				return [ ...this.placedItems, ...this.placeholders ];
+
+			if (this.mode != MODE_IDLE && this.draggedItem) {
+				// add classes to dragged item
+				const draggedItemIndex = this.placedItems.findIndex(item => item.index == this.draggedItem.index);
+				const modifiedDraggedItem = {
+					...this.placedItems[draggedItemIndex],
+					classes: []
+				};
+
+				if (this.mode == MODE_MOVE) {
+					modifiedDraggedItem.classes.push('drop-grid-item-move');
+				}
+				if (this.mode == MODE_RESIZE) {
+					modifiedDraggedItem.classes.push('drop-grid-item-resize');
+					if (this.draggedItem.oversized)
+						modifiedDraggedItem.classes.push('drop-grid-item-oversized')
+					else if (this.tempPositionUpdates?.length)
+						modifiedDraggedItem.classes.push('drop-grid-item-sizechanged')
+				}
+
+				let currentItems = this.placedItems.toSpliced(draggedItemIndex, 1, modifiedDraggedItem);
+
+				if (!this.tempPositionUpdates?.length && this.draggedItem.blockers) {
+					this.draggedItem.blockers.forEach(index => {
+						const blockerIndex = this.placedItems.findIndex(item => item.index == index);
+						const modifiedBlocker = {
+							...this.placedItems[blockerIndex],
+							classes: ['drop-grid-item-blocker']
+						};
+						currentItems.splice(blockerIndex, 1, modifiedBlocker);
+					});
+				}
+
+				return currentItems;
+			}
+
+			return this.placedItems;
 		}
 	},
 	watch: {
 		active(active) {
-			if (!active)
+			if (!active && this.mode != MODE_IDLE)
 				this.dragCancel();
 		},
-		cols() {
-			this.dragCancel();
+		cols(value, oldValue) {
+			if (value == oldValue)
+				return;
+
+			this.reinitGrid();
 		},
 	    rows: {
-			handler(value) {
+			handler(value, oldValue) {
+				if (value == oldValue)
+					return;
+
 				this.$emit('gridHeight', value);
 			},
 			immediate: true
 		},
 		indexedItems: {
 			handler(value) {
-				this.dragCancel();
-
-				const updated = this.createNewGrid(value);
-
-				this.fixedPositionUpdates = updated;
-				if (updated.length)
-					this.$emit('rearrangeItems', updated.filter(v => v));
+				this.reinitGrid();
 			},
 			immediate: true,
 			deep: true
 		}
 	},
 	methods: {
-		createNewGrid(items) {
-			this.grid = new GridLogic(this.cols);
-			const result = [];
-			[...items].sort((a, b) => a.weight > b.weight).forEach(item => {
-				if (item.x + item.w > this.cols) {
-					let targetW = this.cols-item.x,
-						targetX = undefined;
-					if (this.resizeLimit) {
-						[targetW] = this.resizeLimit(item.data, targetW, item.h);
-					}
-					if (targetW < 1)
-						targetW = 1;
-					if (targetW > this.cols)
-						targetW = this.cols;
-					if (item.x + targetW > this.cols) {
-						targetX = this.cols - targetW;
-					}
-					if (targetW == item.w)
-						targetW = undefined;
-					result[item.index] = {
-						item: item.data,
-						x: targetX,
-						w: targetW
-					};
-				}
-				item.frame = this.grid.getItemFrame(item);
-				this.convertGridResultToUpdate(this.grid.add(item), result, items);
-			});
-			this.grid.clearWeights();
-			return result;
+		// helpers
+		reinitGrid() {
+			if (this.mode != MODE_IDLE)
+				this.dragCancel();
+
+			let updated = this.createNewGrid(this.indexedItems);
+
+			this.correctedPositionUpdates = updated;
+			if (updated.length)
+				updated = updated.filter(v => v);
+			if (updated.length)
+				this.$emit('rearrangeItems', updated);
 		},
 		convertGridResultToUpdate(input, output, baseArray) {
 			if (!input)
@@ -205,50 +286,76 @@ export default {
 				output[item.index] = result;
 			});
 		},
-		mouseLeave() {
-			if (this.mode == MODE_IDLE) {
-				this.x = -1;
-				this.y = -1;
-				if (this.additionalRow !== null) {
-					this.grid.h = this.additionalRow;
-					this.additionalRow = null;
+		// gridlogic
+		createNewGrid(items) {
+			this.grid = new GridLogic(this.cols);
+			const result = [];
+			const sortedItems = [...items].sort((a, b) => a.weight > b.weight);
+			sortedItems.forEach(item => {
+				const target = { ...item };
+
+				if (target.x === undefined && target.y == undefined) {
+					target.x = 0;
+					target.y = 0;
+					const setup = this.sizeLimits[target.data.widget];
+					target.w = setup.width.min;
+					target.h = setup.height.min;
 				}
-			}
-		},
-		updateCursor(evt) {
-			if (!this.active) {
-				this.x = this.y = -1;
-				return false;
-			}
-			const addH = this.active ? this.marginForExtraRow : 0;
-			const rect = this.$refs.container.getBoundingClientRect();
 
-			if (!evt.clientX && !evt.clientY && evt.touches) {
-				evt.clientX = evt.touches[0].clientX;
-				evt.clientY = evt.touches[0].clientY;
-			}
+				if (target.x + target.w > this.cols) {
+					let targetW = this.cols - target.x,
+						targetX = undefined;
 
-			const gridX = Math.floor(this.cols * (evt.clientX - rect.left) / this.$refs.container.clientWidth);
-			const gridY = Math.floor((this.rows + addH) * (evt.clientY - rect.top) / this.$refs.container.clientHeight);
-			if (this.x == gridX && this.y == gridY)
-				return false;
-			
-			if (this.mode == MODE_IDLE) {
-				if (this.additionalRow === null && this.y == this.rows-1 && gridY == this.rows) {
-					this.additionalRow = this.grid.h;
-					this.grid.h += 1;
-				} else if (this.additionalRow !== null && gridY != this.rows - 1) {
-					this.grid.h = this.additionalRow;
-					this.additionalRow = null;
+					[ targetW ] = this.cropSizeToAllowed(target.data.widget, targetW, target.h);
+
+					if (targetW > this.cols)
+						targetW = this.cols;
+					if (target.x + targetW > this.cols) {
+						targetX = this.cols - targetW;
+					}
+					if (targetW == target.w)
+						targetW = undefined;
+
+					if (targetX !== undefined)
+						target.x = targetX;
+					if (targetW !== undefined)
+						target.w = targetW;
 				}
-			}
-			
-			this.x = gridX;
-			this.y = gridY;
 
-			return true;
+				target.frame = this.grid.getItemFrame(target);
+				this.convertGridResultToUpdate(this.grid.add(target), result, items);
+				
+				['x', 'y', 'h', 'w'].forEach(prop => {
+					if (target[prop] === item[prop])
+						return;
+					
+					if (!result[target.index])
+						result[target.index] = { item: target.data };
+
+					if (result[target.index][prop] === undefined)
+						result[target.index][prop] = target[prop];
+				});
+			});
+			this.grid.clearWeights();
+			return result;
 		},
-		_dragStart(evt) {
+		_updateCorrectedPositions(updated) {
+			updated.forEach((item, index) => {
+				if (!this.correctedPositionUpdates[index])
+					this.correctedPositionUpdates[index] = item;
+				else
+					this.correctedPositionUpdates[index] = {...this.correctedPositionUpdates[index], ...item};
+			});
+			let additionalUpdates = this.createNewGrid(this.prePlacedItems);
+			if (additionalUpdates.length) {
+				// NOTE(chris): this should never happen but it's here for safety
+				additionalUpdates.forEach((item, index) => updated[index] = item);
+				return this._updateCorrectedPositions(updated);
+			}
+			return updated;
+		},
+		// dragging
+		_dragStart(evt, item) {
 			if (evt.dataTransfer) {
 				evt.dataTransfer.setDragImage(evt.target, -99999, -99999);
 				evt.dataTransfer.dropEffect = 'move';
@@ -258,147 +365,254 @@ export default {
 		startMove(evt, item) {
 			if (!this.active)
 				return;
-			this._dragStart(evt);
-			this.mode = MODE_MOVE;
-			this.updateCursor(evt);
-			this.draggedItem = item;
-			this.draggedOffset = [item.x - this.x, item.y - this.y];
+			
+			// workaround for chrome fireing event dragend when styles are manipulated during dragging
+			setTimeout(() => {
+				this.mode = MODE_MOVE;
+				this.updateCursor(evt);
+				this.draggedItem = item;
+				
+				//clones the widget for the drag Image
+				
+				// NOTE(chris): this is the element that follows the mouse while dragging
+				// equivalent to the ghost image
+				let clone = evt.target.closest(".drop-grid-item")?.cloneNode(true);
+
+				clone.style.zIndex = 5;
+				clone.classList.add("widgetClone");
+				this.$refs.container.appendChild(clone);
+				const hiddenWidget = clone.querySelector("[style='display: none;']");
+				if (hiddenWidget)
+					hiddenWidget.style.removeProperty("display");
+				this.clonedWidget = clone;
+
+				this.draggedOffset = [item.x - this.x, item.y - this.y];
+			}, 0);
+
+			this._dragStart(evt, item);
 		},
 		startResize(evt, item) {
 			if (!this.active)
 				return;
+			
+			// workaround for chrome fireing event dragend when styles are manipulated during dragging
+			setTimeout(() => {
+				this.mode = MODE_RESIZE;
+				this.draggedItem = item;
+			}, 0);
+			
 			this._dragStart(evt);
-			this.mode = MODE_RESIZE;
-			this.draggedItem = item;
+		},
+		updateCursor(evt) {
+			if (!this.active) {
+				this.x = this.y = -1;
+				return false;
+			}
+			const rect = this.$refs.container.getBoundingClientRect();
+			
+			if (!evt.clientX && !evt.clientY && evt.touches){
+				evt.clientX = evt.touches[0].clientX;
+				evt.clientY = evt.touches[0].clientY;
+			}
+
+			this.clientX = (evt.clientX - rect.left);
+			this.clientY = (evt.clientY - rect.top);
+			const gridX = Math.floor(this.cols * (evt.clientX - rect.left) / this.$refs.container.clientWidth);
+			const gridY = Math.floor(this.rows * (evt.clientY - rect.top) / this.$refs.container.clientHeight);
+			
+			if (this.x == gridX && this.y == gridY)
+				return false;
+			
+			this.x = gridX;
+			this.y = gridY;
+
+			return true;
 		},
 		dragOver(evt) {
+			if ((this.y + 1) > this.rows && (this.mode == MODE_MOVE || this.mode == MODE_RESIZE)) {
+				this.dragCancel();
+			}
 			if (!this.active)
 				return this.dragCancel();
+
 			if (this.updateCursor(evt)) {
+				const targetCoordinates = {};
+				const dragGrid = new GridLogic(this.grid);
+
 				switch(this.mode) {
 					case MODE_MOVE: {
-						evt.preventDefault();
-						this.dragGrid = new GridLogic(this.grid);
 						let x = this.x + this.draggedOffset[0];
 						let y = this.y + this.draggedOffset[1];
 						if (x < 0) {
-							this.draggedOffset[0] -= x;
+							this.draggedOffset[0] += x;
 							x = 0;
 						} else if (x + this.draggedItem.w > this.cols) {
 							this.draggedOffset[0] += this.cols - this.draggedItem.w - x;
 							x = this.cols - this.draggedItem.w;
 						}
 						if (y < 0) {
-							this.draggedOffset[1] -= y;
+							this.draggedOffset[1] += y;
 							y = 0;
 						}
+						
+						targetCoordinates.x = x;
+						targetCoordinates.y = y;
+						targetCoordinates.w = this.draggedItem.w;
+						targetCoordinates.h = this.draggedItem.h;
 
-						this.positionUpdates = this.dragGrid.move(this.draggedItem, x, y);
+						this.tempPositionUpdates = dragGrid.move(this.draggedItem, x, y);
+						this.overwriteRows = dragGrid.h;
 						break;
 					}
 					case MODE_RESIZE: {
-						evt.preventDefault();
-						this.dragGrid = new GridLogic(this.grid);
-						let w = Math.min(this.cols - this.draggedItem.x, Math.max(1, this.x - this.draggedItem.x + 1));
-						let h = Math.max(1, this.y - this.draggedItem.y + 1);
-						if (this.resizeLimit)
-							[w, h] = this.resizeLimit(this.draggedItem.data, w, h);
-						this.positionUpdates = this.dragGrid.resize(this.draggedItem, w, h);
+						const targetW = this.x - this.draggedItem.x + 1;
+						const targetH = this.y - this.draggedItem.y + 1;
+						let w = Math.min(this.cols - this.draggedItem.x, targetW);
+						let h = targetH;
+
+						[ w, h ] = this.cropSizeToAllowed(this.draggedItem.data.widget, w, h);
+
+						// check resize limits
+						this.draggedItem.oversized = (w !== targetW || h !== targetH);
+						if (this.draggedItem.oversized)
+							[ w, h ] = [ this.draggedItem.w, this.draggedItem.h ];
+
+						targetCoordinates.x = this.draggedItem.x;
+						targetCoordinates.y = this.draggedItem.y;
+						targetCoordinates.w = w;
+						targetCoordinates.h = h;
+
+						this.tempPositionUpdates = dragGrid.resize(this.draggedItem, w, h);
+						this.overwriteRows = dragGrid.h;
 						break;
 					}
 				}
+				// check for blocking pinned widgets
+				if (!this.tempPositionUpdates?.length) {
+					const frame = this.grid.getItemFrame(targetCoordinates);
+					const itemsAtPosition = this.grid.getItemsInFrame(frame);
+					this.draggedItem.blockers = itemsAtPosition.filter(index => this.indexedItems[index].pinned);
+				}
+			}
+			if (this.tempPositionUpdates?.length)
+				evt.preventDefault();
+		},
+		_cleanupDragging() {
+			this.mode = MODE_IDLE;
+			this.overwriteRows = null;
+			
+			if (this.draggedItem) {
+				const draggedItem = this.indexedItems.find(item => item.index == this.draggedItem.index);
+				delete draggedItem.classes;
+				this.draggedItem = null;
+			}
+			// removeWidgetClones
+			let widgetClones = Array.from(document.getElementsByClassName("widgetClone"));
+			for (let i = 0; i < widgetClones.length; i++) {
+				this.$refs.container.removeChild(widgetClones[i]);
 			}
 		},
 		dragCancel() {
-			this.mode = MODE_IDLE;
-			this.positionUpdates = null;
-			this.draggedOffset = [0,0],
-			this.draggedItem = null;
+			if (this.mode == MODE_IDLE) {
+				return;
+			}
+
+			this.tempPositionUpdates = null;
+			this.draggedOffset = [0,0];
+			this._cleanupDragging();
 		},
 		dragEnd() {
-			if (this.mode == MODE_IDLE)
+			if (this.mode == MODE_IDLE) {
 				return;
-			if (!this.active || this.x < 0 || this.y < 0 || this.x >= this.cols)
-				return this.dragCancel();
-			this.mode = MODE_IDLE;
+			}
+
 			let updated = [];
-			this.convertGridResultToUpdate(this.positionUpdates, updated);
-			updated = this._updateFixedPositions(updated);
+			this.convertGridResultToUpdate(this.tempPositionUpdates, updated);
+			updated = this._updateCorrectedPositions(updated);
 			if (updated.length)
 				this.$emit('rearrangeItems', updated.filter(v => v));
+
+			this._cleanupDragging();
 		},
-		_updateFixedPositions(updated) {
-			updated.forEach((item, index) => {
-				if (!this.fixedPositionUpdates[index])
-					this.fixedPositionUpdates[index] = item;
-				else
-					this.fixedPositionUpdates[index] = {...this.fixedPositionUpdates[index], ...item};
-			});
-			let additionalUpdates = this.createNewGrid(this.prePlacedItems);
-			if (additionalUpdates.length) {
-				// NOTE(chris): this should never happen but it's here for safety
-				additionalUpdates.forEach((item, index) => updated[index] = item);
-				return this._updateFixedPositions(updated);
+		moveGhostImage(event) {
+			if (this.mode == MODE_MOVE) {
+				const containerRect = this.$refs.container.getBoundingClientRect();
+				const clonedWidgetRect = this.clonedWidget.getBoundingClientRect();
+				
+				let desiredTop = this.clientY - 20;
+				let desiredLeft = this.clientX - 15;
+				
+				const minTop = 0;
+				const maxTop = containerRect.height - clonedWidgetRect.height;
+				const minLeft = 0;
+				const maxLeft = containerRect.width - clonedWidgetRect.width;
+				
+				const constrainedTop = Math.max(minTop, Math.min(maxTop, desiredTop));
+				const constrainedLeft = Math.max(minLeft, Math.min(maxLeft, desiredLeft));
+				
+				this.clonedWidget.style.top = `${constrainedTop}px`;
+				this.clonedWidget.style.left = `${constrainedLeft}px`;
 			}
-			return updated;
 		},
-		emptyTileClicked() {
-			this.$emit('newItem', this.x, this.y);
+		cropSizeToAllowed(type, w, h) {
+			if (w < 1)
+				w = 1;
+			if (h < 1)
+				h = 1;
+
+			const setup = this.sizeLimits[type];
+
+			if (!setup)
+				return [w, h];
+
+			if (w < setup.width.min)
+				w = setup.width.min;
+			if (h < setup.height.min)
+				h = setup.height.min;
+			if (setup.width.max && w > setup.width.max)
+				w = setup.width.max;
+			if (setup.height.max && h > setup.height.max)
+				h = setup.height.max;
+			
+			return [w, h];
 		}
 	},
-	template: `
-	<div
+	template: /* html */`
+	<ul
 		ref="container"
-		class="drop-grid position-relative h-0"
+		class="drop-grid position-relative h-0 list-unstyled"
 		:style="gridStyle"
-		@touchmove="dragOver"
-		@touchend="dragCancel"
-		@dragover.prevent="dragOver"
+		@dragover="dragOver"
 		@drop="dragEnd"
-		@mousemove="updateCursor"
-		@mouseleave="mouseLeave">
-		<TransitionGroup tag="div">
+	>
+		<TransitionGroup>
 			<grid-item
-				v-for="item in (mode == 0 && active ? placedItems_withPlaceholders : placedItems)"
+				ref="gridItems"
+				v-for="(item, index) in currentItems"
 				:key="item.data.id"
-				:item="item"
-				@start-move="startMove"
-				@start-resize="startResize"
-				@end-drag="dragCancel"
-				@drop-drag="dragEnd"
 				class="position-absolute"
-				:active="active"
+				:class="item.classes"
+				:item="item"
 				:style="{
 					top: 'calc(' + item.y + ' * var(--fhc-dg-row-height))',
 					left: 'calc(' + item.x + ' * var(--fhc-dg-col-width))',
 					width: 'calc(' + item.w + ' * var(--fhc-dg-col-width))',
 					height: 'calc(' + item.h + ' * var(--fhc-dg-row-height))',
-					paddingTop: 'var(--fhc-dg-item-padding-top)',
-					paddingLeft: 'var(--fhc-dg-item-padding-horizontal)',
-					paddingRight: 'var(--fhc-dg-item-padding-horizontal)'
-				}">
+					padding: 'var(--fhc-dg-item-padding)'
+				}"
+				@start-move="startMove"
+				@start-resize="startResize"
+				@drag="moveGhostImage"
+				@dragend="dragCancel"
+			>
 				<template v-slot="item">
-					<slot v-bind="{...item, ...item.data}" :x="item.x" :y="item.y" ></slot>
+					<slot
+						v-bind="{ ...item, ...item.data, index: index }"
+						:x="item.x"
+						:y="item.y"
+					></slot>
 				</template>
 			</grid-item>
 		</TransitionGroup>
-		
-	</div>`
+	</ul>`
 }
-
-/*
-OLD VERSION - ON HOVER
-<div
-	v-if="showEmptyTileHover"
-	class="position-absolute d-flex justify-content-center align-items-center"
-	:style="{
-		cursor: 'pointer',
-		top: 'calc(' + y + ' * var(--fhc-dg-row-height))',
-		left: 'calc(' + x + ' * var(--fhc-dg-col-width))',
-		width: 'var(--fhc-dg-col-width)',
-		height: 'var(--fhc-dg-row-height)'
-	}"
-	@click="emptyTileClicked">
-	<slot :x="x" :y="y" name="empty-tile-hover"></slot>
-</div>
-*/

@@ -28,10 +28,14 @@ class Studentenverwaltung extends Auth_Controller
 				'basis/prestudentstatus' => $this->permissionlib->isBerechtigt('basis/prestudentstatus'),
 				'assistenz_stgs' => $this->permissionlib->getSTG_isEntitledFor('assistenz'),
 				'admin' => $this->permissionlib->isBerechtigt('admin'),
-				'assistenz_schreibrechte' => $this->permissionlib->isBerechtigt('assistenz','suid'),
+				'assistenz_schreibrechte' => $this->permissionlib->isBerechtigt('assistenz', 'suid'),
 				'student/keine_studstatuspruefung' => $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung'),
 				'lehre/reihungstestAufsicht' => $this->permissionlib->isBerechtigt('lehre/reihungstestAufsicht'),
 				'system/change_outputformat' => $this->permissionlib->getOE_isEntitledFor('system/change_outputformat'),
+				'student/editBakkZgv' => $this->permissionlib->getSTG_isEntitledFor('student/editBakkZgv') ?: array(),
+				'student/editMakkZgv' => $this->permissionlib->getSTG_isEntitledFor('student/editMakkZgv') ?: array(),
+				'student/editDokZgv' => $this->permissionlib->getSTG_isEntitledFor('student/editDokZgv') ?: array(),
+				'student/editBismelden' => $this->permissionlib->isBerechtigt('student/editBismelden')
 			],
 			'variables' => [
 				'semester_aktuell' => $this->variablelib->getVar('semester_aktuell')
@@ -39,3 +43,5 @@ class Studentenverwaltung extends Auth_Controller
 		]);
 	}
 }
+
+

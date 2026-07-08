@@ -88,6 +88,18 @@ export default {
 				if (isMitarbeiter) {
 					content["isMitarbeiter"] = isMitarbeiter;
 				}
+
+				const filesFromDatabase =
+					await this.$api
+						.call(ApiProfilUpdate.getProfilRequestFiles(
+							updateRequest.profil_update_id
+						))
+						.then((res) => {
+							return res.data;
+						});
+
+				files = filesFromDatabase;
+				content["files"] = files;
 			}
 
 			//? adds the status information if the profil update request was rejected or accepted
@@ -155,7 +167,7 @@ export default {
 
 	template: /*html*/ `
 <div class="card">
-    <edit-profil v-if="showUpdateModal" ref="updateEditModal" @hideBsModal="hideEditProfilModal" :value="content" :title="editProfilTitle"></edit-profil>
+    <edit-profil v-if="showUpdateModal" ref="updateEditModal" @hideBsModal="hideEditProfilModal" :value="content" :titel="editProfilTitle"></edit-profil>
     <div class="card-header">{{$p.t('profilUpdate','profilUpdates')}}</div>
     <div class="card-body">
         <div class="table-responsive text-nowrap">
@@ -180,9 +192,9 @@ export default {
                                         <div  class="align-middle text-center"><i role="button" @click="showEditProfilModal(item)" class="fa fa-eye"></i></div>
                                     </template>
                                     <template v-else >
-                                        <div class="align-middle text-center" ><i style="color:#00639c" @click="showEditProfilModal(item)" role="button" class="fa fa-edit"></i></div>
+                                        <div class="align-middle text-center" ><i  @click="showEditProfilModal(item)" role="button" class="fa fa-edit fhc-primary-color"></i></div>
                                     </template>
-                                    <div class="align-middle text-center"><i style="color:red" role="button" @click="deleteRequest(item)" class="fa fa-trash"></i></div>
+                                    <div class="align-middle text-center"><i role="button" @click="deleteRequest(item)" class="text-danger fa fa-trash"></i></div>
                                 </div>
                             </td>
                         </template>          

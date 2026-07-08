@@ -5,14 +5,14 @@ export default {
 		showBezeichnung:Boolean,
 	},
 	template:/*html*/`
-	<div class="card mb-3">
+	<div class="card mb-3 border-0">
 		<div class="card-header">
 			<span>{{title}}</span>
 		</div>
 		<div class="card-body">
 			<p v-for="vertretung in vertretungsList">
-				<a v-if="profilViewLink(vertretung.uid)" :href="profilViewLink(vertretung.uid)">
-					<i class="me-2 fa fa-arrow-up-right-from-square" style="color:#00649C"></i>
+				<a v-if="profilViewLink(vertretung.uid)" :href="profilViewLink(vertretung.uid)" :aria-label="$p.t('profil','profil')" :title="$p.t('profil','profil')">
+					<i class="me-2 fa fa-arrow-up-right-from-square fhc-primary-color" aria-hidden="true"></i>
 				</a>
 				{{vertretungFormatedName(vertretung,false)}}
 			</p>

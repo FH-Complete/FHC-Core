@@ -105,9 +105,6 @@ foreach($uid_arr as $uid)
 			$staatsbuergerschaft = new nation();
 			$staatsbuergerschaft->load($student->staatsbuergerschaft);
 
-
-			$svnr = ($student->svnr == '')?'Ersatzkennzeichen: '.$student->ersatzkennzeichen:$student->svnr;
-
 			$geschlecht_obj = new geschlecht();
 			$geschlecht_obj->load($student->geschlecht);
 
@@ -143,7 +140,6 @@ foreach($uid_arr as $uid)
 			echo "\t\t<gebdatum><![CDATA[".$gebdatum."]]></gebdatum>\n";
 			echo "\t\t<gebort><![CDATA[".$student->gebort."]]></gebort>\n";
 			echo "\t\t<staatsbuergerschaft><![CDATA[".$staatsbuergerschaft->langtext."]]></staatsbuergerschaft>\n";
-			echo "\t\t<svnr><![CDATA[".$svnr."]]></svnr>\n";
 			echo "\t\t<matr_nr><![CDATA[".trim($student->matr_nr)."]]></matr_nr>\n";
 			echo "\t\t<matrikelnr><![CDATA[".trim($student->matrikelnr)."]]></matrikelnr>\n";
 			echo "\t\t<studiengang><![CDATA[".$studienordnung->studiengangbezeichnung."]]></studiengang>\n";

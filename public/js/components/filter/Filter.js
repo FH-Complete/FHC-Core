@@ -22,8 +22,14 @@ import TableDownload from './Table/Download.js';
 import collapseAutoClose from '../../directives/collapseAutoClose.js';
 
 import moduleLayoutFitDataStretchFrozen from '../../tabulator/layouts/fitDataStretchFrozen.js';
+import InternalToExternalEventBroadcastModule from "../../tabulator/customModules/InternalToExternalEventBroadcastModule.js"
+import MenuExtensionModule from "../../tabulator/customModules/MenuExtensionModule.js"
+import ResponsiveLayoutExtensionModule from "../../tabulator/customModules/ResponsiveLayoutExtensionModule.js"
+
+import { debounce } from "../../helpers/DebounceHelper.js";
 
 import ApiFilter from '../../api/factory/filter.js';
+import ApiPhrases from '../../api/factory/phrasen.js';
 
 //
 const FILTER_COMPONENT_NEW_FILTER = 'Filter Component New Filter';
@@ -48,7 +54,8 @@ export const CoreFilterCmpt = {
 		'nwNewEntry',
 		'click:new',
 		'tableBuilt',
-		'uuidDefined'
+		'uuidDefined',
+		'headerFilterOn'
 	],
 	props: {
 		onNwNewEntry: Function, // NOTE(chris): Hack to get the nwNewEntry listener into $props
@@ -66,6 +73,7 @@ export const CoreFilterCmpt = {
 		tableOnly: Boolean,
 		noColumnFilter:Boolean,
 		reload: Boolean,
+		reloadBtnInfotext: String,
 		download: {
 			type: [Boolean, String, Function, Array, Object],
 			default: false
@@ -78,8 +86,13 @@ export const CoreFilterCmpt = {
 
 		idField: String,
 		parentIdField: String,
-		countOnly: Boolean
+		countOnly: Boolean,
+		useSelectionSpan: {
+			type: Boolean,
+			default: true
+		},
 	},
+	inject: ["language"],
 	data: function() {
 		return {
 			uuid: 0,
@@ -90,7 +103,6 @@ export const CoreFilterCmpt = {
 			dataset: null,
 			datasetMetadata: null,
 			selectedFields: null,
-			notSelectedFields: null,
 			filterFields: null,
 
 			availableFilters: null,
@@ -101,6 +113,8 @@ export const CoreFilterCmpt = {
 			fetchCmptApiFunction: null,
 			fetchCmptApiFunctionParams: null,
 			fetchCmptDataFetched: null,
+
+			fetchResult: null,
 
 			tabulator: null,
 			tableBuilt: false,
@@ -113,10 +127,16 @@ export const CoreFilterCmpt = {
 				headerFilter: false,
 				group: false,
 				page: false,
-			}
+			},
+			collapsedHeadingLocalizationTimer: null,
 		};
 	},
 	computed: {
+		notSelectedFields() {
+			if (!this.fields || !this.selectedFields)
+				return null;
+			return this.fields.filter(x => this.selectedFields.indexOf(x) === -1)
+		},
 		filteredData() {
 			if (!this.dataset)
 				return [];
@@ -171,20 +191,25 @@ export const CoreFilterCmpt = {
 			return columns;
 		},
 		fieldIdsForVisibilty() {
-			if (!this.tableBuilt)
-				return [];
-			return this.tabulator.getColumns().filter(col => {
-				let def = col.getDefinition();
-				return !def.frozen && def.title && def.formatter != "responsiveCollapse";
-			}).map(col => col.getField());
-		},
-		fieldNames() {
-			if (!this.tableBuilt)
-				return {};
-			return this.tabulator.getColumns().reduce((res, col) => {
-				res[col.getField()] = col.getDefinition().title;
-				return res;
-			}, {});
+			if (!this.tableBuilt) return [];
+
+			const localizedColumnTitles = this.tabulator.getLang().columns;
+			const isTabulatorLocalized = !!this.$props.tabulatorOptions.locale;
+			return this.tabulator
+				.getColumns()
+				.filter((col) => {
+					let def = col.getDefinition();
+					let title =
+						isTabulatorLocalized && localizedColumnTitles[def.field]
+							? localizedColumnTitles[def.field]
+							: def.title;
+					return (
+						!def.frozen &&
+						title &&
+						def.formatter != "responsiveCollapse"
+					);
+				})
+				.map((col) => col.getField());
 		},
 		idExtra() {
 			if (!this.uuid)
@@ -192,14 +217,30 @@ export const CoreFilterCmpt = {
 			return '-' + this.uuid;
 		},
 		columnsForFilter() {
-			if (!this.filteredColumns || !this.datasetMetadata)
-				return [];
-			const filterTitles = this.filteredColumns.reduce((a,c) => {
-				a[c.field] = c.title;
+			if (!this.filteredColumns || !this.datasetMetadata) return [];
+			const localizedColumnTitles = this.tabulator.getLang().columns;
+			const isTabulatorLocalized = !!this.$props.tabulatorOptions.locale;
+			const filterTitles = this.filteredColumns.reduce((a, c) => {
+				a[c.field] =
+					isTabulatorLocalized && localizedColumnTitles[c.field]
+						? localizedColumnTitles[c.field]
+						: c.title;
 				return a;
 			}, {});
-			return this.datasetMetadata.map(el => ({...el, ...{title: filterTitles[el.name]}}));
-		}
+			return this.datasetMetadata.map((el) => ({
+				...el,
+				...{ title: filterTitles[el.name] },
+			}));
+		},
+	},
+	watch: {
+		"language.value": {
+			handler(newSelectedLanguage) {
+				if (!this.$props.tabulatorOptions.locale) return;
+
+				this.tabulator.setLocale(newSelectedLanguage);
+			},
+		},
 	},
 	methods: {
 		reloadTable() {
@@ -208,12 +249,42 @@ export const CoreFilterCmpt = {
 			else
 				this.getFilter();
 		},
+		setSelectedFields() {
+			const cols = this.tabulator.getColumns();
+			this.selectedFields = cols.filter(col => col.isVisible()).map(col => col.getField());
+		},
 		async initTabulator() {
 			let placeholder = '< Phrasen Plugin not loaded! >';
 			if (this.$p) {
 				await this.$p.loadCategory('ui');
 				placeholder = this.$p.t('ui/keineDatenVorhanden');
 			}
+
+			if (!this.tableOnly) {
+				// prefetch data to get fields & selectedFields for filteredColumns & filteredData
+				await new Promise(resolve => {
+					const filterId = window.location.hash ? window.location.hash.slice(1) : null;
+
+					const resolvePromiseFunc = data => {
+						this.setRenderData(data);
+						resolve();
+					};
+					// get the filter data
+					if (filterId === null)
+						this.startFetchCmpt(
+							wsParams => this.$api.call(ApiFilter.getFilter(wsParams)),
+							null,
+							resolvePromiseFunc
+						);
+					else
+						this.startFetchCmpt(
+							wsParams => this.$api.call(ApiFilter.getFilterById(wsParams)),
+							{ filterId },
+							resolvePromiseFunc
+						);
+				});
+			}
+
 			// Define a default tabulator options in case it was not provided
 			let tabulatorOptions = {...{
 					layout: "fitDataStretchFrozen",
@@ -225,6 +296,10 @@ export const CoreFilterCmpt = {
 					persistence: this.persistence,
 				}, ...(this.tabulatorOptions || {})};
 
+			if (tabulatorOptions.locale) {
+				tabulatorOptions = await this.configureTabulatorLocalizations(tabulatorOptions);
+			}
+
 			// set default height if no height property is set
 			if (tabulatorOptions.height === undefined &&
 				tabulatorOptions.minHeight === undefined &&
@@ -235,9 +310,14 @@ export const CoreFilterCmpt = {
 			if (!this.tableOnly) {
 				tabulatorOptions.data = this.filteredData;
 				tabulatorOptions.columns = this.filteredColumns;
+			} else {
+				tabulatorOptions.columns.forEach(col => {
+					if (col.visible === undefined)
+						col.visible = true;
+				});
 			}
 
-			if (tabulatorOptions.selectable || (tabulatorOptions.columns && tabulatorOptions.columns.filter(el => el.formatter == 'rowSelection').length))
+			if (tabulatorOptions.selectable || tabulatorOptions.selectableRows || (tabulatorOptions.columns && tabulatorOptions.columns.filter(el => el.formatter == 'rowSelection').length))
 				this.tabulatorHasSelector = true;
 
 			if (this.idField) {
@@ -248,10 +328,10 @@ export const CoreFilterCmpt = {
 			}
 
 			// Start the tabulator with the build options
-			this.tabulator = new Tabulator(
-				this.$refs.table,
-				tabulatorOptions
-			);
+			this.tabulator = new Tabulator(this.$refs.table, {
+				...tabulatorOptions,
+				debugInvalidOptions: false,
+			});
 			// If event handlers have been provided
 			if (Array.isArray(this.tabulatorEvents) && this.tabulatorEvents.length > 0)
 			{
@@ -259,7 +339,10 @@ export const CoreFilterCmpt = {
 				for (let evt of this.tabulatorEvents)
 					this.tabulator.on(evt.event, evt.handler);
 			}
-			this.tabulator.on('tableBuilt', () => {this.tableBuilt = true; this.$emit('tableBuilt');});
+			this.tabulator.on('tableBuilt', () => {
+				this.tableBuilt = true;
+				this.$emit('tableBuilt');
+			});
 			this.tabulator.on("rowSelectionChanged", data => {
 				this.selectedData = data;
 			});
@@ -294,7 +377,7 @@ export const CoreFilterCmpt = {
 				this.tabulator.on('tableBuilt', () => {
 					const cols = this.tabulator.getColumns();
 					this.fields = cols.map(col => col.getField());
-					this.selectedFields = cols.filter(col => col.isVisible()).map(col => col.getField());
+					this.setSelectedFields();
 					if (this.tabulator.options.persistence.headerFilter)
 						this._setHeaderFilter();
 				});
@@ -303,7 +386,123 @@ export const CoreFilterCmpt = {
 
 			this.tabulator.on("dataFiltered", filters => {
 				this.filterActive = filters.length > 0;
+				this.$emit("headerFilterOn", this.filterActive);
 			});
+			this.tabulator.on("localized", () => {
+				this.tabulator.modules.responsiveLayout.generateCollapsedContent();
+			});
+		},
+		async configureTabulatorLocalizations(tabulatorOptions) {
+			tabulatorOptions.locale = this.$p.user_language.value;
+			tabulatorOptions.langs = {};
+
+			const genericTabulatorPhrasesResponse = await this.$api.call(
+				ApiPhrases.getTabulatorPhrases(),
+			);
+			const genericTabulatorPhrasesData = genericTabulatorPhrasesResponse.data;
+			Object.keys(genericTabulatorPhrasesData).forEach((language) => {
+				let genericTabulatorPhraseToTranslationMapper = {};
+				genericTabulatorPhrasesData[language].forEach((phrase) => {
+					genericTabulatorPhraseToTranslationMapper[phrase.phrase] = phrase.text;
+				});
+
+				tabulatorOptions.langs[language] = {
+					data: {
+						loading: genericTabulatorPhraseToTranslationMapper["loading"],
+						error: genericTabulatorPhraseToTranslationMapper["error"],
+					},
+					groups: {
+						item: genericTabulatorPhraseToTranslationMapper["item"],
+						items: genericTabulatorPhraseToTranslationMapper["items"],
+					},
+					pagination: {
+						page_size:
+							genericTabulatorPhraseToTranslationMapper["page_size"],
+						page_title:
+							genericTabulatorPhraseToTranslationMapper["page_title"],
+						first: genericTabulatorPhraseToTranslationMapper["first"],
+						first_title:
+							genericTabulatorPhraseToTranslationMapper["first_title"],
+						last: genericTabulatorPhraseToTranslationMapper["last"],
+						last_title:
+							genericTabulatorPhraseToTranslationMapper["last_title"],
+						prev: genericTabulatorPhraseToTranslationMapper["prev"],
+						prev_title:
+							genericTabulatorPhraseToTranslationMapper["prev_title"],
+						next: genericTabulatorPhraseToTranslationMapper["next"],
+						next_title:
+							genericTabulatorPhraseToTranslationMapper["next_title"],
+						all: genericTabulatorPhraseToTranslationMapper["all"],
+						counter: {
+							showing:
+								genericTabulatorPhraseToTranslationMapper["showing"],
+							of: genericTabulatorPhraseToTranslationMapper["of"],
+							rows: genericTabulatorPhraseToTranslationMapper["rows"],
+							pages: genericTabulatorPhraseToTranslationMapper["pages"],
+						},
+					},
+				};
+			});
+
+			let phrasesGroupedByCategoryRequestParam = {};
+			tabulatorOptions.columns.forEach((column) => {
+				if (!column.titlePhrase?.length) return;
+
+				let [category, phrase] = column.titlePhrase.split("/");
+				if (phrasesGroupedByCategoryRequestParam[category]) {
+					phrasesGroupedByCategoryRequestParam[category].push(phrase);
+				} else {
+					phrasesGroupedByCategoryRequestParam[category] = [phrase];
+				}
+			});
+			tabulatorOptions.menuItemPhrases?.forEach((menuItemPhrase) => {
+				let [category, phrase] = menuItemPhrase.split("/");
+				if (phrasesGroupedByCategoryRequestParam[category]) {
+					phrasesGroupedByCategoryRequestParam[category].push(phrase);
+				} else {
+					phrasesGroupedByCategoryRequestParam[category] = [phrase];
+				}
+			});
+
+			if (!Object.keys(phrasesGroupedByCategoryRequestParam).length) {
+				return tabulatorOptions;
+			}
+
+			const phrasesResponse = await this.$api.call(
+				ApiPhrases.getPhrases(phrasesGroupedByCategoryRequestParam),
+			);
+			const phrasesData = phrasesResponse.data;
+
+			Object.keys(phrasesData).forEach((language) => {
+				let phraseToTranslationMapper = {};
+				phrasesData[language].forEach((phrase) => {
+					phraseToTranslationMapper[
+						phrase.category + "/" + phrase.phrase
+					] = phrase.text;
+				});
+
+				let columnFieldToTranslationMapper = {};
+				tabulatorOptions.columns.forEach((column) => {
+					if (!column.titlePhrase?.length) return;
+
+					columnFieldToTranslationMapper[column.field] =
+						phraseToTranslationMapper[column.titlePhrase] ??
+						"<< PHRASE " + column.titlePhrase + " >>";
+				});
+				tabulatorOptions.langs[language].columns =
+					columnFieldToTranslationMapper;
+
+				let menuItemPhraseToTranslationMapper = {};
+				tabulatorOptions.menuItemPhrases?.forEach((menuItemPhrase) => {
+					menuItemPhraseToTranslationMapper[menuItemPhrase] =
+						phraseToTranslationMapper[menuItemPhrase] ??
+						"<< PHRASE " + menuItemPhrase + " >>";
+				});
+				tabulatorOptions.langs[language].menuItems =
+					menuItemPhraseToTranslationMapper;
+			});
+
+			return tabulatorOptions;
 		},
 		updateTabulator() {
 			if (this.tabulator) {
@@ -314,7 +513,7 @@ export const CoreFilterCmpt = {
 			}
 		},
 		_updateTabulator() {
-			this.tabulatorHasSelector = this.tabulatorOptions.selectable || this.filteredColumns.filter(el => el.formatter == 'rowSelection').length;
+			this.tabulatorHasSelector = this.tabulatorOptions.selectable || this.tabulatorOptions.selectableRows || this.filteredColumns.filter(el => el.formatter == 'rowSelection').length;
 			this.tabulator.setColumns(this.filteredColumns);
 			this.tabulator.setData(this.filteredData);
 			this._setHeaderFilter()
@@ -327,6 +526,7 @@ export const CoreFilterCmpt = {
 			});
 			this.tabulator.clearFilter();
 			this.filterActive = false;
+			this.$emit('headerFilterOn', this.filterActive)
 		},
 		_setHeaderFilter()
 		{
@@ -335,9 +535,6 @@ export const CoreFilterCmpt = {
 				this.tabulator.setHeaderFilterValue(filter.field, filter.value);
 			});
 		},
-		/**
-		 *
-		 */
 		getFilter() {
 			if (this.selectedFilter === null)
 				this.startFetchCmpt(
@@ -354,18 +551,14 @@ export const CoreFilterCmpt = {
 					this.render
 				);
 		},
-		/**
-		 *
-		 */
-		render(response) {
-			let data = response;
+		setRenderData(data) {
+			this.fetchResult = data;
 			this.filterName = data.filterName;
 			this.dataset = data.dataset;
 			this.datasetMetadata = data.datasetMetadata;
 
 			this.fields = data.fields;
 			this.selectedFields = data.selectedFields;
-			this.notSelectedFields = this.fields.filter(x => this.selectedFields.indexOf(x) === -1);
 			this.filterFields = [];
 
 			for (let i = 0; i < data.datasetMetadata.length; i++)
@@ -382,6 +575,14 @@ export const CoreFilterCmpt = {
 					}
 				}
 			}
+		},
+		/**
+		 *
+		 */
+		render(response) {
+			let data = response;
+
+			this.setRenderData(data);
 
 			// If the side menu is active
 			if (this.sideMenu === true)
@@ -609,7 +810,18 @@ export const CoreFilterCmpt = {
 
 			// parent not found
 			return false;
-		}
+		},
+		getColumnNames() {
+			if (!this.tableBuilt) {
+				return {};
+			} else if (this.tabulator.options.locale) {
+				return this.tabulator.getLang().columns;
+			}
+			return this.tabulator.getColumns().reduce((res, col) => {
+				res[col.getField()] = col.getDefinition().title;
+				return res;
+			}, {});
+		},
 	},
 	beforeCreate() {
 		if (!this.tableOnly == !this.filterType)
@@ -620,13 +832,16 @@ export const CoreFilterCmpt = {
 			alert('"nwNewEntry" listener is mandatory when sideMenu is true');
 		this.uuid = _uuid++;
 		this.$emit('uuidDefined', this.uuid)
+
+		Tabulator.registerModule(InternalToExternalEventBroadcastModule);
+		Tabulator.registerModule(MenuExtensionModule);
+		Tabulator.registerModule(ResponsiveLayoutExtensionModule);
 	},
 	mounted() {
-
 		this.initTabulator().then(() => {
 			if (!this.tableOnly) {
 				this.selectedFilter = window.location.hash ? window.location.hash.slice(1) : null;
-				this.getFilter(); // get the filter data
+				this.render(this.fetchResult);
 			}
 		});
 
@@ -648,7 +863,6 @@ export const CoreFilterCmpt = {
 				</h3>
 			</div>
 		</div>
-
 		<div :id="'filterCollapsables' + idExtra">
 
 			<div class="d-flex flex-row justify-content-between flex-wrap">
@@ -658,28 +872,28 @@ export const CoreFilterCmpt = {
 						{{ newBtnLabel }}
 					</button>
 					<button v-if="reload" class="btn btn-outline-secondary" aria-label="Reload" @click="reloadTable">
-						<span class="fa-solid fa-rotate-right" aria-hidden="true"></span>
+						<span class="fa-solid fa-rotate-right" aria-hidden="true"  :title="reloadBtnInfotext ? reloadBtnInfotext : 'Reload'" ></span>
 					</button>
-					<span v-if="$slots.actions && tabulatorHasSelector">
+					<span v-if="$slots.actions && tabulatorHasSelector && useSelectionSpan">
 						<span v-if="countOnly">{{ selectedData.length }} ausgewählt</span>
-						<span v-else> Mit {{ selectedData.length }} ausgewählten:</span>
+						<span v-else id="selected-info-text"> Mit {{ selectedData.length }} ausgewählten:</span>
 					</span>
 					<slot name="actions" v-bind="{selected: tabulatorHasSelector ? selectedData : []}"></slot>
 					<slot name="search"></slot>
 				</div>
 				<div class="d-flex gap-1 align-items-baseline flex-grow-1 justify-content-end">
 					<span v-if="!tableOnly">[ {{ filterName }} ]</span>
-					<span v-else-if="description">{{ description }}</span>
-					<a v-if="!tableOnly || $slots.filter" href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra">
+					<span v-else-if="description" v-html="description"></span>
+					<a aria-label="filter" v-if="!tableOnly || $slots.filter" href="#" class="btn btn-link px-0 fhc-text" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra">
 						<span class="fa-solid fa-xl fa-filter"></span>
 					</a>
-					<a v-if="filterActive"  class="btn btn-link px-0 text-dark" :title="$p.t('ui','filterdelete')" @click="clearFilters">
+					<a aria-label="filter" v-if="filterActive"  class="btn btn-link px-0 fhc-text" :title="$p.t('ui','filterdelete')" @click="clearFilters">
 						<span class="fa-solid fa-xl fa-filter-circle-xmark"></span>
 					</a>
-					<a href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra">
+					<a aria-label="filter" href="#" class="btn btn-link px-0 fhc-text" data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra">
 						<span class="fa-solid fa-xl fa-table-columns"></span>
 					</a>
-					<table-download class="btn btn-link px-0 text-dark" :tabulator="tabulator" :config="download"></table-download>
+					<table-download class="btn btn-link px-0 fhc-text" :tabulator="tabulator" :config="download"></table-download>
 				</div>
 			</div>
 
@@ -689,7 +903,7 @@ export const CoreFilterCmpt = {
 				:data-bs-parent="'#filterCollapsables' + idExtra"
 				:fields="fieldIdsForVisibilty"
 				:selected="selectedFields"
-				:names="fieldNames"
+				:names="getColumnNames()"
 				@hide="tabulator.hideColumn($event)"
 				@show="tabulator.showColumn($event)"
 				v-collapse-auto-close

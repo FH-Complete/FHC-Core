@@ -1,7 +1,6 @@
 import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
 import Mailverteiler from "./ProfilComponents/Mailverteiler.js";
 import AusweisStatus from "./ProfilComponents/FhAusweisStatus.js";
-import QuickLinks from "./ProfilComponents/QuickLinks.js";
 import Adresse from "./ProfilComponents/Adresse.js";
 import Kontakt from "./ProfilComponents/Kontakt.js";
 import ProfilEmails from "./ProfilComponents/ProfilEmails.js";
@@ -9,15 +8,17 @@ import RoleInformation from "./ProfilComponents/RoleInformation.js";
 import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
 import FetchProfilUpdates from "./ProfilComponents/FetchProfilUpdates.js";
 import EditProfil from "./ProfilModal/EditProfil.js";
+import QuickLinks from "./ProfilComponents/QuickLinks.js";
+import CalendarSync from "./ProfilComponents/CalendarSync.js";
 
 import ApiProfilUpdate from '../../../api/factory/profilUpdate.js';
+import { dateFilter } from '../../../tabulator/filters/Dates.js';
 
 export default {
 	components: {
 		CoreFilterCmpt,
 		Mailverteiler,
 		AusweisStatus,
-		QuickLinks,
 		Adresse,
 		Kontakt,
 		ProfilEmails,
@@ -25,37 +26,42 @@ export default {
 		ProfilInformation,
 		FetchProfilUpdates,
 		EditProfil,
+		QuickLinks,
+		CalendarSync,
 	},
-	inject: ["sortProfilUpdates", "collapseFunction", "language"],
+	inject: ["sortProfilUpdates", "collapseFunction", "isEditable"],
 	data() {
 		return {
 			showModal: false,
 			collapseIconBetriebsmittel: true,
 			editDataFilter: null,
-
 			// tabulator options
 			zutrittsgruppen_table_options: {
 				persistenceID: "filterTableStudentProfilZutrittsgruppen",
 				persistence: {
 					columns: false
 				},
-				height: 200,
+				minHeight: 200,
 				layout: "fitColumns",
 				columns: [{
-					title: Vue.computed(() => this.$p.t('profil/zutrittsGruppen')),
+					title: "placeholder",
+					titlePhrase: "profil/zutrittsGruppen",
 					field: "bezeichnung"
-				}],
+					}
+				],
 			},
 			betriebsmittel_table_options: {
 				persistenceID: "filterTableStudentProfilBetriebsmittel",
 				persistence: {
 					columns: false
 				},
-				height: 300,
+				minHeight: 300,
 				layout: "fitColumns",
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
 				responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
+				responsiveLayoutCollapseStartOpen: false,
+				locale: true,
 				columns: [
 					{
 						title:
@@ -66,28 +72,38 @@ export default {
 						formatter: "responsiveCollapse",
 						maxWidth: 40,
 						headerClick: this.collapseFunction,
+						responsive: 0,
 					},
 					{
-						title:  Vue.computed(() => this.$p.t('profil/entlehnteBetriebsmittel')),
+						title: "placeholder",
+						titlePhrase: "profil/entlehnteBetriebsmittel",
 						field: "betriebsmittel",
 						headerFilter: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 0,
 					},
 					{
-						title:  Vue.computed(() => this.$p.t('profil/inventarnummer')),
+						title: "placeholder",
+						titlePhrase: "profil/inventarnummer",
 						field: "Nummer",
 						headerFilter: true,
 						resizable: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 2,
 					},
 					{
-						title: Vue.computed(() => this.$p.t('profil/ausgabedatum')),
+						title: "placeholder",
+						titlePhrase: "profil/ausgabedatum",
 						field: "Ausgegeben_am",
-						headerFilter: true,
+						headerFilterFunc: 'dates',
+						headerFilter: dateFilter,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						formatter:"datetime",
+						formatterParams: this.datetimeFormatterParams(),
+						responsive: 1,
 					},
 				],
 			},
@@ -97,6 +113,7 @@ export default {
 	props: {
 		data: Object,
 		editData: Object,
+		calendarSyncUrls: Array,
 	},
 	provide() {
 		return {
@@ -106,11 +123,9 @@ export default {
 	methods: {
 
 		betriebsmittelTableBuilt: function () {
-			this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
 			this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
 		},
 		zutrittsgruppenTableBuilt: function () {
-			this.$refs.zutrittsgruppenTable.tabulator.setColumns(this.zutrittsgruppen_table_options.columns)
 			this.$refs.zutrittsgruppenTable.tabulator.setData(
 				this.data.zuttritsgruppen
 			);
@@ -133,11 +148,11 @@ export default {
 				this.$api
 					.call(ApiProfilUpdate.selectProfilRequest())
 					.then((request) => {
-						if (!request.error && res) {
+						if (!request.error && request.data) {
 							this.data.profilUpdates = request.data;
 							this.data.profilUpdates.sort(this.sortProfilUpdates);
 						} else {
-							console.error("Error when fetching profile updates: " + res.data);
+							console.error("Error when fetching profile updates: " + request);
 						}
 					})
 					.catch((err) => {
@@ -160,11 +175,21 @@ export default {
 				this.$refs.editModal.show();
 			});
 		},
+		datetimeFormatterParams: function() {
+			const params = {
+				inputFormat:"yyyy-MM-dd",
+				outputFormat:"dd.MM.yyyy",
+				invalidPlaceholder:"(invalid date)",
+				timezone:FHC_JS_DATA_STORAGE_OBJECT.timezone
+			};
+			return params;
+		}
 	},
 
 	computed: {
-		editable() {
-			return this.data?.editAllowed ?? false;
+		
+		fotoStatus() {
+			return this.data?.fotoStatus ?? null;
 		},
 
 		filteredEditData() {
@@ -208,6 +233,10 @@ export default {
 					label: `${this.$p.t('person','personenkennzeichen')}`,
 					value: this.data.personenkennzeichen
 				},
+				matrikelnummer: {
+					label: this.$p.t('person/matrikelnummer'),
+					value: this.data.matrikelnummer
+				},
 				studiengang: {
 					label: `${this.$p.t('lehre','studiengang')}`,
 					value: this.data.studiengang
@@ -226,36 +255,27 @@ export default {
 				}
 			};
 		},
+		quickLinks() {
+			let quickLinks = [];
+			//
+			return quickLinks;
+		},
 	},
 	created() {
 		//? sorts the profil Updates: pending -> accepted -> rejected
 		this.data.profilUpdates?.sort(this.sortProfilUpdates);
 	},
-	watch: {
-		'language.value'(newVal) {
-			if(this.$refs.betriebsmittelTable) this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
-			if(this.$refs.zutrittsgruppenTable) this.$refs.zutrittsgruppenTable.tabulator.setColumns(this.zutrittsgruppen_table_options.columns)
-		}
-	},
 	template: /*html*/ `
 <div class="container-fluid text-break fhc-form">
-    <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" 
-    :value="JSON.parse(JSON.stringify(filteredEditData))" :title="$p.t('profil','profilBearbeiten')"></edit-profil>
-    <!-- ROW --> 
+    <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal"
+    :value="JSON.parse(JSON.stringify(filteredEditData))" :titel="$p.t('profil','profilBearbeiten')"></edit-profil>
+    <!-- ROW -->
     <div class="row">
-        <!-- HIDDEN QUICK LINKS -->
         <div  class="d-md-none col-12 ">
-            <!--TODO: uncomment when implemented
-			<div class="row py-2">
-                <div class="col">
-                    <quick-links :title="$p.t('profil','quickLinks')" :mobile="true"></quick-links>
-                </div>
-            </div>-->
-            
 			<!-- Bearbeiten Button -->
-			<div v-if="editable" class="row ">
+			<div v-if="isEditable" class="row ">
 				<div class="col mb-3">
-					<button @click="showEditProfilModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+					<button @click="showEditProfilModal" type="button" class="card text-start  w-100 btn btn-outline-secondary" >
 						<div class="row">
 							<div class="col-2">
 								<i class="fa fa-edit"></i>
@@ -265,46 +285,57 @@ export default {
 					</button>
 				</div>
 			</div>
+			<!-- MOBILE PROFIL UPDATES -->
 				<div v-if="data.profilUpdates" class="row mb-3">
 					<div class="col">
-						<!-- MOBILE PROFIL UPDATES -->  
 						<fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates"  :data="data.profilUpdates"></fetch-profil-updates>
 					</div>
 				</div>
 			</div>
-			<!-- END OF HIDDEN QUCK LINKS -->
-			
+
 			<!-- MAIN PANNEL -->
 			<div class="col-sm-12 col-md-8 col-xxl-9 ">
 				<!-- ROW WITH PROFIL IMAGE AND INFORMATION -->
 				<!-- INFORMATION CONTENT START -->
-				<!-- ROW WITH THE PROFIL INFORMATION --> 
+				<!-- ROW WITH THE PROFIL INFORMATION -->
 				<div class="row mb-4 ">
 					<div  class="col-lg-12 col-xl-6 ">
+						<!-- PROFIL INFORMATION -->
 						<div class="row mb-4">
 							<div class="col">
-								<!-- PROFIL INFORMATION -->
-								<profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','studentIn')" :data="profilInformation" :editable="editable"></profil-information>
+								<profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','studentIn')" :data="profilInformation" :fotoStatus="fotoStatus"></profil-information>
 							</div>
 						</div>
+						<!-- QUICK LINKS, MOBILE VIEW (HIDDEN IF VIEWPORT >= MD BREAKPOINT) -->
+						<div v-if="quickLinks.length" class="row mb-4 d-md-none">
+							<div class="col">
+								<quick-links :title="$p.t('profil/quickLinks')" :links="quickLinks" />
+							</div>
+						</div>
+						<!-- CALENDAR SYNC OPTIONS, MOBILE VIEW (HIDDEN IF VIEWPORT >= MD BREAKPOINT) -->
+						<div class="row mb-4 d-md-none">
+            			    <div class="col">
+								<calendar-sync :uid="$props.data.username" :calendarSyncUrls="$props.calendarSyncUrls"></calendar-sync>
+            			    </div>
+						</div>
+						<!-- STUDENT INFO -->
 						<div class="row mb-4">
 							<div  class=" col-lg-12">
-								<!-- STUDENT INFO -->
 								<role-information :title="$p.t('profil','studentInformation')" :data="roleInformation"></role-information>
-							</div> 
+							</div>
 						</div>
 					<!-- START OF SECOND PROFIL  INFORMATION COLUMN -->
 					</div>
 					<div  class="col-xl-6 col-lg-12 ">
+						<!-- EMAILS -->
 						<div class="row mb-4">
 							<div class="col">
-								<!-- EMAILS -->
 								<profil-emails :title="this.$p.t('person','email')" :data="data.emails" ></profil-emails>
 							</div>
 						</div>
+						<!-- PRIVATE KONTAKTE-->
 						<div class="row mb-4 ">
 							<div class="col">
-								<!-- PRIVATE KONTAKTE-->
 								<div class="card">
 									<div class="card-header">
 										<div class="row">
@@ -326,10 +357,10 @@ export default {
 							</div>
 						</div>
 					</div>
-			
+
+					<!-- PRIVATE ADRESSEN-->
 					<div class="row mb-4">
 						<div class="col">
-							<!-- PRIVATE ADRESSEN-->
 							<div class="card">
 								<div class="card-header">
 									<div class="row">
@@ -344,7 +375,7 @@ export default {
 								<div class="card-body">
 									<div class="gy-3 row ">
 										<div v-for="element in data.adressen" class="col-12">
-											<Adresse :data="element"></Adresse> 
+											<Adresse :data="element"></Adresse>
 										</div>
 									</div>
 								</div>
@@ -356,16 +387,16 @@ export default {
 			<!-- SECOND ROW UNDER THE PROFIL IMAGE AND INFORMATION WITH THE TABLES -->
 			<div class="row">
 				<div class="col-12 mb-4" >
-					<core-filter-cmpt 
-					@tableBuilt="betriebsmittelTableBuilt" 
-					:title="$p.t('profil','entlehnteBetriebsmittel')"  
-					ref="betriebsmittelTable" 
-					:tabulator-options="betriebsmittel_table_options" 
-					tableOnly 
+					<core-filter-cmpt
+					@tableBuilt="betriebsmittelTableBuilt"
+					:title="$p.t('profil','entlehnteBetriebsmittel')"
+					ref="betriebsmittelTable"
+					:tabulator-options="betriebsmittel_table_options"
+					tableOnly
 					:sideMenu="false" />
-				</div> 
+				</div>
 				<div class="col-12 mb-4" >
-					<core-filter-cmpt 
+					<core-filter-cmpt
 					@tableBuilt="zutrittsgruppenTableBuilt" 
 					:title="$p.t('profil','zutrittsGruppen')" 
 					ref="zutrittsgruppenTable" 
@@ -379,16 +410,10 @@ export default {
 		</div>
 		<!-- START OF SIDE PANEL -->
 		<div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
-			<!--TODO: uncomment when implemented
-			<div  class="row d-none d-md-block mb-3">
-				<div class="col">
-					<quick-links :title="$p.t('profil','quickLinks')"></quick-links>
-				</div>
-			</div>-->
 			<!-- Bearbeiten Button -->
 			<div class="row d-none d-md-block">
 				<div class="col mb-3">
-					<button @click="()=>showEditProfilModal()" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+					<button @click="()=>showEditProfilModal()" type="button" class="card text-start  w-100 btn btn-outline-secondary" >
 						<div class="row">
 							<div class="col-2">
 								<i class="fa fa-edit"></i>
@@ -398,9 +423,21 @@ export default {
 					</button>
 				</div>
 			</div>
+			<!-- QUICK LINKS, HIDDEN IF VIEWPORT < MD BREAKPOINT -->
+			<div v-if="quickLinks.length" class="row mb-3 d-none d-md-block">
+				<div class="col">
+					<quick-links :title="$p.t('profil/quickLinks')" :links="quickLinks" />
+				</div>
+			</div>
+			<!-- CALENDAR SYNC OPTIONS, HIDDEN IF VIEWPORT < MD BREAKPOINT -->
+			<div class="row mb-3 d-none d-md-block">
+                <div class="col">
+					<calendar-sync :uid="$props.data.username" :calendarSyncUrls="$props.calendarSyncUrls"></calendar-sync>
+                </div>
+			</div>
+			<!-- PROFIL UPDATES -->
 			<div v-if="data.profilUpdates" class="row d-none d-md-block mb-3">
 				<div class="col mb-3">
-					<!-- PROFIL UPDATES -->
 					<fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates"  :data="data.profilUpdates"></fetch-profil-updates>
 				</div>
 			</div>
@@ -410,13 +447,13 @@ export default {
 				</div>
 			</div>
 			<!-- START OF THE SECOND ROW IN THE SIDE PANEL -->
-			<div  class="row">
+			<!-- MAILVERTEILER -->
+            <div class="row mb-3">
 				<div class="col">
-					<!-- HIER SIND DIE MAILVERTEILER -->
 					<mailverteiler :title="$p.t('profil','mailverteiler')" :data="data?.mailverteiler"></mailverteiler>
 				</div>
-            <!-- END OF THE SECOND ROW IN THE SIDE PANEL -->
             </div>
+            <!-- END OF THE SECOND ROW IN THE SIDE PANEL -->
         <!-- END OF SIDE PANEL -->
         </div>
     <!-- END OF CONTAINER ROW-->

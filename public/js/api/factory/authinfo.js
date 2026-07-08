@@ -21,5 +21,11 @@ export default {
 			method: 'get',
 			url: '/api/frontend/v1/AuthInfo/getAuthUID'
 		};
+	},
+	getAuthInfo() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/AuthInfo/getAuthInfo'
+		};
 	}
 };

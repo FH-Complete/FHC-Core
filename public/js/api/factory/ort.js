@@ -22,5 +22,19 @@ export default {
 			url: '/api/frontend/v1/Ort/ContentID',
 			params: { ort_kurzbz: ort_kurbz }
 		};
+	},
+	getRooms(datum, von, bis, typ, personenanzahl = 0) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Ort/getRooms',
+			params: { datum, von, bis, typ, personenanzahl }
+		};
+	},
+	getRoomTypes() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Ort/getTypes',
+			params: { }
+		};
 	}
 };

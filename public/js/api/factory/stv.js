@@ -29,6 +29,7 @@ import exam from './stv/exam.js';
 import abschlusspruefung from './stv/abschlusspruefung.js';
 import grades from './stv/grades.js';
 import mobility from './stv/mobility.js';
+import admissionDates from './stv/admissionDates.js';
 
 export default {
 	app,
@@ -44,5 +45,6 @@ export default {
 	exam,
 	abschlusspruefung,
 	grades,
-	mobility
+	mobility,
+	admissionDates
 };

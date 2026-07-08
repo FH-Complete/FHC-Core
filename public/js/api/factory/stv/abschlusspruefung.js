@@ -86,13 +86,15 @@ export default {
 	getMitarbeiter(searchString) {
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/stv/abschlusspruefung/getMitarbeiter/' + searchString
+			url: 'api/frontend/v1/stv/abschlusspruefung/getMitarbeiter',
+			params: { searchString }
 		};
 	},
 	getPruefer(searchString) {
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/stv/abschlusspruefung/getPruefer/' + searchString
+			url: 'api/frontend/v1/stv/abschlusspruefung/getPruefer',
+			params: { searchString }
 		};
 	},
 	getNoten() {
@@ -105,7 +107,14 @@ export default {
 		return {
 			method: 'post',
 			url: 'api/frontend/v1/stv/abschlusspruefung/checkForExistingExams/',
-			params: { uid }
+			params: { uids }
 		};
-	}
+	},
+	searchPerson(searchString) {
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/stv/abschlusspruefung/searchPerson/',
+			params: { id }
+		};
+	},
 };

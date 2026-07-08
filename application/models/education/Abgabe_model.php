@@ -11,4 +11,5 @@ class Abgabe_model extends DB_Model
 		$this->dbTable = 'campus.tbl_abgabe';
 		$this->pk = 'abgabe_id';
 	}
+
 }

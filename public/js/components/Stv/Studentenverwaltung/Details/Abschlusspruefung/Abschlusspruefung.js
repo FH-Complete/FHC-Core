@@ -34,43 +34,61 @@ export default {
 			default: false
 		}
 	},
-	computed: {
-		studentUids() {
-			if (this.student.uid)
-			{
-				return [this.student.uid];
-			}
-			return this.student.map(e => e.uid);
-		},
-		studentKzs(){
-			if (this.student.uid)
-			{
-				return [this.student.studiengang_kz];
-			}
-			return this.student.map(e => e.studiengang_kz);
-		},
-		stg_kz(){
-			return this.studentKzs[0];
-		},
-		showAllFormats() {
-			if( this.isBerechtigtDocAndOdt === false
-				|| !Array.isArray(this.isBerechtigtDocAndOdt) )
-			{
-				return false;
-			}
-			let retval = this.isBerechtigtDocAndOdt.includes(this.stgInfo.oe_kurzbz);
-			return retval;
-		}
-	},
 	props: {
 		student: Object
 	},
 	data() {
 		return {
-			tabulatorOptions: {
+			tabulatorData: [],
+			lastSelected: null,
+			formData: {
+				typStg: null,
+				pruefungstyp_kurzbz: null,
+				akadgrad_id: null,
+				vorsitz: null,
+				pruefungsantritt_kurzbz: null,
+				abschlussbeurteilung_kurzbz: null,
+				datum: null,
+				sponsion: null,
+				pruefer1: null,
+				pruefer2: null,
+				pruefer3: null,
+				anmerkung: null,
+				protokoll: null,
+				note: null,
+				link: null
+			},
+			statusNew: true,
+			arrTypen: [],
+			arrAntritte: [],
+			arrBeurteilungen: [],
+			arrAkadGrad: [],
+			arrNoten: [],
+			selectedVorsitz: null,
+			filteredMitarbeiter: [],
+			filteredPersons: [],
+			selectedPruefer1: null,
+			selectedPruefer2: null,
+			selectedPruefer3: null,
+			stgInfo: { typ: '', oe_kurzbz: '' },
+			abortController: {
+				mitarbeiter: null,
+				persons: null
+			},
+			layout: 'fitDataStretchFrozen',
+			layoutColumnsOnNewData: false,
+			height: 'auto',
+			minHeight: '200',
+		}
+	},
+	computed: {
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(ApiStvAbschlusspruefung.getAbschlusspruefung(this.student.uid)),
 				ajaxResponse: (url, params, response) => response.data,
+				index: 'abschlusspruefung_id',
+				persistenceID: 'stv-details-finalexam-20260217',
 				columns: [
 					{title: "vorsitz", field: "vorsitz_nachname"},
 					{title: "abschlussbeurteilung", field: "beurteilung_bezeichnung"},
@@ -78,7 +96,7 @@ export default {
 					{title: "prueferIn2", field: "p2_nachname", visible: false},
 					{title: "prueferIn3", field: "p3_nachname", visible: false},
 					{
-						title: "datum", 
+						title: "datum",
 						field: "datum",
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
@@ -95,7 +113,7 @@ export default {
 					},
 					{title: "uhrzeit", field: "uhrzeit"},
 					{
-						title: "freigabe", 
+						title: "freigabe",
 						field: "freigabedatum",
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
@@ -112,7 +130,7 @@ export default {
 					},
 					{title: "pruefungsantritt", field: "antritt_bezeichnung"},
 					{
-						title: "sponsion", 
+						title: "sponsion",
 						field: "sponsion",
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
@@ -163,15 +181,11 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitDataFill',
-				layoutColumnsOnNewData: false,
-				height: 'auto',
-				minHeight: '200',
-				selectable: true,
-				index: 'abschlusspruefung_id',
-				persistenceID: 'stv-details-finalexam'
-			},
-			tabulatorEvents: [
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'dataLoaded',
 					handler: data => this.tabulatorData = data.map(item => {
@@ -182,90 +196,66 @@ export default {
 				{
 					event: 'tableBuilt',
 					handler: async() => {
+						if (!this.$refs.table) return;
+
 						await this.$p.loadCategory(['global', 'person', 'stv', 'abschlusspruefung', 'ui']);
 
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						let cm = this.$refs.table.tabulator.columnManager;
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
 
-						cm.getColumnByField('vorsitz_nachname').component.updateDefinition({
-							title: this.$p.t('abschlusspruefung', 'vorsitz_header')
-						});
-						cm.getColumnByField('beurteilung_bezeichnung').component.updateDefinition({
-							title: this.$p.t('abschlusspruefung', 'abschlussbeurteilung')
-						});
-						cm.getColumnByField('p1_nachname').component.updateDefinition({
-							title: this.$p.t('abschlusspruefung', 'pruefer1')
-						});
-						cm.getColumnByField('p2_nachname').component.updateDefinition({
-							title: this.$p.t('abschlusspruefung', 'pruefer2')
-						});
-						cm.getColumnByField('p3_nachname').component.updateDefinition({
-							title: this.$p.t('abschlusspruefung', 'pruefer3')
-						});
-						cm.getColumnByField('datum').component.updateDefinition({
-							title: this.$p.t('global', 'datum')
-						});
-						cm.getColumnByField('uhrzeit').component.updateDefinition({
-							title: this.$p.t('global', 'uhrzeit')
-						});
-						cm.getColumnByField('freigabedatum').component.updateDefinition({
-							title: this.$p.t('abschlusspruefung', 'freigabe')
-						});
-						cm.getColumnByField('antritt_bezeichnung').component.updateDefinition({
-							title: this.$p.t('abschlusspruefung', 'pruefungsantritt')
-						});
-						cm.getColumnByField('sponsion').component.updateDefinition({
-							title: this.$p.t('abschlusspruefung', 'sponsion')
-						});
-						cm.getColumnByField('anmerkung').component.updateDefinition({
-							title: this.$p.t('global', 'anmerkung')
-						});
-						cm.getColumnByField('pruefungstyp_kurzbz').component.updateDefinition({
-							title: this.$p.t('global', 'typ')
-						});
-						cm.getColumnByField('abschlusspruefung_id').component.updateDefinition({
-							title: this.$p.t('ui', 'abschlusspruefung_id')
-						});
-						/*
-						cm.getColumnByField('actions').component.updateDefinition({
-						title: this.$p.t('global', 'aktionen')
-												});
-						*/
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('vorsitz_nachname', this.$p.t('abschlusspruefung', 'vorsitz_header'));
+						setHeader('beurteilung_bezeichnung', this.$p.t('abschlusspruefung', 'abschlussbeurteilung'));
+						setHeader('p1_nachname', this.$p.t('abschlusspruefung', 'pruefer1'));
+						setHeader('p2_nachname', this.$p.t('abschlusspruefung', 'pruefer2'));
+						setHeader('p3_nachname', this.$p.t('abschlusspruefung', 'pruefer3'));
+						setHeader('datum', this.$p.t('global', 'datum'));
+						setHeader('uhrzeit', this.$p.t('global', 'uhrzeit'));
+						setHeader('freigabedatum', this.$p.t('abschlusspruefung', 'freigabe'));
+						setHeader('antritt_bezeichnung', this.$p.t('abschlusspruefung', 'pruefungsantritt'));
+						setHeader('sponsion', this.$p.t('abschlusspruefung', 'sponsion'));
+						setHeader('anmerkung', this.$p.t('global', 'anmerkung'));
+						setHeader('pruefungstyp_kurzbz', this.$p.t('global', 'typ'));
+						setHeader('abschlusspruefung_id', this.$p.t('abschlusspruefung', 'abschlusspruefung_id'));
 					}
 				}
-			],
-			tabulatorData: [],
-			lastSelected: null,
-			formData: {
-				typStg: null,
-				pruefungstyp_kurzbz: null,
-				akadgrad_id: null,
-				vorsitz: null,
-				pruefungsantritt_kurzbz: null,
-				abschlussbeurteilung_kurzbz: null,
-				datum: null,
-				sponsion: null,
-				pruefer1: null,
-				pruefer2: null,
-				pruefer3: null,
-				anmerkung: null,
-				protokoll: null,
-				note: null,
-				link: null
-			},
-			statusNew: true,
-			arrTypen: [],
-			arrAntritte: [],
-			arrBeurteilungen: [],
-			arrAkadGrad: [],
-			arrNoten: [],
-			filteredMitarbeiter: [],
-			filteredPruefer: [],
-			abortController: {
-				mitarbeiter: null,
-				pruefer: null
-			},
-			stgInfo: { typ: '', oe_kurzbz: '' }
+			];
+			return events;
+		},
+		studentUids() {
+			if (this.student.uid)
+			{
+				return [this.student.uid];
+			}
+			return this.student.map(e => e.uid);
+		},
+		studentKzs(){
+			if (this.student.uid)
+			{
+				return [this.student.studiengang_kz];
+			}
+			return this.student.map(e => e.studiengang_kz);
+		},
+		stg_kz(){
+			return this.studentKzs[0];
+		},
+		showAllFormats() {
+			if( this.isBerechtigtDocAndOdt === false
+				|| !Array.isArray(this.isBerechtigtDocAndOdt) )
+			{
+				return false;
+			}
+			let retval = this.isBerechtigtDocAndOdt.includes(this.stgInfo.oe_kurzbz);
+			return retval;
 		}
 	},
 	watch: {
@@ -274,6 +264,18 @@ export default {
 				this.$refs.table.reloadTable();
 			}
 			this.getStudiengangByKz();
+		},
+		selectedVorsitz(newVal) {
+			this.formData.vorsitz = newVal?.mitarbeiter_uid || null;
+		},
+		selectedPruefer1(newVal) {
+			this.formData.pruefer1 = newVal?.person_id || null;
+		},
+		selectedPruefer2(newVal) {
+			this.formData.pruefer2 = newVal?.person_id || null;
+		},
+		selectedPruefer3(newVal) {
+			this.formData.pruefer3 = newVal?.person_id || null;
 		}
 	},
 	methods: {
@@ -293,8 +295,38 @@ export default {
 		actionEditAbschlusspruefung(abschlusspruefung_id) {
 			this.resetForm();
 			this.statusNew = false;
+			this.loadAbschlusspruefung(abschlusspruefung_id).then((result) => {
+				//set selectedData to enable viewing label in primevue autocomplete fields
+				const data = result.data;
+				this.selectedVorsitz = {
+					label: this.getPersonLabel(data.pv_titelpre, data.pv_nachname, data.pv_vorname, data.pv_titelpost, data.pv_uid),
+					person_id: data.pv_person_id,
+					mitarbeiter_uid: data.pv_uid
+				};
+				if (data.p1_person_id) {
+					this.selectedPruefer1 = {
+						label: this.getPersonLabel(data.p1_titelpre, data.p1_nachname, data.p1_vorname, data.p1_titelpost),
+						person_id: data.p1_person_id
+					};
+				}
+				if (data.p2_person_id) {
+					this.selectedPruefer2 = {
+						label: this.getPersonLabel(data.p2_titelpre, data.p2_nachname, data.p2_vorname, data.p2_titelpost),
+						person_id: data.p2_person_id
+					}
+				};
+				if (data.p3_person_id) {
+					this.selectedPruefer3= {
+						label: this.getPersonLabel(data.p3_titelpre, data.p3_nachname, data.p3_vorname, data.p3_titelpost),
+						person_id: data.p3_person_id
+					};
+				}
+			});
 			this.$refs.finalexamModal.show();
-			this.loadAbschlusspruefung(abschlusspruefung_id);
+		},
+		getPersonLabel(titelpre, nachname, vorname, titelpost, uid) {
+			return nachname + ' ' + vorname + (titelpre ? ' ' + titelpre : '') + (titelpost ? ' ' + titelpost : '') + (uid ? ' (' + uid + ')' : '');
+
 		},
 		actionDeleteAbschlusspruefung(abschlusspruefung_id) {
 			this.$fhcAlert
@@ -334,8 +366,7 @@ export default {
 				.call(ApiStvAbschlusspruefung.loadAbschlusspruefung(abschlusspruefung_id))
 				.then(result => {
 					this.formData = result.data;
-					//TODO(Manu) check if cisRoot is okay
-					this.formData.link = this.cisRoot + 'index.ci.php/lehre/Pruefungsprotokoll/showProtokoll?abschlusspruefung_id=' + this.formData.abschlusspruefung_id + '&fhc_controller_id=67481e5ed5490';
+					this.formData.link = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'index.ci.php/lehre/Pruefungsprotokoll/showProtokoll?abschlusspruefung_id=' + this.formData.abschlusspruefung_id;
 					return result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -374,7 +405,7 @@ export default {
 			this.formData.vorsitz = null;
 			this.formData.pruefungsantritt_kurzbz = null;
 			this.formData.abschlussbeurteilung_kurzbz = null;
-			this.formData.datum = null; //oder new Date();
+			this.formData.datum = null;
 			this.formData.sponsion = null;
 			this.formData.pruefer1 = null;
 			this.formData.pruefer2 = null;
@@ -382,34 +413,11 @@ export default {
 			this.formData.anmerkung = null;
 			this.formData.protokoll = null;
 			this.formData.note = null;
-			this.formData.p1 = null;
-			this.formData.p2 = null;
-			this.formData.p3 = null;
-			this.formData.pv = null;
-		},
-		search(event) {
-			if (this.abortController.mitarbeiter) {
-				this.abortController.mitarbeiter.abort();
-			}
-			this.abortController.mitarbeiter = new AbortController();
+			this.selectedVorsitz = null;
+			this.selectedPruefer1 = null;
+			this.selectedPruefer2 = null;
+			this.selectedPruefer3 = null;
 
-			return this.$api
-				.call(ApiStvAbschlusspruefung.getMitarbeiter(event.query))
-				.then(result => {
-					this.filteredMitarbeiter = result.data.retval;
-				});
-		},
-		searchNotAkad(event) {
-			if (this.abortController.pruefer) {
-				this.abortController.pruefer.abort();
-			}
-			this.abortController.pruefer = new AbortController();
-
-			return this.$api
-				.call(ApiStvAbschlusspruefung.getPruefer(event.query))
-				.then(result => {
-					this.filteredPruefer = result.data.retval;
-				});
 		},
 		setDefaultFormData() {
 
@@ -417,11 +425,9 @@ export default {
 
 			if (this.stgInfo.typ === 'b') {
 				this.formData.pruefungstyp_kurzbz = 'Bachelor';
-				this.formData.protokoll = this.$p.t('abschlusspruefung', 'pruefungsnotizenMaster');
 			}
 			if (this.stgInfo.typ === 'd' || this.stgInfo === 'm') {
 				this.formData.pruefungstyp_kurzbz = 'Diplom';
-				this.formData.protokoll = this.$p.t('abschlusspruefung', 'pruefungsnotizenMaster');
 			}
 			if (this.stgInfo.typ === 'lg') {
 				this.formData.pruefungstyp_kurzbz = 'lgabschluss';
@@ -433,6 +439,61 @@ export default {
 		},
 		printDocument(link) {
 			window.open(link, '_blank');
+		},
+		searchMitarbeiter(event) {
+			if (this.abortController.mitarbeiter) {
+				this.abortController.mitarbeiter.abort();
+			}
+
+			this.abortController.mitarbeiter = new AbortController();
+
+			return this.$api
+				.call(ApiStvAbschlusspruefung.getMitarbeiter(event.query))
+				.then(result => {
+					this.filteredMitarbeiter = [];
+					for (let mitarbeiter of result.data.retval) {
+						this.filteredMitarbeiter.push(
+							{
+								label: this.getPersonLabel(
+									mitarbeiter.titelpre,
+									mitarbeiter.nachname,
+									mitarbeiter.vorname,
+									mitarbeiter.titelpost,
+									mitarbeiter.mitarbeiter_uid
+								),
+								person_id: mitarbeiter.person_id,
+								mitarbeiter_uid: mitarbeiter.mitarbeiter_uid
+							}
+						);
+					}
+				});
+		},
+		searchPerson(event) {
+			if (this.abortController.persons) {
+				this.abortController.persons.abort();
+			}
+
+			this.abortController.persons = new AbortController();
+
+			return this.$api
+				.call(ApiStvAbschlusspruefung.getPruefer(event.query))
+				.then(result => {
+					this.filteredPersons = [];
+					for (let person of result.data.retval) {
+						this.filteredPersons.push(
+							{
+								label: this.getPersonLabel(
+									person.titelpre,
+									person.nachname,
+									person.vorname,
+									person.titelpost,
+									person.person_uid
+								),
+								person_id: person.person_id
+							}
+						);
+					}
+				});
 		},
 	},
 	created() {
@@ -470,6 +531,7 @@ export default {
 				this.arrAkadGrad = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
+
 		if (!this.student.length) {
 			this.$api
 				.call(ApiStudiengang.getStudiengangByKz(this.student.studiengang_kz))
@@ -484,7 +546,7 @@ export default {
 	template: `
 	<div class="stv-details-abschlusspruefung h-100 pb-3">
 		<h4>{{this.$p.t('stv','tab_finalexam')}}</h4>
-		
+
 		<div v-if="this.student.length">
 			<abschlusspruefung-dropdown
 				:showAllFormats="showAllFormats"
@@ -505,12 +567,13 @@ export default {
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('stv', 'tab_finalexam')"
 			@click:new="actionNewAbschlusspruefung"
 			>
 		</core-filter-cmpt>
-		
+
 		<!--Modal: finalexamModal-->
 		<bs-modal ref="finalexamModal" dialog-class="modal-xl modal-dialog-scrollable">
 			<template #title>
@@ -576,87 +639,39 @@ export default {
 				</div>
 
 				<div class="row mb-3">
-					<template v-if="statusNew">
-						<form-input
-							container-class="col-6 stv-details-abschlusspruefung-vorsitz"
-							:label="$p.t('abschlusspruefung', 'vorsitz_header')"
-							type="autocomplete"
-							optionLabel="mitarbeiter"
-							v-model="formData.vorsitz"
-							name="vorsitz"
-							:suggestions="filteredMitarbeiter"
-							@complete="search"
-							:min-length="3"
-							>
-						</form-input>
-					</template>
-					<template v-else >
-						<form-input
-							v-if= "formData.pv"
-							container-class="col-6 stv-details-abschlusspruefung-vorsitz"
-							type="text"
-							name="name"
-							:label="$p.t('abschlusspruefung', 'vorsitz_header')"
-							v-model="formData.pv"
-							>
-						</form-input>
-						<form-input
-							v-else
-							container-class="col-6 stv-details-abschlusspruefung-vorsitz"
-							:label="$p.t('abschlusspruefung', 'vorsitz_header')"
-							type="autocomplete"
-							optionLabel="mitarbeiter"
-							v-model="formData.vorsitz"
-							name="vorsitz"
-							:suggestions="filteredMitarbeiter"
-							@complete="search"
-							:min-length="3"
-							>
-						</form-input>
-					</template>
-
-					<template v-if="statusNew">
-						<form-input
-							container-class="col-6 stv-details-abschlusspruefung-pruefer1"
-							:label="$p.t('abschlusspruefung', 'pruefer1')"
-							type="autocomplete"
-							optionLabel="mitarbeiter"
-							v-model="formData.pruefer1"
-							name="pruefer1"
-							:suggestions="filteredPruefer"
-							@complete="searchNotAkad"
-							:min-length="3"
-							>
-						</form-input>
-					</template>
-					<template v-else >
-						<form-input
-							v-if= "formData.p1"
-							container-class="col-6 stv-details-abschlusspruefung-pruefer1"
-							type="text"
-							name="name"
-							:label="$p.t('abschlusspruefung', 'pruefer1')"
-							v-model="formData.p1"
-							>
-						</form-input>
-						<form-input
-							v-else
-							container-class="col-6 stv-details-abschlusspruefung-pruefer1"
-							:label="$p.t('abschlusspruefung', 'pruefer1')"
-							type="autocomplete"
-							optionLabel="mitarbeiter"
-							v-model="formData.pruefer1"
-							name="pruefer1"
-							:suggestions="filteredPruefer"
-							@complete="searchNotAkad"
-							:min-length="3"
-							>
-						</form-input>
-					</template>
+					<form-input
+						type="autocomplete"
+						container-class="col-6 stv-details-abschlusspruefung-vorsitz"
+						:label="$p.t('abschlusspruefung', 'vorsitz')"
+						name="vorsitz"
+						v-model="selectedVorsitz"
+						optionLabel="label"
+						optionValue="mitarbeiter_uid"
+						dropdown
+						forceSelection
+						:suggestions="filteredMitarbeiter"
+						@complete="searchMitarbeiter"
+						:min-length="3"
+					>
+					</form-input>
+					<form-input
+						type="autocomplete"
+						container-class="col-6 stv-details-abschlusspruefung-pruefer1"
+						:label="$p.t('abschlusspruefung', 'pruefer1')"
+						name="pruefer1"
+						v-model="selectedPruefer1"
+						optionLabel="label"
+						optionValue="person_id"
+						dropdown
+						forceSelection
+						:suggestions="filteredPersons"
+						@complete="searchPerson"
+						:min-length="3"
+					>
+					</form-input>
 				</div>
-
+				
 				<div class="row mb-3">
-
 					<form-input
 						container-class="col-6 stv-details-abschlusspruefung-abschlussbeurteilung_kurzbz"
 						:label="$p.t('abschlusspruefung', 'abschlussbeurteilung')"
@@ -673,44 +688,21 @@ export default {
 							{{beurteilung.bezeichnung}}
 						</option>
 					</form-input>
-					<template v-if="statusNew">
-						<form-input
-							container-class="col-6 stv-details-abschlusspruefung-pruefer2"
-							:label="$p.t('abschlusspruefung', 'pruefer2')"
-							type="autocomplete"
-							optionLabel="mitarbeiter"
-							v-model="formData.pruefer2"
-							name="pruefer2"
-							:suggestions="filteredPruefer"
-							@complete="searchNotAkad"
-							:min-length="3"
-							>
-						</form-input>
-					</template>
-					<template v-else >
-						<form-input
-							v-if= "formData.p2"
-							container-class="col-6 stv-details-abschlusspruefung-pruefer2"
-							type="text"
-							name="name"
-							:label="$p.t('abschlusspruefung', 'pruefer2')"
-							v-model="formData.p2"
-							>
-						</form-input>
-						<form-input
-							v-else
-							container-class="col-6 stv-details-abschlusspruefung-pruefer2"
-							:label="$p.t('abschlusspruefung', 'pruefer2')"
-							type="autocomplete"
-							optionLabel="mitarbeiter"
-							v-model="formData.pruefer2"
-							name="pruefer2"
-							:suggestions="filteredPruefer"
-							@complete="searchNotAkad"
-							:min-length="3"
-							>
-						</form-input>
-					</template>
+					<form-input
+						type="autocomplete"
+						container-class="col-6 stv-details-abschlusspruefung-pruefer2"
+						:label="$p.t('abschlusspruefung', 'pruefer2')"
+						name="pruefer2"
+						v-model="selectedPruefer2"
+						optionLabel="label"
+						optionValue="person_id"
+						dropdown
+						forceSelection
+						:suggestions="filteredPersons" 
+						@complete="searchPerson"
+						:min-length="3"
+					>
+					</form-input>
 				</div>
 
 				<div class="row mb-3">
@@ -729,44 +721,21 @@ export default {
 							{{grad.titel}}
 						</option>
 					</form-input>
-					<template v-if="statusNew">
-						<form-input
-							container-class="col-6 stv-details-abschlusspruefung-pruefer3"
-							:label="$p.t('abschlusspruefung', 'pruefer3')"
-							type="autocomplete"
-							optionLabel="mitarbeiter"
-							v-model="formData.pruefer3"
-							name="pruefer3"
-							:suggestions="filteredPruefer"
-							@complete="searchNotAkad"
-							:min-length="3"
-							>
-						</form-input>
-					</template>
-					<template v-else >
-						<form-input
-							v-if= "formData.p3"
-							container-class="col-6 stv-details-abschlusspruefung-pruefer3"
-							type="text"
-							name="name"
-							:label="$p.t('abschlusspruefung', 'pruefer3')"
-							v-model="formData.p3"
-							>
-						</form-input>
-						<form-input
-							v-else
-							container-class="col-6 stv-details-abschlusspruefung-pruefer3"
-							:label="$p.t('abschlusspruefung', 'pruefer3')"
-							type="autocomplete"
-							optionLabel="mitarbeiter"
-							v-model="formData.pruefer3"
-							name="pruefer3"
-							:suggestions="filteredPruefer"
-							@complete="searchNotAkad"
-							:min-length="3"
-							>
-						</form-input>
-					</template>
+					<form-input
+						type="autocomplete"
+						container-class="col-6 stv-details-abschlusspruefung-pruefer3"
+						:label="$p.t('abschlusspruefung', 'pruefer3')"
+						name="pruefer3"
+						v-model="selectedPruefer3"
+						optionLabel="label"
+						optionValue="person_id"
+						dropdown
+						forceSelection
+						:suggestions="filteredPersons" 
+						@complete="searchPerson"
+						:min-length="3"
+					>
+					</form-input>
 				</div>
 
 				<div class="row mb-3">
@@ -775,8 +744,10 @@ export default {
 						:label="$p.t('global', 'datum')"
 						type="DatePicker"
 						v-model="formData.datum"
+						model-type="yyyy-MM-dd"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						name="datum"
 						:teleport="true"
@@ -798,8 +769,10 @@ export default {
 						:label="$p.t('abschlusspruefung', 'sponsion')"
 						type="DatePicker"
 						v-model="formData.sponsion"
+						model-type="yyyy-MM-dd"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						name="sponsion"
 						:teleport="true"
@@ -812,6 +785,7 @@ export default {
 						v-model="formData.protokoll"
 						name="protokoll"
 						:rows= 10
+						readonly
 						>
 					</form-input>
 				</div>
@@ -854,4 +828,3 @@ export default {
 	</div>
 `
 }
-

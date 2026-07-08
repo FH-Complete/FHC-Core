@@ -69,10 +69,10 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitColumns',
+				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
 				height: 200,
-				persistenceID: 'core-mobility-support'
+				persistenceID: 'core-mobility-support-20260217'
 			},
 			tabulatorEvents: [
 				{
@@ -81,14 +81,19 @@ export default {
 
 						await this.$p.loadCategory(['ui', 'global', 'mobility']);
 
-												let cm = this.$refs.table.tabulator.columnManager;
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-												cm.getColumnByField('bezeichnung').component.updateDefinition({
-													title: this.$p.t('ui', 'bezeichnung')
-												});
-						/*						cm.getColumnByField('actions').component.updateDefinition({
-													title: this.$p.t('global', 'aktionen')
-												});*/
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+						setHeader('bezeichnung', this.$p.t('ui', 'bezeichnung'));
 					}
 				}
 			],
@@ -156,6 +161,11 @@ export default {
 				else
 				{
 					this.localData.push(newEntry);
+
+					// reload tabulator mit tabulator method
+					if (this.$refs.table?.tabulator) {
+						this.$refs.table.tabulator.replaceData(this.localData);
+					}
 
 					this.$emit('setMobilitySupportToNewMobility', {
 						aufenthaltfoerderung_code: this.formData.aufenthaltfoerderung_code,

@@ -670,7 +670,7 @@ class DmsLib
 			$fileObj = new stdClass();
 			$fileObj->filename = getData($result)[0]->filename;
 			$fileObj->file = DMS_PATH.getData($result)[0]->filename;
-			$fileObj->name = DMS_PATH.getData($result)[0]->name;   // original user filename
+			$fileObj->name = getData($result)[0]->name;   // original user filename
 			$fileObj->mimetype = getData($result)[0]->mimetype;
 
 			return success($fileObj);

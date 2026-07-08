@@ -1,0 +1,18 @@
+.background-past {
+	background-color: var(--fhc-calendar-bg-markings-past);
+	border-bottom: solid 1px var(--fhc-calendar-border-markings-past);
+}
+.background-past > span {
+	display: none;
+}
+.background-past.bg-end > span {
+	display: block;
+	position: absolute;
+	top: 100%;
+	left: 1rem;
+	padding: 0 .5rem;
+	background-color: var(--fhc-calendar-bg-markings-past-label);
+	border: solid 1px var(--fhc-calendar-border-markings-past-label);
+	font-size: .875em;
+}
+

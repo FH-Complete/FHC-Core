@@ -307,8 +307,6 @@ foreach($prestudent_ids as $pid)
 		$nation->load($prestudent->zgvnation);
 		$zgvnation = $nation->kurztext;
 
-		$svnr = ($prestudent->svnr == '')?($prestudent->ersatzkennzeichen != ''?'Ersatzkennzeichen: '.$prestudent->ersatzkennzeichen:''):$prestudent->svnr;
-
 		foreach($adresse->result as $row_adresse)
 		{
 			if($row_adresse->heimatadresse)
@@ -439,7 +437,6 @@ foreach($prestudent_ids as $pid)
 				'zustell_ort' => $zustellOrt,
 				'zustell_bundesland' => $zustellBundesland,
 				'geburtsnation' => $geburtsnation,
-				'svnr' => $svnr,
 				'staatsbuergerschaft' => $staatsbuergerschaft,
 				'geschlecht' => $prestudent->geschlecht,
 				'telefonnummer' => $telefonnummer,

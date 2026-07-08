@@ -17,6 +17,7 @@
 	$use_vuejs_dev_version = $this->config->item('use_vuejs_dev_version');
 
 	// By default set the parameters to null
+	$customCSSs = isset($customCSSs) ? $customCSSs : null;
 	$customJSs = isset($customJSs) ? $customJSs : null;
 	$customJSModules = isset($customJSModules) ? $customJSModules : null;
 
@@ -155,6 +156,8 @@
 		generateJSsInclude('vendor/npm-asset/primevue/tieredmenu/tieredmenu.min.js');
 	}
 
+	if($vuedatepicker11) generateJSsInclude('vendor/vuejs/vuedatepicker_js11/vue-datepicker.iife.js');
+	
 	// --------------------------------------------------------------------------------------------------------
 	// From public folder
 
@@ -184,15 +187,18 @@
 
 	// User Defined Fields
 	if ($udfs === true) generateJSsInclude('public/js/UDFWidget.js');
-
+	
 	// Load addon hooks JS
 	// NOTE: keep it as the last but one
 	if ($addons === true) generateAddonsJSsInclude($calledPath.'/'.$calledMethod);
 
+	$extapphelper = ExtendableAppsHelper::getInstance();
+	$extapphelper->init($customCSSs, $customJSs, $customJSModules);
+
 	// Eventually required JS
 	// NOTE: keep it as the latest
-	generateJSsInclude($customJSs);
-	generateJSModulesInclude($customJSModules);
+	generateJSsInclude($extapphelper->getCustomJSs());
+	generateJSModulesInclude($extapphelper->getCustomJSModules());
 ?>
 	</body>
 </html>

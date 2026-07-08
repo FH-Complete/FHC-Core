@@ -113,7 +113,17 @@ export default {
   },
   template: /*html*/ `
 
-  <bs-modal v-show="!loading" ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" :backdrop="false" >
+  <bs-modal
+		v-show="!loading"
+		ref="modalContainer"
+		v-bind="$props"
+		header-class="bg-light"
+		footer-class="bg-light"
+		body-class=""
+		dialog-class="modal-lg"
+		class="bootstrap-alert"
+		:backdrop="false"
+	>
     
     <template v-slot:title>
       {{title}}  
@@ -188,16 +198,21 @@ export default {
 
       <span  class="form-underline-content" >{{data.requested_change.value}}</span>
     </div>
-    <div v-if="files?.length" class="ms-2">
-    
-    <a  v-for="file in files" target="_blank" :href="getDocumentLink(file.dms_id)" >{{file.name}}</a>
-    </div>
     </template>
 
 
     <component v-else :is="getComponentView" :withZustelladresse="getComponentView==='adresse'?true:false" :data="data.requested_change"></component>
+
     </div>
     </div>
+
+		<div  v-if="files?.length" class="card mt-3">
+			<div class="card-header">{{$p.t('profilUpdate','nachweisdokumente')}}</div>
+			<div class="card-body">
+				<a  v-for="file in files" target="_blank" :href="getDocumentLink(file.dms_id)" >{{file.name}}</a>
+			</div>
+		</div>
+
     </div>
     </div>
     
@@ -205,8 +220,8 @@ export default {
     
 
     <template v-if="data.status === profilUpdateStates['Pending']"  v-slot:footer>
-    <div  class="form-underline flex-fill">
-      <div class="form-underline-titel">{{$p.t('global','nachricht')}}</div>
+    <div  class="flex-fill">
+      <div>{{$p.t('global','nachricht')}}</div>
 
       <div class="d-flex flex-row gap-2">
         <input  class="form-control " v-model="data.status_message"  />

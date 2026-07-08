@@ -9,6 +9,12 @@ export default {
 	emits: [
 		"copied"
 	],
+	inject: {
+		currentSemester: {
+			from: 'currentSemester',
+			required: true
+		}
+	},
 	props: {
 		student: Object,
 		allSemester: Boolean
@@ -24,7 +30,7 @@ export default {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(ApiStvGrades.getTeacherProposal(
 					this.student.prestudent_id,
-					this.allSemester
+						(!this.allSemester ? this.currentSemester : null)
 				)),
 				ajaxResponse: (url, params, response) => {
 					return response.data || [];
@@ -33,8 +39,38 @@ export default {
 					{ field: 'lehrveranstaltung_bezeichnung', title: this.$p.t('lehre/lehrveranstaltung') },
 					{ field: 'note_bezeichnung', title: this.$p.t('lehre/note') },
 					{ field: 'mitarbeiter_uid', title: this.$p.t('profil/mitarbeiterIn'), visible: false },
-					{ field: 'benotungsdatum', title: this.$p.t('stv/grades_gradingdate'), visible: false },
-					{ field: 'freigabedatum', title: this.$p.t('stv/grades_approvaldate'), visible: false },
+					{ field: 'benotungsdatum', title: this.$p.t('stv/grades_gradingdate'), visible: false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								second: "2-digit",
+								hour12: false
+							});
+						}},
+					{ field: 'freigabedatum', title: this.$p.t('stv/grades_approvaldate'), visible: false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								second: "2-digit",
+								hour12: false
+							});
+						}},
 					{ field: 'studiensemester_kurzbz', title: this.$p.t('lehre/studiensemester'), visible: false },
 					{ field: 'note', title: this.$p.t('stv/grades_numericgrade'), visible: false },
 					{ field: 'student_uid', title: this.$p.t('profil/studentIn'), visible: false },
@@ -43,9 +79,9 @@ export default {
 				],
 				layout: 'fitDataStretch',
 				height: '100%',
-				selectable: true,
-				selectableRangeMode: 'click',
-				persistenceID: 'stv-details-noten-teacher'
+				selectableRows: true,
+				selectableRowsRangeMode: 'click',
+				persistenceID: 'stv-details-noten-teacher-20260217'
 			};
 		}
 	},
@@ -95,6 +131,7 @@ export default {
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			>
 			<template #actions="{selected}">
 				<button class="btn btn-primary" :disabled="!selected.length" @click="copyGrades(selected)">

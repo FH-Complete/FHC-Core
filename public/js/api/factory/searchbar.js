@@ -22,5 +22,19 @@ export default {
 			url: '/api/frontend/v1/searchbar/search',
 			params
 		};
+	},
+	searchCis(params) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/searchbar/searchCis',
+			params
+		};
+	},
+	searchStv(params) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/searchbar/searchStv',
+			params
+		};
 	}
 };

@@ -594,7 +594,6 @@ if(!$error)
 				$student->anmerkungen = $_POST['anmerkung'];
 				$student->homepage = $_POST['homepage'];
 				$student->matr_nr = $_POST['matr_nr'];
-				$student->svnr = $_POST['svnr'];
 				$student->ersatzkennzeichen = $_POST['ersatzkennzeichen'];
 				$student->familienstand = $_POST['familienstand'];
 				$student->geschlecht = $_POST['geschlecht'];
@@ -746,7 +745,6 @@ if(!$error)
 				$person->gebzeit = $_POST['geburtszeit'];
 				$person->anmerkungen = $_POST['anmerkung'];
 				$person->homepage = $_POST['homepage'];
-				$person->svnr = $_POST['svnr'];
 				$person->ersatzkennzeichen = $_POST['ersatzkennzeichen'];
 				$person->familienstand = $_POST['familienstand'];
 				$person->geschlecht = $_POST['geschlecht'];

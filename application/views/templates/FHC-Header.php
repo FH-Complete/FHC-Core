@@ -9,12 +9,16 @@
 	$title = isset($title) ? $title : null;
 	$refresh = isset($refresh) ? $refresh : null;
 	$customCSSs = isset($customCSSs) ? $customCSSs : null;
+	$customJSs = isset($customJSs) ? $customJSs : null;
+	$customJSModules = isset($customJSModules) ? $customJSModules : null;
+	$skipID = isset($skipID) ? $skipID : null;
 ?>
 <!-- Header start -->
 
 <!DOCTYPE HTML>
 <html>
 	<head>
+
 		<title><?php printPageTitle($title); ?></title>
 
 		<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -95,7 +99,12 @@
 				generateCSSsInclude('vendor/npm-asset/primeicons/primeicons.css');
 			}
 
-			// --------------------------------------------------------------------------------------------------------
+			if ($vuedatepicker11 === true)
+			{
+				generateCSSsInclude('vendor/vuejs/vuedatepicker_css11/main.css');
+			}
+			
+		// --------------------------------------------------------------------------------------------------------
 			// From public folder
 
 			// AjaxLib CSS
@@ -125,11 +134,16 @@
 			//Tags
 			if ($tags === true) generateCSSsInclude('public/css/tags.css');
 
+			$extapphelper = ExtendableAppsHelper::getInstance();
+			$extapphelper->init($customCSSs, $customJSs, $customJSModules);
+
 			// Eventually required CSS
-			generateCSSsInclude($customCSSs); // Eventually required CSS
+			generateCSSsInclude($extapphelper->getCustomCSSs()); // Eventually required CSS
 		?>
 	</head>
 	<body>
+
+		<?php if($skipID) generateSkipLink($skipID); ?>
 
 <!-- Header end -->
 

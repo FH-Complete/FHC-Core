@@ -36,6 +36,7 @@ require_once('../../../include/notenschluessel.class.php');
 require_once('../../../include/Excel/excel.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/pruefung.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 $uid = get_uid();
 
@@ -44,7 +45,7 @@ $uid = get_uid();
 $sprache = getSprache();
 $p = new phrasen($sprache);
 
-if(!check_lektor($uid))
+if (!check_lektor($uid))
 	die('Sie haben keine Berechtigung fuer diese Seite');
 
 if (!$db = new basis_db())
@@ -89,6 +90,21 @@ if(isset($_GET['lehreinheit_id']))
 	$lehreinheit_id = $_GET['lehreinheit_id'];
 else
 	$lehreinheit_id = '';
+
+// Permissions
+$berechtigung = new benutzerberechtigung();
+$berechtigung->getBerechtigungen($uid);
+
+// LV load
+$lvobj = new lehrveranstaltung($lvid);
+
+// Check permissions
+if (!$berechtigung->isBerechtigt('admin')
+	&& !$berechtigung->isBerechtigt('assistenz')
+	&& !$berechtigung->isBerechtigt('lehre', $lvobj->oe_kurzbz, 's')
+	&& !check_lektor_lehrveranstaltung($uid, $lvid, $stsem)
+)
+	die('Sie haben keine Berechtigung fuer diese Seite');
 
 /*
  * Create Excel File
@@ -142,8 +158,6 @@ else
 //	$format_title->setFgColor('blue');
 	// let's merge
 	$format_title->setAlign('merge');
-
-	$lvobj = new lehrveranstaltung($lvid);
 
 	$worksheet->write(0,0,$p->t('anwesenheitsliste/notenliste')." ".($sprache=='English'?$lvobj->bezeichnung_english:$lvobj->bezeichnung),$format_bold);
 
@@ -264,7 +278,7 @@ else
 		tbl_bisio.bisio_id, tbl_bisio.bis, tbl_bisio.von,
 		tbl_zeugnisnote.note,tbl_mobilitaet.mobilitaetstyp_kurzbz,
 		(CASE WHEN bis.tbl_mobilitaet.studiensemester_kurzbz = vw_student_lehrveranstaltung.studiensemester_kurzbz THEN '1' ELSE '' END) as doubledegree,
-		tbl_note.lkt_ueberschreibbar, tbl_note.anmerkung
+		tbl_note.lkt_ueberschreibbar, tbl_note.anmerkung, tbl_zeugnisnote.punkte
 	FROM
 		campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid)
 		JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid)
@@ -306,7 +320,14 @@ else
 						&& $elem->von < $stsemdatumbis &&	(anzahlTage($elem->von, $elem->bis) >= 30))
 							$inc.=' (o)';
 
-					$note = $elem->note;
+					if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE==true)
+					{
+						$note = $elem->punkte;
+					}
+					else
+					{
+						$note = $elem->note;
+					}
 
 					if($elem->lkt_ueberschreibbar == 'f') // angerechnet / intern angerechnet / nicht zugelassen
 					{
@@ -339,20 +360,23 @@ else
 					{
 						$worksheet->write($lines,8, trim($elem->matrikelnr), $format_highlight);
 						$pr = new Pruefung();
-						$pr->getPruefungen($elem->uid, "Termin2", $lvid, $sem);
+						$pr->getPruefungen($elem->uid, "Termin2", $lvid, $stsem);
 						$output2 = $pr->result;
 
 						if ($output2)
 						{
 							$resultPr = $output2[0];
 							$worksheet->write($lines,9, date('d.m.Y', strtotime($resultPr->datum)), $format_highlightright_date);
-							$worksheet->write($lines,10, $resultPr->note, $format_highlightright);
+							if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE==true)
+								$worksheet->write($lines,10, $resultPr->punkte, $format_highlightright);
+							else
+								$worksheet->write($lines,10, $resultPr->note, $format_highlightright);
 						}
-                                                else
-                                                {
-                                                        $worksheet->write($lines,9, '', $format_highlightright_date);
-                                                        $worksheet->write($lines,10, '', $format_highlightright);
-                                                }
+						else
+						{
+								$worksheet->write($lines,9, '', $format_highlightright_date);
+								$worksheet->write($lines,10, '', $format_highlightright);
+						}
 					}
 
 					// Nachprüfung
@@ -360,20 +384,23 @@ else
 					{
 						$worksheet->write($lines,12, trim($elem->matrikelnr), $format_highlight);
 						$pr = new Pruefung();
-						$pr->getPruefungen($elem->uid, "Termin3", $lvid, $sem);
+						$pr->getPruefungen($elem->uid, "Termin3", $lvid, $stsem);
 						$output3 = $pr->result;
 
 						if ($output3)
 						{
 							$resultPr = $output3[0];
 							$worksheet->write($lines,13, date('d.m.Y', strtotime($resultPr->datum)), $format_highlightright_date);
-							$worksheet->write($lines,14, $resultPr->note, $format_highlightright);
+							if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE==true)
+								$worksheet->write($lines,14, $resultPr->punkte, $format_highlightright);
+							else
+								$worksheet->write($lines,14, $resultPr->note, $format_highlightright);
 						}
-                                                else
-                                                {
-                                                        $worksheet->write($lines,13, '', $format_highlightright_date);
-                                                        $worksheet->write($lines,14, '', $format_highlightright);
-                                                }
+						else
+						{
+								$worksheet->write($lines,13, '', $format_highlightright_date);
+								$worksheet->write($lines,14, '', $format_highlightright);
+						}
 					}
 
 					$i++;

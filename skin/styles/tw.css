@@ -450,18 +450,18 @@ td.MarkLine
 td.HeaderTesttool /*fuer die Button-Optik beim Testtool*/
 {
 	color: #FFFFFF;
-	background-color: #00639C;
+	background-color: #71787D;
 	white-space:nowrap;
 	line-height: 25px;
 	box-shadow: inset 0 0 2px #FFFFFF;
-	padding: 10px;
+	padding: 0 10px;
 	width: 170px;
 }
 td.HeaderTesttoolSTG /*fuer die Button-Optik der Quereinstiegs-Studiengänge beim Testtool*/
 {
 	color: white;
 	border: 2px solid #73a9d6;
-	padding: 10px;
+	padding: 0 10px;
 	max-width: 100px;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -1185,13 +1185,16 @@ td.headerbar
 {
 	background-image: url(styles/tw/header.png);
 	background-position: top;
-	background-repeat: repeat-x;"
+	background-repeat: repeat-x;
 }
 
 div.cis_logo
 {
 	background-image:url(styles/tw/cis_logo_text_400x78.png);
 	background-repeat: no-repeat;
-	width: 400px;
+	max-width: 400px;
 	height: 78px;
+	background-size: 100%;
+	width: 90%;
+	background-position: center;
 }

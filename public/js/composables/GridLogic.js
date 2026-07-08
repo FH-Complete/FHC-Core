@@ -1,4 +1,10 @@
-// TODO(chris): Comments
+/**
+ * This class arranges rectangular items on a grid with a defined width and
+ * a potential infinite height. It calculates repositioning of already placed
+ * items if a new item would overlap one or more of said placed items.
+ * This can be manipulated by adding weights to the items or by defining an
+ * item as pinned.
+ */
 
 const DIR_UP = 0;
 const DIR_LEFT = 1;
@@ -23,9 +29,24 @@ class GridLogic {
 		const i = y*this.w + x;
 		return !this.grid[i] && this.grid[i] !== 0;
 	}
-	add(item, prefer) {
-		let occupiers = this.getItemsInFrame(item.frame);
+	getFreeSlots() {
+		const freeSlots = [];
+		let i = this.w * this.h;
 
+		while (i--) {
+			if (!this.grid[i] && this.grid[i] !== 0) {
+				let x = i % this.w;
+				let y = Math.floor(i / this.w);
+				freeSlots.push({x, y});
+			}
+		}
+
+		return freeSlots;
+	}
+	add(item, prefer) {
+		if (!item.frame)
+			item.frame = this.getItemFrame(item);
+		let occupiers = this.getItemsInFrame(item.frame);
 		if (!occupiers.length) {
 			item.frame.forEach(f => this.grid[f] = item.index);
 			this.data[item.index] = item;
@@ -35,6 +56,16 @@ class GridLogic {
 			const intermGrid = new GridLogic(this);
 			
 			item.frame.forEach(f => intermGrid.grid[f] = -1);
+
+			intermGrid.data.forEach(currItem => {
+				if (!currItem)
+					return;
+				if (currItem.pinned) {
+					if (!currItem.frame)
+						currItem.frame = intermGrid.getItemFrame(currItem);
+					currItem.frame.forEach(f => intermGrid.grid[f] = -1);
+				}
+			});
 
 			const possiblities = intermGrid.tryMoving(occupiers, prefer);
 			if (possiblities.length) {
@@ -58,20 +89,26 @@ class GridLogic {
 					result[move.index] = {
 						index: currItem.index,
 						x: currItem.x,
-						y: currItem.y
+						y: currItem.y,
+						w: currItem.w,
+						h: currItem.h
 					};
 				});
 				item.frame.forEach(f => this.grid[f] = item.index);
 				this.data[item.index] = item;
+
 				return result;
 			} else {
-				console.error('FATAL', "can't arrange item on grid");
+				return null;
 			}
 		}
 	}
 	move(item, x, y) {
+		if (item.pinned)
+			return [];
 		if (item.x == x && item.y == y)
 			return [];
+		
 		this.remove(item);
 
 		let prefer = undefined;
@@ -91,9 +128,63 @@ class GridLogic {
 		currItem.x = x;
 		currItem.y = y;
 		currItem.frame = this.getItemFrame(currItem);
+		let occupiers = this.getItemsInFrame(currItem.frame);
+		
+		// does not update if the target conatins pinned widgets
+		if (occupiers.some(frame => this.data[frame]?.pinned)) {
+			return [];
+		}
+
+		// checks if target contains moving widgets start position
+		// so swapping should be avoided
+		const targetAndItemOverlap = this.getItemFrame(item).some(frame => currItem.frame.includes(frame))
+		if (!targetAndItemOverlap) {
+
+			// checks if target contains widget with the same high and width
+			// so swapping is possible
+			const occupiersFrame = occupiers.map(occupier => this.data[occupier].frame).flat();
+			const occupiersInsideMovingItem = occupiersFrame.every(frame => currItem.frame.includes(frame));
+
+			if (occupiersInsideMovingItem) {
+				// every slot of all items in the target zone is inside said zone
+				const replaceUpdate = [];
+			
+				const diffX = item.x - x;
+				const diffY = item.y - y;
+
+				occupiers.forEach(occupier => {
+					const data = { ...this.data[occupier] };
+					data.x += diffX;
+					data.y += diffY;
+					data.frame = this.getItemFrame(data);
+					this.remove(data);
+					this.add(data);
+					replaceUpdate[occupier] = {
+						index: data.index,
+						x: data.x,
+						y: data.y,
+						w: data.w,
+						h: data.h
+					};
+				});
+
+				this.add({ ...item, x, y });
+				replaceUpdate[item.index] = {
+					index: item.index,
+					x,
+					y,
+					w: item.w,
+					h: item.h
+				};
+				
+				return replaceUpdate;
+			}
+		}
 		
 		const updates = this.add(currItem, prefer);
-		updates[item.index] = {index: item.index, x, y};
+		if (updates)
+			updates[item.index] = { index: item.index, x, y, w: item.w, h: item.h };
+		
 		return updates;
 	}
 	resize(item, w, h) {
@@ -107,7 +198,9 @@ class GridLogic {
 		currItem.frame = this.getItemFrame(currItem);
 		
 		const updates = this.add(currItem);
-		updates[item.index] = {index: item.index, w, h};
+		if(updates)
+			updates[item.index] = { index: item.index, w, h, x: item.x, y: item.y };
+
 		return updates;
 	}
 	tryMoving(index, prefer) {
@@ -145,25 +238,27 @@ class GridLogic {
 		let targetframe;
 		switch(dir) {
 			case DIR_UP:
-				if (this.data[index].y - amount < 0)
+				if (this.data[index].pinned || this.data[index].y - amount < 0)
 					return false;
 				targetframe = this.data[index].frame.map(i => i-this.w*amount);
 				move.y = -amount;
 				break;
 			case DIR_DOWN:
+				if (this.data[index].pinned)
+					return false;
 				if (this.data[index].y + this.data[index].h + amount > this.h)
 					cost += .4;
 				targetframe = this.data[index].frame.map(i => i+this.w*amount);
 				move.y = amount;
 				break;
 			case DIR_LEFT:
-				if (this.data[index].x - amount < 0)
+				if (this.data[index].pinned || this.data[index].x - amount < 0)
 					return false;
 				targetframe = this.data[index].frame.map(i => i-amount);
 				move.x = -amount;
 				break;
 			case DIR_RIGHT:
-				if (this.data[index].x + this.data[index].w + amount > this.w)
+				if (this.data[index].pinned || this.data[index].x + this.data[index].w + amount > this.w)
 					return false;
 				targetframe = this.data[index].frame.map(i => i+amount);
 				move.x = amount;
