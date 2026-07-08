@@ -29750,7 +29750,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Alle StudentInnen aus',
+				'text' => 'Alle Student*innen aus',
 				'description' => '',
 				'insertvon' => 'system'
 			),
