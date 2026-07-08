@@ -64,6 +64,9 @@ export default {
 			return this.propsViewData?.mode;
 		},
 		downloadLinks() {
+			// do not show download links in otherLvPlan Mode
+			return false;
+
 			if (
 				!this.studiensemester_start ||
 				!this.studiensemester_ende ||
