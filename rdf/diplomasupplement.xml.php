@@ -669,7 +669,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 		$ects_total = 0;
 		$ects_total_positiv = 0;
-		$ects_anrechnung_studienplan = 0;
+		$ects_anrechnung_studienplan = '';
 
 		//Anrechnung Quereinsteiger
 		echo ' <anrechnungen>';
