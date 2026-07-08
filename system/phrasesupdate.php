@@ -29742,6 +29742,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'profil',
+		'phrase' => 'alleStudentenVon',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle Student*innen aus',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'All students from',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	//Profil Phrasen ende
 	// LvPlan Phrasen start
 	array(
