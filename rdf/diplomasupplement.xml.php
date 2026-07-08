@@ -136,8 +136,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		//ECTS-Punkte die bei Quereinsteigern angerechnet werden
 		if($semesterNumberStart>1)
 		{
-			$angerechneteECTS=($semesterNumberStart-1)*30; // 30 ECTS pro Semester
-			echo '		<angerechnete_ects_quereinstieg>'.$angerechneteECTS.'</angerechnete_ects_quereinstieg>';
+			//$angerechneteECTS=($semesterNumberStart-1)*30; // 30 ECTS pro Semester
+			//echo '		<angerechnete_ects_quereinstieg_depr>'.$angerechneteECTS.'</angerechnete_ects_quereinstieg_depr>';
 
             $end_semester_anrechnung = $semesterNumberStart - 1;
             echo '      <start_semester_anrechnung_number>1</start_semester_anrechnung_number>';
@@ -669,6 +669,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 		$ects_total = 0;
 		$ects_total_positiv = 0;
+		$ects_anrechnung_studienplan = 0;
 
 		//Anrechnung Quereinsteiger
 		echo ' <anrechnungen>';
@@ -702,8 +703,12 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$summe_sws_orgform += $summe_sws_semester;
 				echo '</stosemester>';
 			}
+			$ects_anrechnung_studienplan = $summe_ects_orgform;
 		}
 		echo ' </anrechnungen>';
+
+		echo '<angerechnete_ects_quereinstieg>'.$ects_anrechnung_studienplan.'</angerechnete_ects_quereinstieg>';
+
 
 		//Berufliche Kompetenzen
 		$studienplan = new studienplan();
