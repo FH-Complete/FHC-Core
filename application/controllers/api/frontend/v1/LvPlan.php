@@ -418,6 +418,10 @@ class LvPlan extends FHCAPI_Controller
 	 */
 	private function fetchMoodleEvents($start_date, $end_date, $uid = null)
 	{
+		if ($uid && $uid !== getAuthUID()) {
+			return [];
+		}
+
 		$this->load->config('calendar');
 
 		$tz = new DateTimeZone($this->config->item('timezone'));
