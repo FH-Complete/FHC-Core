@@ -29,13 +29,12 @@ export default {
 		QuickLinks,
 		CalendarSync,
 	},
-	inject: ["sortProfilUpdates", "collapseFunction", "language","isEditable"],
+	inject: ["sortProfilUpdates", "collapseFunction", "isEditable"],
 	data() {
 		return {
 			showModal: false,
 			collapseIconBetriebsmittel: true,
 			editDataFilter: null,
-			arePhrasesPreloaded: false,
 			// tabulator options
 			zutrittsgruppen_table_options: {
 				persistenceID: "filterTableStudentProfilZutrittsgruppen",
@@ -44,9 +43,9 @@ export default {
 				},
 				minHeight: 200,
 				layout: "fitColumns",
-				columns: [
-					{
-					title: Vue.computed(() => this.$p.t('profil/zutrittsGruppen')),
+				columns: [{
+					title: "placeholder",
+					titlePhrase: "profil/zutrittsGruppen",
 					field: "bezeichnung"
 					}
 				],
@@ -62,6 +61,7 @@ export default {
 				responsiveLayoutCollapseUseFormatters: false,
 				responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
 				responsiveLayoutCollapseStartOpen: false,
+				locale: true,
 				columns: [
 					{
 						title:
@@ -75,7 +75,8 @@ export default {
 						responsive: 0,
 					},
 					{
-						title: Vue.computed(()=>this.$p.t('profil/entlehnteBetriebsmittel')),
+						title: "placeholder",
+						titlePhrase: "profil/entlehnteBetriebsmittel",
 						field: "betriebsmittel",
 						headerFilter: true,
 						minWidth: 200,
@@ -83,7 +84,8 @@ export default {
 						responsive: 0,
 					},
 					{
-						title: Vue.computed(() => this.$p.t('profil/inventarnummer')) ,
+						title: "placeholder",
+						titlePhrase: "profil/inventarnummer",
 						field: "Nummer",
 						headerFilter: true,
 						resizable: true,
@@ -92,7 +94,8 @@ export default {
 						responsive: 2,
 					},
 					{
-						title: Vue.computed(() => this.$p.t('profil/ausgabedatum')) ,
+						title: "placeholder",
+						titlePhrase: "profil/ausgabedatum",
 						field: "Ausgegeben_am",
 						headerFilterFunc: 'dates',
 						headerFilter: dateFilter,
@@ -259,18 +262,8 @@ export default {
 		},
 	},
 	created() {
-		// preload phrasen
-		this.$p.loadCategory('profil').then(() => {
-			this.arePhrasesPreloaded = true;
-		});
 		//? sorts the profil Updates: pending -> accepted -> rejected
 		this.data.profilUpdates?.sort(this.sortProfilUpdates);
-	},
-	watch: {
-		'language.value'(newVal) {
-			if(this.$refs.betriebsmittelTable) this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
-			if(this.$refs.zutrittsgruppenTable) this.$refs.zutrittsgruppenTable.tabulator.setColumns(this.zutrittsgruppen_table_options.columns)
-		}
 	},
 	template: /*html*/ `
 <div class="container-fluid text-break fhc-form">
@@ -395,7 +388,6 @@ export default {
 			<div class="row">
 				<div class="col-12 mb-4" >
 					<core-filter-cmpt
-					v-if="arePhrasesPreloaded"
 					@tableBuilt="betriebsmittelTableBuilt"
 					:title="$p.t('profil','entlehnteBetriebsmittel')"
 					ref="betriebsmittelTable"
@@ -405,7 +397,6 @@ export default {
 				</div>
 				<div class="col-12 mb-4" >
 					<core-filter-cmpt
-					v-if="arePhrasesPreloaded"
 					@tableBuilt="zutrittsgruppenTableBuilt" 
 					:title="$p.t('profil','zutrittsGruppen')" 
 					ref="zutrittsgruppenTable" 
