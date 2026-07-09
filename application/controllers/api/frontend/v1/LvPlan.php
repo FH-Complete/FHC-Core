@@ -108,8 +108,10 @@ class LvPlan extends FHCAPI_Controller
 		$result = $this->stundenplanlib->getEventsUser($start_date, $end_date, $uid);
 		$lvplanEvents = $this->getDataOrTerminateWithError($result);
 
-		// fetching moodle events
-		$moodleEvents = $this->fetchMoodleEvents($start_date, $end_date, $uid);
+		if ($uid && $uid !== getAuthUID()) {
+			// fetching moodle events
+			$moodleEvents = $this->fetchMoodleEvents($start_date, $end_date, $uid);
+		}
 
 		// fetching ferien events
 		$ferienEvents = $this->fetchFerienEvents($start_date, $end_date, $uid);
@@ -418,10 +420,6 @@ class LvPlan extends FHCAPI_Controller
 	 */
 	private function fetchMoodleEvents($start_date, $end_date, $uid = null)
 	{
-		if ($uid && $uid !== getAuthUID()) {
-			return [];
-		}
-
 		$this->load->config('calendar');
 
 		$tz = new DateTimeZone($this->config->item('timezone'));
