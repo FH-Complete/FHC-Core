@@ -1,264 +1,24 @@
 <?php
 
 $phrases = array(
-
 array (
   'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'newLink',
+  'category' => 'tabulator',
+  'phrase' => 'loading',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Neuer Link',
+      'text' => 'Lädt',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'New Link',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-
-array (
-  'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'saveLink',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Link speichern',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'Save link',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-
-array (
-  'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'editLink',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Link bearbeiten',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'Edit link',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-
-array (
-  'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'bookmarkDeleted',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Link gelöscht',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'Link deleted',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-
-array (
-  'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'bookmarkAdded',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Link hinzugefügt',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'Link added',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-
-array (
-  'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'bookmarkUpdated',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Link geändert',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'Link updated',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-
-array (
-  'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'myBookmarks',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Meine Urls',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'My Urls',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-
-array (
-  'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'emptyBookmarks',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Du hast noch keine Bookmarks gesetzt',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'You have not set any bookmarks yet',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-
-array (
-  'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'invalidUrl',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Ungültiger Link',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'Invalid link',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-
-array (
-  'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'invalidTitel',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Ungültiger Titel',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'Invalid title',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-array (
-  'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'editFilter',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Filter bearbeiten',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'edit Filter',
+      'text' => 'Loading',
       'description' => '',
       'insertvon' => 'system',
     ),
@@ -267,22 +27,22 @@ array (
 ,
 array (
   'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'filterByTags',
+  'category' => 'tabulator',
+  'phrase' => 'error',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Nach Tags Filtern',
+      'text' => 'Fehler',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'filter by Tags',
+      'text' => 'Error',
       'description' => '',
       'insertvon' => 'system',
     ),
@@ -291,22 +51,22 @@ array (
 ,
 array (
   'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'sortDownwards',
+  'category' => 'tabulator',
+  'phrase' => 'item',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Nach unten verschieben',
+      'text' => 'Element',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'sort downwards',
+      'text' => 'item',
       'description' => '',
       'insertvon' => 'system',
     ),
@@ -315,22 +75,22 @@ array (
 ,
 array (
   'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'sortToTop',
+  'category' => 'tabulator',
+  'phrase' => 'items',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Nach oben verschieben',
+      'text' => 'Elemente',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'sort to top',
+      'text' => 'items',
       'description' => '',
       'insertvon' => 'system',
     ),
@@ -339,22 +99,22 @@ array (
 ,
 array (
   'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'deleteBookmark',
+  'category' => 'tabulator',
+  'phrase' => 'page_size',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Lesezeichen löschen',
+      'text' => 'Seitengröße',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'delete Bookmark',
+      'text' => 'Page Size',
       'description' => '',
       'insertvon' => 'system',
     ),
@@ -363,22 +123,22 @@ array (
 ,
 array (
   'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'editBookmark',
+  'category' => 'tabulator',
+  'phrase' => 'page_title',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Lesezeichen bearbeiten',
+      'text' => 'Seite anzeigen',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'edit Bookmark',
+      'text' => 'Show Page',
       'description' => '',
       'insertvon' => 'system',
     ),
@@ -387,22 +147,22 @@ array (
 ,
 array (
   'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'filterUpdated',
+  'category' => 'tabulator',
+  'phrase' => 'first',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Filteraktion erfolgreich durchgeführt',
+      'text' => 'Erste',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'filter updated successfully',
+      'text' => 'First',
       'description' => '',
       'insertvon' => 'system',
     ),
@@ -411,22 +171,22 @@ array (
 ,
 array (
   'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'errorInputNecessary',
+  'category' => 'tabulator',
+  'phrase' => 'first_title',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Eingabe eines Zeichens erforderlich',
+      'text' => 'Erste Seite',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'One character must be entered',
+      'text' => 'First Page',
       'description' => '',
       'insertvon' => 'system',
     ),
@@ -435,22 +195,22 @@ array (
 ,
 array (
   'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'noFilter',
+  'category' => 'tabulator',
+  'phrase' => 'last',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Kein Filter für Lesezeichen ausgewählt',
+      'text' => 'Letzte',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'No bookmark filter entered',
+      'text' => 'Last',
       'description' => '',
       'insertvon' => 'system',
     ),
@@ -459,22 +219,22 @@ array (
 ,
 array (
   'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'headerFilterBookmark',
+  'category' => 'tabulator',
+  'phrase' => 'last_title',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Lesezeichen filtern',
+      'text' => 'Letzte Seite',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Filter Bookmarks',
+      'text' => 'Last Page',
       'description' => '',
       'insertvon' => 'system',
     ),
@@ -483,22 +243,214 @@ array (
 ,
 array (
   'app' => 'core',
-  'category' => 'bookmark',
-  'phrase' => 'adminMode',
+  'category' => 'tabulator',
+  'phrase' => 'prev',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Inhalt kann nicht im Administrator Modus angezeigt werden.',
+      'text' => 'zurück',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Content can not be displayed in administrator mode.',
+      'text' => 'Previous',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'tabulator',
+  'phrase' => 'prev_title',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'vorherige Seite',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Previous Page',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'tabulator',
+  'phrase' => 'next',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Nächste',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Next',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'tabulator',
+  'phrase' => 'next_title',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Nächste Seite',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Next Page',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'tabulator',
+  'phrase' => 'all',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Alle',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'All',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'tabulator',
+  'phrase' => 'showing',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Angezeigt',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Showing',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'tabulator',
+  'phrase' => 'of',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'von',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'of',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'tabulator',
+  'phrase' => 'rows',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Zeilen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'rows',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'tabulator',
+  'phrase' => 'pages',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Seiten',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'pages',
       'description' => '',
       'insertvon' => 'system',
     ),

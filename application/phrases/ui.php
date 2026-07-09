@@ -5365,5 +5365,53 @@ array (
     ),
   ),
 )
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'savedAtByV3',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Gespeichert am {0} von {1}',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Saved on {0} by {1}',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'bodyZuLang',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Der Emailtext ist zu lange um kopiert zu werden.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The Emailbody is too long to be copied',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );
 

@@ -984,4 +984,28 @@ array (
     ),
   ),
 )
+,
+array (
+  'app' => 'core',
+  'category' => 'projektarbeit',
+  'phrase' => 'betreuerSpeichernv2',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Betreuer*In speichern',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Save reviewer',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );
