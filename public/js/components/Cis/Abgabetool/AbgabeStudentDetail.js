@@ -306,6 +306,22 @@ export const AbgabeStudentDetail = {
 			const noteOpt = this.notenOptions.find(opt => opt.note == termin.note)
 			return noteOpt ? noteOpt.bezeichnung : ''
 		},
+		hasZweitbetreuer(projektarbeit) {
+			return !!(projektarbeit.zweitbetreuer_person_id || projektarbeit.zweitbetreuer)
+		},
+		getErstbetreuerLabel(projektarbeit) {
+			return projektarbeit.betreuerart_kurzbz
+				? this.$capitalize(this.$p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz))
+				: this.$capitalize(this.$p.t('abgabetool/c4betreuerv2'))
+		},
+		getZweitbetreuerLabel(projektarbeit) {
+			return projektarbeit.zweitbetreuer_betreuerart_kurzbz
+				? this.$capitalize(this.$p.t('abgabetool/c4betrart' + projektarbeit.zweitbetreuer_betreuerart_kurzbz))
+				: this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerv2'))
+		},
+		getZweitbetreuerName(projektarbeit) {
+			return projektarbeit.zweitbetreuer?.first ?? ''
+		},
 	},
 	watch: {
 		projektarbeit(newVal) {
@@ -430,7 +446,8 @@ export const AbgabeStudentDetail = {
 						</button>
 					</p>
 
-					<p>{{$capitalize( $p.t('abgabetool/c4betreuerv2') ) }}: {{projektarbeit ? $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) + ' ' + projektarbeit.betreuer : ''}}</p>
+					<p>{{ getErstbetreuerLabel(projektarbeit) }}: {{ projektarbeit.betreuer }}</p>
+					<p v-if="hasZweitbetreuer(projektarbeit)">{{ getZweitbetreuerLabel(projektarbeit) }}: {{ getZweitbetreuerName(projektarbeit) }}</p>
 				</div>
 				<div class="col-4">
 					<div class="row">

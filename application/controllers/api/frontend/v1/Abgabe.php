@@ -947,6 +947,16 @@ class Abgabe extends FHCAPI_Controller
 		$paabgabeArr = $this->getDataOrTerminateWithError($result, 'general');
 		$paabgabe = $paabgabeArr[0];
 
+		// resolve the insert/update user full names so the frontend info string ("saved at X by Y")
+		// renders immediately for freshly created/updated termine without needing a reload.
+		$this->load->model('person/Person_model', 'PersonModel');
+		if(!empty($paabgabe->insertvon)) {
+			$paabgabe->insertvon_fullname = getData($this->PersonModel->getFullName($paabgabe->insertvon));
+		}
+		if(!empty($paabgabe->updatevon)) {
+			$paabgabe->updatevon_fullname = getData($this->PersonModel->getFullName($paabgabe->updatevon));
+		}
+
 		// check if abgabe even has note
 		if($paabgabe->note) {
 			$this->load->model('education/Note_model', 'NoteModel');

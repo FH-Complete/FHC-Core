@@ -308,6 +308,19 @@ export const AbgabetoolStudent = {
 		hasZweitbetreuer(projektarbeit) {
 			return !!(projektarbeit.zweitbetreuer_person_id || projektarbeit.zweitbetreuer)
 		},
+		getErstbetreuerLabel(projektarbeit) {
+			return projektarbeit.betreuerart_kurzbz
+				? this.$capitalize(this.$p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz))
+				: this.$capitalize(this.$p.t('abgabetool/c4betreuerv2'))
+		},
+		getZweitbetreuerLabel(projektarbeit) {
+			return projektarbeit.zweitbetreuer_betreuerart_kurzbz
+				? this.$capitalize(this.$p.t('abgabetool/c4betrart' + projektarbeit.zweitbetreuer_betreuerart_kurzbz))
+				: this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerv2'))
+		},
+		getZweitbetreuerName(projektarbeit) {
+			return projektarbeit.zweitbetreuer?.first ?? ''
+		},
 		getErstbetreuerEmailLabel(projektarbeit) {
 			// with only one betreuer keep the generic label; with multiple betreuer
 			// distinguish the email rows by their betreuungsart bezeichnung
@@ -510,9 +523,9 @@ export const AbgabetoolStudent = {
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{ projektarbeit?.betreuerart_kurzbz ? $capitalize( $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) ) : $capitalize( $p.t('abgabetool/c4betreuerv2') ) }}</div>
+					<div class="col-4 col-md-3 fw-bold">{{ getErstbetreuerLabel(projektarbeit) }}</div>
 					<div class="col-8 col-md-9">
-						{{ projektarbeit.betreuerart_kurzbz ? projektarbeit.betreuer : '' }}
+						{{ projektarbeit.betreuer }}
 					</div>
 				</div>
 				<div class="row mt-2">
@@ -521,13 +534,13 @@ export const AbgabetoolStudent = {
 						<a :href="getMailLink(projektarbeit)"><i class="fa fa-envelope" style="color:#00649C"></i></a>
 					</div>
 				</div>
-				<div v-if="projektarbeit.zweitbetreuer_person_id || projektarbeit.zweitbetreuer" class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{ projektarbeit.zweitbetreuer_betreuerart_kurzbz ? $p.t('abgabetool/c4betrart' + projektarbeit.zweitbetreuer_betreuerart_kurzbz) : '' }}</div>
+				<div v-if="hasZweitbetreuer(projektarbeit)" class="row mt-2">
+					<div class="col-4 col-md-3 fw-bold">{{ getZweitbetreuerLabel(projektarbeit) }}</div>
 					<div class="col-8 col-md-9">
-						{{ projektarbeit.zweitbetreuer?.first }}
+						{{ getZweitbetreuerName(projektarbeit) }}
 					</div>
 				</div>
-				<div v-if="projektarbeit.zweitbetreuer_person_id || projektarbeit.zweitbetreuer" class="row mt-2">
+				<div v-if="hasZweitbetreuer(projektarbeit)" class="row mt-2">
 					<div class="col-4 col-md-3 fw-bold">{{ getZweitbetreuerEmailLabel(projektarbeit) }}</div>
 					<div class="col-8 col-md-9">
 						<a v-if="projektarbeit.zweitbetreuer_mail" :href="getZweitbetreuerMailLink(projektarbeit)"><i class="fa fa-envelope" style="color:#00649C"></i></a>
