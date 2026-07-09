@@ -2,7 +2,8 @@ import FhcCalendar from "../../Calendar/LvPlan.js";
 
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
 
-export const DEFAULT_MODE_RAUMINFO = 'Week'
+export const DEFAULT_MODE_RAUMINFO_MOBILE = 'List';
+export const DEFAULT_MODE_RAUMINFO_DESKTOP = 'Week';
 
 export default {
 	name: "RoomInformation",
@@ -13,12 +14,14 @@ export default {
 		viewData: Object, // NOTE(chris): this is inherited from router-view
 		propsViewData: Object
 	},
+	inject: ["isMobile"],
 	computed: {
 		currentDay() {
-			return this.propsViewData?.focus_date || luxon.DateTime.now().setZone(this.viewData.timezone).toISODate();
+			return this.propsViewData?.focus_date || luxon.DateTime.now().setZone(FHC_JS_DATA_STORAGE_OBJECT.timezone).toISODate();
 		},
 		currentMode() {
-			return this.propsViewData?.mode || DEFAULT_MODE_RAUMINFO;
+			const defaultMode = this.isMobile ? DEFAULT_MODE_RAUMINFO_MOBILE : DEFAULT_MODE_RAUMINFO_DESKTOP;
+			return this.propsViewData?.mode || defaultMode;
 		}
 	},
 	methods:{
@@ -51,7 +54,6 @@ export default {
 		<hr>
 		<fhc-calendar 
 			ref="calendar"
-			:timezone="viewData.timezone"
 			:get-promise-func="getPromiseFunc"
 			:date="currentDay"
 			:mode="currentMode"
