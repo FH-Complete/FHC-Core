@@ -358,7 +358,8 @@ class AbgabetoolJob extends JOB_Controller
 		foreach($assistenzMap as $assistenz_person_id => $tupelArr) {
 
 			$abgabenString = '<div style="font-family: Arial, sans-serif; color: #333;">';
-
+			$hasContent = false;
+			
 			foreach($tupelArr as $tupel) {
 				$projektarbeit_id = $tupel[0];
 				$assistenzRow = $tupel[1];
@@ -377,6 +378,7 @@ class AbgabetoolJob extends JOB_Controller
 				if(count($relevantAbgaben) == 0) {
 					continue;
 				}
+				$hasContent = true;
 
 				// Format the Student Name
 				$s = $relevantAbgaben[0];
@@ -447,7 +449,12 @@ class AbgabetoolJob extends JOB_Controller
 			}
 
 			$abgabenString .= '</div>';
-
+			
+			// skip send entirely
+			if (!$hasContent) { 
+				continue;
+			}
+			
 			// done with building the change list, now send it
 			$assistenzRow = $tupelArr[0][1];
 			$anrede = $assistenzRow->anrede;

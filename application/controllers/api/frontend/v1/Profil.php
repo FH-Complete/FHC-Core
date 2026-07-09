@@ -16,7 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH'))
+	exit('No direct script access allowed');
 
 class Profil extends FHCAPI_Controller
 {
@@ -27,13 +28,13 @@ class Profil extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-            'fotoSperre' => self::PERM_LOGGED,
+			'fotoSperre' => self::PERM_LOGGED,
 			'getGemeinden' => self::PERM_LOGGED,
 			'getAllNationen' => self::PERM_LOGGED,
 			'isMitarbeiter' => self::PERM_LOGGED,
 			'profilViewData' => self::PERM_LOGGED,
 		]);
-		
+
 		$this->load->library('PermissionLib');
 
 		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
@@ -48,28 +49,37 @@ class Profil extends FHCAPI_Controller
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
-	public function profilViewData($uid=null){
+
+	/**
+     * retrieves view data for profile view
+     * @access public
+     * @param  $uid the userID for which profile is being viewed, null or missing value implies one's own profile
+     */
+	public function profilViewData($uid = null)
+	{
+		$authUid = getAuthUID();
+		$isProfilOfAuthUser = !$uid || $uid === $authUid;
+
 		$this->load->library('ProfilLib');
-		$editable = false;
-		if(isset($uid) && $uid != null){
-			$profil_data = $this->profillib->getView($uid);
-			if($uid == getAuthUID()){
-				$editable = true;
-			}
-		}else{
-			$editable = true;
-			$profil_data = $this->profillib->getView(getAuthUID());
+		$profileData = $this->profillib->getView($uid ?? $authUid);
+		$profileData = hasData($profileData) ? getData($profileData) : null;
+
+		$viewData = [
+			'editable' => $isProfilOfAuthUser,
+			'profil_data' => $profileData,
+			'permissions' => [
+				'basis/other_lv_plan' => $this->permissionlib->isBerechtigt(('basis/other_lv_plan'))
+			]
+		];
+
+		if ($isProfilOfAuthUser) {
+			$viewData['calendar_sync_urls'] = $this->getCalendarSyncUrlData();
 		}
-		
-		$profil_data = hasData($profil_data) ? getData($profil_data) : null;
-		$viewData = array(
-			'editable'=>$editable,
-			'profil_data' => $profil_data,
-		);
+
 		$this->terminateWithSuccess($viewData);
 	}
 
-    /**
+	/**
 	 * update column foto_sperre in public.tbl_person
 	 * @access public
 	 * @param  boolean $value  new value for the column
@@ -77,9 +87,9 @@ class Profil extends FHCAPI_Controller
 	 */
 	public function fotoSperre($value)
 	{
-        if(!isset($value)){
-            $this->terminateWithError("Missing parameter", self::ERROR_TYPE_GENERAL);
-        }
+		if (!isset($value)) {
+			$this->terminateWithError("Missing parameter", self::ERROR_TYPE_GENERAL);
+		}
 
 		$res = $this->PersonModel->update($this->pid, ["foto_sperre" => $value]);
 		if (isError($res)) {
@@ -87,10 +97,10 @@ class Profil extends FHCAPI_Controller
 		}
 		$this->PersonModel->addSelect("foto_sperre");
 		$res = $this->PersonModel->load($this->pid);
-		
-        $res = $this->getDataOrTerminateWithError($res);
-		
-        $this->terminateWithSuccess(current($res));
+
+		$res = $this->getDataOrTerminateWithError($res);
+
+		$this->terminateWithSuccess(current($res));
 	}
 
 	/**
@@ -109,7 +119,7 @@ class Profil extends FHCAPI_Controller
 		if (isError($nation_res)) {
 			$this->terminateWithError("error while trying to query table codex.tbl_nation", self::ERROR_TYPE_GENERAL);
 		}
-		
+
 		$nation_res = $this->getDataOrTerminateWithError($nation_res);
 
 		$this->terminateWithSuccess($nation_res);
@@ -117,30 +127,30 @@ class Profil extends FHCAPI_Controller
 
 	public function getGemeinden($nation, $zip)
 	{
-		if(!isset($nation) || !isset($zip)){
+		if (!isset($nation) || !isset($zip)) {
 			echo json_encode(error("Missing parameters"));
 			return;
 		}
-		
+
 		$this->load->model('codex/Gemeinde_model', "GemeindeModel");
-		
+
 
 		$gemeinde_res = $this->GemeindeModel->getGemeindeByPlz($zip);
-		
+
 		if (isError($gemeinde_res)) {
-			$this->terminateWithError(getError($gemeinde_res),self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError(getError($gemeinde_res), self::ERROR_TYPE_GENERAL);
 		}
 		$gemeinde_res = $this->getDataOrTerminateWithError($gemeinde_res);
-		
+
 		/* $gemeinde_res = array_map(function ($obj) {
 			return $obj->ortschaftsname;
 		}, $gemeinde_res); */
 
-		$this->terminateWithSuccess($gemeinde_res);	
-		
+		$this->terminateWithSuccess($gemeinde_res);
+
 	}
 
-    
+
 	/**
 	 * checks whether a specific userID is a mitarbeiter or not (foreword declaration of the function isMitarbeiter in Mitarbeiter_model.php)
 	 * @access public
@@ -150,23 +160,48 @@ class Profil extends FHCAPI_Controller
 	public function isMitarbeiter($uid)
 	{
 
-		if(!$uid) $this->terminateWithError("No uid provided", self::ERROR_TYPE_GENERAL);
-		
-		
+		if (!$uid)
+			$this->terminateWithError("No uid provided", self::ERROR_TYPE_GENERAL);
+
+
 		$result = $this->MitarbeiterModel->isMitarbeiter($uid);
-		
+
 		if (isError($result)) {
 			$this->terminateWithError("error when calling Mitarbeiter_model function isMitarbeiter with uid " . $uid, self::ERROR_TYPE_GENERAL);
 		}
 
 		$result = $this->getDataOrTerminateWithError($result);
-		
+
 		$this->terminateWithSuccess($result);
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// Private methods
 
-	
+	/**
+	 * gets the identifier, phrase, and url for each calendar sync option
+	 * @access private
+	 * @return array array of arrays, where each child array is a sync option
+	 */
+	private function getCalendarSyncUrlData()
+	{
+		return [
+			[
+				"identifier" => "cal_dav",
+				"labelPhrase" => "profil/calendar_sync_cal_dav",
+				"url" => APP_ROOT . "webdav/lvplan.php/calendars/" . $this->uid . "/LVPlan-" . $this->uid,
+			],
+			[
+				"identifier" => "cal_dav_principal",
+				"labelPhrase" => "profil/calendar_sync_cal_dav_principal",
+				"url" => APP_ROOT . "webdav/lvplan.php/principals/" . $this->uid,
+			],
+			[
+				"identifier" => "i_cal",
+				"labelPhrase" => "profil/calendar_sync_i_cal",
+				"url" => APP_ROOT . "webdav/google.php?cal=" . encryptData($this->uid, LVPLAN_CYPHER_KEY) . "&" . microtime(true),
+			],
+		];
+	}
 }
 
