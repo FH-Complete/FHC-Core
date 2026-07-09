@@ -31,12 +31,8 @@ class Abgabetool extends Auth_Controller
 	{
 		// TODO: routing from index based on berechtigung?
 
-		$viewData = array(
-			'uid'=>getAuthUID(),
-		);
-
 		if(defined('CIS4') && CIS4) {
-			$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'Abgabetool']);
+			$this->load->view('CisRouterView/CisRouterView.php', ['route' => 'Abgabetool']);
 		} else {
 			$this->load->view('Cis/Abgabetool.php', ['uid' => getAuthUID(), 'route' => 'Abgabetool']);
 		}
@@ -44,12 +40,8 @@ class Abgabetool extends Auth_Controller
 
 	public function Student($student_uid_prop = '')
 	{
-		$viewData = array(
-			'uid'=>getAuthUID(),
-		);
-		
 		if(defined('CIS4') && CIS4) {
-			$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'AbgabetoolStudent']);
+			$this->load->view('CisRouterView/CisRouterView.php', ['route' => 'AbgabetoolStudent']);
 		} else {
 			$this->load->view('Cis/Abgabetool.php', ['uid' => getAuthUID(), 'route' => 'AbgabetoolStudent', 'student_uid_prop' => $student_uid_prop]);
 		}
@@ -57,12 +49,8 @@ class Abgabetool extends Auth_Controller
 
 	public function Mitarbeiter()
 	{
-		$viewData = array(
-			'uid'=>getAuthUID(),
-		);
-
 		if(defined('CIS4') && CIS4) {
-			$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'AbgabetoolMitarbeiter']);
+			$this->load->view('CisRouterView/CisRouterView.php', ['route' => 'AbgabetoolMitarbeiter']);
 		} else {
 			$this->load->view('Cis/Abgabetool.php', ['uid' => getAuthUID(), 'route' => 'AbgabetoolMitarbeiter']);
 		}
@@ -70,13 +58,8 @@ class Abgabetool extends Auth_Controller
 
 	public function Assistenz($stg_kz_prop = '')
 	{
-		
-		$viewData = array(
-			'uid'=>getAuthUID(),
-		);
-
 		if(defined('CIS4') && CIS4) {
-			$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'AbgabetoolAssistenz']);
+			$this->load->view('CisRouterView/CisRouterView.php', ['route' => 'AbgabetoolAssistenz']);
 		} else {
 			$this->load->view('Cis/Abgabetool.php', ['uid' => getAuthUID(), 'route' => 'AbgabetoolAssistenz', 'stg_kz_prop' => $stg_kz_prop]);
 		}
@@ -84,12 +67,8 @@ class Abgabetool extends Auth_Controller
 	
 	public function Deadlines()
 	{
-		$viewData = array(
-			'uid'=>getAuthUID(),
-		);
-
 		if(defined('CIS4') && CIS4) {
-			$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'DeadlinesOverview']);
+			$this->load->view('CisRouterView/CisRouterView.php', ['route' => 'DeadlinesOverview']);
 		} else {
 			$this->load->view('Cis/Abgabetool.php', ['uid' => getAuthUID(), 'route' => 'DeadlinesOverview']);
 		}

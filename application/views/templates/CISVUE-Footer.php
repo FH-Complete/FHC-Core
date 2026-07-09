@@ -6,7 +6,7 @@ $includesArray = array(
 	'fontawesome6' => true,
 	'axios027' => true,
 	'customJSModules' => array_merge([
-		'public/js/apps/Cis.js'
+		'public/js/apps/Cis/Menu.js'
 	], $customJSModules ?? []),
 	'customCSSs' => array_merge([
 		'public/css/Cis4/Cis.css'
