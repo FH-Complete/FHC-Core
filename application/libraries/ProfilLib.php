@@ -263,6 +263,59 @@ class ProfilLib{
 			$element->mailto = "mailto:" . $element->gruppe_kurzbz . "@" . DOMAIN;
 			return $element;
 		}, $mailverteiler_res);
+
+		$this->ci->load->model("crm/Student_model", "StudentModel");
+		$this->ci->StudentModel->addJoin("tbl_benutzer", "tbl_benutzer.uid = tbl_student.student_uid");
+		$this->ci->StudentModel->addJoin("tbl_person", "tbl_benutzer.person_id = tbl_person.person_id");
+		$this->ci->StudentModel->addJoin("tbl_studiengang", "tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz");
+		$this->ci->StudentModel->addSelect("matr_nr, semester, verband, gruppe, kurzbzlang");
+
+		$studentResult = $this->ci->StudentModel->loadWhere(["student_uid" => $uid]);
+		if (isError($studentResult)) {
+			return error(getData($studentResult));
+		}
+
+		$studentResultData = getData($studentResult);
+		$studentData = null;
+		if (is_array($studentResultData) && count($studentResultData)) {
+			$studentData = $studentResultData[0];
+		}
+
+		if ($studentData && $studentData->matr_nr) {
+			$this->ci->load->library("phrasesLib", ["profil"], "phrases");
+			$standardCourseVerteiler = trim($studentData->kurzbzlang) . "_STD";
+			$mailverteiler_res[] = [
+				"beschreibung" => $this->ci->phrases->t('profil', 'alleStudentenVon') . " " . $standardCourseVerteiler,
+				"gruppe_kurzbz" => $standardCourseVerteiler,
+				"mailto" => "mailto:" . strtolower($standardCourseVerteiler) . "@" . DOMAIN,
+			];
+
+			$semesterVerteiler = trim($studentData->kurzbzlang) . trim($studentData->semester);
+			$mailverteiler_res[] = [
+				"beschreibung" => $this->ci->phrases->t('profil', 'alleStudentenVon') . " " . $semesterVerteiler,
+				"gruppe_kurzbz" => $semesterVerteiler,
+				"mailto" => "mailto:" . strtolower($semesterVerteiler) . "@" . DOMAIN,
+			];
+
+			if ($studentData->verband && strlen(trim($studentData->verband))) {
+				$verbandVerteiler = $semesterVerteiler . trim($studentData->verband);
+				$mailverteiler_res[] = [
+					"beschreibung" => $this->ci->phrases->t('profil', 'alleStudentenVon') . " " . $verbandVerteiler,
+					"gruppe_kurzbz" => $verbandVerteiler,
+					"mailto" => "mailto:" . strtolower($verbandVerteiler) . "@" . DOMAIN,
+				];
+
+				if ($studentData->gruppe && strlen(trim($studentData->gruppe))) {
+					$gruppeVerteiler = $verbandVerteiler . trim($studentData->gruppe);
+					$mailverteiler_res[] = [
+						"beschreibung" => $this->ci->phrases->t('profil', 'alleStudentenVon') . " " . $gruppeVerteiler,
+						"gruppe_kurzbz" => $gruppeVerteiler,
+						"mailto" => "mailto:" . strtolower($gruppeVerteiler) . "@" . DOMAIN,
+					];
+				}
+			}
+		}
+
 		return $mailverteiler_res;
 	}
 

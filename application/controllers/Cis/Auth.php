@@ -40,7 +40,7 @@ class Auth extends FHC_Controller
 
 		if ($this->form_validation->run())
 		{
-			redirect($this->authlib->getLandingPage('/CisVue/Dashboard'));
+			redirect($this->authlib->getLandingPage('/Cis4'));
 		}
 		else
 		{

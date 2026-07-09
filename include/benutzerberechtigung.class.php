@@ -350,7 +350,7 @@ class benutzerberechtigung extends basis_db
 		};
 		$roles = defined('STUDENTS_KEEP_PERMISSIONS_AFTER_USER_INACTIVE_ROLES')
 				? implode(', ', array_map($mapfunc, unserialize(STUDENTS_KEEP_PERMISSIONS_AFTER_USER_INACTIVE_ROLES)))
-				: 'NO_DEFINED_ROLE';
+				: "'NO_DEFINED_ROLE'";
 
 		$sql = <<<EOSQL
 			SELECT 

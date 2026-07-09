@@ -1,53 +1,31 @@
 export default {
-	//TODO: To be implemented
-	props: {
-		data: {
-			type: String,
-		},
-		title: {
-			type: String,
-			required: true,
-		},
-		mobile: {
-			type: Boolean,
-			default: false,
-		},
-	},
-	methods: {
-		hideCollapse: function () {
-			this.collapseOpen = false;
-		},
-		showCollapse: function () {
-			this.collapseOpen = true;
-		},
-	},
-	data() {
-		return {
-			collapseOpen: false,
-		};
-	},
-	template: /*html*/ `
+  name: "QuickLinks",
+  data() {
+    return {};
+  },
+  props: {
+    title: {
+      type: String,
+      required: true,
+    },
+    links: {
+      type: Array,
+      required: true,
+    },
+  },
+  template: `
 <div class="card">
-    <template v-if="mobile">
-        <button class="btn btn-outline-primary"  data-bs-toggle="collapse"  data-bs-target="#quickLinks" :aria-expanded="collapseOpen" aria-controls="quickLinks" >
-            {{title}}
-            <i class="fa " :class="collapseOpen?'fa-chevron-up':'fa-chevron-down'"></i> 
-        </button>
-        <div @[\`show.bs.collapse\`]="collapseOpen=true;" @[\`hide.bs.collapse\`]="collapseOpen=false;" class="mt-1 collapse" id="quickLinks">
-            <div class="list-group">
-                <a href="#" class="list-group-item list-group-item-action">{{$p.t('profil','zeitwuensche')}}</a>
-                <a href="#" class="list-group-item list-group-item-action">{{$p.t('profil','lehrveranstaltungen')}}</a>
-                <a href="#" class="list-group-item list-group-item-action ">{{$p.t('profil','zeitsperren')}}</a>
+    <div class="card-header">
+        {{title}}
+    </div>
+    <div class="card-body">
+        <div class="d-flex flex-row align-items-center gap-3 flex-wrap">
+            <div v-for="link in links" @click="link.action()" type="button" class="d-flex flex-row gap-2 px-3 py-2 border fhc-primary">
+                <div><i class="fa" :class="link.icon"></i></div>
+                {{ $p.t(link.phrase) }}
+                <div><i class="fa fa-arrow-up-right-from-square" style="color:var(--fhc-light) !important"></i></div>
             </div>
         </div>
-    </template>
-    <template v-else>
-        <div class="card-header">{{title}}</div>
-        <div class="card-body">
-            <a style="text-decoration:none" class="my-1 d-block" href="#">{{$p.t('profil','zeitwuensche')}}</a>
-            <a style="text-decoration:none" class="my-1 d-block" href="#">{{$p.t('profil','lehrveranstaltungen')}}</a>
-            <a style="text-decoration:none" class="my-1 d-block" href="#">{{$p.t('profil','zeitsperren')}}</a>
-        </div>
-    </template>
+    </div>
 </div>`,
 };
