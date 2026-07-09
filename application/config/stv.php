@@ -60,8 +60,7 @@ $config['tabs'] =
 		],
 		'notes' => [
 			//if true, the count of Messages will be shown in the header of the Tab Messages
-			'showCountNotes' => true,
-			'showErweitert' => true,
+			'showCountNotes' => true
 		],
 		'combinePeople' => [
 			//multitab should only be shown with this length of selection

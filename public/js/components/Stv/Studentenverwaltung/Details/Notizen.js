@@ -8,11 +8,7 @@ export default {
 		CoreNotiz
 	},
 	props: {
-		modelValue: Object,
-		config: {
-			type: Object,
-			default: {}
-		}
+		modelValue: Object
 	},
 	data() {
 		return {
@@ -35,7 +31,6 @@ export default {
 		:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
 		@reload="$emit('update:suffix')"
 		tabulator-persistence-id="stv-notiz-20260217"
-		:show-erweitert="config.showErweitert"
 		>
 </core-notiz>
 
