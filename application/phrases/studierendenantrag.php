@@ -3794,4 +3794,28 @@ array (
     ),
   ),
 )
+,
+array (
+  'app' => 'core',
+  'category' => 'studierendenantrag',
+  'phrase' => 'status_grund_abgelehnt',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Grund der Ablehnung:',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Reason for rejection:',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );

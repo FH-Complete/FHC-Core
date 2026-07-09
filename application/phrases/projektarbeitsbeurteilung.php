@@ -2365,5 +2365,53 @@ array (
     ),
   ),
 )
+,
+array (
+  'app' => 'projektarbeitsbeurteilung',
+  'category' => 'projektarbeitsbeurteilung',
+  'phrase' => 'statusZwischengespeichert',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Zwischengespeichert (Noch nicht an Erstbetreuer*In abgeschickt)',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Temporarily saved (Not yet sent to first reviewer)',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'projektarbeitsbeurteilung',
+  'category' => 'projektarbeitsbeurteilung',
+  'phrase' => 'statusAbgeschickt',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Abgeschickt am',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Sent on',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );
 
