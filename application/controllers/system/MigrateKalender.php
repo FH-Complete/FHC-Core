@@ -8,7 +8,7 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class MigrateKalender extends Auth_Controller
+class MigrateKalender extends CLI_Controller
 {
 
 	/**
@@ -35,8 +35,14 @@ class MigrateKalender extends Auth_Controller
 	/**
 	 * Everything has a beginning
 	 */
-	public function migrateStundenplan($von = null, $bis = null, $studiengang_kz = null)
+	public function migrateStundenplan($von, $bis = null, $studiengang_kz = null)
 	{
+		if (is_null($von))
+			return error('Parameter "von" ist erforderlich');
+
+		if (is_null($bis))
+			$bis = '2100-12-31';
+
 		$db = new DB_Model();
 
 		$stpldevsql = '
@@ -71,8 +77,8 @@ class MigrateKalender extends Auth_Controller
 					bk.block_nr,
 					MIN(bk.stunde) AS stunde_von,
 					MAX(bk.stunde) AS stunde_bis,
-					MIN(sp.lehreinheit_id) AS lehreinheit_id,
-					MIN(sp.ort_kurzbz) AS ort_kurzbz,
+					array_agg(DISTINCT sp.lehreinheit_id) AS lehreinheit_id,
+					array_agg(DISTINCT sp.ort_kurzbz) AS ort_kurzbz,
 					array_agg(sp.stundenplandev_id ORDER BY bk.stunde) AS stundenplandev_ids,
 					MIN(sp.insertamum) AS insertamum,
 					(array_agg(sp.insertvon ORDER BY sp.insertamum ASC))[1] AS insertvon,
@@ -118,7 +124,7 @@ class MigrateKalender extends Auth_Controller
 				$ids = is_array($block->stundenplandev_ids) ? $block->stundenplandev_ids : explode(',', $block->stundenplandev_ids);
 				/*$ids = array_map('intval', $ids);*/
 
-				$this->SyncModel->db->where('stundenplandev_id IN (' . implode(',', $ids) . ')');
+				$this->SyncModel->db->where_in('stundenplandev_id', $ids);
 				$sync_result = $this->SyncModel->load();
 
 				if (!hasData($sync_result))
@@ -152,8 +158,14 @@ class MigrateKalender extends Auth_Controller
 		}
 	}
 
-	public function migrateReservierung($von = null, $bis = null, $ort_kurzbz = null)
+	public function migrateReservierung($von, $bis = null, $ort_kurzbz = null)
 	{
+		if (is_null($von))
+			return error('Parameter "von" ist erforderlich');
+
+		if (is_null($bis))
+			$bis = '2100-12-31';
+
 		$db = new DB_Model();
 
 		$qry = "WITH eindeutige_stunden AS (
@@ -170,43 +182,42 @@ class MigrateKalender extends Auth_Controller
 		}
 
 		$qry .=	"),
-					 block_keys AS (
+					block_keys AS (
+						SELECT
+							titel, beschreibung, datum, stunde,
+							stunde - ROW_NUMBER() OVER (PARTITION BY titel, beschreibung, datum ORDER BY stunde) AS block_nr
+						FROM eindeutige_stunden
+					),
+					blocks AS (
 						 SELECT
-							 titel, beschreibung, datum, stunde,
-							 stunde - ROW_NUMBER() OVER (PARTITION BY titel, beschreibung, datum ORDER BY stunde) AS block_nr
-						 FROM eindeutige_stunden
-					 ),
-					 blocks AS (
-						 SELECT
-							 bk.titel,
-							 bk.beschreibung,
-							 bk.datum,
-							 bk.block_nr,
-							 MIN(bk.stunde) AS stunde_von,
-							 MAX(bk.stunde) AS stunde_bis,
-							 array_agg(DISTINCT r.reservierung_id::text) AS reservierung_ids,
-							 array_agg(DISTINCT r.uid) AS uids,
-							 array_agg(DISTINCT r.gruppe_kurzbz) AS gruppen_kurzbz,
-							 array_agg(DISTINCT ROW(r.semester, r.verband, r.gruppe)::text) AS svg_kombis,
-							 array_agg(DISTINCT r.ort_kurzbz) AS orte_kurzbz,
-							 MIN(r.studiengang_kz) AS studiengang_kz,
-							 MIN(r.veranstaltung_id) AS veranstaltung_id,
-							 MIN(r.reservierung_id) AS reservierung_id,
-							 MAX(r.insertamum) AS insertamum,
-							 (array_agg(r.insertvon ORDER BY r.insertamum ASC))[1] AS insertvon
-						 FROM block_keys bk
-								  JOIN campus.tbl_reservierung r
-									   ON r.titel = bk.titel AND r.beschreibung = bk.beschreibung AND r.datum = bk.datum AND r.stunde = bk.stunde
-						 WHERE r.datum >= ? AND r.datum <= ?
-						 GROUP BY bk.titel, bk.beschreibung, bk.datum, bk.block_nr
-					 )
+							bk.titel,
+							bk.beschreibung,
+							bk.datum,
+							bk.block_nr,
+							MIN(bk.stunde) AS stunde_von,
+							MAX(bk.stunde) AS stunde_bis,
+							array_agg(DISTINCT r.reservierung_id::text) AS reservierung_ids,
+							array_agg(DISTINCT r.uid) AS uids,
+							array_agg(DISTINCT r.gruppe_kurzbz) AS gruppen_kurzbz,
+							array_agg(DISTINCT ROW(r.semester, r.verband, r.gruppe, r.studiengang_kz)::text) AS svg_kombis,
+							array_agg(DISTINCT r.ort_kurzbz) AS ort_kurzbz,
+							MIN(r.studiengang_kz) AS studiengang_kz,
+							MIN(r.reservierung_id) AS reservierung_id,
+							MAX(r.insertamum) AS insertamum,
+							(array_agg(r.insertvon ORDER BY r.insertamum ASC))[1] AS insertvon
+						FROM block_keys bk
+							JOIN campus.tbl_reservierung r
+									ON r.titel = bk.titel AND r.beschreibung = bk.beschreibung AND r.datum = bk.datum AND r.stunde = bk.stunde
+						WHERE r.datum >= ? AND r.datum <= ?
+						GROUP BY bk.titel, bk.beschreibung, bk.datum, bk.block_nr
+					)
 				SELECT
 					b.*,
 					(b.datum + s_von.beginn) AS von,
-					(b.datum + s_bis.ende)   AS bis
+					(b.datum + s_bis.ende) AS bis
 				FROM blocks b
-						 JOIN lehre.tbl_stunde s_von ON s_von.stunde = b.stunde_von
-						 JOIN lehre.tbl_stunde s_bis ON s_bis.stunde = b.stunde_bis
+						JOIN lehre.tbl_stunde s_von ON s_von.stunde = b.stunde_von
+						JOIN lehre.tbl_stunde s_bis ON s_bis.stunde = b.stunde_bis
 				ORDER BY b.reservierung_id DESC;";
 
 		array_push($params, $von, $bis);
@@ -222,7 +233,7 @@ class MigrateKalender extends Auth_Controller
 
 				$ids = is_array($block->reservierung_ids) ? $block->reservierung_ids : explode(',', $block->reservierung_ids);
 
-				$this->SyncReservierungModel->db->where('reservierung_id IN (' . implode(',', $ids) . ')');
+				$this->SyncReservierungModel->db->where_in('reservierung_id', $ids);
 				$sync_result = $this->SyncReservierungModel->load();
 
 				if (!hasData($sync_result))
@@ -379,21 +390,30 @@ class MigrateKalender extends Auth_Controller
 
 		if ($typ === 'lehreinheit')
 		{
-			$this->KalenderLehreinheitModel->insert(
-				array (
-					'kalender_id' => $kalender_id,
-					'lehreinheit_id'=> $block->lehreinheit_id
-				)
-			);
+			$lehreinheit_ids = is_array($block->lehreinheit_id) ? $block->lehreinheit_id : explode(',', $block->lehreinheit_id);
+			foreach ($lehreinheit_ids as $lehreinheit_id)
+			{
+				$leResult = $this->KalenderLehreinheitModel->insert(
+					array (
+						'kalender_id' => $kalender_id,
+						'lehreinheit_id'=> $lehreinheit_id
+					)
+				);
+
+				if (!isSuccess($leResult))
+					return null;
+			}
 		}
 		else if ($typ === 'reservierung')
 		{
-			$this->KalenderEventModel->insert(array(
+			$eventResult = $this->KalenderEventModel->insert(array(
 				'kalender_id' => $kalender_id,
 				'titel' => $block->titel,
 				'beschreibung' => $block->beschreibung
 			));
 
+			if (!isSuccess($eventResult))
+				return null;
 
 			if ($block->insertvon)
 			{
@@ -420,7 +440,10 @@ class MigrateKalender extends Auth_Controller
 			}
 
 			$semester_range = $this->StudiensemesterModel->getByDateRange($block->von, $block->bis);
-			if (isError($semester_range)) return $semester_range;
+
+			if (isError($semester_range))
+				return null;
+
 			$studiensemester_kurzbz = getData($semester_range)[0]->studiensemester_kurzbz ?? null;
 
 			$gruppen = is_array($block->gruppen_kurzbz) ? $block->gruppen_kurzbz : explode(',', $block->gruppen_kurzbz ?? '');
@@ -458,24 +481,41 @@ class MigrateKalender extends Auth_Controller
 			foreach ($block->svg_kombis as $kombi_str)
 			{
 				$kombi_str = trim($kombi_str, '()');
-				list($sem, $verb, $grp) = explode(',', $kombi_str);
+				list($sem, $verb, $grp, $stg_kz) = explode(',', $kombi_str);
 
 				$sem = trim($sem) === '' ? null : trim($sem);
 				$verb = trim($verb) === '' ? null : trim($verb);
 				$grp = trim($grp) === '' ? null : trim($grp);
+				$stg_kz = trim($stg_kz) === '' ? null : trim($stg_kz);
 
-				if (is_null($sem) && is_null($verb) && is_null($grp))
+				if (is_null($sem) && is_null($verb) && is_null($grp) && is_null($stg_kz))
 					continue;
 
 				$this->KalenderEventTeilnehmerModel->insert(array(
 					'kalender_id' => $kalender_id,
-					'studiengang_kz' => $block->studiengang_kz,
+					'studiengang_kz' => $stg_kz,
 					'semester' => $sem,
 					'verband' => $verb,
 					'gruppe' => $grp,
 					'studiensemester_kurzbz' => $studiensemester_kurzbz,
 					'rolle_kurzbz' => 'teilnehmer'
 				));
+			}
+		}
+
+		$orte = is_array($block->ort_kurzbz) ? $block->ort_kurzbz : explode(',', $block->ort_kurzbz ?? '');
+
+		foreach ($orte as $ort)
+		{
+			$ort = trim($ort);
+			if (!empty($ort))
+			{
+				$this->KalenderOrtModel->insert(
+					array (
+						'kalender_id' => $kalender_id,
+						'ort_kurzbz' => $ort
+					)
+				);
 			}
 		}
 
@@ -523,6 +563,21 @@ class MigrateKalender extends Auth_Controller
 				'updatevon' => $block->updatevon
 			)
 		);
+
+		$orte = is_array($block->ort_kurzbz) ? $block->ort_kurzbz : explode(',', $block->ort_kurzbz ?? '');
+		$orte = array_filter(array_map('trim', $orte));
+
+		$this->KalenderOrtModel->delete(array('kalender_id' => $kalender_id));
+
+		foreach ($orte as $ort)
+		{
+			$this->KalenderOrtModel->insert(
+				array (
+					'kalender_id' => $kalender_id,
+					'ort_kurzbz' => $ort
+				)
+			);
+		}
 	}
 
 	private function _updateSync($ids, $kalender_id)

@@ -32,7 +32,6 @@ class Coursepicker extends FHCAPI_Controller
 
 		//TODO Where weiter anpassen z.B. Fachbereich
 		$this->_ci->LehreinheitModel->addSelect('tbl_lehreinheit.lehreinheit_id,
-												tbl_lehreinheit.unr,
 												tbl_lehreinheit.lvnr,
 												tbl_lehreinheit.lehrfach_id,
 												lehrfach.kurzbz AS lehrfach,
@@ -103,7 +102,6 @@ class Coursepicker extends FHCAPI_Controller
 
 		$this->_ci->LehreinheitModel->addSelect('
 			tbl_lehreinheit.lehreinheit_id,
-			tbl_lehreinheit.unr,
 			tbl_lehreinheit.lvnr,
 			tbl_lehreinheit.lehrfach_id,
 			lehrfach.kurzbz AS lehrfach,
@@ -146,15 +144,30 @@ class Coursepicker extends FHCAPI_Controller
 		));
 
 		$result = hasData($result) ? getData($result) : array();
+
+		$lehreinheit_ids = array_values(array_unique(array_column($result, 'lehreinheit_id')));
+
+		$offen_map = array();
+		if (!empty($lehreinheit_ids))
+		{
+			$offen_result = $this->_ci->LehreinheitModel->getOffeneStunden($lehreinheit_ids);
+			if (hasData($offen_result))
+			{
+				foreach (getData($offen_result) as $row)
+				{
+					$offen_map[$row->lehreinheit_id . '_' . $row->mitarbeiter_uid] = $row;
+				}
+			}
+		}
+
 		$grouped = array();
 
 		foreach ($result as $row)
 		{
-			$unr = $row->unr;
-			if (!isset($grouped[$unr]))
+			$lehreinheit_id = $row->lehreinheit_id;
+			if (!isset($grouped[$lehreinheit_id]))
 			{
-				$grouped[$unr] = (object)array(
-					'unr' => $row->unr,
+				$grouped[$lehreinheit_id] = (object)array(
 					'lehrfach_id' => $row->lehrfach_id,
 					'lehrfach_bez' => $row->lehrfach_bez,
 					'lehrfach_farbe' => $row->lehrfach_farbe,
@@ -186,7 +199,7 @@ class Coursepicker extends FHCAPI_Controller
 				);
 			}
 
-			$group = $grouped[$unr];
+			$group = $grouped[$lehreinheit_id];
 
 			$group->lektoren[$row->lektor_uid] = (object)array(
 				'uid' => $row->lektor_uid,
@@ -202,9 +215,15 @@ class Coursepicker extends FHCAPI_Controller
 			$group->wochenrythmus[] = $row->wochenrythmus;
 			$group->planstunden[] = $row->planstunden;
 			$group->start_kw[] = $row->start_kw;
-			$group->verplant[] = isset($row->verplant) ? $row->verplant : 0;
-			$group->offenestunden[] = isset($row->offenestunden) ? $row->offenestunden : 0;
-			$group->verplant_gesamt += isset($row->verplant) ? $row->verplant : 0;
+
+			$offen_key = $lehreinheit_id . '_' . $row->lektor_uid;
+			$offen = isset($offen_map[$offen_key]) ? $offen_map[$offen_key] : null;
+			$verplant_wert = $offen ? $offen->verplant : 0;
+			$offenestunden_wert = $offen ? $offen->offenestunden : 0;
+
+			$group->verplant[] = $verplant_wert;
+			$group->offenestunden[] = $offenestunden_wert;
+			$group->verplant_gesamt += $verplant_wert;
 
 			$lvb = $row->studiengang . '-' . $row->semester;
 
@@ -244,7 +263,7 @@ class Coursepicker extends FHCAPI_Controller
 		$values = array_values(array_unique($arr));
 		$formatted = implode(' ', $values);
 
-		if (count($formatted) > 1)
+		if (count($values) > 1)
 			$formatted .= ' ?';
 
 		return $formatted;

@@ -22,17 +22,24 @@ export default {
 				this.$p.t('global/uhrzeit'),
 				[this.start, this.end].join(' - ')
 			].join(": "));
-			
+
 			tooltipArray.push([
 				this.$p.t('profilUpdate/topic'),
-				this.event.topic
+				this.topicString
 			].join(": "));
-			
+
 			tooltipArray.push([
 				this.$p.t('person/ort'),
-				this.event.ort_kurzbz
+				this.ortString
 			].join(": "));
-			
+
+			if (this.gruppeString) {
+				tooltipArray.push([
+					this.$p.t('lehre/gruppe'),
+					this.gruppeString
+				].join(": "));
+			}
+
 			if (Array.isArray(this.event.lektor) && this.event.lektor.length > 0) {
 				if (this.event.lektor.length > 3) {
 					tooltipArray.push([
@@ -47,7 +54,22 @@ export default {
 					].join(": "));
 				}
 			}
-			
+
+			if (Array.isArray(this.event.teilnehmer_person) && this.event.teilnehmer_person.length > 0) {
+				if (this.event.teilnehmer_person.length > 3) {
+					tooltipArray.push([
+						this.$p.t('lehre/teilnehmer'),
+						this.event.teilnehmer_person.slice(0, 3).map(person => `${person.vorname} ${person.nachname}`).join("\n")
+						+ "\n" + this.$p.t('lehre/weitereTeilnehmer', [this.event.teilnehmer_person.length - 3])
+					].join(": "));
+				} else {
+					tooltipArray.push([
+						this.$p.t('lehre/teilnehmer'),
+						this.event.teilnehmer_person.map(person => `${person.vorname} ${person.nachname}`).join("\n")
+					].join(": "));
+				}
+			}
+
 			return tooltipArray.join("\n");
 		},
 		start() {
@@ -59,7 +81,18 @@ export default {
 			return luxon.Duration
 				.fromISOTime(this.event.ende)
 				.toISOTime({ suppressSeconds: true });
-		}
+		},
+		ortString() {
+			return Array.isArray(this.event.ort_kurzbz) ? this.event.ort_kurzbz.join(', ') : this.event.ort_kurzbz;
+		},
+		topicString() {
+			return Array.isArray(this.event.topic) ? this.event.topic.join(', ') : this.event.topic;
+		},
+		gruppeString() {
+			return Array.isArray(this.event.teilnehmer_gruppe)
+				? this.event.teilnehmer_gruppe.map(gruppe => gruppe.gruppe_kurzbz).join(', ')
+				: this.event.teilnehmer_gruppe;
+		},
 	},
 	template: /* html */`
 	<div
@@ -73,7 +106,7 @@ export default {
 			<span>{{ end }}</span>
 		</div>
 		<div class="event-text" v-tooltip="tooltipString">
-			<span class="event-topic">{{ event.topic }}</span>
+			<span class="event-topic">{{ topicString }}</span>
 			<span
 				v-for="lektor in event.lektor.slice(0, 3)"
 				class="event-lectors"
@@ -86,7 +119,20 @@ export default {
 			>
 				... +{{ event.lektor.length - 3 }}
 			</span>
-			<span data-cy="calendar-event-room" class="event-place">{{ event.ort_kurzbz }}</span>
+			<span
+				v-for="person in (event.teilnehmer_person || []).slice(0, 3)"
+				class="event-teilnehmer"
+			>
+				{{ person.vorname }} {{ person.nachname }}
+			</span>
+			<span
+				v-if="event.teilnehmer_person && event.teilnehmer_person.length > 3"
+				class="event-teilnehmer-plus"
+			>
+				... +{{ event.teilnehmer_person.length - 3 }}
+			</span>
+			<span class="event-place" data-cy="calendar-event-room">{{ ortString }}</span>
+			<span v-if="gruppeString" class="event-gruppe">{{ gruppeString }}</span>
 		</div>
 	</div>
 	`,

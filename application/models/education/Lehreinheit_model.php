@@ -395,6 +395,77 @@ EOSQL;
 		return $this->execReadOnlyQuery($qry, $params);
 	}
 
+	public function getOffeneStunden($lehreinheit_ids)
+	{
+		if (!is_array($lehreinheit_ids))
+			$lehreinheit_ids = [$lehreinheit_ids];
+
+		if (empty($lehreinheit_ids))
+			return success([]);
+
+		$db = new DB_Model();
+		$placeholders = implode(',', array_fill(0, count($lehreinheit_ids), '?'));
+
+		$qry = "WITH eventdauer AS (
+					SELECT
+						tbl_kalender_lehreinheit.lehreinheit_id,
+						tbl_kalender.von,
+						tbl_kalender.bis,
+						tbl_kalender.kalender_id
+					FROM lehre.tbl_lehreinheit
+							JOIN lehre.tbl_kalender_lehreinheit USING(lehreinheit_id)
+							JOIN lehre.tbl_kalender USING(kalender_id)
+					WHERE tbl_lehreinheit.lehreinheit_id IN ($placeholders)
+					GROUP BY tbl_kalender_lehreinheit.lehreinheit_id, tbl_kalender.von, tbl_kalender.bis, tbl_kalender.kalender_id
+				),
+				raster AS (
+					SELECT
+						eventdauer.lehreinheit_id,
+						eventdauer.kalender_id,
+						eventdauer.von,
+						eventdauer.bis,
+						vonstunde.stunde AS vonstunde_nr,
+						bisstunde.stunde AS bisstunde_nr
+					FROM eventdauer
+						LEFT JOIN lehre.tbl_stunde vonstunde ON eventdauer.von::time = vonstunde.beginn
+						LEFT JOIN lehre.tbl_stunde bisstunde ON eventdauer.bis::time = bisstunde.ende
+				),
+				unterrichtsdauer AS (
+					SELECT
+						raster.lehreinheit_id,
+						raster.kalender_id,
+						sum(EXTRACT(EPOCH FROM (LEAST(stunde.ende, raster.bis::time) - GREATEST(stunde.beginn, raster.von::time))) / 60) AS minuten
+					FROM raster JOIN lehre.tbl_stunde stunde ON stunde.beginn < raster.bis::time AND stunde.ende > raster.von::time
+					WHERE raster.vonstunde_nr IS NULL OR raster.bisstunde_nr IS NULL
+					GROUP BY raster.lehreinheit_id, raster.kalender_id
+				),
+				verplantestunden AS (
+					SELECT raster.lehreinheit_id, raster.kalender_id,
+						CASE
+							WHEN raster.vonstunde_nr IS NOT NULL AND raster.bisstunde_nr IS NOT NULL
+								THEN (raster.bisstunde_nr - raster.vonstunde_nr + 1)
+							ELSE coalesce(unterrichtsdauer.minuten, 0) / 45
+						END AS verplantestunde
+					FROM raster LEFT JOIN unterrichtsdauer ON unterrichtsdauer.lehreinheit_id = raster.lehreinheit_id AND unterrichtsdauer.kalender_id = raster.kalender_id
+				),
+				verplant_gesamt AS (
+					SELECT lehreinheit_id, SUM(verplantestunde) AS verplant
+					FROM verplantestunden
+					GROUP BY lehreinheit_id
+				)
+				SELECT
+					lema.lehreinheit_id,
+					lema.mitarbeiter_uid,
+					lema.planstunden,
+					ROUND(coalesce(verplant_gesamt.verplant, 0), 2) AS verplant,
+					ROUND((lema.planstunden - coalesce(verplant_gesamt.verplant, 0)), 2) AS offenestunden
+				FROM lehre.tbl_lehreinheitmitarbeiter lema
+					LEFT JOIN verplant_gesamt ON verplant_gesamt.lehreinheit_id = lema.lehreinheit_id
+				WHERE lema.lehreinheit_id IN ($placeholders)";
+
+		return $db->execReadOnlyQuery($qry, array_merge($lehreinheit_ids, $lehreinheit_ids));
+	}
+
 	private function getLVTmp($stg_kz = null)
 	{
 		$qry = "SELECT DISTINCT ON(lehrveranstaltung_id) *, 

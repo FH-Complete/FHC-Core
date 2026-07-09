@@ -9,57 +9,65 @@ import ApiKalender from "../../api/factory/tempus/kalender.js";
 import draggable from "../../directives/draggable.js";
 
 export default {
-  name: "CalendarTempus",
-  components: {
-    FhcCalendar,
-  },
-  inject: {
-    renderers: { from: "renderers" },
-    appConfig: {
-      from: "appConfig",
-      default: {
-        visible_status: "all",
-      },
-    },
-  },
-  directives: {
-    draggable,
-  },
-  props: {
-    timezone: {
-      type: String,
-      required: true,
-    },
-    date: {
-      type: [Date, String, Number, luxon.DateTime],
-      default: luxon.DateTime.local(),
-    },
-    mode: {
-      type: String,
-      default: "Week",
-    },
-    getPromiseFunc: {
-      type: Function,
-      required: true,
-    },
-    parkedEvents: {
-      type: Object,
-      default: () => new Set(),
-    },
-    visibleLecturers: {
-      type: Array,
-      default: null,
-    },
-    extraBackgrounds: {
-      type: Array,
-      default: () => [],
-    },
-    visibleStatus: {
-      type: Array,
-      default: () => ["all"],
-    },
-  },
-  emits: ["update:date", "update:mode", "update:range", "drop", "resize"],
+	name: "CalendarTempus",
+	components: {
+		FhcCalendar
+	},
+	inject: {
+		renderers: {from: 'renderers'},
+		appConfig: {
+			from: 'appConfig',
+			default: {
+				visible_status: 'all'
+			}
+		}
+	},
+	directives: {
+		draggable,
+	},
+	props: {
+		timezone: {
+			type: String,
+			required: true
+		},
+		date: {
+			type: [Date, String, Number, luxon.DateTime],
+			default: luxon.DateTime.local()
+		},
+		mode: {
+			type: String,
+			default: 'Week'
+		},
+		getPromiseFunc: {
+			type: Function,
+			required: true
+		},
+		parkedEvents: {
+			type: Object,
+			default: () => new Set()
+		},
+		visibleLecturers: {
+			type: Array,
+			default: null
+		},
+		extraBackgrounds: {
+			type: Array,
+			default: () => []
+		},
+		visibleStatus: {
+			type: Array,
+			default: () => ['all']
+		},
+	},
+	emits: [
+		"update:date",
+		"update:mode",
+		"update:range",
+		"drop",
+		"resize",
+		"event-hover",
+		"event-unhover"
+	],
 
   data() {
     return {
@@ -149,6 +157,12 @@ export default {
     resetEventLoader() {
       this.reset();
     },
+    navigatePrev() {
+			this.$refs.calendar.clickPrev();
+		},
+		navigateNext() {
+			this.$refs.calendar.clickNext();
+		},
     clearOutCalendarEventEmphasis() {
       this.$refs.calendar.$el
         .querySelectorAll(
@@ -234,6 +248,8 @@ export default {
 				:class="['event-type-' + event.type + ' ' + mode + 'PageContainer', { 'event--parked': parkedEvents.has(String(event.kalender_id)) }]"
 				:type="mode == 'day' ? 'button' : undefined"
  				:style="eventStyle(event)"
+				@mouseenter="$emit('event-hover', event)"
+				@mouseleave="$emit('event-unhover', event)"
 			>
 				<component
 					v-if="mode == 'event'"
@@ -276,5 +292,5 @@ export default {
 				</div>
 			</div>
 		</template>
-	</fhc-calendar>`,
-};
+	</fhc-calendar>`
+}

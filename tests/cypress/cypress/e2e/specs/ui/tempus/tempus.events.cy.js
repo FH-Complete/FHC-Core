@@ -37,7 +37,9 @@ context("Tempus event mutation tests", () => {
 
         const eventData = JSON.parse(eventJSON);
         const eventId = eventData?.id;
-        const originalRoom = eventData?.orig?.ort_kurzbz;
+        let originalRoom = eventData?.orig?.ort_kurzbz;
+        if (Array.isArray(originalRoom)) originalRoom = originalRoom.length ? originalRoom[0] : "";
+
         expect(eventId, "planner event id").to.exist;
         expect(originalRoom, "original event room").to.be.a("string").and.not.be
           .empty;
@@ -80,7 +82,9 @@ context("Tempus event mutation tests", () => {
 
         const eventData = JSON.parse(eventJSON);
         const eventId = eventData?.id;
-        const originalRoom = eventData?.orig?.ort_kurzbz;
+        let originalRoom = eventData?.orig?.ort_kurzbz;
+        if (Array.isArray(originalRoom)) originalRoom = originalRoom.length ? originalRoom[0] : "";
+
         expect(eventId, "planner event id").to.exist;
         expect(originalRoom, "original event room").to.be.a("string").and.not.be
           .empty;

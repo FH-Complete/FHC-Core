@@ -89,62 +89,95 @@ class RaumvorschlagLib
 
 	}
 
-	private function _getOrtDetails($ort_kurzbz)
+	private function _getOrtDetails($ort_kurzbz_array)
 	{
+		$ort_kurzbz_array = (array) $ort_kurzbz_array;
+		if (empty($ort_kurzbz_array)) return [];
 		$this->_ci->OrtModel->addSelect('ort_kurzbz, stockwerk, standort_id');
-		$this->_ci->OrtModel->db->where('ort_kurzbz', $ort_kurzbz);
+		$this->_ci->OrtModel->db->where_in('ort_kurzbz', $ort_kurzbz_array);
 		$result = $this->_ci->OrtModel->load();
-		return hasData($result) ? getData($result)[0] : null;
+
+		return hasData($result) ? getData($result) : [];
 	}
 
-	private function _rateLektor(&$rating, $raum, $lektor_davor_ort)
+	private function _rateLektor(&$rating, $raum, $lektor_davor_orte)
 	{
-		if (!$lektor_davor_ort) return;
+		if (empty($lektor_davor_orte)) return;
 
-		if ($lektor_davor_ort->ort_kurzbz === $raum->ort_kurzbz)
+		foreach ($lektor_davor_orte as $ort)
 		{
-			$rating['score'] += 20;
-			$rating['details'][] = '+20 ' . $this->_ci->phraseslib->t('ui', 'lecturer_already_here');
-			return;
+			if ($ort->ort_kurzbz === $raum->ort_kurzbz)
+			{
+				$rating['score'] += 20;
+				$rating['details'][] = '+20 ' . $this->_ci->phraseslib->t('ui', 'lecturer_already_here');
+				return;
+			}
 		}
 
-		if ($lektor_davor_ort->standort_id !== $raum->standort_id)
+		$gleiches_gebaeude = array_filter($lektor_davor_orte, function($ort) use ($raum)
+		{
+			return $ort->standort_id === $raum->standort_id;
+		});
+
+		if (empty($gleiches_gebaeude))
 		{
 			$rating['score'] -= 20;
 			$rating['details'][] = '-20 '. $this->_ci->phraseslib->t('ui', 'lecturer_building_change');
+			return;
 		}
-		elseif ($lektor_davor_ort->stockwerk !== $raum->stockwerk)
+
+		$diffs = array_map(function($ort) use ($raum)
 		{
-			$diff = abs($lektor_davor_ort->stockwerk - $raum->stockwerk);
+			return abs($ort->stockwerk - $raum->stockwerk);
+		}, $gleiches_gebaeude);
+
+		$diff = min($diffs);
+
+		if ($diff > 0)
+		{
 			$rating['score'] -= $diff * 5;
 			$rating['details'][] = '-' . ($diff * 5) . ' ' . $this->_ci->phraseslib->t('ui', 'lecturer_floor_change');
 		}
 	}
 
-	private function _rateGruppen(&$rating, $raum, $gruppen_davor_ort)
+	private function _rateGruppen(&$rating, $raum, $gruppen_davor_orte)
 	{
-		if (!$gruppen_davor_ort) return;
+		if (empty($gruppen_davor_orte)) return;
 
-		if ($gruppen_davor_ort->ort_kurzbz === $raum->ort_kurzbz)
+		foreach ($gruppen_davor_orte as $ort)
 		{
-			$rating['score'] += 10;
-			$rating['details'][] = '+10 ' . $this->_ci->phraseslib->t('ui', 'student_already_here');
-			return;
+			if ($ort->ort_kurzbz === $raum->ort_kurzbz)
+			{
+				$rating['score'] += 10;
+				$rating['details'][] = '+10 ' . $this->_ci->phraseslib->t('ui', 'student_already_here');
+				return;
+			}
 		}
 
-		if ($gruppen_davor_ort->standort_id !== $raum->standort_id)
+		$gleiches_gebaeude = array_filter($gruppen_davor_orte, function($ort) use ($raum)
+		{
+			return $ort->standort_id === $raum->standort_id;
+		});
+
+		if (empty($gleiches_gebaeude))
 		{
 			$rating['score'] -= 20;
 			$rating['details'][] = '-20 '. $this->_ci->phraseslib->t('ui', 'student_building_change');
+			return;
 		}
-		elseif ($gruppen_davor_ort->stockwerk !== $raum->stockwerk)
+
+		$diffs = array_map(function($ort) use ($raum)
 		{
-			$diff = abs($gruppen_davor_ort->stockwerk - $raum->stockwerk);
+			return abs($ort->stockwerk - $raum->stockwerk);
+		}, $gleiches_gebaeude);
+
+		$diff = min($diffs);
+
+		if ($diff > 0)
+		{
 			$rating['score'] -= $diff * 5;
 			$rating['details'][] = '-' . ($diff * 5) . ' '. $this->_ci->phraseslib->t('ui', 'student_floor_change');
 		}
-
-
 	}
 
 	private function _getEventDavor($events, $von, $uids, $type)

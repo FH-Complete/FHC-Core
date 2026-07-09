@@ -16,7 +16,9 @@ context("Tempus filter tests", () => {
       .then((eventJSON) => {
         expect(eventJSON).to.exist;
 
-        const selectedRoom = JSON.parse(eventJSON)?.orig?.ort_kurzbz;
+        let selectedRoom = JSON.parse(eventJSON)?.orig?.ort_kurzbz;
+        if (Array.isArray(selectedRoom)) selectedRoom = selectedRoom.length ? selectedRoom[0] : "";
+
         expect(selectedRoom, "first event room").to.be.a("string").and.not.be
           .empty;
         expect(
@@ -40,8 +42,11 @@ context("Tempus filter tests", () => {
         tempusPage.getCalendarEvents().should("have.length.greaterThan", 0);
         tempusPage.getCalendarEvents().each(($event) => {
           const eventData = tempusPage.getCalendarEventData($event);
+          
+          let eventRoom = eventData?.orig?.ort_kurzbz;
+          if (Array.isArray(eventRoom)) eventRoom = eventRoom.length ? eventRoom[0] : "";
 
-          expect(eventData?.orig?.ort_kurzbz, "event data room").to.eq(
+          expect(eventRoom, "event data room").to.eq(
             selectedRoom,
           );
           cy.wrap($event)
@@ -64,7 +69,9 @@ context("Tempus filter tests", () => {
       .then((eventJSON) => {
         expect(eventJSON).to.exist;
 
-        const selectedRoom = JSON.parse(eventJSON)?.orig?.ort_kurzbz;
+        let selectedRoom = JSON.parse(eventJSON)?.orig?.ort_kurzbz;
+        if (Array.isArray(selectedRoom)) selectedRoom = selectedRoom.length ? selectedRoom[0] : "";
+        console.log("Selected room:", selectedRoom);
         expect(selectedRoom, "first event room").to.be.a("string").and.not.be
           .empty;
         expect(

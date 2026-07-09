@@ -15,6 +15,17 @@ export default {
 
 			return classes;
 		},
+		topicString() {
+			return Array.isArray(this.event.topic) ? this.event.topic.join(', ') : this.event.topic;
+		},
+		ortString() {
+			return Array.isArray(this.event.ort_kurzbz) ? this.event.ort_kurzbz.join(', ') : this.event.ort_kurzbz;
+		},
+		gruppeString() {
+			return Array.isArray(this.event.gruppe)
+				? this.event.gruppe.map(gruppe => gruppe.bezeichnung).join(', ')
+				: this.event.gruppe;
+		},
 		tooltipString() {
 			const tooltipArray = [];
 
@@ -25,13 +36,20 @@ export default {
 
 			tooltipArray.push([
 				this.$p.t('profilUpdate/topic'),
-				this.event.topic
+				this.topicString
 			].join(": "));
 
 			tooltipArray.push([
 				this.$p.t('person/ort'),
-				this.event.ort_kurzbz
+				this.ortString
 			].join(": "));
+
+			if (this.gruppeString) {
+				tooltipArray.push([
+					this.$p.t('lehre/gruppe'),
+					this.gruppeString
+				].join(": "));
+			}
 
 			if (Array.isArray(this.event.lektor) && this.event.lektor.length > 0) {
 				if (this.event.lektor.length > 3) {
@@ -80,8 +98,9 @@ export default {
 			<span>{{ end }}</span>
 		</div>
 		<div class="event-text" v-tooltip="tooltipString">
-			<span class="event-topic">{{ event.topic }}</span>
-			<span data-cy="calendar-event-room" class="event-place">{{ event.ort_kurzbz }}</span>
+			<span class="event-topic">{{ topicString }}</span>
+			<span class="event-place" data-cy="calendar-event-room">{{ ortString }}</span>
+			<span v-if="gruppeString" class="event-gruppe">{{ gruppeString }}</span>
 			<span
 				v-for="(lektor,index) in event.lektor.slice(0, 3)"
 				class="event-lectors"

@@ -20,7 +20,7 @@ class RoomCollisionCheck implements ICollisionCheck
 
 	public function check($data)
 	{
-		if (!isset($data->ort_kurzbz, $data->von, $data->bis, $data->kalender_id)) return [];
+		if (!isset($data->ort_kurzbz, $data->von, $data->bis, $data->kalender_id) || isEmptyArray($data->ort_kurzbz)) return [];
 
 		if ($this->_ci->variablelib->getVar('ignore_kollision') === 'true') return [];
 
@@ -31,10 +31,10 @@ class RoomCollisionCheck implements ICollisionCheck
 		$this->_ci->KalenderModel->db->where('tbl_kalender.kalender_id NOT IN (SELECT vorgaenger_kalender_id FROM lehre.tbl_kalender WHERE vorgaenger_kalender_id IS NOT NULL)', null, false);
 		$this->_ci->KalenderModel->db->where_not_in('tbl_kalender.status_kurzbz', ['archived', 'deleted', 'to_delete']);
 
+		$this->_ci->KalenderModel->db->where_in('ort_kurzbz', $data->ort_kurzbz);
 		$result = $this->_ci->KalenderModel->loadWhere(array(
 			'von <' => $data->bis,
 			'bis >' => $data->von,
-			'ort_kurzbz' => $data->ort_kurzbz,
 		));
 
 		if (isError($result)) return [];
@@ -66,6 +66,7 @@ class RoomCollisionCheck implements ICollisionCheck
 		$this->_ci->KalenderModel->db->where('other_kalender.kalender_id NOT IN (SELECT vorgaenger_kalender_id FROM lehre.tbl_kalender WHERE vorgaenger_kalender_id IS NOT NULL)', null, false);
 
 		$result = $this->_ci->KalenderModel->load();
+
 
 		if (isError($result) || !hasData($result)) return [];
 

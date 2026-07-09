@@ -135,7 +135,10 @@ class TempusPage {
       const eventData = JSON.parse(
         event.getAttribute("data-fhc-draggable-value"),
       );
-      return !!eventData?.orig?.ort_kurzbz;
+
+      let isArray = Array.isArray(eventData?.orig?.ort_kurzbz);
+
+      return isArray ? eventData?.orig?.ort_kurzbz.length > 0 : !!eventData?.orig?.ort_kurzbz;
     });
   getCalendarEventsWithLecturer = () =>
     this.getCalendarEvents().filter((index, event) => {
@@ -435,6 +438,7 @@ class TempusPage {
     const event = this.getCalendarEventById(eventId);
 
     return event
+      .scrollIntoView()
       .should("be.visible")
       .drag(this.getCalendarPartDropTarget(partIndex), {
         waitForAnimations: false,
