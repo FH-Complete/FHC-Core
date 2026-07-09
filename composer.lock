@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8d6ebeb9e852ad9254b4369578a5325d",
+    "content-hash": "146d2d3708e44cf5966be727e54c0a48",
     "packages": [
         {
             "name": "afarkas/html5shiv",
@@ -796,6 +796,16 @@
             "time": "2018-03-09T06:07:41+00:00"
         },
         {
+            "name": "drag-drop-touch-js/dragdroptouch",
+            "version": "2.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/drag-drop-touch-js/dragdroptouch.git",
+                "reference": "master"
+            },
+            "type": "library"
+        },
+        {
             "name": "easyrdf/easyrdf",
             "version": "0.9.1",
             "source": {
@@ -1488,16 +1498,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.54",
+            "version": "2.0.55",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "a96a835067c39ee7a709329fe70869817da18081"
+                "reference": "d73c9e019a895be83b18a2ccccfa7e2b0a648743"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/a96a835067c39ee7a709329fe70869817da18081",
-                "reference": "a96a835067c39ee7a709329fe70869817da18081",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/d73c9e019a895be83b18a2ccccfa7e2b0a648743",
+                "reference": "d73c9e019a895be83b18a2ccccfa7e2b0a648743",
                 "shasum": ""
             },
             "require": {
@@ -1578,7 +1588,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpseclib/phpseclib/issues",
-                "source": "https://github.com/phpseclib/phpseclib/tree/2.0.54"
+                "source": "https://github.com/phpseclib/phpseclib/tree/2.0.55"
             },
             "funding": [
                 {
@@ -1594,7 +1604,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-04-27T06:59:24+00:00"
+            "time": "2026-06-14T19:53:12+00:00"
         },
         {
             "name": "rmariuzzo/jquery-checkboxes",
