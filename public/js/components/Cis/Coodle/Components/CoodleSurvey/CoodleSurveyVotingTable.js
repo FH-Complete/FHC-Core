@@ -272,12 +272,16 @@ export default {
 						</tr>
 						<tr v-for="participant in participantsWithoutAuthUser">
 							<td class="border-1 px-2 py-1">
-								<div class="d-flex flex-row gap-1 justify-content-between align-items-center">
+								<div
+									v-if="participant.uid"
+									class="d-flex flex-row gap-1 justify-content-between align-items-center"
+								>
 									{{ participant.name }}
 									<a :href="getParticipantProfileHref(participant)" target="_blank" class="px-1 fhc-primary-color">
 										<i class="fa-solid fa-up-right-from-square"></i>
 									</a>
 								</div>
+								<div v-else class="text-center">---</div>
 							</td>
 							<td v-for="timeslot in $props.timeslots" class="border-1">
 								<div class="d-flex justify-content-center">
