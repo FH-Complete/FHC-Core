@@ -10,14 +10,6 @@ export const DeadlineOverview = {
 		person_uid_prop: {
 			default: null	
 		},
-		viewData: {
-			type: Object,
-			required: true,
-			default: () => ({name: '', uid: ''}),
-			validator(value) {
-				return value && value.name && value.uid
-			}
-		}
 	},
 	data() {
 		return {
