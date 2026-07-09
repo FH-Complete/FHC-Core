@@ -158,7 +158,7 @@ class Reservierung extends FHCAPI_Controller
 		$this->_ci->form_validation->set_data($_POST);
 		$this->_ci->form_validation->set_rules('titel',"titel","required");
 		$this->_ci->form_validation->set_rules('beschreibung',"beschreibung","required");
-		$this->_ci->form_validation->set_rules('ort_kurzbz',"ort_kurzbz","required");
+		$this->_ci->form_validation->set_rules('ort_kurzbz[]',"ort_kurzbz","required");
 		$this->_ci->form_validation->set_rules('start_date',"start_date","required");
 		$this->_ci->form_validation->set_rules('end_date',"end_date","required");
 

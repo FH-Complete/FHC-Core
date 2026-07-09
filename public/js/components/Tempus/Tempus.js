@@ -18,9 +18,11 @@ import CoreSearchbar from "../searchbar/searchbar.js";
 import NavLanguage from "../navigation/Language.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
 import FhcCalendar from "../Calendar/Tempus.js";
-import FhcCoursepicker from "../Tempus/Coursepicker.js";
-import LectureSelection from "../Tempus/LectureSelection.js";
-import ParkingSlot from "../Tempus/ParkingSlot.js";
+import FhcCoursepicker from "./Coursepicker.js";
+import LectureSelection from "./Filters/LectureSelection.js";
+import VerbandSelection from "./Filters/VerbandSelection.js";
+import RoomSelection from "./Filters/RoomSelection.js";
+import ParkingSlot from "./ParkingSlot.js";
 import ApiKalender from "../../api/factory/tempus/kalender.js";
 import ApiSearchbar from "../../api/factory/searchbar.js";
 import ApiRenderers from "../../api/factory/renderers.js";
@@ -33,7 +35,8 @@ import AppConfig from "../AppConfig.js";
 import BsModal from "../Bootstrap/Modal.js";
 
 import StvVerband from "../Stv/Studentenverwaltung/Verband.js";
-import ApiStudiengangTree from "../../api/lehrveranstaltung/studiengangtree.js";
+import ApiStudiengangTree from "../../api/factory/tempus/studiengangtree.js";
+import ApiInfo from "../../api/factory/tempus/info.js";
 import StvStudiensemester from "../Stv/Studentenverwaltung/Studiensemester.js";
 import FormInput from "../../../js/components/Form/Input.js";
 import Reservierung from "./Reservierung.js";
@@ -41,6 +44,7 @@ import { getTempusShortcuts } from "./shortcuts.js";
 import KeyboardShortcuts from "./KeyboardShortcuts.js";
 import { useContextMenuActions } from "../../composables/Tempus/ContextMenuActions.js";
 import MultiWeekPlanModal from "./MultiWeekPlanModal.js";
+import { getTempusSearchbarOptions } from "./Filters/searchbarOptions.js";
 
 export default {
   name: "Tempus",
@@ -50,6 +54,8 @@ export default {
     FhcCalendar,
     FhcCoursepicker,
     LectureSelection,
+    VerbandSelection,
+    RoomSelection,
     ParkingSlot,
     AppConfig,
     AppMenu,
@@ -61,7 +67,7 @@ export default {
     FormInput,
     Reservierung,
     KeyboardShortcuts,
-		MultiWeekPlanModal
+    MultiWeekPlanModal,
   },
   props: {
     defaultSemester: String,
@@ -85,56 +91,28 @@ export default {
       renderers: Vue.computed(() => this.renderers),
       appConfig: Vue.computed(() => this.appconfig),
       contextMenuActions: useContextMenuActions({
-				openRaumauswahl: (orig) => this.openRaumauswahl(orig),
-        openResourcesAssignmentModal: (orig) => this.openResourcesAssignmentModal(orig),
-				openHistory: (orig) => this.openHistory(orig),
-				deleteEntry: (orig) => this.deleteEntry(orig),
-				syncToLecturer: (orig) => this.syncToLecturer(orig),
-				syncToStudent: (orig) => this.syncToStudent(orig),
-			}),
-			tableActions: {
-				deleteEntries: (origList) => this.deleteEntries(origList),
-				openRaumauswahl: (orig) => this.openRaumauswahl(orig),
-			},
+        openRaumauswahl: (orig) => this.openRaumauswahl(orig),
+        openResourcesAssignmentModal: (orig) =>
+          this.openResourcesAssignmentModal(orig),
+        openHistory: (orig) => this.openHistory(orig),
+        deleteEntry: (orig) => this.deleteEntry(orig),
+        syncToLecturer: (orig) => this.syncToLecturer(orig),
+        syncToStudent: (orig) => this.syncToStudent(orig),
+      }),
+      tableActions: {
+        deleteEntries: (origList) => this.deleteEntries(origList),
+        openRaumauswahl: (orig) => this.openRaumauswahl(orig),
+      },
     };
   },
   data() {
     return {
       appconfig: {},
-      currentMode: 'week',
+      currentMode: "week",
       configEndpoints: ApiTempusConfig,
       endpoint: ApiStudiengangTree,
       raumVorschlaege: [],
       selected: [],
-      searchbaroptions: {
-        origin: "tempus",
-        cssclass: "position-relative",
-        calcheightonly: true,
-        types: [
-          //"student",
-          "raum",
-          "mitarbeiter",
-          "mitarbeiter_ohne_zuordnung",
-        ],
-        actions: {
-          raum: {
-            defaultaction: {
-              type: "function",
-              action: this.setOrt,
-            },
-            childactions: [],
-          },
-          employee: {
-            defaultaction: {
-              type: "function",
-              action: (data) => {
-                this.setEmp(data);
-              },
-            },
-            childactions: [],
-          },
-        },
-      },
       lv_id: null,
       events: null,
       minimized: false,
@@ -152,11 +130,12 @@ export default {
       view: "room",
       parkedKeys: new Set(),
       lecturers: [],
+      studiengaenge: [],
+      rooms: [],
       overlayCache: [],
       extraBackgrounds: [],
       lastRange: null,
       stg: null,
-      show_stg: null,
       semester: null,
       studiensemester_kurzbz: null,
       raumModal: {
@@ -184,12 +163,13 @@ export default {
       },
       currentlyUpdatedEvent: null,
       multiWeekModal: {
-				show: false,
-				lehreinheitId: null,
-				ortKurzbz: null,
-				startTime: null,
-				endTime: null,
-			},
+        show: false,
+        lehreinheitId: null,
+        ortKurzbz: null,
+        startTime: null,
+        endTime: null,
+      },
+      studiengaenge_all: [],
     };
   },
   computed: {
@@ -219,8 +199,8 @@ export default {
       }));
     },
     keyboardShortcuts() {
-			return getTempusShortcuts(this);
-		},
+      return getTempusShortcuts(this);
+    },
     dropdownParsedAvailableResources() {
       return this.resourcesAssignmentModal.availableResources
         .map((unit) => {
@@ -231,6 +211,9 @@ export default {
           };
         })
         .sort((a, b) => a.label?.localeCompare(b.label));
+    },
+    searchbaroptions() {
+      return getTempusSearchbarOptions(this);
     },
   },
   methods: {
@@ -260,33 +243,30 @@ export default {
 
       this.$refs.resourcesAssignmentModal.show();
     },
-    async deleteEntry(orig)
-		{
-			if (!orig?.kalender_id)
-				return;
+    async deleteEntry(orig) {
+      if (!orig?.kalender_id) return;
 
-			await this.deleteEntryCall(orig);
-			this.$refs.calendar.resetEventLoader();
-			this.$refs.coursepicker.reload();
-		},
-    async deleteEntries(origList)
-		{
-			let validList = (origList ?? []).filter(orig => orig?.kalender_id);
-			if (!validList.length)
-				return;
+      await this.deleteEntryCall(orig);
+      this.$refs.calendar.resetEventLoader();
+      this.$refs.coursepicker.reload();
+    },
+    async deleteEntries(origList) {
+      let validList = (origList ?? []).filter((orig) => orig?.kalender_id);
+      if (!validList.length) return;
 
-			await Promise.allSettled(validList.map(orig => this.deleteEntryCall(orig)));
-			this.$refs.calendar.resetEventLoader();
-			this.$refs.coursepicker.reload();
-		},
-    async deleteEntryCall(orig)
-		{
-			await this.$api.call(ApiKalender.deleteEntry(
-				orig.kalender_id
-			)).then(() => {
-				this.$refs.parking.unpark({ type: orig.type, id: orig.kalender_id });
-			});
-		},
+      await Promise.allSettled(
+        validList.map((orig) => this.deleteEntryCall(orig)),
+      );
+      this.$refs.calendar.resetEventLoader();
+      this.$refs.coursepicker.reload();
+    },
+    async deleteEntryCall(orig) {
+      await this.$api
+        .call(ApiKalender.deleteEntry(orig.kalender_id))
+        .then(() => {
+          this.$refs.parking.unpark({ type: orig.type, id: orig.kalender_id });
+        });
+    },
     async openHistory(orig) {
       if (!orig?.kalender_id) return;
       await this.$api
@@ -297,17 +277,17 @@ export default {
         });
     },
     syncToLecturer(orig) {
-			if (!orig?.kalender_id)
-				return;
-			return this.$api.call(ApiKalender.syncToLecturer(orig.kalender_id))
-				.then(() => this.$refs.calendar.resetEventLoader());
-		},
-		syncToStudent(orig) {
-			if (!orig?.kalender_id)
-				return;
-			return this.$api.call(ApiKalender.syncToStudent(orig.kalender_id))
-				.then(() => this.$refs.calendar.resetEventLoader());
-		},
+      if (!orig?.kalender_id) return;
+      return this.$api
+        .call(ApiKalender.syncToLecturer(orig.kalender_id))
+        .then(() => this.$refs.calendar.resetEventLoader());
+    },
+    syncToStudent(orig) {
+      if (!orig?.kalender_id) return;
+      return this.$api
+        .call(ApiKalender.syncToStudent(orig.kalender_id))
+        .then(() => this.$refs.calendar.resetEventLoader());
+    },
     async selectRaum(ort_kurzbz) {
       const orig = this.raumModal;
       await this.$api
@@ -323,43 +303,69 @@ export default {
     },
     setOrt: function (data) {
       this.ort_kurzbz = data.ort_kurzbz;
-      this.$refs.calendar.resetEventLoader();
+      this.rooms = [{ ort_kurzbz: data.ort_kurzbz }];
     },
     onSelectVerbandAndClose(payload) {
       this.onSelectVerband(payload);
       bootstrap.Offcanvas.getOrCreateInstance(this.$refs.verbandMenu).hide();
     },
-    onSelectVerband({ link, name }) {
-      let stg = null;
-      let semester = null;
-      this.show_stg = name;
-      if (typeof link === "number") stg = link;
-      else if (typeof link === "string") {
-        [stg, semester] = link.split("/");
+    onSelectVerband({ link, studiengang_kz, semester, orgform_kurzbz, name }) {
+      if (orgform_kurzbz) {
+        semester = null;
+      } else if (typeof link === "string") {
+        [studiengang_kz, semester] = link.split("/");
       }
-      this.stg = stg;
-      if (semester !== null) this.semester = semester;
 
-      this.$refs.calendar.resetEventLoader();
+      let exists = this.studiengaenge.some(
+        (stg) =>
+          stg.studiengang_kz == studiengang_kz &&
+          stg.semester == semester &&
+          stg.orgform_kurzbz === orgform_kurzbz,
+      );
+
+      if (!exists) {
+        this.studiengaenge = [
+          ...this.studiengaenge,
+          { studiengang_kz, semester, orgform_kurzbz, name },
+        ];
+      }
     },
     setEmp: function (data) {
       const uid = data.uid;
       const label = data.name;
-      if (!this.lecturers.some((l) => l.uid === uid)) {
-        this.lecturers.push({
+
+      for (const lect of this.lecturers) delete this.overlayCache[lect.uid];
+
+      this.lecturers = [
+        {
           uid,
           label,
           showEvents: true,
           overlays: { blocks: true, wishes: true },
-        });
-      }
+        },
+      ];
 
       this.$refs.calendar.resetEventLoader();
       if (this.lastRange) this.handleRange(this.lastRange);
     },
-    jumpToKw(kw) {
-      const num = parseInt(kw);
-      if (!num) return;
+    addToFilter: function (filter, type) {
+      if (type === "ort") {
+        const ort_kurzbz = filter.ort_kurzbz;
+        if (!this.rooms.some((room) => room.ort_kurzbz === ort_kurzbz)) {
+          this.rooms.push({ ort_kurzbz });
+        }
+      } else if (type === "mitarbeiter") {
+        const uid = filter.uid;
+        const label = filter.name;
+        if (!this.lecturers.some((l) => l.uid === uid)) {
+          this.lecturers.push({
+            uid,
+            label,
+            showEvents: true,
+            overlays: { blocks: true, wishes: true },
+          });
+        }
+      }
 
       const date = luxon.DateTime.fromObject(
         {
@@ -376,12 +382,11 @@ export default {
         this.calendarDate = newDate.toISODate();
     },
     handleChangeMode(newMode, newDate) {
-			if (!newMode)
-				return;
-			this.currentMode = newMode;
-			if (newDate && luxon.DateTime.isDateTime(newDate) && newDate.isValid)
-				this.calendarDate = newDate.toISODate();
-		},
+      if (!newMode) return;
+      this.currentMode = newMode;
+      if (newDate && luxon.DateTime.isDateTime(newDate) && newDate.isValid)
+        this.calendarDate = newDate.toISODate();
+    },
     toggleStatus(selected) {
       if (!selected || selected.length === 0) {
         this.visibleStatus = ["all"];
@@ -401,15 +406,24 @@ export default {
       return this.$api.call(ApiSearchbar.search(params));
     },
     getPromiseFunc(start, end) {
-      const hasRoom = !!this.ort_kurzbz;
+      const hasRooms = this.rooms.length > 0;
       const hasLektoren = this.lecturers.length > 0;
-      const hasStg = !!this.stg;
+      const hasStg = this.studiengaenge.length > 0;
 
       const filter = {};
 
-      if (hasRoom) filter.ort = this.ort_kurzbz;
-      if (hasStg) filter.stg = this.stg;
-      if (hasLektoren) filter.uid = this.lecturers.map((l) => l.uid);
+      if (hasRooms) filter.ort = this.rooms.map((room) => room.ort_kurzbz);
+      if (hasStg) {
+        filter.stg = this.studiengaenge.map(
+          ({ studiengang_kz, semester, orgform_kurzbz }) => ({
+            studiengang_kz,
+            semester,
+            orgform_kurzbz,
+          }),
+        );
+      }
+      if (hasLektoren)
+        filter.uid = this.lecturers.map((lecture) => lecture.uid);
 
       let response = null;
       if (this.previewRole === "lektor") {
@@ -431,7 +445,6 @@ export default {
           ),
         ];
       }
-
 
       if (response) {
         response[0].then((result) => {
@@ -598,18 +611,24 @@ export default {
       const obj = item[0];
       if (!obj?.type) return alert("Unbekannter Drop-Typ");
 
-      if (payload.targetKalenderId)
-			{
-				if (obj.type !== 'lehreinheit' || !obj.orig?.lehreinheit_id)
-					return alert("Nur Lehreinheiten können einem Termin hinzugefügt werden");
+      if (payload.targetKalenderId) {
+        if (obj.type !== "lehreinheit" || !obj.orig?.lehreinheit_id)
+          return alert(
+            "Nur Lehreinheiten können einem Termin hinzugefügt werden",
+          );
 
-				return this.$api.call(
-					ApiKalender.addToKalenderEvent(payload.targetKalenderId, obj.orig.lehreinheit_id)
-				).then(() => {
-					this.$refs.calendar.resetEventLoader();
-					this.bcc.postMessage('dropped');
-				});
-			}
+        return this.$api
+          .call(
+            ApiKalender.addToKalenderEvent(
+              payload.targetKalenderId,
+              obj.orig.lehreinheit_id,
+            ),
+          )
+          .then(() => {
+            this.$refs.calendar.resetEventLoader();
+            this.bcc.postMessage("dropped");
+          });
+      }
 
       const dates = this._parseDates(start, end);
       if (!dates) return;
@@ -634,28 +653,30 @@ export default {
         this.reservierungPending = true;
         this.$refs.reservierung.show(start_time, end_time);
       } else if (obj.type === "lehreinheit") {
-
-        if (obj.multiweek)
-				{
-					this.openMultiWeekPreview(
-						obj.orig.lehreinheit_id,
-						this.ort_kurzbz ? this.ort_kurzbz : obj.orig.ort_kurzbz,
-						start_time,
-						end_time
-					);
-					return;
-				}
+        if (obj.multiweek) {
+          this.openMultiWeekPreview(
+            obj.orig.lehreinheit_id,
+            this.ort_kurzbz ? this.ort_kurzbz : obj.orig.ort_kurzbz,
+            start_time,
+            end_time,
+          );
+          return;
+        }
 
         return this.$api
           .call(
             ApiKalender.addKalenderEvent(
               obj.orig.lehreinheit_id,
-              this.ort_kurzbz ? this.ort_kurzbz : obj.orig.ort_kurzbz,
+              this.rooms.length
+                ? this.rooms.map((r) => r.ort_kurzbz)
+                : obj.orig.ort_kurzbz
+                  ? [obj.orig.ort_kurzbz]
+                  : [],
               start_time,
               end_time,
             ),
           )
-          .then(result => result.data)
+          .then((result) => result.data)
           .then(() => {
             this.$refs.calendar.resetEventLoader();
             this.$refs.coursepicker.reload();
@@ -682,7 +703,7 @@ export default {
             this.updateKalenderEventElementDisplay(
               obj.orig.kalender_id,
               luxon.DateTime.fromISO(obj.orig.isostart),
-              luxon.DateTime.fromISO(obj.orig.isoend)
+              luxon.DateTime.fromISO(obj.orig.isoend),
             );
             this.$refs.calendar.clearOutCalendarEventEmphasis();
             this.$refs.calendar.resetEventLoader();
@@ -693,20 +714,20 @@ export default {
       }
     },
     openMultiWeekPreview(lehreinheit_id, ort_kurzbz, start_time, end_time) {
-			this.multiWeekModal.lehreinheitId = lehreinheit_id;
-			this.multiWeekModal.ortKurzbz = ort_kurzbz;
-			this.multiWeekModal.startTime = start_time;
-			this.multiWeekModal.endTime = end_time;
-			this.multiWeekModal.show = true;
-		},
-		closeMultiWeekModal() {
-			this.multiWeekModal.show = false;
-		},
-		onMultiWeekConfirmed() {
-			this.$refs.calendar.resetEventLoader();
-			this.$refs.coursepicker.reload();
-			this.bcc.postMessage('dropped');
-		},
+      this.multiWeekModal.lehreinheitId = lehreinheit_id;
+      this.multiWeekModal.ortKurzbz = ort_kurzbz;
+      this.multiWeekModal.startTime = start_time;
+      this.multiWeekModal.endTime = end_time;
+      this.multiWeekModal.show = true;
+    },
+    closeMultiWeekModal() {
+      this.multiWeekModal.show = false;
+    },
+    onMultiWeekConfirmed() {
+      this.$refs.calendar.resetEventLoader();
+      this.$refs.coursepicker.reload();
+      this.bcc.postMessage("dropped");
+    },
     handleRange(range) {
       if (!range?.start || !range?.end) return;
 
@@ -818,18 +839,18 @@ export default {
     },
 
     removeLecturer(uid) {
-      this.lecturers = this.lecturers.filter((lecture) => lecture.uid !== uid);
-      delete this.overlayCache[uid];
-      this.$refs.calendar.resetEventLoader();
-    },
-    clearOrt() {
-      this.ort_kurzbz = null;
-      this.$refs.calendar.resetEventLoader();
-    },
-    clearStg() {
-      this.stg = null;
-      this.show_stg = null;
-      this.$refs.calendar.resetEventLoader();
+      if (uid == null) {
+        for (const lect of this.lecturers) delete this.overlayCache[lect.uid];
+
+        this.lecturers = [];
+        this.$refs.calendar.resetEventLoader();
+      } else {
+        this.lecturers = this.lecturers.filter(
+          (lecture) => lecture.uid !== uid,
+        );
+        delete this.overlayCache[uid];
+        this.$refs.calendar.resetEventLoader();
+      }
     },
     triggerSync() {
       this.$api
@@ -937,6 +958,25 @@ export default {
         await this.fetchAssignedResourcesByCalender(calenderItem.kalender_id);
       this.resourcesAssignmentModal.selectedAvailableResource = null;
       this.resourcesAssignmentModal.areFormButtonsDisplayed = false;
+    },
+    removeLecturer(uid) {
+      if (uid == null) {
+        for (const lect of this.lecturers) delete this.overlayCache[lect.uid];
+
+        this.lecturers = [];
+        this.$refs.calendar.resetEventLoader();
+      } else {
+        this.lecturers = this.lecturers.filter(
+          (lecture) => lecture.uid !== uid,
+        );
+        delete this.overlayCache[uid];
+        this.$refs.calendar.resetEventLoader();
+      }
+    },
+    triggerSync() {
+      this.$api
+        .call(ApiKalender.sync())
+        .then(this.$refs.calendar.resetEventLoader());
     },
     async saveAssignedResourcesToCalendarItem(calenderItem, assignedResources) {
       let getSchedulableResourcesByCalendar = await this.$api.call(
@@ -1080,52 +1120,54 @@ export default {
       }
     },
     onEventHover(event) {
-			this.hoveredEvent = event;
-		},
-		onEventUnhover(event)
-		{
-			if (this.hoveredEvent?.kalender_id === event?.kalender_id) {
-				this.hoveredEvent = null;
-			}
-		},
-		parkHoveredEvent()
-		{
-			const event = this.hoveredEvent;
-			if (!event?.kalender_id)
-				return;
+      this.hoveredEvent = event;
+    },
+    onEventUnhover(event) {
+      if (this.hoveredEvent?.kalender_id === event?.kalender_id) {
+        this.hoveredEvent = null;
+      }
+    },
+    parkHoveredEvent() {
+      const event = this.hoveredEvent;
+      if (!event?.kalender_id) return;
 
-			if (this.$refs.parking.isParked(event.kalender_id))
-			{
-				this.$refs.parking.unpark({ type: event.type, id: event.kalender_id });
-			}
-			else
-			{
-				this.$refs.parking.park(null, {
-					type: 'kalender',
-					id: event.kalender_id,
-					orig: event
-				});
-			}
-		},
-		deleteHoveredEvent() {
-			const event = this.hoveredEvent;
-			if (!event?.kalender_id)
-				return;
+      if (this.$refs.parking.isParked(event.kalender_id)) {
+        this.$refs.parking.unpark({ type: event.type, id: event.kalender_id });
+      } else {
+        this.$refs.parking.park(null, {
+          type: "kalender",
+          id: event.kalender_id,
+          orig: event,
+        });
+      }
+    },
+    deleteHoveredEvent() {
+      const event = this.hoveredEvent;
+      if (!event?.kalender_id) return;
 
-			this.deleteEntry(event);
-		},
-		clearHoveredEvent() {
-			this.hoveredEvent = null;
-		},
-		focusSearchbar() {
-			this.$refs.searchbar?.$refs?.input.focus()
-		},
+      this.deleteEntry(event);
+    },
+    clearHoveredEvent() {
+      this.hoveredEvent = null;
+    },
+    focusSearchbar() {
+      this.$refs.searchbar?.$refs?.input.focus();
+    },
   },
   watch: {
     lecturers: {
       deep: true,
       handler() {
         this.rebuildExtraBackgrounds();
+      },
+    },
+    rooms() {
+      this.$refs.calendar.resetEventLoader();
+    },
+    studiengaenge: {
+      deep: true,
+      handler() {
+        this.$refs.calendar.resetEventLoader();
       },
     },
     "resourcesAssignmentModal.selectedAvailableResource": function (newVal) {
@@ -1180,42 +1222,12 @@ export default {
                 () => import(data[rendertype].calendarEvent),
               ),
             );
-
-          if (data[rendertype].calendarEventStyles) {
-            var head = document.head;
-            if (
-              !head.querySelector(
-                `link[href="${data[rendertype].calendarEventStyles}"]`,
-              )
-            ) {
-              var link = document.createElement("link");
-              link.type = "text/css";
-              link.rel = "stylesheet";
-              link.href = data[rendertype].calendarEventStyles;
-              head.appendChild(link);
-            }
-          }
-
-          if (this.renderers === null) {
-            this.renderers = {};
-          }
-          if (!this.renderers[rendertype]) {
-            this.renderers[rendertype] = {};
-          }
-          this.renderers[rendertype].modalTitle = modalTitle;
-          this.renderers[rendertype].modalContent = modalContent;
-          this.renderers[rendertype].calendarEvent = calendarEvent;
         }
       });
-
-    this.$api.call(ApiTempusConfig.getHeader()).then((res) => {
-      this.visibleStatusArray = res.data.visible_status;
-      this.visibleStatus = ["all"];
-    });
   },
-  template: /*html*/ `
-	<div data-cy="tempus" class="tempus">
-    <keyboard-shortcuts :shortcuts="keyboardShortcuts" />
+  template: `
+	<div class="tempus">
+		<keyboard-shortcuts :shortcuts="keyboardShortcuts" />
 		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
 			<div class="col-md-4 col-lg-3 col-xl-2 d-flex align-items-center">
 				<button
@@ -1373,37 +1385,19 @@ export default {
 							</button>
 						</div>
 					</div>
-					<div class="room-selection" v-if="ort_kurzbz">
-						<div class="fw-semibold px-2 d-flex align-items-center justify-content-between">
-							<span><i class="fa-solid fa-door-open me-2"></i>{{ ort_kurzbz }}</span>
-							<button
-								type="button"
-								class="btn btn-sm btn-link text-danger p-0"
-								@click="clearOrt"
-								title="Raum entfernen"
-							>
-								<i class="fa-solid fa-xmark"></i>
-							</button>
-						</div>
-					</div>
-					
-					<div class="room-selection" v-if="show_stg">
-						<div class="fw-semibold px-2 d-flex align-items-center justify-content-between">
-							<span><i class="fa-solid fa-university me-2"></i>{{ show_stg }}</span>
-							<button
-								type="button"
-								class="btn btn-sm btn-link text-danger p-0"
-								@click="clearStg"
-								title="STG entfernen"
-							>
-								<i class="fa-solid fa-xmark"></i>
-							</button>
-						</div>
-					</div>
+					<room-selection
+						v-if="rooms.length"
+						v-model:rooms="rooms"
+					></room-selection>
+					<verband-selection
+						v-if="studiengaenge.length"
+						v-model:studiengaenge="studiengaenge"
+						:studiengaenge-all="studiengaenge_all"
+					></verband-selection>
 					<lecture-selection
-							v-if="lecturers.length"
-							:lecturers="lecturers"
-							@remove="removeLecturer"
+						v-if="lecturers.length"
+						:lecturers="lecturers"
+						@remove="removeLecturer"
 					></lecture-selection>
 					<div class="d-flex flex-column flex-grow-1" style="min-height: 0">
 						<parking-slot
@@ -1411,7 +1405,7 @@ export default {
 							v-model:parked-keys="parkedKeys"
 						></parking-slot>
 						
-						<fhc-coursepicker ref="coursepicker" :stg="stg" @select-lecturer="setEmp" @select-kw="jumpToKw" :studiensemester="selectedStudiensemester"></fhc-coursepicker>
+						<fhc-coursepicker ref="coursepicker" :studiengaenge="studiengaenge" @select-lecturer="setEmp" @select-kw="jumpToKw" :studiensemester="selectedStudiensemester"></fhc-coursepicker>
 
 					</div>
 					<stv-studiensemester v-model:studiensemester-kurzbz="selectedStudiensemester"></stv-studiensemester>
@@ -1561,7 +1555,7 @@ export default {
 		</bs-modal>
 		<reservierung
 			ref="reservierung"
-			:ort-kurzbz="ort_kurzbz"
+			:rooms="rooms"
 			@saved="reservierungPending = false; $refs.calendar.resetEventLoader()"
 		></reservierung>
 		<multi-week-plan-modal
@@ -1573,5 +1567,5 @@ export default {
 			@close="closeMultiWeekModal"
 			@confirmed="onMultiWeekConfirmed"
 		/>
-	</div>`
+	</div>`,
 };
