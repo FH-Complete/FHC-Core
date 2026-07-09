@@ -348,24 +348,9 @@ export default {
       this.$refs.calendar.resetEventLoader();
       if (this.lastRange) this.handleRange(this.lastRange);
     },
-    addToFilter: function (filter, type) {
-      if (type === "ort") {
-        const ort_kurzbz = filter.ort_kurzbz;
-        if (!this.rooms.some((room) => room.ort_kurzbz === ort_kurzbz)) {
-          this.rooms.push({ ort_kurzbz });
-        }
-      } else if (type === "mitarbeiter") {
-        const uid = filter.uid;
-        const label = filter.name;
-        if (!this.lecturers.some((l) => l.uid === uid)) {
-          this.lecturers.push({
-            uid,
-            label,
-            showEvents: true,
-            overlays: { blocks: true, wishes: true },
-          });
-        }
-      }
+    jumpToKw(kw) {
+      const num = parseInt(kw);
+      if (!num) return;
 
       const date = luxon.DateTime.fromObject(
         {
@@ -1185,48 +1170,66 @@ export default {
     },
   },
   mounted() {
-    this.reservierungPending = false;
-    this.bcc = new BroadcastChannel("fhc-dnd");
-    this.bcc.addEventListener("message", (e) => {
-      if (e.data === "dropped" && !this.reservierungPending)
-        this.$refs.calendar.resetEventLoader();
-    });
-  },
-  beforeUnmount() {
-    this.bcc.close();
-  },
-  async created() {
-    await this.$api
-      .call(ApiRenderers.loadTempusRenderers())
-      .then((res) => res.data)
-      .then((data) => {
-        for (let rendertype of Object.keys(data)) {
-          let modalTitle = null;
-          let modalContent = null;
-          let calendarEvent = null;
-          if (data[rendertype].modalTitle)
-            modalTitle = Vue.markRaw(
-              Vue.defineAsyncComponent(
-                () => import(data[rendertype].modalTitle),
-              ),
-            );
-          if (data[rendertype].modalContent)
-            modalContent = Vue.markRaw(
-              Vue.defineAsyncComponent(
-                () => import(data[rendertype].modalContent),
-              ),
-            );
-          if (data[rendertype].calendarEvent)
-            calendarEvent = Vue.markRaw(
-              Vue.defineAsyncComponent(
-                () => import(data[rendertype].calendarEvent),
-              ),
-            );
-        }
-      });
-  },
+		this.reservierungPending = false;
+		this.bcc = new BroadcastChannel('fhc-dnd');
+		this.bcc.addEventListener('message', e => {
+			if (e.data === 'dropped' && !this.reservierungPending)
+				this.$refs.calendar.resetEventLoader();
+		});
+	},
+	beforeUnmount() {
+		this.bcc.close();
+	},
+	async created()
+	{
+		await this.$api
+			.call(ApiRenderers.loadTempusRenderers())
+			.then(res => res.data)
+			.then(data => {
+				for (let rendertype of Object.keys(data)) {
+					let modalTitle = null;
+					let modalContent = null;
+					let calendarEvent = null;
+					if (data[rendertype].modalTitle)
+						modalTitle = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].modalTitle)));
+					if (data[rendertype].modalContent)
+						modalContent = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].modalContent)));
+					if (data[rendertype].calendarEvent)
+						calendarEvent = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].calendarEvent)));
+
+					if (data[rendertype].calendarEventStyles){
+						var head = document.head;
+						if(!head.querySelector(`link[href="${data[rendertype].calendarEventStyles}"]`)){
+							var link = document.createElement("link");
+							link.type = "text/css";
+							link.rel = "stylesheet";
+							link.href = data[rendertype].calendarEventStyles;
+							head.appendChild(link);
+						}
+					}
+
+					if(this.renderers === null) {
+						this.renderers = {};
+					}
+					if (!this.renderers[rendertype]) {
+						this.renderers[rendertype] = {}
+					}
+					this.renderers[rendertype].modalTitle = modalTitle;
+					this.renderers[rendertype].modalContent = modalContent;
+					this.renderers[rendertype].calendarEvent = calendarEvent;
+				}
+			});
+
+		this.$api.call(ApiTempusConfig.getHeader())
+			.then(res => {
+				this.visibleStatusArray = res.data.visible_status;
+				this.visibleStatus = ['all'];
+			});
+		this.$api.call(ApiInfo.getStudiengaenge())
+			.then(res => {this.studiengaenge_all = res.data});
+	},
   template: `
-	<div class="tempus">
+	<div class="tempus" data-cy="tempus">
 		<keyboard-shortcuts :shortcuts="keyboardShortcuts" />
 		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
 			<div class="col-md-4 col-lg-3 col-xl-2 d-flex align-items-center">

@@ -73,9 +73,9 @@ export const tempusApi = {
   getPlannerEvents: (startDate, endDate) =>
     cy
       .request({
-        method: "GET",
+        method: "POST",
         url: `${KALENDER_API}/Kalender/getPlan`,
-        qs: {
+        body: {
           start_date: startDate,
           end_date: endDate,
         },

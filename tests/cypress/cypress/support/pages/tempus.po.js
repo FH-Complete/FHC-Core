@@ -38,7 +38,7 @@ class TempusPage {
   setupIntercepts = () => {
     cy.intercept({ method: "GET", url: "**/StgTree" }).as("fetchCourseTree");
     cy.intercept({
-      method: "GET",
+      method: "POST",
       url: /\/tempus\/Kalender\/getPlan(?:\?|$)/,
     }).as("fetchPlanData");
     cy.intercept({
@@ -61,7 +61,7 @@ class TempusPage {
       url: "**/components/stv/studiensemester/set**",
     }).as("setSemester");
     cy.intercept({
-      method: "GET",
+      method: "POST",
       url: "**/tempus/Kalender/getRaumvorschlag**",
     }).as("fetchRoomSuggestions");
     cy.intercept({
@@ -73,7 +73,7 @@ class TempusPage {
       url: "**/tempus/OperationalResourceToCalenderAPI/getAssignedResourcesByCalender/**",
     }).as("fetchAssignedResources");
     cy.intercept({
-      method: "GET",
+      method: "POST",
       url: "**/tempus/coursepicker/getByStg**",
     }).as("fetchCoursePickerCourses");
     cy.intercept({
