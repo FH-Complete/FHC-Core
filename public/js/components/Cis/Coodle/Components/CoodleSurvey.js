@@ -355,6 +355,7 @@ export default {
 				<div v-if="!isEditInProgress" class="d-flex flex-column gap-2">
 					<coodle-survey-voting-table
 						v-if="$props.survey"
+						@selectionSubmitted="$emit('surveyUpdated', {surveyId: $props.survey.id})"
 						:uid="$props.uid"
 						:timeslots="parsedTimeslotsForVotingTable"
 						:survey="$props.survey"

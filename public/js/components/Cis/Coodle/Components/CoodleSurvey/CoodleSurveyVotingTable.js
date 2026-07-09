@@ -1,3 +1,5 @@
+import CoodleApi from "../../../../../api/factory/coodle.js";
+
 export default {
 	name: "CoodleSurveyVotingTable",
 	props: {
@@ -5,7 +7,7 @@ export default {
 		uid: { type: String | null },
 		timeslots: { type: Array },
 	},
-	emits: [],
+	emits: ["selectionSubmitted"],
 	data() {
 		return {
 			isVotingInProgress: false,
@@ -141,9 +143,29 @@ export default {
 				this.selectedTimeslotId = "none";
 			}
 		},
-		submitVote() {
-			// todo
-			console.log("voting...");
+		async submitParticipantSelection() {
+			const selectedTimeslots = Object.entries(
+				this.editableAuthUserSelection,
+			)
+				.filter((timeslotSelectionPair) => timeslotSelectionPair[1])
+				.map((timeslotSelectionPair) => timeslotSelectionPair[0]);
+
+			let selection;
+			if (!selectedTimeslots.length) {
+				selection = null;
+			} else if (selectedTimeslots.includes("none")) {
+				selection = [];
+			} else {
+				selection = selectedTimeslots.map((Number));
+			}
+
+			const selectionSubmissionResponse = await this.$api.call(
+				CoodleApi.submitParticipantSelection(this.survey.id, selection),
+			);
+
+			if (selectionSubmissionResponse.meta.status === "success") {
+				this.$emit("selectionSubmitted");
+			}
 		},
 		submitFinalSelection() {
 			if (!this.$props.survey.id) return;
@@ -412,7 +434,7 @@ export default {
 					</div>
 					<div
 						v-if="isVotingInProgress"
-						@click="submitVote()"
+						@click="submitParticipantSelection()"
 						:class="isDarkMode ? 'btn-light' : 'btn-dark'"
 						class="btn text-nowrap"
 					>

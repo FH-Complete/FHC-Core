@@ -34,6 +34,7 @@ class CoodleSurvey extends FHCAPI_Controller
 			'createSurvey' => self::PERM_LOGGED,
 			'updateSurvey' => self::PERM_LOGGED,
 			'searchParticipants' => self::PERM_LOGGED,
+			'submitParticipantSelection' => self::PERM_LOGGED,
 		]);
 
 		$this->load->library('PermissionLib');
@@ -245,6 +246,56 @@ class CoodleSurvey extends FHCAPI_Controller
 		$potentialParticipants = array_merge($users, $groups);
 
 		$this->terminateWithSuccess($potentialParticipants);
+	}
+
+	public function submitParticipantSelection()
+	{
+		$surveyId = $this->input->post("surveyId");
+		$selection = $this->input->post("selection");
+
+		$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
+		if (!$survey) {
+			$this->terminateWithError("Survey not found!");
+		}
+
+		if ($survey->completed_at || $survey->canceled_at) {
+			$this->terminateWithError("You can no longer vote in this survey!");
+		}
+
+		$participants = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
+		$this->addMeta("particips", $participants);
+		$participantUids = array_map(
+			function ($participant) {
+				return $participant->uid;
+			},
+			$participants
+		);
+		if (!in_array(getAuthUID(), $participantUids)) {
+			$this->terminateWithError("You are not authorized to participate in this survey!");
+		}
+
+		if ($selection && count($selection)) {
+			$timeslots = $this->CoodleSurveyTimeslotModel->getTimeslots($surveyId);
+			$timeslotIds = array_map(
+				function ($timeslot) {
+					return $timeslot->id;
+				},
+				$timeslots
+			);
+			$selection = array_filter(
+				$selection,
+				function ($selectedTimeslotId) use ($timeslotIds) {
+					return in_array($selectedTimeslotId, $timeslotIds);
+				}
+			);
+
+			$selection = array_slice($selection, 0, $survey->max_selections);
+			$this->addMeta("selection", $selection);
+			$this->addMeta("timeslotIds", $timeslotIds);
+		}
+
+		$this->CoodleSurveyParticipantModel->updateSelection($surveyId, getAuthUID(), json_encode($selection));
+		$this->terminateWithSuccess($surveyId);
 	}
 
 

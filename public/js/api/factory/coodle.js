@@ -67,4 +67,14 @@ export default {
 			url: "/api/frontend/v1/coodle/CoodleSurvey/getInactiveSurveys",
 		};
 	},
+	submitParticipantSelection(surveyId, selection) {
+		return {
+			method: "post",
+			url: "/api/frontend/v1/coodle/CoodleSurvey/submitParticipantSelection",
+			params: {
+				surveyId,
+				selection,
+			},
+		};
+	},
 };
