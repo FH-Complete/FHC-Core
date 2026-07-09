@@ -582,7 +582,6 @@ describe("Tempus Kalender API", () => {
               endDateTime,
             )
             .then((response) => {
-              console.log(response);
               expect(response.status).to.eq(200);
               expect(response.body).to.have.nested.property(
                 "meta.status",
@@ -620,7 +619,6 @@ describe("Tempus Kalender API", () => {
               endDateTime,
             )
             .then((response) => {
-              console.log(response);
               expect(response.status).to.eq(500);
               expect(response.body).to.have.nested.property(
                 "meta.status",

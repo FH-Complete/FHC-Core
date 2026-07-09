@@ -99,7 +99,7 @@ context("Tempus filter tests", () => {
         tempusPage.getSelectedRoomIndicator(selectedRoom).should("be.visible");
         tempusPage.getCalendarEvents().should("have.length.greaterThan", 0);
 
-        tempusPage.getSelectedRoomRemoveButton(selectedRoom).click();
+        tempusPage.getSelectedRoomRemoveButton(selectedRoom).first().click();
         waitForOk("@fetchPlanData");
         tempusPage.waitForCalendarToFinishLoading();
 

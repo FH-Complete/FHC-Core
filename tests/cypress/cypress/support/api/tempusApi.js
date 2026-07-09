@@ -52,13 +52,19 @@ export const tempusApi = {
         return response.body.data;
       }),
 
-  getCoursesByStudyPlan: (studyPlanId, semesterShortCode) =>
-    cy
+  getCoursesByStudyPlan: (studyPlanId, semesterShortCode) => {
+    let parsedStudyPlans = [
+      {
+        studiengang_kz: studyPlanId,
+      },
+    ];
+
+    return cy
       .request({
-        method: "GET",
+        method: "POST",
         url: `/index.ci.php/api/frontend/v1/tempus/coursepicker/getByStg`,
-        qs: {
-          stg: studyPlanId,
+        body: {
+          studiengaenge: parsedStudyPlans,
           studiensemester_kurzbz: semesterShortCode,
         },
       })
@@ -68,7 +74,8 @@ export const tempusApi = {
         expect(response.body.data).to.be.an("array");
 
         return response.body.data;
-      }),
+      });
+  },
 
   getPlannerEvents: (startDate, endDate) =>
     cy
@@ -91,11 +98,13 @@ export const tempusApi = {
   deletePlannerEventsForDay: (day) => {
     const date = getDateForDay(day);
 
-    return tempusApi.getPlannerEvents(date, date).then((events) =>
-      cy.wrap(events).each((event) =>
-        tempusApi.deleteKalenderEvent(event.kalender_id),
-      ),
-    );
+    return tempusApi
+      .getPlannerEvents(date, date)
+      .then((events) =>
+        cy
+          .wrap(events)
+          .each((event) => tempusApi.deleteKalenderEvent(event.kalender_id)),
+      );
   },
 
   resetTempusScenario: () =>
