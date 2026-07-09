@@ -339,12 +339,12 @@ class KalenderLib
 		$data = $this->_ci->KalenderModel->load();
 		return $this->_mapEvents($data);
 	}
-	public function getPlanForPlanner($start_date, $end_date, $ort = null, $uids = null, $stg = null)
+	public function getPlanForPlanner($start_date, $end_date, $ort = null, $uids = null, $studiengaenge = null)
 	{
 		$this->_getBasePlan($start_date, $end_date);
 
 		if (!is_null($ort))
-			$this->_ci->KalenderModel->db->where('tbl_kalender_ort.ort_kurzbz', $ort);
+			$this->_ci->KalenderModel->db->where_in('tbl_kalender_ort.ort_kurzbz', $ort);
 
 		if (!is_null($uids))
 		{
@@ -355,8 +355,33 @@ class KalenderLib
 			$this->_ci->KalenderModel->db->group_end();
 		}
 
-		if (!is_null($stg))
-			$this->_ci->KalenderModel->db->where('tbl_lehrveranstaltung.studiengang_kz', $stg);
+		if (!is_null($studiengaenge))
+		{
+
+			$this->_ci->KalenderModel->db->group_start();
+			$first = true;
+			foreach ($studiengaenge as $studiengang)
+			{
+				if ($first)
+					$this->_ci->KalenderModel->db->group_start();
+				else
+				{
+					$this->_ci->KalenderModel->db->or_group_start();
+				}
+				$first = false;
+
+				$this->_ci->KalenderModel->db->where('tbl_lehrveranstaltung.studiengang_kz', $studiengang['studiengang_kz']);
+
+				if (isset($studiengang['semester']))
+					$this->_ci->KalenderModel->db->where('tbl_lehrveranstaltung.semester', $studiengang['semester']);
+
+				if (isset($studiengang['orgform_kurzbz']))
+					$this->_ci->KalenderModel->db->where('tbl_lehrveranstaltung.orgform_kurzbz', $studiengang['orgform_kurzbz']);
+
+				$this->_ci->KalenderModel->db->group_end();
+			}
+			$this->_ci->KalenderModel->db->group_end();
+		}
 
 		$this->_ci->KalenderModel->db->where('NOT EXISTS (
 				SELECT 1 FROM lehre.tbl_kalender nachfolger
@@ -812,10 +837,10 @@ class KalenderLib
 		{
 			$this->_ci->KalenderModel->addSelect('1');
 			$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_ort', 'kalender_id');
+			$this->_ci->KalenderModel->db->where_in('ort_kurzbz', $ort_kurzbz);
 			$reservierung_vorhanden = $this->_ci->KalenderModel->load(array (
 				'von <=' => $end_date,
 				'bis >=' => $start_date,
-				'ort_kurzbz' => $ort_kurzbz,
 			));
 
 			if (hasData($reservierung_vorhanden) && !$this->_ci->permissionlib->isBerechtigt('lehre/reservierungAdvanced'))
@@ -994,12 +1019,20 @@ class KalenderLib
 	}
 	private function _addKalenderOrt($kalender_id, $ort_kurzbz)
 	{
-		return $this->_ci->KalenderOrtModel->insert(
-			array (
-				'kalender_id' => $kalender_id,
-				'ort_kurzbz' => $ort_kurzbz
-			)
-		);
+		foreach ((array) $ort_kurzbz as $ort)
+		{
+			$ortresult = $this->_ci->KalenderOrtModel->insert(
+				array (
+					'kalender_id' => $kalender_id,
+					'ort_kurzbz' => $ort
+				)
+			);
+
+			if (!isSuccess($ortresult))
+				return $ortresult;
+		}
+
+		return success();
 	}
 
 	public function updateKalenderEvent($kalender_id, $ort_kurzbz = null, $start_time = null, $end_time = null)

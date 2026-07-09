@@ -3,7 +3,7 @@ export default {
 	getPlan(filter, start_date, end_date)
 	{
 		return {
-			method: 'get',
+			method: 'post',
 			url: '/api/frontend/v1/tempus/Kalender/getPlan',
 			params: { ...filter, start_date, end_date }
 		};
@@ -112,7 +112,7 @@ export default {
 	},
 	getRaumvorschlag(kalender_id) {
 		return {
-			method: 'get',
+			method: 'post',
 			url: '/api/frontend/v1/tempus/Kalender/getRaumvorschlag',
 			params: { kalender_id }
 		};

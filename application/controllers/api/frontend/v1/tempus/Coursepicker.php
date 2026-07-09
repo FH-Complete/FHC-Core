@@ -94,11 +94,15 @@ class Coursepicker extends FHCAPI_Controller
 
 	public function getByStg()
 	{
-		//TODO check einbauen ob studiensemester und stg vorhanden ist
-		$stg = $this->input->get('stg');
-		$studiensemester_kurzbz = $this->input->get('studiensemester_kurzbz');
-		if (is_null($stg) || is_null($studiensemester_kurzbz))
-			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+		$this->_ci->form_validation->set_data($_POST);
+		$this->_ci->form_validation->set_rules('studiengaenge[]',"studiengaenge","required");
+		$this->_ci->form_validation->set_rules('studiensemester_kurzbz',"studiensemester_kurzbz","required");
+
+		if($this->_ci->form_validation->run() === FALSE)
+			$this->terminateWithValidationErrors($this->_ci->form_validation->error_array());
+
+		$studiengaenge = $this->input->post('studiengaenge');
+		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
 
 		$this->_ci->LehreinheitModel->addSelect('
 			tbl_lehreinheit.lehreinheit_id,
@@ -131,15 +135,39 @@ class Coursepicker extends FHCAPI_Controller
 		$this->_ci->LehreinheitModel->addJoin('lehre.tbl_lehreinheitmitarbeiter lema', 'tbl_lehreinheit.lehreinheit_id = lema.lehreinheit_id');
 		$this->_ci->LehreinheitModel->addJoin('lehre.tbl_lehreinheitgruppe lvb', 'tbl_lehreinheit.lehreinheit_id = lvb.lehreinheit_id');
 		$this->_ci->LehreinheitModel->addJoin('public.tbl_studiengang', 'lvb.studiengang_kz = tbl_studiengang.studiengang_kz');
+		$this->_ci->LehreinheitModel->addJoin('lehre.tbl_lehrveranstaltung', 'tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id');
 		$this->_ci->LehreinheitModel->addJoin('lehre.tbl_lehrveranstaltung lehrfach', 'tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id');
 		$this->_ci->LehreinheitModel->addJoin('public.tbl_mitarbeiter ma', 'lema.mitarbeiter_uid = ma.mitarbeiter_uid');
 		$this->_ci->LehreinheitModel->addJoin('lehre.tbl_lehrform', 'tbl_lehrform.lehrform_kurzbz = tbl_lehreinheit.lehrform_kurzbz');
 		$this->_ci->LehreinheitModel->addJoin('public.tbl_benutzer', 'ma.mitarbeiter_uid = tbl_benutzer.uid');
 		$this->_ci->LehreinheitModel->addJoin('public.tbl_person', 'tbl_benutzer.person_id = tbl_person.person_id');
 
+		$this->_ci->LehreinheitModel->db->group_start();
+		$first = true;
+		foreach ($studiengaenge as $studiengang)
+		{
+			if ($first)
+				$this->_ci->LehreinheitModel->db->group_start();
+			else
+			{
+				$this->_ci->LehreinheitModel->db->or_group_start();
+			}
+			$first = false;
+
+			$this->_ci->LehreinheitModel->db->where('tbl_lehrveranstaltung.studiengang_kz', $studiengang['studiengang_kz']);
+
+			if (isset($studiengang['semester']))
+				$this->_ci->LehreinheitModel->db->where('tbl_lehrveranstaltung.semester', $studiengang['semester']);
+
+			if (isset($studiengang['orgform_kurzbz']))
+				$this->_ci->LehreinheitModel->db->where('tbl_lehrveranstaltung.orgform_kurzbz', $studiengang['orgform_kurzbz']);
+
+			$this->_ci->LehreinheitModel->db->group_end();
+		}
+		$this->_ci->LehreinheitModel->db->group_end();
+
 		$result = $this->_ci->LehreinheitModel->loadWhere(array(
 			'tbl_lehrform.verplanen' => true,
-			'tbl_studiengang.studiengang_kz' => $stg,
 			'tbl_lehreinheit.studiensemester_kurzbz' => $studiensemester_kurzbz
 		));
 

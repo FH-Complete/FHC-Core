@@ -10,9 +10,9 @@ export default {
 		draggable
 	},
 	props: {
-		stg: {
-			type: [String, Number],
-			default: null,
+		studiengaenge: {
+			type: Array,
+			default: [],
 		},
 		studiensemester: {
 			type: String,
@@ -77,23 +77,33 @@ export default {
 		}
 	},
 	watch: {
-		stg(val) {
-			this.searchparam = '';
-			this.loadCoursesByStg(val);
+		studiengaenge: {
+			deep: true,
+			handler(val) {
+				this.searchparam = '';
+				this.loadCoursesByStg(val);
+			}
 		},
 		studiensemester() {
-			if (this.stg)
-				this.loadCoursesByStg(this.stg);
+			if (this.studiengaenge)
+				this.loadCoursesByStg(this.studiengaenge);
 		},
 	},
 	methods: {
 		async loadCoursesByStg(stg) {
-			if (!stg) {
+			if (stg.length <= 0)
+			{
 				this.allCourses = [];
 				return;
 			}
 
-			this.$api.call(ApiCoursePicker.getByStg(this.stg, this.studiensemester))
+			let payload = stg.map(({ studiengang_kz, semester, orgform_kurzbz }) => ({
+				studiengang_kz,
+				semester,
+				orgform_kurzbz
+			}));
+
+			this.$api.call(ApiCoursePicker.getByStg(payload, this.studiensemester))
 				.then(result => {
 					this.allCourses = result.data.map(e => ({
 						lehreinheit_id: e.lehreinheit_id,
@@ -161,7 +171,7 @@ export default {
 		},
 		reload()
 		{
-			this.loadCoursesByStg(this.stg);
+			this.loadCoursesByStg(this.studiengaenge);
 		},
 		toggleMultiWeek(course)
 		{
@@ -191,7 +201,7 @@ export default {
 				<button
 					type="button"
 					class="btn btn-sm btn-outline-secondary"
-					:disabled="!stg"
+					:disabled="studiengaenge.length <= 0"
 					@click="reload">
 					<i class="fa fa-rotate-right"></i>
 				</button>
@@ -218,7 +228,7 @@ export default {
 				</button>
 			</div>
 		</div>
-		<div v-if="!stg" class="d-flex flex-column align-items-center justify-content-center text-center text-muted py-5 px-3 h-100">
+		<div v-if="studiengaenge.length <= 0" class="d-flex flex-column align-items-center justify-content-center text-center text-muted py-5 px-3 h-100">
 			<span class="small fw-semibold mb-1">Keine Lehreinheiten</span>
 			<span class="small">Wähle einen Studiengang, um Lehreinheiten anzuzeigen.</span>
 		</div>

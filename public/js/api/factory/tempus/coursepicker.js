@@ -6,11 +6,11 @@ export default {
 			params: { query }
 		};
 	},
-	getByStg(stg, studiensemester_kurzbz) {
+	getByStg(studiengaenge, studiensemester_kurzbz) {
 		return {
-			method: 'get',
+			method: 'post',
 			url: 'api/frontend/v1/tempus/coursepicker/getByStg',
-			params: { stg, studiensemester_kurzbz }
+			params: { studiengaenge, studiensemester_kurzbz }
 		};
 	},
 

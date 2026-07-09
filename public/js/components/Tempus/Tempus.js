@@ -18,9 +18,11 @@ import CoreSearchbar from "../searchbar/searchbar.js";
 import NavLanguage from "../navigation/Language.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
 import FhcCalendar from "../Calendar/Tempus.js";
-import FhcCoursepicker from "../Tempus/Coursepicker.js";
-import LectureSelection from "../Tempus/LectureSelection.js";
-import ParkingSlot from "../Tempus/ParkingSlot.js";
+import FhcCoursepicker from "./Coursepicker.js";
+import LectureSelection from "./Filters/LectureSelection.js";
+import VerbandSelection from "./Filters/VerbandSelection.js";
+import RoomSelection from "./Filters/RoomSelection.js";
+import ParkingSlot from "./ParkingSlot.js";
 import ApiKalender from '../../api/factory/tempus/kalender.js';
 import ApiSearchbar from "../../api/factory/searchbar.js";
 import ApiRenderers from '../../api/factory/renderers.js';
@@ -33,7 +35,8 @@ import BsModal from "../Bootstrap/Modal.js";
 
 
 import StvVerband from "../Stv/Studentenverwaltung/Verband.js";
-import ApiStudiengangTree from "../../api/lehrveranstaltung/studiengangtree.js";
+import ApiStudiengangTree from "../../api/factory/tempus/studiengangtree.js";
+import ApiInfo from "../../api/factory/tempus/info.js";
 import StvStudiensemester from "../Stv/Studentenverwaltung/Studiensemester.js";
 import FormInput from "../../../js/components/Form/Input.js";
 import Reservierung from "./Reservierung.js";
@@ -41,6 +44,7 @@ import { getTempusShortcuts } from "./shortcuts.js";
 import KeyboardShortcuts from "./KeyboardShortcuts.js";
 import { useContextMenuActions } from "../../composables/Tempus/ContextMenuActions.js";
 import MultiWeekPlanModal from "./MultiWeekPlanModal.js";
+import { getTempusSearchbarOptions } from "./Filters/searchbarOptions.js";
 
 export default {
 	name: "Tempus",
@@ -50,6 +54,8 @@ export default {
 		FhcCalendar,
 		FhcCoursepicker,
 		LectureSelection,
+		VerbandSelection,
+		RoomSelection,
 		ParkingSlot,
 		AppConfig,
 		AppMenu,
@@ -105,37 +111,7 @@ export default {
 			endpoint: ApiStudiengangTree,
 			raumVorschlaege: [],
 			selected: [],
-			searchbaroptions: {
-				origin: 'tempus',
-				cssclass: "position-relative",
-				calcheightonly: true,
-				types: [
-					//"student",
-					"raum",
-					"mitarbeiter",
-					"mitarbeiter_ohne_zuordnung"
-				],
-				actions: {
-					raum: {
-						defaultaction: {
-							type: "function",
-							action: this.setOrt
-						},
-						childactions: [
-						]
-					},
-					employee: {
-						defaultaction: {
-							type: "function",
-							action: (data) => {
-								this.setEmp(data);
-							}
-						},
-						childactions: [
-						]
-					},
-				}
-			},
+
 			lv_id: null,
 			events: null,
 			minimized: false,
@@ -153,11 +129,12 @@ export default {
 			view: 'room',
 			parkedKeys: new Set(),
 			lecturers: [],
+			studiengaenge: [],
+			rooms: [],
 			overlayCache: [],
 			extraBackgrounds: [],
 			lastRange: null,
 			stg: null,
-			show_stg: null,
 			semester: null,
 			studiensemester_kurzbz: null,
 			raumModal: {
@@ -179,6 +156,7 @@ export default {
 				startTime: null,
 				endTime: null,
 			},
+			studiengaenge_all: []
 		}
 	},
 	computed: {
@@ -200,6 +178,9 @@ export default {
 		},
 		keyboardShortcuts() {
 			return getTempusShortcuts(this);
+		},
+		searchbaroptions() {
+			return getTempusSearchbarOptions(this);
 		},
 	},
 	methods: {
@@ -279,42 +260,81 @@ export default {
 		setOrt: function(data)
 		{
 			this.ort_kurzbz = data.ort_kurzbz;
-			this.$refs.calendar.resetEventLoader();
+			this.rooms = [{ ort_kurzbz: data.ort_kurzbz }];
 		},
 		onSelectVerbandAndClose(payload) {
+			console.log(payload);
 			this.onSelectVerband(payload);
 			bootstrap.Offcanvas.getOrCreateInstance(this.$refs.verbandMenu).hide();
 		},
-		onSelectVerband({link, name})
+
+		onSelectVerband({link, studiengang_kz, semester, orgform_kurzbz, name})
 		{
-			let stg = null;
-			let semester = null;
-			this.show_stg = name
-			if (typeof link === 'number')
-				stg = link;
+			if (orgform_kurzbz)
+			{
+				semester = null;
+			}
 			else if (typeof link === 'string')
 			{
-				[stg, semester] = link.split('/');
+				[studiengang_kz, semester] = link.split('/');
 			}
-			this.stg = stg;
-			if (semester !== null)
-				this.semester = semester;
 
+			let exists = this.studiengaenge.some(stg =>
+				stg.studiengang_kz == studiengang_kz
+				&& stg.semester == semester
+				&& stg.orgform_kurzbz === orgform_kurzbz
+			);
 
-			this.$refs.calendar.resetEventLoader();
+			if (!exists)
+			{
+				this.studiengaenge = [
+					...this.studiengaenge,
+					{ studiengang_kz, semester, orgform_kurzbz, name }
+				];
+			}
 		},
 		setEmp: function(data)
 		{
 			const uid = data.uid;
 			const label = data.name;
-			if (!this.lecturers.some(l => l.uid === uid))
+
+			for (const lect of this.lecturers)
+				delete this.overlayCache[lect.uid];
+
+			this.lecturers = [{
+				uid,
+				label,
+				showEvents: true,
+				overlays: { blocks: true, wishes: true },
+			}];
+
+			this.$refs.calendar.resetEventLoader();
+			if (this.lastRange)
+				this.handleRange(this.lastRange);
+		},
+		addToFilter: function(filter, type)
+		{
+			if (type === 'ort')
 			{
-				this.lecturers.push({
-					uid,
-					label,
-					showEvents: true,
-					overlays: { blocks: true, wishes: true },
-				});
+				const ort_kurzbz = filter.ort_kurzbz;
+				if (!this.rooms.some(room => room.ort_kurzbz === ort_kurzbz))
+				{
+					this.rooms.push({ ort_kurzbz });
+				}
+			}
+			else if (type === 'mitarbeiter')
+			{
+				const uid = filter.uid;
+				const label = filter.name;
+				if (!this.lecturers.some(l => l.uid === uid))
+				{
+					this.lecturers.push({
+						uid,
+						label,
+						showEvents: true,
+						overlays: { blocks: true, wishes: true },
+					});
+				}
 			}
 
 			this.$refs.calendar.resetEventLoader();
@@ -365,18 +385,24 @@ export default {
 			return this.$api.call(ApiSearchbar.search(params));
 		},
 		getPromiseFunc(start, end) {
-			const hasRoom = !!this.ort_kurzbz;
+			const hasRooms = this.rooms.length > 0;
 			const hasLektoren = this.lecturers.length > 0;
-			const hasStg = !!this.stg;
+			const hasStg = this.studiengaenge.length > 0;
 
 			const filter = {};
 
-			if (hasRoom)
-				filter.ort = this.ort_kurzbz;
+			if (hasRooms)
+				filter.ort = this.rooms.map(room => room.ort_kurzbz);
 			if (hasStg)
-				filter.stg = this.stg;
+			{
+				filter.stg = this.studiengaenge.map(({ studiengang_kz, semester, orgform_kurzbz }) => ({
+						studiengang_kz,
+						semester,
+						orgform_kurzbz
+					}));
+			}
 			if (hasLektoren)
-				filter.uid = this.lecturers.map(l => l.uid);
+				filter.uid = this.lecturers.map(lecture => lecture.uid);
 
 			if (this.previewRole === 'lektor')
 				return [this.$api.call(ApiKalender.getPlanLecturer(start.toISODate(), end.toISODate()))];
@@ -540,7 +566,8 @@ export default {
 				return this.$api.call(
 						ApiKalender.addKalenderEvent(
 							obj.orig.lehreinheit_id,
-							this.ort_kurzbz ? this.ort_kurzbz : obj.orig.ort_kurzbz,
+							this.rooms.length ? this.rooms.map(r => r.ort_kurzbz)
+								: (obj.orig.ort_kurzbz ? [obj.orig.ort_kurzbz] : []),
 							start_time,
 							end_time
 						))
@@ -690,18 +717,20 @@ export default {
 
 		removeLecturer(uid)
 		{
-			this.lecturers = this.lecturers.filter(lecture => lecture.uid !== uid);
-			delete this.overlayCache[uid];
-			this.$refs.calendar.resetEventLoader();
-		},
-		clearOrt() {
-			this.ort_kurzbz = null;
-			this.$refs.calendar.resetEventLoader();
-		},
-		clearStg() {
-			this.stg = null;
-			this.show_stg = null;
-			this.$refs.calendar.resetEventLoader();
+			if (uid == null)
+			{
+				for (const lect of this.lecturers)
+					delete this.overlayCache[lect.uid];
+
+				this.lecturers = [];
+				this.$refs.calendar.resetEventLoader();
+			}
+			else
+			{
+				this.lecturers = this.lecturers.filter(lecture => lecture.uid !== uid);
+				delete this.overlayCache[uid];
+				this.$refs.calendar.resetEventLoader();
+			}
 		},
 		triggerSync()
 		{
@@ -755,7 +784,16 @@ export default {
 			handler() {
 				this.rebuildExtraBackgrounds();
 			}
-		}
+		},
+		rooms() {
+			this.$refs.calendar.resetEventLoader();
+		},
+		studiengaenge: {
+			deep: true,
+			handler() {
+				this.$refs.calendar.resetEventLoader();
+			}
+		},
 	},
 	mounted() {
 		this.reservierungPending = false;
@@ -813,6 +851,8 @@ export default {
 				this.visibleStatusArray = res.data.visible_status;
 				this.visibleStatus = ['all'];
 			});
+		this.$api.call(ApiInfo.getStudiengaenge())
+			.then(res => {this.studiengaenge_all = res.data});
 	},
 	template: `
 	<div class="tempus">
@@ -974,37 +1014,19 @@ export default {
 							</button>
 						</div>
 					</div>
-					<div class="room-selection" v-if="ort_kurzbz">
-						<div class="fw-semibold px-2 d-flex align-items-center justify-content-between">
-							<span><i class="fa-solid fa-door-open me-2"></i>{{ ort_kurzbz }}</span>
-							<button
-								type="button"
-								class="btn btn-sm btn-link text-danger p-0"
-								@click="clearOrt"
-								title="Raum entfernen"
-							>
-								<i class="fa-solid fa-xmark"></i>
-							</button>
-						</div>
-					</div>
-					
-					<div class="room-selection" v-if="show_stg">
-						<div class="fw-semibold px-2 d-flex align-items-center justify-content-between">
-							<span><i class="fa-solid fa-university me-2"></i>{{ show_stg }}</span>
-							<button
-								type="button"
-								class="btn btn-sm btn-link text-danger p-0"
-								@click="clearStg"
-								title="STG entfernen"
-							>
-								<i class="fa-solid fa-xmark"></i>
-							</button>
-						</div>
-					</div>
+					<room-selection
+						v-if="rooms.length"
+						v-model:rooms="rooms"
+					></room-selection>
+					<verband-selection
+						v-if="studiengaenge.length"
+						v-model:studiengaenge="studiengaenge"
+						:studiengaenge-all="studiengaenge_all"
+					></verband-selection>
 					<lecture-selection
-							v-if="lecturers.length"
-							:lecturers="lecturers"
-							@remove="removeLecturer"
+						v-if="lecturers.length"
+						:lecturers="lecturers"
+						@remove="removeLecturer"
 					></lecture-selection>
 					<div class="d-flex flex-column flex-grow-1" style="min-height: 0">
 						<parking-slot
@@ -1012,7 +1034,7 @@ export default {
 							v-model:parked-keys="parkedKeys"
 						></parking-slot>
 						
-						<fhc-coursepicker ref="coursepicker" :stg="stg" @select-lecturer="setEmp" @select-kw="jumpToKw" :studiensemester="selectedStudiensemester"></fhc-coursepicker>
+						<fhc-coursepicker ref="coursepicker" :studiengaenge="studiengaenge" @select-lecturer="setEmp" @select-kw="jumpToKw" :studiensemester="selectedStudiensemester"></fhc-coursepicker>
 
 					</div>
 					<stv-studiensemester v-model:studiensemester-kurzbz="selectedStudiensemester"></stv-studiensemester>
@@ -1096,7 +1118,7 @@ export default {
 		</bs-modal>
 		<reservierung
 			ref="reservierung"
-			:ort-kurzbz="ort_kurzbz"
+			:rooms="rooms"
 			@saved="reservierungPending = false; $refs.calendar.resetEventLoader()"
 		></reservierung>
 		<multi-week-plan-modal

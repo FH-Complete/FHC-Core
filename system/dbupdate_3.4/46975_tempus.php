@@ -235,3 +235,17 @@ if(!$result = @$db->db_query("SELECT kalender_id FROM lehre.tbl_kalender_event L
 		echo '<br>lehre.tbl_kalender_event: neue Tabellen hinzugefuegt';
 
 }
+
+// Add new name type in public.tbl_variablenname
+if ($result = @$db->db_query("SELECT 1 FROM public.tbl_variablenname WHERE name = 'tempus_favorites';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_variablenname(name, defaultwert) VALUES('tempus_favorites', null);";
+
+		if (!$db->db_query($qry))
+			echo '<strong>public.tbl_variablenname '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_variablenname: Added name "tempus_favorites"<br>';
+	}
+}
