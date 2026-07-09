@@ -25,21 +25,24 @@ export default {
 			},
 		};
 	},
-	createSurvey(surveyData) {
+	createSurvey(surveyData, shouldInformParticipants) {
 		return {
 			method: "post",
 			url: "/api/frontend/v1/coodle/CoodleSurvey/createSurvey",
 			params: {
 				surveyData,
+				shouldInformParticipants,
 			},
 		};
 	},
-	updateSurvey(surveyData) {
+	updateSurvey(surveyId, surveyData, shouldInformParticipants) {
 		return {
 			method: "post",
 			url: "/api/frontend/v1/coodle/CoodleSurvey/updateSurvey",
 			params: {
-				survey,
+				surveyId,
+				surveyData,
+				shouldInformParticipants,
 			},
 		};
 	},
@@ -50,6 +53,18 @@ export default {
 			params: {
 				surveyId,
 			},
+		};
+	},
+	getActiveSurveys() {
+		return {
+			method: "get",
+			url: "/api/frontend/v1/coodle/CoodleSurvey/getActiveSurveys",
+		};
+	},
+	getInactiveSurveys() {
+		return {
+			method: "get",
+			url: "/api/frontend/v1/coodle/CoodleSurvey/getInactiveSurveys",
 		};
 	},
 };

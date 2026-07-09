@@ -1,3 +1,5 @@
+import ActiveCoodleSurveys from "./Components/ActiveCoodleSurveys.js";
+import InactiveCoodleSurveys from "./Components/InactiveCoodleSurveys.js";
 import CoodleSurvey from "./Components/CoodleSurvey.js";
 import CoodleFreeBusy from "./Components/CoodleFreeBusy.js";
 
@@ -6,12 +8,16 @@ import CoodleApi from "../../../api/factory/coodle.js";
 
 export default {
 	name: "Coodle",
-	components: { CoodleSurvey, CoodleFreeBusy },
+	components: {
+		ActiveCoodleSurveys,
+		InactiveCoodleSurveys,
+		CoodleSurvey,
+		CoodleFreeBusy,
+	},
 	data() {
 		return {
 			uid: null,
-			// todo: revert to default view active when dev done
-			view: "survey",
+			view: "activeSurveysTable",
 			survey: null,
 		};
 	},
@@ -45,7 +51,7 @@ export default {
 			);
 			this.uid = authUidResponse.data.uid;
 		},
-		async showSurvey(surveyId) {
+		async showSurveyDetails(surveyId) {
 			const surveyResponse = await this.$api.call(
 				CoodleApi.getSurvey(surveyId),
 			);
@@ -60,7 +66,8 @@ export default {
 				description: surveyData.description,
 				timeslotDuration: surveyData.timeslot_duration,
 				maxSelections: surveyData.max_selections,
-				areParticipantsAnonymized: surveyData.are_participants_anonymized,
+				areParticipantsAnonymized:
+					surveyData.are_participants_anonymized,
 				areSelectionsAnonymized: surveyData.are_selections_anonymized,
 				selectedTimeslotId: surveyData.description,
 				endsAt: surveyData.ends_at.split(" ")[0],
@@ -81,7 +88,6 @@ export default {
 	},
 	async created() {
 		await this.getAuthUid();
-		this.showSurvey(26);
 	},
 	template: /*html*/ `
 	<div class="h-100 d-flex flex-column gap-2">
@@ -129,13 +135,19 @@ export default {
 			</div>
 		</div>
 		<div class="flex-grow-1 mt-1">
-			<span v-if="view === 'activeSurveysTable'">active surveys table placeholder</span>
-			<span v-else-if="view === 'pastSurveysTable'">past surveys table placeholder</span>
+			<active-coodle-surveys
+				v-if="view === 'activeSurveysTable'"
+				@showSurveyDetails="showSurveyDetails($event.surveyId)"
+			/>
+			<inactive-coodle-surveys
+				v-else-if="view === 'pastSurveysTable'"
+				@showSurveyDetails="showSurveyDetails($event.surveyId)"
+			/>
 			<coodle-survey
 				v-else-if="view === 'survey'"
 				@surveyCreationCanceled="switchToTab('activeSurveysTable')"
-				@surveyCreated="showSurvey($event.surveyId)"
-				@surveyUpdated="showSurvey($event.surveyId)"
+				@surveyCreated="showSurveyDetails($event.surveyId)"
+				@surveyUpdated="showSurveyDetails($event.surveyId)"
 				:survey="survey"
 				:uid="uid"
 			/>

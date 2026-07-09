@@ -26,6 +26,12 @@ class CoodleSurveyParticipant_model extends DB_Model
 		return $this->execQuery($query)->retval;
 	}
 
+	public function getParticipantEntriesByUid($uid)
+	{
+		$query = "SELECT * FROM $this->dbTable WHERE participant_uid = '$uid'";
+		return $this->execQuery($query)->retval;
+	}
+
 	public function updateParticipants($surveyId, $participants, $timeslots)
 	{
 		$participantUids = array_map(function ($participant) {

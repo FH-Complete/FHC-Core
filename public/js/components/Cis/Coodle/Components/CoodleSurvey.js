@@ -268,8 +268,12 @@ export default {
 			};
 		},
 		async createSurvey(surveyData) {
+			const shouldInformParticipants = window.confirm(
+				"Would you like to email all participants to inform them of this survey?",
+			);
+
 			const surveyCreationResponse = await this.$api.call(
-				CoodleApi.createSurvey(surveyData),
+				CoodleApi.createSurvey(surveyData, shouldInformParticipants),
 			);
 			if (surveyCreationResponse.meta.status === "success") {
 				this.$emit("surveyCreated", {
@@ -278,8 +282,16 @@ export default {
 			}
 		},
 		async updateSurvey(surveyData) {
+			const shouldInformParticipants = window.confirm(
+				"Would you like to email all participants to inform them of changes?",
+			);
+
 			const surveyUpdateResponse = await this.$api.call(
-				CoodleApi.updateSurvey(surveyData),
+				CoodleApi.updateSurvey(
+					surveyData.id,
+					surveyData,
+					shouldInformParticipants,
+				),
 			);
 			if (surveyUpdateResponse.meta.status === "success") {
 				this.$emit("surveyUpdated", {

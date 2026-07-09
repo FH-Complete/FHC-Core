@@ -29,6 +29,8 @@ class CoodleSurvey extends FHCAPI_Controller
 	{
 		parent::__construct([
 			'getSurvey' => self::PERM_LOGGED,
+			'getActiveSurveys' => self::PERM_LOGGED,
+			'getInactiveSurveys' => self::PERM_LOGGED,
 			'createSurvey' => self::PERM_LOGGED,
 			'updateSurvey' => self::PERM_LOGGED,
 			'searchParticipants' => self::PERM_LOGGED,
@@ -147,9 +149,49 @@ class CoodleSurvey extends FHCAPI_Controller
 
 		$this->terminateWithSuccess($survey);
 	}
+
+	public function getActiveSurveys()
+	{
+		$uid = getAuthUID();
+		$activeSurveys = $this->CoodleSurveyModel->getActiveSurveys($uid);
+		$activeSurveys = array_map(
+			function ($survey) {
+				$survey->creator = [
+					"uid" => $survey->creator_uid,
+					"name" => $survey->creator_name,
+				];
+				unset($survey->creator_uid);
+				unset($survey->creator_name);
+				return $survey;
+			},
+			$activeSurveys
+		);
+		$this->terminateWithSuccess($activeSurveys);
+	}
+
+	public function getInactiveSurveys()
+	{
+		$uid = getAuthUID();
+		$inactiveSurveys = $this->CoodleSurveyModel->getInactiveSurveys($uid);
+		$inactiveSurveys = array_map(
+			function ($survey) {
+				$survey->creator = [
+					"uid" => $survey->creator_uid,
+					"name" => $survey->creator_name,
+				];
+				unset($survey->creator_uid);
+				unset($survey->creator_name);
+				return $survey;
+			},
+			$inactiveSurveys
+		);
+		$this->terminateWithSuccess($inactiveSurveys);
+	}
+
 	public function createSurvey()
 	{
 		$surveyData = $this->input->post("surveyData");
+		$shouldInformParticipants = $this->input->post("shouldInformParticipants");
 		// todo: form validation
 
 		$surveyId = $this->CoodleSurveyModel->createSurvey($surveyData, getAuthUID())->retval;
@@ -157,12 +199,37 @@ class CoodleSurvey extends FHCAPI_Controller
 		$timeslots = $this->CoodleSurveyTimeslotModel->getTimeslots($surveyId);
 		$this->CoodleSurveyParticipantModel->updateParticipants($surveyId, $surveyData["participants"], $timeslots);
 
+		if ($shouldInformParticipants) {
+			// todo: email participants
+		}
+
 		$this->terminateWithSuccess($surveyId);
 	}
 
 	public function updateSurvey()
 	{
-		// todo: update survey
+		$surveyId = $this->input->post("surveyId");
+		$surveyData = $this->input->post("surveyData");
+		$shouldInformParticipants = $this->input->post("shouldInformParticipants");
+		// todo: form validation
+
+		$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
+
+		if (!$survey)
+			$this->terminateWithError("Survey not found!");
+		if ($survey->creator_uid !== getAuthUID())
+			$this->terminateWithError("You are not authorized to modify this survey!");
+
+		$this->CoodleSurveyModel->updateSurvey($surveyId, $surveyData)->retval;
+		$this->CoodleSurveyTimeslotModel->updateTimeslots($surveyId, $surveyData["timeslots"]);
+		$timeslots = $this->CoodleSurveyTimeslotModel->getTimeslots($surveyId);
+		$this->CoodleSurveyParticipantModel->updateParticipants($surveyId, $surveyData["participants"], $timeslots);
+
+		if ($shouldInformParticipants) {
+			// todo: email participants
+		}
+
+		$this->terminateWithSuccess($surveyId);
 	}
 
 	public function searchParticipants()

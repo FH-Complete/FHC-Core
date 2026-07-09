@@ -719,7 +719,7 @@ export const CoreFilterCmpt = {
 					<a aria-label="filter" v-if="filterActive"  class="btn btn-link px-0 fhc-text" :title="$p.t('ui','filterdelete')" @click="clearFilters">
 						<span class="fa-solid fa-xl fa-filter-circle-xmark"></span>
 					</a>
-					<a aria-label="filter" href="#" class="btn btn-link px-0 fhc-text" data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra">
+					<a v-if="!noColumnFilter" aria-label="filter" href="#" class="btn btn-link px-0 fhc-text" data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra">
 						<span class="fa-solid fa-xl fa-table-columns"></span>
 					</a>
 					<table-download class="btn btn-link px-0 fhc-text" :tabulator="tabulator" :config="download"></table-download>
@@ -727,6 +727,7 @@ export const CoreFilterCmpt = {
 			</div>
 
 			<filter-columns
+				v-if="!noColumnFilter"
 				:id="'collapseColumns' + idExtra"
 				class="card-body collapse"
 				:data-bs-parent="'#filterCollapsables' + idExtra"

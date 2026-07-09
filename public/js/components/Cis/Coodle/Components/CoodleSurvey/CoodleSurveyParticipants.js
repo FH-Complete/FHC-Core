@@ -225,7 +225,7 @@ export default {
 					>
 						<i v-if="searchResult.type === 'user'" class="fa-solid fa-user"></i>
 						<i v-else-if="searchResult.type === 'group'" class="fa-solid fa-user-group"></i>
-						<span>{{ searchResult.name }}</span>
+						<span>{{ searchResult.name + (searchResult.uid ? (" (" + searchResult.uid + ")") : "") }}</span>
 					</div>
 				</div>
 			</div>
