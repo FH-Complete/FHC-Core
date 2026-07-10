@@ -37,6 +37,7 @@ class CoodleSurvey extends FHCAPI_Controller
 			'submitParticipantSelection' => self::PERM_LOGGED,
 			'cancelSurvey' => self::PERM_LOGGED,
 			'completeSurvey' => self::PERM_LOGGED,
+			'sendVotingReminders' => self::PERM_LOGGED,
 		]);
 
 		$this->load->library('PermissionLib');

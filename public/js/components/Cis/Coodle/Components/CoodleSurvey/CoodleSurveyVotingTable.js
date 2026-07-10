@@ -1,4 +1,5 @@
 import CoodleApi from "../../../../../api/factory/coodle.js";
+import OrtApi from "../../../../../api/factory/ort.js";
 
 export default {
 	name: "CoodleSurveyVotingTable",
@@ -17,7 +18,9 @@ export default {
 			editableAuthUserSelection: null,
 			selectedTimeslotId: null,
 			isRoomSelectionShown: false,
-			selectedRoomId: null,
+			selectedRoomIdentifier: null,
+			isFetchingAvailableRooms: false,
+			availableRooms: [],
 		};
 	},
 	computed: {
@@ -133,7 +136,7 @@ export default {
 			this.isVotingInProgress = false;
 			this.isFinalSelectionInProgress = false;
 			this.isRoomSelectionShown = false;
-			this.selectedRoomId = null;
+			this.selectedRoomIdentifier = null;
 		},
 		setEditableAuthUserSelection() {
 			this.editableAuthUserSelection = this.authUserParticipant?.selection
@@ -257,6 +260,7 @@ export default {
 				});
 				if (shouldReserveARoom) {
 					this.isRoomSelectionShown = true;
+					this.fetchAvailableRooms();
 					return;
 				}
 			}
@@ -264,7 +268,7 @@ export default {
 			this.submitFinalSelection();
 		},
 		submitWithRoomSelection() {
-			if (!this.selectedRoomId) {
+			if (this.availableRooms.length && !this.selectedRoomIdentifier) {
 				this.$fhcAlert.alertError("You haven't selected a room!");
 				return;
 			}
@@ -289,7 +293,7 @@ export default {
 				CoodleApi.completeSurvey(
 					this.$props.survey.id,
 					selectedTimeslotId,
-					this.selectedRoomId,
+					this.selectedRoomIdentifier,
 					shouldInformParticipants,
 				),
 			);
@@ -297,9 +301,40 @@ export default {
 				this.$emit("surveyCompleted");
 			}
 		},
+		async fetchAvailableRooms() {
+			this.availableRooms = [];
+
+			const selectedTimeslotInfo = this.$props.timeslots.find(
+				(timeslot) => timeslot.id === this.selectedTimeslotId,
+			);
+
+			this.isFetchingAvailableRooms = true;
+			const roomsResponse = await this.$api.call(
+				OrtApi.getRooms(
+					selectedTimeslotInfo.startsAt.toISOString(),
+					selectedTimeslotInfo.startTime,
+					selectedTimeslotInfo.endTime,
+					"",
+					this.$props.survey.participants.length,
+				),
+			);
+			this.isFetchingAvailableRooms = false;
+
+			this.availableRooms = roomsResponse.data.retval
+				.filter((room) => room.reservieren)
+				.map((room) => {
+					return {
+						id: room.content_id,
+						shortName: room.ort_kurzbz,
+						longName: room.bezeichnung,
+					};
+				});
+		},
 		cancelRoomSelection() {
 			this.isRoomSelectionShown = false;
-			this.selectedRoomId = null;
+			this.selectedRoomIdentifier = null;
+			this.availableRooms = [];
+			this.isFetchingAvailableRooms = false;
 		},
 		getParticipantProfileHref(participant) {
 			if (!participant?.uid) {
@@ -310,6 +345,14 @@ export default {
 				name: "ProfilView",
 				params: { uid: participant.uid },
 			}).href;
+		},
+		getRoomInfoHref(roomId) {
+			return (
+				FHC_JS_DATA_STORAGE_OBJECT.app_root +
+				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+				"/CisVue/Cms/content/" +
+				roomId
+			);
 		},
 	},
 	created() {
@@ -467,7 +510,37 @@ export default {
 						</tr>
 					</table>
 				</div>
-				<div v-if="isRoomSelectionShown">room selection placeholder</div>
+				<div v-if="isRoomSelectionShown" class="mt-3 overflow-y-auto" style="max-height: 200px;">
+					<div v-if="isFetchingAvailableRooms" class="d-flex justify-content-center align-items-center py-3">
+						<div class="spinner-border" role="status">
+							<span class="visually-hidden">Loading...</span>
+						</div>
+					</div>
+					<div v-else-if="!availableRooms.length" class="d-flex justify-content-center align-items-center py-3 px-1">
+						<h5 class="flex-shrink fw-bold text-wrap">
+							{{ "No rooms available!" }}
+						</h5>
+					</div>
+					<div v-else class="d-flex flex-column gap-2">
+						<span class="fw-bold">{{ "Available rooms:" }}</span>
+						<div class="d-flex flex-row flex-wrap gap-2 flex-shrink-1">
+							<div
+								v-for="room in availableRooms"
+								@click="selectedRoomIdentifier = room.shortName"
+								:key="room.shortName"
+								:title="room.longName"
+								type="button"
+								:class="{'fhc-primary-border-color fw-bold': selectedRoomIdentifier === room.shortName}"
+								class="border border-2 rounded-pill py-1 px-2 d-flex flex-row align-items-center gap-1"
+							>
+								<span>{{ room.shortName }}</span>
+								<a v-if="room.id" :href="getRoomInfoHref(room.id)" target="_blank" class="px-1 fhc-primary-color">
+									<i class="fa-solid fa-up-right-from-square"></i>
+								</a>
+							</div>
+					</div>
+					</div>
+				</div>
 				<div v-if="isSurveyActive" class="d-flex flex-row gap-2 mt-3 justify-content-end">
 					<div
 						v-if="authUserParticipant && !isVotingInProgress && !isFinalSelectionInProgress"

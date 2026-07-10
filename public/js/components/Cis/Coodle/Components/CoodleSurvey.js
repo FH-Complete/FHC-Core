@@ -203,6 +203,8 @@ export default {
 					numberPadding(timeslotEndsAt.getHours()) +
 					":" +
 					numberPadding(timeslotEndsAt.getMinutes()),
+				startsAt: timeslotStartsAt,
+				endsAt: timeslotEndsAt,
 			};
 		},
 		cancelEditForm() {

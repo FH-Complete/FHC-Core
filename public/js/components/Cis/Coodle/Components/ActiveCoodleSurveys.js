@@ -130,16 +130,16 @@ export default {
 			</div>
 			<div v-else class="d-flex flex-row overflow-x-auto">
 				<div class="flex-shrink">
-				<core-filter-cmpt
-					@tableBuilt="afterActiveSurveysTableBuilt()"
-					:noColumnFilter="true"
-					:title="'Active Surveys'"
-					:ref="'activeSurveysTable'"
-					:tabulatorOptions="activeSurveysTableConfig"
-					:sideMenu="false"
-					tableOnly
-				/>
-			</div>
+					<core-filter-cmpt
+						@tableBuilt="afterActiveSurveysTableBuilt()"
+						:noColumnFilter="true"
+						:title="'Active Surveys'"
+						:ref="'activeSurveysTable'"
+						:tabulatorOptions="activeSurveysTableConfig"
+						:sideMenu="false"
+						tableOnly
+					/>
+				</div>
 			</div>
 		</div>
 	</div>
