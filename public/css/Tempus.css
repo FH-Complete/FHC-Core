@@ -233,31 +233,6 @@ body {
   }
 }
 
-.deemphasized-event {
-  animation: deEmphasize 1s ease-out;
-}
-
-.deemphasized-event-long {
-  animation: deEmphasize 1.8s ease-out;
-}
-
-@keyframes deEmphasize {
-  0% {
-    opacity: 1;
-    filter: saturate(1) brightness(1);
-  }
-
-  30% {
-    opacity: 0.55;
-    filter: saturate(0.4) brightness(0.4);
-  }
-
-  100% {
-    opacity: 1;
-    filter: saturate(1) brightness(1);
-  }
-}
-
 .spinner-overlay {
   position: absolute;
   inset: 0;              /* top:0 right:0 bottom:0 left:0 */

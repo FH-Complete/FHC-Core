@@ -178,8 +178,6 @@ export default {
             "updating-event",
             "updated-event",
             "updated-event-long",
-            "deemphasized-event",
-            "deemphasized-event-long",
           );
         });
     },

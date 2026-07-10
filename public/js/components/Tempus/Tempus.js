@@ -1028,24 +1028,11 @@ export default {
         let emphasizeUpdateClassName = isInsideScrolledView
           ? "updated-event"
           : "updated-event-long";
-        let deemphasizedUpdateClassName = isInsideScrolledView
-          ? "deemphasized-event"
-          : "deemphasized-event-long";
 
         if (!isInsideScrolledView) timeout = 300;
 
         setTimeout(() => {
           eventEl.classList.add(emphasizeUpdateClassName);
-
-          document
-            .querySelectorAll(
-              ".fhc-calendar-base-grid .fhc-calendar-base-grid-line-event",
-            )
-            .forEach((el) => {
-              if (el !== eventEl) {
-                el.classList.add(deemphasizedUpdateClassName);
-              }
-            });
         }, timeout);
 
         this.currentlyUpdatedEvent = null;
