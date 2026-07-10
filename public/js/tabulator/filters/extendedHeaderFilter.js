@@ -64,8 +64,6 @@ export function buildTagHeaderFilterExpression(selectedTagOptions) {
 }
 
 export function buildTagOptionsFromRows(rows, field = "tags") {
-  let options = [];
-
   let parsedTags = [
     ...new Map(
       getRawTagValuesFromRows(rows, field)
@@ -82,7 +80,7 @@ export function buildTagOptionsFromRows(rows, field = "tags") {
             done: tag.done,
           };
         })
-        .map((obj) => [JSON.stringify(obj), obj]),
+        .map((obj) => [obj.value, obj]),
     ).values(),
   ];
   if (!Array.isArray(parsedTags)) return;
@@ -184,6 +182,7 @@ export function customTagFilter(cell, onRendered, success, cancel, params) {
   input.style.width = "100%";
   input.type = "text";
   let dropdownMenu = null;
+  let suppressScrollCloseUntil = 0;
 
   Object.defineProperty(container, "value", {
     get: () => input.value,
@@ -221,9 +220,25 @@ export function customTagFilter(cell, onRendered, success, cancel, params) {
       activeTagDropdownCleanup = null;
     }
 
-    window.removeEventListener("scroll", positionDropdown, true);
+    window.removeEventListener("scroll", handleScroll, true);
     window.removeEventListener("resize", positionDropdown);
     document.removeEventListener("mousedown", handleOutsideClick, true);
+  };
+
+  const suppressScrollClose = () => {
+    suppressScrollCloseUntil = Date.now() + 300;
+  };
+
+  const handleScroll = (event) => {
+    const target = event.target;
+    const isDropdownScroll =
+      target instanceof Node && dropdownMenu?.contains(target);
+
+    if (isDropdownScroll || Date.now() < suppressScrollCloseUntil) {
+      return;
+    }
+
+    closeDropdown();
   };
 
   const handleOutsideClick = (event) => {
@@ -265,13 +280,14 @@ export function customTagFilter(cell, onRendered, success, cancel, params) {
     dropdownMenu.addEventListener("mousedown", (event) => {
       event.stopPropagation();
     });
+    dropdownMenu.addEventListener("click", suppressScrollClose, true);
 
     document.body.appendChild(dropdownMenu);
     activeTagDropdownCleanup = closeDropdown;
 
     positionDropdown();
 
-    window.addEventListener("scroll", positionDropdown, true);
+    window.addEventListener("scroll", handleScroll, true);
     window.addEventListener("resize", positionDropdown);
     document.addEventListener("mousedown", handleOutsideClick, true);
   };
