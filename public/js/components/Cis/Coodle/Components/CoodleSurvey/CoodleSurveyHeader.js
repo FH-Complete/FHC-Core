@@ -41,7 +41,7 @@ export default {
 					this.$props.survey?.title,
 				);
 			const cancellationConfirmation = await this.$fhcAlert.confirm({
-				header: "Cancellation confirmation!",
+				header: "Cancellation confirmation",
 				message: cancellationConfirmationMessage,
 				acceptLabel: "Yes",
 				rejectLabel: "No",
@@ -66,6 +66,37 @@ export default {
 				this.$emit("surveyCanceled");
 			}
 		},
+		async sendReminders() {
+			if (!this.$props.survey?.id) return;
+
+			const numberOfParticipantsWithoutVote =
+				this.$props.survey.participants.filter(
+					(participant) => participant.selection === null,
+				).length;
+
+			if (!numberOfParticipantsWithoutVote) {
+				this.$fhcAlert.alertError(
+					"All participants have already voted!",
+				);
+				return;
+			}
+
+			const reminderConfirmation = await this.$fhcAlert.confirm({
+				header: "Reminder confirmation",
+				message:
+					"Are you sure you want to remind participants to vote?",
+				acceptLabel: "Yes",
+				rejectLabel: "No",
+			});
+			if (!reminderConfirmation) return;
+
+			const remindersResponse = this.$api.call(
+				CoodleApi.sendReminders(this.$props.survey.id),
+			);
+			if (remindersResponse.meta.status === "success") {
+				this.$fhcAlert.alertSuccess("Reminders successfully sent!");
+			}
+		},
 	},
 	template: /*html*/ `
 	<div class="d-flex flex-row align-items-center justify-content-between">
@@ -84,6 +115,15 @@ export default {
 				<i class="fa-solid fa-ellipsis-vertical fa-lg"></i>
 			</div>
 			<ul class="dropdown-menu dropdown-menu-end" style="min-width:0;'">
+				<li>
+					<div
+						@click="sendReminders()"
+						role="button"
+						class="dropdown-item px-3 py-1"
+					>
+						{{ "Send reminders" }}
+					</div>
+				</li>
 				<li>
 					<div
 						@click="$emit('editSurvey')"

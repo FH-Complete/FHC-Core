@@ -265,7 +265,6 @@ class CoodleSurvey extends FHCAPI_Controller
 		}
 
 		$participants = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
-		$this->addMeta("particips", $participants);
 		$participantUids = array_map(
 			function ($participant) {
 				return $participant->uid;
@@ -292,8 +291,6 @@ class CoodleSurvey extends FHCAPI_Controller
 			);
 
 			$selection = array_slice($selection, 0, $survey->max_selections);
-			$this->addMeta("selection", $selection);
-			$this->addMeta("timeslotIds", $timeslotIds);
 		}
 
 		$this->CoodleSurveyParticipantModel->updateSelection($surveyId, getAuthUID(), json_encode($selection));
@@ -310,6 +307,8 @@ class CoodleSurvey extends FHCAPI_Controller
 			$this->terminateWithError("Survey not found!");
 		} else if ($survey->creator_uid !== getAuthUID()) {
 			$this->terminateWithError("You are not authorized to modify this survey!");
+		} else if ($survey->canceled_at) {
+			$this->terminateWithError("This survey has already been canceled!");
 		} else if ($survey->completed_at) {
 			$this->terminateWithError("This survey has already been completed!");
 		}
@@ -335,6 +334,8 @@ class CoodleSurvey extends FHCAPI_Controller
 			$this->terminateWithError("You are not authorized to modify this survey!");
 		} else if ($survey->canceled_at) {
 			$this->terminateWithError("This survey has already been canceled!");
+		} else if ($survey->completed_at) {
+			$this->terminateWithError("This survey has already been completed!");
 		}
 
 		if ($selectedTimeslotId) {
@@ -355,6 +356,35 @@ class CoodleSurvey extends FHCAPI_Controller
 		if ($shouldInformParticipants) {
 			// todo: email participants
 		}
+	}
+
+	public function sendVotingReminders()
+	{
+		$surveyId = $this->input->post("surveyId");
+		$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
+		if (!$survey) {
+			$this->terminateWithError("Survey not found!");
+		} else if ($survey->creator_uid !== getAuthUID()) {
+			$this->terminateWithError("You do not own this survey!");
+		} else if ($survey->canceled_at || $survey->completed_at) {
+			$this->terminateWithError("This survey is no longer active!");
+		}
+
+		$participants = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
+		$participantsWithoutVote = array_filter(
+			$participants,
+			function ($participant) {
+				return $participant->selection === null;
+			}
+		);
+
+		if (!count($participantsWithoutVote)) {
+			$this->terminateWithError("All participants have already voted!");
+		}
+
+		// todo: send reminder emails
+
+		$this->terminateWithSuccess();
 	}
 
 

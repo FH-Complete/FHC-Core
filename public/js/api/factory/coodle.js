@@ -98,4 +98,13 @@ export default {
 			},
 		};
 	},
+	sendReminders(surveyId) {
+		return {
+			method: "post",
+			url: "/api/frontend/v1/coodle/CoodleSurvey/sendVotingReminders",
+			params: {
+				surveyId,
+			},
+		};
+	}
 };
