@@ -86,4 +86,16 @@ export default {
 			},
 		};
 	},
+	completeSurvey(surveyId, selectedTimeslotId, selectedRoomId, shouldInformParticipants) {
+		return {
+			method: "post",
+			url: "/api/frontend/v1/coodle/CoodleSurvey/completeSurvey",
+			params: {
+				surveyId,
+				selectedTimeslotId,
+				selectedRoomId,
+				shouldInformParticipants
+			},
+		};
+	},
 };

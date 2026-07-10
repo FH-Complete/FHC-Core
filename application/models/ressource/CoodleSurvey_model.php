@@ -128,4 +128,13 @@ class CoodleSurvey_model extends DB_Model
 			"updated_at" => "NOW()",
 		]);
 	}
+
+	public function completeSurvey($surveyId, $timeslotId)
+	{
+		$this->update($surveyId, [
+			"selected_timeslot_id" => $timeslotId,
+			"completed_at" => "NOW()",
+			"updated_at" => "NOW()",
+		]);
+	}
 }

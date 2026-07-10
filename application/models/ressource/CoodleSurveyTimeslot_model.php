@@ -22,6 +22,16 @@ class CoodleSurveyTimeslot_model extends DB_Model
 		return $this->execQuery($query)->retval;
 	}
 
+	public function getTimeslot($timeslotId)
+	{
+		$query = "SELECT *
+			FROM $this->dbTable
+			WHERE id = $timeslotId
+			LIMIT 1
+		";
+		return $this->execQuery($query)->retval[0];
+	}
+
 	public function updateTimeslots($surveyId, $timeslots)
 	{
 		$newTimeslots = array_filter(
@@ -66,7 +76,7 @@ class CoodleSurveyTimeslot_model extends DB_Model
 			$insertQuery = "INSERT INTO $this->dbTable (survey_id, starts_at) VALUES ";
 			$newTimeslotInsertValues = array_map(
 				function ($newTimeslot) use ($surveyId) {
-					return "('$surveyId', '" . $newTimeslot["startsAt"]. "')";
+					return "('$surveyId', '" . $newTimeslot["startsAt"] . "')";
 				},
 				$newTimeslots
 			);

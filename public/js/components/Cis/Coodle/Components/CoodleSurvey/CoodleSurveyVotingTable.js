@@ -7,7 +7,7 @@ export default {
 		uid: { type: String | null },
 		timeslots: { type: Array },
 	},
-	emits: ["selectionSubmitted"],
+	emits: ["selectionSubmitted", "surveyCompleted"],
 	data() {
 		return {
 			isVotingInProgress: false,
@@ -16,6 +16,8 @@ export default {
 			authUserParticipant: null,
 			editableAuthUserSelection: null,
 			selectedTimeslotId: null,
+			isRoomSelectionShown: false,
+			selectedRoomId: null,
 		};
 	},
 	computed: {
@@ -123,11 +125,15 @@ export default {
 			);
 		},
 		setData() {
-			this.isVotingInProgress = false;
-			this.isFinalSelectionInProgress = false;
-
+			this.setForms();
 			this.setSelectedTimeslotId();
 			this.parseParticipants();
+		},
+		setForms() {
+			this.isVotingInProgress = false;
+			this.isFinalSelectionInProgress = false;
+			this.isRoomSelectionShown = false;
+			this.selectedRoomId = null;
 		},
 		setEditableAuthUserSelection() {
 			this.editableAuthUserSelection = this.authUserParticipant?.selection
@@ -167,15 +173,17 @@ export default {
 				this.$emit("selectionSubmitted");
 			}
 		},
-		async submitFinalSelection() {
+		async prepareSubmission() {
 			if (!this.$props.survey.id) return;
-
-			let selectedTimeslot = "";
 
 			if (!this.selectedTimeslotId) {
 				this.$fhcAlert.alertError("You haven't made a selection!");
 				return;
-			} else if (this.selectedTimeslotId === "none") {
+			}
+
+			let selectedTimeslot = "";
+
+			if (this.selectedTimeslotId === "none") {
 				selectedTimeslot = '"No appointment is possible"';
 			} else {
 				const selectedTimeslotInfo = this.$props.timeslots.find(
@@ -236,8 +244,62 @@ export default {
 				if (!shouldProceedWithoutAllVotes) return;
 			}
 
-			console.log("finalizing...");
-			// todo
+			if (
+				!this.isRoomSelectionShown &&
+				this.selectedTimeslotId !== "none"
+			) {
+				const shouldReserveARoom = await this.$fhcAlert.confirm({
+					header: "Warning!",
+					message:
+						"Would you like to reserve a room for the selected timeslot?",
+					acceptLabel: "Yes",
+					rejectLabel: "No",
+				});
+				if (shouldReserveARoom) {
+					this.isRoomSelectionShown = true;
+					return;
+				}
+			}
+
+			this.submitFinalSelection();
+		},
+		submitWithRoomSelection() {
+			if (!this.selectedRoomId) {
+				this.$fhcAlert.alertError("You haven't selected a room!");
+				return;
+			}
+			this.submitFinalSelection();
+		},
+		async submitFinalSelection() {
+			const selectedTimeslotId =
+				this.selectedTimeslotId === "none"
+					? null
+					: this.selectedTimeslotId;
+			const informParticipantsMessage = selectedTimeslotId
+				? "Would you like to email all participants with a calendar invite?"
+				: "Would you like to email all participants to inform them of the survey result?";
+			const shouldInformParticipants = await this.$fhcAlert.confirm({
+				header: "Inform participants",
+				message: informParticipantsMessage,
+				acceptLabel: "Yes",
+				rejectLabel: "No",
+			});
+
+			const completionResponse = await this.$api.call(
+				CoodleApi.completeSurvey(
+					this.$props.survey.id,
+					selectedTimeslotId,
+					this.selectedRoomId,
+					shouldInformParticipants,
+				),
+			);
+			if (completionResponse.meta.status === "success") {
+				this.$emit("surveyCompleted");
+			}
+		},
+		cancelRoomSelection() {
+			this.isRoomSelectionShown = false;
+			this.selectedRoomId = null;
 		},
 		getParticipantProfileHref(participant) {
 			if (!participant?.uid) {
@@ -380,7 +442,7 @@ export default {
 										v-if="isSurveyActive"
 										v-model="selectedTimeslotId"
 										:value="timeslot.id"
-										:disabled="!isFinalSelectionInProgress"
+										:disabled="!isFinalSelectionInProgress || isRoomSelectionShown"
 										:role="isFinalSelectionInProgress ? 'button' : ''"
 										type="radio"
 										style="width: 20px; height: 20px;"
@@ -394,7 +456,7 @@ export default {
 										v-if="isSurveyActive"
 										v-model="selectedTimeslotId"
 										:value="'none'"
-										:disabled="!isFinalSelectionInProgress"
+										:disabled="!isFinalSelectionInProgress || isRoomSelectionShown"
 										:role="isFinalSelectionInProgress ? 'button' : ''"
 										type="radio"
 										style="width: 20px; height: 20px;"
@@ -405,6 +467,7 @@ export default {
 						</tr>
 					</table>
 				</div>
+				<div v-if="isRoomSelectionShown">room selection placeholder</div>
 				<div v-if="isSurveyActive" class="d-flex flex-row gap-2 mt-3 justify-content-end">
 					<div
 						v-if="authUserParticipant && !isVotingInProgress && !isFinalSelectionInProgress"
@@ -424,10 +487,7 @@ export default {
 					</div>
 					<div
 						v-if="isVotingInProgress || isFinalSelectionInProgress"
-						@click="() => {
-							isVotingInProgress = false;	
-							isFinalSelectionInProgress = false;	
-						}"
+						@click="setForms()"
 						:class="isDarkMode ? 'btn-outline-light' : 'btn-outline-dark'"
 						class="btn text-nowrap"
 					>
@@ -443,7 +503,7 @@ export default {
 					</div>
 					<div
 						v-if="isFinalSelectionInProgress"
-						@click="submitFinalSelection()"
+						@click="isRoomSelectionShown ? submitWithRoomSelection() : prepareSubmission()"
 						:class="isDarkMode ? 'btn-light' : 'btn-dark'"
 						class="btn text-nowrap"
 					>

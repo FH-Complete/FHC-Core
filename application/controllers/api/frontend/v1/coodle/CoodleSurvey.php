@@ -36,6 +36,7 @@ class CoodleSurvey extends FHCAPI_Controller
 			'searchParticipants' => self::PERM_LOGGED,
 			'submitParticipantSelection' => self::PERM_LOGGED,
 			'cancelSurvey' => self::PERM_LOGGED,
+			'completeSurvey' => self::PERM_LOGGED,
 		]);
 
 		$this->load->library('PermissionLib');
@@ -314,6 +315,42 @@ class CoodleSurvey extends FHCAPI_Controller
 		}
 
 		$this->CoodleSurveyModel->cancelSurvey($surveyId);
+
+		if ($shouldInformParticipants) {
+			// todo: email participants
+		}
+	}
+
+	public function completeSurvey()
+	{
+		$shouldInformParticipants = $this->input->post("shouldInformParticipants");
+		$surveyId = $this->input->post("surveyId");
+		$selectedTimeslotId = $this->input->post("selectedTimeslotId");
+		$selectedRoomId = $this->input->post("selectedRoomId");
+
+		$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
+		if (!$survey) {
+			$this->terminateWithError("Survey not found!");
+		} else if ($survey->creator_uid !== getAuthUID()) {
+			$this->terminateWithError("You are not authorized to modify this survey!");
+		} else if ($survey->canceled_at) {
+			$this->terminateWithError("This survey has already been canceled!");
+		}
+
+		if ($selectedTimeslotId) {
+			$timeslot = $this->CoodleSurveyTimeslotModel->getTimeslot($selectedTimeslotId);
+			if (!$timeslot) {
+				$this->terminateWithError("Selected timeslot not found!");
+			} else if ($timeslot->survey_id !== $surveyId) {
+				$this->terminateWithError("Invalid timeslot!");
+			}
+		}
+
+		if ($selectedTimeslotId && $selectedRoomId) {
+			// todo: reserve room
+		}
+
+		$this->CoodleSurveyModel->completeSurvey($surveyId, $selectedTimeslotId);
 
 		if ($shouldInformParticipants) {
 			// todo: email participants

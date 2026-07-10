@@ -69,7 +69,7 @@ export default {
 				areParticipantsAnonymized:
 					surveyData.are_participants_anonymized,
 				areSelectionsAnonymized: surveyData.are_selections_anonymized,
-				selectedTimeslotId: surveyData.description,
+				selectedTimeslotId: surveyData.selected_timeslot_id,
 				endsAt: surveyData.ends_at.split(" ")[0],
 				completedAt: surveyData.completed_at,
 				canceledAt: surveyData.canceled_at,
