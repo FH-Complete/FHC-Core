@@ -348,6 +348,35 @@ export default {
       this.$refs.calendar.resetEventLoader();
       if (this.lastRange) this.handleRange(this.lastRange);
     },
+    addToFilter: function(filter, type)
+		{
+			if (type === 'ort')
+			{
+				const ort_kurzbz = filter.ort_kurzbz;
+				if (!this.rooms.some(room => room.ort_kurzbz === ort_kurzbz))
+				{
+					this.rooms.push({ ort_kurzbz });
+				}
+			}
+			else if (type === 'mitarbeiter')
+			{
+				const uid = filter.uid;
+				const label = filter.name;
+				if (!this.lecturers.some(l => l.uid === uid))
+				{
+					this.lecturers.push({
+						uid,
+						label,
+						showEvents: true,
+						overlays: { blocks: true, wishes: true },
+					});
+				}
+			}
+
+			this.$refs.calendar.resetEventLoader();
+			if (this.lastRange)
+				this.handleRange(this.lastRange);
+		},
     jumpToKw(kw) {
       const num = parseInt(kw);
       if (!num) return;
