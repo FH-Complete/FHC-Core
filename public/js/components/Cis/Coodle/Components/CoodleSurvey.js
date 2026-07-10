@@ -211,34 +211,38 @@ export default {
 				this.$emit("surveyCreationCanceled");
 			}
 		},
-		submitForm() {
+		async submitForm() {
 			if (
 				!this.surveyFormData.title?.length ||
 				!this.surveyFormData.endsAt?.length ||
 				!this.surveyFormData.timeslotDuration
 			) {
-				window.alert("Check your inputs!");
+				this.$fhcAlert.alertError("Check your inputs!");
 				return;
 			}
 
 			if (!this.surveyFormData.participants.length) {
-				if (
-					!window.confirm(
-						"You haven't added any participants. Are you sure you want to proceed?",
-					)
-				) {
-					return;
-				}
+				const shouldProceedWithoutParticipants =
+					await this.$fhcAlert.confirm({
+						header: "Warning!",
+						message:
+							"You haven't added any participants. Are you sure you want to proceed?",
+						acceptLabel: "Yes",
+						rejectLabel: "Cancel",
+					});
+				if (!shouldProceedWithoutParticipants) return;
 			}
 
 			if (!this.surveyFormData.timeslots.length) {
-				if (
-					!window.confirm(
-						"You haven't added any proposed appointments. Are you sure you want to proceed?",
-					)
-				) {
-					return;
-				}
+				const shouldProceedWithoutTimeslots =
+					await this.$fhcAlert.confirm({
+						header: "Warning!",
+						message:
+							"You haven't added any proposed appointments. Are you sure you want to proceed?",
+						acceptLabel: "Yes",
+						rejectLabel: "Cancel",
+					});
+				if (!shouldProceedWithoutTimeslots) return;
 			}
 
 			let surveyData = this.formatOutgoingSurveyData(this.surveyFormData);
@@ -268,9 +272,13 @@ export default {
 			};
 		},
 		async createSurvey(surveyData) {
-			const shouldInformParticipants = window.confirm(
-				"Would you like to email all participants to inform them of this survey?",
-			);
+			const shouldInformParticipants = await this.$fhcAlert.confirm({
+				header: "Inform participants",
+				message:
+					"Would you like to email all participants to inform them of this survey?",
+				acceptLabel: "Yes",
+				rejectLabel: "No",
+			});
 
 			const surveyCreationResponse = await this.$api.call(
 				CoodleApi.createSurvey(surveyData, shouldInformParticipants),
@@ -282,9 +290,13 @@ export default {
 			}
 		},
 		async updateSurvey(surveyData) {
-			const shouldInformParticipants = window.confirm(
-				"Would you like to email all participants to inform them of changes?",
-			);
+			const shouldInformParticipants = await this.$fhcAlert.confirm({
+				header: "Inform participants",
+				message:
+					"Would you like to email all participants to inform them of changes?",
+				acceptLabel: "Yes",
+				rejectLabel: "No",
+			});
 
 			const surveyUpdateResponse = await this.$api.call(
 				CoodleApi.updateSurvey(
@@ -352,9 +364,8 @@ export default {
 					:isEditInProgress="isEditInProgress"
 				/>
 				<hr>
-				<div v-if="!isEditInProgress" class="d-flex flex-column gap-2">
+				<div v-if="!isEditInProgress && $props.survey" class="d-flex flex-column gap-2">
 					<coodle-survey-voting-table
-						v-if="$props.survey"
 						@selectionSubmitted="$emit('surveyUpdated', {surveyId: $props.survey.id})"
 						:uid="$props.uid"
 						:timeslots="parsedTimeslotsForVotingTable"

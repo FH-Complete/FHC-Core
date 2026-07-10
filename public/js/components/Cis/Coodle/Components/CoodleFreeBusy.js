@@ -29,9 +29,7 @@ export default {
 	},
 	methods: {
 		getScheduleTypeText(value) {
-			let type = this.scheduleTypes.find(
-				(type) => type.value === value,
-			);
+			let type = this.scheduleTypes.find((type) => type.value === value);
 			return type?.text ?? "Other";
 		},
 		openScheduleForm(index) {
@@ -58,7 +56,7 @@ export default {
 		},
 		async submitScheduleForm() {
 			if (!this.scheduleFormData?.url.length) {
-				window.alert("You must enter a URL!");
+				this.$fhcAlert.alertError("You must enter a URL!");
 				return;
 			}
 
@@ -76,13 +74,14 @@ export default {
 		async deleteSchedule(schedule) {
 			if (!schedule?.id) return;
 
-			if (
-				!window.confirm(
+			const scheduleRemovalConfirmation = await this.$fhcAlert.confirm({
+				header: "Removal confirmation",
+				message:
 					"Are you sure you want to remove this schedule from your FreeBusy?",
-				)
-			) {
-				return;
-			}
+				acceptLabel: "Yes",
+				rejectLabel: "Cancel",
+			});
+			if (!scheduleRemovalConfirmation) return;
 
 			const scheduleDeletionResponse = await this.$api.call(
 				FreeBusyApi.deleteFreeBusyEntry(schedule.id),
@@ -95,15 +94,13 @@ export default {
 			const freeBusyTypesResponse = await this.$api.call(
 				FreeBusyApi.getFreeBusyTypes(),
 			);
-			this.scheduleTypes = freeBusyTypesResponse.data.map(
-				(type) => {
-					return {
-						value: type.freebusytyp_kurzbz,
-						text: type.bezeichnung,
-						urlDefault: type.url_default,
-					};
-				},
-			);
+			this.scheduleTypes = freeBusyTypesResponse.data.map((type) => {
+				return {
+					value: type.freebusytyp_kurzbz,
+					text: type.bezeichnung,
+					urlDefault: type.url_default,
+				};
+			});
 		},
 		async getFreeBusySchedules() {
 			const freeBusyEntriesResponse = await this.$api.call(

@@ -90,24 +90,29 @@ export default {
 				this.areSearchResultsShown = false;
 			}, 100);
 		},
-		selectSearchResult(searchResult) {
+		async selectSearchResult(searchResult) {
 			if (
 				searchResult.type === "group" &&
 				searchResult.users.length >= this.warningGroupSize
 			) {
-				let warningMessage =
+				let groupSizeWarningMessage =
 					"Group (((groupName))) contains (((n))) users. Are you sure you want to add all (((n))) users to your survey?";
-				warningMessage = warningMessage.replace(
+				groupSizeWarningMessage = groupSizeWarningMessage.replace(
 					"(((groupName)))",
 					searchResult.name,
 				);
-				warningMessage = warningMessage.replaceAll(
+				groupSizeWarningMessage = groupSizeWarningMessage.replaceAll(
 					"(((n)))",
 					searchResult.users.length,
 				);
-				if (!window.confirm(warningMessage)) {
-					return;
-				}
+				const groupSizeConfirmation = await this.$fhcAlert.confirm({
+					header: "Warning!",
+					message: groupSizeWarningMessage,
+					acceptLabel: "Yes",
+					rejectLabel: "Cancel",
+				});
+
+				if (!groupSizeConfirmation) return;
 			}
 
 			const addedParticipants =

@@ -156,7 +156,7 @@ export default {
 			} else if (selectedTimeslots.includes("none")) {
 				selection = [];
 			} else {
-				selection = selectedTimeslots.map((Number));
+				selection = selectedTimeslots.map(Number);
 			}
 
 			const selectionSubmissionResponse = await this.$api.call(
@@ -167,13 +167,13 @@ export default {
 				this.$emit("selectionSubmitted");
 			}
 		},
-		submitFinalSelection() {
+		async submitFinalSelection() {
 			if (!this.$props.survey.id) return;
 
 			let selectedTimeslot = "";
 
 			if (!this.selectedTimeslotId) {
-				window.alert("You haven't made a selection!");
+				this.$fhcAlert.alertError("You haven't made a selection!");
 				return;
 			} else if (this.selectedTimeslotId === "none") {
 				selectedTimeslot = '"No appointment is possible"';
@@ -192,18 +192,17 @@ export default {
 					selectedTimeslotInfo.endTime;
 			}
 
-			if (
-				!window.confirm(
-					'Are you sure you want to select option (((selectedTimeslot))) and finalize Coodle survey "(((surveyTitle)))"?'
-						.replace("(((selectedTimeslot)))", selectedTimeslot)
-						.replace(
-							"(((surveyTitle)))",
-							this.$props.survey?.title,
-						),
-				)
-			) {
-				return;
-			}
+			const finalSelectionConfirmationMessage =
+				'Are you sure you want to select option (((selectedTimeslot))) and finalize Coodle survey "(((surveyTitle)))"?'
+					.replace("(((selectedTimeslot)))", selectedTimeslot)
+					.replace("(((surveyTitle)))", this.$props.survey?.title);
+			const finalSelectionConfirmation = await this.$fhcAlert.confirm({
+				header: "Final confirmation",
+				message: finalSelectionConfirmationMessage,
+				acceptLabel: "Yes",
+				rejectLabel: "Cancel",
+			});
+			if (!finalSelectionConfirmation) return;
 
 			let participantsThatHaveNotVoted =
 				this.participantsWithoutAuthUser.reduce((sum, participant) => {
@@ -226,13 +225,15 @@ export default {
 			}
 
 			if (participantsThatHaveNotVoted) {
-				if (
-					!window.confirm(
-						"Not all participants have voted. Are you sure you want to proceed?",
-					)
-				) {
-					return;
-				}
+				const shouldProceedWithoutAllVotes =
+					await this.$fhcAlert.confirm({
+						header: "Warning!",
+						message:
+							"Not all participants have voted. Are you sure you want to proceed?",
+						acceptLabel: "Yes",
+						rejectLabel: "Cancel",
+					});
+				if (!shouldProceedWithoutAllVotes) return;
 			}
 
 			console.log("finalizing...");

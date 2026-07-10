@@ -252,7 +252,7 @@ export default {
 						startDate.toISOString(),
 				)
 			) {
-				window.alert("You cannot create duplicates!");
+				this.$fhcAlert.alertError("You cannot create duplicates!");
 				return;
 			}
 
@@ -269,7 +269,7 @@ export default {
 						newStartDate.toISOString(),
 				)
 			) {
-				window.alert("You cannot create duplicates!");
+				this.$fhcAlert.alertError("You cannot create duplicates!");
 				return;
 			}
 

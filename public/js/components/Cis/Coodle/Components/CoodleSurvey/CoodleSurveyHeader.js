@@ -30,19 +30,22 @@ export default {
 		},
 	},
 	methods: {
-		cancelSurvey() {
+		async cancelSurvey() {
 			if (!this.$props.survey?.id) return;
 
-			if (
-				!window.confirm(
-					'Are you sure you want to cancel Coodle survey "(((surveyTitle)))"?'.replace(
-						"(((surveyTitle)))",
-						this.$props.survey?.title,
-					),
-				)
-			) {
-				return;
-			}
+			const cancellationConfirmationMessage =
+				'Are you sure you want to cancel Coodle survey "(((surveyTitle)))"?'.replace(
+					"(((surveyTitle)))",
+					this.$props.survey?.title,
+				);
+			const cancellationConfirmation = await this.$fhcAlert.confirm({
+				header: "Cancellation confirmation!",
+				message: cancellationConfirmationMessage,
+				acceptLabel: "Yes",
+				rejectLabel: "No",
+			});
+			if (!cancellationConfirmation) return;
+
 			console.log("canceling...");
 			// todo
 		},

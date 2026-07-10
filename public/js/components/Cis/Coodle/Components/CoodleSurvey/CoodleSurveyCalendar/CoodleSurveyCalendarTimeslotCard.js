@@ -68,7 +68,7 @@ export default {
 		},
 		submitForm() {
 			if (!this.dateInput || !this.startTimeInput) {
-				window.alert("Check your inputs!");
+				this.$fhcAlert.alertError("Check your inputs!");
 				return;
 			}
 
@@ -85,7 +85,7 @@ export default {
 				this.startTimeInput < this.minStartTimeInput ||
 				this.startTimeInput > this.maxStartTimeInput
 			) {
-				window.alert(
+				this.$fhcAlert.alertError(
 					"Appointment start time must be between 07:00 and 22:55!",
 				);
 				return;
