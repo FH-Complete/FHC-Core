@@ -324,6 +324,7 @@ export default {
 		<div class="card-header">
 			<coodle-survey-header
 				@editSurvey="isEditInProgress = true"
+				@surveyCanceled="$emit('surveyUpdated', {surveyId: $props.survey.id})"
 				:survey="$props.survey"
 				:isEditInProgress="isEditInProgress"
 				:uid="$props.uid"

@@ -120,4 +120,12 @@ class CoodleSurvey_model extends DB_Model
 
 		return success($surveyUpdateResult->retval);
 	}
+
+	public function cancelSurvey($surveyId)
+	{
+		$this->update($surveyId, [
+			"canceled_at" => "NOW()",
+			"updated_at" => "NOW()",
+		]);
+	}
 }

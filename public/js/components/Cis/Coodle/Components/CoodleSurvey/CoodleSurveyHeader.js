@@ -1,3 +1,5 @@
+import CoodleApi from "../../../../../api/factory/coodle.js";
+
 export default {
 	name: "CoodleSurveyHeader",
 	props: {
@@ -5,7 +7,7 @@ export default {
 		isEditInProgress: Boolean,
 		uid: String | null,
 	},
-	emits: ["editSurvey"],
+	emits: ["editSurvey", "surveyCanceled"],
 	computed: {
 		headerTitle() {
 			if (this.$props.survey?.id && !this.$props.isEditInProgress) {
@@ -46,8 +48,23 @@ export default {
 			});
 			if (!cancellationConfirmation) return;
 
-			console.log("canceling...");
-			// todo
+			const shouldInformParticipants = await this.$fhcAlert.confirm({
+				header: "Inform participants",
+				message:
+					"Would you like to email all participants to inform them of the survey cancellation?",
+				acceptLabel: "Yes",
+				rejectLabel: "No",
+			});
+
+			const cancellationResponse = await this.$api.call(
+				CoodleApi.cancelSurvey(
+					this.$props.survey.id,
+					shouldInformParticipants,
+				),
+			);
+			if ((cancellationResponse.meta.status = "success")) {
+				this.$emit("surveyCanceled");
+			}
 		},
 	},
 	template: /*html*/ `

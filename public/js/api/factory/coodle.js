@@ -77,4 +77,13 @@ export default {
 			},
 		};
 	},
+	cancelSurvey(surveyId) {
+		return {
+			method: "post",
+			url: "/api/frontend/v1/coodle/CoodleSurvey/cancelSurvey",
+			params: {
+				surveyId,
+			},
+		};
+	},
 };

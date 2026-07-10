@@ -35,6 +35,7 @@ class CoodleSurvey extends FHCAPI_Controller
 			'updateSurvey' => self::PERM_LOGGED,
 			'searchParticipants' => self::PERM_LOGGED,
 			'submitParticipantSelection' => self::PERM_LOGGED,
+			'cancelSurvey' => self::PERM_LOGGED,
 		]);
 
 		$this->load->library('PermissionLib');
@@ -296,6 +297,27 @@ class CoodleSurvey extends FHCAPI_Controller
 
 		$this->CoodleSurveyParticipantModel->updateSelection($surveyId, getAuthUID(), json_encode($selection));
 		$this->terminateWithSuccess($surveyId);
+	}
+
+	public function cancelSurvey()
+	{
+		$shouldInformParticipants = $this->input->post("shouldInformParticipants");
+		$surveyId = $this->input->post("surveyId");
+		$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
+
+		if (!$survey) {
+			$this->terminateWithError("Survey not found!");
+		} else if ($survey->creator_uid !== getAuthUID()) {
+			$this->terminateWithError("You are not authorized to modify this survey!");
+		} else if ($survey->completed_at) {
+			$this->terminateWithError("This survey has already been completed!");
+		}
+
+		$this->CoodleSurveyModel->cancelSurvey($surveyId);
+
+		if ($shouldInformParticipants) {
+			// todo: email participants
+		}
 	}
 
 
