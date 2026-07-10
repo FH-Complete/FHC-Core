@@ -4,21 +4,28 @@ import ModeWeek from "../../../../Calendar/Mode/Week.js";
 import ModeDay from "../../../../Calendar/Mode/Day.js";
 
 import FreeBusyApi from "../../../../../api/factory/freeBusy.js";
-
+import { useRenderers } from "../../../../../composables/Renderers.js";
 import { numberPadding } from "../../../../../helpers/DateHelpers.js";
 
 export default {
 	name: "CoodleSurveyCalendar",
 	components: { CoodleSurveyCalendarTimeslotCard, FhcCalendar },
-	inject: ["renderers"],
 	props: {
 		timeslotsModelValue: Array | null,
 		survey: Object | null,
 		surveyFormDataParticipants: Array,
 		participantScheduleColors: Array,
 		timeslotDuration: Number | null,
+		renderers: [],
 	},
 	emits: ["update:timeslotsModelValue"],
+	setup() {
+			const { renderers } = useRenderers();
+	
+			return {
+				renderers
+			};
+		},
 	data() {
 		return {
 			mode: "Week",
@@ -34,6 +41,7 @@ export default {
 			timeslotCalendarEvents: [],
 			participantSchedules: {},
 			isTimeslotCardEditInProgress: false,
+			renderers: [],
 		};
 	},
 	computed: {
@@ -303,11 +311,6 @@ export default {
 			if (!event.farbe) return undefined;
 			return "--event-bg:#" + event.farbe;
 		},
-		onEventClick(clickEvent) {
-			// todo: remove
-			// console.log(clickEvent);
-			// console.log(document.querySelector("#coodleCalendar .grid-body"));
-		},
 		updateDisplayedSchedules() {
 			let participantsWithDisplayedSchedules =
 				this.$props.surveyFormDataParticipants.filter(
@@ -337,6 +340,7 @@ export default {
 		</div>
 		<div style="height:800px;">
 			<fhc-calendar
+				v-if="renderers"
 				@emptyClicked="addTimeslotOnCalendarClick($event)"
 				:ref="'coodleCalendar'"
 				:timezone="timezone"
@@ -370,7 +374,7 @@ export default {
 						></component>
 						<component
 							v-else
-							@click.stop="onEventClick($event)"
+							@click.stop=""
 							@deleteCoodleTimeslot="deleteTimeslot($event.timeslot)"
 							:is="renderers[event.type]?.calendarEvent"
 							:event="event"
