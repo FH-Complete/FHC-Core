@@ -339,17 +339,32 @@ class CoodleSurvey extends FHCAPI_Controller
 			$this->terminateWithError("This survey has already been completed!");
 		}
 
+		$selectedTimeslot = null;
 		if ($selectedTimeslotId) {
-			$timeslot = $this->CoodleSurveyTimeslotModel->getTimeslot($selectedTimeslotId);
-			if (!$timeslot) {
+			$selectedTimeslot = $this->CoodleSurveyTimeslotModel->getTimeslot($selectedTimeslotId);
+			if (!$selectedTimeslot) {
 				$this->terminateWithError("Selected timeslot not found!");
-			} else if ($timeslot->survey_id !== $surveyId) {
+			} else if ($selectedTimeslot->survey_id !== $surveyId) {
 				$this->terminateWithError("Invalid timeslot!");
 			}
 		}
 
-		if ($selectedTimeslotId && $selectedRoomId) {
-			// todo: reserve room
+		if ($selectedTimeslot && $selectedRoomId) {
+			$this->load->library('StundenplanLib');
+			$tz = new DateTimeZone('Europe/Berlin');
+			$reservationStart = DateTimeImmutable::createFromFormat(
+				'Y-m-d H:i:s',
+				$selectedTimeslot->starts_at,
+				$tz
+			);
+			$reservationEnd = $reservationStart->modify("+$survey->timeslot_duration minutes");
+			$this->stundenplanlib->addReservation(
+				$reservationStart->format("c"),
+				$reservationEnd->format("c"),
+				"Coodle",
+				null,
+				$selectedRoomId
+			);
 		}
 
 		$this->CoodleSurveyModel->completeSurvey($surveyId, $selectedTimeslotId);
