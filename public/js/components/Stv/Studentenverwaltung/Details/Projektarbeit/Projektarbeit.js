@@ -289,9 +289,8 @@ export default {
 		},
 		updateProjektarbeit() {
 			this.$refs.projektarbeitDetails.updateProjektarbeit()
-				.then((result) => {
-					this.projektarbeitSaved();
-				})
+				.then(() => this.$refs.projektbetreuer.saveIfOpen())
+				.then(() => this.projektarbeitSaved())
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		deleteProjektarbeit(projektarbeit_id) {
