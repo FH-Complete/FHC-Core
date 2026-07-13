@@ -218,15 +218,23 @@ export const CoreFilterCmpt = {
 		},
 		columnsForFilter() {
 			if (!this.filteredColumns || !this.datasetMetadata) return [];
-			const localizedColumnTitles = this.tabulator.getLang().columns;
+
 			const isTabulatorLocalized = !!this.$props.tabulatorOptions.locale;
-			const filterTitles = this.filteredColumns.reduce((a, c) => {
-				a[c.field] =
-					isTabulatorLocalized && localizedColumnTitles[c.field]
-						? localizedColumnTitles[c.field]
-						: c.title;
-				return a;
-			}, {});
+
+			let filterTitles;
+			if (isTabulatorLocalized) {
+				const localizedColumnTitles = this.tabulator.getLang().columns;
+				filterTitles = this.filteredColumns.reduce((a, c) => {
+					a[c.field] = localizedColumnTitles[c.field];
+					return a;
+				}, {});
+			} else {
+				filterTitles = this.filteredColumns.reduce((a, c) => {
+					a[c.field] = c.title;
+					return a;
+				}, {});
+			}
+
 			return this.datasetMetadata.map((el) => ({
 				...el,
 				...{ title: filterTitles[el.name] },
