@@ -80,7 +80,9 @@ class StudVwLib
 
 	public function prestudent($path_template, $stg)
 	{
-		// TODO(chris): permission check stg
+		// Check permission
+		if ($this->getStgFromUrl($stg) === null)
+			return [];
 
 		return [
 			[
