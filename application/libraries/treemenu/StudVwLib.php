@@ -46,8 +46,6 @@ class StudVwLib
 		'aufgenommen' => 'filter',
 		'warteliste' => 'filter',
 		'absage' => 'filter',
-		'incoming' => 'filter',
-		'incoming' => 'inout',
 		'outgoing' => 'inout',
 		'shared_studies' => 'inout'
 	];
@@ -172,6 +170,14 @@ class StudVwLib
 			return [];
 
 		return $this->_ci->stglib->orgform($path_template, $stg->studiengang_kz);
+	}
+
+	public function incoming($has_children, $path_template, $stg)
+	{
+		if ($stg === null)
+			return $this->inout('incoming', $has_children, $path_template);
+		
+		return $this->filter('incoming', $has_children, $path_template, $stg);
 	}
 
 	public function filter($original_method, $has_children, $path_template, $stg)
