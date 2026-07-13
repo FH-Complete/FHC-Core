@@ -124,13 +124,6 @@ $route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/person/(:any)'] = 'api/fr
 $route['api/frontend/v1/treemenudata/stv/.*'] = 'api/frontend/v1/stv/students/index';
 
 
-// // (studiensemester_kurzbz)/uid/(uid)
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/uid/(:any)'] = 'api/frontend/v1/stv/Students/getStudent/$1/$2';
-// // (studiensemester_kurzbz)/prestudent/(prestudent_id)
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/prestudent/(:num)'] = 'api/frontend/v1/stv/Students/getPrestudent/$1/$2';
-// // (studiensemester_kurzbz)/person/(person_id)
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/person/(:num)'] = 'api/frontend/v1/stv/Students/getPerson/$1/$2';
-
 // load routes from extensions, also look for environment-specific configs
 $subdirs = ['application/config/extensions', 'application/config/' . ENVIRONMENT . '/extensions'];
 
