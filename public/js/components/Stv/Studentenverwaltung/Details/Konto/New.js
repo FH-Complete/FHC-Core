@@ -88,7 +88,7 @@ export default {
 			this.data = {
 				buchungstyp_kurzbz: '',
 				betrag: '-0.00',
-				buchungsdatum: new Date(),
+				buchungsdatum: luxon.DateTime.now().setZone(FHC_JS_DATA_STORAGE_OBJECT.timezone).toISODate(),
 				buchungstext: '',
 				mahnspanne: 30,
 				studiensemester_kurzbz: this.currentSemester,
