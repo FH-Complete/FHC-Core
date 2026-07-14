@@ -119,12 +119,14 @@ export default {
 
 			this.authUserParticipant = participants.filter(
 				(participant) =>
-					this.$props.authUid && participant.uid === this.$props.authUid,
+					this.$props.authUid &&
+					participant.uid === this.$props.authUid,
 			)[0];
 
 			this.participantsWithoutAuthUser = participants.filter(
 				(participant) =>
-					!this.$props.authUid || participant.uid !== this.$props.authUid,
+					!this.$props.authUid ||
+					participant.uid !== this.$props.authUid,
 			);
 		},
 		setData() {
@@ -184,28 +186,29 @@ export default {
 				return;
 			}
 
-			let selectedTimeslot = "";
+			let formattedSelectedTimeslot = "";
+			let selectedTimeslot = null;
 
 			if (this.selectedTimeslotId === "none") {
-				selectedTimeslot = '"No appointment is possible"';
+				formattedSelectedTimeslot = '"No appointment is possible"';
 			} else {
-				const selectedTimeslotInfo = this.$props.timeslots.find(
+				selectedTimeslot = this.$props.timeslots.find(
 					(timeslot) => timeslot.id === this.selectedTimeslotId,
 				);
-				if (!selectedTimeslotInfo) return;
-				selectedTimeslot =
-					selectedTimeslotInfo.weekday +
+				if (!selectedTimeslot) return;
+				formattedSelectedTimeslot =
+					selectedTimeslot.weekday +
 					" " +
-					selectedTimeslotInfo.fullDate +
+					selectedTimeslot.fullDate +
 					" " +
-					selectedTimeslotInfo.startTime +
+					selectedTimeslot.startTime +
 					"-" +
-					selectedTimeslotInfo.endTime;
+					selectedTimeslot.endTime;
 			}
 
 			const finalSelectionConfirmationMessage =
-				'Are you sure you want to select option (((selectedTimeslot))) and finalize Coodle survey "(((surveyTitle)))"?'
-					.replace("(((selectedTimeslot)))", selectedTimeslot)
+				'Are you sure you want to select option (((timeslot))) and finalize Coodle survey "(((surveyTitle)))"?'
+					.replace("(((timeslot)))", formattedSelectedTimeslot)
 					.replace("(((surveyTitle)))", this.$props.survey?.title);
 			const finalSelectionConfirmation = await this.$fhcAlert.confirm({
 				header: "Final confirmation",
@@ -248,10 +251,9 @@ export default {
 				if (!shouldProceedWithoutAllVotes) return;
 			}
 
-			if (
-				!this.isRoomSelectionShown &&
-				this.selectedTimeslotId !== "none"
-			) {
+			const now = new Date();
+			const isFutureTimeslot = selectedTimeslot && selectedTimeslot.startsAt > now;
+			if (selectedTimeslot && isFutureTimeslot) {
 				const shouldReserveARoom = await this.$fhcAlert.confirm({
 					header: "Warning!",
 					message:
@@ -276,19 +278,36 @@ export default {
 			this.submitFinalSelection();
 		},
 		async submitFinalSelection() {
+			let shouldInformParticipants = false;
 			const selectedTimeslotId =
 				this.selectedTimeslotId === "none"
 					? null
 					: this.selectedTimeslotId;
-			const informParticipantsMessage = selectedTimeslotId
-				? "Would you like to email all participants with a calendar invite?"
-				: "Would you like to email all participants to inform them of the survey result?";
-			const shouldInformParticipants = await this.$fhcAlert.confirm({
-				header: "Inform participants",
-				message: informParticipantsMessage,
-				acceptLabel: "Yes",
-				rejectLabel: "No",
-			});
+
+			if (!selectedTimeslotId) {
+				shouldInformParticipants = await this.$fhcAlert.confirm({
+					header: "Inform participants",
+					message:
+						"Would you like to email all participants to inform them of the survey result?",
+					acceptLabel: "Yes",
+					rejectLabel: "No",
+				});
+			} else {
+				const selectedTimeslot = this.$props.timeslots.find(
+					(timeslot) => timeslot.id === selectedTimeslotId,
+				);
+				const now = new Date();
+				const isFutureTimeslot = selectedTimeslot.startsAt > now;
+				if (isFutureTimeslot) {
+					shouldInformParticipants = await this.$fhcAlert.confirm({
+						header: "Inform participants",
+						message:
+							"Would you like to email all participants with a calendar invite?",
+						acceptLabel: "Yes",
+						rejectLabel: "No",
+					});
+				}
+			}
 
 			const completionResponse = await this.$api.call(
 				CoodleApi.completeSurvey(
