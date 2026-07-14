@@ -14,6 +14,7 @@ export default {
 				persistenceID: "activeSurveysTable",
 				minHeight: 300,
 				layout: "fitColumns",
+				initialSort: [{column: "createdAt", dir: "desc"}],
 				columns: [
 					{
 						title: "Title",

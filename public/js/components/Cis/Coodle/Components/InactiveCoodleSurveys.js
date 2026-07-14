@@ -14,6 +14,7 @@ export default {
 				persistenceID: "inactiveSurveysTable",
 				minHeight: 300,
 				layout: "fitColumns",
+				initialSort: [{ column: "endedAt", dir: "desc" }],
 				columns: [
 					{
 						title: "Title",
@@ -38,18 +39,8 @@ export default {
 						headerFilter: dateFilter,
 					},
 					{
-						title: "Completed on",
-						field: "completedAt",
-						headerFilter: true,
-						minWidth: 100,
-						formatter: "datetime",
-						formatterParams: this.datetimeFormatterParams(),
-						headerFilterFunc: "dates",
-						headerFilter: dateFilter,
-					},
-					{
-						title: "Canceled on",
-						field: "canceledAt",
+						title: "Ended on",
+						field: "endedAt",
 						headerFilter: true,
 						minWidth: 100,
 						formatter: "datetime",
@@ -80,6 +71,9 @@ export default {
 					createdAt: surveyData.created_at.split(".")[0],
 					completedAt: surveyData.completed_at?.split(".")[0],
 					canceledAt: surveyData.canceled_at?.split(".")[0],
+					endedAt:
+						surveyData.completed_at?.split(".")[0] ??
+						surveyData.canceled_at?.split(".")[0],
 					creator: {
 						uid: surveyData.creator.uid,
 						name: surveyData.creator.name,
@@ -94,8 +88,7 @@ export default {
 						title: survey.title,
 						creatorName: survey.creator.name,
 						createdAt: survey.createdAt,
-						completedAt: survey.completedAt,
-						canceledAt: survey.canceledAt,
+						endedAt: survey.endedAt,
 					};
 				},
 			);
