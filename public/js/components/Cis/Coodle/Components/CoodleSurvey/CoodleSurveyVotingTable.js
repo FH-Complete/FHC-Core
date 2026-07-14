@@ -228,6 +228,7 @@ export default {
 				}, 0);
 
 			if (
+				this.authUserParticipant &&
 				!Object.values(this.authUserParticipant.selection).filter(
 					(isSelected) => isSelected,
 				).length

@@ -22,6 +22,8 @@ if (!defined('BASEPATH'))
 class CoodleSurvey extends FHCAPI_Controller
 {
 
+	protected $coodlePageUrl;
+
 	/**
 	 * Object initialization
 	 */
@@ -46,6 +48,9 @@ class CoodleSurvey extends FHCAPI_Controller
 		$this->load->model('ressource/CoodleSurvey_model', 'CoodleSurveyModel');
 		$this->load->model('ressource/CoodleSurveyTimeslot_model', 'CoodleSurveyTimeslotModel');
 		$this->load->model('ressource/CoodleSurveyParticipant_model', 'CoodleSurveyParticipantModel');
+		$this->load->helper('hlp_sancho_helper');
+
+		$this->coodlePageUrl = APP_ROOT . "cis.php/Cis/Coodle";
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -147,7 +152,7 @@ class CoodleSurvey extends FHCAPI_Controller
 
 		$survey->creator = [
 			"uid" => $survey->creator_uid,
-			"name" => $this->PersonModel->getFullName($survey->creator_uid)->retval,
+			"name" => getData($this->PersonModel->getFullName($survey->creator_uid)),
 		];
 		unset($survey->creator_uid);
 
@@ -198,13 +203,29 @@ class CoodleSurvey extends FHCAPI_Controller
 		$shouldInformParticipants = $this->input->post("shouldInformParticipants");
 		// todo: form validation
 
-		$surveyId = $this->CoodleSurveyModel->createSurvey($surveyData, getAuthUID())->retval;
+		$surveyId = getData($this->CoodleSurveyModel->createSurvey($surveyData, getAuthUID()));
 		$this->CoodleSurveyTimeslotModel->updateTimeslots($surveyId, $surveyData["timeslots"]);
 		$timeslots = $this->CoodleSurveyTimeslotModel->getTimeslots($surveyId);
 		$this->CoodleSurveyParticipantModel->updateParticipants($surveyId, $surveyData["participants"], $timeslots);
 
 		if ($shouldInformParticipants) {
-			// todo: email participants
+			$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
+			$participants = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
+			$authUserFullName = getData($this->PersonModel->getFullName(getAuthUID()));
+
+			foreach ($participants as $participant) {
+				sendSanchoMail(
+					'Sancho_Mail_Coodle_Created',
+					[
+						"surveyParticipantName" => $participant->name,
+						"surveyCreatorName" => $authUserFullName,
+						"surveyTitle" => $survey->title,
+						"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
+					],
+					$participant->uid . "@" . DOMAIN,
+					'Coodle Umfrage erstellt / Coodle survey created'
+				);
+			}
 		}
 
 		$this->terminateWithSuccess($surveyId);
@@ -224,13 +245,29 @@ class CoodleSurvey extends FHCAPI_Controller
 		if ($survey->creator_uid !== getAuthUID())
 			$this->terminateWithError("You are not authorized to modify this survey!");
 
-		$this->CoodleSurveyModel->updateSurvey($surveyId, $surveyData)->retval;
+		$this->CoodleSurveyModel->updateSurvey($surveyId, $surveyData);
 		$this->CoodleSurveyTimeslotModel->updateTimeslots($surveyId, $surveyData["timeslots"]);
 		$timeslots = $this->CoodleSurveyTimeslotModel->getTimeslots($surveyId);
 		$this->CoodleSurveyParticipantModel->updateParticipants($surveyId, $surveyData["participants"], $timeslots);
 
 		if ($shouldInformParticipants) {
-			// todo: email participants
+			$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
+			$participants = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
+			$authUserFullName = getData($this->PersonModel->getFullName(getAuthUID()));
+
+			foreach ($participants as $participant) {
+				sendSanchoMail(
+					'Sancho_Mail_Coodle_Updated',
+					[
+						"surveyParticipantName" => $participant->name,
+						"surveyCreatorName" => $authUserFullName,
+						"surveyTitle" => $survey->title,
+						"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
+					],
+					$participant->uid . "@" . DOMAIN,
+					'Coodle Umfrage modifiziert / Coodle survey modified'
+				);
+			}
 		}
 
 		$this->terminateWithSuccess($surveyId);
@@ -317,7 +354,23 @@ class CoodleSurvey extends FHCAPI_Controller
 		$this->CoodleSurveyModel->cancelSurvey($surveyId);
 
 		if ($shouldInformParticipants) {
-			// todo: email participants
+			$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
+			$participants = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
+			$authUserFullName = getData($this->PersonModel->getFullName(getAuthUID()));
+
+			foreach ($participants as $participant) {
+				sendSanchoMail(
+					'Sancho_Mail_Coodle_Canceled',
+					[
+						"surveyParticipantName" => $participant->name,
+						"surveyCreatorName" => $authUserFullName,
+						"surveyTitle" => $survey->title,
+						"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
+					],
+					$participant->uid . "@" . DOMAIN,
+					'Coodle Umfrage storniert / Coodle survey canceled'
+				);
+			}
 		}
 	}
 
@@ -370,7 +423,49 @@ class CoodleSurvey extends FHCAPI_Controller
 		$this->CoodleSurveyModel->completeSurvey($surveyId, $selectedTimeslotId);
 
 		if ($shouldInformParticipants) {
-			// todo: email participants
+			$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
+			$participants = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
+			$authUserFullName = getData($this->PersonModel->getFullName(getAuthUID()));
+
+			if ($selectedTimeslot) {
+				$tz = new DateTimeZone('Europe/Berlin');
+				$timeslotStart = DateTimeImmutable::createFromFormat(
+					'Y-m-d H:i:s',
+					$selectedTimeslot->starts_at,
+					$tz
+				);
+				$timeslotEnd = $timeslotStart->modify("+$survey->timeslot_duration minutes");
+				$formattedTimeslot = $timeslotStart->format("d.m.Y H:i") . " " . $timeslotEnd->format("H:i");
+				// todo: create ics file to attach
+				foreach ($participants as $participant) {
+					sendSanchoMail(
+						'Sancho_Mail_Coodle_Completed',
+						[
+							"surveyParticipantName" => $participant->name,
+							"surveyCreatorName" => $authUserFullName,
+							"surveyTitle" => $survey->title,
+							"selectedSurveyTimeslot" => $formattedTimeslot,
+							"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
+						],
+						$participant->uid . "@" . DOMAIN,
+						'Coodle Umfrage vollendet / Coodle survey completed'
+					);
+				}
+			} else {
+				foreach ($participants as $participant) {
+					sendSanchoMail(
+						'Sancho_Mail_Coodle_Completed_No',
+						[
+							"surveyParticipantName" => $participant->name,
+							"surveyCreatorName" => $authUserFullName,
+							"surveyTitle" => $survey->title,
+							"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
+						],
+						$participant->uid . "@" . DOMAIN,
+						'Coodle Umfrage vollendet / Coodle survey completed'
+					);
+				}
+			}
 		}
 	}
 
@@ -398,7 +493,21 @@ class CoodleSurvey extends FHCAPI_Controller
 			$this->terminateWithError("All participants have already voted!");
 		}
 
-		// todo: send reminder emails
+		$authUserFullName = getData($this->PersonModel->getFullName(getAuthUID()));
+
+		foreach ($participantsWithoutVote as $participant) {
+			sendSanchoMail(
+				'Sancho_Mail_Coodle_Reminder',
+				[
+					"surveyParticipantName" => $participant->name,
+					"surveyCreatorName" => $authUserFullName,
+					"surveyTitle" => $survey->title,
+					"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
+				],
+				$participant->uid . "@" . DOMAIN,
+				'Coodle Umfrage Erinnerung / Coodle survey reminder'
+			);
+		}
 
 		$this->terminateWithSuccess();
 	}
@@ -521,5 +630,4 @@ class CoodleSurvey extends FHCAPI_Controller
 		});
 		return $groups;
 	}
-
 }
