@@ -33,6 +33,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  * @param string $headerImg	Filename of the specific Sancho header image.
  * @param string $cc Sets CC of mail.
  * @param string $bcc Sets BCC of mail.
+ * @param array $attachments array of arrays with 'filePath' and (optional) 'altName' keys
  * @return void
  */
 function sendSanchoMail(
@@ -44,7 +45,8 @@ function sendSanchoMail(
 	$footerImg = '',
 	$from = null,
 	$cc = null,
-	$bcc = null
+	$bcc = null,
+	$attachments = []
 )
 {
 	$ci =& get_instance();
@@ -116,6 +118,18 @@ function sendSanchoMail(
 		$ci->email->attach($sanchoFooter_img, 'inline');
 		$cid_header = $ci->email->attachment_cid($sanchoHeader_img); // sets unique content id for embedding
 		$cid_footer = $ci->email->attachment_cid($sanchoFooter_img); // sets unique content id for embedding
+
+		// attach files
+		if (count($attachments)) {
+			foreach ($attachments as $attachment) {
+				if (isset($attachment["altName"])) {
+					$ci->email->attach($attachment["filePath"], 'attachment', $attachment["altName"]);
+				} else {
+					$ci->email->attach($attachment["filePath"], 'attachment');
+				}
+			}
+		}
+
 	}
 
 	// Set specific mail content into specific content template

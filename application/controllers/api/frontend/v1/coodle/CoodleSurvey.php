@@ -435,8 +435,19 @@ class CoodleSurvey extends FHCAPI_Controller
 					$tz
 				);
 				$timeslotEnd = $timeslotStart->modify("+$survey->timeslot_duration minutes");
-				$formattedTimeslot = $timeslotStart->format("d.m.Y H:i") . " " . $timeslotEnd->format("H:i");
-				// todo: create ics file to attach
+				$formattedTimeslot = $timeslotStart->format("d.m.Y H:i") . "-" . $timeslotEnd->format("H:i");
+
+				$calendarFilePath = tempnam(sys_get_temp_dir(), "coodle_");
+				$this->generateIcsContent(
+					$calendarFilePath,
+					$survey->title,
+					$timeslotStart,
+					$timeslotEnd,
+					$authUserFullName,
+					getAuthUID() . "@" . DOMAIN,
+					$selectedRoomId
+				);
+
 				foreach ($participants as $participant) {
 					sendSanchoMail(
 						'Sancho_Mail_Coodle_Completed',
@@ -448,9 +459,21 @@ class CoodleSurvey extends FHCAPI_Controller
 							"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
 						],
 						$participant->uid . "@" . DOMAIN,
-						'Coodle Umfrage vollendet / Coodle survey completed'
+						"Coodle Umfrage vollendet / Coodle survey completed",
+						"",
+						"",
+						null,
+						null,
+						null,
+						[
+							[
+								"filePath" => $calendarFilePath,
+								"altName" => "coodle.ics",
+							]
+						]
 					);
 				}
+				unlink($calendarFilePath);
 			} else {
 				foreach ($participants as $participant) {
 					sendSanchoMail(
@@ -467,6 +490,7 @@ class CoodleSurvey extends FHCAPI_Controller
 				}
 			}
 		}
+		$this->terminateWithSuccess();
 	}
 
 	public function sendVotingReminders()
@@ -629,5 +653,25 @@ class CoodleSurvey extends FHCAPI_Controller
 			return count($group->users);
 		});
 		return $groups;
+	}
+
+	private function generateIcsContent($calendarFilePath, $title, $start, $end, $creatorName, $creatorEmail, $location)
+	{
+		$calendarFile = fopen($calendarFilePath, "w");
+		fwrite($calendarFile, "BEGIN:VCALENDAR" . PHP_EOL);
+		fwrite($calendarFile, "VERSION:2.0" . PHP_EOL);
+		fwrite($calendarFile, "CALSCALE:GREGORIAN" . PHP_EOL);
+		fwrite($calendarFile, "PRDODID:" . CAMPUS_NAME . PHP_EOL);
+		fwrite($calendarFile, "X-WR-TIMEZONE:Europe/Vienna" . PHP_EOL);
+		fwrite($calendarFile, "BEGIN:VEVENT" . PHP_EOL);
+		fwrite($calendarFile, "DTSTART:" . $start->format("Ymd") . "T" . $start->format("His") . PHP_EOL);
+		fwrite($calendarFile, "DTEND:" . $end->format("Ymd") . "T" . $end->format("His") . PHP_EOL);
+		fwrite($calendarFile, "SUMMARY:" . $title . PHP_EOL);
+		if ($location) {
+			fwrite($calendarFile, "LOCATION:" . $location . PHP_EOL);
+		}
+		fwrite($calendarFile, "TRANSP:OPAQUE" . PHP_EOL);
+		fwrite($calendarFile, "END:VEVENT" . PHP_EOL);
+		fwrite($calendarFile, "END:VCALENDAR");
 	}
 }
