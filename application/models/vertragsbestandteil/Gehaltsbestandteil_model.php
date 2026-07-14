@@ -177,7 +177,8 @@ LEFT JOIN
 			$stichtagclause .= ')';
 		}
 
-		$this->addSelect('*');
+		$this->addSelect('tbl_gehaltsbestandteil.*, tbl_gehaltstyp.bezeichnung AS gehaltstyp_bezeichnung');
+		$this->addJoin('hr.tbl_gehaltstyp', 'gehaltstyp_kurzbz');
 		$where = <<<EOSQL
 				dienstverhaeltnis_id = {$this->escape($dienstverhaeltnis_id)} 
 				{$stichtagclause}
@@ -213,9 +214,11 @@ SELECT
 	g.updateamum, 
 	g.updatevon, 
 	g.valorisierung, 
-	g.auszahlungen 
+	g.auszahlungen,
+	gt.bezeichnung AS gehaltstyp_bezeichnung
 FROM 
-	hr.tbl_gehaltsbestandteil g 
+	hr.tbl_gehaltsbestandteil g
+	JOIN hr.tbl_gehaltstyp gt USING (gehaltstyp_kurzbz)
 LEFT JOIN 
 	hr.tbl_valorisierung_historie vh ON vh.gehaltsbestandteil_id = g.gehaltsbestandteil_id AND vh.valorisierungsdatum = (
           SELECT 
