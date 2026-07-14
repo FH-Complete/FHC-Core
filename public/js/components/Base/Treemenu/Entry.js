@@ -1,8 +1,10 @@
 import drop from '../../../directives/drop.js';
+import draggable from '../../../directives/draggable.js';
 
 export default {
 	directives: {
-		drop
+		drop,
+		draggable
 	},
 	emits: [
 		'drop'
@@ -37,6 +39,16 @@ export default {
 			const effect = allowed.shift();
 
 			return { effect, allowed };
+		},
+		dragConfig() {
+			if (!this.node.data?.draggable)
+				return null;
+
+			let config = [ ...this.node.data.draggable ];
+			const effect = config.shift();
+			const value = JSON.parse(config.shift());
+
+			return { effect, value };
 		}
 	},
 	template: /* html */`
@@ -44,6 +56,7 @@ export default {
 		class="treemenu-entry d-flex align-items-center w-100 h-100"
 		:title="title"
 		v-drop:[dropConfig]="(evt, data) => $emit('drop', { drop: node.data, drag: data })"
+		v-draggable:[dragConfig?.effect]="dragConfig?.value"
 	>
 		{{ name }}
 	</span>`
