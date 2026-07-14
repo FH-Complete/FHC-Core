@@ -20,12 +20,15 @@ export default {
 	},
 	emits: ["update:timeslotsModelValue"],
 	setup() {
-			const { renderers } = useRenderers();
-	
-			return {
-				renderers
-			};
-		},
+		const { renderers } = useRenderers();
+
+		return {
+			renderers,
+		};
+	},
+	inject: {
+		isMobile: "isMobile",
+	},
 	data() {
 		return {
 			mode: "Week",
@@ -337,6 +340,7 @@ export default {
 		<div class="d-flex flex-column">
 			<span class="fw-bold">{{ "Timeslot selection" }}</span>
 			<span class="fst-italic">{{ "You can add timeslots directly to the calendar or from the list down below." }}</span>
+			{{isMobile}}
 		</div>
 		<div style="height:800px;">
 			<fhc-calendar
@@ -346,7 +350,7 @@ export default {
 				:timezone="timezone"
 				:modes="modes"
 				:modeOptions="modeOptions"
-				:mode="'Week'"
+				:mode="!isMobile ? 'Week' : 'Day'"
 				:timeGrid="null"
 				:locale="$p.user_locale.value"
 				:events="events"

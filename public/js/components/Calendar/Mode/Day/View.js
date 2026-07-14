@@ -144,6 +144,13 @@ export default {
 			<template #part-header="{ part }">
 				<label-time v-bind="{ part }" />
 			</template>
+			<template #part-body="params">
+				<slot name="part-body">
+					<div
+						@click="$emit('emptyClicked', { event: $event, params })"
+						class="position-absolute h-100 w-100"></div>
+				</slot>
+			</template>
 			<template #event="slot">
 				<div v-if="slot.event.type == 'loading'" class="placeholder-glow h-100 opacity-50">
 					<span class="placeholder w-100 h-100" />
