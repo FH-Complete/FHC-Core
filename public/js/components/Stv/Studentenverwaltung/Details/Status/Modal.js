@@ -135,6 +135,11 @@ export default{
 					.then(result => {
 						this.statusNew = false;
 						this.formData = result.data;
+						//to show Date in correct format in the modal (is timestamp in database)
+						if (this.formData.bewerbung_abgeschicktamum) {
+							this.formData.bewerbung_abgeschicktamum =
+								this.formData.bewerbung_abgeschicktamum.substring(0, 10);
+						}
 						this.originalDatum = new Date(result.data.datum);
 						return prestudent;
 					})
@@ -308,6 +313,7 @@ export default{
 				container-class="mb-3"
 				type="DatePicker"
 				v-model="formData.bewerbung_abgeschicktamum"
+				model-type="yyyy-MM-dd"
 				name="bewerbung_abgeschicktamum"
 				:label="$p.t('lehre/bewerbung_abgeschickt_am')"
 				auto-apply
