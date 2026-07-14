@@ -71,9 +71,6 @@ export default {
 					createdAt: surveyData.created_at.split(".")[0],
 					completedAt: surveyData.completed_at?.split(".")[0],
 					canceledAt: surveyData.canceled_at?.split(".")[0],
-					endedAt:
-						surveyData.completed_at?.split(".")[0] ??
-						surveyData.canceled_at?.split(".")[0],
 					creator: {
 						uid: surveyData.creator.uid,
 						name: surveyData.creator.name,
@@ -88,7 +85,7 @@ export default {
 						title: survey.title,
 						creatorName: survey.creator.name,
 						createdAt: survey.createdAt,
-						endedAt: survey.endedAt,
+						endedAt: survey.completedAt ?? survey.canceledAt,
 					};
 				},
 			);
