@@ -7,6 +7,8 @@ class Rueckstellung extends Auth_Controller
 	private $_ci; // Code igniter instance
 	private $_uid;
 
+	const ZGV_UEBERPRUEFUNG_MAIL_VORLAGE = 'ZGVUEP';
+
 	public function __construct()
 	{
 		parent::__construct(
@@ -23,6 +25,7 @@ class Rueckstellung extends Auth_Controller
 		$this->load->model('crm/RueckstellungStatus_model', 'RueckstellungStatusModel');
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->library('PersonLogLib');
+		$this->load->library('MessageLib');
 
 		$this->_setAuthUID(); // sets property uid
 		
@@ -78,6 +81,8 @@ class Rueckstellung extends Auth_Controller
 		
 		$this->_log($person_id, $status_kurzbz);
 
+		if  ($status_kurzbz === 'onhold_zgv')
+			$this->sendRueckstellungMessage($person_id);
 		$this->outputJson($result);
 	}
 
@@ -104,6 +109,10 @@ class Rueckstellung extends Auth_Controller
 			if (isError($result))
 				$this->terminateWithJsonError(getError($result));
 			$this->_log($person, $status_kurzbz);
+
+			if  ($status_kurzbz === 'onhold_zgv')
+				$this->sendRueckstellungMessage($person);
+
 		}
 		$this->outputJsonSuccess("Erfolgreich gespeichert!");
 	}
@@ -159,5 +168,27 @@ class Rueckstellung extends Auth_Controller
 			null,
 			$this->_uid
 		);
+	}
+
+	private function sendRueckstellungMessage($person_id)
+	{
+		$person = $this->_ci->PersonModel->load($person_id);
+
+		if (hasData($person))
+		{
+			$person = getData($person)[0];
+
+			return $this->messagelib->sendMessageUserTemplate(
+				$person_id,
+				self::ZGV_UEBERPRUEFUNG_MAIL_VORLAGE,
+				array(
+					'anrede' => $person->anrede,
+					'nachname' => $person->nachname
+				),
+				null,
+				getAuthPersonId(),
+				'infocenter'
+			);
+		}
 	}
 }
