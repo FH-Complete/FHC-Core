@@ -122,6 +122,47 @@ class Studiensemester_model extends DB_Model
 		return $this->execQuery($query, array($studiensemester_kurzbz, $limit));
 	}
 
+
+	/**
+	 * Returns the current study semester and the previous semesters of the same type (SS/WS).
+	 *
+	 * Example:
+	 * - SS2026, limit 3:  SS2026, SS2025, SS2024
+	 * - WS2025, limit 2: WS2025, WS2024
+	 *
+	 * @param $studiensemester_kurzbz
+	 * @param $limit
+	 */
+	public function getPreviousSameSemesterFrom($studiensemester_kurzbz, $limit = 1)
+	{
+		$qry = '
+			SELECT 
+			    studiensemester_kurzbz,
+				start,
+				ende
+			FROM 
+			    public.tbl_studiensemester
+			WHERE 
+				SUBSTRING(studiensemester_kurzbz FROM 1 FOR 2) = SUBSTRING(? FROM 1 FOR 2)
+			AND start <= (
+				SELECT start
+				FROM public.tbl_studiensemester
+				WHERE studiensemester_kurzbz = ?
+			)
+			ORDER BY 
+				start DESC
+			LIMIT ?
+		';
+
+		return $this->execQuery($qry,
+			[
+				$studiensemester_kurzbz,
+				$studiensemester_kurzbz,
+				$limit
+			]
+		);
+	}
+
 	/**
 	 * getNearest
 	 */
