@@ -16,7 +16,7 @@ export default {
 	},
 	data() {
 		return {
-			uid: null,
+			authInfo: null,
 			view: "activeSurveysTable",
 			survey: null,
 		};
@@ -45,11 +45,14 @@ export default {
 			this.view = tab;
 			this.survey = null;
 		},
-		async getAuthUid() {
-			const authUidResponse = await this.$api.call(
-				ApiAuthinfo.getAuthUID(),
+		async getAuthInfo() {
+			const authInfoResponse = await this.$api.call(
+				ApiAuthinfo.getAuthInfo(),
 			);
-			this.uid = authUidResponse.data.uid;
+			this.authInfo = {
+				uid: authInfoResponse.data.uid,
+				name: authInfoResponse.data.name,
+			};
 		},
 		async showSurveyDetails(surveyId) {
 			const surveyResponse = await this.$api.call(
@@ -87,7 +90,7 @@ export default {
 		},
 	},
 	async created() {
-		await this.getAuthUid();
+		await this.getAuthInfo();
 	},
 	template: /*html*/ `
 	<div class="h-100 d-flex flex-column gap-2">
@@ -149,9 +152,9 @@ export default {
 				@surveyCreated="showSurveyDetails($event.surveyId)"
 				@surveyUpdated="showSurveyDetails($event.surveyId)"
 				:survey="survey"
-				:uid="uid"
+				:authInfo="authInfo"
 			/>
-			<coodle-free-busy v-else-if="view === 'freeBusySettings'" :uid="uid" />
+			<coodle-free-busy v-else-if="view === 'freeBusySettings'" :authUid="authInfo?.uid" />
 		</div>
 	</div>`,
 };

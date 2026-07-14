@@ -5,7 +5,7 @@ export default {
 	props: {
 		survey: Object | null,
 		isEditInProgress: Boolean,
-		uid: String | null,
+		authUid: String | null,
 	},
 	emits: ["editSurvey", "surveyCanceled"],
 	computed: {
@@ -26,8 +26,8 @@ export default {
 		},
 		isAuthUserSurveyCreator() {
 			return (
-				this.$props.uid &&
-				this.$props.uid === this.$props.survey?.creator?.uid
+				this.$props.authUid &&
+				this.$props.authUid === this.$props.survey?.creator?.uid
 			);
 		},
 	},

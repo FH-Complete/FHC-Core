@@ -8,6 +8,7 @@ export default {
 	props: {
 		participantsModelValue: Array,
 		participantScheduleColorsModelValue: Array,
+		authInfo: { type: Object | null },
 	},
 	emits: [
 		"update:participantsModelValue",
@@ -71,6 +72,11 @@ export default {
 			return this.participants.filter(
 				(participant) => participant.isCalendarShown,
 			).length;
+		},
+		hasAuthUserBeenAddedAsParticipant() {
+			return this.participants.some(
+				(participant) => participant.uid === this.$props.authInfo?.uid,
+			);
 		},
 	},
 	watch: {
@@ -235,10 +241,7 @@ export default {
 				</div>
 			</div>
 		</div>
-		<span v-if="!participants.length" class="fst-italic">
-			{{ "No participants added yet!" }}
-		</span>
-		<div v-else class="d-flex flex-row gap-2 flex-wrap">
+		<div v-if="participants.length" class="d-flex flex-row gap-2 flex-wrap">
 			<div
 				v-for="participant in participants"
 				class="d-flex flex-row align-items-center gap-4 py-1 px-3 border border-1 rounded-pill"
@@ -266,6 +269,19 @@ export default {
 				</div>
 			</div>
 		</div>
+		<div class="d-flex flex-row">
+			<div
+				v-if="!hasAuthUserBeenAddedAsParticipant && $props.authInfo"
+				@click="addParticipants([$props.authInfo])"
+				type="button"
+				class="py-1 px-3 border border-1 rounded-pill"
+			>
+				<span>{{ "Add yourself" }}</span>
+			</div>
+		</div>
+		<span v-if="!participants.length" class="fst-italic">
+			{{ "No participants added yet!" }}
+		</span>
 		<span v-if="isMaxDisplayedParticipantSchedulesReached" class="fst-italic">
 			{{ "You can display no more participant schedules!" }}
 		</span>

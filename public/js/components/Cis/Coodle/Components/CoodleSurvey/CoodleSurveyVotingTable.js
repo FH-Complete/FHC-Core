@@ -5,7 +5,7 @@ export default {
 	name: "CoodleSurveyVotingTable",
 	props: {
 		survey: { type: Object },
-		uid: { type: String | null },
+		authUid: { type: String | null },
 		timeslots: { type: Array },
 	},
 	emits: ["selectionSubmitted", "surveyCompleted"],
@@ -29,8 +29,8 @@ export default {
 		},
 		isAuthUserSurveyCreator() {
 			return (
-				this.$props.uid &&
-				this.$props.uid === this.$props.survey?.creator?.uid
+				this.$props.authUid &&
+				this.$props.authUid === this.$props.survey?.creator?.uid
 			);
 		},
 		hasReachedMaxSelections() {
@@ -119,12 +119,12 @@ export default {
 
 			this.authUserParticipant = participants.filter(
 				(participant) =>
-					this.$props.uid && participant.uid === this.$props.uid,
+					this.$props.authUid && participant.uid === this.$props.authUid,
 			)[0];
 
 			this.participantsWithoutAuthUser = participants.filter(
 				(participant) =>
-					!this.$props.uid || participant.uid !== this.$props.uid,
+					!this.$props.authUid || participant.uid !== this.$props.authUid,
 			);
 		},
 		setData() {

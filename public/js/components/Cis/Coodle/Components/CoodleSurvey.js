@@ -21,7 +21,7 @@ export default {
 	},
 	props: {
 		survey: { type: Object | null },
-		uid: { type: String | null },
+		authInfo: { type: Object | null },
 	},
 	emits: ["surveyCreationCanceled", "surveyCreated", "surveyUpdated"],
 	data() {
@@ -329,7 +329,7 @@ export default {
 				@surveyCanceled="$emit('surveyUpdated', {surveyId: $props.survey.id})"
 				:survey="$props.survey"
 				:isEditInProgress="isEditInProgress"
-				:uid="$props.uid"
+				:authUid="$props.authInfo?.uid"
 			/>
 		</div>
 		<div class="card-body">
@@ -371,7 +371,7 @@ export default {
 					<coodle-survey-voting-table
 						@selectionSubmitted="$emit('surveyUpdated', {surveyId: $props.survey.id})"
 						@surveyCompleted="$emit('surveyUpdated', {surveyId: $props.survey.id})"
-						:uid="$props.uid"
+						:authUid="$props.authInfo?.uid"
 						:timeslots="parsedTimeslotsForVotingTable"
 						:survey="$props.survey"
 					/>
@@ -383,6 +383,7 @@ export default {
 								v-if="surveyFormData?.participants"
 								v-model:participantsModelValue="surveyFormData.participants"
 								v-model:participantScheduleColorsModelValue="participantScheduleColors"
+								:authInfo="authInfo"
 							/>
 						</div>
 						<div class="col-12 col-xxl-8">

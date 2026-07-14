@@ -3,7 +3,6 @@ export default {
 	props: {
 		scheduleFormDataModelValue: Object,
 		scheduleTypes: Array,
-		uid: Number | null,
 	},
 	emits: ["update:scheduleFormDataModelValue", "submitForm", "cancelForm"],
 	computed: {

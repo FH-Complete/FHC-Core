@@ -6,7 +6,7 @@ export default {
 	name: "CoodleFreeBusy",
 	components: { CoodleFreeBusyTableFormRow },
 	props: {
-		uid: Number | null,
+		authUid: Number | null,
 	},
 	data() {
 		return {
@@ -201,7 +201,6 @@ export default {
 							@cancelForm="closeScheduleForm()"
 							@submitForm="submitScheduleForm()"
 							:scheduleTypes="scheduleTypes"
-							:uid="$props.uid"
 						/>
 					</table>
 				</div>

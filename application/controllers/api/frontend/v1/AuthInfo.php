@@ -16,7 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-if (!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH'))
+	exit('No direct script access allowed');
 
 class AuthInfo extends FHCAPI_Controller
 {
@@ -37,6 +38,7 @@ class AuthInfo extends FHCAPI_Controller
 
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
+		$this->load->model('person/Person_model', 'PersonModel');
 
 		$this->uid = getAuthUID();
 		$this->pid = getAuthPersonID();
@@ -54,15 +56,16 @@ class AuthInfo extends FHCAPI_Controller
 	 */
 	public function getAuthUID()
 	{
-		$this->terminateWithSuccess(['uid'=>$this->uid]);
+		$this->terminateWithSuccess(['uid' => $this->uid]);
 	}
-	
+
 	public function getAuthInfo()
 	{
 		$data = (object) array(
-				'uid' => $this->uid,
-				'isMitarbeiter' => $this->isMitarbeiter,
-				'isStudent' => $this->isStudent
+			'uid' => $this->uid,
+			'isMitarbeiter' => $this->isMitarbeiter,
+			'isStudent' => $this->isStudent,
+			'name' => getData($this->PersonModel->getFullName($this->uid)),
 		);
 		$this->terminateWithSuccess($data);
 	}
