@@ -91,6 +91,10 @@ export default {
 	},
 	async created() {
 		await this.getAuthInfo();
+		if (this.$route.query?.id?.length) {
+			this.showSurveyDetails(this.$route.query.id);
+			this.$router.replace({ query: null });
+		}
 	},
 	template: /*html*/ `
 	<div class="h-100 d-flex flex-column gap-2">
