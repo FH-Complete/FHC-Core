@@ -528,8 +528,10 @@ if ($rtprueflingEntSperren)
 				while ($row = $db->db_fetch_object($result))
 					$pruefling_ids[] = $row->pruefling_id;
 
+				$art = filter_input(INPUT_POST, 'art', FILTER_VALIDATE_BOOLEAN);
+
 				$qry = "UPDATE testtool.tbl_pruefling
-						SET gesperrt =" . $db->db_add_param($_POST['art'], 'BOOLEAN') . "
+						SET gesperrt =" . $db->db_add_param($art, FHC_BOOLEAN) . "
 						WHERE pruefling_id IN (" . $db->db_implode4SQL($pruefling_ids) . ")";
 
 				$resultSperre = $db->db_query($qry);
@@ -537,7 +539,7 @@ if ($rtprueflingEntSperren)
 
 			if ($resultSperre)
 			{
-				$msg = $_POST['art'] === 'false' ? 'Pruefling wurde gesperrt' : 'Pruefling wurde freigeschaltet';
+				$msg = !$art ? 'Pruefling wurde gesperrt' : 'Pruefling wurde freigeschaltet';
 				echo json_encode(array(
 					'status' => 'ok',
 					'msg' => $msg));
@@ -645,12 +647,14 @@ if ($rtFreischalten)
 	if (isset($_POST['reihungstest_id']) &&	is_numeric($_POST['reihungstest_id'])
 		&& isset($_POST['art']))
 	{
-		$qry = "UPDATE public.tbl_reihungstest SET freigeschaltet=" . $db->db_add_param($_POST['art'], 'BOOLEAN') . "
+		$art = filter_input(INPUT_POST, 'art', FILTER_VALIDATE_BOOLEAN);
+
+		$qry = "UPDATE public.tbl_reihungstest SET freigeschaltet=" . $db->db_add_param($art, FHC_BOOLEAN) . "
 				WHERE reihungstest_id=" . $db->db_add_param($_POST['reihungstest_id']) . ";";
 
 		if ($result = $db->db_query($qry))
 		{
-			$msg = $_POST['art'] === 'false' ? 'Reihungstest wurde gesperrt' : 'Reihungstest wurde freigeschaltet';
+			$msg = !$art ? 'Reihungstest wurde gesperrt' : 'Reihungstest wurde freigeschaltet';
 			echo json_encode(array(
 				'status' => 'ok',
 				'msg' => $msg));
