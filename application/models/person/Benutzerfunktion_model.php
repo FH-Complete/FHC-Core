@@ -260,7 +260,6 @@ class Benutzerfunktion_model extends DB_Model
         return $this->execQuery($query, $parameters_array);
     }
 
-
 	/**
 	 * Get active Kompetenzfeldleitung bei UID.
 	 *
@@ -295,7 +294,6 @@ class Benutzerfunktion_model extends DB_Model
 
 		return $this->execQuery($query, $parameters_array);
 	}
-
 
 	public function insertBenutzerfunktion($Json)
 	{
