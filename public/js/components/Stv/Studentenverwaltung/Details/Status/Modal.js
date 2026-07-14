@@ -276,6 +276,7 @@ export default{
 				container-class="mb-3"
 				type="DatePicker"
 				v-model="formData.datum"
+				model-type="yyyy-MM-dd"
 				name="datum"
 				:label="$p.t('global/datum')"
 				auto-apply
@@ -291,6 +292,7 @@ export default{
 				container-class="mb-3"
 				type="DatePicker"
 				v-model="formData.bestaetigtam"
+				model-type="yyyy-MM-dd"
 				name="bestaetigtam"
 				:label="$p.t('lehre/bestaetigt_am')"
 				auto-apply
