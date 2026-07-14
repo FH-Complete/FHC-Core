@@ -32,10 +32,6 @@ export default {
 	data() {
 		return {
 			mode: "Week",
-			modes: {
-				week: Vue.markRaw(ModeWeek),
-				day: Vue.markRaw(ModeDay),
-			},
 			modeOptions: {
 				week: {
 					collapseEmptyDays: false,
@@ -122,6 +118,15 @@ export default {
 					}
 				},
 			);
+		},
+		modes() {
+			let modes = {
+				day: Vue.markRaw(ModeDay),
+			};
+			if (!this.isMobile) {
+				modes.week = Vue.markRaw(ModeWeek);
+			}
+			return modes;
 		},
 	},
 	watch: {
@@ -359,6 +364,7 @@ export default {
 				:droppableEvents="true"
 				:onDrop="true"
 				:isAutoScrollEnabled="false"
+				:showBtns="!isMobile"
 			>
 				<template v-slot="{ event, mode }">
 					<div
