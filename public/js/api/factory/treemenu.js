@@ -30,16 +30,16 @@ export default {
 	},
 	// TODO(chris): handle favorites per config
 	favorites: {
-		get() {
+		get(config) {
 			return {
 				method: 'get',
-				url: 'api/frontend/v1/stv/favorites'
+				url: 'api/frontend/v1/favorites/get/' + config
 			};
 		},
-		set(favorites) {
+		set(config, favorites) {
 			return {
 				method: 'post',
-				url: 'api/frontend/v1/stv/favorites/set',
+				url: 'api/frontend/v1/favorites/set/' + config,
 				params: { favorites }
 			};
 		}

@@ -224,6 +224,7 @@ export default {
 			this.favorites.on = !this.favorites.on;
 			this.$api
 				.call(ApiTreemenu.favorites.set(
+					this.config,
 					JSON.stringify(this.favorites)
 				));
 		},
@@ -238,6 +239,7 @@ export default {
 
 			this.$api
 				.call(ApiTreemenu.favorites.set(
+					this.config,
 					JSON.stringify(this.favorites)
 				));
 		},
@@ -272,7 +274,7 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 
 		this.$api
-			.call(ApiTreemenu.favorites.get())
+			.call(ApiTreemenu.favorites.get(this.config))
 			.then(result => {
 				if (result.data) {
 					this.favorites = JSON.parse(result.data);
