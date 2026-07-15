@@ -66,7 +66,7 @@ class Setup extends FHCAPI_Controller
 		);
 		$tabs['termine'] = array (
 			'title' =>  'Termine',
-			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/Termine.js',
+			'component' => absoluteJsImportUrl('public/js/components/LVVerwaltung/Tabs/Termine.js'),
 			'config' => []
 		);
 		$tabs['notiz'] = array (
@@ -86,12 +86,12 @@ class Setup extends FHCAPI_Controller
 	{
 		$tabs['termine'] = array (
 			'title' =>  'Termine',
-			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/LVTermine.js',
+			'component' => absoluteJsImportUrl('public/js/components/LVVerwaltung/Tabs/LVTermine.js'),
 			'config' => []
 		);
 		$tabs['noten'] = array (
 			'title' =>  'Noten',
-			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/Noten.js',
+			'component' => absoluteJsImportUrl('public/js/components/LVVerwaltung/Tabs/Noten.js'),
 			'config' => [
 				'usePoints' => defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE,
 				'edit' => 'both', // Possible values: both|header|inline

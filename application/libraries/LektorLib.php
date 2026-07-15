@@ -165,12 +165,15 @@ class LektorLib
 			$oe_result = $this->_ci->OrganisationseinheitModel->getChilds($stundengrenze->oe_kurzbz);
 			$oe_array = hasData($oe_result) ? array_column(getData($oe_result), 'oe_kurzbz') : array();
 
+			$semesterstunden_alt_sql = is_null($semesterstunden_alt) ? 0 : $semesterstunden_alt;
+			$semesterstunden_neu_sql = is_null($semesterstunden_neu) ? 0 : $semesterstunden_neu;
+
 			if ($alte_stunden_eingerechnet && $neue_stunden_eingerechnet)
-				$this->_ci->LehreinheitmitarbeiterModel->addSelect("(SUM(tbl_lehreinheitmitarbeiter.semesterstunden) - ($semesterstunden_alt) + {$this->_ci->LehreinheitmitarbeiterModel->db->escape($semesterstunden_neu)}) as summe");
+				$this->_ci->LehreinheitmitarbeiterModel->addSelect("(SUM(tbl_lehreinheitmitarbeiter.semesterstunden) - ($semesterstunden_alt_sql) + {$this->_ci->LehreinheitmitarbeiterModel->db->escape($semesterstunden_neu_sql)}) as summe");
 			else if ($alte_stunden_eingerechnet && !$neue_stunden_eingerechnet)
-				$this->_ci->LehreinheitmitarbeiterModel->addSelect("(SUM(tbl_lehreinheitmitarbeiter.semesterstunden) - ($semesterstunden_alt)) as summe");
+				$this->_ci->LehreinheitmitarbeiterModel->addSelect("(SUM(tbl_lehreinheitmitarbeiter.semesterstunden) - ($semesterstunden_alt_sql)) as summe");
 			else if (!$alte_stunden_eingerechnet && $neue_stunden_eingerechnet)
-				$this->_ci->LehreinheitmitarbeiterModel->addSelect("(SUM(tbl_lehreinheitmitarbeiter.semesterstunden) + ({$this->_ci->LehreinheitmitarbeiterModel->db->escape($semesterstunden_neu)})) as summe");
+				$this->_ci->LehreinheitmitarbeiterModel->addSelect("(SUM(tbl_lehreinheitmitarbeiter.semesterstunden) + ({$this->_ci->LehreinheitmitarbeiterModel->db->escape($semesterstunden_neu_sql)})) as summe");
 			else if (!$alte_stunden_eingerechnet && !$neue_stunden_eingerechnet)
 				$this->_ci->LehreinheitmitarbeiterModel->addSelect("(SUM(tbl_lehreinheitmitarbeiter.semesterstunden)) as summe");
 

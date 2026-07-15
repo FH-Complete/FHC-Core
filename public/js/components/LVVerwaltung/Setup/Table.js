@@ -54,6 +54,7 @@ export default {
 				if (this.$refs.table && this.$refs.table.tabulator)
 				{
 					this.expanded = [];
+					this.currentTreeLevel = 0;
 					this.reload();
 				}
 			},
@@ -141,7 +142,7 @@ export default {
 				},
 				layout: 'fitDataStretch',
 				height: '100%',
-				persistenceID: 'lehrveranstaltungen_2025_12_02_v1',
+				persistenceID: 'lehrveranstaltungen_2026_07_15_v1',
 				selectableRowsRangeMode: 'click',
 				selectableRows: true,
 				rowContextMenu: (component, e) => {

@@ -3,7 +3,7 @@ import NotenTeacher from './Noten/Teacher.js';
 import NotenRepeater from './Noten/Repeater.js';
 
 import ApiStvGrades from '../../../../api/factory/stv/grades.js';
-import { highlightGesamtnote } from "../../../../helpers/DocumentHelper";
+import { highlightGesamtnote } from "../../../../helpers/DocumentHelper.js";
 
 const LOCAL_STORAGE_ID = 'stv_details_noten_2024-11-25_stdsem_all';
 
