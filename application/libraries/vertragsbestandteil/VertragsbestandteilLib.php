@@ -339,7 +339,7 @@ class VertragsbestandteilLib
 	{
 		
 		$dv =  $this->fetchDienstverhaeltnis($vertragsbestandteil->getDienstverhaeltnis_id());
-		$hasGehaltsPermission = $this->PermissionLib->isberechtigt('basis/gehaelter', 's', $dv->getOe_kurzbz());
+		$hasGehaltsPermission = $this->PermissionLib->isberechtigt('basis/gehaelter', 'd', $dv->getOe_kurzbz());
 		$vbHasGehaltsbestandteile = $this->GehaltbestandteilModel->existsGehaltsbestandteil($vertragsbestandteil->getVertragsbestandteil_id());
 
 		if (!$hasGehaltsPermission && $vbHasGehaltsbestandteile)
