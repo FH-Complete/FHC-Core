@@ -74,8 +74,8 @@ class FreeBusy extends FHCAPI_Controller
 			"url" => $url,
 			"description" => $description,
 		]);
-		$this->form_validation->set_rules("url", "URL", "required|string|max_length[255]");
-		$this->form_validation->set_rules("description", "Description", "string|max_length[255]");
+		$this->form_validation->set_rules("url", "URL", "required|max_length[255]");
+		$this->form_validation->set_rules("description", "Description", "max_length[255]");
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 

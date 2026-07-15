@@ -209,8 +209,8 @@ class CoodleSurvey extends FHCAPI_Controller
 			"maxSelections" => $surveyData["maxSelections"],
 			"endsAt" => $surveyData["endsAt"],
 		]);
-		$this->form_validation->set_rules("title", "Title", "required|string|max_length[255]");
-		$this->form_validation->set_rules("description", "Description", "string|max_length[1000]");
+		$this->form_validation->set_rules("title", "Title", "required|max_length[255]");
+		$this->form_validation->set_rules("description", "Description", "max_length[1000]");
 		$this->form_validation->set_rules("timeslotDuration", "Appointment duration", "required|integer|min[5]|max[300]");
 		$this->form_validation->set_rules("maxSelections", "Maximum number of selections", "required|integer|min[1]");
 		$this->form_validation->set_rules("endsAt", "Planned end date", "required");
