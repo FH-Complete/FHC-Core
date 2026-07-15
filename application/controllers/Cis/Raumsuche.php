@@ -25,11 +25,6 @@ class Raumsuche extends Auth_Controller
 	 */
 	public function index()
 	{
-
-		$viewData = array(
-			'uid'=>getAuthUID(),
-		);
-
-		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'Raumsuche']);
+		$this->load->view('CisRouterView/CisRouterView.php', ['route' => 'Raumsuche']);
 	}
 }
