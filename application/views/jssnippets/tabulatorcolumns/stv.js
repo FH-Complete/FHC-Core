@@ -65,19 +65,15 @@ return [
 		title: "Geburtsdatum",
 		titlePhrase: 'person/geburtsdatum',
 		field: "gebdatum",
-		formatter: 'dateFormatter', 
-		headerFilter: true,
-		headerFilterFunc(headerValue, rowValue) {
-			const matches = headerValue.match(/^(([0-9]{2})\.)?([0-9]{2})\.([0-9]{4})?$/);
-			let comparestr = headerValue;
-			if(matches !== null) {
-				const year = (matches[4] !== undefined) ? matches[4] : '';
-				const month = matches[3];
-				const day = (matches[2] !== undefined) ? matches[2] : '';
-				comparestr = year + '-' + month + '-' + day;
-			}
-			return rowValue.match(comparestr);
-		}
+		formatter: 'datetime',
+		formatterParams: {
+			inputFormat: "iso",
+			outputFormat: "dd.MM.yyyy",
+			invalidPlaceholder: "&nbsp;",
+			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone
+		}, 
+		headerFilter: 'input',
+		headerFilterFunc: 'dateinput'
 	},
 	{
 		title: "Geschlecht",
@@ -179,15 +175,28 @@ return [
 		titlePhrase: 'profilUpdate/statusDate',
 		field: "status_datum",
 		visible: false,
-		formatter: 'dateFormatter'
+		formatter: 'datetime',
+		formatterParams: {
+			inputFormat: "iso",
+			outputFormat: "dd.MM.yyyy",
+			invalidPlaceholder: "&nbsp;",
+			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone
+		}
 	},
 	{
 		title: "Status Bestaetigung",
 		titlePhrase: 'global/status_bestaetigung',
 		field: "status_bestaetigung",
 		visible: false,
-		formatter: 'dateFormatter',
-		headerFilter: true
+		formatter: 'datetime',
+		formatterParams: {
+			inputFormat: "iso",
+			outputFormat: "dd.MM.yyyy",
+			invalidPlaceholder: "&nbsp;",
+			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone
+		},
+		headerFilter: 'input',
+		headerFilterFunc: 'dateinput'
 	},
 	{
 		title: "EMail (Privat)",

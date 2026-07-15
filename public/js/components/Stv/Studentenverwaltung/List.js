@@ -14,6 +14,9 @@ import draggable from '../../../directives/draggable.js';
 
 import StvColumns from '../../../../../index.ci.php/js/tabulatorcolumns/stv';
 
+import ModuleFilterFilters from '../../../tabulator/filter/filters.js';
+Tabulator.extendModule("filter", "filters", ModuleFilterFilters);
+
 export default {
 	name: "ListPrestudents",
 	components: {
@@ -53,20 +56,6 @@ export default {
 		'filterActive'
 	],
 	data() {
-		Tabulator.extendModule("format", "formatters", {
-			dateFormatter(cell) {
-				let val = cell.getValue();
-				if (!val)
-					return '&nbsp;';
-				let date = new Date(val);
-				return date.toLocaleDateString('de-AT', {
-					"day": "2-digit",
-					"month": "2-digit",
-					"year": "numeric"
-				});
-			}
-		});
-
 		return {
 			tabulatorOptions: {
 				columns: StvColumns,
@@ -226,7 +215,7 @@ export default {
 			return "StudentList_" + today + ".csv";
 		},
 	},
-	created: function() {
+	created() {
 		if(this.tagsEnabled) {
 			const coltags = {
 				title: 'Tags',
