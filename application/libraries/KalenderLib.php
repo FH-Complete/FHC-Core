@@ -344,43 +344,91 @@ class KalenderLib
 		$this->_getBasePlan($start_date, $end_date);
 
 		if (!is_null($ort))
-			$this->_ci->KalenderModel->db->where_in('tbl_kalender_ort.ort_kurzbz', $ort);
+		{
+			$ort_array = (array) $ort;
+			$escaped_orte = array();
+
+			foreach ($ort_array as $ort)
+			{
+				$escaped_orte[] = $this->_ci->KalenderModel->db->escape($ort);
+			}
+			$in_list = '(' . implode(',', $escaped_orte) . ')';
+
+			$this->_ci->KalenderModel->db->where(
+				"(EXISTS (
+					SELECT 1 
+					FROM lehre.tbl_kalender_ort filter_ort
+					WHERE filter_ort.kalender_id = tbl_kalender.kalender_id
+						AND filter_ort.ort_kurzbz IN $in_list
+				))"
+			);
+		}
 
 		if (!is_null($uids))
 		{
-			$this->_ci->KalenderModel->db->group_start();
-			$this->_ci->KalenderModel->db->where_in('tbl_lehreinheitmitarbeiter.mitarbeiter_uid', $uids);
-			$this->_ci->KalenderModel->db->or_where_in('orginasator.uid', $uids);
-			$this->_ci->KalenderModel->db->or_where_in('teilnehmer.uid', $uids);
-			$this->_ci->KalenderModel->db->group_end();
+			$uid_array = (array) $uids;
+			$db = $this->_ci->KalenderModel->db;
+
+			$escaped_uids = array();
+			foreach ($uid_array as $uid)
+				$escaped_uids[] = $db->escape($uid);
+			$in_list = '(' . implode(',', $escaped_uids) . ')';
+
+			$this->_ci->KalenderModel->db->where(
+				"(EXISTS (
+					SELECT 1 
+					FROM lehre.tbl_lehreinheitmitarbeiter filter_lem
+					WHERE filter_lem.lehreinheit_id = tbl_lehreinheit.lehreinheit_id
+					  AND filter_lem.mitarbeiter_uid IN $in_list
+				)
+				OR EXISTS (
+					SELECT 1 
+					FROM lehre.tbl_kalender_event_teilnehmer filter_org
+					WHERE filter_org.kalender_id = tbl_kalender.kalender_id
+					  AND filter_org.rolle_kurzbz = 'organisator'
+					  AND filter_org.uid IN $in_list
+				)
+				OR EXISTS (
+					SELECT 1 
+					FROM lehre.tbl_kalender_event_teilnehmer filter_teil
+					WHERE filter_teil.kalender_id = tbl_kalender.kalender_id
+					  AND filter_teil.rolle_kurzbz = 'teilnehmer'
+					  AND filter_teil.uid IN $in_list
+				))"
+			);
 		}
 
 		if (!is_null($studiengaenge))
 		{
+			$db = $this->_ci->KalenderModel->db;
+			$or_conditions = array();
 
-			$this->_ci->KalenderModel->db->group_start();
-			$first = true;
 			foreach ($studiengaenge as $studiengang)
 			{
-				if ($first)
-					$this->_ci->KalenderModel->db->group_start();
-				else
-				{
-					$this->_ci->KalenderModel->db->or_group_start();
-				}
-				$first = false;
-
-				$this->_ci->KalenderModel->db->where('tbl_lehrveranstaltung.studiengang_kz', $studiengang['studiengang_kz']);
+				$conditions = array();
+				$conditions[] = 'filter_lv.studiengang_kz = ' . $db->escape($studiengang['studiengang_kz']);
 
 				if (isset($studiengang['semester']))
-					$this->_ci->KalenderModel->db->where('tbl_lehrveranstaltung.semester', $studiengang['semester']);
+					$conditions[] = 'filter_lv.semester = ' . $db->escape($studiengang['semester']);
 
 				if (isset($studiengang['orgform_kurzbz']))
-					$this->_ci->KalenderModel->db->where('tbl_lehrveranstaltung.orgform_kurzbz', $studiengang['orgform_kurzbz']);
+					$conditions[] = 'filter_lv.orgform_kurzbz = ' . $db->escape($studiengang['orgform_kurzbz']);
 
-				$this->_ci->KalenderModel->db->group_end();
+				$or_conditions[] = '(' . implode(' AND ', $conditions) . ')';
 			}
-			$this->_ci->KalenderModel->db->group_end();
+
+			$or_block = implode(' OR ', $or_conditions);
+
+			$this->_ci->KalenderModel->db->where(
+				"(EXISTS (
+					SELECT 1
+					FROM lehre.tbl_kalender_lehreinheit filter_kl
+					JOIN lehre.tbl_lehreinheit filter_le ON filter_le.lehreinheit_id = filter_kl.lehreinheit_id
+					JOIN lehre.tbl_lehrveranstaltung filter_lv ON filter_lv.lehrveranstaltung_id = filter_le.lehrveranstaltung_id
+					WHERE filter_kl.kalender_id = tbl_kalender.kalender_id
+						AND ($or_block)
+				))"
+			);
 		}
 
 		$this->_ci->KalenderModel->db->where('NOT EXISTS (

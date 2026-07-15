@@ -79,26 +79,30 @@ export default {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui/settings_saved'));
 				})
 				.catch(this.$fhcAlert.handleSystemErrors);
+		},
+		reload()
+		{
+			this.$api
+				.call(this.endpoints.get())
+				.then(res => {
+					Object.keys(res.data).forEach(key => {
+						const binding = { ...res.data[key] };
+						delete binding.value;
+						delete binding.options;
+						const options = res.data[key].options;
+						this.tempValues[key] = res.data[key].value;
+						this.setup[key] = {
+							binding,
+							options
+						};
+					});
+					this.$emit('update:modelValue', { ...this.tempValues });
+				})
+				.catch(this.$fhcAlert.handleSystemErrors);
 		}
 	},
 	created() {
-		this.$api
-			.call(this.endpoints.get())
-			.then(res => {
-				Object.keys(res.data).forEach(key => {
-					const binding = { ...res.data[key] };
-					delete binding.value;
-					delete binding.options;
-					const options = res.data[key].options;
-					this.tempValues[key] = res.data[key].value;
-					this.setup[key] = {
-						binding,
-						options
-					};
-				});
-				this.$emit('update:modelValue', { ...this.tempValues });
-			})
-			.catch(this.$fhcAlert.handleSystemErrors);
+		this.reload();
 	},
 	template: /* html */`
 	<fhc-form class="stv-config" ref="form" @submit.prevent="update">

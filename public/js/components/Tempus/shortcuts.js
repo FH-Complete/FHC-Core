@@ -7,6 +7,18 @@ export function getTempusShortcuts(self) {
 			handler: () => self.focusSearchbar()
 		},
 		{
+			key: 'f',
+			ctrl: true,
+			skipWhenTyping: false,
+			handler: () => self.focusSearchbar()
+		},
+		{
+			key: 'F9',
+			ctrl: false,
+			skipWhenTyping: false,
+			handler: () => self.updateCollision('month')
+		},
+		{
 			key: '1',
 			ctrl: true,
 			skipWhenTyping: false,

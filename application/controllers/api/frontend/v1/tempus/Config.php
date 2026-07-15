@@ -14,6 +14,7 @@ class Config extends FHCAPI_Controller
 			'get' => ['admin:r', 'assistenz:r'],
 			'getHeader' => ['admin:r', 'assistenz:r'],
 			'set' => ['admin:r', 'assistenz:r'],
+			'updateCollision' => ['admin:r', 'assistenz:r'],
 		]);
 
 		// Load Phrases
@@ -23,12 +24,12 @@ class Config extends FHCAPI_Controller
 
 		$this->_ci = &get_instance();
 		$this->_ci->load->model('ressource/Kalenderstatus_model', 'KalenderStatusModel');
+		$this->_ci->load->model('system/Variable_model', 'VariableModel');
+		$this->_ci->load->library('VariableLib', array('uid' => getAuthUID()));
 	}
 
 	public function get()
 	{
-		$this->_ci->load->model('system/Variable_model', 'VariableModel');
-
 		$config = [];
 
 		$result = $this->_ci->VariableModel->getVariables(getAuthUID(), ['ignore_kollision', 'kollision_student', 'ignore_reservierung', 'ignore_zeitsperre']);
@@ -87,8 +88,6 @@ class Config extends FHCAPI_Controller
 
 	public function set()
 	{
-		$this->_ci->load->model('system/Variable_model', 'VariableModel');
-
 		$this->_ci->VariableModel->setVariable(
 			getAuthUID(),
 			'ignore_kollision',
@@ -112,5 +111,14 @@ class Config extends FHCAPI_Controller
 		$this->terminateWithSuccess();
 	}
 
+	public function updateCollision()
+	{
+		$original_ignore = $this->_ci->variablelib->getVar('ignore_kollision');
+		$this->_ci->VariableModel->setVariable(
+			getAuthUID(),
+			'ignore_kollision',
+			$original_ignore === 'true' ? 'false' : 'true'
+		);
+	}
 
 }

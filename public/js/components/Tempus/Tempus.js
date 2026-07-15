@@ -364,6 +364,16 @@ export default {
 			if (newDate && luxon.DateTime.isDateTime(newDate) && newDate.isValid)
 				this.calendarDate = newDate.toISODate();
 		},
+		updateCollision()
+		{
+			this.$api.call(ApiTempusConfig.updateCollision())
+				.then(() => {
+					this.$refs.config.reload();
+					this.$fhcAlert.alertSuccess(this.$p.t('ui/settings_saved'));
+				})
+				.catch(this.$fhcAlert.handleSystemErrors);
+
+		},
 		toggleStatus(selected) {
 			if (!selected || selected.length === 0) {
 				this.visibleStatus = ['all'];

@@ -271,6 +271,12 @@ export default {
 					></i>
 					<span>Reservierung</span>
 				</div>
+				<div class="d-flex align-items-center gap-2">
+					<i :class="appConfig.ignore_kollision ? 'fa-solid fa-triangle-exclamation text-danger' : 'fa-solid fa-circle-check text-success'"></i>
+					<span class="form-check-label">
+						{{ appConfig.ignore_kollision ? 'Kollisionscheck aus' : 'Kollisionscheck an' }}
+					</span>
+				</div>
 			</div>
 		</template>
 	</fhc-calendar>`

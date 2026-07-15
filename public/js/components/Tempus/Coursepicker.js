@@ -25,7 +25,8 @@ export default {
 			searchparam: '',
 			allCourses: [],
 			sortBy: null,
-			multiWeekIds: new Set()
+			multiWeekIds: new Set(),
+			favorites: new Set()
 		}
 	},
 	computed: {
@@ -50,7 +51,7 @@ export default {
 			{
 				let dir = this.sortBy === 'lektor-asc' ? 1 : -1;
 
-				return result.sort((a, b) => {
+				result = result.sort((a, b) => {
 					let an = a.lektoren?.[0]?.kurzbz ?? '';
 					let bn = b.lektoren?.[0]?.kurzbz ?? '';
 					return an.localeCompare(bn) * dir;
@@ -58,22 +59,26 @@ export default {
 			}
 			else if (this.sortBy === 'kw-asc')
 			{
-				return result.sort((a, b) => (a.start_kw ?? 0) - (b.start_kw ?? 0));
+				result = result.sort((a, b) => (a.start_kw ?? 0) - (b.start_kw ?? 0));
 			}
 			else if (this.sortBy === 'kw-desc')
 			{
-				return result.sort((a, b) => (b.start_kw ?? 0) - (a.start_kw ?? 0));
+				result = result.sort((a, b) => (b.start_kw ?? 0) - (a.start_kw ?? 0));
 			}
 			else if (this.sortBy === 'stunden-asc')
 			{
-				return result.sort((a, b) => (a.offenestunden ?? 0) - (b.offenestunden ?? 0));
+				result = result.sort((a, b) => (a.offenestunden ?? 0) - (b.offenestunden ?? 0));
 			}
 			else if (this.sortBy === 'stunden-desc')
 			{
-				return result.sort((a, b) => (b.offenestunden ?? 0) - (a.offenestunden ?? 0));
+				result = result.sort((a, b) => (b.offenestunden ?? 0) - (a.offenestunden ?? 0));
 			}
 
-			return result;
+			return [...result].sort((a, b) => {
+				let ap = this.isPinned(a) ? 1 : 0;
+				let bp = this.isPinned(b) ? 1 : 0;
+				return bp - ap;
+			});
 		}
 	},
 	watch: {
@@ -124,7 +129,7 @@ export default {
 						showname: `${e.lehrfach} ${e.lehrform}`,
 						orig: {
 							type: 'lehreinheit',
-							lehreinheit_id: e.lehreinheit_id[0],
+							lehreinheit_id: e.lehreinheit_id,
 							blockung: e.stundenblockung,
 							entry: e,
 						}
@@ -175,7 +180,7 @@ export default {
 		},
 		toggleMultiWeek(course)
 		{
-			let id = course.lehreinheit_id[0];
+			let id = course.lehreinheit_id;
 			let weekIds = new Set(this.multiWeekIds);
 			if (weekIds.has(id))
 				weekIds.delete(id);
@@ -186,8 +191,27 @@ export default {
 		},
 		isMultiWeek(course)
 		{
-			return this.multiWeekIds.has(course.lehreinheit_id[0]);
+			return this.multiWeekIds.has(course.lehreinheit_id);
 		},
+		togglePin(course)
+		{
+			let id = course.lehreinheit_id;
+			let favs = new Set(this.favorites);
+			if (favs.has(id))
+				favs.delete(id);
+			else
+				favs.add(id);
+
+			this.favorites = favs;
+			localStorage.setItem('tempus_coursepicker_favs', JSON.stringify([...favs]));
+		},
+		isPinned(course)
+		{
+			return this.favorites.has(course.lehreinheit_id);
+		},
+	},
+	mounted() {
+		this.favorites = new Set(JSON.parse(localStorage.getItem('tempus_coursepicker_favs') || '[]'));
 	},
 	template: `
 	<div class="course-picker d-flex flex-column h-100">
@@ -229,8 +253,8 @@ export default {
 			</div>
 		</div>
 		<div v-if="studiengaenge.length <= 0" class="d-flex flex-column align-items-center justify-content-center text-center text-muted py-5 px-3 h-100">
-			<span class="small fw-semibold mb-1">Keine Lehreinheiten</span>
-			<span class="small">Wähle einen Studiengang, um Lehreinheiten anzuzeigen.</span>
+			<span class="small fw-semibold mb-1">{{$p.t('lehre', 'cptitleempty')}}</span>
+			<span class="small">{{$p.t('lehre', 'cpempty')}}</span>
 		</div>
 		<div v-else class="overflow-auto px-2 pb-2 flex-grow-1">
 			<div
@@ -238,13 +262,20 @@ export default {
 				:key="course.lehreinheit_id"
 				style="cursor:grab"
 				:style="courseStyle(course)"
-				class="course-picker-row"
+				class="course-picker-row rounded-3 mb-2 p-2"
+				:class="{ 'course-picker-row-pinned': isPinned(course) }"
 				v-draggable:move.noimage="dragLehreinheitCollection(course)"
 				tabindex="0"
 			>
-				<div class="d-flex gap-1">
+				<div class="d-flex gap-1 align-items-start">
 					<span class="fw-semibold small w-50" v-tooltip="course.lehrfach_bez">{{ course.lehrfach }} {{ course.lehrform }}</span>
 					<span class="fw-semibold small w-50" v-tooltip="course.raumtypalternativ">{{ course.raumtyp }}</span>
+					<i
+						class="fa fa-thumbtack"
+						:class="isPinned(course) ? 'text-primary' : 'text-muted'"
+						style="cursor:pointer"
+						@click.stop="togglePin(course)"
+					></i>
 					<i
 						class="fa fa-calendar-week"
 						:class="isMultiWeek(course) ? 'text-primary' : 'text-muted'"
@@ -256,14 +287,15 @@ export default {
 				
 				<!--TODO(david) entfernen, dient nur für das mappen mit der lvverwaltung-->
 				<div class="d-flex gap-1">
-					<span class="small w-50" v-tooltip="course.lehreinheit_id">{{ course.lehreinheit_id[0] }} </span>
+					<span class="small w-50" v-tooltip="course.lehreinheit_id">{{ course.lehreinheit_id }} </span>
 				</div>
 				
 				<div class="d-flex gap-1 text-muted">
-					<div class="w-50 d-flex flex-column" v-tooltip="course.anmerkung">
+					<div class="w-50 d-flex flex-column text-truncate" v-tooltip="course.anmerkung">
 						<span
 							v-for="verband in course.lehrverband"
-							:key="verband">
+							:key="verband"
+							class="text-truncate">
 							{{ verband }}
 						</span>
 					</div>
@@ -286,7 +318,7 @@ export default {
 								{{ lektor.kurzbz }}
 						</span>
 						<span v-if="course.lektoren.length > 3" class="text-muted fst-italic">
-							+{{ course.lektoren.length - 3 }} weitere...
+							+{{ course.lektoren.length - 3 }} {{$p.t('lehre', 'cpmore')}}
 						</span>
 					</div>
 					<span class="w-50 align-self-start">WR: {{ course.wochenrythmus }} Bl: {{ course.stundenblockung }}</span>

@@ -211,7 +211,7 @@ class Coursepicker extends FHCAPI_Controller
 					'studiensemester_kurzbz' => $row->studiensemester_kurzbz,
 					'fachbereich_kurzbz' => isset($row->fachbereich_kurzbz) ? $row->fachbereich_kurzbz : null,
 					'lektoren' => array(),
-					'lehreinheit_id' => array(),
+					'lehreinheit_id' => $lehreinheit_id,
 					'lvnr' => array(),
 					'lehrfach' => array(),
 					'lehrform' => array(),
@@ -235,7 +235,6 @@ class Coursepicker extends FHCAPI_Controller
 				'name' => $row->vorname . ' ' . $row->nachname,
 			);
 
-			$group->lehreinheit_id[] = $row->lehreinheit_id;
 			$group->lvnr[] = $row->lvnr;
 			$group->lehrfach[] = $row->lehrfach;
 			$group->lehrform[] = $row->lehrform;
