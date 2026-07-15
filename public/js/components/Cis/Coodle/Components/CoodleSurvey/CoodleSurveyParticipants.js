@@ -20,7 +20,6 @@ export default {
 			isSearchingForParticipants: false,
 			searchResults: [],
 			areSearchResultsShown: false,
-			// todo: increase depending on feedback
 			warningGroupSize: 10,
 			searchParticipantsAbortController: null,
 			searchParticipants: debounce(async () => {
@@ -40,6 +39,9 @@ export default {
 
 				this.isSearchingForParticipants = false;
 			}, 300),
+			hideSearchResults: debounce(async () => {
+				this.areSearchResultsShown = false;
+			}, 100),
 		};
 	},
 	computed: {
@@ -90,12 +92,6 @@ export default {
 		},
 	},
 	methods: {
-		async hideSearchResults() {
-			// todo: clean up, don't use timeout
-			setTimeout(() => {
-				this.areSearchResultsShown = false;
-			}, 100);
-		},
 		async selectSearchResult(searchResult) {
 			if (
 				searchResult.type === "group" &&
