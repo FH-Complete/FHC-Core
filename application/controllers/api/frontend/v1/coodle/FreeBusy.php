@@ -40,6 +40,7 @@ class FreeBusy extends FHCAPI_Controller
 		$this->load->model('person/Freebusytyp_model', 'FreeBusyTypeModel');
 
 		$this->load->library('FreeBusyLib');
+		$this->load->library('form_validation');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -69,6 +70,15 @@ class FreeBusy extends FHCAPI_Controller
 		$url = $this->input->post("url");
 		$isActive = $this->input->post("isActive");
 
+		$this->form_validation->set_data([
+			"url" => $url,
+			"description" => $description,
+		]);
+		$this->form_validation->set_rules("url", "URL", "required|string|max_length[255]");
+		$this->form_validation->set_rules("description", "Description", "string|max_length[255]");
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
 		if (!$this->isUrlValid($url)) {
 			$this->terminateWithError("Could not open the provided URL!");
 		}
@@ -93,6 +103,19 @@ class FreeBusy extends FHCAPI_Controller
 		$type = $this->input->post("type") ?? "Sonstiges";
 		$url = $this->input->post("url");
 		$isActive = $this->input->post("isActive");
+
+		$this->form_validation->set_data([
+			"url" => $url,
+			"description" => $description,
+		]);
+		$this->form_validation->set_rules("url", "URL", "required|string|max_length[255]");
+		$this->form_validation->set_rules("description", "Description", "string|max_length[255]");
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		if (!$this->isUrlValid($url)) {
+			$this->terminateWithError("Could not open the provided URL!");
+		}
 
 		if (!$this->isUrlValid($url)) {
 			$this->terminateWithError("Could not open the provided URL!");

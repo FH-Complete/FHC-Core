@@ -43,7 +43,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		]);
 
 		$this->load->library('PermissionLib');
-
+		$this->load->library('form_validation');
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('ressource/CoodleSurvey_model', 'CoodleSurveyModel');
 		$this->load->model('ressource/CoodleSurveyTimeslot_model', 'CoodleSurveyTimeslotModel');
@@ -201,7 +201,21 @@ class CoodleSurvey extends FHCAPI_Controller
 	{
 		$surveyData = $this->input->post("surveyData");
 		$shouldInformParticipants = $this->input->post("shouldInformParticipants");
-		// todo: form validation
+
+		$this->form_validation->set_data([
+			"title" => $surveyData["title"],
+			"description" => $surveyData["description"],
+			"timeslotDuration" => $surveyData["timeslotDuration"],
+			"maxSelections" => $surveyData["maxSelections"],
+			"endsAt" => $surveyData["endsAt"],
+		]);
+		$this->form_validation->set_rules("title", "Title", "required|string|max_length[255]");
+		$this->form_validation->set_rules("description", "Description", "string|max_length[1000]");
+		$this->form_validation->set_rules("timeslotDuration", "Appointment duration", "required|integer|min[5]|max[300]");
+		$this->form_validation->set_rules("maxSelections", "Maximum number of selections", "required|integer|min[1]");
+		$this->form_validation->set_rules("endsAt", "Planned end date", "required");
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
 		$surveyId = getData($this->CoodleSurveyModel->createSurvey($surveyData, getAuthUID()));
 		$this->CoodleSurveyTimeslotModel->updateTimeslots($surveyId, $surveyData["timeslots"]);
@@ -215,7 +229,7 @@ class CoodleSurvey extends FHCAPI_Controller
 
 			foreach ($participants as $participant) {
 				sendSanchoMail(
-					'Sancho_Mail_Coodle_Created',
+					"Sancho_Mail_Coodle_Created",
 					[
 						"surveyParticipantName" => $participant->name,
 						"surveyCreatorName" => $authUserFullName,
@@ -223,7 +237,7 @@ class CoodleSurvey extends FHCAPI_Controller
 						"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
 					],
 					$participant->uid . "@" . DOMAIN,
-					'Coodle Umfrage erstellt / Coodle survey created'
+					"Coodle Umfrage erstellt / Coodle survey created"
 				);
 			}
 		}
@@ -236,7 +250,25 @@ class CoodleSurvey extends FHCAPI_Controller
 		$surveyId = $this->input->post("surveyId");
 		$surveyData = $this->input->post("surveyData");
 		$shouldInformParticipants = $this->input->post("shouldInformParticipants");
-		// todo: form validation
+		
+		$this->form_validation->set_data([
+			"title" => $surveyData["title"],
+			"description" => $surveyData["description"],
+			"timeslotDuration" => $surveyData["timeslotDuration"],
+			"maxSelections" => $surveyData["maxSelections"],
+			"endsAt" => $surveyData["endsAt"],
+		]);
+		$this->form_validation->set_rules("title", "Title", "required|string|max_length[255]");
+		$this->form_validation->set_rules("description", "Description", "string|max_length[1000]");
+		$this->form_validation->set_rules("timeslotDuration", "Appointment duration", "required|integer|min[5]|max[300]");
+		$this->form_validation->set_rules("maxSelections", "Maximum number of selections", "required|integer|min[1]");
+		$this->form_validation->set_rules("endsAt", "Planned end date", "required");
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		if (!$surveyId) {
+			$this->terminateWithError("Missing survey id!");
+		}
 
 		$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
 
@@ -438,13 +470,11 @@ class CoodleSurvey extends FHCAPI_Controller
 				$formattedTimeslot = $timeslotStart->format("d.m.Y H:i") . "-" . $timeslotEnd->format("H:i");
 
 				$calendarFilePath = tempnam(sys_get_temp_dir(), "coodle_");
-				$this->generateIcsContent(
+				$this->writeToIcsFile(
 					$calendarFilePath,
 					$survey->title,
 					$timeslotStart,
 					$timeslotEnd,
-					$authUserFullName,
-					getAuthUID() . "@" . DOMAIN,
 					$selectedRoomId
 				);
 
@@ -655,7 +685,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		return $groups;
 	}
 
-	private function generateIcsContent($calendarFilePath, $title, $start, $end, $creatorName, $creatorEmail, $location)
+	private function writeToIcsFile($calendarFilePath, $title, $start, $end, $location)
 	{
 		$calendarFile = fopen($calendarFilePath, "w");
 		fwrite($calendarFile, "BEGIN:VCALENDAR" . PHP_EOL);

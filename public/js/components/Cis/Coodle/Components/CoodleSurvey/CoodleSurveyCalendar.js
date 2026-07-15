@@ -345,7 +345,6 @@ export default {
 		<div class="d-flex flex-column">
 			<span class="fw-bold">{{ "Timeslot selection" }}</span>
 			<span class="fst-italic">{{ "You can add timeslots directly to the calendar or from the list down below." }}</span>
-			{{isMobile}}
 		</div>
 		<div style="height:800px;">
 			<fhc-calendar

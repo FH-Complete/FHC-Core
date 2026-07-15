@@ -214,14 +214,14 @@ export default {
 			}
 		},
 		async submitForm() {
-			if (
-				!this.surveyFormData.title?.length ||
-				!this.surveyFormData.endsAt?.length ||
-				!this.surveyFormData.timeslotDuration
-			) {
-				this.$fhcAlert.alertError("Check your inputs!");
-				return;
-			}
+			// if (
+			// 	!this.surveyFormData.title?.length ||
+			// 	!this.surveyFormData.endsAt?.length ||
+			// 	!this.surveyFormData.timeslotDuration
+			// ) {
+			// 	this.$fhcAlert.alertError("Check your inputs!");
+			// 	return;
+			// }
 
 			if (!this.surveyFormData.participants.length) {
 				const shouldProceedWithoutParticipants =
@@ -255,22 +255,38 @@ export default {
 			}
 		},
 		formatOutgoingSurveyData(surveyFormData) {
+			let timeslotDuration = surveyFormData.timeslotDuration;
+			if (!timeslotDuration || timeslotDuration < 5) {
+				timeslotDuration = 5;
+			} else if (timeslotDuration % 5 !== 0) {
+				timeslotDuration = timeslotDuration - (timeslotDuration % 5);
+			}
+
+			let maxSelections = surveyFormData.maxSelections;
+			if (maxSelections < 1) {
+				maxSelections = 1;
+			}
+
+			const participants = surveyFormData.participants.map(
+				(participant) => {
+					return {
+						uid: participant.uid,
+					};
+				},
+			);
+
 			return {
 				id: surveyFormData.id,
-				title: surveyFormData.title,
-				description: surveyFormData.description,
-				timeslotDuration: surveyFormData.timeslotDuration,
-				maxSelections: surveyFormData.maxSelections,
+				title: surveyFormData.title.trim(),
+				description: surveyFormData.description.trim(),
+				timeslotDuration,
+				maxSelections,
 				areParticipantsAnonymized:
 					surveyFormData.areParticipantsAnonymized,
 				areSelectionsAnonymized: surveyFormData.areSelectionsAnonymized,
 				endsAt: surveyFormData.endsAt,
 				timeslots: surveyFormData.timeslots,
-				participants: surveyFormData.participants.map((participant) => {
-					return {
-						uid: participant.uid,
-					};
-				}),
+				participants,
 			};
 		},
 		async createSurvey(surveyData) {

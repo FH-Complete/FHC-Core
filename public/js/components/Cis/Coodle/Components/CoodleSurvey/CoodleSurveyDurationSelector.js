@@ -79,7 +79,8 @@ export default {
 					<input
 						v-model="durationCustomInput"
 						type="number"
-						min="1"
+						min="5"
+						step="5"
 						class="border-0"
 						style="min-width:0; outline: none; background: none;"
 					/>

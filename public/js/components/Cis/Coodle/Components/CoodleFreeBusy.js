@@ -55,11 +55,6 @@ export default {
 			}
 		},
 		async submitScheduleForm() {
-			if (!this.scheduleFormData?.url.length) {
-				this.$fhcAlert.alertError("You must enter a URL!");
-				return;
-			}
-
 			const response = await this.$api.call(
 				this.scheduleFormData.id
 					? FreeBusyApi.updateFreeBusyEntry(this.scheduleFormData)

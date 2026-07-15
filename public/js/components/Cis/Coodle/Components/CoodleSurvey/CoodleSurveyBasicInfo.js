@@ -176,11 +176,11 @@ export default {
 				<div class="d-flex flex-column gap-2 col-12 col-md-6 pb-2">
 					<div class="d-flex flex-column gap-1">
 						<label for="surveyTitleInput" class="fw-bold">{{ "* " + "Title" }}</label>
-						<input v-model="surveyFormData.title" id="surveyTitleInput" type="text" />
+						<input v-model="surveyFormData.title" id="surveyTitleInput" type="text" maxlength="255" />
 					</div>
 					<div class="d-flex flex-column gap-1">
 						<label for="surveyDescriptionInput" class="fw-bold">{{ "Description" }}</label>
-						<textarea v-model="surveyFormData.description" rows="4" class="flex-grow-1" />
+						<textarea v-model="surveyFormData.description" rows="4" class="flex-grow-1" maxlength="1000" />
 					</div>
 				</div>
 				<div class="col-12 col-md-6">
@@ -197,6 +197,7 @@ export default {
 									v-model="surveyFormData.maxSelections"
 									id="surveyMaxSelectionsInput"
 									type="number"
+									min="1"
 									class="flex-grow-1"
 								/>
 							</div>

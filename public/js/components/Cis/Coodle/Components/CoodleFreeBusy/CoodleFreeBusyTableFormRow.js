@@ -18,7 +18,9 @@ export default {
 	watch: {
 		"scheduleFormData.type": {
 			handler(newValue) {
-				const type = this.$props.scheduleTypes.find((type) => type.value === newValue);
+				const type = this.$props.scheduleTypes.find(
+					(type) => type.value === newValue,
+				);
 				if (!type || !type.urlDefault?.length) return;
 
 				this.scheduleFormData.url = type.urlDefault;
@@ -28,7 +30,13 @@ export default {
 	template: /*html*/ `
 	<tr>
 		<td class="border-1 py-2 px-2">
-			<input v-model="scheduleFormData.description" id="scheduleDescriptionInput" type="text" class="w-100" />
+			<input
+				v-model="scheduleFormData.description"
+				id="scheduleDescriptionInput"
+				type="text"
+				maxlength="255"
+				class="w-100"
+			/>
 		</td>
 		<td class="border-1 py-2 px-2">
 			<select v-model="scheduleFormData.type" id="scheduleTypeInput" class="w-100 h-100">
@@ -37,7 +45,13 @@ export default {
 			</select>
 		</td>
 		<td class="border-1 py-2 px-2">
-			<input v-model="scheduleFormData.url" id="scheduleUrlInput" type="text" class="w-100" />
+			<input
+				v-model="scheduleFormData.url"
+				id="scheduleUrlInput"
+				type="text"
+				maxlength="255"
+				class="w-100"
+			/>
 		</td>
 		<td class="border-1 py-2 px-2">
 			<div class="d-flex flex-row align-items-center justify-content-center">
