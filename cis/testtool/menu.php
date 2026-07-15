@@ -187,6 +187,7 @@ else if (isset($_SESSION['pruefling_id']))
 			}
 
 			$qry .= "
+				AND ps_status.bewerbung_abgeschicktamum IS NOT NULL
 
 		/* Order to get last semester when using distinct on */
 		ORDER BY
@@ -293,7 +294,7 @@ else if (isset($_SESSION['pruefling_id']))
 			}
 			$lastsemester = $row->semester;
 
-			echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 3px;">';
+			echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 3px; margin-top: 5px;">';
 			echo '<tr><td class="HeaderTesttool">'. ($row->semester == '1' ? $p->t('testtool/basisgebiete') : $p->t('testtool/quereinstiegsgebiete')).'</td></tr>';
 		}
 
@@ -405,6 +406,29 @@ else if (isset($_SESSION['pruefling_id']))
 		echo '</table>';
 	}
 
+	if (isset($_SESSION['pruefling_id']) && !empty($_SESSION['alleGebiete']))
+	{
+		$alleGebiete = array_map('intval', $_SESSION['alleGebiete']);
+		$pruefling_id = (int)$_SESSION['pruefling_id'];
+
+		$qry = "SELECT COUNT(DISTINCT gebiet_id) AS anzahl
+				FROM testtool.tbl_pruefling_frage
+					JOIN testtool.tbl_frage USING(frage_id)
+				WHERE gebiet_id IN (". implode(',', $alleGebiete) .")
+					AND pruefling_id = ". $pruefling_id;
+
+		$result_check = $db->db_query($qry);
+		$row_check = $db->db_fetch_object($result_check);
+
+		if ((int)$row_check->anzahl === count($alleGebiete))
+		{
+			echo '<tr><td>
+					<div class="alert alert-success small" style="margin-left: 20px; width: 170px; margin-top: 3px;" role="alert">
+						<strong>'.$p->t('testtool/alleGebietGestartet').'</strong>
+					</div>
+				</td></tr>';
+		}
+	}
 	// Link zum Logout
 
 	echo '<tr><td class="ItemTesttool" style="margin-left: 20px;" nowrap>

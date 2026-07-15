@@ -47,12 +47,13 @@ export default {
 					this.endpoint.getStatiOfContract(this.person_id, this.vertrag_id)
 				),
 				ajaxResponse: (url, params, response) => response.data,
-				persistenceID: 'core-contracts-status-2026021701',
+				persistenceID: 'core-contracts-status-2026050501',
 				columns: [
-					{title: "Status", field: "bezeichnung"},
+					{title: "Status", field: "bezeichnung", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
 					{
 						title: "Datum",
 						field: "datum",
+						headerFilter: true,
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
 							const date = new Date(dateStr); // Convert to Date object
@@ -66,14 +67,15 @@ export default {
 							});
 						}
 					},
-					{title: "vertrag_id", field: "vertrag_id", visible: false},
-					{title: "Vertragsstatus", field: "vertragsstatus_kurzbz", visible: false},
-					{title: "User", field: "mitarbeiter_uid", visible: false},
-					{title: "insertvon", field: "insertvon", visible: false},
+					{title: "vertrag_id", field: "vertrag_id", visible: false, headerFilter: true},
+					{title: "Vertragsstatus", field: "vertragsstatus_kurzbz", visible: false, headerFilter: true},
+					{title: "User", field: "mitarbeiter_uid", visible: false, headerFilter: true},
+					{title: "insertvon", field: "insertvon", visible: false, headerFilter: true},
 					{
 						title: "insertamum",
 						field: "insertamum",
 						visible: false,
+						headerFilter: true,
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
 							const date = new Date(dateStr);
@@ -87,11 +89,12 @@ export default {
 							});
 						}
 					},
-					{title: "updatevon", field: "updatevon", visible: false},
+					{title: "updatevon", field: "updatevon", visible: false, headerFilter: true},
 					{
 						title: "updateamum",
 						field: "updateamum",
 						visible: false,
+						headerFilter: true,
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
 							const date = new Date(dateStr);
@@ -148,7 +151,7 @@ export default {
 				],
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
-				height: '200',
+				height: '250',
 				selectableRowsRangeMode: 'click',
 				selectableRows: true,
 			},
