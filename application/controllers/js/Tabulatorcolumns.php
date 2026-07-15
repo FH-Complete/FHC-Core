@@ -26,7 +26,8 @@ class Tabulatorcolumns extends Auth_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'stv' => ['admin:r', 'assistenz:r']
+			'stv' => ['admin:r', 'assistenz:r'],
+			'lvverwaltung' => ['admin:r', 'assistenz:r']
 		]);
 	}
 
