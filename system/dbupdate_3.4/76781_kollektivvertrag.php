@@ -135,7 +135,7 @@ INSERT INTO hr.tbl_kollektivvertrag_verwendungsgruppenjahr(kv_jahre, bezeichnung
 ('2','nach 2','VG6',true,'system',NOW()),
 ('4','nach 4','VG6',true,'system',NOW()),
 ('5','nach 5','VG6',true,'system',NOW())
-ON CONFLICT (kv_jahre) DO NOTHING;
+ON CONFLICT (kv_jahre, verwendungsgruppe_kurzbz) DO NOTHING;
 
 
 INSERT INTO hr.tbl_kollektivvertrag_verwendungsgruppenjahr(kv_jahre, bezeichnung, verwendungsgruppe_kurzbz, aktiv, insertvon, insertamum) VALUES
@@ -158,7 +158,7 @@ INSERT INTO hr.tbl_kollektivvertrag_verwendungsgruppenjahr(kv_jahre, bezeichnung
 ('2','nach 2','VG4_XY',true,'system',NOW()),
 ('4','nach 4','VG4_XY',true,'system',NOW()),
 ('5','nach 5','VG4_XY',true,'system',NOW())
-ON CONFLICT (kv_jahre) DO NOTHING;
+ON CONFLICT (kv_jahre, verwendungsgruppe_kurzbz) DO NOTHING;
 
 
 		";
