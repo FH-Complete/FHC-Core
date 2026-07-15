@@ -123,6 +123,15 @@ $route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/person/(:any)'] = 'api/fr
 
 $route['api/frontend/v1/treemenudata/stv/.*'] = 'api/frontend/v1/stv/students/index';
 
+// Lvverwaltung List Routes
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByStg/$1/$2';
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/semester/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByStg/$1/$2/$3';
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/semester/(:any)/.*'] = 'api/frontend/v1/Lehrveranstaltung/getByStg/$1/$2/$3';
+
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/emp/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByEmp/$1/$2';
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/emp/(:any)/stg/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByEmp/$1/$2/$3';
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/emp/(:any)/stg/(:any)/.*'] = 'api/frontend/v1/Lehrveranstaltung/getByEmp/$1/$2/$3';
+
 
 // load routes from extensions, also look for environment-specific configs
 $subdirs = ['application/config/extensions', 'application/config/' . ENVIRONMENT . '/extensions'];

@@ -10,6 +10,7 @@ import { addTagInTable, deleteTagInTable, updateTagInTable } from "../../../../j
 import ApiLv from "../../../api/lehrveranstaltung.js";
 import ApiTag from "../../../api/lehrveranstaltung/tag.js";
 import ApiLehreinheit from "../../../api/lehrveranstaltung/lehreinheit.js";
+import ApiTreemenu from "../../../api/factory/treemenu.js";
 
 export default {
 	name: "LVVerwaltungTable",
@@ -122,7 +123,7 @@ export default {
 				ajaxRequestFunc: async (url, config, params) => {
 					let realUrl = this.buildApiUrl();
 					if (realUrl)
-						return this.$api.call(ApiLv.getTable(this.buildApiUrl()));
+						return this.$api.call(this.buildApiUrl());
 				},
 				ajaxResponse: (url, params, response) => { return response?.data || [] },
 				dataTree: true,
@@ -335,17 +336,20 @@ export default {
 		},
 		buildApiUrl()
 		{
-			if (this.filter.activeFilter === 'employee' && this.filter.emp)
-			{
-				const { emp, stg, studiensemester_kurzbz } = this.filter;
-				return this.$api.getUri(ApiLv.getByEmp(studiensemester_kurzbz, emp, stg));
+			if (!['emp', 'treemenu'].includes(this.$route.name))
+				return null;
+
+			let url = 'stdsem/' + this.$route.params.stdsem + '/';
+			
+			if (this.$route.params.emp) {
+				url += 'emp/' + this.$route.params.emp;
 			}
 
-			if (this.filter.activeFilter === 'verband' && this.filter.stg)
-			{
-				const { stg, semester, studiensemester_kurzbz } = this.filter;
-				return this.$api.getUri(ApiLv.getByStg(studiensemester_kurzbz, stg, semester));
+			if (this.$route.params.treemenu) {
+				url += this.$route.params.treemenu.join('/');
 			}
+			
+			return ApiTreemenu.data('lvverwaltung', url);
 		},
 		resetEmployeeFilter()
 		{
