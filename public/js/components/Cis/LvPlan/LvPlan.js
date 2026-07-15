@@ -3,7 +3,8 @@ import FhcCalendar from "../../Calendar/LvPlan.js";
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
 
-export const DEFAULT_MODE_LVPLAN = 'Week'
+export const DEFAULT_MODE_LVPLAN_MOBILE = 'List';
+export const DEFAULT_MODE_LVPLAN_DESKTOP = 'Week';
 
 export default {
 	name: 'LvPlan',
@@ -11,31 +12,32 @@ export default {
 		FhcCalendar
 	},
 	props: {
-		viewData: Object, // NOTE(chris): this is inherited from router-view
 		propsViewData: Object
 	},
 	data() {
-		const now = luxon.DateTime.now().setZone(this.viewData.timezone);
 		return {
 			studiensemester_kurzbz: null,
 			studiensemester_start: null,
 			studiensemester_ende: null,
 			uid: null,
-			lv: null
+			lv: null,
+			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone,
 		};
 	},
+	inject: ["isMobile"],
 	computed:{
 		currentDay() {
-			return this.propsViewData?.focus_date || luxon.DateTime.now().setZone(this.viewData.timezone).toISODate();
+			return this.propsViewData?.focus_date || luxon.DateTime.now().setZone(this.timezone).toISODate();
 		},
 		currentMode() {
-			return this.propsViewData?.mode || DEFAULT_MODE_LVPLAN;
+			const defaultMode = this.isMobile ? DEFAULT_MODE_LVPLAN_MOBILE : DEFAULT_MODE_LVPLAN_DESKTOP;
+			return this.propsViewData?.mode || defaultMode;
 		},
 		downloadLinks() {
 			if (!this.studiensemester_start || !this.studiensemester_ende || !this.uid)
 				return false;
 			
-			const opts = { zone: this.viewData.timezone };
+			const opts = { zone: this.timezone };
 			const start = luxon.DateTime
 				.fromISO(this.studiensemester_start, opts)
 				.toUnixInteger();
@@ -115,7 +117,7 @@ export default {
 		<fhc-calendar
 			ref="calendar"
 			v-model:lv="lv"
-			:timezone="viewData.timezone"
+			:timezone="timezone"
 			:get-promise-func="getPromiseFunc"
 			:date="currentDay"
 			:mode="currentMode"
