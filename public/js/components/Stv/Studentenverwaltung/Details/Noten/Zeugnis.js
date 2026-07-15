@@ -2,8 +2,6 @@ import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import ZeugnisActions from './Zeugnis/Actions.js';
 import ZeugnisDocuments from './Zeugnis/Documents.js';
 
-import ApiStvGrades from '../../../../../api/factory/stv/grades.js';
-
 export default {
 	name: 'Zeugnis',
 	components: {
@@ -11,6 +9,7 @@ export default {
 		ZeugnisActions,
 		ZeugnisDocuments
 	},
+	emits: ['loaded'],
 	inject: {
 		config: {
 			from: 'config',
@@ -22,7 +21,15 @@ export default {
 		}
 	},
 	props: {
-		student: Object,
+		endpoint: {
+			type: Object,
+			required: true
+		},
+		id: {
+			type: [Number, String],
+			required: true
+		},
+		optionalTabulatorOptions: Object,
 		allSemester: Boolean
 	},
 	data() {
@@ -34,6 +41,10 @@ export default {
 						item.documentslist = document.createElement("div");
 						return item;
 					})
+				},
+				{
+					event: "dataProcessed",
+					handler: () => this.$emit("loaded")
 				},
 				{
 					event: "rowSelected",
@@ -53,7 +64,7 @@ export default {
 	computed: {
 		tabulatorOptions() {
 			const listPromise = this.$api
-				.call(ApiStvGrades.list())
+				.call(this.endpoint.list())
 				.then(res => res.data.map(({bezeichnung: label, note: value}) => ({label, value})));
 
 			let gradeField = {
@@ -86,7 +97,7 @@ export default {
 							note_bezeichnung
 						}))
 						// send to backend
-						.then(data => this.$api.call(ApiStvGrades.updateCertificate(data)))
+						.then(data => this.$api.call(this.endpoint.updateCertificate(data)))
 						// get bezeichnung again
 						.then(() => listPromise)
 						.then(list => list.find(el => el.value == note))
@@ -109,7 +120,7 @@ export default {
 							if (filterTerm) {
 								return this.$api
 									.call(
-										ApiStvGrades.getGradeFromPoints(
+										this.endpoint.getGradeFromPoints(
 											filterTerm,
 											cell.getData().lehrveranstaltung_id,
 											this.currentSemester
@@ -142,6 +153,8 @@ export default {
 					.then(() => node.innerText = this.$p.t('ui/loading'))
 					.catch(this.$fhcAlert.handleSystemError);
 				gradeField.editorParams.placeholderLoading = node;
+				gradeField.visible = this.optionalTabulatorOptions?.visibleColumns?.note ?? true
+				gradeField.headerFiler = this.optionalTabulatorOptions?.headerFilter?.note || this.optionalTabulatorOptions?.note || false
 			}
 
 			const columns = [
@@ -238,8 +251,8 @@ export default {
 
 			return {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: () => this.$api.call(ApiStvGrades.getCertificate(
-					this.student.prestudent_id,
+				ajaxRequestFunc: () => this.$api.call(this.endpoint.getCertificate(
+					this.id,
 						(!this.allSemester ? this.currentSemester : null)
 				)),
 				ajaxResponse: (url, params, response) => {
@@ -248,9 +261,10 @@ export default {
 				columns,
 				height: '100%',
 				layout: 'fitDataStretchFrozen',
-				selectableRows: 1,
+				selectable: true,
 				selectableRowsRangeMode: 'click',
-				persistenceID: 'stv-details-noten-zeugnis-20260217',
+				selectableRows: true,
+				persistenceID: this.optionalTabulatorOptions?.persistenceZeugnisID ?? 'stv-details-noten-zeugnis-20260217',
 				persistence:{
 					columns: ["width", "visible", "frozen"]
 				}
@@ -258,7 +272,8 @@ export default {
 		}
 	},
 	watch: {
-		student(n) {
+		id()
+		{
 			this.$refs.table.reloadTable();
 		},
 		allSemester(n) {
@@ -269,7 +284,7 @@ export default {
 		setGrade(data) {
 			this.$api
 				.call(
-					ApiStvGrades.updateCertificate(data),
+					this.endpoint.updateCertificate(data),
 					{ errorHeader: data.lehrveranstaltung_bezeichnung }
 				)
 				.then(this.$refs.table.reloadTable)
@@ -282,7 +297,7 @@ export default {
 				.confirmDelete()
 				.then(result => result ? data : Promise.reject({handled:true}))
 				.then(data => this.$api.call(
-					ApiStvGrades.deleteCertificate(data),
+					this.endpoint.deleteCertificate(data),
 					{ errorHeader: data.lehrveranstaltung_bezeichnung }
 				))
 				.then(this.$refs.table.reloadTable)
@@ -291,7 +306,7 @@ export default {
 		}
 	},
 	created() {
-		this.$p.loadCategory(['global', 'stv', 'lehre'])
+		this.$p.loadCategory(['global', 'stv', 'lehre', 'person'])
 			.then(() => {
 				if (this.$refs.table.tableBuilt)
 					this.$refs.table.tabulator.columnManager.setColumns(this.tabulatorOptions.columns);

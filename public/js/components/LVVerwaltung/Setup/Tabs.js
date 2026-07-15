@@ -53,9 +53,11 @@ export default {
 				<fhc-tabs 
 					v-if="lv.length === 1 && lv[0]?.lehreinheit_id"
 					ref="tabs"
+					:useprimevue="true"
 					:modelValue="lv[0]"
 					:config="configLETabs"
 					:default="$route.params.tab"
+					style="flex: 1 1 0%; height: 0%"
 					@changed="reload"
 				/>
 				<fhc-tabs 
@@ -65,6 +67,7 @@ export default {
 					:modelValue="lv[0]"
 					:config="configLVTabs"
 					:default="$route.params.tab"
+					style="flex: 1 1 0%; height: 0%"
 					@changed="reload"
 				/>
 			</div>
