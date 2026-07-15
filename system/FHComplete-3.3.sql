@@ -2,8 +2,10 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.4 (Debian 13.4-0+deb11u1)
--- Dumped by pg_dump version 13.4 (Debian 13.4-0+deb11u1)
+\restrict 2Y3Q8Pggmu0tPpehsGNIym2tWUXRPkjsnoLHPATTfaERaqrOEyOGu7nkmvh7lwP
+
+-- Dumped from database version 15.16 (Debian 15.16-0+deb12u1)
+-- Dumped by pg_dump version 15.16 (Debian 15.16-0+deb12u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -111,6 +113,15 @@ ALTER SCHEMA lehre OWNER TO fhcomplete;
 
 COMMENT ON SCHEMA lehre IS 'Teaching and Learning';
 
+
+--
+-- Name: public; Type: SCHEMA; Schema: -; Owner: fhcomplete
+--
+
+-- *not* creating schema, since initdb creates it
+
+
+ALTER SCHEMA public OWNER TO fhcomplete;
 
 --
 -- Name: reports; Type: SCHEMA; Schema: -; Owner: fhcomplete
@@ -226,6 +237,167 @@ CREATE FUNCTION campus.get_highest_content_version(bigint) RETURNS smallint
 
 
 ALTER FUNCTION campus.get_highest_content_version(bigint) OWNER TO fhcomplete;
+
+--
+-- Name: get_ects_summe_beruflich(character varying); Type: FUNCTION; Schema: public; Owner: fhcomplete
+--
+
+CREATE FUNCTION public.get_ects_summe_beruflich(character varying) RETURNS numeric
+    LANGUAGE plpgsql
+    AS $_$
+				DECLARE var_student_uid ALIAS FOR $1;
+				DECLARE sum_berufliche_ects numeric(4, 1) := 0;
+
+				BEGIN
+
+					SELECT INTO sum_berufliche_ects COALESCE(SUM(ects), 0) FROM (
+						SELECT
+							lehrveranstaltung_id, studiensemester_kurzbz, ects
+						FROM
+							lehre.tbl_zeugnisnote
+							LEFT JOIN lehre.tbl_anrechnung USING(lehrveranstaltung_id, studiensemester_kurzbz)
+							JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+							JOIN public.tbl_student USING(student_uid)
+						WHERE
+							tbl_zeugnisnote.note = 6
+							AND student_uid = var_student_uid
+							AND lehre.tbl_anrechnung.prestudent_id IN (tbl_student.prestudent_id, NULL)
+							AND begruendung_id = 4  -- beruflich
+							AND (anrechnung_id IS NULL OR (anrechnung_id IS NOT NULL AND genehmigt_von IS NOT NULL )) -- Anrechnungen aus Zeit vor Anrechnungstool ODER digitale Anrechnungen mit Noteneintrag UND Genehmigung (wichtig, um zurückgenommene Genehmigungen, die in der Notentabelle noch als angerechnet eingetragen sind, rauszufiltern)
+
+						UNION
+
+						SELECT
+							lehrveranstaltung_id, studiensemester_kurzbz, ects
+						FROM
+							lehre.tbl_anrechnung
+							JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+							JOIN public.tbl_student USING(prestudent_id)
+						WHERE
+							genehmigt_von is not null
+							AND student_uid = var_student_uid
+							AND begruendung_id = 4  -- beruflich
+					) lvsangerechnet;
+
+				RETURN sum_berufliche_ects;
+
+				END;
+				$_$;
+
+
+ALTER FUNCTION public.get_ects_summe_beruflich(character varying) OWNER TO fhcomplete;
+
+--
+-- Name: get_ects_summe_schulisch(character varying, integer, integer); Type: FUNCTION; Schema: public; Owner: fhcomplete
+--
+
+CREATE FUNCTION public.get_ects_summe_schulisch(character varying, integer, integer) RETURNS numeric
+    LANGUAGE plpgsql
+    AS $_$
+				DECLARE var_student_uid ALIAS FOR $1;
+				DECLARE var_prestudent_id ALIAS FOR $2;
+				DECLARE var_studiengang_kz ALIAS FOR $3;
+				DECLARE var_einstiegsausbildungssemester integer;
+				DECLARE var_einstiegsstudiensemester_kurzbz varchar(32);
+				DECLARE var_einstiegsorgform_kurzbz varchar(32);
+				DECLARE rec_quereinstiegs_studiensemester RECORD;
+				DECLARE sum_quereinstiegs_ects numeric(4, 1) := 0;
+				DECLARE sum_schulische_ects numeric(4, 1) := 0;
+
+
+				BEGIN
+
+				-- IF STUDENT IS QUEREINSTEIGER, GET ECTS SUMME OF ANGERECHNETE SEMESTER
+				-- Get Einstiegssemester
+				   SELECT INTO var_einstiegsausbildungssemester , var_einstiegsstudiensemester_kurzbz, var_einstiegsorgform_kurzbz  ausbildungssemester, studiensemester_kurzbz, orgform_kurzbz from public.tbl_prestudentstatus
+				   WHERE prestudent_id = var_prestudent_id
+				   AND status_kurzbz = 'Student'
+				   ORDER BY datum, insertamum, ext_id
+				   LIMIT 1;
+
+				-- If Einstiegssemester > 1 (= Quereinsteiger)
+				IF (var_einstiegsausbildungssemester > 1) THEN
+				-- ...get all Quereinstiegssemester
+				   FOR rec_quereinstiegs_studiensemester IN SELECT studiensemester_kurzbz FROM public.tbl_studiensemester
+					 WHERE ende <= (select start from public.tbl_studiensemester WHERE studiensemester_kurzbz = var_einstiegsstudiensemester_kurzbz )
+					 ORDER BY start DESC
+					 LIMIT (var_einstiegsausbildungssemester -1)
+				-- ...loop the Quereinstiegssemester
+				   LOOP
+				-- ...and sum up ECTS of each Quereinstiegssemester
+					  sum_quereinstiegs_ects = sum_quereinstiegs_ects + (SELECT
+								SUM(tbl_lehrveranstaltung.ects)
+							FROM
+								lehre.tbl_studienplan
+								JOIN lehre.tbl_studienplan_lehrveranstaltung USING (studienplan_id)
+								JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
+							WHERE
+								tbl_studienplan.studienplan_id = (
+									SELECT
+										studienplan_id
+									FROM
+										lehre.tbl_studienordnung
+										JOIN lehre.tbl_studienplan USING (studienordnung_id)
+										JOIN lehre.tbl_studienplan_semester USING (studienplan_id)
+										WHERE tbl_studienordnung.studiengang_kz = var_studiengang_kz
+										AND tbl_studienplan_semester.semester = var_einstiegsausbildungssemester - 1
+										AND tbl_studienplan_semester.studiensemester_kurzbz = rec_quereinstiegs_studiensemester.studiensemester_kurzbz
+										AND tbl_studienplan.orgform_kurzbz = var_einstiegsorgform_kurzbz
+
+									LIMIT 1
+								)
+							AND tbl_studienplan_lehrveranstaltung.semester = var_einstiegsausbildungssemester
+							AND studienplan_lehrveranstaltung_id_parent IS NULL -- auf Modulebene
+							AND tbl_studienplan_lehrveranstaltung.export = TRUE);
+
+							var_einstiegsausbildungssemester = var_einstiegsausbildungssemester - 1;
+				   END LOOP;
+				END IF;
+
+
+				-- GET ECTS SUMME OF ALLE BISHER ANGERECHNETEN LEHRVERANSTALTUNGEN. ANRECHNUNGSGRUND: SCHULISCH.
+				SELECT INTO sum_schulische_ects COALESCE(SUM(ects), 0) FROM (
+									SELECT
+										lehrveranstaltung_id, studiensemester_kurzbz, ects
+									FROM
+										lehre.tbl_zeugnisnote
+										LEFT JOIN lehre.tbl_anrechnung USING(lehrveranstaltung_id, studiensemester_kurzbz)
+										JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+										JOIN public.tbl_student USING(student_uid)
+									WHERE
+										tbl_zeugnisnote.note = 6
+										AND student_uid = var_student_uid
+										AND lehre.tbl_anrechnung.prestudent_id IN (tbl_student.prestudent_id, NULL)
+										AND begruendung_id != 5  -- universitäre ECTS nicht mitrechnen
+                        				AND begruendung_id != 4  -- berufliche ECTS nicht mitrechnen
+                        				AND (anrechnung_id IS NULL OR (anrechnung_id IS NOT NULL AND genehmigt_von IS NOT NULL )) -- Anrechnungen aus Zeit vor Anrechnungstool ODER digitale Anrechnungen mit Noteneintrag UND Genehmigung (wichtig, um zurückgenommene Genehmigungen, die in der Notentabelle noch als angerechnet eingetragen sind, rauszufiltern)
+
+									UNION
+
+									SELECT
+										lehrveranstaltung_id, studiensemester_kurzbz, ects
+									FROM
+										lehre.tbl_anrechnung
+										JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+										JOIN public.tbl_student USING(prestudent_id)
+									WHERE
+										genehmigt_von IS NOT NULL
+										AND student_uid = var_student_uid
+										AND begruendung_id != 5  -- universitäre ECTS nicht mitrechnen
+                        				AND begruendung_id != 4  -- berufliche ECTS nicht mitrechnen
+				) lvsangerechnet;
+
+				-- BUILD ECTS SUMME OF QUEREINSTIEGSSEMESTER- + ANGERECHNETEN LVs-ECTS
+				-- Summe aller bisher schulisch begründet angerechneten LVs + der Quereinstiegssemester
+				sum_schulische_ects = sum_schulische_ects + sum_quereinstiegs_ects;
+
+				RETURN sum_schulische_ects ;
+
+				END;
+				$_$;
+
+
+ALTER FUNCTION public.get_ects_summe_schulisch(character varying, integer, integer) OWNER TO fhcomplete;
 
 --
 -- Name: get_rolle_prestudent(integer, character varying); Type: FUNCTION; Schema: public; Owner: fhcomplete
@@ -533,7 +705,8 @@ CREATE TABLE bis.tbl_bisio (
     universitaet character varying(256),
     lehreinheit_id integer,
     ects_erworben numeric(5,2),
-    ects_angerechnet numeric(5,2)
+    ects_angerechnet numeric(5,2),
+    herkunftsland_code character varying(3)
 );
 
 
@@ -852,7 +1025,8 @@ CREATE TABLE bis.tbl_gsprogramm (
     gsprogramm_id integer DEFAULT nextval('bis.tbl_gsprogramm_gsprogramm_id_seq'::regclass) NOT NULL,
     bezeichnung character varying(255),
     programm_code bigint,
-    gsprogrammtyp_kurzbz character varying(32)
+    gsprogrammtyp_kurzbz character varying(32),
+    studienkennung_uni character varying(32)
 );
 
 
@@ -1199,7 +1373,8 @@ CREATE TABLE bis.tbl_zgv (
     zgv_code integer NOT NULL,
     zgv_bez character varying(64),
     zgv_kurzbz character varying(16),
-    bezeichnung character varying(128)[]
+    bezeichnung character varying(128)[],
+    aktiv boolean DEFAULT true NOT NULL
 );
 
 
@@ -1220,7 +1395,8 @@ CREATE TABLE bis.tbl_zgvdoktor (
     zgvdoktor_code integer NOT NULL,
     zgvdoktor_bez character varying(64),
     zgvdoktor_kurzbz character varying(16),
-    bezeichnung character varying(128)[]
+    bezeichnung character varying(128)[],
+    aktiv boolean DEFAULT true NOT NULL
 );
 
 
@@ -1296,7 +1472,8 @@ CREATE TABLE bis.tbl_zgvmaster (
     zgvmas_code integer NOT NULL,
     zgvmas_bez character varying(64),
     zgvmas_kurzbz character varying(16),
-    bezeichnung character varying(128)[]
+    bezeichnung character varying(128)[],
+    aktiv boolean DEFAULT true NOT NULL
 );
 
 
@@ -1582,6 +1759,34 @@ CREATE SEQUENCE campus.seq_pruefungstermin_pruefungstermin_id
 
 
 ALTER TABLE campus.seq_pruefungstermin_pruefungstermin_id OWNER TO fhcomplete;
+
+--
+-- Name: seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id; Type: SEQUENCE; Schema: campus; Owner: fhcomplete
+--
+
+CREATE SEQUENCE campus.seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE campus.seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id OWNER TO fhcomplete;
+
+--
+-- Name: seq_zeitwunsch_zeitwunsch_id; Type: SEQUENCE; Schema: campus; Owner: fhcomplete
+--
+
+CREATE SEQUENCE campus.seq_zeitwunsch_zeitwunsch_id
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE campus.seq_zeitwunsch_zeitwunsch_id OWNER TO fhcomplete;
 
 --
 -- Name: tbl_abgabe; Type: TABLE; Schema: campus; Owner: fhcomplete
@@ -1978,7 +2183,7 @@ COMMENT ON TABLE campus.tbl_coodle_termin IS 'Time Slots of a Survey';
 CREATE TABLE campus.tbl_dms (
     dms_id bigint DEFAULT nextval('campus.seq_dms_dms_id'::regclass) NOT NULL,
     oe_kurzbz character varying(32),
-    dokument_kurzbz character varying(8),
+    dokument_kurzbz character varying(32),
     kategorie_kurzbz character varying(32)
 );
 
@@ -3212,7 +3417,9 @@ CREATE TABLE campus.tbl_zeitwunsch (
     updateamum timestamp without time zone,
     updatevon character varying(32),
     insertamum timestamp without time zone DEFAULT now(),
-    insertvon character varying(32)
+    insertvon character varying(32),
+    zeitwunsch_id integer DEFAULT nextval('campus.seq_zeitwunsch_zeitwunsch_id'::regclass) NOT NULL,
+    zeitwunsch_gueltigkeit_id integer NOT NULL
 );
 
 
@@ -3224,6 +3431,38 @@ ALTER TABLE campus.tbl_zeitwunsch OWNER TO fhcomplete;
 
 COMMENT ON TABLE campus.tbl_zeitwunsch IS 'Teaching Time Preferences';
 
+
+--
+-- Name: COLUMN tbl_zeitwunsch.mitarbeiter_uid; Type: COMMENT; Schema: campus; Owner: fhcomplete
+--
+
+COMMENT ON COLUMN campus.tbl_zeitwunsch.mitarbeiter_uid IS 'DEPRECATED';
+
+
+--
+-- Name: COLUMN tbl_zeitwunsch.zeitwunsch_gueltigkeit_id; Type: COMMENT; Schema: campus; Owner: fhcomplete
+--
+
+COMMENT ON COLUMN campus.tbl_zeitwunsch.zeitwunsch_gueltigkeit_id IS 'Ordnet die Zeitwuensche einer Gueltigkeitsdauer von-bis zu';
+
+
+--
+-- Name: tbl_zeitwunsch_gueltigkeit; Type: TABLE; Schema: campus; Owner: fhcomplete
+--
+
+CREATE TABLE campus.tbl_zeitwunsch_gueltigkeit (
+    zeitwunsch_gueltigkeit_id integer DEFAULT nextval('campus.seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id'::regclass) NOT NULL,
+    mitarbeiter_uid character varying(32) NOT NULL,
+    von date,
+    bis date,
+    insertamum timestamp without time zone DEFAULT now(),
+    insertvon character varying(32),
+    updateamum timestamp without time zone,
+    updatevon character varying(32)
+);
+
+
+ALTER TABLE campus.tbl_zeitwunsch_gueltigkeit OWNER TO fhcomplete;
 
 --
 -- Name: tbl_benutzer; Type: TABLE; Schema: public; Owner: fhcomplete
@@ -3296,6 +3535,7 @@ CREATE TABLE public.tbl_person (
     matr_aktiv boolean DEFAULT false NOT NULL,
     matr_nr character varying(32),
     zugangscode_timestamp timestamp without time zone,
+    wahlname character varying(128),
     CONSTRAINT chk_person_svnr CHECK (((char_length((svnr)::text) = 10) OR (char_length((svnr)::text) = 16) OR (svnr IS NULL)))
 );
 
@@ -3383,7 +3623,8 @@ CREATE VIEW campus.vw_benutzer AS
     tbl_benutzer.insertvon,
     tbl_benutzer.updateamum,
     tbl_benutzer.updatevon,
-    tbl_benutzer.ext_id
+    tbl_benutzer.ext_id,
+    tbl_person.wahlname
    FROM (public.tbl_benutzer
      JOIN public.tbl_person USING (person_id));
 
@@ -3601,7 +3842,8 @@ CREATE TABLE lehre.tbl_lehrveranstaltung (
     las numeric(5,2),
     benotung boolean DEFAULT true NOT NULL,
     lvinfo boolean DEFAULT true NOT NULL,
-    lehrauftrag boolean DEFAULT true
+    lehrauftrag boolean DEFAULT true,
+    lehrveranstaltung_template_id integer
 );
 
 
@@ -3752,6 +3994,7 @@ CREATE TABLE public.tbl_studiengang (
     foerderrelevant boolean DEFAULT true NOT NULL,
     standort_code integer,
     onlinebewerbung boolean DEFAULT false NOT NULL,
+    melde_studiengang_kz character varying(32),
     CONSTRAINT tbl_studiengang_max_gruppe CHECK (((max_gruppe >= '1'::bpchar) AND (max_gruppe <= '9'::bpchar))),
     CONSTRAINT tbl_studiengang_max_semester CHECK ((max_semester >= 0)),
     CONSTRAINT tbl_studiengang_max_verband CHECK (((max_verband >= 'A'::bpchar) AND (max_verband <= 'Z'::bpchar))),
@@ -3822,6 +4065,13 @@ COMMENT ON COLUMN public.tbl_studiengang.foerderrelevant IS 'Zeigt an, ob Studie
 --
 
 COMMENT ON COLUMN public.tbl_studiengang.standort_code IS 'Zu meldender Standortcode der Studierenden des Studiengangs';
+
+
+--
+-- Name: COLUMN tbl_studiengang.melde_studiengang_kz; Type: COMMENT; Schema: public; Owner: fhcomplete
+--
+
+COMMENT ON COLUMN public.tbl_studiengang.melde_studiengang_kz IS 'Studiengangskennzahl, mit der der Studiengang gemeldet wird (z.B. Bismeldung)';
 
 
 --
@@ -3975,7 +4225,8 @@ CREATE VIEW campus.vw_mitarbeiter AS
          LIMIT 1) AS email_privat,
     tbl_benutzer.updateaktivam,
     tbl_benutzer.updateaktivvon,
-    GREATEST(tbl_person.updateamum, tbl_benutzer.updateamum, tbl_mitarbeiter.updateamum) AS lastupdate
+    GREATEST(tbl_person.updateamum, tbl_benutzer.updateamum, tbl_mitarbeiter.updateamum) AS lastupdate,
+    tbl_person.wahlname
    FROM ((public.tbl_mitarbeiter
      JOIN public.tbl_benutzer ON (((tbl_mitarbeiter.mitarbeiter_uid)::text = (tbl_benutzer.uid)::text)))
      JOIN public.tbl_person USING (person_id));
@@ -4229,7 +4480,8 @@ CREATE VIEW campus.vw_student AS
            FROM public.tbl_kontakt
           WHERE ((tbl_kontakt.person_id = tbl_person.person_id) AND ((tbl_kontakt.kontakttyp)::text = 'email'::text))
           ORDER BY tbl_kontakt.zustellung DESC
-         LIMIT 1) AS email_privat
+         LIMIT 1) AS email_privat,
+    tbl_person.wahlname
    FROM ((public.tbl_student
      JOIN public.tbl_benutzer ON (((tbl_student.student_uid)::text = (tbl_benutzer.uid)::text)))
      JOIN public.tbl_person USING (person_id));
@@ -5700,7 +5952,7 @@ COMMENT ON TABLE lehre.tbl_moodle_version IS 'DEPRECATED';
 
 CREATE TABLE lehre.tbl_note (
     note smallint NOT NULL,
-    bezeichnung character varying(32),
+    bezeichnung character varying(64),
     anmerkung character varying(256),
     farbe character(6),
     offiziell boolean DEFAULT true NOT NULL,
@@ -7116,6 +7368,20 @@ CREATE SEQUENCE public.seq_filter_filter_id
 ALTER TABLE public.seq_filter_filter_id OWNER TO fhcomplete;
 
 --
+-- Name: seq_gruppe_manager_gruppe_manager_id; Type: SEQUENCE; Schema: public; Owner: fhcomplete
+--
+
+CREATE SEQUENCE public.seq_gruppe_manager_gruppe_manager_id
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.seq_gruppe_manager_gruppe_manager_id OWNER TO fhcomplete;
+
+--
 -- Name: seq_notiz_notiz_id; Type: SEQUENCE; Schema: public; Owner: fhcomplete
 --
 
@@ -7268,7 +7534,7 @@ CREATE TABLE public.tbl_adresse (
     ort character varying(256),
     gemeinde character varying(256),
     nation character varying(3),
-    typ character(1),
+    typ character varying(32),
     heimatadresse boolean DEFAULT false NOT NULL,
     zustelladresse boolean DEFAULT false NOT NULL,
     firma_id integer,
@@ -7328,13 +7594,34 @@ ALTER SEQUENCE public.tbl_adresse_adresse_id_seq OWNED BY public.tbl_adresse.adr
 
 
 --
+-- Name: tbl_adressentyp; Type: TABLE; Schema: public; Owner: fhcomplete
+--
+
+CREATE TABLE public.tbl_adressentyp (
+    adressentyp_kurzbz character varying(32) NOT NULL,
+    bezeichnung character varying(256),
+    bezeichnung_mehrsprachig character varying(256)[],
+    sort smallint
+);
+
+
+ALTER TABLE public.tbl_adressentyp OWNER TO fhcomplete;
+
+--
+-- Name: TABLE tbl_adressentyp; Type: COMMENT; Schema: public; Owner: fhcomplete
+--
+
+COMMENT ON TABLE public.tbl_adressentyp IS 'Types of Addresses';
+
+
+--
 -- Name: tbl_akte; Type: TABLE; Schema: public; Owner: fhcomplete
 --
 
 CREATE TABLE public.tbl_akte (
     akte_id integer NOT NULL,
     person_id integer NOT NULL,
-    dokument_kurzbz character varying(8) NOT NULL,
+    dokument_kurzbz character varying(32) NOT NULL,
     inhalt text,
     mimetype character varying(128),
     erstelltam date DEFAULT now(),
@@ -7749,7 +8036,7 @@ COMMENT ON TABLE public.tbl_buchungstyp IS 'Key-Table of Payment Types';
 --
 
 CREATE TABLE public.tbl_dokument (
-    dokument_kurzbz character varying(8) NOT NULL,
+    dokument_kurzbz character varying(32) NOT NULL,
     bezeichnung character varying(128),
     ext_id bigint,
     ausstellungsdetails boolean DEFAULT false NOT NULL,
@@ -7779,7 +8066,7 @@ COMMENT ON COLUMN public.tbl_dokument.ausstellungsdetails IS 'Sollen beim Dokume
 --
 
 CREATE TABLE public.tbl_dokumentprestudent (
-    dokument_kurzbz character varying(8) NOT NULL,
+    dokument_kurzbz character varying(32) NOT NULL,
     prestudent_id integer NOT NULL,
     mitarbeiter_uid character varying(32),
     datum date,
@@ -7805,7 +8092,7 @@ COMMENT ON TABLE public.tbl_dokumentprestudent IS 'Accepted Documents of Degree 
 --
 
 CREATE TABLE public.tbl_dokumentstudiengang (
-    dokument_kurzbz character varying(8) NOT NULL,
+    dokument_kurzbz character varying(32) NOT NULL,
     studiengang_kz integer NOT NULL,
     ext_id bigint,
     stufe smallint,
@@ -8120,6 +8407,42 @@ ALTER TABLE public.tbl_geschlecht OWNER TO fhcomplete;
 --
 
 COMMENT ON TABLE public.tbl_geschlecht IS 'Key-Table of Gender';
+
+
+--
+-- Name: tbl_gruppe_manager; Type: TABLE; Schema: public; Owner: fhcomplete
+--
+
+CREATE TABLE public.tbl_gruppe_manager (
+    gruppe_manager_id integer DEFAULT nextval('public.seq_gruppe_manager_gruppe_manager_id'::regclass) NOT NULL,
+    gruppe_kurzbz character varying(32) NOT NULL,
+    uid character varying(32) NOT NULL,
+    insertamum timestamp without time zone DEFAULT now(),
+    insertvon character varying(32)
+);
+
+
+ALTER TABLE public.tbl_gruppe_manager OWNER TO fhcomplete;
+
+--
+-- Name: TABLE tbl_gruppe_manager; Type: COMMENT; Schema: public; Owner: fhcomplete
+--
+
+COMMENT ON TABLE public.tbl_gruppe_manager IS 'Table to save assignments groups to their managers.';
+
+
+--
+-- Name: COLUMN tbl_gruppe_manager.gruppe_kurzbz; Type: COMMENT; Schema: public; Owner: fhcomplete
+--
+
+COMMENT ON COLUMN public.tbl_gruppe_manager.gruppe_kurzbz IS 'Name of group';
+
+
+--
+-- Name: COLUMN tbl_gruppe_manager.uid; Type: COMMENT; Schema: public; Owner: fhcomplete
+--
+
+COMMENT ON COLUMN public.tbl_gruppe_manager.uid IS 'User id of group manager';
 
 
 --
@@ -9133,7 +9456,10 @@ CREATE TABLE public.tbl_prestudent (
     gsstudientyp_kurzbz character varying(32) DEFAULT 'Intern'::character varying,
     aufnahmegruppe_kurzbz character varying(32),
     foerderrelevant boolean,
-    standort_code integer
+    standort_code integer,
+    zgv_erfuellt boolean DEFAULT false,
+    zgvmas_erfuellt boolean DEFAULT false,
+    zgvdoktor_erfuellt boolean DEFAULT false
 );
 
 
@@ -9799,7 +10125,7 @@ CREATE TABLE public.tbl_vorlage (
     archivierbar boolean DEFAULT false,
     signierbar boolean DEFAULT false,
     stud_selfservice boolean DEFAULT false,
-    dokument_kurzbz character varying(8),
+    dokument_kurzbz character varying(32),
     insertamum timestamp without time zone,
     insertvon character varying(32),
     updateamum timestamp without time zone,
@@ -9867,7 +10193,7 @@ CREATE TABLE public.tbl_vorlagedokument (
     vorlagedokument_id integer DEFAULT nextval('public.tbl_vorlagedokument_vorlagedokument_id_seq'::regclass) NOT NULL,
     sort integer NOT NULL,
     vorlagestudiengang_id bigint NOT NULL,
-    dokument_kurzbz character varying(8) NOT NULL
+    dokument_kurzbz character varying(32) NOT NULL
 );
 
 
@@ -10236,7 +10562,7 @@ CREATE VIEW public.vw_msg_vars AS
                            FROM public.tbl_prestudentstatus tbl_prestudentstatus_1
                           WHERE ((tbl_prestudentstatus_1.prestudent_id = pr.prestudent_id) AND ((tbl_prestudentstatus_1.status_kurzbz)::text = 'Interessent'::text))
                          LIMIT 1))::text) AND ((tbl_prestudentstatus.status_kurzbz)::text = 'Interessent'::text))) prest
-          WHERE (((prest.laststatus)::text <> ALL ((ARRAY['Abbrecher'::character varying, 'Abgewiesener'::character varying, 'Absolvent'::character varying])::text[])) AND (prest.priorisierung <= pr.priorisierung))) AS "Relative Prio",
+          WHERE (((prest.laststatus)::text <> ALL (ARRAY[('Abbrecher'::character varying)::text, ('Abgewiesener'::character varying)::text, ('Absolvent'::character varying)::text])) AND (prest.priorisierung <= pr.priorisierung))) AS "Relative Prio",
     last_prestudent_status.orgform_bezeichnung_de AS "Orgform DE",
     last_prestudent_status.orgform_bezeichnung_en AS "Orgform EN"
    FROM ((((((((((public.tbl_person p
@@ -10248,7 +10574,7 @@ CREATE VIEW public.vw_msg_vars AS
      LEFT JOIN ( SELECT tbl_kontakt.person_id,
             tbl_kontakt.kontakt
            FROM public.tbl_kontakt
-          WHERE ((tbl_kontakt.zustellung = true) AND ((tbl_kontakt.kontakttyp)::text = ANY ((ARRAY['telefon'::character varying, 'mobil'::character varying])::text[])))
+          WHERE ((tbl_kontakt.zustellung = true) AND ((tbl_kontakt.kontakttyp)::text = ANY (ARRAY[('telefon'::character varying)::text, ('mobil'::character varying)::text])))
           ORDER BY tbl_kontakt.kontakt_id DESC) kt USING (person_id))
      LEFT JOIN ( SELECT tbl_adresse.person_id,
             tbl_adresse.strasse,
@@ -10351,7 +10677,7 @@ CREATE VIEW public.vw_msg_vars_person AS
      LEFT JOIN ( SELECT tbl_kontakt.person_id,
             tbl_kontakt.kontakt
            FROM public.tbl_kontakt
-          WHERE ((tbl_kontakt.zustellung = true) AND ((tbl_kontakt.kontakttyp)::text = ANY ((ARRAY['telefon'::character varying, 'mobil'::character varying])::text[])))
+          WHERE ((tbl_kontakt.zustellung = true) AND ((tbl_kontakt.kontakttyp)::text = ANY (ARRAY[('telefon'::character varying)::text, ('mobil'::character varying)::text])))
           ORDER BY tbl_kontakt.kontakt_id DESC) kt USING (person_id))
      LEFT JOIN ( SELECT tbl_adresse.person_id,
             tbl_adresse.strasse,
@@ -10981,7 +11307,9 @@ CREATE TABLE system.tbl_fehler_zustaendigkeiten (
     fehlercode character varying(64) NOT NULL,
     person_id integer,
     oe_kurzbz character varying(32),
-    funktion_kurzbz character varying(16)
+    funktion_kurzbz character varying(16),
+    insertamum timestamp without time zone DEFAULT now(),
+    insertvon character varying(32)
 );
 
 
@@ -11173,6 +11501,7 @@ CREATE TABLE system.tbl_issue (
     insertamum timestamp without time zone DEFAULT now(),
     updatevon character varying(32),
     updateamum timestamp without time zone,
+    behebung_parameter jsonb,
     CONSTRAINT chk_tbl_issue_person_id_oe_kurzbz CHECK (((person_id IS NOT NULL) OR (oe_kurzbz IS NOT NULL)))
 );
 
@@ -12384,7 +12713,8 @@ CREATE TABLE testtool.tbl_pruefling (
     idnachweis character varying(50),
     registriert timestamp without time zone DEFAULT now() NOT NULL,
     prestudent_id integer,
-    semester smallint
+    semester smallint,
+    gesperrt boolean DEFAULT false NOT NULL
 );
 
 
@@ -13361,7 +13691,7 @@ CREATE TABLE wawi.tbl_kostenstelle (
     insertamum timestamp without time zone,
     insertvon character varying(32),
     ext_id bigint,
-    kostenstelle_nr character varying(4),
+    kostenstelle_nr character varying(6),
     deaktiviertvon character varying(32),
     deaktiviertamum timestamp without time zone,
     geschaeftsjahrvon character varying(32),
@@ -14030,7 +14360,7 @@ COPY bis.tbl_bisfunktion (bisverwendung_id, studiengang_kz, sws, updateamum, upd
 -- Data for Name: tbl_bisio; Type: TABLE DATA; Schema: bis; Owner: fhcomplete
 --
 
-COPY bis.tbl_bisio (bisio_id, mobilitaetsprogramm_code, nation_code, von, bis, zweck_code, student_uid, updateamum, updatevon, insertamum, insertvon, ext_id, ort, universitaet, lehreinheit_id, ects_erworben, ects_angerechnet) FROM stdin;
+COPY bis.tbl_bisio (bisio_id, mobilitaetsprogramm_code, nation_code, von, bis, zweck_code, student_uid, updateamum, updatevon, insertamum, insertvon, ext_id, ort, universitaet, lehreinheit_id, ects_erworben, ects_angerechnet, herkunftsland_code) FROM stdin;
 \.
 
 
@@ -34789,7 +35119,7 @@ COPY bis.tbl_gemeinde (gemeinde_id, plz, name, ortschaftskennziffer, ortschaftsn
 -- Data for Name: tbl_gsprogramm; Type: TABLE DATA; Schema: bis; Owner: fhcomplete
 --
 
-COPY bis.tbl_gsprogramm (gsprogramm_id, bezeichnung, programm_code, gsprogrammtyp_kurzbz) FROM stdin;
+COPY bis.tbl_gsprogramm (gsprogramm_id, bezeichnung, programm_code, gsprogrammtyp_kurzbz, studienkennung_uni) FROM stdin;
 \.
 
 
@@ -35159,24 +35489,24 @@ COPY bis.tbl_verwendung (verwendung_code, verwendungbez) FROM stdin;
 -- Data for Name: tbl_zgv; Type: TABLE DATA; Schema: bis; Owner: fhcomplete
 --
 
-COPY bis.tbl_zgv (zgv_code, zgv_bez, zgv_kurzbz, bezeichnung) FROM stdin;
-4	Anerkannte Studienberechtigungsprüfung	Studberprüfung	{"Anerkannte Studienberechtigungsprüfung","Anerkannte Studienberechtigungsprüfung"}
-5	Ausländische Universitätsreife	Ausl.Univreife	{"Ausländische Universitätsreife","Ausländische Universitätsreife"}
-7	Lehrabschlussprüfung mit allfälligen Zusatzqualifikationen	Lehrabschluss	{"Lehrabschlussprüfung mit allfälligen Zusatzqualifikationen","Lehrabschlussprüfung mit allfälligen Zusatzqualifikationen"}
-8	Werkmeister	Werkmeister	{Werkmeister,Werkmeister}
-9	AHS (langform)	AHS-lang	{"AHS (langform)","AHS (langform)"}
-10	Oberstufenrealgymnasium	OberstufenRG	{Oberstufenrealgymnasium,Oberstufenrealgymnasium}
-11	AHS (Sonderformen)	AHS-sonder	{"AHS (Sonderformen)","AHS (Sonderformen)"}
-13	Handelsakademien	Handelsakademien	{Handelsakademien,Handelsakademien}
-16	Höhere Schulen der Lehrer- und Erzieherbildung	Lehrer	{"Höhere Schulen der Lehrer- und Erzieherbildung","Höhere Schulen der Lehrer- und Erzieherbildung"}
-17	Externistenreifeprüfung	Externist	{Externistenreifeprüfung,Externistenreifeprüfung}
-18	Berufreifeprüfung	Berufsreife	{Berufreifeprüfung,Berufreifeprüfung}
-19	Inländische postsekundäre Bildungseinrichtung	Inl.postsekundär	{"Inländische postsekundäre Bildungseinrichtung","Inländische postsekundäre Bildungseinrichtung"}
-99	Sonstige	Sonstige	{Sonstige,Sonstige}
-14	Höhere Lehranstalt für wirtschaftliche Berufe	HL wirtsch.Ber.	{"Höhere Lehranstalt für wirtschaftliche Berufe","Höhere Lehranstalt für wirtschaftliche Berufe"}
-12	Höhere technische und gewerbliche Lehranstalten	HTBLA	{"Höhere technische und gewerbliche Lehranstalten","Höhere technische und gewerbliche Lehranstalten"}
-6	Abschlusszeugnis einer facheinschlägigen BMS	BMS(facheinschl)	{"Abschlusszeugnis einer facheinschlägigen BMS","Abschlusszeugnis einer facheinschlägigen BMS"}
-15	Höhere land- und forstwirtschaftliche Lehranstalten	HL Land-u.Forst	{"Höhere land- und forstwirtschaftliche Lehranstalten","Höhere land- und forstwirtschaftliche Lehranstalten"}
+COPY bis.tbl_zgv (zgv_code, zgv_bez, zgv_kurzbz, bezeichnung, aktiv) FROM stdin;
+4	Anerkannte Studienberechtigungsprüfung	Studberprüfung	{"Anerkannte Studienberechtigungsprüfung","Anerkannte Studienberechtigungsprüfung"}	t
+5	Ausländische Universitätsreife	Ausl.Univreife	{"Ausländische Universitätsreife","Ausländische Universitätsreife"}	t
+7	Lehrabschlussprüfung mit allfälligen Zusatzqualifikationen	Lehrabschluss	{"Lehrabschlussprüfung mit allfälligen Zusatzqualifikationen","Lehrabschlussprüfung mit allfälligen Zusatzqualifikationen"}	t
+8	Werkmeister	Werkmeister	{Werkmeister,Werkmeister}	t
+9	AHS (langform)	AHS-lang	{"AHS (langform)","AHS (langform)"}	t
+10	Oberstufenrealgymnasium	OberstufenRG	{Oberstufenrealgymnasium,Oberstufenrealgymnasium}	t
+11	AHS (Sonderformen)	AHS-sonder	{"AHS (Sonderformen)","AHS (Sonderformen)"}	t
+13	Handelsakademien	Handelsakademien	{Handelsakademien,Handelsakademien}	t
+16	Höhere Schulen der Lehrer- und Erzieherbildung	Lehrer	{"Höhere Schulen der Lehrer- und Erzieherbildung","Höhere Schulen der Lehrer- und Erzieherbildung"}	t
+17	Externistenreifeprüfung	Externist	{Externistenreifeprüfung,Externistenreifeprüfung}	t
+18	Berufreifeprüfung	Berufsreife	{Berufreifeprüfung,Berufreifeprüfung}	t
+19	Inländische postsekundäre Bildungseinrichtung	Inl.postsekundär	{"Inländische postsekundäre Bildungseinrichtung","Inländische postsekundäre Bildungseinrichtung"}	t
+99	Sonstige	Sonstige	{Sonstige,Sonstige}	t
+14	Höhere Lehranstalt für wirtschaftliche Berufe	HL wirtsch.Ber.	{"Höhere Lehranstalt für wirtschaftliche Berufe","Höhere Lehranstalt für wirtschaftliche Berufe"}	t
+12	Höhere technische und gewerbliche Lehranstalten	HTBLA	{"Höhere technische und gewerbliche Lehranstalten","Höhere technische und gewerbliche Lehranstalten"}	t
+6	Abschlusszeugnis einer facheinschlägigen BMS	BMS(facheinschl)	{"Abschlusszeugnis einer facheinschlägigen BMS","Abschlusszeugnis einer facheinschlägigen BMS"}	t
+15	Höhere land- und forstwirtschaftliche Lehranstalten	HL Land-u.Forst	{"Höhere land- und forstwirtschaftliche Lehranstalten","Höhere land- und forstwirtschaftliche Lehranstalten"}	t
 \.
 
 
@@ -35184,7 +35514,7 @@ COPY bis.tbl_zgv (zgv_code, zgv_bez, zgv_kurzbz, bezeichnung) FROM stdin;
 -- Data for Name: tbl_zgvdoktor; Type: TABLE DATA; Schema: bis; Owner: fhcomplete
 --
 
-COPY bis.tbl_zgvdoktor (zgvdoktor_code, zgvdoktor_bez, zgvdoktor_kurzbz, bezeichnung) FROM stdin;
+COPY bis.tbl_zgvdoktor (zgvdoktor_code, zgvdoktor_bez, zgvdoktor_kurzbz, bezeichnung, aktiv) FROM stdin;
 \.
 
 
@@ -35208,18 +35538,18 @@ COPY bis.tbl_zgvgruppe_zuordnung (zgvgruppe_id, studiengang_kz, zgv_code, zgvmas
 -- Data for Name: tbl_zgvmaster; Type: TABLE DATA; Schema: bis; Owner: fhcomplete
 --
 
-COPY bis.tbl_zgvmaster (zgvmas_code, zgvmas_bez, zgvmas_kurzbz, bezeichnung) FROM stdin;
-1	FH-Abschluss Bachelor (Inland)	FH-Bachelor (I)	{"FH-Abschluss Bachelor (Inland)","FH-Abschluss Bachelor (Inland)"}
-2	FH-Abschluss Bachelor (Ausland)	FH-Bachelor (A)	{"FH-Abschluss Bachelor (Ausland)","FH-Abschluss Bachelor (Ausland)"}
-3	Abschluss postsekundäres Studium (Inland)	postsek.Inland	{"Abschluss postsekundäres Studium (Inland)","Abschluss postsekundäres Studium (Inland)"}
-4	Abschluss postsekundäres Studium (Ausland)	postsek.Ausland	{"Abschluss postsekundäres Studium (Ausland)","Abschluss postsekundäres Studium (Ausland)"}
-5	Univ.-Abschluss Bachelor (Inland)	Uni-Bachelor (I)	{"Univ.-Abschluss Bachelor (Inland)","Univ.-Abschluss Bachelor (Inland)"}
-6	Univ.-Abschluss Bachelor (Ausland)	Uni-Bachelor (A)	{"Univ.-Abschluss Bachelor (Ausland)","Univ.-Abschluss Bachelor (Ausland)"}
-11	Sonstige	Sonstige	{Sonstige,Sonstige}
-9	Univ. Abschluss Dipl.-Ing. / Mag. / Master / Dr. (Inland)	Uni (I)	{"Univ. Abschluss Dipl.-Ing. / Mag. / Master / Dr. (Inland)","Univ. Abschluss Dipl.-Ing. / Mag. / Master / Dr. (Inland)"}
-10	Univ. Abschluss Dipl.-Ing. / Mag. / Master / Dr. / PhD (Ausland)	Uni (A)	{"Univ. Abschluss Dipl.-Ing. / Mag. / Master / Dr. / PhD (Ausland)","Univ. Abschluss Dipl.-Ing. / Mag. / Master / Dr. / PhD (Ausland)"}
-7	FH-Abschluss Dipl.-Ing. / Mag. / Master / Dr. (Inland)	FH (I)	{"FH-Abschluss Dipl.-Ing. / Mag. / Master / Dr. (Inland)","FH-Abschluss Dipl.-Ing. / Mag. / Master / Dr. (Inland)"}
-8	FH-Abschluss Dipl.-Ing. / Mag. / Master / Dr. / PhD (Ausland)	FH (A)	{"FH-Abschluss Dipl.-Ing. / Mag. / Master / Dr. / PhD (Ausland)","FH-Abschluss Dipl.-Ing. / Mag. / Master / Dr. / PhD (Ausland)"}
+COPY bis.tbl_zgvmaster (zgvmas_code, zgvmas_bez, zgvmas_kurzbz, bezeichnung, aktiv) FROM stdin;
+1	FH-Abschluss Bachelor (Inland)	FH-Bachelor (I)	{"FH-Abschluss Bachelor (Inland)","FH-Abschluss Bachelor (Inland)"}	t
+2	FH-Abschluss Bachelor (Ausland)	FH-Bachelor (A)	{"FH-Abschluss Bachelor (Ausland)","FH-Abschluss Bachelor (Ausland)"}	t
+3	Abschluss postsekundäres Studium (Inland)	postsek.Inland	{"Abschluss postsekundäres Studium (Inland)","Abschluss postsekundäres Studium (Inland)"}	t
+4	Abschluss postsekundäres Studium (Ausland)	postsek.Ausland	{"Abschluss postsekundäres Studium (Ausland)","Abschluss postsekundäres Studium (Ausland)"}	t
+5	Univ.-Abschluss Bachelor (Inland)	Uni-Bachelor (I)	{"Univ.-Abschluss Bachelor (Inland)","Univ.-Abschluss Bachelor (Inland)"}	t
+6	Univ.-Abschluss Bachelor (Ausland)	Uni-Bachelor (A)	{"Univ.-Abschluss Bachelor (Ausland)","Univ.-Abschluss Bachelor (Ausland)"}	t
+11	Sonstige	Sonstige	{Sonstige,Sonstige}	t
+9	Univ. Abschluss Dipl.-Ing. / Mag. / Master / Dr. (Inland)	Uni (I)	{"Univ. Abschluss Dipl.-Ing. / Mag. / Master / Dr. (Inland)","Univ. Abschluss Dipl.-Ing. / Mag. / Master / Dr. (Inland)"}	t
+10	Univ. Abschluss Dipl.-Ing. / Mag. / Master / Dr. / PhD (Ausland)	Uni (A)	{"Univ. Abschluss Dipl.-Ing. / Mag. / Master / Dr. / PhD (Ausland)","Univ. Abschluss Dipl.-Ing. / Mag. / Master / Dr. / PhD (Ausland)"}	t
+7	FH-Abschluss Dipl.-Ing. / Mag. / Master / Dr. (Inland)	FH (I)	{"FH-Abschluss Dipl.-Ing. / Mag. / Master / Dr. (Inland)","FH-Abschluss Dipl.-Ing. / Mag. / Master / Dr. (Inland)"}	t
+8	FH-Abschluss Dipl.-Ing. / Mag. / Master / Dr. / PhD (Ausland)	FH (A)	{"FH-Abschluss Dipl.-Ing. / Mag. / Master / Dr. / PhD (Ausland)","FH-Abschluss Dipl.-Ing. / Mag. / Master / Dr. / PhD (Ausland)"}	t
 \.
 
 
@@ -35771,6 +36101,7 @@ ZA	Zeitausgleich	FFA605
 Arzt	Arztbesuch	0066FF
 Konfernz	Konferenz/Tagung/Seminar	CC6633
 Urlaub	Urlaub	FF0000
+ZVerfueg	Zeitverfügbarkeit	\N
 \.
 
 
@@ -35778,7 +36109,15 @@ Urlaub	Urlaub	FF0000
 -- Data for Name: tbl_zeitwunsch; Type: TABLE DATA; Schema: campus; Owner: fhcomplete
 --
 
-COPY campus.tbl_zeitwunsch (stunde, mitarbeiter_uid, tag, gewicht, updateamum, updatevon, insertamum, insertvon) FROM stdin;
+COPY campus.tbl_zeitwunsch (stunde, mitarbeiter_uid, tag, gewicht, updateamum, updatevon, insertamum, insertvon, zeitwunsch_id, zeitwunsch_gueltigkeit_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: tbl_zeitwunsch_gueltigkeit; Type: TABLE DATA; Schema: campus; Owner: fhcomplete
+--
+
+COPY campus.tbl_zeitwunsch_gueltigkeit (zeitwunsch_gueltigkeit_id, mitarbeiter_uid, von, bis, insertamum, insertvon, updateamum, updatevon) FROM stdin;
 \.
 
 
@@ -35952,6 +36291,7 @@ COPY lehre.tbl_anrechnung_begruendung (begruendung_id, bezeichnung) FROM stdin;
 2	kompatible Lehrveranstaltung
 3	Prüfung
 4	berufliche Praxis
+5	Hochschulzeugnis
 \.
 
 
@@ -36084,6 +36424,7 @@ COPY lehre.tbl_lehrtyp (lehrtyp_kurzbz, bezeichnung) FROM stdin;
 lv	Lehrveranstaltung
 modul	Modul
 lf	Lehrfach
+tpl	Template
 \.
 
 
@@ -36091,7 +36432,7 @@ lf	Lehrfach
 -- Data for Name: tbl_lehrveranstaltung; Type: TABLE DATA; Schema: lehre; Owner: fhcomplete
 --
 
-COPY lehre.tbl_lehrveranstaltung (lehrveranstaltung_id, kurzbz, bezeichnung, studiengang_kz, semester, sprache, ects, semesterstunden, anmerkung, lehre, lehreverzeichnis, aktiv, planfaktor, planlektoren, planpersonalkosten, plankostenprolektor, updateamum, updatevon, insertamum, insertvon, ext_id, sort, zeugnis, koordinator, projektarbeit, lehrform_kurzbz, bezeichnung_english, orgform_kurzbz, incoming, lehrmodus_kurzbz, lehrtyp_kurzbz, oe_kurzbz, raumtyp_kurzbz, anzahlsemester, semesterwochen, lvnr, farbe, old_lehrfach_id, semester_alternativ, sws, lvs, alvs, lvps, las, benotung, lvinfo, lehrauftrag) FROM stdin;
+COPY lehre.tbl_lehrveranstaltung (lehrveranstaltung_id, kurzbz, bezeichnung, studiengang_kz, semester, sprache, ects, semesterstunden, anmerkung, lehre, lehreverzeichnis, aktiv, planfaktor, planlektoren, planpersonalkosten, plankostenprolektor, updateamum, updatevon, insertamum, insertvon, ext_id, sort, zeugnis, koordinator, projektarbeit, lehrform_kurzbz, bezeichnung_english, orgform_kurzbz, incoming, lehrmodus_kurzbz, lehrtyp_kurzbz, oe_kurzbz, raumtyp_kurzbz, anzahlsemester, semesterwochen, lvnr, farbe, old_lehrfach_id, semester_alternativ, sws, lvs, alvs, lvps, las, benotung, lvinfo, lehrauftrag, lehrveranstaltung_template_id) FROM stdin;
 \.
 
 
@@ -36443,6 +36784,19 @@ COPY public.tbl_adresse (adresse_id, person_id, name, strasse, plz, ort, gemeind
 
 
 --
+-- Data for Name: tbl_adressentyp; Type: TABLE DATA; Schema: public; Owner: fhcomplete
+--
+
+COPY public.tbl_adressentyp (adressentyp_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) FROM stdin;
+h	Hauptwohnsitz	{Hauptwohnsitz,"Principal residence"}	1
+n	Nebenwohnsitz	{Nebenwohnsitz,"Secondary residence"}	2
+ho	Homeoffice	{Homeoffice,Homeoffice}	3
+r	Rechnungsadresse	{Rechnungsadresse,"Billing address"}	4
+f	Firma	{Firma,Company}	5
+\.
+
+
+--
 -- Data for Name: tbl_akte; Type: TABLE DATA; Schema: public; Owner: fhcomplete
 --
 
@@ -36597,6 +36951,10 @@ BD-Zeugs	Bakkalaureats- bzw. Diplompruefungszeugnis	\N	f	{"Bakkalaureats- bzw. D
 Lebenslf	Lebenslauf	\N	f	{Lebenslauf,Lebenslauf}	\N
 Motivat	Motivationsschreiben	\N	f	{Motivationsschreiben,Motivationsschreiben}	\N
 UStatBla	UStat. Blatt	\N	f	{"UStat. Blatt","UStat. Blatt"}	\N
+LVZeugnisEng	Lehrveranstaltungszeugnis Englisch	\N	f	{Lehrveranstaltungszeugnis,"Course Certificate"}	\N
+LVZeugnis	Lehrveranstaltungszeugnis	\N	f	{Lehrveranstaltungszeugnis,"Course Certificate"}	\N
+Zertifikat	Zertifikat	\N	f	{Zertifikat,Certificate}	\N
+GrantAgr	Grant Agreement	\N	f	{"Grant Agreement","Grant Agreement"}	\N
 \.
 
 
@@ -36775,6 +37133,14 @@ u	{unbekannt,unknown}	4
 
 COPY public.tbl_gruppe (gruppe_kurzbz, studiengang_kz, semester, bezeichnung, beschreibung, sichtbar, lehre, aktiv, sort, mailgrp, generiert, updateamum, updatevon, insertamum, insertvon, ext_id, orgform_kurzbz, gid, content_visible, gesperrt, direktinskription, zutrittssystem, aufnahmegruppe) FROM stdin;
 CMS_LOCK	0	\N	CMS_LOCK	Sperrgruppe CMS	f	t	t	\N	f	f	\N	\N	2021-11-11 09:52:12.55153	checksystem	\N	\N	50072	t	f	f	f	f
+\.
+
+
+--
+-- Data for Name: tbl_gruppe_manager; Type: TABLE DATA; Schema: public; Owner: fhcomplete
+--
+
+COPY public.tbl_gruppe_manager (gruppe_manager_id, gruppe_kurzbz, uid, insertamum, insertvon) FROM stdin;
 \.
 
 
@@ -37021,9 +37387,9 @@ COPY public.tbl_ortraumtyp (ort_kurzbz, hierarchie, raumtyp_kurzbz) FROM stdin;
 -- Data for Name: tbl_person; Type: TABLE DATA; Schema: public; Owner: fhcomplete
 --
 
-COPY public.tbl_person (person_id, staatsbuergerschaft, geburtsnation, sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen, gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen, familienstand, geschlecht, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon, ext_id, bundesland_code, kompetenzen, kurzbeschreibung, zugangscode, foto_sperre, udf_values, bpk, matr_aktiv, matr_nr, zugangscode_timestamp) FROM stdin;
-1	\N	\N	\N	\N	\N	\N	Administrator	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	m	\N	t	2013-06-04 16:51:25.448077	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
-2	\N	\N	\N	\N	\N	\N	Dummy	Dieter	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	m	\N	t	2013-08-06 07:41:48.894325	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+COPY public.tbl_person (person_id, staatsbuergerschaft, geburtsnation, sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen, gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen, familienstand, geschlecht, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon, ext_id, bundesland_code, kompetenzen, kurzbeschreibung, zugangscode, foto_sperre, udf_values, bpk, matr_aktiv, matr_nr, zugangscode_timestamp, wahlname) FROM stdin;
+1	\N	\N	\N	\N	\N	\N	Administrator	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	m	\N	t	2013-06-04 16:51:25.448077	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N	\N
+2	\N	\N	\N	\N	\N	\N	Dummy	Dieter	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	m	\N	t	2013-08-06 07:41:48.894325	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N	\N
 \.
 
 
@@ -37119,7 +37485,7 @@ COPY public.tbl_preoutgoing_status (preoutgoing_status_kurzbz, bezeichnung) FROM
 -- Data for Name: tbl_prestudent; Type: TABLE DATA; Schema: public; Owner: fhcomplete
 --
 
-COPY public.tbl_prestudent (prestudent_id, aufmerksamdurch_kurzbz, person_id, studiengang_kz, berufstaetigkeit_code, ausbildungcode, zgv_code, zgvort, zgvdatum, zgvmas_code, zgvmaort, zgvmadatum, aufnahmeschluessel, facheinschlberuf, reihungstest_id, anmeldungreihungstest, reihungstestangetreten, rt_gesamtpunkte, bismelden, insertamum, insertvon, updateamum, updatevon, ext_id, anmerkung, dual, rt_punkte1, rt_punkte2, ausstellungsstaat, rt_punkte3, udf_values, priorisierung, zgvdoktor_code, zgvdoktorort, zgvdoktordatum, mentor, zgvnation, zgvmanation, zgvdoktornation, gsstudientyp_kurzbz, aufnahmegruppe_kurzbz, foerderrelevant, standort_code) FROM stdin;
+COPY public.tbl_prestudent (prestudent_id, aufmerksamdurch_kurzbz, person_id, studiengang_kz, berufstaetigkeit_code, ausbildungcode, zgv_code, zgvort, zgvdatum, zgvmas_code, zgvmaort, zgvmadatum, aufnahmeschluessel, facheinschlberuf, reihungstest_id, anmeldungreihungstest, reihungstestangetreten, rt_gesamtpunkte, bismelden, insertamum, insertvon, updateamum, updatevon, ext_id, anmerkung, dual, rt_punkte1, rt_punkte2, ausstellungsstaat, rt_punkte3, udf_values, priorisierung, zgvdoktor_code, zgvdoktorort, zgvdoktordatum, mentor, zgvnation, zgvmanation, zgvdoktornation, gsstudientyp_kurzbz, aufnahmegruppe_kurzbz, foerderrelevant, standort_code, zgv_erfuellt, zgvmas_erfuellt, zgvdoktor_erfuellt) FROM stdin;
 \.
 
 
@@ -37285,10 +37651,10 @@ COPY public.tbl_studentlehrverband (student_uid, studiensemester_kurzbz, studien
 -- Data for Name: tbl_studiengang; Type: TABLE DATA; Schema: public; Owner: fhcomplete
 --
 
-COPY public.tbl_studiengang (studiengang_kz, kurzbz, kurzbzlang, typ, bezeichnung, english, farbe, email, telefon, max_semester, max_verband, max_gruppe, erhalter_kz, bescheid, bescheidbgbl1, bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, aktiv, ext_id, orgform_kurzbz, zusatzinfo_html, moodle, oe_kurzbz, sprache, testtool_sprachwahl, studienplaetze, lgartcode, mischform, projektarbeit_note_anzeige, melderelevant, foerderrelevant, standort_code, onlinebewerbung) FROM stdin;
-2	S2	STG2	m	Studiengang 2	Studiengang 2	\N	invalid@example.com	\N	4	B	2	5	\N	\N	\N	\N	\N	\N	t	\N	VZ		t	stg2	English	t	\N	\N	f	t	t	t	\N	f
-1	S1	STG1	b	Studiengang 1	Studiengang 1	\N	invalid@example.com	\N	6	B	2	5	\N	\N	\N	\N	\N	\N	t	\N	VZ		t	stg1	English	t	\N	\N	f	t	t	t	\N	f
-0	TW	ETW	e	Erhalter	Erhalter	      	invalid@example.com	\N	4	B	2	5	\N	\N	\N	\N	\N	\N	t	\N	VZ	\N	t	etw	German	f	\N	\N	f	t	f	t	\N	f
+COPY public.tbl_studiengang (studiengang_kz, kurzbz, kurzbzlang, typ, bezeichnung, english, farbe, email, telefon, max_semester, max_verband, max_gruppe, erhalter_kz, bescheid, bescheidbgbl1, bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, aktiv, ext_id, orgform_kurzbz, zusatzinfo_html, moodle, oe_kurzbz, sprache, testtool_sprachwahl, studienplaetze, lgartcode, mischform, projektarbeit_note_anzeige, melderelevant, foerderrelevant, standort_code, onlinebewerbung, melde_studiengang_kz) FROM stdin;
+0	TW	ETW	e	Erhalter	Erhalter	      	invalid@example.com	\N	4	B	2	5	\N	\N	\N	\N	\N	\N	t	\N	VZ	\N	t	etw	German	f	\N	\N	f	t	f	t	\N	f	\N
+2	S2	STG2	m	Studiengang 2	Studiengang 2	\N	invalid@example.com	\N	4	B	2	5	\N	\N	\N	\N	\N	\N	t	\N	VZ		t	stg2	English	t	\N	\N	f	t	t	t	\N	f	0002
+1	S1	STG1	b	Studiengang 1	Studiengang 1	\N	invalid@example.com	\N	6	B	2	5	\N	\N	\N	\N	\N	\N	t	\N	VZ		t	stg1	English	t	\N	\N	f	t	t	t	\N	f	0001
 \.
 
 
@@ -37300,6 +37666,10 @@ COPY public.tbl_studiengangstyp (typ, bezeichnung, beschreibung, bezeichnung_meh
 m	\N	\N	{NULL,NULL}
 b	\N	\N	{NULL,NULL}
 e	\N	\N	{NULL,NULL}
+p	PhD	\N	{PhD,PhD}
+l	Lehrgang	\N	{Lehrgang,Course}
+d	Diplom	\N	{Diplom,Diploma}
+w	Weiterbildung	\N	{Weiterbildung,"Further education"}
 \.
 
 
@@ -37442,6 +37812,7 @@ db_stpl_table	stundenplan
 allow_lehrstunde_drop	false
 alle_unr_mitladen	false
 infocenter_studiensgangtyp	b
+projektuebersicht_studiensemester	\N
 \.
 
 
@@ -37452,7 +37823,6 @@ infocenter_studiensgangtyp	b
 COPY public.tbl_vorlage (vorlage_kurzbz, bezeichnung, anmerkung, mimetype, archivierbar, signierbar, stud_selfservice, dokument_kurzbz, insertamum, insertvon, updateamum, updatevon, attribute) FROM stdin;
 Studienerfolg	\N	\N	\N	f	f	f	\N	\N	\N	\N	\N	\N
 AccountInfo	AccountInfoBlatt	\N	\N	f	f	f	\N	\N	\N	\N	\N	\N
-Zertifikat	Zertifikat Freifächer		\N	f	f	f	\N	\N	\N	\N	\N	\N
 Diplomurkunde	\N	\N	\N	f	f	f	\N	\N	\N	\N	\N	\N
 Diplomzeugnis	\N	\N	\N	f	f	f	\N	\N	\N	\N	\N	\N
 Bakkurkunde	\N	\N	\N	f	f	f	\N	\N	\N	\N	\N	\N
@@ -37468,6 +37838,7 @@ DiplSupplement	\N	\N	\N	t	f	f	\N	\N	\N	\N	\N	\N
 Zeugnis	\N	erledigt	\N	t	f	f	\N	\N	\N	\N	\N	\N
 ZeugnisEng	ZeugnisEng	ZeugnisEng	\N	t	f	f	\N	\N	\N	\N	\N	\N
 Bewerberakt	Bewerberakt Deckblatt	wird als Deckblatt fuer den Bewerberakt verwendet	application/vnd.oasis.opendocument.text	f	f	f	\N	\N	\N	\N	\N	\N
+Zertifikat	Zertifikat Freifächer		\N	t	t	t	\N	\N	\N	\N	\N	\N
 \.
 
 
@@ -37529,6 +37900,7 @@ budget
 reporting
 projektarbeitsbeurteilung
 dvuh
+international
 \.
 
 
@@ -37731,6 +38103,11 @@ lehre/lehrveranstaltungAnlegen	Recht zur Anlage von Lehrveranstaltungen
 system/change_outputformat	Recht, um Dokumente aus dem FAS als Nicht-PDF exportieren zu duerfen (mittels UMSCHALT- oder STRG-Taste)
 basis/studiensemester	Studiensemester verwalten
 basis/status	Status verwalten
+lehre/zeitverfuegbarkeit	Zeitverfuegbarkeit verwalten
+lehre/gruppenmanager	Manager einer Gruppe werden und die Gruppe verwalten
+student/keine_studstatuspruefung	Ermöglicht Umgehen der Checks beim Speichern der Presstudentstatus
+basis/variable_persoenlich	Verwaltung eigener Variablen
+student/editMakkZgv	Bearbeiten der Master ZGV eines PreStudenten
 \.
 
 
@@ -37756,6 +38133,46 @@ COPY system.tbl_extensions (extension_id, name, version, description, license, u
 
 COPY system.tbl_fehler (fehlercode, fehler_kurzbz, fehlercode_extern, fehlertext, fehlertyp_kurzbz, app) FROM stdin;
 UNKNOWN_ERROR	\N	\N	Fehler ist aufgetreten	error	core
+CORE_ZGV_0001	zgvDatumInZukunft	\N	ZGV Datum in Zukunft	error	core
+CORE_ZGV_0002	zgvDatumVorGeburtsdatum	\N	ZGV Datum vor Geburtsdatum	error	core
+CORE_ZGV_0003	zgvMasterDatumInZukunft	\N	ZGV Masterdatum in Zukunft	error	core
+CORE_ZGV_0004	zgvMasterDatumVorZgvdatum	\N	ZGV Masterdatum vor Zgvdatum	error	core
+CORE_ZGV_0005	zgvMasterDatumVorGeburtsdatum	\N	ZGV Masterdatum vor Geburtsdatum	error	core
+CORE_INOUT_0001	keinAufenthaltszweckPlausi	\N	Kein Aufenthaltszweck gefunden	error	core
+CORE_INOUT_0002	zuVieleZweckeIncomingPlausi	\N	Es sind %s Aufenthaltszwecke eingetragen (max. 1 Zweck für Incomings)	error	core
+CORE_INOUT_0003	falscherIncomingZweckPlausi	\N	Aufenthaltszweckcode ist %s (für Incomings ist nur Zweck 1, 2, 3 erlaubt)	error	core
+CORE_INOUT_0004	outgoingAufenthaltfoerderungfehltPlausi	\N	Keine Aufenthaltsfoerderung angegeben (bei Outgoings >= 29 Tage Monat im Ausland muss mind. 1 gemeldet werden)	error	core
+CORE_INOUT_0005	outgoingAngerechneteEctsFehlenPlausi	\N	Angerechnete ECTS fehlen (Meldepflicht bei Outgoings >= 29 Tage Monat im Ausland)	error	core
+CORE_INOUT_0006	outgoingErworbeneEctsFehlenPlausi	\N	Erworbene ECTS fehlen (Meldepflicht bei Outgoings >= 29 Tage Monat im Ausland)	error	core
+CORE_INOUT_0007	IncomingHeimatNationOesterreich	\N	Heimatnation bei Incoming Österreich	error	core
+CORE_INOUT_0008	IncomingOhneIoDatensatz	\N	Incoming hat keinen IO Datensatz (prestudent_id %s)	error	core
+CORE_INOUT_0009	IncomingOrGsFoerderrelevant	\N	Incoming oder gemeinsames Studium ist nicht als nicht förderrelevant markiert. (prestudent_id %s)	error	core
+CORE_STG_0001	StgPrestudentUngleichStgStudent	\N	Studiengang des Prestudenten ist ungleich dem Studiengang des Studenten. (prestudent_id %s)	error	core
+CORE_STG_0002	OrgformStgUngleichOrgformPrestudent	\N	Es ist kein Studienplan mit Studiengang (%s) und Organisationsform (%s) des Studenten zugewiesen. (prestudent_id %s, Studiensemester %s)	error	core
+CORE_STG_0003	PrestudentMischformOhneOrgform	\N	Organisationsform ist für Studierenden/BewerberIn in Mischformstudiengang nicht eingetragen. (prestudent_id %s, Studiensemester %s)	error	core
+CORE_STG_0004	StgPrestudentUngleichStgStudienplan	\N	Studiengang des Prestudenten passt nicht zu Studiengang des Studienplans. (prestudent_id %s, Studienplan %s)	error	core
+CORE_STUDENTSTATUS_0001	AbbrecherAktiv	\N	AbbrecherIn hat aktiven Benutzer. (prestudent_id %s)	error	core
+CORE_STUDENTSTATUS_0002	StudentstatusNachAbbrecher	\N	Aktiver Status nach Abbrecher Status. (prestudent_id %s)	error	core
+CORE_STUDENTSTATUS_0003	AusbildungssemPrestudentUngleichAusbildungssemStatus	\N	Ausbildungssemester %s des aktuellen Status stimmt nicht mit Ausbildungssemester %s bei StudentIn (Lehrverband) überein. (student_uid %s, prestudent_id %s, Studiensemester %s)	error	core
+CORE_STUDENTSTATUS_0004	InaktiverStudentAktiverStatus	\N	Inaktiver Benutzer hat aktiven Status. (prestudent_id %s)	error	core
+CORE_STUDENTSTATUS_0005	InskriptionVorLetzerBismeldung	\N	Datum der Inskription liegt vor dem Datum der letzten BIS-Meldung %s. (prestudent_id %s, Studiensemester %s)	error	core
+CORE_STUDENTSTATUS_0006	DatumStudiensemesterFalscheReihenfolge	\N	Datum und Studiensemester sind bei den Status in falscher Reihenfolge. (prestudent_id %s)	error	core
+CORE_STUDENTSTATUS_0007	AktiverStudentOhneStatus	\N	Aktive/r StudentIn ohne aktuellen Status (prestudent_id %s)	error	core
+CORE_STUDENTSTATUS_0008	StudienplanUngueltig	\N	Studienplan %s ist im Ausbildungssemester %s nicht gültig (prestudent_id %s)	error	core
+CORE_STUDENTSTATUS_0009	FalscheAnzahlAbschlusspruefungen	\N	Mehrere oder keine bestandenen Abschlussprüfungen (prestudent_id %s)	error	core
+CORE_STUDENTSTATUS_0010	DatumAbschlusspruefungFehlt	\N	Kein Abschlussprüfung Datum (prestudent_id %s, abschlusspruefung_id %s)	error	core
+CORE_STUDENTSTATUS_0011	DatumSponsionFehlt	\N	Kein Sponsionsdatum (prestudent_id %s, abschlusspruefung_id %s)	error	core
+CORE_STUDENTSTATUS_0012	BewerberNichtZumRtAngetreten	\N	Bewerber nicht zum Reihungstest angetreten (prestudent_id %s)	error	core
+CORE_STUDENTSTATUS_0013	AktSemesterNull	\N	Aktuelles Ausbildungssemester ist 0 (prestudent_id %s, Studiensemester %s)	error	core
+CORE_STUDENTSTATUS_0014	AbschlussstatusFehlt	\N	Kein Abschlussstatus (prestudent_id %s)	error	core
+CORE_STUDENTSTATUS_0015	AktiverStudentstatusOhneKontobuchung	\N	Keine Kontobuchung bei aktivem Studentstatus (prestudent_id %s, Studiensemester %s)	error	core
+CORE_STUDENTSTATUS_0016	DualesStudiumOhneMarkierung	\N	StudentIn in dualem Studiengang nicht als dual markiert (prestudent_id %s, Studienplan %s)	error	core
+CORE_PERSON_0001	GbDatumWeitZurueck	\N	Geburtsdatum vor dem 01.01.1920	error	core
+CORE_PERSON_0002	NationNichtOesterreichAberGemeinde	\N	Nation der Adresse ist ungleich Österreich, es ist aber eine österreichische Gemeinde (%s) angegeben (adresse_id %s)	error	core
+CORE_PERSON_0003	FalscheAnzahlHeimatadressen	\N	Es sind mehrere oder keine Heimatadressen eingetragen	error	core
+CORE_PERSON_0004	FalscheAnzahlZustelladressen	\N	Es sind mehrere oder keine Zustelladressen eingetragen	error	core
+CORE_PERSON_0005	geburtsnationFehlt	\N	Geburtsnation nicht vorhanden	error	core
+CORE_PERSON_0006	uhstatPersonkennungFehltCore	\N	Personkennung fehlt (vBpk AS, vBpk BF oder Ersatzkennzeichen fehlt)	error	core
 \.
 
 
@@ -37763,7 +38180,7 @@ UNKNOWN_ERROR	\N	\N	Fehler ist aufgetreten	error	core
 -- Data for Name: tbl_fehler_zustaendigkeiten; Type: TABLE DATA; Schema: system; Owner: fhcomplete
 --
 
-COPY system.tbl_fehler_zustaendigkeiten (fehlerzustaendigkeiten_id, fehlercode, person_id, oe_kurzbz, funktion_kurzbz) FROM stdin;
+COPY system.tbl_fehler_zustaendigkeiten (fehlerzustaendigkeiten_id, fehlercode, person_id, oe_kurzbz, funktion_kurzbz, insertamum, insertvon) FROM stdin;
 \.
 
 
@@ -37783,32 +38200,48 @@ info	{info,info}
 --
 
 COPY system.tbl_filters (filter_id, app, dataset_name, filter_kurzbz, person_id, description, sort, default_filter, filter, oe_kurzbz, statistik_kurzbz) FROM stdin;
-10	reihungstest	overview	Reihungstest	\N	{"Reihungstest Übersicht"}	1	t	{"name": "Reihungstest", "columns": [{"name": "fakultaet"}, {"name": "datum"}, {"name": "uhrzeit"}, {"name": "anmeldefrist"}, {"name": "oeffentlich"}, {"name": "studiengaenge"}, {"name": "freie_plaetze"}, {"name": "anzahl_angemeldet"}, {"name": "rt_studiengang"}, {"name": "reihungstest_id"}], "filters": []}	\N	\N
-12	infocenter	zgvUeberpruefung	zgvOffen	\N	{"ZGV Überprüfung"}	1	t	{"name": "Zgv Überprüfung", "columns": [{"name": "PreStudentID"}, {"name": "Vorname"}, {"name": "Nachname"}, {"name": "Studiengang"}], "filters": [{"name": "Status", "condition": "stg", "operation": "contains"}]}	\N	\N
-2	infocenter	overview	InfoCenterSentApplication3days	\N	{"3 Tage keine Aktion"}	2	\N	{"name": "Abgeschickt - 3 Tage keine Aktion", "columns": [{"name": "Vorname"}, {"name": "Nachname"}, {"name": "ZGVNation"}, {"name": "ZGVMNation"}, {"name": "StgAbgeschickt"}, {"name": "Studiensemester"}, {"name": "LastAction"}, {"name": "LastActionType"}, {"name": "User/Operator"}, {"name": "InfoCenterMitarbeiter"}, {"name": "LockUser"}], "filters": [{"name": "LastAction", "option": "days", "condition": "3", "operation": "gt"}, {"name": "AnzahlAbgeschickt", "option": "", "condition": "0", "operation": "gt"}]}	\N	\N
 3	infocenter	overview	InfoCenterNotSentApplicationAll	\N	{Alle}	1	\N	{"name": "Nicht abgeschickt - Alle", "columns": [{"name": "Vorname"}, {"name": "Nachname"}, {"name": "ZGVNation"}, {"name": "ZGVMNation"}, {"name": "LastAction"}, {"name": "LastActionType"}, {"name": "User/Operator"}, {"name": "InfoCenterMitarbeiter"}, {"name": "LockUser"}, {"name": "StgNichtAbgeschickt"}, {"name": "StgAbgeschickt"}, {"name": "StgAktiv"}, {"name": "Studiensemester"}], "filters": [{"name": "AnzahlStgNichtAbgeschickt", "option": "", "condition": "0", "operation": "gt"}]}	\N	\N
 4	infocenter	overview	InfoCenterNotSentApplication14Days	\N	{"14 Tage keine Aktion"}	3	\N	{"name": "Nicht abgeschickt - 14 Tage keine Aktion", "columns": [{"name": "Vorname"}, {"name": "Nachname"}, {"name": "ZGVNation"}, {"name": "ZGVMNation"}, {"name": "LastAction"}, {"name": "User/Operator"}, {"name": "InfoCenterMitarbeiter"}, {"name": "LockUser"}, {"name": "StgNichtAbgeschickt"}, {"name": "StgAbgeschickt"}, {"name": "StgAktiv"}, {"name": "Studiensemester"}], "filters": [{"name": "LastAction", "option": "days", "condition": "14", "operation": "gt"}, {"name": "SendDate", "option": "", "condition": "", "operation": "nset"}]}	\N	\N
 5	infocenter	overview	InfoCenterSentApplicationLt3days	\N	{"< 3 Tage"}	3	\N	{"name": "Abgeschickt - Aktion innert der letzten 3 Tage", "columns": [{"name": "Vorname"}, {"name": "Nachname"}, {"name": "ZGVNation"}, {"name": "ZGVMNation"}, {"name": "StgAbgeschickt"}, {"name": "Studiensemester"}, {"name": "LastAction"}, {"name": "User/Operator"}, {"name": "InfoCenterMitarbeiter"}, {"name": "LockUser"}], "filters": [{"name": "LastAction", "option": "days", "condition": "3", "operation": "lt"}, {"name": "AnzahlAbgeschickt", "option": "", "condition": "0", "operation": "gt"}]}	\N	\N
 7	infocenter	freigegeben	InfoCenterFreigegeben5days	\N	{"5 Tage Letzte Aktion"}	2	\N	{"name": "Freigegeben - 5 Tage Letzte Aktion", "columns": [{"name": "Vorname"}, {"name": "Nachname"}, {"name": "StgAbgeschickt"}, {"name": "LastAction"}, {"name": "User/Operator"}, {"name": "InfoCenterMitarbeiter"}, {"name": "LockUser"}, {"name": "Statusgrund"}], "filters": [{"name": "LastAction", "option": "days", "condition": "5", "operation": "lt"}, {"name": "ReihungstestAngetreten", "operation": "false"}]}	\N	\N
-8	infocenter	freigegeben	InfoCenterFreigegebenAlle	\N	{Alle}	1	t	{"name": "Freigegeben - Alle", "columns": [{"name": "Vorname"}, {"name": "Nachname"}, {"name": "StgAbgeschickt"}, {"name": "LastAction"}, {"name": "LastActionType"}, {"name": "User/Operator"}, {"name": "InfoCenterMitarbeiter"}, {"name": "LockUser"}, {"name": "Statusgrund"}, {"name": "Studiensemester"}, {"name": "ReihungstestApplied"}, {"name": "ReihungstestDate"}], "filters": [{"name": "ReihungstestAngetreten", "operation": "false"}]}	\N	\N
-9	core	overview	BPKWartung	\N	{"bPK Uebersicht"}	1	t	{"name": "Fehlende bPK", "columns": [{"name": "person_id"}, {"name": "vorname"}, {"name": "nachname"}, {"name": "svnr"}, {"name": "ersatzkennzeichen"}], "filters": []}	\N	\N
+8	infocenter	freigegeben	InfoCenterFreigegebenAlle	\N	{Alle}	1	t	{"name": "Freigegeben - Alle", "columns": [{"name": "Vorname"}, {"name": "Nachname"}, {"name": "AktenId"}, {"name": "StgAbgeschickt"}, {"name": "LastAction"}, {"name": "LastActionType"}, {"name": "User/Operator"}, {"name": "InfoCenterMitarbeiter"}, {"name": "LockUser"}, {"name": "Statusgrund"}, {"name": "Studiensemester"}, {"name": "ReihungstestApplied"}, {"name": "ReihungstestDate"}], "filters": [{"name": "ReihungstestAngetreten", "operation": "false"}]}	\N	\N
+9	core	overview	BPKWartung	\N	{"bPK Uebersicht"}	1	t	{"name": "Fehlende bPK", "columns": [{"name": "person_id"}, {"name": "vorname"}, {"name": "nachname"}, {"name": "svnr"}, {"name": "ersatzkennzeichen"}, {"name": "mitarbeiter"}], "filters": []}	\N	\N
+10	reihungstest	overview	Reihungstest	\N	{"Reihungstest Übersicht"}	1	t	{"name": "Reihungstest", "columns": [{"name": "fakultaet"}, {"name": "datum"}, {"name": "uhrzeit"}, {"name": "anmeldefrist"}, {"name": "oeffentlich"}, {"name": "studiengaenge"}, {"name": "freie_plaetze"}, {"name": "anzahl_angemeldet"}, {"name": "rt_studiengang"}, {"name": "reihungstest_id"}], "filters": []}	\N	\N
 11	infocenter	reihungstestAbsolviert	InfoCenterReihungstestAbsolviert5days	\N	{"Letzten 5 Tage"}	2	\N	{"name": "Reihungstest absolviert - Letzten 5 Tage", "columns": [{"name": "Vorname"}, {"name": "Nachname"}, {"name": "StgAbgeschickt"}, {"name": "LastAction"}, {"name": "User/Operator"}, {"name": "InfoCenterMitarbeiter"}, {"name": "LockUser"}], "filters": [{"name": "ReihungstestDatum", "option": "days", "condition": "5", "operation": "lt"}, {"name": "ReihungstestAngetreten", "operation": "true"}]}	\N	\N
+12	infocenter	zgvUeberpruefung	zgvOffen	\N	{"ZGV Überprüfung"}	1	t	{"name": "Zgv Überprüfung", "columns": [{"name": "PreStudentID"}, {"name": "Vorname"}, {"name": "Nachname"}, {"name": "Studiengang"}], "filters": [{"name": "Status", "condition": "stg", "operation": "contains"}]}	\N	\N
 19	core	logs	jqws48hours	\N	{"Last 48 hours JQWs logs"}	2	\N	{"name": "All Job Queue Workers logs from the last 48 hours", "columns": [{"name": "RequestId"}, {"name": "ExecutionTime"}, {"name": "ExecutedBy"}, {"name": "Description"}, {"name": "Data"}], "filters": [{"name": "WebserviceType", "condition": "job", "operation": "contains"}, {"name": "RequestId", "condition": "JQW", "operation": "contains"}, {"name": "ExecutionTime", "option": "hours", "condition": "48", "operation": "lt"}]}	\N	\N
-24	core	issues	offeneFehler	\N	{"Alle offenen"}	1	t	{"name": "Alle offenen Fehler, hauptzuständig", "columns": [{"name": "Datum"}, {"name": "Inhalt"}, {"name": "Vorname"}, {"name": "Nachname"}, {"name": "PersonId"}, {"name": "Fehlerstatus"}], "filters": [{"name": "Fehlerstatus", "condition": "behoben", "operation": "ncontains"}, {"name": "Hauptzuständig", "condition": "Ja", "operation": "contains"}]}	\N	\N
-25	core	issues	FehlerLetze7Tage	\N	{"Letzten 7 Tage"}	2	\N	{"name": "Alle in den letzten 7 Tagen aufgetretenen Fehler", "columns": [{"name": "Datum"}, {"name": "Inhalt"}, {"name": "Vorname"}, {"name": "Nachname"}, {"name": "PersonId"}, {"name": "Fehlerstatus"}], "filters": [{"name": "Datum", "option": "days", "condition": "7", "operation": "lt"}]}	\N	\N
-20	core	logs	repots14days	\N	{"Last 14 days reports logs"}	3	\N	{"name": "All reports logs from the last 14 days", "columns": [{"name": "RequestId"}, {"name": "ExecutionTime"}, {"name": "ExecutedBy"}, {"name": "Description"}, {"name": "Data"}], "filters": [{"name": "WebserviceType", "condition": "reports", "operation": "contains"}, {"name": "ExecutionTime", "option": "days", "condition": "14", "operation": "lt"}]}	\N	\N
-21	core	logs	content3minutes	\N	{"Last 3 minutes content logs"}	4	\N	{"name": "All content logs from the last 3 minutes", "columns": [{"name": "RequestId"}, {"name": "ExecutionTime"}, {"name": "ExecutedBy"}, {"name": "Description"}, {"name": "Data"}], "filters": [{"name": "WebserviceType", "condition": "content", "operation": "contains"}, {"name": "ExecutionTime", "option": "minutes", "condition": "3", "operation": "lt"}]}	\N	\N
-22	core	logs	wienerlinien24hours	\N	{"Last 24 hours Wiener Linien logs"}	5	\N	{"name": "All Wiener Linien logs from the last 24 hours", "columns": [{"name": "RequestId"}, {"name": "ExecutionTime"}, {"name": "ExecutedBy"}, {"name": "Description"}, {"name": "Data"}], "filters": [{"name": "WebserviceType", "condition": "wienerlinien", "operation": "contains"}, {"name": "ExecutionTime", "option": "hours", "condition": "24", "operation": "lt"}]}	\N	\N
-14	budget	budgetoverview	BudgetUebersicht	\N	{"Budgetanträge Übersicht"}	1	t	{"name": "Budgetanträge", "columns": [{"name": "Budgetantrag"}, {"name": "Kostenstelle"}, {"name": "Organisationseinheit"}, {"name": "Geschäftsjahr"}, {"name": "Budgetstatus"}, {"name": "Betrag"}], "filters": [{"name": "Budgetstatus", "condition": "Freigegeben", "operation": "ncontains"}, {"name": "Geschäftsjahr", "condition": "GJ2019-2020", "operation": "contains"}]}	\N	\N
+24	core	issues	offeneFehler	\N	{"Alle offenen"}	1	t	{"name": "Alle offenen Fehler, hauptzuständig", "columns": [{"name": "Datum"}, {"name": "Inhalt"}, {"name": "Vorname"}, {"name": "Nachname"}, {"name": "PersonId"}, {"name": "Fehlerstatus"}, {"name": "Zugehörigkeit"}, {"name": "Person Zuständigkeiten"}, {"name": "Organisationseinheit Zuständigkeiten"}], "filters": [{"name": "Statuscode", "condition": "resolved", "operation": "ncontains"}, {"name": "Hauptzuständig", "condition": "Ja", "operation": "contains"}]}	\N	\N
+25	core	issues	FehlerLetze7Tage	\N	{"Letzten 7 Tage"}	2	\N	{"name": "Alle in den letzten 7 Tagen aufgetretenen Fehler", "columns": [{"name": "Datum"}, {"name": "Inhalt"}, {"name": "Vorname"}, {"name": "Nachname"}, {"name": "PersonId"}, {"name": "Fehlerstatus"}, {"name": "Zugehörigkeit"}, {"name": "Person Zuständigkeiten"}, {"name": "Organisationseinheit Zuständigkeiten"}], "filters": [{"name": "Datum", "option": "days", "condition": "7", "operation": "lt"}]}	\N	\N
+6	infocenter	overview	InfoCenterNotSentApplication5DaysOnline	\N	{"5 Tage keine BewAktion"}	2	\N	{"name": "Nicht abgeschickt - 5 Tage keine Aktion durch BewerberIn", "columns": [{"name": "Vorname"}, {"name": "Nachname"}, {"name": "ZGVNation"}, {"name": "ZGVMNation"}, {"name": "LastAction"}, {"name": "User/Operator"}, {"name": "InfoCenterMitarbeiter"}, {"name": "LockUser"}, {"name": "StgNichtAbgeschickt"}, {"name": "StgAbgeschickt"}, {"name": "StgAktiv"}, {"name": "Studiensemester"}], "filters": [{"name": "SendDate", "option": "", "condition": "", "operation": "nset"}, {"name": "LastAction", "option": "days", "condition": "5", "operation": "gt"}, {"name": "User/Operator", "option": "", "condition": "online", "operation": "contains"}]}	\N	\N
+13	infocenter	zgvUeberpruefung	zgvRest	\N	{"ZGV abgeschlossen"}	2	t	{"name": "Zgv abgeschlossen", "columns": [{"name": "PreStudentID"}, {"name": "Vorname"}, {"name": "Nachname"}, {"name": "Studiengang"}, {"name": "Status"}], "filters": [{"name": "Status", "condition": "stg", "operation": "ncontains"}]}	\N	\N
+23	core	jq	lastHour	\N	{"Last hour queued jobs"}	1	t	{"name": "All jobs queued in the last hour", "columns": [{"name": "JobId"}, {"name": "CreationTime"}, {"name": "Type"}, {"name": "Status"}, {"name": "StartTime"}, {"name": "EndTime"}, {"name": "UserService"}], "filters": [{"name": "CreationTime", "option": "hours", "condition": "1", "operation": "lt"}]}	\N	\N
 15	core	logs	last1min	\N	{"Last minute logs"}	1	t	{"name": "All logs from the last minute", "columns": [{"name": "RequestId"}, {"name": "ExecutionTime"}, {"name": "ExecutedBy"}, {"name": "Description"}, {"name": "Data"}], "filters": [{"name": "ExecutionTime", "option": "minutes", "condition": "1", "operation": "lt"}]}	\N	\N
 16	core	logs	jobs24hours	\N	{"Last 24 hours jobs logs"}	2	\N	{"name": "All jobs logs from the last 24 hours", "columns": [{"name": "RequestId"}, {"name": "ExecutionTime"}, {"name": "ExecutedBy"}, {"name": "Description"}, {"name": "Data"}], "filters": [{"name": "WebserviceType", "condition": "job", "operation": "contains"}, {"name": "RequestId", "condition": "JOB", "operation": "contains"}, {"name": "ExecutionTime", "option": "hours", "condition": "24", "operation": "lt"}]}	\N	\N
 17	core	logs	jobs48hours	\N	{"Last 48 hours jobs logs"}	2	\N	{"name": "All jobs logs from the last 48 hours", "columns": [{"name": "RequestId"}, {"name": "ExecutionTime"}, {"name": "ExecutedBy"}, {"name": "Description"}, {"name": "Data"}], "filters": [{"name": "WebserviceType", "condition": "job", "operation": "contains"}, {"name": "RequestId", "condition": "JOB", "operation": "contains"}, {"name": "ExecutionTime", "option": "hours", "condition": "48", "operation": "lt"}]}	\N	\N
 18	core	logs	jqws24hours	\N	{"Last 24 hours JQWs logs"}	2	\N	{"name": "All Job Queue Workers logs from the last 24 hours", "columns": [{"name": "RequestId"}, {"name": "ExecutionTime"}, {"name": "ExecutedBy"}, {"name": "Description"}, {"name": "Data"}], "filters": [{"name": "WebserviceType", "condition": "job", "operation": "contains"}, {"name": "RequestId", "condition": "JQW", "operation": "contains"}, {"name": "ExecutionTime", "option": "hours", "condition": "24", "operation": "lt"}]}	\N	\N
-13	infocenter	zgvUeberpruefung	zgvRest	\N	{"ZGV abgeschlossen"}	2	t	{"name": "Zgv abgeschlossen", "columns": [{"name": "PreStudentID"}, {"name": "Vorname"}, {"name": "Nachname"}, {"name": "Studiengang"}, {"name": "Status"}], "filters": [{"name": "Status", "condition": "stg", "operation": "ncontains"}]}	\N	\N
-23	core	jq	lastHour	\N	{"Last hour queued jobs"}	1	t	{"name": "All jobs queued in the last hour", "columns": [{"name": "JobId"}, {"name": "CreationTime"}, {"name": "Type"}, {"name": "Status"}, {"name": "StartTime"}, {"name": "EndTime"}, {"name": "UserService"}], "filters": [{"name": "CreationTime", "option": "hours", "condition": "1", "operation": "lt"}]}	\N	\N
-1	infocenter	overview	InfoCenterSentApplicationAll	\N	{Alle}	1	\N	{"name": "Abgeschickt - Alle", "columns": [{"name": "Vorname"}, {"name": "Nachname"}, {"name": "ZGVNation"}, {"name": "ZGVMNation"}, {"name": "StgAbgeschickt"}, {"name": "Studiensemester"}, {"name": "LastAction"}, {"name": "LastActionType"}, {"name": "User/Operator"}, {"name": "InfoCenterMitarbeiter"}, {"name": "LockUser"}], "filters": [{"name": "AnzahlAbgeschickt", "option": "", "condition": "0", "operation": "gt"}]}	\N	\N
-6	infocenter	overview	InfoCenterNotSentApplication5DaysOnline	\N	{"5 Tage keine BewAktion"}	2	\N	{"name": "Nicht abgeschickt - 5 Tage keine Aktion durch BewerberIn", "columns": [{"name": "Vorname"}, {"name": "Nachname"}, {"name": "ZGVNation"}, {"name": "ZGVMNation"}, {"name": "LastAction"}, {"name": "User/Operator"}, {"name": "InfoCenterMitarbeiter"}, {"name": "LockUser"}, {"name": "StgNichtAbgeschickt"}, {"name": "StgAbgeschickt"}, {"name": "StgAktiv"}, {"name": "Studiensemester"}], "filters": [{"name": "SendDate", "option": "", "condition": "", "operation": "nset"}, {"name": "LastAction", "option": "days", "condition": "5", "operation": "gt"}, {"name": "User/Operator", "option": "", "condition": "online", "operation": "contains"}]}	\N	\N
-26	core	issues	FehlerLetzte7TageBearbeitet	\N	{"Letzten 7 Tage bearbeitet"}	3	\N	{"name": "Alle in den letzten 7 Tagen bearbeiteten Fehler", "columns": [{"name": "Datum"}, {"name": "Inhalt"}, {"name": "Vorname"}, {"name": "Nachname"}, {"name": "PersonId"}, {"name": "Fehlerstatus"}, {"name": "Verarbeitet von"}], "filters": [{"name": "Verarbeitet am", "option": "days", "condition": "7", "operation": "lt"}, {"name": "Fehlerstatus", "condition": "behoben", "operation": "contains"}]}	\N	\N
+20	core	logs	repots14days	\N	{"Last 14 days reports logs"}	3	\N	{"name": "All reports logs from the last 14 days", "columns": [{"name": "RequestId"}, {"name": "ExecutionTime"}, {"name": "ExecutedBy"}, {"name": "Description"}, {"name": "Data"}], "filters": [{"name": "WebserviceType", "condition": "reports", "operation": "contains"}, {"name": "ExecutionTime", "option": "days", "condition": "14", "operation": "lt"}]}	\N	\N
+21	core	logs	content3minutes	\N	{"Last 3 minutes content logs"}	4	\N	{"name": "All content logs from the last 3 minutes", "columns": [{"name": "RequestId"}, {"name": "ExecutionTime"}, {"name": "ExecutedBy"}, {"name": "Description"}, {"name": "Data"}], "filters": [{"name": "WebserviceType", "condition": "content", "operation": "contains"}, {"name": "ExecutionTime", "option": "minutes", "condition": "3", "operation": "lt"}]}	\N	\N
+22	core	logs	wienerlinien24hours	\N	{"Last 24 hours Wiener Linien logs"}	5	\N	{"name": "All Wiener Linien logs from the last 24 hours", "columns": [{"name": "RequestId"}, {"name": "ExecutionTime"}, {"name": "ExecutedBy"}, {"name": "Description"}, {"name": "Data"}], "filters": [{"name": "WebserviceType", "condition": "wienerlinien", "operation": "contains"}, {"name": "ExecutionTime", "option": "hours", "condition": "24", "operation": "lt"}]}	\N	\N
+14	budget	budgetoverview	BudgetUebersicht	\N	{"Budgetanträge Übersicht"}	1	t	{"name": "Budgetanträge", "columns": [{"name": "Budgetantrag"}, {"name": "Kostenstelle"}, {"name": "Organisationseinheit"}, {"name": "Geschäftsjahr"}, {"name": "Budgetstatus"}, {"name": "Betrag"}], "filters": [{"name": "Budgetstatus", "condition": "Freigegeben", "operation": "ncontains"}, {"name": "Geschäftsjahr", "condition": "GJ2019-2020", "operation": "contains"}]}	\N	\N
+26	core	issues	FehlerLetzte7TageBearbeitet	\N	{"Letzten 7 Tage bearbeitet"}	3	\N	{"name": "Alle in den letzten 7 Tagen bearbeiteten Fehler", "columns": [{"name": "Datum"}, {"name": "Inhalt"}, {"name": "Vorname"}, {"name": "Nachname"}, {"name": "PersonId"}, {"name": "Fehlerstatus"}, {"name": "Zugehörigkeit"}, {"name": "Verarbeitet von"}, {"name": "Verarbeitet am"}], "filters": [{"name": "Verarbeitet am", "option": "days", "condition": "7", "operation": "lt"}, {"name": "Statuscode", "condition": "resolved", "operation": "contains"}]}	\N	\N
+1	infocenter	overview	InfoCenterSentApplicationAll	\N	{Alle}	1	\N	{"name": "Abgeschickt - Alle", "columns": [{"name": "Vorname"}, {"name": "Nachname"}, {"name": "ZGVNation"}, {"name": "ZGVMNation"}, {"name": "StgAbgeschickt"}, {"name": "LastAction"}, {"name": "LastActionType"}, {"name": "User/Operator"}, {"name": "InfoCenterMitarbeiter"}, {"name": "LockUser"}, {"name": "HoldDate"}, {"name": "Rueckstellgrund"}, {"name": "Kaution"}], "filters": [{"name": "AnzahlAbgeschickt", "option": "", "condition": "0", "operation": "gt"}]}	\N	\N
+2	infocenter	overview	InfoCenterSentApplication3days	\N	{"3 Tage keine Aktion"}	2	\N	{"name": "Abgeschickt - 3 Tage keine Aktion", "columns": [{"name": "Vorname"}, {"name": "Nachname"}, {"name": "ZGVNation"}, {"name": "ZGVMNation"}, {"name": "StgAbgeschickt"}, {"name": "Studiensemester"}, {"name": "LastAction"}, {"name": "LastActionType"}, {"name": "User/Operator"}, {"name": "InfoCenterMitarbeiter"}, {"name": "LockUser"}], "filters": [{"name": "LastAction", "option": "days", "condition": "3", "operation": "gt"}, {"name": "AnzahlAbgeschickt", "option": "", "condition": "0", "operation": "gt"}]}	\N	\N
+27	core	leistungsstipendium	LeistungsstipendiumAlle	\N	{Alle}	1	t	{"name": "Leistungsstipendium - Alle", "columns": [{"name": "Vorname"}, {"name": "Nachname"}, {"name": "Buchungsdatum"}, {"name": "Betrag"}, {"name": "Buchungstyp"}, {"name": "VorgangsId"}, {"name": "FoerderfallId"}, {"name": "LeistungsdatenId"}, {"name": "startjahr"}, {"name": "endjahr"}, {"name": "Uebermittelt"}], "filters": []}	\N	\N
+28	infocenter	abgewiesen	InfoCenterAbgewiesenAlle	\N	{Alle}	1	t	{"name": "Abgewiesen - Alle", "columns": [{"name": "PersonId"}, {"name": "PreStudentID"}, {"name": "Vorname"}, {"name": "Nachname"}, {"name": "Studiengang"}, {"name": "AbgewiesenAm"}, {"name": "Nachricht"}, {"name": "Kaution"}, {"name": "LockUser"}], "filters": []}	\N	\N
+29	infocenter	onboarding	InfoCenterOnboarding	\N	{Alle}	1	t	{"name": "Electronic Onboarding - Alle", "columns": [{"name": "PersonId"}, {"name": "Vorname"}, {"name": "Nachname"}, {"name": "LockUser"}, {"name": "HoldDate"}, {"name": "Rueckstellgrund"}], "filters": []}	\N	\N
+30	infocenter	aufgenommen	InfoCenterAufgenommenAlle	\N	{Alle}	1	t	{"name": "Aufgenommen - Lehrgänge", "columns": [{"name": "PersonId"}, {"name": "Vorname"}, {"name": "Nachname"}, {"name": "Studiengang"}], "filters": []}	\N	\N
+31	projektarbeitsbeurteilung	projektuebersicht	alleProjekte	\N	{Projektübersicht}	1	t	{"name": "Projektübersicht", "columns": [{"name": "Studiengang"}, {"name": "StudentNachname"}, {"name": "Abgabedatum"}, {"name": "Note"}, {"name": "ErstNachname"}, {"name": "ErstAbgeschickt"}, {"name": "ZweitNachname"}, {"name": "ZweitAbgeschickt"}], "filters": []}	\N	\N
+32	dvuh	storno	DVUHStorno	\N	{"DVUH Storno Übersicht"}	1	t	{"name": "DVUHStorno", "columns": [{"name": "vorname"}, {"name": "nachname"}, {"name": "matrikelnummer"}, {"name": "studiengang"}, {"name": "studiensemester"}, {"name": "last_status"}, {"name": "bismelden"}], "filters": []}	\N	\N
+33	dvuh	overview	BPKWartungDVUH	\N	{"bPK Uebersicht"}	1	t	{"name": "Fehlende bPK", "columns": [{"name": "person_id"}, {"name": "vorname"}, {"name": "nachname"}, {"name": "svnr"}, {"name": "ersatzkennzeichen"}, {"name": "mitarbeiter"}], "filters": []}	\N	\N
+34	core	employees	mitarbeiter	\N	{"MA Uebersicht"}	1	t	{"name": "Mitarbeiter", "columns": [{"name": "PersonId"}, {"name": "Vorname"}, {"name": "Nachname"}, {"name": "Alias"}, {"name": "Aktiv"}, {"name": "Raum"}, {"name": "Geschlecht"}, {"name": "Standardkostenstelle"}], "filters": [{"name": "Nachname", "option": "", "condition": "", "operation": ""}]}	\N	\N
+37	core	fehlerZustaendigkeiten	fehlerZustaendigkeiten	\N	{"Fehler Zustaendigkeiten"}	1	t	{"name": "Fehler Zuständigkeiten", "columns": [{"name": "fehlercode"}, {"name": "person_id"}, {"name": "vorname"}, {"name": "nachname"}, {"name": "oe_bezeichnung"}, {"name": "funktion_beschreibung"}], "filters": []}	\N	\N
+38	core	fehlerKonfiguration	fehlerKonfiguration	\N	{"Fehler Konfiguration"}	1	t	{"name": "Fehler Konfiguration", "columns": [{"name": "konfigurationstyp_kurzbz"}, {"name": "fehlercode"}, {"name": "fehler_kurzbz"}, {"name": "konfiguration"}, {"name": "app"}], "filters": []}	\N	\N
+39	core	gruppenmanagement	gruppenmanagement	\N	{"Meine Gruppen"}	1	t	{"name": "gruppenmanagement", "columns": [{"name": "gruppe_kurzbz"}, {"name": "gruppe_bezeichnung"}, {"name": "gruppe_beschreibung"}, {"name": "studiengang_kurzbz"}], "filters": []}	\N	\N
+40	core	softwareManagement	SoftwareManagement	\N	{"Software Verwaltung"}	1	t	{"name": "SoftwareManagement", "columns": [{"name": "software_kurzbz"}, {"name": "version"}, {"name": "beschreibung"}, {"name": "hersteller"}, {"name": "os"}, {"name": "lizenzserver_kurzbz"}, {"name": "lizenzserver_port"}, {"name": "anzahl_lizenzen"}, {"name": "softwarestatus_kurzbz"}], "filters": []}	\N	\N
+41	core	imageVerwaltung	ImageVerwaltung	\N	{"Image Verwaltung"}	1	t	{"name": "ImageVerwaltung", "columns": [{"name": "bezeichnung"}, {"name": "betriebssystem"}, {"name": "verfuegbarkeit_start"}, {"name": "verfuegbarkeit_ende"}, {"name": "anmerkung"}, {"name": "ort_count"}, {"name": "software_count"}], "filters": []}	\N	\N
+42	core	lizenzserverVerwaltung	LizenzserverVerwaltung	\N	{"Lizenzserver Verwaltung"}	1	t	{"name": "LizenzserverVerwaltung", "columns": [{"name": "lizenzserver_kurzbz"}, {"name": "bezeichnung"}, {"name": "macadresse"}, {"name": "ipadresse"}, {"name": "ansprechpartner"}, {"name": "anmerkung"}, {"name": "location"}], "filters": []}	\N	\N
+49	core	vertragsverwaltung	VertragsverwaltungAktiv	\N	{"Aktive Mitarbeiter"}	1	t	{"name": "Aktive Mitarbeiter", "columns": [{"name": "uid"}, {"name": "person_id"}, {"name": "nachname"}, {"name": "vorname"}, {"name": "aktiv"}, {"name": "gebdatum"}, {"name": "unternehmen"}, {"name": "vertragsarten"}, {"name": "ids"}], "filters": [{"name": "aktiv", "option": "", "condition": "true", "operation": "equal"}]}	\N	\N
+50	core	vertragsverwaltung	VertragsverwaltungAlle	\N	{"Alle Mitarbeiter"}	1	\N	{"name": "Alle Mitarbeiter", "columns": [{"name": "uid"}, {"name": "person_id"}, {"name": "nachname"}, {"name": "vorname"}, {"name": "aktiv"}, {"name": "gebdatum"}, {"name": "unternehmen"}, {"name": "vertragsarten"}, {"name": "ids"}], "filters": []}	\N	\N
 \.
 
 
@@ -37816,7 +38249,7 @@ COPY system.tbl_filters (filter_id, app, dataset_name, filter_kurzbz, person_id,
 -- Data for Name: tbl_issue; Type: TABLE DATA; Schema: system; Owner: fhcomplete
 --
 
-COPY system.tbl_issue (issue_id, fehlercode, inhalt, fehlercode_extern, inhalt_extern, person_id, oe_kurzbz, datum, verarbeitetvon, verarbeitetamum, status_kurzbz, insertvon, insertamum, updatevon, updateamum) FROM stdin;
+COPY system.tbl_issue (issue_id, fehlercode, inhalt, fehlercode_extern, inhalt_extern, person_id, oe_kurzbz, datum, verarbeitetvon, verarbeitetamum, status_kurzbz, insertvon, insertamum, updatevon, updateamum, behebung_parameter) FROM stdin;
 \.
 
 
@@ -38521,6 +38954,7 @@ COPY system.tbl_phrase (phrase_id, app, phrase, insertamum, insertvon, category)
 621	core	Laedt	2021-11-11 12:39:58.772826	system	eucovidqr
 622	core	3G	2021-11-11 12:39:58.782679	system	eucovidqr
 623	core	FehlerBeimSpeichernDesGueltigkeitsdatums	2021-11-11 12:39:58.793249	system	eucovidqr
+723	core	lektorbereitsverplant	2026-03-31 14:08:34.173785	system	lehre
 624	core	PersondatenInFH-CompleteStimmenNichtMitDemZertifikatUeberein	2021-11-11 12:39:58.802993	system	eucovidqr
 625	core	UploadSuccessful	2021-11-11 12:39:58.812686	system	eucovidqr
 626	core	UploadFailed	2021-11-11 12:39:58.832062	system	eucovidqr
@@ -38564,6 +38998,1769 @@ COPY system.tbl_phrase (phrase_id, app, phrase, insertamum, insertvon, category)
 664	core	bitteFehlerWaehlen	2021-11-11 12:39:59.248734	system	fehlermonitoring
 665	core	statusAendernFehler	2021-11-11 12:39:59.261363	system	fehlermonitoring
 666	core	statusAendernUnbekannterFehler	2021-11-11 12:39:59.272519	system	fehlermonitoring
+667	core	raum	2026-03-31 14:08:33.779482	system	global
+668	core	feiertag	2026-03-31 14:08:33.784123	system	global
+669	core	collapseMenu	2026-03-31 14:08:33.792346	system	global
+670	core	extendMenu	2026-03-31 14:08:33.796688	system	global
+671	core	insertvon	2026-03-31 14:08:33.861474	system	global
+672	core	insertamum	2026-03-31 14:08:33.865537	system	global
+673	core	updatevon	2026-03-31 14:08:33.869702	system	global
+674	core	updateamum	2026-03-31 14:08:33.873769	system	global
+675	core	speichern	2026-03-31 14:08:33.877825	system	global
+676	core	create	2026-03-31 14:08:33.881798	system	global
+677	core	loeschen	2026-03-31 14:08:33.885909	system	global
+678	core	actions	2026-03-31 14:08:33.89006	system	global
+679	core	unknown_error	2026-03-31 14:08:33.894283	system	global
+680	core	filesizeExceeded	2026-03-31 14:08:33.899683	system	global
+681	core	loading	2026-03-31 14:08:33.903968	system	ui
+682	core	n_errors	2026-03-31 14:08:33.908092	system	ui
+683	core	toggle_nav	2026-03-31 14:08:33.912097	system	ui
+684	core	change	2026-03-31 14:08:33.91761	system	ui
+685	core	logout	2026-03-31 14:08:33.937947	system	ui
+686	core	settings	2026-03-31 14:08:33.942012	system	ui
+687	core	settings_saved	2026-03-31 14:08:33.945988	system	ui
+688	core	geloescht	2026-03-31 14:08:33.960675	system	ui
+689	core	error_fieldWriteAccess	2026-03-31 14:08:33.964701	system	ui
+690	core	error_fieldMustBeArray	2026-03-31 14:08:33.968726	system	ui
+691	core	filterdelete	2026-03-31 14:08:33.972736	system	ui
+692	core	filter	2026-03-31 14:08:33.978123	system	filter
+693	core	filterDelete	2026-03-31 14:08:33.988791	system	filter
+694	core	filterActive	2026-03-31 14:08:33.992808	system	filter
+695	core	person_id	2026-03-31 14:08:33.996862	system	person
+696	core	email_private	2026-03-31 14:08:34.023455	system	person
+697	core	email_intern	2026-03-31 14:08:34.027482	system	person
+698	core	adressen	2026-03-31 14:08:34.034198	system	person
+699	core	bankverbindungen	2026-03-31 14:08:34.038242	system	person
+700	core	rechnungsadresse	2026-03-31 14:08:34.042257	system	person
+701	core	heimatadresse	2026-03-31 14:08:34.046335	system	person
+702	core	co_name	2026-03-31 14:08:34.050392	system	person
+703	core	gemeinde	2026-03-31 14:08:34.05441	system	person
+704	core	gemeinde_waehlen	2026-03-31 14:08:34.05846	system	person
+705	core	plz_waehlen	2026-03-31 14:08:34.062448	system	person
+706	core	plz	2026-03-31 14:08:34.070448	system	person
+707	core	zustellung	2026-03-31 14:08:34.074482	system	person
+708	core	error_uidNotInPerson	2026-03-31 14:08:34.083777	system	person
+709	core	unruly	2026-03-31 14:08:34.087744	system	person
+710	core	error_noBenutzer	2026-03-31 14:08:34.091691	system	person
+711	core	lvOptions	2026-03-31 14:08:34.095675	system	lehre
+712	core	noGrades	2026-03-31 14:08:34.099626	system	lehre
+713	core	cancelvertrag	2026-03-31 14:08:34.105003	system	lehre
+714	core	vertragConfirm	2026-03-31 14:08:34.109091	system	lehre
+715	core	orgform	2026-03-31 14:08:34.11593	system	lehre
+716	core	grp	2026-03-31 14:08:34.122866	system	lehre
+717	core	weitereLektoren	2026-03-31 14:08:34.126901	system	lehre
+718	core	lehrveranstaltung_id	2026-03-31 14:08:34.147027	system	lehre
+719	core	sem	2026-03-31 14:08:34.15501	system	lehre
+720	core	bereitzugeteilt	2026-03-31 14:08:34.161541	system	lehre
+721	core	grpbereitszugeteilt	2026-03-31 14:08:34.165623	system	lehre
+722	core	grpbereitsverplant	2026-03-31 14:08:34.169726	system	lehre
+724	core	keinvertrag	2026-03-31 14:08:34.177766	system	lehre
+736	core	studiengangskennzahlLehre	2026-03-31 14:08:34.208651	system	lehre
+737	core	studiengang_kz	2026-03-31 14:08:34.212695	system	lehre
+738	core	verb	2026-03-31 14:08:34.216698	system	lehre
+739	core	dual_short	2026-03-31 14:08:34.220662	system	lehre
+740	infocenter	rueckstelldatum	2026-03-31 14:08:34.290987	system	infocenter
+741	infocenter	rueckstellgrund	2026-03-31 14:08:34.294973	system	infocenter
+742	infocenter	kaution	2026-03-31 14:08:34.320592	system	infocenter
+743	infocenter	rechnungsnummer	2026-03-31 14:08:34.324475	system	infocenter
+744	infocenter	date	2026-03-31 14:08:34.328238	system	infocenter
+745	infocenter	faelligam	2026-03-31 14:08:34.332069	system	infocenter
+746	infocenter	gesamtbetrag	2026-03-31 14:08:34.335967	system	infocenter
+747	infocenter	rechnungsempfaenger	2026-03-31 14:08:34.33968	system	infocenter
+748	infocenter	rechnung	2026-03-31 14:08:34.343333	system	infocenter
+749	infocenter	studiensemester	2026-03-31 14:08:34.346928	system	infocenter
+750	infocenter	bezeichnung	2026-03-31 14:08:34.350663	system	infocenter
+751	infocenter	datum	2026-03-31 14:08:34.354495	system	infocenter
+752	infocenter	zahlungsbestaetigung	2026-03-31 14:08:34.35838	system	infocenter
+753	infocenter	erklaerungInvoices	2026-03-31 14:08:34.362081	system	bewerbung
+754	infocenter	rechnungserklaerung	2026-03-31 14:08:34.365868	system	infocenter
+755	infocenter	kontoinfotitle	2026-03-31 14:08:34.369869	system	infocenter
+756	infocenter	kontoinfobody	2026-03-31 14:08:34.373809	system	infocenter
+757	infocenter	kontoinfoausland	2026-03-31 14:08:34.377805	system	infocenter
+758	infocenter	rechnungtitle	2026-03-31 14:08:34.381748	system	infocenter
+759	infocenter	faq0frage	2026-03-31 14:08:34.385757	system	infocenter
+760	infocenter	faq0antwort	2026-03-31 14:08:34.389759	system	infocenter
+761	infocenter	faq1frage	2026-03-31 14:08:34.393776	system	infocenter
+762	infocenter	faq1antwort	2026-03-31 14:08:34.39776	system	infocenter
+763	infocenter	faq2frage	2026-03-31 14:08:34.401769	system	infocenter
+764	infocenter	faq2antwort	2026-03-31 14:08:34.405731	system	infocenter
+765	infocenter	faq3frage	2026-03-31 14:08:34.409759	system	infocenter
+766	infocenter	faq3antwort	2026-03-31 14:08:34.413722	system	infocenter
+767	infocenter	faq4frage	2026-03-31 14:08:34.417589	system	infocenter
+768	infocenter	faq4antwort	2026-03-31 14:08:34.421434	system	infocenter
+769	infocenter	faq5frage	2026-03-31 14:08:34.425168	system	infocenter
+770	infocenter	faq5antwort	2026-03-31 14:08:34.429039	system	infocenter
+771	infocenter	faq6frage	2026-03-31 14:08:34.433019	system	infocenter
+772	infocenter	faq6antwort	2026-03-31 14:08:34.436965	system	infocenter
+773	infocenter	faq7frage	2026-03-31 14:08:34.440864	system	infocenter
+774	infocenter	faq7antwort	2026-03-31 14:08:34.444871	system	infocenter
+775	infocenter	zahlungsempfaenger	2026-03-31 14:08:34.448808	system	infocenter
+776	infocenter	unrulyPersonFound	2026-03-31 14:08:34.452743	system	infocenter
+777	core	status_bestaetigung	2026-03-31 14:08:34.490589	system	global
+778	core	neuUndGeaenderteAnzeigen	2026-03-31 14:08:34.526699	system	ui
+779	core	error_invalid_date	2026-03-31 14:08:34.569848	system	ui
+780	core	all_semester	2026-03-31 14:08:34.725989	system	ui
+781	core	current_semester	2026-03-31 14:08:34.73014	system	ui
+782	projektarbeitsbeurteilung	titelDerArbeit	2026-03-31 14:08:34.762449	system	projektarbeitsbeurteilung
+783	projektarbeitsbeurteilung	plagiatscheckBeschreibung	2026-03-31 14:08:34.766559	system	projektarbeitsbeurteilung
+784	projektarbeitsbeurteilung	plagiatscheckBeschreibungMaster	2026-03-31 14:08:34.770558	system	projektarbeitsbeurteilung
+785	projektarbeitsbeurteilung	methodeTextMaster	2026-03-31 14:08:34.785762	system	projektarbeitsbeurteilung
+786	projektarbeitsbeurteilung	eigenstaendigkeitTextMaster	2026-03-31 14:08:34.795446	system	projektarbeitsbeurteilung
+787	projektarbeitsbeurteilung	strukturTextMaster	2026-03-31 14:08:34.802382	system	projektarbeitsbeurteilung
+788	projektarbeitsbeurteilung	literaturTextMaster	2026-03-31 14:08:34.814197	system	projektarbeitsbeurteilung
+789	projektarbeitsbeurteilung	notenschluesselHinweisNullPunkteEinKriterium	2026-03-31 14:08:34.832368	system	projektarbeitsbeurteilung
+790	projektarbeitsbeurteilung	begutachter	2026-03-31 14:08:34.837937	system	projektarbeitsbeurteilung
+791	projektarbeitsbeurteilung	projektarbeitsbeurteilungUebersicht	2026-03-31 14:08:34.867393	system	projektarbeitsbeurteilung
+792	projektarbeitsbeurteilung	abgabedatum	2026-03-31 14:08:34.871602	system	projektarbeitsbeurteilung
+793	projektarbeitsbeurteilung	freischaltung	2026-03-31 14:08:34.875613	system	projektarbeitsbeurteilung
+794	projektarbeitsbeurteilung	resendToken	2026-03-31 14:08:34.879585	system	projektarbeitsbeurteilung
+795	projektarbeitsbeurteilung	freischalten	2026-03-31 14:08:34.88352	system	projektarbeitsbeurteilung
+796	projektarbeitsbeurteilung	kommissionellePruefungHinweis	2026-03-31 14:08:34.887584	system	projektarbeitsbeurteilung
+797	projektarbeitsbeurteilung	kommissionMailSenden	2026-03-31 14:08:34.891686	system	projektarbeitsbeurteilung
+798	projektarbeitsbeurteilung	kommissionMailGesendet	2026-03-31 14:08:34.895817	system	projektarbeitsbeurteilung
+799	projektarbeitsbeurteilung	kommissionMailFehler	2026-03-31 14:08:34.899806	system	projektarbeitsbeurteilung
+800	projektarbeitsbeurteilung	zweitbetreuerBewertungFehlt	2026-03-31 14:08:34.903842	system	projektarbeitsbeurteilung
+801	projektarbeitsbeurteilung	nichtErfuellt	2026-03-31 14:08:34.907899	system	projektarbeitsbeurteilung
+802	projektarbeitsbeurteilung	mindestanforderungErfuellt	2026-03-31 14:08:34.911886	system	projektarbeitsbeurteilung
+803	projektarbeitsbeurteilung	inWeitenTeilenErfuellt	2026-03-31 14:08:34.91579	system	projektarbeitsbeurteilung
+804	projektarbeitsbeurteilung	vollstaendigErfuellt	2026-03-31 14:08:34.919685	system	projektarbeitsbeurteilung
+805	projektarbeitsbeurteilung	kommissionsmitglieder	2026-03-31 14:08:34.923532	system	projektarbeitsbeurteilung
+806	projektarbeitsbeurteilung	plagiatscheckNichtGesetzt	2026-03-31 14:08:34.927443	system	projektarbeitsbeurteilung
+807	projektarbeitsbeurteilung	titelBearbeiten	2026-03-31 14:08:34.931231	system	projektarbeitsbeurteilung
+808	projektarbeitsbeurteilung	titelGespeichert	2026-03-31 14:08:34.935055	system	projektarbeitsbeurteilung
+809	projektarbeitsbeurteilung	titelSpeichernFehler	2026-03-31 14:08:34.939021	system	projektarbeitsbeurteilung
+810	projektarbeitsbeurteilung	plagiatscheckHinweisNegativeBeurteilung	2026-03-31 14:08:34.943039	system	projektarbeitsbeurteilung
+811	projektarbeitsbeurteilung	plagiatscheck	2026-03-31 14:08:34.947059	system	projektarbeitsbeurteilung
+812	projektarbeitsbeurteilung	betreuernote	2026-03-31 14:08:34.951145	system	projektarbeitsbeurteilung
+813	projektarbeitsbeurteilung	senatsvorsitz	2026-03-31 14:08:34.955229	system	projektarbeitsbeurteilung
+814	projektarbeitsbeurteilung	parbeitDownload	2026-03-31 14:08:34.959223	system	projektarbeitsbeurteilung
+815	projektarbeitsbeurteilung	betreuerart	2026-03-31 14:08:34.963187	system	projektarbeitsbeurteilung
+816	projektarbeitsbeurteilung	nebenBegutachter	2026-03-31 14:08:34.967288	system	projektarbeitsbeurteilung
+817	projektarbeitsbeurteilung	notenschluesselHinweisGewichtung	2026-03-31 14:08:34.971207	system	projektarbeitsbeurteilung
+818	projektarbeitsbeurteilung	gewichtet	2026-03-31 14:08:34.975115	system	projektarbeitsbeurteilung
+819	projektarbeitsbeurteilung	sprache	2026-03-31 14:08:34.97917	system	projektarbeitsbeurteilung
+820	projektarbeitsbeurteilung	spracheAendernFehler	2026-03-31 14:08:34.983225	system	projektarbeitsbeurteilung
+821	core	anrechnung	2026-03-31 14:08:34.989825	system	anrechnung
+822	core	antragStellenWegenHochschulzeugnis	2026-03-31 14:08:35.003237	system	anrechnung
+823	core	bisherAngerechneteEcts	2026-03-31 14:08:35.008915	system	anrechnung
+824	core	anrechnungEctsTooltipText	2026-03-31 14:08:35.012935	system	anrechnung
+825	core	anrechnungEctsTooltipTextBeiUeberschreitung	2026-03-31 14:08:35.017007	system	anrechnung
+826	core	anrechnungEctsTextBeiUeberschreitung	2026-03-31 14:08:35.021281	system	anrechnung
+827	core	textUebernehmenOderEigenenBegruendungstext	2026-03-31 14:08:35.025446	system	anrechnung
+828	core	begruendungEcts	2026-03-31 14:08:35.02951	system	anrechnung
+829	core	begruendungLvinhalt	2026-03-31 14:08:35.033387	system	anrechnung
+830	core	anrechnungBegruendungEctsTooltipText	2026-03-31 14:08:35.037319	system	anrechnung
+831	core	anrechnungBegruendungLvinhaltTooltipText	2026-03-31 14:08:35.041245	system	anrechnung
+832	core	requestAnrechnungInfoEctsBerechnungTitle	2026-03-31 14:08:35.045211	system	anrechnung
+833	core	requestAnrechnungInfoEctsBerechnungBody	2026-03-31 14:08:35.049292	system	anrechnung
+834	core	begruendungEctsLabel	2026-03-31 14:08:35.053128	system	anrechnung
+835	core	begruendungLvinhaltLabel	2026-03-31 14:08:35.056816	system	anrechnung
+836	core	empfehlungNegativKenntnisseNichtGleichwertigWeil	2026-03-31 14:08:35.102686	system	anrechnung
+837	core	empfehlungNegativKenntnisseNichtGleichwertigWeilHinweis	2026-03-31 14:08:35.106639	system	anrechnung
+838	core	genehmigungNegativKenntnisseNichtGleichwertigWeil	2026-03-31 14:08:35.110491	system	anrechnung
+839	core	genehmigungNegativKenntnisseNichtGleichwertigWeilHinweis	2026-03-31 14:08:35.114208	system	anrechnung
+840	core	bitteBegruendungVervollstaendigen	2026-03-31 14:08:35.122146	system	ui
+841	core	genehmigungNegativEctsHoechstgrenzeUeberschritten	2026-03-31 14:08:35.14491	system	anrechnung
+842	core	anrechnungenVerwalten	2026-03-31 14:08:35.162694	system	anrechnung
+843	core	anrechnungszeitraumFestlegen	2026-03-31 14:08:35.166761	system	anrechnung
+844	core	anrechnungszeitraumHinzufuegen	2026-03-31 14:08:35.170758	system	anrechnung
+845	core	anrechnungszeitraumSpeichern	2026-03-31 14:08:35.174649	system	anrechnung
+846	core	anrechnungszeitraumStart	2026-03-31 14:08:35.178408	system	anrechnung
+847	core	anrechnungszeitraumEnde	2026-03-31 14:08:35.182217	system	anrechnung
+848	core	errorStartdatumNichtInStudiensemester	2026-03-31 14:08:35.185991	system	ui
+849	core	errorEndedatumNichtInStudiensemester	2026-03-31 14:08:35.189831	system	ui
+850	core	errorStartdatumNachEndedatum	2026-03-31 14:08:35.193585	system	ui
+851	core	frageSicherLoeschen	2026-03-31 14:08:35.197411	system	ui
+852	core	antragNichtFuerVerganganeSS	2026-03-31 14:08:35.257163	system	anrechnung
+853	core	bearbeitetVon	2026-03-31 14:08:35.263527	system	ui
+854	core	bearbeitetAm	2026-03-31 14:08:35.267315	system	ui
+855	core	felderFehlen	2026-03-31 14:08:35.276127	system	ui
+856	core	errorDokumentZuGross	2026-03-31 14:08:35.281226	system	ui
+857	core	errorUploadFehltOderZuGross	2026-03-31 14:08:35.285168	system	ui
+858	core	fehlendeMinZeichen	2026-03-31 14:08:35.293932	system	ui
+859	core	maxtagebeschreibung	2026-03-31 14:08:35.327669	system	eucovidqr
+860	core	schliessen	2026-03-31 14:08:35.345534	system	ui
+861	core	fehlerZustaendigkeiten	2026-03-31 14:08:35.386015	system	fehlermonitoring
+862	core	zustaendigerMitarbeiter	2026-03-31 14:08:35.390291	system	fehlermonitoring
+863	core	oder	2026-03-31 14:08:35.394228	system	fehlermonitoring
+864	core	organisationseinheit	2026-03-31 14:08:35.397973	system	fehlermonitoring
+865	core	funktion	2026-03-31 14:08:35.401673	system	fehlermonitoring
+866	core	zustaendigkeitZuweisen	2026-03-31 14:08:35.40546	system	fehlermonitoring
+867	core	fehlerkurzbz	2026-03-31 14:08:35.409213	system	fehlermonitoring
+868	core	fehlertext	2026-03-31 14:08:35.412895	system	fehlermonitoring
+869	core	oeKurzbz	2026-03-31 14:08:35.416613	system	fehlermonitoring
+870	core	oeBezeichnung	2026-03-31 14:08:35.420377	system	fehlermonitoring
+871	core	funktionKurzbz	2026-03-31 14:08:35.424257	system	fehlermonitoring
+872	core	funktionBeschreibung	2026-03-31 14:08:35.428124	system	fehlermonitoring
+873	core	fehlercodeFehlt	2026-03-31 14:08:35.43222	system	fehlermonitoring
+874	core	mitarbeiterUndOeFehlt	2026-03-31 14:08:35.436157	system	fehlermonitoring
+875	core	nurOeOderMitarbeiterSetzen	2026-03-31 14:08:35.440172	system	fehlermonitoring
+876	core	ungueltigeMitarbeiterId	2026-03-31 14:08:35.444089	system	fehlermonitoring
+877	core	zustaendigkeitExistiert	2026-03-31 14:08:35.448002	system	fehlermonitoring
+878	core	ungueltigeZustaendigkeitenId	2026-03-31 14:08:35.451958	system	fehlermonitoring
+879	core	zustaendigkeitGespeichert	2026-03-31 14:08:35.455958	system	fehlermonitoring
+880	core	zustaendigkeitGespeichertFehler	2026-03-31 14:08:35.46016	system	fehlermonitoring
+881	core	zustaendigkeitGeloescht	2026-03-31 14:08:35.464503	system	fehlermonitoring
+882	core	zustaendigkeitGeloeschtFehler	2026-03-31 14:08:35.468347	system	fehlermonitoring
+883	core	keineAuswahl	2026-03-31 14:08:35.472021	system	fehlermonitoring
+884	core	zustaendigePersonen	2026-03-31 14:08:35.4759	system	fehlermonitoring
+885	core	zustaendigeOrganisationseinheiten	2026-03-31 14:08:35.479703	system	fehlermonitoring
+886	core	zugehoerigkeit	2026-03-31 14:08:35.483536	system	fehlermonitoring
+887	core	nurLeseberechtigung	2026-03-31 14:08:35.487317	system	ui
+888	core	op.label.type	2026-03-31 14:08:35.491075	system	kvp
+889	core	op.label.name	2026-03-31 14:08:35.494867	system	kvp
+890	core	op.label.email	2026-03-31 14:08:35.498669	system	kvp
+891	core	op.label.phone	2026-03-31 14:08:35.502492	system	kvp
+892	core	op.label.implemented	2026-03-31 14:08:35.506202	system	kvp
+893	core	op.label.items	2026-03-31 14:08:35.510205	system	kvp
+894	core	new.title	2026-03-31 14:08:35.514113	system	kvp
+895	core	new.info	2026-03-31 14:08:35.518014	system	kvp
+896	core	new.form.info	2026-03-31 14:08:35.521954	system	kvp
+897	core	new.workpackages	2026-03-31 14:08:35.525811	system	kvp
+898	core	list.empty	2026-03-31 14:08:35.529627	system	kvp
+899	core	new.form.success	2026-03-31 14:08:35.533543	system	kvp
+900	core	new.form.required	2026-03-31 14:08:35.537405	system	kvp
+901	core	new.error.required	2026-03-31 14:08:35.54128	system	kvp
+902	core	new.form.kurs_id	2026-03-31 14:08:35.545156	system	kvp
+903	core	new.form.kurs_id.label	2026-03-31 14:08:35.549004	system	kvp
+904	core	new.form.kurs_kurzbz	2026-03-31 14:08:35.55302	system	kvp
+905	core	new.form.kurs_kurzbz.label	2026-03-31 14:08:35.55691	system	kvp
+906	core	new.form.type	2026-03-31 14:08:35.560746	system	kvp
+907	core	new.form.type.label	2026-03-31 14:08:35.564629	system	kvp
+908	core	new.form.title	2026-03-31 14:08:35.568642	system	kvp
+909	core	new.form.title.label	2026-03-31 14:08:35.572626	system	kvp
+910	core	new.form.priority	2026-03-31 14:08:35.576583	system	kvp
+911	core	new.form.priority.label	2026-03-31 14:08:35.580538	system	kvp
+912	core	new.form.description	2026-03-31 14:08:35.584525	system	kvp
+913	core	new.form.description.label	2026-03-31 14:08:35.588594	system	kvp
+914	core	new.form.items	2026-03-31 14:08:35.592561	system	kvp
+915	core	new.form.items.label	2026-03-31 14:08:35.596533	system	kvp
+916	core	new.form.attachments	2026-03-31 14:08:35.600468	system	kvp
+917	core	new.form.implemented	2026-03-31 14:08:35.604496	system	kvp
+918	core	new.form.implemented.label	2026-03-31 14:08:35.608468	system	kvp
+919	core	new.form.submit	2026-03-31 14:08:35.612494	system	kvp
+920	core	new.error.nosourcecourse.title	2026-03-31 14:08:35.616452	system	kvp
+921	core	new.error.nosourcecourse.msg	2026-03-31 14:08:35.620437	system	kvp
+922	core	new.error.nostandardcourse.title	2026-03-31 14:08:35.624371	system	kvp
+923	core	new.error.nostandardcourse.msg	2026-03-31 14:08:35.628245	system	kvp
+924	core	admin.title.oes	2026-03-31 14:08:35.632233	system	kvp
+925	core	admin.title.openproject	2026-03-31 14:08:35.636299	system	kvp
+926	core	admin.title.edit	2026-03-31 14:08:35.64034	system	kvp
+927	core	admin.title.delete	2026-03-31 14:08:35.644248	system	kvp
+928	core	admin.title.source_linked	2026-03-31 14:08:35.648095	system	kvp
+929	core	admin.title.target_linked	2026-03-31 14:08:35.651964	system	kvp
+930	core	admin.text.delete	2026-03-31 14:08:35.655815	system	kvp
+931	core	admin.text.source_linked	2026-03-31 14:08:35.659771	system	kvp
+932	core	admin.text.target_linked	2026-03-31 14:08:35.663742	system	kvp
+933	core	admin.label.search	2026-03-31 14:08:35.667797	system	kvp
+934	core	admin.label.none	2026-03-31 14:08:35.671681	system	kvp
+935	core	admin.confirm.ok	2026-03-31 14:08:35.675602	system	kvp
+936	core	admin.confirm.cancel	2026-03-31 14:08:35.679428	system	kvp
+937	core	admin.search.error.none	2026-03-31 14:08:35.683323	system	kvp
+938	core	admin.label.template	2026-03-31 14:08:35.68729	system	kvp
+939	core	admin.label.oe	2026-03-31 14:08:35.691139	system	kvp
+940	core	admin.label.language	2026-03-31 14:08:35.694879	system	kvp
+941	core	admin.label.moodle	2026-03-31 14:08:35.698588	system	kvp
+942	core	admin.label.project	2026-03-31 14:08:35.702354	system	kvp
+943	core	admin.label.version	2026-03-31 14:08:35.706159	system	kvp
+944	core	error.opproject_does_not_exists	2026-03-31 14:08:35.710034	system	kvp
+945	international	studiensemesterGeplant	2026-03-31 14:08:35.7139	system	international
+946	international	internationalCredits	2026-03-31 14:08:35.717744	system	international
+947	international	studentstatus	2026-03-31 14:08:35.721582	system	international
+948	international	alledurchgefuehrten	2026-03-31 14:08:35.725434	system	international
+949	international	bestaetigungHochladen	2026-03-31 14:08:35.72928	system	international
+950	international	massnahmeLoeschen	2026-03-31 14:08:35.73307	system	international
+951	international	massnahmen	2026-03-31 14:08:35.736781	system	international
+952	international	internationalskills	2026-03-31 14:08:35.740603	system	international
+953	international	internationalbeschreibung	2026-03-31 14:08:35.745755	system	international
+954	international	nurBachelor	2026-03-31 14:08:35.749758	system	international
+955	international	bezeichnung	2026-03-31 14:08:35.75365	system	international
+956	international	bezeichnungeng	2026-03-31 14:08:35.757515	system	international
+957	international	beschreibung	2026-03-31 14:08:35.761386	system	international
+958	international	beschreibungeng	2026-03-31 14:08:35.765358	system	international
+959	international	massnahmeBearbeiten	2026-03-31 14:08:35.769246	system	international
+960	international	massnahmeLoeschenConfirm	2026-03-31 14:08:35.773126	system	international
+961	international	fileLoeschenConfirm	2026-03-31 14:08:35.77696	system	international
+962	international	planAblehnen	2026-03-31 14:08:35.780812	system	international
+963	international	entbestaetigenConfirm	2026-03-31 14:08:35.784685	system	international
+964	international	entakzeptierenConfirm	2026-03-31 14:08:35.788514	system	international
+965	international	allegeplanten	2026-03-31 14:08:35.792333	system	international
+966	international	alleGeplantenMarkieren	2026-03-31 14:08:35.796162	system	international
+967	international	alleMassnahmenJetzt	2026-03-31 14:08:35.800115	system	international
+968	international	alleStudierendeJetzt	2026-03-31 14:08:35.804005	system	international
+969	international	lastSemester	2026-03-31 14:08:35.807953	system	international
+970	international	meinMassnahmeplan	2026-03-31 14:08:35.811887	system	international
+971	international	ectsBestaetigt	2026-03-31 14:08:35.815933	system	international
+972	international	ectsMassnahme	2026-03-31 14:08:35.819944	system	international
+973	international	statusGeplant	2026-03-31 14:08:35.823886	system	international
+974	international	statusGeplantDesc	2026-03-31 14:08:35.827776	system	international
+975	international	statusAkzeptiert	2026-03-31 14:08:35.831747	system	international
+976	international	statusAkzeptiertDesc	2026-03-31 14:08:35.835664	system	international
+977	international	statusDurchgefuehrt	2026-03-31 14:08:35.839575	system	international
+978	international	statusDurchgefuehrtDesc	2026-03-31 14:08:35.843369	system	international
+979	international	statusBestaetigt	2026-03-31 14:08:35.847058	system	international
+980	international	statusBestaetigtDesc	2026-03-31 14:08:35.850836	system	international
+981	international	statusAbgelehnt	2026-03-31 14:08:35.854697	system	international
+982	international	statusAbgelehntDesc	2026-03-31 14:08:35.858725	system	international
+983	international	ampelRed	2026-03-31 14:08:35.862613	system	international
+984	international	ampelYellow	2026-03-31 14:08:35.86652	system	international
+985	international	ampelOrange	2026-03-31 14:08:35.870457	system	international
+986	international	ampelGreenyellow	2026-03-31 14:08:35.874329	system	international
+987	international	ampelGreen	2026-03-31 14:08:35.878162	system	international
+988	international	mailMeldungzuviele	2026-03-31 14:08:35.882024	system	international
+989	international	mailMeldung	2026-03-31 14:08:35.885932	system	international
+990	international	mailButton	2026-03-31 14:08:35.889849	system	international
+991	international	geplanteMassnahmen	2026-03-31 14:08:35.894099	system	international
+992	international	geplanteMassnahmenDesc	2026-03-31 14:08:35.898015	system	international
+993	international	akzpetierteMassnahmen	2026-03-31 14:08:35.901866	system	international
+994	international	mailversenden	2026-03-31 14:08:35.905794	system	international
+995	international	durchgefuehrteMassnahmen	2026-03-31 14:08:35.909699	system	international
+996	international	bestaetigteMassnahmen	2026-03-31 14:08:35.913506	system	international
+997	international	abgelehnteMassnahmen	2026-03-31 14:08:35.917379	system	international
+998	international	planAkzeptieren	2026-03-31 14:08:35.921112	system	international
+999	international	bestaetigungAkzeptieren	2026-03-31 14:08:35.924864	system	international
+1000	international	bestaetigungAblehnen	2026-03-31 14:08:35.928627	system	international
+1001	international	grund	2026-03-31 14:08:35.93246	system	international
+1002	international	anmerkungstgl	2026-03-31 14:08:35.936205	system	international
+1003	international	mehrverplant	2026-03-31 14:08:35.940066	system	international
+1004	international	stgtodo	2026-03-31 14:08:35.943893	system	international
+1005	international	wenigerverplant	2026-03-31 14:08:35.947894	system	international
+1006	international	mehrbestaetigt	2026-03-31 14:08:35.951731	system	international
+1007	international	wenigerbestaetigt	2026-03-31 14:08:35.955527	system	international
+1008	international	alleAkzeptierenPlan	2026-03-31 14:08:35.959297	system	international
+1009	international	downloadBestaetigung	2026-03-31 14:08:35.963044	system	international
+1010	international	addMassnahme	2026-03-31 14:08:35.966806	system	international
+1011	core	benutzerSchonZugewiesen	2026-03-31 14:08:35.970616	system	gruppenmanagement
+1012	core	gruppenmanagement	2026-03-31 14:08:35.974499	system	gruppenmanagement
+1013	core	kurzbezeichnung	2026-03-31 14:08:35.978337	system	gruppenmanagement
+1014	core	bezeichnung	2026-03-31 14:08:35.981967	system	gruppenmanagement
+1015	core	beschreibung	2026-03-31 14:08:35.985694	system	gruppenmanagement
+1016	core	zuweisenloeschen	2026-03-31 14:08:35.989518	system	gruppenmanagement
+1017	core	benutzergruppe	2026-03-31 14:08:35.993208	system	gruppenmanagement
+1018	core	benutzerHinzufuegen	2026-03-31 14:08:35.996859	system	gruppenmanagement
+1019	core	aktiv	2026-03-31 14:08:36.000661	system	gruppenmanagement
+1020	infocenter	stammdatenFeldFehlt	2026-03-31 14:08:36.004393	system	infocenter
+1021	infocenter	statusSetzen	2026-03-31 14:08:36.008192	system	infocenter
+1022	infocenter	abgewiesenam	2026-03-31 14:08:36.011999	system	infocenter
+1023	infocenter	statusAuswahl	2026-03-31 14:08:36.015809	system	infocenter
+1024	infocenter	statusZuruecksetzen	2026-03-31 14:08:36.019795	system	infocenter
+1025	core	fehlerFehlerKonfigurationLaden	2026-03-31 14:08:36.02372	system	fehlermonitoring
+1026	core	fehlerFehlerLaden	2026-03-31 14:08:36.02755	system	fehlermonitoring
+1027	core	ungueltigerKonfigurationstyp	2026-03-31 14:08:36.031451	system	fehlermonitoring
+1028	core	ungueltigerKonfigurationswert	2026-03-31 14:08:36.03529	system	fehlermonitoring
+1029	core	fehlerKonfiguration	2026-03-31 14:08:36.039144	system	fehlermonitoring
+1030	core	konfigurationstyp	2026-03-31 14:08:36.043026	system	fehlermonitoring
+1031	core	konfigurationswert	2026-03-31 14:08:36.046908	system	fehlermonitoring
+1032	core	konfigurationswertPlatzhalter	2026-03-31 14:08:36.05073	system	fehlermonitoring
+1033	core	konfigurationswertZuweisen	2026-03-31 14:08:36.054538	system	fehlermonitoring
+1034	core	konfigurationsbeschreibung	2026-03-31 14:08:36.058364	system	fehlermonitoring
+1035	core	konfigurationsdatentyp	2026-03-31 14:08:36.062295	system	fehlermonitoring
+1036	core	konfigurationGespeichert	2026-03-31 14:08:36.066221	system	fehlermonitoring
+1037	core	konfigurationGespeichertFehler	2026-03-31 14:08:36.07009	system	fehlermonitoring
+1038	core	konfigurationGeloescht	2026-03-31 14:08:36.073929	system	fehlermonitoring
+1039	core	konfigurationGeloeschtFehler	2026-03-31 14:08:36.077815	system	fehlermonitoring
+1040	core	konfigurationswertLoeschen	2026-03-31 14:08:36.081703	system	fehlermonitoring
+1041	core	angabeFehlt	2026-03-31 14:08:36.085407	system	uhstat
+1042	core	lehrveranstaltungsinformationen	2026-03-31 14:08:36.089074	system	lvinfo
+1043	core	Moodleinformationen	2026-03-31 14:08:36.09283	system	lvinfo
+1044	core	actionname	2026-03-31 14:08:36.096782	system	lvinfo
+1045	core	overdue	2026-03-31 14:08:36.100712	system	lvinfo
+1046	core	overdueEvent	2026-03-31 14:08:36.104696	system	lvinfo
+1047	core	moodleLink	2026-03-31 14:08:36.108673	system	lvinfo
+1048	core	raum_kurzbz	2026-03-31 14:08:36.112607	system	rauminfo
+1049	core	rauminfo	2026-03-31 14:08:36.116669	system	rauminfo
+1050	core	roomSearch	2026-03-31 14:08:36.120676	system	rauminfo
+1051	core	minCapacity	2026-03-31 14:08:36.124896	system	rauminfo
+1052	core	roomReservations	2026-03-31 14:08:36.128819	system	rauminfo
+1053	core	personcap	2026-03-31 14:08:36.132756	system	rauminfo
+1054	core	raumnummer	2026-03-31 14:08:36.136655	system	rauminfo
+1055	core	keineRaumReservierung	2026-03-31 14:08:36.140527	system	rauminfo
+1056	core	keinLektorZugeordnet	2026-03-31 14:08:36.144423	system	lehre
+1057	core	incomingplaetze	2026-03-31 14:08:36.148517	system	lehre
+1058	core	lehrbeauftragter	2026-03-31 14:08:36.152443	system	lehre
+1059	core	lvleitung	2026-03-31 14:08:36.156414	system	lehre
+1060	core	noLvFound	2026-03-31 14:08:36.16032	system	lehre
+1061	core	leitung	2026-03-31 14:08:36.164215	system	global
+1062	core	koordination	2026-03-31 14:08:36.168228	system	global
+1063	core	sprache	2026-03-31 14:08:36.172132	system	global
+1064	core	englisch	2026-03-31 14:08:36.176017	system	global
+1065	core	deutsch	2026-03-31 14:08:36.179947	system	global
+1066	core	verfuegbareSprachen	2026-03-31 14:08:36.183919	system	global
+1067	core	dokumente	2026-03-31 14:08:36.187793	system	tools
+1068	core	dokument	2026-03-31 14:08:36.191786	system	tools
+1069	core	erstelldatum	2026-03-31 14:08:36.195718	system	tools
+1070	core	bestaetigungenZeugnisse	2026-03-31 14:08:36.19957	system	tools
+1071	core	inskriptionsbestaetigung	2026-03-31 14:08:36.203705	system	tools
+1072	core	studienbeitragFuerSSBezahlt	2026-03-31 14:08:36.207721	system	tools
+1073	core	studienbeitragFuerSSNochNichtBezahlt	2026-03-31 14:08:36.21168	system	tools
+1074	core	studienbeitragFuerStgNochNichtBezahlt	2026-03-31 14:08:36.215636	system	tools
+1075	core	studienbeitragNochNichtBezahlt	2026-03-31 14:08:36.21953	system	tools
+1076	core	studienerfolgsbestaetigung	2026-03-31 14:08:36.22354	system	tools
+1077	core	studiensemesterAuswaehlen	2026-03-31 14:08:36.227535	system	tools
+1078	core	vorlageWohnsitzfinanzamt	2026-03-31 14:08:36.231515	system	tools
+1079	core	studienbuchblatt	2026-03-31 14:08:36.235476	system	tools
+1080	core	alleStudiensemester	2026-03-31 14:08:36.2394	system	tools
+1081	core	abschlussdokumente	2026-03-31 14:08:36.243681	system	tools
+1082	core	nochKeineAbschlussdokumenteVorhanden	2026-03-31 14:08:36.247699	system	tools
+1083	core	keinStatusImStudiensemester	2026-03-31 14:08:36.251661	system	tools
+1084	core	warnungDruckDigitaleSignatur	2026-03-31 14:08:36.255707	system	tools
+1085	core	ausbildungBildungsstaatUebereinstimmung	2026-03-31 14:08:36.259647	system	uhstat
+1086	core	erfolgreichGespeichert	2026-03-31 14:08:36.263565	system	uhstat
+1087	core	fehlerBeimSpeichern	2026-03-31 14:08:36.26751	system	uhstat
+1088	core	uhstat1AnmeldungUeberschrift	2026-03-31 14:08:36.271479	system	uhstat
+1089	core	rechtsbelehrung	2026-03-31 14:08:36.275506	system	uhstat
+1090	core	uhstat1AnmeldungEinleitungstext	2026-03-31 14:08:36.279505	system	uhstat
+1091	core	uhstat1EinleitungSvnrtext	2026-03-31 14:08:36.28348	system	uhstat
+1092	core	angabenErziehungsberechtigte	2026-03-31 14:08:36.287438	system	uhstat
+1093	core	angabenErziehungsberechtigteEinleitungstext	2026-03-31 14:08:36.291422	system	uhstat
+1094	core	bitteAuswaehlen	2026-03-31 14:08:36.295403	system	uhstat
+1095	core	erziehungsberechtigtePersonEins	2026-03-31 14:08:36.299354	system	uhstat
+1096	core	geburtsjahr	2026-03-31 14:08:36.303319	system	uhstat
+1097	core	geburtsstaat	2026-03-31 14:08:36.307313	system	uhstat
+1098	core	inDenHeutigenGrenzen	2026-03-31 14:08:36.311227	system	uhstat
+1099	core	hoechsterAbschlussStaat	2026-03-31 14:08:36.315159	system	uhstat
+1100	core	hoechsterAbschluss	2026-03-31 14:08:36.319109	system	uhstat
+1101	core	wennAbschlussInOesterreich	2026-03-31 14:08:36.323113	system	uhstat
+1102	core	wennAbschlussNichtInOesterreich	2026-03-31 14:08:36.327047	system	uhstat
+1103	core	erziehungsberechtigtePersonZwei	2026-03-31 14:08:36.330977	system	uhstat
+1104	core	pruefenUndSpeichern	2026-03-31 14:08:36.334913	system	uhstat
+1105	core	datenLoeschen	2026-03-31 14:08:36.338758	system	uhstat
+1106	core	erfolgreichGeloescht	2026-03-31 14:08:36.342606	system	uhstat
+1107	core	infotext_Wiederholung_0	2026-03-31 14:08:36.347814	system	studierendenantrag
+1108	core	infotext_Wiederholung_1	2026-03-31 14:08:36.351693	system	studierendenantrag
+1109	core	infotext_Wiederholung_2	2026-03-31 14:08:36.355588	system	studierendenantrag
+1110	core	infotext_Wiederholung_3	2026-03-31 14:08:36.359508	system	studierendenantrag
+1111	core	infotext_Wiederholung_4	2026-03-31 14:08:36.363507	system	studierendenantrag
+1112	core	antrag_Wiederholung_pruefung	2026-03-31 14:08:36.367404	system	studierendenantrag
+1113	core	antrag_Wiederholung_pruefung_date	2026-03-31 14:08:36.371189	system	studierendenantrag
+1114	core	antrag_Wiederholung_button_yes	2026-03-31 14:08:36.375048	system	studierendenantrag
+1115	core	antrag_Wiederholung_button_no	2026-03-31 14:08:36.378917	system	studierendenantrag
+1116	core	antrag_header	2026-03-31 14:08:36.382721	system	studierendenantrag
+1117	core	btn_new	2026-03-31 14:08:36.386565	system	studierendenantrag
+1118	core	cancel	2026-03-31 14:08:36.390784	system	ui
+1119	core	ok	2026-03-31 14:08:36.394676	system	ui
+1120	core	suche	2026-03-31 14:08:36.39877	system	ui
+1121	core	btn_create	2026-03-31 14:08:36.40268	system	studierendenantrag
+1122	core	btn_create_Abmeldung	2026-03-31 14:08:36.406588	system	studierendenantrag
+1123	core	btn_create_Unterbrechung	2026-03-31 14:08:36.410556	system	studierendenantrag
+1124	core	btn_cancel	2026-03-31 14:08:36.414502	system	studierendenantrag
+1125	core	filter_all	2026-03-31 14:08:36.418482	system	studierendenantrag
+1126	core	filter_todo	2026-03-31 14:08:36.422395	system	studierendenantrag
+1127	core	warning_Abmeldung	2026-03-31 14:08:36.426321	system	studierendenantrag
+1128	core	warning_AbmeldungStgl	2026-03-31 14:08:36.430291	system	studierendenantrag
+1129	core	title_Abmeldung	2026-03-31 14:08:36.434186	system	studierendenantrag
+1130	core	title_AbmeldungStgl	2026-03-31 14:08:36.438124	system	studierendenantrag
+1131	core	title_Unterbrechung	2026-03-31 14:08:36.441968	system	studierendenantrag
+1132	core	title_Wiederholung	2026-03-31 14:08:36.445769	system	studierendenantrag
+1133	core	title_new_Abmeldung	2026-03-31 14:08:36.449635	system	studierendenantrag
+1134	core	antrag_typ	2026-03-31 14:08:36.453454	system	studierendenantrag
+1135	core	antrag_status	2026-03-31 14:08:36.457178	system	studierendenantrag
+1136	core	antrag_studiensemester	2026-03-31 14:08:36.460974	system	studierendenantrag
+1137	core	antrag_erstelldatum	2026-03-31 14:08:36.465007	system	studierendenantrag
+1138	core	studierendenantraege	2026-03-31 14:08:36.468926	system	studierendenantrag
+1139	core	antrag_datum_wiedereinstieg	2026-03-31 14:08:36.472864	system	studierendenantrag
+1140	core	antrag_grund	2026-03-31 14:08:36.476927	system	studierendenantrag
+1141	core	antrag_unruly	2026-03-31 14:08:36.480892	system	studierendenantrag
+1142	core	antrag_unruly_updated	2026-03-31 14:08:36.484657	system	studierendenantrag
+1143	core	antrag_dateianhaenge	2026-03-31 14:08:36.488353	system	studierendenantrag
+1144	core	antrag_anhang	2026-03-31 14:08:36.49214	system	studierendenantrag
+1145	core	antrag_typ_Abmeldung	2026-03-31 14:08:36.496017	system	studierendenantrag
+1146	core	antrag_typ_AbmeldungStgl	2026-03-31 14:08:36.499974	system	studierendenantrag
+1147	core	antrag_typ_Unterbrechung	2026-03-31 14:08:36.503933	system	studierendenantrag
+1148	core	antrag_typ_Wiederholung	2026-03-31 14:08:36.507865	system	studierendenantrag
+1149	core	btn_show_lvs	2026-03-31 14:08:36.511761	system	studierendenantrag
+1150	core	btn_edit	2026-03-31 14:08:36.515572	system	studierendenantrag
+1151	core	btn_reopen	2026-03-31 14:08:36.519517	system	studierendenantrag
+1152	core	btn_pause	2026-03-31 14:08:36.52351	system	studierendenantrag
+1153	core	btn_unpause	2026-03-31 14:08:36.527457	system	studierendenantrag
+1154	core	btn_object	2026-03-31 14:08:36.531322	system	studierendenantrag
+1155	core	btn_objection_deny	2026-03-31 14:08:36.535276	system	studierendenantrag
+1156	core	btn_objection_approve	2026-03-31 14:08:36.539242	system	studierendenantrag
+1157	core	btn_lvzuweisen	2026-03-31 14:08:36.543151	system	studierendenantrag
+1158	core	btn_approve	2026-03-31 14:08:36.547017	system	studierendenantrag
+1159	core	btn_reject	2026-03-31 14:08:36.550972	system	studierendenantrag
+1160	core	skip	2026-03-31 14:08:36.554903	system	ui
+1161	core	select_studiensemester	2026-03-31 14:08:36.558835	system	ui
+1162	core	keineBerechtigung	2026-03-31 14:08:36.562784	system	ui
+1163	core	btn_save_lvs	2026-03-31 14:08:36.566721	system	studierendenantrag
+1164	core	btn_download_antrag	2026-03-31 14:08:36.570636	system	studierendenantrag
+1165	core	download	2026-03-31 14:08:36.57457	system	table
+1166	core	reload	2026-03-31 14:08:36.578553	system	table
+1167	core	error_no_student	2026-03-31 14:08:36.582522	system	studierendenantrag
+1168	core	error_no_student_for_prestudent	2026-03-31 14:08:36.586488	system	studierendenantrag
+1169	core	error_no_student_no_failed_exam	2026-03-31 14:08:36.590565	system	studierendenantrag
+1170	core	no_attachments	2026-03-31 14:08:36.594518	system	studierendenantrag
+1171	core	prestudent	2026-03-31 14:08:36.598484	system	lehre
+1172	core	studienjahr	2026-03-31 14:08:36.602428	system	lehre
+1173	core	title_lvzuweisen	2026-03-31 14:08:36.606196	system	studierendenantrag
+1174	core	title_lv_nicht_zugelassen	2026-03-31 14:08:36.610135	system	studierendenantrag
+1175	core	title_lv_wiederholen	2026-03-31 14:08:36.614085	system	studierendenantrag
+1176	core	title_show_lvs	2026-03-31 14:08:36.618114	system	studierendenantrag
+1177	core	my_lvs	2026-03-31 14:08:36.622099	system	studierendenantrag
+1178	core	with_selected	2026-03-31 14:08:36.626	system	table
+1179	core	lv_nicht_zulassen	2026-03-31 14:08:36.629985	system	studierendenantrag
+1180	core	lv_wiederholen	2026-03-31 14:08:36.63391	system	studierendenantrag
+1181	core	title_history	2026-03-31 14:08:36.637836	system	studierendenantrag
+1182	core	anmerkung_tooltip	2026-03-31 14:08:36.641742	system	studierendenantrag
+1183	core	fuer_alle_uebernehmen	2026-03-31 14:08:36.645686	system	studierendenantrag
+1184	core	fuer_x_uebernehmen	2026-03-31 14:08:36.649592	system	studierendenantrag
+1185	core	title_grund	2026-03-31 14:08:36.653613	system	studierendenantrag
+1186	core	error_no_lvs	2026-03-31 14:08:36.65747	system	studierendenantrag
+1187	core	status_x	2026-03-31 14:08:36.661472	system	studierendenantrag
+1188	core	status_saving	2026-03-31 14:08:36.665328	system	studierendenantrag
+1189	core	status_error	2026-03-31 14:08:36.669115	system	studierendenantrag
+1190	core	status_open	2026-03-31 14:08:36.672998	system	studierendenantrag
+1191	core	status_created	2026-03-31 14:08:36.676801	system	studierendenantrag
+1192	core	status_cancelling	2026-03-31 14:08:36.680692	system	studierendenantrag
+1193	core	status_cancelled	2026-03-31 14:08:36.684644	system	studierendenantrag
+1194	core	status_unpaused	2026-03-31 14:08:36.688847	system	studierendenantrag
+1195	core	status_stop	2026-03-31 14:08:36.692995	system	studierendenantrag
+1196	core	error_stg_blacklist	2026-03-31 14:08:36.697117	system	studierendenantrag
+1197	core	error_antrag_exists	2026-03-31 14:08:36.70113	system	studierendenantrag
+1198	core	error_antrag_pending	2026-03-31 14:08:36.704961	system	studierendenantrag
+1199	core	error_no_antrag_found	2026-03-31 14:08:36.709152	system	studierendenantrag
+1200	core	error_no_antrag_found_prestudent	2026-03-31 14:08:36.713057	system	studierendenantrag
+1201	core	error_no_stg_and_sem	2026-03-31 14:08:36.717054	system	studierendenantrag
+1202	core	error_no_stg	2026-03-31 14:08:36.720843	system	studierendenantrag
+1203	core	error_no_stg_antrag	2026-03-31 14:08:36.724937	system	studierendenantrag
+1204	core	error_no_stg_email	2026-03-31 14:08:36.728796	system	studierendenantrag
+1205	core	error_no_studienplan	2026-03-31 14:08:36.732682	system	studierendenantrag
+1206	core	error_no_antragstatus	2026-03-31 14:08:36.736501	system	studierendenantrag
+1207	core	error_multiple_studienplan	2026-03-31 14:08:36.740576	system	studierendenantrag
+1208	core	error_no_sem_after	2026-03-31 14:08:36.744451	system	studierendenantrag
+1209	core	error_no_stdsem	2026-03-31 14:08:36.748255	system	studierendenantrag
+1210	core	error_no_status_in_prev_sem	2026-03-31 14:08:36.752081	system	studierendenantrag
+1211	core	error_antrag_locked	2026-03-31 14:08:36.755963	system	studierendenantrag
+1212	core	error_no_lv	2026-03-31 14:08:36.759731	system	studierendenantrag
+1213	core	error_no_lv_in_application	2026-03-31 14:08:36.763811	system	studierendenantrag
+1214	core	error_no_right	2026-03-31 14:08:36.767753	system	studierendenantrag
+1215	core	error_no_objection	2026-03-31 14:08:36.771658	system	studierendenantrag
+1216	core	error_not_objected	2026-03-31 14:08:36.775467	system	studierendenantrag
+1217	core	error_not_approved	2026-03-31 14:08:36.779336	system	studierendenantrag
+1218	core	error_not_pausable	2026-03-31 14:08:36.783119	system	studierendenantrag
+1219	core	error_not_paused	2026-03-31 14:08:36.786836	system	studierendenantrag
+1220	core	error_stg_last_semester	2026-03-31 14:08:36.790546	system	studierendenantrag
+1221	core	error_no_person	2026-03-31 14:08:36.794349	system	studierendenantrag
+1222	core	error_no_person_prestudent	2026-03-31 14:08:36.798199	system	studierendenantrag
+1223	core	error_no_email	2026-03-31 14:08:36.802022	system	studierendenantrag
+1224	core	error_no_prestudent	2026-03-31 14:08:36.805818	system	studierendenantrag
+1225	core	error_no_prestudent_in_sem	2026-03-31 14:08:36.80958	system	studierendenantrag
+1226	core	error_no_stg_for_prestudent	2026-03-31 14:08:36.813304	system	studierendenantrag
+1227	core	error_no_prestudentstatus	2026-03-31 14:08:36.817156	system	studierendenantrag
+1228	core	error_mail_to	2026-03-31 14:08:36.821252	system	studierendenantrag
+1229	core	error_mail	2026-03-31 14:08:36.825088	system	studierendenantrag
+1230	core	error_name	2026-03-31 14:08:36.828957	system	studierendenantrag
+1231	core	error_mail_and_name	2026-03-31 14:08:36.832849	system	studierendenantrag
+1232	core	studentIn	2026-03-31 14:08:36.836757	system	studierendenantrag
+1233	core	error_U_Approve	2026-03-31 14:08:36.840704	system	studierendenantrag
+1234	core	error_U_Reject	2026-03-31 14:08:36.844583	system	studierendenantrag
+1235	core	mail_subject_A_Approve	2026-03-31 14:08:36.848512	system	studierendenantrag
+1236	core	mail_subject_A_Student	2026-03-31 14:08:36.852377	system	studierendenantrag
+1237	core	mail_subject_A_Stgl	2026-03-31 14:08:36.856275	system	studierendenantrag
+1238	core	mail_subject_A_ObjectionDenied	2026-03-31 14:08:36.860125	system	studierendenantrag
+1239	core	mail_subject_U_Approve	2026-03-31 14:08:36.863948	system	studierendenantrag
+1240	core	mail_subject_U_Reject	2026-03-31 14:08:36.867814	system	studierendenantrag
+1241	core	mail_subject_W_New	2026-03-31 14:08:36.871674	system	studierendenantrag
+1242	core	mail_subject_W_Approve	2026-03-31 14:08:36.875725	system	studierendenantrag
+1243	core	mail_subject_W_Student	2026-03-31 14:08:36.879377	system	studierendenantrag
+1244	core	mail_part_table	2026-03-31 14:08:36.883019	system	studierendenantrag
+1245	core	mail_part_x_new_Abmeldung	2026-03-31 14:08:36.886776	system	studierendenantrag
+1246	core	mail_part_x_new_Unterbrechung	2026-03-31 14:08:36.890603	system	studierendenantrag
+1247	core	mail_part_x_new_Wiederholung	2026-03-31 14:08:36.894592	system	studierendenantrag
+1248	core	mail_part_grund	2026-03-31 14:08:36.8984	system	studierendenantrag
+1249	core	mail_part_error_no_lvs	2026-03-31 14:08:36.902306	system	studierendenantrag
+1250	core	calltoaction_Abmeldung	2026-03-31 14:08:36.906153	system	studierendenantrag
+1251	core	calltoaction_Unterbrechung	2026-03-31 14:08:36.91017	system	studierendenantrag
+1252	core	calltoaction_Wiederholung	2026-03-31 14:08:36.914018	system	studierendenantrag
+1253	core	textLong_studentNichtGezahlt	2026-03-31 14:08:36.917958	system	studierendenantrag
+1254	core	textLong_studentNichtAnwesend	2026-03-31 14:08:36.921807	system	studierendenantrag
+1255	core	textLong_PruefunstermineNichtEingehalten	2026-03-31 14:08:36.925718	system	studierendenantrag
+1256	core	textLong_plageat	2026-03-31 14:08:36.929601	system	studierendenantrag
+1257	core	textLong_ungenuegendeLeistung	2026-03-31 14:08:36.933494	system	studierendenantrag
+1258	core	textLong_NichtantrittStudium	2026-03-31 14:08:36.937371	system	studierendenantrag
+1259	core	textLong_MissingZgv	2026-03-31 14:08:36.941169	system	studierendenantrag
+1260	core	textLong_unruly	2026-03-31 14:08:36.945004	system	studierendenantrag
+1261	core	dropdown_nichtGezahlt	2026-03-31 14:08:36.94889	system	studierendenantrag
+1262	core	dropdown_nichtAnwesend	2026-03-31 14:08:36.952746	system	studierendenantrag
+1263	core	dropdown_PruefunstermineNichtEingehalten	2026-03-31 14:08:36.95659	system	studierendenantrag
+1264	core	dropdown_plageat	2026-03-31 14:08:36.960512	system	studierendenantrag
+1265	core	dropdown_ungenuegendeLeistung	2026-03-31 14:08:36.964355	system	studierendenantrag
+1266	core	dropdown_NichtantrittStudium	2026-03-31 14:08:36.968277	system	studierendenantrag
+1267	core	dropdown_MissingZgv	2026-03-31 14:08:36.972097	system	studierendenantrag
+1268	core	dropdown_bitteWaehlen	2026-03-31 14:08:36.975992	system	studierendenantrag
+1269	core	grund_Wiederholung_deadline	2026-03-31 14:08:36.979894	system	studierendenantrag
+1270	core	dropdown_unruly	2026-03-31 14:08:36.983737	system	studierendenantrag
+1271	core	mark_person_as_unruly	2026-03-31 14:08:36.987659	system	studierendenantrag
+1272	core	dropdown_Studienwechsel	2026-03-31 14:08:36.991505	system	studierendenantrag
+1273	core	textLong_Studienwechsel	2026-03-31 14:08:36.995481	system	studierendenantrag
+1274	core	dropdown_Studienabbruch_allgemein	2026-03-31 14:08:36.99955	system	studierendenantrag
+1275	core	textLong_Studienabbruch_allgemein	2026-03-31 14:08:37.003421	system	studierendenantrag
+1276	core	dropdown_vsCodeOfConduct	2026-03-31 14:08:37.007521	system	studierendenantrag
+1277	core	textLong_vsCodeOfConduct	2026-03-31 14:08:37.011562	system	studierendenantrag
+1278	core	dropdown_additionalReason	2026-03-31 14:08:37.015402	system	studierendenantrag
+1279	core	textLong_additionalReason	2026-03-31 14:08:37.019481	system	studierendenantrag
+1280	core	document	2026-03-31 14:08:37.023447	system	notiz
+1281	core	notiz_new	2026-03-31 14:08:37.02731	system	notiz
+1282	core	notiz_edit	2026-03-31 14:08:37.031153	system	notiz
+1283	core	notiz_delete	2026-03-31 14:08:37.034992	system	notiz
+1284	core	verfasser	2026-03-31 14:08:37.038933	system	notiz
+1285	core	bearbeiter	2026-03-31 14:08:37.042757	system	notiz
+1286	core	verfasser_uid	2026-03-31 14:08:37.046621	system	ui
+1287	core	bearbeiter_uid	2026-03-31 14:08:37.050577	system	ui
+1288	core	erledigt	2026-03-31 14:08:37.054584	system	notiz
+1289	core	letzte_aenderung	2026-03-31 14:08:37.05875	system	notiz
+1290	core	error_fieldRequired	2026-03-31 14:08:37.062662	system	ui
+1291	core	error_fieldNotInteger	2026-03-31 14:08:37.06668	system	ui
+1292	core	error_typeNotizIdIncorrect	2026-03-31 14:08:37.070569	system	ui
+1293	core	error_fieldNotFound	2026-03-31 14:08:37.074394	system	ui
+1294	core	tag_rueckgaengig	2026-03-31 14:08:37.078249	system	notiz
+1295	core	tag_erledigt	2026-03-31 14:08:37.082111	system	notiz
+1296	core	tag_verfasser	2026-03-31 14:08:37.085958	system	notiz
+1297	core	tag_bearbeiter	2026-03-31 14:08:37.089804	system	notiz
+1298	core	error_fieldNotNumeric	2026-03-31 14:08:37.093641	system	ui
+1299	core	error_fieldNoValidEmail	2026-03-31 14:08:37.097616	system	ui
+1300	core	warnung	2026-03-31 14:08:37.101483	system	global
+1301	core	vornamen	2026-03-31 14:08:37.105414	system	person
+1302	core	maennlich	2026-03-31 14:08:37.109248	system	person
+1303	core	weiblich	2026-03-31 14:08:37.113177	system	person
+1304	core	sprache	2026-03-31 14:08:37.117085	system	person
+1305	core	zustelladresse	2026-03-31 14:08:37.123639	system	person
+1306	core	kontaktinformation	2026-03-31 14:08:37.127504	system	person
+1307	core	abweichenderEmpfaenger	2026-03-31 14:08:37.132827	system	person
+1389	core	stichtagHinzufuegen	2026-03-31 14:08:37.304517	system	bismeldestichtag
+1390	core	stichtageVerwalten	2026-03-31 14:08:37.308576	system	bismeldestichtag
+1391	core	stichtagLoeschen	2026-03-31 14:08:37.312507	system	bismeldestichtag
+1392	lehrauftrag	hinweistextLehrauftrag	2026-03-31 14:08:37.316414	system	ui
+1393	core	NOTFALLKONTAKT	2026-03-31 14:08:37.320188	system	profil
+1394	core	fotoSperren	2026-03-31 14:08:37.323947	system	profil
+1395	core	fotoEntsperren	2026-03-31 14:08:37.327741	system	profil
+1396	core	fotoHochladen	2026-03-31 14:08:37.331516	system	profil
+1397	core	profil	2026-03-31 14:08:37.335316	system	profil
+1398	core	gruppenLink	2026-03-31 14:08:37.338954	system	profil
+1399	core	verbandLink	2026-03-31 14:08:37.342621	system	profil
+1400	core	semesterLink	2026-03-31 14:08:37.347631	system	profil
+1401	core	TELEFON	2026-03-31 14:08:37.351382	system	profil
+1402	core	MOBIL	2026-03-31 14:08:37.355097	system	profil
+1403	core	EMAIL	2026-03-31 14:08:37.358815	system	profil
+1404	core	personenInformationen	2026-03-31 14:08:37.362563	system	profil
+1405	core	postnomen	2026-03-31 14:08:37.366439	system	profil
+1406	core	Username	2026-03-31 14:08:37.370191	system	profil
+1407	core	Anrede	2026-03-31 14:08:37.373884	system	profil
+1408	core	Titel	2026-03-31 14:08:37.377637	system	profil
+1409	core	Postnomen	2026-03-31 14:08:37.38144	system	profil
+1410	core	Geburtsdatum	2026-03-31 14:08:37.385209	system	profil
+1411	core	Geburtsort	2026-03-31 14:08:37.388955	system	profil
+1412	core	Büro	2026-03-31 14:08:37.392742	system	profil
+1413	core	Kurzzeichen	2026-03-31 14:08:37.3965	system	profil
+1414	core	Telefon	2026-03-31 14:08:37.400304	system	profil
+1415	core	telefon	2026-03-31 14:08:37.404046	system	profil
+1416	core	intern	2026-03-31 14:08:37.407882	system	profil
+1417	core	alias	2026-03-31 14:08:37.411706	system	profil
+1418	core	email	2026-03-31 14:08:37.415508	system	profil
+1419	core	Anmerkung	2026-03-31 14:08:37.419391	system	profil
+1420	core	notfallkontakt	2026-03-31 14:08:37.423308	system	profil
+1421	core	Straße	2026-03-31 14:08:37.427163	system	profil
+1422	core	Strasse	2026-03-31 14:08:37.430952	system	profil
+1423	core	PLZ	2026-03-31 14:08:37.434855	system	profil
+1424	core	Ort	2026-03-31 14:08:37.438683	system	profil
+1425	core	Typ	2026-03-31 14:08:37.442397	system	profil
+1426	core	privateKontakte	2026-03-31 14:08:37.446104	system	profil
+1427	core	privateAdressen	2026-03-31 14:08:37.44992	system	profil
+1428	core	profilBearbeiten	2026-03-31 14:08:37.453829	system	profil
+1429	core	mitarbeiterIn	2026-03-31 14:08:37.457584	system	profil
+1430	core	entlehnteBetriebsmittel	2026-03-31 14:08:37.461435	system	profil
+1431	core	mitarbeiterInformation	2026-03-31 14:08:37.465146	system	profil
+1432	core	studentIn	2026-03-31 14:08:37.46885	system	profil
+1433	core	studentInformation	2026-03-31 14:08:37.47254	system	profil
+1434	core	zutrittsGruppen	2026-03-31 14:08:37.476204	system	profil
+1435	core	fhAusweisStatus	2026-03-31 14:08:37.479817	system	profil
+1436	core	mailverteiler	2026-03-31 14:08:37.483484	system	profil
+1437	core	mailverteilerMitglied	2026-03-31 14:08:37.487249	system	profil
+1438	core	quickLinks	2026-03-31 14:08:37.491092	system	profil
+1439	core	zeitwuensche	2026-03-31 14:08:37.494872	system	profil
+1440	core	lehrveranstaltungen	2026-03-31 14:08:37.4986	system	profil
+1441	core	zeitsperren	2026-03-31 14:08:37.502426	system	profil
+1442	core	inventarnummer	2026-03-31 14:08:37.506143	system	profil
+1443	core	ausgabedatum	2026-03-31 14:08:37.509836	system	profil
+1444	core	wochenstunden	2026-03-31 14:08:37.513597	system	profil
+1445	core	stg_short	2026-03-31 14:08:37.517376	system	profil
+1446	core	orgform_short	2026-03-31 14:08:37.521099	system	profil
+1447	core	orgeinheit_short	2026-03-31 14:08:37.524868	system	profil
+1448	core	sem_short	2026-03-31 14:08:37.528638	system	profil
+1449	core	previousWeek	2026-03-31 14:08:37.532407	system	LvPlan
+1450	core	previousYear	2026-03-31 14:08:37.536259	system	LvPlan
+1451	core	previousMonth	2026-03-31 14:08:37.540117	system	LvPlan
+1452	core	previousDay	2026-03-31 14:08:37.543899	system	LvPlan
+1453	core	nextDay	2026-03-31 14:08:37.547633	system	LvPlan
+1454	core	nextWeek	2026-03-31 14:08:37.55145	system	LvPlan
+1455	core	nextMonth	2026-03-31 14:08:37.555327	system	LvPlan
+1456	core	nextYear	2026-03-31 14:08:37.559204	system	LvPlan
+1457	core	modeDay	2026-03-31 14:08:37.563001	system	LvPlan
+1458	core	modeWeek	2026-03-31 14:08:37.567004	system	LvPlan
+1459	core	modeMonth	2026-03-31 14:08:37.571193	system	LvPlan
+1460	core	profilBild	2026-03-31 14:08:37.575176	system	profilUpdate
+1461	core	deleteAttachment	2026-03-31 14:08:37.579155	system	profilUpdate
+1462	core	documentUpload	2026-03-31 14:08:37.583217	system	profilUpdate
+1463	core	profilUpdates	2026-03-31 14:08:37.587017	system	profilUpdate
+1464	core	topic	2026-03-31 14:08:37.590793	system	profilUpdate
+1465	core	zustell_adressen_warning	2026-03-31 14:08:37.594632	system	profilUpdate
+1466	core	zustell_kontakte_warning	2026-03-31 14:08:37.59866	system	profilUpdate
+1467	core	kontaktTyp	2026-03-31 14:08:37.602433	system	profilUpdate
+1468	core	nebenwohnsitz	2026-03-31 14:08:37.606234	system	profilUpdate
+1469	core	hauptwohnsitz	2026-03-31 14:08:37.610006	system	profilUpdate
+1470	core	homeoffice	2026-03-31 14:08:37.613759	system	profilUpdate
+1471	core	rechnungsadresse	2026-03-31 14:08:37.617605	system	profilUpdate
+1472	core	notfallkontakt	2026-03-31 14:08:37.62168	system	profilUpdate
+1473	core	mobiltelefonnummer	2026-03-31 14:08:37.625473	system	profilUpdate
+1474	core	homepage	2026-03-31 14:08:37.629286	system	profilUpdate
+1475	core	faxnummer	2026-03-31 14:08:37.633316	system	profilUpdate
+1476	core	zustellungsKontakt	2026-03-31 14:08:37.637061	system	profilUpdate
+1477	core	statusMessage	2026-03-31 14:08:37.640975	system	profilUpdate
+1478	core	profilUpdateInformationMessage	2026-03-31 14:08:37.64473	system	profilUpdate
+1479	core	profilBildUpdateMessage	2026-03-31 14:08:37.648529	system	profilUpdate
+1480	core	profilUpdateRequest	2026-03-31 14:08:37.652502	system	profilUpdate
+1481	core	profilUpdateRequests	2026-03-31 14:08:37.656165	system	profilUpdate
+1482	core	statusDate	2026-03-31 14:08:37.65982	system	profilUpdate
+1483	core	userID	2026-03-31 14:08:37.663529	system	profilUpdate
+1484	core	anfrageThema	2026-03-31 14:08:37.667326	system	profilUpdate
+1485	core	anfrageDatum	2026-03-31 14:08:37.671109	system	profilUpdate
+1486	core	update	2026-03-31 14:08:37.674907	system	profilUpdate
+1487	core	accept	2026-03-31 14:08:37.678721	system	profilUpdate
+1488	core	deny	2026-03-31 14:08:37.682509	system	profilUpdate
+1489	core	UID	2026-03-31 14:08:37.686305	system	profilUpdate
+1490	core	pendingRequests	2026-03-31 14:08:37.690074	system	profilUpdate
+1491	core	acceptedRequests	2026-03-31 14:08:37.693813	system	profilUpdate
+1492	core	rejectedRequests	2026-03-31 14:08:37.6976	system	profilUpdate
+1493	core	allRequests	2026-03-31 14:08:37.701356	system	profilUpdate
+1494	core	deleteContact	2026-03-31 14:08:37.705102	system	profilUpdate
+1495	core	deleteItem	2026-03-31 14:08:37.708854	system	profilUpdate
+1496	core	addItem	2026-03-31 14:08:37.71256	system	profilUpdate
+1497	core	deleteAddress	2026-03-31 14:08:37.716388	system	profilUpdate
+1498	core	addContact	2026-03-31 14:08:37.720158	system	profilUpdate
+1499	core	vorname	2026-03-31 14:08:37.725225	system	profilUpdate
+1500	core	nachname	2026-03-31 14:08:37.729039	system	profilUpdate
+1501	core	title	2026-03-31 14:08:37.732823	system	profilUpdate
+1502	core	pending	2026-03-31 14:08:37.736613	system	profilUpdate
+1503	core	accepted	2026-03-31 14:08:37.740601	system	profilUpdate
+1504	core	rejected	2026-03-31 14:08:37.744329	system	profilUpdate
+1505	core	profilUdate_address_error	2026-03-31 14:08:37.748079	system	profilUpdate
+1506	core	profilUpdate_permission_error	2026-03-31 14:08:37.751905	system	profilUpdate
+1507	core	profilUpdate_dms_error	2026-03-31 14:08:37.755657	system	profilUpdate
+1508	core	profilUpdate_email_error	2026-03-31 14:08:37.759438	system	profilUpdate
+1509	core	profilUpdate_studentCheck_error	2026-03-31 14:08:37.763198	system	profilUpdate
+1510	core	profilUpdate_mitarbeiterCheck_error	2026-03-31 14:08:37.766985	system	profilUpdate
+1511	core	profilUpdate_loading_error	2026-03-31 14:08:37.770878	system	profilUpdate
+1512	core	profilUpdate_dmsVersion_error	2026-03-31 14:08:37.774702	system	profilUpdate
+1513	core	profilUpdate_deleteZustellung_error	2026-03-31 14:08:37.778509	system	profilUpdate
+1514	core	profilUpdate_changeTwice_error	2026-03-31 14:08:37.782303	system	profilUpdate
+1515	core	profilUpdate_changeTopicTwice_error	2026-03-31 14:08:37.786074	system	profilUpdate
+1516	core	profilUpdate_loadingOE_error	2026-03-31 14:08:37.789898	system	profilUpdate
+1517	core	profilUpdate_requiredInformation_error	2026-03-31 14:08:37.79371	system	profilUpdate
+1518	core	profilUpdate_insert_error	2026-03-31 14:08:37.797486	system	profilUpdate
+1519	core	profilUpdate_insertKontakt_error	2026-03-31 14:08:37.801302	system	profilUpdate
+1520	core	profilUpdate_insertAdresse_error	2026-03-31 14:08:37.80507	system	profilUpdate
+1521	core	profilUpdate_updateKontakt_error	2026-03-31 14:08:37.808906	system	profilUpdate
+1522	core	profilUpdate_updateAdresse_error	2026-03-31 14:08:37.812717	system	profilUpdate
+1523	core	profilUpdate_loadingZustellkontakte_error	2026-03-31 14:08:37.816476	system	profilUpdate
+1524	core	profilUpdate_loadingZustellAdressen_error	2026-03-31 14:08:37.820566	system	profilUpdate
+1525	core	acceptUpdate	2026-03-31 14:08:37.824342	system	profilUpdate
+1526	core	denyUpdate	2026-03-31 14:08:37.827987	system	profilUpdate
+1527	core	showRequest	2026-03-31 14:08:37.831661	system	profilUpdate
+1528	core	profilUpdate_status_error	2026-03-31 14:08:37.83538	system	profilUpdate
+1529	core	profilUpdate_topic_error	2026-03-31 14:08:37.839154	system	profilUpdate
+1530	core	profilUpdate_address_error	2026-03-31 14:08:37.843037	system	profilUpdate
+1531	core	profilUpdate_kontakt_error	2026-03-31 14:08:37.847019	system	profilUpdate
+1532	core	Name	2026-03-31 14:08:37.85095	system	profilUpdate
+1533	core	Topic	2026-03-31 14:08:37.854854	system	profilUpdate
+1534	core	insertamum	2026-03-31 14:08:37.858721	system	profilUpdate
+1535	core	actions	2026-03-31 14:08:37.86278	system	profilUpdate
+1536	core	Status	2026-03-31 14:08:37.866702	system	profilUpdate
+1537	core	infoHeimatadresse	2026-03-31 14:08:37.870727	system	profilUpdate
+1538	core	infoZustelladresse	2026-03-31 14:08:37.874654	system	profilUpdate
+1539	core	geloescht	2026-03-31 14:08:37.878627	system	global
+1540	core	previous	2026-03-31 14:08:37.882559	system	global
+1541	core	next	2026-03-31 14:08:37.886454	system	global
+1542	core	switchTheme	2026-03-31 14:08:37.890318	system	global
+1543	core	aenderungGespeichert	2026-03-31 14:08:37.894481	system	global
+1549	core	alleGenehmigt	2026-03-31 14:08:37.908815	system	global
+1550	core	alleAbgelehnt	2026-03-31 14:08:37.912616	system	global
+1551	core	dokument	2026-03-31 14:08:37.916299	system	global
+1552	core	aktionen	2026-03-31 14:08:37.920163	system	global
+1667	core	digiAnw	2026-03-31 14:08:38.15251	system	lehre
+1732	core	newLink	2026-03-31 14:08:38.280993	system	bookmark
+1733	core	saveLink	2026-03-31 14:08:38.284755	system	bookmark
+1734	core	editLink	2026-03-31 14:08:38.288515	system	bookmark
+1735	core	bookmarkDeleted	2026-03-31 14:08:38.292339	system	bookmark
+1736	core	bookmarkAdded	2026-03-31 14:08:38.2963	system	bookmark
+1737	core	bookmarkUpdated	2026-03-31 14:08:38.301501	system	bookmark
+1738	core	myBookmarks	2026-03-31 14:08:38.305427	system	bookmark
+1739	core	emptyBookmarks	2026-03-31 14:08:38.309312	system	bookmark
+1740	core	invalidUrl	2026-03-31 14:08:38.31322	system	bookmark
+1741	core	invalidTitel	2026-03-31 14:08:38.317024	system	bookmark
+1742	core	gespeichert	2026-03-31 14:08:38.320923	system	global
+1744	core	raumzuordnung	2026-03-31 14:08:38.326811	system	global
+1745	core	statusSetzen	2026-03-31 14:08:38.331974	system	global
+1746	core	hierarchieAnsicht	2026-03-31 14:08:38.335792	system	global
+1747	core	aufgeklappt	2026-03-31 14:08:38.339596	system	global
+1748	core	zugeklappt	2026-03-31 14:08:38.343414	system	global
+1753	core	verfuegbarkeitBearbeiten	2026-03-31 14:08:38.354918	system	global
+1765	core	bezeichnung	2026-03-31 14:08:38.380209	system	global
+1767	core	verfuegbarkeitStart	2026-03-31 14:08:38.386512	system	global
+1768	core	verfuegbarkeitEnde	2026-03-31 14:08:38.390786	system	global
+1772	core	hersteller	2026-03-31 14:08:38.400675	system	global
+1773	core	verantwortliche	2026-03-31 14:08:38.404805	system	global
+1775	core	ansprechpartner	2026-03-31 14:08:38.410657	system	global
+1776	core	ansprechpartnerIntern	2026-03-31 14:08:38.414735	system	global
+1777	core	ansprechpartnerExtern	2026-03-31 14:08:38.418608	system	global
+1778	core	anmerkungIntern	2026-03-31 14:08:38.422488	system	global
+1786	core	kostentraegerOe	2026-03-31 14:08:38.439903	system	global
+1788	core	euroProJahr	2026-03-31 14:08:38.446018	system	global
+1789	core	alleWaehlen	2026-03-31 14:08:38.450198	system	global
+1794	core	existiertBereits	2026-03-31 14:08:38.461907	system	ui
+1795	core	datumEndeVorDatumStart	2026-03-31 14:08:38.465989	system	ui
+1800	core	zeilenAuswaehlen	2026-03-31 14:08:38.477434	system	global
+1805	core	firma_zusatz	2026-03-31 14:08:38.488944	system	person
+1806	core	firma	2026-03-31 14:08:38.493072	system	person
+1807	core	adresse_new	2026-03-31 14:08:38.496903	system	person
+1808	core	adresse_edit	2026-03-31 14:08:38.500673	system	person
+1809	core	adresse_delete	2026-03-31 14:08:38.504426	system	person
+1810	core	adresse_confirm_delete	2026-03-31 14:08:38.508182	system	person
+1811	core	kontakt_new	2026-03-31 14:08:38.511903	system	person
+1812	core	kontakt_edit	2026-03-31 14:08:38.515604	system	person
+1813	core	kontakt_delete	2026-03-31 14:08:38.519333	system	person
+1814	core	kontakt_confirm_delete	2026-03-31 14:08:38.523026	system	person
+1815	core	privatkonto	2026-03-31 14:08:38.526745	system	person
+1816	core	firmenkonto	2026-03-31 14:08:38.530472	system	person
+1817	core	bankvb_new	2026-03-31 14:08:38.534184	system	person
+1818	core	bankvb_edit	2026-03-31 14:08:38.537871	system	person
+1819	core	bankvb_delete	2026-03-31 14:08:38.541543	system	person
+1820	core	bankvb_confirm_delete	2026-03-31 14:08:38.545251	system	person
+1821	core	status_rolle	2026-03-31 14:08:38.548932	system	lehre
+1822	core	status_new	2026-03-31 14:08:38.552703	system	lehre
+1823	core	status_edit	2026-03-31 14:08:38.556355	system	lehre
+1824	core	status_delete	2026-03-31 14:08:38.559896	system	lehre
+1825	core	bestaetigt_am	2026-03-31 14:08:38.563631	system	lehre
+1826	core	bestaetigt_von	2026-03-31 14:08:38.567373	system	lehre
+1827	core	insert_am	2026-03-31 14:08:38.571056	system	lehre
+1828	core	insert_von	2026-03-31 14:08:38.575029	system	lehre
+1829	core	bewerbung_abgeschickt_am	2026-03-31 14:08:38.579378	system	lehre
+1830	core	aufnahmestufe	2026-03-31 14:08:38.583281	system	lehre
+1831	core	meldestichtag_erreicht	2026-03-31 14:08:38.587061	system	bismeldestichtag
+1832	core	status_confirm_delete	2026-03-31 14:08:38.590866	system	lehre
+1833	core	last_status_confirm_delete	2026-03-31 14:08:38.59461	system	lehre
+1834	core	modal_askAusbildungssem	2026-03-31 14:08:38.598435	system	lehre
+1835	core	modal_askAusbildungssemPlural	2026-03-31 14:08:38.602089	system	lehre
+1836	core	title_zgv	2026-03-31 14:08:38.605792	system	lehre
+1837	core	zgvMaster	2026-03-31 14:08:38.609389	system	lehre
+1838	core	zgvMasterOrt	2026-03-31 14:08:38.613055	system	lehre
+1839	core	zgvMasterDatum	2026-03-31 14:08:38.616875	system	lehre
+1840	core	zgvMasterNation	2026-03-31 14:08:38.620685	system	lehre
+1841	core	zgvMasterErfuellt	2026-03-31 14:08:38.624912	system	lehre
+1842	core	zgvDoktor	2026-03-31 14:08:38.62873	system	lehre
+1843	core	zgvDoktorOrt	2026-03-31 14:08:38.632633	system	lehre
+1844	core	zgvDoktorDatum	2026-03-31 14:08:38.636472	system	lehre
+1845	core	zgvDoktorNation	2026-03-31 14:08:38.640305	system	lehre
+1846	core	zgvDoktorErfuellt	2026-03-31 14:08:38.644247	system	lehre
+1847	core	aufmerksamDurch	2026-03-31 14:08:38.648047	system	person
+1848	core	berufstaetigkeit	2026-03-31 14:08:38.651763	system	person
+1849	core	facheinschlaegigBerufstaetig	2026-03-31 14:08:38.655613	system	person
+1850	core	bisstandort	2026-03-31 14:08:38.659475	system	person
+1851	core	studientyp	2026-03-31 14:08:38.663198	system	lehre
+1852	core	dual	2026-03-31 14:08:38.666829	system	lehre
+1853	core	foerderrelevant	2026-03-31 14:08:38.670521	system	lehre
+1854	core	prioritaet	2026-03-31 14:08:38.674176	system	lehre
+1855	core	title_history	2026-03-31 14:08:38.677771	system	lehre
+1856	core	error_keineSchreibrechte	2026-03-31 14:08:38.681499	system	lehre
+1857	core	error_rolleBereitsVorhanden	2026-03-31 14:08:38.685321	system	lehre
+1858	core	error_rolleBereitsVorhandenMitNamen	2026-03-31 14:08:38.689109	system	lehre
+1859	core	error_personBereitsStudent	2026-03-31 14:08:38.69287	system	lehre
+1860	core	error_keinReihungstestverfahren	2026-03-31 14:08:38.696702	system	lehre
+1861	core	error_ZGVNichtEingetragen	2026-03-31 14:08:38.700672	system	lehre
+1862	core	error_ZGVMasterNichtEingetragen	2026-03-31 14:08:38.704583	system	lehre
+1863	core	error_keinBewerber	2026-03-31 14:08:38.708402	system	lehre
+1864	core	error_keinAufgenommener	2026-03-31 14:08:38.71232	system	lehre
+1865	core	error_lastBewerberAndAufgenommenerSemesters	2026-03-31 14:08:38.716112	system	lehre
+1866	core	error_noStudstatus	2026-03-31 14:08:38.719915	system	lehre
+1867	core	error_dataVorMeldestichtag	2026-03-31 14:08:38.723804	system	lehre
+1868	core	error_duringInsertUpdateLehrverband	2026-03-31 14:08:38.727694	system	lehre
+1869	core	error_duringDeleteLehrverband	2026-03-31 14:08:38.731546	system	lehre
+1870	core	error_onlyAdminDeleteRolleStudent	2026-03-31 14:08:38.735355	system	lehre
+1871	core	error_onlyAdminDeleteLastStatus	2026-03-31 14:08:38.739175	system	lehre
+1872	core	error_noStatusFound	2026-03-31 14:08:38.743034	system	lehre
+1873	core	error_statusConfirmedYet	2026-03-31 14:08:38.746727	system	lehre
+1874	core	error_bewerbungNochNichtAbgeschickt	2026-03-31 14:08:38.750436	system	lehre
+1875	core	error_missingId	2026-03-31 14:08:38.754094	system	ui
+1876	core	error_deleteHomeAdress	2026-03-31 14:08:38.757798	system	person
+1877	core	btn_statusVorruecken	2026-03-31 14:08:38.76153	system	ui
+1878	core	btn_confirmStatus	2026-03-31 14:08:38.76526	system	ui
+1879	core	btn_editStatus	2026-03-31 14:08:38.769089	system	ui
+1880	core	btn_deleteStatus	2026-03-31 14:08:38.772936	system	ui
+1881	core	successSave	2026-03-31 14:08:38.776735	system	ui
+1882	core	successDelete	2026-03-31 14:08:38.780517	system	ui
+1883	core	successAdvance	2026-03-31 14:08:38.784453	system	ui
+1884	core	successConfirm	2026-03-31 14:08:38.788299	system	ui
+1885	core	betriebsmittel	2026-03-31 14:08:38.792073	system	ui
+1886	core	betriebsmittel_delete	2026-03-31 14:08:38.795937	system	ui
+1887	core	betriebsmittel_confirm_delete	2026-03-31 14:08:38.799773	system	ui
+1888	core	add_betriebsmittel	2026-03-31 14:08:38.80363	system	ui
+1889	core	edit_betriebsmittel	2026-03-31 14:08:38.80746	system	ui
+1890	core	inventarnummer	2026-03-31 14:08:38.811389	system	wawi
+1891	core	nummer	2026-03-31 14:08:38.81525	system	wawi
+1892	core	ausgegebenam	2026-03-31 14:08:38.81924	system	wawi
+1893	core	retouram	2026-03-31 14:08:38.82314	system	wawi
+1894	core	retourdatum	2026-03-31 14:08:38.82699	system	wawi
+1895	core	ausgabedatum	2026-03-31 14:08:38.830987	system	wawi
+1896	core	error_zutrittskarteOhneNummer	2026-03-31 14:08:38.834841	system	wawi
+1897	core	error_bmZutrittskarteOccupied	2026-03-31 14:08:38.838867	system	wawi
+1898	core	error_inventarWaehlen	2026-03-31 14:08:38.842698	system	wawi
+1899	core	error_retourdatumVorAusgabe	2026-03-31 14:08:38.846682	system	wawi
+1914	core	eingabeFehlt	2026-03-31 14:08:38.878526	system	global
+1915	core	unveraendert	2026-03-31 14:08:38.882471	system	global
+1919	core	verwalten	2026-03-31 14:08:38.892114	system	global
+1920	core	lvTemplatesVerwalten	2026-03-31 14:08:38.896179	system	lehre
+1921	core	lvTemplatesUebersicht	2026-03-31 14:08:38.899989	system	lehre
+1922	core	buchung	2026-03-31 14:08:38.903872	system	konto
+1923	core	buchungsdatum	2026-03-31 14:08:38.907696	system	konto
+1924	core	buchungstext	2026-03-31 14:08:38.911525	system	konto
+1925	core	betrag	2026-03-31 14:08:38.915332	system	konto
+1926	core	buchungstyp	2026-03-31 14:08:38.919074	system	konto
+1927	core	buchungsnr	2026-03-31 14:08:38.922887	system	konto
+1928	core	mahnspanne	2026-03-31 14:08:38.92663	system	konto
+1929	core	credit_points	2026-03-31 14:08:38.9304	system	konto
+1930	core	reference	2026-03-31 14:08:38.934231	system	konto
+1931	core	confirm_overwrite	2026-03-31 14:08:38.937981	system	konto
+1932	core	confirm_overwrite_1_add_pers	2026-03-31 14:08:38.941809	system	konto
+1933	core	confirm_overwrite_x_add_pers	2026-03-31 14:08:38.945603	system	konto
+1934	core	confirm_overwrite_proceed	2026-03-31 14:08:38.949648	system	konto
+1935	core	error_missing	2026-03-31 14:08:38.953473	system	konto
+1936	core	error_counter_level	2026-03-31 14:08:38.957376	system	konto
+1937	core	error_delete_level	2026-03-31 14:08:38.96119	system	konto
+1938	core	settings_no_displayed_past_sem	2026-03-31 14:08:38.964914	system	stv
+1939	core	settings_fontsize	2026-03-31 14:08:38.9686	system	stv
+1940	core	settings_fontsize_xx-small	2026-03-31 14:08:38.972378	system	stv
+1941	core	settings_fontsize_x-small	2026-03-31 14:08:38.976151	system	stv
+1942	core	settings_fontsize_small	2026-03-31 14:08:38.98	system	stv
+1943	core	settings_fontsize_normal	2026-03-31 14:08:38.983711	system	stv
+1944	core	settings_fontsize_big	2026-03-31 14:08:38.987741	system	stv
+1945	core	settings_fontsize_huge	2026-03-31 14:08:38.991574	system	stv
+1946	core	action_new	2026-03-31 14:08:38.995598	system	stv
+1947	core	warn_removed_favs	2026-03-31 14:08:38.999347	system	stv
+1948	core	notes_person	2026-03-31 14:08:39.003228	system	stv
+1949	core	notes_prestudent	2026-03-31 14:08:39.006936	system	stv
+1950	core	aufnahmegruppe_kurzbz	2026-03-31 14:08:39.010695	system	stv
+1951	core	mentor	2026-03-31 14:08:39.014535	system	stv
+1952	core	tab_details	2026-03-31 14:08:39.01826	system	stv
+1953	core	tab_notes	2026-03-31 14:08:39.022232	system	stv
+1954	core	tab_contact	2026-03-31 14:08:39.025906	system	stv
+1955	core	tab_prestudent	2026-03-31 14:08:39.02973	system	stv
+1956	core	tab_status	2026-03-31 14:08:39.033452	system	stv
+1957	core	tab_banking	2026-03-31 14:08:39.037469	system	stv
+1958	core	tab_resources	2026-03-31 14:08:39.041201	system	stv
+1959	core	tab_grades	2026-03-31 14:08:39.044911	system	stv
+1960	core	tab_exam	2026-03-31 14:08:39.048672	system	stv
+1961	core	grade_report	2026-03-31 14:08:39.052341	system	stv
+1962	core	grade_report_xls	2026-03-31 14:08:39.056232	system	stv
+1963	core	grade_report_xls_extended	2026-03-31 14:08:39.059927	system	stv
+1964	core	grade_report_html	2026-03-31 14:08:39.063811	system	stv
+1965	core	filter_for	2026-03-31 14:08:39.067515	system	stv
+1966	core	filter_konto_count_0	2026-03-31 14:08:39.071259	system	stv
+1967	core	filter_konto_missing_counter	2026-03-31 14:08:39.074949	system	stv
+1968	core	filter_documents	2026-03-31 14:08:39.078743	system	stv
+1969	core	filter_konto_missing_counter_past	2026-03-31 14:08:39.082392	system	stv
+1970	core	filter_konto_missing_studiengebuehr	2026-03-31 14:08:39.086156	system	stv
+1971	core	filter_konto_studiengebuehrerhoeht	2026-03-31 14:08:39.089872	system	stv
+1972	core	filter_zgv_without_date	2026-03-31 14:08:39.093624	system	stv
+1973	core	filter_statusgrund	2026-03-31 14:08:39.097399	system	stv
+1974	core	filter_konto_samestg	2026-03-31 14:08:39.101295	system	stv
+1975	core	filter_fhtw_ausbildungsvertrag_akzeptiert	2026-03-31 14:08:39.105027	system	stv
+1976	core	konto_title_new	2026-03-31 14:08:39.108902	system	stv
+1977	core	konto_title_new_multi	2026-03-31 14:08:39.112672	system	stv
+1978	core	konto_title_edit	2026-03-31 14:08:39.11653	system	stv
+1979	core	konto_counter	2026-03-31 14:08:39.120362	system	stv
+1980	core	konto_payment_confirmation	2026-03-31 14:08:39.124193	system	stv
+1981	core	konto_all_types	2026-03-31 14:08:39.127922	system	stv
+1982	core	konto_filter_open	2026-03-31 14:08:39.131744	system	stv
+1983	core	konto_filter_current_stg	2026-03-31 14:08:39.135685	system	stv
+1984	core	status_confirm_popup	2026-03-31 14:08:39.139539	system	stv
+1985	core	document_certificate	2026-03-31 14:08:39.143407	system	stv
+1986	core	document_coursecertificate	2026-03-31 14:08:39.14719	system	stv
+1987	core	document_download	2026-03-31 14:08:39.150945	system	stv
+1988	core	document_archive	2026-03-31 14:08:39.154743	system	stv
+1989	core	document_signed_and_archived	2026-03-31 14:08:39.158569	system	stv
+1990	core	grades_zeugnis	2026-03-31 14:08:39.162404	system	stv
+1991	core	grades_takeoverdate	2026-03-31 14:08:39.166124	system	stv
+1992	core	grades_gradingdate	2026-03-31 14:08:39.169824	system	stv
+1993	core	grades_approvaldate	2026-03-31 14:08:39.173629	system	stv
+1994	core	grades_numericgrade	2026-03-31 14:08:39.177468	system	stv
+1995	core	grades_studiengang_lv	2026-03-31 14:08:39.181219	system	stv
+1996	core	grades_studiengang_kz_lv	2026-03-31 14:08:39.184948	system	stv
+1997	core	grades_semester_lv	2026-03-31 14:08:39.188804	system	stv
+1998	core	grades_points	2026-03-31 14:08:39.192554	system	stv
+1999	core	grades_lehrveranstaltung_bezeichnung_english	2026-03-31 14:08:39.196225	system	stv
+2000	core	grades_setgrade	2026-03-31 14:08:39.199872	system	stv
+2001	core	grades_updated	2026-03-31 14:08:39.203533	system	stv
+2002	core	grades_title_zeugnis	2026-03-31 14:08:39.207347	system	stv
+2003	core	grades_title_teacher	2026-03-31 14:08:39.211209	system	stv
+2004	core	grades_title_repeater	2026-03-31 14:08:39.214964	system	stv
+2005	core	grades_action_copy	2026-03-31 14:08:39.218643	system	stv
+2006	core	grades_error_sign	2026-03-31 14:08:39.222349	system	stv
+2007	core	grades_error_archive	2026-03-31 14:08:39.225955	system	stv
+2008	core	grades_error_overwrite	2026-03-31 14:08:39.229652	system	stv
+2009	core	grades_error_lehreinheit_id	2026-03-31 14:08:39.233462	system	stv
+2010	core	grades_error_prestudentstatus	2026-03-31 14:08:39.237273	system	stv
+2011	core	groups_error_notallstudents	2026-03-31 14:08:39.241207	system	stv
+2012	core	groups_error_notsamestg	2026-03-31 14:08:39.24497	system	stv
+2013	core	error_unoconv	2026-03-31 14:08:39.248925	system	document_export
+2014	core	error_unoconv_version	2026-03-31 14:08:39.252748	system	document_export
+2015	core	error_conv_timeout	2026-03-31 14:08:39.256617	system	document_export
+2016	core	error_sign_timeout	2026-03-31 14:08:39.26046	system	document_export
+2017	core	error_sign_pdf	2026-03-31 14:08:39.264297	system	document_export
+2018	core	error_outputformat_missing	2026-03-31 14:08:39.26802	system	document_export
+2019	core	error_template_missing	2026-03-31 14:08:39.271834	system	document_export
+2020	core	error_headers	2026-03-31 14:08:39.275588	system	document_export
+2021	core	error_file_copy	2026-03-31 14:08:39.279433	system	document_export
+2022	core	error_file_load	2026-03-31 14:08:39.283508	system	document_export
+2023	core	error_xml_load	2026-03-31 14:08:39.287369	system	document_export
+2024	core	error_xsl_load	2026-03-31 14:08:39.291179	system	document_export
+2025	core	error_styles_load	2026-03-31 14:08:39.295062	system	document_export
+2026	core	error_manifest	2026-03-31 14:08:39.298923	system	document_export
+2027	core	kw	2026-03-31 14:08:39.302716	system	calendar
+2028	core	year_kw	2026-03-31 14:08:39.306574	system	calendar
+2029	core	today	2026-03-31 14:08:39.310347	system	calendar
+2030	core	error_noBuchung	2026-03-31 14:08:39.314092	system	sap
+2031	core	error_buchungLocked	2026-03-31 14:08:39.317879	system	sap
+2032	core	msg_buchung_deleted	2026-03-31 14:08:39.321669	system	sap
+2033	core	lehrverband	2026-03-31 14:08:39.325614	system	lehre
+2034	core	successNewStatus	2026-03-31 14:08:39.329452	system	ui
+2035	core	error_updateLehrverband	2026-03-31 14:08:39.333298	system	lehre
+2036	core	error_noLehrverband	2026-03-31 14:08:39.33709	system	lehre
+2037	core	error_updateStudentlehrverband	2026-03-31 14:08:39.340844	system	lehre
+2038	core	error_noStudentlehrverband	2026-03-31 14:08:39.344603	system	lehre
+2039	core	error_statuseintrag_zeitabfolge	2026-03-31 14:08:39.348478	system	lehre
+2040	core	error_endstatus	2026-03-31 14:08:39.352324	system	lehre
+2041	core	error_consecutiveUnterbrecher	2026-03-31 14:08:39.356133	system	lehre
+2042	core	error_consecutiveUnterbrecherAbbrecher	2026-03-31 14:08:39.359921	system	lehre
+2043	core	error_consecutiveDiplomandStudent	2026-03-31 14:08:39.363755	system	lehre
+2044	core	error_noStudiensemester	2026-03-31 14:08:39.367611	system	lehre
+2045	core	anzahl_existingRoles	2026-03-31 14:08:39.371509	system	lehre
+2046	core	error_entryInPast	2026-03-31 14:08:39.375277	system	lehre
+2047	core	btn_statusAendern	2026-03-31 14:08:39.379119	system	lehre
+2048	core	neuerTerminBachelorMasterbetreuung	2026-03-31 14:08:39.382962	system	abgabetool
+2049	core	neueTerminserie	2026-03-31 14:08:39.386776	system	abgabetool
+2050	core	c4Sprache	2026-03-31 14:08:39.390631	system	abgabetool
+2051	core	c4fehlerAktualitaetProjektarbeit 	2026-03-31 14:08:39.394483	system	abgabetool
+2052	core	serienTerminEmailSentInfo	2026-03-31 14:08:39.398284	system	abgabetool
+2053	core	serienTerminGespeichert	2026-03-31 14:08:39.402097	system	abgabetool
+2054	core	errorSerienterminSpeichern	2026-03-31 14:08:39.406009	system	abgabetool
+2055	core	c4abgabeMitarbeiterbereich	2026-03-31 14:08:39.409864	system	abgabetool
+2056	core	c4all	2026-03-31 14:08:39.413666	system	abgabetool
+2057	core	abgabe	2026-03-31 14:08:39.417507	system	abgabetool
+2058	core	genericDeleted	2026-03-31 14:08:39.421377	system	ui
+2059	core	error_lastRole	2026-03-31 14:08:39.425229	system	lehre
+2060	core	info_MeldestichtagStatusgrund	2026-03-31 14:08:39.428962	system	bismeldestichtag
+2061	core	info_MeldestichtagStatusgrundSemester	2026-03-31 14:08:39.432682	system	bismeldestichtag
+2062	core	error_location_combination	2026-03-31 14:08:39.436425	system	ui
+2063	core	bittePlzWaehlen	2026-03-31 14:08:39.440175	system	ui
+2064	core	bitteGemeindeWaehlen	2026-03-31 14:08:39.443961	system	ui
+2065	core	bitteStandortWaehlen	2026-03-31 14:08:39.447783	system	ui
+2066	core	error_wrongStatusOrderBeforeStudent	2026-03-31 14:08:39.45168	system	lehre
+2067	core	error_personenkennzeichenPasstNichtZuStudiensemester	2026-03-31 14:08:39.455602	system	lehre
+2068	core	error_bewerberOrgformUngleichStudentOrgform	2026-03-31 14:08:39.459472	system	lehre
+2069	core	error_benutzerBereitsVorhanden	2026-03-31 14:08:39.463392	system	lehre
+2070	core	error_noStatusgrund	2026-03-31 14:08:39.467079	system	lehre
+2071	core	modal_StatusactionSingle	2026-03-31 14:08:39.470802	system	lehre
+2072	core	modal_StatusactionPlural	2026-03-31 14:08:39.474547	system	lehre
+2080	core	add_pruefung	2026-03-31 14:08:39.493718	system	exam
+2081	core	edit_pruefung	2026-03-31 14:08:39.497572	system	exam
+2082	core	delete_pruefung	2026-03-31 14:08:39.501253	system	exam
+2083	core	newFromOld_pruefung	2026-03-31 14:08:39.504976	system	exam
+2084	core	hinweis_kommPrfg	2026-03-31 14:08:39.50886	system	exam
+2085	core	keineAuswahl	2026-03-31 14:08:39.512749	system	exam
+2086	core	hinweis_changeAfterExamDate	2026-03-31 14:08:39.51649	system	exam
+2087	core	bitteLvteilWaehlen	2026-03-31 14:08:39.520421	system	exam
+2088	core	punkte	2026-03-31 14:08:39.524111	system	exam
+2089	core	filter_currentSem	2026-03-31 14:08:39.528092	system	exam
+2090	core	student_uid	2026-03-31 14:08:39.531905	system	ui
+2091	core	btn_printUebernahmebestaetigung	2026-03-31 14:08:39.53578	system	betriebsmittel
+2092	core	btn_editBetriebsmittel	2026-03-31 14:08:39.539717	system	betriebsmittel
+2093	core	btn_deleteBetriebsmittel	2026-03-31 14:08:39.543544	system	betriebsmittel
+2094	core	unbekannt	2026-03-31 14:08:39.547404	system	uhstat
+2095	core	errorConfigFehlt	2026-03-31 14:08:39.551367	system	ui
+2096	core	errorUnbekannteUrl	2026-03-31 14:08:39.555348	system	ui
+2103	core	newestAmpeln	2026-03-31 14:08:39.572057	system	ampeln
+2104	core	allAmpeln	2026-03-31 14:08:39.576038	system	ampeln
+2105	core	overdue	2026-03-31 14:08:39.579941	system	ampeln
+2106	core	ampelnDeadline	2026-03-31 14:08:39.583821	system	ampeln
+2107	core	noOpenAmpeln	2026-03-31 14:08:39.587786	system	ampeln
+2108	core	openAmpeln	2026-03-31 14:08:39.591595	system	ampeln
+2109	core	allMyAmpeln	2026-03-31 14:08:39.595639	system	ampeln
+2110	core	mandatory	2026-03-31 14:08:39.599523	system	ampeln
+2111	core	ampelBestaetigt	2026-03-31 14:08:39.603423	system	ampeln
+2112	core	super	2026-03-31 14:08:39.607245	system	ampeln
+2113	core	allNews	2026-03-31 14:08:39.611105	system	news
+2114	core	topNews	2026-03-31 14:08:39.614912	system	news
+2115	core	noSubject	2026-03-31 14:08:39.618764	system	news
+2116	core	studiengangsleitung	2026-03-31 14:08:39.622723	system	global
+2117	core	stellvertreter	2026-03-31 14:08:39.626575	system	global
+2118	core	sekretariat	2026-03-31 14:08:39.630635	system	global
+2119	core	hochschulvertretung	2026-03-31 14:08:39.634494	system	global
+2120	core	studentenvertreter	2026-03-31 14:08:39.638332	system	global
+2121	core	allgemeinerdownload	2026-03-31 14:08:39.642126	system	global
+2122	core	nichtAngemeldet	2026-03-31 14:08:39.64592	system	global
+2123	core	lvInfoBearbeiten	2026-03-31 14:08:39.649771	system	lehre
+2124	core	lehrveranstaltungsinformation	2026-03-31 14:08:39.653646	system	lehre
+2125	core	lehrveranstaltungsmenue	2026-03-31 14:08:39.657508	system	lehre
+2126	core	lehrveranstaltungsmenueUnavailable	2026-03-31 14:08:39.661536	system	lehre
+2127	core	gesamtnote	2026-03-31 14:08:39.665374	system	lehre
+2128	core	noteneingabedeaktiviert	2026-03-31 14:08:39.669257	system	lehre
+2129	core	keinMailverteiler	2026-03-31 14:08:39.6731	system	lehre
+2130	core	mail	2026-03-31 14:08:39.676919	system	lehre
+2131	core	abmelden	2026-03-31 14:08:39.680692	system	lehre
+2132	core	anrechnung	2026-03-31 14:08:39.684442	system	lehre
+2133	core	anrechnungen	2026-03-31 14:08:39.688228	system	lehre
+2134	core	stundenplan	2026-03-31 14:08:39.692332	system	lehre
+2135	core	personalGreeting	2026-03-31 14:08:39.69608	system	global
+2136	core	myLV	2026-03-31 14:08:39.699892	system	lehre
+2137	core	previousStudSemester	2026-03-31 14:08:39.703702	system	lehre
+2138	core	nextStudSemester	2026-03-31 14:08:39.70747	system	lehre
+2139	core	abgabetoolTitle	2026-03-31 14:08:39.711279	system	abgabetool
+2140	core	keinTitel	2026-03-31 14:08:39.715028	system	abgabetool
+2141	core	c4details	2026-03-31 14:08:39.718825	system	abgabetool
+2142	core	c4sem	2026-03-31 14:08:39.722569	system	abgabetool
+2143	core	c4stg	2026-03-31 14:08:39.726379	system	abgabetool
+2144	core	c4kontakt	2026-03-31 14:08:39.730186	system	abgabetool
+2145	core	c4betreuerv2	2026-03-31 14:08:39.733926	system	abgabetool
+2146	core	c4projekttyp	2026-03-31 14:08:39.737707	system	abgabetool
+2147	core	c4titel	2026-03-31 14:08:39.741431	system	abgabetool
+2148	core	c4abgabeuntil2359	2026-03-31 14:08:39.745205	system	abgabetool
+2149	core	c4abgabeStudentenbereich	2026-03-31 14:08:39.74894	system	abgabetool
+2150	core	c4fixterminv4	2026-03-31 14:08:39.752726	system	abgabetool
+2151	core	c4orgform	2026-03-31 14:08:39.756485	system	abgabetool
+2152	core	c4studstatus	2026-03-31 14:08:39.760214	system	abgabetool
+2153	core	c4signaturGefunden	2026-03-31 14:08:39.764022	system	abgabetool
+2154	core	c4keineSignatur	2026-03-31 14:08:39.767814	system	abgabetool
+2155	core	c4signaturServerError	2026-03-31 14:08:39.771562	system	abgabetool
+2156	core	c4noFileFound	2026-03-31 14:08:39.775335	system	abgabetool
+2157	core	c4fileUploaded	2026-03-31 14:08:39.779064	system	abgabetool
+2158	core	c4actions	2026-03-31 14:08:39.782746	system	abgabetool
+2159	core	c4zieldatumv2	2026-03-31 14:08:39.786416	system	abgabetool
+2160	core	c4abgabetyp	2026-03-31 14:08:39.790227	system	abgabetool
+2161	core	c4abgabekurzbzv2	2026-03-31 14:08:39.793968	system	abgabetool
+2162	core	c4abgabedatum	2026-03-31 14:08:39.797774	system	abgabetool
+2163	core	c4aeltereParbeitBenotenv2	2026-03-31 14:08:39.80151	system	abgabetool
+2164	core	c4keinEnduploadErfolgt	2026-03-31 14:08:39.805376	system	abgabetool
+2165	core	c4fileupload	2026-03-31 14:08:39.809073	system	abgabetool
+2166	core	c4benoten	2026-03-31 14:08:39.812817	system	abgabetool
+2167	core	c4allowedFileTypes	2026-03-31 14:08:39.816617	system	abgabetool
+2168	core	c4save	2026-03-31 14:08:39.820566	system	abgabetool
+2169	core	c4delete	2026-03-31 14:08:39.824311	system	abgabetool
+2170	core	c4enduploadZusatzdaten	2026-03-31 14:08:39.827996	system	abgabetool
+2171	core	c4beurteilung	2026-03-31 14:08:39.83175	system	abgabetool
+2172	core	c4schlagwoerterGer	2026-03-31 14:08:39.835448	system	abgabetool
+2173	core	c4schlagwoerterEng	2026-03-31 14:08:39.839188	system	abgabetool
+2174	core	c4abstractGer	2026-03-31 14:08:39.843063	system	abgabetool
+2175	core	c4abstractEng	2026-03-31 14:08:39.84684	system	abgabetool
+2176	core	c4seitenanzahl	2026-03-31 14:08:39.850612	system	abgabetool
+2177	core	deadlinesTitle	2026-03-31 14:08:39.85437	system	abgabetool
+2178	core	c4yes	2026-03-31 14:08:39.858093	system	abgabetool
+2179	core	c4no	2026-03-31 14:08:39.86183	system	abgabetool
+2180	core	c4gelesenUndAkzeptiert	2026-03-31 14:08:39.865585	system	abgabetool
+2181	core	c4personenkennzeichen	2026-03-31 14:08:39.869364	system	abgabetool
+2182	core	c4vorname	2026-03-31 14:08:39.873099	system	abgabetool
+2183	core	c4nachname	2026-03-31 14:08:39.876892	system	abgabetool
+2184	core	currentlySaving	2026-03-31 14:08:39.880558	system	abgabetool
+2185	core	currentlyLoading	2026-03-31 14:08:39.884307	system	abgabetool
+2186	core	c4betreuerartv2	2026-03-31 14:08:39.887948	system	abgabetool
+2187	core	showAll	2026-03-31 14:08:39.891737	system	abgabetool
+2188	core	showDeadlines	2026-03-31 14:08:39.895543	system	abgabetool
+2189	core	c4abgabeStgSpezifischeRichtlinienBeachten	2026-03-31 14:08:39.899296	system	abgabetool
+2190	core	c4note	2026-03-31 14:08:39.903073	system	abgabetool
+2191	core	c4upload_allowed	2026-03-31 14:08:39.906906	system	abgabetool
+2192	core	c4student_perspective	2026-03-31 14:08:39.91074	system	abgabetool
+2193	core	c4upload	2026-03-31 14:08:39.914494	system	abgabetool
+2194	core	c4plagiatcheck_link	2026-03-31 14:08:39.918666	system	abgabetool
+2195	core	c4noEnduploadFound	2026-03-31 14:08:39.922461	system	abgabetool
+2196	core	c4notizQualGatev2	2026-03-31 14:08:39.926295	system	abgabetool
+2197	core	c4abgabeMitarbeiterDetailTitle	2026-03-31 14:08:39.9301	system	abgabetool
+2198	core	c4abgabeStudentDetailTitle	2026-03-31 14:08:39.933956	system	abgabetool
+2199	core	c4tooltipVerspaetet	2026-03-31 14:08:39.93776	system	abgabetool
+2200	core	c4tooltipBeurteilungerforderlich	2026-03-31 14:08:39.941526	system	abgabetool
+2201	core	c4tooltipBestanden	2026-03-31 14:08:39.94515	system	abgabetool
+2202	core	c4tooltipNichtBestanden	2026-03-31 14:08:39.948797	system	abgabetool
+2203	core	c4tooltipVerpasst	2026-03-31 14:08:39.952497	system	abgabetool
+2204	core	c4tooltipAbzugeben	2026-03-31 14:08:39.956113	system	abgabetool
+2205	core	c4tooltipStandardv2	2026-03-31 14:08:39.959727	system	abgabetool
+2206	core	c4tooltipAbgegeben	2026-03-31 14:08:39.963361	system	abgabetool
+2207	core	c4tooltipFixtermin	2026-03-31 14:08:39.967119	system	abgabetool
+2208	core	c4tooltipAbgabeDetected	2026-03-31 14:08:39.971026	system	abgabetool
+2209	core	c4tapForTooltipInfo	2026-03-31 14:08:39.974826	system	abgabetool
+2210	core	c4abgabeZeitstatus	2026-03-31 14:08:39.978627	system	abgabetool
+2211	core	c4notAllowedToEditAbgabeTermin	2026-03-31 14:08:39.98238	system	abgabetool
+2212	core	c4notAllowedToDeleteAbgabeTermin	2026-03-31 14:08:39.986339	system	abgabetool
+2213	core	c4ZusatzdatenBearbeiten	2026-03-31 14:08:39.990068	system	abgabetool
+2214	core	c4abgabeStudentNoProjectsFound	2026-03-31 14:08:39.993879	system	abgabetool
+2215	core	c4studentAbgabeNotAllowedInViewMode	2026-03-31 14:08:39.997639	system	abgabetool
+2216	core	c4studentAbgabeNotAllowedRegular	2026-03-31 14:08:40.001422	system	abgabetool
+2217	core	c4benotet	2026-03-31 14:08:40.005301	system	abgabetool
+2218	core	c4confirm_delete	2026-03-31 14:08:40.009074	system	abgabetool
+2219	core	c4nochNichtsAbgegeben	2026-03-31 14:08:40.012897	system	abgabetool
+2220	core	c4newAbgabetermin	2026-03-31 14:08:40.016702	system	abgabetool
+2221	core	c4qualgateNegativEmailSubjectv2	2026-03-31 14:08:40.020471	system	abgabetool
+2222	core	c4noGradeAssignedYet	2026-03-31 14:08:40.024224	system	abgabetool
+2223	core	c4abgabeQualGateNegativAddNewAutomagisch	2026-03-31 14:08:40.028298	system	abgabetool
+2224	core	c4betreuerEmailKontaktv2	2026-03-31 14:08:40.032091	system	abgabetool
+2225	core	c4projektdetailsOeffnen	2026-03-31 14:08:40.03593	system	abgabetool
+2226	core	c4downloadBeurteilungErstbetreuerv2	2026-03-31 14:08:40.039804	system	abgabetool
+2227	core	c4downloadBeurteilungZweitbetreuerv2	2026-03-31 14:08:40.043601	system	abgabetool
+2228	core	c4nobeurteilungVorhanden	2026-03-31 14:08:40.047371	system	abgabetool
+2229	core	c4AcceptAndProceed	2026-03-31 14:08:40.051159	system	abgabetool
+2230	core	c4Cancel	2026-03-31 14:08:40.054935	system	abgabetool
+2231	core	c4downloadAbgabe	2026-03-31 14:08:40.058729	system	abgabetool
+2232	core	c4downloadLatestAbgabe	2026-03-31 14:08:40.062497	system	abgabetool
+2233	core	c4termineTimeLine	2026-03-31 14:08:40.066271	system	abgabetool
+2234	core	confirmEnduploadSpeichern	2026-03-31 14:08:40.070016	system	abgabetool
+2235	core	confirmZusatzdatenSpeichern	2026-03-31 14:08:40.073804	system	abgabetool
+2236	core	c4errorLoadingStudentForProjektarbeitID	2026-03-31 14:08:40.077641	system	abgabetool
+2237	core	c4noAssignedStudentForProjektarbeitID	2026-03-31 14:08:40.081463	system	abgabetool
+2238	core	c4zusatzdatenausfuellen	2026-03-31 14:08:40.085229	system	abgabetool
+2239	core	warningShortAbstract	2026-03-31 14:08:40.088963	system	abgabetool
+2240	core	warningShortAbstractEn	2026-03-31 14:08:40.09265	system	abgabetool
+2241	core	warningShortSchlagwoerter	2026-03-31 14:08:40.096307	system	abgabetool
+2242	core	warningShortSchlagwoerterEn	2026-03-31 14:08:40.099944	system	abgabetool
+2243	core	warningSmallSeitenanzahl	2026-03-31 14:08:40.1037	system	abgabetool
+2244	core	c4saveNewAbgabetermin	2026-03-31 14:08:40.107337	system	abgabetool
+2245	core	c4eidesstattlicheErklaerung	2026-03-31 14:08:40.111082	system	abgabetool
+2246	core	c4fileUploadSuccessv3	2026-03-31 14:08:40.114996	system	abgabetool
+2247	core	c4fileUploadErrorv3	2026-03-31 14:08:40.118707	system	abgabetool
+2248	core	c4prevAbgabetermin	2026-03-31 14:08:40.122478	system	abgabetool
+2249	core	c4nextAbgabetermin	2026-03-31 14:08:40.126286	system	abgabetool
+2250	core	c4erstbetreuerv2	2026-03-31 14:08:40.129894	system	abgabetool
+2251	core	c4zweitbetreuerv2	2026-03-31 14:08:40.133559	system	abgabetool
+2252	core	c4projektarbeitTimelineTitle	2026-03-31 14:08:40.137186	system	abgabetool
+2253	core	c4sendEmailStudierendev2	2026-03-31 14:08:40.140808	system	abgabetool
+2254	core	c4sammelmailStudentBetreff	2026-03-31 14:08:40.144554	system	abgabetool
+2255	core	c4sendEmailBetreuerv3	2026-03-31 14:08:40.148253	system	abgabetool
+2256	core	c4sammelmailBetreuerBetreff	2026-03-31 14:08:40.151912	system	abgabetool
+2257	core	c4keineAbgabetermineGefunden	2026-03-31 14:08:40.155697	system	abgabetool
+2258	core	showStudentDetails	2026-03-31 14:08:40.159339	system	abgabetool
+2259	core	keineNoteEingetragen	2026-03-31 14:08:40.162962	system	abgabetool
+2260	core	c4fehlerMailBegutachterv2	2026-03-31 14:08:40.166646	system	abgabetool
+2261	core	c4fehlerMailZweitBegutachterv2	2026-03-31 14:08:40.170319	system	abgabetool
+2262	core	c4projektarbeitNichtGefunden	2026-03-31 14:08:40.173972	system	abgabetool
+2263	core	c4projektabgabeNichtGefunden	2026-03-31 14:08:40.178751	system	abgabetool
+2264	core	c4userNichtGefunden	2026-03-31 14:08:40.182373	system	abgabetool
+2265	core	changedAbgabeterminev2	2026-03-31 14:08:40.185913	system	abgabetool
+2266	core	c4paatypqualgate1	2026-03-31 14:08:40.189427	system	abgabetool
+2267	core	c4paatypqualgate2	2026-03-31 14:08:40.193062	system	abgabetool
+2268	core	c4paatypzwischen	2026-03-31 14:08:40.196785	system	abgabetool
+2269	core	c4paatypnote	2026-03-31 14:08:40.200448	system	abgabetool
+2270	core	c4paatypabstract	2026-03-31 14:08:40.204068	system	abgabetool
+2271	core	c4paatypend	2026-03-31 14:08:40.207843	system	abgabetool
+2272	core	c4paatypenda	2026-03-31 14:08:40.211516	system	abgabetool
+2273	core	c4projtypBachelor	2026-03-31 14:08:40.215185	system	abgabetool
+2274	core	c4projtypProjekt	2026-03-31 14:08:40.218876	system	abgabetool
+2275	core	c4projtypPraktikum	2026-03-31 14:08:40.222558	system	abgabetool
+2276	core	c4projtypPraxis	2026-03-31 14:08:40.226244	system	abgabetool
+2277	core	c4projtypDiplom	2026-03-31 14:08:40.229875	system	abgabetool
+2278	core	c4betrartBegutachter	2026-03-31 14:08:40.233563	system	abgabetool
+2279	core	c4betrartErstbetreuer	2026-03-31 14:08:40.23729	system	abgabetool
+2280	core	c4betrartErstbegutachter	2026-03-31 14:08:40.240987	system	abgabetool
+2281	core	c4betrartZweitbegutachter	2026-03-31 14:08:40.24463	system	abgabetool
+2282	core	c4betrartzweitbetreuer	2026-03-31 14:08:40.248335	system	abgabetool
+2283	core	c4betrartBetreuer	2026-03-31 14:08:40.25203	system	abgabetool
+2284	core	c4betrartSenatsvorsitz	2026-03-31 14:08:40.255675	system	abgabetool
+2285	core	c4betrartSenatsmitglied	2026-03-31 14:08:40.259163	system	abgabetool
+2286	core	c4qgate1Status	2026-03-31 14:08:40.262711	system	abgabetool
+2287	core	c4qgate2Status	2026-03-31 14:08:40.266238	system	abgabetool
+2288	core	c4keinTerminVorhanden	2026-03-31 14:08:40.269845	system	abgabetool
+2289	core	c4checkoutStgMoodleInfos	2026-03-31 14:08:40.273347	system	abgabetool
+2290	core	c4positivBenotet	2026-03-31 14:08:40.277001	system	abgabetool
+2291	core	c4negativBenotet	2026-03-31 14:08:40.280682	system	abgabetool
+2292	core	c4notYetGraded	2026-03-31 14:08:40.284416	system	abgabetool
+2293	core	c4notSubmitted	2026-03-31 14:08:40.2882	system	abgabetool
+2294	core	c4notHappenedYet	2026-03-31 14:08:40.291857	system	abgabetool
+2295	core	c4deadlineExceeded	2026-03-31 14:08:40.2956	system	abgabetool
+2296	core	c4missingSignatureNotification	2026-03-31 14:08:40.299297	system	abgabetool
+2297	core	c4erstbetreuerTitelPre	2026-03-31 14:08:40.302977	system	abgabetool
+2298	core	c4erstbetreuerVorname	2026-03-31 14:08:40.306687	system	abgabetool
+2299	core	c4erstbetreuerNachname	2026-03-31 14:08:40.310376	system	abgabetool
+2300	core	c4erstbetreuerTitelPost	2026-03-31 14:08:40.314053	system	abgabetool
+2301	core	c4zweitbetreuerTitelPre	2026-03-31 14:08:40.317866	system	abgabetool
+2302	core	c4zweitbetreuerVorname	2026-03-31 14:08:40.321605	system	abgabetool
+2303	core	c4zweitbetreuerNachname	2026-03-31 14:08:40.325355	system	abgabetool
+2304	core	c4zweitbetreuerTitelPost	2026-03-31 14:08:40.329113	system	abgabetool
+2305	core	c4noZuordnungBetreuerStudent	2026-03-31 14:08:40.332856	system	abgabetool
+2306	core	fachbereich	2026-03-31 14:08:40.336681	system	lehre
+2307	core	lehrtyp	2026-03-31 14:08:40.340445	system	lehre
+2308	core	assistenz	2026-03-31 14:08:40.344234	system	studiengangInformation
+2309	core	geschaeftsfuehrende_leitung	2026-03-31 14:08:40.347979	system	studiengangInformation
+2310	core	stellvertretende_leitung	2026-03-31 14:08:40.351731	system	studiengangInformation
+2311	core	geschaeftsfuehrende_stellvertretende_leitung	2026-03-31 14:08:40.355501	system	studiengangInformation
+2312	core	Jahrgangsvertretung	2026-03-31 14:08:40.35928	system	studiengangInformation
+2313	core	Studienvertretung	2026-03-31 14:08:40.363051	system	studiengangInformation
+2314	core	Hochschulvertretung	2026-03-31 14:08:40.366813	system	studiengangInformation
+2315	core	general	2026-03-31 14:08:40.370553	system	dashboard
+2316	core	addLine	2026-03-31 14:08:40.374642	system	dashboard
+2317	core	custom	2026-03-31 14:08:40.378552	system	dashboard
+2318	core	dashboardGeneralSectionDescription	2026-03-31 14:08:40.382348	system	dashboard
+2319	core	dashboardCustomSectionDescription	2026-03-31 14:08:40.38613	system	dashboard
+2320	core	dashboardSectionDescription	2026-03-31 14:08:40.389782	system	dashboard
+2321	core	tab_finalexam	2026-03-31 14:08:40.393572	system	stv
+2322	core	abschlussbeurteilung	2026-03-31 14:08:40.397405	system	abschlusspruefung
+2323	core	pruefer1	2026-03-31 14:08:40.40134	system	abschlusspruefung
+2324	core	pruefer2	2026-03-31 14:08:40.404955	system	abschlusspruefung
+2325	core	pruefer3	2026-03-31 14:08:40.408636	system	abschlusspruefung
+2326	core	uhrzeit	2026-03-31 14:08:40.412346	system	global
+2327	core	freigabe	2026-03-31 14:08:40.416242	system	abschlusspruefung
+2328	core	sponsion	2026-03-31 14:08:40.419926	system	abschlusspruefung
+2329	core	abschlusspruefung_id	2026-03-31 14:08:40.423646	system	abschlusspruefung
+2330	core	vorsitz_header	2026-03-31 14:08:40.428712	system	abschlusspruefung
+2331	core	zurBeurteilung	2026-03-31 14:08:40.432445	system	abschlusspruefung
+2332	core	akadGrad	2026-03-31 14:08:40.436114	system	abschlusspruefung
+2333	core	error_studentOhneFinalExam	2026-03-31 14:08:40.439794	system	abschlusspruefung
+2334	core	tab_kontaktieren	2026-03-31 14:08:40.443437	system	stv
+2335	core	internEMail	2026-03-31 14:08:40.44732	system	stv
+2336	core	privateEMail	2026-03-31 14:08:40.451036	system	stv
+2337	core	bccEMail	2026-03-31 14:08:40.454665	system	stv
+2338	core	weitereEMail	2026-03-31 14:08:40.458616	system	stv
+2339	core	zuvieleEMails	2026-03-31 14:08:40.462294	system	stv
+2340	core	notekommpruefung	2026-03-31 14:08:40.466088	system	abschlusspruefung
+2341	core	abschluessPruefungAnlegen	2026-03-31 14:08:40.470062	system	abschlusspruefung
+2342	core	abschluessPruefungBearbeiten	2026-03-31 14:08:40.473908	system	abschlusspruefung
+2343	core	nichtZumEditierenDerGruppeBerechtigt	2026-03-31 14:08:40.477734	system	gruppenmanagement
+2353	core	tab_groups	2026-03-31 14:08:40.497733	system	stv
+2354	core	gruppe	2026-03-31 14:08:40.501632	system	gruppenmanagement
+2355	core	special_groups	2026-03-31 14:08:40.505442	system	gruppenmanagement
+2356	core	add_group	2026-03-31 14:08:40.509225	system	gruppenmanagement
+2357	core	groups_added	2026-03-31 14:08:40.513017	system	gruppenmanagement
+2358	core	automatisch_generiert	2026-03-31 14:08:40.516795	system	gruppenmanagement
+2359	core	error_deleteGeneratedGroups	2026-03-31 14:08:40.52059	system	gruppenmanagement
+2360	core	error_alreadyInGroup	2026-03-31 14:08:40.524447	system	gruppenmanagement
+2361	core	wahlname	2026-03-31 14:08:40.528301	system	person
+2362	core	familienstand	2026-03-31 14:08:40.532191	system	person
+2363	core	foto	2026-03-31 14:08:40.536321	system	person
+2364	core	homepage	2026-03-31 14:08:40.540284	system	person
+2365	core	verband	2026-03-31 14:08:40.544226	system	lehre
+2366	core	aktiv	2026-03-31 14:08:40.54828	system	person
+2367	core	error_no_person	2026-03-31 14:08:40.552193	system	lehre
+2368	core	error_no_student	2026-03-31 14:08:40.556227	system	lehre
+2369	core	geschieden	2026-03-31 14:08:40.560019	system	person
+2370	core	ledig	2026-03-31 14:08:40.563995	system	person
+2371	core	verheiratet	2026-03-31 14:08:40.567864	system	person
+2372	core	verwitwet	2026-03-31 14:08:40.571595	system	person
+2373	core	firma_id	2026-03-31 14:08:40.575428	system	ui
+2374	core	adresse_id	2026-03-31 14:08:40.579574	system	ui
+2375	core	kontakt_id	2026-03-31 14:08:40.583318	system	ui
+2376	core	standort_id	2026-03-31 14:08:40.587154	system	ui
+2377	core	bankverbindung_id	2026-03-31 14:08:40.590841	system	ui
+2378	core	studienplan_id	2026-03-31 14:08:40.594648	system	ui
+2379	core	prestudent_id	2026-03-31 14:08:40.598349	system	ui
+2380	core	notiz_id	2026-03-31 14:08:40.602273	system	ui
+2381	core	notizzuordnung_id	2026-03-31 14:08:40.606085	system	ui
+2382	core	extension_id	2026-03-31 14:08:40.610068	system	ui
+2383	core	type_id	2026-03-31 14:08:40.613895	system	ui
+2384	core	betriebsmittel_id	2026-03-31 14:08:40.617619	system	ui
+2385	core	betriebsmittelperson_id	2026-03-31 14:08:40.621449	system	ui
+2386	core	dropdownLoading	2026-03-31 14:08:40.625193	system	ui
+2387	core	error_noInteger	2026-03-31 14:08:40.629014	system	ui
+2388	core	error_maxSem	2026-03-31 14:08:40.632745	system	ui
+2389	core	tab_mobility	2026-03-31 14:08:40.636508	system	stv
+2390	core	mobilitaetsprogramm	2026-03-31 14:08:40.640288	system	mobility
+2391	core	gastnation	2026-03-31 14:08:40.644009	system	mobility
+2392	core	herkunftsland	2026-03-31 14:08:40.647752	system	mobility
+2393	core	universitaet	2026-03-31 14:08:40.651346	system	mobility
+2394	core	ects_erworben	2026-03-31 14:08:40.655026	system	mobility
+2395	core	ects_angerechnet	2026-03-31 14:08:40.658676	system	mobility
+2396	core	zweck	2026-03-31 14:08:40.66237	system	mobility
+2397	core	aufenthalt	2026-03-31 14:08:40.666074	system	mobility
+2398	core	zweck_neu	2026-03-31 14:08:40.669866	system	mobility
+2399	core	foerderung_neu	2026-03-31 14:08:40.673606	system	mobility
+2400	core	kurzbz_program	2026-03-31 14:08:40.677545	system	mobility
+2401	core	bisio_id	2026-03-31 14:08:40.681282	system	mobility
+2402	core	archiv_dokument_archivieren	2026-03-31 14:08:40.685077	system	stv
+2403	core	tab_archive	2026-03-31 14:08:40.689141	system	stv
+2404	core	archiv_title	2026-03-31 14:08:40.692836	system	stv
+2405	core	archiv_description	2026-03-31 14:08:40.696599	system	stv
+2406	core	archiv_creation_date	2026-03-31 14:08:40.700337	system	stv
+2407	core	archiv_accepted_on_at	2026-03-31 14:08:40.704051	system	stv
+2408	core	archiv_gedruckt	2026-03-31 14:08:40.707773	system	stv
+2409	core	archiv_signiert	2026-03-31 14:08:40.711558	system	stv
+2410	core	archiv_title_edit	2026-03-31 14:08:40.715312	system	stv
+2411	core	archiv_akte	2026-03-31 14:08:40.718887	system	stv
+2412	core	archiv_new_file	2026-03-31 14:08:40.722686	system	stv
+2413	core	archiv_akte_id	2026-03-31 14:08:40.726464	system	stv
+2414	core	archiv_signed	2026-03-31 14:08:40.730292	system	stv
+2415	core	kurzbz	2026-03-31 14:08:40.734009	system	mobility
+2416	core	error_entryExisting	2026-03-31 14:08:40.737806	system	ui
+2417	core	error_existingEntryInExtension	2026-03-31 14:08:40.741535	system	mobility
+2418	core	mobility_anlegen	2026-03-31 14:08:40.745222	system	mobility
+2419	core	mobility_bearbeiten	2026-03-31 14:08:40.748854	system	mobility
+2420	core	lvdev_uebersichten	2026-03-31 14:08:40.752635	system	kvp
+2421	core	kompetenzfeld	2026-03-31 14:08:40.756337	system	lehre
+2422	core	expand_all	2026-03-31 14:08:40.759979	system	ui
+2423	core	collapse_all	2026-03-31 14:08:40.763693	system	ui
+2424	core	quellkurs	2026-03-31 14:08:40.767469	system	lehre
+2431	projektarbeitsbeurteilung	maxPunkte	2026-03-31 14:08:40.782001	system	projektarbeitsbeurteilung
+2432	projektarbeitsbeurteilung	bewertung	2026-03-31 14:08:40.785809	system	projektarbeitsbeurteilung
+2433	projektarbeitsbeurteilung	details	2026-03-31 14:08:40.789527	system	projektarbeitsbeurteilung
+2434	projektarbeitsbeurteilung	problemstellungZieldefinition	2026-03-31 14:08:40.793297	system	projektarbeitsbeurteilung
+2435	projektarbeitsbeurteilung	problemstellungZieldefinitionText	2026-03-31 14:08:40.797072	system	projektarbeitsbeurteilung
+2436	projektarbeitsbeurteilung	methodikLoesungsansatz	2026-03-31 14:08:40.800812	system	projektarbeitsbeurteilung
+2437	projektarbeitsbeurteilung	methodikLoesungsansatzText	2026-03-31 14:08:40.804601	system	projektarbeitsbeurteilung
+2438	projektarbeitsbeurteilung	ergebnisseDiskussion	2026-03-31 14:08:40.808351	system	projektarbeitsbeurteilung
+2439	projektarbeitsbeurteilung	ergebnisseDiskussionText	2026-03-31 14:08:40.812095	system	projektarbeitsbeurteilung
+2440	projektarbeitsbeurteilung	strukturAufbau	2026-03-31 14:08:40.815836	system	projektarbeitsbeurteilung
+2441	projektarbeitsbeurteilung	strukturAufbauText	2026-03-31 14:08:40.81957	system	projektarbeitsbeurteilung
+2442	projektarbeitsbeurteilung	stilAusdruck	2026-03-31 14:08:40.823332	system	projektarbeitsbeurteilung
+2443	projektarbeitsbeurteilung	stilAusdruckText	2026-03-31 14:08:40.82698	system	projektarbeitsbeurteilung
+2444	projektarbeitsbeurteilung	zitierregelnQuellenangaben	2026-03-31 14:08:40.830707	system	projektarbeitsbeurteilung
+2445	projektarbeitsbeurteilung	zitierregelnQuellenangabenText	2026-03-31 14:08:40.834443	system	projektarbeitsbeurteilung
+2446	projektarbeitsbeurteilung	notenschluesselHinweisGewichtungEinzeln	2026-03-31 14:08:40.838202	system	projektarbeitsbeurteilung
+2447	projektarbeitsbeurteilung	gesamtkommentar	2026-03-31 14:08:40.841861	system	projektarbeitsbeurteilung
+2448	projektarbeitsbeurteilung	gesamtkommentarVerpflichtend	2026-03-31 14:08:40.845869	system	projektarbeitsbeurteilung
+2449	projektarbeitsbeurteilung	eingabefeld	2026-03-31 14:08:40.849578	system	projektarbeitsbeurteilung
+2450	projektarbeitsbeurteilung	universitaetLogo	2026-03-31 14:08:40.85323	system	projektarbeitsbeurteilung
+2451	projektarbeitsbeurteilung	textEingabefeldBewertung	2026-03-31 14:08:40.856983	system	projektarbeitsbeurteilung
+2452	core	addVertrag	2026-03-31 14:08:40.860742	system	vertrag
+2453	core	editVertrag	2026-03-31 14:08:40.864455	system	vertrag
+2454	core	deleteVertrag	2026-03-31 14:08:40.868416	system	vertrag
+2455	core	addStatus	2026-03-31 14:08:40.872121	system	vertrag
+2456	core	editStatus	2026-03-31 14:08:40.87584	system	vertrag
+2457	core	deleteStatus	2026-03-31 14:08:40.87991	system	vertrag
+2458	core	deleteLehrauftrag	2026-03-31 14:08:40.883783	system	vertrag
+2459	core	datum_vertrag	2026-03-31 14:08:40.887653	system	vertrag
+2460	core	vertrag_urfassung	2026-03-31 14:08:40.891477	system	vertrag
+2461	core	filter_offeneVertraege	2026-03-31 14:08:40.895294	system	vertrag
+2462	core	error_addOrUpdateLehrauftraege	2026-03-31 14:08:40.899118	system	vertrag
+2463	core	error_insertOrUpdateStatusVertrag	2026-03-31 14:08:40.902915	system	vertrag
+2464	core	error_statusVorhanden	2026-03-31 14:08:40.906709	system	vertrag
+2465	core	vertragErstellen	2026-03-31 14:08:40.910657	system	vertrag
+2466	core	vertragDetails	2026-03-31 14:08:40.914527	system	vertrag
+2467	core	vertragStatus	2026-03-31 14:08:40.918496	system	vertrag
+2468	core	error_fieldNotValidDate	2026-03-31 14:08:40.922338	system	ui
+2469	core	text_explainLehrauftrag	2026-03-31 14:08:40.926129	system	vertrag
+2470	core	text_addLehrauftrag	2026-03-31 14:08:40.930051	system	vertrag
+2471	core	vertragsverwaltung	2026-03-31 14:08:40.933866	system	vertrag
+2472	core	nurAktiveMaAnzeigen	2026-03-31 14:08:40.937822	system	vertrag
+2473	core	printHonorarvertrag	2026-03-31 14:08:40.941579	system	vertrag
+2474	core	alertMindestensZweiVertraege	2026-03-31 14:08:40.945251	system	vertrag
+2475	core	alertOnlyApprovedContracts	2026-03-31 14:08:40.948847	system	vertrag
+2476	core	vertragsarten	2026-03-31 14:08:40.952493	system	vertrag
+2477	core	idsDienstverhaeltnisse	2026-03-31 14:08:40.956203	system	vertrag
+2478	core	vertragstyp	2026-03-31 14:08:40.959848	system	vertrag
+2479	core	vertragsdatum	2026-03-31 14:08:40.963506	system	vertrag
+2480	core	vertragsdatum_iso	2026-03-31 14:08:40.967139	system	vertrag
+2481	core	vertrag_id	2026-03-31 14:08:40.970819	system	ui
+2482	core	vertragsstunden	2026-03-31 14:08:40.974503	system	vertrag
+2483	core	vertragsstunden_studiensemester	2026-03-31 14:08:40.978135	system	vertrag
+2484	core	abgerechnet	2026-03-31 14:08:40.981782	system	vertrag
+2485	core	gewicht	2026-03-31 14:08:40.985414	system	lehre
+2486	core	newlehreinheit	2026-03-31 14:08:40.989034	system	lehre
+2487	core	bezeichnungeng	2026-03-31 14:08:40.992682	system	lehre
+2488	core	detailanmerkung	2026-03-31 14:08:40.996291	system	lehre
+2489	core	unr	2026-03-31 14:08:40.999931	system	lehre
+2490	core	las	2026-03-31 14:08:41.003633	system	lehre
+2491	core	lehre	2026-03-31 14:08:41.007276	system	lehre
+2492	core	raumtyp	2026-03-31 14:08:41.011021	system	lehre
+2493	core	lehrende	2026-03-31 14:08:41.014705	system	lehre
+2494	core	raumtypalternativ	2026-03-31 14:08:41.018333	system	lehre
+2495	core	startkw	2026-03-31 14:08:41.02195	system	lehre
+2496	core	stundenblockung	2026-03-31 14:08:41.025568	system	lehre
+2497	core	wochenrhythmus	2026-03-31 14:08:41.029235	system	lehre
+2498	core	lehrfunktion	2026-03-31 14:08:41.032932	system	lehre
+2499	core	anmerkung	2026-03-31 14:08:41.036611	system	lehre
+2500	core	aufklappen	2026-03-31 14:08:41.040208	system	lehre
+2501	core	zuklappen	2026-03-31 14:08:41.043855	system	lehre
+2502	core	planstunden	2026-03-31 14:08:41.047357	system	lehre
+2503	core	leplanstunden	2026-03-31 14:08:41.050775	system	lehre
+2504	core	default	2026-03-31 14:08:41.054237	system	lehre
+2505	core	stundensatz	2026-03-31 14:08:41.057811	system	lehre
+2506	core	bismelden	2026-03-31 14:08:41.061452	system	lehre
+2507	core	gesamtkosten	2026-03-31 14:08:41.065065	system	lehre
+2508	core	daten	2026-03-31 14:08:41.068672	system	lehre
+2509	core	lehreinheit_id	2026-03-31 14:08:41.072296	system	lehre
+2510	core	verplant	2026-03-31 14:08:41.075957	system	lehre
+2511	core	addLektor	2026-03-31 14:08:41.079717	system	lehre
+2512	core	gruppen	2026-03-31 14:08:41.083459	system	lehre
+2513	core	addGroup	2026-03-31 14:08:41.087201	system	lehre
+2514	core	assignPerson	2026-03-31 14:08:41.090913	system	lehre
+2515	core	assignedPersons	2026-03-31 14:08:41.094635	system	lehre
+2516	core	geaendert	2026-03-31 14:08:41.098373	system	lehre
+2517	core	vertragurfassung	2026-03-31 14:08:41.102129	system	lehre
+2518	core	vertragsdetails	2026-03-31 14:08:41.105857	system	lehre
+2519	core	semesterstunden	2026-03-31 14:08:41.109643	system	lehre
+2520	core	vertragsstatus	2026-03-31 14:08:41.113415	system	lehre
+2521	core	auslvplanentfernen	2026-03-31 14:08:41.117184	system	lehre
+2522	core	lehrfach	2026-03-31 14:08:41.120896	system	lehre
+2523	core	tab_messages	2026-03-31 14:08:41.124661	system	stv
+2524	core	unread	2026-03-31 14:08:41.128505	system	messages
+2525	core	read	2026-03-31 14:08:41.132206	system	messages
+2526	core	archived	2026-03-31 14:08:41.136001	system	messages
+2527	core	deleted	2026-03-31 14:08:41.139856	system	messages
+2528	core	body	2026-03-31 14:08:41.143617	system	messages
+2529	core	message_id	2026-03-31 14:08:41.147407	system	messages
+2530	core	sender	2026-03-31 14:08:41.151156	system	messages
+2531	core	recipient	2026-03-31 14:08:41.154933	system	messages
+2532	core	senderId	2026-03-31 14:08:41.158666	system	messages
+2533	core	recipientId	2026-03-31 14:08:41.162425	system	messages
+2534	core	successSent	2026-03-31 14:08:41.166226	system	ui
+2535	core	btnAktualisieren	2026-03-31 14:08:41.170007	system	ui
+2536	core	neueNachricht	2026-03-31 14:08:41.173811	system	messages
+2537	core	meineFelder	2026-03-31 14:08:41.177573	system	messages
+2538	core	reset	2026-03-31 14:08:41.18138	system	ui
+2539	core	tab_documents	2026-03-31 14:08:41.185253	system	stv
+2540	core	uploadDokument	2026-03-31 14:08:41.189012	system	ui
+2541	core	deleteDokument	2026-03-31 14:08:41.192865	system	ui
+2542	core	editDokument	2026-03-31 14:08:41.19667	system	ui
+2543	core	title	2026-03-31 14:08:41.200406	system	dokumente
+2544	core	dokTyp	2026-03-31 14:08:41.204107	system	dokumente
+2545	core	nachreichungAm	2026-03-31 14:08:41.207898	system	dokumente
+2546	core	dokDetails	2026-03-31 14:08:41.211527	system	dokumente
+2547	core	anmerkung_person	2026-03-31 14:08:41.215296	system	dokumente
+2548	core	successUpload	2026-03-31 14:08:41.219051	system	ui
+2549	core	dokumentAccept	2026-03-31 14:08:41.222792	system	dokumente
+2550	core	dokumentUnaccept	2026-03-31 14:08:41.226614	system	dokumente
+2551	core	accepted	2026-03-31 14:08:41.23041	system	dokumente
+2552	core	unaccepted	2026-03-31 14:08:41.234327	system	dokumente
+2553	core	err_deleteDokHere	2026-03-31 14:08:41.238109	system	dokumente
+2554	core	err_updateNotAllowed	2026-03-31 14:08:41.241929	system	dokumente
+2555	core	downloadDok	2026-03-31 14:08:41.245965	system	ui
+2556	core	successAccepted	2026-03-31 14:08:41.249988	system	dokumente
+2557	core	successUnaccepted	2026-03-31 14:08:41.253947	system	dokumente
+2558	core	successCountUnaccepted	2026-03-31 14:08:41.257958	system	dokumente
+2559	core	successCountAccepted	2026-03-31 14:08:41.261936	system	dokumente
+2560	core	errorUnaccepted	2026-03-31 14:08:41.26579	system	dokumente
+2561	core	errorAccepted	2026-03-31 14:08:41.269612	system	dokumente
+2562	core	errorMissingValue	2026-03-31 14:08:41.273571	system	ui
+2563	core	error_valueNotNumeric	2026-03-31 14:08:41.277389	system	ui
+2564	core	nachgereicht	2026-03-31 14:08:41.281261	system	dokumente
+2565	core	vorhanden	2026-03-31 14:08:41.285167	system	dokumente
+2566	core	akte_id	2026-03-31 14:08:41.288947	system	global
+2567	core	nachgereicht_am	2026-03-31 14:08:41.292739	system	global
+2568	core	datumAkzeptiert	2026-03-31 14:08:41.296546	system	dokumente
+2569	core	akzeptiertVon	2026-03-31 14:08:41.300343	system	dokumente
+2570	core	dms_id	2026-03-31 14:08:41.304091	system	global
+2571	core	error_fileMissing	2026-03-31 14:08:41.307925	system	dokumente
+2572	core	error_fileType	2026-03-31 14:08:41.311805	system	dokumente
+2573	core	error_duplicateDokument_kurzbz	2026-03-31 14:08:41.315649	system	dokumente
+2574	core	begruendung	2026-03-31 14:08:41.319586	system	anrechnung
+2575	core	genehmigtVon	2026-03-31 14:08:41.323652	system	anrechnung
+2576	core	editAnrechnung	2026-03-31 14:08:41.327547	system	anrechnung
+2577	core	existingNotes	2026-03-31 14:08:41.331441	system	anrechnung
+2578	core	anrechnung_id	2026-03-31 14:08:41.335344	system	ui
+2579	core	lehrveranstaltung_id_kompatibel	2026-03-31 14:08:41.339186	system	anrechnung
+2580	core	lehrveranstaltung_bez_kompatibel	2026-03-31 14:08:41.343107	system	anrechnung
+2581	core	tab_jointstudies	2026-03-31 14:08:41.34699	system	stv
+2582	core	gemeinsamesStudium	2026-03-31 14:08:41.350799	system	jointstudies
+2583	core	gemeinsameStudien	2026-03-31 14:08:41.354654	system	jointstudies
+2584	core	studienprogramm	2026-03-31 14:08:41.358499	system	jointstudies
+2585	core	neuAnlegen	2026-03-31 14:08:41.362419	system	jointstudies
+2586	core	edit	2026-03-31 14:08:41.366395	system	jointstudies
+2587	core	mobilitaet_id	2026-03-31 14:08:41.370363	system	global
+2588	core	tab_courseDates	2026-03-31 14:08:41.374295	system	stv
+2589	core	export	2026-03-31 14:08:41.378295	system	ui
+2590	core	stundenplanDev	2026-03-31 14:08:41.382315	system	lehre
+2591	core	lehreinheit_id	2026-03-31 14:08:41.386322	system	global
+2592	core	dateFrom	2026-03-31 14:08:41.390316	system	ui
+2593	core	dateTo	2026-03-31 14:08:41.394331	system	ui
+2594	core	gruppen	2026-03-31 14:08:41.398315	system	global
+2595	core	ortLocation	2026-03-31 14:08:41.402342	system	global
+2596	core	lehrfach	2026-03-31 14:08:41.40634	system	global
+2597	core	termine	2026-03-31 14:08:41.410338	system	global
+2598	core	tab_admissionDates	2026-03-31 14:08:41.414213	system	stv
+2599	core	reihungstest	2026-03-31 14:08:41.418079	system	lehre
+2600	core	admission_edit	2026-03-31 14:08:41.422062	system	admission
+2601	core	admission_delete	2026-03-31 14:08:41.426083	system	admission
+2602	core	admission_new	2026-03-31 14:08:41.430003	system	admission
+2603	core	anmeldundRtAm	2026-03-31 14:08:41.433887	system	admission
+2604	core	rtAngetreten	2026-03-31 14:08:41.437726	system	admission
+2605	core	rtAbsolviert	2026-03-31 14:08:41.441675	system	admission
+2606	core	gesamtpunkte	2026-03-31 14:08:41.445515	system	admission
+2607	core	gesamtpunkteBerechnen	2026-03-31 14:08:41.449323	system	admission
+2608	core	allgemein	2026-03-31 14:08:41.453155	system	admission
+2609	core	headerRTVerwaltung	2026-03-31 14:08:41.457324	system	admission
+2610	core	loadZukuenftigeRT	2026-03-31 14:08:41.461418	system	admission
+2611	core	getRTErgebnis	2026-03-31 14:08:41.465371	system	admission
+2612	core	filterOnlyFutureActive	2026-03-31 14:08:41.469257	system	ui
+2613	core	reihungstest_id	2026-03-31 14:08:41.473184	system	ui
+2614	core	reihungstest_person_id	2026-03-31 14:08:41.477047	system	ui
+2615	core	stufe	2026-03-31 14:08:41.480861	system	admission
+2616	core	anmeldedatum	2026-03-31 14:08:41.484662	system	admission
+2617	core	teilgenommen	2026-03-31 14:08:41.488487	system	admission
+2618	core	stg_kurz	2026-03-31 14:08:41.492479	system	admission
+2619	core	ausgewaehlt	2026-03-31 14:08:41.49633	system	global
+2620	core	gefiltert	2026-03-31 14:08:41.500433	system	global
+2621	core	gesamt	2026-03-31 14:08:41.504681	system	global
+2622	core	tab_functions	2026-03-31 14:08:41.508932	system	stv
+2623	core	filter_active	2026-03-31 14:08:41.513026	system	funktion
+2624	core	addFunktion	2026-03-31 14:08:41.516791	system	funktion
+2625	core	editFunktion	2026-03-31 14:08:41.52074	system	funktion
+2626	core	saveAsCopy	2026-03-31 14:08:41.524655	system	ui
+2627	core	error_fieldMustBePositiveInteger	2026-03-31 14:08:41.528414	system	ui
+2628	core	bitteUnternehmenWaehlen	2026-03-31 14:08:41.532179	system	ui
+2629	core	error_keineBerechtigungStg	2026-03-31 14:08:41.53582	system	ui
+2630	core	attention	2026-03-31 14:08:41.539441	system	alert
+2631	core	confirm_delete	2026-03-31 14:08:41.54318	system	alert
+2632	core	systemerror	2026-03-31 14:08:41.548243	system	alert
+2633	core	chooseStudent	2026-03-31 14:08:41.551989	system	ui
+2634	core	notizHinzufuegen	2026-03-31 14:08:41.55573	system	ui
+2635	core	mitarbeiter_uid	2026-03-31 14:08:41.559516	system	ui
+2636	core	pruefung_id	2026-03-31 14:08:41.563283	system	ui
+2637	core	error_fieldInvalidAlias	2026-03-31 14:08:41.566983	system	ui
+2638	core	error_fieldLessThan1000	2026-03-31 14:08:41.57081	system	ui
+2639	core	error_fieldNoValidNumber	2026-03-31 14:08:41.574571	system	ui
+2640	core	submit	2026-03-31 14:08:41.578315	system	search
+2641	core	input_search_label	2026-03-31 14:08:41.582077	system	search
+2642	core	type_employee	2026-03-31 14:08:41.585887	system	search
+2643	core	type_student	2026-03-31 14:08:41.589675	system	search
+2644	core	type_prestudent	2026-03-31 14:08:41.593391	system	search
+2645	core	type_room	2026-03-31 14:08:41.5971	system	search
+2646	core	type_organisationunit	2026-03-31 14:08:41.600811	system	search
+2647	core	type_cms	2026-03-31 14:08:41.604605	system	search
+2648	core	type_dms	2026-03-31 14:08:41.608361	system	search
+2649	core	button_filter_label	2026-03-31 14:08:41.612187	system	search
+2650	core	applyfilter_label	2026-03-31 14:08:41.61609	system	search
+2651	core	action_default_label	2026-03-31 14:08:41.619938	system	search
+2652	core	result_student_uid	2026-03-31 14:08:41.623976	system	search
+2653	core	result_prestudent_id	2026-03-31 14:08:41.627878	system	search
+2654	core	result_emails	2026-03-31 14:08:41.63179	system	search
+2655	core	result_group_emails	2026-03-31 14:08:41.635665	system	search
+2656	core	result_employee	2026-03-31 14:08:41.639529	system	search
+2657	core	result_stdkst	2026-03-31 14:08:41.643474	system	search
+2658	core	result_stdkst_none	2026-03-31 14:08:41.647364	system	search
+2659	core	result_parent_oe	2026-03-31 14:08:41.651375	system	search
+2660	core	result_oe_none	2026-03-31 14:08:41.65523	system	search
+2661	core	result_room_address	2026-03-31 14:08:41.659108	system	search
+2662	core	result_address_floor	2026-03-31 14:08:41.663054	system	search
+2663	core	result_address_none	2026-03-31 14:08:41.666928	system	search
+2664	core	result_workplaces	2026-03-31 14:08:41.670783	system	search
+2665	core	result_workplaces_pc	2026-03-31 14:08:41.674662	system	search
+2666	core	result_workplaces_none	2026-03-31 14:08:41.678639	system	search
+2667	core	result_building	2026-03-31 14:08:41.68251	system	search
+2668	core	result_equipment	2026-03-31 14:08:41.686361	system	search
+2669	core	result_leader	2026-03-31 14:08:41.690233	system	search
+2670	core	result_leader_none	2026-03-31 14:08:41.694104	system	search
+2671	core	result_number_of_employees	2026-03-31 14:08:41.697974	system	search
+2672	core	result_dms_id	2026-03-31 14:08:41.701954	system	search
+2673	core	result_version	2026-03-31 14:08:41.705896	system	search
+2674	core	result_keywords	2026-03-31 14:08:41.709827	system	search
+2675	core	result_content_none	2026-03-31 14:08:41.713731	system	search
+2676	core	error_missing_type	2026-03-31 14:08:41.717619	system	search
+2677	core	error_no_results	2026-03-31 14:08:41.721711	system	search
+2678	core	error_unknown_type	2026-03-31 14:08:41.725627	system	search
+2679	core	error_general	2026-03-31 14:08:41.72957	system	search
+2680	core	error_missing_config	2026-03-31 14:08:41.733556	system	search
+2681	core	error_invalid_config	2026-03-31 14:08:41.737339	system	search
+2682	core	error_invalid_config_searchfield	2026-03-31 14:08:41.741104	system	search
+2683	core	error_fotoupload	2026-03-31 14:08:41.744926	system	header
+2684	core	successFotoUpload	2026-03-31 14:08:41.748864	system	ui
+2685	core	alert_chooseFoto	2026-03-31 14:08:41.752713	system	header
+2686	core	error_noPhoto	2026-03-31 14:08:41.756615	system	header
+2687	core	termineImLvPlan	2026-03-31 14:08:41.760495	system	lehre
+2688	core	meldebestaetigung	2026-03-31 14:08:41.76436	system	profilUpdate
+2689	core	nachweisdokumente	2026-03-31 14:08:41.768241	system	profilUpdate
+2690	core	emailFehlt	2026-03-31 14:08:41.772079	system	onboarding
+2691	core	emailUngueltig	2026-03-31 14:08:41.775939	system	onboarding
+2692	core	emailRegistriert	2026-03-31 14:08:41.779833	system	onboarding
+2693	core	bewerbungZugangEmailBetreff	2026-03-31 14:08:41.7837	system	onboarding
+2694	core	bewerbungZugangEmailAnredeWeiblich	2026-03-31 14:08:41.787574	system	onboarding
+2695	core	bewerbungZugangEmailAnredeMaennlich	2026-03-31 14:08:41.791415	system	onboarding
+2696	core	bewerbungZugangEmailAnredeNeutral	2026-03-31 14:08:41.795325	system	onboarding
+2697	core	bewerbungVerifzieren	2026-03-31 14:08:41.799226	system	onboarding
+2698	core	bewerbungVerifizierungEinleitung	2026-03-31 14:08:41.803212	system	onboarding
+2699	core	bewerbungVerifizierungKontakthinweis	2026-03-31 14:08:41.807124	system	onboarding
+2700	core	bewerbungVerifizierungDatenschutzhinweis	2026-03-31 14:08:41.810959	system	onboarding
+2701	core	bewerbungVerifizierungDatenschutzhinweisText	2026-03-31 14:08:41.814882	system	onboarding
+2702	core	bewerbungVerifizierungInformationenDatenschutzGrundverordnung	2026-03-31 14:08:41.818921	system	onboarding
+2703	core	bewerbungVerifizierungDatenschutzFragen	2026-03-31 14:08:41.822742	system	onboarding
+2704	core	vorname	2026-03-31 14:08:41.826441	system	onboarding
+2705	core	nachname	2026-03-31 14:08:41.830212	system	onboarding
+2706	core	geburtsdatum	2026-03-31 14:08:41.834129	system	onboarding
+2707	core	emailAdresse	2026-03-31 14:08:41.838151	system	onboarding
+2708	core	emailGesendet	2026-03-31 14:08:41.842176	system	onboarding
+2709	core	emailGesendetHinweis	2026-03-31 14:08:41.846478	system	onboarding
+2710	core	fehlerBeiRegistrierung	2026-03-31 14:08:41.850487	system	onboarding
+2711	core	fehlerBeiRegistrierungText	2026-03-31 14:08:41.854458	system	onboarding
+2712	core	fehlerBeiRegistrierungNochmalVersuchen	2026-03-31 14:08:41.858459	system	onboarding
+2713	core	zustimmungDatenuebermittlung	2026-03-31 14:08:41.862525	system	onboarding
+2714	core	zustimmungDatenschutzerklaerung	2026-03-31 14:08:41.866545	system	onboarding
+2715	core	bitteDatenuebermittlungZustimmen	2026-03-31 14:08:41.87052	system	onboarding
+2716	core	bitteDatenschutzerklaerungZustimmen	2026-03-31 14:08:41.874552	system	onboarding
+2717	core	tab_projektarbeit	2026-03-31 14:08:41.878537	system	stv
+2718	core	projektarbeitAnlegen	2026-03-31 14:08:41.882502	system	projektarbeit
+2719	core	projektarbeitBearbeiten	2026-03-31 14:08:41.886455	system	projektarbeit
+2720	core	titel	2026-03-31 14:08:41.890698	system	projektarbeit
+2721	core	titelEnglisch	2026-03-31 14:08:41.894658	system	projektarbeit
+2722	core	themenbereich	2026-03-31 14:08:41.898628	system	projektarbeit
+2723	core	typ	2026-03-31 14:08:41.902629	system	projektarbeit
+2724	core	firma	2026-03-31 14:08:41.906655	system	projektarbeit
+2725	core	lehrveranstaltung	2026-03-31 14:08:41.910663	system	projektarbeit
+2726	core	lvTeil	2026-03-31 14:08:41.914782	system	projektarbeit
+2727	core	betreuer	2026-03-31 14:08:41.918737	system	projektarbeit
+2728	core	betreuerGross	2026-03-31 14:08:41.922697	system	projektarbeit
+2729	core	betreuerart	2026-03-31 14:08:41.926861	system	projektarbeit
+2730	core	note	2026-03-31 14:08:41.930808	system	projektarbeit
+2731	core	stunden	2026-03-31 14:08:41.934927	system	projektarbeit
+2732	core	stundensatz	2026-03-31 14:08:41.93893	system	projektarbeit
+2733	core	beginn	2026-03-31 14:08:41.942877	system	projektarbeit
+2734	core	ende	2026-03-31 14:08:41.946937	system	projektarbeit
+2735	core	freigegeben	2026-03-31 14:08:41.950925	system	projektarbeit
+2736	core	gesperrtBis	2026-03-31 14:08:41.954928	system	projektarbeit
+2737	core	anmerkung	2026-03-31 14:08:41.958828	system	projektarbeit
+2738	core	firmaId	2026-03-31 14:08:41.962673	system	projektarbeit
+2739	core	error_betreuerNichtGeloescht	2026-03-31 14:08:41.966607	system	projektarbeit
+2740	core	error_paabgabeNichtGeloescht	2026-03-31 14:08:41.970399	system	projektarbeit
+2741	core	error_invalidProjektbetreuer	2026-03-31 14:08:41.974229	system	projektarbeit
+2742	core	error_betreuerHatVertrag	2026-03-31 14:08:41.978165	system	projektarbeit
+2743	core	neuePersonAnlegen	2026-03-31 14:08:41.982013	system	projektarbeit
+2744	core	titelPre	2026-03-31 14:08:41.985817	system	person
+2745	core	titelPost	2026-03-31 14:08:41.989738	system	person
+2746	core	weitereVornamen	2026-03-31 14:08:41.99367	system	person
+2747	core	bestehendeAdresseUeberschreiben	2026-03-31 14:08:41.997572	system	person
+2748	core	adresseHinzufuegen	2026-03-31 14:08:42.00146	system	person
+2749	core	adresseNichtAnlegen	2026-03-31 14:08:42.005296	system	person
+2750	core	land	2026-03-31 14:08:42.009101	system	person
+2751	core	mobil	2026-03-31 14:08:42.012924	system	person
+2752	core	letzeAusbildung	2026-03-31 14:08:42.016843	system	lehre
+2753	core	ausbildungsart	2026-03-31 14:08:42.020696	system	lehre
+2754	core	anmerkungen	2026-03-31 14:08:42.024482	system	lehre
+2755	core	personAnlegen	2026-03-31 14:08:42.028253	system	person
+2756	core	interessentAnlegen	2026-03-31 14:08:42.032212	system	lehre
+2757	core	personExistiertPruefung	2026-03-31 14:08:42.036196	system	person
+2758	core	zurueck	2026-03-31 14:08:42.040179	system	ui
+2759	core	kontaktdatenBearbeiten	2026-03-31 14:08:42.044139	system	projektarbeit
+2760	core	projektbeurteilungErstellen	2026-03-31 14:08:42.048056	system	projektarbeit
+2761	core	projektarbeitNochNichtBeurteilt	2026-03-31 14:08:42.051987	system	projektarbeit
+2762	core	vertragStornieren	2026-03-31 14:08:42.055927	system	lehre
+2763	core	nochKeinVertrag	2026-03-31 14:08:42.059835	system	lehre
+2764	core	betreuerBearbeiten	2026-03-31 14:08:42.063801	system	projektarbeit
+2765	core	betreuerSpeichern	2026-03-31 14:08:42.06768	system	projektarbeit
+2766	core	zurFirmenverwaltung	2026-03-31 14:08:42.071482	system	projektarbeit
+2767	core	punkte	2026-03-31 14:08:42.075328	system	projektarbeit
+2768	core	gesamtnote	2026-03-31 14:08:42.079196	system	projektarbeit
+2769	core	abgabeEndupload	2026-03-31 14:08:42.083152	system	projektarbeit
+2770	core	vertrag_id	2026-03-31 14:08:42.087102	system	projektarbeit
+2771	core	projektarbeit_id	2026-03-31 14:08:42.091171	system	projektarbeit
+2772	core	betreuerart_kurzbz	2026-03-31 14:08:42.095135	system	projektarbeit
+2773	core	typ_kurzbz	2026-03-31 14:08:42.099117	system	projektarbeit
+2774	core	betreuerZugewiesen	2026-03-31 14:08:42.103119	system	projektarbeit
+2775	core	error_paarbeitHatBeurteilung	2026-03-31 14:08:42.107094	system	projektarbeit
+2776	core	dokument_erstellen	2026-03-31 14:08:42.111161	system	dokumente
+2777	core	abschicken	2026-03-31 14:08:42.115105	system	global
+2778	core	zurueckZumStart	2026-03-31 14:08:42.119082	system	global
+2802	core	tab_combine_people	2026-03-31 14:08:42.168518	system	stv
+2803	core	question_combine_people	2026-03-31 14:08:42.172436	system	stv
+2804	core	error_combinePeople_samePerson	2026-03-31 14:08:42.17633	system	stv
+2805	core	errorMissingOrInvalidParameterRecipientTypeId	2026-03-31 14:08:42.180292	system	ui
+2806	core	errorMissingOrInvalidParameterRecipientIds	2026-03-31 14:08:42.184041	system	ui
+2807	core	errorMissingOrInvalidParameters	2026-03-31 14:08:42.187953	system	ui
+2808	core	errorEditorNotAvailable	2026-03-31 14:08:42.19169	system	messages
+2809	core	error_missingLogic	2026-03-31 14:08:42.195685	system	messages
+2810	core	error_noLehrverbandAssigned	2026-03-31 14:08:42.199652	system	stv
+2811	core	deleteInfo	2026-03-31 14:08:42.203505	system	ui
+2812	core	success_savePreset	2026-03-31 14:08:42.2075	system	dashboard
+2813	core	alert_deleteWidget	2026-03-31 14:08:42.211516	system	dashboard
+2814	core	confirm_delete	2026-03-31 14:08:42.215509	system	ui
 \.
 
 
@@ -39851,6 +42048,7 @@ COPY system.tbl_phrasentext (phrasentext_id, phrase_id, sprache, orgeinheit_kurz
 1277	640	English	\N	\N	Error when getting student union fees	\N	2021-11-11 12:39:58.98887	system
 1278	641	German	\N	\N	Fehler beim Holen der Semester	\N	2021-11-11 12:39:58.996667	system
 1279	641	English	\N	\N	Error when getting semester	\N	2021-11-11 12:39:59.00013	system
+1330	667	German	\N	\N	Raum	\N	2026-03-31 14:08:33.781429	system
 1280	642	German	\N	\N	Fehler beim Hinzufügen des ÖH-Beitrags	\N	2021-11-11 12:39:59.007091	system
 1281	642	English	\N	\N	Error when adding student union fee	\N	2021-11-11 12:39:59.010497	system
 1282	643	German	\N	\N	Fehler beim Aktualisieren des ÖH-Beitrags	\N	2021-11-11 12:39:59.018402	system
@@ -39901,6 +42099,3533 @@ COPY system.tbl_phrasentext (phrasentext_id, phrase_id, sprache, orgeinheit_kurz
 1327	665	English	\N	\N	Error when changing state	\N	2021-11-11 12:39:59.268937	system
 1328	666	German	\N	\N	Unbekannter Fehler beim Status Ändern	\N	2021-11-11 12:39:59.276827	system
 1329	666	English	\N	\N	Unknown error when changing state	\N	2021-11-11 12:39:59.280329	system
+1331	667	English	\N	\N	Room	\N	2026-03-31 14:08:33.782835	system
+1332	668	German	\N	\N	Ferien / Feiertag	\N	2026-03-31 14:08:33.785732	system
+1333	668	English	\N	\N	Holidays	\N	2026-03-31 14:08:33.787003	system
+1334	669	German	\N	\N	Menu einklappen	\N	2026-03-31 14:08:33.794003	system
+1335	669	English	\N	\N	Collapse menu	\N	2026-03-31 14:08:33.795356	system
+1336	670	German	\N	\N	Menu ausklappen	\N	2026-03-31 14:08:33.798309	system
+1337	670	English	\N	\N	Extend menu	\N	2026-03-31 14:08:33.799563	system
+1338	671	German	\N	\N	Erstellt von	\N	2026-03-31 14:08:33.863164	system
+1339	671	English	\N	\N	Inserted by	\N	2026-03-31 14:08:33.86436	system
+1340	672	German	\N	\N	Erstellt am	\N	2026-03-31 14:08:33.867118	system
+1341	672	English	\N	\N	Inserted on	\N	2026-03-31 14:08:33.868469	system
+1342	673	German	\N	\N	Geändert von	\N	2026-03-31 14:08:33.871332	system
+1343	673	English	\N	\N	Updated by	\N	2026-03-31 14:08:33.872543	system
+1344	674	German	\N	\N	Geändert am	\N	2026-03-31 14:08:33.875376	system
+1345	674	English	\N	\N	Updated on	\N	2026-03-31 14:08:33.876627	system
+1346	675	German	\N	\N	Speichern	\N	2026-03-31 14:08:33.879345	system
+1347	675	English	\N	\N	Save	\N	2026-03-31 14:08:33.880584	system
+1348	676	German	\N	\N	Anlegen	\N	2026-03-31 14:08:33.883426	system
+1349	676	English	\N	\N	Create	\N	2026-03-31 14:08:33.884696	system
+1350	677	German	\N	\N	Löschen	\N	2026-03-31 14:08:33.887506	system
+1351	677	English	\N	\N	Delete	\N	2026-03-31 14:08:33.8888	system
+1352	678	German	\N	\N	Aktionen	\N	2026-03-31 14:08:33.891722	system
+1353	678	English	\N	\N	Actions	\N	2026-03-31 14:08:33.892969	system
+1354	679	German	\N	\N	Ein unbekannter Fehler ist aufgetreten: {error}	\N	2026-03-31 14:08:33.89587	system
+1355	679	English	\N	\N	An unknown error occurred: {error}	\N	2026-03-31 14:08:33.89713	system
+1356	680	German	\N	\N	Die maximale Dateigröße wurde überschritten!	\N	2026-03-31 14:08:33.901344	system
+1357	680	English	\N	\N	The maximum file size has been exceeded!	\N	2026-03-31 14:08:33.90271	system
+1358	681	German	\N	\N	Lädt...	\N	2026-03-31 14:08:33.905643	system
+1359	681	English	\N	\N	Loading...	\N	2026-03-31 14:08:33.906872	system
+1360	682	German	\N	\N	{n} Fehler	\N	2026-03-31 14:08:33.909691	system
+1361	682	English	\N	\N	{n} Error(s)	\N	2026-03-31 14:08:33.910882	system
+1362	683	German	\N	\N	Navigation ein-/ausblenden	\N	2026-03-31 14:08:33.913777	system
+1363	683	English	\N	\N	Toggle navigation	\N	2026-03-31 14:08:33.915	system
+1364	684	German	\N	\N	Ändern	\N	2026-03-31 14:08:33.919227	system
+1365	684	English	\N	\N	Change	\N	2026-03-31 14:08:33.920511	system
+1366	685	German	\N	\N	Logout	\N	2026-03-31 14:08:33.939601	system
+1367	685	English	\N	\N	Logout	\N	2026-03-31 14:08:33.940819	system
+1368	686	German	\N	\N	Einstellungen	\N	2026-03-31 14:08:33.943611	system
+1369	686	English	\N	\N	Settings	\N	2026-03-31 14:08:33.944811	system
+1370	687	German	\N	\N	Einstellungen gespeichert	\N	2026-03-31 14:08:33.947538	system
+1371	687	English	\N	\N	Settings saved	\N	2026-03-31 14:08:33.948773	system
+1372	688	German	\N	\N	Gel&ouml;scht	\N	2026-03-31 14:08:33.962282	system
+1373	688	English	\N	\N	Deleted	\N	2026-03-31 14:08:33.963506	system
+1374	689	German	\N	\N	Sie haben keine Schreibrechte für dieses Feld	\N	2026-03-31 14:08:33.966295	system
+1375	689	English	\N	\N	You do not have writing rights for this field	\N	2026-03-31 14:08:33.967518	system
+1376	690	German	\N	\N	Das {field} Feld muss ein Array sein	\N	2026-03-31 14:08:33.970331	system
+1377	690	English	\N	\N	The {field} field must be an array	\N	2026-03-31 14:08:33.971551	system
+1378	691	German	\N	\N	Filter löschen	\N	2026-03-31 14:08:33.974371	system
+1379	691	English	\N	\N	Clear filter	\N	2026-03-31 14:08:33.97558	system
+1380	692	German	\N	\N	Filter	\N	2026-03-31 14:08:33.97973	system
+1381	692	English	\N	\N	Filter	\N	2026-03-31 14:08:33.980952	system
+1382	693	German	\N	\N	Filter zurücksetzen	\N	2026-03-31 14:08:33.990395	system
+1383	693	English	\N	\N	delete filter	\N	2026-03-31 14:08:33.991606	system
+1384	694	German	\N	\N	Filter aktiv	\N	2026-03-31 14:08:33.99439	system
+1385	694	English	\N	\N	filter active	\N	2026-03-31 14:08:33.995616	system
+1386	695	German	\N	\N	Person ID	\N	2026-03-31 14:08:33.998532	system
+1387	695	English	\N	\N	Person ID	\N	2026-03-31 14:08:33.999752	system
+1388	696	German	\N	\N	EMail (Privat)	\N	2026-03-31 14:08:34.025074	system
+1389	696	English	\N	\N	email (private)	\N	2026-03-31 14:08:34.026289	system
+1390	697	German	\N	\N	EMail (Intern)	\N	2026-03-31 14:08:34.029086	system
+1391	697	English	\N	\N	email (intern)	\N	2026-03-31 14:08:34.030343	system
+1392	698	German	\N	\N	Adressen	\N	2026-03-31 14:08:34.035795	system
+1393	698	English	\N	\N	addresses	\N	2026-03-31 14:08:34.037033	system
+1394	699	German	\N	\N	Bankverbindungen	\N	2026-03-31 14:08:34.03983	system
+1395	699	English	\N	\N	bank details	\N	2026-03-31 14:08:34.041034	system
+1396	700	German	\N	\N	Rechnungsadresse	\N	2026-03-31 14:08:34.043905	system
+1397	700	English	\N	\N	billing address	\N	2026-03-31 14:08:34.045135	system
+1398	701	German	\N	\N	Heimatadresse	\N	2026-03-31 14:08:34.047966	system
+1399	701	English	\N	\N	home address	\N	2026-03-31 14:08:34.049146	system
+1400	702	German	\N	\N	abweichender Empfänger	\N	2026-03-31 14:08:34.051947	system
+1401	702	English	\N	\N	c/o	\N	2026-03-31 14:08:34.053171	system
+1402	703	German	\N	\N	Gemeinde	\N	2026-03-31 14:08:34.056056	system
+1403	703	English	\N	\N	municipality	\N	2026-03-31 14:08:34.057255	system
+1404	704	German	\N	\N	Bitte gültige Gemeinde wählen	\N	2026-03-31 14:08:34.060024	system
+1405	704	English	\N	\N	Please select a valid municipality	\N	2026-03-31 14:08:34.061248	system
+1406	705	German	\N	\N	Bitte gültige PLZ wählen	\N	2026-03-31 14:08:34.064057	system
+1407	705	English	\N	\N	Please select a valid zip code	\N	2026-03-31 14:08:34.065256	system
+1408	706	German	\N	\N	PLZ	\N	2026-03-31 14:08:34.072029	system
+1409	706	English	\N	\N	zip	\N	2026-03-31 14:08:34.073275	system
+1410	707	German	\N	\N	Zustellung	\N	2026-03-31 14:08:34.076037	system
+1411	707	English	\N	\N	delivery	\N	2026-03-31 14:08:34.077288	system
+1412	708	German	\N	\N	Die angegebene UID passt nicht zu der angegebenen Person	\N	2026-03-31 14:08:34.085368	system
+1413	708	English	\N	\N	Given UID is not assigned to the given Person	\N	2026-03-31 14:08:34.086579	system
+1414	709	German	\N	\N	Unruly	\N	2026-03-31 14:08:34.089309	system
+1415	709	English	\N	\N	Unruly	\N	2026-03-31 14:08:34.090516	system
+1416	710	German	\N	\N	Kein Benutzer gefunden	\N	2026-03-31 14:08:34.093272	system
+1417	710	English	\N	\N	No User found	\N	2026-03-31 14:08:34.09448	system
+1418	711	German	\N	\N	Lehrveranstaltungsoptionen	\N	2026-03-31 14:08:34.097221	system
+1419	711	English	\N	\N	Course options	\N	2026-03-31 14:08:34.098428	system
+1420	712	German	\N	\N	Unbewertet	\N	2026-03-31 14:08:34.101176	system
+1421	712	English	\N	\N	Not Graded	\N	2026-03-31 14:08:34.102393	system
+1422	713	German	\N	\N	Vertrag stornieren	\N	2026-03-31 14:08:34.106666	system
+1423	713	English	\N	\N	Cancel Contract	\N	2026-03-31 14:08:34.107882	system
+1424	714	German	\N	\N	Möchten Sie den Vertrag wirklich stornieren?	\N	2026-03-31 14:08:34.110699	system
+1425	714	English	\N	\N	Do you really want to cancel the contract?	\N	2026-03-31 14:08:34.111936	system
+1426	715	German	\N	\N	OrgForm	\N	2026-03-31 14:08:34.117814	system
+1427	715	English	\N	\N	orgform	\N	2026-03-31 14:08:34.119027	system
+1428	716	German	\N	\N	Grp.	\N	2026-03-31 14:08:34.124469	system
+1429	716	English	\N	\N	grp.	\N	2026-03-31 14:08:34.125712	system
+1430	717	German	\N	\N	...und {0} weitere Lektoren	\N	2026-03-31 14:08:34.12853	system
+1431	717	English	\N	\N	group	...and {0} more lecturers	2026-03-31 14:08:34.129781	system
+1432	718	German	\N	\N	Lehrveranstaltung ID	\N	2026-03-31 14:08:34.148754	system
+1433	718	English	\N	\N	Course ID	\N	2026-03-31 14:08:34.14992	system
+1434	719	German	\N	\N	Sem.	\N	2026-03-31 14:08:34.156632	system
+1435	719	English	\N	\N	sem.	\N	2026-03-31 14:08:34.157787	system
+1436	720	German	\N	\N	Lektor bereits zugewiesen	\N	2026-03-31 14:08:34.163162	system
+1437	720	English	\N	\N	Lektor already assigned	\N	2026-03-31 14:08:34.164418	system
+1438	721	German	\N	\N	Gruppe bereits zugewiesen	\N	2026-03-31 14:08:34.167183	system
+1439	721	English	\N	\N	Group already assigned	\N	2026-03-31 14:08:34.16846	system
+1440	722	German	\N	\N	Gruppe ist bereits verplant	\N	2026-03-31 14:08:34.171341	system
+1441	722	English	\N	\N	Group is already scheduled	\N	2026-03-31 14:08:34.172574	system
+1442	723	German	\N	\N	Wechsel vom Mitarbeiter nicht möglich da er bereits verplant ist.	\N	2026-03-31 14:08:34.175362	system
+1443	723	English	\N	\N	Changing the employee is not possible because they are already scheduled.	\N	2026-03-31 14:08:34.176585	system
+1444	724	German	\N	\N	Noch kein Vertrag	\N	2026-03-31 14:08:34.179346	system
+1445	724	English	\N	\N	No contract yet	\N	2026-03-31 14:08:34.180594	system
+1446	736	German	\N	\N	Studiengangskennzahl	\N	2026-03-31 14:08:34.210207	system
+1447	736	English	\N	\N	Study program number	\N	2026-03-31 14:08:34.211417	system
+1448	737	German	\N	\N	Studiengang KZ	\N	2026-03-31 14:08:34.214286	system
+1449	737	English	\N	\N	Study program no	\N	2026-03-31 14:08:34.215526	system
+1450	738	German	\N	\N	Verb.	\N	2026-03-31 14:08:34.218233	system
+1451	738	English	\N	\N	assoc.	\N	2026-03-31 14:08:34.21941	system
+1452	739	German	\N	\N	Dual	\N	2026-03-31 14:08:34.222209	system
+1453	739	English	\N	\N	dual	\N	2026-03-31 14:08:34.223471	system
+1454	740	German	\N	\N	rückstelldatum	\N	2026-03-31 14:08:34.292616	system
+1455	740	English	\N	\N	onHold date	\N	2026-03-31 14:08:34.293832	system
+1456	741	German	\N	\N	Rückstellgrund	\N	2026-03-31 14:08:34.296542	system
+1457	741	English	\N	\N	onHold reason	\N	2026-03-31 14:08:34.297744	system
+1458	742	German	\N	\N	Kaution	\N	2026-03-31 14:08:34.32214	system
+1459	742	English	\N	\N	Deposit	\N	2026-03-31 14:08:34.323336	system
+1460	743	German	\N	\N	Rechnungsnummer	\N	2026-03-31 14:08:34.325939	system
+1461	743	English	\N	\N	Invoice Number	\N	2026-03-31 14:08:34.32709	system
+1462	744	German	\N	\N	Rechnungsnummer	\N	2026-03-31 14:08:34.329764	system
+1463	744	English	\N	\N	Invoice Number	\N	2026-03-31 14:08:34.330937	system
+1464	745	German	\N	\N	Fällig am	\N	2026-03-31 14:08:34.333593	system
+1465	745	English	\N	\N	Due on	\N	2026-03-31 14:08:34.334796	system
+1466	746	German	\N	\N	Gesamtbetrag	\N	2026-03-31 14:08:34.33748	system
+1467	746	English	\N	\N	Total amount	\N	2026-03-31 14:08:34.338585	system
+1468	747	German	\N	\N	Rechnungsempfänger	\N	2026-03-31 14:08:34.341125	system
+1469	747	English	\N	\N	Invoice recipient	\N	2026-03-31 14:08:34.34223	system
+1470	748	German	\N	\N	Rechnungsempfänger	\N	2026-03-31 14:08:34.344747	system
+1471	748	English	\N	\N	Invoice	\N	2026-03-31 14:08:34.345839	system
+1472	749	German	\N	\N	Semester	\N	2026-03-31 14:08:34.348381	system
+1473	749	English	\N	\N	Semester	\N	2026-03-31 14:08:34.349543	system
+1474	750	German	\N	\N	Bezeichnung	\N	2026-03-31 14:08:34.352147	system
+1475	750	English	\N	\N	Title	\N	2026-03-31 14:08:34.353323	system
+1476	751	German	\N	\N	Datum	\N	2026-03-31 14:08:34.355999	system
+1477	751	English	\N	\N	Date	\N	2026-03-31 14:08:34.357204	system
+1478	752	German	\N	\N	Zahlungsbestätigung	\N	2026-03-31 14:08:34.359841	system
+1479	752	English	\N	\N	Payment confirmation	\N	2026-03-31 14:08:34.360965	system
+1480	753	German	\N	\N	Ablauf und Zahlungsbedingungen	\N	2026-03-31 14:08:34.363525	system
+1481	753	English	\N	\N	Procedure and terms of payment	\N	2026-03-31 14:08:34.364715	system
+1482	754	German	\N	\N	Wir möchten Sie darauf aufmerksam machen, dass bei der Überweisung *immer* die Rechnungsnummer als Zahlungsreferenz anzuführen ist.\n\t\t\t\t\t\tAndernfalls erfolgt keine automatische Zahlungszuordnung und es kann zu einer Verzögerung der Darstellung des aktuellen Zahlungsstatus\n\t\t\t\t\t\tder Rechnung im Campus Informations-System kommen.\n\t\t\t\t\t\t<br/>\n\t\t\t\t\t\t<br/>\n\t\t\t\t\t\tIm Falle dass der Betrag an ein falsches Konto überwiesen wurde, bitten wir Sie höflichst sich an Ihre Bank zu wenden.\n\t\t\t\t\t\t<br/>\n\t\t\t\t\t\t<br/>\n\t\t\t\t\t\tJede Rechnung gilt als "Bezahlt", wenn der Gesamtbetrag vollständig auf unser Konto eingelangt ist.\n\t\t\t\t\t\t<br/>\n\t\t\t\t\t\t<br/>	\N	2026-03-31 14:08:34.367514	system
+1483	754	English	\N	\N	We would like to draw your attention to the fact that the invoice number must *always* be quoted as the payment reference when making a bank transfer.\n\t\t\t\t\t\t\tOtherwise, no automatic payment allocation will take place and there may be a delay in displaying the current payment status of the invoice in Campus Informations-System.\n\t\t\t\t\t\t\t<br />\n\t\t\t\t\t\t\t<br />\n\t\t\t\t\t\t\tIn the event that the amount has been transferred to an incorrect account, we kindly ask you to contact your bank.\n\t\t\t\t\t\t\t<br />\n\t\t\t\t\t\t\t<br />\n\t\t\t\t\t\t\tEach invoice is considered "paid" when the total amount has been credited to our account in full.\n\t\t\t\t\t\t\t<br />\n\t\t\t\t\t\t\t<br />	\N	2026-03-31 14:08:34.368712	system
+1484	755	German	\N	\N	Kontoinformationen der FHTW	\N	2026-03-31 14:08:34.371397	system
+1485	755	English	\N	\N	FHTW account information	\N	2026-03-31 14:08:34.372617	system
+1486	756	German	\N	\N	Sämtliche Zahlungen sind an die nachstehende Kontonummer zu leisten und die Rechnungsnummer muss als Zahlungsreferenz eingegeben werden.	\N	2026-03-31 14:08:34.37539	system
+1487	756	English	\N	\N	All payments must be made to the following account number and the invoice number must be entered as the payment reference.	\N	2026-03-31 14:08:34.376604	system
+1488	757	German	\N	\N	Auslandsüberweisungen:\n\t\t\t\t\t\t\t\t\t\t\t<br/>\n\t\t\t\t\t\t\t\t\t\t\tBei Auslandsüberweisungen sind die Spesenkosten von den\n\t\t\t\t\t\t\t\t\t\t\t<br/>\n\t\t\t\t\t\t\t\t\t\t\tZahlenden zusätzlich zu den Rechnungsbeträgen zu zahlen.	\N	2026-03-31 14:08:34.379359	system
+1489	757	English	\N	\N	Foreign bank transfers:\n\t\t\t\t\t\t\t\t\t\t\t<br />\n\t\t\t\t\t\t\t\t\t\t\tIn the case of foreign bank transfers, the charges are to be paid by\n\t\t\t\t\t\t\t\t\t\t\t<br />\n\t\t\t\t\t\t\t\t\t\t\tthe payer in addition to the invoice amounts.	\N	2026-03-31 14:08:34.380569	system
+1490	758	German	\N	\N	Rechnungen & Zahlungsbestätigungen	\N	2026-03-31 14:08:34.383317	system
+1491	758	English	\N	\N	Invoices & payment confirmations	\N	2026-03-31 14:08:34.384555	system
+1492	759	German	\N	\N	Warum ist die Einzahlung trotz Einzahlung noch offen?	\N	2026-03-31 14:08:34.387341	system
+1493	759	English	\N	\N	Why is the deposit still outstanding despite payment?	\N	2026-03-31 14:08:34.388544	system
+1494	760	German	\N	\N	Der häufigste Grund für diesen Fall ist, dass bei der Überweisung nicht die Rechnungsnummer als Zahlungsreferenz eingegeben wird.\nWir bitten Sie höflichst in diesem Fall eine Mail an <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a> mit Zahlungsbestätigung zu senden.\nDie Transaktion und die Bearbeitung der Zahlung, kann bis zu sechs Werktage dauern.	\N	2026-03-31 14:08:34.391339	system
+1495	760	English	\N	\N	The most common reason for this is that the invoice number is not entered as the payment reference in the bank transfer.\nIn this case, we kindly ask you to send an e-mail to <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a> with a payment confirmation.\nThe transaction and processing of the payment can take up to six working days.	\N	2026-03-31 14:08:34.392572	system
+1496	761	German	\N	\N	Ich habe keine Rechnung erhalten, was tun?	\N	2026-03-31 14:08:34.395355	system
+1497	761	English	\N	\N	I have not received an invoice, what should I do?	\N	2026-03-31 14:08:34.396577	system
+1498	762	German	\N	\N	In diesem Fall ist der Spam-Ordner zu kontrollieren. Falls die Rechnung nicht übermittelt wurde ersuchen wir um Information an <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a>.\nDie Rechnung wird Ihnen erneut zugesendet. <u><strong>Erst nach Erhalt der Rechnung ist der Betrag zu überweisen</strong></u>	\N	2026-03-31 14:08:34.399301	system
+1543	784	English	\N	\N	The plagiarism check has been carried out and confirms that the central content of the thesis has been written independently to the required extent (cf. part of the Statutes on Studies Act Provisions / Examination Regulations, § 20 Para. 2 and 3).	\N	2026-03-31 14:08:34.773311	system
+1499	762	English	\N	\N	In this case, please check your spam folder. If the invoice has not been sent, please inform us at <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a>.\nThe invoice will be sent to you again. <u><strong>The amount is only to be transferred after receipt of the invoice!</strong></u>	\N	2026-03-31 14:08:34.400547	system
+1500	763	German	\N	\N	Refundierung des Studienbeitrags	\N	2026-03-31 14:08:34.403322	system
+1501	763	English	\N	\N	Refund of the tuition fee	\N	2026-03-31 14:08:34.40453	system
+1502	764	German	\N	\N	Der Studienbeitrag wird nicht rückerstattet, wenn…\n-Anfänger*innen, die ihren Studienplatz nach Semesterbeginn (1. September / 16. Februar) nicht in Anspruch nehmen\n-Studierende, die ihr Studium nach Semesterbeginn (1. September / 16. Februar) abbrechen.\n\n-Unterbrechung vor dem 15.10. bzw. 15.3.: Studienbeitrag wird rückerstattet\n-Unterbrechung nach dem 15.10. bzw. 15.3.: Studienbeitrag wird nicht rückerstattet\n-in den Folgesemestern der Unterbrechung sind keine Studienbeiträge zu zahlen; der ÖHBeitrag ist jedoch in jedem Semester der Unterbrechung zu zahlen	\N	2026-03-31 14:08:34.407295	system
+1503	764	English	\N	\N	The tuition fee will not be refunded if...\n-Freshmen who do not take up their study place after the start of the semester (September 1 / February 16)\n-Students who discontinue their studies after the start of the semester (September 1 / February 16).\n\n-Interruption before 15.10. or 15.3.: tuition fees will be refunded\n-Interruption after 15.10. or 15.3.: Tuition fee will not be refunded\n-No tuition fees are payable in the semesters following the interruption; however, the ÖH fee must be paid in each semester of the interruption	\N	2026-03-31 14:08:34.408551	system
+1504	765	German	\N	\N	Sie sind vom Studienbeitrag befreit und haben eine Rechnung für den Studienbeitrag bekommen?	\N	2026-03-31 14:08:34.411322	system
+1505	765	English	\N	\N	You are exempt from paying tuition fees and have received an invoice for tuition fees?	\N	2026-03-31 14:08:34.412537	system
+1506	766	German	\N	\N	Treten Sie bitte in Kontakt mit Ihrer Studiengangsassistenz. Die offene Rechnung wird storniert.	\N	2026-03-31 14:08:34.415236	system
+1507	766	English	\N	\N	Please contact your degree program assistant. The outstanding invoice will be canceled.	\N	2026-03-31 14:08:34.416465	system
+1508	767	German	\N	\N	Mir ist ein Fehler bei der Überweisung unterlaufen, was tun?	\N	2026-03-31 14:08:34.419135	system
+1509	767	English	\N	\N	I made a mistake with the transfer, what should I do?	\N	2026-03-31 14:08:34.42031	system
+1510	768	German	\N	\N	Bitte den Fehler an <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a> melden.	\N	2026-03-31 14:08:34.422897	system
+1511	768	English	\N	\N	Please report the error to <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a>.	\N	2026-03-31 14:08:34.424033	system
+1512	769	German	\N	\N	Eine Rechnung wurde zwei Mal überwiesen, was tun?	\N	2026-03-31 14:08:34.426659	system
+1513	769	English	\N	\N	An invoice has been transferred twice, what should I do?	\N	2026-03-31 14:08:34.427846	system
+1514	770	German	\N	\N	Falls eine Rechnung doppelt überwiesen wurde, bitten wir Sie dies an <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a> zu melden. Wir werden Ihnen eine Zahlung refundieren.	\N	2026-03-31 14:08:34.430587	system
+1515	770	English	\N	\N	If an invoice has been transferred twice, please report this to <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a>. We will refund you one payment.	\N	2026-03-31 14:08:34.431795	system
+1516	771	German	\N	\N	Es stehen mehrere Positionen auf der Rechnung – soll für jede Position eine Überweisung durchgeführt werden?	\N	2026-03-31 14:08:34.434614	system
+1517	771	English	\N	\N	There are several items on the invoice - should a transfer be made for each item?	\N	2026-03-31 14:08:34.435797	system
+1518	772	German	\N	\N	Nein, es ist immer der auf der Rechnung ausgewiesene Gesamtbetrag zu überweisen.	\N	2026-03-31 14:08:34.438517	system
+1519	772	English	\N	\N	No, the total amount shown on the invoice must always be transferred.	\N	2026-03-31 14:08:34.439711	system
+1520	773	German	\N	\N	Wann kann der Betrag überwiesen werden?	\N	2026-03-31 14:08:34.442408	system
+1521	773	English	\N	\N	When can the amount be transferred?	\N	2026-03-31 14:08:34.443608	system
+1522	774	German	\N	\N	Wir möchten Sie darauf hinweisen, dass Überweisungen erst bei Erhalt der Rechnung durchzuführen sind. Bitte um Angabe der Rechnungsnummer als Zahlungsreferenz.	\N	2026-03-31 14:08:34.446483	system
+1523	774	English	\N	\N	We would like to point out that bank transfers should only be made on receipt of the invoice. Please state the invoice number as the payment reference.	\N	2026-03-31 14:08:34.447652	system
+1524	775	German	\N	\N	Fachhochschule Technikum Wien	\N	2026-03-31 14:08:34.450335	system
+1525	775	English	\N	\N	University of Applied Sciences Technikum Wien	\N	2026-03-31 14:08:34.451541	system
+1526	776	German	\N	\N	Person mit Markierung „unruly“ gefunden	\N	2026-03-31 14:08:34.454289	system
+1527	776	English	\N	\N	Person flagged as "unruly" detected	\N	2026-03-31 14:08:34.455474	system
+1528	777	German	\N	\N	Status Bestätigung	\N	2026-03-31 14:08:34.492238	system
+1529	777	English	\N	\N	Status confirmation	\N	2026-03-31 14:08:34.493481	system
+1530	778	German	\N	\N	Neue und geänderte anzeigen	\N	2026-03-31 14:08:34.528288	system
+1531	778	English	\N	\N	Show new and changed	\N	2026-03-31 14:08:34.529448	system
+1532	779	German	\N	\N	Das Datumsformat ist ungültig oder liegt außerhalb des gültigen Bereichs.	\N	2026-03-31 14:08:34.571457	system
+1533	779	English	\N	\N	The date format is invalid or out of range.	\N	2026-03-31 14:08:34.572715	system
+1534	780	German	\N	\N	Alle Semester	\N	2026-03-31 14:08:34.7277	system
+1535	780	English	\N	\N	All semester	\N	2026-03-31 14:08:34.728906	system
+1536	781	German	\N	\N	Aktuelles Semester	\N	2026-03-31 14:08:34.731701	system
+1537	781	English	\N	\N	Current semester	\N	2026-03-31 14:08:34.732955	system
+1538	782	German	\N	\N	Titel	\N	2026-03-31 14:08:34.764146	system
+1539	782	English	\N	\N	Title of 	\N	2026-03-31 14:08:34.765401	system
+1540	783	German	\N	\N	Der Plagiatscheck wurde durchgeführt und bestätigt, dass der zentrale Inhalt der Arbeit im erforderlichen Ausmaß eigenständig verfasst wurde (vgl. Satzungsteil Studienrechtliche Bestimmungen / Prüfungsordnung, § 20 Abs. 2 und 3).	\N	2026-03-31 14:08:34.76811	system
+1541	783	English	\N	\N	The plagiarism check has been carried out and confirms that the central content of the paper has been written independently to the required extent (cf. part of the Statutes on Studies Act Provisions / Examination Regulations, § 20 Para. 2 and 3).	\N	2026-03-31 14:08:34.769347	system
+1542	784	German	\N	\N	Der Plagiatscheck wurde durchgeführt und bestätigt, dass der zentrale Inhalt der Arbeit im erforderlichen Ausmaß eigenständig verfasst wurde (vgl. Satzungsteil Studienrechtliche Bestimmungen / Prüfungsordnung, § 20 Abs. 2 und 3).	\N	2026-03-31 14:08:34.772124	system
+1703	864	English	\N	\N	Organisational Unit	\N	2026-03-31 14:08:35.4006	system
+1544	785	German	\N	\N	Das Vorgehen ist in Bezug auf die fachspezifische Ausrichtung der Arbeit angemessen, anhand der Fachliteratur begründet und korrekt umgesetzt.	\N	2026-03-31 14:08:34.787432	system
+1545	785	English	\N	\N	The procedure is appropriate in relation to the subject-specific orientation of the thesis, justified on the basis of the specialist literature and correctly implemented.	\N	2026-03-31 14:08:34.788719	system
+1546	786	German	\N	\N	Die Arbeit wurde in selbständiger Arbeitsweise (z.B. eigenständige Lösung der Fragestellungen und aufgetretener Probleme) verfasst.	\N	2026-03-31 14:08:34.797171	system
+1547	786	English	\N	\N	The thesis was written in an independent way (e.g. independent solutions to the questions and problems that occurred)	\N	2026-03-31 14:08:34.798538	system
+1548	787	German	\N	\N	Die Arbeit ist schlüssig strukturiert.	\N	2026-03-31 14:08:34.804073	system
+1549	787	English	\N	\N	The thesis is structured coherently.	\N	2026-03-31 14:08:34.805429	system
+1550	788	German	\N	\N	Quellen und Literatur sind für die wissenschaftliche Auseinandersetzung mit dem Thema der Arbeit relevant, geben den aktuellen Stand der Forschung wieder und decken das Thema ab.	\N	2026-03-31 14:08:34.815907	system
+1551	788	English	\N	\N	Sources and literature are relevant for the scientific discussion of the topic of the thesis, reflect the current state of the art and cover the topic.	\N	2026-03-31 14:08:34.817125	system
+1552	789	German	\N	\N	Falls ein Kriterium mit 0 Punkten bewertet wird, ist die {0} insgesamt als negativ zu beurteilen.	\N	2026-03-31 14:08:34.834061	system
+1553	789	English	\N	\N	If a criterion is assessed with 0 points, the {0} is to be assessed as negative overall.	\N	2026-03-31 14:08:34.835416	system
+1554	790	German	\N	\N	Begutachter*in	\N	2026-03-31 14:08:34.839607	system
+1555	790	English	\N	\N	Reviewer	\N	2026-03-31 14:08:34.840784	system
+1556	791	German	\N	\N	Projektarbeitsbeurteilungsübersicht	\N	2026-03-31 14:08:34.869058	system
+1557	791	English	\N	\N	Projekt Work Assessment Overview	\N	2026-03-31 14:08:34.870389	system
+1558	792	German	\N	\N	Abgabe - Datum	\N	2026-03-31 14:08:34.873148	system
+1559	792	English	\N	\N	Upload - Date	\N	2026-03-31 14:08:34.874392	system
+1560	793	German	\N	\N	Freischaltung	\N	2026-03-31 14:08:34.877165	system
+1561	793	English	\N	\N	Activation	\N	2026-03-31 14:08:34.878361	system
+1562	794	German	\N	\N	Token an Zweit-Begutachter*in senden	\N	2026-03-31 14:08:34.881075	system
+1563	794	English	\N	\N	Send token to Second Reviewer	\N	2026-03-31 14:08:34.882349	system
+1564	795	German	\N	\N	Freischalten	\N	2026-03-31 14:08:34.885108	system
+1565	795	English	\N	\N	Unlock	\N	2026-03-31 14:08:34.886318	system
+1566	796	German	\N	\N	Dies ist eine im Rahmen einer kommissionellen Wiederholungsprüfung vorgelegte Bachelorarbeit. Die Beurteilung erfolgt erst im Anschluss an eine Abstimmung der Mitglieder des Prüfungssenats.	\N	2026-03-31 14:08:34.889251	\N
+1567	796	English	\N	\N	This is a Bachelor's thesis submitted within the frame of a committee re-sit examination. The assessment only takes place after a vote of the members of the examination commission.	\N	2026-03-31 14:08:34.890437	\N
+1568	797	German	\N	\N	Infomail an Mitglieder des Prüfungssenats senden	\N	2026-03-31 14:08:34.893322	system
+1569	797	English	\N	\N	Send infomail to members of the examination committee	\N	2026-03-31 14:08:34.894565	system
+1570	798	German	\N	\N	Mail an Mitglieder des Prüfungssenats gesendet	\N	2026-03-31 14:08:34.897399	system
+1571	798	English	\N	\N	Sent mail to members of the examination committee	\N	2026-03-31 14:08:34.898618	system
+1572	799	German	\N	\N	Fehler beim Senden der Mail an Prüfungssenat	\N	2026-03-31 14:08:34.901365	system
+1573	799	English	\N	\N	Error when sending mail to commission members	\N	2026-03-31 14:08:34.902598	system
+1574	800	German	\N	\N	Absenden erst nach Abschluss der Bewertung durch Zweitbegutachter*in möglich	\N	2026-03-31 14:08:34.905474	system
+1575	800	English	\N	\N	Sending only possible after completion of assessment by Second Reviewer	\N	2026-03-31 14:08:34.906698	system
+1576	801	German	\N	\N	nicht erfüllt	\N	2026-03-31 14:08:34.909489	system
+1577	801	English	\N	\N	not fulfilled	\N	2026-03-31 14:08:34.910692	system
+1578	802	German	\N	\N	Mindestanforderung erfüllt	\N	2026-03-31 14:08:34.913482	system
+1579	802	English	\N	\N	minimum requirement fulfilled	\N	2026-03-31 14:08:34.914647	system
+1580	803	German	\N	\N	in weiten Teilen erfüllt	\N	2026-03-31 14:08:34.917345	system
+1581	803	English	\N	\N	fulfilled for the most part	\N	2026-03-31 14:08:34.918526	system
+1582	804	German	\N	\N	vollständig erfüllt	\N	2026-03-31 14:08:34.921199	system
+1583	804	English	\N	\N	fully fulfilled	\N	2026-03-31 14:08:34.922352	system
+1584	805	German	\N	\N	Mitglieder Prüfungssenat	\N	2026-03-31 14:08:34.925086	system
+1585	805	English	\N	\N	Members of the examination commission	\N	2026-03-31 14:08:34.926286	system
+1586	806	German	\N	\N	Plagiatscheck auffällig, negative Beurteilung	\N	2026-03-31 14:08:34.92896	system
+1587	806	English	\N	\N	Plagiarism check not passed, negative assessment	\N	2026-03-31 14:08:34.9301	system
+1588	807	German	\N	\N	Titel bearbeiten	\N	2026-03-31 14:08:34.932743	system
+1589	807	English	\N	\N	Edit title	\N	2026-03-31 14:08:34.933898	system
+1590	808	German	\N	\N	Titel gespeichert	\N	2026-03-31 14:08:34.93662	system
+1591	808	English	\N	\N	Title saved	\N	2026-03-31 14:08:34.937824	system
+1592	809	German	\N	\N	Fehler beim Speichern des Titels	\N	2026-03-31 14:08:34.94062	system
+1593	809	English	\N	\N	Error when saving title	\N	2026-03-31 14:08:34.941847	system
+1594	810	German	\N	\N	(Bei Plagiat wird die Arbeit negativ bewertet.)	\N	2026-03-31 14:08:34.944647	system
+1595	810	English	\N	\N	(Plagiarism leads to a negative grade.)	\N	2026-03-31 14:08:34.945856	system
+1596	811	German	\N	\N	Plagiatscheck	\N	2026-03-31 14:08:34.948693	system
+1597	811	English	\N	\N	Plagiarism check	\N	2026-03-31 14:08:34.949921	system
+1598	812	German	\N	\N	Betreuernote	\N	2026-03-31 14:08:34.952758	system
+1599	812	English	\N	\N	Reviewer grade	\N	2026-03-31 14:08:34.95398	system
+1600	813	German	\N	\N	Vorsitz Prüfungssenat	\N	2026-03-31 14:08:34.956849	system
+1601	813	English	\N	\N	Reviewer	\N	2026-03-31 14:08:34.958074	system
+1602	814	German	\N	\N	Download Projektarbeit	\N	2026-03-31 14:08:34.960795	system
+1603	814	English	\N	\N	Download thesis	\N	2026-03-31 14:08:34.961971	system
+1604	815	German	\N	\N	Betreuerart	\N	2026-03-31 14:08:34.964826	system
+1605	815	English	\N	\N	Reviewer type	\N	2026-03-31 14:08:34.966022	system
+1606	816	German	\N	\N	Nebenbegutachter*in	\N	2026-03-31 14:08:34.968859	system
+1607	816	English	\N	\N	secondary reviewer	\N	2026-03-31 14:08:34.970028	system
+1704	865	German	\N	\N	Funktion	\N	2026-03-31 14:08:35.403089	system
+1608	817	German	\N	\N	Die Punkteanzahl der Kriterien "1 - 5" wird mit 70%; die Punkteanzahl der Kriterien "6 - 10" mit 30% gewichtet.	\N	2026-03-31 14:08:34.972756	system
+1609	817	English	\N	\N	The number of points for criteria "1 - 5" is weighted with 70%; the number of points for criteria "6 - 10" is weighted with 30%.	\N	2026-03-31 14:08:34.973933	system
+1610	818	German	\N	\N	gewichtete	\N	2026-03-31 14:08:34.976715	system
+1611	818	English	\N	\N	weightened	\N	2026-03-31 14:08:34.97793	system
+1612	819	German	\N	\N	Sprache	\N	2026-03-31 14:08:34.980765	system
+1613	819	English	\N	\N	language	\N	2026-03-31 14:08:34.981977	system
+1614	820	German	\N	\N	Fehler beim Ändern der Sprache	\N	2026-03-31 14:08:34.984767	system
+1615	820	English	\N	\N	Error when changing language	\N	2026-03-31 14:08:34.985948	system
+1616	821	German	\N	\N	Anrechnung	\N	2026-03-31 14:08:34.991483	system
+1617	821	English	\N	\N	Exemption	\N	2026-03-31 14:08:34.99269	system
+1618	822	German	\N	\N	eines Hochschulzeugnisses (vgl. § 4 Abs. 8 Satzung „Studienrechtliche Bestimmungen / Prüfungsordnung)	\N	2026-03-31 14:08:35.004967	system
+1619	822	English	\N	\N	a university certificate (see § 4 para. 8, Statute on Studies Act Provisions / Examination Regulations of the UASTW)	\N	2026-03-31 14:08:35.00629	system
+1620	823	German	\N	\N	Bisher angerechnete ECTS	\N	2026-03-31 14:08:35.010604	system
+1621	823	English	\N	\N	All previous recognized ECTS	\N	2026-03-31 14:08:35.011781	system
+1622	824	German	\N	\N	Anzeige der Summe der bisher angerechneten ECTS. Für Quereinsteiger in ein höheres Semester werden die ECTS der angerechneten Semester berücksichtigt.<br><br>Seit Oktober 2021 gelten Höchstgrenzen für Anrechnungen:<br>max. 60 ECTS für schulische Zeugnisse (anrechenbar sind nur BHS- und AHS-Zeugnisse!)<br>max. 60 ECTS für berufliche Qualifikationen<br>max. 90 ECTS INSGESAMT für schulische und berufliche Qualifikationen	\N	2026-03-31 14:08:35.014485	system
+1623	824	English	\N	\N	Sum of previous recognized ECTS. Lateral Entries are considered with ECTS of the recognized semester.<br><br>Maximum ECTS limits are applied since Octobre 2021:<br><br>max. 60 ECTS school qualification (BHS and AHS only)<br>max. 60 ECTS professional qualification<br>max. 90 ECTS OVERALL for school and professional qualification	\N	2026-03-31 14:08:35.015712	system
+1624	825	German	\N	\N	Seit Oktober 2021 gelten Höchstgrenzen für Anrechnungen:<br>max. 60 ECTS für schulische Zeugnisse (anrechenbar sind nur BHS- und AHS-Zeugnisse!)<br>max. 60 ECTS für berufliche Qualifikationen<br>max. 90 ECTS INSGESAMT für schulische Zeugnisse und berufliche Qualifikationen	\N	2026-03-31 14:08:35.018725	system
+1625	825	English	\N	\N	Maximum ECTS limits are applied since Octobre 2021:<br>max. 60 ECTS school qualification (BHS and AHS only)<br>max. 60 ECTS professional qualification<br>max. 90 ECTS OVERALL for school and professional qualification	\N	2026-03-31 14:08:35.019978	system
+1626	826	German	\N	\N	Die Höchstgrenze für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz wird überschritten.<span class="fw-bold">Bisherige ECTS + ECTS dieser LV: Total: {0} [ Schulisch: {1}  | Beruflich: {2}  ]</span>	\N	2026-03-31 14:08:35.022866	system
+1627	826	English	\N	\N	<br>Exceedance of maximum limit for exemption (see § 12 para. 3, Regulations of the UASTW).<br><b>Former ECTS + ECTS of this course: Total: {0} [ School  qualification: {1} | Professional qualification: {2} ]</b> 	\N	2026-03-31 14:08:35.024101	system
+1628	827	German	\N	\N	Begründungstext aus Liste übernehmen oder eigene Begründung angeben	\N	2026-03-31 14:08:35.027049	system
+1629	827	English	\N	\N	Copy reason from list above or write your own reason	\N	2026-03-31 14:08:35.028307	system
+1630	828	German	\N	\N	Erläutern Sie die Gleichwertigkeit der ECTS	\N	2026-03-31 14:08:35.031005	system
+1631	828	English	\N	\N	Explain ECTS equivalencies	\N	2026-03-31 14:08:35.032226	system
+1632	829	German	\N	\N	Erläutern Sie die Gleichwertigkeit der Lehrveranstaltungsinhalte	\N	2026-03-31 14:08:35.034902	system
+1633	829	English	\N	\N	Explain the equivalence of course content	\N	2026-03-31 14:08:35.036131	system
+1634	830	German	\N	\N	Hinsichtlich des Umfangs der LV, die Sie anrechnen lassen wollen: Bitte erläutern Sie, warum Ihr Zeugnis bzw. Ihre berufliche Praxis mit dem Umfang der LV gleichwertig ist.<br><br>Referenzbeispiele für die ECTS-Berechnung finden Sie rechts in der Infobox.	\N	2026-03-31 14:08:35.038831	system
+1635	830	English	\N	\N	Regarding the scope of the course you want to have credited: Please explain why your certificate or your professional practice is equivalent to the scope of the course.<br><br>Reference examples for the ECTS calculation can be found in the info box on the right.	\N	2026-03-31 14:08:35.039996	system
+1636	831	German	\N	\N	Hinsichtlich der Lernergebnisse der LV (vgl. CIS), die Sie anrechnen lassen wollen: Bitte erläutern Sie, warum die von Ihnen erworbenen Kompetenzen mit diesen Lernergebnissen gleichwertig sind.	\N	2026-03-31 14:08:35.042808	system
+1637	831	English	\N	\N	With regard to the learning outcomes of the course (cf. CIS) for which you want to receive credit: Please explain why the competences you have acquired are equivalent to these learning outcomes.	\N	2026-03-31 14:08:35.043982	system
+1638	832	German	\N	\N	Referenzbeispiele ECTS-Berechnung	\N	2026-03-31 14:08:35.046752	system
+1639	832	English	\N	\N	Reference examples of ECTS calculation	\N	2026-03-31 14:08:35.047938	system
+1640	833	German	\N	\N	<b>1 ECTS an der FH Technikum Wien entspricht einem Arbeitsaufwand von 25 Stunden.</b>\n\t\t\t\t\t<br><br><u>Schulisches Zeugnis:</u>\n\t\t\t\t\t<br>Bitte die Unterrichtsstunden nachvollziehbar in ECTS umrechnen (ein Schuljahr besteht aus ca. 40 Wochen; d.h., eine Unterrichtsstunde pro Woche sind insgesamt ca. 40 Stunden Jahresaufwand.)\n\t\t\t\t\t<br><br><u>Hochschulzeugnis:</u>\n\t\t\t\t\t<br>Bitte die ECTS angeben.\n\t\t\t\t\t<br><br><u>Berufliche Praxis:</u>\n\t\t\t\t\t<br>Bitte die Dauer der einschlägigen beruflichen Praxis nachvollziehbar in ECTS umrechnen (1,5 ECTS sind ungefähr eine Arbeitswoche im Umfang von 37,5 Stunden).	\N	2026-03-31 14:08:35.050829	system
+1641	833	English	\N	\N	<br>1 ECTS at the FH Technikum Wien corresponds to a workload of 25 hours.</b>\n\t\t\t\t\t<br><br><u>School certificate:</u>\n\t\t\t\t\t<br>Please convert the teaching hours into ECTS in a comprehensible way (a school year consists of approx. 40 weeks; i.e. one teaching hour per week is a total of approx. 40 hours of annual work).\n\t\t\t\t\t<br><br><u>University certificate:</u>\n\t\t\t\t\t<br>Please indicate the ECTS.\n\t\t\t\t\t<br><br><u>Professional practice:</u>\n\t\t\t\t\t<br>Please convert the duration of the relevant professional practice into ECTS in a comprehensible way (1.5 ECTS are approximately one working week of 37.5 hours).	\N	2026-03-31 14:08:35.051981	system
+1642	834	German	\N	\N	Begründung Gleichwertigkeit ECTS	\N	2026-03-31 14:08:35.054605	system
+1643	834	English	\N	\N	Reason Equivalency of ECTS	\N	2026-03-31 14:08:35.055701	system
+1644	835	German	\N	\N	Begründung Gleichwertigkeit LV-Inhalt	\N	2026-03-31 14:08:35.058308	system
+1645	835	English	\N	\N	Reason Equivalency of Course content	\N	2026-03-31 14:08:35.059448	system
+1705	865	English	\N	\N	Function	\N	2026-03-31 14:08:35.404217	system
+1646	836	German	\N	\N	Die anzurechnenden Kenntnisse sind umfangmäßig und/oder inhaltlich nicht gleichwertig, weil<span id="helpTxtBegruendungErgaenzen">...[Erläuterung: Bitte Begründung ergänzen.]</span>	\N	2026-03-31 14:08:35.104276	system
+1647	836	English	\N	\N	The equivalence in terms of learning objectives and the length of the course can not be determined because of<span id="helpTxtBegruendungErgaenzen">...[Explanation: Please add reason.]</span>	\N	2026-03-31 14:08:35.105487	system
+1648	837	German	\N	\N	Die anzurechnenden Kenntnisse sind umfangmäßig und/oder inhaltlich nicht gleichwertig, weil... <span class="text-danger"><b>Bei einer Ablehnung ist eine individuelle Begründung erforderlich. Dies kann nur über die Detailseite erfolgen.</b></span>	\N	2026-03-31 14:08:35.108136	system
+1649	837	English	\N	\N	The equivalence in terms of learning objectives and the length of the course can not be determined because of... <span class="text-danger"><b>If the application is rejected, an individual reason is required. This can only be done from the detail page.</b></span>	\N	2026-03-31 14:08:35.109367	system
+1650	838	German	\N	\N	Die anzurechnenden Kenntnisse sind umfangmäßig und/oder inhaltlich nicht gleichwertig, weil<span id="helpTxtBegruendungErgaenzen">...[Erläuterung: Bitte ergänzen oder Empfehlungstext des Lektors übernehmen und ggf. redigieren.]</span>	\N	2026-03-31 14:08:35.11194	system
+1651	838	English	\N	\N	The equivalence in terms of learning objectives and the length of the course can not be determined because of<span id="helpTxtBegruendungErgaenzen">...[Explanation: Please complete or adopt the text of the lectors recommendation and edit it if necessary]</span>	\N	2026-03-31 14:08:35.113065	system
+1652	839	German	\N	\N	Die anzurechnenden Kenntnisse sind umfangmäßig und/oder inhaltlich nicht gleichwertig, weil... <span class="text-danger"><b>Bei einer Ablehnung ist eine individuelle Begründung erforderlich. Dies kann nur über die Detailseite erfolgen.</b></span>	\N	2026-03-31 14:08:35.115717	system
+1653	839	English	\N	\N	The equivalence in terms of learning objectives and the length of the course can not be determined because of... <span class="text-danger"><b>If the application is rejected, an individual reason is required. This can only be done from the detail page.</b></span>	\N	2026-03-31 14:08:35.116898	system
+1654	840	German	\N	\N	Bitte vervollständigen Sie die Begründung.	\N	2026-03-31 14:08:35.123669	system
+1655	840	English	\N	\N	Please complete the reason.	\N	2026-03-31 14:08:35.124827	system
+1656	841	German	\N	\N	Anrechnung wird nicht genehmigt aufgrund einer Überschreitung der Höchstgrenzen für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz.	\N	2026-03-31 14:08:35.146513	system
+1657	841	English	\N	\N	Recognition and exemption is rejected because of exceedance of maximum limit for exemption (see § 12 para. 3, Regulations of the UASTW).	\N	2026-03-31 14:08:35.147655	system
+1658	842	German	\N	\N	Anrechnungen verwalten	\N	2026-03-31 14:08:35.164277	system
+1659	842	English	\N	\N	Administration of applications.	\N	2026-03-31 14:08:35.16553	system
+1660	843	German	\N	\N	Anrechnungszeitraum festlegen	\N	2026-03-31 14:08:35.168373	system
+1661	843	English	\N	\N	Set appplication period	\N	2026-03-31 14:08:35.169557	system
+1662	844	German	\N	\N	Anrechnungszeitraum hinzufügen	\N	2026-03-31 14:08:35.172295	system
+1663	844	English	\N	\N	Add appplication period	\N	2026-03-31 14:08:35.173495	system
+1664	845	German	\N	\N	Anrechnungszeitraum speichern	\N	2026-03-31 14:08:35.176136	system
+1665	845	English	\N	\N	Save application period	\N	2026-03-31 14:08:35.177314	system
+1666	846	German	\N	\N	Anrechnungszeitraum Start	\N	2026-03-31 14:08:35.179879	system
+1667	846	English	\N	\N	Startdate application	\N	2026-03-31 14:08:35.181049	system
+1668	847	German	\N	\N	Anrechnungszeitraum Ende	\N	2026-03-31 14:08:35.183718	system
+1669	847	English	\N	\N	Enddate application	\N	2026-03-31 14:08:35.184858	system
+1670	848	German	\N	\N	Das Startdatum liegt außerhalb des gewählten Studiensemesters.	\N	2026-03-31 14:08:35.187511	system
+1671	848	English	\N	\N	The startdate is not within the selected study semester.	\N	2026-03-31 14:08:35.188688	system
+1672	849	German	\N	\N	Das Endedatum liegt außerhalb des gewählten Studiensemesters.	\N	2026-03-31 14:08:35.191312	system
+1673	849	English	\N	\N	The enddate is not within the selected study semester.	\N	2026-03-31 14:08:35.192471	system
+1674	850	German	\N	\N	Das Startdatum muss VOR dem Endedatum liegen.	\N	2026-03-31 14:08:35.195055	system
+1675	850	English	\N	\N	The startdate must be BEFORE the enddate.	\N	2026-03-31 14:08:35.196233	system
+1676	851	German	\N	\N	Sicher löschen?	\N	2026-03-31 14:08:35.198974	system
+1677	851	English	\N	\N	Definitely delete?	\N	2026-03-31 14:08:35.200204	system
+1678	852	German	\N	\N	Der Antrag kann nicht für vergangene Semester gestellt werden	\N	2026-03-31 14:08:35.258706	system
+1679	852	English	\N	\N	You can not apply for the past study semester	\N	2026-03-31 14:08:35.259882	system
+1680	853	German	\N	\N	bearbeitet von	\N	2026-03-31 14:08:35.265011	system
+1681	853	English	\N	\N	edited by	\N	2026-03-31 14:08:35.266208	system
+1682	854	German	\N	\N	bearbeitet am	\N	2026-03-31 14:08:35.26877	system
+1683	854	English	\N	\N	edited on	\N	2026-03-31 14:08:35.269906	system
+1684	855	German	\N	\N	Bitte füllen Sie alle Formularfelder aus	\N	2026-03-31 14:08:35.277655	system
+1685	855	English	\N	\N	Please fill in all form fields	\N	2026-03-31 14:08:35.278804	system
+1686	856	German	\N	\N	Dokument zu groß	\N	2026-03-31 14:08:35.282855	system
+1687	856	English	\N	\N	Document maximum size exceeded	\N	2026-03-31 14:08:35.284012	system
+1688	857	German	\N	\N	Dokument fehlt oder zu groß	\N	2026-03-31 14:08:35.28662	system
+1689	857	English	\N	\N	Document missing or maximum size exceeded	\N	2026-03-31 14:08:35.287752	system
+1690	858	German	\N	\N	Fehlende min. Zeichen	\N	2026-03-31 14:08:35.295814	system
+1691	858	English	\N	\N	Missing min. Characters	\N	2026-03-31 14:08:35.296934	system
+1692	859	German	\N	\N	ACHTUNG seit Februar 2022 werden Zutrittskarten für maximal 60 Tage freigeschalten.	\N	2026-03-31 14:08:35.329348	system
+1693	859	English	\N	\N	ATTENTION since February 2022 a maximum of 60 days validity is granted for accesscards	\N	2026-03-31 14:08:35.330516	system
+1694	860	German	\N	\N	Schließen	\N	2026-03-31 14:08:35.347074	system
+1695	860	English	\N	\N	Close	\N	2026-03-31 14:08:35.34836	system
+1696	861	German	\N	\N	Fehler Zuständigkeiten	\N	2026-03-31 14:08:35.387872	system
+1697	861	English	\N	\N	Error Responsibilities	\N	2026-03-31 14:08:35.389052	system
+1698	862	German	\N	\N	Mitarbeiter	\N	2026-03-31 14:08:35.391859	system
+1699	862	English	\N	\N	Employee	\N	2026-03-31 14:08:35.393034	system
+1700	863	German	\N	\N	oder	\N	2026-03-31 14:08:35.395749	system
+1701	863	English	\N	\N	or	\N	2026-03-31 14:08:35.396873	system
+1702	864	German	\N	\N	Organisationseinheit	\N	2026-03-31 14:08:35.39948	system
+1706	866	German	\N	\N	Zuständigkeit zuweisen	\N	2026-03-31 14:08:35.40694	system
+1707	866	English	\N	\N	Assign Responsibility	\N	2026-03-31 14:08:35.408078	system
+1708	867	German	\N	\N	Fehler Kurzbezeichnung	\N	2026-03-31 14:08:35.410669	system
+1709	867	English	\N	\N	Error short name	\N	2026-03-31 14:08:35.411807	system
+1710	868	German	\N	\N	Fehlertext	\N	2026-03-31 14:08:35.414346	system
+1711	868	English	\N	\N	Error text	\N	2026-03-31 14:08:35.415465	system
+1712	869	German	\N	\N	Organisationseinheit Kurzbezeichung	\N	2026-03-31 14:08:35.418069	system
+1713	869	English	\N	\N	Organisational Unit Short Name	\N	2026-03-31 14:08:35.419218	system
+1714	870	German	\N	\N	Organisationseinheit	\N	2026-03-31 14:08:35.421907	system
+1715	870	English	\N	\N	Organisational Unit	\N	2026-03-31 14:08:35.423071	system
+1716	871	German	\N	\N	Funktion Kurzbezeichnung	\N	2026-03-31 14:08:35.425792	system
+1717	871	English	\N	\N	Function Short Name	\N	2026-03-31 14:08:35.426962	system
+1718	872	German	\N	\N	Funktion Beschreibung	\N	2026-03-31 14:08:35.429733	system
+1719	872	English	\N	\N	Function Description	\N	2026-03-31 14:08:35.430915	system
+1720	873	German	\N	\N	Fehlercode fehlt	\N	2026-03-31 14:08:35.433819	system
+1721	873	English	\N	\N	Error code missing	\N	2026-03-31 14:08:35.434982	system
+1722	874	German	\N	\N	Mitarbeiter oder Organisationseinheit müssen gesetzt sein	\N	2026-03-31 14:08:35.437816	system
+1723	874	English	\N	\N	Employee or organisational unit must be set	\N	2026-03-31 14:08:35.439012	system
+1724	875	German	\N	\N	Mitarbeiter und Organisationseinheit dürfen nicht gleichzeitig gesetzt sein	\N	2026-03-31 14:08:35.441751	system
+1725	875	English	\N	\N	Employee and organisational unit cannot be both set	\N	2026-03-31 14:08:35.44293	system
+1726	876	German	\N	\N	Mitarbeiter person Id ist ungültig	\N	2026-03-31 14:08:35.445656	system
+1727	876	English	\N	\N	Employee Id is invalid	\N	2026-03-31 14:08:35.446827	system
+1728	877	German	\N	\N	Zuständigkeit existiert bereits	\N	2026-03-31 14:08:35.449565	system
+1729	877	English	\N	\N	Assignment already exists	\N	2026-03-31 14:08:35.450773	system
+1730	878	German	\N	\N	Ungültige Zuständigkeiten Id	\N	2026-03-31 14:08:35.453536	system
+1731	878	English	\N	\N	Invalid assignement id	\N	2026-03-31 14:08:35.454725	system
+1732	879	German	\N	\N	Zuständigkeit gespeichert	\N	2026-03-31 14:08:35.457575	system
+1733	879	English	\N	\N	Assignment saved	\N	2026-03-31 14:08:35.458765	system
+1734	880	German	\N	\N	Fehler beim Speichern der Zuständigkeit	\N	2026-03-31 14:08:35.461925	system
+1735	880	English	\N	\N	Error when saving assignment	\N	2026-03-31 14:08:35.463354	system
+1736	881	German	\N	\N	Zuständigkeit gelöscht	\N	2026-03-31 14:08:35.466051	system
+1737	881	English	\N	\N	Assignment deleted	\N	2026-03-31 14:08:35.467214	system
+1738	882	German	\N	\N	Fehler beim Löschen der Zuständigkeit	\N	2026-03-31 14:08:35.469786	system
+1739	882	English	\N	\N	Assignment deleted	\N	2026-03-31 14:08:35.470892	system
+1740	883	German	\N	\N	keine Auswahl	\N	2026-03-31 14:08:35.473613	system
+1741	883	English	\N	\N	no selection	\N	2026-03-31 14:08:35.474763	system
+1742	884	German	\N	\N	zuständige Personen	\N	2026-03-31 14:08:35.477407	system
+1743	884	English	\N	\N	responsible persons	\N	2026-03-31 14:08:35.478549	system
+1744	885	German	\N	\N	zuständige Organisationseinheiten	\N	2026-03-31 14:08:35.481195	system
+1745	885	English	\N	\N	responsible organisation units	\N	2026-03-31 14:08:35.482409	system
+1746	886	German	\N	\N	Zugehörigkeit	\N	2026-03-31 14:08:35.485051	system
+1747	886	English	\N	\N	belonging	\N	2026-03-31 14:08:35.486187	system
+1748	887	German	\N	\N	Nur Leseberechtigung	\N	2026-03-31 14:08:35.488796	system
+1749	887	English	\N	\N	Read-Only Access	\N	2026-03-31 14:08:35.489944	system
+1750	888	German	\N	\N	Art der Einmeldung	\N	2026-03-31 14:08:35.492567	system
+1751	888	English	\N	\N	Art der Einmeldung	\N	2026-03-31 14:08:35.493713	system
+1752	889	German	\N	\N	Einreichende*r	\N	2026-03-31 14:08:35.496339	system
+1753	889	English	\N	\N	Einreichende*r	\N	2026-03-31 14:08:35.497483	system
+1754	890	German	\N	\N	Email	\N	2026-03-31 14:08:35.500174	system
+1755	890	English	\N	\N	Email	\N	2026-03-31 14:08:35.501356	system
+1756	891	German	\N	\N	DW	\N	2026-03-31 14:08:35.50396	system
+1757	891	English	\N	\N	DW	\N	2026-03-31 14:08:35.505098	system
+1758	892	German	\N	\N	bereits umgesetzt?	\N	2026-03-31 14:08:35.507931	system
+1759	892	English	\N	\N	bereits umgesetzt?	\N	2026-03-31 14:08:35.509091	system
+1760	893	German	\N	\N	Betroffene items	\N	2026-03-31 14:08:35.511711	system
+1761	893	English	\N	\N	Betroffene items	\N	2026-03-31 14:08:35.512938	system
+1762	894	German	\N	\N	Neuer Eintrag	\N	2026-03-31 14:08:35.515649	system
+1763	894	English	\N	\N	New entry	\N	2026-03-31 14:08:35.516848	system
+1764	895	German	\N	\N	Im Rahmen der Weiterentwicklung von Lehrveranstaltungen können Sie hier wichtige Ideen für die Weiterentwicklung und/oder Verbesserungen einmelden. Diese können sich auf technische, inhaltliche, medien-didaktische oder test- und prüfungsrelevante Aspekte beziehen. Eine mögliche Umsetzung Ihrer Einmeldungen für das folgende Studienjahr wird im Weiteren Ablauf geprüft und priorisiert, und ggf. im Anschluss vom Teamlead im Quellkurs entsprechend eingearbeitet.	\N	2026-03-31 14:08:35.519645	system
+1765	895	English	\N	\N	Im Rahmen der Weiterentwicklung von Lehrveranstaltungen können Sie hier wichtige Ideen für die Weiterentwicklung und/oder Verbesserungen einmelden. Diese können sich auf technische, inhaltliche, medien-didaktische oder test- und prüfungsrelevante Aspekte beziehen. Eine mögliche Umsetzung Ihrer Einmeldungen für das folgende Studienjahr wird im Weiteren Ablauf geprüft und priorisiert, und ggf. im Anschluss vom Teamlead im Quellkurs entsprechend eingearbeitet.	\N	2026-03-31 14:08:35.52082	system
+1766	896	German	\N	\N	Bitte füllen Sie pro Verbesserungspotential einen eigenen Eintrag aus!	\N	2026-03-31 14:08:35.523478	system
+1767	896	English	\N	\N	Bitte füllen Sie pro Verbesserungspotential einen eigenen Eintrag aus!	\N	2026-03-31 14:08:35.524673	system
+1768	897	German	\N	\N	Vorhandene Einmeldungen	\N	2026-03-31 14:08:35.52733	system
+1769	897	English	\N	\N	Vorhandene Einmeldungen	\N	2026-03-31 14:08:35.528475	system
+1770	898	German	\N	\N	Keine Einmeldungen vorhanden	\N	2026-03-31 14:08:35.531153	system
+1771	898	English	\N	\N	Keine Einmeldungen vorhanden	\N	2026-03-31 14:08:35.532378	system
+1772	899	German	\N	\N	Die Einmeldung würde erfolgreich versandt.	\N	2026-03-31 14:08:35.535092	system
+1773	899	English	\N	\N	Die Einmeldung würde erfolgreich versandt.	\N	2026-03-31 14:08:35.536248	system
+1774	900	German	\N	\N	Pflichtfeld	\N	2026-03-31 14:08:35.538949	system
+1775	900	English	\N	\N	Required field	\N	2026-03-31 14:08:35.540119	system
+1776	901	German	\N	\N	Sie müssen hier einen Wert eintragen.	\N	2026-03-31 14:08:35.542783	system
+1777	901	English	\N	\N	You must supply a value here.	\N	2026-03-31 14:08:35.544004	system
+1778	902	German	\N	\N	Bitte geben Sie Ihre Kurs ID (i.e. 5 Zahlen in der URL im Browser oben) an.	\N	2026-03-31 14:08:35.54669	system
+1779	902	English	\N	\N	Bitte geben Sie Ihre Kurs ID (i.e. 5 Zahlen in der URL im Browser oben) an.	\N	2026-03-31 14:08:35.547842	system
+1780	903	German	\N	\N	Kurs Url	\N	2026-03-31 14:08:35.550662	system
+1781	903	English	\N	\N	Kurs Url	\N	2026-03-31 14:08:35.551826	system
+1782	904	German	\N	\N	Bitte geben Sie die Kurzbezeichnug Ihres Kurses an (zb. TEZEI).	\N	2026-03-31 14:08:35.554609	system
+1783	904	English	\N	\N	Bitte geben Sie die Kurzbezeichnug Ihres Kurses an (zb. TEZEI).	\N	2026-03-31 14:08:35.555771	system
+1784	905	German	\N	\N	Kurskrzl	\N	2026-03-31 14:08:35.558451	system
+1785	905	English	\N	\N	Kurskrzl	\N	2026-03-31 14:08:35.559593	system
+1786	906	German	\N	\N	Art der Einmeldung:	\N	2026-03-31 14:08:35.562337	system
+1787	906	English	\N	\N	Art der Einmeldung:	\N	2026-03-31 14:08:35.563485	system
+1788	907	German	\N	\N	Art der Einmeldung	\N	2026-03-31 14:08:35.566154	system
+1789	907	English	\N	\N	Art der Einmeldung	\N	2026-03-31 14:08:35.567425	system
+1790	908	German	\N	\N	Bitte geben Sie einen aussagekräftigen Titel der Einmeldung an	\N	2026-03-31 14:08:35.570211	system
+1791	908	English	\N	\N	Bitte geben Sie einen aussagekräftigen Titel der Einmeldung an	\N	2026-03-31 14:08:35.571412	system
+1792	909	German	\N	\N	Titel der Einmeldung	\N	2026-03-31 14:08:35.574179	system
+1793	909	English	\N	\N	Titel der Einmeldung	\N	2026-03-31 14:08:35.575381	system
+1794	910	German	\N	\N	Bitte geben Sie an, wie hoch Sie den Aufwand für die Umsetzung einschätzen	\N	2026-03-31 14:08:35.578147	system
+1795	910	English	\N	\N	Bitte geben Sie an, wie hoch Sie den Aufwand für die Umsetzung einschätzen	\N	2026-03-31 14:08:35.579316	system
+1796	911	German	\N	\N	Aufwand der Umsetzung	\N	2026-03-31 14:08:35.582108	system
+1797	911	English	\N	\N	Aufwand der Umsetzung	\N	2026-03-31 14:08:35.583334	system
+1798	912	German	\N	\N	 Beschreiben Sie das Verbesserungspotential:<br><br>Geben Sie so konkret wie möglich an, auf welche Stelle im Kurs Sie sich beziehen (z.B. Eigenstudium C Test).	\N	2026-03-31 14:08:35.586109	system
+1799	912	English	\N	\N	 Beschreiben Sie das Verbesserungspotential:<br><br>Geben Sie so konkret wie möglich an, auf welche Stelle im Kurs Sie sich beziehen (z.B. Eigenstudium C Test).	\N	2026-03-31 14:08:35.587384	system
+1800	913	German	\N	\N	Beschreiben Sie das Verbesserungspotenzial.	\N	2026-03-31 14:08:35.590175	system
+1801	913	English	\N	\N	Beschreiben Sie das Verbesserungspotenzial.	\N	2026-03-31 14:08:35.591376	system
+1802	914	German	\N	\N	Bitte spezifizieren Sie, welche Items (Aufgaben, Materialien...) von dem Verbesserungspotential betroffen sind.	\N	2026-03-31 14:08:35.59415	system
+1803	914	English	\N	\N	Bitte spezifizieren Sie, welche Items (Aufgaben, Materialien...) von dem Verbesserungspotential betroffen sind.	\N	2026-03-31 14:08:35.595337	system
+1804	915	German	\N	\N	betroffene items	\N	2026-03-31 14:08:35.598092	system
+1805	915	English	\N	\N	betroffene items	\N	2026-03-31 14:08:35.599292	system
+1806	916	German	\N	\N	Attachments	\N	2026-03-31 14:08:35.602005	system
+1807	916	English	\N	\N	Attachments	\N	2026-03-31 14:08:35.603231	system
+1808	917	German	\N	\N	Wurde das Verbesserungspotential im Quellkurs bereits umgesetzt?	\N	2026-03-31 14:08:35.606056	system
+1809	917	English	\N	\N	Wurde das Verbesserungspotential im Quellkurs bereits umgesetzt?	\N	2026-03-31 14:08:35.607255	system
+1810	918	German	\N	\N	bereits umgesetzt?	\N	2026-03-31 14:08:35.610016	system
+1811	918	English	\N	\N	bereits umgesetzt?	\N	2026-03-31 14:08:35.611197	system
+1812	919	German	\N	\N	Speichern	\N	2026-03-31 14:08:35.614046	system
+1813	919	English	\N	\N	Save	\N	2026-03-31 14:08:35.615278	system
+1814	920	German	\N	\N	Fehler	\N	2026-03-31 14:08:35.617993	system
+1815	920	English	\N	\N	Error	\N	2026-03-31 14:08:35.619155	system
+1816	921	German	\N	\N	Dieser Moodle Kurs ist keinem Quellkurs zugeordnet	\N	2026-03-31 14:08:35.622004	system
+1817	921	English	\N	\N	This Moodle Course doesn't have a Source Course	\N	2026-03-31 14:08:35.623185	system
+1818	922	German	\N	\N	Fehler	\N	2026-03-31 14:08:35.625932	system
+1819	922	English	\N	\N	Error	\N	2026-03-31 14:08:35.627083	system
+1820	923	German	\N	\N	Dieser Moodle Kurs ist keinem standardisierten Quellkurs zugeordnet	\N	2026-03-31 14:08:35.629854	system
+1821	923	English	\N	\N	This Moodle Course is not derived from a standardized Source Course	\N	2026-03-31 14:08:35.631045	system
+1822	924	German	\N	\N	Organisations Einheiten	\N	2026-03-31 14:08:35.633806	system
+1823	924	English	\N	\N	Organisations Einheiten	\N	2026-03-31 14:08:35.635072	system
+1824	925	German	\N	\N	OpenProject Projekte	\N	2026-03-31 14:08:35.637913	system
+1825	925	English	\N	\N	OpenProject Projects	\N	2026-03-31 14:08:35.639099	system
+1826	926	German	\N	\N	%s (%s) ändern	\N	2026-03-31 14:08:35.641879	system
+1827	926	English	\N	\N	Edit %s (%s)	\N	2026-03-31 14:08:35.643071	system
+1828	927	German	\N	\N	Löschen?	\N	2026-03-31 14:08:35.645786	system
+1829	927	English	\N	\N	Delete?	\N	2026-03-31 14:08:35.646937	system
+1830	928	German	\N	\N	Link auflösen?	\N	2026-03-31 14:08:35.649576	system
+1831	928	English	\N	\N	Remove link?	\N	2026-03-31 14:08:35.650776	system
+1832	929	German	\N	\N	Link auflösen?	\N	2026-03-31 14:08:35.653497	system
+1833	929	English	\N	\N	Remove link?	\N	2026-03-31 14:08:35.654657	system
+1834	930	German	\N	\N	Soll diese Verknüpfung wirklich entfernt werden?	\N	2026-03-31 14:08:35.657422	system
+1835	930	English	\N	\N	Do you really want to remove this link?	\N	2026-03-31 14:08:35.658606	system
+1836	931	German	\N	\N	Das Objekt ist noch mit einem anderen Objekt verknüpft. Diese Verknüpfung wird entfernt!	\N	2026-03-31 14:08:35.661364	system
+1837	931	English	\N	\N	Your Source is already linked to another item. This connection will be removed!	\N	2026-03-31 14:08:35.662577	system
+1838	932	German	\N	\N	Das Zielobjekt ist bereits mit einem anderen Objekt verknüpft. Diese Verknüpfung wird entfernt!	\N	2026-03-31 14:08:35.665313	system
+1839	932	English	\N	\N	Your Target is already linked to another item. This connection will be removed!	\N	2026-03-31 14:08:35.666491	system
+1840	933	German	\N	\N	Suchen	\N	2026-03-31 14:08:35.669317	system
+1841	933	English	\N	\N	Search	\N	2026-03-31 14:08:35.670509	system
+1842	934	German	\N	\N	-Keine-	\N	2026-03-31 14:08:35.673311	system
+1843	934	English	\N	\N	-None-	\N	2026-03-31 14:08:35.674475	system
+1844	935	German	\N	\N	OK	\N	2026-03-31 14:08:35.677095	system
+1845	935	English	\N	\N	OK	\N	2026-03-31 14:08:35.678276	system
+1846	936	German	\N	\N	Abbrechen	\N	2026-03-31 14:08:35.680963	system
+1847	936	English	\N	\N	Cancel	\N	2026-03-31 14:08:35.682136	system
+1848	937	German	\N	\N	Keine Einträge gefunden	\N	2026-03-31 14:08:35.68495	system
+1849	937	English	\N	\N	No entries found	\N	2026-03-31 14:08:35.686122	system
+1850	938	German	\N	\N	Template	\N	2026-03-31 14:08:35.68883	system
+1851	938	English	\N	\N	Template	\N	2026-03-31 14:08:35.690043	system
+1852	939	German	\N	\N	Organisationseinheit	\N	2026-03-31 14:08:35.69268	system
+1853	939	English	\N	\N	Organisation unit	\N	2026-03-31 14:08:35.693788	system
+1854	940	German	\N	\N	Sprache	\N	2026-03-31 14:08:35.696366	system
+1855	940	English	\N	\N	Language	\N	2026-03-31 14:08:35.697461	system
+1856	941	German	\N	\N	Moodle Kurs	\N	2026-03-31 14:08:35.700139	system
+1857	941	English	\N	\N	Moodle Course	\N	2026-03-31 14:08:35.701256	system
+1858	942	German	\N	\N	OP Projekt	\N	2026-03-31 14:08:35.703793	system
+1859	942	English	\N	\N	OP Project	\N	2026-03-31 14:08:35.705007	system
+1860	943	German	\N	\N	OP Version	\N	2026-03-31 14:08:35.707706	system
+1861	943	English	\N	\N	OP Version	\N	2026-03-31 14:08:35.708879	system
+1862	944	German	\N	\N	Es ist kein Openproject Projekt verknüpft.	\N	2026-03-31 14:08:35.711563	system
+1863	944	English	\N	\N	No Openproject project is linked.	\N	2026-03-31 14:08:35.712763	system
+1864	945	German	\N	\N	Studiensemester geplant	\N	2026-03-31 14:08:35.715412	system
+1865	945	English	\N	\N	Semester planned	\N	2026-03-31 14:08:35.71659	system
+1866	946	German	\N	\N	International Credits	\N	2026-03-31 14:08:35.719239	system
+1867	946	English	\N	\N	International Credits	\N	2026-03-31 14:08:35.720458	system
+1868	947	German	\N	\N	Studentstatus	\N	2026-03-31 14:08:35.723084	system
+1869	947	English	\N	\N	Student status	\N	2026-03-31 14:08:35.724245	system
+1870	948	German	\N	\N	Alle durchgeführten anzeigen	\N	2026-03-31 14:08:35.726956	system
+1871	948	English	\N	\N	Show all performed	\N	2026-03-31 14:08:35.728108	system
+1872	949	German	\N	\N	Bestätigung hochladen	\N	2026-03-31 14:08:35.730792	system
+1873	949	English	\N	\N	Upload confirmation	\N	2026-03-31 14:08:35.731948	system
+1874	950	German	\N	\N	Maßnahme löschen	\N	2026-03-31 14:08:35.734558	system
+1875	950	English	\N	\N	Delete measure	\N	2026-03-31 14:08:35.735682	system
+1876	951	German	\N	\N	Maßnahmen	\N	2026-03-31 14:08:35.738336	system
+1877	951	English	\N	\N	Measures	\N	2026-03-31 14:08:35.739477	system
+1878	952	German	\N	\N	International skills	\N	2026-03-31 14:08:35.742148	system
+1879	952	English	\N	\N	International skills	\N	2026-03-31 14:08:35.743276	system
+1880	953	German	\N	\N	Ab dem Studienjahr 2022/23 ist der Erwerb von internationalen und interkulturellen Kompetenzen Teil des Curriculums. <br />\n\t\t\t\t\t\t\tAuf der Grundlage der vorliegenden Maßnahmen absolvieren Sie im Laufe ihres Studiums Internationalisierungsaktivitäten, die mit unterschiedlichen International Credits hinterlegt sind. <br />\n\t\t\t\t\t\t\tIn Summe müssen 5 International Credits erworben werden, die im 6. Semester wirksam werden. <br/>\n\t\t\t\t\t\t\tDas Modul „International skills“ wird mit der Beurteilung „Mit Erfolg teilgenommen“ abgeschlossen. <br />\n\t\t\t\t\t\t\tBitte wählen Sie die für Sie in Frage kommenden Maßnahmen aus und planen Sie das entsprechende Semester. <br />\n\t\t\t\t\t\t\tSobald die 5 International Credits erreicht wurden, überprüft der Studiengang die von Ihnen hochgeladenen Dokumente. <br /><br />\n\t\t\t\t\t\t\tFragen zum Status Ihrer Maßnahme u.ä. richten Sie bitte an den Studiengang. <br />\n\t\t\t\t\t\t\tBei allen weiteren Fragen zum Thema Organisation und Finanzierung des Auslandsaufenthalts und/oder Sprachkurs gibt Ihnen das International Office der FH Technikum Wien unter <a href="mailto:international.office@technikum-wien.at">international.office@technikum-wien.at</a> gerne Auskunft.	\N	2026-03-31 14:08:35.747322	system
+1881	953	English	\N	\N	Starting with the study year 2022/23, the acquisition of international and intercultural competencies is part of the curriculum.<br />\n\t\t\t\t\t\t\tOn the basis of the measures at-hand, you will complete internationalization activities during the course of your studies, which are assigned different International Credits.<br />\n\t\t\t\t\t\t\tIn total, 5 International Credits must be acquired, which become effective in the 6th semester.<br />\n\t\t\t\t\t\t\tThe module “International skills” is completed with the assessment "Successfully participated". <br />\n\t\t\t\t\t\t\tPlease select the measures that apply to you and schedule the appropriate semester. <br />\n\t\t\t\t\t\t\tOnce the 5 International Credits have been achieved, the degree program will review the documents you have uploaded. <br /><br />\n\t\t\t\t\t\t\tPlease direct questions regarding the status of your measure and the like should be directed to the study program. <br />\n\t\t\t\t\t\t\tFor all further questions regarding the organization and financing of your stay abroad and/or language course, please contact the International Office of the UAS Technikum Wien at <a href="mailto:international.office@technikum-wien.at">international.office@technikum-wien.at</a>.\n\t\t\t\t\t\t\t	\N	2026-03-31 14:08:35.748604	system
+1882	954	German	\N	\N	Nur für Bachelorstudiengänge.	\N	2026-03-31 14:08:35.751254	system
+1883	954	English	\N	\N	Only for bachelor programmes.	\N	2026-03-31 14:08:35.752461	system
+1884	955	German	\N	\N	Bezeichnung Deutsch	\N	2026-03-31 14:08:35.755175	system
+1885	955	English	\N	\N	title german	\N	2026-03-31 14:08:35.756367	system
+1886	956	German	\N	\N	Bezeichnung Englisch	\N	2026-03-31 14:08:35.759012	system
+1887	956	English	\N	\N	title english	\N	2026-03-31 14:08:35.760197	system
+1888	957	German	\N	\N	Beschreibung Deutsch	\N	2026-03-31 14:08:35.762885	system
+1889	957	English	\N	\N	description german	\N	2026-03-31 14:08:35.764153	system
+1890	958	German	\N	\N	Beschreibung Englisch	\N	2026-03-31 14:08:35.766891	system
+1891	958	English	\N	\N	description english	\N	2026-03-31 14:08:35.768063	system
+1892	959	German	\N	\N	Massnahme bearbeiten	\N	2026-03-31 14:08:35.770754	system
+1893	959	English	\N	\N	Edit measure	\N	2026-03-31 14:08:35.77194	system
+1894	960	German	\N	\N	Wollen Sie die ausgewählte Maßnahme wirklich löschen?	\N	2026-03-31 14:08:35.774677	system
+1895	960	English	\N	\N	Do you really want to delete the measure?	\N	2026-03-31 14:08:35.775821	system
+1896	961	German	\N	\N	Wollen Sie die ausgewählte Bestätigung wirklich löschen?	\N	2026-03-31 14:08:35.778504	system
+1897	961	English	\N	\N	Do you really want to delete the confirmation?	\N	2026-03-31 14:08:35.779673	system
+1898	962	German	\N	\N	Plan ablehnen	\N	2026-03-31 14:08:35.782337	system
+1899	962	English	\N	\N	Reject plan	\N	2026-03-31 14:08:35.783506	system
+1900	963	German	\N	\N	Bestätigung widerrufen	\N	2026-03-31 14:08:35.786232	system
+1901	963	English	\N	\N	Revoke confirmation	\N	2026-03-31 14:08:35.787401	system
+1902	964	German	\N	\N	Wollen Sie die Planbestätigung wirklich widerrufen?	\N	2026-03-31 14:08:35.789993	system
+1903	964	English	\N	\N	Do you really want to cancel the plan confirmation?	\N	2026-03-31 14:08:35.791135	system
+1904	965	German	\N	\N	Alle geplanten	\N	2026-03-31 14:08:35.793857	system
+1905	965	English	\N	\N	All planned	\N	2026-03-31 14:08:35.795012	system
+1906	966	German	\N	\N	Alle geplanten markieren	\N	2026-03-31 14:08:35.797748	system
+1907	966	English	\N	\N	Mark all planned	\N	2026-03-31 14:08:35.798953	system
+1908	967	German	\N	\N	Alle Maßnahmen anzeigen die im jetzigen Studiensemester geplant sind	\N	2026-03-31 14:08:35.801653	system
+1909	967	English	\N	\N	Show all measures that are planned for the current study semester	\N	2026-03-31 14:08:35.802835	system
+1910	968	German	\N	\N	Alle Studierende anzeigen aus dem jetzigen Studiensemester	\N	2026-03-31 14:08:35.805547	system
+1911	968	English	\N	\N	Show all students from the current study semester	\N	2026-03-31 14:08:35.806755	system
+1912	969	German	\N	\N	Alle Studierende anzeigen aus dem letzten Semester	\N	2026-03-31 14:08:35.809523	system
+1913	969	English	\N	\N	Show all students from the last semester"	\N	2026-03-31 14:08:35.810701	system
+1914	970	German	\N	\N	Mein Maßnahmenplan	\N	2026-03-31 14:08:35.813433	system
+1915	970	English	\N	\N	My action plan	\N	2026-03-31 14:08:35.81465	system
+1916	971	German	\N	\N	International Credits bestätigt	\N	2026-03-31 14:08:35.817471	system
+1917	971	English	\N	\N	International Credits confirmed	\N	2026-03-31 14:08:35.818667	system
+1918	972	German	\N	\N	International Credits - Maßnahme	\N	2026-03-31 14:08:35.821532	system
+1919	972	English	\N	\N	International Credits - Measures	\N	2026-03-31 14:08:35.822699	system
+1920	973	German	\N	\N	geplant	\N	2026-03-31 14:08:35.825433	system
+1921	973	English	\N	\N	planned	\N	2026-03-31 14:08:35.826601	system
+1922	974	German	\N	\N	Studierende hat die Maßnahme geplant.	\N	2026-03-31 14:08:35.829355	system
+1923	974	English	\N	\N	The student has planned the measure.	\N	2026-03-31 14:08:35.830558	system
+1924	975	German	\N	\N	akzeptiert	\N	2026-03-31 14:08:35.833311	system
+1925	975	English	\N	\N	accepted	\N	2026-03-31 14:08:35.834496	system
+1926	976	German	\N	\N	Die geplante Maßnahme wurde akzeptiert.	\N	2026-03-31 14:08:35.837206	system
+1927	976	English	\N	\N	The planned measure has been accepted.	\N	2026-03-31 14:08:35.838444	system
+1928	977	German	\N	\N	durchgeführt	\N	2026-03-31 14:08:35.841069	system
+1929	977	English	\N	\N	performed	\N	2026-03-31 14:08:35.842239	system
+1930	978	German	\N	\N	Eine Bestätigung wurde hochgeladen.	\N	2026-03-31 14:08:35.84485	system
+1931	978	English	\N	\N	A confirmation has been uploaded.	\N	2026-03-31 14:08:35.845927	system
+1932	979	German	\N	\N	bestätigt	\N	2026-03-31 14:08:35.848566	system
+1933	979	English	\N	\N	confirmed	\N	2026-03-31 14:08:35.849704	system
+1934	980	German	\N	\N	Die hochgeladene Bestätigung wurde akzeptiert.	\N	2026-03-31 14:08:35.852346	system
+1935	980	English	\N	\N	The uploaded confirmation has been accepted.	\N	2026-03-31 14:08:35.853541	system
+1936	981	German	\N	\N	abgelehnt	\N	2026-03-31 14:08:35.856316	system
+1937	981	English	\N	\N	declined	\N	2026-03-31 14:08:35.857531	system
+1938	982	German	\N	\N	Die Maßnahme wurde abgelehnt.	\N	2026-03-31 14:08:35.860286	system
+1939	982	English	\N	\N	The measure was rejected.	\N	2026-03-31 14:08:35.86145	system
+1940	983	German	\N	\N	Es wurden keine Maßnahmen geplant oder alle wurden abgelehnt.	\N	2026-03-31 14:08:35.864142	system
+1941	983	English	\N	\N	No measures have been planned, or all have been rejected.	\N	2026-03-31 14:08:35.865377	system
+1942	984	German	\N	\N	Mindestens eine Maßnahme wurde akzeptiert.	\N	2026-03-31 14:08:35.868151	system
+1943	984	English	\N	\N	At least one measure has been accepted.	\N	2026-03-31 14:08:35.869337	system
+1944	985	German	\N	\N	Es gibt mindestens eine geplante oder durchgeführte Maßnahme.	\N	2026-03-31 14:08:35.871959	system
+1945	985	English	\N	\N	There is at least one planned or performed measure.	\N	2026-03-31 14:08:35.873139	system
+1946	986	German	\N	\N	Nur bestätigte Maßnahmen vorhanden, aber weniger als 5 International Credits.	\N	2026-03-31 14:08:35.875835	system
+1947	986	English	\N	\N	Only confirmed measures, but fewer than 5 International Credits.	\N	2026-03-31 14:08:35.877012	system
+1948	987	German	\N	\N	Es wurden 5 International Credits erreicht.	\N	2026-03-31 14:08:35.879702	system
+1949	987	English	\N	\N	5 International Credits have been achieved.	\N	2026-03-31 14:08:35.880861	system
+1950	988	German	\N	\N	Die Anzahl der Empfänger überschreitet 50. Bitte verwenden Sie einen Filter (z.B. Semester), um die Empfängeranzahl zu reduzieren.	\N	2026-03-31 14:08:35.883627	system
+1951	988	English	\N	\N	The number of recipients exceeds 50. Please use a filter (e.g., semester) to reduce the number of recipients.	\N	2026-03-31 14:08:35.884791	system
+1952	989	German	\N	\N	Keine Studierenden ohne geplante Maßnahmen gefunden.	\N	2026-03-31 14:08:35.887508	system
+1953	989	English	\N	\N	No students without planned measures were found.	\N	2026-03-31 14:08:35.888694	system
+1954	990	German	\N	\N	E-Mail nur an Studierende, die keine Maßnahmen geplant haben.	\N	2026-03-31 14:08:35.891706	system
+1955	990	English	\N	\N	Send email only to students who have no planned measures.	\N	2026-03-31 14:08:35.892924	system
+1956	991	German	\N	\N	Maßnahme - geplant	\N	2026-03-31 14:08:35.895629	system
+1957	991	English	\N	\N	Measure - planned	\N	2026-03-31 14:08:35.896819	system
+1958	992	German	\N	\N	Die Maßhname wurde geplant.	\N	2026-03-31 14:08:35.899542	system
+1959	992	English	\N	\N	The measure was planned.	\N	2026-03-31 14:08:35.900715	system
+1960	993	German	\N	\N	Plan - akzeptiert	\N	2026-03-31 14:08:35.903436	system
+1961	993	English	\N	\N	Plan - accepted	\N	2026-03-31 14:08:35.904639	system
+1962	994	German	\N	\N	Mail versenden	\N	2026-03-31 14:08:35.907318	system
+1963	994	English	\N	\N	Send mail	\N	2026-03-31 14:08:35.90849	system
+1964	995	German	\N	\N	Maßnahme - durchgeführt	\N	2026-03-31 14:08:35.911194	system
+1965	995	English	\N	\N	Measure - performed	\N	2026-03-31 14:08:35.91236	system
+1966	996	German	\N	\N	International Credits - bestätigt	\N	2026-03-31 14:08:35.91502	system
+1967	996	English	\N	\N	International Credits - confirmed	\N	2026-03-31 14:08:35.916202	system
+1968	997	German	\N	\N	Maßnahme - abgelehnt	\N	2026-03-31 14:08:35.918866	system
+1969	997	English	\N	\N	Measure - declined	\N	2026-03-31 14:08:35.919983	system
+1970	998	German	\N	\N	Plan akzeptieren	\N	2026-03-31 14:08:35.9226	system
+1971	998	English	\N	\N	Accept plan	\N	2026-03-31 14:08:35.923731	system
+1972	999	German	\N	\N	Bestätigung akzeptieren	\N	2026-03-31 14:08:35.926361	system
+1973	999	English	\N	\N	Accept confirmation	\N	2026-03-31 14:08:35.927475	system
+1974	1000	German	\N	\N	Bestätigung ablehnen	\N	2026-03-31 14:08:35.930146	system
+1975	1000	English	\N	\N	Reject confirmation	\N	2026-03-31 14:08:35.93132	system
+1976	1001	German	\N	\N	Grund	\N	2026-03-31 14:08:35.93394	system
+1977	1001	English	\N	\N	Reason	\N	2026-03-31 14:08:35.935094	system
+1978	1002	German	\N	\N	Begründung - Studiengangsleitung	\N	2026-03-31 14:08:35.937811	system
+1979	1002	English	\N	\N	Reason - Study course Director	\N	2026-03-31 14:08:35.93893	system
+1980	1003	German	\N	\N	>=5 International Credits verplant	\N	2026-03-31 14:08:35.941616	system
+1981	1003	English	\N	\N	>=5 international credits planned	\N	2026-03-31 14:08:35.942758	system
+1982	1004	German	\N	\N	Nur offene Massnahmen	\N	2026-03-31 14:08:35.945603	system
+1983	1004	English	\N	\N	only open measures	\N	2026-03-31 14:08:35.94675	system
+1984	1005	German	\N	\N	<5 International Credits verplant	\N	2026-03-31 14:08:35.949465	system
+1985	1005	English	\N	\N	<5 International Credits planned	\N	2026-03-31 14:08:35.950611	system
+1986	1006	German	\N	\N	>=5 International Credits bestätigt	\N	2026-03-31 14:08:35.953201	system
+1987	1006	English	\N	\N	>=5 International Credits confirmed	\N	2026-03-31 14:08:35.954359	system
+1988	1007	German	\N	\N	<5 International Credits bestätigt	\N	2026-03-31 14:08:35.957036	system
+1989	1007	English	\N	\N	<5 International Credits confirmed	\N	2026-03-31 14:08:35.958156	system
+1990	1008	German	\N	\N	Alle markierten Pläne akzeptieren	\N	2026-03-31 14:08:35.960787	system
+1991	1008	English	\N	\N	Accept all marked plans	\N	2026-03-31 14:08:35.96192	system
+1992	1009	German	\N	\N	Bestätigung herunterladen	\N	2026-03-31 14:08:35.964583	system
+1993	1009	English	\N	\N	Download confirmation	\N	2026-03-31 14:08:35.965699	system
+1994	1010	German	\N	\N	Maßnahme hinzufügen	\N	2026-03-31 14:08:35.968289	system
+1995	1010	English	\N	\N	Add measure	\N	2026-03-31 14:08:35.969477	system
+1996	1011	German	\N	\N	Benutzer ist bereits der Gruppe zugewiesen	\N	2026-03-31 14:08:35.972116	system
+1997	1011	English	\N	\N	User is already assigned to the group	\N	2026-03-31 14:08:35.973322	system
+1998	1012	German	\N	\N	Gruppenmanagement	\N	2026-03-31 14:08:35.976026	system
+1999	1012	English	\N	\N	Group management	\N	2026-03-31 14:08:35.977185	system
+2000	1013	German	\N	\N	Kurzbezeichnung	\N	2026-03-31 14:08:35.979791	system
+2001	1013	English	\N	\N	Short description	\N	2026-03-31 14:08:35.980868	system
+2002	1014	German	\N	\N	Bezeichnung	\N	2026-03-31 14:08:35.98344	system
+2003	1014	English	\N	\N	Name	\N	2026-03-31 14:08:35.984584	system
+2004	1015	German	\N	\N	Beschreibung	\N	2026-03-31 14:08:35.98718	system
+2005	1015	English	\N	\N	Description	\N	2026-03-31 14:08:35.988342	system
+2006	1016	German	\N	\N	Zuweisen/Entfernen	\N	2026-03-31 14:08:35.991015	system
+2007	1016	English	\N	\N	Assign/Remove	\N	2026-03-31 14:08:35.99214	system
+2008	1017	German	\N	\N	Benutzergruppe	\N	2026-03-31 14:08:35.994646	system
+2009	1017	English	\N	\N	User group	\N	2026-03-31 14:08:35.995728	system
+2010	1018	German	\N	\N	Benutzer hinzufügen	\N	2026-03-31 14:08:35.998371	system
+2011	1018	English	\N	\N	Add user	\N	2026-03-31 14:08:35.999549	system
+2012	1019	German	\N	\N	aktiv	\N	2026-03-31 14:08:36.00212	system
+2013	1019	English	\N	\N	active	\N	2026-03-31 14:08:36.003273	system
+2014	1020	German	\N	\N	Bitte Nachname, Geschlecht und Geburtsdatum ausfüllen.	\N	2026-03-31 14:08:36.005891	system
+2015	1020	English	\N	\N	Please fill out the last name, gender and date of birth.	\N	2026-03-31 14:08:36.007028	system
+2016	1021	German	\N	\N	Status setzen	\N	2026-03-31 14:08:36.009699	system
+2017	1021	English	\N	\N	Set state	\N	2026-03-31 14:08:36.010847	system
+2018	1022	German	\N	\N	Abgewiesen am	\N	2026-03-31 14:08:36.013568	system
+2019	1022	English	\N	\N	Rejected on	\N	2026-03-31 14:08:36.014708	system
+2020	1023	German	\N	\N	Status ausw&auml;hlen	\N	2026-03-31 14:08:36.017336	system
+2021	1023	English	\N	\N	Select status	\N	2026-03-31 14:08:36.018526	system
+2022	1024	German	\N	\N	Status zur&uuml;cksetzen	\N	2026-03-31 14:08:36.021388	system
+2023	1024	English	\N	\N	Reset status	\N	2026-03-31 14:08:36.022547	system
+2024	1025	German	\N	\N	Fehler beim Laden der Fehlerkonfiguration	\N	2026-03-31 14:08:36.025226	system
+2025	1025	English	\N	\N	Error when loading error configuration	\N	2026-03-31 14:08:36.026395	system
+2026	1026	German	\N	\N	Fehler beim Laden der Fehler	\N	2026-03-31 14:08:36.029091	system
+2027	1026	English	\N	\N	Error when loading errors	\N	2026-03-31 14:08:36.030252	system
+2028	1027	German	\N	\N	Ungültiger Konfigurationstyp	\N	2026-03-31 14:08:36.032973	system
+2029	1027	English	\N	\N	Invalid configuration type	\N	2026-03-31 14:08:36.034124	system
+2030	1028	German	\N	\N	Ungültiger Konfigurationswert für Datentyp {0}, Sonderzeichen nicht erlaubt	\N	2026-03-31 14:08:36.036819	system
+2031	1028	English	\N	\N	Invalid configuration value for data type {0}, special characters not allowed	\N	2026-03-31 14:08:36.037977	system
+2032	1029	German	\N	\N	Fehler Konfiguration	\N	2026-03-31 14:08:36.040688	system
+2033	1029	English	\N	\N	Error configuration	\N	2026-03-31 14:08:36.04186	system
+2034	1030	German	\N	\N	Konfigurationstyp	\N	2026-03-31 14:08:36.044577	system
+2035	1030	English	\N	\N	configuration type	\N	2026-03-31 14:08:36.045746	system
+2036	1031	German	\N	\N	Konfigurationswert	\N	2026-03-31 14:08:36.048419	system
+2037	1031	English	\N	\N	configuration value	\N	2026-03-31 14:08:36.049577	system
+2038	1032	German	\N	\N	wert1;wert2;wert3	\N	2026-03-31 14:08:36.052217	system
+2039	1032	English	\N	\N	value1;value2;value3	\N	2026-03-31 14:08:36.053379	system
+2040	1033	German	\N	\N	Konfigurationswert(e) zuweisen	\N	2026-03-31 14:08:36.056049	system
+2041	1033	English	\N	\N	Assign configuration value(s)	\N	2026-03-31 14:08:36.057205	system
+2042	1034	German	\N	\N	Konfigurationsbeschreibung	\N	2026-03-31 14:08:36.059941	system
+2043	1034	English	\N	\N	Configuration description	\N	2026-03-31 14:08:36.0611	system
+2044	1035	German	\N	\N	Konfigurationsdatentyp	\N	2026-03-31 14:08:36.063896	system
+2045	1035	English	\N	\N	Configuration data type	\N	2026-03-31 14:08:36.065056	system
+2046	1036	German	\N	\N	Konfiguration gespeichert	\N	2026-03-31 14:08:36.067757	system
+2047	1036	English	\N	\N	Configuration saved	\N	2026-03-31 14:08:36.068917	system
+2048	1037	German	\N	\N	Fehler beim Speichern der Konfiguration	\N	2026-03-31 14:08:36.071632	system
+2049	1037	English	\N	\N	Error when saving configuration	\N	2026-03-31 14:08:36.072795	system
+2050	1038	German	\N	\N	Konfiguration gelöscht	\N	2026-03-31 14:08:36.075468	system
+2051	1038	English	\N	\N	Deleted configuration	\N	2026-03-31 14:08:36.076669	system
+2052	1039	German	\N	\N	Fehler beim Löschen der Konfiguration	\N	2026-03-31 14:08:36.079329	system
+2053	1039	English	\N	\N	Error when deleting configuration	\N	2026-03-31 14:08:36.080604	system
+2054	1040	German	\N	\N	Konfigurationswert(e) löschen	\N	2026-03-31 14:08:36.083147	system
+2055	1040	English	\N	\N	Delete configuration value(s)	\N	2026-03-31 14:08:36.084269	system
+2056	1041	German	\N	\N	Angabe fehlt	\N	2026-03-31 14:08:36.086854	system
+2057	1041	English	\N	\N	Value is missing	\N	2026-03-31 14:08:36.087952	system
+2058	1042	German	\N	\N	Lehrveranstaltungsinformationen	\N	2026-03-31 14:08:36.090561	system
+2059	1042	English	\N	\N	Course Information	\N	2026-03-31 14:08:36.091672	system
+2060	1043	German	\N	\N	Moodle Informationen	\N	2026-03-31 14:08:36.094397	system
+2061	1043	English	\N	\N	Moodle Information	\N	2026-03-31 14:08:36.0956	system
+2062	1044	German	\N	\N	Aktion	\N	2026-03-31 14:08:36.098349	system
+2063	1044	English	\N	\N	Action	\N	2026-03-31 14:08:36.099534	system
+2064	1045	German	\N	\N	überfällig	\N	2026-03-31 14:08:36.102282	system
+2065	1045	English	\N	\N	overdue	\N	2026-03-31 14:08:36.103471	system
+2066	1046	German	\N	\N	Event ist überfällig	\N	2026-03-31 14:08:36.106242	system
+2067	1046	English	\N	\N	Event is overdue	\N	2026-03-31 14:08:36.107462	system
+2068	1047	German	\N	\N	Moodle Link	\N	2026-03-31 14:08:36.1102	system
+2069	1047	English	\N	\N	Moodle link	\N	2026-03-31 14:08:36.111409	system
+2070	1048	German	\N	\N	Raum Kurzbezeichnung	\N	2026-03-31 14:08:36.114183	system
+2071	1048	English	\N	\N	Room Shortname	\N	2026-03-31 14:08:36.115433	system
+2072	1049	German	\N	\N	Raum Informationen	\N	2026-03-31 14:08:36.118213	system
+2073	1049	English	\N	\N	Room Information	\N	2026-03-31 14:08:36.119454	system
+2074	1050	German	\N	\N	Räume Suchen	\N	2026-03-31 14:08:36.122207	system
+2075	1050	English	\N	\N	Search Rooms	\N	2026-03-31 14:08:36.123701	system
+2076	1051	German	\N	\N	Mindestpersonenkapazität	\N	2026-03-31 14:08:36.126475	system
+2077	1051	English	\N	\N	Minimum person capacity	\N	2026-03-31 14:08:36.127649	system
+2078	1052	German	\N	\N	Raum Reservierungen	\N	2026-03-31 14:08:36.130379	system
+2079	1052	English	\N	\N	Room Reservations	\N	2026-03-31 14:08:36.131588	system
+2080	1053	German	\N	\N	Personen Kapazität	\N	2026-03-31 14:08:36.134289	system
+2081	1053	English	\N	\N	Person Capacity	\N	2026-03-31 14:08:36.135471	system
+2082	1054	German	\N	\N	Raumnummer	\N	2026-03-31 14:08:36.138189	system
+2083	1054	English	\N	\N	Room Number	\N	2026-03-31 14:08:36.139358	system
+2084	1055	German	\N	\N	Keine Raum Reservierungen gefunden	\N	2026-03-31 14:08:36.142069	system
+2085	1055	English	\N	\N	No Room Reservations found	\N	2026-03-31 14:08:36.143276	system
+2086	1056	German	\N	\N	Aktuell ist dieser Lehrveranstaltung noch kein Lektor zugeordnet	\N	2026-03-31 14:08:36.145963	system
+2087	1056	English	\N	\N	ENG Aktuell ist dieser Lehrveranstaltung noch kein Lektor zugeordnet	\N	2026-03-31 14:08:36.14733	system
+2088	1057	German	\N	\N	Incomingplätze	\N	2026-03-31 14:08:36.150035	system
+2089	1057	English	\N	\N	Places Available for Incoming Students	\N	2026-03-31 14:08:36.151251	system
+2090	1058	German	\N	\N	Lehrbeauftragte*r	\N	2026-03-31 14:08:36.153988	system
+2091	1058	English	\N	\N	Lecturer(s)	\N	2026-03-31 14:08:36.155182	system
+2092	1059	German	\N	\N	LV-Leiter*in	\N	2026-03-31 14:08:36.157934	system
+2093	1059	English	\N	\N	Head of Course	\N	2026-03-31 14:08:36.159119	system
+2094	1060	German	\N	\N	Keine Lehrveranstaltungen gefunden	\N	2026-03-31 14:08:36.161876	system
+2095	1060	English	\N	\N	No LVs found	\N	2026-03-31 14:08:36.163034	system
+2096	1061	German	\N	\N	Leitung	\N	2026-03-31 14:08:36.16585	system
+2097	1061	English	\N	\N	Head	\N	2026-03-31 14:08:36.167022	system
+2098	1062	German	\N	\N	Koordination	\N	2026-03-31 14:08:36.169766	system
+2099	1062	English	\N	\N	Coordination	\N	2026-03-31 14:08:36.170961	system
+2100	1063	German	\N	\N	Sprache	\N	2026-03-31 14:08:36.173693	system
+2101	1063	English	\N	\N	Language	\N	2026-03-31 14:08:36.174836	system
+2102	1064	German	\N	\N	Englisch	\N	2026-03-31 14:08:36.177581	system
+2103	1064	English	\N	\N	English	\N	2026-03-31 14:08:36.178767	system
+2104	1065	German	\N	\N	Deutsch	\N	2026-03-31 14:08:36.181539	system
+2105	1065	English	\N	\N	German	\N	2026-03-31 14:08:36.182711	system
+2106	1066	German	\N	\N	Verfügbare Sprachen	\N	2026-03-31 14:08:36.185464	system
+2107	1066	English	\N	\N	Available languages	\N	2026-03-31 14:08:36.186634	system
+2108	1067	German	\N	\N	Dokumente	\N	2026-03-31 14:08:36.18934	system
+2109	1067	English	\N	\N	Documents	\N	2026-03-31 14:08:36.190552	system
+2110	1068	German	\N	\N	Dokument	\N	2026-03-31 14:08:36.193345	system
+2111	1068	English	\N	\N	Document	\N	2026-03-31 14:08:36.194552	system
+2112	1069	German	\N	\N	Erstelldatum	\N	2026-03-31 14:08:36.197249	system
+2113	1069	English	\N	\N	Creation date	\N	2026-03-31 14:08:36.198405	system
+2114	1070	German	\N	\N	Bestätigungen/Zeugnisse	\N	2026-03-31 14:08:36.201194	system
+2115	1070	English	\N	\N	Certificates/Transcripts	\N	2026-03-31 14:08:36.202439	system
+2116	1071	German	\N	\N	Studienbestätigung	\N	2026-03-31 14:08:36.205284	system
+2117	1071	English	\N	\N	Enrollment Confirmation	\N	2026-03-31 14:08:36.206523	system
+2118	1072	German	\N	\N	Studienbeitrag für das %1$s bezahlt	\N	2026-03-31 14:08:36.209317	system
+2119	1072	English	\N	\N	tuition fee for semester %1$s paid	\N	2026-03-31 14:08:36.210503	system
+2120	1073	German	\N	\N	Studienbeitrag für das %1$s noch nicht bezahlt	\N	2026-03-31 14:08:36.213245	system
+2121	1073	English	\N	\N	tuition fee for semester %1$s not yet paid	\N	2026-03-31 14:08:36.21446	system
+2122	1074	German	\N	\N	Studienbeitrag für %1$s noch nicht bezahlt	\N	2026-03-31 14:08:36.21715	system
+2123	1074	English	\N	\N	tuition fee for %1$s not yet paid	\N	2026-03-31 14:08:36.218336	system
+2124	1075	German	\N	\N	Studienbeitrag noch nicht bezahlt	\N	2026-03-31 14:08:36.221115	system
+2125	1075	English	\N	\N	tuition fee not yet paid	\N	2026-03-31 14:08:36.222352	system
+2126	1076	German	\N	\N	Studienerfolgsbestätigung	\N	2026-03-31 14:08:36.225116	system
+2127	1076	English	\N	\N	Student progress report	\N	2026-03-31 14:08:36.226347	system
+2128	1077	German	\N	\N	Bitte wählen Sie das entsprechende Studiensemester aus	\N	2026-03-31 14:08:36.229105	system
+2129	1077	English	\N	\N	Please select the corresponding semester	\N	2026-03-31 14:08:36.230319	system
+2130	1078	German	\N	\N	zur Vorlage beim Wohnsitzfinanzamt	\N	2026-03-31 14:08:36.233059	system
+2131	1078	English	\N	\N	for submission to local tax office	\N	2026-03-31 14:08:36.234257	system
+2132	1079	German	\N	\N	Studienbuchblatt	\N	2026-03-31 14:08:36.23702	system
+2133	1079	English	\N	\N	Student Record	\N	2026-03-31 14:08:36.238251	system
+2134	1080	German	\N	\N	Alle Studiensemester	\N	2026-03-31 14:08:36.240955	system
+2135	1080	English	\N	\N	All semester	\N	2026-03-31 14:08:36.242294	system
+2136	1081	German	\N	\N	Abschlussdokumente/Zeugnisse	\N	2026-03-31 14:08:36.245331	system
+2137	1081	English	\N	\N	Final documents/Transcripts	\N	2026-03-31 14:08:36.246524	system
+2138	1082	German	\N	\N	Noch keine Abschlussdokumente vorhanden	\N	2026-03-31 14:08:36.249276	system
+2139	1082	English	\N	\N	No final documents available yet	\N	2026-03-31 14:08:36.250468	system
+2140	1083	German	\N	\N	Für das übergebene Studiensemester %1$s existiert kein Status. Bitte wählen Sie ein gültiges Studiensemester aus dem DropDown.	\N	2026-03-31 14:08:36.253237	system
+2141	1083	English	\N	\N	No status found for %1$s. Please select a valid semester from the dropdown.	\N	2026-03-31 14:08:36.254538	system
+2142	1084	German	\N	\N	<b>Hinweis!</b> Digital signierte Dokumente werden in manchen Browsern und PDF-Readern nicht korrekt angezeigt. <br/>Bitte verwenden Sie den <a href="https://get.adobe.com/de/reader/" target="_blank">Adobe Acrobat Reader</a>, wenn Sie das Dokument ausdrucken möchten.	\N	2026-03-31 14:08:36.257235	system
+2143	1084	English	\N	\N	<b>Note!</b> Digitally signed documents are not displayed correctly in some browsers and PDF readers. <br/>Please use the <a href="https://get.adobe.com/de/reader/" target="_blank">Adobe Acrobat Reader</a> if you want to print the document.	\N	2026-03-31 14:08:36.258456	system
+2144	1085	German	\N	\N	Höchster Abschluss (unterteilt in Österreich oder im Ausland/unbekannt) passt nicht zum Staat des höchsten Abschlusses.	\N	2026-03-31 14:08:36.261182	system
+2145	1085	English	\N	\N	Highest completed level of education (divided into those acquired in Austria and those abroad/unknown) does not match country of the highest completed level of education	\N	2026-03-31 14:08:36.262391	system
+2146	1086	German	\N	\N	Erfolgreich gespeichert	\N	2026-03-31 14:08:36.265132	system
+2147	1086	English	\N	\N	Saved successfully	\N	2026-03-31 14:08:36.266342	system
+2148	1087	German	\N	\N	Fehler beim Speichern	\N	2026-03-31 14:08:36.269078	system
+2149	1087	English	\N	\N	Error when saving	\N	2026-03-31 14:08:36.270269	system
+2150	1088	German	\N	\N	Erhebung bei der Anmeldung zu einem Studium oder bei Studienbeginn	\N	2026-03-31 14:08:36.273057	system
+2151	1088	English	\N	\N	Survey when applying for a study or at the start of studies	\N	2026-03-31 14:08:36.274225	system
+2152	1089	German	\N	\N	gemäß § 18 Absätzen 6 und 7 Bildungsdokumentationsgesetz 2020, BGBl. I  Nr. 20/2021, in der gültigen Fassung, sowie § 141 Absatz 3 Universitätsgesetz 2002, BGBl. I  Nr. 120/2002, in der gültigen Fassung.	\N	2026-03-31 14:08:36.27708	system
+2153	1089	English	\N	\N	according to section 18 subsections 6 and 7 of the Bildungsdokumentationsgesetz 2020, Federal Law Gazette I  No. 20/2021, in the current version, and section 141 subsection 3 of the Universitätsgesetz 2002, Federal Law Gazette I  No. 120/2002, in the current version.	\N	2026-03-31 14:08:36.278327	system
+2154	1090	German	\N	\N	Das Senden der Daten ist nur möglich, wenn die Sozialversicherungsnummer (bzw. das Ersatzkennzeichen) gültig ist und alle Fragen beantwortet worden sind. Wenn Sie etwas nicht wissen, wählen Sie die Antwortmöglichkeit „unbekannt“, aber beantworten Sie bitte alle Fragen.	\N	2026-03-31 14:08:36.281035	system
+2155	1090	English	\N	\N	Sending the data is only possible if the social security number (or the substitute code) is valid and all questions have been answered. If you don't know something, choose the answer option “unknown”, but please answer all questions.	\N	2026-03-31 14:08:36.282277	system
+2156	1091	German	\N	\N	Laut Bildungsdokumentationsgesetz sind wir verpflichtet die Sozialversicherungsnummer zu erheben bzw. zu registrieren. Falls Sie über keine Sozialversicherungsnummer verfügen, fordert die FH Technikum Wien in Ihrem Namen ein Ersatzkenneichen an.	\N	2026-03-31 14:08:36.285059	system
+2157	1091	English	\N	\N	According to the General Social Insurance Act, we are obliged to collect and register your national insurance number. If you do not have a national insurance number, UAS Technikum Wien will request a social insurance substitute code on your behalf.	\N	2026-03-31 14:08:36.286273	system
+2158	1092	German	\N	\N	Angaben zu Ihren Erziehungsberechtigten	\N	2026-03-31 14:08:36.289007	system
+2159	1092	English	\N	\N	Information about your legal guardians	\N	2026-03-31 14:08:36.290194	system
+2160	1093	German	\N	\N	Die folgenden Fragen beziehen sich auf Personen, welche für Sie erziehungsberechtigt waren oder sind (Eltern oder jene Personen, die für Sie eine entsprechende Rolle übernommen haben, wie z.B. Stief- oder Pflegeeltern).	\N	2026-03-31 14:08:36.292982	system
+2161	1093	English	\N	\N	The following issues refer to your legal guardians (parents or persons who were in the role of the parents, e.g. stepparents or foster parents).	\N	2026-03-31 14:08:36.294209	system
+2162	1094	German	\N	\N	Bitte auswählen...	\N	2026-03-31 14:08:36.296972	system
+2163	1094	English	\N	\N	please select...	\N	2026-03-31 14:08:36.298154	system
+2164	1095	German	\N	\N	Erziehungsberechtigte Person 1/Mutter	\N	2026-03-31 14:08:36.300915	system
+2165	1095	English	\N	\N	Legal guardian 1/mother	\N	2026-03-31 14:08:36.302116	system
+2166	1096	German	\N	\N	Geburtsjahr	\N	2026-03-31 14:08:36.304923	system
+2167	1096	English	\N	\N	year of birth	\N	2026-03-31 14:08:36.306128	system
+2168	1097	German	\N	\N	Geburtsstaat	\N	2026-03-31 14:08:36.308858	system
+2169	1097	English	\N	\N	country of birth	\N	2026-03-31 14:08:36.310053	system
+2170	1098	German	\N	\N	in den heutigen Grenzen	\N	2026-03-31 14:08:36.312794	system
+2171	1098	English	\N	\N	in today's borders	\N	2026-03-31 14:08:36.313977	system
+2172	1099	German	\N	\N	Staat des höchsten Abschlusses	\N	2026-03-31 14:08:36.316736	system
+2173	1099	English	\N	\N	Country of the highest completed level of education	\N	2026-03-31 14:08:36.317927	system
+2174	1100	German	\N	\N	Höchster Abschluss	\N	2026-03-31 14:08:36.320743	system
+2175	1100	English	\N	\N	Highest completed level of education	\N	2026-03-31 14:08:36.321929	system
+2176	1101	German	\N	\N	Falls der höchste Bildungsabschluss in Österreich erworben wurde	\N	2026-03-31 14:08:36.324707	system
+2177	1101	English	\N	\N	If the highest level of education was completed in Austria:	\N	2026-03-31 14:08:36.325894	system
+2178	1102	German	\N	\N	Falls das Land des höchsten erworbenen Bildungsabschlusses unbekannt oder nicht Österreich ist	\N	2026-03-31 14:08:36.328659	system
+2179	1102	English	\N	\N	If the country of the highest completed level of education is unknown or not Austria:	\N	2026-03-31 14:08:36.329834	system
+2180	1103	German	\N	\N	Erziehungsberechtigte Person 2/Vater	\N	2026-03-31 14:08:36.332557	system
+2181	1103	English	\N	\N	Legal guardian 2/father	\N	2026-03-31 14:08:36.333761	system
+2182	1104	German	\N	\N	Prüfen und Speichern	\N	2026-03-31 14:08:36.336438	system
+2183	1104	English	\N	\N	Check and submit	\N	2026-03-31 14:08:36.337612	system
+2184	1105	German	\N	\N	Daten löschen	\N	2026-03-31 14:08:36.340285	system
+2185	1105	English	\N	\N	Delete data	\N	2026-03-31 14:08:36.341462	system
+2186	1106	German	\N	\N	Erfolgreich gelöscht	\N	2026-03-31 14:08:36.344122	system
+2187	1106	English	\N	\N	Deleted successfully	\N	2026-03-31 14:08:36.345312	system
+2188	1107	German	\N	\N	Gemäß § 16 Abs. 1 FHG steht Studierenden einmalig das Recht auf Wiederholung eines Studienjahres in Folge einer negativ beurteilten kommissionellen Prüfung zu.	\N	2026-03-31 14:08:36.349354	system
+2189	1107	English	\N	\N	According to § 16 paragraph 1 FHG, students have the right to repeat an academic year as a result of a negative examination before a committee.	\N	2026-03-31 14:08:36.350523	system
+2190	1108	German	\N	\N	Die Wiederholung ist bei der Studiengangsleitung binnen eines Monats ab Mitteilung des negativen Prüfungsergebnisses bekannt zu geben.	\N	2026-03-31 14:08:36.35329	system
+2191	1108	English	\N	\N	The head of the degree program must be notified of the repetition within one month of notification of the negative examination result.	\N	2026-03-31 14:08:36.354448	system
+2192	1109	German	\N	\N	Infolge der Weiterentwicklung der Qualität des Studienganges kann es zu Änderungen der Studienbedingungen im Zuge der Wiederholung eines Studienjahres kommen (z.B. Studienplan, Prüfungsordnung etc.).	\N	2026-03-31 14:08:36.357167	system
+2193	1109	English	\N	\N	As a result of the further development of the quality of the course, there may be changes to the study conditions in the course of repeating an academic year (e.g. study plan, examination regulations, etc.).	\N	2026-03-31 14:08:36.358364	system
+2194	1110	German	\N	\N	Die Studiengangsleitung legt Prüfungen und Lehrveranstaltungen für die Wiederholung des Studienjahres fest.	\N	2026-03-31 14:08:36.361047	system
+2195	1110	English	\N	\N	The head of the degree program determines examinations and courses for the repetition of the academic year.	\N	2026-03-31 14:08:36.362275	system
+2196	1111	German	\N	\N	Nicht bestandene Prüfungen und Lehrveranstaltungen sind jedenfalls, bestandene Prüfungen und Lehrveranstaltungen nur, sofern es der Zweck des Studiums erforderlich macht, zu wiederholen oder erneut zu besuchen. Wird eine Lehrveranstaltung nach der letzten Wiederholungsmöglichkeit negativ beurteilt, darf dieder Studierende an keiner kommissionellen Wiederholungsprüfung im Semester der negativ beurteilen Lehrveranstaltung und im Folgesemester mehr teilnehmen (nicht-kommissionelle Wiederholungsprüfungen können wahrgenommen werden)	\N	2026-03-31 14:08:36.365024	system
+2197	1111	English	\N	\N	In any case, failed examinations and courses are to be repeated or attended again only if the purpose of the course makes it necessary. If a course is assessed negatively after the last opportunity to repeat it, the student may no longer take part in a board re-examination in the semester in which the course was assessed as negative and in the following semester (non-board re-examinations can be taken).	\N	2026-03-31 14:08:36.366226	system
+2198	1112	German	\N	\N	Negativ beurteilte kommissionelle Prüfung	\N	2026-03-31 14:08:36.368907	system
+2199	1112	English	\N	\N	Negative assessment by a committee	\N	2026-03-31 14:08:36.370038	system
+2200	1113	German	\N	\N	Datum der Beurteilung	\N	2026-03-31 14:08:36.372732	system
+2201	1113	English	\N	\N	date of assessment	\N	2026-03-31 14:08:36.373889	system
+2202	1114	German	\N	\N	Ich gebe hiermit die Wiederholung des Studienjahres bekannt	\N	2026-03-31 14:08:36.376589	system
+2203	1114	English	\N	\N	I hereby announce the repetition of the academic year	\N	2026-03-31 14:08:36.377754	system
+2204	1115	German	\N	\N	Ich werde das Studienjahr nicht wiederholen und Abbrechen	\N	2026-03-31 14:08:36.380423	system
+2205	1115	English	\N	\N	I will not repeat the academic year and will drop out	\N	2026-03-31 14:08:36.381586	system
+2206	1116	German	\N	\N	Verwaltung des Studierendenstatus	\N	2026-03-31 14:08:36.384239	system
+2207	1116	English	\N	\N	Management of student status	\N	2026-03-31 14:08:36.385419	system
+2208	1117	German	\N	\N	Neu Anlegen	\N	2026-03-31 14:08:36.388332	system
+2209	1117	English	\N	\N	Create new	\N	2026-03-31 14:08:36.38958	system
+2210	1118	German	\N	\N	Abbrechen	\N	2026-03-31 14:08:36.392334	system
+2211	1118	English	\N	\N	Cancel	\N	2026-03-31 14:08:36.393521	system
+2212	1119	German	\N	\N	Ok	\N	2026-03-31 14:08:36.396244	system
+2213	1119	English	\N	\N	Ok	\N	2026-03-31 14:08:36.397467	system
+2214	1120	German	\N	\N	Suche	\N	2026-03-31 14:08:36.400407	system
+2215	1120	English	\N	\N	Search	\N	2026-03-31 14:08:36.401542	system
+2216	1121	German	\N	\N	Anlegen	\N	2026-03-31 14:08:36.404189	system
+2217	1121	English	\N	\N	Create	\N	2026-03-31 14:08:36.40541	system
+2218	1122	German	\N	\N	Vom Studium abmelden	\N	2026-03-31 14:08:36.408152	system
+2219	1122	English	\N	\N	Deregister from your studies	\N	2026-03-31 14:08:36.409373	system
+2220	1123	German	\N	\N	Das Studium unterbrechen	\N	2026-03-31 14:08:36.412148	system
+2221	1123	English	\N	\N	Interrupt your studies	\N	2026-03-31 14:08:36.413331	system
+2222	1124	German	\N	\N	Bekanntgabe zurückziehen	\N	2026-03-31 14:08:36.416057	system
+2223	1124	English	\N	\N	Cancel announcement	\N	2026-03-31 14:08:36.417276	system
+2224	1125	German	\N	\N	alle anzeigen	\N	2026-03-31 14:08:36.420005	system
+2225	1125	English	\N	\N	show all	\N	2026-03-31 14:08:36.421185	system
+2226	1126	German	\N	\N	nur offene anzeigen	\N	2026-03-31 14:08:36.423938	system
+2227	1126	English	\N	\N	only show open	\N	2026-03-31 14:08:36.425136	system
+2228	1127	German	\N	\N	Ihr CIS-Account ist noch 21 Tage aktiv. Wir bitten Sie, alle benötigten Dateien (Zeugnisse, Studienerfolgsbestätigungen, Studienbestätigungen, etc.) innerhalb dieses Zeitraums herunterzuladen. Für die Ausstellung von Duplikaten fallen nach Inaktivsetzung des CIS-Accounts Kosten an.<br>\nBitte retournieren Sie baldmöglichst entlehnte Bücher an die Bibliothek.	\N	2026-03-31 14:08:36.427893	system
+2229	1127	English	\N	\N	Your CIS account is still active for 21 days. We ask you to download all required files (certificates, confirmations of academic success, confirmation of studies, etc.) within this period. There is a charge for issuing duplicates after the CIS account has been deactivated.<br>\nPlease return borrowed books to the library as soon as possible.	\N	2026-03-31 14:08:36.4291	system
+2230	1128	German	\N	\N	Bitte beachten Sie die Einspruchsfrist von 2 Wochen nach Bestätigung durch die Studiengangsleitung!	\N	2026-03-31 14:08:36.431831	system
+2231	1128	English	\N	\N	Please note the objection period of 2 weeks after confirmation by the head of the degree program!	\N	2026-03-31 14:08:36.432997	system
+2232	1129	German	\N	\N	Abmeldung	\N	2026-03-31 14:08:36.435761	system
+2233	1129	English	\N	\N	De-registration	\N	2026-03-31 14:08:36.436948	system
+2234	1130	German	\N	\N	Abmeldung	\N	2026-03-31 14:08:36.439697	system
+2235	1130	English	\N	\N	De-registration	\N	2026-03-31 14:08:36.440827	system
+2236	1131	German	\N	\N	Unterbrechung	\N	2026-03-31 14:08:36.443466	system
+2237	1131	English	\N	\N	Interruption	\N	2026-03-31 14:08:36.444646	system
+2238	1132	German	\N	\N	Wiederholung	\N	2026-03-31 14:08:36.447279	system
+2239	1132	English	\N	\N	Repetition	\N	2026-03-31 14:08:36.448491	system
+2240	1133	German	\N	\N	Neue Abmeldung	\N	2026-03-31 14:08:36.451132	system
+2241	1133	English	\N	\N	New de-registration	\N	2026-03-31 14:08:36.452288	system
+2242	1134	German	\N	\N	Typ	\N	2026-03-31 14:08:36.45492	system
+2243	1134	English	\N	\N	Type	\N	2026-03-31 14:08:36.456043	system
+2244	1135	German	\N	\N	Status	\N	2026-03-31 14:08:36.458669	system
+2245	1135	English	\N	\N	Status	\N	2026-03-31 14:08:36.459801	system
+2246	1136	German	\N	\N	Studiensemester	\N	2026-03-31 14:08:36.462599	system
+2247	1136	English	\N	\N	Semester	\N	2026-03-31 14:08:36.463799	system
+2248	1137	German	\N	\N	Erstelldatum	\N	2026-03-31 14:08:36.466555	system
+2249	1137	English	\N	\N	Createdate	\N	2026-03-31 14:08:36.467758	system
+2250	1138	German	\N	\N	Studierendenanträge	\N	2026-03-31 14:08:36.470506	system
+2251	1138	English	\N	\N	Applications	\N	2026-03-31 14:08:36.471693	system
+2252	1139	German	\N	\N	Wiedereinstieg	\N	2026-03-31 14:08:36.474379	system
+2253	1139	English	\N	\N	Re-Entry	\N	2026-03-31 14:08:36.475752	system
+2254	1140	German	\N	\N	Grund	\N	2026-03-31 14:08:36.47851	system
+2255	1140	English	\N	\N	Reason	\N	2026-03-31 14:08:36.479717	system
+2256	1141	German	\N	\N	Unruly	\N	2026-03-31 14:08:36.482368	system
+2257	1141	English	\N	\N	Unruly	\N	2026-03-31 14:08:36.48351	system
+2258	1142	German	\N	\N	Unruly Person Status wurde aktualisiert.	\N	2026-03-31 14:08:36.48611	system
+2259	1142	English	\N	\N	Unruly person status has been updated.	\N	2026-03-31 14:08:36.487238	system
+2260	1143	German	\N	\N	Dateianhänge	\N	2026-03-31 14:08:36.489873	system
+2261	1143	English	\N	\N	Attachments	\N	2026-03-31 14:08:36.490991	system
+2262	1144	German	\N	\N	Anhang	\N	2026-03-31 14:08:36.493681	system
+2263	1144	English	\N	\N	Attachment	\N	2026-03-31 14:08:36.494839	system
+2264	1145	German	\N	\N	Abmeldung	\N	2026-03-31 14:08:36.4976	system
+2265	1145	English	\N	\N	Deregistration	\N	2026-03-31 14:08:36.498809	system
+2266	1146	German	\N	\N	Abmeldung (durch Studiengangsleitung)	\N	2026-03-31 14:08:36.50153	system
+2267	1146	English	\N	\N	Cancellation (by course director)	\N	2026-03-31 14:08:36.502721	system
+2268	1147	German	\N	\N	Unterbrechung	\N	2026-03-31 14:08:36.505471	system
+2269	1147	English	\N	\N	Break	\N	2026-03-31 14:08:36.506663	system
+2270	1148	German	\N	\N	Wiederholung	\N	2026-03-31 14:08:36.509396	system
+2271	1148	English	\N	\N	Repetition	\N	2026-03-31 14:08:36.510582	system
+2272	1149	German	\N	\N	LVs anzeigen	\N	2026-03-31 14:08:36.513231	system
+2273	1149	English	\N	\N	Show LVs	\N	2026-03-31 14:08:36.514415	system
+2274	1150	German	\N	\N	Bearbeiten	\N	2026-03-31 14:08:36.517147	system
+2275	1150	English	\N	\N	Edit	\N	2026-03-31 14:08:36.518345	system
+2276	1151	German	\N	\N	Erneut Freischalten	\N	2026-03-31 14:08:36.521128	system
+2277	1151	English	\N	\N	Reopen	\N	2026-03-31 14:08:36.522325	system
+2278	1152	German	\N	\N	Pausieren	\N	2026-03-31 14:08:36.525035	system
+2279	1152	English	\N	\N	Pause	\N	2026-03-31 14:08:36.526278	system
+2280	1153	German	\N	\N	Fortsetzen	\N	2026-03-31 14:08:36.529016	system
+2281	1153	English	\N	\N	Resume	\N	2026-03-31 14:08:36.530167	system
+2282	1154	German	\N	\N	Beeinspruchen	\N	2026-03-31 14:08:36.532866	system
+2283	1154	English	\N	\N	Object	\N	2026-03-31 14:08:36.53404	system
+2284	1155	German	\N	\N	Einspruch abgelehnt	\N	2026-03-31 14:08:36.536851	system
+2285	1155	English	\N	\N	Objection rejected	\N	2026-03-31 14:08:36.538027	system
+2286	1156	German	\N	\N	Einspruch stattgegeben	\N	2026-03-31 14:08:36.540853	system
+2287	1156	English	\N	\N	Objection granted	\N	2026-03-31 14:08:36.542001	system
+2288	1157	German	\N	\N	LVs zuweisen	\N	2026-03-31 14:08:36.544693	system
+2289	1157	English	\N	\N	Assign Lvs	\N	2026-03-31 14:08:36.545853	system
+2290	1158	German	\N	\N	Bestätigen	\N	2026-03-31 14:08:36.5486	system
+2291	1158	English	\N	\N	Confirm	\N	2026-03-31 14:08:36.549794	system
+2292	1159	German	\N	\N	Ablehnen	\N	2026-03-31 14:08:36.552525	system
+2293	1159	English	\N	\N	Reject	\N	2026-03-31 14:08:36.553723	system
+2294	1160	German	\N	\N	Überspringen	\N	2026-03-31 14:08:36.556461	system
+2295	1160	English	\N	\N	Skip	\N	2026-03-31 14:08:36.557666	system
+2296	1161	German	\N	\N	Studiensemester auswählen	\N	2026-03-31 14:08:36.560389	system
+2297	1161	English	\N	\N	Select a semester	\N	2026-03-31 14:08:36.561575	system
+2298	1162	German	\N	\N	Keine Berechtigung	\N	2026-03-31 14:08:36.564371	system
+2299	1162	English	\N	\N	No authority	\N	2026-03-31 14:08:36.565567	system
+2300	1163	German	\N	\N	Zuweisungen speichern	\N	2026-03-31 14:08:36.568252	system
+2301	1163	English	\N	\N	Save assignments	\N	2026-03-31 14:08:36.569423	system
+2302	1164	German	\N	\N	PDF herunterladen	\N	2026-03-31 14:08:36.572169	system
+2303	1164	English	\N	\N	Download PDF	\N	2026-03-31 14:08:36.573382	system
+2304	1165	German	\N	\N	Download	\N	2026-03-31 14:08:36.576111	system
+2305	1165	English	\N	\N	Download	\N	2026-03-31 14:08:36.577318	system
+2306	1166	German	\N	\N	Tabelle neu laden	\N	2026-03-31 14:08:36.580118	system
+2307	1166	English	\N	\N	Reload table	\N	2026-03-31 14:08:36.581315	system
+2308	1167	German	\N	\N	Sie sind derzeit in keinem Studium	\N	2026-03-31 14:08:36.584075	system
+2309	1167	English	\N	\N	You are currently not enrolled	\N	2026-03-31 14:08:36.585275	system
+2310	1168	German	\N	\N	Kein Student gefunden für Prestudent #{prestudent_id}	\N	2026-03-31 14:08:36.588165	system
+2311	1168	English	\N	\N	No student found for prestudent #{prestudent_id}	\N	2026-03-31 14:08:36.589381	system
+2312	1169	German	\N	\N	Sie sind derzeit in keinem Studium oder haben keine negativ beurteilte kommissionelle Prüfung	\N	2026-03-31 14:08:36.592114	system
+2313	1169	English	\N	\N	You are not currently studying or have not passed a board examination with negative reasons	\N	2026-03-31 14:08:36.593334	system
+2314	1170	German	\N	\N	Keine Dateianhänge	\N	2026-03-31 14:08:36.59606	system
+2315	1170	English	\N	\N	No Attachments	\N	2026-03-31 14:08:36.597275	system
+2316	1171	German	\N	\N	Prestudent	\N	2026-03-31 14:08:36.600032	system
+2317	1171	English	\N	\N	Prestudent	\N	2026-03-31 14:08:36.60124	system
+2318	1172	German	\N	\N	Studienjahr	\N	2026-03-31 14:08:36.603941	system
+2319	1172	English	\N	\N	Academic year	\N	2026-03-31 14:08:36.605078	system
+2320	1173	German	\N	\N	Lehrveranstaltungen zuweisen für {name}	\N	2026-03-31 14:08:36.607719	system
+2321	1173	English	\N	\N	Assign Courses for {name}	\N	2026-03-31 14:08:36.608949	system
+2322	1174	German	\N	\N	Angabe aller Lehrveranstaltungen, zu denen die Person nicht zugelassen ist	\N	2026-03-31 14:08:36.611715	system
+2323	1174	English	\N	\N	Details of all courses to which the person is not admitted	\N	2026-03-31 14:08:36.612895	system
+2324	1175	German	\N	\N	Angabe aller zu wiederholenden bzw. erneut zu besuchenden Lehrveranstaltungen	\N	2026-03-31 14:08:36.615654	system
+2325	1175	English	\N	\N	Specification of all courses to be repeated or attended again	\N	2026-03-31 14:08:36.616926	system
+2326	1176	German	\N	\N	Lehrveranstaltungen für {name}	\N	2026-03-31 14:08:36.619708	system
+2327	1176	English	\N	\N	Courses for {name}	\N	2026-03-31 14:08:36.620912	system
+2328	1177	German	\N	\N	Meine Lehrveranstaltungen	\N	2026-03-31 14:08:36.623652	system
+2329	1177	English	\N	\N	My Courses	\N	2026-03-31 14:08:36.624834	system
+2330	1178	German	\N	\N	Mit {count} ausgewählten: 	\N	2026-03-31 14:08:36.627562	system
+2331	1178	English	\N	\N	With {count} selected: 	\N	2026-03-31 14:08:36.628777	system
+2332	1179	German	\N	\N	Nicht zulassen	\N	2026-03-31 14:08:36.631532	system
+2333	1179	English	\N	\N	Don't allow 	\N	2026-03-31 14:08:36.632722	system
+2334	1180	German	\N	\N	Wiederholen	\N	2026-03-31 14:08:36.63545	system
+2335	1180	English	\N	\N	Repeat	\N	2026-03-31 14:08:36.636672	system
+2336	1181	German	\N	\N	Statusverlauf für #{id} 	\N	2026-03-31 14:08:36.639381	system
+2337	1181	English	\N	\N	History for #{id}	\N	2026-03-31 14:08:36.640546	system
+2338	1182	German	\N	\N	Die Spalte Anmerkung kann verwendet werden, um Besonderheiten z.B. bei einem Studienplanwechsel zu dokumentieren (Änderung von LV-Titel, ECTS…) 	\N	2026-03-31 14:08:36.643315	system
+2339	1182	English	\N	\N	The Comment column can be used to document special features, e.g. when changing the curriculum (change of course title, ECTS...)	\N	2026-03-31 14:08:36.644511	system
+2340	1183	German	\N	\N	für alle übernehmen	\N	2026-03-31 14:08:36.647198	system
+2341	1183	English	\N	\N	apply for all	\N	2026-03-31 14:08:36.648421	system
+2342	1184	German	\N	\N	Auswahl für {count} weitere(n) Wiederholungsanträge übernehmen	\N	2026-03-31 14:08:36.651155	system
+2343	1184	English	\N	\N	Adopt selection for {count} further repeat applications	\N	2026-03-31 14:08:36.652427	system
+2344	1185	German	\N	\N	Grund für Ablehnung von #{id}	\N	2026-03-31 14:08:36.655158	system
+2345	1185	English	\N	\N	Reason for rejection of #{id}	\N	2026-03-31 14:08:36.656318	system
+2346	1186	German	\N	\N	Keine Lehrveranstaltungen zugewiesen	\N	2026-03-31 14:08:36.65906	system
+2347	1186	English	\N	\N	No courses assigned	\N	2026-03-31 14:08:36.660289	system
+2348	1187	German	\N	\N	<b>Status:</b> {status}	\N	2026-03-31 14:08:36.662979	system
+2349	1187	English	\N	\N	<b>Status:</b> {status}	\N	2026-03-31 14:08:36.664148	system
+2350	1188	German	\N	\N	Daten werden gespeichert...	\N	2026-03-31 14:08:36.666825	system
+2351	1188	English	\N	\N	Saving...	\N	2026-03-31 14:08:36.667981	system
+2352	1189	German	\N	\N	Fehler	\N	2026-03-31 14:08:36.670681	system
+2353	1189	English	\N	\N	Error	\N	2026-03-31 14:08:36.67184	system
+2354	1190	German	\N	\N	Offen	\N	2026-03-31 14:08:36.674499	system
+2355	1190	English	\N	\N	Open	\N	2026-03-31 14:08:36.67566	system
+2356	1191	German	\N	\N	Erstellt	\N	2026-03-31 14:08:36.678337	system
+2357	1191	English	\N	\N	Created	\N	2026-03-31 14:08:36.679511	system
+2358	1192	German	\N	\N	Zurückziehen...	\N	2026-03-31 14:08:36.682202	system
+2359	1192	English	\N	\N	Cancelling...	\N	2026-03-31 14:08:36.683404	system
+2360	1193	German	\N	\N	Zurückgezogen	\N	2026-03-31 14:08:36.68626	system
+2361	1193	English	\N	\N	Cancelled	\N	2026-03-31 14:08:36.687625	system
+2362	1194	German	\N	\N	Fortgesetzt	\N	2026-03-31 14:08:36.690487	system
+2363	1194	English	\N	\N	Resumed	\N	2026-03-31 14:08:36.691748	system
+2364	1195	German	\N	\N	Gestoppt	\N	2026-03-31 14:08:36.694612	system
+2365	1195	English	\N	\N	Stopped	\N	2026-03-31 14:08:36.695876	system
+2366	1196	German	\N	\N	Für diesen Studiengang sind keine Bekanntgaben möglich	\N	2026-03-31 14:08:36.698701	system
+2367	1196	English	\N	\N	No announcements are accepted for this course	\N	2026-03-31 14:08:36.699943	system
+2368	1197	German	\N	\N	Es gibt bereits eine bestehende Bekanntgabe	\N	2026-03-31 14:08:36.702657	system
+2369	1197	English	\N	\N	There is already an existing announcement	\N	2026-03-31 14:08:36.703808	system
+2370	1198	German	\N	\N	Es gibt bereits eine bestehende Bekanntgabe vom Typ {typ}	\N	2026-03-31 14:08:36.706806	system
+2371	1198	English	\N	\N	There is already an existing announcement of type {typ}	\N	2026-03-31 14:08:36.707973	system
+2372	1199	German	\N	\N	Keine Bekanntgabe mit Id {id} gefunden	\N	2026-03-31 14:08:36.710696	system
+2373	1199	English	\N	\N	No announcement found with Id {id}	\N	2026-03-31 14:08:36.711908	system
+2374	1200	German	\N	\N	Keine {typ} Bekanntgabe gefunden für Prestudent {prestudent_id}	\N	2026-03-31 14:08:36.714583	system
+2375	1200	English	\N	\N	No {typ} announcement found for prestudent {prestudent_id}	\N	2026-03-31 14:08:36.715733	system
+2376	1201	German	\N	\N	Kein Studiengang und Ausbildungssemester gefunden für Bekanntgabe mit Id {id}	\N	2026-03-31 14:08:36.718583	system
+2377	1201	English	\N	\N	No studiengang and ausbildungssemester found for announcement with id: {id}	\N	2026-03-31 14:08:36.719703	system
+2378	1202	German	\N	\N	Kein Studiengang gefunden: {studiengang_kz}	\N	2026-03-31 14:08:36.722366	system
+2379	1202	English	\N	\N	No studiengang found: {studiengang_kz}	\N	2026-03-31 14:08:36.723792	system
+2380	1203	German	\N	\N	Kein Studiengang gefunden für Bekanntgabe #{id}	\N	2026-03-31 14:08:36.726463	system
+2381	1203	English	\N	\N	No studiengang found for announcement #{id}	\N	2026-03-31 14:08:36.727638	system
+2382	1204	German	\N	\N	Keine Studiengang-Email gefunden für Bekanntgabe #{id}	\N	2026-03-31 14:08:36.730315	system
+2383	1204	English	\N	\N	No studiengang-email found for announcement #{id}	\N	2026-03-31 14:08:36.731508	system
+2384	1205	German	\N	\N	Kein Studienplan gefunden für Studiengang: {studiengang_kz}, Studiensemester: {studiensemester_kurzbz}, Ausbildungssemester: {semester}	\N	2026-03-31 14:08:36.734179	system
+2385	1205	English	\N	\N	No studienplan found for stg: {studiengang_kz}, studiensemester: {studiensemester_kurzbz}, ausbildungssemester: {semester}	\N	2026-03-31 14:08:36.735355	system
+2386	1206	German	\N	\N	Kein Status für Bekanntgabe #{id} gefunden	\N	2026-03-31 14:08:36.738019	system
+2387	1206	English	\N	\N	No status found announcement #{id}	\N	2026-03-31 14:08:36.7394	system
+2450	1238	German	\N	\N	Ihr Einspruch wurde Abgelehnt	\N	2026-03-31 14:08:36.861626	system
+2388	1207	German	\N	\N	Mehrere Studienpläne gefunden für Studiengang: {studiengang_kz}, Studiensemester: {studiensemester_kurzbz}, Ausbildungssemester: {semester}	\N	2026-03-31 14:08:36.742111	system
+2389	1207	English	\N	\N	Multiple studienplans found for stg: {studiengang_kz}, studiensemester: {studiensemester_kurzbz}, ausbildungssemester: {semester}	\N	2026-03-31 14:08:36.743301	system
+2390	1208	German	\N	\N	Kein Studiensemester nach {semester} gefunden	\N	2026-03-31 14:08:36.745944	system
+2391	1208	English	\N	\N	No studiensemester found after: {semester}	\N	2026-03-31 14:08:36.747097	system
+2392	1209	German	\N	\N	Das Studiensemester {studiensemester_kurzbz} existiert nicht	\N	2026-03-31 14:08:36.749783	system
+2393	1209	English	\N	\N	Semester {studiensemester_kurzbz} does not exist	\N	2026-03-31 14:08:36.750923	system
+2394	1210	German	\N	\N	Kein Status im letzten Semester gefunden	\N	2026-03-31 14:08:36.753634	system
+2395	1210	English	\N	\N	No status found in previous semester	\N	2026-03-31 14:08:36.754804	system
+2396	1211	German	\N	\N	Diese Bekanntgabe ist gesperrt	\N	2026-03-31 14:08:36.757449	system
+2397	1211	English	\N	\N	This request is locked	\N	2026-03-31 14:08:36.758592	system
+2398	1212	German	\N	\N	Keine Lehrveranstaltung ausgewählt	\N	2026-03-31 14:08:36.761469	system
+2399	1212	English	\N	\N	No course selected	\N	2026-03-31 14:08:36.762631	system
+2400	1213	German	\N	\N	Keine Lehrveranstaltung in Bekanntgabe gefunden	\N	2026-03-31 14:08:36.765412	system
+2401	1213	English	\N	\N	No course found in announcement	\N	2026-03-31 14:08:36.766571	system
+2402	1214	German	\N	\N	Keine Berechtigung, die Bekanntgabe zu bearbeiten	\N	2026-03-31 14:08:36.769277	system
+2403	1214	English	\N	\N	No authorization to edit the announcement	\N	2026-03-31 14:08:36.770452	system
+2404	1215	German	\N	\N	Keine Berechtigung, die Bekanntgabe zu beeinspruchen	\N	2026-03-31 14:08:36.773155	system
+2405	1215	English	\N	\N	No authorization to object the announcement	\N	2026-03-31 14:08:36.774335	system
+2406	1216	German	\N	\N	Bekanntgabe ist nicht beeinsprucht	\N	2026-03-31 14:08:36.777009	system
+2407	1216	English	\N	\N	Announcement is not objected	\N	2026-03-31 14:08:36.778174	system
+2408	1217	German	\N	\N	Bakanntgabe ist nicht bestätigt worden	\N	2026-03-31 14:08:36.780818	system
+2409	1217	English	\N	\N	Announcement is not approved	\N	2026-03-31 14:08:36.781969	system
+2410	1218	German	\N	\N	Bekanntgabe mit Id {id} kann nicht pausiert werden	\N	2026-03-31 14:08:36.784615	system
+2411	1218	English	\N	\N	Announcement with Id {id} cannot be not paused	\N	2026-03-31 14:08:36.785731	system
+2412	1219	German	\N	\N	Bekanntgabe mit Id {id} ist nicht pausiert	\N	2026-03-31 14:08:36.788352	system
+2413	1219	English	\N	\N	Announcement with Id {id} is not paused	\N	2026-03-31 14:08:36.789459	system
+2414	1220	German	\N	\N	Der Studiengang hat nicht genügend Semester	\N	2026-03-31 14:08:36.792009	system
+2415	1220	English	\N	\N	The course does not have enough semesters	\N	2026-03-31 14:08:36.793182	system
+2416	1221	German	\N	\N	Keine Person gefunden mit id {person_id}	\N	2026-03-31 14:08:36.795857	system
+2417	1221	English	\N	\N	No Person found with id {person_id}	\N	2026-03-31 14:08:36.797035	system
+2418	1222	German	\N	\N	Keine Person gefunden für Prestudent #{prestudent_id}	\N	2026-03-31 14:08:36.799738	system
+2419	1222	English	\N	\N	No Person found for prestudent #{prestudent_id}	\N	2026-03-31 14:08:36.800881	system
+2420	1223	German	\N	\N	Kein Email kontakt gefunden für Person mit id {person_id}	\N	2026-03-31 14:08:36.803513	system
+2421	1223	English	\N	\N	No email contact found for Person with id {person_id}	\N	2026-03-31 14:08:36.804687	system
+2422	1224	German	\N	\N	Kein Prestudent gefunden: {prestudent_id}	\N	2026-03-31 14:08:36.807329	system
+2423	1224	English	\N	\N	No Prestudent found: {prestudent_id}	\N	2026-03-31 14:08:36.808464	system
+2424	1225	German	\N	\N	Kein Status für Prestudent #{prestudent_id} in Semester {studiensemester_kurzbz} gefunden	\N	2026-03-31 14:08:36.811042	system
+2425	1225	English	\N	\N	No status found for prestudent #{prestudent_id} in semester {studiensemester_kurzbz}	\N	2026-03-31 14:08:36.812138	system
+2426	1226	German	\N	\N	Kein Studiengang für Prestudent #{prestudent_id} gefunden	\N	2026-03-31 14:08:36.814854	system
+2427	1226	English	\N	\N	No course found for prestudent #{prestudent_id}	\N	2026-03-31 14:08:36.815988	system
+2428	1227	German	\N	\N	Kein Status gefunden für Prestudent: {prestudent_id}	\N	2026-03-31 14:08:36.818912	system
+2429	1227	English	\N	\N	No status found for Prestudent: {prestudent_id}	\N	2026-03-31 14:08:36.820087	system
+2430	1228	German	\N	\N	Email an {email} konnte nicht versandt werden	\N	2026-03-31 14:08:36.822764	system
+2431	1228	English	\N	\N	Failed to send email to {email}	\N	2026-03-31 14:08:36.823931	system
+2432	1229	German	\N	\N	Die Email wurde nicht an den Studenten versendet<br>Details:<br>{message}	\N	2026-03-31 14:08:36.826663	system
+2433	1229	English	\N	\N	Mail to student not sent<br>Details:<br>{message}	\N	2026-03-31 14:08:36.827809	system
+2434	1230	German	\N	\N	Name des Studenten nicht gefunden<br>Details:<br>{message}	\N	2026-03-31 14:08:36.830485	system
+2435	1230	English	\N	\N	Name of student not found<br>Details:<br>{message}	\N	2026-03-31 14:08:36.831697	system
+2436	1231	German	\N	\N	Die Email wurde nicht an den Studenten versendet da kein Name gefunden wurde<br>Details:<br>{message}	\N	2026-03-31 14:08:36.834382	system
+2437	1231	English	\N	\N	Mail to student not sent and student name not found<br>Details:<br>{message}	\N	2026-03-31 14:08:36.835589	system
+2438	1232	German	\N	\N	StudentIn ({prestudent_id})	\N	2026-03-31 14:08:36.83831	system
+2439	1232	English	\N	\N	Student ({prestudent_id})	\N	2026-03-31 14:08:36.839508	system
+2440	1233	German	\N	\N	Unterbrechung mit id {studierendenantrag_id} konnte nicht genehmigt werden.<br>Details:<br>{message}	\N	2026-03-31 14:08:36.842237	system
+2441	1233	English	\N	\N	Could not approve Unterbrechung for studierendenantrag_id: {studierendenantrag_id}<br>Details:<br>{message}	\N	2026-03-31 14:08:36.843392	system
+2442	1234	German	\N	\N	Unterbrechung mit id {studierendenantrag_id} konnte nicht abgelehnt werden.<br>Details:<br>{message}	\N	2026-03-31 14:08:36.846119	system
+2443	1234	English	\N	\N	Could not reject Unterbrechung for studierendenantrag_id: {studierendenantrag_id}<br>Details:<br>{message}	\N	2026-03-31 14:08:36.847295	system
+2444	1235	German	\N	\N	Abmeldung freigegeben	\N	2026-03-31 14:08:36.850028	system
+2445	1235	English	\N	\N	Unsubscribe released	\N	2026-03-31 14:08:36.851197	system
+2446	1236	German	\N	\N	Abmeldung freigegeben	\N	2026-03-31 14:08:36.853935	system
+2447	1236	English	\N	\N	Unsubscribe released	\N	2026-03-31 14:08:36.85511	system
+2448	1237	German	\N	\N	Abmeldung durch Studiengangsleitung	\N	2026-03-31 14:08:36.857794	system
+2449	1237	English	\N	\N	De-registration by the course director	\N	2026-03-31 14:08:36.858948	system
+2451	1238	English	\N	\N	Your objection was denied	\N	2026-03-31 14:08:36.862768	system
+2452	1239	German	\N	\N	Unterbrechung freigegeben	\N	2026-03-31 14:08:36.865512	system
+2453	1239	English	\N	\N	Interruption enabled	\N	2026-03-31 14:08:36.866667	system
+2454	1240	German	\N	\N	Unterbrechung abgelehnt	\N	2026-03-31 14:08:36.869332	system
+2455	1240	English	\N	\N	Interruption rejected	\N	2026-03-31 14:08:36.870493	system
+2456	1241	German	\N	\N	Neue*r Wiederholer*in	\N	2026-03-31 14:08:36.873217	system
+2457	1241	English	\N	\N	New Repeater	\N	2026-03-31 14:08:36.874433	system
+2458	1242	German	\N	\N	Wiederholung von Studiengangsleitung freigegeben	\N	2026-03-31 14:08:36.877168	system
+2459	1242	English	\N	\N	Repetition approved by course director	\N	2026-03-31 14:08:36.878287	system
+2460	1243	German	\N	\N	Wiederholung von Studiengangsleitung freigegeben	\N	2026-03-31 14:08:36.880818	system
+2461	1243	English	\N	\N	Repetition approved by course director	\N	2026-03-31 14:08:36.881923	system
+2462	1244	German	\N	\N	<table><tr><th>{stg_bezeichnung} ({stg_orgform_kurzbz})</th></tr>{rows}</table>	\N	2026-03-31 14:08:36.88452	system
+2463	1244	English	\N	\N	<table><tr><th>{stg_bezeichnung} ({stg_orgform_kurzbz})</th></tr>{rows}</table>	\N	2026-03-31 14:08:36.885663	system
+2464	1245	German	\N	\N	<tr><td>{count} neue Abmeldung(en)</td></tr>	\N	2026-03-31 14:08:36.888285	system
+2465	1245	English	\N	\N	<tr><td>{count} new De-registration(s)</td></tr>	\N	2026-03-31 14:08:36.889445	system
+2466	1246	German	\N	\N	<tr><td>{count} neue(r) Antrag/Anträge auf Unterbrechung</td></tr>	\N	2026-03-31 14:08:36.892287	system
+2467	1246	English	\N	\N	<tr><td>{count} new application(s) for Interruption</td></tr>	\N	2026-03-31 14:08:36.893453	system
+2468	1247	German	\N	\N	<tr><td>{count} neue LV Zuweisung(en) für Wiederholer</td></tr>	\N	2026-03-31 14:08:36.896097	system
+2469	1247	English	\N	\N	<tr><td>{count} new LV assignment(s) for repeaters</td></tr>	\N	2026-03-31 14:08:36.897253	system
+2470	1248	German	\N	\N	<h4>Grund:</h4><p>{grund}</p>	\N	2026-03-31 14:08:36.899999	system
+2471	1248	English	\N	\N	<h4>Reason:</h4><p>{grund}</p>	\N	2026-03-31 14:08:36.901171	system
+2472	1249	German	\N	\N	Keine Lehrveranstaltungen gefunden	\N	2026-03-31 14:08:36.903822	system
+2473	1249	English	\N	\N	No courses found	\N	2026-03-31 14:08:36.90499	system
+2474	1250	German	\N	\N	Die Abmeldung vom Studium kann hier durchgeführt werden.	\N	2026-03-31 14:08:36.907778	system
+2475	1250	English	\N	\N	You can deregister from your studies here.	\N	2026-03-31 14:08:36.90895	system
+2476	1251	German	\N	\N	Eine Unterbrechung des Studiums ist hier zu beantragen. Die Gründe der Unterbrechung und die beabsichtigte Fortsetzung des Studiums sind nachzuweisen oder glaubhaft zu machen. In der Entscheidung über den Antrag sind zwingende persönliche, gesundheitliche oder berufliche Gründe zu berücksichtigen. Während der Unterbrechung können keine Prüfungen abgelegt werden.	\N	2026-03-31 14:08:36.911713	system
+2477	1251	English	\N	\N	You can apply for an interruption of your studies here. The reasons for the interruption and the intended continuation of the course must be proven or made credible. Compelling personal, health or professional reasons must be taken into account when deciding on the application. No exams can be taken during the interruption.	\N	2026-03-31 14:08:36.912876	system
+2478	1252	German	\N	\N	Studierenden steht einmalig das Recht auf Wiederholung eines Studienjahres in Folge einer negativ beurteilten kommissionellen Prüfung zu. Die Wiederholung ist bei der Studiengangsleitung binnen eines Monats ab Mitteilung des Prüfungsergebnisses bekannt zu geben. Die Studiengangsleitung hat Prüfungen und Lehrveranstaltungen für die Wiederholung des Studienjahres festzulegen, wobei nicht bestandene Prüfungen und Lehrveranstaltungen jedenfalls, bestandene Prüfungen und Lehrveranstaltungen nur, sofern es der Zweck des Studiums erforderlich macht, zu wiederholen oder erneut zu besuchen sind.	\N	2026-03-31 14:08:36.91561	system
+2479	1252	English	\N	\N	Students have the one-time right to repeat an academic year as a result of a negative examination by a committee. The head of the degree program must be notified of the repetition within one month of notification of the examination result. The head of the degree program must determine examinations and courses for the repetition of the academic year, whereby failed examinations and courses are to be repeated or attended again, in any case, passed examinations and courses only if the purpose of the course makes it necessary.	\N	2026-03-31 14:08:36.916807	system
+2480	1253	German	\N	\N	Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): Nichterfüllung finanzieller Verpflichtungen trotz Mahnung (Studienbeitrag)	\N	2026-03-31 14:08:36.919507	system
+2481	1253	English	\N	\N	Reason for exclusion according to the training contract (point 7.4): Failure to meet financial obligations despite a reminder (tuition fees)	\N	2026-03-31 14:08:36.92067	system
+2482	1254	German	\N	\N	Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): mehrmalig unentschuldigtes Verletzen der Anwesenheitspflicht	\N	2026-03-31 14:08:36.923321	system
+2483	1254	English	\N	\N	Reason for exclusion according to the training contract (point 7.4): multiple unexcused breaches of attendance requirements	\N	2026-03-31 14:08:36.924548	system
+2484	1255	German	\N	\N	Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): wiederholtes Nichteinhalten von Prüfungsterminen bzw Abgabeterminen für Seminararbeiten bzw. Projektarbeiten	\N	2026-03-31 14:08:36.927253	system
+2485	1255	English	\N	\N	Reason for exclusion according to the training contract (point 7.4): repeated non-compliance with examination dates or deadlines for seminar papers or project work	\N	2026-03-31 14:08:36.928474	system
+2486	1256	German	\N	\N	Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): Plagiieren im Rahmen wissenschaftlicher Arbeiten bzw. unerlaubte Verwendung KI generierter Hilfsmittel bzw. Quellen	\N	2026-03-31 14:08:36.931152	system
+2487	1256	English	\N	\N	Reason for exclusion according to the training contract (point 7.4): Plagiarism in the context of scientific work or unauthorized use of AI-generated tools or sources	\N	2026-03-31 14:08:36.932344	system
+2488	1257	German	\N	\N	Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): nicht genügende Leistung im Sinne der Prüfungsordnung	\N	2026-03-31 14:08:36.935016	system
+2489	1257	English	\N	\N	Reason for exclusion according to the training contract (point 7.4): insufficient performance in terms of the examination regulations	\N	2026-03-31 14:08:36.936191	system
+2490	1258	German	\N	\N	Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): Nichtantritt des Studiums zu Beginn des Studienjahres (=Unbegründetes Nichterscheinen zur ersten Studienveranstaltung)	\N	2026-03-31 14:08:36.938879	system
+2491	1258	English	\N	\N	Reason for exclusion according to the training contract (point 7.4): Failure to start the course at the beginning of the academic year (= unjustified non-attendance to the first course event)	\N	2026-03-31 14:08:36.940026	system
+2492	1259	German	\N	\N	Die Zugangsvoraussetzung zum Studium wurde nicht erfüllt.	\N	2026-03-31 14:08:36.942693	system
+2493	1259	English	\N	\N	The entry requirements for the course were not met.	\N	2026-03-31 14:08:36.943832	system
+2494	1260	German	\N	\N	Person ist unruly	\N	2026-03-31 14:08:36.946557	system
+2495	1260	English	\N	\N	Person is unruly	\N	2026-03-31 14:08:36.947727	system
+2496	1261	German	\N	\N	Studierende*r hat Studienbeitrag nicht bezahlt	\N	2026-03-31 14:08:36.95043	system
+2497	1261	English	\N	\N	Student has not paid their tuition fees.	\N	2026-03-31 14:08:36.951577	system
+2498	1262	German	\N	\N	Student*in war mehrmals unentschuldigt abwesend	\N	2026-03-31 14:08:36.954252	system
+2499	1262	English	\N	\N	Student was absent without excuse several times	\N	2026-03-31 14:08:36.955415	system
+2500	1263	German	\N	\N	Nichteinhalten von Prüfungsterminen bzw. Abgabeterminen	\N	2026-03-31 14:08:36.958133	system
+2501	1263	English	\N	\N	Failure to meet exam or submission deadlines	\N	2026-03-31 14:08:36.959374	system
+2502	1264	German	\N	\N	Student*in hat plagiiert	\N	2026-03-31 14:08:36.962034	system
+2503	1264	English	\N	\N	Student failed to meet exam dates	\N	2026-03-31 14:08:36.963172	system
+2504	1265	German	\N	\N	Leistung ungenügend	\N	2026-03-31 14:08:36.965902	system
+2505	1265	English	\N	\N	performance insufficient	\N	2026-03-31 14:08:36.967071	system
+2506	1266	German	\N	\N	Nichtantritt des Studiums	\N	2026-03-31 14:08:36.969802	system
+2507	1266	English	\N	\N	non-commencement of the course	\N	2026-03-31 14:08:36.970937	system
+2508	1267	German	\N	\N	Zugangsvoraussetzungen	\N	2026-03-31 14:08:36.973662	system
+2509	1267	English	\N	\N	Entry requirements	\N	2026-03-31 14:08:36.974822	system
+2510	1268	German	\N	\N	bitte auswählen, sofern zutreffend	\N	2026-03-31 14:08:36.977521	system
+2511	1268	English	\N	\N	please select if applicable	\N	2026-03-31 14:08:36.978723	system
+2512	1269	German	\N	\N	negative kommissionelle Beurteilung und keine fristgerechte Bekanntgabe der Wiederholung des Studienjahres	\N	2026-03-31 14:08:36.981416	system
+2513	1269	English	\N	\N	negative assessment by the committee and no timely announcement of the repetition of the academic year	\N	2026-03-31 14:08:36.982585	system
+2514	1270	German	\N	\N	Person ist unruly.	\N	2026-03-31 14:08:36.985341	system
+2515	1270	English	\N	\N	Person is unruly.	\N	2026-03-31 14:08:36.9865	system
+2516	1271	German	\N	\N	Person ist unruly.	\N	2026-03-31 14:08:36.989156	system
+2517	1271	English	\N	\N	Person is unruly.	\N	2026-03-31 14:08:36.990354	system
+2518	1272	German	\N	\N	Studienwechsel	\N	2026-03-31 14:08:36.99315	system
+2519	1272	English	\N	\N	Change of studies	\N	2026-03-31 14:08:36.994328	system
+2520	1273	German	\N	\N	Studienwechsel: Der*Die Studierende hat uns mitgeteilt, dass er*sie das Studium wechseln wird und bittet um Abmeldung vom Studium.	\N	2026-03-31 14:08:36.99705	system
+2521	1273	English	\N	\N	Change of studies: The student has informed us that he/she will be changing his/her studies and requests to be deregistered from his/her studies.	\N	2026-03-31 14:08:36.998388	system
+2522	1274	German	\N	\N	Allgemeiner Studienabbruch	\N	2026-03-31 14:08:37.001088	system
+2523	1274	English	\N	\N	General withdrawal from studies	\N	2026-03-31 14:08:37.002276	system
+2524	1275	German	\N	\N	Allgemeiner Studienabbruch: Der*Die Studierende hat uns mitgeteilt, dass er*sie das Studium abbrechen wird und bittet um Abmeldung vom Studium.	\N	2026-03-31 14:08:37.004945	system
+2525	1275	English	\N	\N	General withdrawal from studies: The student has informed us that he/she will be dropping out of his/her studies and requests to be deregistered from the program.	\N	2026-03-31 14:08:37.006246	system
+2526	1276	German	\N	\N	Verstoß gegen Code of Conduct	\N	2026-03-31 14:08:37.009141	system
+2527	1276	English	\N	\N	Violation of the Code of Conduct	\N	2026-03-31 14:08:37.010347	system
+2528	1277	German	\N	\N	Verstoß gegen Code of Conduct	\N	2026-03-31 14:08:37.01306	system
+2529	1277	English	\N	\N	Violation of the Code of Conduct	\N	2026-03-31 14:08:37.014224	system
+2530	1278	German	\N	\N	Kein Grund zutreffend, Details:	\N	2026-03-31 14:08:37.017007	system
+2531	1278	English	\N	\N	No reason applies, details:	\N	2026-03-31 14:08:37.018245	system
+2532	1279	German	\N	\N	Kein Grund zutreffend, Details:	\N	2026-03-31 14:08:37.021072	system
+2533	1279	English	\N	\N	No reason applies, details:	\N	2026-03-31 14:08:37.022284	system
+2534	1280	German	\N	\N	Anhänge	\N	2026-03-31 14:08:37.024989	system
+2535	1280	English	\N	\N	Attachments	\N	2026-03-31 14:08:37.026158	system
+2536	1281	German	\N	\N	Neue Notiz	\N	2026-03-31 14:08:37.028816	system
+2537	1281	English	\N	\N	New Note	\N	2026-03-31 14:08:37.02999	system
+2538	1282	German	\N	\N	Notiz bearbeiten	\N	2026-03-31 14:08:37.032719	system
+2539	1282	English	\N	\N	Edit Note	\N	2026-03-31 14:08:37.033853	system
+2540	1283	German	\N	\N	Notiz löschen	\N	2026-03-31 14:08:37.036585	system
+2541	1283	English	\N	\N	Delete Note	\N	2026-03-31 14:08:37.037752	system
+2542	1284	German	\N	\N	Verfasser*in	\N	2026-03-31 14:08:37.040428	system
+2543	1284	English	\N	\N	author	\N	2026-03-31 14:08:37.041571	system
+2544	1285	German	\N	\N	Bearbeiter*in	\N	2026-03-31 14:08:37.044292	system
+2545	1285	English	\N	\N	editor	\N	2026-03-31 14:08:37.045469	system
+2546	1286	German	\N	\N	Verfasser*in UID	\N	2026-03-31 14:08:37.048241	system
+2547	1286	English	\N	\N	author UID	\N	2026-03-31 14:08:37.049423	system
+2548	1287	German	\N	\N	Bearbeiter*in UID	\N	2026-03-31 14:08:37.05233	system
+2549	1287	English	\N	\N	editor UID	\N	2026-03-31 14:08:37.053462	system
+2550	1288	German	\N	\N	erledigt	\N	2026-03-31 14:08:37.056138	system
+2551	1288	English	\N	\N	completed	\N	2026-03-31 14:08:37.057315	system
+2552	1289	German	\N	\N	Letzte Änderung	\N	2026-03-31 14:08:37.06034	system
+2553	1289	English	\N	\N	Last updated	\N	2026-03-31 14:08:37.061507	system
+2554	1290	German	\N	\N	Das Eingabefeld {field} ist erforderlich	\N	2026-03-31 14:08:37.064167	system
+2555	1290	English	\N	\N	The Input Field {field} is required	\N	2026-03-31 14:08:37.065529	system
+2556	1291	German	\N	\N	Das Eingabefeld {field} muss eine Ganzzahl enthalten	\N	2026-03-31 14:08:37.068243	system
+2557	1291	English	\N	\N	The Field {field} must contain an integer	\N	2026-03-31 14:08:37.069438	system
+2558	1292	German	\N	\N	Id-Typ der Notiz ist nicht korrekt	\N	2026-03-31 14:08:37.072074	system
+2559	1292	English	\N	\N	Id type of note is incorrect	\N	2026-03-31 14:08:37.073245	system
+2560	1293	German	\N	\N	{field} nicht gefunden	\N	2026-03-31 14:08:37.075902	system
+2561	1293	English	\N	\N	{field} not found	\N	2026-03-31 14:08:37.077102	system
+2562	1294	German	\N	\N	Rückgängig	\N	2026-03-31 14:08:37.079812	system
+2563	1294	English	\N	\N	Undo	\N	2026-03-31 14:08:37.08098	system
+2564	1295	German	\N	\N	Erledigt	\N	2026-03-31 14:08:37.083639	system
+2565	1295	English	\N	\N	Done	\N	2026-03-31 14:08:37.084792	system
+2566	1296	German	\N	\N	angelegt von {0} am {1}	\N	2026-03-31 14:08:37.087473	system
+2567	1296	English	\N	\N	Created by {0} on {1}	\N	2026-03-31 14:08:37.088673	system
+2568	1297	German	\N	\N	bearbeitet von {0} am {1}	\N	2026-03-31 14:08:37.091313	system
+2569	1297	English	\N	\N	Edited by {0} on {1}	\N	2026-03-31 14:08:37.092509	system
+2570	1298	German	\N	\N	Das Eingabefeld {field} darf nur Zahlen enthalten.	\N	2026-03-31 14:08:37.095293	system
+2571	1298	English	\N	\N	The Field {Field} must contain only numbers.	\N	2026-03-31 14:08:37.096467	system
+2572	1299	German	\N	\N	Das Eingabefeld {field} muss eine gültige Email-Adresse enthalten.	\N	2026-03-31 14:08:37.099175	system
+2573	1299	English	\N	\N	The field {field} must contain a valid email address.	\N	2026-03-31 14:08:37.100351	system
+2574	1300	German	\N	\N	Warnung	\N	2026-03-31 14:08:37.1031	system
+2575	1300	English	\N	\N	Warning	\N	2026-03-31 14:08:37.104272	system
+2576	1301	German	\N	\N	Vornamen	\N	2026-03-31 14:08:37.106909	system
+2577	1301	English	\N	\N	middle names	\N	2026-03-31 14:08:37.108062	system
+2578	1302	German	\N	\N	Männlich	\N	2026-03-31 14:08:37.110853	system
+2579	1302	English	\N	\N	Male	\N	2026-03-31 14:08:37.112026	system
+2580	1303	German	\N	\N	Weiblich	\N	2026-03-31 14:08:37.114764	system
+2581	1303	English	\N	\N	Female	\N	2026-03-31 14:08:37.115946	system
+2582	1304	German	\N	\N	Sprache	\N	2026-03-31 14:08:37.118641	system
+2583	1304	English	\N	\N	language	\N	2026-03-31 14:08:37.119786	system
+2584	1305	German	\N	\N	Zustelladresse	\N	2026-03-31 14:08:37.12518	system
+2585	1305	English	\N	\N	postal address	\N	2026-03-31 14:08:37.126337	system
+2586	1306	German	\N	\N	Kontaktinformation	\N	2026-03-31 14:08:37.129053	system
+2587	1306	English	\N	\N	contact information	\N	2026-03-31 14:08:37.130218	system
+2588	1307	German	\N	\N	Abweich.Empf. (c/o)	\N	2026-03-31 14:08:37.134392	system
+2589	1307	English	\N	\N	dissenting recipient (c/o)	\N	2026-03-31 14:08:37.135553	system
+2590	1389	German	\N	\N	Meldestichtag hinzufügen	\N	2026-03-31 14:08:37.306174	system
+2591	1389	English	\N	\N	Add report target date	\N	2026-03-31 14:08:37.307395	system
+2592	1390	German	\N	\N	BIS-Meldestichtage verwalten	\N	2026-03-31 14:08:37.310105	system
+2593	1390	English	\N	\N	Manage report target dates	\N	2026-03-31 14:08:37.311337	system
+2594	1391	German	\N	\N	Meldestichtag löschen	\N	2026-03-31 14:08:37.314033	system
+2595	1391	English	\N	\N	Delete report target date	\N	2026-03-31 14:08:37.315221	system
+2596	1392	German	\N	\N	<strong>Hinweis:</strong> Das Akzeptieren von Lehraufträgen ersetzt alle vorhergehenden Lehraufträge dieses Studiensemesters.	\N	2026-03-31 14:08:37.317912	system
+2597	1392	English	\N	\N	<strong>Note:</strong> Accepting teaching assignments replaces all previous teaching assignments for this study semester.	\N	2026-03-31 14:08:37.319081	system
+2598	1393	German	\N	\N	Notfallkontakt	\N	2026-03-31 14:08:37.321684	system
+2599	1393	English	\N	\N	Emergency contact	\N	2026-03-31 14:08:37.322802	system
+2600	1394	German	\N	\N	Profilbild sperren	\N	2026-03-31 14:08:37.325473	system
+2601	1394	English	\N	\N	lock profile picture	\N	2026-03-31 14:08:37.326613	system
+2602	1395	German	\N	\N	Profilbild entsperren	\N	2026-03-31 14:08:37.329226	system
+2603	1395	English	\N	\N	unlock profile picture	\N	2026-03-31 14:08:37.330393	system
+2604	1396	German	\N	\N	Profilbild hochladen	\N	2026-03-31 14:08:37.333024	system
+2605	1396	English	\N	\N	upload profile picture	\N	2026-03-31 14:08:37.33421	system
+2606	1397	German	\N	\N	Profil	\N	2026-03-31 14:08:37.336792	system
+2607	1397	English	\N	\N	Profile	\N	2026-03-31 14:08:37.337891	system
+2608	1398	German	\N	\N	Gruppen Link	\N	2026-03-31 14:08:37.340416	system
+2609	1398	English	\N	\N	group link	\N	2026-03-31 14:08:37.34152	system
+2610	1399	German	\N	\N	Verband Link	\N	2026-03-31 14:08:37.344104	system
+2611	1399	English	\N	\N	Verband link	\N	2026-03-31 14:08:37.345198	system
+2612	1400	German	\N	\N	Semester Link	\N	2026-03-31 14:08:37.34912	system
+2613	1400	English	\N	\N	Semester link	\N	2026-03-31 14:08:37.350278	system
+2614	1401	German	\N	\N	Telefon	\N	2026-03-31 14:08:37.35283	system
+2615	1401	English	\N	\N	Telephone	\N	2026-03-31 14:08:37.353951	system
+2616	1402	German	\N	\N	Mobiltelefonnummer	\N	2026-03-31 14:08:37.356576	system
+2617	1402	English	\N	\N	Cell phone number	\N	2026-03-31 14:08:37.357715	system
+2618	1403	German	\N	\N	E-Mail	\N	2026-03-31 14:08:37.360318	system
+2619	1403	English	\N	\N	E-Mail	\N	2026-03-31 14:08:37.361453	system
+2620	1404	German	\N	\N	Personen Informationen	\N	2026-03-31 14:08:37.364174	system
+2621	1404	English	\N	\N	Person Information	\N	2026-03-31 14:08:37.365328	system
+2622	1405	German	\N	\N	Postnomen	\N	2026-03-31 14:08:37.367911	system
+2623	1405	English	\N	\N	post-nominals	\N	2026-03-31 14:08:37.369048	system
+2624	1406	German	\N	\N	Benutzername	\N	2026-03-31 14:08:37.371622	system
+2625	1406	English	\N	\N	Username	\N	2026-03-31 14:08:37.372757	system
+2626	1407	German	\N	\N	Anrede	\N	2026-03-31 14:08:37.375356	system
+2627	1407	English	\N	\N	Salutation	\N	2026-03-31 14:08:37.376492	system
+2628	1408	German	\N	\N	Titel	\N	2026-03-31 14:08:37.37915	system
+2629	1408	English	\N	\N	Title	\N	2026-03-31 14:08:37.380307	system
+2630	1409	German	\N	\N	Postnomen	\N	2026-03-31 14:08:37.382909	system
+2631	1409	English	\N	\N	Postnominal	\N	2026-03-31 14:08:37.384052	system
+2632	1410	German	\N	\N	Geburtsdatum	\N	2026-03-31 14:08:37.386697	system
+2633	1410	English	\N	\N	Birthdate	\N	2026-03-31 14:08:37.387841	system
+2634	1411	German	\N	\N	Geburtsort	\N	2026-03-31 14:08:37.390451	system
+2635	1411	English	\N	\N	Birthplace	\N	2026-03-31 14:08:37.391608	system
+2636	1412	German	\N	\N	Büro	\N	2026-03-31 14:08:37.394234	system
+2637	1412	English	\N	\N	Office	\N	2026-03-31 14:08:37.395369	system
+2638	1413	German	\N	\N	Kurzzeichen	\N	2026-03-31 14:08:37.398014	system
+2639	1413	English	\N	\N	Abbreviation	\N	2026-03-31 14:08:37.39915	system
+2640	1414	German	\N	\N	Telefon	\N	2026-03-31 14:08:37.401806	system
+2641	1414	English	\N	\N	Telephone	\N	2026-03-31 14:08:37.402927	system
+2642	1415	German	\N	\N	Telefon	\N	2026-03-31 14:08:37.405586	system
+2643	1415	English	\N	\N	Telephone	\N	2026-03-31 14:08:37.40673	system
+2644	1416	German	\N	\N	Intern	\N	2026-03-31 14:08:37.409395	system
+2645	1416	English	\N	\N	Internal	\N	2026-03-31 14:08:37.410554	system
+2646	1417	German	\N	\N	Alias	\N	2026-03-31 14:08:37.413199	system
+2647	1417	English	\N	\N	Alias	\N	2026-03-31 14:08:37.414369	system
+2648	1418	German	\N	\N	E-Mail	\N	2026-03-31 14:08:37.417072	system
+2649	1418	English	\N	\N	E-Mail	\N	2026-03-31 14:08:37.418235	system
+2650	1419	German	\N	\N	Anmerkung	\N	2026-03-31 14:08:37.420904	system
+2651	1419	English	\N	\N	Remark	\N	2026-03-31 14:08:37.422159	system
+2652	1420	German	\N	\N	Notfallkontakt	\N	2026-03-31 14:08:37.42482	system
+2653	1420	English	\N	\N	Emergency contact	\N	2026-03-31 14:08:37.425991	system
+2654	1421	German	\N	\N	Straße	\N	2026-03-31 14:08:37.428665	system
+2655	1421	English	\N	\N	Street	\N	2026-03-31 14:08:37.429812	system
+2656	1422	German	\N	\N	Straße	\N	2026-03-31 14:08:37.432491	system
+2657	1422	English	\N	\N	Street	\N	2026-03-31 14:08:37.43369	system
+2658	1423	German	\N	\N	PLZ	\N	2026-03-31 14:08:37.436368	system
+2659	1423	English	\N	\N	PLZ	\N	2026-03-31 14:08:37.437567	system
+2660	1424	German	\N	\N	Ort	\N	2026-03-31 14:08:37.44014	system
+2661	1424	English	\N	\N	Locality	\N	2026-03-31 14:08:37.4413	system
+2662	1425	German	\N	\N	Typ	\N	2026-03-31 14:08:37.443876	system
+2663	1425	English	\N	\N	Type	\N	2026-03-31 14:08:37.445002	system
+2664	1426	German	\N	\N	Private Kontakte	Profil Kategorie in der die ganzen privaten Kontakte einer Person aufgelistet werden	2026-03-31 14:08:37.447624	system
+2665	1426	English	\N	\N	Private Contacts	Profile category in which all private contacts of a person are listed	2026-03-31 14:08:37.448775	system
+2666	1427	German	\N	\N	Private Adressen	Profil Kategorie in der die ganzen privaten Adressen einer Person aufgelistet werden	2026-03-31 14:08:37.451469	system
+2667	1427	English	\N	\N	Private Addresses	Profile category in which all private addresses of a person are listed	2026-03-31 14:08:37.452674	system
+2668	1428	German	\N	\N	Profil bearbeiten	\N	2026-03-31 14:08:37.455362	system
+2669	1428	English	\N	\N	edit profil	\N	2026-03-31 14:08:37.456474	system
+2670	1429	German	\N	\N	MitarbeiterIn	\N	2026-03-31 14:08:37.459062	system
+2671	1429	English	\N	\N	Employee	\N	2026-03-31 14:08:37.460249	system
+2672	1430	German	\N	\N	Entlehnte Betriebsmittel	\N	2026-03-31 14:08:37.462862	system
+2673	1430	English	\N	\N	Borrowed Company Resources	\N	2026-03-31 14:08:37.463993	system
+2674	1431	German	\N	\N	Mitarbeiter Information	\N	2026-03-31 14:08:37.466636	system
+2675	1431	English	\N	\N	Employee Information	\N	2026-03-31 14:08:37.467732	system
+2676	1432	German	\N	\N	StudentIn	\N	2026-03-31 14:08:37.470313	system
+2677	1432	English	\N	\N	Student	\N	2026-03-31 14:08:37.47143	system
+2678	1433	German	\N	\N	Student Information	\N	2026-03-31 14:08:37.473974	system
+2679	1433	English	\N	\N	Student Information	\N	2026-03-31 14:08:37.475099	system
+2680	1434	German	\N	\N	Zutrittsgruppen	\N	2026-03-31 14:08:37.477655	system
+2681	1434	English	\N	\N	Access groups	\N	2026-03-31 14:08:37.478722	system
+2682	1435	German	\N	\N	Der FH Ausweis ist am {0} ausgegeben worden.	\N	2026-03-31 14:08:37.481273	system
+2683	1435	English	\N	\N	The FH ID card was issued on {0}	\N	2026-03-31 14:08:37.482396	system
+2684	1436	German	\N	\N	Mailverteiler	\N	2026-03-31 14:08:37.485	system
+2685	1436	English	\N	\N	Mailing list	\N	2026-03-31 14:08:37.486135	system
+2686	1437	German	\N	\N	Sie sind Mitglied in folgenden Mailverteilern:	\N	2026-03-31 14:08:37.488798	system
+2687	1437	English	\N	\N	You are a member of the following mailing lists:	\N	2026-03-31 14:08:37.489949	system
+2688	1438	German	\N	\N	Quick Links	\N	2026-03-31 14:08:37.492621	system
+2689	1438	English	\N	\N	Quick Links	\N	2026-03-31 14:08:37.493753	system
+2690	1439	German	\N	\N	Zeitwünsche	\N	2026-03-31 14:08:37.496366	system
+2691	1439	English	\N	\N	Time wishes	\N	2026-03-31 14:08:37.497487	system
+2692	1440	German	\N	\N	Lehrveranstaltungen	\N	2026-03-31 14:08:37.500087	system
+2693	1440	English	\N	\N	Courses	\N	2026-03-31 14:08:37.501258	system
+2694	1441	German	\N	\N	Zeitsperren	\N	2026-03-31 14:08:37.503897	system
+2695	1441	English	\N	\N	Time locks	\N	2026-03-31 14:08:37.505026	system
+2696	1442	German	\N	\N	Inventarnummer	\N	2026-03-31 14:08:37.507623	system
+2697	1442	English	\N	\N	inventory number	\N	2026-03-31 14:08:37.50874	system
+2698	1443	German	\N	\N	Ausgabedatum	\N	2026-03-31 14:08:37.51132	system
+2699	1443	English	\N	\N	issue date	\N	2026-03-31 14:08:37.512483	system
+2700	1444	German	\N	\N	Wochenstunden	\N	2026-03-31 14:08:37.515101	system
+2701	1444	English	\N	\N	working hours	\N	2026-03-31 14:08:37.516237	system
+2702	1445	German	\N	\N	StG	\N	2026-03-31 14:08:37.518862	system
+2703	1445	English	\N	\N	degree Progr	\N	2026-03-31 14:08:37.519976	system
+2704	1446	German	\N	\N	OrgForm	\N	2026-03-31 14:08:37.522599	system
+2705	1446	English	\N	\N	org Form	\N	2026-03-31 14:08:37.523739	system
+2706	1447	German	\N	\N	OrgEH	\N	2026-03-31 14:08:37.526347	system
+2707	1447	English	\N	\N	org Unit	\N	2026-03-31 14:08:37.527518	system
+2708	1448	German	\N	\N	Sem	\N	2026-03-31 14:08:37.530141	system
+2709	1448	English	\N	\N	sem	\N	2026-03-31 14:08:37.531295	system
+2710	1449	German	\N	\N	Vorherige Woche	\N	2026-03-31 14:08:37.533897	system
+2711	1449	English	\N	\N	Previous week	\N	2026-03-31 14:08:37.535063	system
+2712	1450	German	\N	\N	Vorheriges Jahr	\N	2026-03-31 14:08:37.53781	system
+2713	1450	English	\N	\N	Previous year	\N	2026-03-31 14:08:37.538953	system
+2714	1451	German	\N	\N	Vorheriges Monat	\N	2026-03-31 14:08:37.541638	system
+2715	1451	English	\N	\N	Previous month	\N	2026-03-31 14:08:37.542752	system
+2716	1452	German	\N	\N	Vorheriger Tag	\N	2026-03-31 14:08:37.545378	system
+2717	1452	English	\N	\N	Previous day	\N	2026-03-31 14:08:37.546509	system
+2718	1453	German	\N	\N	Nächster Tag	\N	2026-03-31 14:08:37.549116	system
+2719	1453	English	\N	\N	Next day	\N	2026-03-31 14:08:37.550299	system
+2720	1454	German	\N	\N	Nächste Woche	\N	2026-03-31 14:08:37.553019	system
+2721	1454	English	\N	\N	Next week	\N	2026-03-31 14:08:37.554161	system
+2722	1455	German	\N	\N	Nächster Monat	\N	2026-03-31 14:08:37.55681	system
+2723	1455	English	\N	\N	Next month	\N	2026-03-31 14:08:37.558061	system
+2724	1456	German	\N	\N	Nächstes Jahr	\N	2026-03-31 14:08:37.560692	system
+2725	1456	English	\N	\N	Next year	\N	2026-03-31 14:08:37.561802	system
+2726	1457	German	\N	\N	Tages Ansicht	\N	2026-03-31 14:08:37.564642	system
+2727	1457	English	\N	\N	Daily view	\N	2026-03-31 14:08:37.565848	system
+2728	1458	German	\N	\N	Wochen Ansicht	\N	2026-03-31 14:08:37.568597	system
+2729	1458	English	\N	\N	Week view	\N	2026-03-31 14:08:37.569806	system
+2730	1459	German	\N	\N	Monats Ansicht	\N	2026-03-31 14:08:37.57278	system
+2731	1459	English	\N	\N	Month view	\N	2026-03-31 14:08:37.573965	system
+2732	1460	German	\N	\N	Profilbild	\N	2026-03-31 14:08:37.576781	system
+2733	1460	English	\N	\N	Profile picture	\N	2026-03-31 14:08:37.577966	system
+2734	1461	German	\N	\N	Anhang löschen	\N	2026-03-31 14:08:37.580816	system
+2735	1461	English	\N	\N	Delete attachment	\N	2026-03-31 14:08:37.58203	system
+2736	1462	German	\N	\N	Dokument hochladen	\N	2026-03-31 14:08:37.584759	system
+2737	1462	English	\N	\N	Upload document	\N	2026-03-31 14:08:37.585902	system
+2738	1463	German	\N	\N	Profil Updates	\N	2026-03-31 14:08:37.588519	system
+2739	1463	English	\N	\N	Profile Updates	\N	2026-03-31 14:08:37.589668	system
+2740	1464	German	\N	\N	Thema	\N	2026-03-31 14:08:37.592313	system
+2741	1464	English	\N	\N	topic	\N	2026-03-31 14:08:37.593447	system
+2742	1465	German	\N	\N	Eine andere Adresse wird aktuell zur Zustellung verwendet, in Zukunft würde diese Adresse als Zustellungsadresse verwendet werden!	\N	2026-03-31 14:08:37.596139	system
+2743	1465	English	\N	\N	Another address is currently used as contact address, in the future this address would be used as contact address!	\N	2026-03-31 14:08:37.597514	system
+2744	1466	German	\N	\N	Ein anderer Kontakt wird aktuell zur Zustellung verwendet, in Zukunft würde dieser Kontakt als Zustellungskontakt verwendet werden!	\N	2026-03-31 14:08:37.60015	system
+2745	1466	English	\N	\N	Another contact is currently used for communication, in the future this contact would be used for communication!	\N	2026-03-31 14:08:37.601296	system
+2746	1467	German	\N	\N	Kontakttyp	\N	2026-03-31 14:08:37.603935	system
+2747	1467	English	\N	\N	contact type	\N	2026-03-31 14:08:37.605125	system
+2748	1468	German	\N	\N	Nebenwohnsitz	\N	2026-03-31 14:08:37.607751	system
+2749	1468	English	\N	\N	secondary residence	\N	2026-03-31 14:08:37.608901	system
+2750	1469	German	\N	\N	Hauptwohnsitz	\N	2026-03-31 14:08:37.611518	system
+2751	1469	English	\N	\N	main residence	\N	2026-03-31 14:08:37.612648	system
+2752	1470	German	\N	\N	Homeoffice	\N	2026-03-31 14:08:37.615284	system
+2753	1470	English	\N	\N	Homeoffice	\N	2026-03-31 14:08:37.616472	system
+2754	1471	German	\N	\N	Rechnungsadresse	\N	2026-03-31 14:08:37.619335	system
+2755	1471	English	\N	\N	Billing address	\N	2026-03-31 14:08:37.620529	system
+2756	1472	German	\N	\N	Notfallkontakt	\N	2026-03-31 14:08:37.623162	system
+2757	1472	English	\N	\N	Emergency contact	\N	2026-03-31 14:08:37.624327	system
+2758	1473	German	\N	\N	Mobiltelefonnummer	\N	2026-03-31 14:08:37.62698	system
+2759	1473	English	\N	\N	Cell phone number	\N	2026-03-31 14:08:37.62812	system
+2760	1474	German	\N	\N	Homepage	\N	2026-03-31 14:08:37.631003	system
+2761	1474	English	\N	\N	Homepage	\N	2026-03-31 14:08:37.632155	system
+2762	1475	German	\N	\N	Faxnummer	\N	2026-03-31 14:08:37.634788	system
+2763	1475	English	\N	\N	Fax number	\N	2026-03-31 14:08:37.635944	system
+2764	1476	German	\N	\N	Zustellungs Kontakt	\N	2026-03-31 14:08:37.638548	system
+2765	1476	English	\N	\N	Delivery contact	\N	2026-03-31 14:08:37.63965	system
+2766	1477	German	\N	\N	Status Mitteilung	\N	2026-03-31 14:08:37.642456	system
+2767	1477	English	\N	\N	Status message	\N	2026-03-31 14:08:37.643592	system
+2768	1478	German	\N	\N	Aktualisieren Sie ihren {0} und laden Sie die passenden Nachweisdokumente hoch	\N	2026-03-31 14:08:37.64624	system
+2769	1478	English	\N	\N	Please update your {0} and upload the corresponding Document of proof	\N	2026-03-31 14:08:37.647394	system
+2770	1479	German	\N	\N	Bitte laden Sie ihr {0} hoch	\N	2026-03-31 14:08:37.650077	system
+2771	1479	English	\N	\N	Please upload your {0}	\N	2026-03-31 14:08:37.651169	system
+2772	1480	German	\N	\N	Profil Änderungs Anfrage	Eine Änderungs Anfrage	2026-03-31 14:08:37.653985	system
+2773	1480	English	\N	\N	Profil Update Request	One profil update request	2026-03-31 14:08:37.655072	system
+2774	1481	German	\N	\N	Profil Änderungs Anfragen	Mehrere Änderungs Anfragen	2026-03-31 14:08:37.657605	system
+2775	1481	English	\N	\N	Profil Update Requests	Multiple update requests	2026-03-31 14:08:37.658694	system
+2776	1482	German	\N	\N	Status Datum	\N	2026-03-31 14:08:37.661285	system
+2777	1482	English	\N	\N	Date of Status	\N	2026-03-31 14:08:37.66238	system
+2778	1483	German	\N	\N	UserID	\N	2026-03-31 14:08:37.665028	system
+2779	1483	English	\N	\N	UserID	\N	2026-03-31 14:08:37.666188	system
+2780	1484	German	\N	\N	Thema der Anfrage	\N	2026-03-31 14:08:37.668809	system
+2781	1484	English	\N	\N	Topic of Request	\N	2026-03-31 14:08:37.669957	system
+2782	1485	German	\N	\N	Datum der Anfrage	\N	2026-03-31 14:08:37.672651	system
+2783	1485	English	\N	\N	Date of Request	\N	2026-03-31 14:08:37.673775	system
+2784	1486	German	\N	\N	Aktualisierung	\N	2026-03-31 14:08:37.676413	system
+2785	1486	English	\N	\N	update	\N	2026-03-31 14:08:37.677586	system
+2786	1487	German	\N	\N	Annehmen	\N	2026-03-31 14:08:37.680216	system
+2787	1487	English	\N	\N	accept	\N	2026-03-31 14:08:37.681387	system
+2788	1488	German	\N	\N	Ablehnen	\N	2026-03-31 14:08:37.683992	system
+2789	1488	English	\N	\N	deny	\N	2026-03-31 14:08:37.685118	system
+2790	1489	German	\N	\N	Benutzer	\N	2026-03-31 14:08:37.687793	system
+2791	1489	English	\N	\N	User	\N	2026-03-31 14:08:37.688948	system
+2792	1490	German	\N	\N	Ausstehende Anfragen	\N	2026-03-31 14:08:37.691534	system
+2793	1490	English	\N	\N	Pending Requests	\N	2026-03-31 14:08:37.692686	system
+2794	1491	German	\N	\N	Angenommene Anfragen	\N	2026-03-31 14:08:37.695338	system
+2795	1491	English	\N	\N	Accepted Requests	\N	2026-03-31 14:08:37.696479	system
+2796	1492	German	\N	\N	Abgelehnte Anfragen	\N	2026-03-31 14:08:37.699086	system
+2797	1492	English	\N	\N	Rejected Requests	\N	2026-03-31 14:08:37.700234	system
+2798	1493	German	\N	\N	Alle Anfragen	\N	2026-03-31 14:08:37.702847	system
+2799	1493	English	\N	\N	All Requests	\N	2026-03-31 14:08:37.703978	system
+2800	1494	German	\N	\N	Kontakt löschen	\N	2026-03-31 14:08:37.706623	system
+2801	1494	English	\N	\N	Delete contact	\N	2026-03-31 14:08:37.707747	system
+2802	1495	German	\N	\N	Item löschen	\N	2026-03-31 14:08:37.710281	system
+2803	1495	English	\N	\N	Delete item	\N	2026-03-31 14:08:37.711401	system
+2804	1496	German	\N	\N	Item hinzufügen	\N	2026-03-31 14:08:37.71403	system
+2805	1496	English	\N	\N	Add item	\N	2026-03-31 14:08:37.715232	system
+2806	1497	German	\N	\N	Adresse löschen	\N	2026-03-31 14:08:37.717906	system
+2807	1497	English	\N	\N	Delete address	\N	2026-03-31 14:08:37.719006	system
+2808	1498	German	\N	\N	Kontakt hinzufügen	\N	2026-03-31 14:08:37.721672	system
+2809	1498	English	\N	\N	Add contact	\N	2026-03-31 14:08:37.722801	system
+2810	1499	German	\N	\N	Vorname	\N	2026-03-31 14:08:37.726748	system
+2811	1499	English	\N	\N	First name	\N	2026-03-31 14:08:37.727896	system
+2812	1500	German	\N	\N	Nachname	\N	2026-03-31 14:08:37.730528	system
+2813	1500	English	\N	\N	Last name	\N	2026-03-31 14:08:37.731697	system
+2814	1501	German	\N	\N	Titel	\N	2026-03-31 14:08:37.734329	system
+2815	1501	English	\N	\N	Title	\N	2026-03-31 14:08:37.735454	system
+2816	1502	German	\N	\N	Ausstehend	\N	2026-03-31 14:08:37.738105	system
+2817	1502	English	\N	\N	Pending	\N	2026-03-31 14:08:37.739241	system
+2818	1503	German	\N	\N	Akzeptiert	Profil Änderungen die akzeptiert wurden	2026-03-31 14:08:37.742081	system
+2819	1503	English	\N	\N	Accepted	Profil updates that were accepted	2026-03-31 14:08:37.743204	system
+2820	1504	German	\N	\N	Abgelehnt	Profil Änderungen die abgelehnt wurden	2026-03-31 14:08:37.745795	system
+2821	1504	English	\N	\N	Rejected	Profil updates that were rejected	2026-03-31 14:08:37.746927	system
+2822	1505	German	\N	\N	Nicht möglich adressenID {0} für profil Änderung {1} hinzuzufügen	Fehlermeldung wenn die AdressenID bereits in einer Profil Änderung verwendet wurde	2026-03-31 14:08:37.749583	system
+2823	1505	English	\N	\N	was not able to add addressID {0} to profilRequest {1}	Error message when the addressID was already used for another profil update	2026-03-31 14:08:37.750743	system
+2824	1506	German	\N	\N	Notwendinge Berechtigungen fehlen	Fehlermeldung wenn notwendige Berechtigungen für Aktionen fehlen	2026-03-31 14:08:37.753444	system
+2825	1506	English	\N	\N	Missing necessary permission	Error message if necessary permissions are missing	2026-03-31 14:08:37.754571	system
+2826	1507	German	\N	\N	Das angeforderte Dokument ist kein Anhang einer Profil Änderung	Fehlermeldung wenn ein Dokument angefordert wird, das nicht im zusammenhang mit einer Profil Änderung ist	2026-03-31 14:08:37.757157	system
+2827	1507	English	\N	\N	The requested document is not an attachment for any profil update	Error message if a document is requested that is not connected with a profil update	2026-03-31 14:08:37.75831	system
+2828	1508	German	\N	\N	Ein Fehler ist aufgetreten beim sender der Email	Fehlermeldung wenn ein Fehler beim senden einer Email auftritt	2026-03-31 14:08:37.760948	system
+2829	1508	English	\N	\N	An error occurred when sending an email	Error message if an error occurred while sending emails	2026-03-31 14:08:37.762078	system
+2830	1509	German	\N	\N	Ein Fehler ist aufgetreten beim Überprüfen ob die Person ein Student ist	Fehlermeldung wenn ein Fehler beim überprüfen eines Studenten auftritt	2026-03-31 14:08:37.764736	system
+2831	1509	English	\N	\N	An error occurred while checking if the person is a student	Error message if an error occurred when checking if a person is a student	2026-03-31 14:08:37.765861	system
+2832	1510	German	\N	\N	Ein Fehler ist aufgetreten, es wurde kein Mitarbeiter mit der gleichen uid gefunden	Fehlermeldung wenn ein Fehler beim überprüfen eines Mitarbeiter auftritt	2026-03-31 14:08:37.76858	system
+2833	1510	English	\N	\N	An error occurred while checking if the person is a mitarbeiter	Error message if an error occurred when checking if a person is a mitarbeiter	2026-03-31 14:08:37.769745	system
+2834	1511	German	\N	\N	Ein Fehler beim laden der Profil Änderung ist aufgetreten	Fehlermeldung wenn ein Fehler beim laden einer Profil Änderung auftritt	2026-03-31 14:08:37.77238	system
+2835	1511	English	\N	\N	An error occurred while loading the profil update	Error message if an error occurred when loading a profil update	2026-03-31 14:08:37.773546	system
+2836	1512	German	\N	\N	Ein Fehler beim laden der Dms Version ist aufgetreten	Fehlermeldung wenn ein Fehler beim laden einer Dms Version auftritt	2026-03-31 14:08:37.776192	system
+2837	1512	English	\N	\N	An error occurred while loading the dms version	Error message if an error occurred when loading a dms version	2026-03-31 14:08:37.777354	system
+2838	1513	German	\N	\N	Ein Fehler ist aufgetretten, man kann keine Zustellung löschen	Fehlermeldung wenn versucht wird eine Zustellungsresource zu löschen	2026-03-31 14:08:37.779993	system
+2839	1513	English	\N	\N	An error occurred, it is not possible to delete a resource marked as zustellung	Error message if someone tried to delete a resource that is marked as zustellung	2026-03-31 14:08:37.781148	system
+2840	1514	German	\N	\N	Ein Fehler ist aufgetretten, man kann die gleiche Profil Information nicht zweimal ändern	Fehlermeldung wenn versucht wird eine Information zweimal zu ändern	2026-03-31 14:08:37.78378	system
+2841	1514	English	\N	\N	An error occurred, it is not possible to change the same profil information twice	Error message if someone tried to change the same profil information twice	2026-03-31 14:08:37.784944	system
+2842	1515	German	\N	\N	Eine Anfrage {0} ist bereits geöffnet worden	Wenn die Profil Änderung nicht über Kontakte oder Adressen ist dann darf das Topic nur einmalig verändert werden	2026-03-31 14:08:37.787621	system
+2843	1515	English	\N	\N	A request to change {0} is already open	if the profil update is not about contacts or addresses then the topic has to be unique	2026-03-31 14:08:37.788775	system
+2844	1516	German	\N	\N	Ein Fehler beim laden der oe_einheit ist aufgetreten	\N	2026-03-31 14:08:37.79138	system
+2845	1516	English	\N	\N	An error occurred, when loading the oe_einheit	\N	2026-03-31 14:08:37.792514	system
+2846	1517	German	\N	\N	Ein Fehler ist aufgetreten, notwendige Informationen fehlen	\N	2026-03-31 14:08:37.795195	system
+2847	1517	English	\N	\N	An error occurred, required informations are missing	\N	2026-03-31 14:08:37.796348	system
+2848	1518	German	\N	\N	Ein Fehler ist beim hinzufügen der Profil Änderung aufgetreten	\N	2026-03-31 14:08:37.798997	system
+2849	1518	English	\N	\N	An error occurred during the insertion of the profil update	\N	2026-03-31 14:08:37.80015	system
+2850	1519	German	\N	\N	Ein Fehler ist beim hinzufügen des Kontaktes aufgetreten	\N	2026-03-31 14:08:37.802795	system
+2851	1519	English	\N	\N	An error occurred during the insertion of the contact	\N	2026-03-31 14:08:37.803947	system
+2852	1520	German	\N	\N	Ein Fehler ist beim hinzufügen der Adresse aufgetreten	\N	2026-03-31 14:08:37.80656	system
+2853	1520	English	\N	\N	An error occurred during the insertion of the address	\N	2026-03-31 14:08:37.807729	system
+2854	1521	German	\N	\N	Ein Fehler ist beim ändern eines Kontaktes aufgetreten	\N	2026-03-31 14:08:37.810398	system
+2855	1521	English	\N	\N	An error occurred while updating a profil update contact	\N	2026-03-31 14:08:37.811566	system
+2856	1522	German	\N	\N	Ein Fehler ist beim ändern einer Adresse aufgetreten	\N	2026-03-31 14:08:37.814194	system
+2857	1522	English	\N	\N	An error occurred while updating a profil update address	\N	2026-03-31 14:08:37.815352	system
+2858	1523	German	\N	\N	Ein Fehler ist während dem laden der Zustellkontakte aufgetreten	\N	2026-03-31 14:08:37.818243	system
+2859	1523	English	\N	\N	An error occurred when querying zustellkontakte	\N	2026-03-31 14:08:37.819408	system
+2860	1524	German	\N	\N	Ein Fehler ist während dem laden der Zustelladressen aufgetreten	\N	2026-03-31 14:08:37.822076	system
+2861	1524	English	\N	\N	An error occurred when querying zustelladressen	\N	2026-03-31 14:08:37.823239	system
+2862	1525	German	\N	\N	Änderung annehmen	\N	2026-03-31 14:08:37.825834	system
+2863	1525	English	\N	\N	Accept Request	\N	2026-03-31 14:08:37.826934	system
+2864	1526	German	\N	\N	Änderung ablehnen	\N	2026-03-31 14:08:37.829459	system
+2865	1526	English	\N	\N	Deny Request	\N	2026-03-31 14:08:37.830564	system
+2866	1527	German	\N	\N	Änderung anzeigen	\N	2026-03-31 14:08:37.833161	system
+2867	1527	English	\N	\N	Show request	\N	2026-03-31 14:08:37.834306	system
+2868	1528	German	\N	\N	Ein Fehler ist aufgetreten, der Status "{0}" ist unbekannt	Fehler der auftritt wenn es den Status nicht in der Datenbank gibt	2026-03-31 14:08:37.836869	system
+2869	1528	English	\N	\N	An error occurred, the status "{0}" is not known	error that occurrs when the used status is not present in the database	2026-03-31 14:08:37.838013	system
+2870	1529	German	\N	\N	Ein Fehler ist aufgetreten, das Topic "{0}" existiert nicht	Fehler der auftritt wenn es das Topic nicht in der Datenbank gibt	2026-03-31 14:08:37.840689	system
+2871	1529	English	\N	\N	An error occurred, the topic "{0}" is not known	error that occurrs when the used topic is not present in the database	2026-03-31 14:08:37.841883	system
+2872	1530	German	\N	\N	Ein Fehler ist aufgetreten, Es war nicht möglich die Adresse mit ID {0} in der Datenbank anzulegen	Fehler der auftritt wenn es nicht möglich war eine neue Adresse anzulegen	2026-03-31 14:08:37.844638	system
+2873	1530	English	\N	\N	An error occurred, it wasn't possible to add new address with ID {0} to the database	error that occurrs when it wasn't possible to add new address in db	2026-03-31 14:08:37.845837	system
+2874	1531	German	\N	\N	Ein Fehler ist aufgetreten, Es war nicht möglich den Kontakt mit ID {0} in der Datenbank anzulegen	Fehler der auftritt wenn es nicht möglich war einen neuen Kontakt anzulegen	2026-03-31 14:08:37.848557	system
+2875	1531	English	\N	\N	An error occurred, it wasn't possible to add new contact with ID {0} to the database	error that occurrs when it wasn't possible to add new contact in db	2026-03-31 14:08:37.849759	system
+2876	1532	German	\N	\N	Name	\N	2026-03-31 14:08:37.852493	system
+2877	1532	English	\N	\N	Name	\N	2026-03-31 14:08:37.853665	system
+2878	1533	German	\N	\N	Thema	\N	2026-03-31 14:08:37.856368	system
+2879	1533	English	\N	\N	Topic	\N	2026-03-31 14:08:37.857548	system
+2880	1534	German	\N	\N	Einfüge Datum	\N	2026-03-31 14:08:37.86025	system
+2881	1534	English	\N	\N	Insert Date	\N	2026-03-31 14:08:37.861598	system
+2882	1535	German	\N	\N	Aktionen	\N	2026-03-31 14:08:37.864342	system
+2883	1535	English	\N	\N	Actions	\N	2026-03-31 14:08:37.865543	system
+2884	1536	German	\N	\N	Status	\N	2026-03-31 14:08:37.868334	system
+2885	1536	English	\N	\N	Status	\N	2026-03-31 14:08:37.86956	system
+2886	1537	German	\N	\N	Die initiale Meldeadresse kann aufgrund von Berichtspflichten nicht verändert oder gelöscht werden.	\N	2026-03-31 14:08:37.872292	system
+2887	1537	English	\N	\N	The initial official address can not be changed or deleted due to reporting obligations.	\N	2026-03-31 14:08:37.873489	system
+2888	1538	German	\N	\N	(Soll etwaige Post an diese Adresse geschickt werden?)	\N	2026-03-31 14:08:37.876186	system
+2889	1538	English	\N	\N	(Should any paper mail be sent to this address?)	\N	2026-03-31 14:08:37.877461	system
+2890	1539	German	\N	\N	Gelöscht	\N	2026-03-31 14:08:37.880149	system
+2891	1539	English	\N	\N	Deleted	\N	2026-03-31 14:08:37.881372	system
+2892	1540	German	\N	\N	vorherige	\N	2026-03-31 14:08:37.884129	system
+2893	1540	English	\N	\N	previous	\N	2026-03-31 14:08:37.885301	system
+2894	1541	German	\N	\N	nächste	\N	2026-03-31 14:08:37.887981	system
+2895	1541	English	\N	\N	next	\N	2026-03-31 14:08:37.88916	system
+2896	1542	German	\N	\N	Zum {0} Theme wechseln	\N	2026-03-31 14:08:37.891872	system
+2897	1542	English	\N	\N	Switch to {0} theme	\N	2026-03-31 14:08:37.893323	system
+2898	1543	German	\N	\N	Änderung gespeichert	\N	2026-03-31 14:08:37.895993	system
+2899	1543	English	\N	\N	Saved changes	\N	2026-03-31 14:08:37.897168	system
+2900	1549	German	\N	\N	Alle genehmigt	\N	2026-03-31 14:08:37.910332	system
+2901	1549	English	\N	\N	All accepted	\N	2026-03-31 14:08:37.911503	system
+2902	1550	German	\N	\N	Alle abgelehnt	\N	2026-03-31 14:08:37.914083	system
+2903	1550	English	\N	\N	All rejected	\N	2026-03-31 14:08:37.915189	system
+2904	1551	German	\N	\N	Dokument	\N	2026-03-31 14:08:37.917889	system
+2905	1551	English	\N	\N	Document	\N	2026-03-31 14:08:37.919022	system
+2906	1552	German	\N	\N	Aktionen	\N	2026-03-31 14:08:37.921635	system
+2907	1552	English	\N	\N	Actions	\N	2026-03-31 14:08:37.92275	system
+2908	1667	German	\N	\N	Digitale Anwesenheiten	\N	2026-03-31 14:08:38.154133	system
+2909	1667	English	\N	\N	Digital Attendances	\N	2026-03-31 14:08:38.155365	system
+2910	1732	German	\N	\N	Neuer Link	\N	2026-03-31 14:08:38.282497	system
+2911	1732	English	\N	\N	New Link	\N	2026-03-31 14:08:38.283593	system
+2912	1733	German	\N	\N	Link speichern	\N	2026-03-31 14:08:38.28617	system
+2913	1733	English	\N	\N	Save link	\N	2026-03-31 14:08:38.287359	system
+2914	1734	German	\N	\N	Link bearbeiten	\N	2026-03-31 14:08:38.290017	system
+2915	1734	English	\N	\N	Edit link	\N	2026-03-31 14:08:38.291209	system
+2916	1735	German	\N	\N	Link gelöscht	\N	2026-03-31 14:08:38.293919	system
+2917	1735	English	\N	\N	Link deleted	\N	2026-03-31 14:08:38.295102	system
+2918	1736	German	\N	\N	Link hinzugefügt	\N	2026-03-31 14:08:38.297853	system
+2919	1736	English	\N	\N	Link added	\N	2026-03-31 14:08:38.299045	system
+2920	1737	German	\N	\N	Link geändert	\N	2026-03-31 14:08:38.303045	system
+2921	1737	English	\N	\N	Link updated	\N	2026-03-31 14:08:38.30422	system
+2922	1738	German	\N	\N	Meine Urls	\N	2026-03-31 14:08:38.30692	system
+2923	1738	English	\N	\N	My Urls	\N	2026-03-31 14:08:38.308108	system
+2924	1739	German	\N	\N	Du hast noch keine Bookmarks gesetzt	\N	2026-03-31 14:08:38.310836	system
+2925	1739	English	\N	\N	You have not set any bookmarks yet	\N	2026-03-31 14:08:38.312021	system
+2926	1740	German	\N	\N	Ungültiger Link	\N	2026-03-31 14:08:38.314741	system
+2927	1740	English	\N	\N	Invalid link	\N	2026-03-31 14:08:38.315893	system
+2928	1741	German	\N	\N	Ungültiger Titel	\N	2026-03-31 14:08:38.318574	system
+2929	1741	English	\N	\N	Invalid title	\N	2026-03-31 14:08:38.319763	system
+2930	1742	German	\N	\N	Gespeichert	\N	2026-03-31 14:08:38.322463	system
+2931	1742	English	\N	\N	Saved	\N	2026-03-31 14:08:38.323686	system
+2932	1744	German	\N	\N	Raumzuordnung	\N	2026-03-31 14:08:38.328352	system
+2933	1744	English	\N	\N	Location Assignment	\N	2026-03-31 14:08:38.329567	system
+2934	1745	German	\N	\N	Status setzen	\N	2026-03-31 14:08:38.333509	system
+2935	1745	English	\N	\N	Set status	\N	2026-03-31 14:08:38.334666	system
+2936	1746	German	\N	\N	Hierarchie-Ansicht	\N	2026-03-31 14:08:38.337321	system
+2937	1746	English	\N	\N	Hierarchy view	\N	2026-03-31 14:08:38.338502	system
+2938	1747	German	\N	\N	aufgeklappt	\N	2026-03-31 14:08:38.341034	system
+2939	1747	English	\N	\N	unfolded	\N	2026-03-31 14:08:38.342293	system
+2940	1748	German	\N	\N	zugeklappt	\N	2026-03-31 14:08:38.344922	system
+2941	1748	English	\N	\N	folded	\N	2026-03-31 14:08:38.346211	system
+2942	1753	German	\N	\N	Verfügbarkeit bearbeiten	\N	2026-03-31 14:08:38.356479	system
+2943	1753	English	\N	\N	Edit availability	\N	2026-03-31 14:08:38.357663	system
+2944	1765	German	\N	\N	Bezeichnung	\N	2026-03-31 14:08:38.381881	system
+2945	1765	English	\N	\N	Name	\N	2026-03-31 14:08:38.383096	system
+2946	1767	German	\N	\N	Verfügbarkeit Start	\N	2026-03-31 14:08:38.388184	system
+2947	1767	English	\N	\N	Availability start	\N	2026-03-31 14:08:38.389441	system
+2948	1768	German	\N	\N	Verfügbarkeit Ende	\N	2026-03-31 14:08:38.392295	system
+2949	1768	English	\N	\N	Availability end	\N	2026-03-31 14:08:38.393525	system
+2950	1772	German	\N	\N	Hersteller	\N	2026-03-31 14:08:38.402528	system
+2951	1772	English	\N	\N	Producer	\N	2026-03-31 14:08:38.403698	system
+2952	1773	German	\N	\N	Verantwortliche	\N	2026-03-31 14:08:38.406327	system
+2953	1773	English	\N	\N	Responsible	\N	2026-03-31 14:08:38.407533	system
+2954	1775	German	\N	\N	Ansprechpartner	\N	2026-03-31 14:08:38.412336	system
+2955	1775	English	\N	\N	Contact person	\N	2026-03-31 14:08:38.413544	system
+2956	1776	German	\N	\N	Ansprechpartner intern	\N	2026-03-31 14:08:38.416175	system
+2957	1776	English	\N	\N	Contact person internal	\N	2026-03-31 14:08:38.417398	system
+2958	1777	German	\N	\N	Ansprechpartner extern	\N	2026-03-31 14:08:38.420142	system
+2959	1777	English	\N	\N	Contact person external	\N	2026-03-31 14:08:38.421373	system
+2960	1778	German	\N	\N	Anmerkung intern	\N	2026-03-31 14:08:38.423966	system
+2961	1778	English	\N	\N	Internal note	\N	2026-03-31 14:08:38.425083	system
+2962	1786	German	\N	\N	Kostenträger-OE	\N	2026-03-31 14:08:38.441668	system
+2963	1786	English	\N	\N	Cost unit	\N	2026-03-31 14:08:38.442878	system
+2964	1788	German	\N	\N	€/Jahr	\N	2026-03-31 14:08:38.447763	system
+2965	1788	English	\N	\N	€/year	\N	2026-03-31 14:08:38.448963	system
+2966	1789	German	\N	\N	Alle wählen	\N	2026-03-31 14:08:38.451761	system
+2967	1789	English	\N	\N	Select all	\N	2026-03-31 14:08:38.452944	system
+2968	1794	German	\N	\N	Existiert bereits	\N	2026-03-31 14:08:38.463602	system
+2969	1794	English	\N	\N	Already exists	\N	2026-03-31 14:08:38.464875	system
+2970	1795	German	\N	\N	Datumende vor Datumstart	\N	2026-03-31 14:08:38.467506	system
+2971	1795	English	\N	\N	Enddate after startdate	\N	2026-03-31 14:08:38.46868	system
+2972	1800	German	\N	\N	Zeilen auswählen	\N	2026-03-31 14:08:38.478975	system
+2973	1800	English	\N	\N	Select rows	\N	2026-03-31 14:08:38.480082	system
+2974	1805	German	\N	\N	Firmenzusatz	\N	2026-03-31 14:08:38.490665	system
+2975	1805	English	\N	\N	add.company info	\N	2026-03-31 14:08:38.491899	system
+2976	1806	German	\N	\N	Firma	\N	2026-03-31 14:08:38.494663	system
+2977	1806	English	\N	\N	company	\N	2026-03-31 14:08:38.495793	system
+2978	1807	German	\N	\N	Adresse anlegen	\N	2026-03-31 14:08:38.498355	system
+2979	1807	English	\N	\N	create address	\N	2026-03-31 14:08:38.499524	system
+2980	1808	German	\N	\N	Adresse bearbeiten	\N	2026-03-31 14:08:38.502144	system
+2981	1808	English	\N	\N	edit address	\N	2026-03-31 14:08:38.503281	system
+2982	1809	German	\N	\N	Adresse löschen	\N	2026-03-31 14:08:38.505881	system
+2983	1809	English	\N	\N	delete address	\N	2026-03-31 14:08:38.507029	system
+2984	1810	German	\N	\N	Adresse wirklich löschen?	\N	2026-03-31 14:08:38.509649	system
+2985	1810	English	\N	\N	Really delete address?	\N	2026-03-31 14:08:38.510753	system
+2986	1811	German	\N	\N	Kontakt anlegen	\N	2026-03-31 14:08:38.513362	system
+2987	1811	English	\N	\N	create contact data	\N	2026-03-31 14:08:38.514477	system
+2988	1812	German	\N	\N	Kontakt bearbeiten	\N	2026-03-31 14:08:38.517058	system
+2989	1812	English	\N	\N	edit contact data	\N	2026-03-31 14:08:38.518198	system
+2990	1813	German	\N	\N	Kontakt löschen	\N	2026-03-31 14:08:38.520798	system
+2991	1813	English	\N	\N	delete contact data	\N	2026-03-31 14:08:38.521907	system
+2992	1814	German	\N	\N	Kontakt wirklich löschen?	\N	2026-03-31 14:08:38.524505	system
+2993	1814	English	\N	\N	Really delete contact data?	\N	2026-03-31 14:08:38.525632	system
+2994	1815	German	\N	\N	Privatkonto	\N	2026-03-31 14:08:38.528216	system
+2995	1815	English	\N	\N	Private account	\N	2026-03-31 14:08:38.529379	system
+2996	1816	German	\N	\N	Firmenkonto	\N	2026-03-31 14:08:38.531918	system
+2997	1816	English	\N	\N	Company Account	\N	2026-03-31 14:08:38.533049	system
+2998	1817	German	\N	\N	Bankverbindung anlegen	\N	2026-03-31 14:08:38.53563	system
+2999	1817	English	\N	\N	create bank details	\N	2026-03-31 14:08:38.536755	system
+3000	1818	German	\N	\N	Bankverbindung bearbeiten	\N	2026-03-31 14:08:38.539312	system
+3001	1818	English	\N	\N	edit bank details	\N	2026-03-31 14:08:38.540431	system
+3002	1819	German	\N	\N	Bankverbindung löschen	\N	2026-03-31 14:08:38.543	system
+3003	1819	English	\N	\N	delete bank details	\N	2026-03-31 14:08:38.544133	system
+3004	1820	German	\N	\N	Bankverbindung wirklich löschen?	\N	2026-03-31 14:08:38.546696	system
+3005	1820	English	\N	\N	Really delete bank details?	\N	2026-03-31 14:08:38.547805	system
+3006	1821	German	\N	\N	Rolle	\N	2026-03-31 14:08:38.550462	system
+3007	1821	English	\N	\N	role	\N	2026-03-31 14:08:38.551596	system
+3008	1822	German	\N	\N	Neuen Status hinzufügen ({vorname} {nachname})	\N	2026-03-31 14:08:38.55415	system
+3009	1822	English	\N	\N	add new status ({vorname} {nachname})	\N	2026-03-31 14:08:38.555301	system
+3010	1823	German	\N	\N	Status bearbeiten ({vorname} {nachname})	\N	2026-03-31 14:08:38.557735	system
+3011	1823	English	\N	\N	edit status ({vorname} {nachname})	\N	2026-03-31 14:08:38.558801	system
+3012	1824	German	\N	\N	Status löschen	\N	2026-03-31 14:08:38.561385	system
+3013	1824	English	\N	\N	delete status	\N	2026-03-31 14:08:38.56251	system
+3014	1825	German	\N	\N	Bestätigt am	\N	2026-03-31 14:08:38.56509	system
+3015	1825	English	\N	\N	confirmed on	\N	2026-03-31 14:08:38.566286	system
+3016	1826	German	\N	\N	Bestätigt von	\N	2026-03-31 14:08:38.568808	system
+3017	1826	English	\N	\N	confirmed by	\N	2026-03-31 14:08:38.569941	system
+3018	1827	German	\N	\N	InsertAmUm	\N	2026-03-31 14:08:38.572628	system
+3019	1827	English	\N	\N	inserted on	\N	2026-03-31 14:08:38.573741	system
+3020	1828	German	\N	\N	InsertVon	\N	2026-03-31 14:08:38.577018	system
+3021	1828	English	\N	\N	inserted by	\N	2026-03-31 14:08:38.578241	system
+3022	1829	German	\N	\N	Bewerbung abgeschickt am	\N	2026-03-31 14:08:38.58091	system
+3023	1829	English	\N	\N	application sent on	\N	2026-03-31 14:08:38.58208	system
+3024	1830	German	\N	\N	Aufnahmestufe	\N	2026-03-31 14:08:38.5848	system
+3025	1830	English	\N	\N	entrance level	\N	2026-03-31 14:08:38.585916	system
+3026	1831	German	\N	\N	Meldestichtag erreicht - Bearbeiten nicht mehr möglich	\N	2026-03-31 14:08:38.588574	system
+3027	1831	English	\N	\N	report target date reached - editing no longer possible	\N	2026-03-31 14:08:38.589732	system
+3028	1832	German	\N	\N	Prestudentstatus wirklich löschen?	\N	2026-03-31 14:08:38.592346	system
+3029	1832	English	\N	\N	Really delete prestudent status?	\N	2026-03-31 14:08:38.593481	system
+3030	1833	German	\N	\N	Das Löschen der letzten Rolle löscht auch den gesamten Prestudent-Datensatz! Möchten Sie fortfahren?	\N	2026-03-31 14:08:38.596126	system
+3031	1833	English	\N	\N	Deleting the last role also deletes the entire Prestudent record! Do you want to continue?	\N	2026-03-31 14:08:38.5973	system
+3032	1834	German	\N	\N	In welches Ausbildungssemester soll dieser {status} verschoben werden?	\N	2026-03-31 14:08:38.599894	system
+3033	1834	English	\N	\N	To which education semester should this {status} be moved?	\N	2026-03-31 14:08:38.600993	system
+3034	1835	German	\N	\N	In welches Semester sollen diese {count} PrestudentInnen ({status})verschoben werden?	\N	2026-03-31 14:08:38.603558	system
+3035	1835	English	\N	\N	To which education semester should these {count} prestudents ({status}) be moved?	\N	2026-03-31 14:08:38.604689	system
+3036	1836	German	\N	\N	Zugangsvoraussetzungen für 	\N	2026-03-31 14:08:38.607205	system
+3037	1836	English	\N	\N	Access requirements for 	\N	2026-03-31 14:08:38.608306	system
+3038	1837	German	\N	\N	ZGV Master	\N	2026-03-31 14:08:38.610824	system
+3039	1837	English	\N	\N	ZGV master	\N	2026-03-31 14:08:38.611934	system
+3040	1838	German	\N	\N	ZGV Master Ort	\N	2026-03-31 14:08:38.614528	system
+3041	1838	English	\N	\N	ZGV master place	\N	2026-03-31 14:08:38.615733	system
+3042	1839	German	\N	\N	ZGV Master Datum	\N	2026-03-31 14:08:38.618374	system
+3043	1839	English	\N	\N	ZGV master date	\N	2026-03-31 14:08:38.619517	system
+3044	1840	German	\N	\N	ZGV Master Nation	\N	2026-03-31 14:08:38.622176	system
+3045	1840	English	\N	\N	ZGV master nation	\N	2026-03-31 14:08:38.623764	system
+3046	1841	German	\N	\N	ZGV Master erfüllt	\N	2026-03-31 14:08:38.626406	system
+3047	1841	English	\N	\N	ZGV master fulfilled	\N	2026-03-31 14:08:38.627579	system
+3048	1842	German	\N	\N	ZGV Doktor	\N	2026-03-31 14:08:38.630222	system
+3049	1842	English	\N	\N	ZGV doctor	\N	2026-03-31 14:08:38.63146	system
+3050	1843	German	\N	\N	ZGV Doktor Ort	\N	2026-03-31 14:08:38.634119	system
+3051	1843	English	\N	\N	ZGV doctor place	\N	2026-03-31 14:08:38.635316	system
+3052	1844	German	\N	\N	ZGV Doktor Datum	\N	2026-03-31 14:08:38.63797	system
+3053	1844	English	\N	\N	ZGV doctor date	\N	2026-03-31 14:08:38.63915	system
+3054	1845	German	\N	\N	ZGV Doktor Nation	\N	2026-03-31 14:08:38.6419	system
+3055	1845	English	\N	\N	ZGV doctor nation	\N	2026-03-31 14:08:38.64305	system
+3056	1846	German	\N	\N	ZGV Doktor erfüllt	\N	2026-03-31 14:08:38.645751	system
+3057	1846	English	\N	\N	ZGV doctor fulfilled	\N	2026-03-31 14:08:38.64692	system
+3058	1847	German	\N	\N	Aufmerksam durch	\N	2026-03-31 14:08:38.649522	system
+3059	1847	English	\N	\N	been brought to attention by	\N	2026-03-31 14:08:38.65065	system
+3060	1848	German	\N	\N	Berufstätigkeit	\N	2026-03-31 14:08:38.653272	system
+3061	1848	English	\N	\N	professional activity	\N	2026-03-31 14:08:38.654484	system
+3062	1849	German	\N	\N	Facheinschlägig berufstätig	\N	2026-03-31 14:08:38.657147	system
+3063	1849	English	\N	\N	employed in a relevant field	\N	2026-03-31 14:08:38.658369	system
+3064	1850	German	\N	\N	Bisstandort	\N	2026-03-31 14:08:38.660954	system
+3065	1850	English	\N	\N	bis location	\N	2026-03-31 14:08:38.662066	system
+3066	1851	German	\N	\N	Studientyp	\N	2026-03-31 14:08:38.66466	system
+3067	1851	English	\N	\N	study type	\N	2026-03-31 14:08:38.665753	system
+3068	1852	German	\N	\N	Duales Studium	\N	2026-03-31 14:08:38.668242	system
+3069	1852	English	\N	\N	dual study	\N	2026-03-31 14:08:38.669397	system
+3070	1853	German	\N	\N	förderrelevant	\N	2026-03-31 14:08:38.671952	system
+3071	1853	English	\N	\N	relevant for funding	\N	2026-03-31 14:08:38.67305	system
+3072	1854	German	\N	\N	Priorität	\N	2026-03-31 14:08:38.675589	system
+3073	1854	English	\N	\N	priority	\N	2026-03-31 14:08:38.67669	system
+3074	1855	German	\N	\N	Gesamthistorie	\N	2026-03-31 14:08:38.679226	system
+3075	1855	English	\N	\N	Overall history	\N	2026-03-31 14:08:38.680356	system
+3076	1856	German	\N	\N	Sie haben keine Schreibrechte für diesen Studiengang!	\N	2026-03-31 14:08:38.682986	system
+3077	1856	English	\N	\N	You do not have writing rights for this course!	\N	2026-03-31 14:08:38.684153	system
+3078	1857	German	\N	\N	Diese Rolle ist bereits vorhanden!	\N	2026-03-31 14:08:38.686813	system
+3079	1857	English	\N	\N	This role already exists!	\N	2026-03-31 14:08:38.687971	system
+3080	1858	German	\N	\N	{name}: Diese Rolle ist bereits vorhanden!	\N	2026-03-31 14:08:38.690589	system
+3081	1858	English	\N	\N	{name}: This role already exists!	\N	2026-03-31 14:08:38.691733	system
+3082	1859	German	\N	\N	{name}: Diese Person ist bereits Student!	\N	2026-03-31 14:08:38.694394	system
+3083	1859	English	\N	\N	{name}: This person already is student!	\N	2026-03-31 14:08:38.695561	system
+3084	1860	German	\N	\N	{name}: Um einen Interessenten zum Bewerber zu machen, muss die Person das Reihungstestverfahren abgeschlossen haben!	\N	2026-03-31 14:08:38.698188	system
+3085	1860	English	\N	\N	{name}: In order to turn an interested party into an applicant the person must have completed the ranking test process!	\N	2026-03-31 14:08:38.699476	system
+3086	1861	German	\N	\N	{name}: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung eingetragen sein!	\N	2026-03-31 14:08:38.702194	system
+3087	1861	English	\N	\N	{name}: In order to turn an interested party into an applicant, the entry requirements must be entered!	\N	2026-03-31 14:08:38.703406	system
+3088	1862	German	\N	\N	{name}: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung Master eingetragen sein!	\N	2026-03-31 14:08:38.706078	system
+3089	1862	English	\N	\N	{name}: In order to turn an interested party into an applicant, the entry requirements for master studies must be entered!	\N	2026-03-31 14:08:38.70725	system
+3090	1863	German	\N	\N	{name} muss zuerst zum Bewerber gemacht werden!	\N	2026-03-31 14:08:38.709904	system
+3091	1863	English	\N	\N	{name} must be made an applicant first!	\N	2026-03-31 14:08:38.711055	system
+3092	1864	German	\N	\N	{name} muss zuerst Aufgenommener sein, um zum Studenten gemacht werden zu können!	\N	2026-03-31 14:08:38.71381	system
+3093	1864	English	\N	\N	{name} must first be admitted in order to be made a student!	\N	2026-03-31 14:08:38.714956	system
+3094	1865	German	\N	\N	Das Studiensemester oder Ausbildungsemester des Berwerberstatus und des Aufgenommenenstatus passen nicht überein	\N	2026-03-31 14:08:38.717594	system
+3095	1865	English	\N	\N	The study semester or training semester of the applicant status and the accepted status do not match	\N	2026-03-31 14:08:38.718755	system
+3096	1866	German	\N	\N	Ein Studentenstatus kann hier nur hinzugefuegt werden wenn die Person bereits Student ist. Um einen Bewerber zum Studenten zu machen waehlen Sie bitte unter "Status aendern" den Punkt "Student"	\N	2026-03-31 14:08:38.721364	system
+3097	1866	English	\N	\N	Student status can only be added here if the person is already a student. To turn an applicant into a student, please select "Student" under "Change status".	\N	2026-03-31 14:08:38.722541	system
+3098	1867	German	\N	\N	Studentstatus mit Datum oder Semesterende vor erreichtem Meldestichtag kann nicht hinzugefügt werden	\N	2026-03-31 14:08:38.725344	system
+3099	1867	English	\N	\N	Student status with a date or end of semester before the reporting deadline cannot be added	\N	2026-03-31 14:08:38.726545	system
+3100	1868	German	\N	\N	Fehler beim Ermitteln bzw Aktualisieren des Lehrverbands: es wurden keine Änderungen in der Datenbank gespeichert	\N	2026-03-31 14:08:38.729197	system
+3101	1868	English	\N	\N	Error during insert or update of Lehrverband: no changes were saved in the database	\N	2026-03-31 14:08:38.730397	system
+3102	1869	German	\N	\N	Fehler beim Löschen des Lehrverbands: es wurden keine Änderungen in der Datenbank gespeichert	\N	2026-03-31 14:08:38.733049	system
+3103	1869	English	\N	\N	Error during deletion of Lehrverband: no changes were saved in the database	\N	2026-03-31 14:08:38.734241	system
+3104	1870	German	\N	\N	Studentenrolle kann nur durch den Administrator geloescht werden	\N	2026-03-31 14:08:38.73683	system
+3105	1870	English	\N	\N	Error during insert or update of Lehrverband: no changes were saved in the database	\N	2026-03-31 14:08:38.737978	system
+3106	1871	German	\N	\N	Die letzte Rolle kann nur durch den Administrator geloescht werden	\N	2026-03-31 14:08:38.740739	system
+3107	1871	English	\N	\N	The last role can only be deleted by the administrator	\N	2026-03-31 14:08:38.741896	system
+3108	1872	German	\N	\N	Fehler: Status nicht gefunden	\N	2026-03-31 14:08:38.744531	system
+3109	1872	English	\N	\N	Error: Status not found	\N	2026-03-31 14:08:38.745639	system
+3110	1873	German	\N	\N	Der Status ist bereits bestätigt!	\N	2026-03-31 14:08:38.748183	system
+3111	1873	English	\N	\N	The status is already confirmed!	\N	2026-03-31 14:08:38.749349	system
+3112	1874	German	\N	\N	Die Bewerbung wurde noch nicht abgeschickt und kann deshalb nicht bestaetigt werden!	\N	2026-03-31 14:08:38.751878	system
+3113	1874	English	\N	\N	The application has not yet been sent and therefore cannot be confirmed!	\N	2026-03-31 14:08:38.752996	system
+3114	1875	German	\N	\N	Id {id} nicht gefunden	\N	2026-03-31 14:08:38.755532	system
+3115	1875	English	\N	\N	Missing Id {id}	\N	2026-03-31 14:08:38.756679	system
+3116	1876	German	\N	\N	Heimatadressen dürfen nicht gelöscht werden, da diese für die BIS-Meldung relevant sind. Um die Adresse dennoch zu löschen, entfernen sie das Häkchen bei Heimatadresse!	\N	2026-03-31 14:08:38.759305	system
+3117	1876	English	\N	\N	Home addresses may not be deleted as they are relevant for the BIS report. To delete the address anyway, uncheck the home address box!	\N	2026-03-31 14:08:38.760427	system
+3118	1877	German	\N	\N	Status vorrücken	\N	2026-03-31 14:08:38.762949	system
+3119	1877	English	\N	\N	advance status	\N	2026-03-31 14:08:38.764083	system
+3120	1878	German	\N	\N	Status bestätigen	\N	2026-03-31 14:08:38.76679	system
+3121	1878	English	\N	\N	confirm status	\N	2026-03-31 14:08:38.767939	system
+3122	1879	German	\N	\N	Status bearbeiten	\N	2026-03-31 14:08:38.770634	system
+3123	1879	English	\N	\N	edit status	\N	2026-03-31 14:08:38.771793	system
+3124	1880	German	\N	\N	Status löschen	\N	2026-03-31 14:08:38.774462	system
+3125	1880	English	\N	\N	delete status	\N	2026-03-31 14:08:38.775596	system
+3126	1881	German	\N	\N	Speichern erfolgreich	\N	2026-03-31 14:08:38.778206	system
+3127	1881	English	\N	\N	Successfully saved	\N	2026-03-31 14:08:38.779372	system
+3128	1882	German	\N	\N	Löschen erfolgreich	\N	2026-03-31 14:08:38.782128	system
+3129	1882	English	\N	\N	Delete successful	\N	2026-03-31 14:08:38.783301	system
+3130	1883	German	\N	\N	Vorrückung Status erfolgreich	\N	2026-03-31 14:08:38.785959	system
+3131	1883	English	\N	\N	Advance status successful	\N	2026-03-31 14:08:38.78712	system
+3132	1884	German	\N	\N	Bestätigung Status erfolgreich	\N	2026-03-31 14:08:38.789778	system
+3133	1884	English	\N	\N	Confirmation status successful	\N	2026-03-31 14:08:38.790919	system
+3134	1885	German	\N	\N	Betriebsmittel	\N	2026-03-31 14:08:38.793678	system
+3135	1885	English	\N	\N	Resources	\N	2026-03-31 14:08:38.794828	system
+3136	1886	German	\N	\N	Betriebsmittel löschen	\N	2026-03-31 14:08:38.797485	system
+3137	1886	English	\N	\N	delete operating resource	\N	2026-03-31 14:08:38.798642	system
+3138	1887	German	\N	\N	Betriebsmittel wirklich löschen?	\N	2026-03-31 14:08:38.801309	system
+3139	1887	English	\N	\N	Really delete operating resource?	\N	2026-03-31 14:08:38.802486	system
+3140	1888	German	\N	\N	Betriebsmittel anlegen	\N	2026-03-31 14:08:38.805133	system
+3141	1888	English	\N	\N	create operating resource	\N	2026-03-31 14:08:38.806306	system
+3142	1889	German	\N	\N	Betriebsmittel bearbeiten	\N	2026-03-31 14:08:38.809061	system
+3143	1889	English	\N	\N	edit operating resource	\N	2026-03-31 14:08:38.810239	system
+3144	1890	German	\N	\N	Inventarnummer	\N	2026-03-31 14:08:38.81294	system
+3145	1890	English	\N	\N	inventory number	\N	2026-03-31 14:08:38.814085	system
+3146	1891	German	\N	\N	Nummer	\N	2026-03-31 14:08:38.816905	system
+3147	1891	English	\N	\N	number	\N	2026-03-31 14:08:38.818053	system
+3148	1892	German	\N	\N	Ausgegeben am	\N	2026-03-31 14:08:38.820782	system
+3149	1892	English	\N	\N	issued on	\N	2026-03-31 14:08:38.821978	system
+3150	1893	German	\N	\N	Retour am	\N	2026-03-31 14:08:38.824687	system
+3151	1893	English	\N	\N	returned on	\N	2026-03-31 14:08:38.82585	system
+3152	1894	German	\N	\N	Retourdatum	\N	2026-03-31 14:08:38.828574	system
+3153	1894	English	\N	\N	return date	\N	2026-03-31 14:08:38.829855	system
+3154	1895	German	\N	\N	Ausgabedatum	\N	2026-03-31 14:08:38.832539	system
+3155	1895	English	\N	\N	issue date	\N	2026-03-31 14:08:38.833694	system
+3156	1896	German	\N	\N	Eine Zutrittskarte muss eine Nummer haben. Um die Zuordnung zu dieser Karte zu löschen entfernen Sie bitte den ganzen Datensatz!	\N	2026-03-31 14:08:38.836336	system
+3157	1896	English	\N	\N	An access card must have a number. To delete the assignment to this card, please remove the entire data record!	\N	2026-03-31 14:08:38.837696	system
+3158	1897	German	\N	\N	Diese Zutrittskarte ist bereits ausgegeben an: {vorname} {nachname} ({uid})	\N	2026-03-31 14:08:38.840358	system
+3159	1897	English	\N	\N	This access card has already been issued to: {vorname} {nachname} ({uid})	\N	2026-03-31 14:08:38.841528	system
+3160	1898	German	\N	\N	Bitte wählen Sie das entsprechende Inventar aus dem Drop Down Menü Inventarnummer aus!	\N	2026-03-31 14:08:38.844299	system
+3161	1898	English	\N	\N	Please select the appropriate inventory from the inventory number drop down menu!	\N	2026-03-31 14:08:38.845516	system
+3162	1899	German	\N	\N	Retourdatum darf nicht vor Datum der Ausgabe liegen!	\N	2026-03-31 14:08:38.848163	system
+3163	1899	English	\N	\N	The return date must not be before the issue date!	\N	2026-03-31 14:08:38.84937	system
+3164	1914	German	\N	\N	Eingabe fehlt	\N	2026-03-31 14:08:38.88011	system
+3165	1914	English	\N	\N	Input missing	\N	2026-03-31 14:08:38.88133	system
+3166	1915	German	\N	\N	Unverändert	\N	2026-03-31 14:08:38.883972	system
+3167	1915	English	\N	\N	Unchanged	\N	2026-03-31 14:08:38.885124	system
+3168	1919	German	\N	\N	Verwalten	\N	2026-03-31 14:08:38.893825	system
+3169	1919	English	\N	\N	Administrate	\N	2026-03-31 14:08:38.894989	system
+3170	1920	German	\N	\N	LV Templates verwalten	\N	2026-03-31 14:08:38.897695	system
+3171	1920	English	\N	\N	Administrate Course Templates	\N	2026-03-31 14:08:38.898823	system
+3172	1921	German	\N	\N	LV Templates Übersicht	\N	2026-03-31 14:08:38.901559	system
+3173	1921	English	\N	\N	Course Templates Overview	\N	2026-03-31 14:08:38.902716	system
+3174	1922	German	\N	\N	Buchung	\N	2026-03-31 14:08:38.905362	system
+3175	1922	English	\N	\N	Booking	\N	2026-03-31 14:08:38.906522	system
+3176	1923	German	\N	\N	Buchungsdatum	\N	2026-03-31 14:08:38.909192	system
+3177	1923	English	\N	\N	Booking date	\N	2026-03-31 14:08:38.910384	system
+3178	1924	German	\N	\N	Buchungstext	\N	2026-03-31 14:08:38.913029	system
+3179	1924	English	\N	\N	Booking text	\N	2026-03-31 14:08:38.914191	system
+3180	1925	German	\N	\N	Betrag	\N	2026-03-31 14:08:38.916814	system
+3181	1925	English	\N	\N	Amount	\N	2026-03-31 14:08:38.917933	system
+3182	1926	German	\N	\N	Buchungstyp	\N	2026-03-31 14:08:38.920584	system
+3183	1926	English	\N	\N	Booking type	\N	2026-03-31 14:08:38.921742	system
+3184	1927	German	\N	\N	Buchungs Nummer	\N	2026-03-31 14:08:38.924335	system
+3185	1927	English	\N	\N	Booking number	\N	2026-03-31 14:08:38.925482	system
+3186	1928	German	\N	\N	Mahnspanne	\N	2026-03-31 14:08:38.928129	system
+3187	1928	English	\N	\N	Dunning margin	\N	2026-03-31 14:08:38.92928	system
+3188	1929	German	\N	\N	Credit Points	\N	2026-03-31 14:08:38.931875	system
+3189	1929	English	\N	\N	Credit Points	\N	2026-03-31 14:08:38.933053	system
+3190	1930	German	\N	\N	Zahlungsreferenz	\N	2026-03-31 14:08:38.935719	system
+3191	1930	English	\N	\N	Payment reference	\N	2026-03-31 14:08:38.936835	system
+3192	1931	German	\N	\N	Es ist bereits eine Buchung vorhanden:	\N	2026-03-31 14:08:38.93957	system
+3193	1931	English	\N	\N	A booking already exists:	\N	2026-03-31 14:08:38.940697	system
+3194	1932	German	\N	\N	und einer weiteren Person.	\N	2026-03-31 14:08:38.943318	system
+3195	1932	English	\N	\N	and one additional person.	\N	2026-03-31 14:08:38.94446	system
+3196	1933	German	\N	\N	und {x} weiteren Personen.	\N	2026-03-31 14:08:38.947318	system
+3197	1933	English	\N	\N	and {x} additional persons.	\N	2026-03-31 14:08:38.948496	system
+3198	1934	German	\N	\N	Trotzdem fortfahren?	\N	2026-03-31 14:08:38.951133	system
+3199	1934	English	\N	\N	Proceed anyway?	\N	2026-03-31 14:08:38.952317	system
+3200	1935	German	\N	\N	Buchung #{buchungsnr} existiert nicht	\N	2026-03-31 14:08:38.955071	system
+3201	1935	English	\N	\N	Booking #{buchungsnr} does not exist	\N	2026-03-31 14:08:38.956245	system
+3202	1936	German	\N	\N	Gegenbuchungen koennen nur auf die obersten Buchungen getaetigt werden	\N	2026-03-31 14:08:38.958883	system
+3203	1936	English	\N	\N	Offsetting bookings can only be made on the top bookings	\N	2026-03-31 14:08:38.960026	system
+3204	1937	German	\N	\N	Bitte zuerst die zugeordneten Buchungen löschen	\N	2026-03-31 14:08:38.96266	system
+3205	1937	English	\N	\N	Please delete the assigned bookings first	\N	2026-03-31 14:08:38.963825	system
+3206	1938	German	\N	\N	Anzahl angezeigter vergangener Studiensemester	\N	2026-03-31 14:08:38.966345	system
+3207	1938	English	\N	\N	Number of past semesters of study displayed	\N	2026-03-31 14:08:38.967436	system
+3208	1939	German	\N	\N	Zoom	\N	2026-03-31 14:08:38.970072	system
+3209	1939	English	\N	\N	Zoom	\N	2026-03-31 14:08:38.971213	system
+3210	1940	German	\N	\N	Sehr Klein	\N	2026-03-31 14:08:38.973859	system
+3211	1940	English	\N	\N	Very Small	\N	2026-03-31 14:08:38.974984	system
+3212	1941	German	\N	\N	Kleiner	\N	2026-03-31 14:08:38.977642	system
+3213	1941	English	\N	\N	Smaller	\N	2026-03-31 14:08:38.978756	system
+3214	1942	German	\N	\N	Klein	\N	2026-03-31 14:08:38.981476	system
+3215	1942	English	\N	\N	Small	\N	2026-03-31 14:08:38.982597	system
+3216	1943	German	\N	\N	Normal	\N	2026-03-31 14:08:38.985158	system
+3217	1943	English	\N	\N	Normal	\N	2026-03-31 14:08:38.986296	system
+3218	1944	German	\N	\N	Groß	\N	2026-03-31 14:08:38.989232	system
+3219	1944	English	\N	\N	Big	\N	2026-03-31 14:08:38.990444	system
+3220	1945	German	\N	\N	Sehr groß	\N	2026-03-31 14:08:38.993048	system
+3221	1945	English	\N	\N	Very big	\N	2026-03-31 14:08:38.994282	system
+3222	1946	German	\N	\N	InteressentIn	\N	2026-03-31 14:08:38.997069	system
+3223	1946	English	\N	\N	Candidate	\N	2026-03-31 14:08:38.998217	system
+3224	1947	German	\N	\N	Zu viele Favoriten! Die folgenden Einträge wurden entfernt: {items}	\N	2026-03-31 14:08:39.000823	system
+3225	1947	English	\N	\N	Too many favorites! The following entries were removed: {items}	\N	2026-03-31 14:08:39.001944	system
+3226	1948	German	\N	\N	Anmerkungen	\N	2026-03-31 14:08:39.004696	system
+3227	1948	English	\N	\N	notes	\N	2026-03-31 14:08:39.005826	system
+3228	1949	German	\N	\N	Anmerkung Pre	\N	2026-03-31 14:08:39.008417	system
+3229	1949	English	\N	\N	note Pre	\N	2026-03-31 14:08:39.009566	system
+3230	1950	German	\N	\N	Aufnahmegruppe	\N	2026-03-31 14:08:39.012281	system
+3231	1950	English	\N	\N	admission group	\N	2026-03-31 14:08:39.013429	system
+3232	1951	German	\N	\N	Mentor	\N	2026-03-31 14:08:39.015985	system
+3233	1951	English	\N	\N	mentor	\N	2026-03-31 14:08:39.01714	system
+3234	1952	German	\N	\N	Details	\N	2026-03-31 14:08:39.020018	system
+3235	1952	English	\N	\N	Details	\N	2026-03-31 14:08:39.021141	system
+3236	1953	German	\N	\N	Notizen	\N	2026-03-31 14:08:39.023691	system
+3237	1953	English	\N	\N	Notes	\N	2026-03-31 14:08:39.024794	system
+3238	1954	German	\N	\N	Kontakt	\N	2026-03-31 14:08:39.027431	system
+3239	1954	English	\N	\N	Contact	\N	2026-03-31 14:08:39.028574	system
+3240	1955	German	\N	\N	PreStudentIn	\N	2026-03-31 14:08:39.031199	system
+3241	1955	English	\N	\N	Prestudent	\N	2026-03-31 14:08:39.032341	system
+3242	1956	German	\N	\N	Status	\N	2026-03-31 14:08:39.034934	system
+3243	1956	English	\N	\N	State	\N	2026-03-31 14:08:39.036342	system
+3244	1957	German	\N	\N	Konto	\N	2026-03-31 14:08:39.038912	system
+3245	1957	English	\N	\N	Banking	\N	2026-03-31 14:08:39.040036	system
+3246	1958	German	\N	\N	Betriebsmittel	\N	2026-03-31 14:08:39.042678	system
+3247	1958	English	\N	\N	Resources	\N	2026-03-31 14:08:39.043809	system
+3248	1959	German	\N	\N	Noten	\N	2026-03-31 14:08:39.046379	system
+3249	1959	English	\N	\N	Grades	\N	2026-03-31 14:08:39.047541	system
+3250	1960	German	\N	\N	Prüfung	\N	2026-03-31 14:08:39.050109	system
+3251	1960	English	\N	\N	Exam	\N	2026-03-31 14:08:39.051235	system
+3252	1961	German	\N	\N	Notenspiegel	\N	2026-03-31 14:08:39.053945	system
+3253	1961	English	\N	\N	Grade report	\N	2026-03-31 14:08:39.055064	system
+3254	1962	German	\N	\N	Notenspiegel EXCEL	\N	2026-03-31 14:08:39.057691	system
+3255	1962	English	\N	\N	Grade report EXCEL	\N	2026-03-31 14:08:39.058796	system
+3256	1963	German	\N	\N	Notenspiegel erweitert EXCEL	\N	2026-03-31 14:08:39.061396	system
+3257	1963	English	\N	\N	Grade report extended EXCEL	\N	2026-03-31 14:08:39.062543	system
+3258	1964	German	\N	\N	Notenspiegel HTML	\N	2026-03-31 14:08:39.065293	system
+3259	1964	English	\N	\N	Grade report HTML	\N	2026-03-31 14:08:39.066429	system
+3260	1965	German	\N	\N	Liste Filtern auf	\N	2026-03-31 14:08:39.068956	system
+3261	1965	English	\N	\N	Filter list for	\N	2026-03-31 14:08:39.070126	system
+3262	1966	German	\N	\N	nicht belastet	\N	2026-03-31 14:08:39.072724	system
+3263	1966	English	\N	\N	not charged	\N	2026-03-31 14:08:39.073846	system
+3264	1967	German	\N	\N	fehlende Gegenbuchungen	\N	2026-03-31 14:08:39.076474	system
+3265	1967	English	\N	\N	missing offsetting entries	\N	2026-03-31 14:08:39.077643	system
+3266	1968	German	\N	\N	fehlende Dokumente	\N	2026-03-31 14:08:39.08016	system
+3267	1968	English	\N	\N	missing documents	\N	2026-03-31 14:08:39.081302	system
+3268	1969	German	\N	\N	überfällige Buchungen	\N	2026-03-31 14:08:39.083848	system
+3269	1969	English	\N	\N	overdue payments	\N	2026-03-31 14:08:39.084984	system
+3270	1970	German	\N	\N	nicht gebuchte Studiengebühr	\N	2026-03-31 14:08:39.087666	system
+3271	1970	English	\N	\N	outstanding tuition fee	\N	2026-03-31 14:08:39.088772	system
+3272	1971	German	\N	\N	erhöhten Studienbeitrag	\N	2026-03-31 14:08:39.091324	system
+3273	1971	English	\N	\N	higher tuition fee	\N	2026-03-31 14:08:39.092464	system
+3274	1972	German	\N	\N	ZGV eingetragen ohne Datum	\N	2026-03-31 14:08:39.095086	system
+3275	1972	English	\N	\N	ZGV set without date	\N	2026-03-31 14:08:39.096248	system
+3276	1973	German	\N	\N	Statusgrund	\N	2026-03-31 14:08:39.098939	system
+3277	1973	English	\N	\N	Status reason	\N	2026-03-31 14:08:39.100093	system
+3278	1974	German	\N	\N	Nur im aktuellen Studiengang	\N	2026-03-31 14:08:39.102752	system
+3279	1974	English	\N	\N	Only in the selected study program	\N	2026-03-31 14:08:39.103872	system
+3280	1975	German	\N	\N	Ausbildungsvertrag akzeptiert	\N	2026-03-31 14:08:39.10657	system
+3281	1975	English	\N	\N	Training contract accepted	\N	2026-03-31 14:08:39.107736	system
+3282	1976	German	\N	\N	Neue Buchung	\N	2026-03-31 14:08:39.110366	system
+3283	1976	English	\N	\N	New Booking	\N	2026-03-31 14:08:39.111527	system
+3284	1977	German	\N	\N	Neue Buchung ({x} Studenten)	\N	2026-03-31 14:08:39.114168	system
+3285	1977	English	\N	\N	New Booking ({x} Students)	\N	2026-03-31 14:08:39.115351	system
+3286	1978	German	\N	\N	Buchung #{buchungsnr} bearbeiten	\N	2026-03-31 14:08:39.11803	system
+3287	1978	English	\N	\N	Edit Booking #{buchungsnr}	\N	2026-03-31 14:08:39.119213	system
+3288	1979	German	\N	\N	Gegenbuchen	\N	2026-03-31 14:08:39.121841	system
+3289	1979	English	\N	\N	Counter-book	\N	2026-03-31 14:08:39.122981	system
+3290	1980	German	\N	\N	Zahlungsbestaetigung	\N	2026-03-31 14:08:39.125656	system
+3291	1980	English	\N	\N	Payment confirmation	\N	2026-03-31 14:08:39.126783	system
+3292	1981	German	\N	\N	alle Buchungstypen	\N	2026-03-31 14:08:39.129436	system
+3293	1981	English	\N	\N	all booking types	\N	2026-03-31 14:08:39.130611	system
+3294	1982	German	\N	\N	Nur offene anzeigen	\N	2026-03-31 14:08:39.133284	system
+3295	1982	English	\N	\N	Display only open	\N	2026-03-31 14:08:39.134474	system
+3296	1983	German	\N	\N	Nur aktuellen Studiengang anzeigen	\N	2026-03-31 14:08:39.137165	system
+3297	1983	English	\N	\N	Display only current Degree Program	\N	2026-03-31 14:08:39.138384	system
+3298	1984	German	\N	\N	Diesen Status bestaetigen?	\N	2026-03-31 14:08:39.141045	system
+3299	1984	English	\N	\N	Confirm this status?	\N	2026-03-31 14:08:39.142221	system
+3300	1985	German	\N	\N	Zertifikat	\N	2026-03-31 14:08:39.144899	system
+3301	1985	English	\N	\N	Certificate	\N	2026-03-31 14:08:39.146058	system
+3302	1986	German	\N	\N	LV Zeugnis	\N	2026-03-31 14:08:39.148674	system
+3303	1986	English	\N	\N	Course certificate	\N	2026-03-31 14:08:39.149805	system
+3304	1987	German	\N	\N	Download	\N	2026-03-31 14:08:39.152459	system
+3305	1987	English	\N	\N	Download	\N	2026-03-31 14:08:39.153642	system
+3306	1988	German	\N	\N	Archivieren	\N	2026-03-31 14:08:39.15622	system
+3307	1988	English	\N	\N	Archive	\N	2026-03-31 14:08:39.157429	system
+3308	1989	German	\N	\N	Dokument signiert und archiviert	\N	2026-03-31 14:08:39.160072	system
+3309	1989	English	\N	\N	Document signed and archived	\N	2026-03-31 14:08:39.161253	system
+3310	1990	German	\N	\N	Zeugnis	\N	2026-03-31 14:08:39.163845	system
+3311	1990	English	\N	\N	Certificate	\N	2026-03-31 14:08:39.164982	system
+3312	1991	German	\N	\N	Übernahmedatum	\N	2026-03-31 14:08:39.167602	system
+3313	1991	English	\N	\N	Takeover date	\N	2026-03-31 14:08:39.168714	system
+3314	1992	German	\N	\N	Benotungsdatum	\N	2026-03-31 14:08:39.171255	system
+3315	1992	English	\N	\N	Grading date	\N	2026-03-31 14:08:39.17248	system
+3316	1993	German	\N	\N	Freigabedatum	\N	2026-03-31 14:08:39.175127	system
+3317	1993	English	\N	\N	Approval date	\N	2026-03-31 14:08:39.176316	system
+3318	1994	German	\N	\N	Note (Numerisch)	\N	2026-03-31 14:08:39.178922	system
+3319	1994	English	\N	\N	Grade (numeric)	\N	2026-03-31 14:08:39.180054	system
+3320	1995	German	\N	\N	Studiengang (Lehrveranstaltung)	\N	2026-03-31 14:08:39.182694	system
+3321	1995	English	\N	\N	Degree-program (Course)	\N	2026-03-31 14:08:39.183823	system
+3322	1996	German	\N	\N	Studiengangskennzahl (Lehrveranstaltung)	\N	2026-03-31 14:08:39.18651	system
+3323	1996	English	\N	\N	Study program number (Course)	\N	2026-03-31 14:08:39.187638	system
+3324	1997	German	\N	\N	Semester (Lehrveranstaltung)	\N	2026-03-31 14:08:39.190311	system
+3325	1997	English	\N	\N	Semester (Course)	\N	2026-03-31 14:08:39.191421	system
+3326	1998	German	\N	\N	Punkte	\N	2026-03-31 14:08:39.193991	system
+3327	1998	English	\N	\N	Points	\N	2026-03-31 14:08:39.195117	system
+3328	1999	German	\N	\N	Lehrveranstaltungsname Englisch	\N	2026-03-31 14:08:39.197695	system
+3329	1999	English	\N	\N	Coursename english	\N	2026-03-31 14:08:39.198796	system
+3330	2000	German	\N	\N	Note setzen	\N	2026-03-31 14:08:39.201311	system
+3331	2000	English	\N	\N	Set grade	\N	2026-03-31 14:08:39.202421	system
+3332	2001	German	\N	\N	Note gesetzt	\N	2026-03-31 14:08:39.205013	system
+3333	2001	English	\N	\N	Grade set	\N	2026-03-31 14:08:39.206183	system
+3334	2002	German	\N	\N	Zeugnis	\N	2026-03-31 14:08:39.20885	system
+3335	2002	English	\N	\N	Certificate	\N	2026-03-31 14:08:39.210016	system
+3336	2003	German	\N	\N	LektorIn	\N	2026-03-31 14:08:39.21271	system
+3337	2003	English	\N	\N	Lector	\N	2026-03-31 14:08:39.21387	system
+3338	2004	German	\N	\N	Wiederholer	\N	2026-03-31 14:08:39.216423	system
+3339	2004	English	\N	\N	Repeater	\N	2026-03-31 14:08:39.217549	system
+3340	2005	German	\N	\N	Übernehmen	\N	2026-03-31 14:08:39.220093	system
+3341	2005	English	\N	\N	Transfer	\N	2026-03-31 14:08:39.221224	system
+3342	2006	German	\N	\N	Diese Vorlage darf nicht signiert werden	\N	2026-03-31 14:08:39.223767	system
+3343	2006	English	\N	\N	This template must not be signed	\N	2026-03-31 14:08:39.224869	system
+3344	2007	German	\N	\N	Dieses Dokument ist nicht archivierbar	\N	2026-03-31 14:08:39.227402	system
+3345	2007	English	\N	\N	This document cannot be archived	\N	2026-03-31 14:08:39.228552	system
+3346	2008	German	\N	\N	Nicht überschreibbar	\N	2026-03-31 14:08:39.231129	system
+3347	2008	English	\N	\N	Not overwritable	\N	2026-03-31 14:08:39.232305	system
+3348	2009	German	\N	\N	Fehler beim Ermitteln der Lehreinheit ID	\N	2026-03-31 14:08:39.234945	system
+3349	2009	English	\N	\N	Error determining the Teaching Unit ID	\N	2026-03-31 14:08:39.236086	system
+3350	2010	German	\N	\N	StudentIn hat keinen Status in diesem Semester	\N	2026-03-31 14:08:39.238872	system
+3351	2010	English	\N	\N	Student has no status this semester	\N	2026-03-31 14:08:39.240022	system
+3352	2011	German	\N	\N	Fehler: Es können nur Studierende mit UID verschoben werden.	\N	2026-03-31 14:08:39.242726	system
+3353	2011	English	\N	\N	Error: Only students with UID can be moved.	\N	2026-03-31 14:08:39.24387	system
+3354	2012	German	\N	\N	Fehler: Alle Studierenden müssen im selben Studiengang sein.	\N	2026-03-31 14:08:39.246607	system
+3355	2012	English	\N	\N	Error: All students must be in the same program.	\N	2026-03-31 14:08:39.247785	system
+3356	2013	German	\N	\N	Unoconv nicht gefunden - Bitte installieren sie Unoconv	\N	2026-03-31 14:08:39.250422	system
+3357	2013	English	\N	\N	Unoconv not found - Please install Unoconv	\N	2026-03-31 14:08:39.251614	system
+3358	2014	German	\N	\N	Unoconv Version konnte nicht ermittelt werden	\N	2026-03-31 14:08:39.254224	system
+3359	2014	English	\N	\N	Could not get Unoconv Version	\N	2026-03-31 14:08:39.255459	system
+3360	2015	German	\N	\N	Dokumentenkonvertierung ist derzeit nicht möglich. Bitte versuchen Sie es in einer Minute erneut oder kontaktieren Sie einen Administrator	\N	2026-03-31 14:08:39.258106	system
+3361	2015	English	\N	\N	Document conversion is currently not possible. Please try again in a minute or contact an administrator	\N	2026-03-31 14:08:39.259307	system
+3362	2016	German	\N	\N	Signaturserver ist derzeit nicht erreichbar	\N	2026-03-31 14:08:39.261948	system
+3363	2016	English	\N	\N	Signature server is currently unavailable	\N	2026-03-31 14:08:39.26309	system
+3364	2017	German	\N	\N	Derzeit können nur PDFs signiert werden	\N	2026-03-31 14:08:39.265755	system
+3365	2017	English	\N	\N	Currently only PDFs can be signed	\N	2026-03-31 14:08:39.266884	system
+3366	2018	German	\N	\N	Ausgabeformat fehlt	\N	2026-03-31 14:08:39.269542	system
+3367	2018	English	\N	\N	Outputformat is not defined	\N	2026-03-31 14:08:39.270672	system
+3368	2019	German	\N	\N	Keine Vorlage gefunden	\N	2026-03-31 14:08:39.273298	system
+3369	2019	English	\N	\N	No template found	\N	2026-03-31 14:08:39.27446	system
+3370	2020	German	\N	\N	Header wurden bereits gesendet -> Abbruch	\N	2026-03-31 14:08:39.277109	system
+3371	2020	English	\N	\N	Header already sent -> Abort	\N	2026-03-31 14:08:39.27828	system
+3372	2021	German	\N	\N	Kopieren fehlgeschlagen	\N	2026-03-31 14:08:39.280951	system
+3373	2021	English	\N	\N	Copy failed	\N	2026-03-31 14:08:39.282083	system
+3374	2022	German	\N	\N	Datei konnte nicht geladen werden	\N	2026-03-31 14:08:39.285025	system
+3375	2022	English	\N	\N	Unable to load file	\N	2026-03-31 14:08:39.28622	system
+3376	2023	German	\N	\N	XML konnte nicht geladen werden: {url} XML: {xml} PARAMETER: {params}	\N	2026-03-31 14:08:39.288835	system
+3377	2023	English	\N	\N	Unable to load xml: {url} XML: {xml} PARAMS: {params}	\N	2026-03-31 14:08:39.289975	system
+3378	2024	German	\N	\N	XSL konnte nicht geladen werden	\N	2026-03-31 14:08:39.292713	system
+3379	2024	English	\N	\N	Unable to load xsl	\N	2026-03-31 14:08:39.293895	system
+3380	2025	German	\N	\N	Styles XSL konnte nicht geladen werden	\N	2026-03-31 14:08:39.29663	system
+3381	2025	English	\N	\N	Unable to load styles xsl	\N	2026-03-31 14:08:39.297773	system
+3382	2026	German	\N	\N	Manifest ungültig	\N	2026-03-31 14:08:39.300406	system
+3383	2026	English	\N	\N	Manifest file invalid	\N	2026-03-31 14:08:39.301564	system
+3384	2027	German	\N	\N	W	\N	2026-03-31 14:08:39.304208	system
+3385	2027	English	\N	\N	W	\N	2026-03-31 14:08:39.305415	system
+3386	2028	German	\N	\N	{year} KW {week}	\N	2026-03-31 14:08:39.308054	system
+3387	2028	English	\N	\N	{year} W {week}	\N	2026-03-31 14:08:39.309212	system
+3388	2029	German	\N	\N	Heute	\N	2026-03-31 14:08:39.311819	system
+3389	2029	English	\N	\N	today	\N	2026-03-31 14:08:39.312967	system
+3390	2030	German	\N	\N	Die Buchungsnr #{buchungsnr} is ungültig	\N	2026-03-31 14:08:39.315595	system
+3391	2030	English	\N	\N	The Buchungnr #{buchungsnr} is not valid	\N	2026-03-31 14:08:39.316733	system
+3529	2112	English	\N	\N	Super!	\N	2026-03-31 14:08:39.609955	system
+3392	2031	German	\N	\N	Die Buchung wurde bereits übertragen und darf nicht geändert werden	\N	2026-03-31 14:08:39.319361	system
+3393	2031	English	\N	\N	The Buchung was already submitted and can not be changed	\N	2026-03-31 14:08:39.320564	system
+3394	2032	German	\N	\N	Buchungszuordnung SAP geloescht: SalesOrder: {sap_sales_order_id}	\N	2026-03-31 14:08:39.323186	system
+3395	2032	English	\N	\N	Buchungszuordnung SAP deleted: SalesOrder: {sap_sales_order_id}	\N	2026-03-31 14:08:39.324448	system
+3396	2033	German	\N	\N	Lehrverband	\N	2026-03-31 14:08:39.327111	system
+3397	2033	English	\N	\N	Teaching Association	\N	2026-03-31 14:08:39.3283	system
+3398	2034	German	\N	\N	{countSuccess} erfolgreiche Statusänderung(en) auf {status}, {countError} Fehler	\N	2026-03-31 14:08:39.330953	system
+3399	2034	English	\N	\N	{countSuccess} successful status changes to {status}, {countError} errors	\N	2026-03-31 14:08:39.332101	system
+3400	2035	German	\N	\N	Fehler bei Aktualisierung Lehrverband	\N	2026-03-31 14:08:39.334818	system
+3401	2035	English	\N	\N	Error during insert/update lehrverband	\N	2026-03-31 14:08:39.335938	system
+3402	2036	German	\N	\N	Kein Lehrverband vorhanden	\N	2026-03-31 14:08:39.338603	system
+3403	2036	English	\N	\N	Error: no existing Lehrverband	\N	2026-03-31 14:08:39.339719	system
+3404	2037	German	\N	\N	Fehler bei Aktualisierung Studentlehrverband	\N	2026-03-31 14:08:39.342338	system
+3405	2037	English	\N	\N	Error during insert/update Studentlehrverband	\N	2026-03-31 14:08:39.343453	system
+3406	2038	German	\N	\N	Kein Studentlehrverband vorhanden	\N	2026-03-31 14:08:39.346119	system
+3407	2038	English	\N	\N	Error: no existing Studentlehrverband	\N	2026-03-31 14:08:39.347327	system
+3408	2039	German	\N	\N	Ungültige Zeitabfolge der Statuseinträge (Statusdatum oder Semester)	\N	2026-03-31 14:08:39.349999	system
+3409	2039	English	\N	\N	Error: Invalid date order of statuses (date or semester)	\N	2026-03-31 14:08:39.35116	system
+3410	2040	German	\N	\N	Nach Abbrecher- und Absolventenstatus darf kein anderer Status mehr eingetragen werden	\N	2026-03-31 14:08:39.35382	system
+3411	2040	English	\N	\N	Error: No other status may be entered after the dropout and graduate status	\N	2026-03-31 14:08:39.354975	system
+3412	2041	German	\N	\N	Aufeinanderfolgende Unterbrecher müssen gleiches Ausbildungssemester haben	\N	2026-03-31 14:08:39.357639	system
+3413	2041	English	\N	\N	Error: Successive interrupters must have the same education semester	\N	2026-03-31 14:08:39.358783	system
+3414	2042	German	\N	\N	Unterbrecher und folgender Abbrecher müssen gleiches Ausbildungssemester haben	\N	2026-03-31 14:08:39.361464	system
+3415	2042	English	\N	\N	Error: interrupter and following dropout must have the same education semester	\N	2026-03-31 14:08:39.362616	system
+3416	2043	German	\N	\N	Nach Diplomandenstatus darf kein Studentenstatus mehr eingetragen werden	\N	2026-03-31 14:08:39.365275	system
+3417	2043	English	\N	\N	Error: Student status may not be entered after graduate status	\N	2026-03-31 14:08:39.366484	system
+3418	2044	German	\N	\N	Kein Eintrag für Studiensemester vorhanden	\N	2026-03-31 14:08:39.369158	system
+3419	2044	English	\N	\N	Error: no entry for study semester	\N	2026-03-31 14:08:39.370316	system
+3420	2045	German	\N	\N	{anzahl} Rollen vorhanden	\N	2026-03-31 14:08:39.372985	system
+3421	2045	English	\N	\N	{anzahl} existing roles	\N	2026-03-31 14:08:39.374145	system
+3422	2046	German	\N	\N	Datum eines neuen Statuseintrags darf nicht in der Vergangenheit liegen	\N	2026-03-31 14:08:39.376754	system
+3423	2046	English	\N	\N	Error: The date of a new status entry cannot be in the past	\N	2026-03-31 14:08:39.377991	system
+3424	2047	German	\N	\N	Status ändern	\N	2026-03-31 14:08:39.380685	system
+3425	2047	English	\N	\N	Change status	\N	2026-03-31 14:08:39.381817	system
+3426	2048	German	\N	\N	Neuer Termin Bachelor-/Masterarbeitsbetreuung	\N	2026-03-31 14:08:39.384484	system
+3427	2048	English	\N	\N	New date for Bachelor/Master thesis supervision	\N	2026-03-31 14:08:39.385645	system
+3428	2049	German	\N	\N	Terminserie anlegen	\N	2026-03-31 14:08:39.388292	system
+3429	2049	English	\N	\N	Create recurring deadline	\N	2026-03-31 14:08:39.389496	system
+3430	2050	German	\N	\N	Sprache	\N	2026-03-31 14:08:39.39211	system
+3431	2050	English	\N	\N	Language	\N	2026-03-31 14:08:39.39334	system
+3432	2051	German	\N	\N	Projektarbeit ist nichtmehr aktuell	\N	2026-03-31 14:08:39.395959	system
+3433	2051	English	\N	\N	Project work is not current anymore	\N	2026-03-31 14:08:39.397129	system
+3434	2052	German	\N	\N	Email über neuen Abgabetermin versendet an: {0}	\N	2026-03-31 14:08:39.399791	system
+3435	2052	English	\N	\N	Email about new deadline sent to: {0}	\N	2026-03-31 14:08:39.400954	system
+3436	2053	German	\N	\N	Serientermin wurde erfolgreich eingetragen!	\N	2026-03-31 14:08:39.403654	system
+3437	2053	English	\N	\N	Series dates were successfully entered!	\N	2026-03-31 14:08:39.404857	system
+3438	2054	German	\N	\N	Fehler beim speichern des Serientermins!	\N	2026-03-31 14:08:39.40754	system
+3439	2054	English	\N	\N	Error saving Series dates!	\N	2026-03-31 14:08:39.408706	system
+3440	2055	German	\N	\N	Dokumentabgabe - MitarbeiterInbereich	\N	2026-03-31 14:08:39.411381	system
+3441	2055	English	\N	\N	File submission - Employee area	\N	2026-03-31 14:08:39.41253	system
+3442	2056	German	\N	\N	Alle	\N	2026-03-31 14:08:39.41515	system
+3443	2056	English	\N	\N	All	\N	2026-03-31 14:08:39.416345	system
+3444	2057	German	\N	\N	Abgabe	\N	2026-03-31 14:08:39.418996	system
+3445	2057	English	\N	\N	Submission	\N	2026-03-31 14:08:39.420142	system
+3446	2058	German	\N	\N	{0} gelöscht	\N	2026-03-31 14:08:39.422896	system
+3447	2058	English	\N	\N	{0} deleted	\N	2026-03-31 14:08:39.424042	system
+3448	2059	German	\N	\N	Die letzte Rolle kann nur durch den Administrator gelöscht werden	\N	2026-03-31 14:08:39.426754	system
+3449	2059	English	\N	\N	Error: The last role can only be deleted by the administrator	\N	2026-03-31 14:08:39.427859	system
+3450	2060	German	\N	\N	Meldestichtag erreicht - ausschließlich Bearbeiten Statusgrund und Anmerkung möglich	\N	2026-03-31 14:08:39.430448	system
+3451	2060	English	\N	\N	Reporting deadline reached - only editing status reason and note possible	\N	2026-03-31 14:08:39.431585	system
+3452	2061	German	\N	\N	Meldestichtag erreicht - Bearbeiten Ausbildungssemester, Statusgrund und Anmerkung möglich	\N	2026-03-31 14:08:39.43418	system
+3453	2061	English	\N	\N	Edit education semester, status reason and note possible	\N	2026-03-31 14:08:39.435314	system
+3454	2062	German	\N	\N	Ort, Gemeinde und Postleitzahl passen nicht zusammen	\N	2026-03-31 14:08:39.437888	system
+3455	2062	English	\N	\N	City, municipality and postcode do not match	\N	2026-03-31 14:08:39.438986	system
+3456	2063	German	\N	\N	Bitte gültige PLZ wählen	\N	2026-03-31 14:08:39.441683	system
+3457	2063	English	\N	\N	Please select valid postcode	\N	2026-03-31 14:08:39.442809	system
+3458	2064	German	\N	\N	Bitte gültige Gemeinde wählen	\N	2026-03-31 14:08:39.445471	system
+3459	2064	English	\N	\N	Please select valid municipality	\N	2026-03-31 14:08:39.446646	system
+3460	2065	German	\N	\N	Bitte Standort wählen	\N	2026-03-31 14:08:39.44939	system
+3461	2065	English	\N	\N	Please select location	\N	2026-03-31 14:08:39.450521	system
+3462	2066	German	\N	\N	Vor dem Studentenstatus müssen folgende Status eingetragen werden: {0}	\N	2026-03-31 14:08:39.453191	system
+3463	2066	English	\N	\N	Error: Following status should be present before student status: {0}	\N	2026-03-31 14:08:39.454427	system
+3464	2067	German	\N	\N	Personenkennzeichen passt nicht zu Studiensemester des ersten Studentstatus	\N	2026-03-31 14:08:39.457131	system
+3465	2067	English	\N	\N	Error: Personenkennzeichen does not fit with semester of first student status	\N	2026-03-31 14:08:39.458321	system
+3466	2068	German	\N	\N	Erster Studentstatus muss gleiche Organisationsform haben wie Bewerberstatus (Studienplan Orgform)	\N	2026-03-31 14:08:39.461082	system
+3467	2068	English	\N	\N	Error: first student status should have same organisational form as bewerber status (Studienplan)	\N	2026-03-31 14:08:39.46229	system
+3468	2069	German	\N	\N	Benutzer für uid {uid} bereits vorhanden	\N	2026-03-31 14:08:39.464838	system
+3469	2069	English	\N	\N	Error: User for uid {uid} already exists	\N	2026-03-31 14:08:39.465958	system
+3470	2070	German	\N	\N	Statusgrund {statusgrundkurzbz} nicht gefunden	\N	2026-03-31 14:08:39.46856	system
+3471	2070	English	\N	\N	Statusgrund {statusgrundkurzbz} not found	\N	2026-03-31 14:08:39.469668	system
+3472	2071	German	\N	\N	Den Status dieser Person wirklich auf {status} setzen?	\N	2026-03-31 14:08:39.472252	system
+3473	2071	English	\N	\N	Really set this person's status to {status}?	\N	2026-03-31 14:08:39.473406	system
+3474	2072	German	\N	\N	Den Status dieser {count} Personen wirklich auf {status} setzen?	\N	2026-03-31 14:08:39.476031	system
+3475	2072	English	\N	\N	Really set the status of these {count} people to {status}?	\N	2026-03-31 14:08:39.477232	system
+3476	2080	German	\N	\N	Prüfung hinzufügen	\N	2026-03-31 14:08:39.495308	system
+3477	2080	English	\N	\N	Add exam	\N	2026-03-31 14:08:39.496463	system
+3478	2081	German	\N	\N	Prüfung bearbeiten	\N	2026-03-31 14:08:39.499022	system
+3479	2081	English	\N	\N	Edit exam	\N	2026-03-31 14:08:39.500155	system
+3480	2082	German	\N	\N	Prüfung löschen	\N	2026-03-31 14:08:39.502748	system
+3481	2082	English	\N	\N	Delete exam	\N	2026-03-31 14:08:39.503878	system
+3482	2083	German	\N	\N	Prüfungskopie für neue Prüfung erstellen	\N	2026-03-31 14:08:39.506467	system
+3483	2083	English	\N	\N	Copy exam	\N	2026-03-31 14:08:39.507752	system
+3484	2084	German	\N	\N	Bitte bei Neuanlage einer kommissionellen Prüfung das Datum der Noteneintragung (i. d. R. heute) eintragen, um den korrekten Fristenablauf der Wiederholung zu ermöglichen.	\N	2026-03-31 14:08:39.510339	system
+3485	2084	English	\N	\N	When creating a new examination before a committee, please enter the date of the grade entry (usually today) to ensure that the deadline for repeating the exam is met correctly.	\N	2026-03-31 14:08:39.511622	system
+3486	2085	German	\N	\N	keine Auswahl	\N	2026-03-31 14:08:39.514226	system
+3487	2085	English	\N	\N	no selection	\N	2026-03-31 14:08:39.515371	system
+3488	2086	German	\N	\N	ACHTUNG! Diese Prüfungsnote wurde nicht ins Zeugnis übernommen da die Zeugnisnote nach dem Prüfungsdatum verändert wurde	\N	2026-03-31 14:08:39.518029	system
+3489	2086	English	\N	\N	ATTENTION! This exam grade was not included in the certificate because the certificate grade was changed after the exam date	\N	2026-03-31 14:08:39.519175	system
+3490	2087	German	\N	\N	Bitte Lv_Teil wählen	\N	2026-03-31 14:08:39.521895	system
+3491	2087	English	\N	\N	Please select teaching unit	\N	2026-03-31 14:08:39.523	system
+3492	2088	German	\N	\N	Punkte	\N	2026-03-31 14:08:39.525812	system
+3493	2088	English	\N	\N	Points	\N	2026-03-31 14:08:39.526964	system
+3494	2089	German	\N	\N	Nur aktuelles Studiensemester anzeigen	\N	2026-03-31 14:08:39.529609	system
+3495	2089	English	\N	\N	Display only current Semester	\N	2026-03-31 14:08:39.530748	system
+3496	2090	German	\N	\N	Student UID	\N	2026-03-31 14:08:39.533405	system
+3497	2090	English	\N	\N	student UID	\N	2026-03-31 14:08:39.534647	system
+3498	2091	German	\N	\N	Übernahmebestätigung drucken	\N	2026-03-31 14:08:39.537313	system
+3499	2091	English	\N	\N	Print acceptance confirmation	\N	2026-03-31 14:08:39.538454	system
+3500	2092	German	\N	\N	Betriebsmittel bearbeiten	\N	2026-03-31 14:08:39.541221	system
+3501	2092	English	\N	\N	Edit Resource	\N	2026-03-31 14:08:39.542399	system
+3502	2093	German	\N	\N	Betriebsmittel löschen	\N	2026-03-31 14:08:39.545113	system
+3503	2093	English	\N	\N	Delete Resource	\N	2026-03-31 14:08:39.546259	system
+3504	2094	German	\N	\N	unbekannt	\N	2026-03-31 14:08:39.548982	system
+3505	2094	English	\N	\N	unknown	\N	2026-03-31 14:08:39.55023	system
+3506	2095	German	\N	\N	Config-Eintrag fehlt	\N	2026-03-31 14:08:39.553063	system
+3507	2095	English	\N	\N	Missing config entry	\N	2026-03-31 14:08:39.554209	system
+3508	2096	German	\N	\N	Unbekannte URL. Seite bzw. Link kann nicht geöffnet werden.	\N	2026-03-31 14:08:39.556837	system
+3509	2096	English	\N	\N	Unknown URL. Cannot open to site or link	\N	2026-03-31 14:08:39.557967	system
+3510	2103	German	\N	\N	Neueste Ampeln	\N	2026-03-31 14:08:39.573668	system
+3511	2103	English	\N	\N	Newest Ampeln	\N	2026-03-31 14:08:39.574893	system
+3512	2104	German	\N	\N	Alle Ampeln	\N	2026-03-31 14:08:39.577582	system
+3513	2104	English	\N	\N	All Ampeln	\N	2026-03-31 14:08:39.578766	system
+3514	2105	German	\N	\N	Überfällig: {count}	\N	2026-03-31 14:08:39.581489	system
+3515	2105	English	\N	\N	Overdue: {count}	\N	2026-03-31 14:08:39.582663	system
+3516	2106	German	\N	\N	Stichtag: {value}	\N	2026-03-31 14:08:39.585364	system
+3517	2106	English	\N	\N	Deadline: {value}	\N	2026-03-31 14:08:39.586519	system
+3518	2107	German	\N	\N	Keine offenen Ampeln.	\N	2026-03-31 14:08:39.589295	system
+3519	2107	English	\N	\N	No open Ampeln.	\N	2026-03-31 14:08:39.590448	system
+3520	2108	German	\N	\N	Offene Ampeln	\N	2026-03-31 14:08:39.593229	system
+3521	2108	English	\N	\N	Open Ampeln	\N	2026-03-31 14:08:39.594453	system
+3522	2109	German	\N	\N	Alle meine Ampeln	\N	2026-03-31 14:08:39.597172	system
+3523	2109	English	\N	\N	All my Ampeln	\N	2026-03-31 14:08:39.598344	system
+3524	2110	German	\N	\N	Pflicht	\N	2026-03-31 14:08:39.601034	system
+3525	2110	English	\N	\N	Mandatory	\N	2026-03-31 14:08:39.602199	system
+3526	2111	German	\N	\N	Ampel bestätigt	\N	2026-03-31 14:08:39.604948	system
+3527	2111	English	\N	\N	Ampel confirmed	\N	2026-03-31 14:08:39.606102	system
+3528	2112	German	\N	\N	Super!	\N	2026-03-31 14:08:39.608783	system
+3530	2113	German	\N	\N	Alle News	\N	2026-03-31 14:08:39.612612	system
+3531	2113	English	\N	\N	All News	\N	2026-03-31 14:08:39.613787	system
+3532	2114	German	\N	\N	Top Nachrichten	\N	2026-03-31 14:08:39.616441	system
+3533	2114	English	\N	\N	Top News	\N	2026-03-31 14:08:39.617604	system
+3534	2115	German	\N	\N	Kein Betreff vorhanden	\N	2026-03-31 14:08:39.620314	system
+3535	2115	English	\N	\N	No Subject available	\N	2026-03-31 14:08:39.621567	system
+3536	2116	German	\N	\N	Studiengangsleitung	\N	2026-03-31 14:08:39.624257	system
+3537	2116	English	\N	\N	Program Director	\N	2026-03-31 14:08:39.625441	system
+3538	2117	German	\N	\N	Stellvertretung	\N	2026-03-31 14:08:39.628065	system
+3539	2117	English	\N	\N	Deputy Program Director	\N	2026-03-31 14:08:39.629289	system
+3540	2118	German	\N	\N	Sekretariat	\N	2026-03-31 14:08:39.632161	system
+3541	2118	English	\N	\N	Administrative Assistant	\N	2026-03-31 14:08:39.633345	system
+3542	2119	German	\N	\N	Hochschulvertretung	\N	2026-03-31 14:08:39.636017	system
+3543	2119	English	\N	\N	UAS Representative	\N	2026-03-31 14:08:39.637181	system
+3544	2120	German	\N	\N	Studienvertretung	\N	2026-03-31 14:08:39.639828	system
+3545	2120	English	\N	\N	Degree Program Representative	\N	2026-03-31 14:08:39.640975	system
+3546	2121	German	\N	\N	Allgemeiner Download	\N	2026-03-31 14:08:39.643633	system
+3547	2121	English	\N	\N	Global Download	\N	2026-03-31 14:08:39.64478	system
+3548	2122	German	\N	\N	Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden	\N	2026-03-31 14:08:39.647423	system
+3549	2122	English	\N	\N	You are not logged in. No UID found	\N	2026-03-31 14:08:39.648644	system
+3550	2123	German	\N	\N	Bearbeiten	\N	2026-03-31 14:08:39.651285	system
+3551	2123	English	\N	\N	Edit	\N	2026-03-31 14:08:39.652482	system
+3552	2124	German	\N	\N	Lehrveranstaltungsinformation	\N	2026-03-31 14:08:39.655192	system
+3553	2124	English	\N	\N	Course Information	\N	2026-03-31 14:08:39.656355	system
+3554	2125	German	\N	\N	Lehrveranstaltungsmenü	\N	2026-03-31 14:08:39.659173	system
+3555	2125	English	\N	\N	Course Menu	\N	2026-03-31 14:08:39.660338	system
+3556	2126	German	\N	\N	Kein Lehrveranstaltungsmenü verfügbar	\N	2026-03-31 14:08:39.663056	system
+3557	2126	English	\N	\N	No Course Menu available	\N	2026-03-31 14:08:39.664238	system
+3558	2127	German	\N	\N	Gesamtnote	\N	2026-03-31 14:08:39.666917	system
+3559	2127	English	\N	\N	Final Grade	\N	2026-03-31 14:08:39.668079	system
+3560	2128	German	\N	\N	Noteneingabe deaktiviert	\N	2026-03-31 14:08:39.670814	system
+3561	2128	English	\N	\N	Grading disabled	\N	2026-03-31 14:08:39.671959	system
+3562	2129	German	\N	\N	Für die Gruppe(n) {nomail} existiert kein Verteiler! Die Studierenden in diesen Gruppen bekommen kein Mail.	\N	2026-03-31 14:08:39.674604	system
+3563	2129	English	\N	\N	There is no e-mail distribution list for the group(s) {nomail}! The students in these groups will not receive an e-mail.	\N	2026-03-31 14:08:39.675782	system
+3564	2130	German	\N	\N	E-Mail an Studierende	\N	2026-03-31 14:08:39.678438	system
+3565	2130	English	\N	\N	E-Mail to students	\N	2026-03-31 14:08:39.679576	system
+3566	2131	German	\N	\N	Abmelden	\N	2026-03-31 14:08:39.682165	system
+3567	2131	English	\N	\N	Unsubscribe	\N	2026-03-31 14:08:39.683314	system
+3568	2132	German	\N	\N	Anrechnung	\N	2026-03-31 14:08:39.685942	system
+3569	2132	English	\N	\N	Exemption	\N	2026-03-31 14:08:39.687078	system
+3570	2133	German	\N	\N	Anrechnungen	\N	2026-03-31 14:08:39.689762	system
+3571	2133	English	\N	\N	Exemptions	\N	2026-03-31 14:08:39.690905	system
+3572	2134	German	\N	\N	LV-Plan	\N	2026-03-31 14:08:39.693812	system
+3573	2134	English	\N	\N	Timetable	\N	2026-03-31 14:08:39.694939	system
+3574	2135	German	\N	\N	{0}'s persönliches Dashboard	\N	2026-03-31 14:08:39.697608	system
+3575	2135	English	\N	\N	{0}'s personal Dashboard	\N	2026-03-31 14:08:39.698754	system
+3576	2136	German	\N	\N	Meine Lehrveranstaltungen	\N	2026-03-31 14:08:39.701407	system
+3577	2136	English	\N	\N	My Courses	\N	2026-03-31 14:08:39.702554	system
+3578	2137	German	\N	\N	Vorheriges Studiensemester	\N	2026-03-31 14:08:39.705184	system
+3579	2137	English	\N	\N	Previous study semester	\N	2026-03-31 14:08:39.706334	system
+3580	2138	German	\N	\N	Nächstes Studiensemester	\N	2026-03-31 14:08:39.708982	system
+3581	2138	English	\N	\N	Next study semester	\N	2026-03-31 14:08:39.710139	system
+3582	2139	German	\N	\N	Bachelor-/Masterarbeiten	\N	2026-03-31 14:08:39.712779	system
+3583	2139	English	\N	\N	Bachelor's/Master's theses	\N	2026-03-31 14:08:39.7139	system
+3584	2140	German	\N	\N	Kein Titel	\N	2026-03-31 14:08:39.716568	system
+3585	2140	English	\N	\N	No Title	\N	2026-03-31 14:08:39.717718	system
+3586	2141	German	\N	\N	Details	\N	2026-03-31 14:08:39.720298	system
+3587	2141	English	\N	\N	Details	\N	2026-03-31 14:08:39.72144	system
+3588	2142	German	\N	\N	Semester	\N	2026-03-31 14:08:39.724053	system
+3589	2142	English	\N	\N	Semester	\N	2026-03-31 14:08:39.725217	system
+3590	2143	German	\N	\N	Studiengang	\N	2026-03-31 14:08:39.727836	system
+3591	2143	English	\N	\N	Degree program	\N	2026-03-31 14:08:39.728976	system
+3592	2144	German	\N	\N	Kontakt	\N	2026-03-31 14:08:39.73167	system
+3593	2144	English	\N	\N	Contact	\N	2026-03-31 14:08:39.732803	system
+3594	2145	German	\N	\N	BetreuerIn	\N	2026-03-31 14:08:39.735411	system
+3595	2145	English	\N	\N	Reviewer	\N	2026-03-31 14:08:39.736569	system
+3596	2146	German	\N	\N	Projekttyp	\N	2026-03-31 14:08:39.739161	system
+3597	2146	English	\N	\N	Project type	\N	2026-03-31 14:08:39.740305	system
+3598	2147	German	\N	\N	Titel	\N	2026-03-31 14:08:39.742937	system
+3599	2147	English	\N	\N	Title	\N	2026-03-31 14:08:39.744091	system
+3600	2148	German	\N	\N	Abgabe bis 23:59	\N	2026-03-31 14:08:39.746684	system
+3601	2148	English	\N	\N	Submission until 23:59	\N	2026-03-31 14:08:39.747798	system
+3602	2149	German	\N	\N	Dokumentabgabe - Studierendenbereich	\N	2026-03-31 14:08:39.75044	system
+3603	2149	English	\N	\N	File submission - Student area	\N	2026-03-31 14:08:39.751559	system
+3604	2150	German	\N	\N	Nachreichen möglich	\N	2026-03-31 14:08:39.754223	system
+3605	2150	English	\N	\N	late submission possible	\N	2026-03-31 14:08:39.755372	system
+3606	2151	German	\N	\N	Organisationseinheit	\N	2026-03-31 14:08:39.757945	system
+3607	2151	English	\N	\N	organization unit	\N	2026-03-31 14:08:39.759091	system
+3608	2152	German	\N	\N	Studierendenstatus	\N	2026-03-31 14:08:39.761716	system
+3609	2152	English	\N	\N	student status	\N	2026-03-31 14:08:39.762908	system
+3610	2153	German	\N	\N	Digitale Signatur gefunden	\N	2026-03-31 14:08:39.765543	system
+3611	2153	English	\N	\N	digital signature found	\N	2026-03-31 14:08:39.766678	system
+3612	2154	German	\N	\N	Keine Digitale Signatur gefunden	\N	2026-03-31 14:08:39.769285	system
+3613	2154	English	\N	\N	no digital signature found	\N	2026-03-31 14:08:39.770442	system
+3614	2155	German	\N	\N	Signatur Server Error	\N	2026-03-31 14:08:39.773055	system
+3615	2155	English	\N	\N	signature server error	\N	2026-03-31 14:08:39.77419	system
+3616	2156	German	\N	\N	Datei wurde nicht gefunden	\N	2026-03-31 14:08:39.776804	system
+3617	2156	English	\N	\N	file not found	\N	2026-03-31 14:08:39.777957	system
+3618	2157	German	\N	\N	Datei hochgeladen	\N	2026-03-31 14:08:39.780567	system
+3619	2157	English	\N	\N	file uploaded	\N	2026-03-31 14:08:39.781667	system
+3620	2158	German	\N	\N	Aktionen	\N	2026-03-31 14:08:39.784171	system
+3621	2158	English	\N	\N	actions	\N	2026-03-31 14:08:39.785315	system
+3622	2159	German	\N	\N	Zieldatum	\N	2026-03-31 14:08:39.787911	system
+3623	2159	English	\N	\N	Deadline	\N	2026-03-31 14:08:39.789061	system
+3624	2160	German	\N	\N	Abgabetyp	\N	2026-03-31 14:08:39.791702	system
+3625	2160	English	\N	\N	Type of document submitted	\N	2026-03-31 14:08:39.792827	system
+3626	2161	German	\N	\N	Kurzbeschreibung der Abgabe	\N	2026-03-31 14:08:39.795512	system
+3627	2161	English	\N	\N	Short description of the submitted document	\N	2026-03-31 14:08:39.796658	system
+3628	2162	German	\N	\N	Abgabedatum	\N	2026-03-31 14:08:39.799235	system
+3629	2162	English	\N	\N	Submission date	\N	2026-03-31 14:08:39.800369	system
+3630	2163	German	\N	\N	Projektarbeit für älteres Semester, bitte Word-Formular in Moodle zur Benotung verwenden!	\N	2026-03-31 14:08:39.802997	system
+3631	2163	English	\N	\N	Thesis handed in for older semester, please use word form in moodle for assessment!	\N	2026-03-31 14:08:39.80423	system
+3632	2164	German	\N	\N	Endupload ist noch nicht erfolgt	\N	2026-03-31 14:08:39.806829	system
+3633	2164	English	\N	\N	Final version not uploaded yet	\N	2026-03-31 14:08:39.80794	system
+3634	2165	German	\N	\N	Fileupload PDF max. 30 MB	\N	2026-03-31 14:08:39.810588	system
+3635	2165	English	\N	\N	Fileupload PDF max. 30 MB	\N	2026-03-31 14:08:39.811716	system
+3636	2166	German	\N	\N	Benoten	\N	2026-03-31 14:08:39.814287	system
+3637	2166	English	\N	\N	Grade	\N	2026-03-31 14:08:39.815453	system
+3638	2167	German	\N	\N	Upload-File ist kein PDF!	\N	2026-03-31 14:08:39.818258	system
+3639	2167	English	\N	\N	Upload-File is not a PDF!	\N	2026-03-31 14:08:39.819386	system
+3640	2168	German	\N	\N	Speichern	\N	2026-03-31 14:08:39.822029	system
+3641	2168	English	\N	\N	Save	\N	2026-03-31 14:08:39.823157	system
+3642	2169	German	\N	\N	Löschen	\N	2026-03-31 14:08:39.825781	system
+3643	2169	English	\N	\N	Delete	\N	2026-03-31 14:08:39.826889	system
+3644	2170	German	\N	\N	Endupload Zusatzdaten	\N	2026-03-31 14:08:39.829482	system
+3645	2170	English	\N	\N	Final submission additional data	\N	2026-03-31 14:08:39.830629	system
+3646	2171	German	\N	\N	Beurteilung	\N	2026-03-31 14:08:39.833225	system
+3647	2171	English	\N	\N	Evaluation	\N	2026-03-31 14:08:39.834337	system
+3648	2172	German	\N	\N	Deutsche Schlagwörter	\N	2026-03-31 14:08:39.836922	system
+3649	2172	English	\N	\N	German Keywords	\N	2026-03-31 14:08:39.838075	system
+3650	2173	German	\N	\N	Englische Schlagwörter	\N	2026-03-31 14:08:39.840789	system
+3651	2173	English	\N	\N	English Keywords	\N	2026-03-31 14:08:39.841902	system
+3652	2174	German	\N	\N	Abstract max 5000 Zeichen	\N	2026-03-31 14:08:39.844562	system
+3653	2174	English	\N	\N	Abstract max 5000 characters	\N	2026-03-31 14:08:39.845726	system
+3654	2175	German	\N	\N	Abstract englisch max 5000 Zeichen	\N	2026-03-31 14:08:39.848316	system
+3655	2175	English	\N	\N	Abstract english max 5000 characters	\N	2026-03-31 14:08:39.849461	system
+3656	2176	German	\N	\N	Seitenanzahl	\N	2026-03-31 14:08:39.852078	system
+3657	2176	English	\N	\N	Number of pages	\N	2026-03-31 14:08:39.853249	system
+3658	2177	German	\N	\N	Terminübersicht	\N	2026-03-31 14:08:39.855847	system
+3659	2177	English	\N	\N	Deadline Overview	\N	2026-03-31 14:08:39.856951	system
+3660	2178	German	\N	\N	Ja	\N	2026-03-31 14:08:39.859577	system
+3661	2178	English	\N	\N	Yes	\N	2026-03-31 14:08:39.860711	system
+3662	2179	German	\N	\N	Nein	\N	2026-03-31 14:08:39.863312	system
+3663	2179	English	\N	\N	No	\N	2026-03-31 14:08:39.864454	system
+3664	2180	German	\N	\N	Gelesen und akzeptiert	\N	2026-03-31 14:08:39.867078	system
+3665	2180	English	\N	\N	Read and accepted	\N	2026-03-31 14:08:39.868234	system
+3666	2181	German	\N	\N	Personenkennzeichen	\N	2026-03-31 14:08:39.870816	system
+3667	2181	English	\N	\N	Personal identity number	\N	2026-03-31 14:08:39.871962	system
+3668	2182	German	\N	\N	Vorname	\N	2026-03-31 14:08:39.874621	system
+3669	2182	English	\N	\N	First Name	\N	2026-03-31 14:08:39.875811	system
+3670	2183	German	\N	\N	Nachname	\N	2026-03-31 14:08:39.878333	system
+3671	2183	English	\N	\N	Last Name	\N	2026-03-31 14:08:39.879472	system
+3672	2184	German	\N	\N	Speichern... 	\N	2026-03-31 14:08:39.882084	system
+3673	2184	English	\N	\N	Saving... 	\N	2026-03-31 14:08:39.883216	system
+3674	2185	German	\N	\N	Laden... 	\N	2026-03-31 14:08:39.885761	system
+3675	2185	English	\N	\N	Loading... 	\N	2026-03-31 14:08:39.886851	system
+3676	2186	German	\N	\N	Betreuerart	\N	2026-03-31 14:08:39.889446	system
+3677	2186	English	\N	\N	Reviewer type	\N	2026-03-31 14:08:39.890569	system
+3678	2187	German	\N	\N	Alle betreuten Projektarbeiten anzeigen	\N	2026-03-31 14:08:39.89323	system
+3679	2187	English	\N	\N	Show all supervised project work	\N	2026-03-31 14:08:39.894425	system
+3680	2188	German	\N	\N	Deadline Übersicht anzeigen 	\N	2026-03-31 14:08:39.897019	system
+3681	2188	English	\N	\N	Show Deadline Overview	\N	2026-03-31 14:08:39.898156	system
+3682	2189	German	\N	\N	Bitte beachten Sie gegebenenfalls existierende studiengangsspezifische Richtlinien und informieren Sie sich diesbezüglich. Vielen Dank.	\N	2026-03-31 14:08:39.900792	system
+3683	2189	English	\N	\N	Please note any existing program-specific guidelines and inform yourself about them. Thank you.	\N	2026-03-31 14:08:39.901932	system
+3684	2190	German	\N	\N	Note	\N	2026-03-31 14:08:39.904634	system
+3685	2190	English	\N	\N	Grade	\N	2026-03-31 14:08:39.905777	system
+3686	2191	German	\N	\N	Upload erlaubt	\N	2026-03-31 14:08:39.908444	system
+3687	2191	English	\N	\N	Upload allowed	\N	2026-03-31 14:08:39.909602	system
+3688	2192	German	\N	\N	Studierendenansicht	\N	2026-03-31 14:08:39.912218	system
+3689	2192	English	\N	\N	Student perspective	\N	2026-03-31 14:08:39.913381	system
+3690	2193	German	\N	\N	Hochladen	\N	2026-03-31 14:08:39.91605	system
+3691	2193	English	\N	\N	Upload	\N	2026-03-31 14:08:39.917238	system
+3692	2194	German	\N	\N	zur Plagiatsprüfung	\N	2026-03-31 14:08:39.920143	system
+3693	2194	English	\N	\N	Plagiarism check	\N	2026-03-31 14:08:39.921328	system
+3694	2195	German	\N	\N	Kein Endupload vorhanden!	\N	2026-03-31 14:08:39.923955	system
+3695	2195	English	\N	\N	No final submission found!	\N	2026-03-31 14:08:39.9251	system
+3696	2196	German	\N	\N	Beurteilungsnotizen	\N	2026-03-31 14:08:39.927817	system
+3697	2196	English	\N	\N	Evaluation notes	\N	2026-03-31 14:08:39.928955	system
+3698	2197	German	\N	\N	Projektarbeit Detailansicht MitarbeiterIn	\N	2026-03-31 14:08:39.931694	system
+3699	2197	English	\N	\N	Project work Detailed view Employees	\N	2026-03-31 14:08:39.932833	system
+3700	2198	German	\N	\N	Projektarbeit Detailansicht Studierende	\N	2026-03-31 14:08:39.935443	system
+3701	2198	English	\N	\N	Project work Detailed view Students	\N	2026-03-31 14:08:39.936632	system
+3702	2199	German	\N	\N	Verspätet abgegeben	\N	2026-03-31 14:08:39.93927	system
+3703	2199	English	\N	\N	Submitted late	\N	2026-03-31 14:08:39.940444	system
+3704	2200	German	\N	\N	Beurteilung erforderlich	\N	2026-03-31 14:08:39.942959	system
+3705	2200	English	\N	\N	Grading necessary	\N	2026-03-31 14:08:39.944052	system
+3706	2201	German	\N	\N	Bestanden	\N	2026-03-31 14:08:39.946602	system
+3707	2201	English	\N	\N	passed	\N	2026-03-31 14:08:39.947723	system
+3708	2202	German	\N	\N	Nicht Bestanden	\N	2026-03-31 14:08:39.9503	system
+3709	2202	English	\N	\N	not passed	\N	2026-03-31 14:08:39.951406	system
+3710	2203	German	\N	\N	Termin überschritten	\N	2026-03-31 14:08:39.953951	system
+3711	2203	English	\N	\N	Deadline exceeded	\N	2026-03-31 14:08:39.955042	system
+3712	2204	German	\N	\N	Termin innerhalb von 12 Tagen	\N	2026-03-31 14:08:39.957554	system
+3713	2204	English	\N	\N	Deadline within 12 days	\N	2026-03-31 14:08:39.95865	system
+3714	2205	German	\N	\N	Termin mehr als 12 Tage entfernt	\N	2026-03-31 14:08:39.961172	system
+3715	2205	English	\N	\N	Deadline more than 12 days away	\N	2026-03-31 14:08:39.962255	system
+3716	2206	German	\N	\N	Rechtzeitig abgegeben	\N	2026-03-31 14:08:39.964832	system
+3717	2206	English	\N	\N	Delivered on time	\N	2026-03-31 14:08:39.96597	system
+3718	2207	German	\N	\N	Für den gesamten Studiengang verbindlicher Termin.\n\n\t\t\t\tLiegt ein Termin in der Vergangenheit, kann nichts mehr hochgeladen werden. Ist es dennoch erforderlich,\n\t\t\t\thaben Studierende bei der Studiengangsassistenz um eine Korrektur dieses Termins anzusuchen.	\N	2026-03-31 14:08:39.968761	system
+3719	2207	English	\N	\N	This deadline is binding for the entire program. If a deadline is in the past,\n\t\t\t\tnothing can be uploaded. If it is still necessary,\n\t\t\t\tstudents must request a correction of this deadline from the program assistant.	\N	2026-03-31 14:08:39.969908	system
+3720	2208	German	\N	\N	Zu diesem Abgabetermin wurde bereits eine Datei hochgeladen	\N	2026-03-31 14:08:39.972548	system
+3721	2208	English	\N	\N	a file has been uploaded for this deadline	\N	2026-03-31 14:08:39.973681	system
+3722	2209	German	\N	\N	Tippen Sie für Tooltip-Informationen	\N	2026-03-31 14:08:39.976337	system
+3723	2209	English	\N	\N	tap for tooltip information	\N	2026-03-31 14:08:39.977492	system
+3724	2210	German	\N	\N	Zeitstatus	\N	2026-03-31 14:08:39.980111	system
+3725	2210	English	\N	\N	time status	\N	2026-03-31 14:08:39.981275	system
+3726	2211	German	\N	\N	Sie sind nicht berechtigt diesen Abgabetermin zu bearbeiten.\n\t\t\t\t\t Es muss entweder eine Benotung vorgesehen sein oder sich um einen individuellen Termin handeln,\n\t\t\t\t\t welcher von Ihrem Benutzerkonto angelegt wurde.	\N	2026-03-31 14:08:39.984105	system
+3727	2211	English	\N	\N	You are not authorized to edit this deadline.\n\t\t\t\t\tIt must either be scheduled for grading or be a custom due date\n\t\t\t\t\tcreated by your user account.	\N	2026-03-31 14:08:39.985236	system
+3728	2212	German	\N	\N	Sie sind nicht berechtigt diesen Abgabetermin zu löschen.\n\t\t\t\t\t Sie benötigen mindestens die Berechtigung den Termin zu bearbeiten und es darf noch keine\n\t\t\t\t\t Dateiabgabe vorhanden sein.	\N	2026-03-31 14:08:39.98776	system
+3729	2212	English	\N	\N	You are not authorized to delete this deadline.\n\t\t\t\t\tYou need at least the permission to edit the deadline, and no file submissions must yet exist.	\N	2026-03-31 14:08:39.988917	system
+3730	2213	German	\N	\N	Zusatzdaten bearbeiten	\N	2026-03-31 14:08:39.991591	system
+3731	2213	English	\N	\N	Edit additional data	\N	2026-03-31 14:08:39.992751	system
+3732	2214	German	\N	\N	Keine Projektarbeiten gefunden!	\N	2026-03-31 14:08:39.995365	system
+3733	2214	English	\N	\N	No projects found!	\N	2026-03-31 14:08:39.996501	system
+3734	2215	German	\N	\N	Projektabgabe im Ansichtsmodus ist nicht erlaubt!	\N	2026-03-31 14:08:39.999105	system
+3735	2215	English	\N	\N	Project submission in view mode is not allowed!	\N	2026-03-31 14:08:40.000284	system
+3736	2216	German	\N	\N	Verspätete Projektabgabe ist bei Terminen, welche von der Studiengangsassistenz für den gesamten Studiengang fixiert wurden nicht erlaubt!\n\n\t\t\t\tUm einen Endupload durchführen zu können, müssen Sie ein positiv benotetes Quality Gate 1 & Quality Gate 2 in der relevanten Projektarbeit absolviert haben.	\N	2026-03-31 14:08:40.002926	system
+3737	2216	English	\N	\N	Late project submissions are not permitted for deadlines set by the program assistant for the entire program!\n\n\t\t\t\tTo be able to complete a final upload, you must have successfully completed Quality Gate 1 and Quality Gate 2 for the relevant project work.	\N	2026-03-31 14:08:40.00406	system
+3738	2217	German	\N	\N	Benotet	\N	2026-03-31 14:08:40.006792	system
+3739	2217	English	\N	\N	Graded	\N	2026-03-31 14:08:40.007929	system
+3740	2218	German	\N	\N	Möchten Sie wirklich Löschen?	\N	2026-03-31 14:08:40.010616	system
+3741	2218	English	\N	\N	Do you really want to delete?	\N	2026-03-31 14:08:40.011741	system
+3742	2219	German	\N	\N	Keine Abgabe vorhanden	\N	2026-03-31 14:08:40.014422	system
+3743	2219	English	\N	\N	No submission yet	\N	2026-03-31 14:08:40.015573	system
+3744	2220	German	\N	\N	Neuen Abgabetermin erstellen	\N	2026-03-31 14:08:40.018201	system
+3745	2220	English	\N	\N	Create new Deadline	\N	2026-03-31 14:08:40.019327	system
+3746	2221	German	\N	\N	Quality Gate negativ beurteilt	\N	2026-03-31 14:08:40.02196	system
+3747	2221	English	\N	\N	Quality Gate graded negative	\N	2026-03-31 14:08:40.023093	system
+3748	2222	German	\N	\N	Keine Note eingetragen	\N	2026-03-31 14:08:40.025731	system
+3749	2222	English	\N	\N	no grade assigned yet	\N	2026-03-31 14:08:40.0269	system
+3750	2223	German	\N	\N	Sie haben eine Abgabe vom Typ Quality Gate negativ benotet, bitte legen Sie zeitnah einen Nachfolgetermin an!	\N	2026-03-31 14:08:40.029803	system
+3751	2223	English	\N	\N	You have graded a submission of type Quality Gate negative, please schedule a follow-up appointment promptly!	\N	2026-03-31 14:08:40.030953	system
+3752	2224	German	\N	\N	E-Mail BetreuerIn	\N	2026-03-31 14:08:40.033644	system
+3753	2224	English	\N	\N	Email Reviewer	\N	2026-03-31 14:08:40.034796	system
+3754	2225	German	\N	\N	Projektdetails öffnen	\N	2026-03-31 14:08:40.037474	system
+3755	2225	English	\N	\N	open Project Details	\N	2026-03-31 14:08:40.038642	system
+3756	2226	German	\N	\N	ErstbetreuerIn Beurteilung herunterladen	\N	2026-03-31 14:08:40.04133	system
+3757	2226	English	\N	\N	Download evaluation of first reviewer	\N	2026-03-31 14:08:40.042468	system
+3758	2227	German	\N	\N	ZweitbetreuerIn Beurteilung herunterladen	\N	2026-03-31 14:08:40.045112	system
+3759	2227	English	\N	\N	Download evaluation of second reviewer	\N	2026-03-31 14:08:40.046245	system
+3760	2228	German	\N	\N	Keine Beurteilung vorhanden	\N	2026-03-31 14:08:40.048846	system
+3761	2228	English	\N	\N	No Project evaluation found	\N	2026-03-31 14:08:40.049998	system
+3762	2229	German	\N	\N	Akzeptieren und Fortfahren	\N	2026-03-31 14:08:40.052665	system
+3763	2229	English	\N	\N	Accept and proceed	\N	2026-03-31 14:08:40.053788	system
+3764	2230	German	\N	\N	Abbrechen	\N	2026-03-31 14:08:40.05644	system
+3765	2230	English	\N	\N	Cancel	\N	2026-03-31 14:08:40.057607	system
+3766	2231	German	\N	\N	Abgabe herunterladen	\N	2026-03-31 14:08:40.060195	system
+3767	2231	English	\N	\N	Download File	\N	2026-03-31 14:08:40.061346	system
+3768	2232	German	\N	\N	Zuletzt getätigte Abgabe herunterladen	\N	2026-03-31 14:08:40.064008	system
+3769	2232	English	\N	\N	Download latest uploaded File	\N	2026-03-31 14:08:40.065155	system
+3770	2233	German	\N	\N	Zeitstrahl Termine	\N	2026-03-31 14:08:40.067746	system
+3771	2233	English	\N	\N	Timeline Deadlines	\N	2026-03-31 14:08:40.068887	system
+3772	2234	German	\N	\N	Möchten Sie den Endupload durchführen?	\N	2026-03-31 14:08:40.071541	system
+3773	2234	English	\N	\N	Do you want to complete the final upload?	\N	2026-03-31 14:08:40.072689	system
+3774	2235	German	\N	\N	Möchten Sie die Zusatzdaten speichern?	\N	2026-03-31 14:08:40.075383	system
+3775	2235	English	\N	\N	Do you want to save the additional data?	\N	2026-03-31 14:08:40.076505	system
+3776	2236	German	\N	\N	Fehler beim Laden der Projektarbeit - StudentIn Zuordnung	\N	2026-03-31 14:08:40.079134	system
+3777	2236	English	\N	\N	Error loading student for project work	\N	2026-03-31 14:08:40.080299	system
+3778	2237	German	\N	\N	Kein zugeteilter StudentIn gefunden für Projektarbeit	\N	2026-03-31 14:08:40.082943	system
+3779	2237	English	\N	\N	No assigned student found for project work	\N	2026-03-31 14:08:40.084075	system
+3780	2238	German	\N	\N	Alle Zusatzdatenfelder benötigen Eingabewerte!	\N	2026-03-31 14:08:40.086765	system
+3781	2238	English	\N	\N	All additional data fields are required!	\N	2026-03-31 14:08:40.087862	system
+3782	2239	German	\N	\N	Ihr Abstract ist sehr kurz, möchten Sie den Endupload trotzdem durchführen?	\N	2026-03-31 14:08:40.090431	system
+3783	2239	English	\N	\N	Your abstract is very short. Would you still like to complete the final upload?	\N	2026-03-31 14:08:40.091544	system
+3784	2240	German	\N	\N	Ihr englisches Abstract ist sehr kurz, möchten Sie den Endupload trotzdem durchführen?	\N	2026-03-31 14:08:40.094085	system
+3785	2240	English	\N	\N	Your english abstract is very short. Would you still like to complete the final upload?	\N	2026-03-31 14:08:40.095183	system
+3786	2241	German	\N	\N	Ihre Schlagwörter sind sehr kurz, möchten Sie den Endupload trotzdem durchführen?	\N	2026-03-31 14:08:40.097762	system
+3787	2241	English	\N	\N	Your keywords are very short. Would you still like to complete the final upload?	\N	2026-03-31 14:08:40.098865	system
+3788	2242	German	\N	\N	Ihre englischen Schlagwörter sind sehr kurz, möchten Sie den Endupload trotzdem durchführen?	\N	2026-03-31 14:08:40.101444	system
+3789	2242	English	\N	\N	Your english keywords are very short. Would you still like to complete the final upload?	\N	2026-03-31 14:08:40.102589	system
+3790	2243	German	\N	\N	Ihre Seitenanzahl ist gering, möchten Sie den Endupload trotzdem durchführen?	\N	2026-03-31 14:08:40.105158	system
+3791	2243	English	\N	\N	Your number of pages is low. Would you still like to complete the final upload?	\N	2026-03-31 14:08:40.106232	system
+3792	2244	German	\N	\N	Neuen Abgabetermin speichern	\N	2026-03-31 14:08:40.108824	system
+3793	2244	English	\N	\N	Save new Deadline	\N	2026-03-31 14:08:40.109955	system
+3794	2245	German	\N	\N	Ich räume der Fachhochschule Technikum Wien das Recht ein, sämtliche übermittelte Dokumente elektronisch zu speichern und zum Zwecke der Langzeitarchivierung unter Beachtung der Bewahrung des Inhalts in andere Formate zu konvertieren.\n\t\t\t\t\t<br><br>\n\t\t\t\t\tIm Falle einer Masterarbeit räume ich der FH Technikum Wien das Recht ein, sie in Datennetzen öffentlich zugänglich zu machen und stimme den bezughabenden <a target="_blank" href="https://cis.technikum-wien.at/cms/dms.php?id=284975">Nutzungsbedingungen des Publikationsservers ePub</a> zu.\n\t\t\t\t\t<br><br>\n\t\t\t\t\tIch bestätige hiermit, dass ich die eidesstattliche Erklärung mittels digitaler Signatur unterzeichnet habe.\n\t\t\t\t\t<a target="_blank" href="https://cis.technikum-wien.at/cms/dms.php?id=214779">Link zum Leitfaden Digitale Signatur</a>.\n\t\t\t\t\t<br><br>\n\t\t\t\t\tHiermit willige ich ein, dass meine Bachelor- oder Masterarbeit im Zuge der Beurteilung auch mittels (Online)-Tools auf die unerlaubte Verwendung von KI geprüft wird.\n\t\t\t\t\t	\N	2026-03-31 14:08:40.112675	system
+3795	2245	English	\N	\N	I grant UAS Technikum Wien the right to store all submitted documents electronically and to convert them into other formats for the purpose of long-term archiving, taking into account the preservation of the content.\n\t\t\t\t\t<br><br>\n\t\t\t\t\tIn the case of a Master's thesis, I grant UAS Technikum Wien the right to make it publicly accessible in data networks and agree to the related <a target="_blank" href="https://cis.technikum-wien.at/cms/dms.php?id=284976">Terms of use for the publication server ePub</a>.\n\t\t\t\t\t<br><br>\n\t\t\t\t\tI hereby confirm that I have signed the affidavit using a digital signature. <a target="_blank" href="https://cis.technikum-wien.at/cms/dms.php?id=215614">Link to the Digital Signature Guide</a>.\n\t\t\t\t\t<br><br>\n\t\t\t\t\tI hereby agree that my bachelor's or master's thesis will also be checked for unauthorized use of AI using (online) tools as part of the assessment.\n\t\t\t\t\t	\N	2026-03-31 14:08:40.113865	system
+3796	2246	German	\N	\N	Datei erfolgreich hochgeladen!	\N	2026-03-31 14:08:40.116472	system
+3797	2246	English	\N	\N	File upload successful	\N	2026-03-31 14:08:40.117591	system
+3798	2247	German	\N	\N	Fehler beim hochladen der Datei!	\N	2026-03-31 14:08:40.12019	system
+3799	2247	English	\N	\N	File upload error!	\N	2026-03-31 14:08:40.121359	system
+3800	2248	German	\N	\N	Vorheriger Termin	\N	2026-03-31 14:08:40.123964	system
+3801	2248	English	\N	\N	Previous Deadline	\N	2026-03-31 14:08:40.125162	system
+3802	2249	German	\N	\N	Nächster Termin	\N	2026-03-31 14:08:40.127714	system
+3803	2249	English	\N	\N	Next Deadline	\N	2026-03-31 14:08:40.128807	system
+3804	2250	German	\N	\N	ErstbetreuerIn	\N	2026-03-31 14:08:40.131367	system
+3805	2250	English	\N	\N	First Reviewer	\N	2026-03-31 14:08:40.132461	system
+3806	2251	German	\N	\N	ZweitbetreuerIn	\N	2026-03-31 14:08:40.134978	system
+3807	2251	English	\N	\N	Second Reviewer	\N	2026-03-31 14:08:40.136084	system
+3808	2252	German	\N	\N	Projektarbeit Abgabetermine Zeitstrahl	\N	2026-03-31 14:08:40.138623	system
+3809	2252	English	\N	\N	Project Deadline Timeline	\N	2026-03-31 14:08:40.139714	system
+3810	2253	German	\N	\N	Email an {0} Studierende schicken	\N	2026-03-31 14:08:40.14232	system
+3811	2253	English	\N	\N	Send Email to {0} students	\N	2026-03-31 14:08:40.143432	system
+3812	2254	German	\N	\N	Betreuungen Bachelorarbeit bzw. Master Thesis bei Studiengang {0}	\N	2026-03-31 14:08:40.146008	system
+3813	2254	English	\N	\N	Supervision of Bachelor's thesis or Master's thesis for degree program {0}	\N	2026-03-31 14:08:40.147128	system
+3814	2255	German	\N	\N	Email an {0} Betreuende schicken	\N	2026-03-31 14:08:40.149739	system
+3815	2255	English	\N	\N	Send Email to {0} reviewers	\N	2026-03-31 14:08:40.150816	system
+3816	2256	German	\N	\N	Betreuungen Bachelorarbeit bzw. Master Thesis bei Studiengang {0}	\N	2026-03-31 14:08:40.153387	system
+3817	2256	English	\N	\N	Supervision of Bachelor's thesis or Master's thesis for degree program {0}	\N	2026-03-31 14:08:40.154471	system
+3818	2257	German	\N	\N	Die Projektarbeit hat keine zugeordneten Abgabetermine!	\N	2026-03-31 14:08:40.157146	system
+3819	2257	English	\N	\N	Project has no assigned Deadlines!	\N	2026-03-31 14:08:40.158237	system
+3820	2258	German	\N	\N	Studierende Details anzeigen	\N	2026-03-31 14:08:40.160754	system
+3821	2258	English	\N	\N	show student details	\N	2026-03-31 14:08:40.161861	system
+3822	2259	German	\N	\N	Keine Note eingetragen	\N	2026-03-31 14:08:40.164398	system
+3823	2259	English	\N	\N	Not graded yet	\N	2026-03-31 14:08:40.165515	system
+3824	2260	German	\N	\N	Fehler beim Versenden des Mails an den Erstbegutachter!	\N	2026-03-31 14:08:40.168081	system
+3825	2260	English	\N	\N	Error sending E-Mail to first Reviewer!	\N	2026-03-31 14:08:40.169182	system
+3826	2261	German	\N	\N	Fehler beim Versenden des Mails an den Zweitbegutachter!	\N	2026-03-31 14:08:40.171766	system
+3827	2261	English	\N	\N	Error sending E-Mail to second Reviewer!	\N	2026-03-31 14:08:40.172863	system
+3828	2262	German	\N	\N	Keine Projektarbeit gefunden.	\N	2026-03-31 14:08:40.175349	system
+3829	2262	English	\N	\N	No projekt work has been found.	\N	2026-03-31 14:08:40.176445	system
+3830	2263	German	\N	\N	Keine Projektabgabe gefunden.	\N	2026-03-31 14:08:40.180182	system
+3831	2263	English	\N	\N	No projekt deadline has been found.	\N	2026-03-31 14:08:40.181285	system
+3832	2264	German	\N	\N	User nicht gefunden.	\N	2026-03-31 14:08:40.183732	system
+3833	2264	English	\N	\N	User not found.	\N	2026-03-31 14:08:40.184827	system
+3834	2265	German	\N	\N	Updates: Abgabetermine Bachelor-/Masterarbeiten	\N	2026-03-31 14:08:40.187329	system
+3835	2265	English	\N	\N	Updates: Deadlines Bachelor's-/Master's Thesis	\N	2026-03-31 14:08:40.18838	system
+3836	2266	German	\N	\N	Quality Gate 1	\N	2026-03-31 14:08:40.190856	system
+3837	2266	English	\N	\N	Quality Gate 1	\N	2026-03-31 14:08:40.191982	system
+3838	2267	German	\N	\N	Quality Gate 2	\N	2026-03-31 14:08:40.194545	system
+3839	2267	English	\N	\N	Quality Gate 2	\N	2026-03-31 14:08:40.195673	system
+3840	2268	German	\N	\N	Zwischenabgabe	\N	2026-03-31 14:08:40.19824	system
+3841	2268	English	\N	\N	Interim submission	\N	2026-03-31 14:08:40.199355	system
+3842	2269	German	\N	\N	Benotung	\N	2026-03-31 14:08:40.201867	system
+3843	2269	English	\N	\N	Grading	\N	2026-03-31 14:08:40.202959	system
+3844	2270	German	\N	\N	Entwurf	\N	2026-03-31 14:08:40.205596	system
+3845	2270	English	\N	\N	Design	\N	2026-03-31 14:08:40.206721	system
+3846	2271	German	\N	\N	Endupload	\N	2026-03-31 14:08:40.2093	system
+3847	2271	English	\N	\N	Final submission	\N	2026-03-31 14:08:40.21039	system
+3848	2272	German	\N	\N	Endabgabe im Sekretariat	\N	2026-03-31 14:08:40.21299	system
+3849	2272	English	\N	\N	Final submission in the administrative office	\N	2026-03-31 14:08:40.214113	system
+3850	2273	German	\N	\N	Bachelorarbeit	\N	2026-03-31 14:08:40.216687	system
+3851	2273	English	\N	\N	Bachelor's thesis	\N	2026-03-31 14:08:40.217784	system
+3852	2274	German	\N	\N	Projektarbeit	\N	2026-03-31 14:08:40.220345	system
+3853	2274	English	\N	\N	Project work	\N	2026-03-31 14:08:40.22146	system
+3854	2275	German	\N	\N	Praktikum	\N	2026-03-31 14:08:40.22403	system
+3855	2275	English	\N	\N	Internship	\N	2026-03-31 14:08:40.225156	system
+3856	2276	German	\N	\N	Praxissemester	\N	2026-03-31 14:08:40.227681	system
+3857	2276	English	\N	\N	Practical semester	\N	2026-03-31 14:08:40.22878	system
+3858	2277	German	\N	\N	Masterarbeit	\N	2026-03-31 14:08:40.231338	system
+3859	2277	English	\N	\N	Master's thesis	\N	2026-03-31 14:08:40.232453	system
+3860	2278	German	\N	\N	BegutachterIn Bachelorarbeit	\N	2026-03-31 14:08:40.235045	system
+3861	2278	English	\N	\N	Reviewer bachelor's thesis	\N	2026-03-31 14:08:40.236199	system
+3862	2279	German	\N	\N	Erstbetreuer einer Diplomarbeit	\N	2026-03-31 14:08:40.238728	system
+3863	2279	English	\N	\N	First reviewer of a master's thesis	\N	2026-03-31 14:08:40.239837	system
+3864	2280	German	\N	\N	1. BegutachterIn Masterarbeit	\N	2026-03-31 14:08:40.242472	system
+3865	2280	English	\N	\N	1. reviewer master's thesis	\N	2026-03-31 14:08:40.24352	system
+3866	2281	German	\N	\N	2. BegutachterIn Masterarbeit	\N	2026-03-31 14:08:40.246119	system
+3867	2281	English	\N	\N	2. reviewer master's thesis	\N	2026-03-31 14:08:40.247234	system
+3868	2282	German	\N	\N	Zweitbetreuer einer Diplomarbeit	\N	2026-03-31 14:08:40.249754	system
+3869	2282	English	\N	\N	Second reviewer of a master's thesis	\N	2026-03-31 14:08:40.250893	system
+3870	2283	German	\N	\N	BetreuerIn Berufspraktikum oder Projektarbeit	\N	2026-03-31 14:08:40.253522	system
+3871	2283	English	\N	\N	Reviewer of an internship or project work	\N	2026-03-31 14:08:40.254622	system
+3872	2284	German	\N	\N	Vorsitz Prüfungssenat	\N	2026-03-31 14:08:40.25706	system
+3873	2284	English	\N	\N	Chair of examination board	\N	2026-03-31 14:08:40.258125	system
+3874	2285	German	\N	\N	Mitglied Prüfungssenat	\N	2026-03-31 14:08:40.260628	system
+3875	2285	English	\N	\N	Member of examination board	\N	2026-03-31 14:08:40.26168	system
+3876	2286	German	\N	\N	Status QG1	\N	2026-03-31 14:08:40.264118	system
+3877	2286	English	\N	\N	Status QG1	\N	2026-03-31 14:08:40.265188	system
+3878	2287	German	\N	\N	Status QG2	\N	2026-03-31 14:08:40.267622	system
+3879	2287	English	\N	\N	Status QG2	\N	2026-03-31 14:08:40.26876	system
+3880	2288	German	\N	\N	Kein Termin vorhanden	\N	2026-03-31 14:08:40.2712	system
+3881	2288	English	\N	\N	No Deadline found	\N	2026-03-31 14:08:40.272277	system
+3882	2289	German	\N	\N	Für weitere Information zu den Abgabemodalitäten Ihres Studienganges lesen Sie bitte die Unterlagen in Moodle: 	\N	2026-03-31 14:08:40.274747	system
+3883	2289	English	\N	\N	For further information on the submission procedures for your degree program, please refer to the documents in Moodle: 	\N	2026-03-31 14:08:40.275868	system
+3884	2290	German	\N	\N	Positiv Benotet!	\N	2026-03-31 14:08:40.278442	system
+3885	2290	English	\N	\N	Graded positive!	\N	2026-03-31 14:08:40.279561	system
+3886	2291	German	\N	\N	Negativ Benotet!	\N	2026-03-31 14:08:40.282128	system
+3887	2291	English	\N	\N	Graded negative!	\N	2026-03-31 14:08:40.283284	system
+3888	2292	German	\N	\N	Noch nicht beurteilt	\N	2026-03-31 14:08:40.286001	system
+3889	2292	English	\N	\N	Not graded yet	\N	2026-03-31 14:08:40.287112	system
+3890	2293	German	\N	\N	Noch nicht abgegeben	\N	2026-03-31 14:08:40.289643	system
+3891	2293	English	\N	\N	Not submitted yet	\N	2026-03-31 14:08:40.290728	system
+3892	2294	German	\N	\N	Noch nicht stattgefunden	\N	2026-03-31 14:08:40.2934	system
+3893	2294	English	\N	\N	Not happened yet	\N	2026-03-31 14:08:40.294501	system
+3894	2295	German	\N	\N	Nicht rechtzeitig abgegeben!	\N	2026-03-31 14:08:40.29708	system
+3895	2295	English	\N	\N	Deadline exceeded!	\N	2026-03-31 14:08:40.298205	system
+3896	2296	German	\N	\N	Abgabetool: Fehlende Signatur bei Endupload	\N	2026-03-31 14:08:40.300782	system
+3897	2296	English	\N	\N	Submission tool: Missing signature at final upload	\N	2026-03-31 14:08:40.301906	system
+3898	2297	German	\N	\N	ErstbetreuerIn Titel Pre	\N	2026-03-31 14:08:40.304465	system
+3899	2297	English	\N	\N	First Reviewer Title Pre	\N	2026-03-31 14:08:40.305566	system
+3900	2298	German	\N	\N	ErstbetreuerIn Vorname	\N	2026-03-31 14:08:40.308135	system
+3901	2298	English	\N	\N	First Reviewer First Name	\N	2026-03-31 14:08:40.309241	system
+3902	2299	German	\N	\N	ErstbetreuerIn Nachname	\N	2026-03-31 14:08:40.311806	system
+3903	2299	English	\N	\N	First Reviewer Last Name	\N	2026-03-31 14:08:40.312921	system
+3904	2300	German	\N	\N	ErstbetreuerIn Titel Post	\N	2026-03-31 14:08:40.315575	system
+3905	2300	English	\N	\N	First Reviewer Title Post	\N	2026-03-31 14:08:40.316721	system
+3906	2301	German	\N	\N	ZweitbetreuerIn Titel Pre	\N	2026-03-31 14:08:40.319343	system
+3907	2301	English	\N	\N	Second Reviewer Title Pre	\N	2026-03-31 14:08:40.320474	system
+3908	2302	German	\N	\N	ZweitbetreuerIn Vorname	\N	2026-03-31 14:08:40.323078	system
+3909	2302	English	\N	\N	Second Reviewer First Name	\N	2026-03-31 14:08:40.324222	system
+3910	2303	German	\N	\N	ZweitbetreuerIn Nachname	\N	2026-03-31 14:08:40.326839	system
+3911	2303	English	\N	\N	Second Reviewer Last Name	\N	2026-03-31 14:08:40.327962	system
+3912	2304	German	\N	\N	ZweitbetreuerIn Titel Post	\N	2026-03-31 14:08:40.330584	system
+3913	2304	English	\N	\N	Second Reviewer Title Post	\N	2026-03-31 14:08:40.331715	system
+3914	2305	German	\N	\N	Keine Zuordnung oder Berechtigung für die Projektarbeit gefunden!	\N	2026-03-31 14:08:40.334324	system
+3915	2305	English	\N	\N	No assignment or authorization found for the project!	\N	2026-03-31 14:08:40.335512	system
+3916	2306	German	\N	\N	Institut	\N	2026-03-31 14:08:40.338154	system
+3917	2306	English	\N	\N	Institute	\N	2026-03-31 14:08:40.339313	system
+3918	2307	German	\N	\N	Lehrtyp	\N	2026-03-31 14:08:40.341945	system
+3919	2307	English	\N	\N	Teaching type	\N	2026-03-31 14:08:40.343094	system
+3920	2308	German	\N	\N	Studiengangsassistenz	\N	2026-03-31 14:08:40.345721	system
+3921	2308	English	\N	\N	degree program assistant	\N	2026-03-31 14:08:40.346833	system
+3922	2309	German	\N	\N	Geschäftsführende Leitung	\N	2026-03-31 14:08:40.349477	system
+3923	2309	English	\N	\N	Managing director	\N	2026-03-31 14:08:40.350599	system
+3924	2310	German	\N	\N	Stellvertretende Leitung	\N	2026-03-31 14:08:40.353204	system
+3925	2310	English	\N	\N	Representative director	\N	2026-03-31 14:08:40.354368	system
+3926	2311	German	\N	\N	Geschäftsführende / Stellvertretende Leitung	\N	2026-03-31 14:08:40.357012	system
+3927	2311	English	\N	\N	Managing / Representative director	\N	2026-03-31 14:08:40.358151	system
+3928	2312	German	\N	\N	Jahrgangsvertretung	\N	2026-03-31 14:08:40.360804	system
+3929	2312	English	\N	\N	Study year representative	\N	2026-03-31 14:08:40.361927	system
+3930	2313	German	\N	\N	Studienvertretung	\N	2026-03-31 14:08:40.364541	system
+3931	2313	English	\N	\N	Study representative	\N	2026-03-31 14:08:40.365691	system
+3932	2314	German	\N	\N	Hochschulvertretung	\N	2026-03-31 14:08:40.36832	system
+3933	2314	English	\N	\N	University representative	\N	2026-03-31 14:08:40.369468	system
+3934	2315	German	\N	\N	Allgemein	\N	2026-03-31 14:08:40.372284	system
+3935	2315	English	\N	\N	General	\N	2026-03-31 14:08:40.373481	system
+3936	2316	German	\N	\N	Weitere Zeile hinzufügen	\N	2026-03-31 14:08:40.376176	system
+3937	2316	English	\N	\N	Add another line	\N	2026-03-31 14:08:40.377373	system
+3938	2317	German	\N	\N	Benutzerdefiniert	\N	2026-03-31 14:08:40.37999	system
+3939	2317	English	\N	\N	Custom	\N	2026-03-31 14:08:40.381179	system
+3940	2318	German	\N	\N	Hier befinden sich die vordefinierten Widgets	\N	2026-03-31 14:08:40.383904	system
+3941	2318	English	\N	\N	Here are the predefined widgets	\N	2026-03-31 14:08:40.38501	system
+3942	2319	German	\N	\N	Hier befinden sich die Widgets Ihrer persönlichen Anpassungen	\N	2026-03-31 14:08:40.387586	system
+3943	2319	English	\N	\N	Here are the widgets of your personal cutomizations	\N	2026-03-31 14:08:40.388683	system
+3944	2320	German	\N	\N	Hier befinden sich die Widgets der {0} Funktion	\N	2026-03-31 14:08:40.391421	system
+3945	2320	English	\N	\N	Here are the widgets of the {0} function	\N	2026-03-31 14:08:40.392515	system
+3946	2321	German	\N	\N	Abschlussprüfung	\N	2026-03-31 14:08:40.394987	system
+3947	2321	English	\N	\N	Final exam	\N	2026-03-31 14:08:40.396274	system
+3948	2322	German	\N	\N	Abschlussbeurteilung	\N	2026-03-31 14:08:40.399111	system
+3949	2322	English	\N	\N	Final assessment	\N	2026-03-31 14:08:40.400237	system
+3950	2323	German	\N	\N	PrüferIn 1	\N	2026-03-31 14:08:40.402745	system
+3951	2323	English	\N	\N	examiner 1	\N	2026-03-31 14:08:40.403851	system
+3952	2324	German	\N	\N	PrüferIn 2	\N	2026-03-31 14:08:40.406379	system
+3953	2324	English	\N	\N	examiner 2	\N	2026-03-31 14:08:40.407483	system
+3954	2325	German	\N	\N	PrüferIn 3	\N	2026-03-31 14:08:40.410113	system
+3955	2325	English	\N	\N	examiner 3	\N	2026-03-31 14:08:40.411228	system
+3956	2326	German	\N	\N	Uhrzeit	\N	2026-03-31 14:08:40.413834	system
+3957	2326	English	\N	\N	time	\N	2026-03-31 14:08:40.414936	system
+3958	2327	German	\N	\N	Freigabe	\N	2026-03-31 14:08:40.417723	system
+3959	2327	English	\N	\N	Approval	\N	2026-03-31 14:08:40.41882	system
+3960	2328	German	\N	\N	Sponsion	\N	2026-03-31 14:08:40.421429	system
+3961	2328	English	\N	\N	Graduation	\N	2026-03-31 14:08:40.42255	system
+3962	2329	German	\N	\N	Abschlussprüfung ID	\N	2026-03-31 14:08:40.42524	system
+3963	2329	English	\N	\N	Final Examination ID	\N	2026-03-31 14:08:40.426349	system
+3964	2330	German	\N	\N	Vorsitz	\N	2026-03-31 14:08:40.430197	system
+3965	2330	English	\N	\N	Chair	\N	2026-03-31 14:08:40.43134	system
+3966	2331	German	\N	\N	Zur Beurteilung	\N	2026-03-31 14:08:40.433907	system
+3967	2331	English	\N	\N	To the assessment	\N	2026-03-31 14:08:40.435002	system
+3968	2332	German	\N	\N	Akademischer Grad	\N	2026-03-31 14:08:40.437558	system
+3969	2332	English	\N	\N	Academic degree	\N	2026-03-31 14:08:40.438673	system
+3970	2333	German	\N	\N	Keine Abschlussprüfungen für Student_uid(s) {id} gefunden	\N	2026-03-31 14:08:40.441243	system
+3971	2333	English	\N	\N	No final exams found for Student_uid(s) {id}	\N	2026-03-31 14:08:40.442347	system
+3972	2334	German	\N	\N	Kontaktieren	\N	2026-03-31 14:08:40.444942	system
+3973	2334	English	\N	\N	Get in Contact	\N	2026-03-31 14:08:40.446212	system
+3974	2335	German	\N	\N	E-Mail senden (intern)	\N	2026-03-31 14:08:40.44883	system
+3975	2335	English	\N	\N	Send email (internal)	\N	2026-03-31 14:08:40.449938	system
+3976	2336	German	\N	\N	E-Mail senden (privat)	\N	2026-03-31 14:08:40.452492	system
+3977	2336	English	\N	\N	Send email (private)	\N	2026-03-31 14:08:40.453595	system
+3978	2337	German	\N	\N	STRG-Taste für BCC	\N	2026-03-31 14:08:40.456148	system
+3979	2337	English	\N	\N	CTRL-Key for BCC	\N	2026-03-31 14:08:40.457482	system
+3980	2338	German	\N	\N	Ein weiteres Fenster wird geöffnet. Fortfahren?	\N	2026-03-31 14:08:40.460065	system
+3981	2338	English	\N	\N	A new window will open. Continue?	\N	2026-03-31 14:08:40.461194	system
+3982	2339	German	\N	\N	Aufgrund der hohen Empfängerzahl muss die Nachricht auf mehrere E-Mails aufgeteilt werden.	\N	2026-03-31 14:08:40.463724	system
+3983	2339	English	\N	\N	Due to the large number of recipients, the message needs to be split across multiple emails.	\N	2026-03-31 14:08:40.46489	system
+3984	2340	German	\N	\N	Note komm. Prüfung	\N	2026-03-31 14:08:40.467737	system
+3985	2340	English	\N	\N	Grade committee exam	\N	2026-03-31 14:08:40.468932	system
+3986	2341	German	\N	\N	Abschlussprüfung anlegen	\N	2026-03-31 14:08:40.471577	system
+3987	2341	English	\N	\N	New Final Exam	\N	2026-03-31 14:08:40.472744	system
+3988	2342	German	\N	\N	Abschlussprüfung bearbeiten	\N	2026-03-31 14:08:40.475396	system
+3989	2342	English	\N	\N	Edit Final Exam	\N	2026-03-31 14:08:40.476592	system
+3990	2343	German	\N	\N	Nicht zum Editieren der Gruppe berechtigt	\N	2026-03-31 14:08:40.479225	system
+3991	2343	English	\N	\N	No authorization for editing the group	\N	2026-03-31 14:08:40.480395	system
+3992	2353	German	\N	\N	Gruppen	\N	2026-03-31 14:08:40.499301	system
+3993	2353	English	\N	\N	Groups	\N	2026-03-31 14:08:40.500462	system
+3994	2354	German	\N	\N	Gruppe	\N	2026-03-31 14:08:40.503115	system
+3995	2354	English	\N	\N	Group	\N	2026-03-31 14:08:40.504299	system
+3996	2355	German	\N	\N	Spezialgruppen	\N	2026-03-31 14:08:40.506911	system
+3997	2355	English	\N	\N	Special groups	\N	2026-03-31 14:08:40.508104	system
+3998	2356	German	\N	\N	Gruppe hinzufügen	\N	2026-03-31 14:08:40.51073	system
+3999	2356	English	\N	\N	Add group	\N	2026-03-31 14:08:40.511878	system
+4000	2357	German	\N	\N	{n} Gruppen hinzufügen	\N	2026-03-31 14:08:40.514518	system
+4001	2357	English	\N	\N	Added {n} groups	\N	2026-03-31 14:08:40.515671	system
+4002	2358	German	\N	\N	automatisch generiert	\N	2026-03-31 14:08:40.518287	system
+4003	2358	English	\N	\N	automatically generated	\N	2026-03-31 14:08:40.519431	system
+4004	2359	German	\N	\N	Automatisch generierte Gruppenzuordnungen können nicht gelöscht werden.	\N	2026-03-31 14:08:40.522069	system
+4005	2359	English	\N	\N	Automatically generated group assignments cannot be deleted.	\N	2026-03-31 14:08:40.523245	system
+4006	2360	German	\N	\N	Der Student {uid} ist bereits im {studiensemester_kurzbz} dieser Gruppe zugeteilt. Entfernen Sie vorher diese Zuteilung.	\N	2026-03-31 14:08:40.52592	system
+4007	2360	English	\N	\N	Student {uid} is already assigned to this group in {studiensemester_kurzbz}. Remove this assignment beforehand.	\N	2026-03-31 14:08:40.527093	system
+4008	2361	German	\N	\N	Wahlname	\N	2026-03-31 14:08:40.529797	system
+4009	2361	English	\N	\N	elective name	\N	2026-03-31 14:08:40.530907	system
+4010	2362	German	\N	\N	Familienstand	\N	2026-03-31 14:08:40.53384	system
+4011	2362	English	\N	\N	marital status	\N	2026-03-31 14:08:40.535034	system
+4012	2363	German	\N	\N	Foto	\N	2026-03-31 14:08:40.537883	system
+4013	2363	English	\N	\N	photo	\N	2026-03-31 14:08:40.539031	system
+4014	2364	German	\N	\N	Homepage	\N	2026-03-31 14:08:40.541824	system
+4015	2364	English	\N	\N	homepage	\N	2026-03-31 14:08:40.542993	system
+4016	2365	German	\N	\N	Verband	\N	2026-03-31 14:08:40.545893	system
+4017	2365	English	\N	\N	verband	\N	2026-03-31 14:08:40.547061	system
+4018	2366	German	\N	\N	Aktiv	\N	2026-03-31 14:08:40.549912	system
+4019	2366	English	\N	\N	active	\N	2026-03-31 14:08:40.55105	system
+4020	2367	German	\N	\N	Keine Person gefunden	\N	2026-03-31 14:08:40.553794	system
+4021	2367	English	\N	\N	No Person found	\N	2026-03-31 14:08:40.554992	system
+4022	2368	German	\N	\N	Kein/e Student/in gefunden	\N	2026-03-31 14:08:40.557753	system
+4023	2368	English	\N	\N	No Student found	\N	2026-03-31 14:08:40.558884	system
+4024	2369	German	\N	\N	geschieden	\N	2026-03-31 14:08:40.561519	system
+4025	2369	English	\N	\N	divorced	\N	2026-03-31 14:08:40.562856	system
+4026	2370	German	\N	\N	ledig	\N	2026-03-31 14:08:40.565509	system
+4027	2370	English	\N	\N	single	\N	2026-03-31 14:08:40.566652	system
+4028	2371	German	\N	\N	verheiratet	\N	2026-03-31 14:08:40.569375	system
+4029	2371	English	\N	\N	married	\N	2026-03-31 14:08:40.570489	system
+4030	2372	German	\N	\N	verwitwet	\N	2026-03-31 14:08:40.573102	system
+4031	2372	English	\N	\N	widowed	\N	2026-03-31 14:08:40.574285	system
+4032	2373	German	\N	\N	Firma ID	\N	2026-03-31 14:08:40.576939	system
+4033	2373	English	\N	\N	Company ID	\N	2026-03-31 14:08:40.578394	system
+4034	2374	German	\N	\N	Adresse ID	\N	2026-03-31 14:08:40.581058	system
+4035	2374	English	\N	\N	Address ID	\N	2026-03-31 14:08:40.582193	system
+4036	2375	German	\N	\N	Kontakt ID	\N	2026-03-31 14:08:40.584779	system
+4037	2375	English	\N	\N	Contact ID	\N	2026-03-31 14:08:40.585931	system
+4038	2376	German	\N	\N	Standort ID	\N	2026-03-31 14:08:40.588657	system
+4039	2376	English	\N	\N	Location ID	\N	2026-03-31 14:08:40.589739	system
+4040	2377	German	\N	\N	Bankverbindung ID	\N	2026-03-31 14:08:40.592333	system
+4041	2377	English	\N	\N	Bankdetails ID	\N	2026-03-31 14:08:40.593509	system
+4042	2378	German	\N	\N	Studienplan ID	\N	2026-03-31 14:08:40.596107	system
+4043	2378	English	\N	\N	Studyplan ID	\N	2026-03-31 14:08:40.59723	system
+4044	2379	German	\N	\N	PrestudentIn ID	\N	2026-03-31 14:08:40.599966	system
+4045	2379	English	\N	\N	Prestudent ID	\N	2026-03-31 14:08:40.601119	system
+4046	2380	German	\N	\N	Notiz ID	\N	2026-03-31 14:08:40.603796	system
+4047	2380	English	\N	\N	Notes ID	\N	2026-03-31 14:08:40.604943	system
+4048	2381	German	\N	\N	Notizzuordnung ID	\N	2026-03-31 14:08:40.607591	system
+4049	2381	English	\N	\N	Noteassignment ID	\N	2026-03-31 14:08:40.608725	system
+4050	2382	German	\N	\N	Extension ID	\N	2026-03-31 14:08:40.611586	system
+4051	2382	English	\N	\N	Extension ID	\N	2026-03-31 14:08:40.612751	system
+4052	2383	German	\N	\N	Type ID	\N	2026-03-31 14:08:40.615355	system
+4053	2383	English	\N	\N	Type ID	\N	2026-03-31 14:08:40.6165	system
+4054	2384	German	\N	\N	Betriebsmittel ID	\N	2026-03-31 14:08:40.61913	system
+4055	2384	English	\N	\N	Ressource ID	\N	2026-03-31 14:08:40.620296	system
+4056	2385	German	\N	\N	Betriebsmittelperson ID	\N	2026-03-31 14:08:40.622926	system
+4057	2385	English	\N	\N	Ressourceperson ID	\N	2026-03-31 14:08:40.62404	system
+4058	2386	German	\N	\N	Daten werden geladen	\N	2026-03-31 14:08:40.62667	system
+4059	2386	English	\N	\N	Loading	\N	2026-03-31 14:08:40.627889	system
+4060	2387	German	\N	\N	Nur Eingabe von ganzen Zahlen erlaubt	\N	2026-03-31 14:08:40.630514	system
+4061	2387	English	\N	\N	Error: Only input of whole numbers allowed	\N	2026-03-31 14:08:40.631644	system
+4062	2388	German	\N	\N	Ausbildungssemester nicht zulässig: größer als Höchstsemester	\N	2026-03-31 14:08:40.634239	system
+4063	2388	English	\N	\N	Error: Semester not allowed: higher than max Semester	\N	2026-03-31 14:08:40.635371	system
+4064	2389	German	\N	\N	Mobilität	\N	2026-03-31 14:08:40.638007	system
+4065	2389	English	\N	\N	Mobility	\N	2026-03-31 14:08:40.639152	system
+4066	2390	German	\N	\N	Mobilitätsprogramm	\N	2026-03-31 14:08:40.641797	system
+4067	2390	English	\N	\N	Mobility program	\N	2026-03-31 14:08:40.642914	system
+4068	2391	German	\N	\N	Gastnation	\N	2026-03-31 14:08:40.645544	system
+4069	2391	English	\N	\N	Host nation	\N	2026-03-31 14:08:40.646691	system
+4070	2392	German	\N	\N	Herkunftsland	\N	2026-03-31 14:08:40.649138	system
+4071	2392	English	\N	\N	Country of origin	\N	2026-03-31 14:08:40.650232	system
+4072	2393	German	\N	\N	Universität	\N	2026-03-31 14:08:40.652778	system
+4073	2393	English	\N	\N	University	\N	2026-03-31 14:08:40.653953	system
+4074	2394	German	\N	\N	Erworbene ECTS	\N	2026-03-31 14:08:40.656481	system
+4075	2394	English	\N	\N	ECTS acquired	\N	2026-03-31 14:08:40.657591	system
+4076	2395	German	\N	\N	Angerechnete ECTS	\N	2026-03-31 14:08:40.660111	system
+4077	2395	English	\N	\N	ECTS credited	\N	2026-03-31 14:08:40.661241	system
+4078	2396	German	\N	\N	Zweck	\N	2026-03-31 14:08:40.663825	system
+4079	2396	English	\N	\N	Purpose	\N	2026-03-31 14:08:40.664957	system
+4080	2397	German	\N	\N	Aufenthalt Förderung	\N	2026-03-31 14:08:40.667597	system
+4081	2397	English	\N	\N	Residency funding	\N	2026-03-31 14:08:40.668724	system
+4082	2398	German	\N	\N	Mobilitätszweck anlegen	\N	2026-03-31 14:08:40.671356	system
+4083	2398	English	\N	\N	Create motivation for mobility	\N	2026-03-31 14:08:40.672473	system
+4084	2399	German	\N	\N	Förderung für Aufenthalt anlegen	\N	2026-03-31 14:08:40.675095	system
+4085	2399	English	\N	\N	Create funding for mobility	\N	2026-03-31 14:08:40.676234	system
+4086	2400	German	\N	\N	Programmkurzbezeichnung	\N	2026-03-31 14:08:40.67903	system
+4087	2400	English	\N	\N	Program short description	\N	2026-03-31 14:08:40.680143	system
+4088	2401	German	\N	\N	Bisio ID	\N	2026-03-31 14:08:40.682805	system
+4089	2401	English	\N	\N	Bisio ID	\N	2026-03-31 14:08:40.683948	system
+4090	2402	German	\N	\N	Dokument archivieren	\N	2026-03-31 14:08:40.686623	system
+4091	2402	English	\N	\N	Archive document	\N	2026-03-31 14:08:40.68801	system
+4092	2403	German	\N	\N	Archiv	\N	2026-03-31 14:08:40.690615	system
+4093	2403	English	\N	\N	Archive	\N	2026-03-31 14:08:40.691719	system
+4094	2404	German	\N	\N	Titel	\N	2026-03-31 14:08:40.694338	system
+4095	2404	English	\N	\N	Title	\N	2026-03-31 14:08:40.695463	system
+4096	2405	German	\N	\N	Bezeichnung	\N	2026-03-31 14:08:40.698076	system
+4097	2405	English	\N	\N	Description	\N	2026-03-31 14:08:40.699201	system
+4098	2406	German	\N	\N	Erstelldatum	\N	2026-03-31 14:08:40.701821	system
+4099	2406	English	\N	\N	Creation date	\N	2026-03-31 14:08:40.702944	system
+4100	2407	German	\N	\N	AkzeptiertAmUm	\N	2026-03-31 14:08:40.705568	system
+4101	2407	English	\N	\N	AcceptionOnAt	\N	2026-03-31 14:08:40.706675	system
+4102	2408	German	\N	\N	Gedruckt	\N	2026-03-31 14:08:40.709242	system
+4103	2408	English	\N	\N	Printed	\N	2026-03-31 14:08:40.71043	system
+4104	2409	German	\N	\N	Signiert	\N	2026-03-31 14:08:40.713042	system
+4105	2409	English	\N	\N	Signed	\N	2026-03-31 14:08:40.714176	system
+4106	2410	German	\N	\N	Akte aktualisieren	\N	2026-03-31 14:08:40.716735	system
+4107	2410	English	\N	\N	Edit document	\N	2026-03-31 14:08:40.717809	system
+4108	2411	German	\N	\N	Akte	\N	2026-03-31 14:08:40.720356	system
+4109	2411	English	\N	\N	Document	\N	2026-03-31 14:08:40.721571	system
+4110	2412	German	\N	\N	Neue Datei	\N	2026-03-31 14:08:40.724192	system
+4111	2412	English	\N	\N	New file	\N	2026-03-31 14:08:40.725331	system
+4112	2413	German	\N	\N	Akte ID	\N	2026-03-31 14:08:40.727949	system
+4113	2413	English	\N	\N	Document ID	\N	2026-03-31 14:08:40.729076	system
+4114	2414	German	\N	\N	Signiert	\N	2026-03-31 14:08:40.731765	system
+4115	2414	English	\N	\N	Signed	\N	2026-03-31 14:08:40.732898	system
+4116	2415	German	\N	\N	Kurzbezeichnung	\N	2026-03-31 14:08:40.735535	system
+4117	2415	English	\N	\N	Short Name	\N	2026-03-31 14:08:40.736696	system
+4118	2416	German	\N	\N	Eintrag bereits vorhanden	\N	2026-03-31 14:08:40.739294	system
+4119	2416	English	\N	\N	Entry already existing	\N	2026-03-31 14:08:40.740396	system
+4120	2417	German	\N	\N	Dieser Datensatz wird von der Mobility Extension verwendet und muss zuerst dort gelöscht werden.	\N	2026-03-31 14:08:40.742961	system
+4121	2417	English	\N	\N	This record is used by the Mobility Extension and must first be deleted there.	\N	2026-03-31 14:08:40.744099	system
+4122	2418	German	\N	\N	Mobilität anlegen	\N	2026-03-31 14:08:40.746681	system
+4123	2418	English	\N	\N	Create mobility	\N	2026-03-31 14:08:40.747736	system
+4124	2419	German	\N	\N	Mobilität bearbeiten	\N	2026-03-31 14:08:40.750338	system
+4125	2419	English	\N	\N	Edit mobility	\N	2026-03-31 14:08:40.75153	system
+4126	2420	German	\N	\N	LV-Weiterentwicklung Übersichten	\N	2026-03-31 14:08:40.754098	system
+4127	2420	English	\N	\N	Course Development Overviews	\N	2026-03-31 14:08:40.755218	system
+4128	2421	German	\N	\N	Kompetenzfeld	\N	2026-03-31 14:08:40.757777	system
+4129	2421	English	\N	\N	competence field	\N	2026-03-31 14:08:40.758883	system
+4130	2422	German	\N	\N	alle ausklappen	\N	2026-03-31 14:08:40.761495	system
+4131	2422	English	\N	\N	expand all	\N	2026-03-31 14:08:40.762585	system
+4132	2423	German	\N	\N	alle einklappen	\N	2026-03-31 14:08:40.765148	system
+4133	2423	English	\N	\N	collapse all	\N	2026-03-31 14:08:40.766298	system
+4134	2424	German	\N	\N	Quellkurs	\N	2026-03-31 14:08:40.768945	system
+4135	2424	English	\N	\N	Source Course	\N	2026-03-31 14:08:40.770153	system
+4136	2431	German	\N	\N	Max. Punkte	\N	2026-03-31 14:08:40.783541	system
+4137	2431	English	\N	\N	Max. points	\N	2026-03-31 14:08:40.784707	system
+4138	2432	German	\N	\N	Erfüllungsgrad (Prozent) zum Ausfüllen	\N	2026-03-31 14:08:40.787247	system
+4139	2432	English	\N	\N	Degree of Fulfilment (Percentage) to Fill In	\N	2026-03-31 14:08:40.788375	system
+4140	2433	German	\N	\N	Details (angemessener und korrekter Einsatz von\nWerkzeugen und Technologien in jedem Schritt)	\N	2026-03-31 14:08:40.791022	system
+4141	2433	English	\N	\N	Details\n(appropriate and correct use of tools and technologies at each step)	\N	2026-03-31 14:08:40.792171	system
+4142	2434	German	\N	\N	Problemstellung und Zieldefinition	\N	2026-03-31 14:08:40.794765	system
+4143	2434	English	\N	\N	Problem Definition and Objective Setting	\N	2026-03-31 14:08:40.795945	system
+4144	2435	German	\N	\N	Die Problemstellung ist klar und präzise definiert und in einen wissenschaftlichen Kontext eingebettet.\nDie Zielsetzung sowie eventuelle Messgrößen sind eindeutig formuliert.	\N	2026-03-31 14:08:40.798587	system
+4145	2435	English	\N	\N	The problem is clearly and precisely defined and embedded in a scientific context.\nThe objective, along with any potential metrics, is clearly formulated.	\N	2026-03-31 14:08:40.799699	system
+4146	2436	German	\N	\N	Methodik und Lösungsansatz	\N	2026-03-31 14:08:40.802236	system
+4147	2436	English	\N	\N	Methodology and Approach	\N	2026-03-31 14:08:40.803457	system
+4148	2437	German	\N	\N	Das methodische Vorgehen ist logisch und nachvollziehbar strukturiert, passend zur Zielsetzung,\nund die angewandten Methoden sind korrekt und fundiert umgesetzt.\nDie Methodik ist fachspezifisch angemessen, literaturbasiert begründet und wissenschaftlich vertretbar.	\N	2026-03-31 14:08:40.806103	system
+4149	2437	English	\N	\N	The methodological approach is logically and comprehensively structured,\naligned with the objective, and the applied methods are implemented correctly and soundly.\nThe methodology is appropriate to the field, justified based on literature, and scientifically valid.	\N	2026-03-31 14:08:40.807225	system
+4150	2438	German	\N	\N	Ergebnisse und Diskussion	\N	2026-03-31 14:08:40.809846	system
+4151	2438	English	\N	\N	Results and Discussion	\N	2026-03-31 14:08:40.810959	system
+4152	2439	German	\N	\N	Die Qualität der Lösung ist bezogen auf die Zielsetzung ausreichend.\n\t\t\t\tDie Ergebnisse werden fundiert analysiert und in Bezug auf die Zielsetzung schlüssig interpretiert.\n\t\t\t\tDie Diskussion reflektiert die Relevanz und Grenzen der Ergebnisse kritisch und ist logisch strukturiert.	\N	2026-03-31 14:08:40.813614	system
+4153	2439	English	\N	\N	The quality of the solution sufficiently meets the objective.\nThe results are thoroughly analyzed and coherently interpreted with respect to the objective.\nThe discussion critically reflects on the relevance and limitations of the results and is logically structured.	\N	2026-03-31 14:08:40.814727	system
+4154	2440	German	\N	\N	Struktur und Aufbau	\N	2026-03-31 14:08:40.817329	system
+4155	2440	English	\N	\N	Structure and Organization	\N	2026-03-31 14:08:40.818458	system
+4156	2441	German	\N	\N	Die Arbeit folgt einer logischen, klaren Gliederung und einem konsistenten roten Faden.\nVerzeichnisse, Grafiken, Tabellen und der Text sind gemäß den aktuell gültigen wissenschaftlichen Richtlinien der FH Technikum Wien aufbereitet.	\N	2026-03-31 14:08:40.821049	system
+4157	2441	English	\N	\N	The work follows a logical and clear outline with a consistent narrative thread.\nDirectories, graphics, tables, and text are prepared in accordance with the currently valid scientific guidelines of FH Technikum Wien.	\N	2026-03-31 14:08:40.822223	system
+4158	2442	German	\N	\N	Stil und Ausdruck	\N	2026-03-31 14:08:40.82477	system
+4159	2442	English	\N	\N	Style and Expression	\N	2026-03-31 14:08:40.825884	system
+4160	2443	German	\N	\N	Der sprachliche Ausdruck ist präzise,\nfachlich korrekt und erfüllt die Anforderungen an gendergerechte Sprache gemäß den geltenden Richtlinien der FH Technikum Wien.	\N	2026-03-31 14:08:40.828444	system
+4161	2443	English	\N	\N	The linguistic expression is precise, professionally accurate,\nand meets the requirements of gender-sensitive language as per the applicable guidelines of FH Technikum Wien.	\N	2026-03-31 14:08:40.82959	system
+4162	2444	German	\N	\N	Zitierregeln und Quellenangaben	\N	2026-03-31 14:08:40.832144	system
+4163	2444	English	\N	\N	Citation Rules and References	\N	2026-03-31 14:08:40.833314	system
+4164	2445	German	\N	\N	Umfang, Qualität und Aktualität der verarbeiteten Quellen sind angemessen\nund repräsentieren den aktuellen Stand der Forschung zum Thema. Die Zitierregeln (IEEE oder Harvard) werden konsequent und korrekt angewendet.	\N	2026-03-31 14:08:40.835956	system
+4165	2445	English	\N	\N	The scope, quality, and timeliness of the sources processed are appropriate\nand represent the current state of research on the topic. The prescribed citation rules are consistently and correctly applied.	\N	2026-03-31 14:08:40.837092	system
+4166	2446	German	\N	\N	Jedes Kriterium muss mit mind. 50% bewertet werden, sonst ist die gesamte Arbeit negativ.	\N	2026-03-31 14:08:40.839652	system
+4167	2446	English	\N	\N	Each criterion must receive a minimum score of 50%; otherwise, the entire work is rated negatively.	\N	2026-03-31 14:08:40.840757	system
+4168	2447	German	\N	\N	Gesamtkommentar	\N	2026-03-31 14:08:40.843596	system
+4169	2447	English	\N	\N	Overall comment	\N	2026-03-31 14:08:40.844739	system
+4170	2448	German	\N	\N	Gesamtkommentar verpflichtend auszufüllen	\N	2026-03-31 14:08:40.847309	system
+4171	2448	English	\N	\N	An overall comment is mandatory and must be completed	\N	2026-03-31 14:08:40.848441	system
+4172	2449	German	\N	\N	Eingabefeld	\N	2026-03-31 14:08:40.851011	system
+4173	2449	English	\N	\N	Input field	\N	2026-03-31 14:08:40.852107	system
+4174	2450	German	\N	\N	Universitätslogo	\N	2026-03-31 14:08:40.854732	system
+4175	2450	English	\N	\N	University logo	\N	2026-03-31 14:08:40.855857	system
+4176	2451	German	\N	\N	Text-Eingabefeld zur Bewertung	\N	2026-03-31 14:08:40.858444	system
+4177	2451	English	\N	\N	Text inut field for assessment	\N	2026-03-31 14:08:40.859613	system
+4178	2452	German	\N	\N	Neuen Vertrag erstellen	\N	2026-03-31 14:08:40.862213	system
+4179	2452	English	\N	\N	Add new contract	\N	2026-03-31 14:08:40.863364	system
+4180	2453	German	\N	\N	Vertrag bearbeiten	\N	2026-03-31 14:08:40.866139	system
+4181	2453	English	\N	\N	Edit contract	\N	2026-03-31 14:08:40.867308	system
+4182	2454	German	\N	\N	Vertrag löschen	\N	2026-03-31 14:08:40.869872	system
+4183	2454	English	\N	\N	Delete contract	\N	2026-03-31 14:08:40.871016	system
+4184	2455	German	\N	\N	Vertragstatus hinzufügen	\N	2026-03-31 14:08:40.873574	system
+4185	2455	English	\N	\N	Add contract status	\N	2026-03-31 14:08:40.874685	system
+4186	2456	German	\N	\N	Vertragstatus bearbeiten	\N	2026-03-31 14:08:40.87732	system
+4187	2456	English	\N	\N	Edit contract status	\N	2026-03-31 14:08:40.878722	system
+4188	2457	German	\N	\N	Vertragstatus löschen	\N	2026-03-31 14:08:40.881457	system
+4189	2457	English	\N	\N	Delete contract status	\N	2026-03-31 14:08:40.882632	system
+4190	2458	German	\N	\N	Lehrauftrag löschen	\N	2026-03-31 14:08:40.885315	system
+4191	2458	English	\N	\N	Delete teaching assignment	\N	2026-03-31 14:08:40.886507	system
+4192	2459	German	\N	\N	Vertragsdatum	\N	2026-03-31 14:08:40.889145	system
+4193	2459	English	\N	\N	contract date	\N	2026-03-31 14:08:40.89031	system
+4194	2460	German	\N	\N	Vertrags-Urfassung	\N	2026-03-31 14:08:40.893006	system
+4195	2460	English	\N	\N	original version of the contract	\N	2026-03-31 14:08:40.894157	system
+4196	2461	German	\N	\N	Nur offene Verträge anzeigen	\N	2026-03-31 14:08:40.896837	system
+4197	2461	English	\N	\N	Show only open contracts	\N	2026-03-31 14:08:40.897982	system
+4198	2462	German	\N	\N	Fehler beim Hinzufügen bzw. Aktualisieren von Lehraufträgen	\N	2026-03-31 14:08:40.900639	system
+4199	2462	English	\N	\N	Error while adding or updating teaching assignments	\N	2026-03-31 14:08:40.901778	system
+4200	2463	German	\N	\N	Fehler beim Hinzufügen bzw. Aktualisieren des Vertragsstatus	\N	2026-03-31 14:08:40.904381	system
+4201	2463	English	\N	\N	Error while adding or updating the contract status	\N	2026-03-31 14:08:40.905559	system
+4202	2464	German	\N	\N	Status bereits vorhanden	\N	2026-03-31 14:08:40.908235	system
+4203	2464	English	\N	\N	Status already existing	\N	2026-03-31 14:08:40.909475	system
+4204	2465	German	\N	\N	Vertrag erstellen	\N	2026-03-31 14:08:40.912182	system
+4205	2465	English	\N	\N	Create contract	\N	2026-03-31 14:08:40.913339	system
+4206	2466	German	\N	\N	Vertragdetails	\N	2026-03-31 14:08:40.916082	system
+4207	2466	English	\N	\N	Contract Details	\N	2026-03-31 14:08:40.917334	system
+4208	2467	German	\N	\N	Vertragsstatus	\N	2026-03-31 14:08:40.920012	system
+4209	2467	English	\N	\N	Contract Status	\N	2026-03-31 14:08:40.921176	system
+4210	2468	German	\N	\N	Das Eingabefeld {field} hat kein gültiges Datumsformat	\N	2026-03-31 14:08:40.923846	system
+4211	2468	English	\N	\N	The input field {field} does not have a valid date format	\N	2026-03-31 14:08:40.924983	system
+4212	2469	German	\N	\N	Die folgenden Lehraufträge sind noch keinem Vertrag zugeordnet. Markieren Sie die Lehraufträge um diese dem Vertrag zuzuordnen:	\N	2026-03-31 14:08:40.927679	system
+4213	2469	English	\N	\N	The following teaching assignments have not yet been assigned to a contract. Mark the teaching assignments to assign them to the contract:	\N	2026-03-31 14:08:40.928825	system
+4214	2470	German	\N	\N	Folgende Lehraufträge werden hinzugefügt:	\N	2026-03-31 14:08:40.931564	system
+4215	2470	English	\N	\N	The following teaching assignments will be added:	\N	2026-03-31 14:08:40.932727	system
+4216	2471	German	\N	\N	Vertragsverwaltung	\N	2026-03-31 14:08:40.935377	system
+4217	2471	English	\N	\N	Contract management	\N	2026-03-31 14:08:40.936687	system
+4218	2472	German	\N	\N	Nur aktive Mitarbeiter:innen anzeigen	\N	2026-03-31 14:08:40.939362	system
+4219	2472	English	\N	\N	Show only active employees	\N	2026-03-31 14:08:40.940476	system
+4220	2473	German	\N	\N	Honorarvertrag drucken	\N	2026-03-31 14:08:40.94301	system
+4221	2473	English	\N	\N	Print fee agreement	\N	2026-03-31 14:08:40.944141	system
+4222	2474	German	\N	\N	Bitte mindestens 2 Verträge auswählen!	\N	2026-03-31 14:08:40.946656	system
+4223	2474	English	\N	\N	Please select at least 2 contracts!	\N	2026-03-31 14:08:40.947736	system
+4224	2475	German	\N	\N	Alle Verträge müssen genehmigt sein.	\N	2026-03-31 14:08:40.950292	system
+4225	2475	English	\N	\N	All contracts must be approved.	\N	2026-03-31 14:08:40.951372	system
+4226	2476	German	\N	\N	Vertragsarten	\N	2026-03-31 14:08:40.953936	system
+4227	2476	English	\N	\N	Types of Contracts	\N	2026-03-31 14:08:40.95507	system
+4228	2477	German	\N	\N	IDs Dienstverhältnis	\N	2026-03-31 14:08:40.957662	system
+4229	2477	English	\N	\N	IDs employment relationship	\N	2026-03-31 14:08:40.958734	system
+4230	2478	German	\N	\N	Vertragstyp	\N	2026-03-31 14:08:40.961288	system
+4231	2478	English	\N	\N	Contract Type	\N	2026-03-31 14:08:40.962385	system
+4232	2479	German	\N	\N	Vertragsdatum	\N	2026-03-31 14:08:40.964937	system
+4233	2479	English	\N	\N	Contract Date	\N	2026-03-31 14:08:40.966037	system
+4234	2480	German	\N	\N	Vertragsdatum Iso	\N	2026-03-31 14:08:40.96862	system
+4235	2480	English	\N	\N	Contract Date Iso	\N	2026-03-31 14:08:40.969741	system
+4236	2481	German	\N	\N	Vertrag ID	\N	2026-03-31 14:08:40.972289	system
+4237	2481	English	\N	\N	Contract ID	\N	2026-03-31 14:08:40.973404	system
+4238	2482	German	\N	\N	Vertragsstunden	\N	2026-03-31 14:08:40.97594	system
+4239	2482	English	\N	\N	Contract hours	\N	2026-03-31 14:08:40.977044	system
+4240	2483	German	\N	\N	vertragsstunden Studiensemester	\N	2026-03-31 14:08:40.97958	system
+4241	2483	English	\N	\N	Contract hours study semester	\N	2026-03-31 14:08:40.980686	system
+4242	2484	German	\N	\N	abgerechnet	\N	2026-03-31 14:08:40.983206	system
+4243	2484	English	\N	\N	billed	\N	2026-03-31 14:08:40.984317	system
+4244	2485	German	\N	\N	Gewicht	\N	2026-03-31 14:08:40.986833	system
+4245	2485	English	\N	\N	Weight	\N	2026-03-31 14:08:40.987934	system
+4246	2486	German	\N	\N	Neuer LV-Teil	\N	2026-03-31 14:08:40.990491	system
+4247	2486	English	\N	\N	New teaching unit	\N	2026-03-31 14:08:40.991578	system
+4248	2487	German	\N	\N	Bezeichnung Englisch	\N	2026-03-31 14:08:40.994098	system
+4249	2487	English	\N	\N	title english	\N	2026-03-31 14:08:40.995199	system
+4250	2488	German	\N	\N	Info an LV-Planung	\N	2026-03-31 14:08:40.99773	system
+4251	2488	English	\N	\N	Info to LV Planning	\N	2026-03-31 14:08:40.99882	system
+4252	2489	German	\N	\N	UNR	\N	2026-03-31 14:08:41.001383	system
+4253	2489	English	\N	\N	UNR	\N	2026-03-31 14:08:41.002488	system
+4254	2490	German	\N	\N	Lehrauftragsstunden (LAS)	\N	2026-03-31 14:08:41.005102	system
+4255	2490	English	\N	\N	Teaching hours (LAS)	\N	2026-03-31 14:08:41.006191	system
+4256	2491	German	\N	\N	Lehre	\N	2026-03-31 14:08:41.008755	system
+4257	2491	English	\N	\N	Teaching	\N	2026-03-31 14:08:41.009907	system
+4258	2492	German	\N	\N	Raumtyp	\N	2026-03-31 14:08:41.012468	system
+4259	2492	English	\N	\N	Room	\N	2026-03-31 14:08:41.013574	system
+4260	2493	German	\N	\N	Lehrende	\N	2026-03-31 14:08:41.016148	system
+4261	2493	English	\N	\N	lecturers	\N	2026-03-31 14:08:41.017235	system
+4262	2494	German	\N	\N	Raumtyp Alternativ	\N	2026-03-31 14:08:41.019764	system
+4263	2494	English	\N	\N	Room Alternative	\N	2026-03-31 14:08:41.020865	system
+4264	2495	German	\N	\N	Start KW	\N	2026-03-31 14:08:41.023372	system
+4265	2495	English	\N	\N	Start CW	\N	2026-03-31 14:08:41.02449	system
+4266	2496	German	\N	\N	Stunden Block	\N	2026-03-31 14:08:41.027021	system
+4267	2496	English	\N	\N	Hours Block	\N	2026-03-31 14:08:41.028143	system
+4268	2497	German	\N	\N	Wochenrhythmus	\N	2026-03-31 14:08:41.030707	system
+4269	2497	English	\N	\N	Weekly rhythm	\N	2026-03-31 14:08:41.031837	system
+4270	2498	German	\N	\N	Lehrfunktion	\N	2026-03-31 14:08:41.034367	system
+4271	2498	English	\N	\N	Teaching function	\N	2026-03-31 14:08:41.035472	system
+4272	2499	German	\N	\N	Info an DepL/KFL	\N	2026-03-31 14:08:41.038067	system
+4273	2499	English	\N	\N	Info to DepL/KFL	\N	2026-03-31 14:08:41.039128	system
+4274	2500	German	\N	\N	Aufklappen	\N	2026-03-31 14:08:41.041676	system
+4275	2500	English	\N	\N	Expand	\N	2026-03-31 14:08:41.042783	system
+4276	2501	German	\N	\N	Zuklappen	\N	2026-03-31 14:08:41.045247	system
+4277	2501	English	\N	\N	Collapse	\N	2026-03-31 14:08:41.046343	system
+4278	2502	German	\N	\N	LV-Plan Stunden	\N	2026-03-31 14:08:41.048697	system
+4279	2502	English	\N	\N	Course-Plan Hours	\N	2026-03-31 14:08:41.049756	system
+4280	2503	German	\N	\N	Planstunden	\N	2026-03-31 14:08:41.052139	system
+4281	2503	English	\N	\N	Plan Hours	\N	2026-03-31 14:08:41.053198	system
+4282	2504	German	\N	\N	Default	\N	2026-03-31 14:08:41.05567	system
+4283	2504	English	\N	\N	Default	\N	2026-03-31 14:08:41.056752	system
+4284	2505	German	\N	\N	Stundensatz	\N	2026-03-31 14:08:41.059235	system
+4285	2505	English	\N	\N	Hourly Rate	\N	2026-03-31 14:08:41.060362	system
+4286	2506	German	\N	\N	BIS-Melden	\N	2026-03-31 14:08:41.062864	system
+4287	2506	English	\N	\N	Report BIS	\N	2026-03-31 14:08:41.063959	system
+4288	2507	German	\N	\N	Gesamtkosten	\N	2026-03-31 14:08:41.06652	system
+4289	2507	English	\N	\N	Total costs	\N	2026-03-31 14:08:41.067589	system
+4290	2508	German	\N	\N	Daten	\N	2026-03-31 14:08:41.070093	system
+4291	2508	English	\N	\N	Data	\N	2026-03-31 14:08:41.07119	system
+4292	2509	German	\N	\N	Lehreinheit ID	\N	2026-03-31 14:08:41.0738	system
+4293	2509	English	\N	\N	Teaching Unit ID	\N	2026-03-31 14:08:41.074889	system
+4294	2510	German	\N	\N	Verplant	\N	2026-03-31 14:08:41.077485	system
+4295	2510	English	\N	\N	Planned	\N	2026-03-31 14:08:41.078561	system
+4296	2511	German	\N	\N	LektorIn hinzufügen	\N	2026-03-31 14:08:41.081192	system
+4297	2511	English	\N	\N	Add lector	\N	2026-03-31 14:08:41.08233	system
+4298	2512	German	\N	\N	Gruppen	\N	2026-03-31 14:08:41.084962	system
+4299	2512	English	\N	\N	Groups	\N	2026-03-31 14:08:41.086095	system
+4300	2513	German	\N	\N	Gruppe hinzufügen	\N	2026-03-31 14:08:41.08871	system
+4301	2513	English	\N	\N	Add group	\N	2026-03-31 14:08:41.089815	system
+4302	2514	German	\N	\N	Person zuordnen	\N	2026-03-31 14:08:41.092388	system
+4303	2514	English	\N	\N	Assign person	\N	2026-03-31 14:08:41.093502	system
+4304	2515	German	\N	\N	Direkt zugeordnete Personen	\N	2026-03-31 14:08:41.096086	system
+4305	2515	English	\N	\N	Directly assigned persons	\N	2026-03-31 14:08:41.097244	system
+4306	2516	German	\N	\N	<b>Geändert</b>	\N	2026-03-31 14:08:41.099829	system
+4307	2516	English	\N	\N	<b>Changed</b>	\N	2026-03-31 14:08:41.100997	system
+4308	2517	German	\N	\N	Vertragsdetails lt. Urfassung	\N	2026-03-31 14:08:41.103631	system
+4309	2517	English	\N	\N	Contract details as per original version	\N	2026-03-31 14:08:41.104744	system
+4310	2518	German	\N	\N	Vertragsdetails	\N	2026-03-31 14:08:41.107341	system
+4311	2518	English	\N	\N	Contract details	\N	2026-03-31 14:08:41.108488	system
+4312	2519	German	\N	\N	Semesterstunden	\N	2026-03-31 14:08:41.11112	system
+4313	2519	English	\N	\N	Semester hours	\N	2026-03-31 14:08:41.11229	system
+4314	2520	German	\N	\N	Vertragsstatus	\N	2026-03-31 14:08:41.114898	system
+4315	2520	English	\N	\N	Contract status	\N	2026-03-31 14:08:41.11604	system
+4316	2521	German	\N	\N	Stunden aus LV-Plan entfernen	\N	2026-03-31 14:08:41.118669	system
+4317	2521	English	\N	\N	Remove hours from course plan	\N	2026-03-31 14:08:41.119784	system
+4318	2522	German	\N	\N	Lehrfach	\N	2026-03-31 14:08:41.122389	system
+4319	2522	English	\N	\N	Course	\N	2026-03-31 14:08:41.123511	system
+4320	2523	German	\N	\N	Nachrichten	\N	2026-03-31 14:08:41.126173	system
+4321	2523	English	\N	\N	Messages	\N	2026-03-31 14:08:41.127328	system
+4322	2524	German	\N	\N	ungelesen	\N	2026-03-31 14:08:41.129966	system
+4323	2524	English	\N	\N	unread	\N	2026-03-31 14:08:41.131104	system
+4324	2525	German	\N	\N	gelesen	\N	2026-03-31 14:08:41.133733	system
+4325	2525	English	\N	\N	read	\N	2026-03-31 14:08:41.134877	system
+4326	2526	German	\N	\N	archiviert	\N	2026-03-31 14:08:41.137526	system
+4327	2526	English	\N	\N	archived	\N	2026-03-31 14:08:41.138669	system
+4328	2527	German	\N	\N	gelöscht	\N	2026-03-31 14:08:41.14133	system
+4329	2527	English	\N	\N	deleted	\N	2026-03-31 14:08:41.142492	system
+4330	2528	German	\N	\N	Nachrichtentext	\N	2026-03-31 14:08:41.145133	system
+4331	2528	English	\N	\N	Body	\N	2026-03-31 14:08:41.146274	system
+4332	2529	German	\N	\N	Message ID	\N	2026-03-31 14:08:41.148885	system
+4333	2529	English	\N	\N	Message ID	\N	2026-03-31 14:08:41.150019	system
+4334	2530	German	\N	\N	SenderIn	\N	2026-03-31 14:08:41.15268	system
+4335	2530	English	\N	\N	Sender	\N	2026-03-31 14:08:41.153793	system
+4336	2531	German	\N	\N	EmpfängerIn	\N	2026-03-31 14:08:41.156452	system
+4337	2531	English	\N	\N	Recipient	\N	2026-03-31 14:08:41.157548	system
+4338	2532	German	\N	\N	SenderIn ID	\N	2026-03-31 14:08:41.160136	system
+4339	2532	English	\N	\N	Sender ID	\N	2026-03-31 14:08:41.161287	system
+4340	2533	German	\N	\N	EmpfängerIn ID	\N	2026-03-31 14:08:41.163938	system
+4341	2533	English	\N	\N	Recipient ID	\N	2026-03-31 14:08:41.165072	system
+4342	2534	German	\N	\N	Nachricht erfolgreich versandt	\N	2026-03-31 14:08:41.16773	system
+4343	2534	English	\N	\N	Message sent successfully	\N	2026-03-31 14:08:41.168879	system
+4344	2535	German	\N	\N	Aktualisieren	\N	2026-03-31 14:08:41.171532	system
+4345	2535	English	\N	\N	Update	\N	2026-03-31 14:08:41.172677	system
+4346	2536	German	\N	\N	Neue Nachricht	\N	2026-03-31 14:08:41.175277	system
+4347	2536	English	\N	\N	New Message	\N	2026-03-31 14:08:41.176456	system
+4348	2537	German	\N	\N	Meine Felder	\N	2026-03-31 14:08:41.179047	system
+4349	2537	English	\N	\N	My fields	\N	2026-03-31 14:08:41.180202	system
+4350	2538	German	\N	\N	Zurücksetzen	\N	2026-03-31 14:08:41.182931	system
+4351	2538	English	\N	\N	Reset	\N	2026-03-31 14:08:41.184061	system
+4352	2539	German	\N	\N	Dokumente	\N	2026-03-31 14:08:41.186737	system
+4353	2539	English	\N	\N	Documents	\N	2026-03-31 14:08:41.187878	system
+4354	2540	German	\N	\N	Dokument hochladen	\N	2026-03-31 14:08:41.190558	system
+4355	2540	English	\N	\N	Upload document	\N	2026-03-31 14:08:41.191724	system
+4356	2541	German	\N	\N	Dokument löschen	\N	2026-03-31 14:08:41.194352	system
+4357	2541	English	\N	\N	Delete document	\N	2026-03-31 14:08:41.195544	system
+4358	2542	German	\N	\N	Dokument bearbeiten	\N	2026-03-31 14:08:41.198126	system
+4359	2542	English	\N	\N	Edit document	\N	2026-03-31 14:08:41.199276	system
+4360	2543	German	\N	\N	Titel	\N	2026-03-31 14:08:41.201866	system
+4361	2543	English	\N	\N	title	\N	2026-03-31 14:08:41.202985	system
+4362	2544	German	\N	\N	Dokumententyp	\N	2026-03-31 14:08:41.205616	system
+4363	2544	English	\N	\N	Document type	\N	2026-03-31 14:08:41.206753	system
+4364	2545	German	\N	\N	Nachreichung am	\N	2026-03-31 14:08:41.209347	system
+4365	2545	English	\N	\N	Submission on	\N	2026-03-31 14:08:41.210452	system
+4366	2546	German	\N	\N	Dokumentendetails	\N	2026-03-31 14:08:41.213013	system
+4367	2546	English	\N	\N	Document Details	\N	2026-03-31 14:08:41.214148	system
+4368	2547	German	\N	\N	Anmerkung der Person	\N	2026-03-31 14:08:41.216799	system
+4369	2547	English	\N	\N	Notes of the Person	\N	2026-03-31 14:08:41.217941	system
+4370	2548	German	\N	\N	Dokument erfolgreich hochgeladen	\N	2026-03-31 14:08:41.220552	system
+4371	2548	English	\N	\N	Dokumentupload successful	\N	2026-03-31 14:08:41.221688	system
+4372	2549	German	\N	\N	Akzeptieren	\N	2026-03-31 14:08:41.224296	system
+4373	2549	English	\N	\N	Accept	\N	2026-03-31 14:08:41.225463	system
+4374	2550	German	\N	\N	Entakzeptieren	\N	2026-03-31 14:08:41.228114	system
+4375	2550	English	\N	\N	Unaccept	\N	2026-03-31 14:08:41.229287	system
+4376	2551	German	\N	\N	Akzeptiert	\N	2026-03-31 14:08:41.231933	system
+4377	2551	English	\N	\N	Accepted	\N	2026-03-31 14:08:41.233188	system
+4378	2552	German	\N	\N	Nicht Akzeptiert	\N	2026-03-31 14:08:41.235826	system
+4379	2552	English	\N	\N	Not Accepted	\N	2026-03-31 14:08:41.236981	system
+4380	2553	German	\N	\N	Dieses Dokument darf hier nicht gelöscht werden	\N	2026-03-31 14:08:41.239634	system
+4381	2553	English	\N	\N	This document may not be deleted here	\N	2026-03-31 14:08:41.240797	system
+4382	2554	German	\N	\N	Es können nur Eintraege geändert werden zu denen Dokumente hochgeladen wurden	\N	2026-03-31 14:08:41.243461	system
+4383	2554	English	\N	\N	Only entries to which documents have been uploaded can be changed	\N	2026-03-31 14:08:41.244714	system
+4384	2555	German	\N	\N	Dokument herunterladen	\N	2026-03-31 14:08:41.247567	system
+4385	2555	English	\N	\N	Download Document	\N	2026-03-31 14:08:41.248777	system
+4386	2556	German	\N	\N	Akzeptieren erfolgreich	\N	2026-03-31 14:08:41.25162	system
+4387	2556	English	\N	\N	Successfully set to accepted	\N	2026-03-31 14:08:41.252753	system
+4388	2557	German	\N	\N	Entakzeptieren erfolgreich	\N	2026-03-31 14:08:41.255555	system
+4389	2557	English	\N	\N	Successfully set to unaccepted	\N	2026-03-31 14:08:41.256785	system
+4390	2558	German	\N	\N	Entakzeptieren von {count} Dokument(en) erfolgreich	\N	2026-03-31 14:08:41.259566	system
+4391	2558	English	\N	\N	{count} Document(s) successfully set to unaccepted	\N	2026-03-31 14:08:41.260779	system
+4392	2559	German	\N	\N	Akzeptieren von {count} Dokument(en) erfolgreich	\N	2026-03-31 14:08:41.263469	system
+4393	2559	English	\N	\N	{count} Document(s) successfully set to accepted	\N	2026-03-31 14:08:41.264662	system
+4394	2560	German	\N	\N	Fehler beim Entakzeptieren von Dokument {dokument_kurzbz}	\N	2026-03-31 14:08:41.267316	system
+4395	2560	English	\N	\N	Error unaccepting document {dokument_kurzbz}	\N	2026-03-31 14:08:41.268459	system
+4396	2561	German	\N	\N	Fehler beim Akzeptieren von Dokument {dokument_kurzbz}	\N	2026-03-31 14:08:41.271194	system
+4397	2561	English	\N	\N	Error Accepting document {dokument_kurzbz}	\N	2026-03-31 14:08:41.272426	system
+4398	2562	German	\N	\N	{value} fehlt	\N	2026-03-31 14:08:41.275076	system
+4399	2562	English	\N	\N	{value} missing	\N	2026-03-31 14:08:41.276237	system
+4400	2563	German	\N	\N	{value} darf nur Ziffern enthalten.	\N	2026-03-31 14:08:41.278884	system
+4401	2563	English	\N	\N	{value} must contain only numbers.	\N	2026-03-31 14:08:41.280049	system
+4402	2564	German	\N	\N	Nachgereicht	\N	2026-03-31 14:08:41.282746	system
+4403	2564	English	\N	\N	Submitted later	\N	2026-03-31 14:08:41.283925	system
+4404	2565	German	\N	\N	Vorhanden	\N	2026-03-31 14:08:41.286678	system
+4405	2565	English	\N	\N	Available	\N	2026-03-31 14:08:41.287819	system
+4406	2566	German	\N	\N	Akte ID	\N	2026-03-31 14:08:41.290473	system
+4407	2566	English	\N	\N	File ID	\N	2026-03-31 14:08:41.291576	system
+4408	2567	German	\N	\N	Nachgereicht am	\N	2026-03-31 14:08:41.294214	system
+4409	2567	English	\N	\N	Submitted on	\N	2026-03-31 14:08:41.295389	system
+4410	2568	German	\N	\N	Akzeptiertdatum	\N	2026-03-31 14:08:41.298059	system
+4411	2568	English	\N	\N	Accepted on	\N	2026-03-31 14:08:41.299202	system
+4412	2569	German	\N	\N	Akzeptiert von	\N	2026-03-31 14:08:41.301819	system
+4413	2569	English	\N	\N	Accepted by	\N	2026-03-31 14:08:41.302955	system
+4414	2570	German	\N	\N	DMS ID	\N	2026-03-31 14:08:41.305613	system
+4415	2570	English	\N	\N	DMS ID	\N	2026-03-31 14:08:41.30678	system
+4416	2571	German	\N	\N	Bitte eine Datei anhängen	\N	2026-03-31 14:08:41.309495	system
+4417	2571	English	\N	\N	Please attach a file	\N	2026-03-31 14:08:41.31069	system
+4418	2572	German	\N	\N	Nur Dateitypen JPEG, PNG oder PDF sind erlaubt	\N	2026-03-31 14:08:41.313329	system
+4419	2572	English	\N	\N	Only JPEG, PNG, or PDF files are allowed.	\N	2026-03-31 14:08:41.314497	system
+4420	2573	German	\N	\N	Akzeptieren / Entakzeptieren von mehr als einem Dokument pro Dokumenttyp nicht zulässig	\N	2026-03-31 14:08:41.317193	system
+4421	2573	English	\N	\N	Accepting / unaccepting more than one document per document type is not permitted	\N	2026-03-31 14:08:41.31838	system
+4422	2574	German	\N	\N	Begründung	\N	2026-03-31 14:08:41.321149	system
+4423	2574	English	\N	\N	Reason	\N	2026-03-31 14:08:41.322343	system
+4424	2575	German	\N	\N	genehmigt von	\N	2026-03-31 14:08:41.325184	system
+4425	2575	English	\N	\N	approved by	\N	2026-03-31 14:08:41.326389	system
+4426	2576	German	\N	\N	Anrechnung bearbeiten	\N	2026-03-31 14:08:41.329074	system
+4427	2576	English	\N	\N	Edit Exemption	\N	2026-03-31 14:08:41.330258	system
+4428	2577	German	\N	\N	 Notiz(en)	\N	2026-03-31 14:08:41.332993	system
+4429	2577	English	\N	\N	 note(s)	\N	2026-03-31 14:08:41.334171	system
+4430	2578	German	\N	\N	Anrechnung ID	\N	2026-03-31 14:08:41.336885	system
+4431	2578	English	\N	\N	Exemption ID	\N	2026-03-31 14:08:41.338029	system
+4432	2579	German	\N	\N	LV kompatibel ID	\N	2026-03-31 14:08:41.340749	system
+4433	2579	English	\N	\N	Course compatible ID	\N	2026-03-31 14:08:41.341925	system
+4434	2580	German	\N	\N	LV kompatibel	\N	2026-03-31 14:08:41.344668	system
+4435	2580	English	\N	\N	Course compatible	\N	2026-03-31 14:08:41.345866	system
+4436	2581	German	\N	\N	GS	\N	2026-03-31 14:08:41.348508	system
+4437	2581	English	\N	\N	Joint Studies	\N	2026-03-31 14:08:41.349682	system
+4438	2582	German	\N	\N	Gemeinsames Studium	\N	2026-03-31 14:08:41.352311	system
+4439	2582	English	\N	\N	Joint Study	\N	2026-03-31 14:08:41.353506	system
+4440	2583	German	\N	\N	Gemeinsame Studien	\N	2026-03-31 14:08:41.356163	system
+4441	2583	English	\N	\N	Joint Studies	\N	2026-03-31 14:08:41.357354	system
+4442	2584	German	\N	\N	Studienprogramm	\N	2026-03-31 14:08:41.360022	system
+4443	2584	English	\N	\N	Study Program	\N	2026-03-31 14:08:41.361209	system
+4444	2585	German	\N	\N	Gemeinsames Studium anlegen	\N	2026-03-31 14:08:41.363967	system
+4445	2585	English	\N	\N	Add Joint Study	\N	2026-03-31 14:08:41.365181	system
+4446	2586	German	\N	\N	Gemeinsames Studium bearbeiten	\N	2026-03-31 14:08:41.367948	system
+4447	2586	English	\N	\N	Edit Joint Study	\N	2026-03-31 14:08:41.369146	system
+4448	2587	German	\N	\N	Mobilität ID	\N	2026-03-31 14:08:41.371924	system
+4449	2587	English	\N	\N	Mobility Id	\N	2026-03-31 14:08:41.373094	system
+4450	2588	German	\N	\N	LV Termine	\N	2026-03-31 14:08:41.37586	system
+4451	2588	English	\N	\N	Course Dates	\N	2026-03-31 14:08:41.377075	system
+4452	2589	German	\N	\N	Exportieren	\N	2026-03-31 14:08:41.37985	system
+4453	2589	English	\N	\N	Export	\N	2026-03-31 14:08:41.381059	system
+4454	2590	German	\N	\N	Stundenplan DEV	\N	2026-03-31 14:08:41.383903	system
+4455	2590	English	\N	\N	Timetable DEV	\N	2026-03-31 14:08:41.385113	system
+4456	2591	German	\N	\N	Lehreinheit ID	\N	2026-03-31 14:08:41.3879	system
+4457	2591	English	\N	\N	Teaching Unit ID	\N	2026-03-31 14:08:41.389105	system
+4458	2592	German	\N	\N	von	\N	2026-03-31 14:08:41.391872	system
+4459	2592	English	\N	\N	from	\N	2026-03-31 14:08:41.393092	system
+4460	2593	German	\N	\N	bis	\N	2026-03-31 14:08:41.395879	system
+4461	2593	English	\N	\N	to	\N	2026-03-31 14:08:41.397097	system
+4462	2594	German	\N	\N	Gruppen	\N	2026-03-31 14:08:41.399903	system
+4463	2594	English	\N	\N	groups	\N	2026-03-31 14:08:41.401125	system
+4464	2595	German	\N	\N	Ort	\N	2026-03-31 14:08:41.403929	system
+4465	2595	English	\N	\N	location	\N	2026-03-31 14:08:41.405137	system
+4466	2596	German	\N	\N	Lehrfach	\N	2026-03-31 14:08:41.407935	system
+4467	2596	English	\N	\N	subject	\N	2026-03-31 14:08:41.409126	system
+4468	2597	German	\N	\N	Termine	\N	2026-03-31 14:08:41.411886	system
+4469	2597	English	\N	\N	Dates	\N	2026-03-31 14:08:41.41304	system
+4470	2598	German	\N	\N	Aufnahmetermine	\N	2026-03-31 14:08:41.415772	system
+4471	2598	English	\N	\N	Admission Dates	\N	2026-03-31 14:08:41.416936	system
+4472	2599	German	\N	\N	Reihungstest	\N	2026-03-31 14:08:41.419684	system
+4473	2599	English	\N	\N	Placement Test	\N	2026-03-31 14:08:41.420892	system
+4474	2600	German	\N	\N	Aufnahmetermin bearbeiten	\N	2026-03-31 14:08:41.42369	system
+4475	2600	English	\N	\N	Edit appointment for participation placement test	\N	2026-03-31 14:08:41.4249	system
+4476	2601	German	\N	\N	Aufnahmetermin Löschen	\N	2026-03-31 14:08:41.42766	system
+4477	2601	English	\N	\N	Delete Admission Date	\N	2026-03-31 14:08:41.428864	system
+4478	2602	German	\N	\N	Termin für Teilnahme am Reihungstest anlegen	\N	2026-03-31 14:08:41.431555	system
+4479	2602	English	\N	\N	Create appointment for participation placement test	\N	2026-03-31 14:08:41.432737	system
+4480	2603	German	\N	\N	Anmeldung zum Reihungstest am	\N	2026-03-31 14:08:41.435401	system
+4481	2603	English	\N	\N	Registration for the ranking test on	\N	2026-03-31 14:08:41.436579	system
+4482	2604	German	\N	\N	Zum Reihungstest angetreten	\N	2026-03-31 14:08:41.439341	system
+4483	2604	English	\N	\N	Participated in the ranking test	\N	2026-03-31 14:08:41.440527	system
+4484	2605	German	\N	\N	Reihungstestverfahren absolviert	\N	2026-03-31 14:08:41.443199	system
+4485	2605	English	\N	\N	Placement test procedure completed	\N	2026-03-31 14:08:41.444378	system
+4486	2606	German	\N	\N	Gesamtpunkte	\N	2026-03-31 14:08:41.447008	system
+4487	2606	English	\N	\N	Total Points	\N	2026-03-31 14:08:41.448171	system
+4488	2607	German	\N	\N	Gesamtpunkte berechnen	\N	2026-03-31 14:08:41.450827	system
+4489	2607	English	\N	\N	Calculate total points	\N	2026-03-31 14:08:41.451978	system
+4490	2608	German	\N	\N	Allgemein	\N	2026-03-31 14:08:41.454859	system
+4491	2608	English	\N	\N	Generally	\N	2026-03-31 14:08:41.456087	system
+4492	2609	German	\N	\N	Zur Reihungstestverwaltung	\N	2026-03-31 14:08:41.458884	system
+4493	2609	English	\N	\N	Administration Placement Test	\N	2026-03-31 14:08:41.460145	system
+4494	2610	German	\N	\N	Nur zukünftige Reihungstests laden	\N	2026-03-31 14:08:41.462951	system
+4495	2610	English	\N	\N	Show future placement tests only	\N	2026-03-31 14:08:41.464166	system
+4496	2611	German	\N	\N	Reihungstestergebnis holen	\N	2026-03-31 14:08:41.466888	system
+4497	2611	English	\N	\N	Get placement test result	\N	2026-03-31 14:08:41.468051	system
+4498	2612	German	\N	\N	Filter 'Nur zukünftige Reihungstest anzeigen' aktiv	\N	2026-03-31 14:08:41.470811	system
+4499	2612	English	\N	\N	Filter 'Only show future placement tests' active	\N	2026-03-31 14:08:41.472014	system
+4500	2613	German	\N	\N	Reihungstest ID	\N	2026-03-31 14:08:41.474728	system
+4501	2613	English	\N	\N	Placementtest ID	\N	2026-03-31 14:08:41.475917	system
+4502	2614	German	\N	\N	RtPerson ID	\N	2026-03-31 14:08:41.478589	system
+4503	2614	English	\N	\N	PtPerson ID	\N	2026-03-31 14:08:41.479734	system
+4504	2615	German	\N	\N	Stufe	\N	2026-03-31 14:08:41.482338	system
+4505	2615	English	\N	\N	level	\N	2026-03-31 14:08:41.483529	system
+4506	2616	German	\N	\N	Anmeldedatum	\N	2026-03-31 14:08:41.486129	system
+4507	2616	English	\N	\N	Registration Date	\N	2026-03-31 14:08:41.487257	system
+4508	2617	German	\N	\N	teilgenommen	\N	2026-03-31 14:08:41.490032	system
+4509	2617	English	\N	\N	participated	\N	2026-03-31 14:08:41.491228	system
+4510	2618	German	\N	\N	Kürzel	\N	2026-03-31 14:08:41.493962	system
+4511	2618	English	\N	\N	shorthand	\N	2026-03-31 14:08:41.495138	system
+4512	2619	German	\N	\N	ausgewählt	\N	2026-03-31 14:08:41.497914	system
+4513	2619	English	\N	\N	selected	\N	2026-03-31 14:08:41.499075	system
+4514	2620	German	\N	\N	gefiltert	\N	2026-03-31 14:08:41.502223	system
+4515	2620	English	\N	\N	filtered	\N	2026-03-31 14:08:41.503398	system
+4516	2621	German	\N	\N	gesamt	\N	2026-03-31 14:08:41.506356	system
+4517	2621	English	\N	\N	total	\N	2026-03-31 14:08:41.507637	system
+4518	2622	German	\N	\N	Funktionen	\N	2026-03-31 14:08:41.510526	system
+4519	2622	English	\N	\N	Functions	\N	2026-03-31 14:08:41.511877	system
+4520	2623	German	\N	\N	Nur aktive anzeigen	\N	2026-03-31 14:08:41.514528	system
+4521	2623	English	\N	\N	Display only active	\N	2026-03-31 14:08:41.515653	system
+4522	2624	German	\N	\N	Funktion hinzufügen	\N	2026-03-31 14:08:41.518305	system
+4523	2624	English	\N	\N	Add function	\N	2026-03-31 14:08:41.519557	system
+4524	2625	German	\N	\N	Funktion bearbeiten	\N	2026-03-31 14:08:41.522326	system
+4525	2625	English	\N	\N	Edit function	\N	2026-03-31 14:08:41.523479	system
+4526	2626	German	\N	\N	Als Kopie speichern	\N	2026-03-31 14:08:41.526148	system
+4527	2626	English	\N	\N	Save as copy	\N	2026-03-31 14:08:41.527271	system
+4528	2627	German	\N	\N	Das Eingabefeld {field} darf nur positive Ganzzahlen enthalten.	\N	2026-03-31 14:08:41.529914	system
+4529	2627	English	\N	\N	The input field {field} may only contain positive integers	\N	2026-03-31 14:08:41.531052	system
+4530	2628	German	\N	\N	Vor Änderung der Organisationseinheit bitte Unternehmen wählen	\N	2026-03-31 14:08:41.533695	system
+4531	2628	English	\N	\N	Before changing the organizational unit, please select company	\N	2026-03-31 14:08:41.534742	system
+4532	2629	German	\N	\N	Sie haben keine Berechtigung, für diesen Studiengang Daten zu ändern	\N	2026-03-31 14:08:41.53726	system
+4533	2629	English	\N	\N	You do not have permission to change data for this study program	\N	2026-03-31 14:08:41.538355	system
+4534	2630	German	\N	\N	Achtung	\N	2026-03-31 14:08:41.540923	system
+4535	2630	English	\N	\N	Attention	\N	2026-03-31 14:08:41.542038	system
+4536	2631	German	\N	\N	Möchten Sie wirklich löschen?	\N	2026-03-31 14:08:41.544688	system
+4537	2631	English	\N	\N	Do you really want to delete?	\N	2026-03-31 14:08:41.545849	system
+4538	2632	German	\N	\N	Systemfehler	\N	2026-03-31 14:08:41.549739	system
+4539	2632	English	\N	\N	System Error	\N	2026-03-31 14:08:41.550873	system
+4540	2633	German	\N	\N	Bitte StudentIn auswählen!	\N	2026-03-31 14:08:41.553477	system
+4541	2633	English	\N	\N	Please select a student!	\N	2026-03-31 14:08:41.554589	system
+4542	2634	German	\N	\N	Notiz hinzufügen	\N	2026-03-31 14:08:41.557232	system
+4543	2634	English	\N	\N	Add note	\N	2026-03-31 14:08:41.558371	system
+4544	2635	German	\N	\N	Mitarbeiter UID	\N	2026-03-31 14:08:41.561005	system
+4545	2635	English	\N	\N	Employee UID	\N	2026-03-31 14:08:41.56212	system
+4546	2636	German	\N	\N	Prüfung ID	\N	2026-03-31 14:08:41.564756	system
+4547	2636	English	\N	\N	Examination ID	\N	2026-03-31 14:08:41.565876	system
+4548	2637	German	\N	\N	Alias ist ungültig	\N	2026-03-31 14:08:41.568523	system
+4549	2637	English	\N	\N	Alias is invalid	\N	2026-03-31 14:08:41.56968	system
+4550	2638	German	\N	\N	Das Eingabefeld {field} muss kleiner als 1000 sein.	\N	2026-03-31 14:08:41.572335	system
+4551	2638	English	\N	\N	The Field {Field} must contain a number less then 10000.	\N	2026-03-31 14:08:41.573454	system
+4552	2639	German	\N	\N	Das Eingabefeld {field} muss eine gültige Zahl sein	\N	2026-03-31 14:08:41.576012	system
+4553	2639	English	\N	\N	The Input Field {field} has to be a valid number	\N	2026-03-31 14:08:41.577166	system
+4554	2640	German	\N	\N	suchen	\N	2026-03-31 14:08:41.579765	system
+4555	2640	English	\N	\N	search	\N	2026-03-31 14:08:41.580934	system
+4556	2641	German	\N	\N	Suche: {types}	\N	2026-03-31 14:08:41.583679	system
+4557	2641	English	\N	\N	Search: {types}	\N	2026-03-31 14:08:41.58479	system
+4558	2642	German	\N	\N	Mitarbeiter	\N	2026-03-31 14:08:41.587394	system
+4559	2642	English	\N	\N	employees	\N	2026-03-31 14:08:41.588553	system
+4560	2643	German	\N	\N	Studenten	\N	2026-03-31 14:08:41.591147	system
+4561	2643	English	\N	\N	students	\N	2026-03-31 14:08:41.592292	system
+4562	2644	German	\N	\N	Prestudenten	\N	2026-03-31 14:08:41.594856	system
+4563	2644	English	\N	\N	prestudents	\N	2026-03-31 14:08:41.595975	system
+4564	2645	German	\N	\N	Räume	\N	2026-03-31 14:08:41.598561	system
+4565	2645	English	\N	\N	rooms	\N	2026-03-31 14:08:41.599705	system
+4566	2646	German	\N	\N	Organisationseinheiten	\N	2026-03-31 14:08:41.602306	system
+4567	2646	English	\N	\N	organisation units	\N	2026-03-31 14:08:41.603455	system
+4568	2647	German	\N	\N	Inhalte	\N	2026-03-31 14:08:41.606079	system
+4569	2647	English	\N	\N	sites	\N	2026-03-31 14:08:41.607223	system
+4570	2648	German	\N	\N	Dokumente	\N	2026-03-31 14:08:41.609904	system
+4571	2648	English	\N	\N	documents	\N	2026-03-31 14:08:41.611019	system
+4572	2649	German	\N	\N	Filter	\N	2026-03-31 14:08:41.613742	system
+4573	2649	English	\N	\N	Filter	\N	2026-03-31 14:08:41.614927	system
+4574	2650	German	\N	\N	Suche filtern nach:	\N	2026-03-31 14:08:41.617621	system
+4575	2650	English	\N	\N	Filter search for:	\N	2026-03-31 14:08:41.618769	system
+4576	2651	German	\N	\N	Standard Aktion	\N	2026-03-31 14:08:41.621463	system
+4577	2651	English	\N	\N	Default Action	\N	2026-03-31 14:08:41.622625	system
+4578	2652	German	\N	\N	Student UID	\N	2026-03-31 14:08:41.625561	system
+4579	2652	English	\N	\N	Student UID	\N	2026-03-31 14:08:41.626714	system
+4580	2653	German	\N	\N	Prestudent ID	\N	2026-03-31 14:08:41.629431	system
+4581	2653	English	\N	\N	Prestudent ID	\N	2026-03-31 14:08:41.630621	system
+4582	2654	German	\N	\N	Emails	\N	2026-03-31 14:08:41.633308	system
+4583	2654	English	\N	\N	Emails	\N	2026-03-31 14:08:41.634483	system
+4584	2655	German	\N	\N	Gruppen-Email	\N	2026-03-31 14:08:41.637212	system
+4585	2655	English	\N	\N	Group-Email	\N	2026-03-31 14:08:41.638371	system
+4586	2656	German	\N	\N	MitarbeiterIn	\N	2026-03-31 14:08:41.641061	system
+4587	2656	English	\N	\N	Employee	\N	2026-03-31 14:08:41.642228	system
+4588	2657	German	\N	\N	Standard-Kostenstelle	\N	2026-03-31 14:08:41.645005	system
+4589	2657	English	\N	\N	Standard cost center	\N	2026-03-31 14:08:41.646191	system
+4590	2658	German	\N	\N	keine	\N	2026-03-31 14:08:41.648901	system
+4591	2658	English	\N	\N	none	\N	2026-03-31 14:08:41.650067	system
+4592	2659	German	\N	\N	Übergeordnete OE	\N	2026-03-31 14:08:41.652878	system
+4593	2659	English	\N	\N	Parent OU	\N	2026-03-31 14:08:41.654068	system
+4594	2660	German	\N	\N	keine	\N	2026-03-31 14:08:41.656753	system
+4595	2660	English	\N	\N	none	\N	2026-03-31 14:08:41.657933	system
+4596	2661	German	\N	\N	Standort	\N	2026-03-31 14:08:41.660762	system
+4597	2661	English	\N	\N	Site	\N	2026-03-31 14:08:41.661913	system
+4598	2662	German	\N	\N	{floor} Stockwerk	\N	2026-03-31 14:08:41.664611	system
+4599	2662	English	\N	\N	{floor} floor	\N	2026-03-31 14:08:41.665791	system
+4600	2663	German	\N	\N	N/A	\N	2026-03-31 14:08:41.668456	system
+4601	2663	English	\N	\N	N/A	\N	2026-03-31 14:08:41.66962	system
+4602	2664	German	\N	\N	Sitzplätze	\N	2026-03-31 14:08:41.672317	system
+4603	2664	English	\N	\N	Seats	\N	2026-03-31 14:08:41.6735	system
+4604	2665	German	\N	\N	{max_person}, davon {workplaces} PC-Plätze	\N	2026-03-31 14:08:41.676281	system
+4605	2665	English	\N	\N	{max_person}, of which {workplaces} PC-Workstations	\N	2026-03-31 14:08:41.677476	system
+4606	2666	German	\N	\N	N/A	\N	2026-03-31 14:08:41.680134	system
+4607	2666	English	\N	\N	N/A	\N	2026-03-31 14:08:41.681328	system
+4608	2667	German	\N	\N	Gebäude	\N	2026-03-31 14:08:41.684006	system
+4609	2667	English	\N	\N	Building	\N	2026-03-31 14:08:41.685196	system
+4610	2668	German	\N	\N	Zusatz Informationen	\N	2026-03-31 14:08:41.687882	system
+4611	2668	English	\N	\N	Additional information	\N	2026-03-31 14:08:41.689051	system
+4612	2669	German	\N	\N	Leiter	\N	2026-03-31 14:08:41.691773	system
+4613	2669	English	\N	\N	Leader	\N	2026-03-31 14:08:41.692921	system
+4614	2670	German	\N	\N	N.N.	\N	2026-03-31 14:08:41.695617	system
+4615	2670	English	\N	\N	N/A	\N	2026-03-31 14:08:41.696784	system
+4616	2671	German	\N	\N	Mitarbeiter-Anzahl	\N	2026-03-31 14:08:41.699619	system
+4617	2671	English	\N	\N	Number of employees	\N	2026-03-31 14:08:41.700794	system
+4618	2672	German	\N	\N	DMS ID	\N	2026-03-31 14:08:41.703546	system
+4619	2672	English	\N	\N	DMS ID	\N	2026-03-31 14:08:41.704746	system
+4620	2673	German	\N	\N	Version	\N	2026-03-31 14:08:41.707408	system
+4621	2673	English	\N	\N	Version	\N	2026-03-31 14:08:41.708642	system
+4622	2674	German	\N	\N	Schlagwörter	\N	2026-03-31 14:08:41.711375	system
+4623	2674	English	\N	\N	Keywords	\N	2026-03-31 14:08:41.712532	system
+4624	2675	German	\N	\N	Kein Inhalt	\N	2026-03-31 14:08:41.715252	system
+4625	2675	English	\N	\N	No Content	\N	2026-03-31 14:08:41.716459	system
+4626	2676	German	\N	\N	Kein Ergebnistyp ausgewählt. Bitte mindestens einen Ergebnistyp auswählen.	\N	2026-03-31 14:08:41.719172	system
+4627	2676	English	\N	\N	No result type selected. Please select at least one result type.	\N	2026-03-31 14:08:41.720413	system
+4628	2677	German	\N	\N	Es wurden keine Ergebnisse gefunden.	\N	2026-03-31 14:08:41.723284	system
+4629	2677	English	\N	\N	No results were found.	\N	2026-03-31 14:08:41.724481	system
+4630	2678	German	\N	\N	Unbekannter Ergebnistyp: '{type}'.	\N	2026-03-31 14:08:41.727135	system
+4631	2678	English	\N	\N	Unknown resulttype: '{type}'.	\N	2026-03-31 14:08:41.728381	system
+4632	2679	German	\N	\N	Bei der Suche ist ein Fehler aufgetreten. {message}	\N	2026-03-31 14:08:41.731148	system
+4633	2679	English	\N	\N	An error occurred while searching. {message}	\N	2026-03-31 14:08:41.732367	system
+4634	2680	German	\N	\N	Such-Konfiguration $config["{type}"] nicht gefunden.	\N	2026-03-31 14:08:41.73505	system
+4635	2680	English	\N	\N	Search config $config["{type}"] not found.	\N	2026-03-31 14:08:41.7362	system
+4636	2681	German	\N	\N	Such-Konfiguration für $config["{type}"] ist ungültig: Feld "{field}" fehlt, ist leer oder hat einen ungültigen Typ.	\N	2026-03-31 14:08:41.738825	system
+4637	2681	English	\N	\N	Search config for $config["{type}"] is invalid: field {field} is missing, empty or has an invalid type.	\N	2026-03-31 14:08:41.739953	system
+4638	2682	German	\N	\N	Such-Konfiguration $config["{type}"]["searchfields"]["{searchfield}"] ist ungültig: Feld "{field}" fehlt oder ist unglültig.	\N	2026-03-31 14:08:41.742609	system
+4639	2682	English	\N	\N	Search config $config["{type}"]["searchfields"]["{searchfield}"] is invalid: field {field} is missing or invalid.	\N	2026-03-31 14:08:41.743735	system
+4640	2683	German	\N	\N	Fehler beim Speichern des Fotos	\N	2026-03-31 14:08:41.746493	system
+4641	2683	English	\N	\N	Error saving photo	\N	2026-03-31 14:08:41.747685	system
+4642	2684	German	\N	\N	Foto erfolgreich hochgeladen	\N	2026-03-31 14:08:41.750368	system
+4643	2684	English	\N	\N	Photoupload successful	\N	2026-03-31 14:08:41.751541	system
+4644	2685	German	\N	\N	Bitte zuerst ein Bild auswählen!	\N	2026-03-31 14:08:41.754257	system
+4645	2685	English	\N	\N	Please select an image first!	\N	2026-03-31 14:08:41.755444	system
+4646	2686	German	\N	\N	Kein Bild empfangen	\N	2026-03-31 14:08:41.758147	system
+4647	2686	English	\N	\N	No picture received	\N	2026-03-31 14:08:41.759317	system
+4648	2687	German	\N	\N	Alle Termine dieser LV	\N	2026-03-31 14:08:41.762004	system
+4649	2687	English	\N	\N	Dates in schedule	\N	2026-03-31 14:08:41.76318	system
+4650	2688	German	\N	\N	Meldebestätigung	\N	2026-03-31 14:08:41.765923	system
+4651	2688	English	\N	\N	Confirmation of registration	\N	2026-03-31 14:08:41.767099	system
+4652	2689	German	\N	\N	Nachweisdokumente	\N	2026-03-31 14:08:41.76978	system
+4653	2689	English	\N	\N	Confirmation documents	\N	2026-03-31 14:08:41.770922	system
+4654	2690	German	\N	\N	Email fehlt	\N	2026-03-31 14:08:41.773598	system
+4655	2690	English	\N	\N	Email is missing	\N	2026-03-31 14:08:41.774781	system
+4656	2691	German	\N	\N	Email ist ungültig	\N	2026-03-31 14:08:41.777481	system
+4657	2691	English	\N	\N	The email is not valid	\N	2026-03-31 14:08:41.778646	system
+4658	2692	German	\N	\N	Diese Email ist bereits registriert. Bitte verwenden sie eine andere Email oder loggen sie sich mit einer anderen Methode ein.	\N	2026-03-31 14:08:41.781376	system
+4659	2692	English	\N	\N	The email is already registered. Please choose a different email or use a different login method.	\N	2026-03-31 14:08:41.78255	system
+4660	2693	German	\N	\N	Zugang zu Ihrer Bewerbung	\N	2026-03-31 14:08:41.785221	system
+4661	2693	English	\N	\N	Access to your application	\N	2026-03-31 14:08:41.786406	system
+4662	2694	German	\N	\N	Sehr geehrte Frau	\N	2026-03-31 14:08:41.789075	system
+4663	2694	English	\N	\N	Dear Ms	\N	2026-03-31 14:08:41.790229	system
+4664	2695	German	\N	\N	Sehr geehrter Herr	\N	2026-03-31 14:08:41.792962	system
+4665	2695	English	\N	\N	Dear Mr	\N	2026-03-31 14:08:41.794155	system
+4666	2696	German	\N	\N	Sehr geehrte/r	\N	2026-03-31 14:08:41.796841	system
+4667	2696	English	\N	\N	Dear	\N	2026-03-31 14:08:41.798055	system
+4668	2697	German	\N	\N	Bewerbung verifizieren	\N	2026-03-31 14:08:41.800886	system
+4669	2697	English	\N	\N	Verify application	\N	2026-03-31 14:08:41.802041	system
+4670	2698	German	\N	\N	Wenn Ihre Daten stimmen, geben Sie bitte Ihre E-Mail Adresse ein und drücken Sie auf "Bewerbung verifizieren".\nDanach erhalten Sie eine E-Mail mit dem Link zu Ihrer Bewerbung an die angegebene Adresse.\nDort können Sie Studienrichtungen hinzufügen, Ihre Daten vervollständigen, und sich unverbindlich bewerben.	\N	2026-03-31 14:08:41.804751	system
+4671	2698	English	\N	\N	If your data is correct, please enter your email and click "Verify application".\nWe will then send you a link via e-mail to the address specified. There, you can add personal information or degree programs and submit non-binding applications.	\N	2026-03-31 14:08:41.805927	system
+4672	2699	German	\N	\N	Wenn Sie mehr Informationen benötigen, steht Ihnen unsere <a href="{0}" target="_blank">Studienberatung</a> gerne persönlich, telefonisch, per E-Mail oder WhatsApp zur Verfügung.	\N	2026-03-31 14:08:41.808676	system
+4673	2699	English	\N	\N	Should you require any additional information, please do not hesitate to contact our <a href="{0}" target="_blank">student counselling team</a> in person, by phone, or via e-mail or WhatsApp.	\N	2026-03-31 14:08:41.809819	system
+4674	2700	German	\N	\N	Datenschutz-Hinweis	\N	2026-03-31 14:08:41.812541	system
+4675	2700	English	\N	\N	Privacy information	\N	2026-03-31 14:08:41.813725	system
+4676	2701	German	\N	\N	Die uns von Ihnen zum Zwecke der Bewerbung bekanntgegebenen Daten werden von uns ausschließlich zur Abwicklung der Bewerbung auf der Grundlage von vor- bzw vertraglichen Zwecken verarbeitet und mit der unten beschriebenen Ausnahme bei Unklarheiten betreffend die Zugangsvoraussetzungen nicht an Dritte weitergegeben.\nKommt es zu keinem weiteren Kontakt bzw zu keiner Aufnahme, löschen wir Ihre Daten nach drei Jahren.	\N	2026-03-31 14:08:41.816476	system
+4677	2701	English	\N	\N	The data communicated to us by you for the purpose of the application will be used by us exclusively for the processing of the application on the basis of pre-contractual or contractual purposes and will not be passed on to third parties with the exception described below in case of uncertainties regarding the entry requirements.\nIf there is no further contact or enrolment, your data will be deleted after three years.	\N	2026-03-31 14:08:41.817649	system
+4678	2702	German	\N	\N	Informationen zu Ihren Betroffenenrechten finden Sie hier:	\N	2026-03-31 14:08:41.82045	system
+4679	2702	English	\N	\N	Information on your data subject rights can be found here:	\N	2026-03-31 14:08:41.821648	system
+4680	2703	German	\N	\N	Bei Fragen stehen wir Ihnen jederzeit unter folgender Mail zur Verfügung: 	\N	2026-03-31 14:08:41.82416	system
+4681	2703	English	\N	\N	If you have any questions, please contact us at 	\N	2026-03-31 14:08:41.825313	system
+4682	2704	German	\N	\N	Vorname	\N	2026-03-31 14:08:41.827885	system
+4683	2704	English	\N	\N	First name	\N	2026-03-31 14:08:41.829016	system
+4684	2705	German	\N	\N	Nachname	\N	2026-03-31 14:08:41.831779	system
+4685	2705	English	\N	\N	Last name	\N	2026-03-31 14:08:41.832955	system
+4686	2706	German	\N	\N	Geburtsdatum	\N	2026-03-31 14:08:41.835678	system
+4687	2706	English	\N	\N	Birth date	\N	2026-03-31 14:08:41.83692	system
+4688	2707	German	\N	\N	E-Mail Adresse	\N	2026-03-31 14:08:41.839771	system
+4689	2707	English	\N	\N	E-mail address	\N	2026-03-31 14:08:41.840956	system
+4690	2708	German	\N	\N	Die E-Mail mit dem Link zu Ihrer Bewerbung wurde erfolgreich an {0} verschickt.	\N	2026-03-31 14:08:41.843948	system
+4691	2708	English	\N	\N	The email with the link to your application has been successfully sent to {0}.	\N	2026-03-31 14:08:41.845232	system
+4692	2709	German	\N	\N	In der Regel erhalten Sie das Mail in wenigen Minuten. Wenn Sie nach <b>24 Stunden</b> noch kein Mail erhalten haben,\n\t\t\t\t\tkontaktieren Sie bitte unsere {0}Studienberatung{1}	\N	2026-03-31 14:08:41.848035	system
+4693	2709	English	\N	\N	You should receive an e-mail within a few minutes. If you receive no e-mail within <b>24 hours</b> please contact\n\t\t\t\t\tour {0}student counselling team{1}.	\N	2026-03-31 14:08:41.849237	system
+4694	2710	German	\N	\N	Fehler bei der Registrierung	\N	2026-03-31 14:08:41.852036	system
+4695	2710	English	\N	\N	Error when registering	\N	2026-03-31 14:08:41.853242	system
+4696	2711	German	\N	\N	Es ist ein Fehler bei der Registrierung aufgetreten.	\N	2026-03-31 14:08:41.855957	system
+4697	2711	English	\N	\N	An error occured during registration.	\N	2026-03-31 14:08:41.85721	system
+4698	2712	German	\N	\N	Nochmals versuchen	\N	2026-03-31 14:08:41.860093	system
+4699	2712	English	\N	\N	Try again	\N	2026-03-31 14:08:41.861295	system
+4700	2713	German	\N	\N	Können in Ausnahmefällen die Zugangsvoraussetzungen von der FH Technikum Wien nicht abschließend abgeklärt werden, erteile ich die Zustimmung, dass die FH Technikum Wien die Dokumente zur Überprüfung an die zuständigen Behörden weiterleiten kann.<br>\nIch wurde darüber informiert, dass ich nicht verpflichtet bin, der Übermittlung meiner Daten zuzustimmen. Diese Zustimmung ist allerdings notwendig, um die Bewerbung berücksichtigen zu können.	\N	2026-03-31 14:08:41.864101	system
+4701	2713	English	\N	\N	If in exceptional cases the admission requirements can not be finally clarified by the UAS Technikum Wien, I give my consent that the UAS Technikum Wien can forward the documents to the competent authorities for verification.<br>\nI have been informed that I am under no obligation to consent to the transmission of my data. However, this consent is necessary in order for the application to be considered.	\N	2026-03-31 14:08:41.865345	system
+4702	2714	German	\N	\N	Ich habe die Datenschutzerklärung zu Kenntnis genommen.	\N	2026-03-31 14:08:41.868138	system
+4703	2714	English	\N	\N	I have taken note of the privacy policy.	\N	2026-03-31 14:08:41.869323	system
+4704	2715	German	\N	\N	Sie müssen der Datenübermittlung zustimmen, um Ihre Bewerbung abschicken zu können.	\N	2026-03-31 14:08:41.8721	system
+4705	2715	English	\N	\N	You have to consent the transmission of your data to send the application.	\N	2026-03-31 14:08:41.873326	system
+4706	2716	German	\N	\N	Sie müssen der Datenschutzerklärung zustimmen, um Ihre Bewerbung abschicken zu können.	\N	2026-03-31 14:08:41.876119	system
+4707	2716	English	\N	\N	You have to consent to the privacy statement to send the application.	\N	2026-03-31 14:08:41.87734	system
+4708	2717	German	\N	\N	Projektarbeit	\N	2026-03-31 14:08:41.880095	system
+4709	2717	English	\N	\N	Project work	\N	2026-03-31 14:08:41.881312	system
+4710	2718	German	\N	\N	Projektarbeit anlegen	\N	2026-03-31 14:08:41.884002	system
+4711	2718	English	\N	\N	Create project work	\N	2026-03-31 14:08:41.885225	system
+4712	2719	German	\N	\N	Projektarbeit bearbeiten	\N	2026-03-31 14:08:41.88824	system
+4713	2719	English	\N	\N	Edit project work	\N	2026-03-31 14:08:41.889509	system
+4714	2720	German	\N	\N	Titel	\N	2026-03-31 14:08:41.892217	system
+4715	2720	English	\N	\N	title	\N	2026-03-31 14:08:41.893454	system
+4716	2721	German	\N	\N	Titel Englisch	\N	2026-03-31 14:08:41.896221	system
+4717	2721	English	\N	\N	title English	\N	2026-03-31 14:08:41.897424	system
+4718	2722	German	\N	\N	Themenbereich	\N	2026-03-31 14:08:41.900237	system
+4719	2722	English	\N	\N	topic area	\N	2026-03-31 14:08:41.901458	system
+4720	2723	German	\N	\N	Typ	\N	2026-03-31 14:08:41.904147	system
+4721	2723	English	\N	\N	type	\N	2026-03-31 14:08:41.905444	system
+4722	2724	German	\N	\N	Firma	\N	2026-03-31 14:08:41.908202	system
+4723	2724	English	\N	\N	company	\N	2026-03-31 14:08:41.909429	system
+4724	2725	German	\N	\N	Lehrveranstaltung	\N	2026-03-31 14:08:41.912408	system
+4725	2725	English	\N	\N	course	\N	2026-03-31 14:08:41.913631	system
+4726	2726	German	\N	\N	LV-Teil	\N	2026-03-31 14:08:41.916326	system
+4727	2726	English	\N	\N	teaching unit	\N	2026-03-31 14:08:41.917554	system
+4728	2727	German	\N	\N	BetreuerIn	\N	2026-03-31 14:08:41.920331	system
+4729	2727	English	\N	\N	reviewer	\N	2026-03-31 14:08:41.921537	system
+4730	2728	German	\N	\N	BetreuerIn	\N	2026-03-31 14:08:41.924456	system
+4731	2728	English	\N	\N	Reviewer	\N	2026-03-31 14:08:41.925675	system
+4732	2729	German	\N	\N	Betreuerart	\N	2026-03-31 14:08:41.928399	system
+4733	2729	English	\N	\N	reviewer type	\N	2026-03-31 14:08:41.929622	system
+4734	2730	German	\N	\N	Note	\N	2026-03-31 14:08:41.932455	system
+4735	2730	English	\N	\N	grade	\N	2026-03-31 14:08:41.933733	system
+4736	2731	German	\N	\N	Stunden	\N	2026-03-31 14:08:41.936501	system
+4737	2731	English	\N	\N	hours	\N	2026-03-31 14:08:41.937722	system
+4738	2732	German	\N	\N	Stundensatz	\N	2026-03-31 14:08:41.940533	system
+4739	2732	English	\N	\N	hourly rate	\N	2026-03-31 14:08:41.941706	system
+4740	2733	German	\N	\N	Beginn	\N	2026-03-31 14:08:41.944459	system
+4741	2733	English	\N	\N	start	\N	2026-03-31 14:08:41.945752	system
+4742	2734	German	\N	\N	Ende	\N	2026-03-31 14:08:41.948516	system
+4743	2734	English	\N	\N	end	\N	2026-03-31 14:08:41.949718	system
+4744	2735	German	\N	\N	freigegeben	\N	2026-03-31 14:08:41.952515	system
+4745	2735	English	\N	\N	approved	\N	2026-03-31 14:08:41.95373	system
+4746	2736	German	\N	\N	Gesperrt bis	\N	2026-03-31 14:08:41.95651	system
+4747	2736	English	\N	\N	locked until	\N	2026-03-31 14:08:41.957664	system
+4748	2737	German	\N	\N	Anmerkung	\N	2026-03-31 14:08:41.960357	system
+4749	2737	English	\N	\N	annotation	\N	2026-03-31 14:08:41.961524	system
+4750	2738	German	\N	\N	Firma ID	\N	2026-03-31 14:08:41.964213	system
+4751	2738	English	\N	\N	company Id	\N	2026-03-31 14:08:41.965434	system
+4752	2739	German	\N	\N	Löschen nicht möglich, dieser Projektarbeit sind bereits BetreuerInnen zugewiesen	\N	2026-03-31 14:08:41.968055	system
+4753	2739	English	\N	\N	Deleting not possible, reviewers were already assigned to this projekt work	\N	2026-03-31 14:08:41.969238	system
+4754	2740	German	\N	\N	Löschen nicht möglich, für diese Projektarbeit gibt es bereits Projektarbeitsabgaben	\N	2026-03-31 14:08:41.971912	system
+4755	2740	English	\N	\N	Deleting not possible, there are projekt submissions for this project work	\N	2026-03-31 14:08:41.973095	system
+4756	2741	German	\N	\N	ProjektbetreuerIn ungültig	\N	2026-03-31 14:08:41.975818	system
+4757	2741	English	\N	\N	Invalid project reviewers	\N	2026-03-31 14:08:41.977013	system
+4758	2742	German	\N	\N	Löschen nicht möglich, ProjektbetreuerIn hat bereits einen Vertrag	\N	2026-03-31 14:08:41.97968	system
+4759	2742	English	\N	\N	Deleting not possible, project reviewer has a contract already	\N	2026-03-31 14:08:41.980847	system
+4760	2743	German	\N	\N	Neue Person anlegen	\N	2026-03-31 14:08:41.983457	system
+4761	2743	English	\N	\N	Create new person	\N	2026-03-31 14:08:41.984646	system
+4762	2744	German	\N	\N	Titel (Pre)	\N	2026-03-31 14:08:41.987348	system
+4763	2744	English	\N	\N	title (Pre)	\N	2026-03-31 14:08:41.98854	system
+4764	2745	German	\N	\N	Titel (Post)	\N	2026-03-31 14:08:41.99131	system
+4765	2745	English	\N	\N	title (Post)	\N	2026-03-31 14:08:41.992517	system
+4766	2746	German	\N	\N	Weitere Vornamen	\N	2026-03-31 14:08:41.995192	system
+4767	2746	English	\N	\N	other first names	\N	2026-03-31 14:08:41.996399	system
+4768	2747	German	\N	\N	Bestehende Adresse überschreiben	\N	2026-03-31 14:08:41.999077	system
+4769	2747	English	\N	\N	Replace existing address	\N	2026-03-31 14:08:42.000285	system
+4770	2748	German	\N	\N	Adresse hinzufügen	\N	2026-03-31 14:08:42.002936	system
+4771	2748	English	\N	\N	Add new address	\N	2026-03-31 14:08:42.00411	system
+4772	2749	German	\N	\N	Adresse nicht anlegen	\N	2026-03-31 14:08:42.006802	system
+4773	2749	English	\N	\N	Do not create address	\N	2026-03-31 14:08:42.007943	system
+4774	2750	German	\N	\N	Land	\N	2026-03-31 14:08:42.010563	system
+4775	2750	English	\N	\N	nation	\N	2026-03-31 14:08:42.011727	system
+4776	2751	German	\N	\N	Mobil	\N	2026-03-31 14:08:42.014485	system
+4777	2751	English	\N	\N	mobile phone	\N	2026-03-31 14:08:42.01567	system
+4778	2752	German	\N	\N	Letzte Ausbildung	\N	2026-03-31 14:08:42.018342	system
+4779	2752	English	\N	\N	most recent education	\N	2026-03-31 14:08:42.019552	system
+4780	2753	German	\N	\N	Ausbildungsart	\N	2026-03-31 14:08:42.022191	system
+4781	2753	English	\N	\N	education type	\N	2026-03-31 14:08:42.023353	system
+4782	2754	German	\N	\N	Anmerkungen	\N	2026-03-31 14:08:42.025937	system
+4783	2754	English	\N	\N	notes	\N	2026-03-31 14:08:42.027071	system
+4784	2755	German	\N	\N	Person anlegen	\N	2026-03-31 14:08:42.029811	system
+4785	2755	English	\N	\N	Create person	\N	2026-03-31 14:08:42.031001	system
+4786	2756	German	\N	\N	InteressentIn anlegen	\N	2026-03-31 14:08:42.03383	system
+4787	2756	English	\N	\N	Create candidate	\N	2026-03-31 14:08:42.035005	system
+4788	2757	German	\N	\N	Prüfung ob Person bereits existiert	\N	2026-03-31 14:08:42.037775	system
+4789	2757	English	\N	\N	Check if a person already exists	\N	2026-03-31 14:08:42.038979	system
+4790	2758	German	\N	\N	Zurück	\N	2026-03-31 14:08:42.041767	system
+4791	2758	English	\N	\N	Back	\N	2026-03-31 14:08:42.042943	system
+4792	2759	German	\N	\N	Kontaktdaten bearbeiten	\N	2026-03-31 14:08:42.045702	system
+4793	2759	English	\N	\N	Edit contact data	\N	2026-03-31 14:08:42.046876	system
+4794	2760	German	\N	\N	Projektbeurteilung erstellen	\N	2026-03-31 14:08:42.04961	system
+4795	2760	English	\N	\N	Create project assessment document	\N	2026-03-31 14:08:42.05081	system
+4796	2761	German	\N	\N	Projektarbeit ist noch nicht beurteilt	\N	2026-03-31 14:08:42.053521	system
+4797	2761	English	\N	\N	Projekt work was not assessed yet	\N	2026-03-31 14:08:42.054749	system
+4798	2762	German	\N	\N	Stornieren	\N	2026-03-31 14:08:42.057465	system
+4799	2762	English	\N	\N	Cancel contract	\N	2026-03-31 14:08:42.058659	system
+4800	2763	German	\N	\N	Noch kein Vertrag	\N	2026-03-31 14:08:42.061376	system
+4801	2763	English	\N	\N	No contract yet	\N	2026-03-31 14:08:42.062646	system
+4802	2764	German	\N	\N	BetreuerIn bearbeiten	\N	2026-03-31 14:08:42.065376	system
+4803	2764	English	\N	\N	Edit reviewer	\N	2026-03-31 14:08:42.066543	system
+4804	2765	German	\N	\N	BetreuerIn speichern	\N	2026-03-31 14:08:42.069172	system
+4805	2765	English	\N	\N	Save reviewer	\N	2026-03-31 14:08:42.07033	system
+4806	2766	German	\N	\N	Zur Firmenverwaltung	\N	2026-03-31 14:08:42.072986	system
+4807	2766	English	\N	\N	Company management	\N	2026-03-31 14:08:42.074142	system
+4808	2767	German	\N	\N	Punkte	\N	2026-03-31 14:08:42.076862	system
+4809	2767	English	\N	\N	points	\N	2026-03-31 14:08:42.078038	system
+4810	2768	German	\N	\N	Gesamtnote	\N	2026-03-31 14:08:42.080822	system
+4811	2768	English	\N	\N	final grade	\N	2026-03-31 14:08:42.081979	system
+4812	2769	German	\N	\N	Abgabe Endupload	\N	2026-03-31 14:08:42.084734	system
+4813	2769	English	\N	\N	final submission upload	\N	2026-03-31 14:08:42.085934	system
+4814	2770	German	\N	\N	Vertrag ID	\N	2026-03-31 14:08:42.088748	system
+4815	2770	English	\N	\N	contract ID	\N	2026-03-31 14:08:42.089997	system
+4816	2771	German	\N	\N	Projektarbeit ID	\N	2026-03-31 14:08:42.092751	system
+4817	2771	English	\N	\N	project work ID	\N	2026-03-31 14:08:42.093941	system
+4818	2772	German	\N	\N	Betreuerart Kurzbezeichnung	\N	2026-03-31 14:08:42.096735	system
+4819	2772	English	\N	\N	project reviewer short name	\N	2026-03-31 14:08:42.097929	system
+4820	2773	German	\N	\N	Typ Kurzbezeichnung	\N	2026-03-31 14:08:42.100732	system
+4821	2773	English	\N	\N	type short name	\N	2026-03-31 14:08:42.101933	system
+4822	2774	German	\N	\N	Betreuer*In ist bereits zugewiesen	\N	2026-03-31 14:08:42.104709	system
+4823	2774	English	\N	\N	This project reviewer is already assigned	\N	2026-03-31 14:08:42.105908	system
+4824	2775	German	\N	\N	Für diese Projektarbeit ist bereits eine Projektarbeitsbeurteilung eingetragen	\N	2026-03-31 14:08:42.108769	system
+4825	2775	English	\N	\N	This project work has already been assessed	\N	2026-03-31 14:08:42.109986	system
+4826	2776	German	\N	\N	Dokument erstellen	\N	2026-03-31 14:08:42.112747	system
+4827	2776	English	\N	\N	Create Document	\N	2026-03-31 14:08:42.113943	system
+4828	2777	German	\N	\N	Abschicken	\N	2026-03-31 14:08:42.116718	system
+4829	2777	English	\N	\N	Submit	\N	2026-03-31 14:08:42.117919	system
+4830	2778	German	\N	\N	Zurück zum Start	\N	2026-03-31 14:08:42.12065	system
+4831	2778	English	\N	\N	Back to Start	\N	2026-03-31 14:08:42.12184	system
+4832	2802	German	\N	\N	Personen zusammenlegen	\N	2026-03-31 14:08:42.170083	system
+4833	2802	English	\N	\N	Combine People	\N	2026-03-31 14:08:42.171253	system
+4834	2803	German	\N	\N	Die Personen {person1} und {person2} zusammenlegen?	\N	2026-03-31 14:08:42.173915	system
+4835	2803	English	\N	\N	Merge the persons {person1} and {person2}?	\N	2026-03-31 14:08:42.175112	system
+4836	2804	German	\N	\N	Keine Zusammenlegung möglich bei identischer Person ID!	\N	2026-03-31 14:08:42.177882	system
+4837	2804	English	\N	\N	No merging possible with identical person ID"	\N	2026-03-31 14:08:42.179085	system
+4838	2805	German	\N	\N	Fehlender oder ungültiger Parameter Type_ID Empfänger	\N	2026-03-31 14:08:42.181769	system
+4839	2805	English	\N	\N	Missing or invalid parameter type ID Recipient	\N	2026-03-31 14:08:42.182923	system
+4840	2806	German	\N	\N	Fehlende(r) oder ungültige(r) Parameter Empfänger-Id(s)	\N	2026-03-31 14:08:42.185634	system
+4841	2806	English	\N	\N	Missing or invalid parameter(s) Recipient ID(s)	\N	2026-03-31 14:08:42.186808	system
+4842	2807	German	\N	\N	Fehlende(r) oder ungültige(r) Parameter {parameter}	\N	2026-03-31 14:08:42.189465	system
+4843	2807	English	\N	\N	Missing or invalid parameter(s) {parameter}	\N	2026-03-31 14:08:42.190602	system
+4844	2808	German	\N	\N	Editor-Instanz nicht verfügbar.	\N	2026-03-31 14:08:42.19324	system
+4845	2808	English	\N	\N	Editor instance is not available.	\N	2026-03-31 14:08:42.19446	system
+4846	2809	German	\N	\N	Logik für Type ID {type} nicht implementiert.	\N	2026-03-31 14:08:42.197272	system
+4847	2809	English	\N	\N	logic for type ID {type} not implemented.	\N	2026-03-31 14:08:42.198504	system
+4848	2810	German	\N	\N	StudentIn ist in diesem Semester keinem Lehrverband zugeteilt	\N	2026-03-31 14:08:42.201164	system
+4849	2810	English	\N	\N	Student has no assignment to any teaching association	\N	2026-03-31 14:08:42.202353	system
+4850	2811	German	\N	\N	Mit dieser Aktion werden auch alle Voreinstellungen der verbundenen Widgets gelöscht.	\N	2026-03-31 14:08:42.205059	system
+4851	2811	English	\N	\N	This action will also delete all presets of the connected widgets.	\N	2026-03-31 14:08:42.206293	system
+4852	2812	German	\N	\N	Voreinstellung erfolgreich aktualisiert	\N	2026-03-31 14:08:42.209048	system
+4853	2812	English	\N	\N	Preset successfully updated	\N	2026-03-31 14:08:42.210237	system
+4854	2813	German	\N	\N	Sind Sie sicher, dass Sie dieses Widget löschen möchten?	\N	2026-03-31 14:08:42.213057	system
+4855	2813	English	\N	\N	Are you sure you want to delete this widget?	\N	2026-03-31 14:08:42.214328	system
+4856	2814	German	\N	\N	Möchten Sie wirklich löschen?	\N	2026-03-31 14:08:42.217055	system
+4857	2814	English	\N	\N	Do you really want to delete?	\N	2026-03-31 14:08:42.218231	system
 \.
 
 
@@ -40063,6 +45788,8 @@ COPY system.tbl_webservicerecht (webservicerecht_id, berechtigung_kurzbz, method
 28	soap/studienordnung	saveSortierung	\N	2021-11-11 09:52:13.552995	checksystem	\N	\N	studienplan
 29	soap/benutzer	search	\N	2021-11-11 09:52:13.555927	checksystem	\N	\N	benutzer
 30	soap/buchungen	getBuchungen	\N	2021-11-11 09:52:13.558745	checksystem	\N	\N	konto
+31	soap/studienordnung	loadTemplates	\N	2026-03-31 14:08:33.474292	checksystem	\N	\N	lehrveranstaltung
+32	soap/studienordnung	loadTemplateByName	\N	2026-03-31 14:08:33.475636	checksystem	\N	\N	lehrveranstaltung
 \.
 
 
@@ -40271,7 +45998,7 @@ Anerkennungsbed.	7	17	sehr kritisch
 -- Data for Name: tbl_pruefling; Type: TABLE DATA; Schema: testtool; Owner: fhcomplete
 --
 
-COPY testtool.tbl_pruefling (pruefling_id, studiengang_kz, idnachweis, registriert, prestudent_id, semester) FROM stdin;
+COPY testtool.tbl_pruefling (pruefling_id, studiengang_kz, idnachweis, registriert, prestudent_id, semester, gesperrt) FROM stdin;
 \.
 
 
@@ -40689,6 +46416,20 @@ SELECT pg_catalog.setval('campus.seq_pruefungstermin_pruefungstermin_id', 1, fal
 
 
 --
+-- Name: seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id; Type: SEQUENCE SET; Schema: campus; Owner: fhcomplete
+--
+
+SELECT pg_catalog.setval('campus.seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id', 1, false);
+
+
+--
+-- Name: seq_zeitwunsch_zeitwunsch_id; Type: SEQUENCE SET; Schema: campus; Owner: fhcomplete
+--
+
+SELECT pg_catalog.setval('campus.seq_zeitwunsch_zeitwunsch_id', 1, false);
+
+
+--
 -- Name: tbl_abgabe_abgabe_id_seq; Type: SEQUENCE SET; Schema: campus; Owner: fhcomplete
 --
 
@@ -40832,7 +46573,7 @@ SELECT pg_catalog.setval('lehre.seq_anrechnung_anrechnungstatus_anrechnungstatus
 -- Name: seq_anrechnung_begruendung_begruendung_id; Type: SEQUENCE SET; Schema: lehre; Owner: fhcomplete
 --
 
-SELECT pg_catalog.setval('lehre.seq_anrechnung_begruendung_begruendung_id', 4, true);
+SELECT pg_catalog.setval('lehre.seq_anrechnung_begruendung_begruendung_id', 5, true);
 
 
 --
@@ -41043,6 +46784,13 @@ SELECT pg_catalog.setval('public.seq_filter_filter_id', 1, false);
 --
 
 SELECT pg_catalog.setval('public.seq_gruppe_gid', 50072, true);
+
+
+--
+-- Name: seq_gruppe_manager_gruppe_manager_id; Type: SEQUENCE SET; Schema: public; Owner: fhcomplete
+--
+
+SELECT pg_catalog.setval('public.seq_gruppe_manager_gruppe_manager_id', 1, false);
 
 
 --
@@ -41322,7 +47070,7 @@ SELECT pg_catalog.setval('system.seq_webservicelog_webservicelog_id', 1, false);
 -- Name: seq_webservicerecht_webservicerecht_id; Type: SEQUENCE SET; Schema: system; Owner: fhcomplete
 --
 
-SELECT pg_catalog.setval('system.seq_webservicerecht_webservicerecht_id', 30, true);
+SELECT pg_catalog.setval('system.seq_webservicerecht_webservicerecht_id', 32, true);
 
 
 --
@@ -41350,7 +47098,7 @@ SELECT pg_catalog.setval('system.tbl_extensions_id_seq', 1, false);
 -- Name: tbl_filters_id_seq; Type: SEQUENCE SET; Schema: system; Owner: fhcomplete
 --
 
-SELECT pg_catalog.setval('system.tbl_filters_id_seq', 26, true);
+SELECT pg_catalog.setval('system.tbl_filters_id_seq', 50, true);
 
 
 --
@@ -41371,14 +47119,14 @@ SELECT pg_catalog.setval('system.tbl_person_lock_lock_id_seq', 1, false);
 -- Name: tbl_phrase_phrase_id_seq; Type: SEQUENCE SET; Schema: system; Owner: fhcomplete
 --
 
-SELECT pg_catalog.setval('system.tbl_phrase_phrase_id_seq', 666, true);
+SELECT pg_catalog.setval('system.tbl_phrase_phrase_id_seq', 2814, true);
 
 
 --
 -- Name: tbl_phrasentext_phrasentext_id_seq; Type: SEQUENCE SET; Schema: system; Owner: fhcomplete
 --
 
-SELECT pg_catalog.setval('system.tbl_phrasentext_phrasentext_id_seq', 1329, true);
+SELECT pg_catalog.setval('system.tbl_phrasentext_phrasentext_id_seq', 4857, true);
 
 
 --
@@ -42265,14 +48013,6 @@ ALTER TABLE ONLY campus.tbl_zeitsperretyp
 
 
 --
--- Name: tbl_zeitwunsch pk_tbl_zeitwunsch; Type: CONSTRAINT; Schema: campus; Owner: fhcomplete
---
-
-ALTER TABLE ONLY campus.tbl_zeitwunsch
-    ADD CONSTRAINT pk_tbl_zeitwunsch PRIMARY KEY (stunde, mitarbeiter_uid, tag);
-
-
---
 -- Name: tbl_template pk_template; Type: CONSTRAINT; Schema: campus; Owner: fhcomplete
 --
 
@@ -42286,6 +48026,22 @@ ALTER TABLE ONLY campus.tbl_template
 
 ALTER TABLE ONLY campus.tbl_zeitaufzeichnung_gd
     ADD CONSTRAINT pk_zeitaufzeichnung_gd_zeitaufzeichnung_gd_id PRIMARY KEY (zeitaufzeichnung_gd_id);
+
+
+--
+-- Name: tbl_zeitwunsch_gueltigkeit pk_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id; Type: CONSTRAINT; Schema: campus; Owner: fhcomplete
+--
+
+ALTER TABLE ONLY campus.tbl_zeitwunsch_gueltigkeit
+    ADD CONSTRAINT pk_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id PRIMARY KEY (zeitwunsch_gueltigkeit_id);
+
+
+--
+-- Name: tbl_zeitwunsch pk_zeitwunsch_zeitwunsch_id; Type: CONSTRAINT; Schema: campus; Owner: fhcomplete
+--
+
+ALTER TABLE ONLY campus.tbl_zeitwunsch
+    ADD CONSTRAINT pk_zeitwunsch_zeitwunsch_id PRIMARY KEY (zeitwunsch_id);
 
 
 --
@@ -42921,6 +48677,14 @@ ALTER TABLE ONLY public.tbl_fotostatus
 
 
 --
+-- Name: tbl_gruppe_manager pk_gruppe_manager; Type: CONSTRAINT; Schema: public; Owner: fhcomplete
+--
+
+ALTER TABLE ONLY public.tbl_gruppe_manager
+    ADD CONSTRAINT pk_gruppe_manager PRIMARY KEY (gruppe_manager_id);
+
+
+--
 -- Name: tbl_notiz pk_notiz; Type: CONSTRAINT; Schema: public; Owner: fhcomplete
 --
 
@@ -43086,6 +48850,14 @@ ALTER TABLE ONLY public.tbl_tag
 
 ALTER TABLE ONLY public.tbl_adresse
     ADD CONSTRAINT pk_tbl_adresse PRIMARY KEY (adresse_id);
+
+
+--
+-- Name: tbl_adressentyp pk_tbl_adressentyp; Type: CONSTRAINT; Schema: public; Owner: fhcomplete
+--
+
+ALTER TABLE ONLY public.tbl_adressentyp
+    ADD CONSTRAINT pk_tbl_adressentyp PRIMARY KEY (adressentyp_kurzbz);
 
 
 --
@@ -43670,6 +49442,14 @@ ALTER TABLE ONLY public.tbl_firma_organisationseinheit
 
 ALTER TABLE ONLY public.tbl_gruppe
     ADD CONSTRAINT uk_gruppe_gid UNIQUE (gid);
+
+
+--
+-- Name: tbl_gruppe_manager uk_gruppe_manager_gruppe_kurzbz_uid; Type: CONSTRAINT; Schema: public; Owner: fhcomplete
+--
+
+ALTER TABLE ONLY public.tbl_gruppe_manager
+    ADD CONSTRAINT uk_gruppe_manager_gruppe_kurzbz_uid UNIQUE (gruppe_kurzbz, uid);
 
 
 --
@@ -44362,6 +50142,13 @@ CREATE INDEX idx_reservierung_stunde ON campus.tbl_reservierung USING btree (stu
 
 
 --
+-- Name: idx_tbl_zeitaufzeichnung_uid; Type: INDEX; Schema: campus; Owner: fhcomplete
+--
+
+CREATE INDEX idx_tbl_zeitaufzeichnung_uid ON campus.tbl_zeitaufzeichnung USING btree (uid);
+
+
+--
 -- Name: idx_zeitsperre_uid; Type: INDEX; Schema: campus; Owner: fhcomplete
 --
 
@@ -44845,6 +50632,13 @@ CREATE INDEX idx_userberechtigung_uid ON system.tbl_benutzerrolle USING btree (u
 
 
 --
+-- Name: idx_webservicelog_beschreibung; Type: INDEX; Schema: system; Owner: fhcomplete
+--
+
+CREATE INDEX idx_webservicelog_beschreibung ON system.tbl_webservicelog USING btree (beschreibung);
+
+
+--
 -- Name: idx_webservicerecht_methode; Type: INDEX; Schema: system; Owner: fhcomplete
 --
 
@@ -45157,6 +50951,14 @@ ALTER TABLE ONLY bis.tbl_bisio_aufenthaltfoerderung
 
 ALTER TABLE ONLY bis.tbl_bisio_aufenthaltfoerderung
     ADD CONSTRAINT fk_tbl_bisio_aufenthaltfoerderung_bisio FOREIGN KEY (bisio_id) REFERENCES bis.tbl_bisio(bisio_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: tbl_bisio fk_tbl_bisio_herkunftsland_code; Type: FK CONSTRAINT; Schema: bis; Owner: fhcomplete
+--
+
+ALTER TABLE ONLY bis.tbl_bisio
+    ADD CONSTRAINT fk_tbl_bisio_herkunftsland_code FOREIGN KEY (herkunftsland_code) REFERENCES bis.tbl_nation(nation_code) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
@@ -45853,6 +51655,14 @@ ALTER TABLE ONLY campus.tbl_zeitaufzeichnung
 
 ALTER TABLE ONLY campus.tbl_zeitaufzeichnung
     ADD CONSTRAINT fk_zeitaufzeichnung_service FOREIGN KEY (service_id) REFERENCES public.tbl_service(service_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: tbl_zeitwunsch fk_zeitwunsch_zeitwunsch_gueltigkeit_id; Type: FK CONSTRAINT; Schema: campus; Owner: fhcomplete
+--
+
+ALTER TABLE ONLY campus.tbl_zeitwunsch
+    ADD CONSTRAINT fk_zeitwunsch_zeitwunsch_gueltigkeit_id FOREIGN KEY (zeitwunsch_gueltigkeit_id) REFERENCES campus.tbl_zeitwunsch_gueltigkeit(zeitwunsch_gueltigkeit_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
@@ -46565,6 +52375,14 @@ ALTER TABLE ONLY lehre.tbl_lehrveranstaltung
 
 ALTER TABLE ONLY lehre.tbl_lehrveranstaltung
     ADD CONSTRAINT fk_lehrveranstaltung_raumtyp FOREIGN KEY (raumtyp_kurzbz) REFERENCES public.tbl_raumtyp(raumtyp_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: tbl_lehrveranstaltung fk_lehrveranstaltung_template; Type: FK CONSTRAINT; Schema: lehre; Owner: fhcomplete
+--
+
+ALTER TABLE ONLY lehre.tbl_lehrveranstaltung
+    ADD CONSTRAINT fk_lehrveranstaltung_template FOREIGN KEY (lehrveranstaltung_template_id) REFERENCES lehre.tbl_lehrveranstaltung(lehrveranstaltung_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
@@ -47840,6 +53658,22 @@ ALTER TABLE ONLY public.tbl_personfunktionstandort
 
 
 --
+-- Name: tbl_gruppe_manager fk_gruppe_manager_gruppe_kurzbz; Type: FK CONSTRAINT; Schema: public; Owner: fhcomplete
+--
+
+ALTER TABLE ONLY public.tbl_gruppe_manager
+    ADD CONSTRAINT fk_gruppe_manager_gruppe_kurzbz FOREIGN KEY (gruppe_kurzbz) REFERENCES public.tbl_gruppe(gruppe_kurzbz) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: tbl_gruppe_manager fk_gruppe_manager_uid; Type: FK CONSTRAINT; Schema: public; Owner: fhcomplete
+--
+
+ALTER TABLE ONLY public.tbl_gruppe_manager
+    ADD CONSTRAINT fk_gruppe_manager_uid FOREIGN KEY (uid) REFERENCES public.tbl_benutzer(uid) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
 -- Name: tbl_notizzuordnung fk_lehreinheit_notizzuordnung; Type: FK CONSTRAINT; Schema: public; Owner: fhcomplete
 --
 
@@ -48285,6 +54119,14 @@ ALTER TABLE ONLY public.tbl_studiensemester
 
 ALTER TABLE ONLY public.tbl_firmatag
     ADD CONSTRAINT fk_tag_firmatag FOREIGN KEY (tag) REFERENCES public.tbl_tag(tag) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: tbl_adresse fk_tbl_adresse_adressentyp; Type: FK CONSTRAINT; Schema: public; Owner: fhcomplete
+--
+
+ALTER TABLE ONLY public.tbl_adresse
+    ADD CONSTRAINT fk_tbl_adresse_adressentyp FOREIGN KEY (typ) REFERENCES public.tbl_adressentyp(adressentyp_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
@@ -49970,13 +55812,11 @@ GRANT ALL ON SCHEMA lehre TO vilesci;
 -- Name: SCHEMA public; Type: ACL; Schema: -; Owner: fhcomplete
 --
 
-REVOKE ALL ON SCHEMA public FROM postgres;
-REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE USAGE ON SCHEMA public FROM PUBLIC;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 GRANT USAGE ON SCHEMA public TO web;
 GRANT ALL ON SCHEMA public TO admin;
 GRANT ALL ON SCHEMA public TO vilesci;
-GRANT CREATE ON SCHEMA public TO fhcomplete;
 
 
 --
@@ -50215,6 +56055,7 @@ GRANT SELECT,UPDATE ON SEQUENCE bis.tbl_gsprogramm_gsprogramm_id_seq TO vilesci;
 --
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE bis.tbl_gsprogramm TO vilesci;
+GRANT SELECT ON TABLE bis.tbl_gsprogramm TO web;
 
 
 --
@@ -50261,6 +56102,7 @@ GRANT SELECT,UPDATE ON SEQUENCE bis.tbl_mobilitaet_mobilitaet_id_seq TO vilesci;
 --
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE bis.tbl_mobilitaet TO vilesci;
+GRANT SELECT ON TABLE bis.tbl_mobilitaet TO web;
 
 
 --
@@ -50528,6 +56370,22 @@ GRANT SELECT,UPDATE ON SEQUENCE campus.seq_pruefungsfenster_pruefungsfenster_id 
 
 GRANT SELECT,UPDATE ON SEQUENCE campus.seq_pruefungstermin_pruefungstermin_id TO web;
 GRANT SELECT,UPDATE ON SEQUENCE campus.seq_pruefungstermin_pruefungstermin_id TO vilesci;
+
+
+--
+-- Name: SEQUENCE seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id; Type: ACL; Schema: campus; Owner: fhcomplete
+--
+
+GRANT SELECT,UPDATE ON SEQUENCE campus.seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id TO vilesci;
+GRANT SELECT,UPDATE ON SEQUENCE campus.seq_zeitwunsch_gueltigkeit_zeitwunsch_gueltigkeit_id TO web;
+
+
+--
+-- Name: SEQUENCE seq_zeitwunsch_zeitwunsch_id; Type: ACL; Schema: campus; Owner: fhcomplete
+--
+
+GRANT SELECT,UPDATE ON SEQUENCE campus.seq_zeitwunsch_zeitwunsch_id TO vilesci;
+GRANT SELECT,UPDATE ON SEQUENCE campus.seq_zeitwunsch_zeitwunsch_id TO web;
 
 
 --
@@ -51072,6 +56930,14 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE campus.tbl_zeitsperretyp TO vilesci;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE campus.tbl_zeitwunsch TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE campus.tbl_zeitwunsch TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE campus.tbl_zeitwunsch TO vilesci;
+
+
+--
+-- Name: TABLE tbl_zeitwunsch_gueltigkeit; Type: ACL; Schema: campus; Owner: fhcomplete
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE campus.tbl_zeitwunsch_gueltigkeit TO vilesci;
+GRANT SELECT,INSERT,UPDATE ON TABLE campus.tbl_zeitwunsch_gueltigkeit TO web;
 
 
 --
@@ -52160,6 +58026,13 @@ GRANT SELECT,UPDATE ON SEQUENCE public.seq_filter_filter_id TO vilesci;
 
 
 --
+-- Name: SEQUENCE seq_gruppe_manager_gruppe_manager_id; Type: ACL; Schema: public; Owner: fhcomplete
+--
+
+GRANT SELECT,UPDATE ON SEQUENCE public.seq_gruppe_manager_gruppe_manager_id TO vilesci;
+
+
+--
 -- Name: SEQUENCE seq_notiz_notiz_id; Type: ACL; Schema: public; Owner: fhcomplete
 --
 
@@ -52255,6 +58128,14 @@ GRANT ALL ON SEQUENCE public.tbl_adresse_adresse_id_seq TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE public.tbl_adresse_adresse_id_seq TO wawi;
 GRANT SELECT,UPDATE ON SEQUENCE public.tbl_adresse_adresse_id_seq TO web;
 GRANT ALL ON SEQUENCE public.tbl_adresse_adresse_id_seq TO vilesci;
+
+
+--
+-- Name: TABLE tbl_adressentyp; Type: ACL; Schema: public; Owner: fhcomplete
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.tbl_adressentyp TO vilesci;
+GRANT SELECT ON TABLE public.tbl_adressentyp TO web;
 
 
 --
@@ -52525,6 +58406,14 @@ GRANT SELECT ON TABLE public.tbl_geschaeftsjahr TO wawi;
 GRANT SELECT ON TABLE public.tbl_geschlecht TO web;
 GRANT SELECT ON TABLE public.tbl_geschlecht TO wawi;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.tbl_geschlecht TO vilesci;
+
+
+--
+-- Name: TABLE tbl_gruppe_manager; Type: ACL; Schema: public; Owner: fhcomplete
+--
+
+GRANT SELECT ON TABLE public.tbl_gruppe_manager TO web;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.tbl_gruppe_manager TO vilesci;
 
 
 --
@@ -54079,4 +59968,6 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE wawi.tbl_zahlungstyp TO vilesci;
 --
 -- PostgreSQL database dump complete
 --
+
+\unrestrict 2Y3Q8Pggmu0tPpehsGNIym2tWUXRPkjsnoLHPATTfaERaqrOEyOGu7nkmvh7lwP
 
