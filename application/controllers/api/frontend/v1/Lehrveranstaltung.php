@@ -56,7 +56,9 @@ class Lehrveranstaltung extends FHCAPI_Controller
 
 		$studiensemester_kurzbz = $this->getStudiensemesterKurzbz($studiensemester_kurzbz);
 
-		$lehrveranstaltungen = $this->_ci->LehreinheitModel->getLvsByEmployee($mitarbeiter_uid, $studiensemester_kurzbz, $stg_kz);
+		$studiengang_kz = $this->getStudiengangKz($stg_kz);
+
+		$lehrveranstaltungen = $this->_ci->LehreinheitModel->getLvsByEmployee($mitarbeiter_uid, $studiensemester_kurzbz, $studiengang_kz);
 		$lehrveranstaltungen_data = $this->getDataOrTerminateWithError($lehrveranstaltungen);
 
 		$tree = [];
@@ -75,8 +77,10 @@ class Lehrveranstaltung extends FHCAPI_Controller
 
 		$this->terminateWithSuccess($tree);
 	}
-	public function getByStg($studiensemester_kurzbz = null, $studiengang_kz = null, $semester = null)
+	public function getByStg($studiensemester_kurzbz = null, $stg_kz = null, $semester = null)
 	{
+		$studiengang_kz = $this->getStudiengangKz($stg_kz);
+
 		if (is_null($studiengang_kz) || !preg_match("/^-?[1-9][0-9]*$/", (string)$studiengang_kz))
 			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
@@ -260,14 +264,31 @@ class Lehrveranstaltung extends FHCAPI_Controller
 		}
 	}
 
+	protected function getStudiengangKz($studiengang_typ_kurzbz)
+	{
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$result = $this->StudiengangModel->loadWhere([
+			'LOWER(CONCAT(typ, kurzbz)) =' => strtolower($studiengang_typ_kurzbz)
+		]);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		if (!$data)
+			return null;
+
+		return current($data)->studiengang_kz;
+	}
+
 	private function getStudiensemesterKurzbz($studiensemester_kurzbz = null)
 	{
 		if (!is_null($studiensemester_kurzbz))
 		{
-			$studiensemester_result = $this->_ci->StudiensemesterModel->load($studiensemester_kurzbz);
+			$studiensemester_result = $this->_ci->StudiensemesterModel->loadWhere([
+				'LOWER(studiensemester_kurzbz)' => strtolower($studiensemester_kurzbz)
+			]);
 
 			if (isError($studiensemester_result) || !hasData($studiensemester_result))
-				$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+				$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
 			return getData($studiensemester_result)[0]->studiensemester_kurzbz;
 		}

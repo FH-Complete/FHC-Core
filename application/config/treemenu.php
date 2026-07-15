@@ -23,3 +23,7 @@ $config['stv'] = [
 	"library" => "treemenu/StudVwLib",
 	"permissions" => ["admin:r", "assistenz:r"]
 ];
+$config['lvv'] = [
+	"library" => "treemenu/LvVwLib",
+	"permissions" => ["admin:r", "assistenz:r"]
+];

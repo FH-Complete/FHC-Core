@@ -1,7 +1,7 @@
 import CoreSearchbar from "../searchbar/searchbar.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
 import AppMenu from "../AppMenu.js";
-import StvVerband from "../Stv/Studentenverwaltung/Verband.js";
+import BaseTreemenu from '../Base/Treemenu.js';
 import StvStudiensemester from "../Stv/Studentenverwaltung/Studiensemester.js";
 import LvTable from "./Setup/Table.js";
 import LvTabs from "./Setup/Tabs.js";
@@ -19,7 +19,7 @@ export default {
 		CoreSearchbar,
 		VerticalSplit,
 		AppMenu,
-		StvVerband,
+		BaseTreemenu,
 		StvStudiensemester,
 		LvTable,
 		LvTabs,
@@ -29,12 +29,7 @@ export default {
 		lvRoot: String,
 		permissions: Object,
 		config: Object,
-		stg: { type: String, required: false },
-		semester: { type: [Number, String], required: false, default: null },
-		studiensemester_kurzbz: { type: String, required: false, default: null },
-		emp: { type: String, required: false, default: null }
 	},
-
 	provide() {
 		return {
 			currentSemester: Vue.computed(() => this.selectedStudiensemester),
@@ -50,32 +45,12 @@ export default {
 			permissionLektorEntfernen: this.permissions['lv-plan/lektorentfernen'],
 		}
 	},
-	mounted() {
-		this.updateFilter();
-	},
-	watch: {
-		stg() {
-			this.updateFilter();
-		},
-		semester() {
-			this.updateFilter();
-		},
-		selectedStudiensemester() {
-			this.updateFilter();
-		},
-		emp() {
-			this.updateFilter();
-		},
-		studiensemester_kurzbz(newVal) {
-			this.selectedStudiensemester = newVal ?? this.defaultSemester;
-		}
-	},
 	data() {
 		return {
 			selected: [],
 			studiengang: "",
-			filter: {},
-			selectedStudiensemester: this.studiensemester_kurzbz ?? this.defaultSemester,
+			//filter: {},
+			selectedStudiensemester: this.defaultSemester,
 			endpoint: ApiStudiengangTree,
 			dropdowns: {
 				studiensemester_array: [],
@@ -83,7 +58,7 @@ export default {
 				lehrform_array: [],
 				raumtyp_array: [],
 			},
-			selectedStudiengang: '',
+			//selectedStudiengang: '',
 			searchbaroptions: {
 				origin: 'lvverwaltung',
 				cssclass: "position-relative",
@@ -107,106 +82,119 @@ export default {
 			},
 		}
 	},
-	methods: {
-		updateFilter()
-		{
-			const filter = {
-				stg: this.stg,
-				emp: this.emp,
-				semester: this.semester,
-				studiensemester_kurzbz: this.selectedStudiensemester,
-				activeFilter: this.emp ? 'employee' : this.stg ? 'verband' : null
+	computed: {
+		filter() {
+			let filter = {
+				emp: this.$route.params.emp,
+				studiensemester_kurzbz: this.selectedStudiensemester
 			}
 
-			if (this.stg !== undefined)
-			{
-				this.selectedStudiengang = this.semester !== '' && this.semester
-					? `${this.stg}/${this.semester}`
-					: this.stg;
+			let index;
+			if (this.$route.params.treemenu) {
+				index = this.$route.params.treemenu.indexOf('stg');
+				if (index > -1)
+					filter.stg = this.$route.params.treemenu[index+1];
+				index = this.$route.params.treemenu.indexOf('semester');
+				if (index > -1)
+					filter.semester = this.$route.params.treemenu[index+1];
 			}
-			else
-			{
-				this.selectedStudiengang = '';
-			}
-			this.filter = filter;
-		},
+
+			filter.activeFilter = filter.emp ? 'employee' : filter.stg ? 'verband' : null;
+			
+			return filter;
+		}
+	},
+	methods: {
 		handleRowClicked(data)
 		{
 			this.selected = data
 		},
 		onSelectEmployee(emp)
 		{
-			const { stg, semester } = this.filter;
-
-			let studiensemester_kurzbz = this.selectedStudiensemester;
-			const params = { emp };
-
-			if (stg)
-				params.stg = stg;
-			if (semester !== null)
-				params.semester = semester;
-			if (studiensemester_kurzbz)
-				params.studiensemester_kurzbz = studiensemester_kurzbz;
-
-			this.$router.push({ name: 'byEmp', params })
+			this.$router.push({
+				name: 'emp',
+				params: {
+					...this.$route.params,
+					emp
+				}
+			});
 		},
-
-		onSelectVerband({link})
+		onSelectVerband({ path: link })
 		{
-			let stg = null;
-			let semester = null;
-			let studiensemester_kurzbz = this.selectedStudiensemester;
-
-			if (typeof link === 'number')
-				stg = link;
-			else if (typeof link === 'string')
-			{
-				[stg, semester] = link.split('/');
-			}
-
-			const routeName = this.filter.emp ? 'byEmp' : 'byStg';
-			const params = { stg };
-
-			params.semester = '';
-			if (semester !== null)
-				params.semester = semester;
-			if (studiensemester_kurzbz)
-				params.studiensemester_kurzbz = studiensemester_kurzbz;
-			if (this.filter.emp)
-				params.emp = this.filter.emp;
-			this.$router.push({ name: routeName, params });
+			this.$router.push({
+				name: this.$route.name == 'emp' ? 'emp' : 'treemenu',
+				params: {
+					...this.$route.params,
+					treemenu: link.split('/')
+				}
+			});
 			this.selected = [];
 		},
 		resetEmployeeFilter()
 		{
-			const newParams = { ...this.filter, activeFilter: 'verband' };
-			if (newParams.stg === '')
-				this.$router.replace({ name: 'index' });
-			else
-			{
-				delete newParams.emp;
-
-				this.$router.replace({ name: 'byStg', params: newParams });
-			}
+			let params = { ...this.$route.params };
+			
+			delete params.emp;
+			
+			this.$router.replace({
+				name: params.treemenu ? 'treemenu' : 'stdsem',
+				params
+			});
 		},
 		resetStgFilter()
 		{
-			const newParams = { ...this.filter, activeFilter: 'emp' };
-			delete newParams.stg;
-			this.selectedStudiengang = '';
-			this.$router.replace({ name: 'byEmp', params: newParams });
+			let params = { ...this.$route.params };
+			let index = params.treemenu.indexOf('stg');
+			if (index > -1)
+				params.treemenu = params.treemenu.slice(0, index);
+			if (params.treemenu.length) {
+				this.$router.replace({
+					params: {
+						treemenu: params.treemenu
+					}
+				});
+			} else {
+				delete params.treemenu;
+				this.$router.replace({
+					name: params.emp ? 'emp' : 'stdsem',
+					params
+				});
+			}
 		},
-		searchfunction(params) {
-			return this.$api.call(ApiSearchbar.search(params));
+		searchfunction(params, config) {
+			return this.$api.call(ApiSearchbar.search(params), config);
 		},
-		studiensemesterChanged(newValue) {
-			const routeName = this.filter.activeFilter === 'employee' ? 'byEmp' : 'byStg';
-			const newParams = {...this.filter, studiensemester_kurzbz: newValue};
-			this.$router.push({ name: routeName, params: newParams });
+		studiensemesterChanged(stdsem) {
+			if (!stdsem) {
+				// no valid studiensemester in url
+				this.$router.replace({
+					params: {
+						stdsem: this.defaultSemester.toLowerCase()
+					}
+				});
+				return;
+			}
+			if (stdsem.toLowerCase() != this.selectedStudiensemester?.toLowerCase()) {
+				this.$router.push({
+					params: {
+						stdsem: stdsem.toLowerCase()
+					}
+				});
+			}
+			this.selectedStudiensemester = stdsem;
 			this.selected = [];
-		},
+		}
 	},
 	created() {
+		if (!this.$route.params.stdsem) {
+			this.$router.replace({
+				name: 'stdsem',
+				params: {
+					stdsem: this.defaultSemester.toLowerCase()
+				}
+			});
+		}
+
 		this.$p.loadCategory(['lehre', 'person', 'global'])
 
 		this.$api.call(ApiDetails.getStudiensemester())
@@ -239,7 +227,6 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
-
 	template: /* html */`
 	<div class="stv">
 		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
@@ -268,7 +255,7 @@ export default {
 			>
 				<span class="fa-solid fa-table-list"></span>
 			</button>
-			<core-searchbar :searchoptions="searchbaroptions" :searchfunction=searchfunction class="searchbar w-100"></core-searchbar>
+			<core-searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunction" class="searchbar w-100"></core-searchbar>
 		</header>
 		<div class="container-fluid overflow-hidden">
 			<div class="row h-100">
@@ -285,8 +272,15 @@ export default {
 					<div class="offcanvas-header justify-content-end px-1 d-md-none">
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
 					</div>
-					<stv-verband :preselectedKey="selectedStudiengang" :endpoint="endpoint" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
-					<stv-studiensemester v-model:studiensemester-kurzbz="selectedStudiensemester" @update:studiensemester-kurzbz="studiensemesterChanged"></stv-studiensemester>
+					<!--stv-verband :preselectedKey="selectedStudiengang" :endpoint="endpoint" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband-->
+					<div class="overflow-auto col h-0">
+						<base-treemenu
+							config="lvv"
+							:preselected-key="$route.params.treemenu"
+							@select-entry="onSelectVerband"
+						></base-treemenu>
+					</div>
+					<stv-studiensemester :studiensemester-kurzbz="$route.params.stdsem || defaultSemester" @update:studiensemester-kurzbz="studiensemesterChanged"></stv-studiensemester>
 				</nav>
 				
 				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
@@ -307,7 +301,7 @@ export default {
 										<i class="fa fa-xmark"></i>
 									</button>
 									<template v-if="filter.stg">
-										| Stg: {{ filter.stg }}
+										| Stg: {{ filter.stg.toUpperCase() }}
 										<button type="button"
 											class="btn btn-outline-secondary btn-action btn-sm ms-1"
 											:title="$p.t('ui', 'filterdelete')"
