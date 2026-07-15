@@ -32,7 +32,7 @@ $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('basis/berechtigung'))
 	die($rechte->errormsg);
-//echo '<pre>', var_dump($_POST), '</pre>';exit();
+
 $rolle_kurzbz = filter_input(INPUT_GET, 'rolle_kurzbz');
 $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 $copy = filter_input(INPUT_POST, 'copy');
@@ -100,22 +100,22 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 					}
 				});
 
-				$(".berechtigung_autocomplete").autocomplete({
-					source: "benutzerberechtigung_autocomplete.php?autocomplete=berechtigung",
+				$(".rolle_autocomplete").autocomplete({
+					source: "benutzerberechtigung_autocomplete.php?autocomplete=rollen",
 					minLength:2,
 					response: function(event, ui)
 					{
 						//Value und Label fuer die Anzeige setzen
 						for(i in ui.content)
 						{
-							ui.content[i].value=ui.content[i].berechtigung_kurzbz;
-							ui.content[i].label=ui.content[i].berechtigung_kurzbz+" - "+ui.content[i].beschreibung;
+							ui.content[i].value=ui.content[i].rolle_kurzbz;
+							ui.content[i].label=ui.content[i].rolle_kurzbz+" - "+ui.content[i].beschreibung;
 						}
 					},
 					select: function(event, ui)
 					{
 						//Ausgewaehlte Ressource zuweisen und Textfeld wieder leeren
-						$(this).val(ui.item.berechtigung_kurzbz);
+						$(this).val(ui.item.rolle_kurzbz);
 					}
 				});
 
@@ -129,7 +129,7 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 
 			function validateNewData()
 			{
-				if($('#berechtigung_neu_autocomplete').val() == '')
+				if($('#rolle_neu_autocomplete').val() == '')
 				{
 					alert('Berechtigung darf nicht leer sein')
 					return false;
@@ -264,7 +264,7 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 
 		$berechtigung = new berechtigung();
 		$berechtigung->rolle_kurzbz = $rolle_kurzbz;
-		$berechtigung->berechtigung_kurzbz = $recht;
+		$berechtigung->rolle_kurzbz = $recht;
 		$berechtigung->art = $art;
 		$berechtigung->insertamum = date('Y-m-d H:i:s');
 		$berechtigung->insertvon = $user;
@@ -290,18 +290,18 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 	if(isset($rolle_kurzbz))
 	{
 		echo '<h2>Berechtigungen der Rolle "'.$rolle_kurzbz.'"</h2>';
-		$berechtigung_kurzbz = filter_input(INPUT_GET, 'berechtigung_kurzbz');
+		$rolle_kurzbz = filter_input(INPUT_GET, 'rolle_kurzbz');
 		$art = filter_input(INPUT_GET, 'art');
 		$save = filter_input(INPUT_GET, 'save');
 		$anmerkung = filter_input(INPUT_GET, 'anmerkung');
 
 		if(isset($save))
 		{
-			if($rolle_kurzbz && $berechtigung_kurzbz && $art)
+			if($rolle_kurzbz && $rolle_kurzbz && $art)
 			{
 				$berechtigung = new berechtigung();
 				$berechtigung->rolle_kurzbz = $rolle_kurzbz;
-				$berechtigung->berechtigung_kurzbz = $berechtigung_kurzbz;
+				$berechtigung->rolle_kurzbz = $rolle_kurzbz;
 				$berechtigung->art = $art;
 				$berechtigung->anmerkung = $anmerkung;
 				$berechtigung->insertamum = date('Y-m-d H:i:s');
@@ -310,7 +310,7 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 				if($berechtigung->saveRolleBerechtigung()): ?>
 					<b>Zuteilung gespeichert</b>
 				<?php
-					$berechtigung_kurzbz = '';
+					$rolle_kurzbz = '';
 					$art = 'suid';
 					$anmerkung = '';
 				else: ?>
@@ -322,10 +322,10 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 		if(isset($delete))
 		{
 			$berechtigung = new berechtigung();
-			if(!$berechtigung->deleteRolleBerechtigung($rolle_kurzbz, $berechtigung_kurzbz)): ?>
+			if(!$berechtigung->deleteRolleBerechtigung($rolle_kurzbz, $rolle_kurzbz)): ?>
 				<b>Fehler beim Löschen: </b><?php echo $berechtigung->errormsg ?>
 			<?php else: ?>
-				<b>Berechtigung <?php echo $berechtigung_kurzbz.' mit '.$art ?> gelöscht!</b>
+				<b>Berechtigung <?php echo $rolle_kurzbz.' mit '.$art ?> gelöscht!</b>
 			<?php endif;
 		} ?>
 
@@ -340,11 +340,11 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 		<form action="<?php echo basename(__FILE__) ?>" method="GET">
 			<div style="vertical-align: top">
 			<input type="text" 
-					value="<?php echo $berechtigung_kurzbz ?>"
+					value="<?php echo $rolle_kurzbz ?>"
 					placeholder="Berechtigung" 
-					id="berechtigung_neu_autocomplete" 
-					class="berechtigung_autocomplete" 
-					name="berechtigung_kurzbz" 
+					id="rolle_neu_autocomplete" 
+					class="rolle_autocomplete" 
+					name="rolle_kurzbz" 
 					style="width: 300px">
 			<input type="hidden" name="rolle_kurzbz" value="<?php echo $rolle_kurzbz ?>">
 			<input type="text" 
@@ -382,17 +382,17 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 
 		foreach($berechtigungen->result as $rolle): ?>
 				<tr>
-					<td><?php echo $rolle->berechtigung_kurzbz ?></td>
+					<td><?php echo $rolle->rolle_kurzbz ?></td>
 					<td><?php echo $rolle->art ?></td>
 					<td><?php echo $rolle->beschreibung ?></td>
 					<td><?php echo $rolle->anmerkung ?></td>
 					<td>
-						<a href="<?php echo basename(__FILE__) ?>?rolle_kurzbz=<?php echo $rolle->rolle_kurzbz ?>&berechtigung_kurzbz=<?php echo $rolle->berechtigung_kurzbz ?>&art=<?php echo $rolle->art ?>&anmerkung=<?php echo $rolle->anmerkung ?>">
+						<a href="<?php echo basename(__FILE__) ?>?rolle_kurzbz=<?php echo $rolle->rolle_kurzbz ?>&rolle_kurzbz=<?php echo $rolle->rolle_kurzbz ?>&art=<?php echo $rolle->art ?>&anmerkung=<?php echo $rolle->anmerkung ?>">
 							Bearbeiten
 						</a>
 					</td>
 					<td>
-						<a href="<?php echo basename(__FILE__) ?>?delete=1&rolle_kurzbz=<?php echo $rolle->rolle_kurzbz ?>&berechtigung_kurzbz=<?php echo $rolle->berechtigung_kurzbz ?>&art=<?php echo $rolle->art ?>&anmerkung=<?php echo $rolle->anmerkung ?>">
+						<a href="<?php echo basename(__FILE__) ?>?delete=1&rolle_kurzbz=<?php echo $rolle->rolle_kurzbz ?>&rolle_kurzbz=<?php echo $rolle->rolle_kurzbz ?>&art=<?php echo $rolle->art ?>&anmerkung=<?php echo $rolle->anmerkung ?>">
 							Recht entfernen
 						</a>
 					</td>
@@ -422,13 +422,13 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 		$rollen->getRolleBerechtigung($rolle1);
 		foreach ($rollen->result AS $recht)
 		{
-			$rollen1Arr[$recht->berechtigung_kurzbz] = $recht->art;
+			$rollen1Arr[$recht->rolle_kurzbz] = $recht->art;
 		}
 		$rollen = new berechtigung();
 		$rollen->getRolleBerechtigung($rolle2);
 		foreach ($rollen->result AS $recht)
 		{
-			$rollen2Arr[$recht->berechtigung_kurzbz] = $recht->art;
+			$rollen2Arr[$recht->rolle_kurzbz] = $recht->art;
 		}
 		$rollenGesamt = array_merge($rollen1Arr,$rollen2Arr);
 		ksort($rollenGesamt);
@@ -647,14 +647,14 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 					{
 						$newRolleRecht = new berechtigung();
 						$newRolleRecht->rolle_kurzbz = $copyName;
-						$newRolleRecht->berechtigung_kurzbz = $rollenrecht->berechtigung_kurzbz;
+						$newRolleRecht->rolle_kurzbz = $rollenrecht->rolle_kurzbz;
 						$newRolleRecht->art = $rollenrecht->art;
 						$newRolleRecht->anmerkung = $rollenrecht->anmerkung;
 						$newRolleRecht->insertamum = date('Y-m-d H:i:s');
 						$newRolleRecht->insertvon = $user;
 						if(!$newRolleRecht->saveRolleBerechtigung())
 						{
-							echo 'Fehler beim Speichern des Rechts '.$rollenrecht->berechtigung_kurzbz.' zur Rolle '.$rollenrecht->rolle_kurzbz;
+							echo 'Fehler beim Speichern des Rechts '.$rollenrecht->rolle_kurzbz.' zur Rolle '.$rollenrecht->rolle_kurzbz;
 							break;
 						}
 					}
