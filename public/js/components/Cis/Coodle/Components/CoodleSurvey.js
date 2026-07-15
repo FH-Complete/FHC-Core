@@ -214,15 +214,6 @@ export default {
 			}
 		},
 		async submitForm() {
-			// if (
-			// 	!this.surveyFormData.title?.length ||
-			// 	!this.surveyFormData.endsAt?.length ||
-			// 	!this.surveyFormData.timeslotDuration
-			// ) {
-			// 	this.$fhcAlert.alertError("Check your inputs!");
-			// 	return;
-			// }
-
 			if (!this.surveyFormData.participants.length) {
 				const shouldProceedWithoutParticipants =
 					await this.$fhcAlert.confirm({

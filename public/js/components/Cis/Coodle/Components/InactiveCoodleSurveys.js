@@ -49,7 +49,6 @@ export default {
 						headerFilter: dateFilter,
 					},
 				],
-				data: [],
 			},
 			isFetchingSurveys: false,
 		};
@@ -128,14 +127,14 @@ export default {
 				v-else-if="!inactiveSurveys?.length"
 				class="d-flex justify-content-center align-items-center mt-5"
 			>
-				<h3 class="fw-bold">{{ "No active surveys found!" }}</h3>
+				<h3 class="fw-bold">{{ "No past surveys found!" }}</h3>
 			</div>
 			<div v-else class="d-flex flex-row overflow-x-auto">
 				<div class="flex-shrink">
 					<core-filter-cmpt
 						@tableBuilt="afterInactiveSurveysTableBuilt()"
 						:noColumnFilter="true"
-						:title="'Past Surveys'"
+						:title="'Past surveys'"
 						:ref="'inactiveSurveysTable'"
 						:tabulatorOptions="inactiveSurveysTableConfig"
 						:sideMenu="false"

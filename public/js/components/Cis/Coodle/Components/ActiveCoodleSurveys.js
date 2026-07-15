@@ -49,7 +49,6 @@ export default {
 						headerFilter: dateFilter,
 					},
 				],
-				data: [],
 			},
 			isFetchingSurveys: false,
 		};
@@ -120,7 +119,7 @@ export default {
 				class="d-flex justify-content-center align-items-center mt-5"
 			>
 				<div class="spinner-border" role="status">
-					<span class="visually-hidden">Loading...</span>
+					<span class="visually-hidden">{{ "Loading..." }}</span>
 				</div>
 			</div>
 			<div
@@ -134,7 +133,7 @@ export default {
 					<core-filter-cmpt
 						@tableBuilt="afterActiveSurveysTableBuilt()"
 						:noColumnFilter="true"
-						:title="'Active Surveys'"
+						:title="'Active surveys'"
 						:ref="'activeSurveysTable'"
 						:tabulatorOptions="activeSurveysTableConfig"
 						:sideMenu="false"

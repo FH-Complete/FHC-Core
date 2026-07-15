@@ -343,8 +343,8 @@ export default {
 	template: /*html*/ `
 	<div id="coodleCalendar" class="d-flex flex-column gap-3">
 		<div class="d-flex flex-column">
-			<span class="fw-bold">{{ "Timeslot selection" }}</span>
-			<span class="fst-italic">{{ "You can add timeslots directly to the calendar or from the list down below." }}</span>
+			<span class="fw-bold">{{ "Appointment selection" }}</span>
+			<span class="fst-italic">{{ "You can add appointment options directly to the calendar or from the list down below." }}</span>
 		</div>
 		<div style="height:800px;">
 			<fhc-calendar

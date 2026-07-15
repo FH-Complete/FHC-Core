@@ -85,7 +85,12 @@ export default {
 	<div class="d-flex flex-column gap-3">
 		<template v-if="!$props.isEditInProgress">
 			<span v-if="$props.survey?.completedAt" class="fst-italic">
-				{{ "This survey was completed on " + formattedSurveyCompletedAt + ". " }}
+				{{
+					"This survey was completed on (((completedAt))).".replace(
+						'(((completedAt)))',
+						formattedSurveyCompletedAt
+					)
+				}}
 				<span v-if="$props.survey?.selectedTimeslotId">
 					{{
 						"The timeslot (((timeslot))) was selected.".replace(
@@ -103,7 +108,12 @@ export default {
 				<span v-else>{{ "No timeslot was selected." }}</span>
 			</span>
 			<span v-else-if="$props.survey?.canceledAt" class="fst-italic">
-				{{ "This survey was canceled on " + formattedSurveyCanceledAt + "." }}
+				{{
+					"This survey was canceled on (((canceledAt))).".replace(
+						'(((canceledAt)))',
+						formattedSurveyCanceledAt
+					)
+				}}
 			</span>
 			<div class="d-flex flex-row gap-3 flex-wrap">
 				<div class="d-flex flex-row">
@@ -124,7 +134,7 @@ export default {
 						<i class="fa-solid fa-calendar fa-lg"></i>
 					</div>
 					<span>
-						<span class="fw-bold">{{ "Planned to end on: " }}</span>
+						<span class="fw-bold">{{ "Planned end date: " }}</span>
 						{{ formattedSurveyEndsAt }}
 					</span>
 				</div>
@@ -142,7 +152,7 @@ export default {
 						<i class="fa-solid fa-calendar-check fa-lg"></i>
 					</div>
 					<span>
-						<span class="fw-bold">{{ "Maximum selectable timeslots: " }}</span>
+						<span class="fw-bold">{{ "Maximum selectable appointments: " }}</span>
 						{{ $props.survey?.maxSelections}}
 					</span>
 				</div>

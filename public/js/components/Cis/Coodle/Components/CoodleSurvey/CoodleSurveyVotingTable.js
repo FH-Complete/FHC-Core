@@ -498,7 +498,7 @@ export default {
 							:class="{'fhc-body-bg': isFinalSelectionInProgress}"
 							class="fw-bold"
 						>
-							<td class="border-1 px-2 py-1">{{ "Final timeslot" }}</td>
+							<td class="border-1 px-2 py-1">{{ "Final selected appointment" }}</td>
 							<td v-for="timeslot in $props.timeslots" class="border-1">
 								<div class="d-flex flex-row justify-content-center py-3">
 									<input
@@ -568,7 +568,7 @@ export default {
 						:class="isDarkMode ? 'btn-outline-light' : 'btn-outline-dark'"
 						class="btn text-nowrap"
 					>
-						Vote
+						{{ "Vote" }}
 					</div>
 					<div
 						v-if="isAuthUserSurveyCreator && !isVotingInProgress && !isFinalSelectionInProgress"
@@ -576,7 +576,7 @@ export default {
 						:class="isDarkMode ? 'btn-outline-light' : 'btn-outline-dark'"
 						class="btn text-nowrap"
 					>
-						Finalize survey
+						{{ "Finalize survey" }}
 					</div>
 					<div
 						v-if="isVotingInProgress || isFinalSelectionInProgress"
@@ -584,7 +584,7 @@ export default {
 						:class="isDarkMode ? 'btn-outline-light' : 'btn-outline-dark'"
 						class="btn text-nowrap"
 					>
-						Cancel
+						{{ "Cancel" }}
 					</div>
 					<div
 						v-if="isVotingInProgress"
@@ -592,7 +592,7 @@ export default {
 						:class="isDarkMode ? 'btn-light' : 'btn-dark'"
 						class="btn text-nowrap"
 					>
-						Submit vote
+						{{ "Submit vote" }}
 					</div>
 					<div
 						v-if="isFinalSelectionInProgress"
@@ -600,7 +600,7 @@ export default {
 						:class="isDarkMode ? 'btn-light' : 'btn-dark'"
 						class="btn text-nowrap"
 					>
-						Submit final selection
+						{{ "Submit final selection" }}
 					</div>
 				</div>
 			</div>
