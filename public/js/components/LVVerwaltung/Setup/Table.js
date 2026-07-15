@@ -296,7 +296,8 @@ export default {
 
 			if (this.shouldAutoLoad)
 			{
-				this.$refs.table.reloadTable();
+				if (this.$refs.table.tabulator)
+					this.$refs.table.reloadTable();
 			}
 		},
 		rowSelectionChanged(data) {
