@@ -25,6 +25,7 @@ export default {
 			scheduleEditIndex: null,
 			scheduleFormData: null,
 			scheduleTypes: [],
+			isSubmittingScheduleForm: false,
 		};
 	},
 	methods: {
@@ -55,11 +56,15 @@ export default {
 			}
 		},
 		async submitScheduleForm() {
+			if (this.isSubmittingScheduleForm) return;
+
+			this.isSubmittingScheduleForm = true;
 			const response = await this.$api.call(
 				this.scheduleFormData.id
 					? FreeBusyApi.updateFreeBusyEntry(this.scheduleFormData)
 					: FreeBusyApi.createFreeBusyEntry(this.scheduleFormData),
 			);
+			this.isSubmittingScheduleForm = false;
 
 			if (response.meta.status === "success") {
 				this.closeScheduleForm();
