@@ -34,6 +34,7 @@ class CoodleSurvey_model extends DB_Model
 			$userParticipantEntries
 		);
 		$surveyIdsWhereUserIsParticipantValue = implode(", ", $surveyIdsWhereUserIsParticipant);
+
 		$query = "SELECT
 			survey.id as id,
 			survey.creator_uid as creator_uid,
@@ -44,9 +45,14 @@ class CoodleSurvey_model extends DB_Model
 		 	FROM $this->dbTable as survey
 			JOIN public.tbl_benutzer benutzer ON(benutzer.uid = survey.creator_uid)
 			JOIN public.tbl_person person ON(person.person_id = benutzer.person_id)
-			WHERE (id IN ($surveyIdsWhereUserIsParticipantValue) OR creator_uid = '$uid')
+			WHERE (";
+		if (strlen($surveyIdsWhereUserIsParticipantValue)) {
+			$query .= "id IN ($surveyIdsWhereUserIsParticipantValue) OR ";
+		}
+		$query .= "creator_uid = '$uid')
 			AND completed_at IS NULL
 			AND canceled_at IS NULL";
+
 		return $this->execQuery($query)->retval;
 	}
 
@@ -60,6 +66,7 @@ class CoodleSurvey_model extends DB_Model
 			$userParticipantEntries
 		);
 		$surveyIdsWhereUserIsParticipantValue = implode(", ", $surveyIdsWhereUserIsParticipant);
+
 		$query = "SELECT 
 			survey.id as id,
 			survey.creator_uid as creator_uid,
@@ -71,8 +78,13 @@ class CoodleSurvey_model extends DB_Model
 		 	FROM $this->dbTable as survey
 			JOIN public.tbl_benutzer benutzer ON(benutzer.uid = survey.creator_uid)
 			JOIN public.tbl_person person ON(person.person_id = benutzer.person_id)
-			WHERE (id IN ($surveyIdsWhereUserIsParticipantValue) OR creator_uid = '$uid')
+			WHERE (";
+		if (strlen($surveyIdsWhereUserIsParticipantValue)) {
+			$query .= "id IN ($surveyIdsWhereUserIsParticipantValue) OR ";
+		}
+		$query .= "creator_uid = '$uid')
 			AND (completed_at IS NOT NULL OR canceled_at IS NOT NULL)";
+
 		return $this->execQuery($query)->retval;
 	}
 
