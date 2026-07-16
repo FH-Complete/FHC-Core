@@ -150,7 +150,7 @@ class FreeBusy extends FHCAPI_Controller
 		if (!$existingFreeBusyEntry) {
 			$this->terminateWithError("FreeBusy entry not found!");
 		} else if ($existingFreeBusyEntry->uid !== getAuthUID()) {
-			$this->terminateWithError("You are not authorized to modify this FreeBusy entry!");
+			$this->terminateWithError("You are not authorized to delete this FreeBusy entry!");
 		}
 
 		$this->FreeBusyModel->delete($id);

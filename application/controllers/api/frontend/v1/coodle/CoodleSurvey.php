@@ -530,7 +530,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		if (!$survey) {
 			$this->terminateWithError("Survey not found!");
 		} else if ($survey->creator_uid !== getAuthUID()) {
-			$this->terminateWithError("You do not own this survey!");
+			$this->terminateWithError("You are not authorized to send reminders for this survey!");
 		} else if ($survey->canceled_at || $survey->completed_at) {
 			$this->terminateWithError("This survey is no longer active!");
 		}
