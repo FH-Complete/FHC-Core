@@ -77,12 +77,13 @@ export default {
 			},
 		};
 	},
-	cancelSurvey(surveyId) {
+	cancelSurvey(surveyId, shouldInformParticipants) {
 		return {
 			method: "post",
 			url: "/api/frontend/v1/coodle/CoodleSurvey/cancelSurvey",
 			params: {
 				surveyId,
+				shouldInformParticipants,
 			},
 		};
 	},
