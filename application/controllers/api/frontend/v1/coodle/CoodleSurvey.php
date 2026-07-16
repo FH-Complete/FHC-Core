@@ -42,7 +42,6 @@ class CoodleSurvey extends FHCAPI_Controller
 			'sendVotingReminders' => self::PERM_LOGGED,
 		]);
 
-		$this->load->library('PermissionLib');
 		$this->load->library('form_validation');
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('ressource/CoodleSurvey_model', 'CoodleSurveyModel');
