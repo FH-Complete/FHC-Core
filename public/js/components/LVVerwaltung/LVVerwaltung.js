@@ -27,6 +27,8 @@ export default {
 		AppConfig
 	},
 	props: {
+		avatarUrl: String,
+		logoutUrl: String,
 		defaultSemester: String,
 		lvRoot: String,
 		permissions: Object,
@@ -34,9 +36,7 @@ export default {
 		stg: { type: String, required: false },
 		semester: { type: [Number, String], required: false, default: null },
 		studiensemester_kurzbz: { type: String, required: false, default: null },
-		emp: { type: String, required: false, default: null },
-		avatarUrl: String,
-		logoutUrl: String,
+		emp: { type: String, required: false, default: null }
 	},
 
 	provide() {
