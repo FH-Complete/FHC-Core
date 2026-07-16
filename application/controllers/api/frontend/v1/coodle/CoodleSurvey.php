@@ -362,7 +362,7 @@ class CoodleSurvey extends FHCAPI_Controller
 			$selection = array_slice($selection, 0, $survey->max_selections);
 		}
 
-		$this->CoodleSurveyParticipantModel->updateSelection($surveyId, getAuthUID(), json_encode($selection));
+		$this->CoodleSurveyParticipantModel->updateSelection($surveyId, getAuthUID(), $selection);
 		$this->terminateWithSuccess($surveyId);
 	}
 

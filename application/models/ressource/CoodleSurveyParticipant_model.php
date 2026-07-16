@@ -93,11 +93,14 @@ class CoodleSurveyParticipant_model extends DB_Model
 				continue;
 
 			$selection = json_decode($participant->selection, true);
+			if (!count($selection))
+				continue;
+
 			$obsoleteSelectedTimeslotIds = array_diff($selection, $timeslotIds);
 			if (!count($obsoleteSelectedTimeslotIds))
 				continue;
 
-			$updatedSelectionValue = "NULL";
+			$updatedSelection = null;
 			if (count($obsoleteSelectedTimeslotIds) !== count($selection)) {
 				$updatedSelection = array_filter(
 					$selection,
@@ -105,17 +108,16 @@ class CoodleSurveyParticipant_model extends DB_Model
 						return !in_array($timeslotId, $obsoleteSelectedTimeslotIds);
 					}
 				);
-				$updatedSelectionValue = "'" . json_encode($updatedSelection) . "'";
 			}
 
-			$updateQuery = "UPDATE $this->dbTable SET selection = $updatedSelectionValue WHERE survey_id = $surveyId AND participant_uid = $participant->uid";
-			$this->execQuery($updateQuery);
+			$this->updateSelection($surveyId, $participant->participant_uid, $updatedSelection);
 		}
 	}
 
 	public function updateSelection($surveyId, $participantUid, $selection)
 	{
-		$selectionUpdateQuery = "UPDATE $this->dbTable SET selection = '$selection' WHERE survey_id = $surveyId AND participant_uid = '$participantUid'";
+		$selection = $selection ? "'" . json_encode($selection) . "'" : "NULL";
+		$selectionUpdateQuery = "UPDATE $this->dbTable SET selection = $selection WHERE survey_id = $surveyId AND participant_uid = '$participantUid'";
 		$this->execQuery($selectionUpdateQuery);
 	}
 }
