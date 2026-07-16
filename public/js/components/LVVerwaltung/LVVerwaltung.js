@@ -112,6 +112,73 @@ export default {
 			},
 		}
 	},
+	computed: {
+		appMenuExtraItems()
+		{
+			let extraItems = [];
+
+			const studiengang_kz = this.stg || '';
+			const studiensemester = this.selectedStudiensemester;
+			const semester = this.semester || '';
+			const uid = this.emp || '';
+
+
+			extraItems.push(
+				{
+					description: 'lehre/berichte',
+					requires: ['stg'],
+					children: [
+						{
+							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+								+ 'content/statistik/lvplanung.xls.php'
+								+ '?studiengang_kz=' + studiengang_kz
+								+ '&studiensemester_kurzbz=' + studiensemester
+								+ '&semester=' + semester,
+							description: 'lehre/lvplanung',
+							requires: ['stg']
+						},
+						{
+							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+								+ 'content/statistik/lehrauftragsliste_gst.xls.php'
+								+ '?studiengang_kz=' + studiengang_kz
+								+ '&studiensemester_kurzbz=' + studiensemester
+								+ '&semester=' + semester,
+							description: 'lehre/lehrauftragsliste',
+							requires: ['stg']
+						},
+						{
+							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+								+ 'content/pdfExport.php?xml=lehrauftrag.xml.php'
+								+ '&xsl=Lehrauftrag'
+								+ '&stg_kz=' + studiengang_kz
+								+ '&ss=' + studiensemester,
+							description: 'lehre/lehrauftraege',
+							requires: ['stg']
+						},
+						{
+							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+								+ 'content/pdfExport.php?xml=lehrauftrag.xml.php'
+								+ '&xsl=Lehrauftrag'
+								+ '&stg_kz=' + studiengang_kz
+								+ '&ss=' + studiensemester
+								+ '&uid=' + uid,
+							description: 'lehre/lehrauftragslisteemp',
+							requires: ['emp']
+						}
+					]
+				},
+				{
+					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+						+ 'vilesci/lehre/lehrveranstaltung.php'
+						+ '?stg_kz=' + studiengang_kz,
+					description: 'lehre/extrakvverwaltung',
+					requires: ['stg']
+				}
+			);
+
+			return extraItems;
+		}
+	},
 	methods: {
 		updateFilter()
 		{
@@ -258,74 +325,6 @@ export default {
 				this.dropdowns.lehrfunktion_array = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-	},
-	computed:
-	{
-		appMenuExtraItems()
-		{
-			let extraItems = [];
-
-			const studiengang_kz = this.stg || '';
-			const studiensemester = this.selectedStudiensemester;
-			const semester = this.semester || '';
-			const uid = this.emp || '';
-
-
-			extraItems.push(
-				{
-					description: 'lehre/berichte',
-					requires: ['stg'],
-					children: [
-						{
-							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
-								+ 'content/statistik/lvplanung.xls.php'
-								+ '?studiengang_kz=' + studiengang_kz
-								+ '&studiensemester_kurzbz=' + studiensemester
-								+ '&semester=' + semester,
-							description: 'lehre/lvplanung',
-							requires: ['stg']
-						},
-						{
-							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
-								+ 'content/statistik/lehrauftragsliste_gst.xls.php'
-								+ '?studiengang_kz=' + studiengang_kz
-								+ '&studiensemester_kurzbz=' + studiensemester
-								+ '&semester=' + semester,
-							description: 'lehre/lehrauftragsliste',
-							requires: ['stg']
-						},
-						{
-							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
-								+ 'content/pdfExport.php?xml=lehrauftrag.xml.php'
-								+ '&xsl=Lehrauftrag'
-								+ '&stg_kz=' + studiengang_kz
-								+ '&ss=' + studiensemester,
-							description: 'lehre/lehrauftraege',
-							requires: ['stg']
-						},
-						{
-							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
-								+ 'content/pdfExport.php?xml=lehrauftrag.xml.php'
-								+ '&xsl=Lehrauftrag'
-								+ '&stg_kz=' + studiengang_kz
-								+ '&ss=' + studiensemester
-								+ '&uid=' + uid,
-							description: 'lehre/lehrauftragslisteemp',
-							requires: ['emp']
-						}
-					]
-				},
-				{
-					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
-						+ 'vilesci/lehre/lehrveranstaltung.php'
-						+ '?stg_kz=' + studiengang_kz,
-					description: 'lehre/extrakvverwaltung',
-					requires: ['stg']
-				}
-			);
-
-			return extraItems;
-		}
 	},
 
 	template: /* html */`
