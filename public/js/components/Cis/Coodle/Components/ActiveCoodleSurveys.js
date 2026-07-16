@@ -13,6 +13,7 @@ export default {
 			activeSurveysTableConfig: {
 				persistenceID: "activeSurveysTable",
 				minHeight: 300,
+				movableColumns: false,
 				layout: "fitColumns",
 				initialSort: [{column: "createdAt", dir: "desc"}],
 				columns: [

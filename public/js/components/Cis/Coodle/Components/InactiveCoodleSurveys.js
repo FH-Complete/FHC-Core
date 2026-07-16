@@ -12,6 +12,7 @@ export default {
 			inactiveSurveys: [],
 			inactiveSurveysTableConfig: {
 				persistenceID: "inactiveSurveysTable",
+				movableColumns: false,
 				minHeight: 300,
 				layout: "fitColumns",
 				initialSort: [{ column: "endedAt", dir: "desc" }],
