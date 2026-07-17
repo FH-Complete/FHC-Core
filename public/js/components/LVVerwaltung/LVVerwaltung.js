@@ -49,7 +49,6 @@ export default {
 		return {
 			selected: [],
 			studiengang: "",
-			//filter: {},
 			selectedStudiensemester: this.defaultSemester,
 			endpoint: ApiStudiengangTree,
 			dropdowns: {
@@ -58,7 +57,6 @@ export default {
 				lehrform_array: [],
 				raumtyp_array: [],
 			},
-			//selectedStudiengang: '',
 			searchbaroptions: {
 				origin: 'lvverwaltung',
 				cssclass: "position-relative",
@@ -272,7 +270,6 @@ export default {
 					<div class="offcanvas-header justify-content-end px-1 d-md-none">
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
 					</div>
-					<!--stv-verband :preselectedKey="selectedStudiengang" :endpoint="endpoint" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband-->
 					<div class="overflow-auto col h-0">
 						<base-treemenu
 							config="lvv"
