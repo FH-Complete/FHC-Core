@@ -106,7 +106,7 @@ export default {
 		},
 		semester() {
 			return this.filter.semester;
-		}
+		},
 	},
 	methods: {
 		updateFilter()
