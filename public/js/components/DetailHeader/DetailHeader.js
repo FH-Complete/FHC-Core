@@ -59,10 +59,6 @@ export default {
 			from: 'configStvTagsEnabled',
 			default: false
 		},
-		currentSemester: {
-			from: 'currentSemester',
-			required: true
-		},
 		lists: {
 			from: 'lists',
 			required: true
@@ -293,8 +289,10 @@ export default {
 					this.semesterDates.ende
 				);
 
-			this.$refs.tagWrapper.innerHTML = '';
-			this.$refs.tagWrapper.appendChild(container);
+			if(this.headerData.length == 1) {
+				this.$refs.tagWrapper.innerHTML = '';
+				this.$refs.tagWrapper.appendChild(container);
+			}
 		},
 		getAllTags(prestudent_id){
 			return this.$api
@@ -437,6 +435,12 @@ export default {
 							{{headerData[0].verband}}
 						<strong v-if="headerData[0].gruppe !== null && headerData[0].gruppe != ' '" class="text-muted"> | {{$p.t('lehre', 'gruppe')}} </strong>
 							{{headerData[0].gruppe}}
+						<strong v-if="headerData[0].status=='Interessent'
+							|| headerData[0].status=='Aufgenommener'
+							|| headerData[0].status=='Bewerber'
+							|| headerData[0].status=='Wartender'"
+							class="text-muted"> | Einstiegssemester {{headerData[0].semester_berechnet}}
+						</strong>
 					</template>
 					<template v-else>
 					<strong class="text-muted"> | {{$p.t('lehre', 'semester')}} </strong>
@@ -452,6 +456,13 @@ export default {
 					<strong class="text-muted">Email </strong>
 					<span v-if="!isLoading">
 						<a :href="'mailto:'+headerData[0]?.mail_intern">{{headerData[0].mail_intern}}</a>
+					</span>
+					<span v-else>
+						<pv-skeleton width="10rem"></pv-skeleton>
+					</span>
+					<strong class="text-muted"> | {{$p.t('ui', 'private')}} </strong>
+					<span v-if="!isLoading">
+						<a :href="'mailto:'+headerData[0]?.mail_privat">{{headerData[0].mail_privat}}</a>
 					</span>
 					<span v-else>
 						<pv-skeleton width="10rem"></pv-skeleton>

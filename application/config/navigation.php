@@ -385,7 +385,7 @@ $config['navigation_menu']['apps'] = [
 	],
 	'lav' => [
 		'link' => site_url('lehre/lehrauftrag/Lehrauftrag/Dashboard'),
-		'description' => 'Lehraufträge',
+		'description' => 'Lehrauftragsverwaltung',
 		#'icon' => 'person-chalkboard',
 		'requiredPermissions' => array('lehre/lehrauftrag_bestellen:r', 'lehre/lehrauftrag_erteilen:r')
 	]

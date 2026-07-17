@@ -16,28 +16,28 @@ if(!@$db->db_query("SELECT taglib FROM public.tbl_notiz_typ LIMIT 1"))
 $tags = [
 	[
 		'typ_kurzbz' => 'wh_auto',
-		'bezeichnung' => '{Wiederholer, repeater}',
+		'bezeichnung' => '{WH, R}',
 		'style' => 'tag_dark_grey',
 		'prioritaet' => 11,
 		'taglib' => 'tags/CoreWiederholerTagLib'
 	],
 	[
 		'typ_kurzbz' => 'dd_auto',
-		'bezeichnung' => '{DoubleDegree, DoubleDegree}',
+		'bezeichnung' => '{DD, DD}',
 		'style' => 'tag_braun',
 		'prioritaet' => 10,
 		'taglib' => 'tags/CoreDoubleDegreeTagLib'
 	],
 	[
 		'typ_kurzbz' => 'out_auto',
-		'bezeichnung' => '{Outgoing, Outgoing}',
+		'bezeichnung' => '{Out, Out}',
 		'style' => 'tag_limette',
 		'prioritaet' => 12,
 		'taglib' => 'tags/CoreOutgoingTagLib'
 	],
 	[
 		'typ_kurzbz' => 'prewh_auto',
-		'bezeichnung' => '{Pre-Wiederholer, pre-repeater}',
+		'bezeichnung' => '{Pre-WH, pre-R}',
 		'style' => 'tag_light_grey',
 		'prioritaet' => 13,
 		'taglib' => 'tags/CorePrewiederholerTagLib'
@@ -45,28 +45,28 @@ $tags = [
 	[
 		'typ_kurzbz' => 'zgv_auto',
 		'bezeichnung' => '{ZGV offen, ZGV missing}',
-		'style' => 'tag_lavendel',
+		'style' => 'tag_beige',
 		'prioritaet' => 14,
 		'taglib' => 'tags/CoreMissingZgvTagLib'
 	],
 	[
 		'typ_kurzbz' => 'unterbrecher_auto',
-		'bezeichnung' => '{Unterbrecher, Interrupter}',
-		'style' => 'tag_blau',
+		'bezeichnung' => '{UB, I}',
+		'style' => 'tag_turquoise',
 		'prioritaet' => 15,
 		'taglib' => 'tags/CoreUnterbrecherTagLib'
 	],
 	[
 		'typ_kurzbz' => 'stbtr_erh_auto',
 		'bezeichnung' => '{erh.Studienbeitrag, Incr. Tuition Fees}',
-		'style' => 'tag_pfirsich',
+		'style' => 'tag_bordeaux',
 		'prioritaet' => 16,
 		'taglib' => 'tags/CoreStbErhoehtTagLib'
 	],
 	[
 		'typ_kurzbz' => 'jgv_auto',
-		'bezeichnung' => '{JGV, Year Group Representative}',
-		'style' => 'tag_gelb',
+		'bezeichnung' => '{JGV, YGR}',
+		'style' => 'tag_olive',
 		'prioritaet' => 17,
 		'taglib' => 'tags/CoreJgvTagLib'
 	],

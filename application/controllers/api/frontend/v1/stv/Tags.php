@@ -15,7 +15,9 @@ class Tags extends Tag_Controller
 			'addTag' => self::BERECHTIGUNG_KURZBZ,
 			'updateTag' => self::BERECHTIGUNG_KURZBZ,
 			'doneTag' => self::BERECHTIGUNG_KURZBZ,
-			'deleteTag' => self::BERECHTIGUNG_KURZBZ
+			'deleteTag' => self::BERECHTIGUNG_KURZBZ,
+			'getAllTags' => self::BERECHTIGUNG_KURZBZ,
+			'rebuildTagsForTypeId' => self::BERECHTIGUNG_KURZBZ,
 		]);
 
 	$this->config->load('stv');

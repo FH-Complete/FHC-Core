@@ -96,6 +96,13 @@ html.fs_huge {
 	overflow: visible !important;
 }
 
+/* to enable scrolling for many student entries*/
+.stv-details-abschlusspruefung-student-names {
+	max-height: 80px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
 .p-dropdown-item{
 	z-index: 1201 !important;
 }

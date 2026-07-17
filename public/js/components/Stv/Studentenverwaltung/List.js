@@ -93,7 +93,7 @@ export default {
 						}
 					},
 					{title:"Geschlecht", field:"geschlecht", headerFilter: "list", headerFilterParams: {values:{'m':'männlich','w':'weiblich','x':'divers','u':'unbekannt'}, listOnEmpty:true, autocomplete:true}},
-					{title:"Sem.", field:"semester_berechnet", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
+					{title: "Sem.", field:"semester_berechnet", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
 					{title:"Verb.", field:"verband", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
 					{title:"Grp.", field:"gruppe", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
 					{title:"Studiengang", field:"studiengang", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
@@ -283,7 +283,6 @@ export default {
 				};
 			});
 		},
-		//TODO(Manu) check: replace download or additional entry?
 		downloadConfig() {
 			return {
 				csv: {
@@ -292,8 +291,9 @@ export default {
 					options: {
 						delimiter: ';',
 						bom: true,
-					}
-				}
+					},
+					rowRange: this.selectedcount > 0 ? "selected" : "all",
+				},
 			};
 		},
 		fileString() {
@@ -420,8 +420,12 @@ export default {
 		rowSelectionChanged(data, rows, selected, deselected) {
 			this.selectedcount = data.length;
 
-			if(selected.length > 0 || deselected.length > 0){
+			//in case of empty selection (eg. in future or past semester of selected student without sem)
+			if(selected.length == 0 ) {
 				this.lastSelected = this.selected;
+			}
+
+			if(selected.length > 0 || deselected.length > 0){
 
 				//for tags
 				this.selectedRows = this.$refs.table.tabulator.getSelectedRows();
@@ -510,6 +514,14 @@ export default {
 			this.$reloadList();
 		},
 		onKeydown(e) { // TODO(chris): this should be in the filter component
+
+			if ((e.ctrlKey || e.metaKey) && e.code === "KeyA") {
+				e.preventDefault();
+
+				this.$refs.table.tabulator.deselectRow();
+				this.$refs.table.tabulator.selectRow();
+			}
+
 			if (!this.focusObj)
 				return;
 
@@ -638,7 +650,7 @@ export default {
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
-	<div class="stv-list h-100 pt-3">	
+	<div class="stv-list h-100 pt-3">
 		<div
 			class="tabulator-container d-flex flex-column h-100"
 			:class="{'has-filter': filter.length}"
