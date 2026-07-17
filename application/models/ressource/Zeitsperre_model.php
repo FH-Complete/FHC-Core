@@ -12,6 +12,12 @@ class Zeitsperre_model extends DB_Model
 		$this->pk = 'zeitsperre_id';
 	}
 
+	public function getZeitsperre($uid)
+	{
+		$query = "SELECT * from campus.tbl_zeitsperre WHERE mitarbeiter_uid = '$uid'";
+		return $this->execQuery($query);
+	}
+
     /**
      * Save or update Zeitsperre.
      *

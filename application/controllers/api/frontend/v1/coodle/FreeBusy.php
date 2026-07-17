@@ -164,7 +164,8 @@ class FreeBusy extends FHCAPI_Controller
 		$uid = $this->input->post("uid");
 		$freeBusyEntries = $this->FreeBusyModel->loadWhere(["uid" => $uid, "aktiv" => true]);
 		$freeBusyEntries = $this->getDataOrTerminateWithError($freeBusyEntries);
-		$freeBusyEvents = [];
+
+		$freeBusyEvents = $this->freebusylib->getDefaultInternalFreeBusy($uid);
 
 		foreach ($freeBusyEntries as $freeBusyEntry) {
 			$freeBusyEvents = array_merge(

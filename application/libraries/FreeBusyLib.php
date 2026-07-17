@@ -28,6 +28,8 @@ class FreeBusyLib
 	public function __construct()
 	{
 		$this->_ci =& get_instance();
+
+		$this->_ci->load->model("ressource/Zeitsperre_model", "ZeitsperreModel");
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -50,6 +52,53 @@ class FreeBusyLib
 		return $busyTimeslots;
 	}
 
+	public function getDefaultInternalFreeBusy($uid)
+	{
+		$events = [];
+
+		$this->_ci->load->library('StundenplanLib');
+
+		$startDate = new DateTime();
+		$startDate = $startDate->format("Y-m-d");
+		$endDate = new DateTime();
+		$endDate->modify("+1 year");
+		$endDate = $endDate->format("Y-m-d");
+
+		$userEvents = getData($this->_ci->stundenplanlib->getEventsUser($startDate, $endDate, $uid));
+		if ($userEvents && count($userEvents)) {
+			$userEvents = array_map(
+				function ($event) {
+					return [
+						"start" => $event->datum . " " . $event->beginn,
+						"end" => $event->datum . " " . $event->ende,
+					];
+				},
+				$userEvents
+			);
+			$events = array_merge($events, $userEvents);
+		}
+
+		$userAbsences = getData($this->_ci->ZeitsperreModel->getZeitsperre($uid));
+		if ($userAbsences && count($userAbsences)) {
+			$today = new DateTime();
+			$today = $today->format("Y-m-d");
+			$userAbsences = array_map(
+				function ($absence) use ($today) {
+					if ($absence->bisdatum < $today)
+						return;
+
+					return [
+						"start" => $absence->vondatum . " 00:00:00",
+						"end" => $absence->bisdatum . " 23:59:00",
+					];
+				},
+				$userAbsences
+			);
+			$events = array_merge($events, $userAbsences);
+		}
+
+		return $events;
+	}
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
