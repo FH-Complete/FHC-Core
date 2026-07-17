@@ -296,6 +296,10 @@ class Student extends FHCAPI_Controller
 				$fotoval = ($val == '') ? null : str_replace('data:image/jpeg;base64,', '', $val);
 				$update_person[$prop] = $fotoval;
 			}
+			else if ($prop == 'gebdatum')
+			{
+				$update_person[$prop] = ($val == '') ? null : $val;
+			}
 			else
 			{
 				$update_person[$prop] = $val;
