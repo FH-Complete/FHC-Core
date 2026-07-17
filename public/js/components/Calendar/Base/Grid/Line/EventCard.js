@@ -22,6 +22,7 @@ export default {
 		class="fhc-calendar-base-grid-line-event event"
 		v-draggable:move.noimage="dragKalenderCollection"
 		style="border:1px"
+		data-cy="calendar-event"
 	>
 		<div class="title">
 			{{ topicString || event.orig.titel || event.orig.lehrfach }}

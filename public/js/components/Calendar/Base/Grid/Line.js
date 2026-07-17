@@ -12,7 +12,17 @@ export default {
 		LineEvent,
 		LineBackground,
 	},
-	inject: ["axisRow", "shouldCompactEvents", "compactibleEventTypes"],
+	inject: {
+		axisRow: "axisRow",
+		shouldCompactEvents: {
+			from: "shouldCompactEvents",
+			default: undefined,
+		},
+		compactibleEventTypes: {
+			from: "compactibleEventTypes",
+			default: undefined,
+		},
+	},
 	props: {
 		date: {
 			type: luxon.DateTime,

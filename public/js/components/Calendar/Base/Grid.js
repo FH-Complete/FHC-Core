@@ -481,6 +481,7 @@ export default {
 		class="fhc-calendar-base-grid"
 		style="display:grid;width:100%;height:100%;overflow:auto"
 		:style="'grid-template-' + axisRow + 's:auto' + (allDayEvents ? ' auto ' : ' ') + '1fr;grid-template-' + axisCol + 's:auto ' + styleGridCols"
+		data-cy="calendar-base-grid"
 	>
 		<div
 			class="grid-header"
@@ -561,6 +562,8 @@ export default {
 							class="part-body"
 							style="position:relative"
 							:style="'grid-' + axisCol + ':' + (1+index) + ';grid-' + axisRow + ':ps_' + i + '/pe_' + i"
+							:data-drop-index="index * axisPartsSave.length + i + 1"
+							data-cy="calendar-grid-part"
 						>
 							<slot name="part-body" v-bind="{ index, part }" />
 							<div

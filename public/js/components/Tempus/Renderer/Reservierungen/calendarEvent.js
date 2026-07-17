@@ -131,7 +131,10 @@ export default {
 			>
 				... +{{ event.teilnehmer_person.length - 3 }}
 			</span>
-			<span class="event-place">{{ ortString }}</span>
+			<span
+				class="event-place"
+				data-cy="calendar-event-room"
+			>{{ ortString }}</span>
 			<span v-if="gruppeString" class="event-gruppe">{{ gruppeString }}</span>
 		</div>
 	</div>

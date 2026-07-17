@@ -159,7 +159,7 @@ export default {
 	},
 	// language=HTML
 	template: `
-		<bs-modal ref="modal" class="bootstrap-prompt" dialogClass="modal-xl">
+		<bs-modal ref="modal" class="bootstrap-prompt" dialogClass="modal-xl" data-cy="reservationModal">
 			<template #title>Neue Reservierung</template>
 			<template #default>
 				<div class="row g-3">
