@@ -85,8 +85,7 @@ export default {
 			let filter = {
 				emp: this.$route.params.emp,
 				studiensemester_kurzbz: this.selectedStudiensemester
-			}
-
+			};
 			let index;
 			if (this.$route.params.treemenu) {
 				index = this.$route.params.treemenu.indexOf('stg');
@@ -96,9 +95,7 @@ export default {
 				if (index > -1)
 					filter.semester = this.$route.params.treemenu[index+1];
 			}
-
 			filter.activeFilter = filter.emp ? 'employee' : filter.stg ? 'verband' : null;
-			
 			return filter;
 		},
 		emp() {
