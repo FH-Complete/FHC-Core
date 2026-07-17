@@ -100,6 +100,15 @@ export default {
 			filter.activeFilter = filter.emp ? 'employee' : filter.stg ? 'verband' : null;
 			
 			return filter;
+		},
+		emp() {
+			return this.filter.emp;
+		},
+		stg() {
+			return this.filter.stg;
+		},
+		semester() {
+			return this.filter.semester;
 		}
 	},
 	methods: {
