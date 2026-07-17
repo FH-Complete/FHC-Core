@@ -253,7 +253,7 @@ export default {
 			>
 				<span class="fa-solid fa-table-list"></span>
 			</button>
-			<core-searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunction" class="searchbar w-100"></core-searchbar>
+			<core-searchbar :searchoptions="searchbaroptions" :searchfunction=searchfunction class="searchbar w-100"></core-searchbar>
 		</header>
 		<div class="container-fluid overflow-hidden">
 			<div class="row h-100">
