@@ -478,6 +478,18 @@ export default {
 		},
 		showAlertNoSelectedStudent(){
 			this.$fhcAlert.alertError(this.$p.t('ui', 'alert_chooseStudent'));
+		},
+		showAlertMultipleStudents() {
+			this.$fhcAlert.alertError(this.$p.t('ui', 'alert_chooseOnlyOneStudent'));
+		},
+		showAlertNoGroupChosen(){
+			this.$fhcAlert.alertError(this.$p.t('ui', 'alert_chooseGroupSem'));
+		},
+		showMenu(refName) {
+			bootstrap.Dropdown.getOrCreateInstance(this.$refs[refName]).show();
+		},
+		hideMenu(refName) {
+			bootstrap.Dropdown.getOrCreateInstance(this.$refs[refName]).hide();
 		}
 	},
 	created() {
@@ -653,19 +665,30 @@ export default {
 					</div>
 					<div class="offcanvas-body">
 						<app-menu app-identifier="stv">
-							<li class="dropend">
+							<li :class="{ dropend: appMenuExtraItems.length }"
+								@mouseenter="appMenuExtraItems.length && showMenu('gradeReportToggle')"
+								@mouseleave="appMenuExtraItems.length && hideMenu('gradeReportToggle')"
+							>
 								<a
+									ref="gradeReportToggle"
+									v-if="appMenuExtraItems.length"
 									class="dropdown-toggle"
 									href="#"
 									role="button"
 									data-bs-toggle="dropdown"
 									aria-expanded="false"
-									:class="{ disabled: !appMenuExtraItems.length }"
 									data-bs-popper-config='{"strategy":"fixed"}'
 								>
 									{{ $p.t('stv/grade_report') }}
 								</a>
-								<ul class="dropdown-menu p-0">
+								<a
+									v-else
+									href="#"
+									@click.prevent="showAlertNoGroupChosen"
+									>
+										{{ $p.t('stv/grade_report') }}
+								</a>
+								<ul v-if="appMenuExtraItems.length" class="dropdown-menu p-0">
 									<li
 										v-for="(item, key) in appMenuExtraItems"
 										:key="key"
@@ -676,19 +699,30 @@ export default {
 									</li>
 								</ul>
 							</li>
-							<li class="dropend">
+							<li :class="{ dropend: appMenuExtraItems.length }"
+								@mouseenter="appMenuExtraItems.length && showMenu('lvPlanungToggle')"
+								@mouseleave="appMenuExtraItems.length && hideMenu('lvPlanungToggle')"
+							>
 								<a
+									ref="lvPlanungToggle"
+									v-if="appMenuExtraItems.length"
 									class="dropdown-toggle"
 									href="#"
 									role="button"
 									data-bs-toggle="dropdown"
 									aria-expanded="false"
-									:class="{ disabled: !appMenuExtraItems.length }"
 									data-bs-popper-config='{"strategy":"fixed"}'
+									>
+										{{ $p.t('stv/lvplanung') }}
+								</a>
+								<a
+									v-else
+									href="#"
+									@click.prevent="showAlertNoGroupChosen"
 								>
 									{{ $p.t('stv/lvplanung') }}
 								</a>
-								<ul class="dropdown-menu p-0">
+								<ul v-if="appMenuExtraItems.length" class="dropdown-menu p-0">
 									<li
 										v-for="(item, key) in appMenuLvPlanungItems"
 										:key="key"
@@ -705,10 +739,13 @@ export default {
 								</a>
 							</li>
 							<li>
-								<a v-if="selected_uid" :href="linkGradeList" target="_blank">
+								<a v-if="selected.length === 1" :href="linkGradeList" target="_blank">
 									{{ $p.t('stv/studienverlauf') }}
 								</a>
-								<a v-else href="#" @click.prevent="showAlertNoSelectedStudent">
+								<a v-else-if="selected.length === 0" href="#" @click.prevent="showAlertNoSelectedStudent">
+									{{ $p.t('stv/studienverlauf') }}
+								</a>
+								<a v-else href="#" @click.prevent="showAlertMultipleStudents">
 									{{ $p.t('stv/studienverlauf') }}
 								</a>
 							</li>
