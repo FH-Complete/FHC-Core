@@ -281,14 +281,16 @@ export default {
 		<span v-if="isMaxDisplayedParticipantSchedulesReached" class="fst-italic">
 			{{ "You can display no more participant schedules!" }}
 		</span>
-		<span
-			v-if="displayedParticipantSchedulesCount"
-			@click="hideAllSchedules()"
-			type="button"
-			class="text-decoration-underline"
-		>
-			{{ "Hide all participant schedules" }}
-		</span>
+		<div>
+			<span
+				v-if="displayedParticipantSchedulesCount"
+				@click="hideAllSchedules()"
+				type="button"
+				class="text-decoration-underline"
+			>
+				{{ "Hide all participant schedules" }}
+			</span>
+		</div>
 	</div>
 	`,
 };
