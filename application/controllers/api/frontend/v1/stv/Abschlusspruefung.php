@@ -371,6 +371,9 @@ class Abschlusspruefung extends FHCAPI_Controller
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
+		$datum = $formData['datum'] == '' ? null : $formData['datum'];
+		$sponsion = $formData['sponsion'] == '' ? null : $formData['sponsion'];
+
 		$result = $this->AbschlusspruefungModel->update(
 			[
 				'abschlusspruefung_id' => $abschlusspruefung_id
@@ -382,8 +385,8 @@ class Abschlusspruefung extends FHCAPI_Controller
 				'vorsitz' => $vorsitz,
 				'pruefungsantritt_kurzbz' => $formData['pruefungsantritt_kurzbz'],
 				'abschlussbeurteilung_kurzbz' => $formData['abschlussbeurteilung_kurzbz'],
-				'datum' => $formData['datum'],
-				'sponsion' => $formData['sponsion'],
+				'datum' => $datum,
+				'sponsion' => $sponsion,
 				'pruefer1' => $pruefer1,
 				'pruefer2' => $pruefer2,
 				'pruefer3' => $pruefer3,
