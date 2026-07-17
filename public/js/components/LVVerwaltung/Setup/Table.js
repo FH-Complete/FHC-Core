@@ -272,14 +272,14 @@ export default {
 			if (!['emp', 'treemenu'].includes(this.$route.name))
 				return null;
 
-			let url = 'stdsem/' + this.$route.params.stdsem + '/';
+			let url = 'stdsem/' + this.$route.params.stdsem;
 			
 			if (this.$route.params.emp) {
-				url += 'emp/' + this.$route.params.emp;
+				url += '/emp/' + this.$route.params.emp;
 			}
 
 			if (this.$route.params.treemenu) {
-				url += this.$route.params.treemenu.join('/');
+				url += '/' + this.$route.params.treemenu.join('/');
 			}
 			
 			return ApiTreemenu.data('lvverwaltung', url);
