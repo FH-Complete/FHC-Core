@@ -103,6 +103,10 @@ export default {
 		}
 	},
 	methods: {
+		updateFilter()
+		{
+			// deprecated
+		},
 		handleRowClicked(data)
 		{
 			this.selected = data
