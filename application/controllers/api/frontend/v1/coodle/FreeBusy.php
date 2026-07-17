@@ -34,6 +34,7 @@ class FreeBusy extends FHCAPI_Controller
 			'updateFreeBusyEntry' => self::PERM_LOGGED,
 			'deleteFreeBusyEntry' => self::PERM_LOGGED,
 			'getFreeBusySchedule' => self::PERM_LOGGED,
+			'getCoodleFreeBusy' => self::PERM_ANONYMOUS,
 		]);
 
 		$this->load->model('person/Freebusy_model', 'FreeBusyModel');
@@ -166,16 +167,19 @@ class FreeBusy extends FHCAPI_Controller
 		$freeBusyEvents = [];
 
 		foreach ($freeBusyEntries as $freeBusyEntry) {
-			if ($freeBusyEntry->freebusytyp_kurzbz === "Google") {
-				$freeBusyEvents = array_merge(
-					$freeBusyEvents,
-					$this->freebusylib->getGoogleFreeBusy($freeBusyEntry->url)
-				);
-			}
+			$freeBusyEvents = array_merge(
+				$freeBusyEvents,
+				$this->freebusylib->getFreeBusy($freeBusyEntry->url, $freeBusyEntry->freebusytyp_kurzbz)
+			);
 		}
 		// todo
 
 		$this->terminateWithSuccess($freeBusyEvents);
+	}
+
+	public function getCoodleFreeBusy()
+	{
+		// todo: return actual ics file
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
