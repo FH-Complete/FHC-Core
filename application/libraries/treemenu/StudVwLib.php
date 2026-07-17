@@ -85,7 +85,7 @@ class StudVwLib
 		return [
 			[
 				'path' => sprintf($path_template, '1'),
-				'name' => 'Prestudent',
+				'name' => ['lehre', 'prestudent'],
 				'no_sem_reload' => true
 			]
 		];
@@ -187,9 +187,10 @@ class StudVwLib
 		if ($stg === null)
 			return [];
 
+		// TODO(chris): phrasen
 		$item = [
 			'path' => sprintf($path_template, '1'),
-			'name' => $original_method
+			'name' => ['treemenu', 'filter_' . $original_method]
 		];
 
 		if (!$has_children)
@@ -203,9 +204,10 @@ class StudVwLib
 		if (!$this->_ci->permissionlib->isBerechtigt('inout/uebersicht'))
 			return [];
 
+		// TODO(chris): phrasen
 		$item = [
 			'path' => sprintf($path_template, '1'),
-			'name' => $original_method
+			'name' => ['treemenu', 'inout_' . $original_method]
 		];
 
 		if (!$has_children)
