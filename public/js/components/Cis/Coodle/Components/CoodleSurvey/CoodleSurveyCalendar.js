@@ -73,10 +73,12 @@ export default {
 					this.participantSchedules[participant.uid] ?? [];
 				participantEvents = participantEvents.map((event) => {
 					event.farbe =
-						this.$props.participantScheduleColors.find(
-							(participantColor) =>
-								participantColor.uid === participant.uid,
-						)?.color ?? "DDDDDD";
+						this.$props.participantScheduleColors
+							.find(
+								(participantColor) =>
+									participantColor.uid === participant.uid,
+							)
+							?.color.slice(1) ?? "DDDDDD";
 					return event;
 				});
 				events = events.concat(participantEvents);
@@ -333,7 +335,21 @@ export default {
 		async fetchFreeBusySchedule(uid) {
 			this.participantSchedules[uid] = null;
 			const freeBusyScheduleResponse = await this.$api.call(
-				FreeBusyApi.getFreeBusySchedule(uid, 1, 1),
+				FreeBusyApi.getFreeBusySchedule(uid),
+			);
+			this.participantSchedules[uid] = freeBusyScheduleResponse.data.map(
+				(event) => {
+					const startDate = new Date(event.start);
+					const endDate = new Date(event.end);
+					return {
+						datum: event.start.split(" ")[0],
+						beginn: event.start.split(" ")[1],
+						ende: event.end.split(" ")[1],
+						isostart: startDate.toISOString(),
+						isoend: endDate.toISOString(),
+						type: "freeBusy",
+					};
+				},
 			);
 		},
 	},

@@ -43,5 +43,15 @@ Events::on('loadRenderers', function ($renderers) {
 	);
 });
 
+Events::on('loadRenderers', function ($renderers) {
+	$fhc_core_renderers =& $renderers();
+	$fhc_core_renderers["freeBusy"] = array(
+		'calendarEvent' => absoluteJsImportUrl('public/js/components/Cis/Renderer/FreeBusy/calendarEvent.js'),
+		'modalTitle' => absoluteJsImportUrl('public/js/components/Cis/Renderer/FreeBusy/modalTitle.js'),
+		'modalContent' => absoluteJsImportUrl('public/js/components/Cis/Renderer/FreeBusy/modalContent.js'),
+		'calendarEventStyles' => APP_ROOT . 'public/css/Cis4/CoreCalendarEvents.css'
+	);
+});
+
 
 
