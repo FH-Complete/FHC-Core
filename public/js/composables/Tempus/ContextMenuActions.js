@@ -8,6 +8,11 @@ export function useContextMenuActions(handlers)
 				action: handlers.openRaumauswahl
 			},
 			{
+				label: 'Ressourcen zuordnen',
+				icon: 'fa-solid fa-table-list',
+				action: handlers.openResourcesAssignmentModal
+			},
+			{
 				label: 'Freischalten für Voransicht',
 				icon: 'fa-solid fa-chalkboard-user',
 				action: handlers.syncToLecturer

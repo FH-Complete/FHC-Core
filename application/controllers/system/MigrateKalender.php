@@ -264,7 +264,108 @@ class MigrateKalender extends CLI_Controller
 		}
 	}
 
+	public function migrateStundenplanBetriebsmittelEntries() {
+		$this->setKalendarEntriesGroupIDs();
+		$this->setKalendarEntriesGroupIDsForChildren();
 
+		$dbModel = new DB_Model();
+
+		$deleteOldImportedTempusEntriesQuery = "DELETE from lehre.tbl_betriebsmittel_kalender WHERE quelle != 'tempus_neu' OR quelle IS NULL;";
+		$createHelperTypeQuery = "DO $$
+			BEGIN
+				IF NOT EXISTS (
+					SELECT 1
+					FROM pg_type
+					WHERE typname = 'betriebsmittel_info'
+				) THEN
+					CREATE TYPE betriebsmittel_info AS (
+						betriebsmittel_id bigint,
+						insertamum timestamp,
+						insertvon text
+					);
+				END IF;
+			END $$;";
+		
+		$query = $deleteOldImportedTempusEntriesQuery . 
+				 $createHelperTypeQuery .
+		"WITH test AS (
+			SELECT 
+				tk.eindeutige_gruppen_id AS eindeutige_gruppen_id,
+				array_agg(tk.kalender_id),
+				array_agg(
+					ROW(tsb.betriebsmittel_id, tsb.insertamum, tsb.insertvon)::betriebsmittel_info
+				) AS betriebsmittel_data
+			FROM sync.tbl_stundenplandev_kalender AS sk
+			JOIN lehre.tbl_kalender tk ON tk.kalender_id = sk.kalender_id
+			JOIN lehre.tbl_stundenplan_betriebsmittel tsb ON tsb.stundenplandev_id = sk.stundenplandev_id 
+			GROUP BY tk.eindeutige_gruppen_id 
+			)
+			INSERT INTO lehre.tbl_betriebsmittel_kalender (
+				eindeutige_kalender_gruppen_id, 
+				betriebsmittel_id,
+				insertamum,
+				insertvon
+				)
+			SELECT
+				t.eindeutige_gruppen_id,
+				bm.betriebsmittel_id,
+				bm.insertamum,
+				bm.insertvon
+			FROM test t
+			CROSS JOIN LATERAL unnest(t.betriebsmittel_data) AS bm
+			ON CONFLICT (eindeutige_kalender_gruppen_id, betriebsmittel_id) DO NOTHING;
+			;";
+
+		$dbModel->db->query($query);
+	}
+
+	private function setKalendarEntriesGroupIDs() {
+		$dbModel = new DB_Model();
+
+		$query = "UPDATE lehre.tbl_kalender
+			SET eindeutige_gruppen_id = gen_random_uuid()
+			WHERE vorgaenger_kalender_id IS NULL
+			AND eindeutige_gruppen_id IS NULL;";
+
+		$dbModel->db->query($query);
+
+	}
+
+	private function setKalendarEntriesGroupIDsForChildren() {
+		$dbModel = new DB_Model();
+
+		$query = "WITH RECURSIVE tree AS 
+			(
+				SELECT
+					kalender_id,
+					vorgaenger_kalender_id,
+					kalender_id AS root_id,
+					eindeutige_gruppen_id as root_eindeutige_gruppen_id
+				FROM lehre.tbl_kalender
+				WHERE vorgaenger_kalender_id IS NULL
+
+				UNION ALL
+
+				SELECT
+					i.kalender_id,
+					i.vorgaenger_kalender_id,
+					t.root_id,
+					t.root_eindeutige_gruppen_id 
+				FROM lehre.tbl_kalender i
+				JOIN tree t
+				ON i.vorgaenger_kalender_id = t.kalender_id
+				where i.eindeutige_gruppen_id is NULL
+			
+			)
+			UPDATE lehre.tbl_kalender k
+			SET eindeutige_gruppen_id = t.root_eindeutige_gruppen_id
+			FROM tree t
+			WHERE k.kalender_id = t.kalender_id
+			AND k.eindeutige_gruppen_id IS NULL;";
+
+		$dbModel->db->query($query);
+	}
+	
 	private function _insertKalender($block, $typ)
 	{
 		$result = $this->KalenderModel->insert(

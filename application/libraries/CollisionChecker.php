@@ -18,10 +18,12 @@ class CollisionChecker
 		$this->_ci->load->library('collision/checks/LectureCollisionCheck');
 		$this->_ci->load->library('collision/checks/VerbandCollisionCheck');
 		$this->_ci->load->library('collision/checks/StudentCollisionCheck');
+		$this->_ci->load->library('collision/checks/ResourcesCollisionCheck');
 		$this->register($this->_ci->roomcollisioncheck);
 		$this->register($this->_ci->lecturecollisioncheck);
 		$this->register($this->_ci->verbandcollisioncheck);
 		$this->register($this->_ci->studentcollisioncheck);
+		$this->register($this->_ci->resourcescollisioncheck);
 		Events::trigger('collision_register', $this);
 	}
 

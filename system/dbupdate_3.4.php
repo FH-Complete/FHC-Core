@@ -99,7 +99,7 @@ require_once('dbupdate_3.4/75888_reihungstest_mehrfachdurchfuehrung.php');
 require_once('dbupdate_3.4/76150_perm_other_lv_plan.php');
 require_once('dbupdate_3.4/68957_dashboard_bookmark_neue_Spalte_sort.php');
 require_once('dbupdate_3.4/68530_Dashboard_Cleanup.php');
-
+require_once('dbupdate_3.4/77375_ressourcen.php');
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
