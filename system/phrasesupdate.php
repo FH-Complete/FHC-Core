@@ -62624,7 +62624,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'coodle',
-		'phrase' => 'aaaaaaaaaaa',
+		'phrase' => 'freebusy_explainer',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -62635,7 +62635,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'aaaaaaaaaaa',
+				'text' => 'FreeBusy supports effective scheduling by combining internal and external calendars, and displaying events (without identifying details such as title, description, or location) in Coodle to avoid timing conflicts. Your base timetable and planned absences will be displayed by default, but you can add additional schedules (e.g. Google Calendar). To do so, you must locate and copy a sharing url from your calendar application marked as either "ICS" or "iCal", usually ending with the suffix ".ics". The calendar being shared must also be set to public. However, schedules of type "SoGo" and "Coodle" will autofill with default urls which will be processed internally.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
