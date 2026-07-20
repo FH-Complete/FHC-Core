@@ -66,6 +66,24 @@ export default {
 					return "d-none d-xl-grid";
 			}
 		},
+		// link into the FHC-Core-Anwesenheiten tool
+		// digi_anw_data is attached per event by the extension's `extendStundenplanData` listener
+		anwLink() {
+			const d = this.event && this.event.digi_anw_data;
+			if (!d || !d.stg_kz || !d.lv_id || !d.sem_kurzbz)
+				return null;
+			const base = FHC_JS_DATA_STORAGE_OBJECT.app_root
+				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router
+				+ '/extensions/FHC-Core-Anwesenheiten/';
+			return base
+				+ `?stg_kz=${encodeURIComponent(d.stg_kz)}`
+				+ `&sem=${encodeURIComponent(d.sem ?? '')}`
+				+ `&lvid=${encodeURIComponent(d.lv_id)}`
+				+ `&sem_kurzbz=${encodeURIComponent(d.sem_kurzbz)}`;
+		},
+		anwLinkTitle() {
+			return this.$p.t('global/digitalesAnwManagement');
+		},
 	},
 	template: /*html*/`
 	<div
@@ -96,6 +114,21 @@ export default {
 				... +{{ event.lektor.length - 3 }}
 			</span>
 		</div>
+		<a
+			v-if="anwLink"
+			:href="anwLink"
+			target="_blank"
+			rel="noopener"
+			class="d-flex align-items-center flex-shrink-0"
+			style="margin-right: 4px"
+			:title="anwLinkTitle"
+			:aria-label="anwLinkTitle"
+			draggable="false"
+			@click.stop
+			@mousedown.stop
+		>
+			<i class="fa fa-arrow-up-right-from-square fs-5" aria-hidden="true"></i>
+		</a>
 	</div>
 	`,
 }

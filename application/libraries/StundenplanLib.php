@@ -7,6 +7,7 @@ use \DateTime as DateTime;
 use \DateTimeZone as DateTimeZone;
 use \DateInterval as DateInterval;
 use \DatePeriod as DatePeriod;
+use CI3_Events as Events;
 
 class StundenplanLib
 {
@@ -141,7 +142,7 @@ class StundenplanLib
 			return $stundenplan_data;
 		$stundenplan_data = getData($stundenplan_data) ?? [];
 
-		$function_error = $this->expandObjectInformation($stundenplan_data);
+		$function_error = $this->expandObjectInformation($stundenplan_data, true);
 		if ($function_error)
 			return $function_error;
 		
@@ -286,7 +287,7 @@ class StundenplanLib
 		return success($lektoren);
 	}
 
-	public function expandObjectInformation($data)
+	public function expandObjectInformation($data, $callExtensionsEvent = false)
 	{
 		$this->_ci =& get_instance();
 		
@@ -375,6 +376,20 @@ class StundenplanLib
 			$item->lektor = $lektor_obj_array;
 
 		}
+		
+		// info retrieved from extensions might not be necessary for some stundenplan use cases so the event
+		// will be gated behind this flag
+		
+		if($callExtensionsEvent) {
+			Events::trigger(
+				'extendStundenplanData',
+				function & () use (&$data)
+				{
+					return $data;
+				}
+			);
+		}
+		
 	}
 
 	public function fetchFerienTageEvents($start_date, $end_date, $studiengang_kz)
