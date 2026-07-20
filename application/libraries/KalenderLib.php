@@ -479,6 +479,101 @@ class KalenderLib
 		return $this->_mapEvents($data);
 	}
 
+	public function getPlanForVerband($start_date, $end_date, $studiengangKz, $semester, $verband = null, $gruppe = null)
+	{
+		$this->_getBasePlan($start_date, $end_date);
+
+		$db = $this->_ci->KalenderModel->db;
+		$escapedStudiengangKz = $db->escape($studiengangKz);
+		$escapedSemester = $db->escape($semester);
+
+		if (is_null($verband) || trim((string)$verband) === '' || (string)$verband === '0')
+			$verband = null;
+		if (is_null($gruppe) || trim((string)$gruppe) === '' || (string)$gruppe === '0')
+			$gruppe = null;
+
+		$buildAssignmentCondition = function ($assignmentAlias, $specialGroupAlias) use (
+			$db,
+			$escapedStudiengangKz,
+			$escapedSemester,
+			$verband,
+			$gruppe
+		) {
+			$lehrverbandConditions = array(
+				$assignmentAlias.'.gruppe_kurzbz IS NULL',
+				$assignmentAlias.'.studiengang_kz = '.$escapedStudiengangKz,
+				'('.$assignmentAlias.'.semester = '.$escapedSemester.' OR '.$assignmentAlias.'.semester IS NULL)'
+			);
+
+			if (!is_null($verband))
+			{
+				$escapedVerband = $db->escape($verband);
+				$lehrverbandConditions[] = '('.$assignmentAlias.'.verband = '.$escapedVerband.'
+					OR '.$assignmentAlias.'.verband IS NULL
+					OR btrim('.$assignmentAlias.'.verband::text) = \'\'
+					OR '.$assignmentAlias.'.verband::text = \'0\')';
+			}
+
+			if (!is_null($gruppe))
+			{
+				$escapedGruppe = $db->escape($gruppe);
+				$lehrverbandConditions[] = '('.$assignmentAlias.'.gruppe = '.$escapedGruppe.'
+					OR '.$assignmentAlias.'.gruppe IS NULL
+					OR btrim('.$assignmentAlias.'.gruppe::text) = \'\'
+					OR '.$assignmentAlias.'.gruppe::text = \'0\')';
+			}
+
+			$specialGroupCondition = $assignmentAlias.'.gruppe_kurzbz IS NOT NULL
+				AND EXISTS (
+					SELECT 1
+					FROM public.tbl_gruppe '.$specialGroupAlias.'
+					WHERE '.$specialGroupAlias.'.gruppe_kurzbz = '.$assignmentAlias.'.gruppe_kurzbz
+						AND '.$specialGroupAlias.'.studiengang_kz = '.$escapedStudiengangKz.'
+						AND ('.$specialGroupAlias.'.semester = '.$escapedSemester.' OR '.$specialGroupAlias.'.semester IS NULL)
+						AND '.$specialGroupAlias.'.direktinskription = FALSE
+				)';
+
+			return "((
+				".implode("\n\t\t\t\tAND ", $lehrverbandConditions)."
+			) OR (
+				".$specialGroupCondition."
+			))";
+		};
+
+		$lehreinheitCondition = $buildAssignmentCondition(
+			'verband_lehreinheitgruppe',
+			'verband_lehreinheit_sondergruppe'
+		);
+		$eventCondition = $buildAssignmentCondition(
+			'verband_event_teilnehmer',
+			'verband_event_sondergruppe'
+		);
+
+		$db->where('tbl_kalender.status_kurzbz', 'live');
+		$db->where(
+			"(EXISTS (
+				SELECT 1
+				FROM lehre.tbl_kalender_lehreinheit verband_kalender_lehreinheit
+				JOIN lehre.tbl_lehreinheitgruppe verband_lehreinheitgruppe
+					ON verband_lehreinheitgruppe.lehreinheit_id = verband_kalender_lehreinheit.lehreinheit_id
+				WHERE verband_kalender_lehreinheit.kalender_id = tbl_kalender.kalender_id
+					AND $lehreinheitCondition
+			) OR EXISTS (
+				SELECT 1
+				FROM lehre.tbl_kalender_event_teilnehmer verband_event_teilnehmer
+				WHERE verband_event_teilnehmer.kalender_id = tbl_kalender.kalender_id
+					AND verband_event_teilnehmer.rolle_kurzbz = 'teilnehmer'
+					AND $eventCondition
+			))",
+			null,
+			false
+		);
+
+		$data = $this->_ci->KalenderModel->load();
+
+		return $this->_mapEvents($data, false);
+	}
+
 	public function getPlanForStudentByStudent($start_date, $end_date, $userUID)
 	{
 		$this->_getBasePlan($start_date, $end_date);

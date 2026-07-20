@@ -268,7 +268,7 @@ if(!$stdplan->load_data($type,$pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$grup
 }
 
 //Ueberschriften in HTML
-if($format=='HTML')
+if($format=='html')
 {
 	if($type=='verband' || $type=='einheit')
 	{

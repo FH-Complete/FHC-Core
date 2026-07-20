@@ -129,6 +129,7 @@ $route['lvplan/ical/subscription'] = 'LvPlanICALSubscription';
 $route['lvplan/ical/download'] = 'LvPlanICALDownload';
 $route['lvplan/csv/download'] = 'LvPlanCSVDownload';
 $route['lvplan/excel/download'] = 'LvPlanExcelDownload';
+$route['lvplan/html/preview'] = 'LvPlanHTMLPreview';
 
 // load routes from extensions, also look for environment-specific configs
 $subdirs = ['application/config/extensions', 'application/config/' . ENVIRONMENT . '/extensions'];

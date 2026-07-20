@@ -136,6 +136,36 @@ function jumpKalender(){
 			+'&ver='+document.getElementById('ver_semplan').value+'&grp='+document.getElementById('grp_semplan').value+'&begin='+document.getElementById('studiensemester').value+'&format=html', '_blank');
 	  }
 }
+function jumpKalenderNew(){
+	var stgKz = document.getElementById('stg_kz_semplan').value;
+	var semesterRange = document.getElementById('studiensemester').value;
+
+	if (stgKz == '') {
+		alert("<?php echo $p->t('lvplan/bitteEinenStudiengangAuswaehlen');?>");
+		return;
+	}
+	if (semesterRange == '') {
+		alert("<?php echo $p->t('lvplan/bitteEinStudiensemesterAuswaehlen');?>");
+		return;
+	}
+
+	var rangeMatch = semesterRange.match(/^(\d+)&(?:amp;)?ende=(\d+)$/);
+	if (!rangeMatch) {
+		alert("Fehlerhafter Datumsbereich");
+		return;
+	}
+
+	var url = <?php echo json_encode(APP_ROOT.'index.ci.php/lvplan/html/preview'); ?>
+		+ '?type=verband'
+		+ '&stg_kz=' + encodeURIComponent(stgKz)
+		+ '&sem=' + encodeURIComponent(document.getElementById('sem_semplan').value)
+		+ '&ver=' + encodeURIComponent(document.getElementById('ver_semplan').value)
+		+ '&grp=' + encodeURIComponent(document.getElementById('grp_semplan').value)
+		+ '&begin=' + encodeURIComponent(rangeMatch[1])
+		+ '&ende=' + encodeURIComponent(rangeMatch[2]);
+
+	window.open(url, '_blank');
+}
 function checkSetStudiengang(){
 	if (document.getElementById('stg_kz').value == '') {
 		alert("<?php echo $p->t('lvplan/bitteEinenStudiengangAuswaehlen');?>");
@@ -519,6 +549,7 @@ if(!defined('CIS_LVPLAN_ARCHIVAUSWAHL_ANZEIGEN') || CIS_LVPLAN_ARCHIVAUSWAHL_ANZ
 		echo '</td>
 		<td colspan="3" valign="bottom">
 			<input type="button" name="Abschicken" value="'.$p->t('lvplan/semesterplanLaden').'" onClick="jumpKalender()">
+			&nbsp;<a class="Item" href="#" onClick="jumpKalenderNew(); return false;">HTML-new</a>
 		</td>
 		</tr>
 		</table>
