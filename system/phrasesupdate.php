@@ -62641,6 +62641,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'coodle',
+		'phrase' => 'filter_rooms',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'TODO',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Filter rooms...',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	)
 	// coodle phrases END
 );
 
