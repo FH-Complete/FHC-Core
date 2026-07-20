@@ -63,70 +63,6 @@ export default {
 				return defaultMode;
 			return this.propsViewData?.mode;
 		},
-		downloadLinks() {
-			// do not show download links in otherLvPlan Mode
-			return false;
-
-			if (
-				!this.studiensemester_start ||
-				!this.studiensemester_ende ||
-				!this.propsViewData.otherUid
-			)
-				return false;
-
-			const type = this.isOtherPersonStudent
-				? "student"
-				: this.isOtherPersonMitarbeiter
-					? "lektor"
-					: null;
-
-			if (!type) return;
-
-			const opts = { zone: this.timezone };
-			const start = luxon.DateTime.fromISO(
-				this.studiensemester_start,
-				opts,
-			).toUnixInteger();
-			const ende = luxon.DateTime.fromISO(
-				this.studiensemester_ende,
-				opts,
-			).toUnixInteger();
-
-			const download_link =
-				FHC_JS_DATA_STORAGE_OBJECT.app_root +
-				"cis/private/lvplan/stpl_kalender.php" +
-				"?type=" +
-				type +
-				"&pers_uid=" +
-				this.propsViewData.otherUid +
-				"&begin=" +
-				start +
-				"&ende=" +
-				ende;
-
-			return [
-				{
-					title: "excel",
-					icon: "fa-solid fa-file-excel",
-					link: download_link + "&format=excel",
-				},
-				{
-					title: "csv",
-					icon: "fa-solid fa-file-csv",
-					link: download_link + "&format=csv",
-				},
-				{
-					title: "ical1",
-					icon: "fa-regular fa-calendar",
-					link: download_link + "&format=ical&version=1&target=ical",
-				},
-				{
-					title: "ical2",
-					icon: "fa-regular fa-calendar",
-					link: download_link + "&format=ical&version=2&target=ical",
-				},
-			];
-		},
 		get_image_base64_src: function () {
 			if (!this.otherPersonData.photo?.length) {
 				return "";
@@ -258,23 +194,6 @@ export default {
             @update:range="updateRange"
             class="responsive-calendar"
         >
-            <div
-                v-if="downloadLinks"
-                class="d-flex gap-1 justify-items-start"
-                >
-                <div v-for="{ title, icon, link } in downloadLinks">
-                    <a
-                        :href="link"
-                        :aria-label="title"
-                        class="py-1 btn btn-outline-secondary"
-                    >
-                        <div class="d-flex flex-column">
-                            <i aria-hidden="true" :class="icon"></i>
-                            <span style="font-size:.5rem">{{ title }}</span>
-                        </div>
-                    </a>
-                </div>
-            </div>
         </fhc-calendar>
     </div>
     `,
