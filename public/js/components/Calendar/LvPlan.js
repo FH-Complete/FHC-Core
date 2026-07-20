@@ -182,17 +182,17 @@ export default {
 			>
 				<component
 					v-if="mode == 'event'"
-					:is="renderers[event.type]?.modalContent"
+					:is="renderers?.[event.type]?.modalContent"
 					:event="event"
 				></component>
 				<component
 					v-else-if="mode == 'eventheader'"
-					:is="renderers[event.type]?.modalTitle"
+					:is="renderers?.[event.type]?.modalTitle"
 					:event="event"
 				></component>
 				<component
 					v-else
-					:is="renderers[event.type]?.calendarEvent"
+					:is="renderers?.[event.type]?.calendarEvent"
 					:event="event"
 					:timeSlotDisplayBehavior="
 						$props.mode.toLowerCase() === 'list' ? 'always' : 'default'
