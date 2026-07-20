@@ -187,7 +187,9 @@ export const AbgabetoolStudent = {
 					termin.file = []
 					termin.allowedToUpload = false
 
-					if(termin.paabgabetyp_kurzbz == 'end') {
+					if(termin.note) { // quality gate termin already has note
+						termin.allowedToUpload = false
+					} else if(termin.paabgabetyp_kurzbz == 'end') {
 						const inTime = termin.fixtermin ? !this.isPastDate(termin.datum) : true
 						termin.allowedToUpload = inTime && this.checkQualityGatesOptional(pa.abgabetermine)
 					} else if(termin.fixtermin) {
