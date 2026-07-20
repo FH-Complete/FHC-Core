@@ -185,6 +185,9 @@ define('LVPLAN_ANMERKUNG_ANZEIGEN',true);
 //Gruppieren zeitgleicher Lehreinheiten im LV-Plan
 define('LVPLAN_LEHREINHEITEN_GRUPPIEREN',true);
 
+// Key zum Verschluesseln des LV-Plan Kalender-Links
+define('LVPLAN_CYPHER_KEY', pack('H*', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'));
+
 // Ende-Datum des LVPlan Syncs Format: 2014-02-01
 // Wenn leer wird jeweils bis Semesterende gesynct
 define('LVPLAN_SYNC_ENDE','');

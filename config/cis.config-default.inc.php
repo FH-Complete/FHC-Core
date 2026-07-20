@@ -152,9 +152,6 @@ define('TAGE_PRO_WOCHE','7');
 // Kalenderkategorie beim Export des LVPlans
 define('LVPLAN_KATEGORIE', 'StundenplanTW');
 
-// Key zum Verschluesseln des LV-Plan Google Links
-define('LVPLAN_CYPHER_KEY',pack('H*', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'));
-
 // Gibt an ob Termine aus dem Vorsemester nach der Semesterhaelfte des Folgesemesters
 // noch im pers. LVPan aufscheinen.
 // true | false

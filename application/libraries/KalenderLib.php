@@ -37,7 +37,7 @@ class KalenderLib
 
 		$this->_ci->load->library('CollisionChecker', ['uid' => $this->_uid]);
 		$this->_ci->load->library('PhrasesLib', array('ui'));
-		$this->_ci->load->library('VariableLib', array('uid' => getAuthUID()));
+		$this->_ci->load->library('VariableLib', array('uid' => $this->_uid));
 
 
 	}
@@ -602,7 +602,7 @@ class KalenderLib
 
 		$data = $this->_ci->KalenderModel->load();
 
-		return $this->_mapEvents($data);
+		return $this->_mapEvents($data, false);
 	}
 
 	public function getPlanForLecturer($start_date, $end_date)
@@ -671,7 +671,7 @@ class KalenderLib
 		
 		$data = $this->_ci->KalenderModel->load();
 
-		return $this->_mapEvents($data);
+		return $this->_mapEvents($data, false);
 	}
 
 	public function getZeitsperren($start_date, $end_date, $emp)
