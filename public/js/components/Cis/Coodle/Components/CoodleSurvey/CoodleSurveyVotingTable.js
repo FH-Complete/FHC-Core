@@ -21,6 +21,7 @@ export default {
 			selectedRoomIdentifier: null,
 			isFetchingAvailableRooms: false,
 			availableRooms: [],
+			roomFilterText: "",
 		};
 	},
 	computed: {
@@ -47,6 +48,18 @@ export default {
 			return (
 				!this.$props.survey.completedAt &&
 				!this.$props.survey.canceledAt
+			);
+		},
+		filteredAvailableRooms() {
+			if (!this.roomFilterText?.length) {
+				return this.availableRooms;
+			}
+
+			const roomFilterText = this.roomFilterText.toLowerCase();
+			return this.availableRooms.filter(
+				(room) =>
+					room.shortName.toLowerCase().includes(roomFilterText) ||
+					room.longName.toLowerCase().includes(roomFilterText),
 			);
 		},
 	},
@@ -139,6 +152,7 @@ export default {
 			this.isFinalSelectionInProgress = false;
 			this.isRoomSelectionShown = false;
 			this.selectedRoomIdentifier = null;
+			this.roomFilterText = "";
 		},
 		setEditableAuthUserSelection() {
 			this.editableAuthUserSelection = this.authUserParticipant?.selection
@@ -252,7 +266,8 @@ export default {
 			}
 
 			const now = new Date();
-			const isFutureTimeslot = selectedTimeslot && selectedTimeslot.startsAt > now;
+			const isFutureTimeslot =
+				selectedTimeslot && selectedTimeslot.startsAt > now;
 			if (selectedTimeslot && isFutureTimeslot) {
 				const shouldReserveARoom = await this.$fhcAlert.confirm({
 					header: "Warning!",
@@ -355,6 +370,7 @@ export default {
 			this.selectedRoomIdentifier = null;
 			this.availableRooms = [];
 			this.isFetchingAvailableRooms = false;
+			this.roomFilterText = "";
 		},
 		getParticipantProfileHref(participant) {
 			if (!participant?.uid) {
@@ -542,10 +558,25 @@ export default {
 						</h5>
 					</div>
 					<div v-else class="d-flex flex-column gap-2">
-						<span class="fw-bold">{{ "Available rooms:" }}</span>
-						<div class="d-flex flex-row flex-wrap gap-2 flex-shrink-1">
+						<div class="d-flex flex-row justify-content-between">
+							<div class="d-flex flex-column gap-1 justify-content-start">
+								<span class="fw-bold">{{ "Available rooms:" }}</span>
+								<div>
+									<input v-model="roomFilterText" />
+								</div>
+							</div>
+							<div @click="cancelRoomSelection()" type="button" class="p-2">
+								<i class="fa-solid fa-xmark fa-lg"></i>
+							</div>
+						</div>
+						<div v-if="!filteredAvailableRooms.length" class="d-flex flex-row align-items-center justify-content-center py-3 px-1">
+							<h5 class="flex-shrink fw-bold text-wrap">
+								{{ "No available rooms match your filter!" }}
+							</h5>
+						</div>
+						<div v-else class="d-flex flex-row flex-wrap gap-2">
 							<div
-								v-for="room in availableRooms"
+								v-for="room in filteredAvailableRooms"
 								@click="selectedRoomIdentifier = room.shortName"
 								:key="room.shortName"
 								:title="room.longName"
