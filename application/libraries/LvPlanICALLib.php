@@ -18,26 +18,45 @@ class LvPlanICALLib
 	public function __construct()
 	{
 		$this->ci =& get_instance();
-		$this->ci->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 	}
 
 	/**
-	 * Builds the complete iCalendar subscription content for a user.
+	 * Builds complete iCalendar content for a user.
 	 *
-	 * @param string $uid Authenticated user UID.
+	 * If no type is given, the user's role is inferred for subscription feeds.
+	 * Downloads pass the type explicitly so dual-role users receive the selected
+	 * timetable.
+	 *
+	 * @param string $uid User UID.
 	 * @param int $begin First included date as Unix timestamp.
 	 * @param int $ende Last included date as Unix timestamp.
+	 * @param string|null $type Timetable type (student or lektor).
+	 * @param int $version iCalendar major version (1 or 2).
 	 * @return string
 	 */
-	public function getContent($uid, $begin, $ende)
+	public function getContent($uid, $begin, $ende, $type = null, $version = 2)
 	{
+		if (!in_array($version, array(1, 2), true))
+			throw new InvalidArgumentException('Unsupported iCalendar version');
+		if ($type !== null && !in_array($type, array('student', 'lektor'), true))
+			throw new InvalidArgumentException('Unsupported timetable type');
+
 		$this->ci->load->library('KalenderLib', array('uid' => $uid));
 
-		$isLecturerResult = $this->ci->MitarbeiterModel->isMitarbeiter($uid);
-		$isLecturer = isSuccess($isLecturerResult) && getData($isLecturerResult) === true;
+		if ($type === null)
+		{
+			$this->ci->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
+			$isLecturerResult = $this->ci->MitarbeiterModel->isMitarbeiter($uid);
+			$isLecturer = isSuccess($isLecturerResult) && getData($isLecturerResult) === true;
+		}
+		else
+		{
+			$isLecturer = $type === 'lektor';
+		}
 
 		$startDate = date('Y-m-d', $begin);
-		$endDate = date('Y-m-d', $ende);
+		// KalenderLib uses an exclusive end date; $ende is inclusive here.
+		$endDate = date('Y-m-d', strtotime('+1 day', $ende));
 
 		if ($isLecturer)
 		{
@@ -53,7 +72,7 @@ class LvPlanICALLib
 		if (!is_array($events))
 			$events = array();
 
-		$content = $this->buildCalendarHeader();
+		$content = $this->buildCalendarHeader($version);
 
 		foreach ($events as $event)
 			$content .= $this->buildEvent($event);
@@ -61,14 +80,14 @@ class LvPlanICALLib
 		return $content.$this->buildICalLine('END', 'VCALENDAR');
 	}
 
-	private function buildCalendarHeader()
+	private function buildCalendarHeader($version)
 	{
 		$productId = defined('CAMPUS_NAME') && CAMPUS_NAME !== ''
 			? CAMPUS_NAME
 			: 'FHComplete';
 
 		return $this->buildICalLine('BEGIN', 'VCALENDAR')
-			.$this->buildICalLine('VERSION', '2.0')
+			.$this->buildICalLine('VERSION', $version.'.0')
 			.$this->buildICalTextLine('PRODID', $productId)
 			.$this->buildICalLine('BEGIN', 'VTIMEZONE')
 			.$this->buildICalLine('TZID', 'Europe/Vienna')

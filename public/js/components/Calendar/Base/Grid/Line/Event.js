@@ -151,8 +151,6 @@ export default {
 		v-drop:move.lehreinheit.kalender.reservierung="onDropOnCard"
 		v-cal-click:event="isHeaderOrFooter ? event : event.orig"
 		@contextmenu.prevent="onRightClick"
-		:data-id="'event-' + event.orig.kalender_id"
-		:data-group-id="'event-group-' + event.orig.eindeutige_gruppen_id"
 		data-cy="calendar-event"
 	>
 		<div
@@ -185,7 +183,6 @@ export default {
 			/>
 			<ul
 				v-if="contextMenu.show"
-				data-cy="eventContextMenu"
 				class="dropdown-menu show"
 				:style="{ position: 'fixed', top: contextMenu.y + 'px', left: contextMenu.x + 'px', zIndex: 9999 }"
 				data-cy="eventContextMenu"

@@ -126,6 +126,7 @@ $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/person/(:num)'] = 'api/f
 $route['lvplan/caldav'] = 'LvPlanCalDAV';
 $route['lvplan/caldav/.*'] = 'LvPlanCalDAV';
 $route['lvplan/ical/subscription'] = 'LvPlanICALSubscription';
+$route['lvplan/ical/download'] = 'LvPlanICALDownload';
 
 // load routes from extensions, also look for environment-specific configs
 $subdirs = ['application/config/extensions', 'application/config/' . ENVIRONMENT . '/extensions'];
