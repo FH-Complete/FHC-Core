@@ -323,6 +323,9 @@ class Abgabe extends FHCAPI_Controller
 
 		$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
 
+		// block uploads for quality gate termine that are already graded
+		$this->checkPaabgabeForGradedStatus($paabgabe_id);
+
 		// load the $student_uid by $projektarbeit_id so we dont need any post params
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
@@ -335,11 +338,11 @@ class Abgabe extends FHCAPI_Controller
 		$data = getData($res)[0];
 		$student_uid = $data->uid;
 		$studiengang_kz = $data->studiengang_kz;
-		
+
 		if(!$this->checkZuordnung($projektarbeit_id, getAuthUID(), $student_uid, $studiengang_kz)) {
 			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent', [getAuthUID(), $student_uid]));
 		}
-			
+
 		$path = PAABGABE_PATH.$paabgabe_id.'_'.$student_uid.'.pdf';
 		
 		if ((isset($_FILES) and isset($_FILES['file']) and ! $_FILES['file']['error'])) {
@@ -2006,10 +2009,30 @@ class Abgabe extends FHCAPI_Controller
 
 		$data = getData($res)[0];
 		if($data->note !== NULL) {
-			// hardcode this error msg cause phrasen arent reliable and people keep bugging why the cant edit old entries they definitely shouldnt update
+			// hardcode this error msg cause phrasen arent always being updated
 			$message = $this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeitv3');
 			if(strpos($message, "<<") === 0) { // phrase could not be loaded
 				$this->terminateWithError('Die Projektarbeit wurde bereits benotet, Sie dürfen deshalb keine weiteren Termine anlegen oder bearbeiten.', 'general');
+			} else {
+				$this->terminateWithError($message);
+			}
+		}
+	}
+	
+	private function checkPaabgabeForGradedStatus($paabgabe_id) {
+		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
+		$res = $this->PaabgabeModel->load($paabgabe_id);
+
+		if(isError($res) || !hasData($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4projektabgabeNichtGefunden'), 'general');
+		}
+
+		$paabgabe = getData($res)[0];
+		if($paabgabe->note !== NULL) {
+			// hardcode a fallback cause phrasen arent reliable
+			$message = $this->p->t('abgabetool', 'c4studentAbgabeNotAllowedRegularv3');
+			if(strpos($message, "<<") === 0) { // phrase could not be loaded
+				$this->terminateWithError('Uploads sind für bereits benotete Quality Gates gesperrt. Sollten Sie trotzdem etwas hochladen wollen, wenden Sie sich bitte an Ihre Studiengangsassistenz.', 'general');
 			} else {
 				$this->terminateWithError($message);
 			}

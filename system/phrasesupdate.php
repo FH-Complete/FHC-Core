@@ -45762,7 +45762,7 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4studentAbgabeNotAllowedRegularv2',
+		'phrase' => 'c4studentAbgabeNotAllowedRegularv3',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -45771,7 +45771,7 @@ array(
 
 				Um einen Endupload durchführen zu können, müssen Sie ein positiv benotetes Quality Gate 1 & Quality Gate 2 in der relevanten Projektarbeit absolviert haben.
 				
-				Uploads sind für bereits benotete Projektarbeiten gesperrt. Sollten Sie trotzdem etwas hochladen wollen, wenden Sie sich bitte an Ihre Studiengangsassistenz.",
+				Uploads sind für bereits benotete Projektarbeiten beziehungsweise Quality Gates gesperrt. Sollten Sie trotzdem etwas hochladen wollen, wenden Sie sich bitte an Ihre Studiengangsassistenz.",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -45781,7 +45781,7 @@ array(
 
 				To be able to complete a final upload, you must have successfully completed Quality Gate 1 and Quality Gate 2 for the relevant project work.
 				
-				Uploads are blocked for already graded project work. If you still wish to upload something, please contact your program assistant.',
+				Uploads are blocked for already graded project work aswell as quality gates. If you still wish to upload something, please contact your program assistant.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
