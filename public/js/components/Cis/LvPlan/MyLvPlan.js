@@ -80,10 +80,18 @@ export default {
 				+ '&pers_uid=' + encodeURIComponent(this.uid)
 				+ '&begin=' + encodeURIComponent(start)
 				+ '&ende=' + encodeURIComponent(ende);
+			const new_csv_download_link = FHC_JS_DATA_STORAGE_OBJECT.app_root
+				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router
+				+ '/lvplan/csv/download'
+				+ '?type=' + encodeURIComponent(type)
+				+ '&pers_uid=' + encodeURIComponent(this.uid)
+				+ '&begin=' + encodeURIComponent(start)
+				+ '&ende=' + encodeURIComponent(ende);
 
 			return [
 				{ title: "excel", icon: 'fa-solid fa-file-excel', link: download_link + '&format=excel' },
 				{ title: "csv", icon: 'fa-solid fa-file-csv', link: download_link + '&format=csv' },
+				{ title: "csv-new", icon: 'fa-solid fa-file-csv', link: new_csv_download_link },
 				{ title: "ical1", icon: 'fa-regular fa-calendar', link: download_link + '&format=ical&version=1&target=ical' },
 				{ title: "ical2", icon: 'fa-regular fa-calendar', link: download_link + '&format=ical&version=2&target=ical' },
 				{ title: "ical1-new", icon: 'fa-regular fa-calendar', link: new_download_link + '&version=1' },

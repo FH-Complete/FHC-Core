@@ -127,6 +127,7 @@ $route['lvplan/caldav'] = 'LvPlanCalDAV';
 $route['lvplan/caldav/.*'] = 'LvPlanCalDAV';
 $route['lvplan/ical/subscription'] = 'LvPlanICALSubscription';
 $route['lvplan/ical/download'] = 'LvPlanICALDownload';
+$route['lvplan/csv/download'] = 'LvPlanCSVDownload';
 
 // load routes from extensions, also look for environment-specific configs
 $subdirs = ['application/config/extensions', 'application/config/' . ENVIRONMENT . '/extensions'];
