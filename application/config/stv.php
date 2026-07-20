@@ -150,4 +150,6 @@ $config['stv_prestudent_tags'] = [
 	'unterbrecher_auto' => ['readonly' => true],
 	'stbtr_erh_auto' => ['readonly' => true],
 	'jgv_auto' => ['readonly' => true],
+	'in_auto' => ['readonly' => true],
+	'preabbr_auto' => ['readonly' => true],
 ];
