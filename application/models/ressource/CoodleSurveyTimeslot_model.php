@@ -14,10 +14,21 @@ class CoodleSurveyTimeslot_model extends DB_Model
 
 	public function getTimeslots($surveyId)
 	{
-		$query = "
-			SELECT id, starts_at
+		$query = "SELECT id, starts_at
 			FROM $this->dbTable
 			WHERE survey_id = $surveyId
+		";
+		return $this->execQuery($query)->retval;
+	}
+
+	public function getTimeslotsForMultipleSurveys($surveyIds)
+	{
+		if (!count($surveyIds)) return [];
+
+		$surveyIds = "(" . implode(", ", $surveyIds) . ")";
+		$query = "SELECT *
+			FROM $this->dbTable
+			WHERE survey_id IN $surveyIds
 		";
 		return $this->execQuery($query)->retval;
 	}
@@ -53,8 +64,7 @@ class CoodleSurveyTimeslot_model extends DB_Model
 			$persistedTimeslots
 		);
 
-		$existingTimeslotsQuery = "
-			SELECT id, starts_at
+		$existingTimeslotsQuery = "SELECT id, starts_at
 			FROM $this->dbTable
 			WHERE survey_id = $surveyId
 		";

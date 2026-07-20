@@ -42,6 +42,10 @@ class FreeBusy extends FHCAPI_Controller
 
 		$this->load->library('FreeBusyLib');
 		$this->load->library('form_validation');
+
+		$this->load->model("ressource/CoodleSurvey_model", "CoodleSurveyModel");
+		$this->load->model("ressource/CoodleSurveyTimeslot_model", "CoodleSurveyTimeslotModel");
+		$this->load->model("ressource/CoodleSurveyParticipant_model", "CoodleSurveyParticipantModel");
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -162,25 +166,129 @@ class FreeBusy extends FHCAPI_Controller
 	public function getFreeBusySchedule()
 	{
 		$uid = $this->input->post("uid");
+		$coodleSurveyIdToExclude = $this->input->post("coodleSurveyIdToExclude");
 		$freeBusyEntries = $this->FreeBusyModel->loadWhere(["uid" => $uid, "aktiv" => true]);
 		$freeBusyEntries = $this->getDataOrTerminateWithError($freeBusyEntries);
 
-		$freeBusyEvents = $this->freebusylib->getDefaultInternalFreeBusy($uid);
+		$cumulativeFreeBusyEvents = $this->freebusylib->getDefaultInternalFreeBusy($uid);
 
 		foreach ($freeBusyEntries as $freeBusyEntry) {
-			$freeBusyEvents = array_merge(
-				$freeBusyEvents,
-				$this->freebusylib->getFreeBusy($freeBusyEntry->url, $freeBusyEntry->freebusytyp_kurzbz)
+			// todo: following workaround is to use new coodle freebusy endpoint, remove once actual redirect is set up
+			// keep query param with excluded survey id, only remove url replacement
+			$freeBusyUrl = $freeBusyEntry->url;
+			if ($freeBusyEntry->freebusytyp_kurzbz === "Coodle") {
+				$freeBusyUrl = APP_ROOT . "cis.php/CoodleFreeBusy/" . $uid;
+				if ($coodleSurveyIdToExclude) {
+					$freeBusyUrl .= "?excludeSurvey=" . $coodleSurveyIdToExclude;
+				}
+			}
+
+			$freeBusyEvents = $this->freebusylib->getFreeBusy($freeBusyUrl);
+			$cumulativeFreeBusyEvents = array_merge(
+				$cumulativeFreeBusyEvents,
+				$freeBusyEvents
 			);
 		}
-		// todo
 
-		$this->terminateWithSuccess($freeBusyEvents);
+		$this->terminateWithSuccess($cumulativeFreeBusyEvents);
 	}
 
-	public function getCoodleFreeBusy()
+	public function getCoodleFreeBusy($uid)
 	{
-		// todo: return actual ics file
+		$participantEntries = $this->CoodleSurveyParticipantModel->getParticipantEntriesByUid($uid);
+
+		$surveys = [];
+		if (count($participantEntries)) {
+			$surveyIds = array_map(
+				function ($participantEntry) {
+					return $participantEntry->survey_id;
+				},
+				$participantEntries
+			);
+			$surveys = $this->CoodleSurveyModel->getSurveys($surveyIds);
+		}
+
+		$surveyIdToBeExcluded = $this->input->get("excludeSurvey");
+		if ($surveyIdToBeExcluded) {
+			$surveyIdToBeExcluded = intval($surveyIdToBeExcluded);
+			$surveys = array_filter(
+				$surveys,
+				function ($survey) use ($surveyIdToBeExcluded) {
+					return $survey->id !== $surveyIdToBeExcluded;
+				}
+			);
+		}
+
+
+		$activeSurveys = array_filter(
+			$surveys,
+			function ($survey) {
+				return !$survey->completed_at && !$survey->canceled_at;
+			}
+		);
+
+		$timeslots = [];
+		if (count($activeSurveys)) {
+			$activeSurveyIds = array_map(
+				function ($activeSurvey) {
+					return $activeSurvey->id;
+				},
+				$activeSurveys
+			);
+			$timeslots = $this->CoodleSurveyTimeslotModel->getTimeslotsForMultipleSurveys($activeSurveyIds);
+		}
+
+		$formattedTimeslots = [];
+		if (count($timeslots)) {
+			$localTimezone = new DateTimeZone("Europe/Vienna");
+			$utcTimezone = new DateTimeZone("UTC");
+
+			foreach ($activeSurveys as $activeSurvey) {
+				$correspondingTimeslots = array_filter(
+					$timeslots,
+					function ($timeslot) use ($activeSurvey) {
+						return $timeslot->survey_id === $activeSurvey->id;
+					}
+				);
+				$formattedCorrespondingTimeslots = array_map(
+					function ($timeslot) use ($activeSurvey, $utcTimezone, $localTimezone) {
+						$startTime = new DateTime($timeslot->starts_at, $localTimezone);
+						$endTime = new DateTime($timeslot->starts_at, $localTimezone);
+						$endTime->modify("+$activeSurvey->timeslot_duration minutes");
+
+						$startTime->setTimezone($utcTimezone);
+						$endTime->setTimezone($utcTimezone);
+
+						$formattedStartTime = $startTime->format("Ymd\THis\Z");
+						$formattedEndTime = $endTime->format("Ymd\THis\Z");
+						return [
+							"start" => $formattedStartTime,
+							"end" => $formattedEndTime,
+						];
+					},
+					$correspondingTimeslots
+				);
+				$formattedTimeslots = array_merge($formattedTimeslots, $formattedCorrespondingTimeslots);
+			}
+		}
+
+		$coodleFreeBusyIcsFilePath = tempnam(sys_get_temp_dir(), "coodle_freebusy_");
+
+		$coodleFreeBusyIcsFile = fopen($coodleFreeBusyIcsFilePath, "w");
+		fwrite($coodleFreeBusyIcsFile, "BEGIN:VCALENDAR" . PHP_EOL);
+		fwrite($coodleFreeBusyIcsFile, "VERSION:2.0" . PHP_EOL);
+		fwrite($coodleFreeBusyIcsFile, "PRDODID:" . CAMPUS_NAME . PHP_EOL);
+		fwrite($coodleFreeBusyIcsFile, "ATTENDEE:mailto:" . $uid . "@" . DOMAIN . PHP_EOL);
+		fwrite($coodleFreeBusyIcsFile, "BEGIN:VFREEBUSY" . PHP_EOL);
+
+		foreach ($formattedTimeslots as $timeslot) {
+			fwrite($coodleFreeBusyIcsFile, "FREEBUSY;FBTYPE=BUSY:" . $timeslot["start"] . "/" . $timeslot["end"] . PHP_EOL);
+		}
+
+		fwrite($coodleFreeBusyIcsFile, "END:VFREEBUSY" . PHP_EOL);
+		fwrite($coodleFreeBusyIcsFile, "END:VCALENDAR");
+
+		$this->terminateWithFileOutput("text/calendar", file_get_contents($coodleFreeBusyIcsFilePath), "coodle_freebusy_$uid.ics");
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -207,35 +315,4 @@ class FreeBusy extends FHCAPI_Controller
 		}, $freeBusyTypes);
 	}
 
-	// todo: remove
-	private function _getFreeBusySchedule($uid)
-	{
-		$fp = fopen(APP_ROOT . 'cis/public/freebusy.php/' . $uid, 'r');
-		if (!$fp) {
-			//Load Failed
-		} else {
-			$doc = '';
-			while (!feof($fp)) {
-				$line = fgets($fp);
-				$doc .= $line;
-			}
-			fclose($fp);
-
-			//FreeBusy Parsen
-			$ical = new ical();
-			$ical->parseFreeBusy($doc);
-
-			$events = [];
-			foreach ($ical->dtresult as $row) {
-				$item['id'] = $uid . $row['dtstart'] . $row['dtend'];
-				$item['title'] = $uid;
-				$item['start'] = fixDate($row['dtstart']);
-				$item['end'] = fixDate($row['dtend']);
-				$item['allDay'] = false;
-				$item['editable'] = false;
-				$events[] = $item;
-			}
-			return $events;
-		}
-	}
 }

@@ -51,12 +51,13 @@ export default {
 			url: "/api/frontend/v1/coodle/FreeBusy/getFreeBusyTypes",
 		};
 	},
-	getFreeBusySchedule(uid) {
+	getFreeBusySchedule(uid, coodleSurveyIdToExclude) {
 		return {
 			method: "post",
 			url: "/api/frontend/v1/coodle/FreeBusy/getFreeBusySchedule",
 			params: {
 				uid,
+				coodleSurveyIdToExclude
 			},
 		};
 	},

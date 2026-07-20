@@ -24,6 +24,18 @@ class CoodleSurvey_model extends DB_Model
 		return $this->execQuery($query)->retval[0];
 	}
 
+	public function getSurveys($surveyIds)
+	{
+		if (!count($surveyIds)) return [];
+
+		$surveyIds = "(" . implode(", ", $surveyIds) . ")";
+		$query = "SELECT *
+			FROM $this->dbTable
+			WHERE id IN $surveyIds
+		";
+		return $this->execQuery($query)->retval;
+	}
+
 	public function getActiveSurveys($uid)
 	{
 		$userParticipantEntries = $this->CoodleSurveyParticipantModel->getParticipantEntriesByUid($uid);

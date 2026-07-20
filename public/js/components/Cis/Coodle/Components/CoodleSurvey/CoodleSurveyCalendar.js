@@ -335,7 +335,7 @@ export default {
 		async fetchFreeBusySchedule(uid) {
 			this.participantSchedules[uid] = null;
 			const freeBusyScheduleResponse = await this.$api.call(
-				FreeBusyApi.getFreeBusySchedule(uid),
+				FreeBusyApi.getFreeBusySchedule(uid, this.$props.survey?.id),
 			);
 			this.participantSchedules[uid] = freeBusyScheduleResponse.data.map(
 				(event) => {

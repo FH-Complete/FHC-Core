@@ -82,11 +82,14 @@ class FreeBusyLib
 		if ($userAbsences && count($userAbsences)) {
 			$today = new DateTime();
 			$today = $today->format("Y-m-d");
-			$userAbsences = array_map(
+			$userAbsences = array_filter(
+				$userAbsences,
 				function ($absence) use ($today) {
-					if ($absence->bisdatum < $today)
-						return;
-
+					return $absence->bisdatum >= $today;
+				}
+			);
+			$userAbsences = array_map(
+				function ($absence) {
 					return [
 						"start" => $absence->vondatum . " 00:00:00",
 						"end" => $absence->bisdatum . " 23:59:00",
@@ -230,10 +233,10 @@ class FreeBusyLib
 	private function convertTimestampToLocalTimezone($timestamp, $originalTimezoneIdentifier = "UTC")
 	{
 		$originalTimezone = new DateTimeZone($originalTimezoneIdentifier);
-		$localTimezone = new DateTimeZone('Europe/Vienna');
+		$localTimezone = new DateTimeZone("Europe/Vienna");
 
 		$date = new DateTime($timestamp, $originalTimezone);
 		$date->setTimezone($localTimezone);
-		return $date->format('Ymd\THis');
+		return $date->format("Ymd\THis");
 	}
 }
