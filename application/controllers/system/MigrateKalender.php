@@ -460,6 +460,21 @@ class MigrateKalender extends CLI_Controller
 				}
 			}
 
+			$rooms = is_array($block->orte_kurzbz) ? $block->orte_kurzbz : explode(',', $block->orte_kurzbz ?? '');
+			foreach ($rooms as $room_kurzbz)
+			{
+				$room_kurzbz = trim($room_kurzbz);
+				if (!empty($room_kurzbz))
+				{
+					$this->KalenderOrtModel->insert(
+						array (
+							'kalender_id' => $kalender_id,
+							'ort_kurzbz' => $room_kurzbz
+						)
+					);
+				}
+			}
+
 			foreach ($block->svg_kombis as $kombi_str)
 			{
 				$kombi_str = trim($kombi_str, '()');

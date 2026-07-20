@@ -143,6 +143,8 @@ export default {
 		:class="classes"
 		style="z-index: 11"
 		:draggable="draggable"
+		:data-id="'event-' + event.orig.kalender_id"
+		:data-group-id="'event-group-' + event.orig.eindeutige_gruppen_id"
 		ref="eventEl"
 		@dragstart="onDragStart"
 		v-draggable:move.noimage="draggable ? dragKalenderCollection : {}"
@@ -183,6 +185,7 @@ export default {
 			/>
 			<ul
 				v-if="contextMenu.show"
+				data-cy="eventContextMenu"
 				class="dropdown-menu show"
 				:style="{ position: 'fixed', top: contextMenu.y + 'px', left: contextMenu.x + 'px', zIndex: 9999 }"
 				data-cy="eventContextMenu"

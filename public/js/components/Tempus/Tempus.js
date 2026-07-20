@@ -32,7 +32,6 @@ import ApiOperationalResourceToCalender from "../../api/factory/operationalResou
 import AppMenu from "../AppMenu.js";
 import drop from "../../directives/drop.js";
 import AppConfig from "../AppConfig.js";
-
 import BsModal from "../Bootstrap/Modal.js";
 
 import StvVerband from "../Stv/Studentenverwaltung/Verband.js";
@@ -114,7 +113,6 @@ export default {
       endpoint: ApiStudiengangTree,
       raumVorschlaege: [],
       selected: [],
-
       lv_id: null,
       events: null,
       minimized: false,

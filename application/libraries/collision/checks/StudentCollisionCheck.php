@@ -3,12 +3,20 @@
 class StudentCollisionCheck implements ICollisionCheck
 {
 	private $_ci;
+	private $_uid;
 
-	public function __construct()
+	public function __construct($params)
 	{
 		$this->_ci =& get_instance();
+		
+		if (isset($params['uid']) && !isEmptyString($params['uid'])){
+			$this->_uid = $params['uid'];
+		} else {
+			show_error('uid of logged user not passed!');
+		}
+
 		$this->_ci->load->model('ressource/Kalender_model', 'KalenderModel');
-		$this->_ci->load->library('VariableLib', array('uid' => getAuthUID()));
+		$this->_ci->load->library('VariableLib', array('uid' => $this->_uid));
 		$this->_ci->load->library('PhrasesLib', array('ui'));
 	}
 

@@ -9,16 +9,23 @@ class CollisionChecker
 	private $_checks = [];
 
 	private $_ci;
+	private $_uid;
 
-	public function __construct()
+	public function __construct($params)
 	{
 		$this->_ci =& get_instance();
 
-		$this->_ci->load->library('collision/checks/RoomCollisionCheck');
-		$this->_ci->load->library('collision/checks/LectureCollisionCheck');
-		$this->_ci->load->library('collision/checks/VerbandCollisionCheck');
-		$this->_ci->load->library('collision/checks/StudentCollisionCheck');
-		$this->_ci->load->library('collision/checks/ResourcesCollisionCheck');
+		if (isset($params['uid']) && !isEmptyString($params['uid'])){
+			$this->_uid = $params['uid'];
+		} else {
+			show_error('uid of logged user not passed!');
+		}
+
+		$this->_ci->load->library('collision/checks/RoomCollisionCheck', ['uid' => $this->_uid]);
+		$this->_ci->load->library('collision/checks/LectureCollisionCheck', ['uid' => $this->_uid]);
+		$this->_ci->load->library('collision/checks/VerbandCollisionCheck', ['uid' => $this->_uid]);
+		$this->_ci->load->library('collision/checks/StudentCollisionCheck', ['uid' => $this->_uid]);
+		$this->_ci->load->library('collision/checks/ResourcesCollisionCheck', ['uid' => $this->_uid]);
 		$this->register($this->_ci->roomcollisioncheck);
 		$this->register($this->_ci->lecturecollisioncheck);
 		$this->register($this->_ci->verbandcollisioncheck);

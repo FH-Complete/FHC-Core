@@ -8,6 +8,8 @@ require_once(dirname(__FILE__).'/../include/datum.class.php');
  */
 class MySabre_CalDAV_Backend extends \Sabre\CalDAV\Backend\AbstractBackend
 {
+	protected $auth;
+
     /**
      * Creates the backend
      *
@@ -54,12 +56,13 @@ class MySabre_CalDAV_Backend extends \Sabre\CalDAV\Backend\AbstractBackend
                 'uri' => 'LVPlan-'.$user,
                 'principaluri' => 'principals/'.$user,
                 '{' . \Sabre\CalDAV\Plugin::NS_CALENDARSERVER . '}getctag' => 'LVPlan-'.$user.'-'.time(),
-                '{' . \Sabre\CalDAV\Plugin::NS_CALDAV . '}supported-calendar-component-set' => new \Sabre\CalDAV\Property\SupportedCalendarComponentSet(array('VEVENT','VTODO')),
+                '{' . \Sabre\CalDAV\Plugin::NS_CALDAV . '}supported-calendar-component-set' => new \Sabre\CalDAV\Xml\Property\SupportedCalendarComponentSet(array('VEVENT','VTODO')),
 				'{DAV:}displayname'                          => 'LVPlan',
 		        '{urn:ietf:params:xml:ns:caldav}calendar-description' => 'description comes here',
 		        '{urn:ietf:params:xml:ns:caldav}calendar-timezone'    => 'Europe/Vienna',
 		        '{http://apple.com/ns/ical/}calendar-order'  => '1',
-		        '{http://apple.com/ns/ical/}calendar-color'  => '#FF0000'
+		        '{http://apple.com/ns/ical/}calendar-color'  => '#FF0000',
+		        '{http://sabredav.org/ns}read-only' => 1
         );
 		$calendars[] = $calendar;
 
@@ -117,9 +120,9 @@ class MySabre_CalDAV_Backend extends \Sabre\CalDAV\Backend\AbstractBackend
      * @param array $mutations
      * @return bool|array
      */
-    public function updateCalendar($calendarId, array $mutations)
+    public function updateCalendar($calendarId, \Sabre\DAV\PropPatch $propPatch)
 	{
-        return false;
+        $propPatch->setRemainingResultCode(403);
     }
 
     /**
@@ -213,7 +216,7 @@ class MySabre_CalDAV_Backend extends \Sabre\CalDAV\Backend\AbstractBackend
 				foreach($val as $row)
 				{
 					//einzelnen Eintrag holen
-					if($row['dtstart']==$dtstart && ($row['unr'][0]==$unr) || $unr=='R'.$row['reservierung_id'])
+					if($row['dtstart']==$dtstart && (($row['unr'][0]==$unr) || $unr=='R'.$row['reservierung_id']))
 					{
 						return $row;
 					}
@@ -251,6 +254,48 @@ TZOFFSETTO:+0100
 END:STANDARD
 END:VTIMEZONE\n".$event."\nEND:VCALENDAR";
 	}
+
+	protected function getObjectUri($row)
+	{
+		// Reservierungen werden mit einem R markiert und mit der ReservierungID da sonst
+		// Termine verloren gehen koennen wenn zur selben Zeit eine Reservierung und ein LVPlan Eintrag vorhanden ist
+		if($row['reservierung'])
+			$uri = $row['dtstart'].'-R'.$row['reservierung_id'];
+		else
+			$uri = $row['dtstart'].'-'.$row['unr'][0];
+
+		return $uri.'@'.md5($row['UID']);
+	}
+
+	protected function buildCalendarObject($row, $calendarId)
+	{
+		$calendarData = $this->makeCal($row['data']);
+
+		return array("id"=>$row['UID'],
+		"calendardata"=>$calendarData,
+		"uri"=>$this->getObjectUri($row),
+		"lastmodified"=>$this->getLastModifiedTimestamp($row['updateamum']),
+		"etag"=>'"'.$row['UID'].'"',
+		"calendarid"=>$calendarId,
+		"size"=>strlen($calendarData),
+		"component"=>'vevent');
+	}
+
+	protected function getLastModifiedTimestamp($lastModified)
+	{
+		if($lastModified === null || $lastModified === '')
+			return null;
+
+		if(is_numeric($lastModified))
+			return (int)$lastModified;
+
+		$timestamp = strtotime($lastModified);
+		if($timestamp === false)
+			return null;
+
+		return $timestamp;
+	}
+
     /**
      * Returns all calendar objects within a calendar.
      *
@@ -283,20 +328,7 @@ END:VTIMEZONE\n".$event."\nEND:VCALENDAR";
 		$return  = array();
 		foreach($data as $row)
 		{
-			// Reservierungen werden mit einem R markiert und mit der ReservierungID da sonst
-			// Termine verloren gehen koennen wenn zur selben Zeit eine Reservierung und ein LVPlan Eintrag vorhanden ist
-			if($row['reservierung'])
-				$uri = $row['dtstart'].'-R'.$row['reservierung_id'];
-			else
-				$uri = $row['dtstart'].'-'.$row['unr'][0];
-
-			$return[] = array("id"=>$row['UID'],
-			"calendardata"=>$this->makeCal($row['data']),
-			"uri"=>$uri.'@'.md5($row['UID']),
-			"lastmodified"=>$row['updateamum'],
-			"etag"=>'"'.$row['UID'].'"',
-			"calendarid"=>$calendarId);
-
+			$return[] = $this->buildCalendarObject($row, $calendarId);
 		}
 		return $return;
     }
@@ -319,23 +351,13 @@ END:VTIMEZONE\n".$event."\nEND:VCALENDAR";
 		//$user = $this->getUser();
 		$user = $calendarId;
 		$data = $this->getCalendarData($user,$objectUri);
-		if(count($data)==0)
+		if(empty($data))
 		{
-			$ret=array("id"=>'',
-			"calendardata"=>'',
-			"uri"=>'',
-			"lastmodified"=>'',
-			"etag"=>'',
-			"calendarid"=>$calendarId);
+			return null;
 		}
 		else
 		{
-			$ret = array("id"=>$data['UID'],
-			"calendardata"=>$this->makeCal($data['data']),
-			"uri"=>'principals/'.$user.'/LVPlan/'.$data['dtstart'].'-'.$data['unr'][0].'@'.md5($data['UID']),
-			"lastmodified"=>$data['updateamum'],
-			"etag"=>'"'.$data['UID'].'"',
-			"calendarid"=>$calendarId);
+			$ret = $this->buildCalendarObject($data, $calendarId);
 		}
 		return $ret;
     }

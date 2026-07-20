@@ -13,7 +13,7 @@ class TempusJob extends JOB_Controller
 		$this->_ci =& get_instance();
 
 		$this->_ci->load->helper('hlp_sancho_helper');
-		$this->_ci->load->library('KalenderLib');
+		$this->_ci->load->library('KalenderLib', ["uid" => null]);
 	}
 
 

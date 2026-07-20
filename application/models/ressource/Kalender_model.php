@@ -10,6 +10,8 @@ class Kalender_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'lehre.tbl_kalender';
 		$this->pk = 'kalender_id';
+
+		$this->load->helper('hlp_common');
 	}
 
 	public function generateUniqueGroupId()

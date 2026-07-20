@@ -25,12 +25,25 @@ require_once(dirname(__FILE__).'/../include/functions.inc.php');
 
 class myauth extends \Sabre\DAV\Auth\Backend\AbstractBasic
 {
+	protected $currentUser = null;
+
 	function validateUserPass($username, $password)
 	{
 		if(checkldapuser($username,$password))
+		{
+			$this->currentUser = $username;
 			return true;	
+		}
 		else
+		{
+			$this->currentUser = null;
 			return false;
+		}
+	}
+
+	public function getCurrentUser()
+	{
+		return $this->currentUser;
 	}
 }
 ?>

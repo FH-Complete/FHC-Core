@@ -22,7 +22,7 @@ class Reservierung extends FHCAPI_Controller
 
 		$this->_ci->load->library('LogLib');
 		$this->_ci->load->library('form_validation');
-		$this->_ci->load->library('KalenderLib');
+		$this->_ci->load->library('KalenderLib', ["uid" => getAuthUID()]);
 
 		$this->_ci->load->model('ressource/Ort_model', 'OrtModel');
 		$this->_ci->load->model('ressource/Kalender_Event_Rolle_model', 'KalenderEventRolleModel');

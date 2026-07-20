@@ -8,6 +8,7 @@
 		'primevue3' => true,
 		'tabulator5' => true,
 		'vuedatepicker11' => true,
+		'momentjs2' => true,
 		'phrases' => array(
 			'global',
 			'ui',
