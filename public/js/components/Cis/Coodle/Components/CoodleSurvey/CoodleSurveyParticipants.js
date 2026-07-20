@@ -7,13 +7,18 @@ export default {
 	components: {},
 	props: {
 		participantsModelValue: Array,
+		externalParticipantsModelValue: Array,
 		participantScheduleColorsModelValue: Array,
 		authInfo: { type: Object | null },
 	},
 	emits: [
 		"update:participantsModelValue",
+		"update:externalParticipantsModelValue",
 		"update:participantScheduleColorsModelValue",
 	],
+	inject: {
+		isMobile: "isMobile",
+	},
 	data() {
 		return {
 			searchInput: "",
@@ -42,6 +47,8 @@ export default {
 			hideSearchResults: debounce(async () => {
 				this.areSearchResultsShown = false;
 			}, 100),
+			externalParticipantNameInput: "",
+			externalParticipantEmailInput: "",
 		};
 	},
 	computed: {
@@ -51,6 +58,14 @@ export default {
 			},
 			set(newValue) {
 				this.$emit("update:participantsModelValue", newValue);
+			},
+		},
+		externalParticipants: {
+			get() {
+				return this.$props.externalParticipantsModelValue;
+			},
+			set(newValue) {
+				this.$emit("update:externalParticipantsModelValue", newValue);
 			},
 		},
 		participantScheduleColors: {
@@ -194,103 +209,187 @@ export default {
 				(participantColor) => participantColor.uid === participant.uid,
 			)?.color;
 		},
+		addExternalParticipant() {
+			const nameInput = this.externalParticipantNameInput.trim();
+			const emailInput = this.externalParticipantEmailInput.trim();
+
+			if (!nameInput.length || !emailInput.length) {
+				this.$fhcAlert.alertError("Missing inputs!");
+				return;
+			}
+
+			const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+			if (!emailRegex.test(emailInput)) {
+				this.$fhcAlert.alertError("Invalid email format!");
+				return;
+			}
+
+			if (this.externalParticipants.some((externalParticipant) => externalParticipant.email === emailInput)) {
+				this.$fhcAlert.alertError("Duplicates not allowed!");
+				return;
+			}
+
+			this.externalParticipants.push({
+				name: nameInput,
+				email: emailInput
+			});
+			this.externalParticipantNameInput = "";
+			this.externalParticipantEmailInput = "";
+		},
+		removeExternalParticipant(email) {
+			this.externalParticipants = this.externalParticipants.filter(
+				(externalParticipant) => externalParticipant.email !== email,
+			);
+		},
 	},
 	template: /*html*/ `
-	<div class="d-flex flex-column gap-2 mb-3">
-		<label for="searchInput" class="fw-bold">{{ "Participants" }}</label>
-		<div class="position-relative" style="max-width:300px;">
-			<input
-				v-model="searchInput"
-				@blur="hideSearchResults()"
-				id="searchInput"
-				class="w-100"
-			/>
-			<div
-				v-if="areSearchResultsShown"
-				id="coodleParticipantsSearchResults"
-				class="position-absolute w-100 d-flex flex-column overflow-y-auto"
-				style="height:200px;"
-			>
+	<div class="row mb-3">
+		<div class="col-12 col-md-6 col-xxl-12 d-flex flex-column gap-1">
+			<label for="searchInput" class="fw-bold">{{ "Participants" }}</label>
+			<div class="position-relative mb-1">
+				<input
+					v-model="searchInput"
+					@focus="areSearchResultsShown = searchInput.length >= 2"
+					@blur="hideSearchResults()"
+					:placeholder="'Search participants...'"
+					id="searchInput"
+					class="w-100"
+				/>
 				<div
-					v-if="isSearchingForParticipants"
-					class="flex-grow-1 d-flex flex-row justify-content-center align-items-center"
+					v-if="areSearchResultsShown"
+					id="coodleParticipantsSearchResults"
+					class="position-absolute w-100 d-flex flex-column overflow-y-auto"
+					style="height:200px;"
 				>
-					<i class="fa-solid fa-spinner fa-spin fa-xl"></i>
-				</div>
-				<div
-					v-else-if="!searchResults.length"
-					class="d-flex flex-row justify-content-center align-items-center py-3"
-				>
-					<span>{{ "No results found!" }}</span>
-				</div>
-				<div v-else>
 					<div
-						v-for="searchResult in searchResults"
-						@click="selectSearchResult(searchResult)"
-						type="button"
-						class="coodleParticipantSearchResult d-flex flex-row gap-2 justify-content-start align-items-center py-1 px-2 border-bottom border-1"
+						v-if="isSearchingForParticipants"
+						class="flex-grow-1 d-flex flex-row justify-content-center align-items-center"
 					>
-						<i v-if="searchResult.type === 'user'" class="fa-solid fa-user"></i>
-						<i v-else-if="searchResult.type === 'group'" class="fa-solid fa-user-group"></i>
-						<span>{{ searchResult.name + (searchResult.uid ? (" (" + searchResult.uid + ")") : "") }}</span>
+						<i class="fa-solid fa-spinner fa-spin fa-xl"></i>
+					</div>
+					<div
+						v-else-if="!searchResults.length"
+						class="d-flex flex-row justify-content-center align-items-center py-3"
+					>
+						<span>{{ "No results found!" }}</span>
+					</div>
+					<div v-else>
+						<div
+							v-for="searchResult in searchResults"
+							@click="selectSearchResult(searchResult)"
+							type="button"
+							class="coodleParticipantSearchResult d-flex flex-row gap-2 justify-content-start align-items-center py-1 px-2 border-bottom border-1"
+						>
+							<i v-if="searchResult.type === 'user'" class="fa-solid fa-user"></i>
+							<i v-else-if="searchResult.type === 'group'" class="fa-solid fa-user-group"></i>
+							<span>{{ searchResult.name + (searchResult.uid ? (" (" + searchResult.uid + ")") : "") }}</span>
+						</div>
 					</div>
 				</div>
 			</div>
+			<div v-if="participants.length" class="d-flex flex-row gap-2 flex-wrap">
+				<div
+					v-for="participant in participants"
+					class="d-flex flex-row align-items-center gap-4 py-1 px-3 border border-1 rounded-pill"
+				>
+					<span>{{ participant.name }}</span>
+					<div class="d-flex flex-row align-items-center gap-3">
+						<i
+							v-if="participant.isCalendarShown"
+							@click="hideSchedule(participant)"
+							type="button"
+							class="fa-solid fa-calendar"
+							:style="{color: getParticipantScheduleColor(participant)}"
+						></i>
+						<i
+							v-else-if="isMaxDisplayedParticipantSchedulesReached"
+							class="fa-regular fa-calendar-xmark"
+						></i>
+						<i
+							v-else
+							@click="showSchedule(participant)"
+							type="button"
+							class="fa-regular fa-calendar"
+						></i>
+						<i @click="removeParticipant(participant)" type="button" class="fa-solid fa-xmark"></i>
+					</div>
+				</div>
+			</div>
+			<div v-if="!hasAuthUserBeenAddedAsParticipant && $props.authInfo" class="d-flex flex-row">
+				<div
+					@click="addParticipants([$props.authInfo])"
+					type="button"
+					class="py-1 px-3 border border-1 rounded-pill"
+				>
+					<span>{{ "Add yourself" }}</span>
+				</div>
+			</div>
+			<span v-if="isMaxDisplayedParticipantSchedulesReached" class="fst-italic">
+				{{ "You can display no more participant schedules!" }}
+			</span>
+			<div>
+				<span
+					v-if="displayedParticipantSchedulesCount"
+					@click="hideAllSchedules()"
+					type="button"
+					class="text-decoration-underline"
+				>
+					{{ "Hide all participant schedules" }}
+				</span>
+			</div>
 		</div>
-		<div v-if="participants.length" class="d-flex flex-row gap-2 flex-wrap">
-			<div
-				v-for="participant in participants"
-				class="d-flex flex-row align-items-center gap-4 py-1 px-3 border border-1 rounded-pill"
-			>
-				<span>{{ participant.name }}</span>
-				<div class="d-flex flex-row align-items-center gap-3">
+		<div class="col-12 col-md-6 col-xxl-12 d-flex flex-column gap-1">
+			<span class="fw-bold">{{ "External participants" }}</span>
+			<div class="d-flex flex-row gap-2 mb-1">
+				<div class="flex-grow-1 d-flex flex-column gap-2">
+					<div >
+						<input
+							v-model="externalParticipantNameInput"
+							:placeholder="'Name'"
+							id="externalParticipantNameInput"
+							maxlength="255"
+							style="width:100%"
+						/>
+					</div>
+					<div >
+						<input
+							v-model="externalParticipantEmailInput"
+							:placeholder="'Email'"
+							type="email"
+							id="externalParticipantEmailInput"
+							maxlength="255"
+							style="width:100%"
+						/>
+					</div>
+				</div>
+				<div class="d-flex flex-row align-items-center justify-content-center">
+					<div @click="addExternalParticipant()" type="button" class="p-1 fhcPrimaryHover">
+						<i class="fa-solid fa-circle-plus fa-xl"></i>
+					</div>
+				</div>
+			</div>
+			<div v-if="externalParticipants.length" class="d-flex flex-row gap-2 flex-wrap">
+				<div
+					v-for="externalParticipant in externalParticipants"
+					:key="externalParticipant.email"
+					class="d-flex flex-row align-items-center gap-4 py-1 px-3 border border-1 rounded-pill"
+				>
+					<div class="d-flex flex-row gap-2 flex-wrap">
+						<span>{{ externalParticipant.name }}</span>
+						<span>|</span>
+						<span>{{ externalParticipant.email }}</span>
+					</div>
 					<i
-						v-if="participant.isCalendarShown"
-						@click="hideSchedule(participant)"
+						@click="removeExternalParticipant(externalParticipant.email)"
 						type="button"
-						class="fa-solid fa-calendar"
-						:style="{color: getParticipantScheduleColor(participant)}"
+						class="fa-solid fa-xmark"
 					></i>
-					<i
-						v-else-if="isMaxDisplayedParticipantSchedulesReached"
-						class="fa-regular fa-calendar-xmark"
-					></i>
-					<i
-						v-else
-						@click="showSchedule(participant)"
-						type="button"
-						class="fa-regular fa-calendar"
-					></i>
-					<i @click="removeParticipant(participant)" type="button" class="fa-solid fa-xmark"></i>
 				</div>
 			</div>
 		</div>
-		<div class="d-flex flex-row">
-			<div
-				v-if="!hasAuthUserBeenAddedAsParticipant && $props.authInfo"
-				@click="addParticipants([$props.authInfo])"
-				type="button"
-				class="py-1 px-3 border border-1 rounded-pill"
-			>
-				<span>{{ "Add yourself" }}</span>
-			</div>
-		</div>
-		<span v-if="!participants.length" class="fst-italic">
+		<span v-if="!participants.length && !externalParticipants.length" class="fst-italic">
 			{{ "No participants added yet!" }}
-		</span>
-		<span v-if="isMaxDisplayedParticipantSchedulesReached" class="fst-italic">
-			{{ "You can display no more participant schedules!" }}
-		</span>
-		<div>
-			<span
-				v-if="displayedParticipantSchedulesCount"
-				@click="hideAllSchedules()"
-				type="button"
-				class="text-decoration-underline"
-			>
-				{{ "Hide all participant schedules" }}
-			</span>
-		</div>
+		</span>	
 	</div>
 	`,
 };

@@ -169,6 +169,20 @@ export default {
 					createdAt: null,
 					timeslots: [],
 					participants: [],
+					externalParticipants: [
+						{
+							name: "Adis Posko",
+							email: "adis.posko@gmail.com"
+						},
+						{
+							name: "Test User",
+							email: "test_user@gmail.com"
+						},
+						{
+							name: "Someoneee Elseee",
+							email: "veryyy.longgggg.emailllll@gmail.com"
+						},
+					],
 				};
 			}
 
@@ -389,6 +403,7 @@ export default {
 							<coodle-survey-participants
 								v-if="surveyFormData?.participants"
 								v-model:participantsModelValue="surveyFormData.participants"
+								v-model:externalParticipantsModelValue="surveyFormData.externalParticipants"
 								v-model:participantScheduleColorsModelValue="participantScheduleColors"
 								:authInfo="authInfo"
 							/>

@@ -145,7 +145,7 @@ export default {
 							@click="startEdit()"
 							:title="'Edit'"
 							type="button"
-							class="p-1 coodleCalendarTimeslotCardIcon"
+							class="p-1 fhcPrimaryHover"
 						>
 							<i class="fa-solid fa-pen-to-square fa-lg"></i>
 						</div>
@@ -153,7 +153,7 @@ export default {
 							@click="$emit('deleteTimeslot')"
 							:title="'Delete'"
 							type="button"
-							class="p-1 coodleCalendarTimeslotCardIcon"
+							class="p-1 fhcPrimaryHover"
 						>
 							<i class="fa-solid fa-trash-can fa-lg"></i>
 						</div>
@@ -163,7 +163,7 @@ export default {
 							@click="cancelEdit()"
 							:title="'Cancel'"
 							type="button"
-							class="p-1 coodleCalendarTimeslotCardIcon"
+							class="p-1 fhcPrimaryHover"
 						>
 							<i class="fa-regular fa-circle-left fa-lg"></i>
 						</div>
@@ -171,7 +171,7 @@ export default {
 							@click="submitForm()"
 							:title="'Save'"
 							type="button"
-							class="p-1 coodleCalendarTimeslotCardIcon"
+							class="p-1 fhcPrimaryHover"
 						>
 							<i class="fa-solid fa-floppy-disk fa-lg"></i>
 						</div>
@@ -183,7 +183,7 @@ export default {
 					@click="startEdit()"
 					:title="'Add'"
 					type="button"
-					class="coodleCalendarTimeslotCardIcon fa-solid fa-circle-plus fa-2xl"
+					class="fhcPrimaryHover fa-solid fa-circle-plus fa-2xl"
 				></i>
 			</div>
 		</div>

@@ -62660,6 +62660,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 				'insertvon' => 'system'
 			)
 		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'coodle',
+		'phrase' => 'search_participants_input_placeholders',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'TODO',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Search participants...',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 	)
 	// coodle phrases END
 );

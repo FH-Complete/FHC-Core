@@ -871,7 +871,7 @@ html {
 	background-color: var(--fhc-background);
 }
 
-.coodleCalendarTimeslotCardIcon:hover {
+.coodlePrimaryHover:hover {
 	color: var(--fhc-primary);
 }
 
@@ -899,4 +899,12 @@ html {
 
 #freeBusyTable .action:hover {
 	opacity:80%;
+}
+
+.fhcPrimaryHover:hover {
+	color: var(--fhc-primary);
+}
+
+.fhcPrimaryBorderHover:hover {
+	border-color: var(--fhc-primary) !important;
 }
