@@ -561,8 +561,13 @@ export default {
 						<div class="d-flex flex-column gap-1 justify-content-start">
 							<span class="fw-bold">{{ "Available rooms:" }}</span>
 							<div class="d-flex flex-row align-items-center gap-2">
-								<input v-model="roomFilterText" :placeholder="'Filter rooms...'" />
-								<div @click="roomFilterText = ''" type="button" class="p-1">
+								<input v-model="roomFilterText" :placeholder="'Filter rooms...'" id="roomFilterInput" />
+								<div
+									v-if="roomFilterText?.length"
+									@click="roomFilterText = ''"
+									type="button"
+									class="px-1"
+								>
 									<i class="fa-solid fa-xmark fa-lg"></i>
 								</div>
 							</div>
@@ -579,7 +584,7 @@ export default {
 								:key="room.shortName"
 								:title="room.longName"
 								type="button"
-								:class="{'fhc-primary-border-color fw-bold': selectedRoomIdentifier === room.shortName}"
+								:class="{'fhc-primary-border-color': selectedRoomIdentifier === room.shortName}"
 								class="border border-2 rounded-pill py-1 px-2 d-flex flex-row align-items-center gap-1"
 							>
 								<span>{{ room.shortName }}</span>
