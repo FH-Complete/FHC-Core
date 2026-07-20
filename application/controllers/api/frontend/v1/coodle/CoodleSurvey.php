@@ -473,7 +473,9 @@ class CoodleSurvey extends FHCAPI_Controller
 					$survey->title,
 					$timeslotStart,
 					$timeslotEnd,
-					$selectedRoomId
+					$selectedRoomId,
+					$authUserFullName,
+					getAuthUID() . "@" . DOMAIN
 				);
 
 				foreach ($participants as $participant) {
@@ -683,12 +685,13 @@ class CoodleSurvey extends FHCAPI_Controller
 		return $groups;
 	}
 
-	private function writeToIcsFile($calendarFilePath, $title, $startUTC, $endUTC, $location)
+	private function writeToIcsFile($calendarFilePath, $title, $startUTC, $endUTC, $location, $organizerName, $organizerEmail)
 	{
 		$calendarFile = fopen($calendarFilePath, "w");
 		fwrite($calendarFile, "BEGIN:VCALENDAR" . PHP_EOL);
 		fwrite($calendarFile, "VERSION:2.0" . PHP_EOL);
 		fwrite($calendarFile, "CALSCALE:GREGORIAN" . PHP_EOL);
+		fwrite($calendarFile, "ORGANIZER;CN=" . $organizerName . ":mailto:" . $organizerEmail . PHP_EOL);
 		fwrite($calendarFile, "PRDODID:" . CAMPUS_NAME . PHP_EOL);
 		fwrite($calendarFile, "X-WR-TIMEZONE:Europe/Vienna" . PHP_EOL);
 		fwrite($calendarFile, "BEGIN:VEVENT" . PHP_EOL);
