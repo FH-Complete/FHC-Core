@@ -558,15 +558,13 @@ export default {
 						</h5>
 					</div>
 					<div v-else class="d-flex flex-column gap-2">
-						<div class="d-flex flex-row justify-content-between">
-							<div class="d-flex flex-column gap-1 justify-content-start">
-								<span class="fw-bold">{{ "Available rooms:" }}</span>
-								<div>
-									<input v-model="roomFilterText" />
+						<div class="d-flex flex-column gap-1 justify-content-start">
+							<span class="fw-bold">{{ "Available rooms:" }}</span>
+							<div class="d-flex flex-row align-items-center gap-2">
+								<input v-model="roomFilterText" :placeholder="'Filter rooms...'" />
+								<div @click="roomFilterText = ''" type="button" class="p-1">
+									<i class="fa-solid fa-xmark fa-lg"></i>
 								</div>
-							</div>
-							<div @click="cancelRoomSelection()" type="button" class="p-2">
-								<i class="fa-solid fa-xmark fa-lg"></i>
 							</div>
 						</div>
 						<div v-if="!filteredAvailableRooms.length" class="d-flex flex-row align-items-center justify-content-center py-3 px-1">
