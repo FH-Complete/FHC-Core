@@ -132,13 +132,7 @@ export default {
 			<div class="d-flex flex-column gap-3">
 				<div class="d-flex flex-column gap-2">
 					<span>
-						{{ "Here you can combine different external schedules to create your personal FreeBusy URL, which is used by Coodle." }}
-					</span>
-					<span>
-						{{ "FreeBusy supports effective scheduling by displaying your appointments (without any details such as titles or content) to avoid timing conflicts." }}
-					</span>
-					<span>
-						{{ "To effectively use FreeBusy, you must carefully enter and update your calendar data. Your base schedule and planned absences will be displayed by default, but you can add additional schedules (Google, SOGo, etc). To do so, you must locate and copy a sharing url from your calendar application marked as either 'ICS' or 'iCal', and ending with the suffix '.ics'. The calendar being shared must also be set to public." }}
+						{{ "FreeBusy supports effective scheduling by combining internal and external calendars, and displaying events (without identifying details such as title, description, or location) in Coodle to avoid timing conflicts. Your base timetable and planned absences will be displayed by default, but you can add additional schedules (e.g. Google Calendar). To do so, you must locate and copy a sharing url from your calendar application marked as either 'ICS' or 'iCal', usually ending with the suffix '.ics'. The calendar being shared must also be set to public. However, schedules of type 'SoGo' and 'Coodle' will autofill with default urls which will be processed internally." }}
 					</span>
 				</div>
 				<div class="overflow-x-auto">

@@ -435,13 +435,11 @@ class CoodleSurvey extends FHCAPI_Controller
 
 		if ($selectedTimeslot && $selectedRoomId) {
 			$this->load->library('StundenplanLib');
-			$tz = new DateTimeZone('Europe/Berlin');
-			$reservationStart = DateTimeImmutable::createFromFormat(
-				'Y-m-d H:i:s',
-				$selectedTimeslot->starts_at,
-				$tz
-			);
-			$reservationEnd = $reservationStart->modify("+$survey->timeslot_duration minutes");
+
+			$localTimezone = new DateTimeZone('Europe/Vienna');
+			$reservationStart = new DateTime($selectedTimeslot->starts_at, $localTimezone);
+			$reservationEnd = new DateTime($selectedTimeslot->starts_at, $localTimezone);
+			$reservationEnd = $reservationEnd->modify("+$survey->timeslot_duration minutes");
 			$this->stundenplanlib->addReservation(
 				$reservationStart->format("c"),
 				$reservationEnd->format("c"),
@@ -459,14 +457,15 @@ class CoodleSurvey extends FHCAPI_Controller
 			$authUserFullName = getData($this->PersonModel->getFullName(getAuthUID()));
 
 			if ($selectedTimeslot) {
-				$tz = new DateTimeZone('Europe/Berlin');
-				$timeslotStart = DateTimeImmutable::createFromFormat(
-					'Y-m-d H:i:s',
-					$selectedTimeslot->starts_at,
-					$tz
-				);
-				$timeslotEnd = $timeslotStart->modify("+$survey->timeslot_duration minutes");
+				$localTimezone = new DateTimeZone('Europe/Vienna');
+				$timeslotStart = new DateTime($selectedTimeslot->starts_at, $localTimezone);
+				$timeslotEnd = new DateTime($selectedTimeslot->starts_at, $localTimezone);
+				$timeslotEnd = $timeslotEnd->modify("+$survey->timeslot_duration minutes");
 				$formattedTimeslot = $timeslotStart->format("d.m.Y H:i") . "-" . $timeslotEnd->format("H:i");
+
+				$utcTimezone = new DateTimeZone("UTC");
+				$timeslotStart->setTimezone($utcTimezone);
+				$timeslotEnd->setTimezone($utcTimezone);
 
 				$calendarFilePath = tempnam(sys_get_temp_dir(), "coodle_");
 				$this->writeToIcsFile(
@@ -684,7 +683,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		return $groups;
 	}
 
-	private function writeToIcsFile($calendarFilePath, $title, $start, $end, $location)
+	private function writeToIcsFile($calendarFilePath, $title, $startUTC, $endUTC, $location)
 	{
 		$calendarFile = fopen($calendarFilePath, "w");
 		fwrite($calendarFile, "BEGIN:VCALENDAR" . PHP_EOL);
@@ -693,8 +692,8 @@ class CoodleSurvey extends FHCAPI_Controller
 		fwrite($calendarFile, "PRDODID:" . CAMPUS_NAME . PHP_EOL);
 		fwrite($calendarFile, "X-WR-TIMEZONE:Europe/Vienna" . PHP_EOL);
 		fwrite($calendarFile, "BEGIN:VEVENT" . PHP_EOL);
-		fwrite($calendarFile, "DTSTART:" . $start->format("Ymd") . "T" . $start->format("His") . PHP_EOL);
-		fwrite($calendarFile, "DTEND:" . $end->format("Ymd") . "T" . $end->format("His") . PHP_EOL);
+		fwrite($calendarFile, "DTSTART:" . $startUTC->format("Ymd\THis\Z") . PHP_EOL);
+		fwrite($calendarFile, "DTEND:" . $endUTC->format("Ymd\THis\Z") . PHP_EOL);
 		fwrite($calendarFile, "SUMMARY:" . $title . PHP_EOL);
 		if ($location) {
 			fwrite($calendarFile, "LOCATION:" . $location . PHP_EOL);
