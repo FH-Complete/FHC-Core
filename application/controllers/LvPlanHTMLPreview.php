@@ -19,7 +19,9 @@ class LvPlanHTMLPreview extends Auth_Controller
 		]);
 
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
+		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$this->load->model('ressource/Ort_model', 'OrtModel');
 	}
 
 	/**
@@ -31,9 +33,12 @@ class LvPlanHTMLPreview extends Auth_Controller
 	{
 		$type = $this->getType();
 		list($begin, $ende) = $this->getDateRange();
-		$filters = $type === 'verband'
-			? $this->getVerbandFilters()
-			: $this->getPersonalFilters();
+		if ($type === 'verband')
+			$filters = $this->getVerbandFilters();
+		elseif ($type === 'ort')
+			$filters = $this->getRoomFilters();
+		else
+			$filters = $this->getPersonalFilters($type);
 
 		$this->load->library('LvPlanHTMLLib');
 		$content = $this->lvplanhtmllib->getContent(
@@ -56,7 +61,7 @@ class LvPlanHTMLPreview extends Auth_Controller
 	{
 		$type = $this->input->get('type', true);
 
-		if (!in_array($type, array('student', 'lektor', 'verband'), true))
+		if (!in_array($type, array('student', 'lektor', 'verband', 'ort'), true))
 			show_error('Ungueltiger Parameter: type', 400);
 
 		return $type;
@@ -65,8 +70,10 @@ class LvPlanHTMLPreview extends Auth_Controller
 	/**
 	 * @return array Personal preview filters.
 	 */
-	private function getPersonalFilters()
+	private function getPersonalFilters($type)
 	{
+		// Legacy wochenplan calendar links include empty Lehrverband parameters
+		// for personal plans. They are irrelevant when type is student or lektor.
 		if ($this->hasVerbandParameters())
 			show_error('Ungueltige Parameterkombination', 400);
 
@@ -80,15 +87,81 @@ class LvPlanHTMLPreview extends Auth_Controller
 			show_error('Forbidden', 403);
 		}
 
-		$this->BenutzerModel->addSelect('uid');
+		$this->BenutzerModel->addSelect(
+			'tbl_benutzer.uid, tbl_person.titelpre, tbl_person.vorname, '
+			.'tbl_person.nachname, tbl_person.titelpost'
+		);
+		$this->BenutzerModel->addJoin('public.tbl_person', 'person_id', 'LEFT');
 		$user = $this->BenutzerModel->load(array($uid));
 
 		if (isError($user))
 			show_error(getError($user), 500);
 		if (!hasData($user))
 			show_error('Ungueltiger Parameter: pers_uid', 400);
+		$users = getData($user);
+		$userData = reset($users);
+		$nameParts = array();
+		foreach (array('titelpre', 'vorname', 'nachname', 'titelpost') as $property)
+		{
+			if (isset($userData->{$property}) && trim($userData->{$property}) !== '')
+				$nameParts[] = trim($userData->{$property});
+		}
 
-		return array('uid' => $uid);
+		$filters = array(
+			'uid' => $uid,
+			'full_name' => implode(' ', $nameParts)
+		);
+
+		if ($type === 'student')
+		{
+			$this->StudentModel->addSelect(
+				'studiengang_kz, semester, verband, gruppe'
+			);
+			$student = $this->StudentModel->load(array($uid));
+
+			if (isError($student))
+				show_error(getError($student), 500);
+			if (!hasData($student))
+				show_error('Ungueltiger Parameter: pers_uid', 400);
+
+			$students = getData($student);
+			$studentData = reset($students);
+			$filters['stg_kz'] = $studentData->studiengang_kz;
+			$filters['sem'] = $studentData->semester;
+			$filters['ver'] = $studentData->verband;
+			$filters['grp'] = $studentData->gruppe;
+		}
+
+		return $filters;
+	}
+
+	/**
+	 * Legacy room links also carry pers_uid, but the UID does not filter or
+	 * authorize a room plan. Only ort_kurzbz identifies the requested plan.
+	 *
+	 * @return array Room preview filters.
+	 */
+	private function getRoomFilters()
+	{
+		$ortKurzbz = $this->input->get('ort_kurzbz', true);
+		if (!is_string($ortKurzbz) || $ortKurzbz === '' || !check_utf8($ortKurzbz))
+			show_error('Ungueltiger Parameter: ort_kurzbz', 400);
+
+		$this->OrtModel->addSelect('ort_kurzbz, bezeichnung');
+		$room = $this->OrtModel->load($ortKurzbz);
+
+		if (isError($room))
+			show_error(getError($room), 500);
+		if (!hasData($room))
+			show_error('Ungueltiger Parameter: ort_kurzbz', 400);
+
+		$rooms = getData($room);
+		$roomData = reset($rooms);
+
+		return array(
+			'ort_kurzbz' => $ortKurzbz,
+			'bezeichnung' => isset($roomData->bezeichnung) ? $roomData->bezeichnung : ''
+		);
 	}
 
 	/**
@@ -96,24 +169,30 @@ class LvPlanHTMLPreview extends Auth_Controller
 	 */
 	private function getVerbandFilters()
 	{
-		if ($this->input->get('pers_uid', true) !== null)
-			show_error('Ungueltige Parameterkombination', 400);
-
+		// Legacy wochenplan links always carry pers_uid. It does not filter or
+		// authorize a Lehrverband plan and is intentionally ignored here.
 		$stgKz = $this->getInteger('stg_kz', true);
 		$semester = $this->getInteger('sem', false);
 		$verband = $this->getOptionalFilter('ver');
 		$gruppe = $this->getOptionalFilter('grp');
 
-		$this->StudiengangModel->addSelect('studiengang_kz');
+		$this->StudiengangModel->addSelect(
+			'studiengang_kz, UPPER(typ || kurzbz) AS stg_kurzbz'
+		);
 		$studiengang = $this->StudiengangModel->load($stgKz);
 
 		if (isError($studiengang))
 			show_error(getError($studiengang), 500);
 		if (!hasData($studiengang))
 			show_error('Ungueltiger Parameter: stg_kz', 400);
+		$studiengaenge = getData($studiengang);
+		$studiengangData = reset($studiengaenge);
 
 		return array(
 			'stg_kz' => $stgKz,
+			'stg_kurzbz' => isset($studiengangData->stg_kurzbz)
+				? $studiengangData->stg_kurzbz
+				: '',
 			'sem' => $semester,
 			'ver' => $verband,
 			'grp' => $gruppe
@@ -121,13 +200,14 @@ class LvPlanHTMLPreview extends Auth_Controller
 	}
 
 	/**
-	 * @return bool Whether any Lehrverband-only parameters were supplied.
+	 * @return bool Whether any non-empty Lehrverband-only parameters were supplied.
 	 */
 	private function hasVerbandParameters()
 	{
 		foreach (array('stg_kz', 'sem', 'ver', 'grp') as $name)
 		{
-			if ($this->input->get($name, true) !== null)
+			$value = $this->input->get($name, true);
+			if ($value !== null && $value !== '')
 				return true;
 		}
 

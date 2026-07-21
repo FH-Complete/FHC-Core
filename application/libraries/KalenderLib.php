@@ -299,6 +299,20 @@ class KalenderLib
 		return $this->_mapEvents($data);
 	}
 
+	/**
+	 * Returns the published timetable for one room without collision checks.
+	 */
+	public function getPlanForRoom($start_date, $end_date, $ort)
+	{
+		$this->_getBasePlan($start_date, $end_date);
+
+		$this->_ci->KalenderModel->db->where('tbl_kalender_ort.ort_kurzbz', $ort);
+		$this->_ci->KalenderModel->db->where('tbl_kalender.status_kurzbz', 'live');
+		$data = $this->_ci->KalenderModel->load();
+
+		return $this->_mapEvents($data, false);
+	}
+
 
 
 	public function getForRaumvorschlag($start_date, $end_date, $lektor_uids = [], $gruppen_kurzbz = [], $lehrverband_gruppen = [])

@@ -19,6 +19,8 @@ class LvPlanICALDownload extends Auth_Controller
 		]);
 
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
+		$this->load->model('ressource/Ort_model', 'OrtModel');
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 	}
 
 	/**
@@ -29,12 +31,21 @@ class LvPlanICALDownload extends Auth_Controller
 	public function index()
 	{
 		$type = $this->getType();
-		$uid = $this->getUid();
+		$uid = getAuthUID();
+		$ortKurzbz = null;
+		$verbandFilters = null;
+		if ($type === 'ort')
+			$ortKurzbz = $this->getRoom();
+		elseif ($type === 'verband')
+			$verbandFilters = $this->getVerbandFilters();
+		else
+		{
+			$uid = $this->getUid();
+			$this->authorizeUid($uid);
+			$this->validateUid($uid);
+		}
 		$version = $this->getVersion();
 		list($begin, $ende) = $this->getDateRange();
-
-		$this->authorizeUid($uid);
-		$this->validateUid($uid);
 
 		$this->load->library('LvPlanICALLib');
 		$content = $this->lvplanicallib->getContent(
@@ -42,7 +53,9 @@ class LvPlanICALDownload extends Auth_Controller
 			$begin,
 			$ende,
 			$type,
-			$version
+			$version,
+			$ortKurzbz,
+			$verbandFilters
 		);
 
 		$filename = 'FH-Kalender_'.date('m_Y', $begin).'_ical'.$version.'.ics';
@@ -62,7 +75,7 @@ class LvPlanICALDownload extends Auth_Controller
 	{
 		$type = $this->input->get('type', true);
 
-		if (!in_array($type, array('student', 'lektor'), true))
+		if (!in_array($type, array('student', 'lektor', 'ort', 'verband'), true))
 			show_error('Ungueltiger Parameter: type', 400);
 
 		return $type;
@@ -79,6 +92,80 @@ class LvPlanICALDownload extends Auth_Controller
 			show_error('Ungueltiger Parameter: pers_uid', 400);
 
 		return $uid;
+	}
+
+	/**
+	 * @return string Requested room identifier.
+	 */
+	private function getRoom()
+	{
+		$ortKurzbz = $this->input->get('ort_kurzbz', true);
+		if (!is_string($ortKurzbz) || $ortKurzbz === '' || !check_utf8($ortKurzbz))
+			show_error('Ungueltiger Parameter: ort_kurzbz', 400);
+
+		$this->OrtModel->addSelect('ort_kurzbz');
+		$room = $this->OrtModel->load($ortKurzbz);
+		if (isError($room))
+			show_error(getError($room), 500);
+		if (!hasData($room))
+			show_error('Ungueltiger Parameter: ort_kurzbz', 400);
+
+		return $ortKurzbz;
+	}
+
+	/**
+	 * @return array Requested Lehrverband filters.
+	 */
+	private function getVerbandFilters()
+	{
+		$stgKz = $this->getInteger('stg_kz', true);
+		$semester = $this->getInteger('sem', false);
+		$verband = $this->getOptionalFilter('ver');
+		$gruppe = $this->getOptionalFilter('grp');
+
+		$this->StudiengangModel->addSelect('studiengang_kz');
+		$studiengang = $this->StudiengangModel->load($stgKz);
+		if (isError($studiengang))
+			show_error(getError($studiengang), 500);
+		if (!hasData($studiengang))
+			show_error('Ungueltiger Parameter: stg_kz', 400);
+
+		return array(
+			'stg_kz' => $stgKz,
+			'sem' => $semester,
+			'ver' => $verband,
+			'grp' => $gruppe
+		);
+	}
+
+	private function getInteger($name, $signed)
+	{
+		$value = $this->input->get($name, true);
+		$pattern = $signed ? '/^-?\d+$/' : '/^\d+$/';
+		if (!is_string($value) || !preg_match($pattern, $value))
+			show_error('Ungueltiger Parameter: '.$name, 400);
+
+		$integer = filter_var($value, FILTER_VALIDATE_INT);
+		if ($integer === false || (!$signed && $integer < 0))
+			show_error('Ungueltiger Parameter: '.$name, 400);
+
+		return $integer;
+	}
+
+	private function getOptionalFilter($name)
+	{
+		$value = $this->input->get($name, true);
+		if ($value === null || $value === '' || $value === '0')
+			return null;
+		if (!is_string($value)
+			|| !check_utf8($value)
+			|| mb_strlen($value) > 20
+			|| !preg_match('/^[[:alnum:]_-]+$/u', $value))
+		{
+			show_error('Ungueltiger Parameter: '.$name, 400);
+		}
+
+		return $value;
 	}
 
 	/**

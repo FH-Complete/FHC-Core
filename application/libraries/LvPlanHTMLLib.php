@@ -6,6 +6,8 @@ if (!defined('BASEPATH'))
 class LvPlanHTMLLib
 {
 	const TIMEZONE = 'Europe/Vienna';
+	const DETAIL_WINDOW_NAME = 'Details';
+	const DETAIL_WINDOW_OPTIONS = 'height=320,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes';
 
 	private $ci;
 
@@ -25,12 +27,16 @@ class LvPlanHTMLLib
 	 */
 	public function getContent($begin, $ende, $type, array $filters)
 	{
-		if (!in_array($type, array('student', 'lektor', 'verband'), true))
+		if (!in_array($type, array('student', 'lektor', 'verband', 'ort'), true))
 			throw new InvalidArgumentException('Unsupported timetable type');
 
-		$events = $type === 'verband'
-			? $this->getVerbandEvents($begin, $ende, $filters)
-			: $this->getPersonalEvents($begin, $ende, $type, $filters);
+		if ($type === 'verband')
+			$events = $this->getVerbandEvents($begin, $ende, $filters);
+		elseif ($type === 'ort')
+			$events = $this->getRoomEvents($begin, $ende, $filters);
+		else
+			$events = $this->getPersonalEvents($begin, $ende, $type, $filters);
+
 		$hourRaster = $this->loadHourRaster();
 		$normalizedEvents = $this->normalizeEvents($events);
 
@@ -69,6 +75,28 @@ class LvPlanHTMLLib
 			$events = $this->ci->kalenderlib
 				->getPlanForStudentByStudent($startDate, $endDate, $uid);
 		}
+
+		return is_array($events) ? $events : array();
+	}
+
+	/**
+	 * @return array Room plan events.
+	 */
+	private function getRoomEvents($begin, $ende, array $filters)
+	{
+		if (!isset($filters['ort_kurzbz'])
+			|| !is_string($filters['ort_kurzbz'])
+			|| $filters['ort_kurzbz'] === '')
+		{
+			throw new InvalidArgumentException('Missing room timetable filter');
+		}
+
+		$this->ci->load->library('KalenderLib', array('uid' => getAuthUID()));
+		$events = $this->ci->kalenderlib->getPlanForRoom(
+			$this->formatLocalDate($begin),
+			$this->formatLocalDate($ende),
+			$filters['ort_kurzbz']
+		);
 
 		return is_array($events) ? $events : array();
 	}
@@ -168,6 +196,9 @@ class LvPlanHTMLLib
 					isset($event->ort_kurzbz) ? $event->ort_kurzbz : '',
 					' / '
 				),
+				'detail_ort_kurzbz' => $this->getFirstScalarValue(
+					isset($event->ort_kurzbz) ? $event->ort_kurzbz : ''
+				),
 				'lecturers' => $this->getLecturers($event),
 				'groups' => $this->getGroups($event),
 				'note' => $this->getEventNote($event, $isReservation),
@@ -210,7 +241,7 @@ class LvPlanHTMLLib
 		$html .= '<body id="inhalt"><h1>'.$this->escape($title).'</h1>';
 
 		foreach ($weeks as $week)
-			$html .= $this->renderWeek($week, $hourRaster, $type);
+			$html .= $this->renderWeek($week, $hourRaster, $type, $filters);
 
 		if (empty($weeks))
 			$html .= '<p>Keine Termine im gewählten Zeitraum.</p>';
@@ -300,7 +331,7 @@ class LvPlanHTMLLib
 	/**
 	 * Renders one printable week.
 	 */
-	private function renderWeek(array $week, array $raster, $type)
+	private function renderWeek(array $week, array $raster, $type, array $filters)
 	{
 		$weekdayNames = array(
 			1 => 'Montag',
@@ -331,7 +362,7 @@ class LvPlanHTMLLib
 			$html .= '<tr><td>'.$weekdayNames[$weekday].'<br>';
 			$html .= $day['date']->format('d.m.Y').'<br></td>';
 
-			foreach ($day['cells'] as $events)
+			foreach ($day['cells'] as $slotIndex => $events)
 			{
 				if (empty($events))
 				{
@@ -340,8 +371,18 @@ class LvPlanHTMLLib
 				}
 
 				$html .= '<td nowrap valign="top" align="center">';
+
+				$hourNumber = isset($raster[$slotIndex]['number'])
+					? $raster[$slotIndex]['number']
+					: null;
 				foreach ($events as $event)
-					$html .= $this->renderEvent($event, $type, false);
+					$html .= $this->renderEvent(
+						$event,
+						$type,
+						false,
+						$filters,
+						$hourNumber
+					);
 				$html .= '</td>';
 			}
 
@@ -354,7 +395,15 @@ class LvPlanHTMLLib
 		{
 			$html .= '<div class="outside"><h3>Termine außerhalb des Stundenrasters</h3>';
 			foreach ($week['outside'] as $event)
-				$html .= $this->renderEvent($event, $type, true);
+			{
+				$html .= $this->renderEvent(
+					$event,
+					$type,
+					true,
+					$filters,
+					$this->getNearestHourNumber($event, $raster)
+				);
+			}
 			$html .= '</div>';
 		}
 
@@ -364,26 +413,40 @@ class LvPlanHTMLLib
 	/**
 	 * Renders an escaped event card.
 	 */
-	private function renderEvent(array $event, $type, $showDate)
-	{
+	private function renderEvent(
+		array $event,
+		$type,
+		$showDate,
+		array $filters,
+		$hourNumber
+	) {
 		$style = $event['color'] !== ''
 			? ' style="background-color: #'.$event['color'].'; margin-bottom: 3px;"'
 			: '';
 		$html = '<div align="center"'.$style.'>';
-		$html .= '<a class="stpl_detail" title="'.$this->escape($event['note']).'">';
+		$detailUrl = $this->buildDetailUrl($event, $type, $filters, $hourNumber);
+		$html .= '<a class="stpl_detail" title="'.$this->escape($event['note']).'"';
+		if ($detailUrl !== null)
+		{
+			$onclick = 'window.open('
+				.$this->encodeJavaScriptString($detailUrl).','
+				.$this->encodeJavaScriptString(self::DETAIL_WINDOW_NAME).','
+				.$this->encodeJavaScriptString(self::DETAIL_WINDOW_OPTIONS)
+				.');return false;';
+			$html .= ' href="'.$this->escape($detailUrl).'"';
+			$html .= ' target="'.self::DETAIL_WINDOW_NAME.'"';
+			$html .= ' onclick="'.$this->escape($onclick).'"';
+		}
+		$html .= '>';
 
 		if ($showDate)
 			$html .= $event['start']->format('d.m.Y H:i').'–'.$event['end']->format('H:i').'<br>';
 
 		$html .= $this->escape($event['title']);
-		if ($event['note'] !== '')
-		{
-			$html .= '<img src="'.$this->escape($this->getAppRoot().'skin/images/sticky.png').'"';
-			$html .= ' title="'.$this->escape($event['note']).'" alt="">';
-		}
 
-		if (($type === 'lektor' || $type === 'verband') && $event['groups'] !== '')
-			$html .= '<br>'.$this->escape($event['groups']);
+		if (($type === 'lektor' || $type === 'verband' || $type === 'ort')
+			&& $event['groups'] !== '')
+			$html .= '<br>'.$this->renderLines($event['groups']);
 		if ($type !== 'lektor' && $event['lecturers'] !== '')
 			$html .= '<br>'.$this->renderLines($event['lecturers']);
 		if ($event['location'] !== '')
@@ -394,19 +457,107 @@ class LvPlanHTMLLib
 		return $html.'</a></div>';
 	}
 
+	/**
+	 * Builds the URL consumed by the legacy timetable detail popup.
+	 */
+	private function buildDetailUrl(array $event, $type, array $filters, $hourNumber)
+	{
+		if ($hourNumber === null || !preg_match('/^\d+$/', (string)$hourNumber))
+			return null;
+
+		$uid = isset($filters['uid']) && $filters['uid'] !== ''
+			? $filters['uid']
+			: getAuthUID();
+		$room = $type === 'ort' && isset($filters['ort_kurzbz'])
+			? $filters['ort_kurzbz']
+			: $event['detail_ort_kurzbz'];
+		$parameters = array(
+			'type' => $type,
+			'datum' => $event['date'],
+			'stunde' => (string)$hourNumber,
+			'pers_uid' => $uid,
+			'stg_kz' => isset($filters['stg_kz']) ? $filters['stg_kz'] : '',
+			'sem' => isset($filters['sem']) ? $filters['sem'] : '',
+			'ver' => isset($filters['ver']) && $filters['ver'] !== null
+				? $filters['ver']
+				: '',
+			'grp' => isset($filters['grp']) && $filters['grp'] !== null
+				? $filters['grp']
+				: '',
+			'ort_kurzbz' => $room
+		);
+
+		return $this->getAppRoot().'cis/private/lvplan/stpl_detail.php?'
+			.http_build_query($parameters, '', '&', PHP_QUERY_RFC3986);
+	}
+
+	/**
+	 * Returns the hour whose configured start is closest to the event start.
+	 */
+	private function getNearestHourNumber(array $event, array $raster)
+	{
+		if (empty($raster))
+			return null;
+
+		$eventStart = $this->timeToSeconds($event['start']->format('H:i:s'));
+		if ($eventStart === null)
+			return null;
+
+		$nearestNumber = null;
+		$nearestDistance = null;
+		foreach ($raster as $hour)
+		{
+			$distance = abs($eventStart - $hour['begin']);
+			if ($nearestDistance === null || $distance < $nearestDistance)
+			{
+				$nearestDistance = $distance;
+				$nearestNumber = $hour['number'];
+			}
+		}
+
+		return $nearestNumber;
+	}
+
 	private function getDocumentTitle($type, array $filters)
 	{
-		if ($type === 'verband')
+		if ($type === 'ort')
 		{
-			$title = 'Lehrverband: '.$filters['stg_kz'].'-'.$filters['sem'];
-			if (isset($filters['ver']) && $filters['ver'] !== null)
-				$title .= $filters['ver'];
-			if (isset($filters['grp']) && $filters['grp'] !== null)
-				$title .= $filters['grp'];
+			$title = 'Ort: '.$filters['ort_kurzbz'];
+			if (isset($filters['bezeichnung']) && $filters['bezeichnung'] !== '')
+				$title .= ' - '.$filters['bezeichnung'];
 			return $title;
 		}
 
-		return ($type === 'lektor' ? 'Lektor: ' : 'Student: ').$filters['uid'];
+		if ($type === 'verband')
+		{
+			$studiengang = isset($filters['stg_kurzbz'])
+				&& $filters['stg_kurzbz'] !== ''
+				? $filters['stg_kurzbz']
+				: $filters['stg_kz'];
+			$title = 'Lehrverband: '.$studiengang.'-'.$filters['sem'];
+
+			if (isset($filters['ver']) && $filters['ver'] !== null)
+				$title .= $filters['ver'];
+			else 
+				$title .= 0;
+			
+			if (isset($filters['grp']) && $filters['grp'] !== null)
+				$title .= $filters['grp'];
+			else 
+				$title .= 0;
+			
+			return $title;
+		}
+
+		if ($type === 'lektor')
+		{
+			$name = isset($filters['full_name']) && $filters['full_name'] !== ''
+				? $filters['full_name']
+				: $filters['uid'];
+			return 'Lektor: '.$name;
+		}
+
+		return 'Student: '.$filters['uid'];
 	}
 
 	private function getEventDateTime($event, $isoProperty, $dateProperty, $timeProperty)
@@ -508,6 +659,22 @@ class LvPlanHTMLLib
 			: '';
 	}
 
+	private function getFirstScalarValue($value)
+	{
+		if (is_scalar($value))
+			return (string)$value;
+		if (!is_array($value))
+			return '';
+
+		foreach ($value as $item)
+		{
+			if (is_scalar($item) && (string)$item !== '')
+				return (string)$item;
+		}
+
+		return '';
+	}
+
 	private function joinValue($value, $separator = ', ')
 	{
 		if (!is_array($value))
@@ -548,6 +715,14 @@ class LvPlanHTMLLib
 	private function escape($value)
 	{
 		return htmlspecialchars((string)$value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+	}
+
+	private function encodeJavaScriptString($value)
+	{
+		return json_encode(
+			(string)$value,
+			JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+		);
 	}
 
 	private function renderLines($value)

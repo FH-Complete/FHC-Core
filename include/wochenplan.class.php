@@ -512,6 +512,69 @@ class wochenplan extends basis_db
 		$this->kal_link.='&pers_uid='.$this->pers_uid.'&ort_kurzbz='.$this->ort_kurzbz.'&stg_kz='.$this->stg_kz.'&sem='.$this->sem.'&ver='.$this->ver.'&grp='.$this->grp.'&gruppe_kurzbz='.$this->gruppe_kurzbz.'&lva='.$this->lva;
 		$kal_link_ws=$this->kal_link.'&begin='.$this->studiensemester_now->start.'&ende='.$this->studiensemester_now->ende;
 		$kal_link_ss=$this->kal_link.'&begin='.$this->studiensemester_next->start.'&ende='.$this->studiensemester_next->ende;
+		$kal_link_new_ws = null;
+		$kal_link_new_ss = null;
+		$kal_link_new_downloads = false;
+
+		// Build only the type-specific parameters accepted by the new endpoints.
+		if ($this->type == 'student' || $this->type == 'lektor')
+		{
+			$kal_link_new_downloads = true;
+			$kal_link_new_ws = http_build_query(array(
+				'type' => $this->type,
+				'pers_uid' => $this->pers_uid,
+				'begin' => $this->studiensemester_now->start,
+				'ende' => $this->studiensemester_now->ende
+			), '', '&');
+			$kal_link_new_ss = http_build_query(array(
+				'type' => $this->type,
+				'pers_uid' => $this->pers_uid,
+				'begin' => $this->studiensemester_next->start,
+				'ende' => $this->studiensemester_next->ende
+			), '', '&');
+		}
+		elseif ($this->type == 'ort' && $this->ort_kurzbz != '' && $this->ort_kurzbz != 'all')
+		{
+			$kal_link_new_downloads = true;
+			$kal_link_new_ws = http_build_query(array(
+				'type' => $this->type,
+				'pers_uid' => $this->pers_uid,
+				'ort_kurzbz' => $this->ort_kurzbz,
+				'begin' => $this->studiensemester_now->start,
+				'ende' => $this->studiensemester_now->ende
+			), '', '&');
+			$kal_link_new_ss = http_build_query(array(
+				'type' => $this->type,
+				'pers_uid' => $this->pers_uid,
+				'ort_kurzbz' => $this->ort_kurzbz,
+				'begin' => $this->studiensemester_next->start,
+				'ende' => $this->studiensemester_next->ende
+			), '', '&');
+		}
+		elseif ($this->type == 'verband')
+		{
+			$kal_link_new_downloads = true;
+			$kal_link_new_ws = http_build_query(array(
+				'type' => $this->type,
+				'pers_uid' => $this->pers_uid,
+				'stg_kz' => $this->stg_kz,
+				'sem' => $this->sem,
+				'ver' => $this->ver,
+				'grp' => $this->grp,
+				'begin' => $this->studiensemester_now->start,
+				'ende' => $this->studiensemester_now->ende
+			), '', '&');
+			$kal_link_new_ss = http_build_query(array(
+				'type' => $this->type,
+				'pers_uid' => $this->pers_uid,
+				'stg_kz' => $this->stg_kz,
+				'sem' => $this->sem,
+				'ver' => $this->ver,
+				'grp' => $this->grp,
+				'begin' => $this->studiensemester_next->start,
+				'ende' => $this->studiensemester_next->ende
+			), '', '&');
+		}
 
 		echo 				$this->crlf;
 		echo				$this->studiensemester_now->name.'<br>'.$this->crlf;
@@ -521,6 +584,19 @@ class wochenplan extends basis_db
 		echo '				<A href="'.$kal_link_ws.'&format=csv&target=outlook" title="CSV-Outlook"><IMG src="../../../skin/images/outlook.png" height="30" alt="CSV-Outlook" border="0"></A>'.$this->crlf;
 		echo '				<A href="'.$kal_link_ws.'&format=ical&version=1&target=ical" title="iCal Version 1.0"><IMG src="../../../skin/images/ical1.0.png" height="30" alt="vCal Version 1.0" border="0"></A>'.$this->crlf;
 		echo '				<A href="'.$kal_link_ws.'&format=ical&version=2&target=ical" title="iCal Version 2.0"><IMG src="../../../skin/images/ical2.0.png" height="30" alt="vCal Version 2.0" border="0"></A>'.$this->crlf;
+		if ($kal_link_new_ws !== null)
+		{
+			echo '				<br>'.$this->crlf;
+			echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/html/preview?'.htmlspecialchars($kal_link_new_ws, ENT_QUOTES, 'UTF-8').'" target="_blank" title="HTML-new">HTML-new</A> '.$this->crlf;
+			if ($kal_link_new_downloads)
+			{
+				echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/excel/download?'.htmlspecialchars($kal_link_new_ws, ENT_QUOTES, 'UTF-8').'" title="excel-new">excel-new</A> '.$this->crlf;
+				echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/csv/download?'.htmlspecialchars($kal_link_new_ws, ENT_QUOTES, 'UTF-8').'" title="CSV-new">CSV-new</A> '.$this->crlf;
+				echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/csv/download?'.htmlspecialchars($kal_link_new_ws, ENT_QUOTES, 'UTF-8').'&amp;target=outlook" title="CSV-Outlook-new">CSV-Outlook-new</A> '.$this->crlf;
+				echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/ical/download?'.htmlspecialchars($kal_link_new_ws, ENT_QUOTES, 'UTF-8').'&amp;version=1" title="iCal Version 1.0-new">iCal1-new</A> '.$this->crlf;
+				echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/ical/download?'.htmlspecialchars($kal_link_new_ws, ENT_QUOTES, 'UTF-8').'&amp;version=2" title="iCal Version 2.0-new">iCal2-new</A>'.$this->crlf;
+			}
+		}
 		echo '				</td><td class="stdplan" style="padding:8px;" align="center">'.$p->t('lvplan/semesterplaene').'</td><td style="padding:3px 15px 0px 15px;" align="center">';
 		echo '				<span style="color:#999">'.$this->studiensemester_next->name.'</span><br>'.$this->crlf;
 		echo '				<A href="'.$kal_link_ss.'&format=html" target="_blank" title="HTML"><IMG src="../../../skin/images/html_light.png" height="30" alt="HTML" border="0"></A>'.$this->crlf;
@@ -529,6 +605,19 @@ class wochenplan extends basis_db
 		echo '				<A href="'.$kal_link_ss.'&format=csv&target=outlook" title="CSV-Outlook"><IMG src="../../../skin/images/outlook_light.png" height="30" alt="CSV-Outlook" border="0"></A>'.$this->crlf;
 		echo '				<A href="'.$kal_link_ss.'&format=ical&version=1&target=ical" title="iCal Version 1.0"><IMG src="../../../skin/images/ical1.0_light.png" height="30" alt="iCal Version 1.0" border="0"></A>'.$this->crlf;
 		echo '				<A href="'.$kal_link_ss.'&format=ical&version=2&target=ical" title="iCal Version 2.0"><IMG src="../../../skin/images/ical2.0_light.png" height="30" alt="iCal Version 2.0" border="0"></A>'.$this->crlf;
+		if ($kal_link_new_ss !== null)
+		{
+			echo '				<br>'.$this->crlf;
+			echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/html/preview?'.htmlspecialchars($kal_link_new_ss, ENT_QUOTES, 'UTF-8').'" target="_blank" title="HTML-new">HTML-new</A> '.$this->crlf;
+			if ($kal_link_new_downloads)
+			{
+				echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/excel/download?'.htmlspecialchars($kal_link_new_ss, ENT_QUOTES, 'UTF-8').'" title="excel-new">excel-new</A> '.$this->crlf;
+				echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/csv/download?'.htmlspecialchars($kal_link_new_ss, ENT_QUOTES, 'UTF-8').'" title="CSV-new">CSV-new</A> '.$this->crlf;
+				echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/csv/download?'.htmlspecialchars($kal_link_new_ss, ENT_QUOTES, 'UTF-8').'&amp;target=outlook" title="CSV-Outlook-new">CSV-Outlook-new</A> '.$this->crlf;
+				echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/ical/download?'.htmlspecialchars($kal_link_new_ss, ENT_QUOTES, 'UTF-8').'&amp;version=1" title="iCal Version 1.0-new">iCal1-new</A> '.$this->crlf;
+				echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/ical/download?'.htmlspecialchars($kal_link_new_ss, ENT_QUOTES, 'UTF-8').'&amp;version=2" title="iCal Version 2.0-new">iCal2-new</A>'.$this->crlf;
+			}
+		}
 		echo '			</td></tr></table>'.$this->crlf;
 		echo '		</TD>'.$this->crlf;
 

@@ -30,16 +30,34 @@ class LvPlanICALLib
 	 * @param string $uid User UID.
 	 * @param int $begin First included date as Unix timestamp.
 	 * @param int $ende Last included date as Unix timestamp.
-	 * @param string|null $type Timetable type (student or lektor).
+	 * @param string|null $type Timetable type (student, lektor, ort or verband).
 	 * @param int $version iCalendar major version (1 or 2).
+	 * @param string|null $ortKurzbz Room identifier for room plans.
+	 * @param array|null $verbandFilters Lehrverband filters.
 	 * @return string
 	 */
-	public function getContent($uid, $begin, $ende, $type = null, $version = 2)
-	{
+	public function getContent(
+		$uid,
+		$begin,
+		$ende,
+		$type = null,
+		$version = 2,
+		$ortKurzbz = null,
+		$verbandFilters = null
+	) {
 		if (!in_array($version, array(1, 2), true))
 			throw new InvalidArgumentException('Unsupported iCalendar version');
-		if ($type !== null && !in_array($type, array('student', 'lektor'), true))
+		if ($type !== null && !in_array($type, array('student', 'lektor', 'ort', 'verband'), true))
 			throw new InvalidArgumentException('Unsupported timetable type');
+		if ($type === 'ort' && (!is_string($ortKurzbz) || $ortKurzbz === ''))
+			throw new InvalidArgumentException('Missing room timetable filter');
+		if ($type === 'verband'
+			&& (!is_array($verbandFilters)
+				|| !array_key_exists('stg_kz', $verbandFilters)
+				|| !array_key_exists('sem', $verbandFilters)))
+		{
+			throw new InvalidArgumentException('Missing Lehrverband timetable filters');
+		}
 
 		$this->ci->load->library('KalenderLib', array('uid' => $uid));
 
@@ -58,7 +76,23 @@ class LvPlanICALLib
 		// KalenderLib uses an exclusive end date; $ende is inclusive here.
 		$endDate = date('Y-m-d', strtotime('+1 day', $ende));
 
-		if ($isLecturer)
+		if ($type === 'verband')
+		{
+			$events = $this->ci->kalenderlib->getPlanForVerband(
+				$startDate,
+				$endDate,
+				$verbandFilters['stg_kz'],
+				$verbandFilters['sem'],
+				isset($verbandFilters['ver']) ? $verbandFilters['ver'] : null,
+				isset($verbandFilters['grp']) ? $verbandFilters['grp'] : null
+			);
+		}
+		elseif ($type === 'ort')
+		{
+			$events = $this->ci->kalenderlib
+				->getPlanForRoom($startDate, $endDate, $ortKurzbz);
+		}
+		elseif ($isLecturer)
 		{
 			$events = $this->ci->kalenderlib
 				->getPlanForLecturerByLecturer($startDate, $endDate, $uid);

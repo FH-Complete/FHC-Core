@@ -62,16 +62,34 @@ class LvPlanCSVLib
 	 * @param string $uid User UID.
 	 * @param int $begin First included date as Unix timestamp.
 	 * @param int $ende Last included date as Unix timestamp.
-	 * @param string $type Timetable type (student or lektor).
+	 * @param string $type Timetable type (student, lektor, ort or verband).
 	 * @param string|null $target Optional CSV target (outlook).
+	 * @param string|null $ortKurzbz Room identifier for room plans.
+	 * @param array|null $verbandFilters Lehrverband filters.
 	 * @return string
 	 */
-	public function getContent($uid, $begin, $ende, $type, $target = null)
-	{
-		if (!in_array($type, array('student', 'lektor'), true))
+	public function getContent(
+		$uid,
+		$begin,
+		$ende,
+		$type,
+		$target = null,
+		$ortKurzbz = null,
+		$verbandFilters = null
+	) {
+		if (!in_array($type, array('student', 'lektor', 'ort', 'verband'), true))
 			throw new InvalidArgumentException('Unsupported timetable type');
 		if ($target !== null && $target !== self::TARGET_OUTLOOK)
 			throw new InvalidArgumentException('Unsupported CSV target');
+		if ($type === 'ort' && (!is_string($ortKurzbz) || $ortKurzbz === ''))
+			throw new InvalidArgumentException('Missing room timetable filter');
+		if ($type === 'verband'
+			&& (!is_array($verbandFilters)
+				|| !array_key_exists('stg_kz', $verbandFilters)
+				|| !array_key_exists('sem', $verbandFilters)))
+		{
+			throw new InvalidArgumentException('Missing Lehrverband timetable filters');
+		}
 
 		$isLecturer = $type === 'lektor';
 		$this->ci->load->library('KalenderLib', array('uid' => $uid));
@@ -79,7 +97,23 @@ class LvPlanCSVLib
 		$startDate = date('Y-m-d', $begin);
 		$endDate = date('Y-m-d', $ende);
 
-		if ($isLecturer)
+		if ($type === 'verband')
+		{
+			$events = $this->ci->kalenderlib->getPlanForVerband(
+				$startDate,
+				$endDate,
+				$verbandFilters['stg_kz'],
+				$verbandFilters['sem'],
+				isset($verbandFilters['ver']) ? $verbandFilters['ver'] : null,
+				isset($verbandFilters['grp']) ? $verbandFilters['grp'] : null
+			);
+		}
+		elseif ($type === 'ort')
+		{
+			$events = $this->ci->kalenderlib
+				->getPlanForRoom($startDate, $endDate, $ortKurzbz);
+		}
+		elseif ($isLecturer)
 		{
 			$events = $this->ci->kalenderlib
 				->getPlanForLecturerByLecturer($startDate, $endDate, $uid);
