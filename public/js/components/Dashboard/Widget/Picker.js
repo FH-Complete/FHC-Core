@@ -12,6 +12,12 @@ export default {
 	data: () => ({
 		callbacks: {}
 	}),
+	computed: {
+		// filter widgets away the user has no permissions for
+		availableWidgets() {
+			return (this.widgets || []).filter(widget => widget.permitted !== false);
+		}
+	},
 	methods: {
 		getWidget() {
 			return new Promise((resolve,reject) => {
@@ -37,17 +43,17 @@ export default {
 		<bs-modal
 			ref="modal"
 			class="fade"
-			:dialog-class="{ 'modal-fullscreen-sm-down': 1, 'modal-xl': widgets && widgets.length > 0 }"
+			:dialog-class="{ 'modal-fullscreen-sm-down': 1, 'modal-xl': availableWidgets.length > 0 }"
 			@hiddenBsModal="close"
 		>
 			<template v-slot:title>{{ $p.t('dashboard/createWidget') }}</template>
 			<template v-slot:default>
 				<div v-if="widgets" class="row g-2">
-					<div v-if="!widgets.length">
+					<div v-if="!availableWidgets.length">
 						{{ $p.t('dashboard/noWidgetsAvailable') }}
 					</div>
 					<div
-						v-for="widget in widgets"
+						v-for="widget in availableWidgets"
 						:key="widget.widget_id"
 						class="widget-icon-container col-sm-6 col-md-4 col-lg-3 col-xl-2"
 					>

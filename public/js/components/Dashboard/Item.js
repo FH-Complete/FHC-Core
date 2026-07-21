@@ -1,5 +1,6 @@
 import BsModal from "../Bootstrap/Modal.js";
 import HeightTransition from "../Tranistion/HeightTransition.js";
+import MissingPermissionWidget from "../DashboardWidget/MissingPermission.js";
 
 import { enableDragDropTouch } from "../../../../vendor/drag-drop-touch-js/dragdroptouch/dist/drag-drop-touch.esm.min.js";
 
@@ -113,6 +114,12 @@ export default {
 		isPinned() {
 			return this.place?.pinned ? true : false;
 		},
+		permitted() {
+			// widgets without a linked permission (or before the template loaded)
+			// are considered permitted; the backend sets permitted === false only
+			// when the user is missing the widget's required permission
+			return this.widgetTemplate?.permitted !== false;
+		},
 		ready() {
 			return this.component && this.arguments !== null;
 		},
@@ -178,7 +185,11 @@ export default {
 				&& this.widgetTemplate.widget_id
 				&& this.widgetTemplate.arguments
 			) {
-				let component = (await import(this.widgetTemplate.setup.file)).default;
+				// render the "missing permission" screen instead of the actual
+				// widget when the user does not hold the widget's linked permission
+				let component = this.permitted
+					? (await import(this.widgetTemplate.setup.file)).default
+					: MissingPermissionWidget;
 				this.$options.components["widget" + this.widgetTemplate.widget_id] = component;
 				this.component = "widget" + this.widgetTemplate.widget_id;
 				this.arguments = { ...this.widgetTemplate.arguments, ...this.config };
@@ -280,7 +291,7 @@ export default {
 				</template>
 				<!-- widget link -->
 				<a
-					v-if="widgetTemplate.setup.cis4link"
+					v-if="widgetTemplate.setup.cis4link && permitted"
 					:href="getWidgetC4Link(widgetTemplate)"
 					class="col-auto ms-auto"
 					:aria-label="$p.t('dashboard/widget_link')"
