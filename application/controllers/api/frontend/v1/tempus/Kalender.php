@@ -41,6 +41,7 @@ class Kalender extends FHCAPI_Controller
 		$this->_ci->load->library('LogLib');
 		$this->_ci->load->library('form_validation');
 		$this->_ci->load->library('KalenderLib');
+		$this->_ci->load->library('KalenderSyncLib');
 		$this->_ci->load->library('RaumvorschlagLib');
 		$this->loadPhrases([
 			'ui'
@@ -273,7 +274,7 @@ class Kalender extends FHCAPI_Controller
 
 	public function sync()
 	{
-		$result = $this->_ci->kalenderlib->sync();
+		$result = $this->_ci->kalendersynclib->sync();
 		$this->terminateWithSuccess(getData($result));
 	}
 	public function syncToLecturer()

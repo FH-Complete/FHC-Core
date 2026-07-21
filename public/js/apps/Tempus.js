@@ -16,6 +16,7 @@
  */
 
 import FhcTempus from "../components/Tempus/Tempus.js";
+import FhcTempusSync from "../components/Tempus/TempusSync.js";
 
 import Phrasen from "../plugins/Phrasen.js";
 import {capitalize} from "../helpers/StringHelpers.js";
@@ -27,6 +28,7 @@ const router = VueRouter.createRouter({
 	history: VueRouter.createWebHistory(),
 	routes: [
 		{ path: `/${ciPath}/Tempus`, component: FhcTempus },
+		{ path: `/${ciPath}/Tempus/sync`, component: FhcTempusSync },
 	]
 });
 
