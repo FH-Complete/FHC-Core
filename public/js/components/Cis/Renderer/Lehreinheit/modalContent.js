@@ -49,6 +49,20 @@ export default {
 				return this.event.ende;
 			}
 			return numberPadding(this.event.ende.getHours()) + ":" + numberPadding(this.event.ende.getMinutes());
+		},
+		// Deep link into the attendance tool; only present when the anw extension wrote into digi_anw_data
+		anwLink: function () {
+			const d = this.event && this.event.digi_anw_data;
+			if (!d || !d.stg_kz || !d.lv_id || !d.sem_kurzbz)
+				return null;
+			const base = FHC_JS_DATA_STORAGE_OBJECT.app_root
+				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router
+				+ '/extensions/FHC-Core-Anwesenheiten/';
+			return base
+				+ `?stg_kz=${encodeURIComponent(d.stg_kz)}`
+				+ `&sem=${encodeURIComponent(d.sem ?? '')}`
+				+ `&lvid=${encodeURIComponent(d.lv_id)}`
+				+ `&sem_kurzbz=${encodeURIComponent(d.sem_kurzbz)}`;
 		}
 	},
 	methods: {
@@ -139,6 +153,16 @@ export default {
 							:''
 						}}</th>
 						<td>{{event.organisationseinheit}}</td>
+					</tr>
+					<tr v-if="anwLink">
+						<th>{{
+							$p.t('global','anwKontrolle')?
+							$p.t('global','anwKontrolle')+':'
+							:''
+						}}</th>
+						<td>
+							<a :href="anwLink" target="_blank" rel="noopener" :aria-label="$p.t('global','anwKontrolleOeffnen')" :title="$p.t('global','anwKontrolleOeffnen')"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C" aria-hidden="true"></i></a>
+						</td>
 					</tr>
 				</tbody>
 		</table>

@@ -82,7 +82,7 @@ export default {
 				+ `&sem_kurzbz=${encodeURIComponent(d.sem_kurzbz)}`;
 		},
 		anwLinkTitle() {
-			return this.$p.t('global/digitalesAnwManagement');
+			return this.$p.t('global/anwKontrolleOeffnen');
 		},
 	},
 	template: /*html*/`
