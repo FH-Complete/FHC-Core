@@ -493,7 +493,7 @@ class Students extends FHCAPI_Controller
 			'gruppe' => $gruppe
 		));
 		
-		$this->fetchStudents($studiensemester_kurzbz, $studiengang_typ_kurzbzstudiengang_typ_kurzbz, $semester, $verband, $gruppe, null, $orgform_kurzbz);
+		$this->fetchStudents($studiensemester_kurzbz, $studiengang_typ_kurzbz, $semester, $verband, $gruppe, null, $orgform_kurzbz);
 	}
 
 	public function getStudentsSpezialgruppe(
