@@ -34,17 +34,8 @@ class LvVwLib
 		$this->_ci =& get_instance();
 
 		// Load Tree-config
-		$this->config = [
-			'stg' => [
-				'semester' => [
-					'group',
-					'verband' => [
-						'group'
-					]
-				],
-				'orgform'
-			]
-		];
+		$this->_ci->load->config('treemenu/custom/lvvw');
+		$this->config = $this->_ci->config->item('root');
 
 		// Load Libraries
 		$this->_ci->load->library('treemenu/base/StgLib');
@@ -74,13 +65,15 @@ class LvVwLib
 		return $this->_ci->stglib->studiengang($path_template, $permittedStgs);
 	}
 
-	public function semester($path_template, $stg)
+	public function semester($path_template, $has_children, $stg)
 	{
 		$stg = $this->getStgFromUrl($stg);
 
 		if ($stg === null)
 			return [];
 
+		if (!$has_children)
+			$this->_ci->StudiengangModel->db->select('TRUE AS leaf', false);
 		$this->_ci->StudiengangModel->addSelect("ARRAY['link', FORMAT('{" .
 			'"type": "verband",' .
 			'"id": "lv/%1$s/%2$s",' .
