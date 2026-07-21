@@ -251,9 +251,9 @@ class StudentListLib
 	 *
 	 * @return stdClass		result of the query
 	 */
-	public function execute($studiensemester_kurzbz)
+	public function execute($studiensemester_kurzbz, $index_bezeichnung_mehrsprachig=0)
 	{
-		$this->addSelectAndJoinForTagsIfConfigured($studiensemester_kurzbz);
+		$this->addSelectAndJoinForTagsIfConfigured($studiensemester_kurzbz, $index_bezeichnung_mehrsprachig);
 
 		$stdsemEsc = $studiensemester_kurzbz ? $this->_ci->PrestudentModel->escape($studiensemester_kurzbz) : 'NULL';
 
@@ -302,7 +302,7 @@ class StudentListLib
 	 * @param string studiensemester_kurzbz
 	 *
 	 */
-	 protected function addSelectAndJoinForTagsIfConfigured($studiensemester_kurzbz)
+	 protected function addSelectAndJoinForTagsIfConfigured($studiensemester_kurzbz, $index_bezeichnung_mehrsprachig)
 	 {
 		if (defined('STV_TAGS_ENABLED') && STV_TAGS_ENABLED) {
 			$this->_ci->load->config('stv');
@@ -326,7 +326,7 @@ class StudentListLib
 					SELECT DISTINCT ON (n.notiz_id)
 						n.notiz_id AS id,
 						nt.typ_kurzbz,
-						array_to_json(nt.bezeichnung_mehrsprachig)->>0 AS beschreibung,
+						array_to_json(nt.bezeichnung_mehrsprachig)->>". $index_bezeichnung_mehrsprachig . " AS beschreibung,
 						n.text AS notiz,
 						nt.style,
 						n.erledigt AS done,

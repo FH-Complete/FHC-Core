@@ -103,6 +103,8 @@ class Students extends FHCAPI_Controller
 	 */
 	public function getIncoming($studiensemester_kurzbz)
 	{
+		$index_bezeichnung_mehrsprachig = $this->_getLanguageIndex();
+
 		$this->addMeta('ci_method', __FUNCTION__);
 		$this->addMeta('ci_params', [
 			'studiensemester_kurzbz' => $studiensemester_kurzbz
@@ -135,7 +137,7 @@ class Students extends FHCAPI_Controller
 
 		$this->addFilter($studiensemester_kurzbz);
 
-		$result = $this->studentlistlib->execute($studiensemester_kurzbz);
+		$result = $this->studentlistlib->execute($studiensemester_kurzbz, $index_bezeichnung_mehrsprachig);
 
 		$data = $this->getDataOrTerminateWithError($result);
 		$this->decodeTagsJsonInResult($data);
@@ -149,6 +151,8 @@ class Students extends FHCAPI_Controller
 	 */
 	public function getOutgoing($studiensemester_kurzbz)
 	{
+		$index_bezeichnung_mehrsprachig = $this->_getLanguageIndex();
+
 		$this->addMeta('ci_method', __FUNCTION__);
 		$this->addMeta('ci_params', [
 			'studiensemester_kurzbz' => $studiensemester_kurzbz
@@ -194,7 +198,7 @@ class Students extends FHCAPI_Controller
 
 		$this->addFilter($studiensemester_kurzbz);
 
-		$result = $this->studentlistlib->execute($studiensemester_kurzbz);
+		$result = $this->studentlistlib->execute($studiensemester_kurzbz, $index_bezeichnung_mehrsprachig);
 
 		$data = $this->getDataOrTerminateWithError($result);
 		$this->decodeTagsJsonInResult($data);
@@ -208,6 +212,7 @@ class Students extends FHCAPI_Controller
 	 */
 	public function getGemeinsamestudien($studiensemester_kurzbz)
 	{
+		$index_bezeichnung_mehrsprachig = $this->_getLanguageIndex();
 		$this->addMeta('ci_method', __FUNCTION__);
 		$this->addMeta('ci_params', [
 			'studiensemester_kurzbz' => $studiensemester_kurzbz
@@ -239,7 +244,7 @@ class Students extends FHCAPI_Controller
 
 		$this->addFilter($studiensemester_kurzbz);
 
-		$result = $this->studentlistlib->execute($studiensemester_kurzbz);
+		$result = $this->studentlistlib->execute($studiensemester_kurzbz, $index_bezeichnung_mehrsprachig);
 
 		$data = $this->getDataOrTerminateWithError($result);
 		$this->decodeTagsJsonInResult($data);
@@ -289,6 +294,8 @@ class Students extends FHCAPI_Controller
 	protected function fetchPrestudents($studiengang_kz, $studiensemester_kurzbz = null, $filter = null, $orgform_kurzbz = null)
 	{
 		$stdsemEsc = $studiensemester_kurzbz ? $this->PrestudentModel->escape($studiensemester_kurzbz) : 'NULL';
+
+		$index_bezeichnung_mehrsprachig = $this->_getLanguageIndex();
 
 		$selectRT = "
 			SELECT 1 
@@ -444,7 +451,7 @@ class Students extends FHCAPI_Controller
 
 		$this->addFilter($studiensemester_kurzbz);
 
-		$result = $this->studentlistlib->execute($studiensemester_kurzbz);
+		$result = $this->studentlistlib->execute($studiensemester_kurzbz, $index_bezeichnung_mehrsprachig);
 
 		$data = $this->getDataOrTerminateWithError($result);
 		$this->decodeTagsJsonInResult($data);
@@ -547,6 +554,7 @@ class Students extends FHCAPI_Controller
 		$gruppe_kurzbz = null,
 		$orgform_kurzbz = null
 	) {
+		$index_bezeichnung_mehrsprachig = $this->_getLanguageIndex();
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		if (!$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
@@ -591,10 +599,8 @@ class Students extends FHCAPI_Controller
 			}
 		}
 
-
 		$this->addFilter($studiensemester_kurzbz);
-
-		$result = $this->studentlistlib->execute($studiensemester_kurzbz);
+		$result = $this->studentlistlib->execute($studiensemester_kurzbz, $index_bezeichnung_mehrsprachig);
 
 		$data = $this->getDataOrTerminateWithError($result);
 		$this->decodeTagsJsonInResult($data);
@@ -620,6 +626,7 @@ class Students extends FHCAPI_Controller
 	 */
 	public function getPrestudent($studiensemester_kurzbz, $prestudent_id)
 	{
+		$index_bezeichnung_mehrsprachig = $this->_getLanguageIndex();
 		$this->addMeta('ci_method', __FUNCTION__);
 		$this->addMeta('ci_params', array(
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
@@ -647,10 +654,8 @@ class Students extends FHCAPI_Controller
 
 		$this->studentlistlib->addWhere('tbl_prestudent.prestudent_id', $prestudent_id);
 
-
 		$this->addFilter($studiensemester_kurzbz);
-
-		$result = $this->studentlistlib->execute($studiensemester_kurzbz);
+		$result = $this->studentlistlib->execute($studiensemester_kurzbz, $index_bezeichnung_mehrsprachig);
 
 		$data = $this->getDataOrTerminateWithError($result);
 		$this->decodeTagsJsonInResult($data);
@@ -664,6 +669,7 @@ class Students extends FHCAPI_Controller
 	 */
 	public function getStudent($studiensemester_kurzbz, $student_uid)
 	{
+		$index_bezeichnung_mehrsprachig = $this->_getLanguageIndex();
 		$this->addMeta('ci_method', __FUNCTION__);
 		$this->addMeta('ci_params', array(
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
@@ -679,11 +685,9 @@ class Students extends FHCAPI_Controller
 
 
 		$this->studentlistlib->addWhere('s.student_uid', $student_uid);
-		
 
 		$this->addFilter($studiensemester_kurzbz);
-
-		$result = $this->studentlistlib->execute($studiensemester_kurzbz);
+		$result = $this->studentlistlib->execute($studiensemester_kurzbz, $index_bezeichnung_mehrsprachig);
 		
 		$data = $this->getDataOrTerminateWithError($result);
 		$this->decodeTagsJsonInResult($data);
@@ -698,6 +702,8 @@ class Students extends FHCAPI_Controller
 	 */
 	public function getPerson($studiensemester_kurzbz, $person_id)
 	{
+		$index_bezeichnung_mehrsprachig = $this->_getLanguageIndex();
+
 		$this->addMeta('ci_method', __FUNCTION__);
 		$this->addMeta('ci_params', array(
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
@@ -717,7 +723,7 @@ class Students extends FHCAPI_Controller
 		
 		$this->addFilter($studiensemester_kurzbz);
 
-		$result = $this->studentlistlib->execute($studiensemester_kurzbz);
+		$result = $this->studentlistlib->execute($studiensemester_kurzbz, $index_bezeichnung_mehrsprachig);
 		
 		$data = $this->getDataOrTerminateWithError($result);
 		$this->decodeTagsJsonInResult($data);
@@ -731,6 +737,7 @@ class Students extends FHCAPI_Controller
 	 */
 	public function search($studiensemester_kurzbz)
 	{
+		$index_bezeichnung_mehrsprachig = $this->_getLanguageIndex();
 		$this->addMeta('ci_method', __FUNCTION__);
 		$this->addMeta('ci_params', array(
 			'studiensemester_kurzbz' => $studiensemester_kurzbz
@@ -786,7 +793,7 @@ class Students extends FHCAPI_Controller
 
 		$this->addFilter($studiensemester_kurzbz);
 
-		$result = $this->studentlistlib->execute($studiensemester_kurzbz);
+		$result = $this->studentlistlib->execute($studiensemester_kurzbz, $index_bezeichnung_mehrsprachig);
 
 		$data = $this->getDataOrTerminateWithError($result);
 		$this->decodeTagsJsonInResult($data);
@@ -817,5 +824,16 @@ class Students extends FHCAPI_Controller
 				return;
 			}
 		}
+	}
+
+	private function _getLanguageIndex()
+	{
+		$this->load->model('system/Sprache_model', 'SpracheModel');
+		$this->SpracheModel->addSelect('index');
+		$result = $this->SpracheModel->loadWhere(array('sprache' => getUserLanguage()));
+		$language = hasData($result) ? getData($result)[0]->index : 1;
+		$index_bezeichnung_mehrsprachig = $language - 1;
+
+		return $index_bezeichnung_mehrsprachig;
 	}
 }
