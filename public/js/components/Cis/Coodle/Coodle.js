@@ -26,7 +26,6 @@ export default {
 			return this.$theme.theme_name.value == "dark";
 		},
 	},
-	watch: {},
 	methods: {
 		getTabStylingClass(isSelected) {
 			if (this.isDarkMode && isSelected) {
@@ -85,6 +84,7 @@ export default {
 					};
 				}),
 				participants: surveyData.participants,
+				externalParticipants: surveyData.external_participants,
 				voteTallies: surveyData.vote_tallies,
 			};
 		},

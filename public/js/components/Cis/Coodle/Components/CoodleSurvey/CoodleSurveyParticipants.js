@@ -218,21 +218,30 @@ export default {
 				return;
 			}
 
-			const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+			const emailRegex =
+				/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 			if (!emailRegex.test(emailInput)) {
 				this.$fhcAlert.alertError("Invalid email format!");
 				return;
 			}
 
-			if (this.externalParticipants.some((externalParticipant) => externalParticipant.email === emailInput)) {
+			if (
+				this.externalParticipants.some(
+					(externalParticipant) =>
+						externalParticipant.email === emailInput,
+				)
+			) {
 				this.$fhcAlert.alertError("Duplicates not allowed!");
 				return;
 			}
 
-			this.externalParticipants.push({
-				name: nameInput,
-				email: emailInput
-			});
+			this.externalParticipants = [
+				...this.externalParticipants,
+				{
+					name: nameInput,
+					email: emailInput,
+				},
+			];
 			this.externalParticipantNameInput = "";
 			this.externalParticipantEmailInput = "";
 		},
@@ -244,8 +253,8 @@ export default {
 	},
 	template: /*html*/ `
 	<div class="row mb-3">
-		<div class="col-12 col-md-6 col-xxl-12 d-flex flex-column gap-1">
-			<label for="searchInput" class="fw-bold">{{ "Participants" }}</label>
+		<div class="col-12 col-md-6 col-xxl-12 d-flex flex-column gap-1 mb-2">
+			<label for="searchInput" class="fw-bold">{{ "Internal participants" }}</label>
 			<div class="position-relative mb-1">
 				<input
 					v-model="searchInput"
@@ -338,7 +347,7 @@ export default {
 				</span>
 			</div>
 		</div>
-		<div class="col-12 col-md-6 col-xxl-12 d-flex flex-column gap-1">
+		<div class="col-12 col-md-6 col-xxl-12 d-flex flex-column gap-1 mb-2">
 			<span class="fw-bold">{{ "External participants" }}</span>
 			<div class="d-flex flex-row gap-2 mb-1">
 				<div class="flex-grow-1 d-flex flex-column gap-2">

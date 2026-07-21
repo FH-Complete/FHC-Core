@@ -96,6 +96,66 @@ if (!$result = @$db->db_query("SELECT 1 FROM campus.tbl_coodle_survey_participan
 
 
 
+if (!$result = @$db->db_query("SELECT 1 FROM campus.tbl_coodle_survey_external_participants LIMIT 1")) {
+	$qry = "CREATE TABLE campus.tbl_coodle_survey_external_participants (
+		id int NOT NULL,
+		survey_id int NOT NULL,
+		name varchar(255) NOT NULL,
+		email varchar(255) NOT NULL,
+		access_key varchar(255) NOT NULL,
+		selection varchar(255),
+		CONSTRAINT tbl_coodle_surveys_external_participants_id_pk PRIMARY KEY(id),
+		CONSTRAINT tbl_coodle_survey_external_participants_survey_id_fk FOREIGN KEY (survey_id) REFERENCES campus.tbl_coodle_surveys(id)
+		);";
+
+	if (!$db->db_query($qry))
+		echo '<strong>campus.tbl_coodle_survey_external_participants: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo '<br>campus.tbl_coodle_survey_external_participants: table created';
+
+	$db->db_query('CREATE SEQUENCE IF NOT EXISTS campus.seq_tbl_coodle_survey_external_participants_id
+     INCREMENT BY 1
+     NO MAXVALUE
+     NO MINVALUE
+     CACHE 1;');
+
+	$db->db_query("ALTER TABLE campus.tbl_coodle_survey_external_participants ALTER COLUMN id SET DEFAULT nextval('campus.seq_tbl_coodle_survey_external_participants_id');");
+
+
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE campus.tbl_coodle_survey_external_participants TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>campus.tbl_coodle_survey_external_participants: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on campus.tbl_coodle_survey_external_participants';
+
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE campus.tbl_coodle_survey_external_participants TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>campus.tbl_coodle_survey_external_participants: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on campus.tbl_coodle_survey_external_participants';
+
+	$qry = 'GRANT USAGE ON campus.seq_tbl_coodle_survey_external_participants_id TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>campus.tbl_coodle_survey_external_participants: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on campus.tbl_coodle_survey_external_participants';
+
+	$qry = 'GRANT USAGE ON campus.seq_tbl_coodle_survey_external_participants_id TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>campus.tbl_coodle_survey_external_participants: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on campus.tbl_coodle_survey_external_participants';
+}
+
+$db->db_query('CREATE SEQUENCE IF NOT EXISTS campus.seq_tbl_coodle_survey_external_participants_id
+     INCREMENT BY 1
+     NO MAXVALUE
+     NO MINVALUE
+     CACHE 1;');
+
+	$db->db_query("ALTER TABLE campus.tbl_coodle_survey_external_participants ALTER COLUMN id SET DEFAULT nextval('campus.seq_tbl_coodle_survey_external_participants_id');");
+
+
 if (!$result = @$db->db_query("SELECT 1 FROM campus.tbl_coodle_survey_timeslots LIMIT 1")) {
 	$qry = "CREATE TABLE campus.tbl_coodle_survey_timeslots (
 		id int GENERATED ALWAYS AS IDENTITY,

@@ -14,6 +14,7 @@ export default {
 			isVotingInProgress: false,
 			isFinalSelectionInProgress: false,
 			participantsWithoutAuthUser: [],
+			externalParticipantsWithoutAuthUser: [],
 			authUserParticipant: null,
 			editableAuthUserSelection: null,
 			selectedTimeslotId: null,
@@ -142,10 +143,42 @@ export default {
 					participant.uid !== this.$props.authUid,
 			);
 		},
+		parseExternalParticipants() {
+			const externalParticipants =
+				this.$props.survey.externalParticipants.map((participant) => {
+					participant = { ...participant };
+					const hasVotedWithoutSelection =
+						participant.selection &&
+						participant.selection.length === 0;
+
+					let selectionEntries = this.$props.timeslots.map(
+						(timeslot) => [
+							timeslot.id,
+							participant.selection?.includes(timeslot.id),
+						],
+					);
+					selectionEntries.push(["none", hasVotedWithoutSelection]);
+					participant.selection =
+						Object.fromEntries(selectionEntries);
+
+					return participant;
+				});
+
+			// todo: properly parse external participants once external page is ready
+			// this.authUserParticipant = externalParticipants.filter(
+			// 	(participant) =>
+			// 		this.$props.authUid &&
+			// 		participant.uid === this.$props.authUid,
+			// )[0];
+
+			this.externalParticipantsWithoutAuthUser = externalParticipants;
+			// 
+		},
 		setData() {
 			this.setForms();
 			this.setSelectedTimeslotId();
 			this.parseParticipants();
+			this.parseExternalParticipants();
 		},
 		setForms() {
 			this.isVotingInProgress = false;
@@ -455,6 +488,27 @@ export default {
 							<td class="border-1">
 								<div class="d-flex justify-content-center">
 									<i v-if="participant.selection.none" class="fa-solid fa-check"></i>
+								</div>
+							</td>
+						</tr>
+						<tr v-for="externalParticipant in externalParticipantsWithoutAuthUser">
+							<td class="border-1 px-2 py-1">
+								<div
+									v-if="externalParticipant.name?.length"
+									class="d-flex flex-row gap-1 justify-content-between align-items-center"
+								>
+									{{ externalParticipant.name }}
+								</div>
+								<div v-else class="text-center">---</div>
+							</td>
+							<td v-for="timeslot in $props.timeslots" class="border-1">
+								<div class="d-flex justify-content-center">
+									<i v-if="externalParticipant.selection[timeslot.id]" class="fa-solid fa-check"></i>
+								</div>
+							</td>
+							<td class="border-1">
+								<div class="d-flex justify-content-center">
+									<i v-if="externalParticipant.selection.none" class="fa-solid fa-check"></i>
 								</div>
 							</td>
 						</tr>

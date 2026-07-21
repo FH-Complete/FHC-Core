@@ -169,20 +169,7 @@ export default {
 					createdAt: null,
 					timeslots: [],
 					participants: [],
-					externalParticipants: [
-						{
-							name: "Adis Posko",
-							email: "adis.posko@gmail.com"
-						},
-						{
-							name: "Test User",
-							email: "test_user@gmail.com"
-						},
-						{
-							name: "Someoneee Elseee",
-							email: "veryyy.longgggg.emailllll@gmail.com"
-						},
-					],
+					externalParticipants: [],
 				};
 			}
 
@@ -228,7 +215,10 @@ export default {
 			}
 		},
 		async submitForm() {
-			if (!this.surveyFormData.participants.length) {
+			if (
+				!this.surveyFormData.participants.length &&
+				!this.surveyFormData.externalParticipants.length
+			) {
 				const shouldProceedWithoutParticipants =
 					await this.$fhcAlert.confirm({
 						header: "Warning!",
@@ -292,6 +282,7 @@ export default {
 				endsAt: surveyFormData.endsAt,
 				timeslots: surveyFormData.timeslots,
 				participants,
+				externalParticipants: surveyFormData.externalParticipants,
 			};
 		},
 		async createSurvey(surveyData) {

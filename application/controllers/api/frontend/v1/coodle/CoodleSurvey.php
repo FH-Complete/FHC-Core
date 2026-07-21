@@ -47,6 +47,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		$this->load->model('ressource/CoodleSurvey_model', 'CoodleSurveyModel');
 		$this->load->model('ressource/CoodleSurveyTimeslot_model', 'CoodleSurveyTimeslotModel');
 		$this->load->model('ressource/CoodleSurveyParticipant_model', 'CoodleSurveyParticipantModel');
+		$this->load->model('ressource/CoodleSurveyExternalParticipant_model', 'CoodleSurveyExternalParticipantModel');
 		$this->load->helper('hlp_sancho_helper');
 
 		$this->coodlePageUrl = APP_ROOT . "cis.php/Cis/Coodle";
@@ -72,6 +73,14 @@ class CoodleSurvey extends FHCAPI_Controller
 			return $participant;
 		}, $participants);
 
+		$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId);
+		$externalParticipants = array_map(function ($externalParticipant) {
+			if ($externalParticipant->selection) {
+				$externalParticipant->selection = json_decode($externalParticipant->selection);
+			}
+			return $externalParticipant;
+		}, $externalParticipants);
+
 		$timeslotIds = array_map(function ($timeslot) {
 			return $timeslot->id;
 		}, $timeslots);
@@ -91,6 +100,17 @@ class CoodleSurvey extends FHCAPI_Controller
 			}
 
 			$individualVotes = array_merge($individualVotes, $participant->selection);
+		}
+		foreach ($externalParticipants as $externalParticipant) {
+			if ($externalParticipant->selection === null)
+				continue;
+
+			if (!count($externalParticipant->selection)) {
+				$individualVotes[] = "none";
+				continue;
+			}
+
+			$individualVotes = array_merge($individualVotes, $externalParticipant->selection);
 		}
 		foreach ($individualVotes as $vote) {
 			$voteTallies[$vote]++;
@@ -134,6 +154,14 @@ class CoodleSurvey extends FHCAPI_Controller
 					},
 					$participants
 				);
+
+				$externalParticipants = array_map(
+					function ($externalParticipant) {
+						$externalParticipant->name = null;
+						$externalParticipant->email = null;
+					},
+					$externalParticipants
+				);
 			} else if ($areSelectionsAnonymized) {
 				$participants = array_map(
 					function ($participant) use ($authUserUID) {
@@ -144,10 +172,18 @@ class CoodleSurvey extends FHCAPI_Controller
 					},
 					$participants
 				);
+
+				$externalParticipants = array_map(
+					function ($externalParticipant) {
+						$externalParticipant->selection = null;
+					},
+					$externalParticipants
+				);
 			}
 		}
 
 		$survey->participants = $participants;
+		$survey->external_participants = $externalParticipants;
 
 		$survey->creator = [
 			"uid" => $survey->creator_uid,
@@ -157,6 +193,8 @@ class CoodleSurvey extends FHCAPI_Controller
 
 		$this->terminateWithSuccess($survey);
 	}
+
+	// todo: secondary get method for external users
 
 	public function getActiveSurveys()
 	{
@@ -220,6 +258,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		$this->CoodleSurveyTimeslotModel->updateTimeslots($surveyId, $surveyData["timeslots"]);
 		$timeslots = $this->CoodleSurveyTimeslotModel->getTimeslots($surveyId);
 		$this->CoodleSurveyParticipantModel->updateParticipants($surveyId, $surveyData["participants"], $timeslots);
+		$this->CoodleSurveyExternalParticipantModel->updateExternalParticipants($surveyId, $surveyData["externalParticipants"], $timeslots);
 
 		if ($shouldInformParticipants) {
 			$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
@@ -239,6 +278,23 @@ class CoodleSurvey extends FHCAPI_Controller
 					"Coodle Umfrage erstellt / Coodle survey created"
 				);
 			}
+
+			$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId, true);
+			foreach ($externalParticipants as $externalParticipant) {
+				sendSanchoMail(
+					"Sancho_Mail_Coodle_Created_Ext",
+					[
+						"surveyParticipantName" => $externalParticipant->name,
+						"surveyCreatorName" => $authUserFullName,
+						"org" => CAMPUS_NAME,
+						"surveyTitle" => $survey->title,
+						// todo: replace with actual url once external page access and encryption are resolved
+						"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
+					],
+					$externalParticipant->email,
+					"Coodle Umfrage erstellt / Coodle survey created"
+				);
+			}
 		}
 
 		$this->terminateWithSuccess($surveyId);
@@ -249,7 +305,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		$surveyId = $this->input->post("surveyId");
 		$surveyData = $this->input->post("surveyData");
 		$shouldInformParticipants = $this->input->post("shouldInformParticipants");
-		
+
 		$this->form_validation->set_data([
 			"title" => $surveyData["title"],
 			"description" => $surveyData["description"],
@@ -280,6 +336,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		$this->CoodleSurveyTimeslotModel->updateTimeslots($surveyId, $surveyData["timeslots"]);
 		$timeslots = $this->CoodleSurveyTimeslotModel->getTimeslots($surveyId);
 		$this->CoodleSurveyParticipantModel->updateParticipants($surveyId, $surveyData["participants"], $timeslots);
+		$this->CoodleSurveyExternalParticipantModel->updateExternalParticipants($surveyId, $surveyData["externalParticipants"], $timeslots);
 
 		if ($shouldInformParticipants) {
 			$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
@@ -297,6 +354,23 @@ class CoodleSurvey extends FHCAPI_Controller
 					],
 					$participant->uid . "@" . DOMAIN,
 					'Coodle Umfrage modifiziert / Coodle survey modified'
+				);
+			}
+
+			$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId, true);
+			foreach ($externalParticipants as $externalParticipant) {
+				sendSanchoMail(
+					"Sancho_Mail_Coodle_Updated_Ext",
+					[
+						"surveyParticipantName" => $externalParticipant->name,
+						"surveyCreatorName" => $authUserFullName,
+						"org" => CAMPUS_NAME,
+						"surveyTitle" => $survey->title,
+						// todo: replace with actual url once external page access and encryption are resolved
+						"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
+					],
+					$externalParticipant->email,
+					"Coodle Umfrage modifiziert / Coodle survey modified"
 				);
 			}
 		}
@@ -387,6 +461,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		if ($shouldInformParticipants) {
 			$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
 			$participants = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
+			$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId, true);
 			$authUserFullName = getData($this->PersonModel->getFullName(getAuthUID()));
 
 			foreach ($participants as $participant) {
@@ -399,6 +474,22 @@ class CoodleSurvey extends FHCAPI_Controller
 						"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
 					],
 					$participant->uid . "@" . DOMAIN,
+					'Coodle Umfrage storniert / Coodle survey canceled'
+				);
+			}
+
+			foreach ($externalParticipants as $externalParticipant) {
+				sendSanchoMail(
+					"Sancho_Mail_Coodle_Canceled_Ext",
+					[
+						"surveyParticipantName" => $externalParticipant->name,
+						"surveyCreatorName" => $authUserFullName,
+						"org" => CAMPUS_NAME,
+						"surveyTitle" => $survey->title,
+						// todo: replace with actual url once external page access and encryption are resolved
+						"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
+					],
+					$externalParticipant->email,
 					'Coodle Umfrage storniert / Coodle survey canceled'
 				);
 			}
@@ -454,6 +545,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		if ($shouldInformParticipants) {
 			$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
 			$participants = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
+			$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId, true);
 			$authUserFullName = getData($this->PersonModel->getFullName(getAuthUID()));
 
 			if ($selectedTimeslot) {
@@ -503,6 +595,34 @@ class CoodleSurvey extends FHCAPI_Controller
 						]
 					);
 				}
+
+				foreach ($externalParticipants as $externalParticipant) {
+					sendSanchoMail(
+						"Sancho_Mail_Coodle_Completed_Ext",
+						[
+							"surveyCreatorName" => $authUserFullName,
+							"surveyParticipantName" => $externalParticipant->name,
+							"org" => CAMPUS_NAME,
+							"surveyTitle" => $survey->title,
+							// todo: replace with actual url once external page access and encryption are resolved
+							"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
+						],
+						$externalParticipant->email,
+						"Coodle Umfrage vollendet / Coodle survey completed",
+						"",
+						"",
+						null,
+						null,
+						null,
+						[
+							[
+								"filePath" => $calendarFilePath,
+								"altName" => "coodle.ics",
+							]
+						]
+					);
+				}
+
 				unlink($calendarFilePath);
 			} else {
 				foreach ($participants as $participant) {
@@ -516,6 +636,22 @@ class CoodleSurvey extends FHCAPI_Controller
 						],
 						$participant->uid . "@" . DOMAIN,
 						'Coodle Umfrage vollendet / Coodle survey completed'
+					);
+				}
+
+				foreach ($externalParticipants as $externalParticipant) {
+					sendSanchoMail(
+						"Sancho_Mail_Coodle_Cmpltd_No_Ext",
+						[
+							"surveyCreatorName" => $authUserFullName,
+							"surveyParticipantName" => $externalParticipant->name,
+							"org" => CAMPUS_NAME,
+							"surveyTitle" => $survey->title,
+							// todo: replace with actual url once external page access and encryption are resolved
+							"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
+						],
+						$externalParticipant->email,
+						"Coodle Umfrage vollendet / Coodle survey completed"
 					);
 				}
 			}
@@ -543,7 +679,15 @@ class CoodleSurvey extends FHCAPI_Controller
 			}
 		);
 
-		if (!count($participantsWithoutVote)) {
+		$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId, true);
+		$externalParticipantsWithoutVote = array_filter(
+			$externalParticipants,
+			function ($externalParticipant) {
+				return $externalParticipant->selection === null;
+			}
+		);
+
+		if (!count($participantsWithoutVote) && !count($externalParticipantsWithoutVote)) {
 			$this->terminateWithError("All participants have already voted!");
 		}
 
@@ -560,6 +704,22 @@ class CoodleSurvey extends FHCAPI_Controller
 				],
 				$participant->uid . "@" . DOMAIN,
 				'Coodle Umfrage Erinnerung / Coodle survey reminder'
+			);
+		}
+
+		foreach ($externalParticipantsWithoutVote as $externalParticipant) {
+			sendSanchoMail(
+				"Sancho_Mail_Coodle_Reminder_Ext",
+				[
+					"surveyCreatorName" => $authUserFullName,
+					"surveyParticipantName" => $externalParticipant->name,
+					"org" => CAMPUS_NAME,
+					"surveyTitle" => $survey->title,
+					// todo: replace with actual url once external page access and encryption are resolved
+					"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
+				],
+				$externalParticipant->email,
+				"Coodle Umfrage Erinnerung / Coodle survey reminder"
 			);
 		}
 
