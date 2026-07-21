@@ -49,6 +49,10 @@ export function tagFormatter(cell, tagComponent)
 			tagElement.title = tag.notiz;
 			tagElement.className = "tag " + tag.style;
 			if (tag.done) tagElement.className += " tag_done";
+			if (tag.automatisiert){
+				tagElement.className += " tag_auto";
+				tagElement.innerHTML = "<i class='fa-solid fa-lock'></i> " + tag.beschreibung;
+			}
 
 			const tagDef = mappedData.find(t => t.typ_kurzbz === tag.typ_kurzbz);
 
