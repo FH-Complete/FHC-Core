@@ -2,6 +2,9 @@ import { numberPadding } from "../../../../../../helpers/DateHelpers.js";
 
 export default {
 	name: "CoodleSurveyCalendarTimeslotCard",
+	components: {
+		VueDatePicker,
+	},
 	props: {
 		timeslot: Object | null,
 		isTimeslotCardEditInProgress: Boolean,
@@ -16,8 +19,6 @@ export default {
 			isEditInProgress: false,
 			dateInput: null,
 			startTimeInput: null,
-			minStartTimeInput: "07:00",
-			maxStartTimeInput: "22:55",
 		};
 	},
 	computed: {
@@ -50,8 +51,14 @@ export default {
 	},
 	methods: {
 		setInputs() {
-			this.dateInput = this.$props.timeslot?.datum;
-			this.startTimeInput = this.$props.timeslot?.beginn?.slice(0, 5);
+			const tomorrow = new Date(
+				new Date().getTime() + 24 * 60 * 60 * 1000,
+			);
+			this.dateInput =
+				this.$props.timeslot?.datum ??
+				tomorrow.toISOString().slice(0, 10);
+			this.startTimeInput =
+				this.$props.timeslot?.beginn?.slice(0, 5) ?? "12:00";
 		},
 		async startEdit() {
 			if (this.$props.isTimeslotCardEditInProgress) {
@@ -107,6 +114,44 @@ export default {
 				this.$emit("createTimeslot", { startDate });
 			}
 		},
+		updateDateInput(value) {
+			let date = new Date(value);
+			this.dateInput = date.toISOString().slice(0, 10);
+		},
+		getDateInputPreview() {
+			if (!this.dateInput?.length) return "";
+
+			const day = this.dateInput.slice(8);
+			const month = this.dateInput.slice(5, 7);
+			const year = this.dateInput.slice(0, 4);
+
+			return day + "." + month + "." + year;
+		},
+		updateStartTimeInput(value) {
+			this.startTimeInput =
+				numberPadding(value.hours) + ":" + numberPadding(value.minutes);
+		},
+		getStartTimeInputPreview() {
+			if (!this.startTimeInput?.length) return "";
+
+			const hours = this.startTimeInput.slice(0, 2);
+			const minutes = this.startTimeInput.slice(3, 5);
+
+			return hours + ":" + minutes;
+		},
+		getInitialStartTimeValue() {
+			if (!this.startTimeInput?.length) {
+				return {
+					hours: 12,
+					minutes: 0,
+				};
+			}
+
+			return {
+				hours: parseInt(this.startTimeInput.split(":")[0]),
+				minutes: parseInt(this.startTimeInput.split(":")[1]),
+			};
+		},
 	},
 	created() {
 		this.setInputs();
@@ -123,19 +168,35 @@ export default {
 					<span>{{ formattedStartEnd }}</span>
 				</div>
 				<div v-else class="d-flex flex-column gap-2 flex-grow-1 justify-content-center pe-3">
-					<div class="d-flex flex-row gap-2">
+					<div class="d-flex flex-row align-items-center gap-2">
 						<label :for="'dateInput-' + $props.timeslot?.isostart" class="fw-bold">{{ "Date: " }}</label>
-						<input v-model="dateInput" type="date" class="flex-grow-1" />
+						<vue-date-picker
+							@update:model-value="updateDateInput($event)"
+							:model-value="dateInput"
+							:format="() => getDateInputPreview()"
+							:text-input="true"
+							:clearable="false"
+							:enable-time-picker="false"
+							:now-button-label="$p.t('calendar/today')"
+							:week-num-name="$p.t('calendar/kw')"
+							auto-apply
+							six-weeks
+							teleport
+						/>
 					</div>
 					<div class="d-flex flex-row gap-2">
 						<label :for="'startTimeInput-' + $props.timeslot?.isostart" class="fw-bold">{{ "Start time: " }}</label>
-						<input
-							v-model="startTimeInput"
-							type="time"
-							step="300"
-							:min="minStartTimeInput"
-							:max="maxStartTimeInput"
-							class="flex-grow-1"
+						<vue-date-picker
+							@update:model-value="updateStartTimeInput($event)"
+							:model-value="getInitialStartTimeValue()"
+							:format="() => getStartTimeInputPreview()"
+							:text-input="true"
+							:clearable="false"
+							:minutes-increment="5"
+							:min-time="{ hours: 7, minutes: 0 }"
+							:max-time="{ hours: 22, minutes: 55 }"
+							time-picker
+							teleport
 						/>
 					</div>
 				</div>
