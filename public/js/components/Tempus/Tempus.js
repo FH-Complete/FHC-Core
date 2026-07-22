@@ -46,6 +46,7 @@ import { getTempusShortcuts } from "./shortcuts.js";
 import KeyboardShortcuts from "./KeyboardShortcuts.js";
 import { useContextMenuActions } from "../../composables/Tempus/ContextMenuActions.js";
 import MultiWeekPlanModal from "./MultiWeekPlanModal.js";
+import HistoryModal from "./HistoryModal.js";
 import { getTempusSearchbarOptions } from "./Filters/searchbarOptions.js";
 import CoreTag from '../Tag/Tag.js';
 
@@ -71,6 +72,7 @@ export default {
     Reservierung,
     KeyboardShortcuts,
     MultiWeekPlanModal,
+    HistoryModal,
     CoreTag,
   },
   props: {
@@ -310,7 +312,7 @@ export default {
         .call(ApiKalender.getHistory(orig.kalender_id))
         .then((result) => {
           this.historyEntries = result.data ?? [];
-          this.$refs.historyModel.show();
+          this.$refs.historyModal.show();
         });
     },
     syncToLecturer(orig) {
@@ -1569,29 +1571,7 @@ export default {
         </div>
 			</template>
 		</bs-modal>
-		<bs-modal ref="historyModel" class="bootstrap-prompt" dialogClass="modal-lg" data-cy="historyModal">
-			<template #title>History</template>
-			<template #default>
-				<table v-if="historyEntries.length" class="table table-bordered table-hover">
-					<thead class="table-light">
-						<tr>
-							<th>Von</th>
-							<th>Bis</th>
-							<th>Status</th>
-							<th>Ort</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr v-for="entry in historyEntries" :key="entry.id">
-							<td>{{ entry.von }}</td>
-							<td>{{ entry.bis }}</td>
-							<td>{{ entry.status_kurzbz }}</td>
-							<td>{{ entry.ort }}</td>
-						</tr>
-					</tbody>
-				</table>
-			</template>
-		</bs-modal>
+		<history-modal ref="historyModal" :entries="historyEntries" />
     <core-tag
         v-if="tagEndpoint && tagsAssignmentModal.calendar?.eindeutige_gruppen_id"
         ref="tagComponent"
