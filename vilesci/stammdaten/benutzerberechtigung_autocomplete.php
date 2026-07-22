@@ -148,4 +148,31 @@ if (isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete'] == 'kostenstel
 	exit();
 }
 
+if (isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete'] == 'rollen')
+{
+	$rolle = trim((isset($_REQUEST['rolle']) ? $_REQUEST['rolle'] : ''));
+	if (is_null($rolle) || $rolle == '')
+		exit();
+
+	$search = trim((isset($_REQUEST['term']) ? $_REQUEST['term'] : ''));
+	if (is_null($search) || $search == '')
+		exit();
+
+	$berechtigung = new berechtigung();
+
+	if ($berechtigung->searchRollen($rolle, $search))
+	{
+		$result_obj = array();
+		foreach ($berechtigung->result as $row)
+		{
+			$item['rolle_kurzbz'] = html_entity_decode($row->rolle_kurzbz);
+			$item['beschreibung'] = html_entity_decode($row->beschreibung);
+			$item['lange_beschreibung'] = html_entity_decode($row->lange_beschreibung);
+			$result_obj[] = $item;
+		}
+		echo json_encode($result_obj);
+	}
+	exit();
+}
+
 ?>

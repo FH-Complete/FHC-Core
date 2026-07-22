@@ -387,5 +387,117 @@ class berechtigung extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Sucht nach rollen
+	 * @param string $searchItem Suchbegriff
+	 * @return boolean
+	 */
+	public function searchRollen($rolle, $searchItem)
+	{
+		$this->result=array();
+		$qry = 'SELECT * FROM system.tbl_rolle WHERE
+				(
+					LOWER(rolle_kurzbz) LIKE LOWER(\'%'.$this->db_escape(($searchItem)).'%\')
+					OR
+					LOWER(beschreibung) LIKE LOWER(\'%'.$this->db_escape(($searchItem)).'%\')
+					OR
+					LOWER(lange_beschreibung) LIKE LOWER(\'%'.$this->db_escape(($searchItem)).'%\')
+				) AND rolle_kurzbz NOT IN (SELECT basic_rolle_kurzbz FROM system.tbl_rolle_rolle WHERE main_rolle_kurzbz = \''.$this->db_escape(($rolle)).'\')';
+
+		$qry .= ' ORDER BY rolle_kurzbz';
+
+		if ($this->db_query($qry))
+		{
+			while ($row = $this->db_fetch_object())
+			{
+				$obj = new stdClass();
+
+				$obj->rolle_kurzbz = $row->rolle_kurzbz;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->lange_beschreibung = $row->lange_beschreibung;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Berechtigungen';
+			return false;
+		}
+	}
+
+	/**
+	 *
+	 */
+	public function getRollenRollen($rolle_kurzbz)
+	{
+		$qry = 'SELECT r.*
+			FROM system.tbl_rolle r
+			JOIN system.tbl_rolle_rolle rr ON (rr.basic_rolle_kurzbz = r.rolle_kurzbz)
+			WHERE rr.main_rolle_kurzbz = \''.$this->db_escape(($rolle_kurzbz)).'\'
+			ORDER BY r.rolle_kurzbz';
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new stdClass();
+	
+				$obj->rolle_kurzbz = $row->rolle_kurzbz;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->lange_beschreibung = $row->lange_beschreibung;
+				
+				$this->result[] = $obj;
+			}
+			return true;	
+		}
+		else
+		{
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+			return false;
+		}		
+	}
+
+	/**
+	 *
+	 */
+	public function saveRolleRolle($main_rolle, $basic_rolle, $uid)
+	{
+		// Upsert
+		$qry = 'INSERT INTO system.tbl_rolle_rolle (main_rolle_kurzbz, basic_rolle_kurzbz, insertvon)
+			VALUES (\''.$this->db_escape(($main_rolle)).'\', \''.$this->db_escape(($basic_rolle)).'\', \''.$this->db_escape(($uid)).'\')
+			ON CONFLICT (main_rolle_kurzbz, basic_rolle_kurzbz) DO NOTHING';
+		if ($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern: '.$this->db_last_error();
+			return false;
+		}
+	}
+
+	/**
+	 *
+	 */
+	public function deleteRolleRolle($main_rolle_kurzbz, $basic_rolle_kurzbz)
+	{
+		$qry = 'DELETE FROM system.tbl_rolle_rolle
+			WHERE main_rolle_kurzbz = '.$this->db_add_param($main_rolle_kurzbz).'
+			AND basic_rolle_kurzbz = '.$this->db_add_param($basic_rolle_kurzbz);
+		
+		if ($this->db_query($qry))
+		{
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Löschen der Rolle:'.$this->db_last_error();
+			return false;
+		}
+	}
 }
 ?>

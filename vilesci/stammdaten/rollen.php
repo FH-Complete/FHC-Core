@@ -30,18 +30,16 @@ $user = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-if(!$rechte->isBerechtigt('basis/berechtigung'))
+if (!$rechte->isBerechtigt('basis/berechtigung'))
 	die($rechte->errormsg);
 
 $rolle_kurzbz = filter_input(INPUT_GET, 'rolle_kurzbz');
 $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
-$copy = filter_input(INPUT_POST, 'copy');
-$saveRecht = isset($_POST['action']) && $_POST['action'] == 'saveRechtAjax' ? true : false;
-$vergleich = filter_input(INPUT_GET, 'vergleich');
+$save = filter_input(INPUT_GET, 'save');
 ?>
 <html>
 	<head>
-		<title>Rollen Uebersicht</title>
+		<title>Rollen Rollen Uebersicht</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
@@ -62,27 +60,9 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 					widgetOptions : {filter_saveFilters : true}
 				});
 
-				$("#t2").tablesorter(
-				{
-					sortList: [[0,0]],
-					widgets: ["zebra", "filter", "stickyHeaders"],
-					headers: {2:{filter:false, sorter:false}},
-					widgetOptions : {filter_saveFilters : true}
-				});
-				$("#t3").tablesorter(
-				{
-					sortList: [],
-					widgets: ["zebra"]
-				});
-				$("#t4").tablesorter(
-				{
-					sortList: [],
-					widgets: ["zebra"]
-				});
 				$('.resetsaved').click(function()
 				{
 					$(".tablesorter").trigger("filterReset");
-					window.location("<?php echo $_SERVER['PHP_SELF'] ?>");
 					return false;
 				});
 				$("textarea").keyup(function()
@@ -101,7 +81,7 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 				});
 
 				$(".rolle_autocomplete").autocomplete({
-					source: "benutzerberechtigung_autocomplete.php?autocomplete=rollen",
+					source: "benutzerberechtigung_autocomplete.php?autocomplete=rollen&rolle=<?php echo $rolle_kurzbz; ?>",
 					minLength:2,
 					response: function(event, ui)
 					{
@@ -118,89 +98,17 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 						$(this).val(ui.item.rolle_kurzbz);
 					}
 				});
-
-				$(".copyButton").click(function(event)
-				{
-					event.preventDefault();
-					$(this).siblings().show();
-					$(this).hide();
-				});
 			});
 
 			function validateNewData()
 			{
 				if($('#rolle_neu_autocomplete').val() == '')
 				{
-					alert('Berechtigung darf nicht leer sein')
+					alert('Rolle darf nicht leer sein')
 					return false;
-				}
-				else if ($('#art_neu').val() == '')
-				{
-					alert('Art darf nicht leer sein')
-					return false;
-				}
-				else if ($('#art_neu').val() != '')
-				{
-					var eingabe, c, erlaubt = 'suid', laenge;
-					eingabe = $('#art_neu').val();
-					eingabe = eingabe.toLowerCase();
-					laenge = eingabe.length;
-					for (c = 0; c < laenge; c++)
-					{
-						d = eingabe.charAt(c);
-						if (erlaubt.indexOf(d) == -1)
-						{
-							alert ('Erlaubte Werte für Art sind s,u,i,d');
-							return false;
-						}
-					}
 				}
 				else
 					return true;
-			}
-
-			function saveRecht(rolle_kurzbz, recht, art)
-			{
-				data = {
-					action: 'saveRechtAjax',
-					rolle_ajax: rolle_kurzbz,
-					recht_ajax: recht,
-					art_ajax: art
-				};
-
-				$.ajax({
-					url: 'berechtigungrolle.php',
-					data: data,
-					type: 'POST',
-					dataType: 'json',
-					success: function(data)
-					{
-						if(data.status!='ok')
-						{
-							//error
-							console.log('error');
-						}
-						else
-						{
-							//location.reload(true);
-							window.location.reload(true)
-							// html = '<td style=""></td><td style="">'+recht+'</td><td style="text-align: right;">'+art+'</td>';
-							// console.log('#'+rolle_kurzbz+'_'+recht);
-							// $('#'+rolle_kurzbz+'_'+recht).html(html);
-						}
-					},
-					error: function(data)
-					{
-						//error
-						console.log('AJAX-Fehler in Error-Methode: ' + data.status + ' - ' + data.error);
-
-						location.reload(true);
-					},
-					stop: function (data)
-					{
-						location.reload(true);
-					}
-				});
 			}
 		</script>
 		<style>
@@ -253,114 +161,65 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 
 	<body class="background_main">
 
-
-	<?php
-
-	if($saveRecht)
+<?php
+	if (isset($rolle_kurzbz))
 	{
-		$rolle_kurzbz = filter_input(INPUT_POST, 'rolle_ajax');
-		$recht = filter_input(INPUT_POST, 'recht_ajax');
-		$art = filter_input(INPUT_POST, 'art_ajax');
+		echo '<h2>Rollen der Rolle "'.$rolle_kurzbz.'"</h2>';
 
-		$berechtigung = new berechtigung();
-		$berechtigung->rolle_kurzbz = $rolle_kurzbz;
-		$berechtigung->rolle_kurzbz = $recht;
-		$berechtigung->art = $art;
-		$berechtigung->insertamum = date('Y-m-d H:i:s');
-		$berechtigung->insertvon = $user;
-
-		if($berechtigung->saveRolleBerechtigung())
+		if (isset($save))
 		{
-			echo json_encode(array(
-						'status' => 'ok',
-						'msg' => ''
-					));
-			exit();
-		}
-		else
-		{
-			echo json_encode(array(
-						'status' => 'error',
-						'msg' => 'Fehler beim Speichern der Rolle'
-					));
-			exit();
-		}
-	}
-
-	if(isset($rolle_kurzbz))
-	{
-		echo '<h2>Berechtigungen der Rolle "'.$rolle_kurzbz.'"</h2>';
-		$rolle_kurzbz = filter_input(INPUT_GET, 'rolle_kurzbz');
-		$art = filter_input(INPUT_GET, 'art');
-		$save = filter_input(INPUT_GET, 'save');
-		$anmerkung = filter_input(INPUT_GET, 'anmerkung');
-
-		if(isset($save))
-		{
-			if($rolle_kurzbz && $rolle_kurzbz && $art)
+			$add_rolle_kurzbz = filter_input(INPUT_GET, 'add_rolle_kurzbz');
+			if (isset($rolle_kurzbz) && isset($add_rolle_kurzbz))
 			{
 				$berechtigung = new berechtigung();
-				$berechtigung->rolle_kurzbz = $rolle_kurzbz;
-				$berechtigung->rolle_kurzbz = $rolle_kurzbz;
-				$berechtigung->art = $art;
-				$berechtigung->anmerkung = $anmerkung;
-				$berechtigung->insertamum = date('Y-m-d H:i:s');
-				$berechtigung->insertvon = $user;
 
-				if($berechtigung->saveRolleBerechtigung()): ?>
-					<b>Zuteilung gespeichert</b>
-				<?php
-					$rolle_kurzbz = '';
-					$art = 'suid';
-					$anmerkung = '';
-				else: ?>
-					<b>Fehler beim Speichern der Zuteilung: <?php echo $berechtigung->errormsg ?>
-				<?php endif;
+				if ($berechtigung->saveRolleRolle($rolle_kurzbz, $add_rolle_kurzbz, $user))
+				{
+					echo '<b>Zuteilung gespeichert</b>';
+				}
+				else
+				{
+					echo '<b>Fehler beim Speichern der Zuteilung: </b>'.$berechtigung->errormsg;
+				}
 			}
 		}
 
-		if(isset($delete))
+		if (isset($delete))
 		{
-			$berechtigung = new berechtigung();
-			if(!$berechtigung->deleteRolleBerechtigung($rolle_kurzbz, $rolle_kurzbz)): ?>
-				<b>Fehler beim Löschen: </b><?php echo $berechtigung->errormsg ?>
-			<?php else: ?>
-				<b>Berechtigung <?php echo $rolle_kurzbz.' mit '.$art ?> gelöscht!</b>
-			<?php endif;
-		} ?>
+			$delete_rolle_kurzbz = filter_input(INPUT_GET, 'delete_rolle_kurzbz');
+			if (isset($rolle_kurzbz) && isset($delete_rolle_kurzbz))
+			{
+				$berechtigung = new berechtigung();
 
-		<a href="<?php echo basename(__FILE__) ?>">
+				if ($berechtigung->deleteRolleRolle($rolle_kurzbz, $delete_rolle_kurzbz))
+				{
+					echo '<b>Rolle '.$delete_rolle_kurzbz.' gelöscht!</b>';
+				}
+				else
+				{
+					echo '<b>Fehler beim Löschen: </b>'.$berechtigung->errormsg;
+				}
+			}
+		}
+?>
+		<a href="<?php echo APP_ROOT; ?>/vilesci/stammdaten/berechtigungrolle.php">
 			Zurück zur Rollen Übersicht
 		</a>
 		<br><br>
-		<?php
+<?php
 		$berechtigung = new berechtigung();
 		$berechtigung->getBerechtigungen();
-		?>
+?>
 		<form action="<?php echo basename(__FILE__) ?>" method="GET">
 			<div style="vertical-align: top">
 			<input type="text" 
-					value="<?php echo $rolle_kurzbz ?>"
-					placeholder="Berechtigung" 
+					value=""
+					placeholder="Neue Rolle" 
 					id="rolle_neu_autocomplete" 
 					class="rolle_autocomplete" 
-					name="rolle_kurzbz" 
+					name="add_rolle_kurzbz" 
 					style="width: 300px">
 			<input type="hidden" name="rolle_kurzbz" value="<?php echo $rolle_kurzbz ?>">
-			<input type="text" 
-					id="art_neu" 
-					value="<?php echo ($art != '' ? $art : 'suid') ?>"
-					size="4" 
-					name="art">
-			<textarea type="text"
-					placeholder="Anmerkung"
-					id="anmerkung_neu"
-					rows="2"
-					cols="50"
-					size="200"
-					maxlength="256"
-					name="anmerkung"
-					style="vertical-align: top; font-family: inherit; font-size: small;"><?php echo $anmerkung ?></textarea>
 			<input type="submit" name="save" value="Hinzufügen" onclick="return validateNewData()">
 			</div>
 		</form>
@@ -369,405 +228,33 @@ $vergleich = filter_input(INPUT_GET, 'vergleich');
 			<thead>
 				<tr>
 					<th>Kurzbz</th>
-					<th>Art</th>
 					<th>Beschreibung</th>
-					<th>Anmerkung</th>
-					<th colspan="2"></th>
+					<th>Lange Beschreibung</th>
+					<th></th>
 				</tr>
 			</thead>
 			<tbody>
 		<?php
 		$berechtigungen = new berechtigung();
-		$berechtigungen->getRolleBerechtigung($rolle_kurzbz);
+		$berechtigungen->getRollenRollen($rolle_kurzbz);
 
 		foreach($berechtigungen->result as $rolle): ?>
 				<tr>
 					<td><?php echo $rolle->rolle_kurzbz ?></td>
-					<td><?php echo $rolle->art ?></td>
 					<td><?php echo $rolle->beschreibung ?></td>
-					<td><?php echo $rolle->anmerkung ?></td>
+					<td><?php echo $rolle->lange_beschreibung ?></td>
 					<td>
-						<a href="<?php echo basename(__FILE__) ?>?rolle_kurzbz=<?php echo $rolle->rolle_kurzbz ?>&rolle_kurzbz=<?php echo $rolle->rolle_kurzbz ?>&art=<?php echo $rolle->art ?>&anmerkung=<?php echo $rolle->anmerkung ?>">
-							Bearbeiten
-						</a>
-					</td>
-					<td>
-						<a href="<?php echo basename(__FILE__) ?>?delete=1&rolle_kurzbz=<?php echo $rolle->rolle_kurzbz ?>&rolle_kurzbz=<?php echo $rolle->rolle_kurzbz ?>&art=<?php echo $rolle->art ?>&anmerkung=<?php echo $rolle->anmerkung ?>">
-							Recht entfernen
+						<a href="<?php echo basename(__FILE__) ?>?delete=1&rolle_kurzbz=<?php echo $rolle_kurzbz ?>&delete_rolle_kurzbz=<?php echo $rolle->rolle_kurzbz ?>">
+							Rolle entfernen
 						</a>
 					</td>
 				</tr>
 		<?php endforeach; ?>
 			</tbody>
 		</table>
-		<?php
+<?php
 	}
-	elseif(isset($vergleich))
-	{
-		echo '<h2>Rollen vergleichen</h2>';
-		$rolle1 = filter_input(INPUT_GET, 'rolle_kurzbz1');
-		$rolle2 = filter_input(INPUT_GET, 'rolle_kurzbz2');
-		 ?>
-
-		<a href="<?php echo basename(__FILE__) ?>">
-			Zurück zur Rollen Übersicht
-		</a>
-		<br><br>
-
-		<?php
-		$rollen1Arr = array();
-		$rollen2Arr = array();
-		$rollenGesamt = array();
-		$rollen = new berechtigung();
-		$rollen->getRolleBerechtigung($rolle1);
-		foreach ($rollen->result AS $recht)
-		{
-			$rollen1Arr[$recht->rolle_kurzbz] = $recht->art;
-		}
-		$rollen = new berechtigung();
-		$rollen->getRolleBerechtigung($rolle2);
-		foreach ($rollen->result AS $recht)
-		{
-			$rollen2Arr[$recht->rolle_kurzbz] = $recht->art;
-		}
-		$rollenGesamt = array_merge($rollen1Arr,$rollen2Arr);
-		ksort($rollenGesamt);
-
-		echo '	<form action="'.basename(__FILE__).'?vergleich=vergleich" method="GET" style="width: 60%">
-					<div style="width: 100%">
-						<div style="width: 50%; float: left;">
-							Rolle 1:
-							<select id="rolle_kurzbz" name="rolle_kurzbz1">
-								<option value="">Bitte auswählen</option>';
-							$rollen = new berechtigung();
-							$rollen->getRollen('rolle_kurzbz');
-							foreach($rollen->result as $rolle)
-							{
-								if ($rolle1 == $rolle->rolle_kurzbz)
-									$selected = 'selected="selected"';
-								else
-									$selected = '';
-
-								echo '<option value="'.$rolle->rolle_kurzbz.'"  title="'.$rolle->beschreibung.'" '.$selected.'>'.$rolle->rolle_kurzbz.'</option>';
-							}
-							echo '</select>';
-							if (isset($rolle1))
-							{
-								echo '	<table id="t3" class="tablesorter">
-											<thead>
-											<tr>
-												<th>Kurzbz</th>
-												<th>Art</th>
-												<th>&nbsp;</th>
-											</tr>
-											</thead>
-											<tbody>';
-
-											foreach ($rollenGesamt AS $recht => $art)
-											{
-												if (array_key_exists($recht, $rollen1Arr) || !array_key_exists($recht, $rollen2Arr))
-												{
-													if ($art != $rollen1Arr[$recht])
-													{
-														echo '	<tr id="'.$rolle1.'_'.$recht.'">
-																	<td style="">'.$recht.'</td>
-																	<td class="difference">'.$rollen1Arr[$recht].'</td>
-																	<td style="text-align: right;"><button type="button" onclick="saveRecht(\''.$rolle2.'\', \''.$recht.'\', \''.$rollen1Arr[$recht].'\')"> -> </button></td>
-																</tr>';
-													}
-													elseif (!array_key_exists($recht, $rollen2Arr))
-													{
-														echo '	<tr id="'.$rolle1.'_'.$recht.'">
-																	<td style="">'.$recht.'</td>
-																	<td style="">'.$art.'</td>
-																	<td style="text-align: right;"><button type="button" onclick="saveRecht(\''.$rolle2.'\', \''.$recht.'\', \''.$rollen1Arr[$recht].'\')"> -> </button></td>
-																</tr>';
-													}
-													else
-													{
-														echo '	<tr id="'.$rolle1.'_'.$recht.'">
-																	<td style="">'.$recht.'</td>
-																	<td style="">'.$art.'</td>
-																	<td style="text-align: right;"></td>
-																</tr>';
-													}
-												}
-												else
-												{
-													echo '	<tr id="'.$rolle1.'_'.$recht.'">
-																<td class="difference" style="">&nbsp;</td>
-																<td class="difference"style="">&nbsp;</td>
-																<td class="difference"style=" text-align: right;"></td>
-															</tr>';
-												}
-											}
-											echo '
-											</tbody>
-										</table>';
-							}
-						echo '
-						</div>
-						<div style="width: 50%; float: left;">
-							Rolle 2:
-							<select id="rolle_kurzbz" name="rolle_kurzbz2">
-								<option value="">Bitte auswählen</option>';
-							$rollen = new berechtigung();
-							$rollen->getRollen('rolle_kurzbz');
-							foreach($rollen->result as $rolle)
-							{
-								if ($rolle2 == $rolle->rolle_kurzbz)
-									$selected = 'selected="selected"';
-								else
-									$selected = '';
-
-								echo '<option value="'.$rolle->rolle_kurzbz.'"  title="'.$rolle->beschreibung.'" '.$selected.'>'.$rolle->rolle_kurzbz.'</option>';
-							}
-							echo '</select>';
-							echo '<input style="margin-left: 20px" type="submit" name="vergleich" value="Vergleichen">';
-							if (isset($rolle2))
-							{
-								echo '	<table id="t4" class="tablesorter">
-											<thead>
-											<tr>
-												<th>&nbsp;</th>
-												<th>Kurzbz</th>
-												<th>Art</th>
-											</tr>
-											</thead>
-											<tbody>';
-								foreach ($rollenGesamt AS $recht => $art)
-								{
-									if (array_key_exists($recht, $rollen2Arr) || !array_key_exists($recht, $rollen1Arr))
-									{
-										if ($art != $rollen2Arr[$recht])
-										{
-											echo '	<tr id="'.$rolle2.'_'.$recht.'">
-														<td style="text-align: left;"><button type="button" onclick="saveRecht(\''.$rolle1.'\', \''.$recht.'\', \''.$rollen2Arr[$recht].'\')"> <- </button></td>
-														<td style="">'.$recht.'</td>
-														<td class="difference" style="">'.$rollen2Arr[$recht].'</td>
-													</tr>';
-										}
-										elseif (!array_key_exists($recht, $rollen1Arr))
-										{
-											echo '	<tr id="'.$rolle2.'_'.$recht.'">
-														<td style="text-align: left;"><button type="button" onclick="saveRecht(\''.$rolle1.'\', \''.$recht.'\', \''.$rollen2Arr[$recht].'\')"> <- </button></td>
-														<td style="">'.$recht.'</td>
-														<td style="">'.$art.'</td>														
-													</tr>';
-										}
-										else
-										{
-											echo '	<tr id="'.$rolle2.'_'.$recht.'">
-														<td style="">&nbsp;</td>
-														<td style="">'.$recht.'</td>
-														<td style="">'.$art.'</td>
-													</tr>';
-										}
-									}
-									else
-									{
-										echo '	<tr id="'.$rolle2.'_'.$recht.'">
-													<td class="difference" style=""></td>
-													<td class="difference" style="">&nbsp;</td>
-													<td class="difference" style="">&nbsp;</td>
-												</tr>';
-									}
-								}
-											echo '
-											</tbody>
-										</table>';
-							}
-						echo '
-						</div>						
-					</div>
-				</form>';
-	}
-	else
-	{
-		echo '<h2>Rollen Übersicht</h2>';
-		$save = filter_input(INPUT_POST, 'save');
-		$edit = filter_input(INPUT_POST, 'edit');
-
-		if(isset($save))
-		{
-			$kurzbz = filter_input(INPUT_POST, 'kurzbz');
-			$beschreibung = filter_input(INPUT_POST, 'beschreibung');
-
-			if(isset($kurzbz) && isset($beschreibung))
-			{
-				$berechtigung = new berechtigung();
-				$berechtigung->rolle_kurzbz = $kurzbz;
-				$berechtigung->beschreibung = $beschreibung;
-				$berechtigung->new = true;
-
-				if($berechtigung->saveRolle())
-				{
-					echo 'Daten wurden gespeichert';
-				}
-				else
-				{
-					echo 'Fehler beim Speichern:'.$berechtigung->errormsg;
-				}
-			}
-			else
-			{
-				echo 'Zum Speichern der Daten muss die kurzbz und die Beschreibung angegeben werden';
-			}
-		}
-
-		$kurzbz = filter_input(INPUT_GET, 'kurzbz');
-
-		if(isset($delete) && isset($kurzbz))
-		{
-			$berechtigung = new berechtigung();
-			if($berechtigung->deleteRolle($kurzbz))
-				echo 'Die Rolle '.$kurzbz.' wurde erfolgreich gelöscht';
-			else
-				echo 'Fehler beim Löschen:'.$berechtigung->errormsg;
-		}
-
-		if(isset($copy))
-		{
-			$kurzbz = filter_input(INPUT_POST, 'kurzbz');
-			$copyName = filter_input(INPUT_POST, 'copy_name');
-			$beschreibung = filter_input(INPUT_POST, 'beschreibung');
-
-			if(isset($kurzbz))
-			{
-				$berechtigung = new berechtigung();
-				$berechtigung->rolle_kurzbz = $copyName;
-				$berechtigung->beschreibung = $beschreibung;
-				$berechtigung->new = true;
-
-				if($berechtigung->saveRolle())
-				{
-					$rollenrechte = new berechtigung();
-					$rollenrechte->getRolleBerechtigung($kurzbz);
-					foreach($rollenrechte->result as $rollenrecht)
-					{
-						$newRolleRecht = new berechtigung();
-						$newRolleRecht->rolle_kurzbz = $copyName;
-						$newRolleRecht->rolle_kurzbz = $rollenrecht->rolle_kurzbz;
-						$newRolleRecht->art = $rollenrecht->art;
-						$newRolleRecht->anmerkung = $rollenrecht->anmerkung;
-						$newRolleRecht->insertamum = date('Y-m-d H:i:s');
-						$newRolleRecht->insertvon = $user;
-						if(!$newRolleRecht->saveRolleBerechtigung())
-						{
-							echo 'Fehler beim Speichern des Rechts '.$rollenrecht->rolle_kurzbz.' zur Rolle '.$rollenrecht->rolle_kurzbz;
-							break;
-						}
-					}
-					echo 'Rolle erfolgreich kopiert';
-				}
-				else
-				{
-					echo 'Fehler beim kopieren der Rolle '.$kurzbz.':'.$berechtigung->errormsg;
-				}
-			}
-			else
-			{
-				echo 'Zum Speichern der Daten muss die kurzbz und die Beschreibung angegeben werden';
-			}
-		}
-
-		if(isset($edit))
-		{
-			$beschreibung = filter_input(INPUT_POST, 'beschreibung');
-
-			$berechtigung = new berechtigung();
-			$berechtigung->rolle_kurzbz = $kurzbz;
-			$berechtigung->beschreibung = $beschreibung;
-			$berechtigung->saveRolle(false);
-		}
-
-		//Tabelle mit Rollen anzeigen
-		$berechtigung = new berechtigung();
-		$berechtigung->getRollen(); ?>
-
-		<p style="text-align: right">
-			<a href="<?php echo basename(__FILE__) ?>?vergleich=vergleich">
-				Rollen vergleichen
-			</a>
-		</p>
-		<button type="button" class="resetsaved" title="Reset Filter">Reset Filter</button>
-		<table id="t2" class="tablesorter">
-			<thead>
-				<tr>
-					<th>Kurzbz</th>
-					<th>Beschreibung</th>
-					<th colspan="3">Aktion</th>
-				</tr>
-			</thead>
-			<tbody>
-
-			<?php
-			$edit = filter_input(INPUT_GET, 'edit');
-			$kurzbz = filter_input(INPUT_GET, 'kurzbz');
-			foreach($berechtigung->result as $rolle):
-				if($edit && $rolle->rolle_kurzbz == $kurzbz)
-				{
-					$rolle_edit = $rolle;
-				}
-				?>
-				<tr>
-					<td>
-						<a href="<?php echo basename(__FILE__) ?>?kurzbz=<?php echo $rolle->rolle_kurzbz ?>&edit=1">
-							<?php echo $rolle->rolle_kurzbz ?>
-						</a>
-					</td>
-					<td><?php echo $rolle->beschreibung ?></td>
-					<td>
-						<a href="<?php echo basename(__FILE__) ?>?rolle_kurzbz=<?php echo $rolle->rolle_kurzbz ?>">
-							Berechtigungen zuordnen
-						</a>
-					</td>
-					<td>
-						<a href="<?php echo APP_ROOT; ?>/vilesci/stammdaten/rollen.php?rolle_kurzbz=<?php echo $rolle->rolle_kurzbz ?>">
-							Rollen hinzufügen
-						</a>
-					</td>
-					<td>
-						<form method="POST" style="display: none">
-							<input type="text" placeholder="Name der Kopie" maxlength="32" size="35" name="copy_name" value=""/>
-							<input type="hidden" name="kurzbz" value="<?php echo $rolle->rolle_kurzbz ?>"/>
-							<input type="hidden" name="beschreibung" value="<?php echo $rolle->beschreibung ?>"/>
-							<input type="submit" name="copy" value="Jetzt kopieren" />
-						</form>
-						<a class="copyButton" href="">
-							Rolle kopieren
-						</a>
-					</td>
-					<td>
-						<a href="<?php echo basename(__FILE__) ?>?kurzbz=<?php echo $rolle->rolle_kurzbz ?>&delete=1" onclick="return confirm('Achtung! Das Löschen einer Rolle löscht auch alle Zuordnungen dieser Rolle zu BenutzerInnen.\n\nWollen Sie die Rolle <?php echo $rolle->rolle_kurzbz ?> wirklich löschen?');">
-							Rolle löschen
-						</a>
-					</td>
-				</tr>
-			<?php endforeach; ?>
-			</tbody>
-		</table>
-
-		<br><div style="vertical-align: top">
-			<?php
-			if($edit):
-				?>
-				<form method="POST">
-					Kurzbz: <input type="text" maxlength="32" size="35" name="kurzbz" value="<?php echo $rolle_edit->rolle_kurzbz ?>" disabled />
-					Beschreibung: <textarea style="vertical-align: top; font-family: inherit; font-size: small;" cols="50" rows="3" type="text" maxlength="256" size="200" name="beschreibung" value="" /><?php echo $rolle_edit->beschreibung ?></textarea>
-					<span style="color: grey; display: inline-block; width: 30px;"><?php echo (256 - strlen($rolle_edit->beschreibung)) ?></span>
-					&nbsp;<input type="submit" name="edit" value="Speichern" />
-				</form>
-		<a href="<?php echo basename(__FILE__) ?>">Neue Rolle anlegen</a>
-			<?php else: ?>
-				<form method="POST">
-					Kurzbz: <input type="text" maxlength="32" size="35" name="kurzbz" value="" />
-					Beschreibung: <textarea style="vertical-align: top; font-family: inherit; font-size: small;" cols="50" rows="3" type="text" maxlength="256" size="200" name="beschreibung" value="" /></textarea>
-					<span style="color: grey; display: inline-block; width: 30px;" id="countdown_textarea_new">256</span>
-					&nbsp;<input type="submit" name="save" value="Anlegen" />
-				</form>
-			<?php endif; ?>
-	<?php } ?>
+?>
 			</div>
 	</body>
 </html>
