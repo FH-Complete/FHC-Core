@@ -371,7 +371,6 @@ export default {
 						</div>
 					</div>
 				</div>
-			</div>
 				<coodle-survey-basic-info
 					v-model:surveyFormDataModelValue="surveyFormData"
 					:survey="$props.survey"

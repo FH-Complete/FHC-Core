@@ -23,6 +23,8 @@ class CoodleSurvey extends FHCAPI_Controller
 {
 
 	protected $coodlePageUrl;
+	protected $coodleIcalUrl;
+	protected $coodleIcalUrlWithEncryptedUid;
 
 	/**
 	 * Object initialization
@@ -40,9 +42,13 @@ class CoodleSurvey extends FHCAPI_Controller
 			'cancelSurvey' => self::PERM_LOGGED,
 			'completeSurvey' => self::PERM_LOGGED,
 			'sendVotingReminders' => self::PERM_LOGGED,
+			'getCoodleIcalUrl' => self::PERM_LOGGED,
+			'getCoodleIcal' => self::PERM_ANONYMOUS,
+			'getCoodleIcalEncrypted' => self::PERM_ANONYMOUS,
 		]);
 
 		$this->load->library('form_validation');
+		$this->load->library('CryptLib');
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('ressource/CoodleSurvey_model', 'CoodleSurveyModel');
 		$this->load->model('ressource/CoodleSurveyTimeslot_model', 'CoodleSurveyTimeslotModel');
@@ -51,6 +57,8 @@ class CoodleSurvey extends FHCAPI_Controller
 		$this->load->helper('hlp_sancho_helper');
 
 		$this->coodlePageUrl = APP_ROOT . "cis.php/Cis/Coodle";
+		$this->coodleIcalUrl = APP_ROOT . "cis.php/CoodleIcal/{uid}";
+		$this->coodleIcalUrlWithEncryptedUid = APP_ROOT . "cis.php/CoodleIcal/encrypted/{encryptedUid}";
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -726,6 +734,44 @@ class CoodleSurvey extends FHCAPI_Controller
 		$this->terminateWithSuccess();
 	}
 
+	public function getCoodleIcalUrl()
+	{
+		$uid = getAuthUID();
+
+		$encryptedUid = $this->cryptlib->RIJNDAEL_256_ECB(str_pad($uid, 32, chr(0)), LVPLAN_CYPHER_KEY, true);
+		$encryptedUid = base64_encode($encryptedUid);
+		$encryptedUid = str_replace(array('+', '/', '='), array('-', '_', ''), $encryptedUid);
+		$encryptedUid = trim($encryptedUid);
+
+		$unencryptedUrl = str_replace("{uid}", $uid, $this->coodleIcalUrl);
+		$encryptedUrl = str_replace("{encryptedUid}", $encryptedUid, $this->coodleIcalUrlWithEncryptedUid);
+
+		$this->terminateWithSuccess([
+			"unencryptedUrl" => $unencryptedUrl,
+			"encryptedUrl" => $encryptedUrl,
+		]);
+	}
+
+	public function getCoodleIcal($uid)
+	{
+		$coodleIcalFilePath = $this->_getCoodleIcal($uid, false);
+		$this->terminateWithFileOutput("text/calendar", file_get_contents($coodleIcalFilePath), "coodle_ical.ics");
+	}
+
+	public function getCoodleIcalEncrypted($encryptedUid)
+	{
+		$data = str_replace(array('-', '_'), array('+', '/'), $encryptedUid);
+		$mod4 = strlen($data) % 4;
+		if ($mod4) {
+			$data .= substr('====', $mod4);
+		}
+		$decodedData = base64_decode($data);
+
+		$uid = trim($this->cryptlib->RIJNDAEL_256_ECB_DECRYPT($decodedData, LVPLAN_CYPHER_KEY, true));
+
+		$coodleIcalFilePath = $this->_getCoodleIcal($uid, true);
+		$this->terminateWithFileOutput("text/calendar", file_get_contents($coodleIcalFilePath), "coodle_ical.ics");
+	}
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// Private methods
@@ -864,5 +910,69 @@ class CoodleSurvey extends FHCAPI_Controller
 		fwrite($calendarFile, "TRANSP:OPAQUE" . PHP_EOL);
 		fwrite($calendarFile, "END:VEVENT" . PHP_EOL);
 		fwrite($calendarFile, "END:VCALENDAR");
+	}
+
+	private function _getCoodleIcal($uid, $shouldIncludeIdentifyingInformation)
+	{
+		$activeParticipantEntries = $this->CoodleSurveyParticipantModel->getActiveParticipantEntriesByUid($uid);
+		$selectedTimeslotIds = [];
+		foreach ($activeParticipantEntries as $participantEntry) {
+			if ($participantEntry->selection === null)
+				continue;
+
+			$selectedTimeslotIds = array_merge($selectedTimeslotIds, json_decode($participantEntry->selection));
+		}
+
+		$events = [];
+		$localTimezone = new DateTimeZone("Europe/Vienna");
+		$utcTimezone = new DateTimeZone("UTC");
+		foreach ($selectedTimeslotIds as $timeslotId) {
+			$timeslot = $this->CoodleSurveyTimeslotModel->getTimeslot($timeslotId);
+			if (!$timeslot)
+				continue;
+
+			$survey = $this->CoodleSurveyModel->getSurvey($timeslot->survey_id);
+
+			$startTime = new DateTime($timeslot->starts_at, $localTimezone);
+			$endTime = new DateTime($timeslot->starts_at, $localTimezone);
+			$endTime->modify("+$survey->timeslot_duration minutes");
+
+			$startTime->setTimezone($utcTimezone);
+			$endTime->setTimezone($utcTimezone);
+
+			$surveyCreatorFullName = getData($this->PersonModel->getFullName($survey->creator_uid));
+
+			$formattedStartTime = $startTime->format("Ymd\THis\Z");
+			$formattedEndTime = $endTime->format("Ymd\THis\Z");
+			$events[] = [
+				"id" => "coodle_termin_option_" . $survey->id . "_" . $formattedStartTime . "_" . $formattedEndTime,
+				"summary" => "Coodle Terminoption" . ($shouldIncludeIdentifyingInformation ? " $survey->title" : ""),
+				"description" => $shouldIncludeIdentifyingInformation ? "Erstellt von " . $surveyCreatorFullName : "",
+				"start" => $formattedStartTime,
+				"end" => $formattedEndTime,
+			];
+		}
+
+		$coodleIcalFilePath = tempnam(sys_get_temp_dir(), "coodle_ical_");
+
+		$coodleIcalFile = fopen($coodleIcalFilePath, "w");
+		fwrite($coodleIcalFile, "BEGIN:VCALENDAR" . PHP_EOL);
+		fwrite($coodleIcalFile, "VERSION:2.0" . PHP_EOL);
+		fwrite($coodleIcalFile, "PRDODID:" . CAMPUS_NAME . PHP_EOL);
+
+		foreach ($events as $event) {
+			fwrite($coodleIcalFile, "BEGIN:VEVENT" . PHP_EOL);
+			fwrite($coodleIcalFile, "UID:" . $event["id"] . PHP_EOL);
+			fwrite($coodleIcalFile, "SUMMARY:" . $event["summary"] . PHP_EOL);
+			fwrite($coodleIcalFile, "DESCRIPTION:" . $event["description"] . PHP_EOL);
+			fwrite($coodleIcalFile, "DTSTART:" . $event["start"] . PHP_EOL);
+			fwrite($coodleIcalFile, "DTNED:" . $event["end"] . PHP_EOL);
+			fwrite($coodleIcalFile, "TRANS:OPAQUE" . PHP_EOL);
+			fwrite($coodleIcalFile, "END:VEVENT" . PHP_EOL);
+		}
+
+		fwrite($coodleIcalFile, "END:VCALENDAR");
+
+		return $coodleIcalFilePath;
 	}
 }

@@ -25,4 +25,17 @@ class CryptLib
 
 		return $cipher->encrypt($value);
 	}
+
+	public static function RIJNDAEL_256_ECB_DECRYPT($value, $key, $paddingDisabled = false)
+	{
+		if (isEmptyString($value) || isEmptyString($key)) return null;
+
+		$cipher = new Rijndael(Rijndael::MODE_ECB);
+		$cipher->setBlockLength(256);
+		$cipher->setKey($key);
+
+		if ($paddingDisabled === true) $cipher->disablePadding();
+
+		return $cipher->decrypt($value);
+	}
 }

@@ -2,6 +2,7 @@ import ActiveCoodleSurveys from "./Components/ActiveCoodleSurveys.js";
 import InactiveCoodleSurveys from "./Components/InactiveCoodleSurveys.js";
 import CoodleSurvey from "./Components/CoodleSurvey.js";
 import CoodleFreeBusy from "./Components/CoodleFreeBusy.js";
+import CoodleIcal from "./Components/CoodleIcal.js";
 
 import ApiAuthinfo from "../../../api/factory/authinfo.js";
 import CoodleApi from "../../../api/factory/coodle.js";
@@ -13,6 +14,7 @@ export default {
 		InactiveCoodleSurveys,
 		CoodleSurvey,
 		CoodleFreeBusy,
+		CoodleIcal,
 	},
 	data() {
 		return {
@@ -141,6 +143,16 @@ export default {
 					</div>
 					<span class="text-nowrap">{{ "FreeBusy Settings" }}</span>
 				</div>
+				<div
+					@click="switchToTab('ical')"
+					:class="getTabStylingClass(view === 'ical')"
+					class="btn d-flex flex-row gap-2 align-items-center py-2"
+				>
+					<div>
+						<i class="fa-solid fa-calendar fa-lg"></i>
+					</div>
+					<span class="text-nowrap">{{ "Coodle iCal" }}</span>
+				</div>
 			</div>
 		</div>
 		<div class="flex-grow-1 mt-1">
@@ -161,6 +173,7 @@ export default {
 				:authInfo="authInfo"
 			/>
 			<coodle-free-busy v-else-if="view === 'freeBusySettings'" :authUid="authInfo?.uid" />
+			<coodle-ical v-else-if="view === 'ical'" :authUid="authInfo?.uid" />
 		</div>
 	</div>`,
 };

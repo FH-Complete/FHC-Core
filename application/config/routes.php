@@ -71,6 +71,8 @@ $route['Cis/StgOrgLvPlan/.*'] = 'Cis/StgOrgLvPlan/index/$1';
 $route['Cis/Coodle'] = 'Cis/Coodle';
 
 $route['CoodleFreeBusy/(:any)'] = 'api/frontend/v1/coodle/FreeBusy/getCoodleFreeBusy/$1';
+$route['CoodleIcal/encrypted/(:any)'] = 'api/frontend/v1/coodle/CoodleSurvey/getCoodleIcalEncrypted/$1';
+$route['CoodleIcal/(:any)'] = 'api/frontend/v1/coodle/CoodleSurvey/getCoodleIcal/$1';
 
 $route['Abgabetool/Assistenz'] = 'Cis/Abgabetool/Assistenz';
 $route['Abgabetool/Assistenz/(:any)'] = 'Cis/Abgabetool/Assistenz/$1';

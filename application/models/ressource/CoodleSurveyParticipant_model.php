@@ -32,6 +32,20 @@ class CoodleSurveyParticipant_model extends DB_Model
 		return $this->execQuery($query)->retval;
 	}
 
+	public function getActiveParticipantEntriesByUid($uid)
+	{
+		$query = "SELECT
+		surveyParticipant.survey_id as survey_id,
+		surveyParticipant.participant_uid as participant_uid,
+		surveyParticipant.selection as selection
+		FROM $this->dbTable surveyParticipant
+		JOIN campus.tbl_coodle_surveys survey ON(survey.id = surveyParticipant.survey_id)
+		WHERE surveyParticipant.participant_uid = '$uid'
+		AND survey.completed_at IS NULL
+		AND survey.canceled_at IS NULL";
+		return $this->execQuery($query)->retval;
+	}
+
 	public function updateParticipants($surveyId, $participants, $timeslots)
 	{
 		$participantUids = array_map(function ($participant) {

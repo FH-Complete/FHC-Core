@@ -108,4 +108,10 @@ export default {
 			},
 		};
 	},
+	getCoodleIcalLink() {
+		return {
+			method: "get",
+			url: "/api/frontend/v1/coodle/CoodleSurvey/getCoodleIcalUrl",
+		};
+	},
 };
