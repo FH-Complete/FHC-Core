@@ -87,7 +87,7 @@ class Lehrveranstaltung extends FHCAPI_Controller
 		$verband = null;
 		if (!is_null($semester) && !is_numeric($semester))
 		{
-			$verband = $semester;
+			$verband = $this->getOrgformKurzbz($semester);
 			$semester = null;
 		}
 
@@ -294,5 +294,23 @@ class Lehrveranstaltung extends FHCAPI_Controller
 		}
 
 		$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+	}
+
+	protected function getOrgformKurzbz($orgform_kurzbz)
+	{
+		if ($orgform_kurzbz === null)
+			return null;
+
+		$this->load->model('codex/Orgform_model', 'OrgformModel');
+		$result = $this->OrgformModel->loadWhere([
+			'LOWER(orgform_kurzbz) =' => strtolower($orgform_kurzbz)
+		]);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		if (!$data)
+			return $orgform_kurzbz;
+
+		return current($data)->orgform_kurzbz;
 	}
 }
