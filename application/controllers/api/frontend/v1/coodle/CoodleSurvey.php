@@ -568,8 +568,9 @@ class CoodleSurvey extends FHCAPI_Controller
 				$timeslotEnd->setTimezone($utcTimezone);
 
 				$calendarFilePath = tempnam(sys_get_temp_dir(), "coodle_");
-				$this->writeToIcsFile(
+				$this->writeToCoodleIcsFile(
 					$calendarFilePath,
+					$survey->id,
 					$survey->title,
 					$timeslotStart,
 					$timeslotEnd,
@@ -891,18 +892,21 @@ class CoodleSurvey extends FHCAPI_Controller
 		return $groups;
 	}
 
-	private function writeToIcsFile($calendarFilePath, $title, $startUTC, $endUTC, $location, $organizerName, $organizerEmail)
+	private function writeToCoodleIcsFile($calendarFilePath, $id, $title, $startUTC, $endUTC, $location, $organizerName, $organizerEmail)
 	{
+		$formattedStart = $startUTC->format("Ymd\THis\Z");
+		$formattedEnd = $endUTC->format("Ymd\THis\Z");
+
 		$calendarFile = fopen($calendarFilePath, "w");
 		fwrite($calendarFile, "BEGIN:VCALENDAR" . PHP_EOL);
 		fwrite($calendarFile, "VERSION:2.0" . PHP_EOL);
 		fwrite($calendarFile, "CALSCALE:GREGORIAN" . PHP_EOL);
 		fwrite($calendarFile, "ORGANIZER;CN=" . $organizerName . ":mailto:" . $organizerEmail . PHP_EOL);
 		fwrite($calendarFile, "PRDODID:" . CAMPUS_NAME . PHP_EOL);
-		fwrite($calendarFile, "X-WR-TIMEZONE:Europe/Vienna" . PHP_EOL);
 		fwrite($calendarFile, "BEGIN:VEVENT" . PHP_EOL);
-		fwrite($calendarFile, "DTSTART:" . $startUTC->format("Ymd\THis\Z") . PHP_EOL);
-		fwrite($calendarFile, "DTEND:" . $endUTC->format("Ymd\THis\Z") . PHP_EOL);
+		fwrite($calendarFile, "UID:" . "coodle_" . $id . "_" . $formattedStart . "_" . $formattedEnd . PHP_EOL);
+		fwrite($calendarFile, "DTSTART:" . $formattedStart . PHP_EOL);
+		fwrite($calendarFile, "DTEND:" . $formattedEnd . PHP_EOL);
 		fwrite($calendarFile, "SUMMARY:" . $title . PHP_EOL);
 		if ($location) {
 			fwrite($calendarFile, "LOCATION:" . $location . PHP_EOL);
