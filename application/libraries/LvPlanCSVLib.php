@@ -182,6 +182,7 @@ class LvPlanCSVLib
 		{
 			$descriptionParts = array(
 				'Stundenplan',
+				$title,
 				isset($event->lehrfach_bez) ? $event->lehrfach_bez : '',
 				$lecturers,
 				$groups,

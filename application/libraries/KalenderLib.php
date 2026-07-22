@@ -146,8 +146,6 @@ class KalenderLib
 
 		$this->_ci->KalenderModel->db->where('tbl_kalender.von >=', $start_date);
 		$this->_ci->KalenderModel->db->where('tbl_kalender.bis <', $end_date);
-
-		$this->_ci->KalenderModel->addOrder('tbl_kalender.eindeutige_gruppen_id', 'DESC');
 	}
 
 	private function _mapEvents($data, $collisionCheck = true)
@@ -294,6 +292,7 @@ class KalenderLib
 		$this->_getBasePlan($start_date, $end_date);
 
 		$this->_ci->KalenderModel->db->where('tbl_kalender_ort.ort_kurzbz', $ort);
+		$this->_ci->KalenderModel->addOrder('tbl_kalender.eindeutige_gruppen_id', 'DESC');
 		$data = $this->_ci->KalenderModel->load();
 
 		return $this->_mapEvents($data);
@@ -308,6 +307,7 @@ class KalenderLib
 
 		$this->_ci->KalenderModel->db->where('tbl_kalender_ort.ort_kurzbz', $ort);
 		$this->_ci->KalenderModel->db->where('tbl_kalender.status_kurzbz', 'live');
+		$this->_ci->KalenderModel->addOrder('tbl_kalender.eindeutige_gruppen_id', 'DESC');
 		$data = $this->_ci->KalenderModel->load();
 
 		return $this->_mapEvents($data, false);
@@ -351,6 +351,8 @@ class KalenderLib
 			$this->_ci->KalenderModel->db->group_end();
 		}
 
+		$this->_ci->KalenderModel->addOrder('tbl_kalender.eindeutige_gruppen_id', 'DESC');
+
 		$data = $this->_ci->KalenderModel->load();
 		return $this->_mapEvents($data, false);
 	}
@@ -369,6 +371,7 @@ class KalenderLib
 
 		$this->_getBasePlan($kalender_entry->von, $kalender_entry->bis);
 		$this->_ci->KalenderModel->db->where('tbl_kalender.kalender_id', $kalender_entry->kalender_id);
+		$this->_ci->KalenderModel->addOrder('tbl_kalender.eindeutige_gruppen_id', 'DESC');
 		$data = $this->_ci->KalenderModel->load();
 		return $this->_mapEvents($data);
 	}
@@ -476,6 +479,9 @@ class KalenderLib
 				WHERE tbl_betriebsmittel_kalender.eindeutige_kalender_gruppen_id = tbl_kalender.eindeutige_gruppen_id
 			) AS has_assigned_resources"
 		]);
+
+		$this->_ci->KalenderModel->addOrder('tbl_kalender.eindeutige_gruppen_id', 'DESC');
+		
 		$data = $this->_ci->KalenderModel->load();
 
 		return $this->_mapEvents($data);
@@ -487,6 +493,8 @@ class KalenderLib
 
 	
 		$this->_ci->KalenderModel->db->where('status_kurzbz', 'live');
+
+		$this->_ci->KalenderModel->addOrder('tbl_kalender.eindeutige_gruppen_id', 'DESC');
 
 		$data = $this->_ci->KalenderModel->load();
 
@@ -583,8 +591,10 @@ class KalenderLib
 			false
 		);
 
-		$data = $this->_ci->KalenderModel->load();
+		$this->_ci->KalenderModel->addOrder('tbl_kalender.von', 'ASC');
 
+		$data = $this->_ci->KalenderModel->load();
+		
 		return $this->_mapEvents($data, false);
 	}
 
@@ -709,6 +719,8 @@ class KalenderLib
 		$this->_ci->KalenderModel->db->or_where($lehreinheitStudentlehrverbandExists, null, false);
 		$this->_ci->KalenderModel->db->group_end();
 
+		$this->_ci->KalenderModel->addOrder('tbl_kalender.von', 'ASC');
+
 		$data = $this->_ci->KalenderModel->load();
 
 		return $this->_mapEvents($data, false);
@@ -728,6 +740,9 @@ class KalenderLib
 			OR (tbl_kalender.status_kurzbz = 'preview' AND neuerer.kalender_id IS NULL)
 			OR (tbl_kalender.status_kurzbz = 'live' AND neuerer.kalender_id IS NULL)
 		)", NULL, FALSE);
+
+		$this->_ci->KalenderModel->addOrder('tbl_kalender.eindeutige_gruppen_id', 'DESC');
+
 		$data = $this->_ci->KalenderModel->load();
 
 		return $this->_mapEvents($data);
@@ -778,8 +793,11 @@ class KalenderLib
 		$this->_ci->KalenderModel->db->or_where($eventBenutzergruppeExists, null, false);
 		$this->_ci->KalenderModel->db->group_end();
 		
-		$data = $this->_ci->KalenderModel->load();
 
+		$this->_ci->KalenderModel->addOrder('tbl_kalender.von', 'ASC');
+
+		$data = $this->_ci->KalenderModel->load();
+		
 		return $this->_mapEvents($data, false);
 	}
 

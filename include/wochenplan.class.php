@@ -2745,9 +2745,21 @@ class wochenplan extends basis_db
 						}
 						else
 						{
-							echo $this->crlf.'"'.$lehrfach[$idx].'","'.$lvplan_kategorie.'","'.$this->std_plan[$i][$j][$idx]->ort.'","Stundenplan'.$this->crlf.$this->std_plan[$i][$j][$idx]->lehrfach.$this->crlf;
-							echo (($this->std_plan[$i][$j][$idx]->mitarbeiter_kurzbz === null) ? $this->std_plan[$i][$j][$idx]->lektor : $this->std_plan[$i][$j][$idx]->mitarbeiter_kurzbz).$this->crlf.$lvb.$this->crlf.$this->std_plan[$i][$j][$idx]->ort.(LVPLAN_ANMERKUNG_ANZEIGEN?$this->crlf.$this->std_plan[$i][$j][$idx]->anmerkung:'').'","Stundenplan",';
-							echo '"'.$start_date.'","'.$start_time.'","'.$end_date.'","'.$end_time.'",,,,,';
+							
+							$description = '","Stundenplan'.$this->crlf
+							.$this->std_plan[$i][$j][$idx]->lehrfach.$this->crlf // somehow the title
+							.(($this->std_plan[$i][$j][$idx]->mitarbeiter_kurzbz === null) ? $this->std_plan[$i][$j][$idx]->lektor : $this->std_plan[$i][$j][$idx]->mitarbeiter_kurzbz).$this->crlf
+							.$lvb.$this->crlf
+							.$this->std_plan[$i][$j][$idx]->ort
+							.(LVPLAN_ANMERKUNG_ANZEIGEN?$this->crlf.$this->std_plan[$i][$j][$idx]->anmerkung:'');
+
+							echo $this->crlf.
+							'"'.$lehrfach[$idx].'","' // title
+							.$lvplan_kategorie.'","' // category
+							.$this->std_plan[$i][$j][$idx]->ort
+							.$description
+							.'","Stundenplan",' // keywords
+							.'"'.$start_date.'","'.$start_time.'","'.$end_date.'","'.$end_time.'",,,,,';
 						}
 					}
 				}
