@@ -1,5 +1,4 @@
 import { tempusApi } from "../../../../support/api/tempusApi";
-import { getDateForDay } from "../../../../support/helpers/date";
 import {
   getTempusTestSemester,
   TEMPUS_TEST_STUDY_PLAN_SHORT_CODE,
