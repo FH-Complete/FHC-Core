@@ -20,6 +20,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 use \ReflectionMethod as ReflectionMethod;
+use \ReflectionFunction as ReflectionFunction;
 
 /**
  * This controller operates between (interface) the JS (GUI) and the back-end
@@ -101,7 +102,24 @@ class Treemenu extends FHCAPI_Controller
 			}
 
 			// Prepare arguments
-			$reflection = new ReflectionMethod($this->treemenulib, $methodName);
+			if (is_callable($methodName, false, $name)) {
+				if (is_string($methodName) && is_callable([$this->treemenulib, $methodName]))
+					$callable = [$this->treemenulib, $methodName];
+				else
+					$callable = $methodName;
+			} else {
+				$callable = [$this->treemenulib, $methodName];
+			}
+
+			if (is_array($callable))
+				$reflection = new ReflectionMethod($callable[0], $callable[1]);
+			elseif (is_string($callable) && strstr($callable, '::'))
+				$reflection = new ReflectionMethod($callable);
+			elseif ($name != 'Closure::__invoke' && strstr($name, '::__invoke'))
+				$reflection = new ReflectionMethod($callable, '__invoke');
+			else
+				$reflection = new ReflectionFunction($callable);
+
 			$arguments = [];
 			foreach ($reflection->getParameters() as $arg) {
 				if ($arg->name == 'path_template') {
@@ -122,7 +140,7 @@ class Treemenu extends FHCAPI_Controller
 			}
 
 			// Call function from lib
-			$items = array_merge($items, call_user_func_array([$this->treemenulib, $methodName], $arguments));
+			$items = array_merge($items, call_user_func_array($callable, $arguments));
 		}
 
 		$this->terminateWithSuccess($items);
