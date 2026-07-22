@@ -26,7 +26,8 @@ export default {
 		// The values as associative array
 		modelValue: Object,
 		// Show only fields with a name that exists in the filter
-		filter: [String, Array]
+		filter: [String, Array],
+		readonly: true
 	},
 	data() {
 		return {
@@ -35,6 +36,13 @@ export default {
 		};
 	},
 	computed: {
+		isPkValid() {
+			// If the provided pk is _not_ valid
+			return !Object.keys(this.pk).every(key => !this.pk[key]);
+		},
+		getReadonly() {
+			return this.readonly;
+		},
 		filterArray() {
 			if (!this.filter || Array.isArray(this.filter))
 				return this.filter;
@@ -61,6 +69,10 @@ export default {
 	},
 	watch: {
 		pk(n, o) {
+
+			// If the provided pk is _not_ valid
+			if (Object.keys(n).every(key => !n[key])) return;
+
 			if (!this.$refs.fetch)
 				return; // NOTE(chris): no initial load yet
 			
@@ -124,6 +136,7 @@ export default {
 	template: `
 	<div class="core-udf row">
 		<core-fetch-cmpt
+			v-if="isPkValid"
 			ref="fetch"
 			:api-function="loadF"
 			:api-function-parameters="{ ciModel, pk }"
@@ -138,7 +151,7 @@ export default {
 						:type="field.type"
 						:multiple="field.multiple"
 						:title="field.description"
-						:disabled="field.disabled"
+						:disabled="field.disabled || getReadonly"
 						:clearable="field.clearable"
 						:auto-apply="field.autoApply"
 						:enable-time-picker="field.enableTimePicker"
