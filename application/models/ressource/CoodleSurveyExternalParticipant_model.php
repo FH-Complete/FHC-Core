@@ -39,8 +39,6 @@ class CoodleSurveyExternalParticipant_model extends DB_Model
 			},
 			$oldExternalParticipants
 		);
-		$this->_ci->addMeta("oldExternalParticipants", $oldExternalParticipants);
-		$this->_ci->addMeta("oldExternalParticipantIds", $oldExternalParticipantIds);
 
 		$persistingExternalParticipants = array_filter(
 			$externalParticipants,
@@ -54,14 +52,11 @@ class CoodleSurveyExternalParticipant_model extends DB_Model
 			},
 			$persistingExternalParticipants
 		);
-		$this->_ci->addMeta("persistingExternalParticipants", $persistingExternalParticipants);
-		$this->_ci->addMeta("persistingExternalParticipantIds", $persistingExternalParticipantIds);
 
 		$redundantExternalParticipantIds = array_diff(
 			$oldExternalParticipantIds,
 			$persistingExternalParticipantIds
 		);
-		$this->_ci->addMeta("redundantExternalParticipantIds", $redundantExternalParticipantIds);
 
 		$newExternalParticipants = array_filter(
 			$externalParticipants,
@@ -69,7 +64,6 @@ class CoodleSurveyExternalParticipant_model extends DB_Model
 				return !isset($externalParticipant->id) || !$externalParticipant->id;
 			}
 		);
-		$this->_ci->addMeta("newExternalParticipants", $newExternalParticipants);
 
 
 		if (count($redundantExternalParticipantIds)) {
