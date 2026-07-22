@@ -315,8 +315,10 @@ export default {
 			this.reload();
 		},
 		rebuildPrestudentTags(){
+			const id = [this.headerData[0].prestudent_id];
+
 			const params = {
-				id : this.headerData[0].prestudent_id,
+				ids: id,
 				typeId: 'prestudent_id',
 				sem: this.currentSemester
 			};
