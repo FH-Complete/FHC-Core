@@ -28,7 +28,6 @@ import ApiSearchbar from "../../api/factory/searchbar.js";
 import ApiRenderers from "../../api/factory/renderers.js";
 import ApiTempusConfig from "../../api/factory/tempus/config.js";
 import ApiBetriebsmittel from "../../api/factory/betriebsmittel.js";
-import ApiOperationalResourceToCalender from "../../api/factory/operationalResourceToCalender.js";
 import ApiTempusTag from "../../api/factory/tempus/tag.js";
 import AppMenu from "../AppMenu.js";
 import drop from "../../directives/drop.js";
@@ -47,6 +46,7 @@ import KeyboardShortcuts from "./KeyboardShortcuts.js";
 import { useContextMenuActions } from "../../composables/Tempus/ContextMenuActions.js";
 import MultiWeekPlanModal from "./MultiWeekPlanModal.js";
 import HistoryModal from "./HistoryModal.js";
+import ResourcesAssignmentModal from "./ResourcesAssignmentModal.js";
 import { getTempusSearchbarOptions } from "./Filters/searchbarOptions.js";
 import CoreTag from '../Tag/Tag.js';
 
@@ -73,6 +73,7 @@ export default {
     KeyboardShortcuts,
     MultiWeekPlanModal,
     HistoryModal,
+    ResourcesAssignmentModal,
     CoreTag,
   },
   props: {
@@ -99,7 +100,7 @@ export default {
       contextMenuActions: useContextMenuActions({
         openRaumauswahl: (orig) => this.openRaumauswahl(orig),
 		    openResourcesAssignmentModal: (orig) =>
-          this.openResourcesAssignmentModal(orig),
+          this.$refs.resourcesAssignmentModal?.open(orig),
         openTagsModal: (orig) => this.openTagsAssignmentModal(orig),
         openHistory: (orig) => this.openHistory(orig),
         deleteEntry: (orig) => this.deleteEntry(orig),
@@ -169,14 +170,6 @@ export default {
         endTime: null,
       },
       studiengaenge_all: [],
-      resourcesAssignmentModal: {
-        calendar: null,
-        availableResources: [],
-        filteredAvailableResources: [],
-        selectedAvailableResource: null,
-        assignedResources: [],
-        areFormButtonsDisplayed: false,
-      },
       tagsAssignmentModal: {
         calendar: null,
         availableTags: [],
@@ -220,17 +213,6 @@ export default {
     searchbaroptions() {
       return getTempusSearchbarOptions(this);
     },
-    dropdownParsedAvailableResources() {
-      return this.resourcesAssignmentModal.availableResources
-        .map((unit) => {
-          return {
-            label: unit.beschreibung,
-            value: unit.betriebsmittel_id,
-            data: unit,
-          };
-        })
-        .sort((a, b) => a.label?.localeCompare(b.label));
-    },
     dropdownParsedAvailableTags() {
       return this.tagsAssignmentModal.availableTags
         .map((tag) => {
@@ -253,21 +235,6 @@ export default {
           this.raumVorschlaege = result.data ?? [];
           this.$refs.raumModal.show();
         });
-    },
-    async openResourcesAssignmentModal(orig) {
-      if (!orig?.kalender_id) return;
-
-      this.resourcesAssignmentModal.calendar = orig;
-      this.resourcesAssignmentModal.availableResources =
-        await this.fetchSchedulableResourcesByCalender(orig.kalender_id);
-      this.resourcesAssignmentModal.filteredAvailableResources = [
-        ...this.dropdownParsedAvailableResources,
-      ];
-
-      this.resourcesAssignmentModal.assignedResources =
-        await this.fetchAssignedResourcesByCalender(orig.kalender_id);
-
-      this.$refs.resourcesAssignmentModal.show();
     },
     async openTagsAssignmentModal(orig) {
       console.log("openTagsAssignmentModal called with orig:", orig);
@@ -827,138 +794,6 @@ export default {
       this.extraBackgrounds = res;
     },
 
-    async fetchAssignedResourcesByCalender(calenderId) {
-      let getAssignedResources = await this.$api.call(
-        ApiOperationalResourceToCalender.getAssignedResourcesByCalender(
-          calenderId,
-        ),
-      );
-      if (getAssignedResources.meta.status === "success") {
-        return getAssignedResources.data
-          .filter((unit) => !!unit)
-          .map((unit) => {
-            return {
-              isNoteTextareaShown:
-                unit.anmerkung && unit.anmerkung.trim() !== "",
-              ...unit,
-            };
-          })
-          .filter((unit) => !!unit);
-      } else {
-        this.$fhcAlert.alertError(
-          this.$p.t("ui", "failed_assigned_resources_fetch_error_message"),
-        );
-      }
-
-      return [];
-    },
-    async fetchSchedulableResourcesByCalender(calendarID) {
-      let getSchedulableResourcesByCalendar = await this.$api.call(
-        ApiOperationalResourceToCalender.getSchedulableResourcesByCalendar(
-          calendarID,
-        ),
-      );
-      if (getSchedulableResourcesByCalendar.meta.status === "success") {
-        return getSchedulableResourcesByCalendar.data;
-      } else {
-        this.$fhcAlert.alertError(
-          this.$p.t("ui", "failed_schedulable_resources_fetch_error_message"),
-        );
-      }
-
-      return [];
-    },
-    filterAvailableResources(event) {
-      this.resourcesAssignmentModal.filteredAvailableResources;
-      const query = event.query.toLowerCase();
-      if (!query) {
-        return (this.resourcesAssignmentModal.filteredAvailableResources = [
-          ...this.dropdownParsedAvailableResources.filter((unit) => {
-            return !this.resourcesAssignmentModal.assignedResources.some(
-              (assigned) => assigned.betriebsmittel_id === unit.value,
-            );
-          }),
-        ]);
-      }
-
-      return (this.resourcesAssignmentModal.filteredAvailableResources =
-        this.dropdownParsedAvailableResources
-          .filter((unit) => {
-            return !this.resourcesAssignmentModal.assignedResources.some(
-              (assigned) => assigned.betriebsmittel_id === unit.value,
-            );
-          })
-          .filter((unit) => {
-            return unit.label.toLowerCase().includes(query);
-          }));
-    },
-    toggleAssignedResourceNoteInput(resource) {
-      const index = this.resourcesAssignmentModal.assignedResources.findIndex(
-        (assigned) => assigned.betriebsmittel_id === resource.betriebsmittel_id,
-      );
-      if (index !== -1) {
-        this.resourcesAssignmentModal.assignedResources[
-          index
-        ].isNoteTextareaShown =
-          !this.resourcesAssignmentModal.assignedResources[index]
-            .isNoteTextareaShown;
-      }
-
-      this.resourcesAssignmentModal.areFormButtonsDisplayed = true;
-    },
-    removeAssignedResource(resource) {
-      this.resourcesAssignmentModal.assignedResources =
-        this.resourcesAssignmentModal.assignedResources.filter(
-          (assigned) =>
-            assigned.betriebsmittel_id !== resource.betriebsmittel_id,
-        );
-
-      this.resourcesAssignmentModal.areFormButtonsDisplayed = true;
-    },
-    async refreshResourcesAssignmentModalData(calenderItem) {
-      this.resourcesAssignmentModal.availableResources =
-        await this.fetchSchedulableResourcesByCalender(
-          calenderItem.kalender_id,
-        );
-      this.resourcesAssignmentModal.filteredAvailableResources = [
-        ...this.dropdownParsedAvailableResources,
-      ];
-
-      this.resourcesAssignmentModal.assignedResources =
-        await this.fetchAssignedResourcesByCalender(calenderItem.kalender_id);
-      this.resourcesAssignmentModal.selectedAvailableResource = null;
-      this.resourcesAssignmentModal.areFormButtonsDisplayed = false;
-    },
-	  async saveAssignedResourcesToCalendarItem(calenderItem, assignedResources) {
-      let getSchedulableResourcesByCalendar = await this.$api.call(
-        ApiOperationalResourceToCalender.storeResourcesToCalendarRelationship(
-          calenderItem.kalender_id,
-          assignedResources,
-        ),
-      );
-      if (getSchedulableResourcesByCalendar.meta.status === "success") {
-        this.$fhcAlert.alertSuccess(
-          this.$p.t("ui", "assigned_resources_save_success_message"),
-        );
-        await this.refreshResourcesAssignmentModalData(calenderItem);
-      } else {
-        this.$fhcAlert.alertError(
-          this.$p.t("ui", "failed_assigned_resources_save_error_message"),
-        );
-      }
-
-      this.$refs.calendar.resetEventLoader();
-      this.$refs.resourcesAssignmentModal.hide();
-    },
-    closeResourcesAssignmentModal() {
-      this.resourcesAssignmentModal = {
-        availableResources: [],
-        filteredAvailableResources: [],
-        selectedAvailableResource: null,
-        assignedResources: [],
-        areFormButtonsDisplayed: false,
-      };
-    },
     async fetchAvailableTags() {
       let getAvailableTags = await this.$api.call(
         ApiTempusTag.getTags(),
@@ -1136,19 +971,6 @@ export default {
       handler() {
         this.$refs.calendar.resetEventLoader();
       },
-    },
-	"resourcesAssignmentModal.selectedAvailableResource": function (newVal) {
-      if (!newVal) return;
-
-      this.resourcesAssignmentModal.assignedResources.push({
-        betriebsmittel_kalender_id: null,
-        betriebsmittel_id: newVal.data.betriebsmittel_id,
-        beschreibung: newVal.data.beschreibung,
-        anmerkung: "",
-        isNoteTextareaShown: false,
-      });
-
-      this.resourcesAssignmentModal.areFormButtonsDisplayed = true;
     },
   },
   mounted() {
@@ -1439,7 +1261,6 @@ export default {
 			</div>
 			<stv-verband :endpoint="endpoint" @select-verband="onSelectVerbandAndClose" class="col" style="height:0%"></stv-verband>
 		</div>
-
 		<bs-modal ref="raumModal" class="bootstrap-prompt">
 			<template #title>Raumauswahl</template>
 			<template #default>
@@ -1458,71 +1279,10 @@ export default {
 				<p v-else class="text-muted mb-0">Keine freien Räume gefunden.</p>
 			</template>
 		</bs-modal>
-		 <bs-modal 
+    <resources-assignment-modal
       ref="resourcesAssignmentModal"
-      @hideBsModal="closeResourcesAssignmentModal"
-      class="bootstrap-prompt"
-      data-cy="resourcesAssignmentModal"
-    >
-			<template #title>{{$p.t('ui', 'resource_assignment_modal_title')}}</template>
-			<template #default>
-        <div class="mb-5">
-          <form-input
-            v-if="resourcesAssignmentModal.availableResources.length"
-            @itemSelect="(option) => { resourcesAssignmentModal.selectedAvailableResource = option.value; }"
-            :label="$p.t('ui', 'available_resources_label')"
-            :suggestions="resourcesAssignmentModal.filteredAvailableResources"
-            :optionValue="(option) => option.value"
-            :optionLabel="(option) => option.label" 
-            @complete="filterAvailableResources"
-            dropdown
-            forceSelection
-            type="autocomplete"
-            name="availableResources"  
-            :closeOnSelect="false"
-            >
-          </form-input>
-        </div>
-        <div>
-          <div class="d-flex align-items-center justify-content-between mb-2">
-            <h6 class="mb-2 mx-auto text-bold fw-1">{{$p.t('ui', 'assigned_resources_subtitle')}}</h6>
-          </div>
-          <div v-if="resourcesAssignmentModal.assignedResources.length" class="mb-4">
-            <div
-              v-for="resource in resourcesAssignmentModal.assignedResources"
-              :key="resource.betriebsmittel_id"
-              class=" shadow-sm p-2 mb-2 bg-body rounded"
-            >
-              <div class="d-flex justify-content-between align-items-center mb-1">
-                <p class="m-0">{{ resource.beschreibung }}</p>
-                <div class="d-flex justify-content-between align-items-center gap-2">
-                  <a href="#" @click.prevent="toggleAssignedResourceNoteInput(resource)" class="ms-auto"><i class="fa fa-edit text-primary"></i></a>
-                  <a href="#" @click.prevent="removeAssignedResource(resource)" class="ms-auto"><i class="fa fa-trash text-danger"></i></a>
-                </div>
-              </div>
-              <form-input
-                v-if="resource.isNoteTextareaShown"
-                v-model="resource.anmerkung"
-                @input="this.resourcesAssignmentModal.areFormButtonsDisplayed = true"
-                :placeholder="$capitalize($p.t('global/anmerkung'))"
-                :rows="1"
-                class="flex-grow-1"
-                type="textarea"
-                name="anmerkung"  
-                >
-              </form-input>
-            </div>
-          </div>
-          <div v-else class="d-flex align-items-center justify-content-center mb-2">
-            <p class="text-muted mb-0">{{$p.t('ui', 'no_assigned_resources')}}</p>
-          </div>
-          <div v-if="resourcesAssignmentModal.areFormButtonsDisplayed" class="d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-secondary" @click="refreshResourcesAssignmentModalData(resourcesAssignmentModal.calendar)">{{$p.t('ui', 'abbrechen')}}</button>
-            <button type="button" class="btn btn-primary" @click="saveAssignedResourcesToCalendarItem(resourcesAssignmentModal.calendar, resourcesAssignmentModal.assignedResources)">{{$p.t('ui', 'speichern')}}</button>
-          </div>
-        </div>
-			</template>
-		</bs-modal>
+      @save-finished="$refs.calendar.resetEventLoader()"
+    />
     <bs-modal 
       ref="tagsAssignmentModal"
       @hideBsModal="closeTagsAssignmentModal"
