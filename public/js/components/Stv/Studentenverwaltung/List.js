@@ -769,7 +769,7 @@ export default {
 					v-else
 					class="btn btn-outline btn-light mb-1"
 					@click="rebuild(selected)"
-					:title="$p.t('tag','rebuild_tags') + ' ' + $p.t('ui','selection') + currentSemester"
+					:title="$p.t('tag','rebuild_tags') + ' ' + $p.t('ui','selection') + ' ' + currentSemester"
 					>
 						<i class="fa-solid fa-refresh pe-1"></i> {{selected.length}}
 				</button>
