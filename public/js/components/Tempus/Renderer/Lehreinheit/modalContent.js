@@ -53,6 +53,31 @@ export default {
 		ortString() {
 			return Array.isArray(this.event.ort_kurzbz) ? this.event.ort_kurzbz.join(', ') : this.event.ort_kurzbz;
 		},
+		tags() {
+			if (typeof this.event.tags === 'string') {
+				try {
+					return JSON.parse(this.event.tags);
+				} catch (e) {
+					console.error('Failed to parse tags:', e);
+					return [];
+				}
+			}
+			
+			return this.event.tags || [];
+		},
+		resourcesValue() {
+			let resources = this.event.resources;
+			if (typeof this.event.resources === 'string') {
+				try {
+					resources = JSON.parse(this.event.resources);
+				} catch (e) {
+					console.error('Failed to parse resources:', e);
+					return null;
+				}
+			}
+			
+			return resources.map(resource => resource.beschreibung).join(', ');
+		},
 	},
 	methods: {
 		mehtodNumberPadding: function (number) {
@@ -78,7 +103,7 @@ export default {
 				});
 		}
 	},
-	template: `
+	template: /*html*/`
 	<div>
 		<h5>
 			{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}
@@ -142,6 +167,33 @@ export default {
 							:''
 						}}</th>
 						<td>{{event.organisationseinheit}}</td>
+					</tr>
+					<tr v-if="resourcesValue">
+						<th>{{
+							$p.t('ui','betriebsmittel')?
+							$p.t('ui','betriebsmittel')+':'
+							:''
+						}}</th>
+						<td>
+							{{ resourcesValue }}
+						</td>
+					</tr>
+					<tr v-if="tags.length">
+						<th>{{
+							$p.t('ui','tags')?
+							$p.t('ui','tags')+':'
+							:''
+						}}</th>
+						<td>
+							<div>
+								<span
+									v-for="tag in tags"
+									:key="tag.tag_typ_kurzbz"
+									:class="[tag.style, { tag_done: tag.done }]"
+									class="tag disabled"
+									>{{ tag.beschreibung }}</span>
+							</div>
+						</td>
 					</tr>
 				</tbody>
 		</table>

@@ -14,6 +14,10 @@ export default {
 		'deleted',
 	],
 	props: {
+		isListItemShown: {
+			type: Boolean,
+			default: true
+		},
 		endpoint: {
 			type: Object,
 			required: true
@@ -206,7 +210,7 @@ export default {
 		}
 	},
 	template: `
-		<div class="plus_button_container" @mouseleave="hideList">
+		<div v-if="isListItemShown" class="plus_button_container" @mouseleave="hideList">
 			<span :title="values.length === 0 ? 'Bitte Zeilen markieren' : ''">
 			<button @mouseover="showList = true" 
 					:disabled="!values || values.length === 0"

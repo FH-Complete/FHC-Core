@@ -125,6 +125,8 @@ $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/person/(:num)'] = 'api/f
 // load routes from extensions, also look for environment-specific configs
 $subdirs = ['application/config/extensions', 'application/config/' . ENVIRONMENT . '/extensions'];
 
+$route['api/frontend/v1/tempus/Tags/getTagsByCalendar/(:num)'] = 'api/frontend/v1/tempus/Tags/getTagsByCalendar/$1';
+
 foreach($subdirs as $subdir)
 {
 	if(is_dir($subdir))

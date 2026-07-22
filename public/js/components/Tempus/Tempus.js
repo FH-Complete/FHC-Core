@@ -29,6 +29,7 @@ import ApiRenderers from "../../api/factory/renderers.js";
 import ApiTempusConfig from "../../api/factory/tempus/config.js";
 import ApiBetriebsmittel from "../../api/factory/betriebsmittel.js";
 import ApiOperationalResourceToCalender from "../../api/factory/operationalResourceToCalender.js";
+import ApiTempusTag from "../../api/factory/tempus/tag.js";
 import AppMenu from "../AppMenu.js";
 import drop from "../../directives/drop.js";
 import AppConfig from "../AppConfig.js";
@@ -46,6 +47,7 @@ import KeyboardShortcuts from "./KeyboardShortcuts.js";
 import { useContextMenuActions } from "../../composables/Tempus/ContextMenuActions.js";
 import MultiWeekPlanModal from "./MultiWeekPlanModal.js";
 import { getTempusSearchbarOptions } from "./Filters/searchbarOptions.js";
+import CoreTag from '../Tag/Tag.js';
 
 export default {
   name: "Tempus",
@@ -69,6 +71,7 @@ export default {
     Reservierung,
     KeyboardShortcuts,
     MultiWeekPlanModal,
+    CoreTag,
   },
   props: {
     defaultSemester: String,
@@ -93,8 +96,9 @@ export default {
       appConfig: Vue.computed(() => this.appconfig),
       contextMenuActions: useContextMenuActions({
         openRaumauswahl: (orig) => this.openRaumauswahl(orig),
-		openResourcesAssignmentModal: (orig) =>
+		    openResourcesAssignmentModal: (orig) =>
           this.openResourcesAssignmentModal(orig),
+        openTagsModal: (orig) => this.openTagsAssignmentModal(orig),
         openHistory: (orig) => this.openHistory(orig),
         deleteEntry: (orig) => this.deleteEntry(orig),
         syncToLecturer: (orig) => this.syncToLecturer(orig),
@@ -171,6 +175,15 @@ export default {
         assignedResources: [],
         areFormButtonsDisplayed: false,
       },
+      tagsAssignmentModal: {
+        calendar: null,
+        availableTags: [],
+        filteredAvailableTags: [],
+        selectedAvailableTag: null,
+        assignedTags: [],
+        areFormButtonsDisplayed: false,
+      },
+      tagEndpoint: ApiTempusTag,
     };
   },
   computed: {
@@ -216,6 +229,16 @@ export default {
         })
         .sort((a, b) => a.label?.localeCompare(b.label));
     },
+    dropdownParsedAvailableTags() {
+      return this.tagsAssignmentModal.availableTags
+        .map((tag) => {
+          return {
+            label: tag.bezeichnung,
+            value: tag.tag_typ_kurzbz,
+            data: tag,
+          };
+        });
+    },
   },
   methods: {
     async openRaumauswahl(orig) {
@@ -243,6 +266,19 @@ export default {
         await this.fetchAssignedResourcesByCalender(orig.kalender_id);
 
       this.$refs.resourcesAssignmentModal.show();
+    },
+    async openTagsAssignmentModal(orig) {
+      console.log("openTagsAssignmentModal called with orig:", orig);
+      if (!orig?.kalender_id) return;
+
+      this.tagsAssignmentModal.calendar = orig;
+      this.tagsAssignmentModal.availableTags = await this.fetchAvailableTags();
+      this.tagsAssignmentModal.filteredAvailableTags = [
+        ...this.dropdownParsedAvailableTags,
+      ];
+
+      this.tagsAssignmentModal.assignedTags = await this.fetchAssignedTagsByCalender(orig.eindeutige_gruppen_id);
+      this.$refs.tagsAssignmentModal.show();
     },
     async deleteEntry(orig) {
       if (!orig?.kalender_id) return;
@@ -891,7 +927,7 @@ export default {
       this.resourcesAssignmentModal.selectedAvailableResource = null;
       this.resourcesAssignmentModal.areFormButtonsDisplayed = false;
     },
-	async saveAssignedResourcesToCalendarItem(calenderItem, assignedResources) {
+	  async saveAssignedResourcesToCalendarItem(calenderItem, assignedResources) {
       let getSchedulableResourcesByCalendar = await this.$api.call(
         ApiOperationalResourceToCalender.storeResourcesToCalendarRelationship(
           calenderItem.kalender_id,
@@ -920,6 +956,114 @@ export default {
         assignedResources: [],
         areFormButtonsDisplayed: false,
       };
+    },
+    async fetchAvailableTags() {
+      let getAvailableTags = await this.$api.call(
+        ApiTempusTag.getTags(),
+      );
+      if (getAvailableTags.meta.status === "success") {
+        return getAvailableTags.data;
+      } else {
+        this.$fhcAlert.alertError(
+          this.$p.t("ui", "failed_available_tags_fetch_error_message"),
+        );
+      }
+
+      return [];
+    },
+    async fetchAssignedTagsByCalender(calenderId) {
+      let getAssignedTags = await this.$api.call(
+        ApiTempusTag.getTagsByCalendar(calenderId),
+      );
+      if (getAssignedTags.meta.status === "success") {
+        return getAssignedTags.data.filter((unit) => !!unit);
+      } else {
+        this.$fhcAlert.alertError(
+          this.$p.t("ui", "failed_assigned_tags_fetch_error_message"),
+        );
+      }
+
+      return [];
+    },
+    filterAvailableTags(event) {
+      this.tagsAssignmentModal.filteredAvailableTags;
+      const query = event.query.toLowerCase();
+      if (!query) {
+        return (this.tagsAssignmentModal.filteredAvailableTags = [
+          ...this.dropdownParsedAvailableTags.filter((tag) => {
+            return !this.tagsAssignmentModal.assignedTags.some(
+              (assigned) => assigned.tag_id === tag.value,
+            );
+          }),
+        ]);
+      }
+
+      return (this.tagsAssignmentModal.filteredAvailableTags =
+        this.dropdownParsedAvailableTags
+          .filter((tag) => {
+            return !this.tagsAssignmentModal.assignedTags.some(
+              (assigned) => assigned.tag_id === tag.value,
+            );
+          })
+          .filter((tag) => {
+            return tag.label.toLowerCase().includes(query);
+          }));
+    },
+    removeAssignedTag(tag) {
+      this.tagsAssignmentModal.assignedTags =
+        this.tagsAssignmentModal.assignedTags.filter(
+          (assigned) => assigned.tag_id !== tag.tag_id,
+        );
+
+      this.tagsAssignmentModal.areFormButtonsDisplayed = true;
+    },
+    async refreshTagsAssignmentModalData(calenderItem) {
+      this.tagsAssignmentModal.availableTags =
+        await this.fetchAvailableTags();
+      this.tagsAssignmentModal.filteredAvailableTags = [
+        ...this.dropdownParsedAvailableTags,
+      ];
+
+      this.tagsAssignmentModal.assignedTags =
+        await this.fetchAssignedTagsByCalender(calenderItem.eindeutige_gruppen_id);
+      this.tagsAssignmentModal.selectedAvailableTag = null;
+      this.tagsAssignmentModal.areFormButtonsDisplayed = false;
+    },
+    async saveAssignedTagsToCalendarItem(calenderItem, assignedTags) {
+      let saveAssignedTagsByCalender = await this.$api.call(
+        ApiTempusTag.getTags(
+          calenderItem.eindeutige_gruppen_id,
+          assignedTags,
+        ),
+      );
+      if (saveAssignedTagsByCalender.meta.status === "success") {
+        this.$fhcAlert.alertSuccess(
+          this.$p.t("ui", "assigned_tags_save_success_message"),
+        );
+        await this.refreshTagsAssignmentModalData(calenderItem);
+      } else {
+        this.$fhcAlert.alertError(
+          this.$p.t("ui", "failed_assigned_tags_save_error_message"),
+        );
+      }
+
+      this.$refs.calendar.resetEventLoader();
+      this.$refs.tagsAssignmentModal.hide();
+    },
+    closeTagsAssignmentModal() {
+      this.tagsAssignmentModal = {
+        availableTags: [],
+        filteredAvailableTags: [],
+        selectedAvailableTag: null,
+        assignedTags: [],
+        areFormButtonsDisplayed: false,
+      };
+    },
+    async handleCalenderTagChange(calenderID) {
+      this.tagsAssignmentModal.assignedTags =
+        await this.fetchAssignedTagsByCalender(calenderID);
+      
+      this.$refs.calendar.resetEventLoader();
     },
     removeLecturer(uid) {
       if (uid == null) {
@@ -1079,7 +1223,7 @@ export default {
       this.studiengaenge_all = res.data;
     });
   },
-  template: `
+  template: /* html */`
 	<div
     class="tempus"
     data-cy="tempus"
@@ -1201,17 +1345,6 @@ export default {
 						</button>
 					</div>
 					<div class="px-2 py-1 w-100">
-						<!--<Multiselect
-							:model-value="visibleStatusValue"
-							@update:model-value="val => toggleStatus(val.map(o => o.key))"
-							option-label="label"
-							:options="visibleStatusOptions"
-							placeholder="Status filtern"
-							:hide-selected="false"
-							:show-toggle-all="false"
-							class="w-100"
-						/>-->
-						
 						<div
               class="d-flex gap-1 py-1"
               data-cy="previewRoleOptionsHolder"
@@ -1388,6 +1521,54 @@ export default {
         </div>
 			</template>
 		</bs-modal>
+    <bs-modal 
+      ref="tagsAssignmentModal"
+      @hideBsModal="closeTagsAssignmentModal"
+      bodyClass="p-4"
+      class="bootstrap-prompt"
+      data-cy="tagsAssignmentModal"
+    >
+			<template #title>{{$p.t('ui', 'tags_assignment_modal_title')}}</template>
+			<template #default>
+        <div class="mb-5">
+          <form-input
+            v-if="tagsAssignmentModal.availableTags.length"
+            @itemSelect="(option) => { tagsAssignmentModal.selectedAvailableTag = option.value; $refs.tagComponent.openModal(option.value.data); }"
+            :label="$capitalize($p.t('ui', 'tags'))"
+            :suggestions="tagsAssignmentModal.filteredAvailableTags"
+            :optionValue="(option) => option.value"
+            :optionLabel="(option) => option.label"
+            @complete="filterAvailableTags"
+            dropdown
+            forceSelection
+            type="autocomplete"
+            name="availableTags"
+            :closeOnSelect="false"
+          >
+            <template #option="{ option }">
+              <span :class="['tag', option.data.style]">{{ option.label }}</span>
+            </template>
+          </form-input>
+        </div>
+        <div>
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <h6 class="mb-1 mx-auto text-bold fw-1">{{$p.t('ui', 'assigned_tags_subtitle')}}</h6>
+          </div>
+          <div v-if="tagsAssignmentModal.assignedTags.length">
+            <span
+              v-for="tag in tagsAssignmentModal.assignedTags"
+              :key="tag.tag_typ_kurzbz"
+              :class="[tag.style, { tag_done: tag.done }]"
+              @click="$refs.tagComponent.editTag(tag.notiz_id)"
+              class="tag"
+              >{{ tag.bezeichnung }}</span>
+          </div>
+          <div v-else class="d-flex align-items-center justify-content-center mb-2">
+            <p class="text-muted mb-0">{{$p.t('ui', 'no_assigned_tags')}}</p>
+          </div>
+        </div>
+			</template>
+		</bs-modal>
 		<bs-modal ref="historyModel" class="bootstrap-prompt" dialogClass="modal-lg" data-cy="historyModal">
 			<template #title>History</template>
 			<template #default>
@@ -1411,6 +1592,17 @@ export default {
 				</table>
 			</template>
 		</bs-modal>
+    <core-tag
+        v-if="tagEndpoint && tagsAssignmentModal.calendar?.eindeutige_gruppen_id"
+        ref="tagComponent"
+        :isListItemShown="false"
+				:endpoint="tagEndpoint"
+				:values="[tagsAssignmentModal.calendar?.eindeutige_gruppen_id]"
+				:zuordnung_typ="'eindeutige_kalender_gruppen_id'"
+        @added="handleCalenderTagChange(tagsAssignmentModal.calendar?.eindeutige_gruppen_id)"
+        @deleted="handleCalenderTagChange(tagsAssignmentModal.calendar?.eindeutige_gruppen_id)"
+        @updated="handleCalenderTagChange(tagsAssignmentModal.calendar?.eindeutige_gruppen_id)"
+			></core-tag>
 		<reservierung
 			ref="reservierung"
 			:rooms="rooms"

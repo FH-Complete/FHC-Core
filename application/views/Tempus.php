@@ -8,6 +8,7 @@
 		'primevue3' => true,
 		'tabulator5' => true,
 		'vuedatepicker11' => true,
+		'tags' => true,
 		'phrases' => array(
 			'global',
 			'ui',
