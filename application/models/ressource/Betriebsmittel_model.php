@@ -46,11 +46,11 @@ class Betriebsmittel_model extends DB_Model
 					JOIN lehre.tbl_kalender ON tbl_kalender.eindeutige_gruppen_id = tbl_betriebsmittel_kalender.eindeutige_kalender_gruppen_id
 					WHERE
 						betriebsmittel_id=tbl_betriebsmittel.betriebsmittel_id
-					AND tbl_kalender.von <= ?
-					AND tbl_kalender.bis >= ?
+					AND tbl_kalender.von < ?
+					AND tbl_kalender.bis > ?
 				)";
 
 
-		return $this->execQuery($qry, array($from, $to));
+		return $this->execQuery($qry, array($to, $from));
 	}
 }
