@@ -63,6 +63,27 @@ export default {
 					room.longName.toLowerCase().includes(roomFilterText),
 			);
 		},
+		timeslotDates() {
+			if (!this.$props.timeslots.length) return [];
+
+			let groupedTimeslots = Object.groupBy(
+				this.$props.timeslots,
+				(timeslot) => {
+					return timeslot.startsAt.toISOString().slice(0, 10);
+				},
+			);
+			return Object.keys(groupedTimeslots)
+				.sort()
+				.map((dateKey) => {
+					let timeslotDate = groupedTimeslots[dateKey];
+					return {
+						count: timeslotDate.length,
+						date: timeslotDate[0].date,
+						weekday: timeslotDate[0].weekday,
+						month: timeslotDate[0].month,
+					};
+				});
+		},
 	},
 	watch: {
 		survey: {
@@ -172,7 +193,7 @@ export default {
 			// )[0];
 
 			this.externalParticipantsWithoutAuthUser = externalParticipants;
-			// 
+			//
 		},
 		setData() {
 			this.setForms();
@@ -446,11 +467,11 @@ export default {
 					<table>
 						<tr>
 							<td rowspan="2" class="border-1"></td>
-							<td v-for="timeslot in $props.timeslots" class="border-1">
+							<td v-for="timeslotDate in timeslotDates" :colspan="timeslotDate.count" class="border-1">
 								<div class="px-1 d-flex flex-column align-items-center">
-									<span>{{ timeslot.month.slice(0,3) }}</span>
-									<span class="fs-5 fw-bold">{{ timeslot.date }}</span>
-									<span>{{ timeslot.weekday.slice(0,3) }}</span>
+									<span>{{ timeslotDate.month.slice(0,3) }}</span>
+									<span class="fs-5 fw-bold">{{ timeslotDate.date }}</span>
+									<span>{{ timeslotDate.weekday.slice(0,3) }}</span>
 								</div>
 							</td>
 							<td rowspan="2" class="border-1">
