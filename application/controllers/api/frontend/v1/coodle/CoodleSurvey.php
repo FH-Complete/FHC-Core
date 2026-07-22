@@ -754,7 +754,7 @@ class CoodleSurvey extends FHCAPI_Controller
 
 	public function getCoodleIcal($uid)
 	{
-		$coodleIcalFilePath = $this->_getCoodleIcal($uid, false);
+		$coodleIcalFilePath = $this->generateCoodleIcal($uid, false);
 		$this->terminateWithFileOutput("text/calendar", file_get_contents($coodleIcalFilePath), "coodle_ical.ics");
 	}
 
@@ -769,7 +769,7 @@ class CoodleSurvey extends FHCAPI_Controller
 
 		$uid = trim($this->cryptlib->RIJNDAEL_256_ECB_DECRYPT($decodedData, LVPLAN_CYPHER_KEY, true));
 
-		$coodleIcalFilePath = $this->_getCoodleIcal($uid, true);
+		$coodleIcalFilePath = $this->generateCoodleIcal($uid, true);
 		$this->terminateWithFileOutput("text/calendar", file_get_contents($coodleIcalFilePath), "coodle_ical.ics");
 	}
 
@@ -912,7 +912,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		fwrite($calendarFile, "END:VCALENDAR");
 	}
 
-	private function _getCoodleIcal($uid, $shouldIncludeIdentifyingInformation)
+	private function generateCoodleIcal($uid, $shouldIncludeIdentifyingInformation)
 	{
 		$activeParticipantEntries = $this->CoodleSurveyParticipantModel->getActiveParticipantEntriesByUid($uid);
 		$selectedTimeslotIds = [];
