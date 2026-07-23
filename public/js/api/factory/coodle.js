@@ -55,6 +55,15 @@ export default {
 			},
 		};
 	},
+	getSurveyForExternalParticipant(key) {
+		return {
+			method: "post",
+			url: "/api/frontend/v1/coodle/CoodleSurvey/getSurveyForExternalParticipant",
+			params: {
+				key,
+			},
+		};
+	},
 	getActiveSurveys() {
 		return {
 			method: "get",
@@ -73,6 +82,16 @@ export default {
 			url: "/api/frontend/v1/coodle/CoodleSurvey/submitParticipantSelection",
 			params: {
 				surveyId,
+				selection,
+			},
+		};
+	},
+	submitExternalParticipantSelection(key, selection) {
+		return {
+			method: "post",
+			url: "/api/frontend/v1/coodle/CoodleSurvey/submitExternalParticipantSelection",
+			params: {
+				key,
 				selection,
 			},
 		};

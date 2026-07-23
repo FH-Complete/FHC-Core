@@ -25,6 +25,10 @@ $this->load->view('templates/FHC-Header', $includesArray);
 		document.body.classList.add("in-frame");
 </script>
 
+<?php
+if (!isset($isExternal) || !$isExternal) {
+?>
+
 <header id="cis-header" class="navbar-dark">
 	<cis-menu 
 		root-url="<?= site_url(''); ?>" 
@@ -35,5 +39,9 @@ $this->load->view('templates/FHC-Header', $includesArray);
 		:searchfunction="searchfunction"
 		></cis-menu>
 </header>
+
+<?php
+}
+?>
 
 <main id="cis-main" class="flex-grow-1 p-4 pt-2" style="min-width: 0;">

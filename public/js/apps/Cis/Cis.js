@@ -11,6 +11,7 @@ import Raumsuche from "../../components/Cis/Raumsuche/Raumsuche.js";
 import CmsNews from "../../components/Cis/Cms/News.js";
 import CmsContent from "../../components/Cis/Cms/Content.js";
 import Coodle from "../../components/Cis/Coodle/Coodle.js";
+import CoodleExternal from "../../components/Cis/Coodle/CoodleExternal.js";
 import Info from "../../components/Cis/Mylv/Semester/Studiengang/Lv/Info.js";
 import RoomInformation, {DEFAULT_MODE_RAUMINFO_DESKTOP, DEFAULT_MODE_RAUMINFO_MOBILE} from "../../components/Cis/Mylv/RoomInformation.js";
 import AbgabetoolStudent from "../../components/Cis/Abgabetool/AbgabetoolStudent.js";
@@ -224,6 +225,12 @@ const router = VueRouter.createRouter({
 			path: `/Cis/Coodle`,
 			name: 'Coodle',
 			component: Coodle,
+			props: true
+		},
+		{
+			path: `/Cis/CoodleExternal/:key`,
+			name: 'CoodleExternal',
+			component: CoodleExternal,
 			props: true
 		},
 		{

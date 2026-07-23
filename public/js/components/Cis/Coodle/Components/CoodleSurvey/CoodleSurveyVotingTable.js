@@ -6,6 +6,7 @@ export default {
 	props: {
 		survey: { type: Object },
 		authUid: { type: String | null },
+		authExternalParticipantId: { type: Number | null },
 		timeslots: { type: Array },
 	},
 	emits: ["selectionSubmitted", "surveyCompleted"],
@@ -37,7 +38,7 @@ export default {
 		},
 		hasReachedMaxSelections() {
 			if (!this.authUserParticipant || !this.editableAuthUserSelection)
-				return 0;
+				return false;
 
 			return (
 				Object.values(this.editableAuthUserSelection).filter(
@@ -98,7 +99,10 @@ export default {
 			},
 			deep: true,
 		},
-		uid() {
+		authUid() {
+			this.setData();
+		},
+		authExternalParticipantId() {
 			this.setData();
 		},
 		authUserParticipant: {
@@ -152,48 +156,65 @@ export default {
 				},
 			);
 
-			this.authUserParticipant = participants.filter(
-				(participant) =>
-					this.$props.authUid &&
-					participant.uid === this.$props.authUid,
-			)[0];
+			if (this.$props.authUid) {
+				this.authUserParticipant =
+					participants.find(
+						(participant) =>
+							participant.uid === this.$props.authUid,
+					) ?? null;
+			}
 
-			this.participantsWithoutAuthUser = participants.filter(
-				(participant) =>
-					!this.$props.authUid ||
-					participant.uid !== this.$props.authUid,
-			);
+			this.participantsWithoutAuthUser = this.$props.authUid
+				? participants.filter(
+						(participant) =>
+							participant.uid !== this.$props.authUid,
+					)
+				: participants;
 		},
 		parseExternalParticipants() {
 			const externalParticipants =
-				this.$props.survey.externalParticipants.map((participant) => {
-					participant = { ...participant };
-					const hasVotedWithoutSelection =
-						participant.selection &&
-						participant.selection.length === 0;
+				this.$props.survey.externalParticipants.map(
+					(externalParticipant) => {
+						externalParticipant = { ...externalParticipant };
+						const hasVotedWithoutSelection =
+							externalParticipant.selection &&
+							externalParticipant.selection.length === 0;
 
-					let selectionEntries = this.$props.timeslots.map(
-						(timeslot) => [
-							timeslot.id,
-							participant.selection?.includes(timeslot.id),
-						],
-					);
-					selectionEntries.push(["none", hasVotedWithoutSelection]);
-					participant.selection =
-						Object.fromEntries(selectionEntries);
+						let selectionEntries = this.$props.timeslots.map(
+							(timeslot) => [
+								timeslot.id,
+								externalParticipant.selection?.includes(
+									timeslot.id,
+								),
+							],
+						);
+						selectionEntries.push([
+							"none",
+							hasVotedWithoutSelection,
+						]);
+						externalParticipant.selection =
+							Object.fromEntries(selectionEntries);
 
-					return participant;
-				});
+						return externalParticipant;
+					},
+				);
 
-			// todo: properly parse external participants once external page is ready
-			// this.authUserParticipant = externalParticipants.filter(
-			// 	(participant) =>
-			// 		this.$props.authUid &&
-			// 		participant.uid === this.$props.authUid,
-			// )[0];
+			if (this.$props.authExternalParticipantId) {
+				this.authUserParticipant = externalParticipants.find(
+					(externalParticipant) =>
+						externalParticipant.id ===
+						this.$props.authExternalParticipantId,
+				);
+			}
 
-			this.externalParticipantsWithoutAuthUser = externalParticipants;
-			//
+			this.externalParticipantsWithoutAuthUser = this.$props
+				.authExternalParticipantId
+				? externalParticipants.filter(
+						(externalParticipant) =>
+							externalParticipant.id !==
+							this.$props.authExternalParticipantId,
+					)
+				: externalParticipants;
 		},
 		setData() {
 			this.setForms();
@@ -238,15 +259,28 @@ export default {
 				selection = selectedTimeslots.map(Number);
 			}
 
-			const selectionSubmissionResponse = await this.$api.call(
-				CoodleApi.submitParticipantSelection(this.survey.id, selection),
-			);
+			let selectionSubmissionResponse;
+			if (this.$props.authExternalParticipantId) {
+				selectionSubmissionResponse = await this.$api.call(
+					CoodleApi.submitExternalParticipantSelection(
+						this.$route.params.key,
+						selection,
+					),
+				);
+			} else {
+				selectionSubmissionResponse = await this.$api.call(
+					CoodleApi.submitParticipantSelection(
+						this.survey.id,
+						selection,
+					),
+				);
+			}
 
 			if (selectionSubmissionResponse.meta.status === "success") {
 				this.$emit("selectionSubmitted");
 			}
 		},
-		async prepareSubmission() {
+		async prepareFinalSelectionSubmission() {
 			if (!this.$props.survey.id) return;
 
 			if (!this.selectedTimeslotId) {
@@ -475,7 +509,7 @@ export default {
 								</div>
 							</td>
 							<td rowspan="2" class="border-1">
-								<div class="px-2 py-1">
+								<div class="px-2 py-1 text-center">
 									{{ "No appointment is possible" }}
 								</div>
 							</td>
@@ -491,11 +525,18 @@ export default {
 						<tr v-for="participant in participantsWithoutAuthUser">
 							<td class="border-1 px-2 py-1">
 								<div
-									v-if="participant.uid"
+									v-if="participant.name"
 									class="d-flex flex-row gap-1 justify-content-between align-items-center"
 								>
-									{{ participant.name }}
-									<a :href="getParticipantProfileHref(participant)" target="_blank" class="px-1 fhc-primary-color">
+									<span>
+										{{ participant.name }}
+									</span>	
+									<a
+										v-if="participant.uid"
+										:href="getParticipantProfileHref(participant)"
+										target="_blank"
+										class="px-1 fhc-primary-color"
+									>
 										<i class="fa-solid fa-up-right-from-square"></i>
 									</a>
 								</div>
@@ -705,7 +746,7 @@ export default {
 					</div>
 					<div
 						v-if="isFinalSelectionInProgress"
-						@click="isRoomSelectionShown ? submitWithRoomSelection() : prepareSubmission()"
+						@click="isRoomSelectionShown ? submitWithRoomSelection() : prepareFinalSelectionSubmission()"
 						:class="isDarkMode ? 'btn-light' : 'btn-dark'"
 						class="btn text-nowrap"
 					>

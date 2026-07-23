@@ -16,18 +16,23 @@ class CoodleSurveyExternalParticipant_model extends DB_Model
 		$this->_ci =& get_instance();
 	}
 
-	public function getExternalParticipants($surveyId, $shouldIncludeAccessKey = false)
+	public function getExternalParticipants($surveyId)
 	{
-		$columns = "id, name, email, selection";
-		if ($shouldIncludeAccessKey) {
-			$columns .= ", access_key";
-		}
-
-		$query = "SELECT $columns
+		$query = "SELECT *
 				FROM $this->dbTable
 				WHERE survey_id = $surveyId
 		";
 		return $this->execQuery($query)->retval;
+	}
+
+	public function getExternalParticipant($externalParticipantId)
+	{
+		$query = "SELECT *
+			FROM $this->dbTable
+			WHERE id = $externalParticipantId
+			LIMIT 1
+		";
+		return $this->execQuery($query)->retval[0];
 	}
 
 	public function updateExternalParticipants($surveyId, $externalParticipants, $timeslots)
@@ -39,31 +44,35 @@ class CoodleSurveyExternalParticipant_model extends DB_Model
 			},
 			$oldExternalParticipants
 		);
+		$this->_ci->addMeta("oldExternalParticipants", $oldExternalParticipants);
 
 		$persistingExternalParticipants = array_filter(
 			$externalParticipants,
 			function ($externalParticipant) {
-				return isset($externalParticipant->id) && $externalParticipant->id;
+				return isset($externalParticipant["id"]) && $externalParticipant["id"];
 			}
 		);
 		$persistingExternalParticipantIds = array_map(
 			function ($persistingExternalParticipant) {
-				return $persistingExternalParticipant->id;
+				return $persistingExternalParticipant["id"];
 			},
 			$persistingExternalParticipants
 		);
+		$this->_ci->addMeta("persistingExternalParticipants", $persistingExternalParticipants);
 
 		$redundantExternalParticipantIds = array_diff(
 			$oldExternalParticipantIds,
 			$persistingExternalParticipantIds
 		);
+		$this->_ci->addMeta("redundantExternalParticipantIds", $redundantExternalParticipantIds);
 
 		$newExternalParticipants = array_filter(
 			$externalParticipants,
 			function ($externalParticipant) {
-				return !isset($externalParticipant->id) || !$externalParticipant->id;
+				return !isset($externalParticipant["id"]) || !$externalParticipant["id"];
 			}
 		);
+		$this->_ci->addMeta("newExternalParticipants", $newExternalParticipants);
 
 
 		if (count($redundantExternalParticipantIds)) {
@@ -77,14 +86,12 @@ class CoodleSurveyExternalParticipant_model extends DB_Model
 				function ($newExternalParticipant) use ($surveyId) {
 					$name = $newExternalParticipant["name"];
 					$email = $newExternalParticipant["email"];
-					$accessKey = $surveyId . "_" . $email;
-					// todo: encrypt access key
-					return "($surveyId, '$name', '$email', '$accessKey', NULL)";
+					return "($surveyId, '$name', '$email', NULL)";
 				},
 				$newExternalParticipants
 			);
 			$insertValues = implode(", ", $insertValues);
-			$insertQuery = "INSERT INTO $this->dbTable (survey_id, name, email, access_key, selection) VALUES $insertValues";
+			$insertQuery = "INSERT INTO $this->dbTable (survey_id, name, email, selection) VALUES $insertValues";
 			$this->execQuery($insertQuery);
 		}
 

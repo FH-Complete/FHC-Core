@@ -22,6 +22,8 @@ export default {
 	props: {
 		survey: { type: Object | null },
 		authInfo: { type: Object | null },
+		authExternalParticipantId: { type: Number | null },
+		isExternal: { type: Boolean, default: false },
 	},
 	emits: ["surveyCreationCanceled", "surveyCreated", "surveyUpdated"],
 	data() {
@@ -385,9 +387,10 @@ export default {
 						:authUid="$props.authInfo?.uid"
 						:timeslots="parsedTimeslotsForVotingTable"
 						:survey="$props.survey"
+						:authExternalParticipantId="$props.authExternalParticipantId"
 					/>
 				</div>
-				<div v-else class="d-flex flex-column gap-3">
+				<div v-else-if="!$props.isExternal" class="d-flex flex-column gap-3">
 					<div class="row">
 						<div class="col-12 col-xxl-4 pb-3">
 							<coodle-survey-participants

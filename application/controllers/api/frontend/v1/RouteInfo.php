@@ -25,7 +25,7 @@ class RouteInfo extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'info' => self::PERM_LOGGED,
+			'info' => self::PERM_ANONYMOUS,
 		]);
 
 		$this->load->model('system/Webservicelog_model', 'WebservicelogModel');
@@ -33,6 +33,8 @@ class RouteInfo extends FHCAPI_Controller
 
 	public function info()
 	{
+		if (!getAuthUID()) $this->terminateWithSuccess(null);
+
 		$payload = json_decode($this->input->raw_input_stream);
 
 		if (isset($payload->app) && isset($payload->path) && $this->isValidApp($payload->app) && $this->isValidPath($payload->path))

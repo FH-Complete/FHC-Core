@@ -102,7 +102,6 @@ if (!$result = @$db->db_query("SELECT 1 FROM campus.tbl_coodle_survey_external_p
 		survey_id int NOT NULL,
 		name varchar(255) NOT NULL,
 		email varchar(255) NOT NULL,
-		access_key varchar(255) NOT NULL,
 		selection varchar(255),
 		CONSTRAINT tbl_coodle_surveys_external_participants_id_pk PRIMARY KEY(id),
 		CONSTRAINT tbl_coodle_survey_external_participants_survey_id_fk FOREIGN KEY (survey_id) REFERENCES campus.tbl_coodle_surveys(id)
@@ -147,13 +146,6 @@ if (!$result = @$db->db_query("SELECT 1 FROM campus.tbl_coodle_survey_external_p
 		echo '<br>Granted privileges to <strong>vilesci</strong> on campus.tbl_coodle_survey_external_participants';
 }
 
-$db->db_query('CREATE SEQUENCE IF NOT EXISTS campus.seq_tbl_coodle_survey_external_participants_id
-     INCREMENT BY 1
-     NO MAXVALUE
-     NO MINVALUE
-     CACHE 1;');
-
-	$db->db_query("ALTER TABLE campus.tbl_coodle_survey_external_participants ALTER COLUMN id SET DEFAULT nextval('campus.seq_tbl_coodle_survey_external_participants_id');");
 
 
 if (!$result = @$db->db_query("SELECT 1 FROM campus.tbl_coodle_survey_timeslots LIMIT 1")) {

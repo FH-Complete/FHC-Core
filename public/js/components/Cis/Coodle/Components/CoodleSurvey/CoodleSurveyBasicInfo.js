@@ -123,7 +123,12 @@ export default {
 					<span>
 						<span class="fw-bold">{{ "Created by: " }}</span>
 						{{ this.$props.survey?.creator?.name }}
-						<a :href="surveyCreatorProfileHref" target="_blank" class="fhc-primary-color">
+						<a
+							v-if="this.$props.survey?.creator?.uid"
+							:href="surveyCreatorProfileHref"
+							target="_blank"
+							class="fhc-primary-color"
+						>
 							<i class="fa-solid fa-up-right-from-square"></i>
 						</a>
 						{{ " on " + formattedSurveyCreatedAt}}

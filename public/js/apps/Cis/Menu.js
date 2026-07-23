@@ -1,5 +1,6 @@
 import FhcSearchbar from "../../components/searchbar/searchbar.js";
 import CisMenu from "../../components/Cis/Menu.js";
+import CisExternalMenu from "../../components/Cis/ExternalMenu.js";
 import PluginsPhrasen from '../../plugins/Phrasen.js';
 import Theme from "../../plugins/Theme.js";
 import ApiSearchbar from '../../api/factory/searchbar.js';
@@ -9,7 +10,8 @@ const app = Vue.createApp({
     name: 'CisMenuApp',
     components: {
         FhcSearchbar,
-        CisMenu
+        CisMenu,
+		CisExternalMenu
     },
     data: function() {
         return {
