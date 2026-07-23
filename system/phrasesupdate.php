@@ -59261,6 +59261,106 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'benotungstool',
+		'phrase' => 'maxAntritteReached',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Für Studierenden {0} sind bereits die maximal zulässigen Prüfungsantritte ({1}) vergeben. Es wurde keine Prüfung angelegt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student {0} has already used the maximum number of exam attempts ({1}). No exam was created.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'pruefungDatumBeforeExisting',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Prüfungsdatum für Studierenden {0} darf nicht vor oder am selben Tag wie ein bereits bestehender Prüfungstermin liegen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The exam date for student {0} must not be on or before an existing exam date.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'noteOccuranceLimitReached',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die gewählte Note darf für Studierenden {0} nicht so oft vergeben werden. Es wurde keine Prüfung angelegt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The selected grade may not be assigned that many times for student {0}. No exam was created.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'noteneintragungsfristVorbei',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Noteneintragungsfrist ({0}) für dieses Studiensemester ist abgelaufen. Es können keine Noten oder Prüfungen mehr eingetragen werden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The grade entry deadline ({0}) for this study semester has passed. Grades and exams can no longer be entered.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'keineBerechtigungNoten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Berechtigung, um in der Lehrveranstaltung "{0}" im Semester {1} Noten einzutragen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No permission to enter grades for the course "{0}" in semester {1}.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
 		'phrase' => 'freezeColumnsToggle',
 		'insertvon' => 'system',
 		'phrases' => array(

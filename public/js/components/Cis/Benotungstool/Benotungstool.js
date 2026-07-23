@@ -1,7 +1,5 @@
 import {CoreFilterCmpt} from "../../filter/Filter.js";
-import ApiLehre from "../../../api/factory/lehre.js";
 import ApiNoten from "../../../api/factory/noten.js";
-import ApiAuthinfo from "../../../api/factory/authinfo.js";
 import ApiStudiensemester from "../../../api/factory/studiensemester.js";
 import BsModal from '../../Bootstrap/Modal.js';
 import BsOffcanvas from '../../Bootstrap/Offcanvas.js';
@@ -42,7 +40,6 @@ export const Benotungstool = {
 	},
 	data() {
 		return {
-			uid: null,
 			headerFiltersRestored: false,
 			filtersRestored: false,
 			filteredRows: null,
@@ -85,6 +82,9 @@ export const Benotungstool = {
 			pruefungen: null,
 			studiensemester: null,
 			selectedSemester: null,
+			isAssistenz: false,
+			assistenzStudiengaenge: null,
+			selectedStudiengang: null,
 			lehrveranstaltungen: null,
 			selectedLehrveranstaltung: null,
 			tableBuiltResolve: null,
@@ -206,10 +206,6 @@ export const Benotungstool = {
 			]};
 	},
 	methods: {
-		async fetchAuthUID() {
-			const authIdResponse = await this.$api.call(ApiAuthinfo.getAuthUID());
-			this.uid = authIdResponse.data.uid;
-		},
 		loadState() {
 			return JSON.parse(localStorage.getItem(this.persistenceID) || "null");
 		},
@@ -621,6 +617,18 @@ export const Benotungstool = {
 			this.$api.call(ApiNoten.saveStudentPruefungBulk(this.lv_id, this.sem_kurzbz, pruefungenbulk))
 				.then((res)=> {
 					if(res.meta.status === 'success') {
+						// separate per-row backend rejections (localized string messages) from actual saves
+						let errorList = ''
+						Object.keys(res.data ?? {}).forEach(uid => {
+							const entry = res.data[uid]
+							if(!entry?.savedPruefung && !entry?.extraPruefung) {
+								errorList += entry + '\n'
+							}
+						})
+						if(errorList !== '') {
+							this.$fhcAlert.alertError(errorList)
+						}
+
 						this.$fhcAlert.alertDefault(
 							'success',
 							'Info',
@@ -637,11 +645,16 @@ export const Benotungstool = {
 			
 			const pruefungen = res.data
 			uids.forEach(entry => {
-				const saved = pruefungen[entry.uid].savedPruefung?.[0]
-				const extra = pruefungen[entry.uid].extraPruefung?.[0]
+				const rowResult = pruefungen[entry.uid]
+				const saved = rowResult?.savedPruefung?.[0]
+				const extra = rowResult?.extraPruefung?.[0]
 
 				const student = this.studenten.find(s => s.uid == entry.uid)
 				if(!student) return
+
+				// a per-row backend rejection returns a localized error string (or produced nothing) ->
+				// skip it here; callers surface those messages to the user separately
+				if(!saved) return
 
 				// check for extra pruefung (termin1) to add before
 				if(extra) {
@@ -1381,9 +1394,21 @@ export const Benotungstool = {
 				
 				// no actions on kommPruef allowed
 				// no actions on termin1 aka pruefung 0 aka ursprüngliche note erlaubt
-				if(field === 'kommPruef' || field === "Termin1") { 
+				if(field === 'kommPruef' || field === "Termin1") {
+					// Prüfungsordnung §2: for the original Zeugnisnote (Termin1 = first Antritt) optionally
+					// show its Benotungsdatum inline next to the grade
+					if(field === "Termin1"
+						&& this.config?.SHOW_BENOTUNGSDATUM_ON_NOTENVORSCHLAG_UEBERNAHME
+						&& studentPruefung?.datum) {
+						const dateDiv = createCol(this.formatDatumDMY(studentPruefung.datum), 'col-auto d-flex justify-content-center align-items-center')
+						dateDiv.classList.add('text-muted')
+						dateDiv.style.fontSize = '0.75rem'
+						dateDiv.style.whiteSpace = 'nowrap'
+						dateDiv.style.marginLeft = '6px'
+						rowDiv.appendChild(dateDiv)
+					}
 					return rowDiv
-				} 
+				}
 				
 				if(data[field]?.pruefungstyp_kurzbz !== 'Termin1') {
 					// once a later-dated or higher-attempt pruefung exists (e.g. a Termin3/kommPruef has
@@ -1430,6 +1455,12 @@ export const Benotungstool = {
 			const parts = (iso ?? '').slice(0, 10).split('-')
 			if(parts.length !== 3) return null
 			return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]))
+		},
+		formatDatumDMY(datum) {
+			// 'YYYY-MM-DD[ ...]' -> 'DD.MM.YYYY'
+			const parts = (datum ?? '').slice(0, 10).split('-')
+			if(parts.length !== 3) return ''
+			return `${parts[2]}.${parts[1]}.${parts[0]}`
 		},
 		addDays(date, days) {
 			const d = new Date(date)
@@ -1775,22 +1806,73 @@ export const Benotungstool = {
 			this.notenTableOptions.height = window.visualViewport.height - rect.top - 50
 			this.$refs.notenTable.tabulator.setHeight(this.notenTableOptions.height)
 		},
-		loadLehrveranstaltungen(sem_kurzbz, preselectLvId = null) {
-			return this.$api.call(ApiLehre.getZugewieseneLv(this.uid, sem_kurzbz)).then(res => {
-				this.lehrveranstaltungen = res.data
-				this.lehrveranstaltungen.forEach(lva => {
-					lva.fullString = `${lva.stg_kurzbz} - ${lva.lv_semester} - ${lva.orgform}: ${lva.lv_bezeichnung}`
-				})
-				this.selectedLehrveranstaltung = preselectLvId
-					? this.lehrveranstaltungen.find(lva => lva.lehrveranstaltung_id == preselectLvId) ?? null
-					: null
+		setLehrveranstaltungen(lvaData, preselectLvId = null) {
+			this.lehrveranstaltungen = lvaData
+			this.lehrveranstaltungen.forEach(lva => {
+				lva.fullString = `${lva.stg_kurzbz} - ${lva.lv_semester} - ${lva.orgform}: ${lva.lv_bezeichnung}`
 			})
+			this.selectedLehrveranstaltung = preselectLvId
+				? this.lehrveranstaltungen.find(lva => lva.lehrveranstaltung_id == preselectLvId) ?? null
+				: null
+		},
+		// Decides how the LV dropdown is fed for the current user: Assistenzen pick a Studiengang first
+		// (LVs scoped by entitlement), teachers get their assigned LVs directly. Also loads the
+		// entitled Studiengänge for the Studiengang dropdown when in Assistenz mode.
+		setupLvSource(sem_kurzbz, preselectLvId = null) {
+			return this.$api.call(ApiNoten.getBenotungstoolContext(sem_kurzbz, preselectLvId)).then(res => {
+				this.isAssistenz = !!res.data?.isAssistenz
+
+				if (this.isAssistenz) {
+					this.setAssistenzStudiengaenge(res.data?.studiengaenge ?? [])
+
+					// deep-link: preselect the requested LV's Studiengang, load its LVs and preselect the LV.
+					// Without a (resolvable) deep-link, wait for a manual Studiengang selection.
+					const preStgKz = res.data?.preselectStudiengang_kz
+					this.selectedStudiengang = preStgKz
+						? this.assistenzStudiengaenge.find(s => s.studiengang_kz == preStgKz) ?? null
+						: null
+
+					if (this.selectedStudiengang) {
+						return this.loadLehrveranstaltungenForStudiengang(this.selectedStudiengang.studiengang_kz, sem_kurzbz, preselectLvId)
+					}
+
+					this.lehrveranstaltungen = null
+					this.selectedLehrveranstaltung = null
+				} else {
+					// teacher: assigned LVs delivered by the same context call (deep-linked lv_id preselected)
+					this.setLehrveranstaltungen(res.data?.lehrveranstaltungen ?? [], preselectLvId)
+				}
+			})
+		},
+		setAssistenzStudiengaenge(studiengaenge) {
+			this.assistenzStudiengaenge = studiengaenge
+			this.assistenzStudiengaenge.forEach(stg => {
+				stg.fullString = `${stg.kuerzel} - ${stg.bezeichnung}`
+			})
+		},
+		loadLehrveranstaltungenForStudiengang(studiengang_kz, sem_kurzbz, preselectLvId = null) {
+			return this.$api.call(ApiNoten.getLvForStudiengang(studiengang_kz, sem_kurzbz)).then(res => {
+				this.setLehrveranstaltungen(res.data, preselectLvId)
+			})
+		},
+		stgChanged(e) {
+			const sem = this.selectedSemester?.studiensemester_kurzbz ?? this.sem_kurzbz
+			const stg = e.value?.studiengang_kz ?? null
+
+			this.selectedLehrveranstaltung = null
+			if (stg && sem) {
+				this.loading = true
+				this.loadLehrveranstaltungenForStudiengang(stg, sem).finally(() => this.loading = false)
+			} else {
+				this.lehrveranstaltungen = null
+			}
+		},
+		getOptionLabelStg(option) {
+			return option.fullString
 		},
 		async setupCreated() {
 			this.loading = true
 
-			await this.fetchAuthUID()
-			
 			this.debouncedFetchPunkteForPruefung = debounce(this.fetchNoteForPunktePruefung, 500)
 			
 			// fetch cis config regarding gesamtnoteneingabe, needs to be fetched before setup can finish
@@ -1818,7 +1900,7 @@ export const Benotungstool = {
 				this.selectedSemester = defaultSem ?? this.studiensemester[0] ?? null
 
 				const sem = this.selectedSemester?.studiensemester_kurzbz
-				if (sem) this.loadLehrveranstaltungen(sem, this.lv_id)
+				if (sem) this.setupLvSource(sem, this.lv_id)
 			})
 			
 			LehreinheitenModule.setupContext(this.$.appContext.config.globalProperties)
@@ -1864,22 +1946,44 @@ export const Benotungstool = {
 		ssChanged(e) {
 			const sem = e.value.studiensemester_kurzbz
 			const keepLvId = this.selectedLehrveranstaltung?.lehrveranstaltung_id ?? this.lv_id
+			const keepStg = this.selectedStudiengang?.studiengang_kz
 
 			this.loading = true
-			this.loadLehrveranstaltungen(sem, keepLvId).then(() => {
-				const lvId = this.selectedLehrveranstaltung?.lehrveranstaltung_id ?? null
+			this.$api.call(ApiNoten.getBenotungstoolContext(sem)).then(res => {
+				this.isAssistenz = !!res.data?.isAssistenz
 
-				this.$router.push({
-					name: "Benotungstool",
-					params: { sem_kurzbz: sem, lv_id: lvId ?? undefined }
-				})
+				if (this.isAssistenz) {
+					// keep the selected Studiengang if it still exists this semester, then reload its LVs
+					this.setAssistenzStudiengaenge(res.data?.studiengaenge ?? [])
+					this.selectedStudiengang = keepStg
+						? this.assistenzStudiengaenge.find(s => s.studiengang_kz == keepStg) ?? null
+						: null
 
-				if (lvId) {
-					this.loadNoten(lvId, sem)
-				} else if (this.$refs.notenTable?.tabulator) {
-					this.$refs.notenTable.tabulator.setData([])
+					const loadLvs = this.selectedStudiengang
+						? this.loadLehrveranstaltungenForStudiengang(this.selectedStudiengang.studiengang_kz, sem, keepLvId)
+						: Promise.resolve(this.lehrveranstaltungen = null)
+
+					return loadLvs.then(() => this.afterSemesterChange(sem))
 				}
+
+				// teacher: assigned LVs for the new semester come from the same context call
+				this.setLehrveranstaltungen(res.data?.lehrveranstaltungen ?? [], keepLvId)
+				return this.afterSemesterChange(sem)
 			}).finally(() => this.loading = false)
+		},
+		afterSemesterChange(sem) {
+			const lvId = this.selectedLehrveranstaltung?.lehrveranstaltung_id ?? null
+
+			this.$router.push({
+				name: "Benotungstool",
+				params: { sem_kurzbz: sem, lv_id: lvId ?? undefined }
+			})
+
+			if (lvId) {
+				this.loadNoten(lvId, sem)
+			} else if (this.$refs.notenTable?.tabulator) {
+				this.$refs.notenTable.tabulator.setData([])
+			}
 		},
 		getOptionLabel(option) {
 			return option.studiensemester_kurzbz
@@ -1890,21 +1994,24 @@ export const Benotungstool = {
 		getOptionLabelLe(option) {
 			return option.infoString
 		},
-		getPruefungstypForStudentByAntritt(student) { 
-			// when adding new pruefungen, determine the next pruefungstyp by using the antritt counter
-			switch (student.hoechsterAntritt) {
-				case 0:
-					return "Termin2"
-					break
-				case 1: 
-					return "Termin2"
-					break
-				case 2: 
-					return "Termin3"
-					break
-				default:
-					return ""
-			}
+		getPruefungstypForStudentByAntritt(student) {
+			// Determine the next in-tool pruefungstyp when adding a new attempt. The order of retake
+			// types is driven by config so each installation keeps its own ruleset:
+			//   - Termin1 (the original Zeugnisnote) is attempt 1 and is not offered here.
+			//   - each enabled retake type is the next offered attempt: Termin2, then legacy Termin3.
+			//   - kommPruef is the terminal attempt and is entered elsewhere, so it is never offered here.
+			// Our installation enables only Termin2 (Termin3 is legacy for other unis), so every offered
+			// retake resolves to Termin2 - which is also why Termin2 can occur twice: the excused Termin
+			// does not increment hoechsterAntritt (see getAntrittCountStudent), so the next offered attempt
+			// stays Termin2 until a counting Termin2 exists.
+			const retakeTypes = []
+			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_TERMIN2) retakeTypes.push("Termin2")
+			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_TERMIN3) retakeTypes.push("Termin3")
+
+			// hoechsterAntritt is the number of counting attempts already taken (>=1 once an original
+			// note exists). The next retake sits at index hoechsterAntritt-1 (attempt 1 -> first retake).
+			const idx = Math.max(0, student.hoechsterAntritt - 1)
+			return retakeTypes[idx] ?? ""
 		},
 		savePruefungEingabe() {
 			// keep the date within the neighbouring exam dates (a typed value can bypass the picker bounds)
@@ -2279,14 +2386,17 @@ export const Benotungstool = {
 			}).finally(()=> this.loading = false)
 		},
 		getAntrittCountStudent(student) {
-			// checks for existence of a prüfung with a note that resolves to a 
-			// "angetretene Prüfung" -> anything except "entschuldigt" & "noch nicht eingetragen"
-			// and returns the next allowed pruefungstyp from the number of taken pruefungen
-			
-			// 1 -> reguläre note
-			// 2 -> erste Nachprüfung / Termin2
-			// 3 -> 2te Nachprüfung / Termin3
-			// 4 -> kommPruef
+			// Number of counting Prüfungsantritte the student has taken. Counting is by NOTE, not by
+			// pruefungstyp: any note except the "antrittslose" ones (entschuldigt & noch nicht eingetragen,
+			// see NOTEN_OHNE_ANTRITT) counts as an attempt. That is exactly what makes an excused Termin2
+			// not consume an attempt, so Termin2 can be entered a second time.
+			//
+			// Antritt numbering in our installation: 1 = original note, 2 = Termin2 (may be entered twice,
+			// one excused), terminal = kommPruef. (Termin3 is a legacy retake for other installations and
+			// is simply counted like any other pruefung when enabled.)
+			//
+			// A present kommPruef is terminal: return a sentinel (4) that is >= any maxAntrittCount, so no
+			// further attempts can be added here regardless of installation.
 			if(student['kommPruef']) return 4
 			
 			let pruefungsAntrittCount = 0
@@ -2410,11 +2520,17 @@ export const Benotungstool = {
 				+ ': <strong>' + (this.studenten?.length || 0) + '</strong>';
 		},
 		maxAntrittCount() {
+			// Maximum number of counting Prüfungsantritte enterable IN THIS TOOL: the original note
+			// (always 1) plus each enabled in-tool retake type. kommPruef is the terminal attempt and is
+			// entered elsewhere, so it is intentionally NOT part of this cap. For our installation
+			// (Termin2 on, Termin3 off) this is 2 (original + Termin2); Termin3 is legacy for other unis.
+			// Excused Termine do not count (see getAntrittCountStudent), which is what lets Termin2 occur
+			// twice within this cap.
 			let maxAntritte = 1;
-			
+
 			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_TERMIN2) maxAntritte++
 			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_TERMIN3) maxAntritte++
-			
+
 			return maxAntritte;
 		},
 		getFreigabeCounter() {
@@ -2684,53 +2800,64 @@ export const Benotungstool = {
 
 		<FhcOverlay :active="loading"></FhcOverlay>
 
-		<div class="row">
-			<div class="col-auto me-auto">
-				<h2>{{$capitalize($p.t('benotungstool/benotungstoolTitle'))}}</h2>
-				<h5>{{ selectedLehrveranstaltung?.lv_bezeichnung }}</h5>
+		<div class="row align-items-center gy-2 mb-2">
+			<div class="col-12 col-xxl-auto">
+				<h2 class="mb-0">{{$capitalize($p.t('benotungstool/benotungstoolTitle'))}}</h2>
+				<h5 class="mb-0 text-truncate" style="max-width: 22rem;">{{ selectedLehrveranstaltung?.lv_bezeichnung }}</h5>
 			</div>
-		
-			<div class="col-auto d-none d-xxl-flex">
-				<label class="col-form-label">{{$capitalize($p.t('lehre/lehrveranstaltung'))}}:</label>
-			</div>
-			<div class="col-2">
-				<Dropdown @change="lvChanged" :style="{'width': '100%'}" :optionLabel="getOptionLabelLv"
-					:placeholder="$capitalize($p.t('lehre/lehrveranstaltung'))"
-					v-model="selectedLehrveranstaltung" :options="lehrveranstaltungen" appendTo="self">
-					<template #optionsgroup="slotProps">
-						<div> {{ option.fullString }} </div>
-					</template>
-				</Dropdown>
-			</div>
-		
-			<div class="col-auto d-none d-xxl-flex">
-				<label class="col-form-label">{{$capitalize($p.t('lehre/lehreinheit'))}}:</label>
-			</div>
-			<div class="col-2">
-				<Dropdown :style="{'width': '100%'}" v-bind="LehreinheitenModule"
-					v-model="selectedLehreinheit" showClear appendTo="self">
-					<template #option="slotProps">
-						<div>
-							{{ slotProps.option.infoString }}
-							<i class="fa-solid fa-user"></i>
-							{{ slotProps.option.studentcount }}
-							<i class="fa-solid fa-calendar-days"></i>
-							{{ slotProps.option.termincount }}
-						</div>
-					</template>
-				</Dropdown>
-			</div>
-		
-			<div class="col-auto d-none d-xxl-flex">
-				<label class="col-form-label">{{$capitalize($p.t('lehre/studiensemester'))}}:</label>
-			</div>
-			<div class="col-2">
-				<Dropdown @change="ssChanged" :style="{'width': '100%'}" :optionLabel="getOptionLabel"
-					v-model="selectedSemester" :options="studiensemester" appendTo="self">
-					<template #optionsgroup="slotProps">
-						<div> {{ option.studiensemester_kurzbz }} </div>
-					</template>
-				</Dropdown>
+
+			<div class="col-12 col-xxl">
+				<div class="d-flex flex-wrap align-items-center justify-content-xxl-end" style="gap: 0.5rem;">
+
+					<div class="d-flex align-items-center" style="flex: 1 1 12rem; min-width: 9rem; gap: 0.35rem;" v-if="isAssistenz">
+						<label class="col-form-label py-0 text-nowrap flex-shrink-0 d-none d-xxl-inline">{{$capitalize($p.t('lehre/studiengang'))}}:</label>
+						<Dropdown @change="stgChanged" class="flex-grow-1" :style="{'minWidth': '0'}" :optionLabel="getOptionLabelStg"
+							:placeholder="$capitalize($p.t('lehre/studiengang'))"
+							v-model="selectedStudiengang" :options="assistenzStudiengaenge" appendTo="self">
+							<template #optionsgroup="slotProps">
+								<div> {{ option.fullString }} </div>
+							</template>
+						</Dropdown>
+					</div>
+
+					<div class="d-flex align-items-center" style="flex: 1 1 12rem; min-width: 9rem; gap: 0.35rem;">
+						<label class="col-form-label py-0 text-nowrap flex-shrink-0 d-none d-xxl-inline">{{$capitalize($p.t('lehre/lehrveranstaltung'))}}:</label>
+						<Dropdown @change="lvChanged" class="flex-grow-1" :style="{'minWidth': '0'}" :optionLabel="getOptionLabelLv"
+							:placeholder="$capitalize($p.t('lehre/lehrveranstaltung'))"
+							v-model="selectedLehrveranstaltung" :options="lehrveranstaltungen" appendTo="self">
+							<template #optionsgroup="slotProps">
+								<div> {{ option.fullString }} </div>
+							</template>
+						</Dropdown>
+					</div>
+
+					<div class="d-flex align-items-center" style="flex: 1 1 12rem; min-width: 9rem; gap: 0.35rem;">
+						<label class="col-form-label py-0 text-nowrap flex-shrink-0 d-none d-xxl-inline">{{$capitalize($p.t('lehre/lehreinheit'))}}:</label>
+						<Dropdown class="flex-grow-1" :style="{'minWidth': '0'}" v-bind="LehreinheitenModule"
+							v-model="selectedLehreinheit" showClear appendTo="self">
+							<template #option="slotProps">
+								<div>
+									{{ slotProps.option.infoString }}
+									<i class="fa-solid fa-user"></i>
+									{{ slotProps.option.studentcount }}
+									<i class="fa-solid fa-calendar-days"></i>
+									{{ slotProps.option.termincount }}
+								</div>
+							</template>
+						</Dropdown>
+					</div>
+
+					<div class="d-flex align-items-center" style="flex: 1 1 8rem; min-width: 7rem; gap: 0.35rem;">
+						<label class="col-form-label py-0 text-nowrap flex-shrink-0 d-none d-xxl-inline">{{$capitalize($p.t('lehre/studiensemester'))}}:</label>
+						<Dropdown @change="ssChanged" class="flex-grow-1" :style="{'minWidth': '0'}" :optionLabel="getOptionLabel"
+							v-model="selectedSemester" :options="studiensemester" appendTo="self">
+							<template #optionsgroup="slotProps">
+								<div> {{ option.studiensemester_kurzbz }} </div>
+							</template>
+						</Dropdown>
+					</div>
+
+				</div>
 			</div>
 		</div>
 		

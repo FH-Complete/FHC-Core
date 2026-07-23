@@ -28,18 +28,21 @@ class Noten extends FHCAPI_Controller
 	 */
 	public function __construct()
 	{
+		$permissions = array('lehre/benotungstool:rw', 'lehre/benotungstool_assistenz:rw');
 		parent::__construct([
-			'getStudentenNoten' => array('lehre/benotungstool:rw'),
-			'getNoten' => array('lehre/benotungstool:rw'),
-			'saveStudentenNoten' => array('lehre/benotungstool:rw'),
-			'getNotenvorschlagStudent' => array('lehre/benotungstool:rw'),
-			'saveNotenvorschlag' => array('lehre/benotungstool:rw'),
-			'saveStudentPruefung' => array('lehre/benotungstool:rw'),
-			'createPruefungen' => array('lehre/benotungstool:rw'),
-			'saveNotenvorschlagBulk' => array('lehre/benotungstool:rw'),
-			'savePruefungenBulk' => array('lehre/benotungstool:rw'),
-			'getCisConfig' => array('lehre/benotungstool:rw'),
-			'getNoteByPunkte' => array('lehre/benotungstool:rw')
+			'getStudentenNoten' => $permissions,
+			'getNoten' => $permissions,
+			'saveStudentenNoten' => $permissions,
+			'getNotenvorschlagStudent' => $permissions,
+			'saveNotenvorschlag' => $permissions,
+			'saveStudentPruefung' => $permissions,
+			'createPruefungen' => $permissions,
+			'saveNotenvorschlagBulk' => $permissions,
+			'savePruefungenBulk' => $permissions,
+			'getCisConfig' => $permissions,
+			'getNoteByPunkte' => $permissions,
+			'getBenotungstoolContext' => $permissions,
+			'getLvForStudiengang' => $permissions
 		]);
 
 		$this->load->library('AuthLib', null, 'AuthLib');
@@ -72,6 +75,7 @@ class Noten extends FHCAPI_Controller
 		$this->load->model('education/Lvgesamtnote_model', 'LvgesamtnoteModel');
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 		$this->load->model('education/Notenschluesselaufteilung_model', 'NotenschluesselaufteilungModel');
+		$this->load->model('education/Note_model', 'NoteModel');
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
@@ -84,9 +88,11 @@ class Noten extends FHCAPI_Controller
 	}
 
 	public function getCisConfig() {
-		$NOTEN_OHNE_ANTRITT = $this->config->item('NOTEN_OHNE_ANTRITT');
-		$NOTEN_OCCURANCE_LIMIT_MAP = $this->config->item('NOTEN_OCCURANCE_LIMIT_MAP');
-		$NOTE_ENTSCHULDIGT = $this->config->item('NOTE_ENTSCHULDIGT');
+		// resolved from tbl_note (Bezeichnung) with config fallback -> single source of truth
+		$special = $this->resolveSpecialNotes();
+		$NOTEN_OHNE_ANTRITT = $special['ohneAntritt'];
+		$NOTEN_OCCURANCE_LIMIT_MAP = $special['limitMap'];
+		$NOTE_ENTSCHULDIGT = $special['entschuldigt'];
 		
 		$this->terminateWithSuccess(
 			array(
@@ -99,12 +105,12 @@ class Noten extends FHCAPI_Controller
 				// only relevant in punkte calculation in backend
 				// 'CIS_GESAMTNOTE_GEWICHTUNG' => CIS_GESAMTNOTE_GEWICHTUNG,
 				
-				// this one should always be set true since fh prüfungsordnung requires at least 3 antritte (t1+t2+kP)
-				// send it anyway to use in maxAntritte calculation
+				// enables the first in-tool retake (Termin2).
+				// Used in the maxAntritte calculation.
 				'CIS_GESAMTNOTE_PRUEFUNG_TERMIN2' => CIS_GESAMTNOTE_PRUEFUNG_TERMIN2,
-				
-				// should in 99% of cases be kept true to enable 4 antritte in total, but if a certain
-				// fh still works with 3 antritte per note this can limit the max number of antritte accordingly
+
+				// legacy: enables a SECOND in-tool retake (Termin3) for other installations whose ruleset
+				// uses three explicit Nachprüfungs-Termine. Each enabled retake type raises the maxAntritte cap.
 				'CIS_GESAMTNOTE_PRUEFUNG_TERMIN3' => CIS_GESAMTNOTE_PRUEFUNG_TERMIN3,
 				
 				// used to toggle availability of kommPruef type pruefungen
@@ -133,8 +139,141 @@ class Noten extends FHCAPI_Controller
 				'NOTEN_OCCURANCE_LIMIT_MAP' => $NOTEN_OCCURANCE_LIMIT_MAP,
 
 				// pk of the 'entschuldigt' note; used to preserve excused Termine on new pruefung creation
-				'NOTE_ENTSCHULDIGT' => $NOTE_ENTSCHULDIGT
+				'NOTE_ENTSCHULDIGT' => $NOTE_ENTSCHULDIGT,
+
+				// show the Benotungsdatum of the first Antritt in the "Ursprüngliche Zeugnisnote" column
+				'SHOW_BENOTUNGSDATUM_ON_NOTENVORSCHLAG_UEBERNAHME' => $this->config->item('SHOW_BENOTUNGSDATUM_ON_NOTENVORSCHLAG_UEBERNAHME'),
+
+				// Noteneintragungsfrist window (enforced server-side; also surfaced so the UI can hint at it)
+				'CIS_GESAMTNOTE_NOTENEINTRAGUNGSFRIST' => $this->config->item('CIS_GESAMTNOTE_NOTENEINTRAGUNGSFRIST')
 			)
+		);
+	}
+
+	/**
+	 * GET METHOD
+	 * expects (optional) 'sem_kurzbz'
+	 * Single role-determining entry point for the tool: the server decides which flow the current user
+	 * gets and returns exactly the initial dropdown data for it.
+	 * A teacher (holds lehre/benotungstool) gets their assigned
+	 * Lehrveranstaltungen directly. Assistenz (only lehre/benotungstool_assistenz) gets the
+	 * Studiengänge they are entitled for and picks one before an LV is loaded.
+	 */
+	public function getBenotungstoolContext() {
+		$sem_kurzbz = $this->input->get("sem_kurzbz", TRUE);
+		$lv_id = $this->input->get("lv_id", TRUE); // optional: deep-link target, used to preselect
+
+		$this->load->library('PermissionLib');
+
+		// teachers keep the classic assigned-LV flow; the Studiengang flow is only for Assistenz.
+		// Role determination mirrors assertLvAccess, which scopes each role's actual data
+		// access (teachers to their own LVs, Assistenzen to their entitled Studiengänge).
+		$isLektor = $this->permissionlib->isBerechtigt('lehre/benotungstool');
+		$entitledStgs = $this->permissionlib->getSTG_isEntitledFor('lehre/benotungstool_assistenz');
+		$isAssistenz = !$isLektor && is_array($entitledStgs) && count($entitledStgs) > 0;
+
+		$studiengaenge = array();
+		$lehrveranstaltungen = array();
+		$preselectStudiengang_kz = null;
+
+		if (isset($sem_kurzbz) && !isEmptyString($sem_kurzbz)) {
+			if ($isAssistenz) {
+				$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+				$result = $this->StudiengangModel->getByStgs($entitledStgs, $sem_kurzbz);
+				if (!isError($result)) $studiengaenge = getData($result) ?? array();
+
+				// deep-link: resolve the Studiengang of the requested LV so the frontend can preselect
+				// the Studiengang dropdown (and then its LV) - only if the Assistenz is entitled for it
+				if (isset($lv_id) && !isEmptyString($lv_id)) {
+					$res = $this->LehrveranstaltungModel->load($lv_id);
+					if (!isError($res) && hasData($res)) {
+						$stg = getData($res)[0]->studiengang_kz;
+						if (in_array($stg, $entitledStgs)) $preselectStudiengang_kz = $stg;
+					}
+				}
+			} else {
+				$result = $this->LehrveranstaltungModel->getLvForLektorInSemester($sem_kurzbz, getAuthUID());
+				if (!isError($result)) $lehrveranstaltungen = getData($result) ?? array();
+			}
+		}
+
+		$this->terminateWithSuccess(array(
+			'isAssistenz' => $isAssistenz,
+			'studiengaenge' => $studiengaenge,
+			'lehrveranstaltungen' => $lehrveranstaltungen,
+			'preselectStudiengang_kz' => $preselectStudiengang_kz
+		));
+	}
+
+	/**
+	 * GET METHOD
+	 * expects 'studiengang_kz', 'sem_kurzbz'
+	 * Returns the Lehrveranstaltungen of a Studiengang in a Studiensemester for the Assistenz flow.
+	 * The caller may only load Studiengänge they are entitled for via lehre/benotungstool_assistenz.
+	 */
+	public function getLvForStudiengang() {
+		$studiengang_kz = $this->input->get("studiengang_kz", TRUE);
+		$sem_kurzbz = $this->input->get("sem_kurzbz", TRUE);
+
+		if (!isset($studiengang_kz) || isEmptyString($studiengang_kz)
+			|| !isset($sem_kurzbz) || isEmptyString($sem_kurzbz)) {
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
+
+		$this->load->library('PermissionLib');
+		$entitledStgs = $this->permissionlib->getSTG_isEntitledFor('lehre/benotungstool_assistenz');
+		$isAdmin = $this->permissionlib->isBerechtigt('admin');
+
+		if (!$isAdmin && (!is_array($entitledStgs) || !in_array($studiengang_kz, $entitledStgs))) {
+			$this->terminateWithError($this->p->t('ui', 'keineBerechtigung'), 'general');
+		}
+
+		$result = $this->LehrveranstaltungModel->getLvForStudiengangInSemester($sem_kurzbz, $studiengang_kz);
+		$data = $this->getDataOrTerminateWithError($result);
+		$this->terminateWithSuccess($data);
+	}
+
+	/**
+	 * Scopes data access to the Lehrveranstaltungen a user may act on, so a shared/guessed URL cannot be
+	 * used to read or edit foreign grades. A teacher (lehre/benotungstool) may
+	 * only touch LVs they are assigned to teach in the given Studiensemester. Assistenz may
+	 * touch LVs of a Studiengang they are entitled for.
+	 */
+	private function assertLvAccess($lv_id, $sem_kurzbz = null)
+	{
+		$this->load->library('PermissionLib');
+
+		// admins keep full access
+		if ($this->permissionlib->isBerechtigt('admin')) return;
+
+		// teachers: only their own LVs (assigned as lehreinheitmitarbeiter in this semester)
+		if ($this->permissionlib->isBerechtigt('lehre/benotungstool')) {
+			$res = $this->LehrveranstaltungModel->getLektorIsTeachingLva($lv_id, getAuthUID(), $sem_kurzbz);
+			$rows = getData($res);
+			if (!isError($res) && !empty($rows) && $rows[0]->teaches > 0) return;
+			// not a teacher of this LV -> fall through (a both-role user may still be entitled as Assistenz)
+		}
+
+		// (pure or additional) Assistenz: only LVs of an entitled Studiengang
+		$entitledStgs = $this->permissionlib->getSTG_isEntitledFor('lehre/benotungstool_assistenz');
+		$lv = null;
+		if (is_array($entitledStgs) && count($entitledStgs) > 0) {
+			$res = $this->LehrveranstaltungModel->load($lv_id);
+			if (!isError($res) && hasData($res)) {
+				$lv = getData($res)[0];
+				if (in_array($lv->studiengang_kz, $entitledStgs)) return;
+			}
+		}
+
+		if ($lv === null) {
+			$res = $this->LehrveranstaltungModel->load($lv_id);
+			if (!isError($res) && hasData($res)) $lv = getData($res)[0];
+		}
+		$bezeichnung = $lv !== null ? $lv->bezeichnung : $lv_id;
+
+		$this->terminateWithError(
+			$this->p->t('benotungstool', 'keineBerechtigungNoten', [$bezeichnung, $sem_kurzbz]),
+			'general'
 		);
 	}
 
@@ -153,13 +292,15 @@ class Noten extends FHCAPI_Controller
 		if (!isset($lv_id) || isEmptyString($lv_id)
 			|| !isset($sem_kurzbz) || isEmptyString($sem_kurzbz))
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
-		
+
+		$this->assertLvAccess($lv_id, $sem_kurzbz);
+
 		// get studenten for lva & sem with zeugnisnote if available
 		$studenten = $this->LehrveranstaltungModel->getStudentsByLv($sem_kurzbz, $lv_id);
 		$studentenData = $this->getDataOrTerminateWithError($studenten);
 		
 		if(count($studentenData) == 0) {
-			$this->terminateWithError('No students found for lva and semester');
+			$this->terminateWithError($this->p->t('benotungstool', 'c4keineStudentenGefunden'));
 		}
 		
 		$func = function ($value) {
@@ -325,9 +466,11 @@ class Noten extends FHCAPI_Controller
 		
 		$lv_id = $result->lv_id;
 		$sem_kurzbz = $result->sem_kurzbz;
-		
+
+		$this->assertLvAccess($lv_id, $sem_kurzbz);
+
 		$ret = [];
-		
+
 		$res = $this->LehrveranstaltungModel->load($lv_id);
 		if(isError($res) || !hasData($res)) {
 			$this->terminateWithError($this->p->t('benotungstool', 'noValidLvFoundForId', [$lv_id]));
@@ -370,7 +513,7 @@ class Noten extends FHCAPI_Controller
 			<td><b>" . $this->p->t('lehre','studiengang') . "</b></td>\n
 			<td><b>" . $this->p->t('benotungstool','c4nachname') . "</b></td>\n
 			<td><b>" . $this->p->t('benotungstool','c4vorname') . "</b></td>\n";
-			if(defined(CIS_GESAMTNOTE_PUNKTE) && CIS_GESAMTNOTE_PUNKTE) {
+			if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE) {
 				$studlist .= "<td><b>" . $this->p->t('benotungstool','c4punkte') . "</b></td>\n";
 			}
 			$studlist .= "<td><b>" . $this->p->t('benotungstool','c4grade') . "</b></td>\n";
@@ -382,7 +525,6 @@ class Noten extends FHCAPI_Controller
 		foreach($result->noten as $note) {
 
 			$resultLVGes = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lv_id, $note->uid, $sem_kurzbz);
-//			$this->addMeta($note->uid.'$resultLVGes', $resultLVGes);
 			if (!isError($resultLVGes) && hasData($resultLVGes))
 			{
 				$lvgesamtnote = getData($resultLVGes)[0];
@@ -416,7 +558,7 @@ class Noten extends FHCAPI_Controller
 						$studlist .= "<td>" . trim($note->nachname) . "</td>";
 						$studlist .= "<td>" . trim($note->vorname) . "</td>";
 
-						if(defined(CIS_GESAMTNOTE_PUNKTE) && CIS_GESAMTNOTE_PUNKTE) {
+						if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE) {
 							$studlist .= "<td>" . trim($lvgesamtnote->punkte) . "</td>";
 						}
 						$studlist .= "<td>" .$note->noteBezeichnung. "</td>";
@@ -493,10 +635,9 @@ class Noten extends FHCAPI_Controller
 			|| $lv_id === NULL || trim((string)$lv_id) === '') {
 			$this->terminateWithError($this->p->t('global', 'missingParameters'), 'general');
 		}
+
+		$this->assertLvAccess($lv_id, $sem_kurzbz);
 		
-		// TODO: we need a zuordnungscheck here? any lektor can get any grades?
-		// what about assistenz with different rights doing lectors job once again?
-		// students checking their own grades?
 
 		$result = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lv_id, $uid, $sem_kurzbz);
 		$data = $this->getDataOrTerminateWithError($result);
@@ -540,6 +681,11 @@ class Noten extends FHCAPI_Controller
 		$stsem = $result->sem_kurzbz;
 		$typ = $result->typ;
 
+		$this->assertLvAccess($lva_id, $stsem);
+
+		// Prüfungsordnung §1: no entry/change past the Noteneintragungsfrist
+		$this->enforceNoteneintragungsfrist($stsem);
+
 		$jetzt = date("Y-m-d H:i:s");
 
 		if(CIS_GESAMTNOTE_PUNKTE && isset($punkte) && $punkte >= 0) {
@@ -572,19 +718,28 @@ class Noten extends FHCAPI_Controller
 			$this->terminateWithError($editError, 'general');
 		}
 
+		// for a NEW attempt (no pruefung_id) enforce the add rules server-side
+		// maxAntritte calc, chronological order, occurrence limit for entschuldigt
+		if($pruefung_id === null || $pruefung_id === '') {
+			$addError = $this->validatePruefungAdd($student_uid, $lva_id, $stsem, $note, $datum);
+			if($addError !== null) {
+				$this->terminateWithError($addError, 'general');
+			}
+		}
+
 
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 
 		$res = $this->LehrveranstaltungModel->load($lva_id);
 		if(isError($res) || !hasData($res)) {
-			$this->terminateWithError('Keine gültige Lehrveranstaltung gefunden für ID: '.$lva_id);
+			$this->terminateWithError($this->p->t('benotungstool', 'noValidLvFoundForId', [$lva_id]));
 		}
-		
+
 		$studiengang_kz = getData($res)[0]->studiengang_kz;
 		$res = $this->StudiengangModel->load($studiengang_kz);
 		if(isError($res) || !hasData($res)) {
-			$this->terminateWithError('Kein gültiger Studiengang gefunden für ID: '.$studiengang_kz);
+			$this->terminateWithError($this->p->t('benotungstool', 'noValidStudiengangFoundForId', [$studiengang_kz]));
 		}
 		
 
@@ -670,7 +825,7 @@ class Noten extends FHCAPI_Controller
 	/**
 	 * private helper method to update/insert pruefungstermine 
 	 */
-	private function savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte = '', $datum, $origLvNote = null, $origLvPunkte = null, $origBenotungsdatum = null) 
+	private function savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum, $origLvNote = null, $origLvPunkte = null, $origBenotungsdatum = null)
 	{
 
 		// extra check if the student has lvnote and a zeugnisnote in the relevant lva
@@ -697,9 +852,17 @@ class Noten extends FHCAPI_Controller
 		);
 		
 		if(count($status) > 0 && $status[0] == true) {
-			$this->load->model('education/Note_model', 'NoteModel');
-			$result = $this->NoteModel->getEntschuldigtNote();
-			$note = getData($result)[0]->note;
+			$entschuldigtNote = $this->resolveSpecialNotes()['entschuldigt'];
+
+			// the occurrence limit was validated on the PRE-override note, so re-check it here: only
+			// apply the auto-excuse if it would not exceed the allowed number of excused Termine
+			if($entschuldigtNote !== null) {
+				$allRes = $this->LePruefungModel->getPruefungenByUidTypLvStudiensemester($student_uid, null, $lva_id, $stsem);
+				$existing = (!isError($allRes) && hasData($allRes)) ? getData($allRes) : [];
+				if(!$this->exceedsNoteOccuranceLimit($existing, $entschuldigtNote, null)) {
+					$note = $entschuldigtNote;
+				}
+			}
 		}
 		
 		$jetzt = date("Y-m-d H:i:s");
@@ -923,7 +1086,7 @@ class Noten extends FHCAPI_Controller
 	 */
 	private function isEntschuldigtNote($note)
 	{
-		$entschuldigt = $this->config->item('NOTE_ENTSCHULDIGT');
+		$entschuldigt = $this->resolveSpecialNotes()['entschuldigt'];
 		return $entschuldigt !== null && $note == $entschuldigt;
 	}
 
@@ -998,7 +1161,229 @@ class Noten extends FHCAPI_Controller
 			return $this->p->t('benotungstool', 'pruefungDatumOutOfRange', [$student_uid]);
 		}
 
+		// an edit may also change the note (e.g. to 'entschuldigt') -> keep the occurrence limit
+		if($this->exceedsNoteOccuranceLimit($pruefungen, $newNote, $current->pruefung_id)) {
+			return $this->p->t('benotungstool', 'noteOccuranceLimitReached', [$student_uid]);
+		}
+
 		return null;
+	}
+
+	/**
+	 * Validates ADDING a new pruefung (attempt). Returns an error string if the add is not
+	 * allowed, or null if it is..
+	 *
+	 * Rules (Prüfungsordnung §1):
+	 *  - Rule A: the number of counting Prüfungsantritte may not exceed the configured maximum
+	 *  - Rule B: attempts are taken in chronological order
+	 *  - Rule C: a note carrying an occurrence limit (entschuldigt) may not exceed it.
+	 *
+	 * @param string $student_uid
+	 * @param int    $lva_id
+	 * @param string $stsem
+	 * @param int    $note   the (already resolved) note being saved
+	 * @param string $datum  the datum being saved (Y-m-d)
+	 * @return string|null
+	 */
+	private function validatePruefungAdd($student_uid, $lva_id, $stsem, $note, $datum)
+	{
+		$result = $this->LePruefungModel->getPruefungenByUidTypLvStudiensemester($student_uid, null, $lva_id, $stsem);
+		$pruefungen = (!isError($result) && hasData($result)) ? getData($result) : [];
+
+		// current LV note (the implicit first Antritt), read before it gets mutated by the caller
+		$lvNote = null;
+		$resLv = $this->LvgesamtnoteModel->getLvGesamtNoten($lva_id, $student_uid, $stsem);
+		if(!isError($resLv) && hasData($resLv)) $lvNote = getData($resLv)[0]->note;
+
+		// Rule A: max Antritte
+		if($this->computeAntrittCount($pruefungen, $lvNote) >= $this->computeMaxAntritte()) {
+			return $this->p->t('benotungstool', 'maxAntritteReached', [$student_uid, $this->computeMaxAntritte()]);
+		}
+
+		// Rule B: no new attempt on/before an existing dated attempt
+		$newDate = substr((string)$datum, 0, 10);
+		foreach($pruefungen as $p) {
+			$d = substr((string)$p->datum, 0, 10);
+			if($d !== '' && $d >= $newDate) {
+				return $this->p->t('benotungstool', 'pruefungDatumBeforeExisting', [$student_uid]);
+			}
+		}
+
+		// Rule C: occurrence limit (e.g. only one 'entschuldigt' across the fixed Antritte)
+		if($this->exceedsNoteOccuranceLimit($pruefungen, $note, null)) {
+			return $this->p->t('benotungstool', 'noteOccuranceLimitReached', [$student_uid]);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Number of counting Prüfungsantritte for a student, mirroring the frontend getAntrittCountStudent:
+	 * a kommPruef caps the count at 4, notes in NOTEN_OHNE_ANTRITT (entschuldigt / noch nicht
+	 * eingetragen) do not count, and when no pruefung counts yet the original LV note counts as the
+	 * first Antritt (unless it is a non-lehre note such as 'angerechnet').
+	 */
+	private function computeAntrittCount($pruefungen, $lvNote)
+	{
+		$notenOhneAntritt = $this->resolveSpecialNotes()['ohneAntritt'];
+
+		foreach($pruefungen as $p) {
+			if($p->pruefungstyp_kurzbz == 'kommPruef') return 4;
+		}
+
+		$count = 0;
+		foreach($pruefungen as $p) {
+			if(!in_array($p->note, $notenOhneAntritt)) $count++;
+		}
+
+		if($count === 0 && $lvNote !== null && $this->isLehreNote($lvNote)) return 1;
+
+		return $count;
+	}
+
+	/**
+	 * Maximum number of counting Prüfungsantritte enterable IN THIS TOOL, mirroring the frontend
+	 * maxAntrittCount: the original note (always 1) plus each enabled in-tool retake type (Termin2 and
+	 * the legacy Termin3). kommPruef is the terminal attempt, entered elsewhere, and is intentionally
+	 * not part of this cap. For our installation (Termin2 on, Termin3 off) this is 2; excused Termine do
+	 * not count (see computeAntrittCount), which is what lets Termin2 occur twice within the cap.
+	 */
+	private function computeMaxAntritte()
+	{
+		$max = 1;
+		if(defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2) $max++;
+		if(defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3) $max++;
+		return $max;
+	}
+
+	/**
+	 * Whether the given note is flagged as a 'lehre' note in tbl_note.
+	 */
+	private function isLehreNote($note)
+	{
+		$res = $this->NoteModel->load($note);
+		if(isError($res) || !hasData($res)) return false;
+		return (bool) getData($res)[0]->lehre;
+	}
+
+	/**
+	 * Single source of truth for the "special" note PKs (entschuldigt & noch nicht eingetragen).
+	 * tbl_note is resolved by Bezeichnung (install-independent) and takes precedence; the hardcoded
+	 * config PKs (NOTE_ENTSCHULDIGT / NOTEN_OHNE_ANTRITT) are only a fallback. This removes the second
+	 * source of truth so the entschuldigt-preservation and Antritt-counting logic can't disagree with
+	 * the Bezeichnung lookups on installs whose PKs differ. Cached per request.
+	 *
+	 * @return array{entschuldigt: mixed, ohneAntritt: array, limitMap: array}
+	 */
+	private function resolveSpecialNotes()
+	{
+		static $cache = null;
+		if($cache !== null) return $cache;
+
+		$cfgEntschuldigt = $this->config->item('NOTE_ENTSCHULDIGT');
+		$cfgOhneAntritt  = $this->config->item('NOTEN_OHNE_ANTRITT');
+		$cfgLimitMap     = $this->config->item('NOTEN_OCCURANCE_LIMIT_MAP');
+		if(!is_array($cfgOhneAntritt)) $cfgOhneAntritt = [];
+		if(!is_array($cfgLimitMap))    $cfgLimitMap = [];
+
+		// resolve by Bezeichnung, fall back to the config PKs
+		$resEnt = $this->NoteModel->getEntschuldigtNote();
+		$entschuldigt = (!isError($resEnt) && hasData($resEnt)) ? getData($resEnt)[0]->note : $cfgEntschuldigt;
+
+		$resNn = $this->NoteModel->getNochNichtEingetragenNote();
+		$nochNicht = (!isError($resNn) && hasData($resNn)) ? getData($resNn)[0]->note : ($cfgOhneAntritt[0] ?? null);
+
+		$ohneAntritt = array_values(array_filter([$nochNicht, $entschuldigt], function($v){ return $v !== null; }));
+
+		// re-key the configured entschuldigt limit onto the resolved PK (keep any other entries as-is)
+		$limitMap = [];
+		foreach($cfgLimitMap as $k => $v) {
+			$limitMap[($k == $cfgEntschuldigt) ? $entschuldigt : $k] = $v;
+		}
+
+		$cache = [
+			'entschuldigt' => $entschuldigt,
+			'ohneAntritt'  => $ohneAntritt,
+			'limitMap'     => $limitMap
+		];
+		return $cache;
+	}
+
+	/**
+	 * Check for configured occurrence limit (NOTEN_OCCURANCE_LIMIT_MAP) among the given pruefungen.
+	 * $excludePruefungId skips the record currently being edited
+	 * Noten without a configured limit never exceed.
+	 */
+	private function exceedsNoteOccuranceLimit($pruefungen, $note, $excludePruefungId = null)
+	{
+		$limitMap = $this->resolveSpecialNotes()['limitMap'];
+		if(!is_array($limitMap)) return false;
+
+		$limit = null;
+		foreach($limitMap as $limitNote => $limitVal) {
+			if($limitNote == $note) { $limit = $limitVal; break; }
+		}
+		if($limit === null) return false;
+
+		$count = 0;
+		foreach($pruefungen as $p) {
+			if($excludePruefungId !== null && $p->pruefung_id == $excludePruefungId) continue;
+			if($p->note == $note) $count++;
+		}
+
+		return ($count + 1) > $limit;
+	}
+
+	/**
+	 * Enforces the Noteneintragungsfrist (Prüfungsordnung §1) for grade/pruefung entry. Terminates the
+	 * request with an error when the deadline for the given studiensemester has passed. Does nothing
+	 * when the window enforcement is disabled or the deadline cannot be determined.
+	 */
+	private function enforceNoteneintragungsfrist($sem_kurzbz)
+	{
+		if(!$this->config->item('CIS_GESAMTNOTE_NOTENEINTRAGUNGSFRIST')) return;
+
+		$deadline = $this->computeNoteneintragungsfrist($sem_kurzbz);
+		if($deadline === null) return;
+
+		if(new DateTime() > $deadline) {
+			$this->terminateWithError(
+				$this->p->t('benotungstool', 'noteneintragungsfristVorbei', [$deadline->format('d.m.Y')]),
+				'general'
+			);
+		}
+	}
+
+	/**
+	 * Computes the Noteneintragungsfrist deadline (end of day) for a studiensemester_kurzbz of the
+	 * form '{SS|WS}yyyy'. SS -> deadline in the same calendar year, WS -> in the following year. The
+	 * month/day come from the noten config. Returns a DateTime, or null when it can't be determined.
+	 */
+	private function computeNoteneintragungsfrist($sem_kurzbz)
+	{
+		if(!is_string($sem_kurzbz) || strlen($sem_kurzbz) < 6) return null;
+
+		$type = strtoupper(substr($sem_kurzbz, 0, 2));
+		$year = (int) substr($sem_kurzbz, 2, 4);
+		if($year <= 0) return null;
+
+		if($type === 'SS') {
+			$cfg = $this->config->item('NOTENEINTRAGUNGSFRIST_SS');
+			$deadlineYear = $year;
+		} elseif($type === 'WS') {
+			$cfg = $this->config->item('NOTENEINTRAGUNGSFRIST_WS');
+			$deadlineYear = $year + 1;
+		} else {
+			return null;
+		}
+
+		$month = (is_array($cfg) && isset($cfg['month'])) ? (int)$cfg['month'] : ($type === 'SS' ? 11 : 5);
+		$day   = (is_array($cfg) && isset($cfg['day']))   ? (int)$cfg['day']   : 15;
+
+		$deadline = new DateTime();
+		$deadline->setDate($deadlineYear, $month, $day);
+		$deadline->setTime(23, 59, 59);
+		return $deadline;
 	}
 
 	/**
@@ -1020,7 +1405,12 @@ class Noten extends FHCAPI_Controller
 		$sem_kurzbz = $result->sem_kurzbz;
 		$note = $result->note;
 		$punkte = $result->punkte;
-		
+
+		$this->assertLvAccess($lv_id, $sem_kurzbz);
+
+		// Prüfungsordnung §1: no entry/change past the Noteneintragungsfrist
+		$this->enforceNoteneintragungsfrist($sem_kurzbz);
+
 		$result = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lv_id, $student_uid, $sem_kurzbz);
 
 //		$this->addMeta('LvgesamtnoteModelresult', $result);
@@ -1092,7 +1482,12 @@ class Noten extends FHCAPI_Controller
 		$lv_id = $result->lv_id;
 		$sem_kurzbz = $result->sem_kurzbz;
 		$noten = $result->noten;
-		
+
+		$this->assertLvAccess($lv_id, $sem_kurzbz);
+
+		// Prüfungsordnung §1: no entry/change past the Noteneintragungsfrist
+		$this->enforceNoteneintragungsfrist($sem_kurzbz);
+
 		$retLvNoten = [];
 		
 		foreach($noten as $note)
@@ -1177,21 +1572,34 @@ class Noten extends FHCAPI_Controller
 		$uids = $result->uids;
 		$datum = $result->datum;
 		$lva_id = $result->lva_id;
-		
+
 		$stsem = $result->sem_kurzbz;
-		
+
+		$this->assertLvAccess($lva_id, $stsem);
+
+		// Prüfungsordnung §1: no entry past the Noteneintragungsfrist
+		$this->enforceNoteneintragungsfrist($stsem);
+
 		$ret = [];
 
 		$this->load->model('education/Note_model', 'NoteModel');
 		$result = $this->NoteModel->getNochNichtEingetragenNote();
 		$note = getData($result)[0]->note;
-		
+
 		foreach ($uids as $student) {
 			$student_uid = $student->uid;
 			$typ = $student->typ;
 			$punkte = null; // new pruefungen never have punkte,
 
 			$lehreinheit_id = $student->lehreinheit_id;
+
+			// server-side add guards (max Antritte, chronological order, occurrence limit)
+			$addError = $this->validatePruefungAdd($student_uid, $lva_id, $stsem, $note, $datum);
+			if($addError !== null) {
+				$ret[$student->uid] = $addError; // string result is surfaced per-student in the UI
+				continue;
+			}
+
 			$ret[$student->uid] = $this->savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum);
 		}
 
@@ -1216,7 +1624,12 @@ class Noten extends FHCAPI_Controller
 		$lv_id = $result->lv_id;
 		$sem_kurzbz = $result->sem_kurzbz;
 		$pruefungen = $result->pruefungen;
-		
+
+		$this->assertLvAccess($lv_id, $sem_kurzbz);
+
+		// Prüfungsordnung §1: no entry past the Noteneintragungsfrist
+		$this->enforceNoteneintragungsfrist($sem_kurzbz);
+
 		$ret = [];
 
 		foreach ($pruefungen as $pruefung) {
@@ -1235,6 +1648,14 @@ class Noten extends FHCAPI_Controller
 			$punkte = $pruefung->punkte;
 
 			$lehreinheit_id = $pruefung->lehreinheit_id;
+
+			// server-side add guards (max Antritte, chronological order, occurrence limit)
+			$addError = $this->validatePruefungAdd($student_uid, $lv_id, $sem_kurzbz, $note, $datum);
+			if($addError !== null) {
+				$ret[$student_uid] = $addError; // string result is surfaced per-student in the UI
+				continue;
+			}
+
 			$ret[$student_uid] = $this->savePruefungstermin($typ, $student_uid, $lv_id, $sem_kurzbz, $lehreinheit_id, $note, $punkte, $datum);
 		}
 

@@ -83,5 +83,19 @@ export default {
 			url: '/api/frontend/v1/Noten/getNoteByPunkte',
 			params: { punkte, lv_id, sem_kurzbz }
 		};
+	},
+	getBenotungstoolContext(sem_kurzbz, lv_id = null) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Noten/getBenotungstoolContext',
+			params: { sem_kurzbz, lv_id }
+		};
+	},
+	getLvForStudiengang(studiengang_kz, sem_kurzbz) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Noten/getLvForStudiengang',
+			params: { studiengang_kz, sem_kurzbz }
+		};
 	}
 }

@@ -15,3 +15,13 @@ $config['NOTE_ENTSCHULDIGT'] = 17;
 // separate buttons/dialogs.
 $config['CIS_GESAMTNOTE_PRUEFUNGSIMPORT'] = true;  // dated import that creates a pruefung per row
 $config['CIS_GESAMTNOTE_NOTENIMPORT'] = false;     // classic note-only import (uid + note, no date)
+
+$config['SHOW_BENOTUNGSDATUM_ON_NOTENVORSCHLAG_UEBERNAHME'] = true;
+
+// Noteneintragungsfrist (Prüfungsordnung §1): grade/pruefung entry is only permitted up to this
+// deadline. The month/day below is applied to the studiensemester's year:
+//   Sommersemester (SSyyyy) -> deadline in the SAME calendar year   (default 15th November)
+//   Wintersemester (WSyyyy) -> deadline in the FOLLOWING calendar year (default 15th May)
+$config['CIS_GESAMTNOTE_NOTENEINTRAGUNGSFRIST'] = false; // switch to use the window enforcement
+$config['NOTENEINTRAGUNGSFRIST_SS'] = ['month' => 11, 'day' => 15]; // Sommersemester deadline (same year)
+$config['NOTENEINTRAGUNGSFRIST_WS'] = ['month' => 5,  'day' => 15];  // Wintersemester deadline (following year)
