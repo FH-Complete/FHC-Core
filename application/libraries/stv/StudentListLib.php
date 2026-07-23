@@ -28,6 +28,7 @@ class StudentListLib
 	private $_allowedStgs = [];
 	private $_selects = [];
 	private $_joins = [];
+	private $_wheres = [];
 	
 	/**
 	 * Gets the CI instance, loads model and prepares default values
@@ -260,11 +261,7 @@ class StudentListLib
 	 */
 	public function addWhere($key, $value = null, $escape = true)
 	{
-		if (!is_array($key) && is_array($value)) {
-			$this->_ci->PrestudentModel->db->where_in($key, $value, $escape);
-		} else {
-			$this->_ci->PrestudentModel->db->where($key, $value, $escape);
-		}
+		$this->_wheres[] = [$key, $value, $escape, false];
 	}
 
 	/**
@@ -278,11 +275,7 @@ class StudentListLib
 	 */
 	public function addOrWhere($key, $value = null, $escape = true)
 	{
-		if (!is_array($key) && is_array($value)) {
-			$this->_ci->PrestudentModel->db->or_where_in($key, $value, $escape);
-		} else {
-			$this->_ci->PrestudentModel->db->or_where($key, $value, $escape);
-		}
+		$this->_wheres[] = [$key, $value, $escape, true];
 	}
 
 	/**
@@ -325,6 +318,20 @@ class StudentListLib
 
 		foreach ($this->_selects as $select)
 			$this->_ci->PrestudentModel->addSelect($select[0], $select[1]);
+
+		foreach ($this->_wheres as $where) {
+			if (!is_array($where[0]) && is_array($where[1])) {
+				if ($where[3])
+					$this->_ci->PrestudentModel->db->or_where_in($where[0], $where[1], $where[2]);
+				else
+					$this->_ci->PrestudentModel->db->where_in($where[0], $where[1], $where[2]);
+			} else {
+				if ($where[3])
+					$this->_ci->PrestudentModel->db->or_where($where[0], $where[1], $where[2]);
+				else
+					$this->_ci->PrestudentModel->db->where($where[0], $where[1], $where[2]);
+			}
+		}
 
 		$this->_ci->PrestudentModel->addOrder('nachname');
 		$this->_ci->PrestudentModel->addOrder('vorname');
