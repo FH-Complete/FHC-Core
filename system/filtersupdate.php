@@ -910,7 +910,9 @@ $filters = array(
 					{"name": "Organisationseinheit"},
 					{"name": "Geschäftsjahr"},
 					{"name": "Budgetstatus"},
-					{"name": "Betrag"}
+					{"name": "Grundbetrag"},
+					{"name": "Korrekturbetrag"},
+					{"name": "Endbetrag"}
 				],
 				"filters": [
 					{
@@ -920,7 +922,7 @@ $filters = array(
 					},
 					{
 						"name": "Geschäftsjahr",
-						"condition": "GJ2019-2020",
+						"condition": "GJ2026-2027",
 						"operation": "contains"
 					}
 				]
