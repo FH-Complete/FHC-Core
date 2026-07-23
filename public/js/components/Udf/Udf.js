@@ -4,6 +4,7 @@ import FormInput from '../Form/Input.js';
 import ApiUdf from '../../api/udf.js';
 
 export default {
+	name: 'CoreUdfCmpt',
 	components: {
 		CoreFetchCmpt,
 		FormInput
