@@ -40057,13 +40057,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ZGV',
+				'text' => 'ZGV erfüllt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'ZGV',
+				'text' => 'ZGV fulfilled',
 				'description' => '',
 				'insertvon' => 'system'
 			)
