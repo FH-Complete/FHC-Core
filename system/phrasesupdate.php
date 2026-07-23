@@ -58217,6 +58217,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'kompatibilityMode_Sogo',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kompatibilitätsmodus für SOGO',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Open in Compatibility mode (SOGO)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

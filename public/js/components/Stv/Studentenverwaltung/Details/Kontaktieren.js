@@ -1,7 +1,14 @@
+import { splitMailsHelper } from "../../../../helpers/EmailHelpers.js";
 import { splitMailLinks } from "../../../../helpers/EmailHelpers.js";
+import FormInput from "../../../Form/Input.js";
+import FormForm from "../../../Form/Form.js";
 
 export default {
 	name: "Kontaktieren",
+	components: {
+		FormInput,
+		FormForm
+	},
 	computed: {
 		internMails() {
 			if (this.modelValue.mail_intern)
@@ -31,20 +38,21 @@ export default {
 	data(){
 		return {
 			mailLinks: [],
-			showMailDialog: false
+			showMailDialog: false,
+			showDivKomp: false
 		}
 	},
 	methods: {
 		internMail(event) {
 			if (this.internMails.length)
 			{
-				splitMailsHelper(this.internMails, event, null, this.$fhcAlert, this.$p)
+				splitMailsHelper(this.internMails, event, null, this.$fhcAlert, this.$p, this.authUid)
 			}
 		},
 		privateMail(event) {
 			if (this.privateMails.length)
 			{
-				splitMailsHelper(this.privateMails, event, null, this.$fhcAlert, this.$p)
+				splitMailsHelper(this.privateMails, event, null, this.$fhcAlert, this.$p, this.authUid)
 			}
 		},
 		createMailLinks(event, mailGroup){
@@ -63,67 +71,108 @@ export default {
 		},
 		reset(){
 			this.showMailDialog = false;
+		},
+		onSwitchChange(){
+			if (this.showDivKomp) {
+				console.log("zeigen");
+			}
+			else {
+				console.log("nicht zeigen");
+			}
+
+		},
+		showKompatiblitymode(){
+			this.showDivKomp = !this.showDivKomp;
 		}
 	},
 	template: `
 	<div class="core-kontaktieren>
 		<div id="elementID"></div>
 
-		<div v-if="!showMailDialog" class="row">
-			<div class="col-lg-2">
-				<button class="btn btn-primary mb-2" @click="createMailLinks($event, 'intern')" :title="$p.t('stv', 'bccEMail')">
-					<i class="fa-solid fa-mail"></i> {{$p.t('stv', 'internEMail')}}
-				</button>
+		<div class="d-flex justify-content-end pb-3">
+			<form-input
+				container-class="form-switch mb-0"
+				type="checkbox"
+				:label="$p.t('ui/kompatibilityMode_Sogo')"
+				v-model="showDivKomp"
+				@change="onSwitchChange"
+				>
+			</form-input>
+		</div>
+
+		<div  v-if="!showDivKomp">
+			<div class="row">
+				<div class="col-lg-2">
+					<button class="btn btn-primary mb-2" @click="internMail($event)" :title="$p.t('stv', 'bccEMail')">
+						<i class="fa-solid fa-mail"></i> {{$p.t('stv', 'internEMail')}}
+					</button>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-2">
+					<button class="btn btn-primary mb-2" @click="privateMail($event)" :title="$p.t('stv', 'bccEMail')">
+						<i class="fa-solid fa-mail"></i> {{$p.t('stv', 'privateEMail')}}
+					</button>
+				</div>
 			</div>
 		</div>
 
-		<div v-if="!showMailDialog" class="row">
-			<div class="col-lg-2">
-				<button class="btn btn-primary mb-2" @click="createMailLinks($event, 'private')" :title="$p.t('stv', 'bccEMail')">
-					<i class="fa-solid fa-mail"></i> {{$p.t('stv', 'privateEMail')}}
-				</button>
+		<div v-if="showDivKomp">
+
+			<div v-if="!showMailDialog" class="row">
+				<div class="col-lg-2">
+					<button class="btn btn-secondary mb-2" @click="createMailLinks($event, 'intern')" :title="$p.t('stv', 'bccEMail')">
+						<i class="fa-solid fa-mail"></i> {{$p.t('stv', 'internEMail')}} (SOGO)
+					</button>
+				</div>
 			</div>
-		</div>
+			<div v-if="!showMailDialog" class="row">
+				<div class="col-lg-2">
+					<button class="btn btn-secondary mb-2" @click="createMailLinks($event, 'private')" :title="$p.t('stv', 'bccEMail')">
+						<i class="fa-solid fa-mail"></i> {{$p.t('stv', 'privateEMail')}} (SOGO)
+					</button>
+				</div>
+			</div>
 
-		<div v-if="showMailDialog" class="mt-3">
-				<div v-if="mailLinks.length > 1" class="mt-2">
-					<p>{{$p.t('stv', 'zuvieleEMails')}}</p>
+			<div v-if="showMailDialog" class="mt-3">
+					<div v-if="mailLinks.length > 1" class="mt-2">
+						<p>{{$p.t('stv', 'zuvieleEMails')}}</p>
 
-					<div
-						v-for="(link,index) in mailLinks"
-						:key="index"
-						class="mb-2">
-
-						<a
-							:href="link"
-							@click.prevent="handleMailLink"
-							>
-								Email {{ index + 1 }}
-						</a>
+						<div
+							v-for="(link,index) in mailLinks"
+							:key="index"
+							class="mb-2">
+							<a
+								:href="link"
+								@click.prevent="handleMailLink"
+								>
+									Email {{ index + 1 }}
+							</a>
+						</div>
+							<a
+								class="btn btn-outline-secondary m-2"
+								@click.prevent="reset"
+								>
+									<span class="fa-solid fa-rotate-right" :title="this.$p.t('ui','zurueck')" ></span>
+							</a>
 					</div>
-						<a
-							class="btn btn-outline-secondary m-2"
-							@click.prevent="reset"
-							>
-								<span class="fa-solid fa-rotate-right" :title="this.$p.t('ui','zurueck')" ></span>
-						</a>
-				</div>
-				<div v-else>
-						<a
-							:href="mailLinks[0]"
-							@click.prevent="handleMailLink"
-							class="btn btn-primary m-2"
-							>
-								{{$p.t('ui', 'openInMailClient')}}
-						</a>
+					<div v-else>
+							<a
+								:href="mailLinks[0]"
+								@click.prevent="handleMailLink"
+								class="btn btn-primary m-2"
+								>
+									{{$p.t('ui', 'openInMailClient')}}
+							</a>
+							<a
+								class="btn btn-outline-secondary m-2"
+								@click.prevent="reset"
+								>
+									<span class="fa-solid fa-rotate-right" :title="this.$p.t('ui','zurueck')" ></span>
+							</a>
+					</div>
+			</div>
 
-						<a
-							class="btn btn-outline-secondary m-2"
-							@click.prevent="reset"
-							>
-								<span class="fa-solid fa-rotate-right" :title="this.$p.t('ui','zurueck')" ></span>
-						</a>
-				</div>
 		</div>
 	`
 };

@@ -1,4 +1,7 @@
-export async function splitMailsHelper(mails, event, subject, alertPluginRef, phrasenPluginRef) {
+
+
+
+export async function splitMailsHelper(mails, event, subject, alertPluginRef, phrasenPluginRef, uidCC= "") {
 	let splititem = ",";
 	let maillist = mails.join(splititem);
 	let mailto = "";
@@ -26,7 +29,9 @@ export async function splitMailsHelper(mails, event, subject, alertPluginRef, ph
 			maillist = "";
 		}
 
-		let mailLink = useBcc ? `mailto:?bcc=${mailto}` : `mailto:${mailto}`;
+		let mailadressUid = uidCC + '@technikum-wien.at';
+
+		let mailLink = useBcc ? `mailto:${mailadressUid}?cc=${mailadressUid}&bcc=${mailto}` : `mailto:${mailto}`;
 		if(subject && typeof subject === 'string') mailLink += `?subject=${subject}`
 		if (firstrun)
 		{
