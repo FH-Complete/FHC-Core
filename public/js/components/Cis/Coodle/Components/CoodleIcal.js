@@ -25,16 +25,11 @@ export default {
 			if (icalLinkResponse.meta.status === "success") {
 				this.icalLink = icalLinkResponse.data.unencryptedUrl;
 				this.encryptedIcalLink = icalLinkResponse.data.encryptedUrl;
-				console.log(icalLinkResponse);
-				console.log(this.icalLink);
-				console.log(this.encryptedIcalLink);
 			}
 		},
 	},
 	async created() {
 		await this.getIcalLink();
-		console.log(this.icalLink);
-				console.log(this.encryptedIcalLink);
 	},
 	template: /*html*/ `
 	<div class="card" style="min-height:100%">
