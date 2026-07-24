@@ -68,7 +68,8 @@ class Noten extends FHCAPI_Controller
 			'person',
 			'benotungstool',
 			'lehre',
-			'ui'
+			'ui',
+			'password'
 		]);
 		
 		$this->load->model('education/LePruefung_model', 'LePruefungModel');
@@ -461,7 +462,7 @@ class Noten extends FHCAPI_Controller
 		}
 		
 		if(!$this->AuthLib->checkUserAuthByUsernamePassword(getAuthUID(), $result->password)->retval) {
-			$this->terminateWithError($this->p->t('global', 'wrongPassword'), 'general');
+			$this->terminateWithError($this->p->t('password', 'wrongPassword'), 'general');
 		}
 		
 		$lv_id = $result->lv_id;

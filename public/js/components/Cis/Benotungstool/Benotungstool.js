@@ -1235,18 +1235,31 @@ export const Benotungstool = {
 			
 			return value
 		},
-		saveNote(e, cell) { // Notenvorschlag freigeben
+		async saveNote(e, cell) { // Notenvorschlag freigeben
 			const row = cell.getRow()
 			const data = row.getData()
-			
+
 			if(!data.note_vorschlag) return
-			
+
 			// if vorschlag is the same as lv_note do nothing
 			if(data.note_vorschlag == data.lv_note) return
-			
+
 			// if the student already has pruefungen disable this part
 			if(data.pruefungen.length) return
-			
+
+			// confirm before writing the LV-Gesamtnote
+			const noteOption = this.notenOptions.find(opt => opt.note == data.note_vorschlag)
+			const noteBezeichnung = noteOption ? noteOption.bezeichnung : data.note_vorschlag
+			const dateLocale = this.$p.user_language?.value === 'English' ? 'en-GB' : 'de-AT'
+			const benotungsdatum = new Date().toLocaleString(dateLocale)
+			if(await this.$fhcAlert.confirm({
+				message: this.$p.t('benotungstool/c4notenvorschlagUebernehmenConfirm', [noteBezeichnung, data.vorname, data.nachname, data.uid, benotungsdatum]),
+				acceptClass: 'p-button-primary',
+				rejectClass: 'p-button-secondary'
+			}) === false) {
+				return
+			}
+
 			this.loading = true
 			this.$api.call(ApiNoten.saveNotenvorschlag(this.lv_id, this.sem_kurzbz, data.uid, data.note_vorschlag, data.punkte))
 				.then((res) => {
@@ -2596,6 +2609,24 @@ export const Benotungstool = {
 			}, []) : []
 			return cs
 		},
+		// Row-by-row preview for the Noten-freigeben modal, over the exact set that
+		// saveStudentenNoten will release (changedNoten). Freigabe releases the LV-Note
+		// (lv_note); it does not itself write the Zeugnisnote (that is a separate übernahme).
+		// So we compare what is currently on record in the Zeugnis (note) against the
+		// LV-Note that is about to be freigegeben (lv_note), and flag any mismatch.
+		freigabeSummary() {
+			return this.changedNoten.map(s => {
+				const zeugnisOpt = this.notenOptions?.find(opt => opt.note == s.note)
+				const releaseOpt = this.notenOptions?.find(opt => opt.note == s.lv_note)
+				return {
+					uid: s.uid,
+					name: `${s.vorname} ${s.nachname}`,
+					currentNote: zeugnisOpt ? zeugnisOpt.bezeichnung : (s.note || '—'),
+					releasedNote: releaseOpt ? releaseOpt.bezeichnung : (s.lv_note || '—'),
+					changed: (s.note ?? '') != (s.lv_note ?? '')
+				}
+			})
+		},
 		getNotenfreigabeHinweistext() {
 			return this.$capitalize(this.$p.t('benotungstool/notenfreigabeHinweistextv4'))
 		},
@@ -2716,6 +2747,35 @@ export const Benotungstool = {
 			<template v-slot:default>
 				<div class="row justify-content-center">
 					<div class="col-12" v-html="getNotenfreigabeHinweistext"></div>
+				</div>
+				<div v-if="freigabeSummary.length" class="row mt-3 justify-content-center">
+					<div class="col-12">
+						<div class="fw-bold mb-1">{{ $p.t('benotungstool/c4freigabeSummaryHeading', [freigabeSummary.length]) }}</div>
+						<div class="border rounded" style="max-height: 250px; overflow-y: auto;">
+							<table class="table table-sm table-hover align-middle mb-0">
+								<thead>
+									<tr>
+										<th class="bg-body sticky-top">{{ $capitalize($p.t('benotungstool/c4student')) }}</th>
+										<th class="bg-body sticky-top">{{ $capitalize($p.t('benotungstool/c4freigabeSummaryCurrent')) }}</th>
+										<th class="bg-body sticky-top"></th>
+										<th class="bg-body sticky-top">{{ $capitalize($p.t('benotungstool/c4freigabeSummaryReleased')) }}</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="row in freigabeSummary" :key="row.uid">
+										<td>{{ row.name }} <span class="text-muted">({{ row.uid }})</span></td>
+										<td>{{ row.currentNote }}</td>
+										<td class="text-center"><i class="fa fa-arrow-right"></i></td>
+										<td :class="{ 'fw-bold text-success': row.changed }">{{ row.releasedNote }}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="small text-muted mt-1">{{ $p.t('benotungstool/c4freigabeSummaryLegend') }}</div>
+					</div>
+				</div>
+				<div v-else class="row mt-3 justify-content-center">
+					<div class="col-12 text-center text-muted">{{ $p.t('benotungstool/c4freigabeSummaryEmpty') }}</div>
 				</div>
 				<div class="row mt-3 justify-content-center">
 					<div class="col-auto">
