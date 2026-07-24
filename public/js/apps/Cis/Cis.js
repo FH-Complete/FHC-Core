@@ -19,6 +19,7 @@ import DeadlineOverview from "../../components/Cis/Abgabetool/DeadlineOverview.j
 import Studium from "../../components/Cis/Studium/Studium.js";
 import StgOrgLvPlan from "../../components/Cis/LvPlan/StgOrg.js";
 import OtherLvPlan from "../../components/Cis/LvPlan/OtherLvPlan.js";
+import ZeitsperrenMa from "../../components/Cis/ZeitsperrenMitarbeiter/ZeitsperrenMa.js";
 
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
 import {capitalize} from "../../helpers/StringHelpers.js";
@@ -244,6 +245,12 @@ const router = VueRouter.createRouter({
 					},
 				};
 			},
+		},
+		{
+			path: `/Cis/ZeitsperrenMa`,
+			name: 'ZeitsperrenMa',
+			component: ZeitsperrenMa,
+			props: true
 		},
 	]
 })
