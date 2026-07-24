@@ -34,13 +34,14 @@ const router = VueRouter.createRouter({
 				{
 					name: 'stdsem',
 					path: 'stdsem/:stdsem',
+					component: FhcStudentenverwaltung,
 					children: [
-						{ name: 'search', path: 'search/:query' },
-						{ name: 'searchtypes', path: 'search/:types/:query' },
-						{ name: 'prestudent', path: 'prestudent/:prestudent_id' },
-						{ name: 'student', path: 'student/:student_uid' },
-						{ name: 'person', path: 'person/:person_id' },
-						{ name: 'treemenu', path: ':treemenu(.*)*' }
+						{ name: 'search', path: 'search/:query', component: FhcStudentenverwaltung },
+						{ name: 'searchtypes', path: 'search/:types/:query', component: FhcStudentenverwaltung },
+						{ name: 'prestudent', path: 'prestudent/:prestudent_id', component: FhcStudentenverwaltung },
+						{ name: 'student', path: 'student/:student_uid', component: FhcStudentenverwaltung },
+						{ name: 'person', path: 'person/:person_id', component: FhcStudentenverwaltung },
+						{ name: 'treemenu', path: ':treemenu(.*)*', component: FhcStudentenverwaltung },
 					]
 				}
 			]

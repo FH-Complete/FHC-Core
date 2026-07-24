@@ -16,8 +16,8 @@ const router = VueRouter.createRouter({
 			path: '/stdsem/:stdsem',
 			component: LVVerwaltung,
 			children: [
-				{ name: 'emp', path: 'emp/:emp/:treemenu(.*)*' },
-				{ name: 'treemenu', path: ':treemenu(.*)*' }
+				{ name: 'emp', path: 'emp/:emp/:treemenu(.*)*', component: LVVerwaltung },
+				{ name: 'treemenu', path: ':treemenu(.*)*', component: LVVerwaltung }
 			]
 		},
 		{
