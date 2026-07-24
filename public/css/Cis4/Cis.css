@@ -908,3 +908,16 @@ html {
 .fhcPrimaryBorderHover:hover {
 	border-color: var(--fhc-primary) !important;
 }
+
+button.tabulator-page {
+	background-color: var(--fhc-primary) !important;
+	color: var(--fhc-light) !important;
+}
+
+button.tabulator-page:hover {
+	opacity: 90%;
+}
+
+button.tabulator-page.active {
+	border: solid 2px var(--fhc-primary) !important;
+}

@@ -16,6 +16,9 @@ export default {
 				minHeight: 300,
 				layout: "fitColumns",
 				initialSort: [{ column: "endedAt", dir: "desc" }],
+				pagination: true,
+				paginationSize: 25,
+				paginationCounter: "rows",
 				locale: true,
 				columns: [
 					{

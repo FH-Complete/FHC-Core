@@ -15,8 +15,11 @@ export default {
 				minHeight: 300,
 				movableColumns: false,
 				layout: "fitColumns",
-				initialSort: [{column: "createdAt", dir: "desc"}],
+				initialSort: [{ column: "createdAt", dir: "desc" }],
 				locale: true,
+				pagination: true,
+				paginationSize: 25,
+				paginationCounter: "rows",
 				columns: [
 					{
 						title: "Title",
