@@ -14,8 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import CoreSearchbar from "../searchbar/searchbar.js";
-import NavLanguage from "../navigation/Language.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
 import FhcCalendar from "../Calendar/Tempus.js";
 import FhcCoursepicker from "./Coursepicker.js";
@@ -47,11 +45,11 @@ import HistoryModal from "./HistoryModal.js";
 import ResourcesAssignmentModal from "./ResourcesAssignmentModal.js";
 import TagsAssignmentModal from "./TagsAssignmentModal.js";
 import { getTempusSearchbarOptions } from "./Filters/searchbarOptions.js";
+import TempusHeader from "./Header.js";
 
 export default {
   name: "Tempus",
   components: {
-    CoreSearchbar,
     VerticalSplit,
     FhcCalendar,
     FhcCoursepicker,
@@ -61,7 +59,7 @@ export default {
     ParkingSlot,
     AppConfig,
     AppMenu,
-    NavLanguage,
+    TempusHeader,
     BsModal,
     StvVerband,
     StvStudiensemester,
@@ -810,7 +808,7 @@ export default {
       this.hoveredEvent = null;
     },
     focusSearchbar() {
-      this.$refs.searchbar?.$refs?.input.focus();
+      this.$refs.header?.focusSearchbar();
     },
   },
   watch: {
@@ -910,85 +908,14 @@ export default {
     data-cy="tempus"
   >
 		<keyboard-shortcuts :shortcuts="keyboardShortcuts" />
-		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
-			<div class="col-md-4 col-lg-3 col-xl-2 d-flex align-items-center">
-				<button
-					class="btn btn-outline-light border-0 m-1 collapsed"
-					type="button"
-					data-bs-toggle="offcanvas"
-					data-bs-target="#appMenu"
-					aria-controls="appMenu"
-					aria-expanded="false"
-					:aria-label="$p.t('ui/toggle_nav')"
-				>
-					<span class="svg-icon svg-icon-apps"></span>
-				</button>
-				<a class="navbar-brand me-0" :href="tempusRoot">Tempus</a>
-			</div>
-			<button
-				class="btn btn-outline-light border-0 d-md-none m-1 collapsed"
-				type="button"
-				data-bs-toggle="offcanvas"
-				data-bs-target="#sidebarMenu"
-				aria-controls="sidebarMenu"
-				aria-expanded="false"
-				:aria-label="$p.t('ui/toggle_nav')"
-			>
-				<span class="fa-solid fa-table-list"></span>
-			</button>
-			<core-searchbar
-				ref="searchbar"
-				:searchoptions="searchbaroptions"
-				:searchfunction="searchfunction"
-				class="searchbar position-relative w-100"
-				show-btn-submit
-			></core-searchbar>
-			<div id="nav-user" class="dropdown">
-				<button
-					id="nav-user-btn"
-					class="btn btn-link rounded-0 py-0"
-					type="button"
-					data-bs-toggle="dropdown"
-					data-bs-target="#nav-user-menu"
-					aria-expanded="false"
-					aria-controls="nav-user-menu"
-				>
-					<img
-						:src="avatarUrl"
-						:alt="$p.t('profilUpdate/profilBild')"
-						class="bg-light avatar rounded-circle border border-light"
-					/>
-				</button>
-				<ul
-					ref="navUserDropdown"
-					class="dropdown-menu dropdown-menu-dark dropdown-menu-end rounded-0 text-center m-0"
-					aria-labelledby="nav-user-btn"
-				>
-					<li>
-						<button
-							type="button"
-							class="dropdown-item"
-							data-bs-toggle="modal"
-							data-bs-target="#configModal"
-						>
-							{{ $p.t('ui/settings') }}
-						</button>
-					</li>
-					<li><hr class="dropdown-divider m-0"/></li>
-					<li>
-						<nav-language
-							item-class="dropdown-item border-left-dark"
-						/>
-					</li>
-					<li><hr class="dropdown-divider m-0"/></li>
-					<li>
-						<a class="dropdown-item" :href="logoutUrl">
-							{{ $p.t('ui/logout') }}
-						</a>
-					</li>
-				</ul>
-			</div>
-		</header>
+		<tempus-header
+			ref="header"
+			:tempus-root="tempusRoot"
+			:avatar-url="avatarUrl"
+			:logout-url="logoutUrl"
+			:searchbaroptions="searchbaroptions"
+			:searchfunction="searchfunction"
+		/>
 		<div class="container-fluid overflow-hidden heightfull">
 			<div class="row h-100">
 				<aside id="appMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">
