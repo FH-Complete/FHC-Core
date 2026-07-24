@@ -93,6 +93,7 @@ export default {
 	},
 	async created() {
 		await this.getAuthInfo();
+		await this.$p.loadCategory(["coodle", "global", "ui"]);
 		if (this.$route.query?.id?.length) {
 			this.showSurveyDetails(this.$route.query.id);
 			this.$router.replace({ query: null });
@@ -111,7 +112,7 @@ export default {
 					<div>
 						<i class="fa-solid fa-person-booth fa-lg"></i>
 					</div>
-					<span class="text-nowrap">{{ "Active surveys" }}</span>
+					<span class="text-nowrap">{{ $p.t("coodle/active_surveys") }}</span>
 				</div>
 				<div
 					@click="switchToTab('pastSurveysTable')"
@@ -121,7 +122,7 @@ export default {
 					<div>
 						<i class="fa-solid fa-flag-checkered fa-lg"></i>
 					</div>
-					<span class="text-nowrap">{{ "Past surveys" }}</span>
+					<span class="text-nowrap">{{ $p.t("coodle/inactive_surveys") }}</span>
 				</div>
 				<div
 					@click="switchToTab('survey')"
@@ -131,7 +132,7 @@ export default {
 					<div>
 						<i class="fa-solid fa-circle-plus fa-lg"></i>
 					</div>
-					<span class="text-nowrap">{{ "Create new survey" }}</span>
+					<span class="text-nowrap">{{ $p.t("coodle/create_survey") }}</span>
 				</div>
 				<div
 					@click="switchToTab('freeBusySettings')"
@@ -141,7 +142,7 @@ export default {
 					<div>
 						<i class="fa-solid fa-gear fa-lg"></i>
 					</div>
-					<span class="text-nowrap">{{ "FreeBusy Settings" }}</span>
+					<span class="text-nowrap">{{ $p.t("coodle/freebusy_settings") }}</span>
 				</div>
 				<div
 					@click="switchToTab('ical')"

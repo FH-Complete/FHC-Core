@@ -13,9 +13,9 @@ export default {
 			if (this.$props.survey?.id && !this.$props.isEditInProgress) {
 				return this.$props.survey.title;
 			} else if (this.$props.survey?.id && this.$props.isEditInProgress) {
-				return "Edit survey";
+				return this.$p.t("coodle/edit_survey");
 			} else {
-				return "New survey";
+				return this.$p.t("coodle/new_survey");
 			}
 		},
 		isSurveyActive() {
@@ -35,25 +35,22 @@ export default {
 		async cancelSurvey() {
 			if (!this.$props.survey?.id) return;
 
-			const cancellationConfirmationMessage =
-				'Are you sure you want to cancel Coodle survey "(((surveyTitle)))"?'.replace(
-					"(((surveyTitle)))",
-					this.$props.survey?.title,
-				);
+			const cancellationConfirmationMessage = this.$p
+				.t("coodle/cancel_survey_confirmation_message")
+				.replace("(((surveyTitle)))", this.$props.survey?.title);
 			const cancellationConfirmation = await this.$fhcAlert.confirm({
-				header: "Cancellation confirmation",
+				header: this.$p.t("coodle/cancellation_confirmation"),
 				message: cancellationConfirmationMessage,
-				acceptLabel: "Yes",
-				rejectLabel: "No",
+				acceptLabel: this.$p.t("coodle/yes"),
+				rejectLabel: this.$p.t("coodle/no"),
 			});
 			if (!cancellationConfirmation) return;
 
 			const shouldInformParticipants = await this.$fhcAlert.confirm({
-				header: "Inform participants",
-				message:
-					"Would you like to email all participants to inform them of the survey cancellation?",
-				acceptLabel: "Yes",
-				rejectLabel: "No",
+				header: this.$p.t("coodle/inform_participants"),
+				message: this.$p.t("coodle/email_participants_canceled"),
+				acceptLabel: this.$p.t("coodle/yes"),
+				rejectLabel: this.$p.t("coodle/no"),
 			});
 
 			const cancellationResponse = await this.$api.call(
@@ -76,17 +73,16 @@ export default {
 
 			if (!numberOfParticipantsWithoutVote) {
 				this.$fhcAlert.alertError(
-					"All participants have already voted!",
+					this.$p.t("coodle/all_participants_voted"),
 				);
 				return;
 			}
 
 			const reminderConfirmation = await this.$fhcAlert.confirm({
-				header: "Reminder confirmation",
-				message:
-					"Are you sure you want to remind participants to vote?",
-				acceptLabel: "Yes",
-				rejectLabel: "No",
+				header: this.$p.t("coodle/reminder_confirmation"),
+				message: this.$p.t("coodle/email_participants_reminder"),
+				acceptLabel: this.$p.t("coodle/yes"),
+				rejectLabel: this.$p.t("coodle/no"),
 			});
 			if (!reminderConfirmation) return;
 
@@ -94,7 +90,9 @@ export default {
 				CoodleApi.sendReminders(this.$props.survey.id),
 			);
 			if (remindersResponse.meta.status === "success") {
-				this.$fhcAlert.alertSuccess("Reminders successfully sent!");
+				this.$fhcAlert.alertSuccess(
+					this.$p.t("coodle/reminders_success"),
+				);
 			}
 		},
 	},
@@ -121,7 +119,7 @@ export default {
 						role="button"
 						class="dropdown-item px-3 py-1"
 					>
-						{{ "Send reminders" }}
+						{{ $p.t("coodle/send_reminders") }}
 					</div>
 				</li>
 				<li>
@@ -130,7 +128,7 @@ export default {
 						role="button"
 						class="dropdown-item px-3 py-1"
 					>
-						{{ "Edit survey" }}
+						{{ $p.t("coodle/edit_survey") }}
 					</div>
 				</li>
 				<li>
@@ -139,7 +137,7 @@ export default {
 						role="button"
 						class="dropdown-item px-3 py-1"
 					>
-						{{ "Cancel survey" }}
+						{{ $p.t("coodle/cancel_survey") }}
 					</div>
 				</li>
 			</ul>

@@ -72,28 +72,28 @@ export default {
 				},
 			],
 			isEditInProgress: false,
-			weekdays: [
-				"Sunday",
-				"Monday",
-				"Tuesday",
-				"Wednesday",
-				"Thursday",
-				"Friday",
-				"Saturday",
+			weekdayPhrases: [
+				"global/monday",
+				"global/tuesday",
+				"global/wednesday",
+				"global/thursday",
+				"global/friday",
+				"global/saturday",
+				"global/sunday",
 			],
-			months: [
-				"January",
-				"February",
-				"March",
-				"April",
-				"May",
-				"June",
-				"July",
-				"August",
-				"September",
-				"October",
-				"November",
-				"December",
+			monthPhrases: [
+				"global/january",
+				"global/february",
+				"global/march",
+				"global/april",
+				"global/may",
+				"global/june",
+				"global/july",
+				"global/august",
+				"global/september",
+				"global/october",
+				"global/november",
+				"global/december",
 			],
 		};
 	},
@@ -126,6 +126,12 @@ export default {
 						this.parseTimeslotForDisplay(timeslot),
 					) ?? []
 			);
+		},
+		weekdays() {
+			return this.weekdayPhrases.map((phrase) => this.$p.t(phrase));
+		},
+		months() {
+			return this.monthPhrases.map((phrase) => this.$p.t(phrase));
 		},
 	},
 	watch: {
@@ -223,11 +229,10 @@ export default {
 			) {
 				const shouldProceedWithoutParticipants =
 					await this.$fhcAlert.confirm({
-						header: "Warning!",
-						message:
-							"You haven't added any participants. Are you sure you want to proceed?",
-						acceptLabel: "Yes",
-						rejectLabel: "Cancel",
+						header: this.$p.t("coodle/warning"),
+						message: this.$p.t("coodle/no_participants_added"),
+						acceptLabel: this.$p.t("coodle/yes"),
+						rejectLabel: this.$p.t("ui/abbrechen"),
 					});
 				if (!shouldProceedWithoutParticipants) return;
 			}
@@ -235,11 +240,10 @@ export default {
 			if (!this.surveyFormData.timeslots.length) {
 				const shouldProceedWithoutTimeslots =
 					await this.$fhcAlert.confirm({
-						header: "Warning!",
-						message:
-							"You haven't added any proposed appointments. Are you sure you want to proceed?",
-						acceptLabel: "Yes",
-						rejectLabel: "Cancel",
+						header: this.$p.t("coodle/warning"),
+						message: this.$p.t("coodle/no_timeslots_added"),
+						acceptLabel: this.$p.t("coodle/yes"),
+						rejectLabel: this.$p.t("ui/abbrechen"),
 					});
 				if (!shouldProceedWithoutTimeslots) return;
 			}
@@ -289,11 +293,10 @@ export default {
 		},
 		async createSurvey(surveyData) {
 			const shouldInformParticipants = await this.$fhcAlert.confirm({
-				header: "Inform participants",
-				message:
-					"Would you like to email all participants to inform them of this survey?",
-				acceptLabel: "Yes",
-				rejectLabel: "No",
+				header: this.$p.t("coodle/inform_participants"),
+				message: this.$p.t("coodle/email_participants_created"),
+				acceptLabel: this.$p.t("coodle/yes"),
+				rejectLabel: this.$p.t("coodle/no"),
 			});
 
 			const surveyCreationResponse = await this.$api.call(
@@ -307,11 +310,10 @@ export default {
 		},
 		async updateSurvey(surveyData) {
 			const shouldInformParticipants = await this.$fhcAlert.confirm({
-				header: "Inform participants",
-				message:
-					"Would you like to email all participants to inform them of changes?",
-				acceptLabel: "Yes",
-				rejectLabel: "No",
+				header: this.$p.t("coodle/inform_participants"),
+				message: this.$p.t("coodle/email_participants_created"),
+				acceptLabel: this.$p.t("coodle/yes"),
+				rejectLabel: this.$p.t("coodle/no"),
 			});
 
 			const surveyUpdateResponse = await this.$api.call(
@@ -333,7 +335,6 @@ export default {
 		if (!this.$props.survey?.id) {
 			this.isEditInProgress = true;
 		}
-		// todo: localize weekdays and months
 	},
 	template: /*html*/ `
 	<div class="card mb-4" style="min-height:100%">
@@ -350,7 +351,7 @@ export default {
 			<div class="d-flex flex-column gap-3">
 				<div v-if="isEditInProgress" class="d-flex flex-row justify-content-between">
 					<span class="fst-italic">
-						{{ "Required inputs are marked with *." }}
+						{{ $p.t("coodle/required_inputs") }}
 					</span>
 					<div class="d-flex flex-row gap-2 justify-content-end align-items-start px-0">
 						<div>
@@ -359,7 +360,7 @@ export default {
 								:class="isDarkMode ? 'btn-outline-light' : 'btn-outline-dark'"
 								class="btn text-nowrap"
 								>
-								{{ "Cancel" }}
+								{{ $p.t("ui/abbrechen") }}
 							</div>
 						</div>
 						<div>
@@ -368,7 +369,7 @@ export default {
 								:class="isDarkMode ? 'btn-light' : 'btn-dark'"
 								class="btn text-nowrap"
 							>
-								{{ "Save" }}
+								{{ $p.t("global/speichern") }}
 							</div>
 						</div>
 					</div>

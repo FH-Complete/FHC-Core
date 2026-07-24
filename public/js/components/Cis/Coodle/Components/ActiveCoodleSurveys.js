@@ -16,21 +16,28 @@ export default {
 				movableColumns: false,
 				layout: "fitColumns",
 				initialSort: [{column: "createdAt", dir: "desc"}],
+				locale: true,
 				columns: [
 					{
 						title: "Title",
+						title: "placeholder",
+						titlePhrase: "coodle/title",
 						field: "title",
 						headerFilter: true,
 						minWidth: 150,
 					},
 					{
 						title: "Creator",
+						title: "placeholder",
+						titlePhrase: "coodle/creator",
 						field: "creatorName",
 						headerFilter: true,
 						minWidth: 100,
 					},
 					{
 						title: "Started on",
+						title: "placeholder",
+						titlePhrase: "coodle/started_on",
 						field: "createdAt",
 						headerFilter: true,
 						minWidth: 100,
@@ -41,6 +48,8 @@ export default {
 					},
 					{
 						title: "Ends on",
+						title: "placeholder",
+						titlePhrase: "coodle/ends_on",
 						field: "endsAt",
 						headerFilter: true,
 						minWidth: 100,
@@ -120,14 +129,14 @@ export default {
 				class="d-flex justify-content-center align-items-center mt-5"
 			>
 				<div class="spinner-border" role="status">
-					<span class="visually-hidden">{{ "Loading..." }}</span>
+					<span class="visually-hidden">{{ $p.t("coodle/loading") }}</span>
 				</div>
 			</div>
 			<div
 				v-else-if="!activeSurveys?.length"
 				class="d-flex justify-content-center align-items-center mt-5"
 			>
-				<h3 class="fw-bold">{{ "No active surveys found!" }}</h3>
+				<h3 class="fw-bold">{{ $p.t("coodle/no_active_surveys_found") }}</h3>
 			</div>
 			<div v-else class="d-flex flex-row overflow-x-auto">
 				<div class="flex-shrink">

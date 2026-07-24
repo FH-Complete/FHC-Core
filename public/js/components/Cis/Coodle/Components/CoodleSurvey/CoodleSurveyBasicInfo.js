@@ -86,14 +86,14 @@ export default {
 		<template v-if="!$props.isEditInProgress">
 			<span v-if="$props.survey?.completedAt" class="fst-italic">
 				{{
-					"This survey was completed on (((completedAt))).".replace(
+					$p.t("coodle/survey_completed_info").replace(
 						'(((completedAt)))',
 						formattedSurveyCompletedAt
 					)
 				}}
 				<span v-if="$props.survey?.selectedTimeslotId">
 					{{
-						"The timeslot (((timeslot))) was selected.".replace(
+						$p.t("coodle/selected_timeslot_info").replace(
 							"(((timeslot)))",
 							parsedSelectedTimeslot?.weekday +
 								" " +
@@ -105,11 +105,11 @@ export default {
 						)
 					}}
 				</span>
-				<span v-else>{{ "No timeslot was selected." }}</span>
+				<span v-else>{{ $p.t("coodle/no_selected_timeslot_info") }}</span>
 			</span>
 			<span v-else-if="$props.survey?.canceledAt" class="fst-italic">
 				{{
-					"This survey was canceled on (((canceledAt))).".replace(
+					$p.t("coodle/survey_canceled_info").replace(
 						'(((canceledAt)))',
 						formattedSurveyCanceledAt
 					)
@@ -121,7 +121,7 @@ export default {
 						<i class="fa-solid fa-user fa-lg"></i>
 					</div>
 					<span>
-						<span class="fw-bold">{{ "Created by: " }}</span>
+						<span class="fw-bold">{{ $p.t("coodle/created_by") + ": " }}</span>
 						{{ this.$props.survey?.creator?.name }}
 						<a
 							v-if="this.$props.survey?.creator?.uid"
@@ -131,7 +131,7 @@ export default {
 						>
 							<i class="fa-solid fa-up-right-from-square"></i>
 						</a>
-						{{ " on " + formattedSurveyCreatedAt}}
+						{{ " " + $p.t("ui/am") + " " + formattedSurveyCreatedAt}}
 					</span>
 				</div>
 				<div class="d-flex flex-row">
@@ -139,7 +139,7 @@ export default {
 						<i class="fa-solid fa-calendar fa-lg"></i>
 					</div>
 					<span>
-						<span class="fw-bold">{{ "Planned end date: " }}</span>
+						<span class="fw-bold">{{ $p.t("coodle/planned_end_date") + ": " }}</span>
 						{{ formattedSurveyEndsAt }}
 					</span>
 				</div>
@@ -148,7 +148,7 @@ export default {
 						<i class="fa-solid fa-clock fa-lg"></i>
 					</div>
 					<span>
-						<span class="fw-bold">{{ "Appointment duration: " }}</span>
+						<span class="fw-bold">{{ $p.t("coodle/timeslot_duration") + ": " }}</span>
 						{{ formattedSurveyTimeslotDuration }}
 					</span>
 				</div>
@@ -157,7 +157,7 @@ export default {
 						<i class="fa-solid fa-calendar-check fa-lg"></i>
 					</div>
 					<span>
-						<span class="fw-bold">{{ "Maximum selectable appointments: " }}</span>
+						<span class="fw-bold">{{ $p.t("coodle/max_selectable_timeslots") + ": " }}</span>
 						{{ $props.survey?.maxSelections}}
 					</span>
 				</div>
@@ -166,8 +166,8 @@ export default {
 						<i class="fa-solid fa-user-secret fa-lg"></i>
 					</div>
 					<span>
-						<span class="fw-bold">{{ "Are participants anonymous: " }}</span>
-						{{ $props.survey?.areParticipantsAnonymized ? "yes" : "no" }}
+						<span class="fw-bold">{{ $p.t("coodle/anon_participants") + ": " }}</span>
+						{{ $props.survey?.areParticipantsAnonymized ? $p.t("coodle/yes") : $p.t("coodle/no")}}
 					</span>
 				</div>
 				<div class="d-flex flex-row">
@@ -175,8 +175,8 @@ export default {
 						<i class="fa-solid fa-eye-slash fa-lg"></i>
 					</div>
 					<span>
-						<span class="fw-bold">{{ "Are votes anonymous: " }}</span>
-						{{ $props.survey?.areSelectionsAnonymized ? "yes" : "no" }}
+						<span class="fw-bold">{{ $p.t("coodle/anon_votes") + ": " }}</span>
+						{{ $props.survey?.areSelectionsAnonymized ? $p.t("coodle/yes") : $p.t("coodle/no") }}
 					</span>
 				</div>
 			</div>
@@ -190,11 +190,11 @@ export default {
 			<div class="row">
 				<div class="d-flex flex-column gap-2 col-12 col-md-6 pb-2">
 					<div class="d-flex flex-column gap-1">
-						<label for="surveyTitleInput" class="fw-bold">{{ "* " + "Title" }}</label>
+						<label for="surveyTitleInput" class="fw-bold">{{ "* " + $p.t("coodle/title") }}</label>
 						<input v-model="surveyFormData.title" id="surveyTitleInput" type="text" maxlength="255" />
 					</div>
 					<div class="d-flex flex-column gap-1">
-						<label for="surveyDescriptionInput" class="fw-bold">{{ "Description" }}</label>
+						<label for="surveyDescriptionInput" class="fw-bold">{{ $p.t("coodle/description") }}</label>
 						<textarea v-model="surveyFormData.description" rows="4" class="flex-grow-1" maxlength="1000" />
 					</div>
 				</div>
@@ -206,7 +206,7 @@ export default {
 									for="surveyMaxSelectionsInput"
 									class="fw-bold text-wrap"
 								>
-									{{ "Maximum number of selections" }}
+									{{ $p.t("coodle/max_selectable_timeslots") }}
 								</label>
 								<input
 									v-model="surveyFormData.maxSelections"
@@ -223,7 +223,7 @@ export default {
 									for="surveyEndsAtInput"
 									class="fw-bold text-wrap"
 								>
-									{{ "* " + "Planned end date" }}
+									{{ "* " + $p.t("coodle/planned_end_date") }}
 								</label>
 								<input
 									v-model="surveyFormData.endsAt"
@@ -240,7 +240,7 @@ export default {
 										for="surveyAreParticipantsAnonymizedInput"
 										class="fw-bold text-wrap"
 									>
-										{{ "Are participants anonymous?" }}
+										{{ $p.t("coodle/anon_participants") + "?" }}
 									</label>
 									<input
 										v-model="surveyFormData.areParticipantsAnonymized"
@@ -254,7 +254,7 @@ export default {
 										for="surveyAreSelectionsAnonymizedInput"
 										class="fw-bold text-wrap"
 									>
-										{{ "Are votes anonymous?" }}
+										{{ $p.t("coodle/anon_votes") + "?" }}
 									</label>
 									<input
 										v-model="surveyFormData.areSelectionsAnonymized"

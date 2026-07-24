@@ -13,12 +13,12 @@ export default {
 			columnHeaders: [],
 			defaultSchedules: [
 				{
-					description: "Personal schedule",
-					type: "Schedule",
+					description: this.$p.t("coodle/freebusy_personal_schedule"),
+					type: this.$p.t("coodle/schedule"),
 				},
 				{
-					description: "My planned absences",
-					type: "Absences",
+					description: this.$p.t("coodle/freebusy_planned_absences"),
+					type: this.$p.t("coodle/absences"),
 				},
 			],
 			externalSchedules: [],
@@ -58,13 +58,11 @@ export default {
 		async submitScheduleForm() {
 			if (this.isSubmittingScheduleForm) return;
 
-			this.isSubmittingScheduleForm = true;
 			const response = await this.$api.call(
 				this.scheduleFormData.id
 					? FreeBusyApi.updateFreeBusyEntry(this.scheduleFormData)
 					: FreeBusyApi.createFreeBusyEntry(this.scheduleFormData),
 			);
-			this.isSubmittingScheduleForm = false;
 
 			if (response.meta.status === "success") {
 				this.closeScheduleForm();
@@ -75,11 +73,11 @@ export default {
 			if (!schedule?.id) return;
 
 			const scheduleRemovalConfirmation = await this.$fhcAlert.confirm({
-				header: "Removal confirmation",
+				header: this.$p.t("coodle/removal_confirmation"),
 				message:
-					"Are you sure you want to remove this schedule from your FreeBusy?",
-				acceptLabel: "Yes",
-				rejectLabel: "Cancel",
+					this.$p.t("coodle/freebusy_removal_confirmation_message"),
+				acceptLabel: this.$p.t("coodle/yes"),
+				rejectLabel: this.$p.t("ui/abbrechen"),
 			});
 			if (!scheduleRemovalConfirmation) return;
 
@@ -126,29 +124,29 @@ export default {
 	template: /*html*/ `
 	<div class="card" style="min-height:100%">
 		<div class="card-header">
-			<h4>{{ "FreeBusy settings" }}</h4>
+			<h4>{{ $p.t("coodle/freebusy_settings") }}</h4>
 		</div>
 		<div class="card-body">
 			<div class="d-flex flex-column gap-3">
 				<div class="d-flex flex-column gap-2">
 					<span>
-						{{ "FreeBusy supports effective scheduling by combining internal and external calendars, and displaying events (without identifying details such as title, description, or location) in Coodle to avoid timing conflicts. Your base timetable and planned absences will be displayed by default, but you can add additional schedules (e.g. Google Calendar). To do so, you must locate and copy a sharing url from your calendar application marked as either 'ICS' or 'iCal', usually ending with the suffix '.ics'. The calendar being shared must also be set to public. However, schedules of type 'SoGo' and 'Coodle' will autofill with default urls which will be processed internally." }}
+						{{ $p.t("coodle/freebusy_explainer") }}
 					</span>
 				</div>
 				<div class="overflow-x-auto">
 					<table id="freeBusyTable" style="min-width:500px;">
 						<tr>
-							<th class="border-1 py-1 px-2 fw-bold">{{ "Description" }}</th>
-							<th class="border-1 py-1 px-2 fw-bold">{{ "Type" }}</th>
+							<th class="border-1 py-1 px-2 fw-bold">{{ $p.t("coodle/description") }}</th>
+							<th class="border-1 py-1 px-2 fw-bold">{{ $p.t("coodle/type") }}</th>
 							<th class="border-1 py-1 px-2 fw-bold" style="width: 50%;">{{ "URL" }}</th>
-							<th class="border-1 py-1 px-2 fw-bold">{{ "Active" }}</th>
-							<th class="border-1 py-1 px-2 fw-bold">{{ "Actions" }}</th>
+							<th class="border-1 py-1 px-2 fw-bold">{{ $p.t("coodle/active") }}</th>
+							<th class="border-1 py-1 px-2 fw-bold">{{ $p.t("coodle/actions") }}</th>
 						</tr>
 						<tr v-for="defaultSchedule in defaultSchedules">
 							<td class="border-1 py-1 px-2">{{ defaultSchedule.description }}</td>
 							<td class="border-1 py-1 px-2">{{ defaultSchedule.type }}</td>
 							<td class="border-1 py-1 px-2"></td>
-							<td class="border-1 py-1 px-2">{{ "Yes" }}</td>
+							<td class="border-1 py-1 px-2">{{ $p.t("coodle/yes") }}</td>
 							<td class="border-1 py-1 px-2"></td>
 						</tr>
 						<template v-for="(schedule, index) in externalSchedules">
@@ -156,7 +154,7 @@ export default {
 								<td class="border-1 py-1 px-2">{{ schedule.description }}</td>
 								<td class="border-1 py-1 px-2">{{ getScheduleTypeText(schedule.type) }}</td>
 								<td class="border-1 py-1 px-2">{{ schedule.url }}</td>
-								<td class="border-1 py-1 px-2">{{ schedule.isActive ? "Yes" : "No" }}</td>
+								<td class="border-1 py-1 px-2">{{ schedule.isActive ? $p.t("coodle/yes") : $p.t("coodle/no") }}</td>
 								<td class="border-1 py-1 px-2">
 									<div class="w-100 d-flex flex-row gap-1 align-items-center justify-content-evenly">
 										<div @click="openScheduleForm(index)" type="button" class="action py-1 px-1">

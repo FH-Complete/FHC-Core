@@ -46,6 +46,10 @@ class FreeBusy extends FHCAPI_Controller
 		$this->load->model("ressource/CoodleSurvey_model", "CoodleSurveyModel");
 		$this->load->model("ressource/CoodleSurveyTimeslot_model", "CoodleSurveyTimeslotModel");
 		$this->load->model("ressource/CoodleSurveyParticipant_model", "CoodleSurveyParticipantModel");
+
+		$this->loadPhrases([
+			'coodle'
+		]);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -85,7 +89,7 @@ class FreeBusy extends FHCAPI_Controller
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
 		if (!$this->isUrlValid($url)) {
-			$this->terminateWithError("Could not open the provided URL!");
+			$this->terminateWithError($this->p->t("coodle", "url_not_working"));
 		}
 
 		$this->FreeBusyModel->insert(
@@ -119,11 +123,7 @@ class FreeBusy extends FHCAPI_Controller
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
 		if (!$this->isUrlValid($url)) {
-			$this->terminateWithError("Could not open the provided URL!");
-		}
-
-		if (!$this->isUrlValid($url)) {
-			$this->terminateWithError("Could not open the provided URL!");
+			$this->terminateWithError($this->p->t("coodle", "url_not_working"));
 		}
 
 		$existingFreeBusyEntry = $this->FreeBusyModel->load($id)->retval[0];

@@ -63,6 +63,10 @@ class CoodleSurvey extends FHCAPI_Controller
 		$this->coodlePageExternalUrl = APP_ROOT . "cis.php/Cis/CoodleExternal/{key}";
 		$this->coodleIcalUrl = APP_ROOT . "cis.php/CoodleIcal/{uid}";
 		$this->coodleIcalUrlWithEncryptedUid = APP_ROOT . "cis.php/CoodleIcal/encrypted/{encryptedUid}";
+
+		$this->loadPhrases([
+			'coodle'
+		]);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -118,7 +122,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		$key = $this->input->post("key");
 		$validatedKey = $this->validateEncryptedExternalParticipantKey($this->safeDecode($key));
 		if (!$validatedKey)
-			$this->terminateWithError("Invalid access key!");
+			$this->terminateWithError($this->p->t("coodle", "invalid_access_key_error"));
 
 		$survey = $validatedKey["survey"];
 		$externalParticipant = $validatedKey["externalParticipant"];
@@ -401,7 +405,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		$key = $this->input->post("key");
 		$validatedKey = $this->validateEncryptedExternalParticipantKey($this->safeDecode($key));
 		if (!$validatedKey)
-			$this->terminateWithError("Invalid access key!");
+			$this->terminateWithError($this->p->t("coodle", "invalid_access_key_error"));
 
 		$survey = $validatedKey["survey"];
 		$externalParticipant = $validatedKey["externalParticipant"];

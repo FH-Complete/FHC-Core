@@ -113,7 +113,7 @@ export default {
 				searchResult.users.length >= this.warningGroupSize
 			) {
 				let groupSizeWarningMessage =
-					"Group (((groupName))) contains (((n))) users. Are you sure you want to add all (((n))) users to your survey?";
+					this.$p.t("coodle/group_size_warning");
 				groupSizeWarningMessage = groupSizeWarningMessage.replace(
 					"(((groupName)))",
 					searchResult.name,
@@ -123,10 +123,10 @@ export default {
 					searchResult.users.length,
 				);
 				const groupSizeConfirmation = await this.$fhcAlert.confirm({
-					header: "Warning!",
+					header: this.$p.t("coodle/warning"),
 					message: groupSizeWarningMessage,
-					acceptLabel: "Yes",
-					rejectLabel: "Cancel",
+					acceptLabel: this.$p.t("coodle/yes"),
+					rejectLabel: this.$p.t("ui/abbrechen"),
 				});
 
 				if (!groupSizeConfirmation) return;
@@ -231,7 +231,7 @@ export default {
 						externalParticipant.email === emailInput,
 				)
 			) {
-				this.$fhcAlert.alertError("Duplicates not allowed!");
+				this.$fhcAlert.alertError(this.$p.t("coodle/duplicates_not_allowed"));
 				return;
 			}
 
@@ -254,7 +254,7 @@ export default {
 	template: /*html*/ `
 	<div class="row mb-3">
 		<div class="col-12 col-md-6 col-xxl-12 d-flex flex-column gap-1 mb-2">
-			<label for="searchInput" class="fw-bold">{{ "Internal participants" }}</label>
+			<label for="searchInput" class="fw-bold">{{ $p.t("coodle/int_participants") }}</label>
 			<div class="position-relative mb-1">
 				<input
 					v-model="searchInput"
@@ -280,7 +280,7 @@ export default {
 						v-else-if="!searchResults.length"
 						class="d-flex flex-row justify-content-center align-items-center py-3"
 					>
-						<span>{{ "No results found!" }}</span>
+						<span>{{ $p.t("coodle/no_results_found") }}</span>
 					</div>
 					<div v-else>
 						<div
@@ -330,11 +330,11 @@ export default {
 					type="button"
 					class="py-1 px-3 border border-1 rounded-pill"
 				>
-					<span>{{ "Add yourself" }}</span>
+					<span>{{ $p.t("coodle/add_yourself") }}</span>
 				</div>
 			</div>
 			<span v-if="isMaxDisplayedParticipantSchedulesReached" class="fst-italic">
-				{{ "You can display no more participant schedules!" }}
+				{{ $p.t("coodle/max_participant_schedules") }}
 			</span>
 			<div>
 				<span
@@ -343,12 +343,12 @@ export default {
 					type="button"
 					class="text-decoration-underline"
 				>
-					{{ "Hide all participant schedules" }}
+					{{ $p.t("coodle/hide_participant_schedules") }}
 				</span>
 			</div>
 		</div>
 		<div class="col-12 col-md-6 col-xxl-12 d-flex flex-column gap-1 mb-2">
-			<span class="fw-bold">{{ "External participants" }}</span>
+			<span class="fw-bold">{{ $p.t("coodle/ext_participants") }}</span>
 			<div class="d-flex flex-row gap-2 mb-1">
 				<div class="flex-grow-1 d-flex flex-column gap-2">
 					<div >
@@ -397,7 +397,7 @@ export default {
 			</div>
 		</div>
 		<span v-if="!participants.length && !externalParticipants.length" class="fst-italic">
-			{{ "No participants added yet!" }}
+			{{ $p.t("coodle/no_participants_yet") }}
 		</span>	
 	</div>
 	`,

@@ -40,7 +40,7 @@ export default {
 		</td>
 		<td class="border-1 py-2 px-2">
 			<select v-model="scheduleFormData.type" id="scheduleTypeInput" class="w-100 h-100">
-				<option value="null">{{ "--Select--" }}</option>
+				<option value="null">{{ "--" + $p.t("global/waehlen") + "--" }}</option>
 				<option v-for="type in $props.scheduleTypes" :value="type.value">{{ type.text }}</option>
 			</select>
 		</td>

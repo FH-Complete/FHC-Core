@@ -284,7 +284,9 @@ export default {
 			if (!this.$props.survey.id) return;
 
 			if (!this.selectedTimeslotId) {
-				this.$fhcAlert.alertError("You haven't made a selection!");
+				this.$fhcAlert.alertError(
+					this.$p.t("coodle/no_selection_made"),
+				);
 				return;
 			}
 
@@ -292,7 +294,8 @@ export default {
 			let selectedTimeslot = null;
 
 			if (this.selectedTimeslotId === "none") {
-				formattedSelectedTimeslot = '"No appointment is possible"';
+				formattedSelectedTimeslot =
+					'"' + this.$p.t("coodle/no_timeslot_possible") + '"';
 			} else {
 				selectedTimeslot = this.$props.timeslots.find(
 					(timeslot) => timeslot.id === this.selectedTimeslotId,
@@ -308,15 +311,15 @@ export default {
 					selectedTimeslot.endTime;
 			}
 
-			const finalSelectionConfirmationMessage =
-				'Are you sure you want to select option (((timeslot))) and finalize Coodle survey "(((surveyTitle)))"?'
-					.replace("(((timeslot)))", formattedSelectedTimeslot)
-					.replace("(((surveyTitle)))", this.$props.survey?.title);
+			const finalSelectionConfirmationMessage = this.$p
+				.t("coodle/survey_completion_confirmation")
+				.replace("(((timeslot)))", formattedSelectedTimeslot)
+				.replace("(((surveyTitle)))", this.$props.survey?.title);
 			const finalSelectionConfirmation = await this.$fhcAlert.confirm({
 				header: "Final confirmation",
 				message: finalSelectionConfirmationMessage,
-				acceptLabel: "Yes",
-				rejectLabel: "Cancel",
+				acceptLabel: this.$p.t("coodle/yes"),
+				rejectLabel: this.$p.t("ui/abbrechen"),
 			});
 			if (!finalSelectionConfirmation) return;
 
@@ -344,11 +347,10 @@ export default {
 			if (participantsThatHaveNotVoted) {
 				const shouldProceedWithoutAllVotes =
 					await this.$fhcAlert.confirm({
-						header: "Warning!",
-						message:
-							"Not all participants have voted. Are you sure you want to proceed?",
-						acceptLabel: "Yes",
-						rejectLabel: "Cancel",
+						header: this.$p.t("coodle/warning"),
+						message: this.$p.t("coodle/continue_without_all_votes"),
+						acceptLabel: this.$p.t("coodle/yes"),
+						rejectLabel: this.$p.t("ui/abbrechen"),
 					});
 				if (!shouldProceedWithoutAllVotes) return;
 			}
@@ -358,11 +360,10 @@ export default {
 				selectedTimeslot && selectedTimeslot.startsAt > now;
 			if (selectedTimeslot && isFutureTimeslot) {
 				const shouldReserveARoom = await this.$fhcAlert.confirm({
-					header: "Warning!",
-					message:
-						"Would you like to reserve a room for the selected timeslot?",
-					acceptLabel: "Yes",
-					rejectLabel: "No",
+					header: this.$p.t("coodle/room_reservation"),
+					message: this.$p.t("coodle/reserve_room_confirmation"),
+					acceptLabel: this.$p.t("coodle/yes"),
+					rejectLabel: this.$p.t("coodle/no"),
 				});
 				if (shouldReserveARoom) {
 					this.isRoomSelectionShown = true;
@@ -375,7 +376,9 @@ export default {
 		},
 		submitWithRoomSelection() {
 			if (this.availableRooms.length && !this.selectedRoomIdentifier) {
-				this.$fhcAlert.alertError("You haven't selected a room!");
+				this.$fhcAlert.alertError(
+					this.$p.t("coodle/no_room_selection"),
+				);
 				return;
 			}
 			this.submitFinalSelection();
@@ -389,11 +392,10 @@ export default {
 
 			if (!selectedTimeslotId) {
 				shouldInformParticipants = await this.$fhcAlert.confirm({
-					header: "Inform participants",
-					message:
-						"Would you like to email all participants to inform them of the survey result?",
-					acceptLabel: "Yes",
-					rejectLabel: "No",
+					header: this.$p.t("coodle/inform_participants"),
+					message: this.$p.t("coodle/email_participants_result"),
+					acceptLabel: this.$p.t("coodle/yes"),
+					rejectLabel: this.$p.t("coodle/no"),
 				});
 			} else {
 				const selectedTimeslot = this.$props.timeslots.find(
@@ -403,11 +405,12 @@ export default {
 				const isFutureTimeslot = selectedTimeslot.startsAt > now;
 				if (isFutureTimeslot) {
 					shouldInformParticipants = await this.$fhcAlert.confirm({
-						header: "Inform participants",
-						message:
-							"Would you like to email all participants with a calendar invite?",
-						acceptLabel: "Yes",
-						rejectLabel: "No",
+						header: this.$p.t("coodle/inform_participants"),
+						message: this.$p.t(
+							"coodle/email_participants_calendar_invite",
+						),
+						acceptLabel: this.$p.t("coodle/yes"),
+						rejectLabel: this.$p.t("coodle/no"),
 					});
 				}
 			}
@@ -486,13 +489,13 @@ export default {
 	template: /*html*/ `
 	<div>
 		<span v-if="!isSurveyActive" class="fst-italic">
-			{{ "Voting is closed for this survey." }}
+			{{ $p.t("coodle/voting_closed") }}
 		</span>
 		<span v-else-if="authUserParticipant" :class="{'opacity-0': !isVotingInProgress}" class="fst-italic">
 			{{
 				$props.survey?.maxSelections === 1 ?
-				"You can only select one option" :
-				"You can select up to (((n))) options.".replace("(((n)))", $props.survey?.maxSelections)
+				$p.t("coodle/max_one_selectable_timeslot") :
+				$p.t("coodle/up_to_max_selectable_timeslots").replace("(((n)))", $props.survey?.maxSelections)
 			}}
 		</span>
 		<div class="d-flex flex-row">
@@ -510,7 +513,7 @@ export default {
 							</td>
 							<td rowspan="2" class="border-1">
 								<div class="px-2 py-1 text-center">
-									{{ "No appointment is possible" }}
+									{{ $p.t("coodle/no_timeslot_possible") }}
 								</div>
 							</td>
 						</tr>
@@ -613,7 +616,7 @@ export default {
 							</td>
 						</tr>
 						<tr v-if="$props.survey.voteTallies" class="fw-bold">
-							<td class="border-1 px-2 py-1">{{ "Vote tally" }}</td>
+							<td class="border-1 px-2 py-1">{{ $p.t("coodle/vote_tally") }}</td>
 							<td v-for="timeslot in $props.timeslots" class="border-1">
 								<div class="d-flex flex-row justify-content-center">
 									{{ $props.survey.voteTallies[timeslot.id] }}
@@ -630,7 +633,7 @@ export default {
 							:class="{'fhc-body-bg': isFinalSelectionInProgress}"
 							class="fw-bold"
 						>
-							<td class="border-1 px-2 py-1">{{ "Final selected appointment" }}</td>
+							<td class="border-1 px-2 py-1">{{ $p.t("coodle/final_selection") }}</td>
 							<td v-for="timeslot in $props.timeslots" class="border-1">
 								<div class="d-flex flex-row justify-content-center py-3">
 									<input
@@ -665,17 +668,17 @@ export default {
 				<div v-if="isRoomSelectionShown" class="mt-3 overflow-y-auto" style="max-height: 200px;">
 					<div v-if="isFetchingAvailableRooms" class="d-flex justify-content-center align-items-center py-3">
 						<div class="spinner-border" role="status">
-							<span class="visually-hidden">Loading...</span>
+							<span class="visually-hidden">{{ $p.t("coodle/loading") }}</span>
 						</div>
 					</div>
 					<div v-else-if="!availableRooms.length" class="d-flex justify-content-center align-items-center py-3 px-1">
 						<h5 class="flex-shrink fw-bold text-wrap">
-							{{ "No rooms available!" }}
+							{{ $p.t("coodle/no_rooms_available") }}
 						</h5>
 					</div>
 					<div v-else class="d-flex flex-column gap-2">
 						<div class="d-flex flex-column gap-1 justify-content-start">
-							<span class="fw-bold">{{ "Available rooms:" }}</span>
+							<span class="fw-bold">{{ $p.t("coodle/available_rooms") + ":" }}</span>
 							<div class="d-flex flex-row align-items-center gap-2">
 								<input v-model="roomFilterText" :placeholder="'Filter rooms...'" id="roomFilterInput" />
 								<div
@@ -690,7 +693,7 @@ export default {
 						</div>
 						<div v-if="!filteredAvailableRooms.length" class="d-flex flex-row align-items-center justify-content-center py-3 px-1">
 							<h5 class="flex-shrink fw-bold text-wrap">
-								{{ "No available rooms match your filter!" }}
+								{{ $p.t("coodle/no_available_rooms") }}
 							</h5>
 						</div>
 						<div v-else class="d-flex flex-row flex-wrap gap-2">
@@ -718,7 +721,7 @@ export default {
 						:class="isDarkMode ? 'btn-outline-light' : 'btn-outline-dark'"
 						class="btn text-nowrap"
 					>
-						{{ "Vote" }}
+						{{ $p.t("coodle/vote") }}
 					</div>
 					<div
 						v-if="isAuthUserSurveyCreator && !isVotingInProgress && !isFinalSelectionInProgress"
@@ -726,7 +729,7 @@ export default {
 						:class="isDarkMode ? 'btn-outline-light' : 'btn-outline-dark'"
 						class="btn text-nowrap"
 					>
-						{{ "Finalize survey" }}
+						{{ $p.t("coodle/finalize_survey") }}
 					</div>
 					<div
 						v-if="isVotingInProgress || isFinalSelectionInProgress"
@@ -734,7 +737,7 @@ export default {
 						:class="isDarkMode ? 'btn-outline-light' : 'btn-outline-dark'"
 						class="btn text-nowrap"
 					>
-						{{ "Cancel" }}
+						{{ $p.t("ui/abbrechen") }}
 					</div>
 					<div
 						v-if="isVotingInProgress"
@@ -742,7 +745,7 @@ export default {
 						:class="isDarkMode ? 'btn-light' : 'btn-dark'"
 						class="btn text-nowrap"
 					>
-						{{ "Submit vote" }}
+						{{ $p.t("coodle/submit_vote") }}
 					</div>
 					<div
 						v-if="isFinalSelectionInProgress"
@@ -750,7 +753,7 @@ export default {
 						:class="isDarkMode ? 'btn-light' : 'btn-dark'"
 						class="btn text-nowrap"
 					>
-						{{ "Submit final selection" }}
+						{{ $p.t("coodle/submit_final_selection") }}
 					</div>
 				</div>
 			</div>

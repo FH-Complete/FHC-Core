@@ -93,7 +93,7 @@ export default {
 				this.startTimeInput > this.maxStartTimeInput
 			) {
 				this.$fhcAlert.alertError(
-					"Appointment start time must be between 07:00 and 22:55!",
+					this.$p.t("coodle/timeslot_start_limits"),
 				);
 				return;
 			}
@@ -169,7 +169,7 @@ export default {
 				</div>
 				<div v-else class="d-flex flex-column gap-2 flex-grow-1 justify-content-center pe-3">
 					<div class="d-flex flex-row align-items-center gap-2">
-						<label :for="'dateInput-' + $props.timeslot?.isostart" class="fw-bold">{{ "Date: " }}</label>
+						<label :for="'dateInput-' + $props.timeslot?.isostart" class="fw-bold">{{ $p.t("coodle/date") + ": " }}</label>
 						<vue-date-picker
 							@update:model-value="updateDateInput($event)"
 							:model-value="dateInput"
@@ -185,7 +185,7 @@ export default {
 						/>
 					</div>
 					<div class="d-flex flex-row gap-2">
-						<label :for="'startTimeInput-' + $props.timeslot?.isostart" class="fw-bold">{{ "Start time: " }}</label>
+						<label :for="'startTimeInput-' + $props.timeslot?.isostart" class="fw-bold">{{ $p.t("coodle/starts_at") + ": " }}</label>
 						<vue-date-picker
 							@update:model-value="updateStartTimeInput($event)"
 							:model-value="getInitialStartTimeValue()"
@@ -204,7 +204,7 @@ export default {
 					<template v-if="!isEditInProgress">
 						<div
 							@click="startEdit()"
-							:title="'Edit'"
+							:title="$p.t('coodle/edit')"
 							type="button"
 							class="p-1 fhcPrimaryHover"
 						>
@@ -212,7 +212,7 @@ export default {
 						</div>
 						<div
 							@click="$emit('deleteTimeslot')"
-							:title="'Delete'"
+							:title="$p.t('ui/loeschen')"
 							type="button"
 							class="p-1 fhcPrimaryHover"
 						>
@@ -222,7 +222,7 @@ export default {
 					<template v-else>
 						<div
 							@click="cancelEdit()"
-							:title="'Cancel'"
+							:title="$p.t('ui/abbrechen')"
 							type="button"
 							class="p-1 fhcPrimaryHover"
 						>
@@ -230,7 +230,7 @@ export default {
 						</div>
 						<div
 							@click="submitForm()"
-							:title="'Save'"
+							:title="$p.t('global/speichern')"
 							type="button"
 							class="p-1 fhcPrimaryHover"
 						>
@@ -242,7 +242,7 @@ export default {
 			<div v-else class="flex-grow-1 d-flex flex-row justify-content-center align-items-center">
 				<i
 					@click="startEdit()"
-					:title="'Add'"
+					:title="$p.t('ui/hinzufugen')"
 					type="button"
 					class="fhcPrimaryHover fa-solid fa-circle-plus fa-2xl"
 				></i>

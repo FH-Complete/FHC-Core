@@ -57,7 +57,7 @@ export default {
 	},
 	template: /*html*/ `
 	<div class="d-flex flex-column gap-2">
-		<span class="fw-bold">{{ "* " + "Appointment duration (in minutes)" }}</span>
+		<span class="fw-bold">{{ "* " + $p.t("coodle/timeslot_duration_in_minutes") }}</span>
 		<div class="overflow-x-auto">
 			<div class="d-flex flex-row align-items-center gap-2">
 				<div
@@ -70,7 +70,7 @@ export default {
 				>
 					<span>{{ durationPreset }}</span>
 				</div>
-				<span class="text-nowrap ps-2">{{ "Custom duration: " }}</span>
+				<span class="text-nowrap ps-2">{{ $p.t("coodle/custom_duration") + ": " }}</span>
 				<div
 					:class="{'fhc-primary-border-color': durationCustomInput}"
 					class="border border-2 d-flex justify-content-center align-items-center px-1"

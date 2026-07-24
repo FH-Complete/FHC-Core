@@ -36,14 +36,14 @@ export default {
 		<div class="card-body">
 			<div class="d-flex flex-column gap-3">
 				<span>
-					{{ "You can integrate your selections from active Coodle surveys into your preferred calendar application. To do so, import the .ics file from one of the following links." }}
+					{{ $p.t("coodle/ical_explainer") }}
 				</span>
 				<span>
-					{{ "To exclude identifiable survey data: " }}
+					{{ $p.t("coodle/ical_unencrypted") + ": " }}
 					<a v-if="icalLink?.length" :href="icalLink" target="_blank">{{ icalLink }}</a>
 				</span>
 				<span>
-					{{ "To include identifiable survey data: " }}
+					{{ $p.t("coodle/ical_encrypted") + ": " }}
 					<a v-if="encryptedIcalLink?.length" :href="encryptedIcalLink" target="_blank">{{ encryptedIcalLink }}</a>
 				</span>
 								
