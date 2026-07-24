@@ -16,11 +16,6 @@
  */
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
 import FhcCalendar from "../Calendar/Tempus.js";
-import FhcCoursepicker from "./Coursepicker.js";
-import LectureSelection from "./Filters/LectureSelection.js";
-import VerbandSelection from "./Filters/VerbandSelection.js";
-import RoomSelection from "./Filters/RoomSelection.js";
-import ParkingSlot from "./ParkingSlot.js";
 import ApiKalender from "../../api/factory/tempus/kalender.js";
 import ApiSearchbar from "../../api/factory/searchbar.js";
 import ApiRenderers from "../../api/factory/renderers.js";
@@ -33,7 +28,6 @@ import BsModal from "../Bootstrap/Modal.js";
 
 import ApiStudiengangTree from "../../api/factory/tempus/studiengangtree.js";
 import ApiInfo from "../../api/factory/tempus/info.js";
-import StvStudiensemester from "../Stv/Studentenverwaltung/Studiensemester.js";
 import Reservierung from "./Reservierung.js";
 import { getTempusShortcuts } from "./shortcuts.js";
 import KeyboardShortcuts from "./KeyboardShortcuts.js";
@@ -46,23 +40,19 @@ import { getTempusSearchbarOptions } from "./Filters/searchbarOptions.js";
 import TempusHeader from "./Header.js";
 import TempusAppMenu from "./AppMenu.js";
 import TempusVerbandMenu from "./VerbandMenu.js";
+import TempusSidebarMenu from "./SidebarMenu.js";
 
 export default {
   name: "Tempus",
   components: {
     VerticalSplit,
     FhcCalendar,
-    FhcCoursepicker,
-    LectureSelection,
-    VerbandSelection,
-    RoomSelection,
-    ParkingSlot,
     AppConfig,
     TempusAppMenu,
     TempusHeader,
     BsModal,
     TempusVerbandMenu,
-    StvStudiensemester,
+    TempusSidebarMenu,
     Multiselect: primevue.multiselect,
     Reservierung,
     KeyboardShortcuts,
@@ -217,7 +207,7 @@ export default {
 
       await this.deleteEntryCall(orig);
       this.$refs.calendar.resetEventLoader();
-      this.$refs.coursepicker.reload();
+      this.$refs.sidebar.reloadCoursepicker();
     },
     async deleteEntries(origList) {
       let validList = (origList ?? []).filter((orig) => orig?.kalender_id);
@@ -227,13 +217,16 @@ export default {
         validList.map((orig) => this.deleteEntryCall(orig)),
       );
       this.$refs.calendar.resetEventLoader();
-      this.$refs.coursepicker.reload();
+      this.$refs.sidebar.reloadCoursepicker();
     },
     async deleteEntryCall(orig) {
       await this.$api
         .call(ApiKalender.deleteEntry(orig.kalender_id))
         .then(() => {
-          this.$refs.parking.unpark({ type: orig.type, id: orig.kalender_id });
+          this.$refs.sidebar.unpark({
+            type: orig.type,
+            id: orig.kalender_id,
+          });
         });
     },
     async openHistory(orig) {
@@ -534,7 +527,7 @@ export default {
         dates.end_time,
         () => {
           this.$refs.calendar.resetEventLoader();
-          this.$refs.coursepicker.reload();
+          this.$refs.sidebar.reloadCoursepicker();
         },
       );
     },
@@ -603,7 +596,7 @@ export default {
           .then((result) => result.data)
           .then((result) => {
             this.$refs.calendar.resetEventLoader();
-            this.$refs.coursepicker.reload();
+            this.$refs.sidebar.reloadCoursepicker();
             this.bcc.postMessage("dropped");
           });
       } else if (obj.type === "kalender") {
@@ -614,7 +607,7 @@ export default {
           start_time,
           end_time,
           () => {
-            this.$refs.parking.unpark({
+            this.$refs.sidebar.unpark({
               type: obj.type,
               id: obj.orig.kalender_id,
             });
@@ -638,7 +631,7 @@ export default {
     },
     onMultiWeekConfirmed() {
       this.$refs.calendar.resetEventLoader();
-      this.$refs.coursepicker.reload();
+      this.$refs.sidebar.reloadCoursepicker();
       this.bcc.postMessage("dropped");
     },
     handleRange(range) {
@@ -765,6 +758,10 @@ export default {
         this.$refs.calendar.resetEventLoader();
       }
     },
+    handlePreviewRoleChange(role) {
+      this.previewRole = role;
+      this.$refs.calendar.resetEventLoader();
+    },
     triggerSync() {
       this.$api
         .call(ApiKalender.sync())
@@ -782,10 +779,13 @@ export default {
       const event = this.hoveredEvent;
       if (!event?.kalender_id) return;
 
-      if (this.$refs.parking.isParked(event.kalender_id)) {
-        this.$refs.parking.unpark({ type: event.type, id: event.kalender_id });
+      if (this.$refs.sidebar.isParked(event.kalender_id)) {
+        this.$refs.sidebar.unpark({
+          type: event.type,
+          id: event.kalender_id,
+        });
       } else {
-        this.$refs.parking.park(null, {
+        this.$refs.sidebar.park({
           type: "kalender",
           id: event.kalender_id,
           orig: event,
@@ -913,91 +913,24 @@ export default {
 		<div class="container-fluid overflow-hidden heightfull">
 			<div class="row h-100">
 				<tempus-app-menu />
-				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100 d-flex flex-column">
-					<div class="sidebar-icons d-flex flex-row align-items-start py-2 gap-1 ps-2">
-						<button
-							class="btn btn-outline-secondary"
-							type="button"
-							data-bs-toggle="offcanvas"
-							data-bs-target="#verbandMenu"
-							aria-controls="verbandMenu"
-							aria-expanded="false"
-							title="Verband"
-						>
-							<span class="fa-solid fa-university"></span>
-						</button>
-						<button
-							class="btn btn-outline-secondary"
-							type="button"
-							data-bs-toggle="offcanvas"
-							data-bs-target="#verbandMenu"
-							aria-controls="verbandMenu"
-							aria-expanded="false"
-							title="Verband"
-						>
-							<span class="fa-solid fa-door-open"></span>
-						</button>
-					</div>
-					<div class="px-2 py-1 w-100">
-						<div
-              class="d-flex gap-1 py-1"
-              data-cy="previewRoleOptionsHolder"
-            >
-							<button
-								class="btn btn-sm"
-								:class="previewRole === 'planer' ? 'btn-dark' : 'btn-outline-dark'"
-								@click="previewRole = 'planer'; $refs.calendar.resetEventLoader()"
-							>
-								<i class="fa-solid fa-pen-ruler me-1"></i>Planer
-							</button>
-							<button
-								class="btn btn-sm"
-								:class="previewRole === 'lektor' ? 'btn-primary' : 'btn-outline-primary'"
-								@click="previewRole = 'lektor'; $refs.calendar.resetEventLoader()"
-							>
-								<i class="fa-solid fa-chalkboard-user me-1"></i>Lektor
-							</button>
-							<button
-								class="btn btn-sm"
-								:class="previewRole === 'student' ? 'btn-success' : 'btn-outline-success'"
-								@click="previewRole = 'student'; $refs.calendar.resetEventLoader()"
-							>
-								<i class="fa-solid fa-user-graduate me-1"></i>Student
-							</button>
-							<button
-								class="btn btn-sm btn-outline-danger"
-								@click="triggerSync"
-							>
-								<i class="fa-solid fa-rotate me-1"></i>Sync
-							</button>
-						</div>
-					</div>
-					<room-selection
-						v-if="rooms.length"
-						v-model:rooms="rooms"
-					></room-selection>
-					<verband-selection
-						v-if="studiengaenge.length"
-						v-model:studiengaenge="studiengaenge"
-						:studiengaenge-all="studiengaenge_all"
-					></verband-selection>
-					<lecture-selection
-						v-if="lecturers.length"
-						:lecturers="lecturers"
-						@remove="removeLecturer"
-					></lecture-selection>
-					<div class="d-flex flex-column flex-grow-1" style="min-height: 0">
-						<parking-slot
-							ref="parking"
-							v-model:parked-keys="parkedKeys"
-						></parking-slot>
-						
-						<fhc-coursepicker ref="coursepicker" :studiengaenge="studiengaenge" @select-lecturer="setEmp" @select-kw="jumpToKw" :studiensemester="selectedStudiensemester"></fhc-coursepicker>
-
-					</div>
-					<stv-studiensemester v-model:studiensemester-kurzbz="selectedStudiensemester"></stv-studiensemester>
-
-				</nav>
+				<tempus-sidebar-menu
+					ref="sidebar"
+					:preview-role="previewRole"
+					:rooms="rooms"
+					:studiengaenge="studiengaenge"
+					:studiengaenge-all="studiengaenge_all"
+					:lecturers="lecturers"
+					:selected-studiensemester="selectedStudiensemester"
+					@update:preview-role="handlePreviewRoleChange"
+					@update:rooms="rooms = $event"
+					@update:studiengaenge="studiengaenge = $event"
+					@update:parked-keys="parkedKeys = $event"
+					@update:selected-studiensemester="selectedStudiensemester = $event"
+					@remove-lecturer="removeLecturer"
+					@select-lecturer="setEmp"
+					@select-kw="jumpToKw"
+					@sync="triggerSync"
+				/>
 				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
 					<fhc-calendar
 						ref="calendar"
