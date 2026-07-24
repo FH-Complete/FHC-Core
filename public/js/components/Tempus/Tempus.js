@@ -26,13 +26,11 @@ import ApiSearchbar from "../../api/factory/searchbar.js";
 import ApiRenderers from "../../api/factory/renderers.js";
 import ApiTempusConfig from "../../api/factory/tempus/config.js";
 import ApiBetriebsmittel from "../../api/factory/betriebsmittel.js";
-import AppMenu from "../AppMenu.js";
 import drop from "../../directives/drop.js";
 import AppConfig from "../AppConfig.js";
 
 import BsModal from "../Bootstrap/Modal.js";
 
-import StvVerband from "../Stv/Studentenverwaltung/Verband.js";
 import ApiStudiengangTree from "../../api/factory/tempus/studiengangtree.js";
 import ApiInfo from "../../api/factory/tempus/info.js";
 import StvStudiensemester from "../Stv/Studentenverwaltung/Studiensemester.js";
@@ -46,6 +44,8 @@ import ResourcesAssignmentModal from "./ResourcesAssignmentModal.js";
 import TagsAssignmentModal from "./TagsAssignmentModal.js";
 import { getTempusSearchbarOptions } from "./Filters/searchbarOptions.js";
 import TempusHeader from "./Header.js";
+import TempusAppMenu from "./AppMenu.js";
+import TempusVerbandMenu from "./VerbandMenu.js";
 
 export default {
   name: "Tempus",
@@ -58,10 +58,10 @@ export default {
     RoomSelection,
     ParkingSlot,
     AppConfig,
-    AppMenu,
+    TempusAppMenu,
     TempusHeader,
     BsModal,
-    StvVerband,
+    TempusVerbandMenu,
     StvStudiensemester,
     Multiselect: primevue.multiselect,
     Reservierung,
@@ -274,12 +274,6 @@ export default {
       this.ort_kurzbz = data.ort_kurzbz;
       this.rooms = [{ ort_kurzbz: data.ort_kurzbz }];
     },
-    onSelectVerbandAndClose(payload) {
-      console.log(payload);
-      this.onSelectVerband(payload);
-      bootstrap.Offcanvas.getOrCreateInstance(this.$refs.verbandMenu).hide();
-    },
-
     onSelectVerband({ link, studiengang_kz, semester, orgform_kurzbz, name }) {
       if (orgform_kurzbz) {
         semester = null;
@@ -918,15 +912,7 @@ export default {
 		/>
 		<div class="container-fluid overflow-hidden heightfull">
 			<div class="row h-100">
-				<aside id="appMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">
-					<div class="offcanvas-header">
-						Tempus
-						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
-					</div>
-					<div class="offcanvas-body">
-						<app-menu app-identifier="tempus" />
-					</div>
-				</aside>
+				<tempus-app-menu />
 				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100 d-flex flex-column">
 					<div class="sidebar-icons d-flex flex-row align-items-start py-2 gap-1 ps-2">
 						<button
@@ -1036,15 +1022,10 @@ export default {
 			</div>
 		</div>
 		<app-config ref="config" v-model="appconfig" :endpoints="configEndpoints"></app-config>
-		<div id="verbandMenu" ref="verbandMenu" class="offcanvas offcanvas-start col-md p-md-0 h-100" tabindex="-1" data-cy="verbandMenu">
-			<div class="offcanvas-header justify-content-end px-1 d-md-none">
-				<h5 class="offcanvas-title" id="verbandMenuLabel">
-					<i class="fa-solid fa-university me-2"></i>Verband
-				</h5>
-				<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
-			</div>
-			<stv-verband :endpoint="endpoint" @select-verband="onSelectVerbandAndClose" class="col" style="height:0%"></stv-verband>
-		</div>
+		<tempus-verband-menu
+			:endpoint="endpoint"
+			@select-verband="onSelectVerband"
+		/>
 		<bs-modal ref="raumModal" class="bootstrap-prompt">
 			<template #title>Raumauswahl</template>
 			<template #default>
