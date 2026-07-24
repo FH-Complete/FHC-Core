@@ -47,7 +47,7 @@ class LvPlan extends FHCAPI_Controller
 			'fetchFerienEvents' => self::PERM_LOGGED,
 			'getStudiengaenge' => self::PERM_LOGGED,
 			'getLehrverband' => self::PERM_LOGGED,
-			'permissionOtherLvPlan' => self::PERM_LOGGED,
+			'permissionOtherLvPlan' => self::PERM_ANONYMOUS,
 			'compactibleEventTypes' => self::PERM_LOGGED,
 		]);
 
@@ -60,6 +60,7 @@ class LvPlan extends FHCAPI_Controller
 			'dbExecuteUser' => 'RESTful API'
 		));
 
+		$this->load->library('PermissionLib');
 		$this->load->library('form_validation');
 	}
 
@@ -396,7 +397,7 @@ class LvPlan extends FHCAPI_Controller
 	 */
 	public function permissionOtherLvPlan()
 	{
-		$this->terminateWithSuccess($this->permissionlib->isBerechtigt('basis/other_lv_plan'));
+		$this->terminateWithSuccess(getAuthUID() && $this->permissionlib->isBerechtigt('basis/other_lv_plan'));
 	}
 
 	/**

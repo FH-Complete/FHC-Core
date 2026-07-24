@@ -25,23 +25,16 @@ $this->load->view('templates/FHC-Header', $includesArray);
 		document.body.classList.add("in-frame");
 </script>
 
-<?php
-if (!isset($isExternal) || !$isExternal) {
-?>
-
 <header id="cis-header" class="navbar-dark">
 	<cis-menu 
 		root-url="<?= site_url(''); ?>" 
 		logo-url="<?= base_url($this->config->item('theme_logo')); ?>" 
-		avatar-url="<?= site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>" 
+		avatar-url="<?= isset($isExternal) && $isExternal ? '' : site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>" 
 		logout-url="<?= site_url('Cis/Auth/logout'); ?>"
 		:searchbaroptions="searchbaroptions" 
 		:searchfunction="searchfunction"
+		:is-external="<?= isset($isExternal) && $isExternal ? 1 : 0 ?>"
 		></cis-menu>
 </header>
-
-<?php
-}
-?>
 
 <main id="cis-main" class="flex-grow-1 p-4 pt-2" style="min-width: 0;">

@@ -18,7 +18,8 @@ export default {
         logoutUrl: String,
 		selectedtypes: Array,
         searchbaroptions: Object,
-        searchfunction: Function
+        searchfunction: Function,
+		isExternal: Boolean,
     },
     data: () => {
         return {
@@ -104,7 +105,9 @@ export default {
 		},
 	},
 	created(){
-		this.fetchMenu();
+		if (!this.$props.isExternal) {
+			this.fetchMenu();
+		}
 	},
 	mounted(){
 		this.$p.loadCategory(['ui', 'global', 'profilUpdate'])
@@ -113,17 +116,17 @@ export default {
 		});
 	},
     template: /*html*/`
-	<div id="cis-header-bar" class="d-flex flex-row flex-grow-1">
-		<div id="nav-logo" class="d-none d-lg-block">
+	<div id="cis-header-bar" :class="{'justify-content-between': $props.isExternal}" class="d-flex flex-row flex-grow-1">
+		<div id="nav-logo" :class="{'d-none d-lg-block': !$props.isExternal}">
 			<div class="d-flex h-100 justify-content-between">
 				<a :href="rootUrl">
 					<img :src="logoUrl" alt="Corporate Identity Logo">
 				</a>
 			</div>
 		</div>
-
+		
 		<div
-			v-if="isNarrow"
+			v-if="isNarrow && !$props.isExternal"
 			:class="{'collapse multi-collapse collapse-horizontal show': isMobile}"
 			id="navbar-toggler-collapsible"
 		>
@@ -135,6 +138,7 @@ export default {
 		</div>
 
 		<fhc-searchbar
+			v-if="!$props.isExternal"
 			:searchoptions="searchbaroptions"
 			:searchfunction="searchfunction"
 			ref="searchbar"
@@ -159,6 +163,7 @@ export default {
 		</fhc-searchbar>
 		
 		<div
+			v-if="!$props.isExternal"
 			id="options-collapsible"
 			:class="{'collapse multi-collapse collapse-horizontal show': isMobile}"
 		>
@@ -184,9 +189,40 @@ export default {
 				</div>
 			</div>
 		</div>
+
+		<div v-if="$props.isExternal" class="d-flex flex-row align-items-center justify-content-center gap-2 pe-2">
+			<theme-switch></theme-switch>
+			<div>
+				<span
+					id="externalPageLanguageDropdownToggler"
+					data-bs-toggle="collapse"
+					data-bs-target="#externalPageLanguageDropdown"
+					aria-expanded="false"
+					aria-controls="externalPageLanguageDropdown"
+					class="fhc-primary-highlight-bg align-self-center btn btn-secondary rounded-5"
+				>
+					<i class="fa-solid fa-language fa-2xl"></i>
+				</span>
+				<div
+					id="externalPageLanguageDropdown"
+					ref="externalPageLanguageDropdown"
+					class="top-100 end-0 collapse position-absolute"
+					aria-labelledby="externalPageLanguageDropdownToggler"
+				>
+					<cis-sprachen />
+				</div>
+			</div>
+		</div>
 	</div>
 
-    <nav id="nav-main" class="offcanvas offcanvas-start" tabindex="-1" aria-labelledby="nav-main-btn" data-bs-backdrop="false">
+    <nav
+		v-if="!$props.isExternal"
+		id="nav-main"
+		class="offcanvas offcanvas-start"
+		tabindex="-1"
+		aria-labelledby="nav-main-btn"
+		data-bs-backdrop="false"
+	>
 		<div id="nav-main-sticky">
 			<div class="d-flex flex-row h-100">
 				<div class="offcanvas-body p-0">
