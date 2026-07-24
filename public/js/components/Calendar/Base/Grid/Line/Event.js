@@ -35,6 +35,10 @@ export default {
 		onDrop: {
 			from: "onDrop",
 			default: () => null
+		},
+		onDropEvent: {
+			from: "onDropEvent",
+			default: () => () => {}
 		}
 	},
 	props: {
@@ -128,13 +132,7 @@ export default {
 				});
 			}
 
-			return this.onDrop({
-				item: [obj],
-				start: this.event.start.toISO(),
-				end: this.event.end.toISO(),
-				ctrlKey: false,
-				targetKalenderId: null
-			});
+			return this.onDropEvent(evt, items, this.event.start.startOf('day'));
 		},
 	},
 	template:`
