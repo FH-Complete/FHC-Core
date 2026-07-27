@@ -345,7 +345,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
-		$this->load->library('SearchLib', ["config" => "searchCoodleParticipants"]);
+		$this->load->library('SearchLib', ["config" => "search_coodle_participants"]);
 		$result = $this->searchlib->search($searchString, ["employee", "student", "group"]);
 		$data = $this->getDataOrTerminateWithError($result);
 
