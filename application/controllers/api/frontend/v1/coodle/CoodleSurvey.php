@@ -338,16 +338,18 @@ class CoodleSurvey extends FHCAPI_Controller
 	public function searchParticipants()
 	{
 		$searchString = $this->input->post("searchString");
+		$this->form_validation->set_data([
+			"searchString" => $searchString,
+		]);
+		$this->form_validation->set_rules("searchString", "Search text", "required|max_length[255]");
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
-		if (!$searchString || !strlen($searchString))
-			$this->terminateWithError("Empty search input!");
+		$this->load->library('SearchLib', ["config" => "searchCoodleParticipants"]);
+		$result = $this->searchlib->search($searchString, ["employee", "student", "group"]);
+		$data = $this->getDataOrTerminateWithError($result);
 
-		$users = $this->searchUsersAsParticipants($searchString);
-		$groups = $this->searchGroupsAsParticipants($searchString);
-
-		$potentialParticipants = array_merge($users, $groups);
-
-		$this->terminateWithSuccess($potentialParticipants);
+		$this->terminateWithSuccess($data);
 	}
 
 	public function submitParticipantSelection()
@@ -912,122 +914,6 @@ class CoodleSurvey extends FHCAPI_Controller
 			return $participant;
 		}, $participants);
 		return $result;
-	}
-
-	private function searchUsersAsParticipants($searchString)
-	{
-		$searchStrings = explode(" ", strtolower($searchString));
-
-		$firstSearchString = $searchStrings[0];
-		$remainingSearchStrings = array_slice($searchStrings, 1);
-
-		$query = "SELECT
-				'user' AS type,
-				benutzer.uid AS uid,
-				person.vorname || ' ' || person.nachname AS name
-				FROM public.tbl_person person
-				JOIN public.tbl_benutzer benutzer ON(benutzer.person_id = person.person_id)
-				WHERE (LOWER(person.vorname || ' ' || person.nachname) LIKE '%" . $firstSearchString . "%'
-				OR benutzer.uid LIKE '%" . $firstSearchString . "%')
-		";
-
-		if (count($remainingSearchStrings)) {
-			foreach ($remainingSearchStrings as $remainingSearchString) {
-				$query .= " AND (LOWER(person.vorname || ' ' || person.nachname) LIKE '%" . $remainingSearchString . "%'
-				OR benutzer.uid LIKE '%" . $remainingSearchString . "%')";
-			}
-		}
-
-		$query .= "ORDER BY benutzer.uid
-			LIMIT 25";
-
-		$dbModel = new DB_Model();
-		$usersQueryResult = $dbModel->execReadOnlyQuery($query);
-
-		if (hasData($usersQueryResult)) {
-			return getData($usersQueryResult);
-		} else {
-			return [];
-		}
-
-	}
-
-	private function searchGroupsAsParticipants($searchString)
-	{
-		$searchStrings = explode(" ", strtolower($searchString));
-
-		$firstSearchString = $searchStrings[0];
-		$remainingSearchStrings = array_slice($searchStrings, 1);
-
-		$groupsQuery = "
-			SELECT
-				'group' AS type,
-				gruppe_kurzbz AS name
-				FROM public.tbl_gruppe
-				WHERE LOWER(gruppe_kurzbz) LIKE '%" . $firstSearchString . "%'
-		";
-
-		if (count($remainingSearchStrings)) {
-			foreach ($remainingSearchStrings as $remainingSearchString) {
-				$groupsQuery .= " AND LOWER(gruppe_kurzbz) LIKE '%" . $remainingSearchString . "%'";
-			}
-		}
-
-		$groupsQuery .= " LIMIT 25";
-
-		$dbModel = new DB_Model();
-		$groupsQueryResult = $dbModel->execReadOnlyQuery($groupsQuery);
-		// return getData($groupsQueryResult);
-
-		$groups = hasData($groupsQueryResult) ? getData($groupsQueryResult) : [];
-		if (!count($groups))
-			return $groups;
-
-		$groupNames = array_map(function ($group) {
-			return $group->name;
-		}, $groups);
-
-
-		$userGroupsQuery = "SELECT
-				benutzerGruppe.uid as uid,
-				benutzerGruppe.gruppe_kurzbz as group,
-				person.vorname || ' ' || person.nachname AS name
-				FROM public.tbl_benutzergruppe benutzerGruppe
-				JOIN public.tbl_benutzer benutzer ON(benutzer.uid = benutzerGruppe.uid)
-				JOIN public.tbl_person person ON(person.person_id = benutzer.person_id)
-				WHERE gruppe_kurzbz IN ('" . implode("', '", $groupNames) . "')
-		";
-		$userGroupsQueryResult = $dbModel->execReadOnlyQuery($userGroupsQuery);
-
-		$users = hasData($userGroupsQueryResult) ? getData($userGroupsQueryResult) : [];
-		if (!count($users))
-			return [];
-
-		$groupedUsers = [];
-
-		foreach ($users as $user) {
-			$userData = [
-				"uid" => $user->uid,
-				"name" => $user->name,
-			];
-
-			$group = $user->group;
-
-			if (isset($groupedUsers[$group])) {
-				$groupedUsers[$group][] = $userData;
-			} else {
-				$groupedUsers[$group] = [$userData];
-			}
-		}
-
-		$groups = array_map(function ($group) use ($groupedUsers) {
-			$group->users = isset($groupedUsers[$group->name]) ? $groupedUsers[$group->name] : [];
-			return $group;
-		}, $groups);
-		$groups = array_filter($groups, function ($group) {
-			return count($group->users);
-		});
-		return $groups;
 	}
 
 	private function writeToCoodleIcsFile($calendarFilePath, $id, $title, $startUTC, $endUTC, $location, $organizerName, $organizerEmail)

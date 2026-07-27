@@ -40,9 +40,11 @@ export default {
 					CoodleApi.searchParticipants(this.searchInput),
 					{ signal: this.searchParticipantsAbortController.signal },
 				);
-				this.searchResults = participantsSearchResponse.data;
-
 				this.isSearchingForParticipants = false;
+
+				this.parseParticipantSearchResults(
+					participantsSearchResponse.data,
+				);
 			}, 300),
 			hideSearchResults: debounce(async () => {
 				this.areSearchResultsShown = false;
@@ -107,13 +109,44 @@ export default {
 		},
 	},
 	methods: {
+		parseParticipantSearchResults(searchResults) {
+			this.searchResults = searchResults
+				.map((searchResult) => {
+					let data = JSON.parse(searchResult.data);
+					if (data.uid) {
+						return {
+							rank: searchResult.rank,
+							type: "user",
+							name: data.name,
+							uid: data.uid,
+						};
+					} else {
+						return {
+							rank: searchResult.rank,
+							type: "group",
+							name: data.name,
+							users: data.user_uids.map((userUid, index) => {
+								return {
+									uid: userUid,
+									name: data.user_names[index],
+								};
+							}),
+						};
+					}
+				})
+				.toSorted(
+					(searchResultA, searchResultB) =>
+						searchResultB.rank - searchResultA.rank,
+				);
+		},
 		async selectSearchResult(searchResult) {
 			if (
 				searchResult.type === "group" &&
 				searchResult.users.length >= this.warningGroupSize
 			) {
-				let groupSizeWarningMessage =
-					this.$p.t("coodle/group_size_warning");
+				let groupSizeWarningMessage = this.$p.t(
+					"coodle/group_size_warning",
+				);
 				groupSizeWarningMessage = groupSizeWarningMessage.replace(
 					"(((groupName)))",
 					searchResult.name,
@@ -231,7 +264,9 @@ export default {
 						externalParticipant.email === emailInput,
 				)
 			) {
-				this.$fhcAlert.alertError(this.$p.t("coodle/duplicates_not_allowed"));
+				this.$fhcAlert.alertError(
+					this.$p.t("coodle/duplicates_not_allowed"),
+				);
 				return;
 			}
 

@@ -872,3 +872,19 @@ $config['dms'] = [
 				)
 			)"
 ];
+
+$config['group'] = [
+	'primarykey' => 'gruppe_kurzbz',
+	'table' => 'public.tbl_gruppe',
+	'searchfields' => [
+		'gruppe_kurzbz' => [
+			'comparison' => 'similar',
+			'field' => 'gruppe_kurzbz',
+		],
+	],
+	'resultfields' => [
+		"g.gruppe_kurzbz as name",
+	],
+	'resultjoin' => "
+		JOIN public.tbl_gruppe g USING (gruppe_kurzbz)"
+];
