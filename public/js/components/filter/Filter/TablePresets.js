@@ -27,7 +27,6 @@ export default {
 		tabulator: { type: Object },
 		generalPresets: { type: Array, default: [] },
 	},
-	emits: ["applyTablePreset"],
 	data: function () {
 		return {
 			customUserPresets: [],
