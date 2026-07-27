@@ -9,9 +9,13 @@ export default class ResponsiveLayoutExtensionModule extends ResponsiveLayout {
 	}
 
 	generateCollapsedRowData(row) {
-		let result = super.generateCollapsedRowData(row)
-		const isLocalizationEnabled = this.table.options.locale && this.table.options.locale !== "default";
-		const columnHeadingTranslations = this.table?.getLang()?.columns;
+		let result = super.generateCollapsedRowData(row);
+		const isLocalizationEnabled =
+			this.table.options.locale &&
+			this.table.options.locale !== "default";
+		const columnHeadingTranslations = this.table?.initialized
+			? this.table.getLang()?.columns
+			: null;
 
 		if (isLocalizationEnabled && columnHeadingTranslations) {
 			result = result.map((column) => {
