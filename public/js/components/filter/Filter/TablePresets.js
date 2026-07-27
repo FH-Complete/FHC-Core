@@ -27,6 +27,7 @@ export default {
 		tabulator: { type: Object },
 		generalPresets: { type: Array, default: [] },
 	},
+	emits: ["tablePresetApplied"],
 	data: function () {
 		return {
 			customUserPresets: [],
@@ -385,6 +386,8 @@ export default {
 		},
 		async applyPreset(preset) {
 			preset = this.syncPresetWithConfig(preset);
+			window.localStorage["tabulatorPreset-" + this.$props.presetsId] =
+				preset.id ? "custom:" + preset.id : "general:" + preset.name;
 
 			let columns = this.$props.tabulator
 				.getColumnDefinitions()
@@ -457,10 +460,34 @@ export default {
 				]);
 			return Object.fromEntries(columnFieldTitlePairs);
 		},
+		applyStoredPreset() {
+			let storedPreset =
+				window.localStorage["tabulatorPreset-" + this.$props.presetsId];
+			if (!storedPreset) return;
+
+			let preset = null;
+
+			if (storedPreset.search("custom:") === 0) {
+				const customPresetId = parseInt(storedPreset.slice(7));
+				preset = this.customUserPresets.find(
+					(customPreset) => customPreset.id === customPresetId,
+				);
+			} else if (storedPreset.search("general:") === 0) {
+				const generalPresetName = storedPreset.slice(8);
+				preset = this.$props.generalPresets.find(
+					(generalPreset) => generalPreset.name === generalPresetName,
+				);
+			}
+
+			if (!preset) return;
+
+			this.applyPreset(preset);
+		},
 	},
 	async created() {
 		await this.$p.loadCategory(["tabulator_presets", "global"]);
 		await this.fetchCustomUserTabulatorPresets();
+		this.applyStoredPreset();
 	},
 	template: /*html*/ `
 	<div>
