@@ -1,7 +1,6 @@
 import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
 import Mailverteiler from "./ProfilComponents/Mailverteiler.js";
 import AusweisStatus from "./ProfilComponents/FhAusweisStatus.js";
-import QuickLinks from "./ProfilComponents/QuickLinks.js";
 import Adresse from "./ProfilComponents/Adresse.js";
 import Kontakt from "./ProfilComponents/Kontakt.js";
 import ProfilEmails from "./ProfilComponents/ProfilEmails.js";
@@ -9,6 +8,8 @@ import RoleInformation from "./ProfilComponents/RoleInformation.js";
 import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
 import FetchProfilUpdates from "./ProfilComponents/FetchProfilUpdates.js";
 import EditProfil from "./ProfilModal/EditProfil.js";
+import QuickLinks from "./ProfilComponents/QuickLinks.js";
+import CalendarSync from "./ProfilComponents/CalendarSync.js";
 
 import ApiProfilUpdate from '../../../api/factory/profilUpdate.js';
 import { dateFilter } from '../../../tabulator/filters/Dates.js';
@@ -18,7 +19,6 @@ export default {
 		CoreFilterCmpt,
 		Mailverteiler,
 		AusweisStatus,
-		QuickLinks,
 		Adresse,
 		Kontakt,
 		ProfilEmails,
@@ -26,6 +26,8 @@ export default {
 		ProfilInformation,
 		FetchProfilUpdates,
 		EditProfil,
+		QuickLinks,
+		CalendarSync,
 	},
 	inject: ["sortProfilUpdates", "collapseFunction", "isEditable"],
 	data() {
@@ -45,7 +47,8 @@ export default {
 					title: "placeholder",
 					titlePhrase: "profil/zutrittsGruppen",
 					field: "bezeichnung"
-				}],
+					}
+				],
 			},
 			betriebsmittel_table_options: {
 				persistenceID: "filterTableStudentProfilBetriebsmittel",
@@ -57,6 +60,7 @@ export default {
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
 				responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
+				responsiveLayoutCollapseStartOpen: false,
 				locale: true,
 				columns: [
 					{
@@ -109,6 +113,7 @@ export default {
 	props: {
 		data: Object,
 		editData: Object,
+		calendarSyncUrls: Array,
 	},
 	provide() {
 		return {
@@ -118,11 +123,9 @@ export default {
 	methods: {
 
 		betriebsmittelTableBuilt: function () {
-			this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
 			this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
 		},
 		zutrittsgruppenTableBuilt: function () {
-			this.$refs.zutrittsgruppenTable.tabulator.setColumns(this.zutrittsgruppen_table_options.columns)
 			this.$refs.zutrittsgruppenTable.tabulator.setData(
 				this.data.zuttritsgruppen
 			);
@@ -230,6 +233,10 @@ export default {
 					label: `${this.$p.t('person','personenkennzeichen')}`,
 					value: this.data.personenkennzeichen
 				},
+				matrikelnummer: {
+					label: this.$p.t('person/matrikelnummer'),
+					value: this.data.matrikelnummer
+				},
 				studiengang: {
 					label: `${this.$p.t('lehre','studiengang')}`,
 					value: this.data.studiengang
@@ -248,6 +255,11 @@ export default {
 				}
 			};
 		},
+		quickLinks() {
+			let quickLinks = [];
+			//
+			return quickLinks;
+		},
 	},
 	created() {
 		//? sorts the profil Updates: pending -> accepted -> rejected
@@ -259,15 +271,7 @@ export default {
     :value="JSON.parse(JSON.stringify(filteredEditData))" :titel="$p.t('profil','profilBearbeiten')"></edit-profil>
     <!-- ROW -->
     <div class="row">
-        <!-- HIDDEN QUICK LINKS -->
         <div  class="d-md-none col-12 ">
-            <!--TODO: uncomment when implemented
-			<div class="row py-2">
-                <div class="col">
-                    <quick-links :title="$p.t('profil','quickLinks')" :mobile="true"></quick-links>
-                </div>
-            </div>-->
-
 			<!-- Bearbeiten Button -->
 			<div v-if="isEditable" class="row ">
 				<div class="col mb-3">
@@ -281,14 +285,13 @@ export default {
 					</button>
 				</div>
 			</div>
+			<!-- MOBILE PROFIL UPDATES -->
 				<div v-if="data.profilUpdates" class="row mb-3">
 					<div class="col">
-						<!-- MOBILE PROFIL UPDATES -->
 						<fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates"  :data="data.profilUpdates"></fetch-profil-updates>
 					</div>
 				</div>
 			</div>
-			<!-- END OF HIDDEN QUCK LINKS -->
 
 			<!-- MAIN PANNEL -->
 			<div class="col-sm-12 col-md-8 col-xxl-9 ">
@@ -297,30 +300,42 @@ export default {
 				<!-- ROW WITH THE PROFIL INFORMATION -->
 				<div class="row mb-4 ">
 					<div  class="col-lg-12 col-xl-6 ">
+						<!-- PROFIL INFORMATION -->
 						<div class="row mb-4">
 							<div class="col">
-								<!-- PROFIL INFORMATION -->
 								<profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','studentIn')" :data="profilInformation" :fotoStatus="fotoStatus"></profil-information>
 							</div>
 						</div>
+						<!-- QUICK LINKS, MOBILE VIEW (HIDDEN IF VIEWPORT >= MD BREAKPOINT) -->
+						<div v-if="quickLinks.length" class="row mb-4 d-md-none">
+							<div class="col">
+								<quick-links :title="$p.t('profil/quickLinks')" :links="quickLinks" />
+							</div>
+						</div>
+						<!-- CALENDAR SYNC OPTIONS, MOBILE VIEW (HIDDEN IF VIEWPORT >= MD BREAKPOINT) -->
+						<div class="row mb-4 d-md-none">
+            			    <div class="col">
+								<calendar-sync :uid="$props.data.username" :calendarSyncUrls="$props.calendarSyncUrls"></calendar-sync>
+            			    </div>
+						</div>
+						<!-- STUDENT INFO -->
 						<div class="row mb-4">
 							<div  class=" col-lg-12">
-								<!-- STUDENT INFO -->
 								<role-information :title="$p.t('profil','studentInformation')" :data="roleInformation"></role-information>
 							</div>
 						</div>
 					<!-- START OF SECOND PROFIL  INFORMATION COLUMN -->
 					</div>
 					<div  class="col-xl-6 col-lg-12 ">
+						<!-- EMAILS -->
 						<div class="row mb-4">
 							<div class="col">
-								<!-- EMAILS -->
 								<profil-emails :title="this.$p.t('person','email')" :data="data.emails" ></profil-emails>
 							</div>
 						</div>
+						<!-- PRIVATE KONTAKTE-->
 						<div class="row mb-4 ">
 							<div class="col">
-								<!-- PRIVATE KONTAKTE-->
 								<div class="card">
 									<div class="card-header">
 										<div class="row">
@@ -343,9 +358,9 @@ export default {
 						</div>
 					</div>
 
+					<!-- PRIVATE ADRESSEN-->
 					<div class="row mb-4">
 						<div class="col">
-							<!-- PRIVATE ADRESSEN-->
 							<div class="card">
 								<div class="card-header">
 									<div class="row">
@@ -395,12 +410,6 @@ export default {
 		</div>
 		<!-- START OF SIDE PANEL -->
 		<div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
-			<!--TODO: uncomment when implemented
-			<div  class="row d-none d-md-block mb-3">
-				<div class="col">
-					<quick-links :title="$p.t('profil','quickLinks')"></quick-links>
-				</div>
-			</div>-->
 			<!-- Bearbeiten Button -->
 			<div class="row d-none d-md-block">
 				<div class="col mb-3">
@@ -414,9 +423,21 @@ export default {
 					</button>
 				</div>
 			</div>
+			<!-- QUICK LINKS, HIDDEN IF VIEWPORT < MD BREAKPOINT -->
+			<div v-if="quickLinks.length" class="row mb-3 d-none d-md-block">
+				<div class="col">
+					<quick-links :title="$p.t('profil/quickLinks')" :links="quickLinks" />
+				</div>
+			</div>
+			<!-- CALENDAR SYNC OPTIONS, HIDDEN IF VIEWPORT < MD BREAKPOINT -->
+			<div class="row mb-3 d-none d-md-block">
+                <div class="col">
+					<calendar-sync :uid="$props.data.username" :calendarSyncUrls="$props.calendarSyncUrls"></calendar-sync>
+                </div>
+			</div>
+			<!-- PROFIL UPDATES -->
 			<div v-if="data.profilUpdates" class="row d-none d-md-block mb-3">
 				<div class="col mb-3">
-					<!-- PROFIL UPDATES -->
 					<fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates"  :data="data.profilUpdates"></fetch-profil-updates>
 				</div>
 			</div>
@@ -426,13 +447,13 @@ export default {
 				</div>
 			</div>
 			<!-- START OF THE SECOND ROW IN THE SIDE PANEL -->
-			<div  class="row">
+			<!-- MAILVERTEILER -->
+            <div class="row mb-3">
 				<div class="col">
-					<!-- HIER SIND DIE MAILVERTEILER -->
 					<mailverteiler :title="$p.t('profil','mailverteiler')" :data="data?.mailverteiler"></mailverteiler>
 				</div>
-            <!-- END OF THE SECOND ROW IN THE SIDE PANEL -->
             </div>
+            <!-- END OF THE SECOND ROW IN THE SIDE PANEL -->
         <!-- END OF SIDE PANEL -->
         </div>
     <!-- END OF CONTAINER ROW-->

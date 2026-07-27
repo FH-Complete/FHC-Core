@@ -276,6 +276,7 @@ export default{
 				container-class="mb-3"
 				type="DatePicker"
 				v-model="formData.datum"
+				model-type="yyyy-MM-dd"
 				name="datum"
 				:label="$p.t('global/datum')"
 				auto-apply
@@ -291,6 +292,7 @@ export default{
 				container-class="mb-3"
 				type="DatePicker"
 				v-model="formData.bestaetigtam"
+				model-type="yyyy-MM-dd"
 				name="bestaetigtam"
 				:label="$p.t('lehre/bestaetigt_am')"
 				auto-apply
@@ -306,13 +308,14 @@ export default{
 				container-class="mb-3"
 				type="DatePicker"
 				v-model="formData.bewerbung_abgeschicktamum"
+				model-type="yyyy-MM-dd HH:mm:ss"
 				name="bewerbung_abgeschicktamum"
 				:label="$p.t('lehre/bewerbung_abgeschickt_am')"
 				auto-apply
-				:enable-time-picker="false"
-				format="dd.MM.yyyy"
+				:enable-time-picker="true"
+				format="dd.MM.yyyy HH:mm:ss"
 				text-input
-				preview-format="dd.MM.yyyy"
+				preview-format="dd.MM.yyyy HH:mm:ss"
 				:teleport="true"
 				:disabled="bisLocked || !hasPrestudentstatusPermission"
 				>
