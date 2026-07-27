@@ -128,7 +128,7 @@ class CoodleSurveyExternalParticipant_model extends DB_Model
 
 	public function updateSelection($externalParticipantId, $selection)
 	{
-		$selection = $selection ? "'" . json_encode($selection) . "'" : "NULL";
+		$selection = $selection !== null ? "'" . json_encode($selection) . "'" : "NULL";
 		$selectionUpdateQuery = "UPDATE $this->dbTable SET selection = $selection WHERE id = $externalParticipantId";
 		$this->execQuery($selectionUpdateQuery);
 	}
