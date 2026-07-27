@@ -59,8 +59,12 @@ export default {
 			const surveyResponse = await this.$api.call(
 				CoodleApi.getSurvey(surveyId),
 			);
-			this.survey = this.parseIncomingSurveyData(surveyResponse.data);
-			this.view = "survey";
+			if (surveyResponse.meta.status === "success") {
+				this.survey = this.parseIncomingSurveyData(surveyResponse.data);
+				this.view = "survey";
+			} else {
+				this.view = "activeSurveysTable";
+			}
 		},
 		parseIncomingSurveyData(surveyData) {
 			return {
