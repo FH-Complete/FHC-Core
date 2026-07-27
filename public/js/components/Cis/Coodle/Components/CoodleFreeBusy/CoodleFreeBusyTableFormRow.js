@@ -65,10 +65,10 @@ export default {
 		</td>
 		<td class="border-1 py-2 px-2">
 			<div class="w-100 d-flex flex-row gap-1 align-items-center justify-content-evenly">
-			<div @click="$emit('cancelForm')" type="button" class="action py-1 px-1">
+			<div @click="$emit('cancelForm')" :title="$p.t('ui/abbrechen')" type="button" class="action py-1 px-1">
 				<i class="fa-solid fa-circle-left"></i>
 			</div>
-			<div @click="$emit('submitForm')" type="button" class="action py-1 px-1">
+			<div @click="$emit('submitForm')" :title="$p.t('global/speichern')" type="button" class="action py-1 px-1">
 				<i class="fa-solid fa-floppy-disk"></i>
 			</div>
 		</td>

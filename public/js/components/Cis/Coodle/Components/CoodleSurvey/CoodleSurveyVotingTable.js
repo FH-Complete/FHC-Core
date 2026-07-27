@@ -665,18 +665,22 @@ export default {
 						</tr>
 					</table>
 				</div>
-				<div v-if="isRoomSelectionShown" class="mt-3 overflow-y-auto" style="max-height: 200px;">
+				<div v-if="isRoomSelectionShown" class="mt-3">
 					<div v-if="isFetchingAvailableRooms" class="d-flex justify-content-center align-items-center py-3">
 						<div class="spinner-border" role="status">
 							<span class="visually-hidden">{{ $p.t("coodle/loading") }}</span>
 						</div>
 					</div>
-					<div v-else-if="!availableRooms.length" class="d-flex justify-content-center align-items-center py-3 px-1">
-						<h5 class="flex-shrink fw-bold text-wrap">
+					<div v-else-if="!availableRooms.length" class="d-flex justify-content-center align-items-center py-4 px-1">
+						<h5 class="flex-shrink fw-bold text-wrap m-0">
 							{{ $p.t("coodle/no_rooms_available") }}
 						</h5>
 					</div>
 					<div v-else class="d-flex flex-column gap-2">
+						<div class="d-flex flex-row gap-1">
+							<span class="fw-bold">{{ "Selected room: " }}</span>
+							<span v-if="selectedRoomIdentifier?.length">{{ selectedRoomIdentifier }}</span>
+						</div>
 						<div class="d-flex flex-column gap-1 justify-content-start">
 							<span class="fw-bold">{{ $p.t("coodle/available_rooms") + ":" }}</span>
 							<div class="d-flex flex-row align-items-center gap-2">
@@ -691,27 +695,27 @@ export default {
 								</div>
 							</div>
 						</div>
-						<div v-if="!filteredAvailableRooms.length" class="d-flex flex-row align-items-center justify-content-center py-3 px-1">
-							<h5 class="flex-shrink fw-bold text-wrap">
-								{{ $p.t("coodle/no_available_rooms") }}
+						<div v-if="!filteredAvailableRooms.length" class="d-flex flex-row align-items-center justify-content-center py-4 px-1">
+							<h5 class="flex-shrink fw-bold text-wrap m-0">
+								{{ $p.t("coodle/no_available_rooms_for_filter") }}
 							</h5>
 						</div>
-						<div v-else class="d-flex flex-row flex-wrap gap-2">
+						<div v-else class="d-flex flex-column overflow-y-auto" style="max-height:200px;">
 							<div
 								v-for="room in filteredAvailableRooms"
 								@click="selectedRoomIdentifier = room.shortName"
 								:key="room.shortName"
 								:title="room.longName"
 								type="button"
-								:class="{'fhc-primary-border-color': selectedRoomIdentifier === room.shortName}"
-								class="border border-2 rounded-pill py-1 px-2 d-flex flex-row align-items-center gap-1"
+								:class="{'fhc-primary-color': selectedRoomIdentifier === room.shortName}"
+								class="px-2 py-1 border border-x-2 border-y-1 d-flex flex-row align-items-center gap-1"
 							>
 								<span>{{ room.shortName }}</span>
-								<a v-if="room.id" :href="getRoomInfoHref(room.id)" target="_blank" class="px-1 fhc-primary-color">
+								<a v-if="room.id" @click.stop="" :href="getRoomInfoHref(room.id)" target="_blank" class="px-1 fhc-primary-color">
 									<i class="fa-solid fa-up-right-from-square"></i>
 								</a>
 							</div>
-					</div>
+						</div>
 					</div>
 				</div>
 				<div v-if="isSurveyActive" class="d-flex flex-row gap-2 mt-3 justify-content-end">

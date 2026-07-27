@@ -604,6 +604,7 @@ class CoodleSurvey extends FHCAPI_Controller
 							"surveyParticipantName" => $externalParticipant->name,
 							"org" => CAMPUS_NAME,
 							"surveyTitle" => $survey->title,
+							"selectedSurveyTimeslot" => $formattedTimeslot,
 							"surveyHref" => str_replace("{key}", $encryptedAccessKey, $this->coodlePageExternalUrl),
 						],
 						$externalParticipant->email,
@@ -904,12 +905,13 @@ class CoodleSurvey extends FHCAPI_Controller
 
 	private function parseParticipantSelections($participants)
 	{
-		return array_map(function ($participant) {
+		$result = array_map(function ($participant) {
 			if ($participant->selection) {
-				$participant->selection = json_decode($participant->selection);
+				$participant->selection = array_values(json_decode($participant->selection, true));
 			}
 			return $participant;
 		}, $participants);
+		return $result;
 	}
 
 	private function searchUsersAsParticipants($searchString)
@@ -919,23 +921,25 @@ class CoodleSurvey extends FHCAPI_Controller
 		$firstSearchString = $searchStrings[0];
 		$remainingSearchStrings = array_slice($searchStrings, 1);
 
-		$query = "
-			SELECT
+		$query = "SELECT
 				'user' AS type,
 				benutzer.uid AS uid,
 				person.vorname || ' ' || person.nachname AS name
 				FROM public.tbl_person person
 				JOIN public.tbl_benutzer benutzer ON(benutzer.person_id = person.person_id)
-				WHERE LOWER(person.vorname || ' ' || person.nachname) LIKE '%" . $firstSearchString . "%'
+				WHERE (LOWER(person.vorname || ' ' || person.nachname) LIKE '%" . $firstSearchString . "%'
+				OR benutzer.uid LIKE '%" . $firstSearchString . "%')
 		";
 
 		if (count($remainingSearchStrings)) {
 			foreach ($remainingSearchStrings as $remainingSearchString) {
-				$query .= " AND LOWER(person.vorname || ' ' || person.nachname) LIKE '%" . $remainingSearchString . "%'";
+				$query .= " AND (LOWER(person.vorname || ' ' || person.nachname) LIKE '%" . $remainingSearchString . "%'
+				OR benutzer.uid LIKE '%" . $remainingSearchString . "%')";
 			}
 		}
 
-		$query .= " LIMIT 25";
+		$query .= "ORDER BY benutzer.uid
+			LIMIT 25";
 
 		$dbModel = new DB_Model();
 		$usersQueryResult = $dbModel->execReadOnlyQuery($query);
@@ -984,8 +988,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		}, $groups);
 
 
-		$userGroupsQuery = "
-			SELECT
+		$userGroupsQuery = "SELECT
 				benutzerGruppe.uid as uid,
 				benutzerGruppe.gruppe_kurzbz as group,
 				person.vorname || ' ' || person.nachname AS name

@@ -134,7 +134,7 @@ export default {
 					</span>
 				</div>
 				<div class="overflow-x-auto">
-					<table id="freeBusyTable" style="min-width:500px;">
+					<table id="freeBusyTable" style="min-width:100%;">
 						<tr>
 							<th class="border-1 py-1 px-2 fw-bold">{{ $p.t("coodle/description") }}</th>
 							<th class="border-1 py-1 px-2 fw-bold">{{ $p.t("coodle/type") }}</th>
@@ -157,10 +157,20 @@ export default {
 								<td class="border-1 py-1 px-2">{{ schedule.isActive ? $p.t("coodle/yes") : $p.t("coodle/no") }}</td>
 								<td class="border-1 py-1 px-2">
 									<div class="w-100 d-flex flex-row gap-1 align-items-center justify-content-evenly">
-										<div @click="openScheduleForm(index)" type="button" class="action py-1 px-1">
+										<div
+											@click="openScheduleForm(index)"
+											:title="$p.t('coodle/edit')"
+											type="button"
+											class="action py-1 px-1"
+										>
 											<i class="fa-solid fa-pen-to-square"></i>
 										</div>
-										<div @click="deleteSchedule(schedule)" type="button" class="action py-1 px-1">
+										<div
+											@click="deleteSchedule(schedule)"
+											:title="$p.t('global/loeschen')"
+											type="button"
+											class="action py-1 px-1"
+										>
 											<i class="fa-solid fa-trash-can"></i>
 										</div>
 									</div>

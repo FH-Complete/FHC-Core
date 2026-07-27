@@ -63044,7 +63044,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'coodle',
-		'phrase' => 'no_available_rooms',
+		'phrase' => 'no_available_rooms_for_filter',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(

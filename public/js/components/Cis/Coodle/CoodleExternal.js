@@ -19,10 +19,12 @@ export default {
 				),
 			);
 
-			this.survey = this.parseIncomingSurveyData(surveyResponse.data);
-			this.authExternalParticipantId = this.survey.externalParticipants.find(
-				(externalParticipant) => !!externalParticipant.id,
-			).id;
+			if (surveyResponse.meta.status === "success") {
+				this.survey = this.parseIncomingSurveyData(surveyResponse.data);
+				this.authExternalParticipantId = this.survey.externalParticipants.find(
+					(externalParticipant) => !!externalParticipant.id,
+				).id;
+			}
 		},
 		parseIncomingSurveyData(surveyData) {
 			return {
