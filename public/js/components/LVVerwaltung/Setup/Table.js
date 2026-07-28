@@ -112,23 +112,6 @@ export default {
 				lehrfach_id: ''
 
 			},
-			tabulatorGeneralPresets: [
-				{
-					id: null,
-					name: "Straight Ls",
-					displayedColumns: [
-						"lehrveranstaltung_id",
-						"lehreinheit_id",
-					],
-					headerFilters: {
-						lehrveranstaltung_id: "L"
-					},
-					sort: {
-						column: "lehreinheit_id",
-						direction: "desc",
-					},
-				}
-			],
 		}
 	},
 	computed: {
@@ -545,10 +528,7 @@ export default {
 		new-btn-label="LV-Teil hinzufügen"
 		new-btn-show
 		:new-btn-disabled="!lv_info"
-		@click:new="showLehreinheitModal"
-		:isUsingPresets="true"
-		:presetsId="'lvVerwaltung_table'"
-		:generalPresets="tabulatorGeneralPresets">
+		@click:new="showLehreinheitModal">
 		
 		<template #actions>
 			<button @click="expandTree" class="btn btn-outline-secondary" type="button" :title="$p.t('lehre', 'aufklappen')"><i class="fa-solid fa-maximize"></i></button>
