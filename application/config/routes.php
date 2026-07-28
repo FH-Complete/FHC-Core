@@ -120,6 +120,7 @@ $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/prestudent/(:num)'] = 'a
 $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/person/(:num)'] = 'api/frontend/v1/stv/Students/getPerson/$1/$2';
 
 
+$route['api/frontend/v1/lvplan/calendar-events'] = 'api/frontend/v1/LvPlanCalendarEvents/getCalendarData';
 $route['lvplan/caldav'] = 'LvPlanCalDAV';
 $route['lvplan/caldav/.*'] = 'LvPlanCalDAV';
 
