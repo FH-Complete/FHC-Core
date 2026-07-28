@@ -38,6 +38,7 @@ export default {
 			{
 				result = this.allCourses.filter(course =>
 					course.showname.toLowerCase().includes(query) ||
+					course.start_kw.includes(query) ||
 					course.lektoren?.some(lektor =>
 						lektor.name.toLowerCase().includes(query) ||
 						lektor.kurzbz.toLowerCase().includes(query)

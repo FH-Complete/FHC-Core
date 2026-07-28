@@ -35,6 +35,11 @@ export function useContextMenuActions(handlers)
 		],
 		reservierung: [
 			{
+				label: 'Raumauswahl',
+				icon: 'fa-solid fa-door-open',
+				action: handlers.openRaumauswahl
+			},
+			{
 				label: 'Delete',
 				icon: 'fa-solid fa-calendar-xmark',
 				action: handlers.deleteEntry

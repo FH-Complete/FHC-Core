@@ -82,7 +82,7 @@ class RaumvorschlagLib
 
 		usort($ratings, function($a, $b)
 		{
-			return $b['score'] - $a['score'];
+			return $b['score'] <=> $a['score'];
 		});
 
 		return $ratings;
@@ -213,21 +213,32 @@ class RaumvorschlagLib
 
 	private function _getRaumkandidaten($event)
 	{
-		$lehreinheit = $this->_ci->LehreinheitModel->load($event->lehreinheit_id[0]);
-		if (!hasData($lehreinheit)) return [];
-		$lehreinheit = getData($lehreinheit)[0];
+		$raumtyp = null;
+		$raumtypalternativ = null;
+
+		if (!empty($event->lehreinheit_id))
+		{
+			$lehreinheit = $this->_ci->LehreinheitModel->load($event->lehreinheit_id[0]);
+			if (hasData($lehreinheit))
+			{
+				$lehreinheit = getData($lehreinheit)[0];
+				$raumtyp = $lehreinheit->raumtyp ?? null;
+				$raumtypalternativ = $lehreinheit->raumtypalternativ ?? null;
+			}
+		}
 
 		$this->_ci->KalenderModel->addSelect('tbl_kalender_ort.ort_kurzbz');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_ort', 'tbl_kalender.kalender_id = tbl_kalender_ort.kalender_id');
 		$this->_ci->KalenderModel->db->where('tbl_kalender.von <', $event->isoend);
 		$this->_ci->KalenderModel->db->where('tbl_kalender.bis >', $event->isostart);
+		$this->_ci->KalenderModel->db->where('tbl_kalender.kalender_id !=', $event->kalender_id);
 		$this->_ci->KalenderModel->db->where_not_in('tbl_kalender.status_kurzbz', ['deleted']);
 		$this->_ci->KalenderModel->db->where('tbl_kalender_ort.ort_kurzbz IS NOT NULL', null, false);
 		$belegte = $this->_ci->KalenderModel->load();
 
 		$belegte_orte = hasData($belegte) ? array_column(getData($belegte), 'ort_kurzbz') : [];
 
-		if (empty($lehreinheit->raumtyp))
+		if (empty($raumtyp))
 		{
 			$raeume = $this->_getFreieRaeume(null, $belegte_orte);
 			return hasData($raeume) ? getData($raeume) : [];
@@ -235,14 +246,14 @@ class RaumvorschlagLib
 
 		$vorschlaege = [];
 
-		$raeume = $this->_getFreieRaeume($lehreinheit->raumtyp, $belegte_orte);
+		$raeume = $this->_getFreieRaeume($raumtyp, $belegte_orte);
 		if (hasData($raeume))
 			$vorschlaege = getData($raeume);
 
-		if (count($vorschlaege) < 5 && !empty($lehreinheit->raumtypalternativ))
+		if (count($vorschlaege) < 5 && !empty($raumtypalternativ))
 		{
 			$bereits_gefunden = array_merge($belegte_orte, array_column($vorschlaege, 'ort_kurzbz'));
-			$alternativ = $this->_getFreieRaeume($lehreinheit->raumtypalternativ, $bereits_gefunden);
+			$alternativ = $this->_getFreieRaeume($raumtypalternativ, $bereits_gefunden);
 
 			if (!isError($alternativ) && hasData($alternativ))
 				$vorschlaege = array_merge($vorschlaege, getData($alternativ));
@@ -255,7 +266,12 @@ class RaumvorschlagLib
 	{
 		$this->_ci->OrtModel->addSelect('ort_kurzbz, stockwerk, standort_id');
 		$this->_ci->OrtModel->addJoin('public.tbl_ortraumtyp', 'ort_kurzbz');
-		$this->_ci->OrtModel->db->where('raumtyp_kurzbz', $raumtyp);
+
+		if (!empty($raumtyp))
+			$this->_ci->OrtModel->db->where('raumtyp_kurzbz', $raumtyp);
+		else
+			$this->_ci->OrtModel->db->where('reservieren', true);
+
 		$this->_ci->OrtModel->db->where('aktiv', true);
 		$this->_ci->OrtModel->db->where("ort_kurzbz NOT LIKE '\_%'", null, false);
 

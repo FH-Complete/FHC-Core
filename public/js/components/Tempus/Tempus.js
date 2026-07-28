@@ -536,7 +536,9 @@ export default {
 				return;
 
 			const updatedInfos = {
-				ort_kurzbz: this.ort_kurzbz ? this.ort_kurzbz : obj.orig.ort_kurzbz,
+				ort_kurzbz: this.rooms.length
+					? this.rooms.map((room) => room.ort_kurzbz)
+					: obj.orig.ort_kurzbz ?? [],
 				start_time,
 				end_time,
 			};
@@ -630,9 +632,7 @@ export default {
 							obj.orig.lehreinheit_id,
 							this.rooms.length
 								? this.rooms.map((r) => r.ort_kurzbz)
-								: obj.orig.ort_kurzbz
-									? [obj.orig.ort_kurzbz]
-									: [],
+								: obj.orig.ort_kurzbz ?? [],
 							start_time,
 							end_time,
 						),
