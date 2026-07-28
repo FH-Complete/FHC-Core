@@ -74,7 +74,7 @@ router.afterEach((to, from, failure) => {
 FhcApps.router.makeExtendable(router);
 
 const app = Vue.createApp({
-	name: 'StudentenverwaltungApp'
+	name: 'StudVwApp'
 });
 
 FhcApps.makeExtendable(app);

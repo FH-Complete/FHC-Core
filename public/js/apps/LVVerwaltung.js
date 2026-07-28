@@ -30,7 +30,9 @@ const router = VueRouter.createRouter({
 
 FhcApps.router.makeExtendable(router);
 
-const app = Vue.createApp();
+const app = Vue.createApp({
+	name: 'LvVwApp'
+});
 
 FhcApps.makeExtendable(app);
 
