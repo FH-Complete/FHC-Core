@@ -134,6 +134,15 @@ export default {
 						};
 					}
 				})
+				.filter((searchResult) => {
+					return (
+						searchResult.type === "group" ||
+						!this.participants.some(
+							(existingParticipant) =>
+								existingParticipant.uid === searchResult.uid,
+						)
+					);
+				})
 				.toSorted(
 					(searchResultA, searchResultB) =>
 						searchResultB.rank - searchResultA.rank,
