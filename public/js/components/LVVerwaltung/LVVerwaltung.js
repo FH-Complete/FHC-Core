@@ -9,6 +9,8 @@ import LvTabs from "./Setup/Tabs.js";
 import ApiDetails from "../../api/lehrveranstaltung/details.js";
 import ApiLektor from "../../api/lehrveranstaltung/lektor.js";
 import ApiSearchbar from "../../api/factory/searchbar.js";
+import AppConfig from "../AppConfig.js";
+import ApiLvConfig from "../../api/lehrveranstaltung/config.js";
 
 
 export default {
@@ -21,8 +23,11 @@ export default {
 		StvStudiensemester,
 		LvTable,
 		LvTabs,
+		AppConfig
 	},
 	props: {
+		avatarUrl: String,
+		logoutUrl: String,
 		defaultSemester: String,
 		lvRoot: String,
 		permissions: Object,
@@ -37,7 +42,6 @@ export default {
 			lehreinheitAnmerkungDefault: (this.config.lehreinheitAnmerkungDefault || '').replace(/\\n/g, '\n'),
 			lehreinheitRaumtypDefault: this.config.lehreinheitRaumtypDefault,
 			lehreinheitRaumtypAlternativeDefault: this.config.lehreinheitRaumtypAlternativeDefault,
-
 			permissionLehrveranstaltung: this.permissions['lehre/lehrveranstaltung'],
 			permissionGruppenEntfernen: this.permissions['lv-plan/gruppenentfernen'],
 			permissionLektorEntfernen: this.permissions['lv-plan/lektorentfernen'],
@@ -45,6 +49,8 @@ export default {
 	},
 	data() {
 		return {
+			appconfig:{},
+			configEndpoints: ApiLvConfig,
 			selected: [],
 			studiengang: "",
 			selectedStudiensemester: this.defaultSemester,
@@ -104,6 +110,71 @@ export default {
 		semester() {
 			return this.filter.semester;
 		},
+		appMenuExtraItems()
+		{
+			let extraItems = [];
+
+			const studiengang_kz = this.stg || '';
+			const studiensemester = this.selectedStudiensemester;
+			const semester = this.semester || '';
+			const uid = this.emp || '';
+
+
+			extraItems.push(
+				{
+					description: 'lehre/berichte',
+					requires: ['stg'],
+					children: [
+						{
+							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+								+ 'content/statistik/lvplanung.xls.php'
+								+ '?studiengang_kz=' + studiengang_kz
+								+ '&studiensemester_kurzbz=' + studiensemester
+								+ '&semester=' + semester,
+							description: 'lehre/lvplanung',
+							requires: ['stg']
+						},
+						{
+							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+								+ 'content/statistik/lehrauftragsliste_gst.xls.php'
+								+ '?studiengang_kz=' + studiengang_kz
+								+ '&studiensemester_kurzbz=' + studiensemester
+								+ '&semester=' + semester,
+							description: 'lehre/lehrauftragsliste',
+							requires: ['stg']
+						},
+						{
+							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+								+ 'content/pdfExport.php?xml=lehrauftrag.xml.php'
+								+ '&xsl=Lehrauftrag'
+								+ '&stg_kz=' + studiengang_kz
+								+ '&ss=' + studiensemester,
+							description: 'lehre/lehrauftraege',
+							requires: ['stg']
+						},
+						{
+							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+								+ 'content/pdfExport.php?xml=lehrauftrag.xml.php'
+								+ '&xsl=Lehrauftrag'
+								+ '&stg_kz=' + studiengang_kz
+								+ '&ss=' + studiensemester
+								+ '&uid=' + uid,
+							description: 'lehre/lehrauftragslisteemp',
+							requires: ['emp']
+						}
+					]
+				},
+				{
+					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+						+ 'vilesci/lehre/lehrveranstaltung.php'
+						+ '?stg_kz=' + studiengang_kz,
+					description: 'lehre/extrakvverwaltung',
+					requires: ['stg']
+				}
+			);
+
+			return extraItems;
+		}
 	},
 	methods: {
 		updateFilter()
@@ -188,6 +259,21 @@ export default {
 			}
 			this.selectedStudiensemester = stdsem;
 			this.selected = [];
+		},
+		isDisabled(item)
+		{
+			if (!item?.requires?.length)
+				return false;
+
+			const values = {
+				stg: this.stg,
+				emp: this.emp,
+				studiensemester: this.selectedStudiensemester,
+				semester: this.semester
+			};
+
+			return item.requires.some(req => !values[req]);
+
 		}
 	},
 	created() {
@@ -261,6 +347,51 @@ export default {
 				<span class="fa-solid fa-table-list"></span>
 			</button>
 			<core-searchbar :searchoptions="searchbaroptions" :searchfunction=searchfunction class="searchbar w-100"></core-searchbar>
+			<div id="nav-user" class="dropdown">
+				<button
+					id="nav-user-btn"
+					class="btn btn-link rounded-0 py-0"
+					type="button"
+					data-bs-toggle="dropdown"
+					data-bs-target="#nav-user-menu"
+					aria-expanded="false"
+					aria-controls="nav-user-menu"
+				>
+					<img
+						:src="avatarUrl"
+						:alt="$p.t('profilUpdate/profilBild')"
+						class="bg-light avatar rounded-circle border border-light"
+					/>
+				</button>
+				<ul
+					ref="navUserDropdown"
+					class="dropdown-menu dropdown-menu-dark dropdown-menu-end rounded-0 text-center m-0"
+					aria-labelledby="nav-user-btn"
+				>
+					<li>
+						<button
+							type="button"
+							class="dropdown-item"
+							data-bs-toggle="modal"
+							data-bs-target="#configModal"
+						>
+							{{ $p.t('ui/settings') }}
+						</button>
+					</li>
+					<li><hr class="dropdown-divider m-0"/></li>
+					<li>
+						<nav-language
+							item-class="dropdown-item border-left-dark"
+						/>
+					</li>
+					<li><hr class="dropdown-divider m-0"/></li>
+					<li>
+						<a class="dropdown-item" :href="logoutUrl">
+							{{ $p.t('ui/logout') }}
+						</a>
+					</li>
+				</ul>
+			</div>
 		</header>
 		<div class="container-fluid overflow-hidden">
 			<div class="row h-100">
@@ -270,7 +401,40 @@ export default {
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
 					</div>
 					<div class="offcanvas-body">
-						<app-menu app-identifier="lvv" />
+						<app-menu app-identifier="lvv">
+							<template v-for="(item, key) in appMenuExtraItems" :key="key">
+								<li v-if="item.children" class="dropend">
+									<a
+										class="dropdown-toggle" 
+										href="#"
+										role="button" 
+										data-bs-toggle="dropdown"
+										aria-expanded="false"
+										data-bs-popper-config='{"strategy":"fixed"}'
+									>
+										{{ $p.t(item.description) }}
+									</a>
+									<ul class="dropdown-menu p-0">
+										<li
+											v-for="(child, childKey) in item.children"
+											:key="childKey"
+										>
+											<a class="dropdown-item" :href="child.link" target="_blank" :class="{ disabled: isDisabled(child) }">
+												{{ $p.t(child.description) }}
+											</a>
+										</li>
+									</ul>
+								</li>
+								<li v-else>
+									<a 
+										:href="item.link" 
+										target="_blank" 
+										:class="{ disabled: isDisabled(item) }">
+										{{ $p.t(item.description) }}
+									</a>
+								</li>
+							</template>
+						</app-menu>
 					</div>
 				</aside>
 				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">
@@ -325,5 +489,6 @@ export default {
 				</main>
 			</div>
 		</div>
+		<app-config ref="config" v-model="appconfig" :endpoints="configEndpoints"></app-config>
 	</div>`
 };

@@ -1,13 +1,12 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 
-import ApiStvGrades from '../../../../../api/factory/stv/grades.js';
-
 export default {
 	components: {
 		CoreFilterCmpt
 	},
 	emits: [
-		"copied"
+		"copied",
+		"loaded"
 	],
 	inject: {
 		currentSemester: {
@@ -16,20 +15,33 @@ export default {
 		}
 	},
 	props: {
-		student: Object,
-		allSemester: Boolean
+		endpoint: {
+			type: Object,
+			required: true
+		},
+		id: {
+			type: [Number, String],
+			required: true
+		},
+		allSemester: Boolean,
+		optionalTabulatorOptions: Object,
 	},
 	data() {
 		return {
-			tabulatorEvents: []
+			tabulatorEvents: [
+				{
+					event: "dataProcessed",
+					handler: () => this.$emit("loaded"),
+				},
+			]
 		};
 	},
 	computed: {
 		tabulatorOptions() {
 			return {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: () => this.$api.call(ApiStvGrades.getTeacherProposal(
-					this.student.prestudent_id,
+				ajaxRequestFunc: () => this.$api.call(this.endpoint.getTeacherProposal(
+					this.id,
 						(!this.allSemester ? this.currentSemester : null)
 				)),
 				ajaxResponse: (url, params, response) => {
@@ -77,16 +89,19 @@ export default {
 					{ field: 'lehrveranstaltung_id', title: this.$p.t('lehre/lehrveranstaltung_id'), visible: false },
 					{ field: 'punkte', title: this.$p.t('stv/grades_points'), visible: false }
 				],
+				columnDefaults: {
+					headerFilter: this.optionalTabulatorOptions?.headerFilter ?? false,
+				},
 				layout: 'fitDataStretch',
 				height: '100%',
 				selectableRows: true,
 				selectableRowsRangeMode: 'click',
-				persistenceID: 'stv-details-noten-teacher-20260217'
+				persistenceID: this.optionalTabulatorOptions?.persistenceTeacherID ?? 'stv-details-noten-teacher-2025120401',
 			};
 		}
 	},
 	watch: {
-		student(n) {
+		id() {
 			this.$refs.table.reloadTable();
 		},
 		allSemester(n) {
@@ -97,7 +112,7 @@ export default {
 		copyGrades(selected) {
 			const promises = selected.map(
 				grade => this.$api
-					.call(ApiStvGrades.copyTeacherProposalToCertificate(grade), {
+					.call(this.endpoint.copyTeacherProposalToCertificate(grade), {
 						errorHeader: grade.lehrveranstaltung_bezeichnung
 					})
 					.then(() => {
