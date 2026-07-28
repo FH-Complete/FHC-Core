@@ -28,6 +28,7 @@ class StudentListLib
 	private $_allowedStgs = [];
 	private $_selects = [];
 	private $_joins = [];
+	private $_wheres = [];
 	
 	/**
 	 * Gets the CI instance, loads model and prepares default values
@@ -39,6 +40,8 @@ class StudentListLib
 	public function __construct($params = null)
 	{
 		$this->_ci =& get_instance(); // get code igniter instance
+
+		$this->_ci->load->config('stv');
 
 		$this->_ci->load->model('crm/Prestudent_model', 'PrestudentModel');
 
@@ -116,7 +119,7 @@ class StudentListLib
 			) prest
 			WHERE laststatus NOT IN ('Abbrecher', 'Abgewiesener', 'Absolvent')
 			AND priorisierung <= tbl_prestudent.priorisierung
-		) || ' (' || COALESCE(tbl_prestudent.priorisierung::text, ' '::text) || ')' AS priorisierung_relativ", false); // TODO(chris): overwrite in fetchStudents
+		) || ' (' || COALESCE(tbl_prestudent.priorisierung::text, ' '::text) || ')' AS priorisierung_relativ", false);
 		$this->addSelect('mentor');
 		$this->addSelect('b.aktiv AS bnaktiv');
 		$this->addSelect('unruly');
@@ -124,7 +127,7 @@ class StudentListLib
 		// Add default JOINs
 		$this->addJoin('public.tbl_studiengang stg', 'studiengang_kz', 'LEFT');
 		$this->addJoin('public.tbl_person p', 'person_id');
-		$this->addJoin('public.tbl_student s', 'prestudent_id', 'LEFT'); // TODO(chris): overwrite in fetchStudents
+		$this->addJoin('public.tbl_student s', 'prestudent_id', 'LEFT');
 		$this->addJoin('public.tbl_prestudentstatus pls', '
 			pls.status_kurzbz=public.get_rolle_prestudent(tbl_prestudent.prestudent_id, NULL) 
 			AND pls.prestudent_id=tbl_prestudent.prestudent_id 
@@ -134,6 +137,15 @@ class StudentListLib
 		$this->addJoin('public.tbl_benutzer b', 's.student_uid=b.uid', 'LEFT');
 		$this->addJoin("v", "", ""); // Will be replaced later
 		$this->addJoin("ps", "", ""); // Will be replaced later
+
+		// Add SELECTs and JOINs from config
+		$config = $this->_ci->config->item('list_columns') ?: [];
+		foreach ($config as $conf) {
+			$this->addSelect($conf['default']);
+			if (isset($conf['joins']))
+				foreach ($conf['joins'] as $join)
+					call_user_func_array([$this, 'addJoin'], $join);
+		}
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -219,11 +231,7 @@ class StudentListLib
 	 */
 	public function addWhere($key, $value = null, $escape = true)
 	{
-		if (!is_array($key) && is_array($value)) {
-			$this->_ci->PrestudentModel->db->where_in($key, $value, $escape);
-		} else {
-			$this->_ci->PrestudentModel->db->where($key, $value, $escape);
-		}
+		$this->_wheres[] = [$key, $value, $escape, false];
 	}
 
 	/**
@@ -237,11 +245,7 @@ class StudentListLib
 	 */
 	public function addOrWhere($key, $value = null, $escape = true)
 	{
-		if (!is_array($key) && is_array($value)) {
-			$this->_ci->PrestudentModel->db->or_where_in($key, $value, $escape);
-		} else {
-			$this->_ci->PrestudentModel->db->or_where($key, $value, $escape);
-		}
+		$this->_wheres[] = [$key, $value, $escape, true];
 	}
 
 	/**
@@ -285,6 +289,20 @@ class StudentListLib
 
 		foreach ($this->_selects as $select)
 			$this->_ci->PrestudentModel->addSelect($select[0], $select[1]);
+
+		foreach ($this->_wheres as $where) {
+			if (!is_array($where[0]) && is_array($where[1])) {
+				if ($where[3])
+					$this->_ci->PrestudentModel->db->or_where_in($where[0], $where[1], $where[2]);
+				else
+					$this->_ci->PrestudentModel->db->where_in($where[0], $where[1], $where[2]);
+			} else {
+				if ($where[3])
+					$this->_ci->PrestudentModel->db->or_where($where[0], $where[1], $where[2]);
+				else
+					$this->_ci->PrestudentModel->db->where($where[0], $where[1], $where[2]);
+			}
+		}
 
 		$this->_ci->PrestudentModel->addOrder('nachname');
 		$this->_ci->PrestudentModel->addOrder('vorname');

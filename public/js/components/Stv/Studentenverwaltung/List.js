@@ -12,6 +12,11 @@ import { capitalize } from '../../../helpers/StringHelpers.js';
 
 import draggable from '../../../directives/draggable.js';
 
+import StvColumns from '../../../../../index.ci.php/js/tabulatorcolumns/stv';
+
+import ModuleFilterFilters from '../../../tabulator/filter/filters.js';
+Tabulator.extendModule("filter", "filters", ModuleFilterFilters);
+
 export default {
 	name: "ListPrestudents",
 	components: {
@@ -51,92 +56,10 @@ export default {
 		'filterActive'
 	],
 	data() {
-		function dateFormatter(cell)
-		{
-			let val = cell.getValue();
-			if (!val)
-				return '&nbsp;';
-			let date = new Date(val);
-			return date.toLocaleDateString('de-AT', {
-				"day": "2-digit",
-				"month": "2-digit",
-				"year": "numeric"
-			});
-		}
-
 		return {
 			tabulatorOptions: {
-				columns:[
-					{title:"UID", field:"uid", headerFilter: true},
-					{title:"TitelPre", field:"titelpre", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{title:"Nachname", field:"nachname", headerFilter: true},
-					{title:"Vorname", field:"vorname", headerFilter: true},
-					{title:"Wahlname", field:"wahlname", visible:false, headerFilter: true},
-					{title:"Vornamen", field:"vornamen", visible:false, headerFilter: true},
-					{title:"TitelPost", field:"titelpost", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{title:"Ersatzkennzeichen", field:"ersatzkennzeichen", headerFilter: true},
-					{
-						title: "Geburtsdatum",
-						field: "gebdatum",
-						formatter: dateFormatter, 
-						headerFilter: true,
-						headerFilterFunc(headerValue, rowValue) {
-							const matches = headerValue.match(/^(([0-9]{2})\.)?([0-9]{2})\.([0-9]{4})?$/);
-							let comparestr = headerValue;
-							if(matches !== null) {
-								const year = (matches[4] !== undefined) ? matches[4] : '';
-								const month = matches[3];
-								const day = (matches[2] !== undefined) ? matches[2] : '';
-								comparestr = year + '-' + month + '-' + day;
-							}
-							return rowValue.match(comparestr);
-						}
-					},
-					{title:"Geschlecht", field:"geschlecht", headerFilter: "list", headerFilterParams: {values:{'m':'männlich','w':'weiblich','x':'divers','u':'unbekannt'}, listOnEmpty:true, autocomplete:true}},
-					{title: "Sem.", field:"semester_berechnet", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{title:"Verb.", field:"verband", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{title:"Grp.", field:"gruppe", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{title:"Studiengang", field:"studiengang", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{title:"Studiengang_kz", field:"studiengang_kz", visible:false, headerFilter: true},
-					{title:"Personenkennzeichen", field:"matrikelnr", headerFilter: true},
-					{title:"PersonID", field:"person_id", headerFilter: true},
-					{title:"Status", field:"status", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{title:"Status Datum", field:"status_datum", visible:false, formatter:dateFormatter},
-					{title:"Status Bestaetigung", field:"status_bestaetigung", visible:false, formatter:dateFormatter, headerFilter: true},
-					{title:"EMail (Privat)", field:"mail_privat", visible:false, headerFilter: true},
-					{title:"EMail (Intern)", field:"mail_intern", visible:false, headerFilter: true},
-					{title:"Anmerkungen", field:"anmerkungen", visible:false, headerFilter: true},
-					{title:"AnmerkungPre", field:"anmerkung", visible:false, headerFilter: true},
-					{title:"OrgForm", field:"orgform_kurzbz", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{title:"Aufmerksamdurch", field:"aufmerksamdurch_kurzbz", visible:false},
-					{title:"Gesamtpunkte", field:"punkte", visible:false},
-					{title:"Aufnahmegruppe", field:"aufnahmegruppe_kurzbz", visible:false},
-					{title:"Dual", field:"dual", visible:false, 
-						formatter:'tickCross', formatterParams: {
-							tickElement: '<i class="fas fa-check text-success"></i>',
-							crossElement: '<i class="fas fa-times text-danger"></i>'
-						},						
-						headerFilter:"tickCross", headerFilterParams: {
-							"tristate":true, elementAttributes:{"value":"true"}
-						}, headerFilterEmptyCheck:function(value){return value === null}
-					},
-					{title:"Matrikelnummer", field:"matr_nr", visible:false, headerFilter: true},
-					{title:"Studienplan", field:"studienplan_bezeichnung", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{title:"PreStudentInnenID", field:"prestudent_id", headerFilter: true},
-					{title:"Priorität", field:"priorisierung_relativ"},
-					{title:"Mentor", field:"mentor", visible:false},
-					{title:"Aktiv", field:"bnaktiv", visible:false, 
-						formatter:'tickCross', formatterParams: {
-							allowEmpty:true,
-							tickElement: '<i class="fas fa-check text-success"></i>',
-							crossElement: '<i class="fas fa-times text-danger"></i>'
-						},						
-						headerFilter:"tickCross", headerFilterParams: {
-							"tristate":true, elementAttributes:{"value":"true"}
-						}, headerFilterEmptyCheck:function(value){return value === null}
-					},
-					{title:"Unruly", field:"unruly", visible:false},
-				],
+				columns: StvColumns,
+				locale: true,
 				rowFormatter(row) {
 					if (row.getData().bnaktiv === false) {
 						row.getElement().classList.add('text-black','text-opacity-50','fst-italic');
@@ -317,8 +240,7 @@ export default {
 			+ '&data=' + this.selectedPrestudents.join(";");
 		},
 	},
-	created: function() {
-
+	created() {
 		if(this.tagsEnabled) {
 			const coltags = {
 				title: 'Tags',
@@ -333,84 +255,7 @@ export default {
 			this.tabulatorOptions.columns.splice(2, 0, coltags);
 		}
 	},
-	watch: {
-		'$p.user_language.value'(n, o) {
-			if (n !== o && o !== undefined && this.$refs.table.tableBuilt) {
-				this.translateTabulator();
-			}
-		},
-	},
 	methods: {
-		translateTabulator() {
-			this.$p
-				.loadCategory(['global', 'person', 'lehre', 'ui', 'profilUpdate', 'admission', 'stv'])
-				.then(() => {
-					const translations = {
-						uid: capitalize(this.$p.t('person/uid')),
-						titelpre: capitalize(this.$p.t('person/titelpre')),
-						nachname: capitalize(this.$p.t('person/nachname')),
-						vorname: capitalize(this.$p.t('person/vorname')),
-						wahlname: capitalize(this.$p.t('person/wahlname')),
-						vornamen: capitalize(this.$p.t('person/vornamen')),
-						titelpost: capitalize(this.$p.t('person/titelpost')),
-						ersatzkennzeichen: capitalize(this.$p.t('person/ersatzkennzeichen')),
-						gebdatum: capitalize(this.$p.t('person/geburtsdatum')),
-						geschlecht: capitalize(this.$p.t('person/geschlecht')),
-						semester_berechnet: capitalize(this.$p.t('lehre/sem')),
-						verband: capitalize(this.$p.t('lehre/verb')),
-						gruppe: capitalize(this.$p.t('lehre/grp')),
-						studiengang: capitalize(this.$p.t('lehre/studiengang')),
-						studiengang_kz: capitalize(this.$p.t('lehre/studiengang_kz')),
-						matrikelnr: capitalize(this.$p.t('person/personenkennzeichen')),
-						person_id: capitalize(this.$p.t('person/person_id')),
-						status: capitalize(this.$p.t('global/status')),
-						status_datum: capitalize(this.$p.t('profilUpdate/statusDate')),
-						status_bestaetigung: capitalize(this.$p.t('global/status_bestaetigung')),
-						mail_privat: capitalize(this.$p.t('person/email_private')),
-						mail_intern: capitalize(this.$p.t('person/email_intern')),
-						anmerkungen: capitalize(this.$p.t('stv/notes_person')),
-						anmerkung: capitalize(this.$p.t('stv/notes_prestudent')),
-						orgform_kurzbz: capitalize(this.$p.t('lehre/orgform')),
-						aufmerksamdurch_kurzbz: capitalize(this.$p.t('person/aufmerksamDurch')),
-						punkte: capitalize(this.$p.t('admission/gesamtpunkte')),
-						aufnahmegruppe_kurzbz: capitalize(this.$p.t('stv/aufnahmegruppe_kurzbz')),
-						dual: capitalize(this.$p.t('lehre/dual_short')),
-						matr_nr: capitalize(this.$p.t('person/matrikelnummer')),
-						studienplan_bezeichnung: capitalize(this.$p.t('lehre/studienplan')),
-						prestudent_id: capitalize(this.$p.t('ui/prestudent_id')),
-						priorisierung_relativ: capitalize(this.$p.t('lehre/prioritaet')),
-						mentor: capitalize(this.$p.t('stv/mentor')),
-						bnaktiv: capitalize(this.$p.t('person/aktiv'))
-					};
-
-					/** NOTE(chris):
-					 * use this approach because updateDefinition
-					 * on the Tabulator columns is way slower and
-					 * freezes up the GUI.
-					 */
-					// Overwrite definition for column show/hide
-					this.$refs.table.tabulator.getColumns().forEach(col => {
-						const trans = translations[col.getField()];
-						if (!trans)
-							return;
-						col.getDefinition().title = trans;
-					});
-					// Overwrite node in dom
-					this.$refs.table.tabulator.element
-						.querySelectorAll('.tabulator-col[tabulator-field]')
-						.forEach(el => {
-							const field = el.getAttribute('tabulator-field');
-							if (!translations[field])
-								return;
-
-							const title = el.querySelector('.tabulator-col-title');
-							if (!title)
-								return;
-
-							title.innerText = translations[field];
-						});
-				});
-		},
 		reload() {
 			this.$refs.table.reloadTable();
 		},
@@ -672,7 +517,6 @@ export default {
 				new-btn-show
 				:new-btn-label="$p.t('stv/action_new')"
 				@click:new="actionNewPrestudent"
-				@table-built="translateTabulator"
 				:useSelectionSpan="false"
 				@headerFilterOn="handleHeaderFilter"
 			>

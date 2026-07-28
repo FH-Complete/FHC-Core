@@ -1,6 +1,27 @@
 <?php
 
 $config['number_displayed_past_studiensemester_default'] = 5;
+
+# Additional columns:
+/*
+$config["list_columns"] = [
+	'fieldname' => [
+		'js' => 'path/to/snippet.js', // tabulator config snippet (eg: return { name: 'Name', field: 'fieldname' }; )
+		'default' => "SQL SELECT statement for value",
+		'joins' => [
+			// additional joins needed for the SELECT statement above
+			[
+				'tablename',
+				'join condition', // single fieldname for USING or full condition for ON
+				'LEFT|RIGHT', // optional - join type
+				'after_xxx|before_xxx|end' // optional - position in query
+			]
+			// ...
+		]
+	]
+];
+*/
+
 $config['tabs'] =
 	[
 		'details' => [
