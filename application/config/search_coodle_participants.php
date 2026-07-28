@@ -7,6 +7,8 @@ $CI =& get_instance();
 
 
 $config['employee'] = $CI->config->item('employee', 'search');
+unset($config['student']['searchfields']['email']);
+unset($config['student']['searchfields']['tel']);
 $config['employee']['resultfields'] = [
 	"m.mitarbeiter_uid AS uid",
 	"(p.vorname || ' ' || p.nachname) AS name",
