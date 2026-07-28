@@ -59424,6 +59424,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'lvevaluierung',
+		'category' => 'global',
+		'phrase' => 'modified',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'modifiziert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'modified',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// ### 		DOKUMENTE ERSTELLEN PHRASEN 		END 		###
 	// ### Personen zusammenlegen Phrasen BEGIN
 	array(

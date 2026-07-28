@@ -162,8 +162,17 @@ export default {
 	},
 	methods: {
 		async showPresetInfo(preset) {
-			if (preset !== this.presetInfo) {
-				this.presetInfo = preset;
+			let shouldUpdatePresetInfo;
+			if (!this.presetInfo) {
+				shouldUpdatePresetInfo = true;
+			} else if (preset.id) {
+				shouldUpdatePresetInfo = preset.id !== this.presetInfo.id;
+			} else {
+				shouldUpdatePresetInfo = preset.name !== this.presetInfo.name;
+			}
+
+			if (shouldUpdatePresetInfo) {
+				this.presetInfo = {...preset};
 			}
 
 			this.hideNewPresetForm();
