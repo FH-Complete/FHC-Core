@@ -33,6 +33,7 @@ class OtherLvPlan extends FHCAPI_Controller
 
 		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
+		$this->load->library('ProfilLib');
 
 	}
 
@@ -50,21 +51,17 @@ class OtherLvPlan extends FHCAPI_Controller
 		$isMitarbeiter = getData($isMitarbeiterResult);
 		$isStudent = !$isMitarbeiter;
 
-		$this->BenutzerModel->addSelect(["foto", "foto_sperre", "vorname", "nachname"]);
-		$this->BenutzerModel->addJoin("tbl_person", "person_id");
-		$personResult = $this->BenutzerModel->load([$uid]);
-		$person = hasData($personResult) ? getData($personResult) : null;
-
-		$photo = $person[0]->foto_sperre ? base64_encode(file_get_contents(DOC_ROOT . 'skin/images/profilbild_dummy.jpg')) : $person[0]->foto;
+		$profileData = $this->profillib->getView($uid);
+		$profileData = hasData($profileData) ? getData($profileData) : null;
 
 		$viewData = [
 			"user_data" => [
 				"username" => $uid,
 				"is_student" => $isStudent,
 				"is_mitarbeiter" => $isMitarbeiter,
-				"foto" => $photo,
-				"vorname" => $person[0]->vorname,
-				"nachname" => $person[0]->nachname,
+				"foto" => $profileData->data->foto,
+				"vorname" => $profileData->data->vorname,
+				"nachname" => $profileData->data->nachname,
 			],
 		];
 
