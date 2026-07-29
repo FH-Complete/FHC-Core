@@ -17,60 +17,62 @@
  */
 
 if (!defined('BASEPATH'))
-    exit('No direct script access allowed');
+	exit('No direct script access allowed');
 
 class OtherLvPlan extends FHCAPI_Controller
 {
 
-    /**
-     * Object initialization
-     */
-    public function __construct()
-    {
-        parent::__construct([
-            'otherLvPlanViewData' => ['basis/other_lv_plan:r'],
-        ]);
+	/**
+	 * Object initialization
+	 */
+	public function __construct()
+	{
+		parent::__construct([
+			'otherLvPlanViewData' => ['basis/other_lv_plan:r'],
+		]);
 
-        $this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
-        $this->load->model('person/Benutzer_model', 'BenutzerModel');
+		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
+		$this->load->model('person/Benutzer_model', 'BenutzerModel');
 
-    }
+	}
 
-    //------------------------------------------------------------------------------------------------------------------
-    // Public methods
+	//------------------------------------------------------------------------------------------------------------------
+	// Public methods
 
-    /**
-     * retrieves viewData for other lv plan view
-     * @access public
-     * @param  $uid the userID for which the other lv plan is being viewed
-     */
-    public function otherLvPlanViewData($uid)
-    {
-        $isMitarbeiterResult = $this->MitarbeiterModel->isMitarbeiter($uid);
-        $isMitarbeiter = getData($isMitarbeiterResult);
-        $isStudent = !$isMitarbeiter;
+	/**
+	 * retrieves viewData for other lv plan view
+	 * @access public
+	 * @param  $uid the userID for which the other lv plan is being viewed
+	 */
+	public function otherLvPlanViewData($uid)
+	{
+		$isMitarbeiterResult = $this->MitarbeiterModel->isMitarbeiter($uid);
+		$isMitarbeiter = getData($isMitarbeiterResult);
+		$isStudent = !$isMitarbeiter;
 
-        $this->BenutzerModel->addSelect(["foto", "vorname", "nachname"]);
-        $this->BenutzerModel->addJoin("tbl_person", "person_id");
-        $personResult = $this->BenutzerModel->load([$uid]);
-        $person = hasData($personResult) ? getData($personResult) : null;
+		$this->BenutzerModel->addSelect(["foto", "foto_sperre", "vorname", "nachname"]);
+		$this->BenutzerModel->addJoin("tbl_person", "person_id");
+		$personResult = $this->BenutzerModel->load([$uid]);
+		$person = hasData($personResult) ? getData($personResult) : null;
 
-        $viewData = [
-            "user_data" => [
-                "username" => $uid,
-                "is_student" => $isStudent,
-                "is_mitarbeiter" => $isMitarbeiter,
-                "foto" => $person[0]->foto,
-                "vorname" => $person[0]->vorname,
-                "nachname" => $person[0]->nachname,
-            ],
-        ];
+		$photo = $person[0]->foto_sperre ? base64_encode(file_get_contents(DOC_ROOT . 'skin/images/profilbild_dummy.jpg')) : $person[0]->foto;
 
-        $this->terminateWithSuccess($viewData);
-    }
+		$viewData = [
+			"user_data" => [
+				"username" => $uid,
+				"is_student" => $isStudent,
+				"is_mitarbeiter" => $isMitarbeiter,
+				"foto" => $photo,
+				"vorname" => $person[0]->vorname,
+				"nachname" => $person[0]->nachname,
+			],
+		];
 
-    // -----------------------------------------------------------------------------------------------------------------
-    // Private methods
+		$this->terminateWithSuccess($viewData);
+	}
+
+	// -----------------------------------------------------------------------------------------------------------------
+	// Private methods
 
 }
 
