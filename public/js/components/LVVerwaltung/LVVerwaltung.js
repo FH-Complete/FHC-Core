@@ -1,5 +1,6 @@
 import CoreSearchbar from "../searchbar/searchbar.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
+import HorizontalSplit from "../horizontalsplit/horizontalsplit.js";
 import AppMenu from "../AppMenu.js";
 import BaseTreemenu from '../Base/Treemenu.js';
 import StvStudiensemester from "../Stv/Studentenverwaltung/Studiensemester.js";
@@ -18,6 +19,7 @@ export default {
 	components: {
 		CoreSearchbar,
 		VerticalSplit,
+		HorizontalSplit,
 		AppMenu,
 		BaseTreemenu,
 		StvStudiensemester,
@@ -176,6 +178,15 @@ export default {
 			return extraItems;
 		}
 	},
+
+	watch: {
+		sidebarCollapsed(newVal) {
+			if(newVal)
+				this.$refs.hSplit.collapseLeft()
+			else
+				this.$refs.hSplit.showBoth()
+		}
+	},
 	methods: {
 		updateFilter()
 		{
@@ -321,7 +332,7 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: /* html */`
-	<div class="stv">
+		<div class="stv" :class="{ 'sidebar-collapsed': sidebarCollapsed }">
 		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
 			<div class="col-md-4 col-lg-3 col-xl-2 d-flex align-items-center">
 				<button
@@ -439,56 +450,61 @@ export default {
 						</app-menu>
 					</div>
 				</aside>
-				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">
-					<div class="offcanvas-header justify-content-end px-1 d-md-none">
-						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
-					</div>
-					<div class="overflow-auto col h-0">
-						<base-treemenu
-							config="lvv"
-							:preselected-key="$route.params.treemenu"
-							@select-entry="onSelectVerband"
-						></base-treemenu>
-					</div>
-					<stv-studiensemester :studiensemester-kurzbz="$route.params.stdsem || defaultSemester" @update:studiensemester-kurzbz="studiensemesterChanged"></stv-studiensemester>
-				</nav>
-				
-				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
-					<vertical-split>
-						<template #top>
-							<lv-table ref="lvTable"
-								v-model:selected="selected"
-								 @row-clicked="handleRowClicked"
-								:filter="filter"
-							>
-								<template #filterzuruecksetzen v-if="filter.activeFilter === 'employee'">
-									<span class="fw-bold small">
-									[{{ $p.t('lehre', 'lektor') }}: {{ filter.emp || '' }}
-									<button type="button"
-											class="btn btn-outline-secondary btn-action btn-sm ms-1"
-											:title="$p.t('ui', 'filterdelete')"
-											@click="resetEmployeeFilter">
-										<i class="fa fa-xmark"></i>
-									</button>
-									<template v-if="filter.stg">
-										| Stg: {{ filter.stg.toUpperCase() }}
-										<button type="button"
-											class="btn btn-outline-secondary btn-action btn-sm ms-1"
-											:title="$p.t('ui', 'filterdelete')"
-											@click="resetStgFilter">
-											<i class="fa fa-xmark"></i>
-										</button>
-									</template>
-									]
-								  </span>
+				<horizontal-split ref="hSplit" :defaultRatio="[15, 85]">
+					<template #left>
+						<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100 w-100">
+							<div class="offcanvas-header justify-content-end px-1 d-md-none">
+								<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
+							</div>
+							<div class="overflow-auto col h-0">
+								<base-treemenu
+									config="lvv"
+									:preselected-key="$route.params.treemenu"
+									@select-entry="onSelectVerband"
+								></base-treemenu>
+							</div>
+							<stv-studiensemester :studiensemester-kurzbz="$route.params.stdsem || defaultSemester" @update:studiensemester-kurzbz="studiensemesterChanged"></stv-studiensemester>
+						</nav>
+					</template>
+					<template #right>
+						<main>
+							<vertical-split>
+								<template #top>
+									<lv-table ref="lvTable"
+										v-model:selected="selected"
+										 @row-clicked="handleRowClicked"
+										:filter="filter"
+									>
+										<template #filterzuruecksetzen v-if="filter.activeFilter === 'employee'">
+											<span class="fw-bold small">
+											[{{ $p.t('lehre', 'lektor') }}: {{ filter.emp || '' }}
+											<button type="button"
+													class="btn btn-outline-secondary btn-action btn-sm ms-1"
+													:title="$p.t('ui', 'filterdelete')"
+													@click="resetEmployeeFilter">
+												<i class="fa fa-xmark"></i>
+											</button>
+											<template v-if="filter.stg">
+												| Stg: {{ filter.stg.toUpperCase() }}
+												<button type="button"
+													class="btn btn-outline-secondary btn-action btn-sm ms-1"
+													:title="$p.t('ui', 'filterdelete')"
+													@click="resetStgFilter">
+													<i class="fa fa-xmark"></i>
+												</button>
+											</template>
+											]
+										  </span>
+										</template>
+									</lv-table>
 								</template>
-							</lv-table>
-						</template>
-						<template #bottom>
-							<lv-tabs ref="details" :lv="selected"></lv-tabs>
-						</template>
-					</vertical-split>
-				</main>
+								<template #bottom>
+									<lv-tabs ref="details" :lv="selected"></lv-tabs>
+								</template>
+							</vertical-split>
+						</main>
+					</template>
+				</horizontal-split>
 			</div>
 		</div>
 		<app-config ref="config" v-model="appconfig" :endpoints="configEndpoints"></app-config>
