@@ -63,11 +63,12 @@ class KalenderLib
 												lehrfach.kurzbz AS lehrfach_kurzbz,
 												lehrfach.bezeichnung AS lehrfach_bezeichnung,
 												lehrfach.farbe,
-												COALESCE(orginasator.uid, tbl_lehreinheitmitarbeiter.mitarbeiter_uid) as mitarbeiter_uid,
+												COALESCE(organisator.uid, tbl_lehreinheitmitarbeiter.mitarbeiter_uid) as mitarbeiter_uid,
 												COALESCE(reservierung_person.vorname, tbl_person.vorname) as vorname,
 												COALESCE(reservierung_person.nachname, tbl_person.nachname) as nachname,
 												COALESCE(reservierung_ma.kurzbz, tbl_mitarbeiter.kurzbz) AS ma_kurzbz,
 												teilnehmergruppe.gruppe_kurzbz as teilnehmerg_grp,
+												teilnehmergruppe.bezeichnung as teilnehmerg_grp_bezeichnung,
 												COALESCE (
 													UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) || 
 													COALESCE(verbandgruppe.semester::varchar, \'\') || 
@@ -103,7 +104,7 @@ class KalenderLib
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit', 'tbl_kalender.kalender_id = tbl_kalender_lehreinheit.kalender_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event', 'tbl_kalender.kalender_id = tbl_kalender_event.kalender_id', 'LEFT');
 
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event_teilnehmer orginasator', 'tbl_kalender_event.kalender_id = orginasator.kalender_id AND orginasator.rolle_kurzbz = \'organisator\'', 'LEFT');
+		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event_teilnehmer organisator', 'tbl_kalender_event.kalender_id = organisator.kalender_id AND organisator.rolle_kurzbz = \'organisator\'', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event_teilnehmer teilnehmer', 'tbl_kalender_event.kalender_id = teilnehmer.kalender_id AND teilnehmer.rolle_kurzbz = \'teilnehmer\'', 'LEFT');
 
 		$this->_ci->KalenderModel->addJoin('public.tbl_benutzer teilbenutzer', 'teilnehmer.uid = teilbenutzer.uid', 'LEFT');
@@ -129,7 +130,7 @@ class KalenderLib
 		$this->_ci->KalenderModel->addJoin('public.tbl_benutzer', 'tbl_mitarbeiter.mitarbeiter_uid = tbl_benutzer.uid', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('public.tbl_person', 'tbl_person.person_id = tbl_benutzer.person_id', 'LEFT');
 
-		$this->_ci->KalenderModel->addJoin('public.tbl_mitarbeiter reservierung_ma', 'reservierung_ma.mitarbeiter_uid = orginasator.uid', 'LEFT');
+		$this->_ci->KalenderModel->addJoin('public.tbl_mitarbeiter reservierung_ma', 'reservierung_ma.mitarbeiter_uid = organisator.uid', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('public.tbl_benutzer resevierung_benutzer', 'reservierung_ma.mitarbeiter_uid = resevierung_benutzer.uid', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('public.tbl_person reservierung_person', 'reservierung_person.person_id = resevierung_benutzer.person_id', 'LEFT');
 
@@ -239,6 +240,7 @@ class KalenderLib
 				{
 					$events[$id]->teilnehmer_gruppe[] = [
 						'gruppe_kurzbz' => $row->teilnehmerg_grp,
+						'bezeichnung' => 222,
 					];
 				}
 			}
@@ -307,7 +309,7 @@ class KalenderLib
 
 		$this->_ci->KalenderModel->db->where('tbl_kalender_ort.ort_kurzbz', $ort);
 		$this->_ci->KalenderModel->db->where('tbl_kalender.status_kurzbz', 'live');
-		$this->_ci->KalenderModel->addOrder('tbl_kalender.eindeutige_gruppen_id', 'DESC');
+		$this->_ci->KalenderModel->addOrder('tbl_kalender.von', 'ASC');
 		$data = $this->_ci->KalenderModel->load();
 
 		return $this->_mapEvents($data, false);
@@ -501,13 +503,13 @@ class KalenderLib
 		return $this->_mapEvents($data);
 	}
 
-	public function getPlanForVerband($start_date, $end_date, $studiengangKz, $semester, $verband = null, $gruppe = null)
+	public function getPlanForVerband($start_date, $end_date, $studiengangKz, $semester = null, $verband = null, $gruppe = null)
 	{
 		$this->_getBasePlan($start_date, $end_date);
 
 		$db = $this->_ci->KalenderModel->db;
 		$escapedStudiengangKz = $db->escape($studiengangKz);
-		$escapedSemester = $db->escape($semester);
+		$escapedSemester = is_null($semester) ? null : $db->escape($semester);
 
 		if (is_null($verband) || trim((string)$verband) === '' || (string)$verband === '0')
 			$verband = null;
@@ -523,9 +525,13 @@ class KalenderLib
 		) {
 			$lehrverbandConditions = array(
 				$assignmentAlias.'.gruppe_kurzbz IS NULL',
-				$assignmentAlias.'.studiengang_kz = '.$escapedStudiengangKz,
-				'('.$assignmentAlias.'.semester = '.$escapedSemester.' OR '.$assignmentAlias.'.semester IS NULL)'
+				$assignmentAlias.'.studiengang_kz = '.$escapedStudiengangKz
 			);
+			if (!is_null($escapedSemester))
+			{
+				$lehrverbandConditions[] = '('.$assignmentAlias.'.semester = '
+					.$escapedSemester.' OR '.$assignmentAlias.'.semester IS NULL)';
+			}
 
 			if (!is_null($verband))
 			{
@@ -545,14 +551,22 @@ class KalenderLib
 					OR '.$assignmentAlias.'.gruppe::text = \'0\')';
 			}
 
+			$specialGroupConditions = array(
+				$specialGroupAlias.'.gruppe_kurzbz = '.$assignmentAlias.'.gruppe_kurzbz',
+				$specialGroupAlias.'.studiengang_kz = '.$escapedStudiengangKz,
+				$specialGroupAlias.'.direktinskription = FALSE'
+			);
+			if (!is_null($escapedSemester))
+			{
+				$specialGroupConditions[] = '('.$specialGroupAlias.'.semester = '
+					.$escapedSemester.' OR '.$specialGroupAlias.'.semester IS NULL)';
+			}
+
 			$specialGroupCondition = $assignmentAlias.'.gruppe_kurzbz IS NOT NULL
 				AND EXISTS (
 					SELECT 1
 					FROM public.tbl_gruppe '.$specialGroupAlias.'
-					WHERE '.$specialGroupAlias.'.gruppe_kurzbz = '.$assignmentAlias.'.gruppe_kurzbz
-						AND '.$specialGroupAlias.'.studiengang_kz = '.$escapedStudiengangKz.'
-						AND ('.$specialGroupAlias.'.semester = '.$escapedSemester.' OR '.$specialGroupAlias.'.semester IS NULL)
-						AND '.$specialGroupAlias.'.direktinskription = FALSE
+					WHERE '.implode("\n\t\t\t\t\t\tAND ", $specialGroupConditions).'
 				)';
 
 			return "((

@@ -125,7 +125,7 @@ $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/person/(:num)'] = 'api/f
 
 $route['lvplan/caldav'] = 'LvPlanCalDAV';
 $route['lvplan/caldav/.*'] = 'LvPlanCalDAV';
-$route['lvplan/ical/subscription'] = 'LvPlanICALSubscription';
+$route['lvplan/ical/subscription/google'] = 'LvPlanICALSubscription';
 $route['lvplan/ical/download'] = 'LvPlanICALDownload';
 $route['lvplan/csv/download'] = 'LvPlanCSVDownload';
 $route['lvplan/excel/download'] = 'LvPlanExcelDownload';

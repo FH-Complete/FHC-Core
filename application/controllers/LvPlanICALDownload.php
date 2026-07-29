@@ -119,7 +119,7 @@ class LvPlanICALDownload extends Auth_Controller
 	private function getVerbandFilters()
 	{
 		$stgKz = $this->getInteger('stg_kz', true);
-		$semester = $this->getInteger('sem', false);
+		$semester = $this->getInteger('sem', false, true);
 		$verband = $this->getOptionalFilter('ver');
 		$gruppe = $this->getOptionalFilter('grp');
 
@@ -138,9 +138,12 @@ class LvPlanICALDownload extends Auth_Controller
 		);
 	}
 
-	private function getInteger($name, $signed)
+	private function getInteger($name, $signed, $optional = false)
 	{
 		$value = $this->input->get($name, true);
+		if ($optional && ($value === null || $value === ''))
+			return null;
+
 		$pattern = $signed ? '/^-?\d+$/' : '/^\d+$/';
 		if (!is_string($value) || !preg_match($pattern, $value))
 			show_error('Ungueltiger Parameter: '.$name, 400);

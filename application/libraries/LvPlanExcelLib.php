@@ -164,7 +164,7 @@ class LvPlanExcelLib
 
 		$isReservation = isset($event->type) && $event->type === 'reservierung';
 		$subject = $isReservation
-			? (isset($event->titel) ? $event->titel : '')
+			? $event->titel . " " . $this->joinValues(isset($event->ort_kurzbz) ? $event->ort_kurzbz : array()) . " - " . $this->getGroups($event)
 			: (isset($event->lehrfach_bez) ? $event->lehrfach_bez : '');
 
 		if ($subject === '')
@@ -179,12 +179,12 @@ class LvPlanExcelLib
 			$start->format('H:i:s'),
 			$end->format('H:i:s'),
 			$this->joinValues(isset($event->ort_kurzbz) ? $event->ort_kurzbz : array()),
-			$this->getLecturers($event),
+			!$isReservation ? $this->getParticipants($event) : $this->getLecturers($event),
 			$this->getGroups($event),
 			$subject,
 			$note,
-			$this->findHour($start->format('H:i:s'), $hourRaster),
-			$this->findHour($end->format('H:i:s'), $hourRaster)
+			$this->findHour($start->format('H:i:s'), $hourRaster, "start"),
+			$this->findHour($end->format('H:i:s'), $hourRaster, "end")
 		);
 	}
 
@@ -274,6 +274,8 @@ class LvPlanExcelLib
 			}
 		}
 
+		sort($lecturers, SORT_NATURAL | SORT_FLAG_CASE);
+
 		return implode(', ', array_unique($lecturers));
 	}
 
@@ -303,6 +305,8 @@ class LvPlanExcelLib
 			}
 		}
 
+		sort($groups, SORT_NATURAL | SORT_FLAG_CASE);
+
 		return implode(',', array_unique($groups));
 	}
 
@@ -311,7 +315,7 @@ class LvPlanExcelLib
 	 * @param array $hourRaster Timetable-hour raster.
 	 * @return string|int Timetable-hour number or an empty string.
 	 */
-	private function findHour($time, array $hourRaster)
+	private function findHour($time, array $hourRaster, string $context = '')
 	{
 		$seconds = $this->timeToSeconds($time);
 		if ($seconds === null || count($hourRaster) === 0)
@@ -324,7 +328,10 @@ class LvPlanExcelLib
 
 		foreach ($hourRaster as $hour)
 		{
-			if ($seconds <= $hour['end'])
+			if (
+				($seconds < $hour['end'] && $context === "start") ||
+				($seconds <= $hour['end'] && $context === "end")
+			)
 				return $hour['stunde'];
 		}
 
@@ -416,5 +423,37 @@ class LvPlanExcelLib
 		{
 			return null;
 		}
+	}
+
+	private function getParticipants($event)
+	{
+		$values = array();
+		if (!isset($event->teilnehmer_person) || !is_array($event->teilnehmer_person))
+			return '';
+
+		foreach ($event->teilnehmer_person as $participant)
+		{
+			$value = $participant['vorname'] . ' ' . $participant['nachname'];
+
+			if ($value !== '')
+				$values[] = $value;
+		}
+
+		sort($values, SORT_NATURAL | SORT_FLAG_CASE);
+
+		return implode(', ', array_unique($values));
+	}
+
+	private function getNestedValue($value, array $properties)
+	{
+		foreach ($properties as $property)
+		{
+			if (is_array($value) && isset($value[$property]))
+				return (string)$value[$property];
+			if (is_object($value) && isset($value->{$property}))
+				return (string)$value->{$property};
+		}
+
+		return is_scalar($value) ? (string)$value : '';
 	}
 }

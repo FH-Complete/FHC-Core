@@ -63,7 +63,12 @@ class LvPlanICALSubscription extends FHC_Controller
 		$content = $this->lvplanicallib->getContent(
 			$this->uid,
 			$this->begin,
-			$this->ende
+			$this->ende,
+			null,
+			2,
+			null,
+			null,
+			'FH-Kalender'
 		);
 
 		$filename = 'FH-Kalender_'.date('m_Y', $this->begin).'_ical.ics';

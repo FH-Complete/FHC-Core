@@ -34,6 +34,7 @@ class LvPlanICALLib
 	 * @param int $version iCalendar major version (1 or 2).
 	 * @param string|null $ortKurzbz Room identifier for room plans.
 	 * @param array|null $verbandFilters Lehrverband filters.
+	 * @param string|null $calendarName Display name for calendar subscriptions.
 	 * @return string
 	 */
 	public function getContent(
@@ -43,7 +44,8 @@ class LvPlanICALLib
 		$type = null,
 		$version = 2,
 		$ortKurzbz = null,
-		$verbandFilters = null
+		$verbandFilters = null,
+		$calendarName = null
 	) {
 		if (!in_array($version, array(1, 2), true))
 			throw new InvalidArgumentException('Unsupported iCalendar version');
@@ -106,7 +108,7 @@ class LvPlanICALLib
 		if (!is_array($events))
 			$events = array();
 
-		$content = $this->buildCalendarHeader($version);
+		$content = $this->buildCalendarHeader($version, $calendarName);
 
 		foreach ($events as $event)
 			$content .= $this->buildEvent($event);
@@ -114,15 +116,23 @@ class LvPlanICALLib
 		return $content.$this->buildICalLine('END', 'VCALENDAR');
 	}
 
-	private function buildCalendarHeader($version)
+	private function buildCalendarHeader($version, $calendarName = null)
 	{
 		$productId = defined('CAMPUS_NAME') && CAMPUS_NAME !== ''
 			? CAMPUS_NAME
 			: 'FHComplete';
 
-		return $this->buildICalLine('BEGIN', 'VCALENDAR')
+		$header = $this->buildICalLine('BEGIN', 'VCALENDAR')
 			.$this->buildICalLine('VERSION', $version.'.0')
-			.$this->buildICalTextLine('PRODID', $productId)
+			.$this->buildICalTextLine('PRODID', $productId);
+
+		if (is_string($calendarName) && $calendarName !== '')
+		{
+			$header .= $this->buildICalTextLine('NAME', $calendarName);
+			$header .= $this->buildICalTextLine('X-WR-CALNAME', $calendarName);
+		}
+
+		return $header
 			.$this->buildICalLine('BEGIN', 'VTIMEZONE')
 			.$this->buildICalLine('TZID', 'Europe/Vienna')
 			.$this->buildICalLine('BEGIN', 'DAYLIGHT')
@@ -144,26 +154,27 @@ class LvPlanICALLib
 
 	private function buildEvent($event)
 	{
+		$isReservation = $event->type === 'reservierung';
+
 		$summaryIcon = '';
-		$summary = $event->type === 'reservierung'
-			? $event->titel
+		$summary = $isReservation
+			? implode(' - ', array_filter(array($event->titel, implode('/', $event->ort_kurzbz), $this->getGroups($event))))
 			: $this->joinValues($event->topic);
 
-		if ($event->type === 'reservierung')
-		{
-			$description = $event->beschreibung;
-		}
-		else
-		{
-			$description = $event->lehrfach_bez."\r\n";
-
-			if (isset($event->lektor) && is_array($event->lektor) && count($event->lektor) > 0)
-			{
-				$description .= 'Lektor*in: '.implode(', ', array_map(function ($teacher) {
-					return $teacher['kurzbz'];
-				}, $event->lektor))."\r\n";
+		$descriptionParts = array(
+			$event->titel,
+			isset($event->lehrfach_bez) ? $event->lehrfach_bez : '',
+			$isReservation ? $this->getParticipants($event) : $this->getLecturers($event),
+			$this->getGroups($event),
+			implode('/', $event->ort_kurzbz),
+			isset($event->beschreibung) ? $event->beschreibung : ''
+		);
+		$description = implode("\r\n", array_values(array_filter(
+			$descriptionParts,
+			function ($value) {
+				return $value !== '';
 			}
-		}
+		)));
 
 		$category = self::CATEGORY_TIMETABLE;
 		if ($event->type === 'lehreinheit')
@@ -318,5 +329,77 @@ class LvPlanICALLib
 		{
 			return null;
 		}
+	}
+
+		/**
+	 * @param object $event Calendar event.
+	 * @return string Participant group labels.
+	 */
+	private function getGroups($event)
+	{
+		$groups = array();
+
+		if (isset($event->gruppe) && is_array($event->gruppe))
+		{
+			foreach ($event->gruppe as $group)
+			{
+				if (isset($group['bezeichnung']) && $group['bezeichnung'] !== '')
+					$groups[] = $group['bezeichnung'];
+			}
+		}
+
+		if (isset($event->teilnehmer_gruppe) && is_array($event->teilnehmer_gruppe))
+		{
+			foreach ($event->teilnehmer_gruppe as $group)
+			{
+				if (isset($group['gruppe_kurzbz']) && $group['gruppe_kurzbz'] !== '')
+					$groups[] = $group['gruppe_kurzbz'];
+			}
+		}
+
+		sort($groups, SORT_NATURAL | SORT_FLAG_CASE);
+
+		return implode(',', array_unique($groups));
+	}
+
+	/**
+	 * @param object $event Calendar event.
+	 * @return string Lecturer abbreviations.
+	 */
+	private function getLecturers($event)
+	{
+		$lecturers = array();
+
+		if (isset($event->lektor) && is_array($event->lektor))
+		{
+			foreach ($event->lektor as $lecturer)
+			{
+				if (isset($lecturer['kurzbz']) && $lecturer['kurzbz'] !== '')
+					$lecturers[] = $lecturer['kurzbz'];
+			}
+		}
+
+		sort($lecturers, SORT_NATURAL | SORT_FLAG_CASE);
+
+		return implode(' / ', array_unique($lecturers));
+	}
+
+	private function getParticipants($event)
+	{
+		$values = array();
+		if (!isset($event->teilnehmer_person) || !is_array($event->teilnehmer_person))
+			return '';
+
+		foreach ($event->teilnehmer_person as $participant)
+		{
+			$value = $participant['vorname'] . ' ' . $participant['nachname'];
+
+			if ($value !== '')
+				$values[] = $value;
+		}
+
+		sort($values, SORT_NATURAL | SORT_FLAG_CASE);
+
+		return implode(', ', array_unique($values));
 	}
 }

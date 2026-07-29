@@ -133,7 +133,7 @@ class LvPlanCSVLib
 
 		foreach ($events as $event)
 		{
-			$eventData = $this->getEventData($event);
+			$eventData = $this->getEventData($event, $type);
 			if ($eventData === null)
 				continue;
 
@@ -151,7 +151,7 @@ class LvPlanCSVLib
 	 * @param object $event Calendar event.
 	 * @return array|null Normalized CSV values or null for invalid dates.
 	 */
-	private function getEventData($event)
+	private function getEventData($event, $type = null)
 	{
 		$start = $this->createDateTime(isset($event->isostart) ? $event->isostart : null);
 		$end = $this->createDateTime(isset($event->isoend) ? $event->isoend : null);
@@ -164,38 +164,38 @@ class LvPlanCSVLib
 		$end->setTimezone($timezone);
 
 		$isReservation = isset($event->type) && $event->type === 'reservierung';
+		
 		$title = $isReservation
 			? (isset($event->titel) ? $event->titel : '')
 			: $this->joinValues(isset($event->topic) ? $event->topic : array());
+		if ($type === 'verband') {
+			$title = '';
+		}
+
 		$location = $this->joinValues(
 			isset($event->ort_kurzbz) ? $event->ort_kurzbz : array(),
 			' / '
 		);
 		$groups = $this->getGroups($event);
 		$lecturers = $this->getLecturers($event);
+		$participants = $this->getParticipants($event);
+		
 
-		if ($isReservation)
-		{
-			$description = isset($event->beschreibung) ? $event->beschreibung : '';
-		}
-		else
-		{
-			$descriptionParts = array(
+		$descriptionParts = array(
 				'Stundenplan',
 				$title,
-				isset($event->lehrfach_bez) ? $event->lehrfach_bez : '',
-				$lecturers,
+				$isReservation ? '' : (isset($event->lehrfach_bez) ? $event->lehrfach_bez : '') ,
+				$isReservation ? $participants : $lecturers,
 				$groups,
 				$location,
 				isset($event->beschreibung) ? $event->beschreibung : ''
 			);
-			$description = implode("\r\n", array_values(array_filter(
-				$descriptionParts,
-				function ($value) {
-					return $value !== '';
-				}
-			)));
-		}
+		$description = implode("\r\n", array_values(array_filter(
+			$descriptionParts,
+			function ($value) {
+				return $value !== '';
+			}
+		)));
 
 		return array(
 			'title' => $title,
@@ -288,6 +288,8 @@ class LvPlanCSVLib
 			}
 		}
 
+		sort($lecturers, SORT_NATURAL | SORT_FLAG_CASE);
+		
 		return implode(' / ', array_unique($lecturers));
 	}
 
@@ -316,6 +318,8 @@ class LvPlanCSVLib
 					$groups[] = $group['gruppe_kurzbz'];
 			}
 		}
+
+		sort($groups, SORT_NATURAL | SORT_FLAG_CASE);
 
 		return implode(' / ', array_unique($groups));
 	}
@@ -369,5 +373,24 @@ class LvPlanCSVLib
 		{
 			return null;
 		}
+	}
+
+	private function getParticipants($event)
+	{
+		$values = array();
+		if (!isset($event->teilnehmer_person) || !is_array($event->teilnehmer_person))
+			return '';
+
+		foreach ($event->teilnehmer_person as $participant)
+		{
+			$value = $participant['kurzbz'];
+
+			if ($value !== '')
+				$values[] = $value;
+		}
+
+		sort($values, SORT_NATURAL | SORT_FLAG_CASE);
+
+		return implode(', ', array_unique($values));
 	}
 }

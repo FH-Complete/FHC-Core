@@ -9,6 +9,8 @@ class LvPlanHTMLLib
 	const DETAIL_WINDOW_NAME = 'Details';
 	const DETAIL_WINDOW_OPTIONS = 'height=320,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes';
 
+	const ICON_EXAM = '📝';
+
 	private $ci;
 
 	public function __construct()
@@ -39,7 +41,7 @@ class LvPlanHTMLLib
 
 		$hourRaster = $this->loadHourRaster();
 		$normalizedEvents = $this->normalizeEvents($events);
-
+		
 		return $this->renderDocument(
 			$begin,
 			$ende,
@@ -180,9 +182,16 @@ class LvPlanHTMLLib
 				continue;
 
 			$isReservation = isset($event->type) && $event->type === 'reservierung';
-			$title = $isReservation
-				? $this->getScalar($event, 'titel')
-				: $this->joinValue(isset($event->topic) ? $event->topic : '');
+			
+			$title = '';
+			if ($isReservation) {
+				$title = $this->getScalar($event, 'titel');
+			} else {
+				$title = $this->joinValue(isset($event->topic) ? $event->topic : '');
+
+				if ($title !== '' && strtoupper($event->lehrform) === 'EXAM')
+					$title = $title . ' ' . self::ICON_EXAM;
+			}
 
 			if ($title === '')
 				$title = $this->getScalar($event, 'lehrfach_bez');
@@ -200,6 +209,7 @@ class LvPlanHTMLLib
 					isset($event->ort_kurzbz) ? $event->ort_kurzbz : ''
 				),
 				'lecturers' => $this->getLecturers($event),
+				'participants' => $this->getParticipants($event),
 				'groups' => $this->getGroups($event),
 				'note' => $this->getEventNote($event, $isReservation),
 				'color' => $this->getColor($event)
@@ -227,13 +237,14 @@ class LvPlanHTMLLib
 		$timezone = new DateTimeZone(self::TIMEZONE);
 		$rangeStart = (new DateTime('@'.$begin))->setTimezone($timezone)->setTime(0, 0, 0);
 		$rangeEnd = (new DateTime('@'.$ende))->setTimezone($timezone)->setTime(23, 59, 59);
+
 		$weeks = $this->buildWeeks($rangeStart, $rangeEnd, $hourRaster, $events);
 		$title = $this->getDocumentTitle($type, $filters);
 		$appRoot = $this->getAppRoot();
 
 		$html = '<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8">';
 		$html .= '<meta name="viewport" content="width=device-width, initial-scale=1">';
-		$html .= '<title>'.$this->escape($title).'</title>';
+		$html .= '<title>'.$this->escape('Kalender').'</title>';
 		$html .= '<link rel="stylesheet" href="'.$this->escape($appRoot.'skin/style.css.php').'" type="text/css">';
 		$html .= '<link rel="stylesheet" media="print" href="'.$this->escape($appRoot.'skin/cis.css').'" type="text/css">';
 		$html .= '<link rel="stylesheet" media="print" href="'.$this->escape($appRoot.'skin/print.css').'" type="text/css">';
@@ -360,7 +371,7 @@ class LvPlanHTMLLib
 		{
 			$weekday = (int)$day['date']->format('N');
 			$html .= '<tr><td>'.$weekdayNames[$weekday].'<br>';
-			$html .= $day['date']->format('d.m.Y').'<br></td>';
+			$html .= $day['date']->format('j.M Y').'<br></td>';
 
 			foreach ($day['cells'] as $slotIndex => $events)
 			{
@@ -407,7 +418,49 @@ class LvPlanHTMLLib
 			$html .= '</div>';
 		}
 
+		if ($type === 'ort')
+			$html .= $this->renderRoomReservationNotice($week, $filters);
+
 		return $html.'</div>';
+	}
+
+	/**
+	 * Renders the room reservation warning used by the legacy weekly plan.
+	 */
+	private function renderRoomReservationNotice(array $week, array $filters)
+	{
+		$requiredFilters = array(
+			'room_reservable',
+			'room_reservation_permitted',
+			'room_reservation_start',
+			'room_reservation_end',
+			'room_not_reservable_message',
+			'room_reservation_restricted_message'
+		);
+		foreach ($requiredFilters as $filter)
+		{
+			if (!array_key_exists($filter, $filters))
+				return '';
+		}
+
+		$weekEnd = (clone $week['end'])->modify('+1 day')->getTimestamp();
+		$canReserveInWeek = $filters['room_reservation_permitted']
+			&& $filters['room_reservable']
+			&& $weekEnd >= time()
+			&& $weekEnd >= $filters['room_reservation_start']
+			&& $week['start']->getTimestamp() <= $filters['room_reservation_end'];
+
+		if ($canReserveInWeek)
+			return '';
+
+		$message = $filters['room_reservation_permitted']
+			&& !$filters['room_reservable']
+			? $filters['room_not_reservable_message']
+			: $filters['room_reservation_restricted_message'];
+
+		return '<table><tr><td><br><span style="color: orange">'
+			.$this->escape($message)
+			.'</span></td></tr></table>';
 	}
 
 	/**
@@ -447,9 +500,11 @@ class LvPlanHTMLLib
 		if (($type === 'lektor' || $type === 'verband' || $type === 'ort')
 			&& $event['groups'] !== '')
 			$html .= '<br>'.$this->renderLines($event['groups']);
-		if ($type !== 'lektor' && $event['lecturers'] !== '')
+		if ($type !== 'lektor' && $type !== 'ort' && $event['lecturers'] !== '')
 			$html .= '<br>'.$this->renderLines($event['lecturers']);
-		if ($event['location'] !== '')
+		if ($type === 'ort' && $event['participants'] !== '')
+			$html .= '<br>'.$this->renderLines($event['participants']);
+		if ($event['location'] !== '' && $type !== 'ort')
 			$html .= '<br>'.$this->escape($event['location']);
 		if ($event['note'] !== '' && $this->shouldShowNotes())
 			$html .= '<br>'.$this->escape($event['note']);
@@ -520,6 +575,7 @@ class LvPlanHTMLLib
 
 	private function getDocumentTitle($type, array $filters)
 	{
+		//return 'Kalender';
 		if ($type === 'ort')
 		{
 			$title = 'Ort: '.$filters['ort_kurzbz'];
@@ -598,13 +654,33 @@ class LvPlanHTMLLib
 				$values[] = $value;
 		}
 
+		sort($values, SORT_STRING | SORT_FLAG_CASE);
+
+		return implode(', ', array_unique($values));
+	}
+
+	private function getParticipants($event)
+	{
+		$values = array();
+		if (!isset($event->teilnehmer_person) || !is_array($event->teilnehmer_person))
+			return '';
+
+		foreach ($event->teilnehmer_person as $participant)
+		{
+			$value = $this->getNestedValue($participant, array('kurzbz', 'student_uid'));
+			if ($value !== '')
+				$values[] = $value;
+		}
+
+		sort($values, SORT_STRING | SORT_FLAG_CASE);
+
 		return implode(', ', array_unique($values));
 	}
 
 	private function getGroups($event)
 	{
 		$values = array();
-		foreach (array('gruppe', 'teilnehmer_gruppe') as $property)
+		foreach (array('teilnehmer_gruppe', 'gruppe') as $property)
 		{
 			if (!isset($event->{$property}) || !is_array($event->{$property}))
 				continue;
@@ -620,6 +696,8 @@ class LvPlanHTMLLib
 			}
 		}
 
+		sort($values, SORT_STRING | SORT_FLAG_CASE);
+		
 		return implode(', ', array_unique($values));
 	}
 

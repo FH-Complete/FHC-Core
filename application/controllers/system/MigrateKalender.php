@@ -264,6 +264,58 @@ class MigrateKalender extends CLI_Controller
 		}
 	}
 
+	/**
+	 * Removes calendar entries created by the Stundenplan and Reservierung migrations,
+	 * so that both imports can be started from scratch.
+	 */
+	public function resetBeforeNewStundenplandevImport()
+	{
+		$db = new DB_Model();
+
+		$db->db->trans_start();
+
+		$db->db->query('DELETE FROM sync.tbl_stundenplandev_kalender');
+		$db->db->query('DELETE FROM sync.tbl_reservierung_kalender');
+
+		$db->db->query("DELETE FROM lehre.tbl_kalender_event_teilnehmer
+			WHERE kalender_id IN (
+				SELECT kalender_id
+				FROM lehre.tbl_kalender
+				WHERE typ = 'reservierung'
+			)");
+
+		$db->db->query("DELETE FROM lehre.tbl_kalender_event
+			WHERE kalender_id IN (
+				SELECT kalender_id
+				FROM lehre.tbl_kalender
+				WHERE typ = 'reservierung'
+			)");
+
+		$db->db->query("DELETE FROM lehre.tbl_kalender_lehreinheit
+			WHERE kalender_id IN (
+				SELECT kalender_id
+				FROM lehre.tbl_kalender
+				WHERE typ = 'lehreinheit' OR typ = 'reservierung'
+			)");
+
+		$db->db->query("DELETE FROM lehre.tbl_kalender_ort
+			WHERE kalender_id IN (
+				SELECT kalender_id
+				FROM lehre.tbl_kalender
+				WHERE typ IN ('lehreinheit', 'reservierung')
+			)");
+
+		$db->db->query("DELETE FROM lehre.tbl_kalender
+			WHERE typ IN ('lehreinheit', 'reservierung')");
+
+		$db->db->trans_complete();
+
+		if ($db->db->trans_status() === false)
+			return error('Reset before new import failed');
+
+		return success('Migration data reset successfully');
+	}
+
 	public function migrateStundenplanBetriebsmittelEntries() {
 		$this->setKalendarEntriesGroupIDs();
 		$this->setKalendarEntriesGroupIDsForChildren();

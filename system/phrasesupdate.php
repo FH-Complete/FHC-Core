@@ -61219,6 +61219,47 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	//*******************************		CORE/lvplan
+	array(
+		'app' => 'core',
+		'category' => 'lvplan',
+		'phrase' => 'room_not_reservable',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Möglichkeit der Reservierung ist für diesen Raum deaktiviert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reservation is disabled for this room.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lvplan',
+		'phrase' => 'room_reservation_restricted_to_period',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Raumreservierung ist auf den Zeitraum vom {start_date} bis {end_date} eingeschränkt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Room reservation is limited to the period from {start_date} to {end_date}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// generic tabulator phrases END
 );
 

@@ -8,6 +8,8 @@ require_once(FHCPATH.'include/functions.inc.php');
 class LvPlanHTMLPreview extends Auth_Controller
 {
 	const MAX_DATE_RANGE = 34560000; // 400 days
+	const DEFAULT_RESERVATION_MIN_DAYS = 1;
+	const DEFAULT_RESERVATION_END_DATE = '2099-01-01';
 
 	/**
 	 * Object initialization.
@@ -22,6 +24,14 @@ class LvPlanHTMLPreview extends Auth_Controller
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		$this->load->model('ressource/Ort_model', 'OrtModel');
+		$this->loadPhrases(
+			array(
+				'lvplan' => array(
+					'room_not_reservable',
+					'room_reservation_restricted_to_period'
+				)
+			)
+		);
 	}
 
 	/**
@@ -147,7 +157,7 @@ class LvPlanHTMLPreview extends Auth_Controller
 		if (!is_string($ortKurzbz) || $ortKurzbz === '' || !check_utf8($ortKurzbz))
 			show_error('Ungueltiger Parameter: ort_kurzbz', 400);
 
-		$this->OrtModel->addSelect('ort_kurzbz, bezeichnung');
+		$this->OrtModel->addSelect('ort_kurzbz, bezeichnung, reservieren');
 		$room = $this->OrtModel->load($ortKurzbz);
 
 		if (isError($room))
@@ -157,10 +167,41 @@ class LvPlanHTMLPreview extends Auth_Controller
 
 		$rooms = getData($room);
 		$roomData = reset($rooms);
+		$reservationMinDays = defined('RES_TAGE_LEKTOR_MIN')
+			? (int)constant('RES_TAGE_LEKTOR_MIN')
+			: self::DEFAULT_RESERVATION_MIN_DAYS;
+		$reservationEndDate = defined('RES_TAGE_LEKTOR_BIS')
+			? constant('RES_TAGE_LEKTOR_BIS')
+			: self::DEFAULT_RESERVATION_END_DATE;
+		$reservationStart = jump_day(
+			time(),
+			$reservationMinDays - 1
+		);
+		$reservationEnd = strtotime($reservationEndDate);
 
 		return array(
 			'ort_kurzbz' => $ortKurzbz,
-			'bezeichnung' => isset($roomData->bezeichnung) ? $roomData->bezeichnung : ''
+			'bezeichnung' => isset($roomData->bezeichnung) ? $roomData->bezeichnung : '',
+			'room_reservable' => isset($roomData->reservieren)
+				&& $roomData->reservieren === true,
+			'room_reservation_permitted' => $this->permissionlib->isBerechtigt(
+				'lehre/reservierung:begrenzt',
+				'sui'
+			),
+			'room_reservation_start' => $reservationStart,
+			'room_reservation_end' => $reservationEnd,
+			'room_not_reservable_message' => $this->p->t(
+				'lvplan',
+				'room_not_reservable'
+			),
+			'room_reservation_restricted_message' => $this->p->t(
+				'lvplan',
+				'room_reservation_restricted_to_period',
+				array(
+					'start_date' => date('d.m.Y', $reservationStart),
+					'end_date' => date('d.m.Y', $reservationEnd)
+				)
+			)
 		);
 	}
 
@@ -172,7 +213,7 @@ class LvPlanHTMLPreview extends Auth_Controller
 		// Legacy wochenplan links always carry pers_uid. It does not filter or
 		// authorize a Lehrverband plan and is intentionally ignored here.
 		$stgKz = $this->getInteger('stg_kz', true);
-		$semester = $this->getInteger('sem', false);
+		$semester = $this->getInteger('sem', false, true);
 		$verband = $this->getOptionalFilter('ver');
 		$gruppe = $this->getOptionalFilter('grp');
 
@@ -217,11 +258,15 @@ class LvPlanHTMLPreview extends Auth_Controller
 	/**
 	 * @param string $name GET parameter name.
 	 * @param bool $signed Whether negative values are allowed.
-	 * @return int
+	 * @param bool $optional Whether the parameter may be omitted or empty.
+	 * @return int|null
 	 */
-	private function getInteger($name, $signed)
+	private function getInteger($name, $signed, $optional = false)
 	{
 		$value = $this->input->get($name, true);
+		if ($optional && ($value === null || $value === ''))
+			return null;
+
 		$pattern = $signed ? '/^-?\d+$/' : '/^\d+$/';
 
 		if (!is_string($value) || !preg_match($pattern, $value))
