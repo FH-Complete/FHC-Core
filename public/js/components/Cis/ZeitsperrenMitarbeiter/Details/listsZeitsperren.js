@@ -5,7 +5,7 @@ import FormInput from "../../../Form/Input.js";
 import PvAutoComplete from "../../../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 
 export default {
-	name: "aktuelleZeitsperren",
+	name: "listsTimelocks",
 	components: {
 		FormForm,
 		FormInput,
@@ -314,6 +314,7 @@ export default {
 	},
 	template: `
 	<div class="w-100 h-100">
+	type: {{type}}
 		<h3 class="mt-3"><span v-if="type=='all'">Mitarbeiter*innen mit aktuellen </span>Zeitsperren 
 			<span v-if="type=='fix'">Fixangestellte</span>
 			<span v-if="type=='lector'">aller fixer Lektoren</span> 
