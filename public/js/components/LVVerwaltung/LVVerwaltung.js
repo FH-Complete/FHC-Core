@@ -52,7 +52,7 @@ export default {
 			appconfig:{},
 			configEndpoints: ApiLvConfig,
 			selected: [],
-			studiengang: "",
+			studiengang_kz: null,
 			selectedStudiensemester: this.defaultSemester,
 			dropdowns: {
 				studiensemester_array: [],
@@ -114,7 +114,7 @@ export default {
 		{
 			let extraItems = [];
 
-			const studiengang_kz = this.stg || '';
+			const studiengang_kz = this.studiengang_kz || '';
 			const studiensemester = this.selectedStudiensemester;
 			const semester = this.semester || '';
 			const uid = this.emp || '';
@@ -123,7 +123,7 @@ export default {
 			extraItems.push(
 				{
 					description: 'lehre/berichte',
-					requires: ['stg'],
+					requires: ['studiengang_kz'],
 					children: [
 						{
 							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
@@ -132,7 +132,7 @@ export default {
 								+ '&studiensemester_kurzbz=' + studiensemester
 								+ '&semester=' + semester,
 							description: 'lehre/lvplanung',
-							requires: ['stg']
+							requires: ['studiengang_kz']
 						},
 						{
 							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
@@ -141,7 +141,7 @@ export default {
 								+ '&studiensemester_kurzbz=' + studiensemester
 								+ '&semester=' + semester,
 							description: 'lehre/lehrauftragsliste',
-							requires: ['stg']
+							requires: ['studiengang_kz']
 						},
 						{
 							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
@@ -150,7 +150,7 @@ export default {
 								+ '&stg_kz=' + studiengang_kz
 								+ '&ss=' + studiensemester,
 							description: 'lehre/lehrauftraege',
-							requires: ['stg']
+							requires: ['studiengang_kz']
 						},
 						{
 							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
@@ -169,7 +169,7 @@ export default {
 						+ 'vilesci/lehre/lehrveranstaltung.php'
 						+ '?stg_kz=' + studiengang_kz,
 					description: 'lehre/extrakvverwaltung',
-					requires: ['stg']
+					requires: ['studiengang_kz']
 				}
 			);
 
@@ -195,7 +195,7 @@ export default {
 				}
 			});
 		},
-		onSelectVerband({ path: link })
+		onSelectVerband({ path: link, stg_kz })
 		{
 			this.$router.push({
 				name: this.$route.name == 'emp' ? 'emp' : 'treemenu',
@@ -205,6 +205,7 @@ export default {
 				}
 			});
 			this.selected = [];
+			this.studiengang_kz = stg_kz;
 		},
 		resetEmployeeFilter()
 		{
@@ -266,6 +267,7 @@ export default {
 				return false;
 
 			const values = {
+				studiengang_kz: this.studiengang_kz,
 				stg: this.stg,
 				emp: this.emp,
 				studiensemester: this.selectedStudiensemester,
