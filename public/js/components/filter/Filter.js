@@ -92,7 +92,6 @@ export const CoreFilterCmpt = {
 			default: true
 		},
 	},
-	inject: ["language"],
 	data: function() {
 		return {
 			uuid: 0,
@@ -239,6 +238,9 @@ export const CoreFilterCmpt = {
 				...el,
 				...{ title: filterTitles[el.name] },
 			}));
+		},
+		language() {
+			return this.$p.user_language;
 		},
 	},
 	watch: {
