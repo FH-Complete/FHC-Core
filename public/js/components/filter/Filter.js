@@ -825,7 +825,23 @@ export const CoreFilterCmpt = {
 			if (!this.tableBuilt) {
 				return {};
 			} else if (this.tabulator.options.locale) {
-				return this.tabulator.getLang().columns;
+				let result = this.tabulator.getLang().columns;
+				const columnFieldTitlePairs = this.tabulator
+					.getColumns()
+					.map((column) => {
+						const definition = column.getDefinition();
+						return [definition.field, definition.title];
+					});
+				columnFieldTitlePairs.forEach((fieldTitlePair) => {
+					if (
+						fieldTitlePair[0]?.length &&
+						fieldTitlePair[1]?.length &&
+						!(fieldTitlePair[0] in result)
+					) {
+						result[fieldTitlePair[0]] = fieldTitlePair[1];
+					}
+				});
+				return result;
 			}
 			return this.tabulator.getColumns().reduce((res, col) => {
 				res[col.getField()] = col.getDefinition().title;
