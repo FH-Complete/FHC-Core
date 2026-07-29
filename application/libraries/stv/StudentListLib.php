@@ -323,6 +323,13 @@ class StudentListLib
 	 protected function addSelectAndJoinForTagsIfConfigured($studiensemester_kurzbz)
 	 {
 		if (defined('STV_TAGS_ENABLED') && STV_TAGS_ENABLED) {
+
+			$this->_ci->load->model('system/Sprache_model', 'SpracheModel');
+			$this->_ci->SpracheModel->addSelect('index');
+			$result = $this->_ci->SpracheModel->loadWhere(array('sprache' => getUserLanguage()));
+			$language = hasData($result) ? getData($result)[0]->index : 1;
+			$index_bezeichnung_mehrsprachig = $language - 1;
+
 			$this->_ci->load->config('stv');
 			$tags = $this->_ci->config->item('stv_prestudent_tags');
 
@@ -344,7 +351,7 @@ class StudentListLib
 					SELECT DISTINCT ON (n.notiz_id)
 						n.notiz_id AS id,
 						nt.typ_kurzbz,
-						array_to_json(nt.bezeichnung_mehrsprachig)->>0 AS beschreibung,
+						array_to_json(nt.bezeichnung_mehrsprachig)->>". $index_bezeichnung_mehrsprachig . " AS beschreibung,
 						n.text AS notiz,
 						nt.style,
 						n.erledigt AS done,
