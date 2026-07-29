@@ -35,6 +35,7 @@ export default {
       selectedAvailableTag: null,
       assignedTags: [],
       tagEndpoint: ApiTempusTag,
+      tagModalEscapeHandler: null,
     };
   },
   computed: {
@@ -66,11 +67,52 @@ export default {
       this.$refs.modal.hide();
     },
     reset() {
+      this.removeTagModalEscapeHandler();
       this.calendar = null;
       this.availableTags = [];
       this.filteredAvailableTags = [];
       this.selectedAvailableTag = null;
       this.assignedTags = [];
+    },
+    prepareTagModal() {
+      const tagModal = this.$refs.tagComponent?.$refs.tagModal;
+      const tagModalElement = tagModal?.$el;
+
+      if (!tagModalElement) return;
+
+      tagModalElement.addEventListener(
+        "shown.bs.modal",
+        () => {
+          this.tagModalEscapeHandler = (event) => {
+            if (event.key !== "Escape") return;
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            tagModal.hide();
+          };
+          document.addEventListener("keydown", this.tagModalEscapeHandler, true);
+        },
+        { once: true },
+      );
+      tagModalElement.addEventListener(
+        "hidden.bs.modal",
+        () => this.restoreAssignmentModalFocus(),
+        { once: true },
+      );
+    },
+    removeTagModalEscapeHandler() {
+      if (!this.tagModalEscapeHandler) return;
+
+      document.removeEventListener(
+        "keydown",
+        this.tagModalEscapeHandler,
+        true,
+      );
+      this.tagModalEscapeHandler = null;
+    },
+    restoreAssignmentModalFocus() {
+      this.removeTagModalEscapeHandler();
+      this.$refs.modal?.$el?.focus();
     },
     async fetchAvailableTags() {
       const result = await this.$api.call(ApiTempusTag.getTags());
@@ -113,12 +155,16 @@ export default {
     },
     selectTag(event) {
       this.selectedAvailableTag = event.value;
+      this.prepareTagModal();
       this.$refs.tagComponent?.openModal(event.value.data);
     },
     editTag(tag) {
+      this.prepareTagModal();
       this.$refs.tagComponent?.editTag(tag.notiz_id);
     },
     async handleCalendarTagChange() {
+      this.removeTagModalEscapeHandler();
+
       const calendarGroupId = this.calendar?.eindeutige_gruppen_id;
       if (!calendarGroupId) return;
 
