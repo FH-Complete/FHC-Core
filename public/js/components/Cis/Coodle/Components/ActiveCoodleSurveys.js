@@ -22,7 +22,6 @@ export default {
 				paginationCounter: "rows",
 				columns: [
 					{
-						title: "Title",
 						title: "placeholder",
 						titlePhrase: "coodle/title",
 						field: "title",
@@ -30,7 +29,6 @@ export default {
 						minWidth: 150,
 					},
 					{
-						title: "Creator",
 						title: "placeholder",
 						titlePhrase: "coodle/creator",
 						field: "creatorName",
@@ -38,7 +36,6 @@ export default {
 						minWidth: 100,
 					},
 					{
-						title: "Started on",
 						title: "placeholder",
 						titlePhrase: "coodle/started_on",
 						field: "createdAt",
@@ -50,7 +47,6 @@ export default {
 						headerFilter: dateFilter,
 					},
 					{
-						title: "Ends on",
 						title: "placeholder",
 						titlePhrase: "coodle/ends_on",
 						field: "endsAt",
