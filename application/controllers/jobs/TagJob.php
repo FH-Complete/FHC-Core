@@ -6,9 +6,6 @@ use \DateTime as DateTime;
 
 class TagJob extends JOB_Controller
 {
-
-	const BATCHUSER = 'sftest';
-
 	/**
 	 * API constructor
 	 */
@@ -34,8 +31,6 @@ class TagJob extends JOB_Controller
 
 	public function rebuildAutomatedTags()
 	{
-
-
 		$automatedTagsRes = $this->NotiztypModel->loadWhere(array('automatisiert' => true, 'taglib IS NOT NULL' => null));
 		$automatedTags = hasData($automatedTagsRes) ? getData($automatedTagsRes) : [];
 
@@ -109,9 +104,7 @@ class TagJob extends JOB_Controller
 				$this->logInfo("Tag " . $result->retval['input']['tag'] . "Deleted tags(s: " . implode(', ', $result->retval['results']['deletedTagsIds']));
 			if ($result->retval['results']['retaggedIds'])
 				$this->logInfo("Tag " . $result->retval['input']['tag'] . "Recycled tag(s): " . implode(', ', $result->retval['results']['retaggedIds']));
-
 		}
 		$this->logInfo( "End Job rebuild Automated Tags");
-
 	}
 }

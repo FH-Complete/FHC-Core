@@ -190,7 +190,7 @@ class Students extends FHCAPI_Controller
 		) AS semester", false);
 		$this->studentlistlib->addSelect("COALESCE(v.verband::text, ''::text) AS verband");
 		$this->studentlistlib->addSelect("COALESCE(v.gruppe::text, ''::text) AS gruppe");
-		
+
 
 		$this->addFilter($studiensemester_kurzbz);
 
@@ -235,7 +235,7 @@ class Students extends FHCAPI_Controller
 		) AS semester", false);
 		$this->studentlistlib->addSelect("COALESCE(v.verband::text, ''::text) AS verband");
 		$this->studentlistlib->addSelect("COALESCE(v.gruppe::text, ''::text) AS gruppe");
-		
+
 
 		$this->addFilter($studiensemester_kurzbz);
 
@@ -649,7 +649,7 @@ class Students extends FHCAPI_Controller
 			$this->terminateWithError($studiensemester_kurzbz . ' - ' . $this->p->t('lehre', 'error_noStudiensemester'));
 		}
 
-		
+
 		$this->studentlistlib->addSelect("COALESCE(
 			v.semester::text, 
 			CASE 
@@ -697,7 +697,7 @@ class Students extends FHCAPI_Controller
 
 
 		$this->studentlistlib->addWhere('s.student_uid', $student_uid);
-		
+
 
 		$this->addFilter($studiensemester_kurzbz);
 
@@ -734,7 +734,7 @@ class Students extends FHCAPI_Controller
 
 		$this->studentlistlib->addWhere('p.person_id', $person_id);
 
-		
+
 		$this->addFilter($studiensemester_kurzbz);
 
 		$result = $this->studentlistlib->execute($studiensemester_kurzbz);
