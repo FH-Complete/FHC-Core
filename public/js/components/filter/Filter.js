@@ -333,6 +333,16 @@ export const CoreFilterCmpt = {
 				...(this.tabulatorOptions || {}),
 			};
 
+			if (
+				this.$props.isUsingPresets &&
+				"tabulatorPreset-" + this.$props.presetsId in
+					window.localStorage
+			) {
+				tabulatorOptions.persistence.columns = false;
+				tabulatorOptions.persistence.headerFilter = false;
+				tabulatorOptions.persistence.sort = false;
+			}
+
 			if (tabulatorOptions.locale) {
 				tabulatorOptions =
 					await this.configureTabulatorLocalizations(
