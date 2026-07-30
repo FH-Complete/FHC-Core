@@ -186,15 +186,21 @@ export default {
 				item.label.toLowerCase().includes(query)
 			);
 		},
-		//TODO(Manu) check link profile
 		link(uid) {
-			//https://www.fhcomplete.local/cis.php/Cis/Profil/getView/bell
+
+			//link to new profile
 			return (
-				FHC_JS_DATA_STORAGE_OBJECT.app_root +
-				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-				"/Cis/Profil/getView/" +
+			FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+				"/Cis/Profil/View/"+
 				uid
 			);
+
+			//link to old profile
+/*			return (
+				FHC_JS_DATA_STORAGE_OBJECT.app_root +
+				"cis/private/profile/index.php?uid=" +
+				uid
+			);*/
 		}
 	},
 	computed: {
@@ -413,11 +419,10 @@ export default {
 						<template v-if="sperre = getSperre(m, day.date)">
 							{{$p.t('zeitsperren/abwesend')}}
 							<div v-if="sperre.kurzbz">
-								V: {{ sperre.kurzbz }}
-							</div>
-							<a :href="link(sperre.vertretung_uid)">
+								V: <a :href="link(sperre.vertretung_uid)">
 								{{ sperre.kurzbz }}
 							</a>
+							</div>
 							<div v-if="sperre.erreichbarkeit_kurzbz">E: {{ sperre.erreichbarkeit_kurzbz }}</div>
 						</template>
 					</td>
