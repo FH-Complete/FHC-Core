@@ -1,6 +1,6 @@
 // TODO(chris): load events that are longer than the interval without doubling it
 
-export function useEventLoader(rangeInterval, getPromiseFunc) {
+export function useEventLoader(rangeInterval, getPromiseFunc, preserveRequestedRange = false) {
 	let loading_id = 0;
 	const events = Vue.ref([]);
 	const loadingEvents = Vue.ref([]);
@@ -83,6 +83,23 @@ export function useEventLoader(rangeInterval, getPromiseFunc) {
 						// load the rest
 						let rStart = eventsLoaded[index + 1] + 1;
 						result = mergePromiseArr(markEventsLoaded(start.plus(rStart - start.ts), end), result);
+					} else if (
+						Vue.toValue(preserveRequestedRange)
+						&& end.ts < eventsLoaded[index]
+					) {
+						// requested range is entirely inside the gap
+						// between the previous and next loaded chunks
+						const touchesPrevious = eventsLoaded[index - 1] + 1 == start.ts;
+						const touchesNext = end.ts + 1 == eventsLoaded[index];
+
+						if (touchesPrevious && touchesNext)
+							eventsLoaded.splice(index - 1, 2);
+						else if (touchesPrevious)
+							eventsLoaded[index - 1] = end.ts;
+						else if (touchesNext)
+							eventsLoaded[index] = start.ts;
+						else
+							eventsLoaded.splice(index, 0, start.ts, end.ts);
 					} else {
 						// extend an existing chunk
 						// and load the rest if necessary

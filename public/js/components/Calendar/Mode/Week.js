@@ -27,16 +27,9 @@ export default {
 	},
 	computed: {
 		range() {
-			let first = this.focusDate.startOf('week', { useLocaleWeeks: true });
-			let last = this.focusDate.endOf('week', { useLocaleWeeks: true });
-
-			if (this.rangeOffset != 0) {
-				if (this.rangeOffset < 0) {
-					first = first.plus({ weeks: this.rangeOffset });
-				} else {
-					last = last.plus({ weeks: this.rangeOffset });
-				}
-			}
+			const targetDate = this.focusDate.plus({ weeks: this.rangeOffset });
+			const first = targetDate.startOf('week', { useLocaleWeeks: true });
+			const last = targetDate.endOf('week', { useLocaleWeeks: true });
 
 			return luxon.Interval.fromDateTimes(first, last);
 		}
@@ -98,7 +91,7 @@ export default {
 		this.$emit('update:range', this.range);
 		this.$refs.view.$refs.grid.enableAutoScroll();
 	},
-	template: `
+	template: /* html */`
 	<div
 		class="fhc-calendar-mode-week flex-grow-1 position-relative"
 		@cal-click-default.capture="handleClickDefaults"
