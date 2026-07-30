@@ -18,6 +18,7 @@ export default {
 			default: 'all',
 			validator(value) {
 				return [
+					'all',
 					'fix',
 					'lector',
 					'oe',
