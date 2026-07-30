@@ -373,7 +373,8 @@ class Noten extends FHCAPI_Controller
 		// calculate notenvorschläge from teilnoten
 		foreach($studentenData as $student) {
 			
-			$student->anwquote = $anwresult[$student->prestudent_id];
+			// null when the Anwesenheiten addon is absent - the column stays empty in the UI
+			$student->anwquote = $anwresult[$student->prestudent_id] ?? null;
 			
 			$g = $grades[$student->uid]['grades'];
 			$note_lv = $grades[$student->uid]['note_lv'];
