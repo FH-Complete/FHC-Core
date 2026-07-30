@@ -28,6 +28,7 @@ class mitarbeiter extends benutzer
 {
 	public $new;
 	public $result=array();
+	public $maData=array();
 
     //Tabellenspalten
 	public $ausbildungcode;	//integer
@@ -1917,6 +1918,63 @@ class mitarbeiter extends benutzer
 
 		if($this->db_query($qry))
 		{
+			while($row = $this->db_fetch_object())
+			{
+				$ma_obj = new mitarbeiter();
+
+				$ma_obj->nachname = $row->nachname;
+				$ma_obj->vorname = $row->vorname;
+				$ma_obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$ma_obj->alias = $row->alias;
+
+				$this->maData[] = $ma_obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Liefert alle zeitaufzeichnungspflichtigen Mitarbeiter*innen
+	 *
+	 * @param $aktiv
+	 * @return boolean
+	 */
+	public function getZeitaufzeichnungspflichtig($aktiv=null)
+	{
+		$aktivClause = '';
+
+		if (is_bool($aktiv)) $aktivClause = 'AND b.aktiv = '.$this->db_add_param($aktiv, FHC_BOOLEAN); 
+
+		$qry = "
+			SELECT
+				ma.mitarbeiter_uid, p.nachname, p.vorname, b.alias
+			FROM
+				public.tbl_mitarbeiter ma
+				JOIN public.tbl_benutzer b ON (mitarbeiter_uid=uid)
+				JOIN public.tbl_person p  USING(person_id)
+			WHERE
+				EXISTS (
+					SELECT 1
+					FROM
+						hr.tbl_vertragsbestandteil_zeitaufzeichnung vbtza
+						JOIN hr.tbl_vertragsbestandteil vbt USING (vertragsbestandteil_id)
+						JOIN hr.tbl_dienstverhaeltnis dv USING (dienstverhaeltnis_id)
+					WHERE
+						dv.mitarbeiter_uid = b.uid
+						AND zeitaufzeichnung
+				)
+				{$aktivClause}
+			ORDER BY b.uid
+		";
+
+		if($this->db_query($qry))
+		{
+			$this->maData[] = array();
 			while($row = $this->db_fetch_object())
 			{
 				$ma_obj = new mitarbeiter();
