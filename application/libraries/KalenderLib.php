@@ -52,10 +52,18 @@ class KalenderLib
 												tbl_kalender.typ,
 												tbl_kalender.von,
 												tbl_kalender.bis,
+												tbl_kalender.insertvon AS created_by_uid,
+												kalender_ersteller_person.titelpre AS created_by_titelpre,
+												kalender_ersteller_person.titelpost AS created_by_titelpost,
+												kalender_ersteller_person.vorname AS created_by_vorname,
+												kalender_ersteller_person.nachname AS created_by_nachname,
 												tbl_kalender_ort.ort_kurzbz,
 												tbl_kalender_ort.ort_kurzbz as ko_ort_kurzbz,
 												tbl_kalender_ort.location as ko_location,
+												kalender_ort.bezeichnung AS ko_ort_bezeichnung,
+												kalender_ort.content_id AS ko_ort_content_id,
 												tbl_lehreinheit.lehreinheit_id,
+												tbl_lehreinheit.unr,
 												tbl_lehreinheit.lehrveranstaltung_id,
 												tbl_lehreinheit.lehrfach_id,
 												tbl_lehreinheit.lehrform_kurzbz,
@@ -64,9 +72,12 @@ class KalenderLib
 												lehrfach.bezeichnung AS lehrfach_bezeichnung,
 												lehrfach.farbe,
 												COALESCE(organisator.uid, tbl_lehreinheitmitarbeiter.mitarbeiter_uid) as mitarbeiter_uid,
+												COALESCE(reservierung_person.titelpre, tbl_person.titelpre) as titelpre,
+												COALESCE(reservierung_person.titelpost, tbl_person.titelpost) as titelpost,
 												COALESCE(reservierung_person.vorname, tbl_person.vorname) as vorname,
 												COALESCE(reservierung_person.nachname, tbl_person.nachname) as nachname,
 												COALESCE(reservierung_ma.kurzbz, tbl_mitarbeiter.kurzbz) AS ma_kurzbz,
+												COALESCE(reservierung_ma.personalnummer, tbl_mitarbeiter.personalnummer) AS personalnummer,
 												teilnehmergruppe.gruppe_kurzbz as teilnehmerg_grp,
 												teilnehmergruppe.bezeichnung as teilnehmerg_grp_bezeichnung,
 												COALESCE (
@@ -78,6 +89,8 @@ class KalenderLib
 												tbl_kalender_event.beschreibung,
 												tbl_kalender_event.titel,
 												teilmitarbeiter.kurzbz as teilnehmer_kurzbz,
+												teilperson.titelpre as teilnehmer_titelpre,
+												teilperson.titelpost as teilnehmer_titelpost,
 												teilperson.vorname as teilnehmer_vorname,
 												teilperson.nachname as teilnehmer_nachname,
 												teilbenutzer.uid as teilnehmer_uid,
@@ -103,6 +116,12 @@ class KalenderLib
 
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit', 'tbl_kalender.kalender_id = tbl_kalender_lehreinheit.kalender_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event', 'tbl_kalender.kalender_id = tbl_kalender_event.kalender_id', 'LEFT');
+		$this->_ci->KalenderModel->addJoin('public.tbl_benutzer kalender_ersteller', 'tbl_kalender.insertvon = kalender_ersteller.uid', 'LEFT');
+		$this->_ci->KalenderModel->addJoin(
+			'public.tbl_person kalender_ersteller_person',
+			'kalender_ersteller.person_id = kalender_ersteller_person.person_id',
+			'LEFT'
+		);
 
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event_teilnehmer organisator', 'tbl_kalender_event.kalender_id = organisator.kalender_id AND organisator.rolle_kurzbz = \'organisator\'', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event_teilnehmer teilnehmer', 'tbl_kalender_event.kalender_id = teilnehmer.kalender_id AND teilnehmer.rolle_kurzbz = \'teilnehmer\'', 'LEFT');
@@ -124,6 +143,7 @@ class KalenderLib
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehrveranstaltung', 'tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehrveranstaltung lehrfach', 'tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_ort', 'tbl_kalender.kalender_id = tbl_kalender_ort.kalender_id', 'LEFT');
+		$this->_ci->KalenderModel->addJoin('public.tbl_ort kalender_ort', 'tbl_kalender_ort.ort_kurzbz = kalender_ort.ort_kurzbz', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter', 'tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id', 'LEFT');
 
 		$this->_ci->KalenderModel->addJoin('public.tbl_mitarbeiter', 'tbl_mitarbeiter.mitarbeiter_uid = tbl_lehreinheitmitarbeiter.mitarbeiter_uid', 'LEFT');
@@ -131,8 +151,12 @@ class KalenderLib
 		$this->_ci->KalenderModel->addJoin('public.tbl_person', 'tbl_person.person_id = tbl_benutzer.person_id', 'LEFT');
 
 		$this->_ci->KalenderModel->addJoin('public.tbl_mitarbeiter reservierung_ma', 'reservierung_ma.mitarbeiter_uid = organisator.uid', 'LEFT');
-		$this->_ci->KalenderModel->addJoin('public.tbl_benutzer resevierung_benutzer', 'reservierung_ma.mitarbeiter_uid = resevierung_benutzer.uid', 'LEFT');
-		$this->_ci->KalenderModel->addJoin('public.tbl_person reservierung_person', 'reservierung_person.person_id = resevierung_benutzer.person_id', 'LEFT');
+		$this->_ci->KalenderModel->addJoin('public.tbl_benutzer reservierung_benutzer', 'organisator.uid = reservierung_benutzer.uid', 'LEFT');
+		$this->_ci->KalenderModel->addJoin(
+			'public.tbl_person reservierung_person',
+			'reservierung_person.person_id = reservierung_benutzer.person_id',
+			'LEFT'
+		);
 
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitgruppe', 'tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('public.tbl_gruppe le_gruppe', 'tbl_lehreinheitgruppe.gruppe_kurzbz = le_gruppe.gruppe_kurzbz', 'LEFT');
@@ -179,19 +203,32 @@ class KalenderLib
 					'tooltip' => 'tip',
 					'status_kurzbz' => $row->status_kurzbz,
 					'ort_kurzbz' => [],
+					'ort_details' => [],
+					'locations' => [],
 					'ko_ort_kurzbz' => isset($row->ko_ort_kurzbz) ? $row->ko_ort_kurzbz : '',
 					'ko_location' => isset($row->ko_location) ? $row->ko_location : '',
 					'lehrform' => isset($row->lehrform_kurzbz) ? $row->lehrform_kurzbz : '',
 					'lehrfach' => isset($row->lehrfach_kurzbz) ? $row->lehrfach_kurzbz : '',
 					'lehrfach_bez' => isset($row->lehrfach_bezeichnung) ? $row->lehrfach_bezeichnung : '',
+					'lehrfach_details' => [],
 					'farbe' => isset($row->farbe) ? $row->farbe : '',
 					'lehrveranstaltung_id' => $row->lehrveranstaltung_id,
 					'organisationseinheit' => isset($row->oe_kurzbz) ? $row->oe_kurzbz : '',
 					'lehreinheit_id' => [],
+					'unr' => [],
 					'lektor' => [],
 					'teilnehmer_gruppe' => [],
 					'teilnehmer_person' => [],
 					'gruppe' => [],
+					'created_by' => isset($row->created_by_uid) && $row->created_by_uid !== ''
+						? [
+							'uid' => $row->created_by_uid,
+							'titelpre' => $row->created_by_titelpre,
+							'titelpost' => $row->created_by_titelpost,
+							'vorname' => $row->created_by_vorname,
+							'nachname' => $row->created_by_nachname,
+						]
+						: null,
 					'titel' => isset($row->titel) ? $row->titel : '',
 					'beschreibung' => isset($row->beschreibung) ? $row->beschreibung : '',
 					'topic' => [],
@@ -204,8 +241,57 @@ class KalenderLib
 			if ($row->lehreinheit_id && !in_array($row->lehreinheit_id, $events[$id]->lehreinheit_id))
 				$events[$id]->lehreinheit_id[] = $row->lehreinheit_id;
 
+			if (isset($row->unr) && $row->unr !== null && $row->unr !== ''
+				&& !in_array($row->unr, $events[$id]->unr))
+			{
+				$events[$id]->unr[] = $row->unr;
+			}
+
 			if (isset($row->ort_kurzbz) && $row->ort_kurzbz !== '' && !in_array($row->ort_kurzbz, $events[$id]->ort_kurzbz))
 				$events[$id]->ort_kurzbz[] = $row->ort_kurzbz;
+
+			if (isset($row->ort_kurzbz) && $row->ort_kurzbz !== ''
+				&& !in_array(
+					$row->ort_kurzbz,
+					array_column($events[$id]->ort_details, 'ort_kurzbz')
+				))
+			{
+				$events[$id]->ort_details[] = [
+					'ort_kurzbz' => $row->ort_kurzbz,
+					'bezeichnung' => isset($row->ko_ort_bezeichnung)
+						? $row->ko_ort_bezeichnung
+						: '',
+					'content_id' => isset($row->ko_ort_content_id)
+						? $row->ko_ort_content_id
+						: null,
+				];
+			}
+
+			if (isset($row->ko_location) && $row->ko_location !== ''
+				&& !in_array($row->ko_location, $events[$id]->locations))
+			{
+				$events[$id]->locations[] = $row->ko_location;
+			}
+
+			if (isset($row->lehrfach_id) && $row->lehrfach_id
+				&& !in_array(
+					$row->lehrfach_id,
+					array_column($events[$id]->lehrfach_details, 'lehrfach_id')
+				))
+			{
+				$events[$id]->lehrfach_details[] = [
+					'lehrfach_id' => $row->lehrfach_id,
+					'kurzbz' => isset($row->lehrfach_kurzbz)
+						? $row->lehrfach_kurzbz
+						: '',
+					'bezeichnung' => isset($row->lehrfach_bezeichnung)
+						? $row->lehrfach_bezeichnung
+						: '',
+					'lehrform' => isset($row->lehrform_kurzbz)
+						? $row->lehrform_kurzbz
+						: '',
+				];
+			}
 
 			$topic = trim((isset($row->lehrfach_kurzbz) ? $row->lehrfach_kurzbz : '').' '.(isset($row->lehrform_kurzbz) ? $row->lehrform_kurzbz : ''));
 			if ($topic !== '' && !in_array($topic, $events[$id]->topic))
@@ -217,16 +303,19 @@ class KalenderLib
 				{
 					$events[$id]->lektor[] = [
 						'mitarbeiter_uid' => $row->mitarbeiter_uid,
+						'titelpre' => $row->titelpre,
+						'titelpost' => $row->titelpost,
 						'vorname' => $row->vorname,
 						'nachname' => $row->nachname,
 						'kurzbz' => $row->ma_kurzbz,
+						'personalnummer' => $row->personalnummer,
 					];
 				}
 			}
 
 			if ($row->verband_grp)
 			{
-				if (!in_array($row->teilnehmerg_grp, array_column($events[$id]->teilnehmer_gruppe, 'gruppe_kurzbz')))
+				if (!in_array($row->verband_grp, array_column($events[$id]->teilnehmer_gruppe, 'gruppe_kurzbz')))
 				{
 					$events[$id]->teilnehmer_gruppe[] = [
 						'gruppe_kurzbz' => $row->verband_grp,
@@ -240,7 +329,7 @@ class KalenderLib
 				{
 					$events[$id]->teilnehmer_gruppe[] = [
 						'gruppe_kurzbz' => $row->teilnehmerg_grp,
-						'bezeichnung' => 222,
+						'bezeichnung' => $row->teilnehmerg_grp_bezeichnung,
 					];
 				}
 			}
@@ -267,6 +356,8 @@ class KalenderLib
 				{
 					$events[$id]->teilnehmer_person[] = [
 						'uid' => $row->teilnehmer_uid,
+						'titelpre' => $row->teilnehmer_titelpre,
+						'titelpost' => $row->teilnehmer_titelpost,
 						'vorname' => $row->teilnehmer_vorname,
 						'nachname' => $row->teilnehmer_nachname,
 						'kurzbz' => $row->teilnehmer_kurzbz,

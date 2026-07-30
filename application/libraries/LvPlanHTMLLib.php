@@ -9,8 +9,6 @@ class LvPlanHTMLLib
 	const DETAIL_WINDOW_NAME = 'Details';
 	const DETAIL_WINDOW_OPTIONS = 'height=320,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes';
 
-	const ICON_EXAM = '📝';
-
 	private $ci;
 
 	public function __construct()
@@ -188,9 +186,6 @@ class LvPlanHTMLLib
 				$title = $this->getScalar($event, 'titel');
 			} else {
 				$title = $this->joinValue(isset($event->topic) ? $event->topic : '');
-
-				if ($title !== '' && strtoupper($event->lehrform) === 'EXAM')
-					$title = $title . ' ' . self::ICON_EXAM;
 			}
 
 			if ($title === '')
@@ -542,7 +537,7 @@ class LvPlanHTMLLib
 			'ort_kurzbz' => $room
 		);
 
-		return $this->getAppRoot().'cis/private/lvplan/stpl_detail.php?'
+		return $this->getAppRoot().'index.ci.php/lvplan/html/detail?'
 			.http_build_query($parameters, '', '&', PHP_QUERY_RFC3986);
 	}
 

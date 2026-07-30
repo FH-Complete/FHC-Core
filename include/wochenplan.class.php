@@ -593,7 +593,6 @@ class wochenplan extends basis_db
 				echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/excel/download?'.htmlspecialchars($kal_link_new_ws, ENT_QUOTES, 'UTF-8').'" title="excel-new">excel-new</A> '.$this->crlf;
 				echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/csv/download?'.htmlspecialchars($kal_link_new_ws, ENT_QUOTES, 'UTF-8').'" title="CSV-new">CSV-new</A> '.$this->crlf;
 				echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/csv/download?'.htmlspecialchars($kal_link_new_ws, ENT_QUOTES, 'UTF-8').'&amp;target=outlook" title="CSV-Outlook-new">CSV-Outlook-new</A> '.$this->crlf;
-				echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/ical/download?'.htmlspecialchars($kal_link_new_ws, ENT_QUOTES, 'UTF-8').'&amp;version=1" title="iCal Version 1.0-new">iCal1-new</A> '.$this->crlf;
 				echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/ical/download?'.htmlspecialchars($kal_link_new_ws, ENT_QUOTES, 'UTF-8').'&amp;version=2" title="iCal Version 2.0-new">iCal2-new</A>'.$this->crlf;
 			}
 		}
@@ -614,7 +613,6 @@ class wochenplan extends basis_db
 				echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/excel/download?'.htmlspecialchars($kal_link_new_ss, ENT_QUOTES, 'UTF-8').'" title="excel-new">excel-new</A> '.$this->crlf;
 				echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/csv/download?'.htmlspecialchars($kal_link_new_ss, ENT_QUOTES, 'UTF-8').'" title="CSV-new">CSV-new</A> '.$this->crlf;
 				echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/csv/download?'.htmlspecialchars($kal_link_new_ss, ENT_QUOTES, 'UTF-8').'&amp;target=outlook" title="CSV-Outlook-new">CSV-Outlook-new</A> '.$this->crlf;
-				echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/ical/download?'.htmlspecialchars($kal_link_new_ss, ENT_QUOTES, 'UTF-8').'&amp;version=1" title="iCal Version 1.0-new">iCal1-new</A> '.$this->crlf;
 				echo '				<A href="'.APP_ROOT.'index.ci.php/lvplan/ical/download?'.htmlspecialchars($kal_link_new_ss, ENT_QUOTES, 'UTF-8').'&amp;version=2" title="iCal Version 2.0-new">iCal2-new</A>'.$this->crlf;
 			}
 		}
