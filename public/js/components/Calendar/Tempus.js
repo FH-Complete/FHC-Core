@@ -167,7 +167,9 @@ export default {
 	},
 	setup(props, context) {
 		const rangeInterval = Vue.ref(null);
-		const preserveRequestedRange = Vue.computed(() => props.mode?.toLowerCase() === 'week');
+		const preserveRequestedRange = Vue.computed(() => {
+			return ['week', 'month'].includes(props.mode?.toLowerCase());
+		});
 
 		const { events, lv, reset } = useEventLoader(
 			rangeInterval,
