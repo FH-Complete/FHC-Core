@@ -46,7 +46,6 @@ export default {
 		};
 	},
 	loadZeitsperrenAss(days) {
-		console.log("url: loadZeitsperrenAss");
 		return {
 			method: 'get',
 			url:'api/frontend/v1/MaZeitsperren/getZeitsperrenAss/' + days
@@ -59,7 +58,6 @@ export default {
 		};
 	},
 	loadZeitsperrenLectorStg(days,stg) {
-		console.log("url: loadZeitsperrenLectorStg");
 		return {
 			method: 'get',
 			url:'api/frontend/v1/MaZeitsperren/loadZeitsperrenLectorStg/' + days + '/' + stg,

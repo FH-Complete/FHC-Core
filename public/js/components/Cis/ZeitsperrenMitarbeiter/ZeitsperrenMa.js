@@ -44,9 +44,8 @@ export default {
 	},
 	methods: {
 		show(view) {
-			console.log(view);
 			this.activeView = this.activeView === view ? null : view;
-		},
+		}
 	},
 	template: `
 		<div class="base-zeitsperren w-100 h-100">
@@ -69,6 +68,7 @@ export default {
 
 			<lists-zeitsperren
 				v-if="activeView"
+				ref="listTimeLocks"
 				:type="activeView"
 			/>
 		</div>

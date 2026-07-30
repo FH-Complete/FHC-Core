@@ -39,7 +39,8 @@ export default {
 			listStg: [],
 			filteredStg: [],
 			selectedStg: null,
-			studiengang_kz: null
+			studiengang_kz: null,
+			showTable: true
 		}
 	},
 	methods: {
@@ -65,7 +66,6 @@ export default {
 				})
 		},
 		loadZeitsperrenOE(days, oe){
-			console.log("in function oe " + oe);
 			this.$api
 				.call(ApiMaTimelocks.loadAllZeitsperrenOE(days, oe))
 				.then(result => {
@@ -73,7 +73,6 @@ export default {
 				})
 		},
 		loadZeitsperrenAss(days){
-			console.log("in ASS ");
 			this.$api
 				.call(ApiMaTimelocks.loadZeitsperrenAss(days))
 				.then(result => {
@@ -81,7 +80,6 @@ export default {
 				})
 		},
 		loadZeitsperrenStg(days, stg){
-			console.log("in function stg " + stg);
 			this.$api
 				.call(ApiMaTimelocks.loadZeitsperrenLectorStg(days, stg))
 				.then(result => {
@@ -111,6 +109,46 @@ export default {
 					})
 				};
 			});
+		},
+		createArrayMa(type){
+			this.showTable = true;
+			if(type == "fix") {
+				this.loadZeitsperrenFixeMa(this.interval);
+			}
+			else if(type == "lector") {
+				this.loadZeitsperrenLector(this.interval);
+			}
+			else if(type == "oe") {
+				this.showTable = false;
+				this.selectedOe = null;
+				this.$api
+					.call(ApiMaTimelocks.getAllOes())
+					.then(result => {
+						this.listOes = result.data;
+
+					})
+					.catch(this.$fhcAlert.handleSystemError);
+			}
+			else if(type == "lecStg") {
+				this.showTable = false;
+				this.selectedStg = null;
+				this.$api
+					.call(ApiMaTimelocks.getAllStg())
+					.then(result => {
+						this.listStg = result.data;
+					})
+					.catch(this.$fhcAlert.handleSystemError);
+			}
+			else if(type == "all") {
+				this.loadAllActiveZeitsperren(this.interval);
+			}
+			else if(type == "ass") {
+				this.loadZeitsperrenAss(this.interval);
+			}
+			else
+			{
+				this.$fhcAlert.alertError(this.$p.t('ui', 'error_fieldNotFound', {field: "Typ Zeitsperre"}));
+			}
 		},
 		isBlocked(mitarbeiter, tag) {
 			if (!mitarbeiter?.sperren) {
@@ -193,7 +231,6 @@ export default {
 		mitarbeiter() {
 			const map = {};
 
-			//vor version with uid in query
 			this.arrayMaTimelocks.forEach(z => {
 				if (!map[z.uid]) {
 					map[z.uid] = [];
@@ -213,32 +250,25 @@ export default {
 			handler(newVal) {
 				if (newVal) {
 					if(this.type == "fix") {
-						console.log("fix");
 						this.loadZeitsperrenFixeMa(newVal);
 					}
 					else if(this.type == "lector") {
-						console.log("lector");
 						this.loadZeitsperrenLector(newVal);
 					}
 					else if(this.type == "oe") {
-						console.log("oe: in handler");
 						if(this.oe_kurzbz && this.oe_kurzbz !="")
 							this.loadZeitsperrenOE(newVal, this.oe_kurzbz);
-						else
-							console.log("Bitte OE auswählen");
 					}
 					else if(this.type == "all")
 					{
-						console.log("all active");
 						this.loadAllActiveZeitsperren(newVal);
 					}
 					else if(this.type == "ass") {
-						console.log("ass");
 						this.loadZeitsperrenAss(newVal);
 					}
 					else
 					{
-						console.log("not defined");
+						this.$fhcAlert.alertError(this.$p.t('ui', 'error_fieldNotFound', {field: "Typ Zeitsperre"}));
 					}
 					this.createDays();
 				}
@@ -250,8 +280,10 @@ export default {
 		},
 		oe_kurzbz(newVal){
 			{
-				if(newVal != "")
+				if(newVal != "") {
 					this.loadZeitsperrenOE(this.interval, newVal);
+					this.showTable = true;
+				}
 			}
 		},
 		selectedStg(newVal) {
@@ -259,146 +291,103 @@ export default {
 		},
 		studiengang_kz(newVal){
 			{
-				console.log("STG triggered");
-				if(newVal != "")
+				if(newVal != "") {
 					this.loadZeitsperrenStg(this.interval, newVal);
+					this.showTable = true;
+				}
+			}
+		},
+		type(newVal){
+			{
+				if(newVal != "")
+					this.createArrayMa(newVal);
 			}
 		},
 	},
 	created(){
-		if(this.type == "fix") {
-			console.log("fix");
-			this.loadZeitsperrenFixeMa(this.interval);
-		}
-		else if(this.type == "lector") {
-			console.log("lector");
-			this.loadZeitsperrenLector(this.interval);
-		}
-		else if(this.type == "oe") {
-			console.log("oeg");
-			this.$api
-				.call(ApiMaTimelocks.getAllOes())
-				.then(result => {
-					this.listOes = result.data;
-/*					this.listStg = this.listOes.filter(item =>
-						item.label.includes("[Studiengang]") && item.aktiv || item.label.includes("[Lehrgang]") && item.aktiv
-					);*/
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		}
-		else if(this.type == "lecStg") {
-			console.log("lecStg");
-			this.$api
-				.call(ApiMaTimelocks.getAllStg())
-				.then(result => {
-					this.listStg = result.data;
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		}
-		else if(this.type == "all") {
-			console.log("all active");
-			this.loadAllActiveZeitsperren(this.interval);
-		}
-		else if(this.type == "ass") {
-			console.log("ass");
-			this.loadZeitsperrenAss(this.interval);
-		}
-		else
-		{
-			console.log("not defined");
-		}
+		this.createArrayMa(this.type);
 		this.createDays();
-
-/*		console.log('adams, 2026-07-16');
-		console.log(this.isBlocked('adams', '2026-07-16'));*/
 	},
 	template: `
 	<div class="w-100 h-100">
-	type: {{type}}
-		<h3 class="mt-3"><span v-if="type=='all'">Mitarbeiter*innen mit aktuellen </span>Zeitsperren 
-			<span v-if="type=='fix'">Fixangestellte</span>
-			<span v-if="type=='lector'">aller fixer Lektoren</span> 
-			<span v-if="type=='oe'">nach Organisationseinheit</span> {{ mondayBeforeToday.toLocaleDateString('de-AT') }} - {{endInterval}}			
-		</h3>
-				<div class="d-flex align-items-center gap-2">
-					<label for="days" class="mb-0">Anzahl Tage:</label>
-				
-					<input
-					  id="days"
-					  v-model.number="interval"
-					  type="number"
-					  class="form-control"
-					  style="width: 90px"
-					  min="1"
-					  max="99"
-					  @input="limitDays"
-					>
-					<label v-if="type=='oe'">{{$p.t('lehre/organisationseinheit')}}</label>
-					<div v-if="type=='oe'" class="flex-grow-1">
-						<form-form class="g-3 mt-2" ref="oeSelectForm">
-							<form-input
-								container-class="mb-3 w-50"
-								type="autocomplete"
-								name="oe_kurzbz"
-								v-model="selectedOe"
-								forceSelection
-								optionLabel="label"
-								optionValue="oe_kurzbz"
-								:suggestions="filteredOes"
-								dropdown
-								@complete="filterOes"
-								>
-									<template #option="slotProps">
-										<div
-											:class="!slotProps.option.aktiv
-											? 'item-inactive'
-											: ''"
-											>
-												{{slotProps.option.label}}
-										</div>
-									</template>
-							</form-input>
-						</form-form>
-					</div>
-					
-					<label v-if="type=='lecStg'">{{$p.t('studium/lektoren')}}</label>
-					<div v-if="type=='lecStg'" class="flex-grow-1 mt-2">
-						<form-form class="g-3 mt-2" ref="oeSelectForm">
-							<form-input
-								container-class="mb-3 w-50"
-								type="autocomplete"
-								name="studiengang_kz"
-								v-model="selectedStg"
-								forceSelection
-								optionLabel="label"
-								optionValue="studiengang_kz"
-								:suggestions="filteredStg"
-								dropdown
-								@complete="filterStg"
-								>
-									<template #option="slotProps">
-										<div
-											:class="!slotProps.option.aktiv
-											? 'item-inactive'
-											: ''"
-											>
-												{{slotProps.option.label}}
-										</div>
-									</template>
-							</form-input>
-						</form-form>
-					</div>
-			  </div>
-			  					
-		<br> count results: {{mitarbeiter.length}}, days: {{interval}}
-		<br> type: {{type}} <br> {{oe_kurzbz}} | {{selectedOe}}
-		<br> {{selectedStg}} | {{studiengang_kz}}
-		{{arrayMaTimelocks[0]}}
-		<hr>
-	
-		
-		
-		<table class="table table-dark table-striped table-bordered">
+		<h4 class="mt-3"><span v-if="type=='all'">{{$p.t('zeitsperren/title_allMa')}}</span>
+			<span v-if="type=='fix'">{{$p.t('zeitsperren/title_fix')}}</span>
+			<span v-if="type=='lector'">{{$p.t('zeitsperren/title_fixLecturers')}}</span>
+			<span v-if="type=='oe'">{{$p.t('zeitsperren/title_byOe')}}</span>
+			<span v-if="type=='lecStg'">{{$p.t('zeitsperren/title_lectStg')}}</span>
+			<span v-if="type=='ass'">{{$p.t('zeitsperren/title_ass')}}</span>
+			{{ mondayBeforeToday.toLocaleDateString('de-AT') }} - {{endInterval}}
+		</h4>
+		<div class="d-flex align-items-center gap-2 mb-3">
+			<label for="days">Anzahl Tage:</label>
+			<input
+			  id="days"
+			  v-model.number="interval"
+			  type="number"
+			  class="form-control"
+			  style="width: 90px"
+			  min="1"
+			  max="99"
+			  @input="limitDays"
+			>
+			<label v-if="type=='oe'">{{$p.t('lehre/organisationseinheit')}}</label>
+			<div v-if="type=='oe'" class="flex-grow-1">
+				<form-form class="g-3" ref="oeSelectForm">
+					<form-input
+						container-class="w-50"
+						type="autocomplete"
+						name="oe_kurzbz"
+						v-model="selectedOe"
+						forceSelection
+						optionLabel="label"
+						optionValue="oe_kurzbz"
+						:suggestions="filteredOes"
+						dropdown
+						@complete="filterOes"
+						>
+							<template #option="slotProps">
+								<div
+									:class="!slotProps.option.aktiv
+									? 'item-inactive'
+									: ''"
+									>
+										{{slotProps.option.label}}
+								</div>
+							</template>
+					</form-input>
+				</form-form>
+			</div>
+
+			<label v-if="type=='lecStg'">{{$p.t('zeitsperren/lektor_innen')}}</label>
+			<div v-if="type=='lecStg'" class="flex-grow-1">
+				<form-form class="g-3" ref="oeSelectForm">
+					<form-input
+						container-class="w-50"
+						type="autocomplete"
+						name="studiengang_kz"
+						v-model="selectedStg"
+						forceSelection
+						optionLabel="label"
+						optionValue="studiengang_kz"
+						:suggestions="filteredStg"
+						dropdown
+						@complete="filterStg"
+						>
+							<template #option="slotProps">
+								<div
+									:class="!slotProps.option.aktiv
+									? 'item-inactive'
+									: ''"
+									>
+										{{slotProps.option.label}}
+								</div>
+							</template>
+					</form-input>
+				</form-form>
+			</div>
+		</div>
+
+		<table v-if="showTable" class="table table-dark table-striped table-bordered">
 			<thead>
 				<tr>
 				  <th scope="col"> UID </th>
@@ -434,9 +423,10 @@ export default {
 				</tr>
 			</tbody>
 		</table>
-		
-		
 
+		<div v-if="!arrayMaTimelocks.length">
+			<p> Keine Einträge vorhanden </p>
+		</div>
 	</div>
 	`,
 }
