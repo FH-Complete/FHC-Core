@@ -60621,7 +60621,46 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
-
+	array(
+		'app' => 'core',
+		'category' => 'zeitsperren',
+		'phrase' => 'abwesend',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'abwesend',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'absent',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'zeitsperren',
+		'phrase' => 'anzahlTage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anzahl Tage',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Number of days',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// PHRASES ZEITSPERREN END
 
 );

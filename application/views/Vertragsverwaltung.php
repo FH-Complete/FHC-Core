@@ -12,13 +12,14 @@ $includesArray = array(
 	'tinymce5' => true,
 	'phrases' => array(
 		'global',
-		'ui',
+		'ui'
 	),
 	'customCSSs' => [
 		'public/css/components/vue-datepicker.css',
 		'public/css/components/primevue.css',
 		'public/css/Vertragsverwaltung.css',
-		'public/css/components/Detailheader.css'
+		'public/css/components/Detailheader.css',
+		'public/css/components/Zeitsperren.css'
 	],
 	'customJSs' => [
 		#'vendor/npm-asset/primevue/tree/tree.min.js',

@@ -311,80 +311,81 @@ export default {
 	},
 	template: `
 	<div class="w-100 h-100">
-		<h4 class="mt-3"><span v-if="type=='all'">{{$p.t('zeitsperren/title_allMa')}}</span>
-			<span v-if="type=='fix'">{{$p.t('zeitsperren/title_fix')}}</span>
-			<span v-if="type=='lector'">{{$p.t('zeitsperren/title_fixLecturers')}}</span>
-			<span v-if="type=='oe'">{{$p.t('zeitsperren/title_byOe')}}</span>
-			<span v-if="type=='lecStg'">{{$p.t('zeitsperren/title_lectStg')}}</span>
-			<span v-if="type=='ass'">{{$p.t('zeitsperren/title_ass')}}</span>
-			{{ mondayBeforeToday.toLocaleDateString('de-AT') }} - {{endInterval}}
-		</h4>
-		<div class="d-flex align-items-center gap-2 mb-3">
-			<label for="days">Anzahl Tage:</label>
-			<input
-			  id="days"
-			  v-model.number="interval"
-			  type="number"
-			  class="form-control"
-			  style="width: 90px"
-			  min="1"
-			  max="99"
-			  @input="limitDays"
-			>
-			<label v-if="type=='oe'">{{$p.t('lehre/organisationseinheit')}}</label>
-			<div v-if="type=='oe'" class="flex-grow-1">
-				<form-form class="g-3" ref="oeSelectForm">
-					<form-input
-						container-class="w-50"
-						type="autocomplete"
-						name="oe_kurzbz"
-						v-model="selectedOe"
-						forceSelection
-						optionLabel="label"
-						optionValue="oe_kurzbz"
-						:suggestions="filteredOes"
-						dropdown
-						@complete="filterOes"
-						>
-							<template #option="slotProps">
-								<div
-									:class="!slotProps.option.aktiv
-									? 'item-inactive'
-									: ''"
-									>
-										{{slotProps.option.label}}
-								</div>
-							</template>
-					</form-input>
-				</form-form>
-			</div>
-
-			<label v-if="type=='lecStg'">{{$p.t('zeitsperren/lektor_innen')}}</label>
-			<div v-if="type=='lecStg'" class="flex-grow-1">
-				<form-form class="g-3" ref="oeSelectForm">
-					<form-input
-						container-class="w-50"
-						type="autocomplete"
-						name="studiengang_kz"
-						v-model="selectedStg"
-						forceSelection
-						optionLabel="label"
-						optionValue="studiengang_kz"
-						:suggestions="filteredStg"
-						dropdown
-						@complete="filterStg"
-						>
-							<template #option="slotProps">
-								<div
-									:class="!slotProps.option.aktiv
-									? 'item-inactive'
-									: ''"
-									>
-										{{slotProps.option.label}}
-								</div>
-							</template>
-					</form-input>
-				</form-form>
+		<div class="sticky-top bg-white p-3 border-bottom">
+			<h4 class="mt-3"><span v-if="type=='all'">{{$p.t('zeitsperren/title_allMa')}}</span>
+				<span v-if="type=='fix'">{{$p.t('zeitsperren/title_fix')}}</span>
+				<span v-if="type=='lector'">{{$p.t('zeitsperren/title_fixLecturers')}}</span>
+				<span v-if="type=='oe'">{{$p.t('zeitsperren/title_byOe')}}</span>
+				<span v-if="type=='lecStg'">{{$p.t('zeitsperren/title_lectStg')}}</span>
+				<span v-if="type=='ass'">{{$p.t('zeitsperren/title_ass')}}</span>
+				{{ mondayBeforeToday.toLocaleDateString('de-AT') }} - {{endInterval}}
+			</h4>
+			<div class="d-flex align-items-center gap-2 mb-3">
+				<label for="days">Anzahl Tage:</label>
+				<input
+				  id="days"
+				  v-model.number="interval"
+				  type="number"
+				  class="form-control"
+				  style="width: 90px"
+				  min="1"
+				  max="99"
+				  @input="limitDays"
+				>
+				<label v-if="type=='oe'">{{$p.t('lehre/organisationseinheit')}}</label>
+				<div v-if="type=='oe'" class="flex-grow-1">
+					<form-form class="g-3" ref="oeSelectForm">
+						<form-input
+							container-class="w-50"
+							type="autocomplete"
+							name="oe_kurzbz"
+							v-model="selectedOe"
+							forceSelection
+							optionLabel="label"
+							optionValue="oe_kurzbz"
+							:suggestions="filteredOes"
+							dropdown
+							@complete="filterOes"
+							>
+								<template #option="slotProps">
+									<div
+										:class="!slotProps.option.aktiv
+										? 'item-inactive'
+										: ''"
+										>
+											{{slotProps.option.label}}
+									</div>
+								</template>
+						</form-input>
+					</form-form>
+				</div>
+				<label v-if="type=='lecStg'">{{$p.t('zeitsperren/lektor_innen')}}</label>
+				<div v-if="type=='lecStg'" class="flex-grow-1">
+					<form-form class="g-3" ref="oeSelectForm">
+						<form-input
+							container-class="w-50"
+							type="autocomplete"
+							name="studiengang_kz"
+							v-model="selectedStg"
+							forceSelection
+							optionLabel="label"
+							optionValue="studiengang_kz"
+							:suggestions="filteredStg"
+							dropdown
+							@complete="filterStg"
+							>
+								<template #option="slotProps">
+									<div
+										:class="!slotProps.option.aktiv
+										? 'item-inactive'
+										: ''"
+										>
+											{{slotProps.option.label}}
+									</div>
+								</template>
+						</form-input>
+					</form-form>
+				</div>
 			</div>
 		</div>
 
@@ -404,14 +405,13 @@ export default {
 					:key="m.uid"
 				>
 					<td>{{m.sperren[0].nachname}} {{m.sperren[0].vorname}}</td>
-			
 					<td
 						v-for="day in days"
 						:key="day.date"
 						:class="{ 'table-warning': day.weekday === 'Sa' || day.weekday === 'So' }"
 					>
 						<template v-if="sperre = getSperre(m, day.date)">
-							abwesend
+							{{$p.t('zeitsperren/abwesend')}}
 							<div v-if="sperre.kurzbz">
 								V: {{ sperre.kurzbz }}
 							</div>
@@ -426,7 +426,7 @@ export default {
 		</table>
 
 		<div v-if="!arrayMaTimelocks.length">
-			<p> Keine Einträge vorhanden </p>
+			<p>{{$p.t('ui/keineEintraegeGefunden')}}</p>
 		</div>
 	</div>
 	`,

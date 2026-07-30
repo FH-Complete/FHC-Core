@@ -34,7 +34,6 @@ class MaZeitsperren extends FHCAPI_Controller
 	//only user with zeitsperren
 	public function getAllActiveZeitsperren($days)
 	{
-
 		$result = $this->ZeitsperreModel->getZeitsperrenForNextDays($days);
 		$data = $this->getDataOrTerminateWithError($result);
 
@@ -45,7 +44,9 @@ class MaZeitsperren extends FHCAPI_Controller
 	//all fixe Ma
 	public function getAllZeitsperrenFixeMa($days)
 	{
-		$result = $this->ZeitsperreModel->getMitarbeiterWithZeitsperren($days, true, false, null, false);
+		$von = date('Y-m-d');
+		$bis = date('Y-m-d', strtotime("+{$days} days"));
+		$result = $this->ZeitsperreModel->getMitarbeiterWithZeitsperren($von, $bis, true, false, null, false);
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);
@@ -53,7 +54,9 @@ class MaZeitsperren extends FHCAPI_Controller
 
 	public function getAllZeitsperrenLector($days)
 	{
-		$result = $this->ZeitsperreModel->getMitarbeiterWithZeitsperren($days, false, true, null, false);
+		$von = date('Y-m-d');
+		$bis = date('Y-m-d', strtotime("+{$days} days"));
+		$result = $this->ZeitsperreModel->getMitarbeiterWithZeitsperren($von, $bis, false, true, null, false);
 
 		$data = $this->getDataOrTerminateWithError($result);
 
@@ -62,7 +65,9 @@ class MaZeitsperren extends FHCAPI_Controller
 
 	public function getZeitsperrenAss($days)
 	{
-		$result = $this->ZeitsperreModel->getMitarbeiterWithZeitsperren($days, false, false, null, true);
+		$von = date('Y-m-d');
+		$bis = date('Y-m-d', strtotime("+{$days} days"));
+		$result = $this->ZeitsperreModel->getMitarbeiterWithZeitsperren($von, $bis, false, false, null, true);
 
 		$data = $this->getDataOrTerminateWithError($result);
 
@@ -71,7 +76,9 @@ class MaZeitsperren extends FHCAPI_Controller
 
 	public function getAllZeitsperrenOes($days, $oe)
 	{
-		$result = $this->ZeitsperreModel->getMitarbeiterWithZeitsperren($days, false, false, $oe, false);
+		$von = date('Y-m-d');
+		$bis = date('Y-m-d', strtotime("+{$days} days"));
+		$result = $this->ZeitsperreModel->getMitarbeiterWithZeitsperren($von, $bis, false, false, $oe, false);
 
 		$data = $this->getDataOrTerminateWithError($result);
 
@@ -80,7 +87,9 @@ class MaZeitsperren extends FHCAPI_Controller
 
 	public function loadZeitsperrenLectorStg($days, $stg)
 	{
-		$result = $this->ZeitsperreModel->getMitarbeiterWithZeitsperren($days, false, true, false, false, $stg);
+		$von = date('Y-m-d');
+		$bis = date('Y-m-d', strtotime("+{$days} days"));
+		$result = $this->ZeitsperreModel->getMitarbeiterWithZeitsperren($von, $bis, false, true, false, false, $stg);
 
 		$data = $this->getDataOrTerminateWithError($result);
 
@@ -96,7 +105,8 @@ class MaZeitsperren extends FHCAPI_Controller
 				kurzbzlang,
 				typ,
 				bezeichnung,
-				kurzbzlang || ' (' || bezeichnung || ')' AS label
+				kurzbzlang || ' (' || bezeichnung || ')' AS label,
+				aktiv
 			from
 				public.tbl_studiengang
 			where 

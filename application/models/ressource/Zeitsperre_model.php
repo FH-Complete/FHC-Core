@@ -67,13 +67,11 @@ class Zeitsperre_model extends DB_Model
 	 * @ days: count of the intervall of the next days
 	 * @return array
 	 */
-	public function getZeitsperrenForNextDays($days, $type=null)
+	public function getZeitsperrenForNextDays($days)
 	{
-		//TODO(Manu) von und bis im controller berechnen und hier übergeben
 		$von = date('Y-m-d');
 		$bis = date('Y-m-d', strtotime("+{$days} days"));
 
-		//version with campus.vw_mitarbeiter
 		$paramsArray = [$von, $bis, $bis, $von];
 		$qry = "select
 					nachname,
@@ -82,85 +80,28 @@ class Zeitsperre_model extends DB_Model
 					vondatum,
 					bisdatum,
 					vertretung_uid,
-					erreichbarkeit_kurzbz
-					--lektor,
-					-- fixangestellt
+					erreichbarkeit_kurzbz,
+					mv.kurzbz
 				from
 					campus.vw_mitarbeiter
 				join campus.tbl_zeitsperre on
 					(uid = mitarbeiter_uid)
+				left join public.tbl_mitarbeiter mv on campus.tbl_zeitsperre.vertretung_uid = mv.mitarbeiter_uid
 				where
 					((? <= bisdatum
 						and ? >= bisdatum)
 					or (?>= vondatum
 						and ? <= vondatum))
+				order by nachname
 				";
-
-		//fix, lektor etc just with all ma
-		if($type=="fix") {
-			$qry.= "AND fixangestellt = true";
-		}
-		if($type=="lector") {
-			$qry.= "AND lektor = true";
-		}
-
-		//wenn lektor= WAHR und fixangestellt = Falsch: -->  externer Lektor
-
-		$qry .= " order by nachname";
-
-
-
-		//version with hr.dienstverhaeltnis
-/*			$paramsArray = [$bis, $von];
-		$qry = "
-			SELECT
-				ps.nachname,
-				ps.vorname,
-				zs.mitarbeiter_uid,
-				zs.vondatum,
-				zs.bisdatum,
-				zs.vertretung_uid,
-				zs.erreichbarkeit_kurzbz
-			FROM campus.tbl_zeitsperre zs
-			JOIN public.tbl_benutzer bn
-				ON bn.uid = zs.mitarbeiter_uid
-			JOIN public.tbl_person ps
-				ON ps.person_id = bn.person_id ";
-
-		if ($type != null) {
-			$qry.= " JOIN hr.tbl_dienstverhaeltnis dv on bn.uid = dv.mitarbeiter_uid ";
-		}
-
-		$qry.="
-			WHERE
-				zs.vondatum <= ?
-				AND zs.bisdatum >= ?";
-
-		if($type=="fix") {
-			$qry.= " and dv.vertragsart_kurzbz = 'echterdv'";
-		}
-		if($type=="lector") {
-			$qry.= " and dv.vertragsart_kurzbz in ('externerlehrender', 'gastlektor')";
-		}
-
-		$qry .= "			
-			ORDER BY
-				ps.nachname,
-				ps.vorname,
-				zs.vondatum;";*/
 
 		$result = $this->execQuery($qry, $paramsArray);
 
 		return $result;
 	}
 
-	public function getMitarbeiterWithZeitsperren($days, $fix=false, $lector=false, $oe=null, $ass=false, $stg=false)
+	public function getMitarbeiterWithZeitsperren($von, $bis, $fix=false, $lector=false, $oe=null, $ass=false, $stg=false)
 	{
-		//TODO(Manu) von und bis im controller berechnen und hier übergeben
-		$von = date('Y-m-d');
-		$bis = date('Y-m-d', strtotime("+{$days} days"));
-
-		//version with campus.vw_mitarbeiter
 		$paramsArray = [$von, $bis, $bis, $von];
 
 		if($oe)
