@@ -49,8 +49,8 @@ class vertragsbestandteil_zeitaufzeichnung extends basis_db
 			$this->load($vertragsbestandteil_id);
 	}
 
-		/**
-	 * Speichert das Studiensemester in die Datenbank
+	/**
+	 * Speichert den Vertragsbestandteil in die Datenbank
 	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
 	 * angelegt, ansonsten der Datensatz upgedated
 	 *
