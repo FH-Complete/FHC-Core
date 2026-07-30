@@ -176,37 +176,63 @@ class LvPlanCSVLib
 			isset($event->ort_kurzbz) ? $event->ort_kurzbz : array(),
 			' / '
 		);
-		$groups = $this->getGroups($event);
-		$lecturers = $this->getLecturers($event);
-		$participants = $this->getParticipants($event);
-		
 
-		$descriptionParts = array(
-				'Stundenplan',
-				$title,
-				$isReservation ? '' : (isset($event->lehrfach_bez) ? $event->lehrfach_bez : '') ,
-				$isReservation ? $participants : $lecturers,
-				$groups,
-				$location,
-				isset($event->beschreibung) ? $event->beschreibung : ''
-			);
-		$description = implode("\r\n", array_values(array_filter(
-			$descriptionParts,
-			function ($value) {
-				return $value !== '';
-			}
-		)));
+		$description = $this->getDescription(
+			$event,
+			$isReservation
+		);
 
 		return array(
 			'title' => $title,
 			'location' => $location,
 			'description' => $description,
-			'groups' => $groups,
 			'start_date' => $start->format('d.m.Y'),
 			'start_time' => $start->format('H:i:s'),
 			'end_date' => $end->format('d.m.Y'),
 			'end_time' => $end->format('H:i:s')
 		);
+	}
+
+	/**
+	 * Builds a localized event description from populated event details.
+	 *
+	 * @param object $event Calendar event.
+	 * @param bool $isReservation Whether the event is a reservation.
+	 * @param string $participants Participant abbreviations.
+	 * @param string $lecturers Lecturer abbreviations.
+	 * @param string $groups Participant group labels.
+	 * @return string Description lines separated by CRLF.
+	 */
+	private function getDescription($event, $isReservation)
+	{
+		$groups = $this->getGroups($event);
+		$lecturers = $this->getLecturers($event);
+		$participants = $this->getParticipants($event);
+
+		$parts = array();
+		if ($isReservation)
+		{
+			if ($participants !== '')
+				$parts[] = $this->ci->p->t('ui', 'teilnehmende').': '.$participants;
+		}
+		else
+		{
+			$subject = isset($event->lehrfach_bez) ? $event->lehrfach_bez : '';
+
+			if ($subject !== '')
+				$parts[] = $this->ci->p->t('global', 'lehrfach').': '.$subject;
+			if ($lecturers !== '')
+				$parts[] = $this->ci->p->t('lehre', 'lektorInnen').': '.$lecturers;
+		}
+
+		if ($groups !== '')
+			$parts[] = $this->ci->p->t('global', 'gruppen').': '.$groups;
+
+		$description = isset($event->beschreibung) ? $event->beschreibung : '';
+		if ($description !== '')
+			$parts[] = $this->ci->p->t('global', 'beschreibung').': '.$description;
+
+		return implode("\r\n", $parts);
 	}
 
 	/**
@@ -242,8 +268,6 @@ class LvPlanCSVLib
 	private function buildOutlookRow(array $eventData)
 	{
 		$subject = $eventData['title'];
-		if ($eventData['groups'] !== '')
-			$subject .= ' - '.$eventData['groups'];
 
 		return array(
 			$subject,

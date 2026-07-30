@@ -163,12 +163,7 @@ class LvPlanExcelLib
 		$end->setTimezone($timezone);
 
 		$isReservation = isset($event->type) && $event->type === 'reservierung';
-		$subject = $isReservation
-			? $event->titel . " " . $this->joinValues(isset($event->ort_kurzbz) ? $event->ort_kurzbz : array()) . " - " . $this->getGroups($event)
-			: (isset($event->lehrfach_bez) ? $event->lehrfach_bez : '');
-
-		if ($subject === '')
-			$subject = $this->joinValues(isset($event->topic) ? $event->topic : array());
+		$subject = $this->getSubject($event);
 
 		$note = isset($event->beschreibung) ? $event->beschreibung : '';
 		if ($note === '' && isset($event->titel) && !$isReservation)
@@ -186,6 +181,25 @@ class LvPlanExcelLib
 			$this->findHour($start->format('H:i:s'), $hourRaster, "start"),
 			$this->findHour($end->format('H:i:s'), $hourRaster, "end")
 		);
+	}
+
+	/**
+	 * @param object $event Calendar event.
+	 * @return string Event subject.
+	 */
+	private function getSubject($event)
+	{
+		if (isset($event->type) && $event->type === 'reservierung')
+		{
+			return isset($event->titel) ? $event->titel : '';
+		}
+
+		$subject = isset($event->lehrfach_bez) ? $event->lehrfach_bez : '';
+
+		if ($subject === '')
+			$subject = $this->joinValues(isset($event->topic) ? $event->topic : array());
+
+		return $subject;
 	}
 
 	/**

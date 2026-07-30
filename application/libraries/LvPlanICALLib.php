@@ -157,24 +157,8 @@ class LvPlanICALLib
 		$isReservation = $event->type === 'reservierung';
 
 		$summaryIcon = '';
-		$summary = $isReservation
-			? implode(' - ', array_filter(array($event->titel, implode('/', $event->ort_kurzbz), $this->getGroups($event))))
-			: $this->joinValues($event->topic);
-
-		$descriptionParts = array(
-			$event->titel,
-			isset($event->lehrfach_bez) ? $event->lehrfach_bez : '',
-			$isReservation ? $this->getParticipants($event) : $this->getLecturers($event),
-			$this->getGroups($event),
-			implode('/', $event->ort_kurzbz),
-			isset($event->beschreibung) ? $event->beschreibung : ''
-		);
-		$description = implode("\r\n", array_values(array_filter(
-			$descriptionParts,
-			function ($value) {
-				return $value !== '';
-			}
-		)));
+		$summary = $this->getSummary($event);
+		$description = $this->getDescription($event);
 
 		$category = self::CATEGORY_TIMETABLE;
 		if ($event->type === 'lehreinheit')
@@ -226,6 +210,66 @@ class LvPlanICALLib
 		return $fragment
 			.$this->buildICalLine('DTSTAMP', $dtStamp)
 			.$this->buildICalLine('END', 'VEVENT');
+	}
+
+	/**
+	 * @param object $event Calendar event.
+	 * @return string Event summary.
+	 */
+	private function getSummary($event)
+	{
+		if (isset($event->type) && $event->type === 'reservierung')
+		{
+			return isset($event->titel) ? $event->titel : '';
+		}
+
+		$subject = isset($event->lehrfach_bez) ? $event->lehrfach_bez : '';
+
+		if ($subject === '')
+			$subject = $this->joinValues(isset($event->topic) ? $event->topic : array());
+
+		return $subject;
+	}
+
+	/**
+	 * @param object $event Calendar event.
+	 * @return string Event description.
+	 */
+	private function getDescription($event)
+	{
+		$isReservation = isset($event->type) && $event->type === 'reservierung';
+		$parts = array();
+		$subject = $isReservation && isset($event->lehrfach_bez)
+			? $event->lehrfach_bez
+			: '';
+
+		if ($subject !== '')
+			$parts[] = $this->ci->p->t('global', 'lehrfach').': '.$subject;
+
+		if ($isReservation)
+		{
+			$participants = $this->getParticipants($event);
+
+			if ($participants !== '')
+				$parts[] = $this->ci->p->t('ui', 'teilnehmende').': '.$participants;
+		}
+		else
+		{
+			$lecturers = $this->getLecturers($event);
+
+			if ($lecturers !== '')
+				$parts[] = $this->ci->p->t('lehre', 'lektorInnen').': '.$lecturers;
+		}
+
+		$groups = $this->getGroups($event);
+		if ($groups !== '')
+			$parts[] = $this->ci->p->t('global', 'gruppen').': '.$groups;
+
+		$description = isset($event->beschreibung) ? $event->beschreibung : '';
+		if ($description !== '')
+			$parts[] = $this->ci->p->t('global', 'beschreibung').': '.$description;
+
+		return implode("\r\n", $parts);
 	}
 
 	private function joinValues($value)

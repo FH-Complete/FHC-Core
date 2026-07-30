@@ -21,6 +21,8 @@ class LvPlanCSVDownload extends Auth_Controller
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
 		$this->load->model('ressource/Ort_model', 'OrtModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		$this->loadPhrases(array('global', 'lehre', 'ui'));
 	}
 
 	/**
@@ -58,10 +60,7 @@ class LvPlanCSVDownload extends Auth_Controller
 			$verbandFilters
 		);
 
-		$filename = 'FH-Kalender_'.date('m_Y');
-		if ($target === 'outlook')
-			$filename .= '_outlook';
-		$filename .= '.csv';
+		$filename = $this->getFilename($begin, $ende, $target);
 
 		$this->output
 			->set_content_type('text/csv', 'UTF-8')
@@ -207,6 +206,51 @@ class LvPlanCSVDownload extends Auth_Controller
 		$ende = strtotime('sunday this week', $ende);
 
 		return array($begin, $ende);
+	}
+
+	/**
+	 * Builds the CSV download filename.
+	 *
+	 * @param int $begin Range start timestamp.
+	 * @param int $ende Range end timestamp.
+	 * @param string|null $target Requested CSV target.
+	 * @return string Filename.
+	 */
+	private function getFilename($begin, $ende, $target)
+	{
+		$studiensemester = $this->getStudiensemester($begin, $ende);
+
+		$filename = $this->p->t('global', 'termine');
+		if ($studiensemester !== null)
+			$filename .= '_'.$studiensemester->studiensemester_kurzbz;
+		$filename .= '-'.date('Ymd');
+		if ($target === 'outlook')
+			$filename .= '_outlook';
+		$filename .= '.csv';
+
+		return $filename;
+	}
+
+	/**
+	 * Gets the study semester covered by the requested date range.
+	 *
+	 * @param int $begin Range start timestamp.
+	 * @param int $ende Range end timestamp.
+	 * @return object|null Study semester, if one overlaps the range.
+	 */
+	private function getStudiensemester($begin, $ende)
+	{
+		$semesterRange = $this->StudiensemesterModel->getByDateRange(
+			date('Y-m-d', $begin),
+			date('Y-m-d', $ende)
+		);
+
+		if (isError($semesterRange) || !hasData($semesterRange))
+			return null;
+
+		$studiensemester = current(getData($semesterRange));
+
+		return $studiensemester;
 	}
 
 	/**
