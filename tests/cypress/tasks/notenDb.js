@@ -102,6 +102,46 @@ const seedLvGesamtnote = async (scope) => {
 	});
 };
 
+/**
+ * Seeds a single Prüfung row. Needed for states no endpoint can produce: an excused and a real
+ * Termin2 side by side, or a kommPruef (entered in a different tool).
+ */
+const seedPruefung = async (scope) => {
+	assertWritable();
+	assertScope({ ...scope, studentUids: [scope.studentUid] });
+
+	const { lvId, semKurzbz, studentUid, lehreinheitId, note, datum, typ, mitarbeiterUid } = scope;
+
+	if (note === undefined || note === null) throw new Error("noten:db seedPruefung - note is required");
+	if (!datum) throw new Error("noten:db seedPruefung - datum is required");
+	if (!typ) throw new Error("noten:db seedPruefung - typ is required");
+	if (!lehreinheitId) throw new Error("noten:db seedPruefung - lehreinheitId is required");
+	if (!mitarbeiterUid) throw new Error("noten:db seedPruefung - mitarbeiterUid is required");
+
+	return withClient(async (client) => {
+		// reset scopes through the LV's lehreinheiten, so a row outside them would be unreclaimable
+		const owned = await client.query(
+			`SELECT 1 FROM lehre.tbl_lehreinheit
+			  WHERE lehreinheit_id = $1 AND lehrveranstaltung_id = $2 AND studiensemester_kurzbz = $3`,
+			[lehreinheitId, lvId, semKurzbz],
+		);
+		if (!owned.rowCount) {
+			throw new Error(`noten:db seedPruefung refused - lehreinheit ${lehreinheitId} is outside ${lvId}/${semKurzbz}`);
+		}
+
+		const res = await client.query(
+			`INSERT INTO lehre.tbl_pruefung
+			     (lehreinheit_id, student_uid, mitarbeiter_uid, note, pruefungstyp_kurzbz, datum,
+			      anmerkung, insertamum, insertvon)
+			 VALUES ($1, $2, $3, $4, $5, $6, '', NOW(), $3)
+			 RETURNING pruefung_id`,
+			[lehreinheitId, studentUid, mitarbeiterUid, note, typ, datum],
+		);
+
+		return { pruefungId: res.rows[0].pruefung_id, note, datum, typ };
+	});
+};
+
 /** Raw row, without the `freigabedatum < NOW()` filter getLvGesamtNoten applies. */
 const readLvGesamtnote = async ({ lvId, semKurzbz, studentUid }) => {
 	if (!dbConfigured()) throw new Error("noten:db refused - database is not configured");
@@ -121,6 +161,7 @@ const registerNotenDbTasks = (on) => {
 		"noten:db:available": () => checkAvailability(),
 		"noten:db:reset": (scope) => resetStudents(scope),
 		"noten:db:seedLvGesamtnote": (scope) => seedLvGesamtnote(scope),
+		"noten:db:seedPruefung": (scope) => seedPruefung(scope),
 		"noten:db:readLvGesamtnote": (scope) => readLvGesamtnote(scope),
 		"noten:db:close": () => closeDb(),
 	});

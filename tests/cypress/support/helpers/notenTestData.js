@@ -9,7 +9,9 @@
 
 import { notenApi } from "../api/notenApi";
 import { expectNotenSuccess } from "./notenErrors";
-import { describeFailure, performRead, performReset, performSeed, resolveResetStrategy } from "./notenReset";
+import {
+	describeFailure, performRead, performReset, performSeed, performSeedPruefung, resolveResetStrategy,
+} from "./notenReset";
 
 const BEZ_ENTSCHULDIGT = "entschuldigt";
 const BEZ_NOCH_NICHT = "Noch nicht eingetragen";
@@ -152,7 +154,14 @@ export const loadNotenContext = () => {
 
 			expect(context.gradeNotes.length, "need two ordinary grades to vary one on edit").to.be.greaterThan(1);
 
-			context.notes = { entschuldigt: entschuldigt.note, nochNichtEingetragen: nochNicht.note };
+			// administrative note the editor list excludes ("intern angerechnet" / "nicht zugelassen")
+			const nichtLehre = noten.find((n) => n.lehre === false);
+
+			context.notes = {
+				entschuldigt: entschuldigt.note,
+				nochNichtEingetragen: nochNicht.note,
+				nichtLehre: nichtLehre ? nichtLehre.note : null,
+			};
 
 			return notenApi.getStudentenNoten(context.lvId, context.semKurzbz);
 		})
@@ -188,6 +197,15 @@ export const seedBaseline = (context, studentUid, options = {}) =>
 		benotungsdatum: options.benotungsdatum || baselineBenotungsdatum(context),
 		freigegeben: options.freigegeben !== undefined ? options.freigegeben : true,
 		freigabedatum: options.freigabedatum || null,
+	});
+
+/** -> { pruefungId, note, datum, typ }. For attempt states the API cannot build. */
+export const seedPruefung = (context, student, { note, datum, typ }) =>
+	performSeedPruefung(context, student.uid, {
+		lehreinheitId: student.lehreinheit_id,
+		note,
+		datum,
+		typ,
 	});
 
 /** Raw row, bypassing the freigabedatum filter of getLvGesamtNoten. */

@@ -67,6 +67,17 @@ export const performSeed = (context, studentUid, payload) =>
 		}),
 	);
 
+export const performSeedPruefung = (context, studentUid, payload) =>
+	authUid().then((uid) =>
+		cy.task("noten:db:seedPruefung", {
+			lvId: context.lvId,
+			semKurzbz: context.semKurzbz,
+			studentUid,
+			mitarbeiterUid: uid,
+			...payload,
+		}),
+	);
+
 export const performRead = (context, studentUid) =>
 	cy.task("noten:db:readLvGesamtnote", {
 		lvId: context.lvId,

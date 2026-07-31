@@ -15,6 +15,7 @@ import {
 	baselineDate,
 	loadNotenContext,
 	requireDbReset,
+	seedPruefung,
 	shiftDate,
 } from "../../../../support/helpers/notenTestData";
 import {
@@ -236,6 +237,67 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 					String(ctx.gradeNotes[0]),
 				);
 				expect(String(termin2[1].datum).slice(0, 10)).to.eq(attemptDate(ctx, 2));
+			});
+		});
+	});
+
+	describe("kommPruef is the terminal attempt", () => {
+		it("refuses a further attempt once a kommPruef exists", () => {
+			const student = studentFor(0);
+
+			givenBaseline(ctx, student);
+
+			// kommPruef is entered in a different tool - no API path, hence the direct seed
+			seedPruefung(ctx, student, {
+				note: ctx.gradeNotes[0],
+				datum: attemptDate(ctx, 1),
+				typ: "kommPruef",
+			});
+
+			// dated after the kommPruef, so only Rule A can fire
+			addPruefung(ctx, student, {
+				note: ctx.gradeNotes[0],
+				datum: attemptDate(ctx, 2),
+				typ: enabledRetakeTypes(ctx)[0],
+			}).then((response) => {
+				expectNotenError(response, "maxAntritteReached");
+			});
+		});
+	});
+
+	describe("'Noch nicht eingetragen' does not consume an attempt", () => {
+		it("leaves the full cap available after an uncounted attempt", () => {
+			const student = studentFor(1);
+			const retakes = enabledRetakeTypes(ctx);
+
+			givenBaseline(ctx, student);
+
+			// occupies a date without counting; the first retake add also snapshots Termin1
+			addPruefung(ctx, student, {
+				note: ctx.notes.nochNichtEingetragen,
+				datum: attemptDate(ctx, 1),
+				typ: retakes[0],
+			}).then((response) => {
+				expectNotenSuccess(response, "uncounted attempt");
+			});
+
+			retakes.forEach((typ, i) => {
+				addPruefung(ctx, student, {
+					note: ctx.gradeNotes[0],
+					datum: attemptDate(ctx, i + 2),
+					typ,
+				}).then((response) => {
+					expectNotenSuccess(response, `${typ} after an uncounted attempt`);
+				});
+			});
+
+			// only now is the cap reached - the uncounted attempt consumed nothing
+			addPruefung(ctx, student, {
+				note: ctx.gradeNotes[0],
+				datum: attemptDate(ctx, retakes.length + 2),
+				typ: retakes[retakes.length - 1],
+			}).then((response) => {
+				expectNotenError(response, "maxAntritteReached");
 			});
 		});
 	});
