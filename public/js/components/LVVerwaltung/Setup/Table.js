@@ -2,8 +2,16 @@ import {CoreFilterCmpt} from "../../filter/Filter.js";
 import BsModal from "../../Bootstrap/Modal.js";
 import DetailsForm from "../Details/Form.js";
 import CoreTag from '../../Tag/Tag.js';
-import { tagHeaderFilter } from '../../../../js/tabulator/filters/extendedHeaderFilter.js';
-import { extendedHeaderFilter } from "../../../../js/tabulator/filters/extendedHeaderFilter.js";
+import {
+  buildTagHeaderFilterExpression,
+  buildTagOptionsFromRows,
+  customTagFilter,
+  setTagHeaderFilterValue,
+  tagHeaderFilter,
+  extendedHeaderFilter,
+  syncTagHeaderFilterOptions,
+  syncSelectedTagOptionsWithHeaderFilters
+} from "../../../../js/tabulator/filters/extendedHeaderFilter.js";
 import { tagFormatter } from "../../../../js/tabulator/formatter/tags.js";
 import { addTagInTable, deleteTagInTable, updateTagInTable } from "../../../../js/helpers/TagHelper.js";
 
@@ -69,7 +77,20 @@ export default {
 				this.lv_info_default.studiensemester_kurzbz = newVal
 				this.lv_info = false;
 			}
-		}
+		},
+		"tagFilterState.selectedOptions": {
+			handler() {
+				const selectedOptions = this.tagFilterState.selectedOptions;
+				const combinedFilterStatement =
+				buildTagHeaderFilterExpression(selectedOptions);
+
+				setTagHeaderFilterValue(
+					combinedFilterStatement,
+					this.$refs.table.tabulator
+				);
+			},
+			deep: true,
+		},
 	},
 	data() {
 		return {
@@ -100,8 +121,37 @@ export default {
 					handler: (data) => {
 						this.getExpandedRows()
 					}
-				}
+				},
+				{
+					event: "dataLoaded",
+					handler: (data) => {
+						syncTagHeaderFilterOptions(
+							Array.isArray(data) ? data : [],
+							this.tagFilterState.initialOptions,
+							this.tagFilterState.selectedOptions,
+						);
+					},
+				},
+				{
+					event: "dataFiltered",
+					handler: (filters, rows) => {
+						syncSelectedTagOptionsWithHeaderFilters(
+							filters,
+							this.tagFilterState.selectedOptions,
+							this.tagsEnabled,
+						);
+					},
+				},
+				{
+					event: "columnWidth",
+					handler: (column) => {
+						if (column.getField() !== "tags") return;
 
+						column.getCells().forEach((cell) => {
+						cell.getElement().firstElementChild?.fitTags?.();
+						});
+					},
+				},
 			],
 			formData: {},
 			lv_info: false,
@@ -115,7 +165,20 @@ export default {
 				raumtypalternativ: this.lehreinheitRaumtypAlternativeDefault,
 				lehrfach_id: ''
 
-			}
+			},
+			tagFilterState: {
+				initialOptions: [],
+				selectedOptions: [],
+			},
+			tagFilterLabels: {
+				tag: "Tag",
+				clear: "Clear",
+				connectors: {
+				AND: "AND",
+				OR: "OR",
+				NOT: "NOT",
+				},
+			},
 		}
 	},
 	computed: {
@@ -146,6 +209,14 @@ export default {
 				layout: 'fitDataStretch',
 				height: '100%',
 				persistenceID: 'lehrveranstaltungen_2026_07_15_v1',
+				persistence: {
+					sort: true,
+					columns: ["width", "visible"],
+					filter: false,
+					headerFilter: false,
+					group: false,
+					page: false,
+				},
 				selectableRowsRangeMode: 'click',
 				selectableRows: true,
 				rowContextMenu: (component, e) => {
@@ -204,10 +275,24 @@ export default {
 	created() {
 		Tabulator.extendModule("format", "formatters", {
 			tagHeaderFilter,
-			tagFormatter: cell => tagFormatter(cell, this.$refs.tagComponent),
+			tagFormatter: (cell, params, onRendered) => tagFormatter(cell, this.$refs.tagComponent, onRendered),
 			ja_nein: cell => cell.getValue()
 				? this.toUpperCase(this.$p.t('ui', 'ja'))
 				: this.toUpperCase(this.$p.t('ui', 'nein'))
+		});
+		LvvColumns.foreach(col => {
+			if (col.headerFilter == 'input' && col.headerFilterFunc == 'tagHeaderFilter') {
+				col.headerFilter = customTagFilter;
+				col.headerFilterParams = {
+					listOnEmpty: true,
+					autocomplete: true,
+					sort: "asc",
+					initialOptions: this.tagFilterState.initialOptions,
+					selectedOptions: this.tagFilterState.selectedOptions,
+					labels: this.tagFilterLabels,
+				};
+				col.headerSort = false;
+			}
 		});
 	},
 	mounted() {
@@ -319,16 +404,31 @@ export default {
 		},
 		addedTag(addedTag)
 		{
-			addTagInTable(addedTag, this.allRows, 'lehreinheit_id')
+			addTagInTable(addedTag, this.allRows, 'lehreinheit_id');
+			syncTagHeaderFilterOptions(
+				this.$refs.table?.tabulator?.getData() || [],
+				this.tagFilterState.initialOptions,
+				this.tagFilterState.selectedOptions,
+			);
 		},
 		deletedTag(deletedTag)
 		{
 			deleteTagInTable(deletedTag, this.allRows);
+			syncTagHeaderFilterOptions(
+				this.$refs.table?.tabulator?.getData() || [],
+				this.tagFilterState.initialOptions,
+				this.tagFilterState.selectedOptions,
+			);
 		},
 
 		updatedTag(updatedTag)
 		{
 			updateTagInTable(updatedTag, this.allRows);
+			syncTagHeaderFilterOptions(
+				this.$refs.table?.tabulator?.getData() || [],
+				this.tagFilterState.initialOptions,
+				this.tagFilterState.selectedOptions,
+			);
 		},
 		async copyLehreinheit(row, art)
 		{

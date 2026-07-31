@@ -5,8 +5,7 @@ return [
 		field: "lv_kurzbz",
 		headerFilterFuncParams: { field: 'lv_kurzbz' },
 		headerFilter: true,
-		formatter(cell,
-			formatterParams) {
+		formatter(cell, formatterParams) {
 			const rowData = cell.getRow().getData();
 			const iconKey = (rowData.lehrtyp_kurzbz || '').toLowerCase();
 			const lvkurzbz = (cell.getValue()).toUpperCase();
@@ -22,8 +21,7 @@ return [
 
 			return parentspan;
 		},
-		cellClick(e,
-			cell) {
+		cellClick(e, cell) {
 			cell.getRow().treeToggle();
 		}
 	},

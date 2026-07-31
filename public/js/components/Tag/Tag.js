@@ -47,7 +47,8 @@ export default {
 				updatevon: "",
 				response: "",
 				start: "",
-				ende: ""
+				ende: "",
+				prioritaet: 100,
 			},
 			mode: "create"
 		};
@@ -94,7 +95,8 @@ export default {
 			this.tagData.automatisiert = item.automatisiert;
 			this.tagData.start = this.formatDateTimeDay(item.start);
 			this.tagData.ende = this.formatDateTimeDay(item.ende);
-
+			this.tagData.prioritaet = item.prioritaet || 100;
+			
 			if (item && item.notiz_id)
 			{
 				this.selectedTagId = item.notiz_id;
@@ -192,7 +194,8 @@ export default {
 				updateamum: "",
 				bearbeiter: "",
 				response: "",
-				readonly: false
+				readonly: false,
+				prioritaet: 100,
 			};
 			this.selectedTagId = null;
 			this.mode = "create";

@@ -268,9 +268,9 @@ return [
 		},						
 		headerFilter: "tickCross",
 		headerFilterParams: {
-			"tristate": true,
+			tristate: true,
 			elementAttributes: {
-				"value": "true"
+				value: "true"
 			}
 		},
 		headerFilterEmptyCheck(value) {
@@ -326,9 +326,9 @@ return [
 		},						
 		headerFilter: "tickCross",
 		headerFilterParams: {
-			"tristate": true,
+			tristate: true,
 			elementAttributes: {
-				"value": "true"
+				value: "true"
 			}
 		},
 		headerFilterEmptyCheck(value) {

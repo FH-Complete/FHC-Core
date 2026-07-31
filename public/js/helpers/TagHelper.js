@@ -20,25 +20,37 @@ export function addTagInTable(addedTag, rows, matchKey, tagsKey = "tags")
 		for (const tag of addedTag.response)
 		{
 			if (rowData[matchKey] !== tag[matchKey])
-				continue;
+				return;
 
-			//avoid double inserts
-			if (tags.some(x => x.id === tag.id))
-				continue;
+			let tags;
+			try {
+				let initialTags = rowData[tagsKey] || "[]";
+				if (typeof initialTags === 'string') {
+					tags = JSON.parse(initialTags);
+				} else {
+					tags = initialTags;
+				}
+			} catch (e) {
+				tags = [];
+			}
 
-			const newTag = {
-				id: tag.id,
-				prestudent_id: tag.prestudent_id,
-				//add also information of addedTag
-				beschreibung: addedTag.beschreibung,
-				notiz: addedTag.notiz ?? "",
-				style: addedTag.style,
-				done: addedTag.done ?? false,
-				typ_kurzbz: addedTag.tag_typ_kurzbz ?? addedTag.typ_kurzbz, //here seem to be 2 variations
-				automatisiert: addedTag.automatisiert
-			};
+			if (!Array.isArray(tags))
+				tags = [];
 
-			tags.unshift(newTag);
+			if (tags.some(t => t?.id === tag.id))
+				return;
+
+			let newTag = { ...addedTag, id: tag.id };
+
+			tags.push(newTag);
+			tags.sort((a, b) => {
+				let adone = a.done ? 1 : 0;
+				let bdone = b.done ? 1 : 0;
+
+				if (adone !== bdone) return adone - bdone;
+				return a.prioritaet - b.prioritaet;
+			});
+			rowData[tagsKey] = JSON.stringify(tags);
 			updated = true;
 		}
 
@@ -69,10 +81,11 @@ export function deleteTagInTable(deletedTag, rows, tagsKeys = ['tags'])
 			let tags = [];
 
 			try {
-				if (typeof raw === "string") {
-					tags = JSON.parse(raw || "[]");
-				} else if (Array.isArray(raw)) {
-					tags = [...raw];
+				let initialTags = rowData[key] || "[]";
+				if (typeof initialTags === 'string') {
+					tags = JSON.parse(initialTags);
+				} else {
+					tags = initialTags;
 				}
 			} catch (e) {
 				tags = [];
@@ -113,7 +126,12 @@ export function updateTagInTable(updatedTag, rows, fields = ['tags'])
 
 			let fieldData;
 			try {
-				fieldData = JSON.parse(rowData[field] || "[]");
+				let initialTags = rowData[field] || "[]";
+				if (typeof initialTags === 'string') {
+					fieldData = JSON.parse(initialTags);
+				} else {
+					fieldData = initialTags;
+				}
 			} catch (e) {
 				return;
 			}
@@ -126,6 +144,14 @@ export function updateTagInTable(updatedTag, rows, fields = ['tags'])
 			if (index !== -1)
 			{
 				fieldData[index] = { ...updatedTag };
+				fieldData.sort((a, b) => {
+					let adone = a.done ? 1 : 0;
+					let bdone = b.done ? 1 : 0;
+
+					if (adone !== bdone) return adone - bdone;
+					return a.prioritaet - b.prioritaet;
+				});
+
 				let updatedFieldData = JSON.stringify(fieldData);
 
 				if (updatedFieldData !== rowData[field])

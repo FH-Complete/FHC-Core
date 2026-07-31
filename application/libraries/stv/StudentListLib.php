@@ -346,7 +346,7 @@ class StudentListLib
 			$subQueryTag = "(
 				SELECT
 					tag.prestudent_id,
-					COALESCE(json_agg(tag ORDER BY tag.done), '[]'::json) AS tags
+					COALESCE(json_agg(tag ORDER BY tag.done, tag.prioritaet), '[]'::json) AS tags
 				FROM (
 					SELECT DISTINCT ON (n.notiz_id)
 						n.notiz_id AS id,
@@ -355,6 +355,8 @@ class StudentListLib
 						n.text AS notiz,
 						nt.style,
 						n.erledigt AS done,
+						nt.prioritaet AS prioritaet,
+						nt.automatisiert AS automatisiert,
 						nz.prestudent_id,
 						n.start,
 						n.ende
