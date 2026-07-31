@@ -175,6 +175,7 @@ export default {
 		survey: {
 			handler() {
 				this.setTimeslotCalendarEvents();
+				this.participantSchedules = {};
 			},
 			deep: true,
 		},
