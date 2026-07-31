@@ -85,6 +85,7 @@ class StundenplanLib
 		$this->sortStudienSemester($semester_range);
 
 		$function_error = $this->applyLoadUeberSemesterHaelfte($semester_range);
+		$this->_ci->addMeta('nach_apply_semester_range', $semester_range);
 		if ($function_error)
 			return $function_error;
 		
