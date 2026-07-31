@@ -467,6 +467,7 @@ export default {
 						:label="$p.t('ui', 'von')"
 						type="DatePicker"
 						v-model="formData.von"
+						model-type="yyyy-MM-dd"
 						auto-apply
 						:enable-time-picker="false"
 						text-input
@@ -501,6 +502,7 @@ export default {
 						:label="$p.t('global', 'bis')"
 						type="DatePicker"
 						v-model="formData.bis"
+						model-type="yyyy-MM-dd"
 						auto-apply
 						:enable-time-picker="false"
 						text-input
