@@ -45,6 +45,8 @@ import KeyboardShortcuts from "./KeyboardShortcuts.js";
 import { useContextMenuActions } from "../../composables/Tempus/ContextMenuActions.js";
 import MultiWeekPlanModal from "./MultiWeekPlanModal.js";
 import { getTempusSearchbarOptions } from "./Filters/searchbarOptions.js";
+import RaumauswahlModal from "./RaumauswahlModal.js";
+import LehreinheitModal from "./LehreinheitModal.js";
 
 export default {
 	name: "Tempus",
@@ -68,6 +70,8 @@ export default {
 		Reservierung,
 		KeyboardShortcuts,
 		MultiWeekPlanModal,
+		RaumauswahlModal,
+		LehreinheitModal
 	},
 	props: {
 		defaultSemester: String,
@@ -91,9 +95,9 @@ export default {
 			renderers: Vue.computed(() => this.renderers),
 			appConfig: Vue.computed(() => this.appconfig),
 			contextMenuActions: useContextMenuActions({
-				openRaumauswahl: (orig) => this.openRaumauswahl(orig),
-				openResourcesAssignmentModal: (orig) =>
-					this.openResourcesAssignmentModal(orig),
+				openRaumauswahl: (orig) => this.$refs.raumModal.show(orig),
+				openLehreinheit: (orig) => this.$refs.lehreinheitModal.show(orig),
+				openResourcesAssignmentModal: (orig) => this.openResourcesAssignmentModal(orig),
 				openHistory: (orig) => this.openHistory(orig),
 				deleteEntry: (orig) => this.deleteEntry(orig),
 				syncToLecturer: (orig) => this.syncToLecturer(orig),
@@ -101,7 +105,7 @@ export default {
 			}),
 			tableActions: {
 				deleteEntries: (origList) => this.deleteEntries(origList),
-				openRaumauswahl: (orig) => this.openRaumauswahl(orig),
+				openRaumauswahl: (orig) => this.$refs.raumModal.show(orig),
 			},
 		};
 	},
@@ -139,12 +143,7 @@ export default {
 			stg: null,
 			semester: null,
 			studiensemester_kurzbz: null,
-			raumModal: {
-				show: false,
-				loading: false,
-				vorschlaege: [],
-				event: null,
-			},
+
 			visibleStatusArray: {},
 			visibleStatus: ["all"],
 			selectedStudiensemester:
@@ -217,17 +216,6 @@ export default {
 		},
 	},
 	methods: {
-		async openRaumauswahl(orig) {
-			if (!orig?.kalender_id) return;
-			this.raumModal = orig;
-
-			await this.$api
-				.call(ApiKalender.getRaumvorschlag(orig.kalender_id))
-				.then((result) => {
-					this.raumVorschlaege = result.data ?? [];
-					this.$refs.raumModal.show();
-				});
-		},
 		async openResourcesAssignmentModal(orig) {
 			if (!orig?.kalender_id) return;
 
@@ -287,19 +275,6 @@ export default {
 			return this.$api
 				.call(ApiKalender.syncToStudent(orig.kalender_id))
 				.then(() => this.$refs.calendar.resetEventLoader());
-		},
-		async selectRaum(ort_kurzbz) {
-			const orig = this.raumModal;
-			await this.$api
-				.call(
-					ApiKalender.updateKalenderEvent(orig.kalender_id, {
-						ort_kurzbz,
-						start_time: orig.von,
-						end_time: orig.bis,
-					}),
-				)
-				.then(() => this.$refs.raumModal.hide());
-			this.$refs.calendar.resetEventLoader();
 		},
 		setOrt: function (data) {
 			this.ort_kurzbz = data.ort_kurzbz;
@@ -1304,30 +1279,15 @@ export default {
 			<stv-verband :endpoint="endpoint" @select-verband="onSelectVerbandAndClose" class="col" style="height:0%"></stv-verband>
 		</div>
 
-		<bs-modal ref="raumModal" class="bootstrap-prompt">
-			<template #title>Raumauswahl</template>
-			<template #default>
-				<ul v-if="raumVorschlaege.length" class="list-group">
-					<li
-						v-for="raum in raumVorschlaege"
-						:key="raum.ort_kurzbz"
-						class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-						style="cursor:pointer"
-						@click="selectRaum(raum.ort_kurzbz)"
-					>
-						<span><i class="fa-solid fa-door-open me-2"></i>{{ raum.ort_kurzbz }}</span>
-						<span class="text-muted" v-tooltip="{ value: raum.details.join('\\n'), class: 'custom-tooltip' }">{{ raum.score }}</span>
-					</li>
-				</ul>
-				<p v-else class="text-muted mb-0">Keine freien Räume gefunden.</p>
-			</template>
-		</bs-modal>
-		 <bs-modal 
-      ref="resourcesAssignmentModal"
-      @hideBsModal="closeResourcesAssignmentModal"
-      class="bootstrap-prompt"
-      data-cy="resourcesAssignmentModal"
-    >
+		<raumauswahl-modal ref="raumModal" @saved="$refs.calendar.resetEventLoader()"/>
+		<lehreinheit-modal ref="lehreinheitModal" @saved="$refs.calendar.resetEventLoader()"/>
+
+		<bs-modal 
+			ref="resourcesAssignmentModal"
+			@hideBsModal="closeResourcesAssignmentModal"
+			class="bootstrap-prompt"
+		data-cy="resourcesAssignmentModal"
+			>
 			<template #title>{{$p.t('ui', 'resource_assignment_modal_title')}}</template>
 			<template #default>
         <div class="mb-5">

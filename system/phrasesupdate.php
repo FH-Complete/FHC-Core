@@ -21733,6 +21733,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'lehre',
+		'phrase' => 'roomselection',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Raumauswahl",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Room Selection",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
 		'phrase' => 'incomingplaetze',
 		'insertvon' => 'system',
 		'phrases' => array(

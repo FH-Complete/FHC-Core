@@ -85,7 +85,8 @@ export default {
 		activeContextActions() {
 			if (this.isHeaderOrFooter) return [];
 			const type = this.event.orig?.type ?? 'lehreinheit';
-			return this.contextMenuActions[type] ?? this.contextMenuActions['default'] ?? [];
+			const actions = this.contextMenuActions[type] ?? this.contextMenuActions['default'] ?? [];
+			return actions.filter(action => !action.visible || action.visible(this.event.orig));
 		}
 	},
 	methods: {

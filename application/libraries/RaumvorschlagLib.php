@@ -62,6 +62,14 @@ class RaumvorschlagLib
 		$kandidaten = $this->_getRaumkandidaten($event);
 		if (empty($kandidaten)) return [];
 
+		$unique = [];
+
+		foreach ($kandidaten as $raum)
+		{
+			$unique[$raum->ort_kurzbz] = $raum;
+		}
+
+		$kandidaten = array_values($unique);
 
 		$ratings = [];
 		foreach ($kandidaten as $raum)
@@ -227,6 +235,7 @@ class RaumvorschlagLib
 			}
 		}
 
+		$this->_ci->KalenderModel->addDistinct('tbl_kalender_ort.ort_kurzbz');
 		$this->_ci->KalenderModel->addSelect('tbl_kalender_ort.ort_kurzbz');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_ort', 'tbl_kalender.kalender_id = tbl_kalender_ort.kalender_id');
 		$this->_ci->KalenderModel->db->where('tbl_kalender.von <', $event->isoend);
