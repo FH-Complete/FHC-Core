@@ -80,10 +80,12 @@ class StundenplanLib
 		if (isError($semester_range))
 			return $semester_range;
 		$semester_range = getData($semester_range);
+		$this->_ci->addMeta('semester_range', $semester_range);
 
 		$this->sortStudienSemester($semester_range);
 
 		$function_error = $this->applyLoadUeberSemesterHaelfte($semester_range);
+		$this->_ci->addMeta('nach_apply_semester_range', $semester_range);
 		if ($function_error)
 			return $function_error;
 		
@@ -799,7 +801,8 @@ class StundenplanLib
 		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		// gets all studiensemester from the student from start_date to end_date
-		$semester_range = $this->_ci->StudiensemesterModel->getByDateRange($start_date, $end_date);
+		//$semester_range = $this->_ci->StudiensemesterModel->getByDateRange($start_date, $end_date);
+		$semester_range = $this->_ci->StudiensemesterModel->getContainingOrNearestByDateRange($start_date, $end_date);
 		if (isError($semester_range))
 			return $semester_range;
 		
