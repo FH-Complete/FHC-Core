@@ -16,20 +16,32 @@ class CoodleSurveyExternalParticipant_model extends DB_Model
 		$this->_ci =& get_instance();
 	}
 
-	public function getExternalParticipants($surveyId)
+	public function getExternalParticipants($surveyId, $includeAccessKeys = false)
 	{
-		$query = "SELECT *
+		$selectedColumns = $includeAccessKeys ? "*" : "id, survey_id, name, email, selection";
+		$query = "SELECT $selectedColumns
 				FROM $this->dbTable
 				WHERE survey_id = $surveyId
 		";
 		return $this->execQuery($query)->retval;
 	}
 
-	public function getExternalParticipant($externalParticipantId)
+	public function getExternalParticipant($externalParticipantId, $includeAccessKey = false)
 	{
+		$selectedColumns = $includeAccessKey ? "*" : "id, survey_id, name, email, selection";
 		$query = "SELECT *
 			FROM $this->dbTable
 			WHERE id = $externalParticipantId
+			LIMIT 1
+		";
+		return $this->execQuery($query)->retval[0];
+	}
+
+	public function getExternalParticipantByAccessKey($surveyId, $accessKey)
+	{
+		$query = "SELECT *
+			FROM $this->dbTable
+			WHERE survey_id = $surveyId AND access_key = '$accessKey'
 			LIMIT 1
 		";
 		return $this->execQuery($query)->retval[0];
@@ -82,12 +94,13 @@ class CoodleSurveyExternalParticipant_model extends DB_Model
 				function ($newExternalParticipant) use ($surveyId) {
 					$name = $newExternalParticipant["name"];
 					$email = $newExternalParticipant["email"];
-					return "($surveyId, '$name', '$email', NULL)";
+					$accessKey = uniqid();
+					return "($surveyId, '$name', '$email', '$accessKey', NULL)";
 				},
 				$newExternalParticipants
 			);
 			$insertValues = implode(", ", $insertValues);
-			$insertQuery = "INSERT INTO $this->dbTable (survey_id, name, email, selection) VALUES $insertValues";
+			$insertQuery = "INSERT INTO $this->dbTable (survey_id, name, email, access_key, selection) VALUES $insertValues";
 			$this->execQuery($insertQuery);
 		}
 

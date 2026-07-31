@@ -263,7 +263,8 @@ export default {
 			if (this.$props.authExternalParticipantId) {
 				selectionSubmissionResponse = await this.$api.call(
 					CoodleApi.submitExternalParticipantSelection(
-						this.$route.params.key,
+						this.$route.params.surveyId,
+						this.$route.params.accessKey,
 						selection,
 					),
 				);

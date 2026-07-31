@@ -228,7 +228,7 @@ const router = VueRouter.createRouter({
 			props: true
 		},
 		{
-			path: `/Cis/CoodleExternal/:key`,
+			path: `/Cis/CoodleExternal/:surveyId/:accessKey`,
 			name: 'CoodleExternal',
 			component: CoodleExternal,
 			props: true

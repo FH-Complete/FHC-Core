@@ -102,6 +102,7 @@ if (!$result = @$db->db_query("SELECT 1 FROM campus.tbl_coodle_survey_external_p
 		survey_id int NOT NULL,
 		name varchar(255) NOT NULL,
 		email varchar(255) NOT NULL,
+		access_key varchar(64),
 		selection varchar(255),
 		CONSTRAINT tbl_coodle_surveys_external_participants_id_pk PRIMARY KEY(id),
 		CONSTRAINT tbl_coodle_survey_external_participants_survey_id_fk FOREIGN KEY (survey_id) REFERENCES campus.tbl_coodle_surveys(id)

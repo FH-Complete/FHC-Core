@@ -15,7 +15,8 @@ export default {
 		async fetchSurvey() {
 			const surveyResponse = await this.$api.call(
 				CoodleApi.getSurveyForExternalParticipant(
-					this.$route.params.key,
+					this.$route.params.surveyId,
+					this.$route.params.accessKey,
 				),
 			);
 

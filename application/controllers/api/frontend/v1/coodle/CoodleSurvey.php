@@ -60,7 +60,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		$this->load->helper('hlp_sancho_helper');
 
 		$this->coodlePageUrl = APP_ROOT . "cis.php/Cis/Coodle";
-		$this->coodlePageExternalUrl = APP_ROOT . "cis.php/Cis/CoodleExternal/{key}";
+		$this->coodlePageExternalUrl = APP_ROOT . "cis.php/Cis/CoodleExternal/{surveyId}/{accessKey}";
 		$this->coodleIcalUrl = APP_ROOT . "cis.php/CoodleIcal/{uid}";
 		$this->coodleIcalUrlWithEncryptedUid = APP_ROOT . "cis.php/CoodleIcal/encrypted/{encryptedUid}";
 
@@ -119,13 +119,14 @@ class CoodleSurvey extends FHCAPI_Controller
 
 	public function getSurveyForExternalParticipant()
 	{
-		$key = $this->input->post("key");
-		$validatedKey = $this->validateEncryptedExternalParticipantKey($this->safeDecode($key));
-		if (!$validatedKey)
+		$surveyId = $this->input->post("surveyId");
+		$accessKey = $this->input->post("accessKey");
+		$validatedAccessKey = $this->validateExternalParticipantAccessKey($surveyId, $accessKey);
+		if (!$validatedAccessKey)
 			$this->terminateWithError($this->p->t("coodle", "invalid_access_key_error"));
 
-		$survey = $validatedKey["survey"];
-		$externalParticipant = $validatedKey["externalParticipant"];
+		$survey = $validatedAccessKey["survey"];
+		$externalParticipant = $validatedAccessKey["externalParticipant"];
 
 		$timeslots = $this->CoodleSurveyTimeslotModel->getTimeslots($survey->id);
 		$survey->timeslots = $timeslots;
@@ -234,10 +235,8 @@ class CoodleSurvey extends FHCAPI_Controller
 				);
 			}
 
-			$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId);
+			$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId, true);
 			foreach ($externalParticipants as $externalParticipant) {
-				$encryptedAccessKey = $this->safeEncode($this->getEncryptedExternalParticipantKey($externalParticipant));
-
 				sendSanchoMail(
 					"Sancho_Mail_Coodle_Created_Ext",
 					[
@@ -245,7 +244,7 @@ class CoodleSurvey extends FHCAPI_Controller
 						"surveyCreatorName" => $authUserFullName,
 						"org" => CAMPUS_NAME,
 						"surveyTitle" => $survey->title,
-						"surveyHref" => str_replace("{key}", $encryptedAccessKey, $this->coodlePageExternalUrl),
+						"surveyHref" => $this->getUrlForExternalParticipant($externalParticipant),
 					],
 					$externalParticipant->email,
 					"Coodle Umfrage erstellt / Coodle survey created"
@@ -313,10 +312,8 @@ class CoodleSurvey extends FHCAPI_Controller
 				);
 			}
 
-			$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId);
+			$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId, true);
 			foreach ($externalParticipants as $externalParticipant) {
-				$encryptedAccessKey = $this->safeEncode($this->getEncryptedExternalParticipantKey($externalParticipant));
-
 				sendSanchoMail(
 					"Sancho_Mail_Coodle_Updated_Ext",
 					[
@@ -324,7 +321,7 @@ class CoodleSurvey extends FHCAPI_Controller
 						"surveyCreatorName" => $authUserFullName,
 						"org" => CAMPUS_NAME,
 						"surveyTitle" => $survey->title,
-						"surveyHref" => str_replace("{key}", $encryptedAccessKey, $this->coodlePageExternalUrl),
+						"surveyHref" => $this->getUrlForExternalParticipant($externalParticipant),
 					],
 					$externalParticipant->email,
 					"Coodle Umfrage modifiziert / Coodle survey modified"
@@ -401,16 +398,16 @@ class CoodleSurvey extends FHCAPI_Controller
 
 	public function submitExternalParticipantSelection()
 	{
-		$key = $this->input->post("key");
+		$surveyId = $this->input->post("surveyId");
+		$accessKey = $this->input->post("accessKey");
 		$selection = $this->input->post("selection");
 
-		$key = $this->input->post("key");
-		$validatedKey = $this->validateEncryptedExternalParticipantKey($this->safeDecode($key));
-		if (!$validatedKey)
+		$validatedAccessKey = $this->validateExternalParticipantAccessKey($surveyId, $accessKey);
+		if (!$validatedAccessKey)
 			$this->terminateWithError($this->p->t("coodle", "invalid_access_key_error"));
 
-		$survey = $validatedKey["survey"];
-		$externalParticipant = $validatedKey["externalParticipant"];
+		$survey = $validatedAccessKey["survey"];
+		$externalParticipant = $validatedAccessKey["externalParticipant"];
 
 		if ($survey->completed_at || $survey->canceled_at) {
 			$this->terminateWithError("You can no longer vote in this survey!");
@@ -459,7 +456,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		if ($shouldInformParticipants) {
 			$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
 			$participants = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
-			$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId);
+			$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId, true);
 			$authUserFullName = getData($this->PersonModel->getFullName(getAuthUID()));
 
 			foreach ($participants as $participant) {
@@ -477,8 +474,6 @@ class CoodleSurvey extends FHCAPI_Controller
 			}
 
 			foreach ($externalParticipants as $externalParticipant) {
-				$encryptedAccessKey = $this->safeEncode($this->getEncryptedExternalParticipantKey($externalParticipant));
-
 				sendSanchoMail(
 					"Sancho_Mail_Coodle_Canceled_Ext",
 					[
@@ -486,7 +481,7 @@ class CoodleSurvey extends FHCAPI_Controller
 						"surveyCreatorName" => $authUserFullName,
 						"org" => CAMPUS_NAME,
 						"surveyTitle" => $survey->title,
-						"surveyHref" => str_replace("{key}", $encryptedAccessKey, $this->coodlePageExternalUrl),
+						"surveyHref" => $this->getUrlForExternalParticipant($externalParticipant),
 					],
 					$externalParticipant->email,
 					'Coodle Umfrage storniert / Coodle survey canceled'
@@ -544,7 +539,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		if ($shouldInformParticipants) {
 			$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
 			$participants = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
-			$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId);
+			$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId, true);
 			$authUserFullName = getData($this->PersonModel->getFullName(getAuthUID()));
 
 			if ($selectedTimeslot) {
@@ -597,8 +592,6 @@ class CoodleSurvey extends FHCAPI_Controller
 				}
 
 				foreach ($externalParticipants as $externalParticipant) {
-					$encryptedAccessKey = $this->safeEncode($this->getEncryptedExternalParticipantKey($externalParticipant));
-
 					sendSanchoMail(
 						"Sancho_Mail_Coodle_Completed_Ext",
 						[
@@ -607,7 +600,7 @@ class CoodleSurvey extends FHCAPI_Controller
 							"org" => CAMPUS_NAME,
 							"surveyTitle" => $survey->title,
 							"selectedSurveyTimeslot" => $formattedTimeslot,
-							"surveyHref" => str_replace("{key}", $encryptedAccessKey, $this->coodlePageExternalUrl),
+							"surveyHref" => $this->getUrlForExternalParticipant($externalParticipant),
 						],
 						$externalParticipant->email,
 						"Coodle Umfrage vollendet / Coodle survey completed",
@@ -642,8 +635,6 @@ class CoodleSurvey extends FHCAPI_Controller
 				}
 
 				foreach ($externalParticipants as $externalParticipant) {
-					$encryptedAccessKey = $this->safeEncode($this->getEncryptedExternalParticipantKey($externalParticipant));
-
 					sendSanchoMail(
 						"Sancho_Mail_Coodle_Cmpltd_No_Ext",
 						[
@@ -651,7 +642,7 @@ class CoodleSurvey extends FHCAPI_Controller
 							"surveyParticipantName" => $externalParticipant->name,
 							"org" => CAMPUS_NAME,
 							"surveyTitle" => $survey->title,
-							"surveyHref" => str_replace("{key}", $encryptedAccessKey, $this->coodlePageExternalUrl),
+							"surveyHref" => $this->getUrlForExternalParticipant($externalParticipant),
 						],
 						$externalParticipant->email,
 						"Coodle Umfrage vollendet / Coodle survey completed"
@@ -682,7 +673,7 @@ class CoodleSurvey extends FHCAPI_Controller
 			}
 		);
 
-		$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId);
+		$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId, true);
 		$externalParticipantsWithoutVote = array_filter(
 			$externalParticipants,
 			function ($externalParticipant) {
@@ -711,8 +702,6 @@ class CoodleSurvey extends FHCAPI_Controller
 		}
 
 		foreach ($externalParticipantsWithoutVote as $externalParticipant) {
-			$encryptedAccessKey = $this->safeEncode($this->getEncryptedExternalParticipantKey($externalParticipant));
-
 			sendSanchoMail(
 				"Sancho_Mail_Coodle_Reminder_Ext",
 				[
@@ -720,7 +709,7 @@ class CoodleSurvey extends FHCAPI_Controller
 					"surveyParticipantName" => $externalParticipant->name,
 					"org" => CAMPUS_NAME,
 					"surveyTitle" => $survey->title,
-					"surveyHref" => str_replace("{key}", $encryptedAccessKey, $this->coodlePageExternalUrl),
+					"surveyHref" => $this->getUrlForExternalParticipant($externalParticipant),
 				],
 				$externalParticipant->email,
 				"Coodle Umfrage Erinnerung / Coodle survey reminder"
@@ -1023,26 +1012,24 @@ class CoodleSurvey extends FHCAPI_Controller
 		return $decodedValue;
 	}
 
-	private function getEncryptedExternalParticipantKey($externalParticipant)
+	private function getUrlForExternalParticipant($externalParticipant)
 	{
-		$value = "coodleExt_" . $externalParticipant->survey_id . "_" . $externalParticipant->id;
-		return $this->cryptlib->RIJNDAEL_256_ECB(str_pad($value, 32, chr(0)), LVPLAN_CYPHER_KEY, true);
+		return str_replace(
+			["{surveyId}", "{accessKey}"],
+			[$externalParticipant->survey_id, $externalParticipant->access_key],
+			$this->coodlePageExternalUrl
+		);
 	}
 
-	private function validateEncryptedExternalParticipantKey($encryptedKey)
+	private function validateExternalParticipantAccessKey($surveyId, $accessKey)
 	{
-		$decryptedKey = trim($this->cryptlib->RIJNDAEL_256_ECB_DECRYPT($encryptedKey, LVPLAN_CYPHER_KEY, true));
-		$values = explode("_", $decryptedKey);
-		if (count($values) !== 3 || $values[0] !== "coodleExt")
+		if (!$surveyId || !$accessKey)
 			return null;
 
-		$surveyId = $values[1];
-		$externalParticipantId = $values[2];
-
 		$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
-		$externalParticipant = $this->CoodleSurveyExternalParticipantModel->getExternalParticipant($externalParticipantId);
+		$externalParticipant = $this->CoodleSurveyExternalParticipantModel->getExternalParticipantByAccessKey($surveyId, $accessKey);
 
-		if (!$survey || !$externalParticipant || $survey->id !== $externalParticipant->survey_id)
+		if (!$survey || !$externalParticipant)
 			return null;
 
 		return [
