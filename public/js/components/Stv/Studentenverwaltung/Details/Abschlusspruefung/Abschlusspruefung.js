@@ -434,7 +434,10 @@ export default {
 			}
 
 			if (!this.formData.akadgrad_id && this.arrAkadGrad.length > 0) {
-				this.formData.akadgrad_id = this.arrAkadGrad[0].akadgrad_id;
+				if(this.student.geschlecht == 'w')
+					this.formData.akadgrad_id = this.arrAkadGrad[1].akadgrad_id;
+				else
+					this.formData.akadgrad_id = this.arrAkadGrad[0].akadgrad_id;
 			}
 		},
 		printDocument(link) {
@@ -718,7 +721,7 @@ export default {
 							:key="grad.akadgrad_id"
 							:value="grad.akadgrad_id"
 							>
-							{{grad.titel}}
+							{{ grad.titel }} <span v-if="grad.geschlecht !== null"> ({{ grad.geschlecht }}) </span>
 						</option>
 					</form-input>
 					<form-input
