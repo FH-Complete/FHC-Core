@@ -532,7 +532,7 @@ export default {
         e.preventDefault();
 
         this.$refs.table.tabulator.deselectRow();
-        this.$refs.table.tabulator.selectRow();
+        this.$refs.table.tabulator.selectRow('active');
       }
 
       if (!this.focusObj)
