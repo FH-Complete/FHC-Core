@@ -24,6 +24,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 class StudentListLib
 {
 	private $_ci; // Code igniter instance
+	private $index_bezeichnung_mehrsprachig;
 
 	private $_allowedStgs = [];
 	private $_selects = [];
@@ -39,12 +40,14 @@ class StudentListLib
 	public function __construct($params = null)
 	{
 		$this->_ci =& get_instance(); // get code igniter instance
+		$this->index_bezeichnung_mehrsprachig = $this->_getLanguageIndex();
 
 		$this->_ci->load->model('crm/Prestudent_model', 'PrestudentModel');
 
 		if (isset($params['allowedStgs']))
 			$this->_allowedStgs = $params['allowedStgs'];
 
+		$this->_ci->db->reset_query();
 		// Add default SELECTs
 		$this->addSelect("b.uid");
 		$this->addSelect('titelpre');
@@ -251,9 +254,9 @@ class StudentListLib
 	 *
 	 * @return stdClass		result of the query
 	 */
-	public function execute($studiensemester_kurzbz, $index_bezeichnung_mehrsprachig=0)
+	public function execute($studiensemester_kurzbz)
 	{
-		$this->addSelectAndJoinForTagsIfConfigured($studiensemester_kurzbz, $index_bezeichnung_mehrsprachig);
+		$this->addSelectAndJoinForTagsIfConfigured($studiensemester_kurzbz);
 
 		$stdsemEsc = $studiensemester_kurzbz ? $this->_ci->PrestudentModel->escape($studiensemester_kurzbz) : 'NULL';
 
@@ -302,7 +305,7 @@ class StudentListLib
 	 * @param string studiensemester_kurzbz
 	 *
 	 */
-	 protected function addSelectAndJoinForTagsIfConfigured($studiensemester_kurzbz, $index_bezeichnung_mehrsprachig)
+	 protected function addSelectAndJoinForTagsIfConfigured($studiensemester_kurzbz)
 	 {
 		if (defined('STV_TAGS_ENABLED') && STV_TAGS_ENABLED) {
 			$this->_ci->load->config('stv');
@@ -326,7 +329,7 @@ class StudentListLib
 					SELECT DISTINCT ON (n.notiz_id)
 						n.notiz_id AS id,
 						nt.typ_kurzbz,
-						array_to_json(nt.bezeichnung_mehrsprachig)->>". $index_bezeichnung_mehrsprachig . " AS beschreibung,
+						array_to_json(nt.bezeichnung_mehrsprachig)->>". $this->index_bezeichnung_mehrsprachig . " AS beschreibung,
 						n.text AS notiz,
 						nt.style,
 						n.erledigt AS done,
@@ -361,6 +364,17 @@ class StudentListLib
 			$this->addJoin($subQueryTag, 'tag_data_agg.prestudent_id = tbl_prestudent.prestudent_id', 'LEFT');
 		}
 	 }
+
+	protected function _getLanguageIndex()
+	{
+		$this->_ci->load->model('system/Sprache_model', 'SpracheModel');
+		$this->_ci->SpracheModel->addSelect('index');
+		$result = $this->_ci->SpracheModel->loadWhere(array('sprache' => getUserLanguage()));
+		$language = hasData($result) ? getData($result)[0]->index : 1;
+		$index_bezeichnung_mehrsprachig = $language - 1;
+
+		return $index_bezeichnung_mehrsprachig;
+	}
 
 	/**
 	 * Get alias of a table or select statement
