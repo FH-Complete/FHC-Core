@@ -345,7 +345,7 @@ class KalenderLib
 		$data = $this->_ci->KalenderModel->load();
 		return $this->_mapEvents($data);
 	}
-	public function getPlanForPlanner($start_date, $end_date, $ort = null, $uids = null, $studiengaenge = null)
+	public function getPlanForPlanner($start_date, $end_date, $ort = null, $uids = null, $studiengaenge = null, $collisionCheck = true)
 	{
 		$this->_getBasePlan($start_date, $end_date);
 
@@ -452,7 +452,7 @@ class KalenderLib
 		
 		$data = $this->_ci->KalenderModel->load();
 
-		return $this->_mapEvents($data);
+		return $this->_mapEvents($data, $collisionCheck);
 	}
 
 	public function getPlanForStudent($start_date, $end_date)

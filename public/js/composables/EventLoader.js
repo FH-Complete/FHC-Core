@@ -1,6 +1,6 @@
 // TODO(chris): load events that are longer than the interval without doubling it
 
-export function useEventLoader(rangeInterval, getPromiseFunc, preserveRequestedRange = false) {
+export function useEventLoader(rangeInterval, getPromiseFunc, preserveRequestedRange = false, cacheMultiplier = 1) {
 	let loading_id = 0;
 	const events = Vue.ref([]);
 	const loadingEvents = Vue.ref([]);
@@ -12,6 +12,23 @@ export function useEventLoader(rangeInterval, getPromiseFunc, preserveRequestedR
 		if (Array.isArray(n))
 			return o.concat(n);
 		return o.push(n), o;
+	};
+
+	const filterEventsOutsideRange = validRange => {
+		events.value = events.value.filter(event => {
+			const start = luxon.DateTime.fromISO(event.isostart).ts;
+			const end = luxon.DateTime.fromISO(event.isoend).ts;
+			return start <= validRange.end.ts && end >= validRange.start.ts;
+		});
+
+		const loadedRanges = [];
+		for (let i = 0; i < eventsLoaded.length; i += 2) {
+			const start = Math.max(eventsLoaded[i], validRange.start.ts);
+			const end = Math.min(eventsLoaded[i + 1], validRange.end.ts);
+			if (start < end)
+				loadedRanges.push(start, end);
+		}
+		eventsLoaded.splice(0, eventsLoaded.length, ...loadedRanges);
 	};
 
 	const markEventsLoaded = (start, end) => {
@@ -132,6 +149,13 @@ export function useEventLoader(rangeInterval, getPromiseFunc, preserveRequestedR
 		const range = Vue.toValue(rangeInterval);
 		if (!(range instanceof luxon.Interval))
 			return;
+		const cacheSize = Math.max(Vue.toValue(cacheMultiplier), 0);
+		const cachePadding = Math.round(range.length() * cacheSize);
+		const validRange = luxon.Interval.fromDateTimes(
+			range.start.minus(cachePadding ?? 0),
+			range.end.plus(cachePadding ?? 0)
+		);
+
 		const promises = markEventsLoaded(range.start, range.end);
 		Promise
 			.allSettled(promises)
@@ -145,6 +169,8 @@ export function useEventLoader(rangeInterval, getPromiseFunc, preserveRequestedR
 							lv.value = res.value.meta.lv;
 
 						events.value = events.value.concat(res.value.data);
+						
+						filterEventsOutsideRange(validRange);
 						loadingEvents.value = [];
 					}
 				})

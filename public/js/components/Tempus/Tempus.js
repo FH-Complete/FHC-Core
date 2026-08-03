@@ -424,6 +424,7 @@ export default {
 			return this.$api.call(ApiSearchbar.search(params));
 		},
 		getPromiseFunc(start, end) {
+			const collisionCheck = this.currentMode?.toLowerCase() !== "month";
 			const hasRooms = this.rooms.length > 0;
 			const hasLektoren = this.lecturers.length > 0;
 			const hasStg = this.studiengaenge.length > 0;
@@ -446,20 +447,33 @@ export default {
 			if (this.previewRole === "lektor")
 				return [
 					this.$api.call(
-						ApiKalender.getPlanLecturer(start.toISODate(), end.toISODate()),
+						ApiKalender.getPlanLecturer(
+							start.toISODate(),
+							end.toISODate(),
+							collisionCheck,
+						),
 					),
 				];
 
 			if (this.previewRole === "student")
 				return [
 					this.$api.call(
-						ApiKalender.getPlanStudent(start.toISODate(), end.toISODate()),
+						ApiKalender.getPlanStudent(
+							start.toISODate(),
+							end.toISODate(),
+							collisionCheck,
+						),
 					),
 				];
 
 			return [
 				this.$api.call(
-					ApiKalender.getPlan(filter, start.toISODate(), end.toISODate()),
+					ApiKalender.getPlan(
+						filter,
+						start.toISODate(),
+						end.toISODate(),
+						collisionCheck,
+					),
 				),
 			];
 		},
@@ -1275,6 +1289,7 @@ export default {
 						ref="calendar"
 						:timezone="config.timezone"
 						:get-promise-func="getPromiseFunc"
+						:cache-multiplier="currentMode === 'week' ? 1 : 0"
 						:visible-status="visibleStatus"
 						:date="calendarDate"
 						:mode="currentMode"

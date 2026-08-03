@@ -43,6 +43,10 @@ export default {
 			type: Function,
 			required: true
 		},
+		cacheMultiplier: {
+			type: Number,
+			default: 1
+		},
 		parkedEvents: {
 			type: Object,
 			default: () => new Set()
@@ -174,7 +178,8 @@ export default {
 		const { events, lv, reset } = useEventLoader(
 			rangeInterval,
 			props.getPromiseFunc,
-			preserveRequestedRange
+			preserveRequestedRange,
+			() => props.cacheMultiplier
 		);
 
 		Vue.watch(lv, newValue => {

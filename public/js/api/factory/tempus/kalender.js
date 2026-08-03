@@ -1,27 +1,27 @@
 
 export default {
-	getPlan(filter, start_date, end_date)
+	getPlan(filter, start_date, end_date, collisionCheck = true)
 	{
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/tempus/Kalender/getPlan',
-			params: { ...filter, start_date, end_date }
+			params: { ...filter, start_date, end_date, collisionCheck }
 		};
 	},
-	getPlanLecturer(start_date, end_date)
+	getPlanLecturer(start_date, end_date, collisionCheck = true)
 	{
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/tempus/Kalender/getPlanLecturer',
-			params: { start_date, end_date }
+			params: { start_date, end_date, collisionCheck }
 		};
 	},
-	getPlanStudent(start_date, end_date)
+	getPlanStudent(start_date, end_date, collisionCheck = true)
 	{
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/tempus/Kalender/getPlanStudent',
-			params: { start_date, end_date }
+			params: { start_date, end_date, collisionCheck }
 		};
 	},
 
