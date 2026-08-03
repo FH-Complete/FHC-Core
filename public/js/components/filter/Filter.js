@@ -1131,7 +1131,7 @@ export const CoreFilterCmpt = {
 			</div>
 
 			<table-presets
-				v-if="$props.isUsingPresets && $props.presetsId?.length"
+				v-if="$props.isUsingPresets && $props.presetsId?.length && tableBuilt"
 				v-collapse-auto-close
 				@tablePresetApplied="afterTablePresetApplied($event.preset)"
 				@[\`shown.bs.collapse\`]="updateTablePresetsSubCollapsibles()"

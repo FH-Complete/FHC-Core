@@ -520,7 +520,7 @@ export default {
 						</div>
 					</div>
 				</div>
-				<div v-collapse-auto-close :id="'presetInfoCollapsible_' + $props.presetsId" ref="presetInfoCollapsible" class="collapse">
+				<div :id="'presetInfoCollapsible_' + $props.presetsId" ref="presetInfoCollapsible" class="collapse">
 					<div class="d-flex flex-column">
 						<hr />
 						<div class="d-flex flex-column gap-2">
@@ -534,7 +534,7 @@ export default {
 						</div>
 					</div>
 				</div>
-				<div v-collapse-auto-close :id="'newPresetFormCollapsible_' + $props.presetsId" ref="newPresetFormCollapsible" class="collapse">
+				<div :id="'newPresetFormCollapsible_' + $props.presetsId" ref="newPresetFormCollapsible" class="collapse">
 					<div class="d-flex flex-column">
 						<hr />
 						<div class="d-flex flex-column gap-2">
