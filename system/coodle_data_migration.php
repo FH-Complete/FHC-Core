@@ -125,12 +125,12 @@ while ($survey = $db->db_fetch_object($surveysResult)) {
 
 	// if there is a selected timeslot, getting its new id and updating survey
 	if ($selectedOldTimeslotId && count($timeslotIds)) {
-		$selectedTimeslotIdArray = array_filter(
+		$selectedTimeslotIdArray = array_values(array_filter(
 			$timeslotIds,
 			function ($timeslot) use ($selectedOldTimeslotId) {
 				return $timeslot["oldTimeslotId"] === $selectedOldTimeslotId;
 			}
-		);
+		));
 		$selectedTimeslotId = count($selectedTimeslotIdArray) ? $selectedTimeslotIdArray[0] : null;
 		$selectedTimeslotNewId = isset($selectedTimeslotId["newTimeslotId"]) ? $selectedTimeslotId["newTimeslotId"] : null;
 		if ($selectedTimeslotNewId) {
@@ -201,7 +201,7 @@ while ($survey = $db->db_fetch_object($surveysResult)) {
 			}
 
 			$participantsData[] = $participantData;
-		} else if ($resource->name && $resource->email) {
+		} else if ($resource->name && $resource->email && $resource->zugangscode) {
 			$externalParticipantData = [
 				"name" => $resource->name,
 				"email" => $resource->email,
