@@ -51,8 +51,8 @@ class OtherLvPlan extends FHCAPI_Controller
 		$isMitarbeiter = getData($isMitarbeiterResult);
 		$isStudent = !$isMitarbeiter;
 
-		$profileData = $this->profillib->getView($uid);
-		$profileData = hasData($profileData) ? getData($profileData) : null;
+		$resProfileData = $this->profillib->getView($uid);
+		$profileData = hasData($resProfileData) ? getData($resProfileData) : null;
 
 		$viewData = [
 			"user_data" => [
