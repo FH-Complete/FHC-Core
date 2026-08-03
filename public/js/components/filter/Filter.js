@@ -1126,11 +1126,12 @@ export const CoreFilterCmpt = {
 						<span v-if="hasPresetBeenModified"> {{ " [" + $p.t("global/modified") + "]" }} </span>
 					</span>
 					<table-download class="btn btn-link px-0 fhc-text" :tabulator="tabulator" :config="download"></table-download>
+					<slot name="additional"></slot>
 				</div>
 			</div>
 
 			<table-presets
-				v-if="$props.isUsingPresets && $props.presetsId?.length"
+				v-if="$props.isUsingPresets && $props.presetsId?.length && tableBuilt"
 				v-collapse-auto-close
 				@tablePresetApplied="afterTablePresetApplied($event.preset)"
 				@[\`shown.bs.collapse\`]="updateTablePresetsSubCollapsibles()"
