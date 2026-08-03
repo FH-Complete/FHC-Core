@@ -229,6 +229,23 @@ export default {
     }
   },
   computed: {
+	generalPresets: function() {
+		return [
+			{
+				"id": null,
+				"name": "Standard",
+				"displayedColumns": [
+					"uid","titelpre","tags","nachname","vorname","titelpost",
+					"ersatzkennzeichen","gebdatum","geschlecht",
+					"semester_berechnet","verband","gruppe","studiengang",
+					"matrikelnr","person_id","status","orgform_kurzbz",
+					"studienplan_bezeichnung","prestudent_id","priorisierung_relativ"
+				],
+				"headerFilters": [],
+				"sort": null
+			}
+		];
+	},
     countsToHTML: function() {
       return this.$p.t('global/ausgewaehlt')
         + ': <strong>' + (this.selectedcount || 0) + '</strong>'
@@ -785,6 +802,9 @@ export default {
     >
       <core-filter-cmpt
         ref="table"
+		:isUsingPresets="true"
+		presetsId="studVwListTable"
+		:generalPresets="generalPresets"
         :description="countsToHTML"
         :tabulator-options="tabulatorOptions"
         :tabulator-events="tabulatorEvents"
