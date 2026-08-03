@@ -1123,7 +1123,7 @@ export const CoreFilterCmpt = {
 						class="fw-bold"
 					>
 						{{ appliedPreset.name }}
-						<span v-if="hasPresetBeenModified"> {{ " [" + $p.t("global/modified") + "]" }} </span>
+						<span v-if="hasPresetBeenModified"> {{ " [" + $p.t("tabulator_presets/modified") + "]" }} </span>
 					</span>
 					<table-download class="btn btn-link px-0 fhc-text" :tabulator="tabulator" :config="download"></table-download>
 					<slot name="additional"></slot>

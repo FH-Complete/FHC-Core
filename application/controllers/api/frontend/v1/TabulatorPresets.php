@@ -49,7 +49,7 @@ class TabulatorPresets extends FHCAPI_Controller
 	{
 		$tableName = $this->input->get("tableName");
 		if (!$tableName) {
-			$this->terminateWithError(error($this->p->t("global", "invalid_params_err_msg")));
+			$this->terminateWithError(error($this->p->t("tabulator_presets", "invalid_params_err_msg")));
 		}
 
 		$uid = getAuthUID();
@@ -66,7 +66,7 @@ class TabulatorPresets extends FHCAPI_Controller
 		$preset = $this->input->post("preset");
 
 		if (!$tableName || !$presetName || !$preset) {
-			$this->terminateWithError($this->p->t("global", "invalid_params_err_msg"), "general", 400);
+			$this->terminateWithError($this->p->t("tabulator_presets", "invalid_params_err_msg"), "general", 400);
 		}
 
 		$uid = getAuthUID();
@@ -105,7 +105,7 @@ class TabulatorPresets extends FHCAPI_Controller
 		$preset = $this->input->post("preset");
 
 		if (!$presetId || !$preset) {
-			$this->terminateWithError($this->p->t("global", "invalid_params_err_msg"), "general", 400);
+			$this->terminateWithError($this->p->t("tabulator_presets", "invalid_params_err_msg"), "general", 400);
 		} 
 
 		$existingPresetData = $this->TabulatorPresetModel->getTabulatorPreset($presetId);
@@ -136,7 +136,7 @@ class TabulatorPresets extends FHCAPI_Controller
 	{
 		$presetId = $this->input->post("presetId");
 		if (!$presetId) {
-			$this->terminateWithError($this->p->t("global", "invalid_params_err_msg"), "general", 400);
+			$this->terminateWithError($this->p->t("tabulator_presets", "invalid_params_err_msg"), "general", 400);
 		}
 
 		$presetData = $this->TabulatorPresetModel->getTabulatorPreset($presetId);
