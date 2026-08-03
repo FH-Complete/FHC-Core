@@ -280,7 +280,7 @@ export default {
 				? this.toUpperCase(this.$p.t('ui', 'ja'))
 				: this.toUpperCase(this.$p.t('ui', 'nein'))
 		});
-		LvvColumns.foreach(col => {
+		LvvColumns.forEach(col => {
 			if (col.headerFilter == 'input' && col.headerFilterFunc == 'tagHeaderFilter') {
 				col.headerFilter = customTagFilter;
 				col.headerFilterParams = {
