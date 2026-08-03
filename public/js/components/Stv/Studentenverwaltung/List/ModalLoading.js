@@ -5,7 +5,8 @@ export default {
 	name: "modalLoading",
 	components: {
 		BsModal,
-		FormForm
+		FormForm,
+		PvProgressBar: primevue.progressbar
 	},
 	props: {
 		isLoading: {
@@ -15,6 +16,18 @@ export default {
 		message: {
 			type: String,
 			required: true
+		},
+		progress: {
+			type: Number,
+			default: -1
+		},
+		total: {
+			type: Number,
+			default: -1
+		},
+		processed: {
+			type: Number,
+			default: -1
 		}
 	},
 	data(){
@@ -37,7 +50,7 @@ export default {
 			dialog-class="modal-dialog-scrollable"
 			>
 				<template #title>
-					Loading
+					{{ $p.t('ui/loading') }}
 				</template>
 
 				<form-form
@@ -52,6 +65,8 @@ export default {
 						  </div>
 					  </div>
 				</form-form>
+
+				<pv-progress-bar v-if="progress >= 0" class="my-3" :value="progress">{{processed}} / {{total}}</pv-progress-bar>
 
 				<template #footer>
 					<div class="d-grid gap-2 d-md-flex justify-content-md-end">

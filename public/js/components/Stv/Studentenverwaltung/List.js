@@ -250,7 +250,10 @@ export default {
 			oldScrollTop: 0,
 			allPrestudents: [],
 			rebuildData: [],
-			isLoading: false
+			isLoading: false,
+			progress: -1,
+			total: -1,
+			processed: -1
 		}
 	},
 	computed: {
@@ -650,10 +653,12 @@ export default {
 				this.oldScrollUrl = this.$refs.table.tabulator.getAjaxUrl();
 			}
 		},
-		rebuild(selected){
+		async rebuild(selected){
+			const maxbulksize = 25;
+			const minbulksize = 5;
+			let bulksize = minbulksize;
 			this.isLoading = true;
 			let prestudentIds = [];
-			this.showModal();
 			if(!selected.length)
 				prestudentIds = this.$refs.table.tabulator
 					.getData()
@@ -661,28 +666,56 @@ export default {
 			else
 				prestudentIds = selected.map(item => item.prestudent_id);
 
-			const params = {
-				ids: prestudentIds,
-				typeId: 'prestudent_id',
-				sem: this.studiensemesterKurzbz
-			};
+			this.progress = 0;
+			this.total = prestudentIds.length;
+			this.processed = 0;
+			this.rebuildData = [
+				[],
+				[],
+				[]
+			];
 
-			return this.$api
-				.call(ApiTag.rebuildTagsforTypeId(params))
-				.then(result => {
-					this.rebuildData = result.data;
-					this.isLoading = false;
-					console.log("Rebuild manually triggered");
-					if(this.rebuildData[1].length > 0)
-					{
-						this.$fhcAlert.alertSuccess(this.$p.t('tag', 'alertSuccessRebuild', { count: this.rebuildData[1].length }));
-					}
-					if(this.rebuildData[2].length > 0)
-					{
-						this.$fhcAlert.alertError(this.$p.t('tag', 'alertErrorRebuild') + this.rebuildData[2].toString());
-					}
-				})
-				.catch(this.$fhcAlert.handleSystemError);
+			this.showModal();
+
+			while(this.processed < this.total)
+			{
+				let iteration_prestudentIds = prestudentIds.slice(
+					this.processed,
+					(this.processed + bulksize)
+				);
+				const params = {
+					ids: iteration_prestudentIds,
+					typeId: 'prestudent_id',
+					sem: this.studiensemesterKurzbz
+				};
+
+				try
+				{
+					const result = await this.$api.call(ApiTag.rebuildTagsforTypeId(params));
+					this.rebuildData[1] = [...this.rebuildData[1], ...result.data[1]];
+					this.rebuildData[2] = [...this.rebuildData[2], ...result.data[2]];
+				}
+				catch(error) {
+					this.$fhcAlert.handleSystemError(error);
+				};
+
+				this.processed += iteration_prestudentIds.length;
+				this.progress = Math.round(this.processed * 100 / this.total);
+
+				bulksize = bulksize * 2;
+				if(bulksize > maxbulksize) bulksize = maxbulksize;
+			}
+
+			if(this.rebuildData[1].length > 0)
+			{
+				this.$fhcAlert.alertSuccess(this.$p.t('tag', 'alertSuccessRebuild', { count: this.rebuildData[1].length }));
+			}
+			if(this.rebuildData[2].length > 0)
+			{
+				this.$fhcAlert.alertError(this.$p.t('tag', 'alertErrorRebuild') + this.rebuildData[2].toString());
+			}
+
+			this.isLoading = false;
 		},
 		showModal(){
 			this.$refs.modalLocked.open();
@@ -695,6 +728,9 @@ export default {
 			<modal-loading
 				ref="modalLocked"
 				:isLoading="isLoading"
+				:progress="progress"
+				:total="total"
+				:processed="processed"
 				:message="$p.t('tag','messageModalWait')"
 			>
 			</modal-loading>
