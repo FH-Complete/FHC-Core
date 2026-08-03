@@ -86,7 +86,7 @@ export default {
 			return Array.isArray(this.event.ort_kurzbz) ? this.event.ort_kurzbz.join(', ') : this.event.ort_kurzbz;
 		},
 		topicString() {
-			return Array.isArray(this.event.topic) ? this.event.topic.join(', ') : this.event.topic;
+			return Array.isArray(this.event.titel) ? this.event.titel.join(', ') : this.event.titel;
 		},
 		gruppeString() {
 			return Array.isArray(this.event.teilnehmer_gruppe)
@@ -131,7 +131,10 @@ export default {
 			>
 				... +{{ event.teilnehmer_person.length - 3 }}
 			</span>
-			<span class="event-place">{{ ortString }}</span>
+			<span
+				class="event-place"
+				data-cy="calendar-event-room"
+			>{{ ortString }}</span>
 			<span v-if="gruppeString" class="event-gruppe">{{ gruppeString }}</span>
 		</div>
 	</div>

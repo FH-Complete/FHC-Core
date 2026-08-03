@@ -416,6 +416,9 @@ EOSQL;
 							JOIN lehre.tbl_kalender_lehreinheit USING(lehreinheit_id)
 							JOIN lehre.tbl_kalender USING(kalender_id)
 					WHERE tbl_lehreinheit.lehreinheit_id IN ($placeholders)
+						AND NOT EXISTS (SELECT 1 FROM lehre.tbl_kalender nachfolger
+										WHERE nachfolger.vorgaenger_kalender_id = tbl_kalender.kalender_id)
+						AND tbl_kalender.status_kurzbz NOT IN ('deleted', 'todelete', 'archived')
 					GROUP BY tbl_kalender_lehreinheit.lehreinheit_id, tbl_kalender.von, tbl_kalender.bis, tbl_kalender.kalender_id
 				),
 				raster AS (

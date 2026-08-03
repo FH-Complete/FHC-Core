@@ -82,8 +82,14 @@ export default {
 	template: /*html*/`
 	<div
 		:class="classes"
+		class="position-relative"
 		@wheel.stop
 	>
+		<div v-if="event.has_assigned_resources" class="position-absolute top-0 start-0 m-1" >
+			<i
+			  class="fa-solid fa-table-list text-muted"
+			></i>
+		</div>
 		<div
 			v-if="!event.allDayEvent && event?.beginn && event?.ende"
 			class="event-time d-none d-xl-grid h-100"
@@ -93,7 +99,10 @@ export default {
 		</div>
 		<div class="event-text" v-tooltip="tooltipString">
 			<span class="event-topic">{{ topicString }}</span>
-			<span class="event-place">{{ ortString }}</span>
+			<span
+				class="event-place"
+				data-cy="calendar-event-room"
+			>{{ ortString }}</span>
 			<span v-if="gruppeString" class="event-gruppe">{{ gruppeString }}</span>
 			<span
 				v-for="(lektor,index) in event.lektor.slice(0, 3)"

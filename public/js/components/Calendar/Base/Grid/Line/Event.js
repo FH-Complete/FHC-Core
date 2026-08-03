@@ -35,6 +35,10 @@ export default {
 		onDrop: {
 			from: "onDrop",
 			default: () => null
+		},
+		onDropEvent: {
+			from: "onDropEvent",
+			default: () => () => {}
 		}
 	},
 	props: {
@@ -81,7 +85,8 @@ export default {
 		activeContextActions() {
 			if (this.isHeaderOrFooter) return [];
 			const type = this.event.orig?.type ?? 'lehreinheit';
-			return this.contextMenuActions[type] ?? this.contextMenuActions['default'] ?? [];
+			const actions = this.contextMenuActions[type] ?? this.contextMenuActions['default'] ?? [];
+			return actions.filter(action => !action.visible || action.visible(this.event.orig));
 		}
 	},
 	methods: {
@@ -128,13 +133,7 @@ export default {
 				});
 			}
 
-			return this.onDrop({
-				item: [obj],
-				start: this.event.start.toISO(),
-				end: this.event.end.toISO(),
-				ctrlKey: false,
-				targetKalenderId: null
-			});
+			return this.onDropEvent(evt, items, this.event.start.startOf('day'));
 		},
 	},
 	template:`
@@ -149,6 +148,9 @@ export default {
 		v-drop:move.lehreinheit.kalender.reservierung="onDropOnCard"
 		v-cal-click:event="isHeaderOrFooter ? event : event.orig"
 		@contextmenu.prevent="onRightClick"
+		:data-id="'event-' + event.orig.kalender_id"
+		:data-group-id="'event-group-' + event.orig.eindeutige_gruppen_id"
+		data-cy="calendar-event"
 	>
 		<div
 			v-if="resizable"
@@ -182,6 +184,7 @@ export default {
 				v-if="contextMenu.show"
 				class="dropdown-menu show"
 				:style="{ position: 'fixed', top: contextMenu.y + 'px', left: contextMenu.x + 'px', zIndex: 9999 }"
+				data-cy="eventContextMenu"
 			>
 				<li v-for="action in activeContextActions" :key="action.label">
 					<button class="dropdown-item" type="button" @click.stop="onContextAction(action.action)">

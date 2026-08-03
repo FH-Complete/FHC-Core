@@ -14,6 +14,7 @@ class KalenderLib
 		$this->_ci->load->model('ressource/Kalender_Event_model', 'KalenderEventModel');
 		$this->_ci->load->model('ressource/Kalender_Event_Teilnehmer_model', 'KalenderEventTeilnehmerModel');
 		$this->_ci->load->model('ressource/Kalender_Ort_model', 'KalenderOrtModel');
+		$this->_ci->load->model('ressource/BetriebsmittelKalender_model', 'BetriebsmittelKalenderModel');
 		$this->_ci->load->model('education/Lehreinheit_model', 'LehreinheitModel');
 		$this->_ci->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 		$this->_ci->load->model('education/LehreinheitMitarbeiter_model', 'LehreinheitMitarbeiterModel');
@@ -38,6 +39,7 @@ class KalenderLib
 		$end_date = date('Y-m-d', strtotime($end_date . ' +1 day'));
 
 		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id,
+												tbl_kalender.eindeutige_gruppen_id,
 												tbl_kalender.status_kurzbz,
 												tbl_kalender.typ,
 												tbl_kalender.von,
@@ -134,6 +136,8 @@ class KalenderLib
 
 		$this->_ci->KalenderModel->db->where('tbl_kalender.von >=', $start_date);
 		$this->_ci->KalenderModel->db->where('tbl_kalender.bis <', $end_date);
+
+		$this->_ci->KalenderModel->addOrder('tbl_kalender.eindeutige_gruppen_id', 'DESC');
 	}
 
 	private function _mapEvents($data, $collisionCheck = true)
@@ -155,6 +159,7 @@ class KalenderLib
 				$bis = new DateTime($row->bis);
 
 				$events[$id] = (object) [
+					'eindeutige_gruppen_id' => $row->eindeutige_gruppen_id,
 					'type' => $row->typ,
 					'beginn' => $von->format('H:i:s'),
 					'ende' => $bis->format('H:i:s'),
@@ -179,7 +184,8 @@ class KalenderLib
 					'titel' => isset($row->titel) ? $row->titel : '',
 					'beschreibung' => isset($row->beschreibung) ? $row->beschreibung : '',
 					'topic' => [],
-					'collisions' => false
+					'collisions' => false,
+					'has_assigned_resources' => isset($row->has_assigned_resources) ? $row->has_assigned_resources : false,
 				];
 			}
 
@@ -436,6 +442,14 @@ class KalenderLib
 				WHERE nachfolger.vorgaenger_kalender_id = tbl_kalender.kalender_id)', null, false);
 
 		$this->_ci->KalenderModel->db->where_not_in('status_kurzbz', array('deleted'));
+
+		$this->_ci->KalenderModel->addSelect([ 
+			"(
+				SELECT COUNT(*) FROM lehre.tbl_betriebsmittel_kalender 
+				WHERE tbl_betriebsmittel_kalender.eindeutige_kalender_gruppen_id = tbl_kalender.eindeutige_gruppen_id
+			) AS has_assigned_resources"
+		]);
+		
 		$data = $this->_ci->KalenderModel->load();
 
 		return $this->_mapEvents($data);
@@ -579,15 +593,32 @@ class KalenderLib
 
 	public function addToKalenderEvent($target_kalender_id, $lehreinheit_id)
 	{
-		$check = $this->_ci->KalenderLehreinheitModel->loadWhere(array('kalender_id' => $target_kalender_id, 'lehreinheit_id' => $lehreinheit_id));
+		$entryResult = $this->_loadKalenderEntry($target_kalender_id);
+		if (isError($entryResult)) return $entryResult;
 
-		if (hasData($check))
+		$kalender_entry = getData($entryResult);
+
+		if (in_array($kalender_entry->status_kurzbz, array('todelete', 'deleted')))
+		{
+			return error([
+				'message' => $this->_ci->phraseslib->t('ui', 'entry_not_editable'),
+				'errorCode' => 'entry_not_editable'
+			]);
+		}
+
+		if (in_array($lehreinheit_id, $kalender_entry->lehreinheit_id))
 		{
 			return error([
 				'message' => $this->_ci->phraseslib->t('ui', 'already_present'),
 				'errorCode' => 'already_present'
 			]);
 		}
+
+		$lehreinheit_ids = $kalender_entry->lehreinheit_id;
+		$lehreinheit_ids[] = $lehreinheit_id;
+
+		if (in_array($kalender_entry->status_kurzbz, array('live', 'preview')))
+			return success($this->_createHistoryEntry($kalender_entry, null, null, null, $lehreinheit_ids));
 
 		$kalenderlehreinheitresult = $this->_ci->KalenderLehreinheitModel->insert(
 			array(
@@ -600,6 +631,50 @@ class KalenderLib
 			return $kalenderlehreinheitresult;
 
 		return success($target_kalender_id);
+	}
+
+
+	public function deleteFromKalenderEvent($kalender_id, $lehreinheit_ids)
+	{
+		$entryResult = $this->_loadKalenderEntry($kalender_id);
+		if (isError($entryResult)) return $entryResult;
+
+		$kalender_entry = getData($entryResult);
+
+		if (in_array($kalender_entry->status_kurzbz, array('todelete', 'deleted')))
+		{
+			return error([
+				'message' => $this->_ci->phraseslib->t('ui', 'entry_not_editable'),
+				'errorCode' => 'entry_not_editable'
+			]);
+		}
+
+		$remaining_ids = array_values(array_diff($kalender_entry->lehreinheit_id, $lehreinheit_ids));
+
+		if (in_array($kalender_entry->status_kurzbz, array('live', 'preview')))
+			return success($this->_createHistoryEntry($kalender_entry, null, null, null, $remaining_ids));
+
+		$count = 0;
+		foreach ($lehreinheit_ids as $lehreinheit_id)
+		{
+			$check = $this->_ci->KalenderLehreinheitModel->loadWhere(array('kalender_id' => $kalender_id, 'lehreinheit_id' => $lehreinheit_id));
+
+			if (hasData($check))
+			{
+				$kalenderlehreinheitresult = $this->_ci->KalenderLehreinheitModel->delete(
+					array(
+						'kalender_id' => $kalender_id,
+						'lehreinheit_id' => $lehreinheit_id
+					)
+				);
+
+				if (isError($kalenderlehreinheitresult))
+					return $kalenderlehreinheitresult;
+
+				$count++;
+			}
+		}
+		return success($count);
 	}
 
 	private function _addWeeks($date_str, $weeks)
@@ -633,6 +708,7 @@ class KalenderLib
 				'bis' => $end_date,
 				'typ' => 'lehreinheit',
 				'status_kurzbz' => 'planning',
+				'eindeutige_gruppen_id' => $this->_ci->KalenderModel->generateUniqueGroupId(),
 				'insertvon' => getAuthUID(),
 				'insertamum' => date('Y-m-d H:i:s')
 			)
@@ -990,6 +1066,81 @@ class KalenderLib
 		return $kalenderresult;
 	}
 
+	public function addOperationalResourcesToKalenderEvent($calendar, $assignedResources)
+	{
+		$checkerData = new stdClass();
+		$checkerData->kalender_id = $calendar->kalender_id;
+		$checkerData->betriebsmittel_ids = [];
+		$checkerData->von = $calendar->von;
+		$checkerData->bis = $calendar->bis;
+
+		foreach ($assignedResources as $assignedResource) {
+			array_push($checkerData->betriebsmittel_ids, $assignedResource['betriebsmittel_id']);
+		}
+
+		$errors = [];
+		$result = $this->_ci->collisionchecker->run($checkerData);
+		if (!empty($result))
+		{
+			$errors = $result;
+		}
+
+		if (!empty($errors)) {
+			return error($errors);
+		}
+		
+		$this->_ci->db->trans_start();
+
+		$allowedResourceIDs = array_filter(array_map(
+			function ($resource) {
+				return $resource['betriebsmittel_id'] ?? null;
+			},
+			$assignedResources
+		));
+
+		if (!empty($allowedResourceIDs)) {
+			$placeholders = implode(',', array_fill(0, count($allowedResourceIDs), '?'));
+
+			$query = "
+				DELETE FROM lehre.tbl_betriebsmittel_kalender
+				WHERE eindeutige_kalender_gruppen_id = ?
+				AND betriebsmittel_id NOT IN ($placeholders)
+			";
+
+			$params = array_merge(
+				[$calendar->eindeutige_gruppen_id],
+				$allowedResourceIDs
+			);
+
+			$this->_ci->db->query($query, $params);
+		} else {
+			$this->_ci->db->where('eindeutige_kalender_gruppen_id', $calendar->eindeutige_gruppen_id);
+			$this->_ci->db->delete('lehre.tbl_betriebsmittel_kalender');
+		}
+
+		foreach ($assignedResources as $assignedResource) {
+			$data = [
+				'eindeutige_kalender_gruppen_id' => $calendar->eindeutige_gruppen_id,
+				'betriebsmittel_id' => $assignedResource['betriebsmittel_id'],
+				'anmerkung' => $assignedResource['anmerkung'] ?? null,
+				'quelle' => 'tempus_neu',
+				'updateamum' => date('c'),
+				'updatevon' => getAuthUid(),
+			];
+			if (isset($assignedResource['betriebsmittel_kalender_id'])) {
+				$result = $this->_ci->BetriebsmittelKalenderModel->update($assignedResource['betriebsmittel_kalender_id'], $data);
+			} else {
+				$result = $this->_ci->BetriebsmittelKalenderModel->insert(array_merge($data, [
+					'insertvon' => getAuthUid(),
+					'updateamum' => date('c'),
+				]));
+			}
+		}
+		$this->_ci->db->trans_complete();
+
+		return success('Operational resources added to calendar event successfully.');
+	}
+
 	private function _addTeilnehmerToEvent($kalender_id, $uid, $rolle)
 	{
 		return $this->_ci->KalenderEventTeilnehmerModel->insert(
@@ -1090,6 +1241,18 @@ class KalenderLib
 
 		$kalender_entry = getData($entryResult);
 
+		$calendarResources = $this->_ci->BetriebsmittelKalenderModel->loadWhere(['eindeutige_kalender_gruppen_id' => $kalender_entry->eindeutige_gruppen_id]);
+		if (isError($calendarResources)) return $calendarResources;
+		
+		$calendarResourcesItems = getData($calendarResources);
+		$calendarResourcesIDs = [];
+ 		if (is_array($calendarResourcesItems)) {
+			$calendarResourcesIDs = array_map(function($resource) {
+				return $resource->betriebsmittel_id;
+			}, getData($calendarResources));
+		} 
+
+		$kalender_entry->betriebsmittel_ids = $calendarResourcesIDs;
 		$kalender_entry->ort_kurzbz = !is_null($ort_kurzbz) ? (array) $ort_kurzbz : $kalender_entry->ort_kurzbz;
 		$kalender_entry->von = $start_time ?? $kalender_entry->von;
 		$kalender_entry->bis = $end_time ?? $kalender_entry->bis;
@@ -1098,7 +1261,9 @@ class KalenderLib
 
 		if (!empty($errors)) return error($errors);
 
-		if (!is_null($ort_kurzbz) && !empty($ort_kurzbz))
+		$result = $kalender_entry;
+
+		if (!is_null($ort_kurzbz))
 		{
 			$result = $this->updateOrt($kalender_id, $ort_kurzbz);
 			if (isError($result)) return $result;
@@ -1115,7 +1280,7 @@ class KalenderLib
 			if (isError($result)) return $result;
 		}
 
-		return success('Erfolgreich');
+		return success($result);
 	}
 
 	public function updateZeit($kalender_id, $start_date, $end_date)
@@ -1148,6 +1313,39 @@ class KalenderLib
 				'updatevon' => getAuthUID()
 			)
 		);
+	}
+
+	public function getLehreinheiten($kalender_id)
+	{
+		$entryResult = $this->_loadKalenderEntry($kalender_id);
+		if (isError($entryResult)) return $entryResult;
+
+		$entryResult = getData($entryResult);
+
+		$result = [];
+
+		foreach ($entryResult->lehreinheit_id as $lehreinheit_id)
+		{
+			$this->_ci->LehreinheitModel->addSelect('lehrfach.kurzbz AS lehrfach_kurzbz,
+										tbl_lehreinheit.lehrform_kurzbz,
+ 										lehrfach.bezeichnung AS lehrfach_bezeichnung');
+			$this->_ci->LehreinheitModel->addJoin('lehre.tbl_lehrveranstaltung', 'tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id', 'LEFT');
+			$this->_ci->LehreinheitModel->addJoin('lehre.tbl_lehrveranstaltung lehrfach', 'tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id', 'LEFT');
+			$lehreinheit = $this->_ci->LehreinheitModel->load($lehreinheit_id);
+
+			if (!hasData($lehreinheit))
+				return error('Lehreinheit nicht gefunden');
+			$lehreinheit = getData($lehreinheit)[0];
+
+			$topic = trim((isset($lehreinheit->lehrfach_kurzbz) ? $lehreinheit->lehrfach_kurzbz : '').' '.(isset($lehreinheit->lehrform_kurzbz) ? $lehreinheit->lehrform_kurzbz : ''));
+
+			$result[] = (object)[
+				'lehreinheit_id' => $lehreinheit_id,
+				'title' => $topic,
+			];
+		}
+
+		return success($result);
 	}
 
 	public function updateOrt($kalender_id, $ort_kurzbz_array)
@@ -1226,7 +1424,7 @@ class KalenderLib
 		return success();
 	}
 
-	private function _createHistoryEntry($kalender_entry, $start_date = null, $end_date = null, $ort_kurzbz_array = null)
+	private function _createHistoryEntry($kalender_entry, $start_date = null, $end_date = null, $ort_kurzbz_array = null, $lehreinheit_id_array = null)
 	{
 		$old_id = $kalender_entry->kalender_id;
 
@@ -1237,6 +1435,7 @@ class KalenderLib
 				'typ' => 'lehreinheit',
 				'status_kurzbz' => 'planning',
 				'vorgaenger_kalender_id' => $old_id,
+				'eindeutige_gruppen_id' => $kalender_entry->eindeutige_gruppen_id,
 				'insertvon' => getAuthUID(),
 				'insertamum' => date('Y-m-d H:i:s')
 			)
@@ -1247,7 +1446,7 @@ class KalenderLib
 
 		$new_kalender_id = getData($kalenderresult);
 
-		$lehreinheit_ids = (array) $kalender_entry->lehreinheit_id;
+		$lehreinheit_ids = !is_null($lehreinheit_id_array) ? $lehreinheit_id_array : $kalender_entry->lehreinheit_id;
 
 		foreach ($lehreinheit_ids as $lehreinheit_id)
 		{
@@ -1262,7 +1461,7 @@ class KalenderLib
 				return $kalenderlehreinheitresult;
 		}
 
-		if (!empty($ort_kurzbz_array))
+		if (!is_null($ort_kurzbz_array))
 		{
 			$new_orte = (array) $ort_kurzbz_array;
 			$new_locations = array_fill(0, count($new_orte), null);
@@ -1289,7 +1488,6 @@ class KalenderLib
 
 		return success($new_kalender_id);
 	}
-
 	private function _loadKalenderEntry($kalender_id)
 	{
 		$this->_ci->KalenderModel->addSelect('
@@ -1447,7 +1645,7 @@ class KalenderLib
 	public function getHistory($kalender_id, $only_previous = false)
 	{
 		$dbModel = new DB_Model();
-		$history_entries = $dbModel->execReadOnlyQuery('
+		$history_entries = $dbModel->execReadOnlyQuery("
 				WITH RECURSIVE 
 				vorgaenger(kalender_id, vorgaenger_kalender_id) AS (
 					SELECT kalender_id, vorgaenger_kalender_id
@@ -1470,21 +1668,27 @@ class KalenderLib
 					SELECT k.kalender_id, k.vorgaenger_kalender_id
 					FROM lehre.tbl_kalender k
 					JOIN nachfolger ON k.vorgaenger_kalender_id = nachfolger.kalender_id
+				),
+				orte AS (
+					SELECT kalender_id,
+						STRING_AGG(COALESCE(ort_kurzbz, location), ', ' ORDER BY ort_kurzbz) AS ort
+					FROM lehre.tbl_kalender_ort
+					GROUP BY kalender_id
 				)
 				SELECT tbl_kalender.*,
-						TO_CHAR(von, \'DD.MM.YYYY HH24:MI:SS\') as von,
-						TO_CHAR(bis, \'DD.MM.YYYY HH24:MI:SS\') as bis,
-						COALESCE(tbl_kalender_ort.ort_kurzbz, location) as ort
+						TO_CHAR(von, 'DD.MM.YYYY HH24:MI:SS') as von,
+						TO_CHAR(bis, 'DD.MM.YYYY HH24:MI:SS') as bis,
+						orte.ort
 				FROM (
 					SELECT kalender_id FROM vorgaenger
 					UNION
 					SELECT kalender_id FROM nachfolger
 				) combined
 				JOIN lehre.tbl_kalender USING(kalender_id)
-				LEFT JOIN lehre.tbl_kalender_ort USING(kalender_id)
+					LEFT JOIN orte USING(kalender_id)
 				ORDER BY kalender_id DESC
 				
-			' . ($only_previous ? ' LIMIT 1' : ''), array($kalender_id, $kalender_id));
+			" . ($only_previous ? ' LIMIT 1' : ''), array($kalender_id, $kalender_id));
 
 		return $history_entries;
 	}
