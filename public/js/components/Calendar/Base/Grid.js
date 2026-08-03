@@ -397,7 +397,11 @@ export default {
 			const blocks = this.axisPartsWithBreaks.filter(p => p.index !== undefined);
 			const grabOffset = grabTime.diff(dropDay);
 
-			const snappedPart = blocks.find(b => grabOffset >= b.start && grabOffset < b.end) || part;
+			let snappedPart = blocks.find(b => grabOffset >= b.start && grabOffset < b.end);
+
+			if (!snappedPart)
+				snappedPart = blocks.find(b => b.start >= grabOffset) || blocks[blocks.length - 1];
+
 			const dropStart = snappedPart ? dropDay.plus(snappedPart.start) : grabTime;
 
 			let nettoDuration = this._getNettoDurationForDrop(obj);
