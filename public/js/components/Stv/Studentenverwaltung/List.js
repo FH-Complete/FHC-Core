@@ -11,6 +11,7 @@ import {
 } from "../../../tabulator/filters/extendedHeaderFilter.js";
 import { addTagInTable, deleteTagInTable, updateTagInTable } from "../../../../js/helpers/TagHelper.js";
 import { tagFormatter } from "../../../../js/tabulator/formatter/tags.js";
+import ModalLoading from "./List/ModalLoading.js";
 
 import ApiTag from "../../../api/factory/stv/tag.js";
 import ListFilter from './List/Filter.js';
@@ -30,7 +31,8 @@ export default {
     CoreFilterCmpt,
     ListNew,
     CoreTag,
-    ListFilter
+    ListFilter,
+	ModalLoading
   },
   directives: {
     draggable
@@ -218,7 +220,12 @@ export default {
       oldScrollUrl: '',
       oldScrollLeft: 0,
       oldScrollTop: 0,
-      allPrestudents: []
+      allPrestudents: [],
+      rebuildData: [],
+      isLoading: false,
+      progress: -1,
+      total: -1,
+      processed: -1
     }
   },
   computed: {
@@ -658,6 +665,73 @@ export default {
         this.oldScrollUrl = this.$refs.table.tabulator.getAjaxUrl();
       }
     },
+	async rebuild(selected){
+		const maxbulksize = 25;
+		const minbulksize = 5;
+		let bulksize = minbulksize;
+		this.isLoading = true;
+		let prestudentIds = [];
+		if(!selected.length)
+			prestudentIds = this.$refs.table.tabulator
+				.getData()
+				.map(row => row.prestudent_id);
+		else
+			prestudentIds = selected.map(item => item.prestudent_id);
+
+		this.progress = 0;
+		this.total = prestudentIds.length;
+		this.processed = 0;
+		this.rebuildData = [
+			[],
+			[],
+			[]
+		];
+
+		this.showModal();
+
+		while(this.processed < this.total)
+		{
+			let iteration_prestudentIds = prestudentIds.slice(
+				this.processed,
+				(this.processed + bulksize)
+			);
+			const params = {
+				ids: iteration_prestudentIds,
+				typeId: 'prestudent_id',
+				sem: this.studiensemesterKurzbz
+			};
+
+			try
+			{
+				const result = await this.$api.call(ApiTag.rebuildTagsforTypeId(params));
+				this.rebuildData[1] = [...this.rebuildData[1], ...result.data[1]];
+				this.rebuildData[2] = [...this.rebuildData[2], ...result.data[2]];
+			}
+			catch(error) {
+				this.$fhcAlert.handleSystemError(error);
+			};
+
+			this.processed += iteration_prestudentIds.length;
+			this.progress = Math.round(this.processed * 100 / this.total);
+
+			bulksize = bulksize * 2;
+			if(bulksize > maxbulksize) bulksize = maxbulksize;
+		}
+
+		if(this.rebuildData[1].length > 0)
+		{
+			this.$fhcAlert.alertSuccess(this.$p.t('tag', 'alertSuccessRebuild', { count: this.rebuildData[1].length }));
+		}
+		if(this.rebuildData[2].length > 0)
+		{
+			this.$fhcAlert.alertError(this.$p.t('tag', 'alertErrorRebuild') + this.rebuildData[2].toString());
+		}
+
+		this.isLoading = false;
+	},
+	showModal(){
+		this.$refs.modalLocked.open();
+	},
   },
   created() {
     if (this.tagsEnabled) {
@@ -690,6 +764,16 @@ export default {
   // TODO(chris): filter component column chooser has no accessibilty features
   template: /* html */`
   <div class="stv-list h-100 pt-3">
+	<modal-loading
+		ref="modalLocked"
+		:isLoading="isLoading"
+		:progress="progress"
+		:total="total"
+		:processed="processed"
+		:message="$p.t('tag','messageModalWait')"
+	>
+	</modal-loading>
+
     <div
       class="tabulator-container d-flex flex-column h-100"
       :class="{'has-filter': filter.length}"
@@ -747,6 +831,23 @@ export default {
           @updated="updatedTag"
           zuordnung_typ="prestudent_id"
         ></core-tag>
+
+		<button
+			v-if="!selected.length"
+			class="btn btn-outline btn-light mb-1"
+			@click="rebuild(selected)"
+			:title="$p.t('tag','rebuild_tags') + ' Stg ' + currentSemester"
+			>
+				<i class="fa-solid fa-refresh pe-1"></i> STG
+		</button>
+		<button
+			v-else
+			class="btn btn-outline btn-light mb-1"
+			@click="rebuild(selected)"
+			:title="$p.t('tag','rebuild_tags') + ' ' + $p.t('ui','selection') + ' ' + currentSemester"
+			>
+				<i class="fa-solid fa-refresh pe-1"></i> {{selected.length}}
+		</button>
 
         <template v-if="filter.length || headerFilterActive">
         <div class="d-flex justify-content-center align-items-center gap-2 ps-4 position-absolute start-50 translate-middle-x">

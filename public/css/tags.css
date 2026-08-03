@@ -91,6 +91,15 @@
 	color: black;
 }
 
+.tag_skyblue {
+	background-color: #90D5FF;
+	color: black;
+}
+.tag_blush {
+	background-color: #A83E3E;
+	color: white;
+}
+
 .tag_done {
 	text-decoration: line-through;
 }

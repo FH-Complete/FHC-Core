@@ -16,7 +16,7 @@ if(!@$db->db_query("SELECT taglib FROM public.tbl_notiz_typ LIMIT 1"))
 $tags = [
 	[
 		'typ_kurzbz' => 'wh_auto',
-		'bezeichnung' => '{WH, R}',
+		'bezeichnung' => '{WH, WH}',
 		'style' => 'tag_dark_grey',
 		'prioritaet' => 11,
 		'taglib' => 'tags/CoreWiederholerTagLib'
@@ -30,14 +30,14 @@ $tags = [
 	],
 	[
 		'typ_kurzbz' => 'out_auto',
-		'bezeichnung' => '{Out, Out}',
+		'bezeichnung' => '{Outgoing, Outgoing}',
 		'style' => 'tag_limette',
 		'prioritaet' => 12,
 		'taglib' => 'tags/CoreOutgoingTagLib'
 	],
 	[
 		'typ_kurzbz' => 'prewh_auto',
-		'bezeichnung' => '{Pre-WH, pre-R}',
+		'bezeichnung' => '{Pre-WH, pre-WH}',
 		'style' => 'tag_light_grey',
 		'prioritaet' => 13,
 		'taglib' => 'tags/CorePrewiederholerTagLib'
@@ -51,7 +51,7 @@ $tags = [
 	],
 	[
 		'typ_kurzbz' => 'unterbrecher_auto',
-		'bezeichnung' => '{UB, I}',
+		'bezeichnung' => '{UB, UB}',
 		'style' => 'tag_turquoise',
 		'prioritaet' => 15,
 		'taglib' => 'tags/CoreUnterbrecherTagLib'
@@ -69,6 +69,20 @@ $tags = [
 		'style' => 'tag_olive',
 		'prioritaet' => 17,
 		'taglib' => 'tags/CoreJgvTagLib'
+	],
+	[
+		'typ_kurzbz' => 'preabbr_auto',
+		'bezeichnung' => '{Pre-Abbr, pre-Abbr}',
+		'style' => 'tag_blush',
+		'prioritaet' => 18,
+		'taglib' => 'tags/CorePreabbrecherTagLib'
+	],
+	[
+		'typ_kurzbz' => 'in_auto',
+		'bezeichnung' => '{Incoming, Incoming}',
+		'style' => 'tag_skyblue',
+		'prioritaet' => 19,
+		'taglib' => 'tags/CoreIncomingTagLib'
 	],
 
 ];
