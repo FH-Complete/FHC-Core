@@ -1,27 +1,43 @@
 
 export default {
-	getPlan(filter, start_date, end_date, collisionCheck = true)
+	getPlan(filter, start_date, end_date, collisionCheck = true, maxDailyEventLimit = null)
 	{
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/tempus/Kalender/getPlan',
-			params: { ...filter, start_date, end_date, collisionCheck }
+			params: {
+				...filter,
+				start_date,
+				end_date,
+				collisionCheck,
+				...(maxDailyEventLimit == null ? {} : { maxDailyEventLimit })
+			}
 		};
 	},
-	getPlanLecturer(start_date, end_date, collisionCheck = true)
+	getPlanLecturer(start_date, end_date, collisionCheck = true, maxDailyEventLimit = null)
 	{
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/tempus/Kalender/getPlanLecturer',
-			params: { start_date, end_date, collisionCheck }
+			params: {
+				start_date,
+				end_date,
+				collisionCheck,
+				...(maxDailyEventLimit == null ? {} : { maxDailyEventLimit })
+			}
 		};
 	},
-	getPlanStudent(start_date, end_date, collisionCheck = true)
+	getPlanStudent(start_date, end_date, collisionCheck = true, maxDailyEventLimit = null)
 	{
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/tempus/Kalender/getPlanStudent',
-			params: { start_date, end_date, collisionCheck }
+			params: {
+				start_date,
+				end_date,
+				collisionCheck,
+				...(maxDailyEventLimit == null ? {} : { maxDailyEventLimit })
+			}
 		};
 	},
 

@@ -170,6 +170,7 @@ export default {
 				assignedResources: [],
 				areFormButtonsDisplayed: false,
 			},
+			maxDailyEventLimitForMonthView: 10,
 		};
 	},
 	computed: {
@@ -424,7 +425,9 @@ export default {
 			return this.$api.call(ApiSearchbar.search(params));
 		},
 		getPromiseFunc(start, end) {
-			const collisionCheck = this.currentMode?.toLowerCase() !== "month";
+			const isMonth = this.currentMode?.toLowerCase() === "month";
+			const collisionCheck = !isMonth;
+			const maxDailyEventLimit = isMonth ? this.maxDailyEventLimitForMonthView : null;
 			const hasRooms = this.rooms.length > 0;
 			const hasLektoren = this.lecturers.length > 0;
 			const hasStg = this.studiengaenge.length > 0;
@@ -451,6 +454,7 @@ export default {
 							start.toISODate(),
 							end.toISODate(),
 							collisionCheck,
+							maxDailyEventLimit,
 						),
 					),
 				];
@@ -462,6 +466,7 @@ export default {
 							start.toISODate(),
 							end.toISODate(),
 							collisionCheck,
+							maxDailyEventLimit,
 						),
 					),
 				];
@@ -473,6 +478,7 @@ export default {
 						start.toISODate(),
 						end.toISODate(),
 						collisionCheck,
+						maxDailyEventLimit,
 					),
 				),
 			];

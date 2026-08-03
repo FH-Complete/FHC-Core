@@ -140,7 +140,7 @@ class KalenderLib
 		$this->_ci->KalenderModel->addOrder('tbl_kalender.eindeutige_gruppen_id', 'DESC');
 	}
 
-	private function _mapEvents($data, $collisionCheck = true)
+	private function _mapEvents($data, $collisionCheck = true, $maxDailyEventLimit = null)
 	{
 		$stundenplan_data = [];
 
@@ -274,6 +274,21 @@ class KalenderLib
 			}
 		}
 
+		if (!is_null($maxDailyEventLimit) && is_numeric($maxDailyEventLimit) && $maxDailyEventLimit > 0)
+		{
+			$eventsPerDay = [];
+			$events = array_filter($events, function ($event) use (&$eventsPerDay, $maxDailyEventLimit) {
+				$date = $event->datum;
+				$eventsPerDay[$date] = $eventsPerDay[$date] ?? 0;
+	
+				if ($eventsPerDay[$date] >= $maxDailyEventLimit)
+					return false;
+	
+				$eventsPerDay[$date]++;
+				return true;
+			});
+		}
+
 		return array_values($events);
 	}
 	public function getPlanByOrt($start_date, $end_date, $ort)
@@ -345,7 +360,7 @@ class KalenderLib
 		$data = $this->_ci->KalenderModel->load();
 		return $this->_mapEvents($data);
 	}
-	public function getPlanForPlanner($start_date, $end_date, $ort = null, $uids = null, $studiengaenge = null, $collisionCheck = true)
+	public function getPlanForPlanner($start_date, $end_date, $ort = null, $uids = null, $studiengaenge = null, $collisionCheck = true, $maxDailyEventLimit = null)
 	{
 		$this->_getBasePlan($start_date, $end_date);
 
@@ -452,7 +467,7 @@ class KalenderLib
 		
 		$data = $this->_ci->KalenderModel->load();
 
-		return $this->_mapEvents($data, $collisionCheck);
+		return $this->_mapEvents($data, $collisionCheck, $maxDailyEventLimit);
 	}
 
 	public function getPlanForStudent($start_date, $end_date)
