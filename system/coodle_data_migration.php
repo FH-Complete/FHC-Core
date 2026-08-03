@@ -141,6 +141,8 @@ while ($survey = $db->db_fetch_object($surveysResult)) {
 		}
 	}
 
+	// todo: cancel survey if sufficiently old and all timeslots are in the past
+
 	// getting old timeslot votes...
 	$votes = [];
 	$oldTimeslotIds = array_map(
