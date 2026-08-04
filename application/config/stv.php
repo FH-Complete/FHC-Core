@@ -81,7 +81,13 @@ $config['tabs'] =
 		],
 		'notes' => [
 			//if true, the count of Messages will be shown in the header of the Tab Messages
-			'showCountNotes' => true
+			'showCountNotes' => true,
+
+			//if true: section with following fields will be displayed: 'verfasser', 'bearbeiter', 'von', 'bis' and 'erledigt'
+			'showErweitert' => false,
+
+			//notizlayout: choose of "classicFas", "twoColumnsFormLeft", twoColumnsFormRight, popupModal"
+			'notizLayout' => 'popupModal'
 		],
 		'combinePeople' => [
 			//multitab should only be shown with this length of selection
