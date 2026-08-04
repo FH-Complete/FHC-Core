@@ -224,15 +224,23 @@ export default {
 	},
 	template: /* html */`
 	<div class="core-dashboard">
-		<h3>
-			{{ userFirstName ? $p.t('global/personalGreeting', [ userFirstName ]) : '' }}
-			<button
-				class="btn ms-2"
-				aria-label="edit dashboard"
-				v-tooltip="{ showDelay: 1000, value: $p.t('dashboard/edit') }"
-				@click="editMode = !editMode"
-			><i class="fa-solid fa-gear" aria-hidden="true"></i></button>
-		</h3>
+		<header class="d-flex justify-content-between align-items-baseline">
+			<h3>
+				{{ userFirstName ? $p.t('global/personalGreeting', [ userFirstName ]) : '' }}
+			</h3>
+			<div class="form-check form-check-reverse form-switch">
+				<label class="form-check-label" for="switchEditMode">
+					{{ $p.t('dashboard/edit') }}
+				</label>
+				<input
+					class="form-check-input"
+					type="checkbox"
+					role="switch"
+					id="switchEditMode"
+					v-model="editMode"
+				>
+			</div>
+		</header>
 		<dashboard-section
 			name="general"
 			:widgets="widgets"
