@@ -32,6 +32,36 @@ class MigrateKalender extends CLI_Controller
 	/**
 	 * Everything has a beginning
 	 */
+	public function refreshTablesAndFullMigrateOfStundenplanReservierung($von, $bis = null, $studiengang_kz = null, $ort_kurzbz = null)
+	{
+		echo "Refreshing calendar related tables...\n";
+		$this->resetBeforeNewStundenplanReservierungImport();
+		echo "Calendar related tables refreshed successfully.\n\n";
+
+		echo "Starting full migration of Stundenplan and Reservierung from $von to " . ($bis ?? '2100-12-31') . "...\n";
+		$this->fullMigrateOfStundenplanReservierung($von, $bis, $studiengang_kz, $ort_kurzbz);
+		echo "Full migration of Stundenplan and Reservierung completed successfully.\n";
+	}
+
+	public function fullMigrateOfStundenplanReservierung($von, $bis = null, $studiengang_kz = null, $ort_kurzbz = null)
+	{
+		echo "Starting migration of Stundenplan from $von to " . ($bis ?? '2100-12-31') . "...\n";
+		$this->migrateStundenplan($von, $bis, $studiengang_kz);
+		echo "Stundenplan migration completed successfully.\n\n";
+
+		echo "Starting migration of Reservierung from $von to " . ($bis ?? '2100-12-31') . "...\n";
+		$this->migrateReservierung($von, $bis, $ort_kurzbz);
+		echo "Reservierung migration completed successfully.\n\n";
+
+		echo "Starting migration of Stundenplan Betriebsmittel entries...\n";
+		$this->migrateStundenplanBetriebsmittelEntries();
+		echo "Stundenplan Betriebsmittel entries migration completed successfully.\n\n";
+
+		echo "Starting to add title values as tags to calendar entries...\n";
+		$this->addTitleValuesAsTagsToKalenderEntries();
+		echo "Adding title values as tags to calendar entries completed successfully.\n\n";
+	}
+
 	public function migrateStundenplan($von, $bis = null, $studiengang_kz = null)
 	{
 		if (is_null($von))
@@ -264,6 +294,77 @@ class MigrateKalender extends CLI_Controller
 		}
 	}
 
+	public function resetBeforeNewStundenplanReservierungImport()
+	{
+		
+		$db = new DB_Model();
+
+		$db->db->trans_start();
+
+		$db->db->query('DELETE FROM sync.tbl_stundenplandev_kalender');
+		$db->db->query('DELETE FROM sync.tbl_reservierung_kalender');
+
+		$db->db->query("DELETE FROM lehre.tbl_kalender_event_teilnehmer
+			WHERE kalender_id IN (
+				SELECT kalender_id
+				FROM lehre.tbl_kalender
+				WHERE typ = 'reservierung'
+			)");
+
+		$db->db->query("DELETE FROM lehre.tbl_kalender_event
+			WHERE kalender_id IN (
+				SELECT kalender_id
+				FROM lehre.tbl_kalender
+				WHERE typ = 'reservierung'
+			)");
+
+		$db->db->query("DELETE FROM lehre.tbl_kalender_lehreinheit
+			WHERE kalender_id IN (
+				SELECT kalender_id
+				FROM lehre.tbl_kalender
+				WHERE typ = 'lehreinheit' OR typ = 'reservierung'
+			)");
+
+		$db->db->query("DELETE FROM lehre.tbl_kalender_ort
+			WHERE kalender_id IN (
+				SELECT kalender_id
+				FROM lehre.tbl_kalender
+				WHERE typ IN ('lehreinheit', 'reservierung')
+			)");
+
+		$db->db->query("DELETE FROM public.tbl_notiz
+			WHERE notiz_id IN (
+				SELECT notiz_id
+				FROM public.tbl_notizzuordnung
+				WHERE eindeutige_kalender_gruppen_id IN (
+					SELECT eindeutige_gruppen_id
+					FROM lehre.tbl_kalender
+				)
+			)");
+
+		$db->db->query("DELETE FROM public.tbl_notizzuordnung
+			WHERE eindeutige_kalender_gruppen_id IN (
+				SELECT eindeutige_gruppen_id
+				FROM lehre.tbl_kalender
+			)");
+		
+		$db->db->query("DELETE FROM public.tbl_betriebsmittel_kalender
+			WHERE eindeutige_kalender_gruppen_id IN (
+				SELECT eindeutige_gruppen_id
+				FROM lehre.tbl_kalender
+			)");
+
+		$db->db->query("DELETE FROM lehre.tbl_kalender
+			WHERE typ IN ('lehreinheit', 'reservierung')");
+
+		$db->db->trans_complete();
+
+		if ($db->db->trans_status() === false)
+			return error('Reset before new import failed');
+
+		return success('Migration data reset successfully');
+	}
+
 	public function migrateStundenplanBetriebsmittelEntries() {
 		$this->setKalendarEntriesGroupIDs();
 		$this->setKalendarEntriesGroupIDsForChildren();
@@ -317,6 +418,45 @@ class MigrateKalender extends CLI_Controller
 			;";
 
 		$dbModel->db->query($query);
+	}
+
+	public function addTitleValuesAsTagsToKalenderEntries() {
+		$dbModel = new DB_Model();
+
+		
+		$query = "SELECT 
+				k.eindeutige_gruppen_id,
+				ARRAY_AGG(DISTINCT(spd.titel) ORDER BY spd.titel) AS titel,
+				MAX(spd.updateamum) AS updateamum
+			FROM lehre.tbl_stundenplandev spd
+			JOIN sync.tbl_stundenplandev_kalender spdk ON spd.stundenplandev_id = spdk.stundenplandev_id
+			JOIN lehre.tbl_kalender k ON k.kalender_id = spdk.kalender_id
+			WHERE k.typ = 'lehreinheit' AND k.eindeutige_gruppen_id IS NOT NULL AND spd.titel IS NOT NULL
+			GROUP BY k.eindeutige_gruppen_id";
+
+		$result = $dbModel->execReadOnlyQuery($query);
+
+		if (isError($result)) {
+			error("Error while fetching title values for adding as tags: " . getError($result));
+			return;
+		}
+		if (!hasData($result)) {
+			error("No title values found for adding as tags.");
+			return;
+		}
+
+		$data = getData($result);
+
+		foreach($data as $block) {
+			$eindeutige_gruppen_id = $block->eindeutige_gruppen_id;
+			$notizText = implode(' - ', array_filter($block->titel, function($titel) {
+				return !empty(trim($titel));
+			}));
+
+			if (!empty($notizText)) {
+				$this->addTag($eindeutige_gruppen_id, $notizText, $block->updateamum);
+			}
+		}
 	}
 
 	private function setKalendarEntriesGroupIDs() {
@@ -592,5 +732,130 @@ class MigrateKalender extends CLI_Controller
 				)
 			);
 		}
+	}
+
+	private function addTag($eindeutige_kalender_gruppen_id, $notizText, $lastUpdatedInOldSystem): bool
+	{
+		$notizType = 'hinweis';
+		$insertvonMockUser = 'oldToNewTempusMigration';
+		
+		if (is_null($eindeutige_kalender_gruppen_id) || empty($eindeutige_kalender_gruppen_id)) {
+			var_dump("Error: eindeutige_kalender_gruppen_id is null or empty.");
+			return false;
+		}
+
+		$this->load->model('person/Notiz_model', 'NotizModel');
+		$this->load->model('system/Notiztyp_model', 'NotiztypModel');
+		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
+
+		$checkTyp = $this->NotiztypModel->loadWhere(array('typ_kurzbz' => $notizType));
+
+		if (isError($checkTyp))
+		{
+			error("Error occurred while checking Notiztyp: " . $checkTyp->message);
+			return false;
+		}
+
+		if (!hasData($checkTyp))
+		{
+			error("Notiztyp 'hinweis' does not exist. Please create it before adding tags.");
+			return false;
+		}
+		 
+
+		$this->NotizzuordnungModel->addJoin('tbl_notiz', 'tbl_notiz.notiz_id = tbl_notizzuordnung.notiz_id', 'LEFT');
+		$this->NotizzuordnungModel->db->where('tbl_notiz.typ', $notizType);
+		$this->NotizzuordnungModel->db->where('tbl_notiz.insertvon', $insertvonMockUser);
+		$oldNotizZuordnung = $this->NotizzuordnungModel->loadWhere(array('eindeutige_kalender_gruppen_id' => $eindeutige_kalender_gruppen_id));
+		if (isError($oldNotizZuordnung))
+		{
+			error("Error occurred while checking Notizzuordnung: " . $oldNotizZuordnung->message);
+			return false;
+		}
+		if (hasData($oldNotizZuordnung))
+		{
+			return $this->updateTag($eindeutige_kalender_gruppen_id, $notizText, $lastUpdatedInOldSystem);
+		}
+
+		
+		$insertResult = $this->NotizModel->insert(array(
+			'titel' => 'TAG',
+			'text' => $notizText,
+			'verfasser_uid' => null,
+			'erledigt' => false,
+			'insertamum' => date('Y-m-d H:i:s'),
+			'insertvon' => $insertvonMockUser,
+			'typ' => $notizType
+		));
+
+		if (isError($insertResult))
+		{
+			error("Error occurred while inserting Notiz: " . $insertResult->message);
+			return false;
+		}
+
+		$insertZuordnung = $this->NotizzuordnungModel->insert(array(
+			'notiz_id' => $insertResult->retval,
+			'eindeutige_kalender_gruppen_id' => $eindeutige_kalender_gruppen_id
+		));
+
+		if (isError($insertZuordnung)) 
+		{
+			error("Error occurred while inserting Notizzuordnung: " . $insertZuordnung->message);
+			return false;
+		}
+
+		return true;
+	}
+
+	private function updateTag($eindeutige_kalender_gruppen_id, $notizText, $lastUpdatedInOldSystem)
+	{
+		$notizType = 'hinweis';
+		$insertvonMockUser = 'oldToNewTempusMigration';
+		
+		$this->NotizzuordnungModel->addJoin('tbl_notiz', 'tbl_notiz.notiz_id = tbl_notizzuordnung.notiz_id', 'LEFT');
+		$this->NotizzuordnungModel->db->where('tbl_notiz.typ', $notizType);
+		$this->NotizzuordnungModel->db->where('tbl_notiz.insertvon', $insertvonMockUser);
+		$notizZuordnungRes = $this->NotizzuordnungModel->loadWhere(array('eindeutige_kalender_gruppen_id' => $eindeutige_kalender_gruppen_id));
+		if (isError($notizZuordnungRes))
+		{
+			error("Error occurred while loading Notizzuordnung: " . $notizZuordnungRes->message);
+			return false;
+		}
+
+
+		$tag = $this->NotizModel->loadWhere(array('notiz_id' => $notizZuordnungRes->retval[0]->notiz_id));
+		if (isError($tag))
+		{
+			error("Error occurred while loading Notiz: " . $tag->message);
+			return false;
+		}
+
+		if (!hasData($tag))
+		{
+			error("Error occurred while loading Notiz: " . $tag->message);
+			return false;
+		}
+
+		$adjustedLastUpdatedInOldSystem = date('Y-m-d H:i:s', strtotime($lastUpdatedInOldSystem) + 5);
+		if ($tag->retval[0]->updateamum >= $adjustedLastUpdatedInOldSystem)
+		{
+			return true;
+		}
+
+		$updateData = $this->NotizModel->update(array('notiz_id' => $tag->retval[0]->notiz_id),
+			array('text' => $notizText,
+				'updateamum' => date('Y-m-d H:i:s'),
+				'updatevon' => $insertvonMockUser,
+				'bearbeiter_uid' => null,
+			)
+		);
+		if (isError($updateData))
+		{
+			error("Error occurred while updating Notiz: " . $updateData->message);
+			return false;
+		}
+
+		return true;
 	}
 }
