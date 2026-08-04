@@ -18,6 +18,12 @@ export function useEventLoader(
 
   let currentlyDisplayedDateRange;
 
+  const getCachePadding = () => {
+    const cacheSize = Math.max(Vue.toValue(cacheMultiplier), 0);
+
+    return Math.round(currentlyDisplayedDateRange.length() * cacheSize) + 1;
+  };
+
   const reload = () => {
     if (
       currentlyDisplayedDateRange &&
@@ -144,10 +150,7 @@ export function useEventLoader(
       cachedEventsEndTimestamp = modifiedRequestEndTimestamp;
     }
 
-    const cacheSize = Math.max(Vue.toValue(cacheMultiplier), 0);
-    const cachePadding = Math.round(
-      currentlyDisplayedDateRange.length() * cacheSize,
-    );
+    const cachePadding = getCachePadding();
 
     allowedCacheStartTimestamp = startTimestamp - cachePadding;
     allowedCacheEndTimestamp = endTimestamp + cachePadding;
@@ -190,11 +193,6 @@ export function useEventLoader(
     allowedCacheStartTimestamp,
     allowedCacheEndTimestamp,
   ) => {
-    const cacheSize = Math.max(Vue.toValue(cacheMultiplier), 0);
-    const cachePadding = Math.round(
-      currentlyDisplayedDateRange.length() * cacheSize,
-    );
-
     if (
       cachedEventsStartTimestamp < allowedCacheEndTimestamp &&
       cachedEventsEndTimestamp > allowedCacheStartTimestamp
