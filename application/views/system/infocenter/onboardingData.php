@@ -24,22 +24,15 @@ $query = '
 					 WHERE tpl.app = '.$APP.'
 				 ) pl ON p.person_id = pl.person_id
 			LEFT JOIN (
-				SELECT
+					SELECT DISTINCT ON (tbl_rueckstellung.person_id)
 					tbl_rueckstellung.person_id,
 					tbl_rueckstellung.datum_bis,
 					tbl_rueckstellung.status_kurzbz,
 					array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung
 				FROM public.tbl_rueckstellung
-					JOIN public.tbl_rueckstellung_status USING(status_kurzbz)
-					JOIN public.tbl_person sp ON tbl_rueckstellung.person_id = sp.person_id
-				WHERE tbl_rueckstellung.rueckstellung_id =
-				(
-					SELECT srueck.rueckstellung_id
-					FROM public.tbl_rueckstellung srueck
-					WHERE srueck.person_id = tbl_rueckstellung.person_id
-						AND datum_bis >= NOW()
-					ORDER BY srueck.datum_bis DESC LIMIT 1
-				)
+				JOIN public.tbl_rueckstellung_status USING(status_kurzbz)
+				WHERE tbl_rueckstellung.datum_bis >= NOW()
+				ORDER BY tbl_rueckstellung.person_id, tbl_rueckstellung.datum_bis DESC
 			) rueck ON rueck.person_id = p.person_id
 		WHERE p.person_id NOT IN (SELECT person_id FROM public.tbl_prestudent)';
 

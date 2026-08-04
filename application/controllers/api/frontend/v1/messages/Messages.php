@@ -42,14 +42,22 @@ class Messages extends FHCAPI_Controller
 		]);
 	}
 
-	public function getMessages($id, $type_id, $size, $page)
+	public function getMessages($id, $type_id, $size=null, $page=null)
 	{
 		if($type_id != 'person_id'){
 			$id = $this->_getPersonId($id, $type_id);
 		}
 
-		$offset = $size * ($page - 1);
-		$limit = $size;
+		if(!(is_null($size) && is_null($page)))
+		{
+			$offset = $size * ($page - 1);
+			$limit = $size;
+		}
+		else
+		{
+			$offset = null;
+			$limit = null;
+		}
 
 		$result = $this->MessageModel->getMessagesForTable($id, $offset, $limit);
 
