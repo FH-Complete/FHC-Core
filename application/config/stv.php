@@ -63,7 +63,7 @@ $config['tabs'] =
 			'showCountNotes' => true,
 
 			//if true: section with following fields will be displayed: 'verfasser', 'bearbeiter', 'von', 'bis' and 'erledigt'
-			'showErweitert' => true,
+			'showErweitert' => false,
 
 			//notizlayout: choose of "classicFas", "twoColumnsFormLeft", twoColumnsFormRight, popupModal"
 			'notizLayout' => 'popupModal'
