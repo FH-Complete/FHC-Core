@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2022 fhcomplete.org
+ * Copyright (C) 2026 fhcomplete.org
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -172,7 +172,7 @@ export default {
 			}
 
 			if (shouldUpdatePresetInfo) {
-				this.presetInfo = {...preset};
+				this.presetInfo = { ...preset };
 			}
 
 			this.hideNewPresetForm();
@@ -398,45 +398,8 @@ export default {
 			window.localStorage["tabulatorPreset-" + this.$props.presetsId] =
 				preset.id ? "custom:" + preset.id : "general:" + preset.name;
 
-			let columns = this.$props.tabulator
-				.getColumnDefinitions()
-				.filter((column) => column.field !== "collapse");
-			columns.forEach((column) =>
-				this.$props.tabulator.hideColumn(column.field),
-			);
-
-			preset.displayedColumns?.forEach(
-				(columnField, index, displayedColumns) => {
-					this.$props.tabulator.showColumn(columnField);
-					if (index === 0) return;
-					this.$props.tabulator.moveColumn(
-						columnField,
-						displayedColumns[index - 1],
-						true,
-					);
-				},
-			);
-
-			this.$props.tabulator.clearHeaderFilter();
-			if (preset.headerFilters) {
-				Object.entries(preset.headerFilters).forEach(
-					([columnField, filterValue]) => {
-						this.$props.tabulator.setHeaderFilterValue(
-							columnField,
-							filterValue,
-						);
-					},
-				);
-			}
-
-			this.$props.tabulator.clearSort();
-			if (preset.sort?.column) {
-				this.$props.tabulator.setSort(
-					preset.sort.column,
-					preset.sort.direction ?? "asc",
-				);
-			}
-
+			this.$props.tabulator.modules.tablePresets.applyPreset(preset);
+			
 			this.$emit("tablePresetApplied", { preset });
 		},
 		async fetchCustomUserTabulatorPresets() {
