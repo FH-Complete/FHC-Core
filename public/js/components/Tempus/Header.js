@@ -20,7 +20,7 @@ export default {
       required: true,
     },
   },
-  emits: ["focus-searchbar"],
+  emits: ["focus-searchbar", "language-changed"],
   methods: {
     focusSearchbar() {
       this.$refs.searchbar?.$refs?.input?.focus();
@@ -94,7 +94,7 @@ export default {
           </li>
           <li><hr class="dropdown-divider m-0"/></li>
           <li>
-            <nav-language item-class="dropdown-item border-left-dark" />
+            <nav-language @changed="$emit('language-changed', $event)" item-class="dropdown-item border-left-dark" />
           </li>
           <li><hr class="dropdown-divider m-0"/></li>
           <li>
