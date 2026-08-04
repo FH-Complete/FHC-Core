@@ -51,7 +51,6 @@ const assertWritable = () => {
 	}
 };
 
-/** Runs fn with a pooled client and always releases it. */
 const withClient = async (fn) => {
 	const client = await getPool().connect();
 	try {
@@ -61,7 +60,6 @@ const withClient = async (fn) => {
 	}
 };
 
-/** Same, in a transaction that rolls back on any throw. */
 const inTransaction = (fn) =>
 	withClient(async (client) => {
 		await client.query("BEGIN");
@@ -75,10 +73,6 @@ const inTransaction = (fn) =>
 		}
 	});
 
-/**
- * The pg_hba case is the one worth spelling out: it is server-side, so no local setting fixes it
- * and the tunnel is the only workstation answer.
- */
 const explainFailure = (error) => {
 	const msg = String(error && error.message ? error.message : error);
 

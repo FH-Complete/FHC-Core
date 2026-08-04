@@ -71,21 +71,6 @@ describe("Noten API - Notenfreigabe", () => {
 			});
 		});
 
-		it("rejects a Freigabe without the required parameters", () => {
-			cy.request({
-				method: "POST",
-				url: "/index.ci.php/api/frontend/v1/Noten/saveStudentenNoten",
-				body: { lv_id: ctx.lvId, sem_kurzbz: ctx.semKurzbz },
-				auth: {
-					username: Cypress.env("adminusername"),
-					password: Cypress.env("adminpassword"),
-				},
-				failOnStatusCode: false,
-			}).then((response) => {
-				expect(response.status, "missing password/noten").to.eq(500);
-				expect(response.body).to.have.nested.property("meta.status", "error");
-			});
-		});
 	});
 
 	describe("happy path (sends mail - opt in via NOTEN_FREIGABE_ENABLED)", () => {

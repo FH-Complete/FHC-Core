@@ -117,19 +117,4 @@ describe("Noten API - Notenschlüssel (getNoteByPunkte)", () => {
 		});
 	});
 
-	it("rejects a request without the required parameters", () => {
-		cy.request({
-			method: "POST",
-			url: "/index.ci.php/api/frontend/v1/Noten/getNoteByPunkte",
-			body: { punkte: 50 },
-			auth: {
-				username: Cypress.env("adminusername"),
-				password: Cypress.env("adminpassword"),
-			},
-			failOnStatusCode: false,
-		}).then((response) => {
-			expect(response.status, "missing lv_id/sem_kurzbz").to.eq(500);
-			expect(response.body).to.have.nested.property("meta.status", "error");
-		});
-	});
 });

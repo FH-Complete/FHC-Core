@@ -37,30 +37,19 @@ describe("Noten API - access control", () => {
 		});
 	});
 
-	describe("authentication", () => {
-		it("rejects an unauthenticated request", () => {
-			// Without this the auth is still active from last login
-			cy.clearAllCookies();
+	it("rejects requests that are not authenticated", () => {
+		cy.clearAllCookies(); // otherwise the previous login is still active
 
-			cy.request({
-				method: "GET",
-				url: `${NOTEN_API}/getCisConfig`,
-				failOnStatusCode: false,
-			}).then((response) => {
-				expectAuthError(response);
-			});
-		});
+		cy.request({ method: "GET", url: `${NOTEN_API}/getCisConfig`, failOnStatusCode: false }).then(
+			(response) => expectAuthError(response),
+		);
 
-		it("rejects invalid credentials", () => {
-			cy.request({
-				method: "GET",
-				url: `${NOTEN_API}/getCisConfig`,
-				auth: { username: "no-such-user", password: "no-such-password" },
-				failOnStatusCode: false,
-			}).then((response) => {
-				expectAuthError(response);
-			});
-		});
+		cy.request({
+			method: "GET",
+			url: `${NOTEN_API}/getCisConfig`,
+			auth: { username: "no-such-user", password: "no-such-password" },
+			failOnStatusCode: false,
+		}).then((response) => expectAuthError(response));
 	});
 
 	describe("the configured API user", () => {
@@ -82,6 +71,9 @@ describe("Noten API - access control", () => {
 				);
 				this.skip();
 			}
+			// cy.request reuses the session cookie of the previous (admin) call and the server prefers
+			// it over the Basic header - without this every test here silently runs as the admin user.
+			cy.clearAllCookies();
 		});
 
 		const teacherAuth = () => ({
@@ -89,40 +81,61 @@ describe("Noten API - access control", () => {
 			password: Cypress.env("NOTEN_TEACHER_PASSWORD"),
 		});
 
-		it("lets a teacher read an LV they teach", () => {
-			notenApi.getBenotungstoolContext(ctx.semKurzbz).then(() => {
-				cy.request({
-					method: "GET",
-					url: `${NOTEN_API}/getBenotungstoolContext`,
-					qs: { sem_kurzbz: ctx.semKurzbz },
-					auth: teacherAuth(),
-					failOnStatusCode: false,
-				}).then((response) => {
-					const context = expectNotenSuccess(response, "teacher getBenotungstoolContext");
-					const lvs = context.lehrveranstaltungen || [];
-
-					expect(
-						lvs.length,
-						`${Cypress.env("NOTEN_TEACHER_USER")} must teach at least one LV in ` +
-							`${ctx.semKurzbz} for this test to mean anything`,
-					).to.be.greaterThan(0);
-
-					getStudentenNotenAs(teacherAuth(), lvs[0].lehrveranstaltung_id, ctx.semKurzbz).then(
-						(studentsResponse) => {
-							expectNotenSuccess(studentsResponse, "teacher reading their own LV");
-						},
-					);
-				});
+		/**
+		 * Without this the denials below pass on a 401 from the LOGIN, never reaching assertLvAccess -
+		 * a scoping suite that is green because the second account cannot log in at all.
+		 */
+		it("authenticates as the configured teacher", () => {
+			cy.request({
+				method: "GET",
+				url: "/index.ci.php/api/frontend/v1/AuthInfo/getAuthUID",
+				auth: teacherAuth(),
+				failOnStatusCode: false,
+			}).then((response) => {
+				expect(
+					response.status,
+					`NOTEN_TEACHER_USER "${Cypress.env("NOTEN_TEACHER_USER")}" cannot log in, so every ` +
+						"authorization test below would only be re-testing the login. Fix the credentials.",
+				).to.eq(200);
+				expect(String(response.body?.data?.uid).toLowerCase()).to.eq(
+					String(Cypress.env("NOTEN_TEACHER_USER")).toLowerCase(),
+				);
 			});
 		});
 
+		it("lets a teacher read an LV they teach", () => {
+			cy.request({
+				method: "GET",
+				url: `${NOTEN_API}/getBenotungstoolContext`,
+				qs: { sem_kurzbz: ctx.semKurzbz },
+				auth: teacherAuth(),
+				failOnStatusCode: false,
+			}).then((response) => {
+				const context = expectNotenSuccess(response, "teacher getBenotungstoolContext");
+				const lvs = context.lehrveranstaltungen || [];
+
+				expect(
+					lvs.length,
+					`${Cypress.env("NOTEN_TEACHER_USER")} must teach at least one LV in ` +
+						`${ctx.semKurzbz} for this test to mean anything`,
+				).to.be.greaterThan(0);
+
+				getStudentenNotenAs(teacherAuth(), lvs[0].lehrveranstaltung_id, ctx.semKurzbz).then(
+					(studentsResponse) => {
+						expectNotenSuccess(studentsResponse, "teacher reading their own LV");
+					},
+				);
+			});
+		});
+
+		// assertLvAccess denies through terminateWithError -> 500 + phrase, not a 401.
 		it("denies a teacher access to an LV they do not teach", () => {
 			getStudentenNotenAs(
 				teacherAuth(),
 				Cypress.env("NOTEN_FOREIGN_LV_ID"),
 				ctx.semKurzbz,
 			).then((response) => {
-				expectAuthError(response);
+				expectNotenError(response, "keineBerechtigungNoten");
 			});
 		});
 
@@ -140,46 +153,14 @@ describe("Noten API - access control", () => {
 				auth: teacherAuth(),
 				failOnStatusCode: false,
 			}).then((response) => {
-				expectAuthError(response);
+				expectNotenError(response, "keineBerechtigungNoten");
 			});
 		});
 	});
 
-	describe("getLvForStudiengang (Assistenz flow)", () => {
-		it("refuses a Studiengang the caller is not entitled for", () => {
-			// 0 is not a real studiengang_kz, so no caller can be entitled for it. Admins bypass the
-			// check entirely, in which case the request succeeds with an empty list instead.
-			notenApi.getLvForStudiengang(0, ctx.semKurzbz).then((response) => {
-				expect(response.status, "either denied (500) or allowed-as-admin (200)").to.be.oneOf([
-					200, 500,
-				]);
-
-				if (response.status === 500) {
-					expect(response.body).to.have.nested.property("meta.status", "error");
-					expect(response.body.errors, "a denial carries a message").to.be.an("array").and.not
-						.be.empty;
-				} else {
-					expect(response.body.data, "an admin gets an empty LV list").to.be.an("array");
-				}
-			});
-		});
-
-		it("rejects a call without the required parameters", () => {
-			cy.request({
-				method: "GET",
-				url: `${NOTEN_API}/getLvForStudiengang`,
-				qs: { sem_kurzbz: ctx.semKurzbz },
-				auth: {
-					username: Cypress.env("adminusername"),
-					password: Cypress.env("adminpassword"),
-				},
-				failOnStatusCode: false,
-			}).then((response) => {
-				expect(response.status, "missing studiengang_kz").to.eq(500);
-				expect(response.body).to.have.nested.property("meta.status", "error");
-			});
-		});
-	});
+	// getLvForStudiengang's refusal is NOT covered: the configured user is an admin, so
+	// isBerechtigt('admin') short-circuits the entitlement check and every call succeeds. It needs
+	// the same non-admin login as the teacher tests above.
 
 	describe("getBenotungstoolContext shape", () => {
 		it("returns the role-determining payload", () => {

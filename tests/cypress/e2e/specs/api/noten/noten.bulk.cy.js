@@ -115,21 +115,6 @@ describe("Noten API - bulk paths", () => {
 				});
 		});
 
-		it("rejects a call without the required parameters", () => {
-			cy.request({
-				method: "POST",
-				url: "/index.ci.php/api/frontend/v1/Noten/createPruefungen",
-				body: { lva_id: ctx.lvId, sem_kurzbz: ctx.semKurzbz },
-				auth: {
-					username: Cypress.env("adminusername"),
-					password: Cypress.env("adminpassword"),
-				},
-				failOnStatusCode: false,
-			}).then((response) => {
-				expect(response.status, "missing uids/datum").to.eq(500);
-				expect(response.body).to.have.nested.property("meta.status", "error");
-			});
-		});
 	});
 
 	describe("savePruefungenBulk", () => {

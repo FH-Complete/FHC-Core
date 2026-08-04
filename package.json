@@ -2,8 +2,8 @@
   "scripts": {
     "cy:open": "cypress open",
     "cy:run": "cypress run",
-    "cy:noten": "cypress run --spec \"tests/cypress/e2e/specs/api/noten/**/*.cy.js\"",
-    "cy:noten:p0": "cypress run --spec \"tests/cypress/e2e/specs/api/noten/noten.pruefungsantritte.cy.js,tests/cypress/e2e/specs/api/noten/noten.frist.cy.js,tests/cypress/e2e/specs/api/noten/noten.notenschluessel.cy.js\"",
+    "cy:noten": "cypress run --spec \"tests/cypress/e2e/specs/**/*.cy.js\"",
+    "cy:noten:p0": "cypress run --spec \"tests/cypress/e2e/specs/unit/notenRules.cy.js,tests/cypress/e2e/specs/api/noten/noten.pruefungsantritte.cy.js,tests/cypress/e2e/specs/api/noten/noten.pruefungstermin.cy.js,tests/cypress/e2e/specs/api/noten/noten.ueberschreiben.cy.js\"",
     "noten:check": "node tests/cypress/tools/dbCheck.js noten"
   },
   "dependencies": {

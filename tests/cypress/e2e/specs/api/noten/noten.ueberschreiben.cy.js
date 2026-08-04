@@ -75,4 +75,50 @@ describe("Noten API - Notenvorschlag overwrite rules", () => {
 				);
 			});
 	});
+
+	// Same hole through the CSV import, which is the path an Assistenz actually drives.
+	// saveNotenvorschlagBulk validates nothing at all, so these are RED for the same reason.
+	describe("saveNotenvorschlagBulk", () => {
+		it("refuses a note the editor list never offers", function () {
+			if (ctx.notes.nichtLehre === null) this.skip();
+
+			const student = studentFor(2);
+
+			givenBaseline(ctx, student);
+
+			notenApi
+				.saveNotenvorschlagBulk(ctx.lvId, ctx.semKurzbz, [
+					{ uid: student.uid, note: ctx.notes.nichtLehre, punkte: null },
+				])
+				.then(() => readLvGesamtnote(ctx, student.uid))
+				.then((row) => {
+					expect(String(row.note), "a non-lehre note must not become the LV note").to.eq(
+						String(ctx.gradeNotes[0]),
+					);
+				});
+		});
+
+		it("refuses to change the Notenvorschlag once a Prüfung exists", () => {
+			const student = studentFor(3);
+
+			givenBaseline(ctx, student);
+
+			addPruefung(ctx, student, { note: ctx.gradeNotes[1], datum: attemptDate(ctx, 1) }).then(
+				(response) => {
+					expectNotenSuccess(response, "seed a Prüfung");
+				},
+			);
+
+			notenApi
+				.saveNotenvorschlagBulk(ctx.lvId, ctx.semKurzbz, [
+					{ uid: student.uid, note: ctx.gradeNotes[0], punkte: null },
+				])
+				.then(() => readLvGesamtnote(ctx, student.uid))
+				.then((row) => {
+					expect(String(row.note), "the attempt's grade must survive the import").to.eq(
+						String(ctx.gradeNotes[1]),
+					);
+				});
+		});
+	});
 });

@@ -9,6 +9,8 @@
 
 import { notenApi } from "../api/notenApi";
 import { expectNotenSuccess } from "./notenErrors";
+// the client rule; the server's computeMaxAntritte must agree with it
+import { maxAntrittCount as computeMaxAntritte } from "../../../../public/js/components/Cis/Benotungstool/notenRules.js";
 import {
 	describeFailure, performRead, performReset, performSeed, performSeedPruefung, resolveResetStrategy,
 } from "./notenReset";
@@ -102,11 +104,6 @@ const resolveLehrveranstaltung = (semKurzbz) => {
 	});
 };
 
-/** maxAntritte as the server computes it: 1 + each enabled retake type. */
-const computeMaxAntritte = (cisConfig) =>
-	1 +
-	(cisConfig.CIS_GESAMTNOTE_PRUEFUNG_TERMIN2 ? 1 : 0) +
-	(cisConfig.CIS_GESAMTNOTE_PRUEFUNG_TERMIN3 ? 1 : 0);
 
 /** -> { semKurzbz, lvId, cisConfig, maxAntritte, notes, gradeNotes, students, studentUids } */
 export const loadNotenContext = () => {
@@ -219,10 +216,6 @@ export const baselineDate = (context) => baselineBenotungsdatum(context).slice(0
 /** attemptDate(ctx,1) < attemptDate(ctx,2) < ... , all after the baseline. */
 export const attemptDate = (context, index) => shiftDate(baselineDate(context), 30 * index);
 
-/**
- * Hard failure rather than a skip: these are the regulatory rules, and a green run that never
- * exercised them is worse than a red one.
- */
 export const requireDbReset = () =>
 	resolveResetStrategy().then((state) => {
 		expect(

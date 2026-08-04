@@ -116,13 +116,7 @@ describe("Noten API - Noteneintragungsfrist (Prüfungsordnung §1)", () => {
 		});
 	});
 
-	describe("deadline computation", () => {
-		it("derives the documented SS and WS deadlines", () => {
-			const cfg = fristConfig();
-
-			// pins the mapping, independent of the clock
-			expect(expectedFristString("SS2025", cfg.ss, cfg.ws)).to.eq("15.11.2025");
-			expect(expectedFristString("WS2025", cfg.ss, cfg.ws)).to.eq("15.05.2026");
-		});
-	});
+	// The SS/WS derivation is asserted against the SERVER in the two "deadline has passed" tests,
+	// which compare the deadline it names in the error message. A local check of expectedFristString()
+	// against constants only tested the helper, so it was removed.
 });

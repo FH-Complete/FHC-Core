@@ -10,6 +10,7 @@ import NotenlisteLinks from "./NotenlisteLinks.js";
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import {debounce} from "../../../helpers/debounce.js";
 import {centeredTextFormatter} from "../../../tabulator/formatter/centered.js";
+import * as NotenRules from "./notenRules.js";
 
 export const Benotungstool = {
 	name: "Benotungstool",
@@ -1185,15 +1186,8 @@ export const Benotungstool = {
 			const [hour, minute, second] = timePart.split(":").map(Number);
 			return new Date(year, month - 1, day, hour, minute, second);
 		},
-		checkFreigabe(freigabedatum, benotungsdatum, uid) {
-			if(!freigabedatum) {
-				// check for change -> set freigabe to 'changed' on change
-				return 'offen'
-			} else if(benotungsdatum > freigabedatum) {
-				return 'changed'
-			} else {
-				return 'ok'
-			}
+		checkFreigabe(freigabedatum, benotungsdatum) {
+			return NotenRules.checkFreigabe(freigabedatum, benotungsdatum)
 		},
 		unselectableFormatter(row) {
 			
@@ -2008,23 +2002,7 @@ export const Benotungstool = {
 			return option.infoString
 		},
 		getPruefungstypForStudentByAntritt(student) {
-			// Determine the next in-tool pruefungstyp when adding a new attempt. The order of retake
-			// types is driven by config so each installation keeps its own ruleset:
-			//   - Termin1 (the original Zeugnisnote) is attempt 1 and is not offered here.
-			//   - each enabled retake type is the next offered attempt: Termin2, then legacy Termin3.
-			//   - kommPruef is the terminal attempt and is entered elsewhere, so it is never offered here.
-			// Our installation enables only Termin2 (Termin3 is legacy for other unis), so every offered
-			// retake resolves to Termin2 - which is also why Termin2 can occur twice: the excused Termin
-			// does not increment hoechsterAntritt (see getAntrittCountStudent), so the next offered attempt
-			// stays Termin2 until a counting Termin2 exists.
-			const retakeTypes = []
-			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_TERMIN2) retakeTypes.push("Termin2")
-			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_TERMIN3) retakeTypes.push("Termin3")
-
-			// hoechsterAntritt is the number of counting attempts already taken (>=1 once an original
-			// note exists). The next retake sits at index hoechsterAntritt-1 (attempt 1 -> first retake).
-			const idx = Math.max(0, student.hoechsterAntritt - 1)
-			return retakeTypes[idx] ?? ""
+			return NotenRules.pruefungstypForAntritt(student, this.config)
 		},
 		savePruefungEingabe() {
 			// keep the date within the neighbouring exam dates (a typed value can bypass the picker bounds)
@@ -2399,41 +2377,7 @@ export const Benotungstool = {
 			}).finally(()=> this.loading = false)
 		},
 		getAntrittCountStudent(student) {
-			// Number of counting Prüfungsantritte the student has taken. Counting is by NOTE, not by
-			// pruefungstyp: any note except the "antrittslose" ones (entschuldigt & noch nicht eingetragen,
-			// see NOTEN_OHNE_ANTRITT) counts as an attempt. That is exactly what makes an excused Termin2
-			// not consume an attempt, so Termin2 can be entered a second time.
-			//
-			// Antritt numbering in our installation: 1 = original note, 2 = Termin2 (may be entered twice,
-			// one excused), terminal = kommPruef. (Termin3 is a legacy retake for other installations and
-			// is simply counted like any other pruefung when enabled.)
-			//
-			// A present kommPruef is terminal: return a sentinel (4) that is >= any maxAntrittCount, so no
-			// further attempts can be added here regardless of installation.
-			if(student['kommPruef']) return 4
-			
-			let pruefungsAntrittCount = 0
-			const pLen = student.pruefungen.length
-			for(let i = 0; i < pLen; i++) {
-				const p = student.pruefungen[i]
-
-				// TODO: filter for limit here but in a perfect world they should never be able to exceed that anyway
-				const isDefinedAsAntrittsloseNote = this.config.NOTEN_OHNE_ANTRITT.find(n_pk => n_pk == p.note)
-				if(!isDefinedAsAntrittsloseNote) pruefungsAntrittCount++
-			}
-
-			// when student never had to take an exam beyond the original benotung 
-			// aka pruefungsantritt (even though it does not have to have pruefungscharacter)
-			// it still counts as an antritt, except it is coming from a notenOption like "angerechnet" 
-			// which indicates no participation at all
-			if(pruefungsAntrittCount === 0 && student.note){
-				const noteOption = this.notenOptions.find(note => note.note == student.note)
-
-				if(noteOption.lehre) return 1
-				else return 0
-			}
-			
-			return pruefungsAntrittCount
+			return NotenRules.antrittCountStudent(student, this.config, this.notenOptions)
 		}
 	},
 	watch: {
@@ -2533,18 +2477,7 @@ export const Benotungstool = {
 				+ ': <strong>' + (this.studenten?.length || 0) + '</strong>';
 		},
 		maxAntrittCount() {
-			// Maximum number of counting Prüfungsantritte enterable IN THIS TOOL: the original note
-			// (always 1) plus each enabled in-tool retake type. kommPruef is the terminal attempt and is
-			// entered elsewhere, so it is intentionally NOT part of this cap. For our installation
-			// (Termin2 on, Termin3 off) this is 2 (original + Termin2); Termin3 is legacy for other unis.
-			// Excused Termine do not count (see getAntrittCountStudent), which is what lets Termin2 occur
-			// twice within this cap.
-			let maxAntritte = 1;
-
-			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_TERMIN2) maxAntritte++
-			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_TERMIN3) maxAntritte++
-
-			return maxAntritte;
+			return NotenRules.maxAntrittCount(this.config)
 		},
 		getFreigabeCounter() {
 			return this.studenten ? this.studenten.reduce((acc, cur) => {

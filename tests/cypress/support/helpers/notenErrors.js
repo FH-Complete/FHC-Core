@@ -31,6 +31,14 @@ const PHRASES = {
 		de: "Die Noteneintragungsfrist ({0}) für dieses Studiensemester ist abgelaufen. Es können keine Noten oder Prüfungen mehr eingetragen werden.",
 		en: "The grade entry deadline ({0}) for this study semester has passed. Grades and exams can no longer be entered.",
 	},
+	wrongPruefungType: {
+		de: "Prüfung für Studierenden {0} konnte nicht bearbeitet werden, {1} ist keine gültiger Prüfungstyp.",
+		en: "Exam for Student {0} was not saved, {1} is not a valid exam type.",
+	},
+	c4keineLvNoteEingetragen: {
+		de: "Keine LV Note eingetragen",
+		en: "No Subject Grade entered",
+	},
 	keineBerechtigungNoten: {
 		de: 'Keine Berechtigung, um in der Lehrveranstaltung "{0}" im Semester {1} Noten einzutragen.',
 		en: 'No permission to enter grades for the course "{0}" in semester {1}.',

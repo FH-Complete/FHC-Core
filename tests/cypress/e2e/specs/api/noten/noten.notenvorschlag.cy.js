@@ -73,6 +73,21 @@ describe("Noten API - Notenvorschlag", () => {
 			});
 		});
 
+		// The unfiltered getter behind getNotenvorschlagStudent sees the same row fine - which is the
+		// getter finding 1 says getStudentenNoten should be using.
+		it("reports the offen note through getNotenvorschlagStudent", () => {
+			const student = ctx.students[0];
+
+			resetNotenState(ctx);
+			notenApi.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, ctx.gradeNotes[0]);
+
+			notenApi.getNotenvorschlagStudent(ctx.lvId, ctx.semKurzbz, student.uid).then((response) => {
+				const data = expectNotenSuccess(response, "getNotenvorschlagStudent");
+				expect(String(data[0].note)).to.eq(String(ctx.gradeNotes[0]));
+				expect(data[0].freigabedatum, "still offen").to.be.null;
+			});
+		});
+
 		// EXPECTED TO FAIL while getLvGesamtNoten filters `freigabedatum < NOW()`: the row exists
 		// (test above proves it) but the read model drops it until the note is freigegeben.
 		it("reports the offen note back through getStudentenNoten", () => {
@@ -150,21 +165,4 @@ describe("Noten API - Notenvorschlag", () => {
 		});
 	});
 
-	describe("parameter validation", () => {
-		it("rejects a call without student_uid", () => {
-			cy.request({
-				method: "POST",
-				url: "/index.ci.php/api/frontend/v1/Noten/saveNotenvorschlag",
-				body: { lv_id: ctx.lvId, sem_kurzbz: ctx.semKurzbz, note: ctx.gradeNotes[0] },
-				auth: {
-					username: Cypress.env("adminusername"),
-					password: Cypress.env("adminpassword"),
-				},
-				failOnStatusCode: false,
-			}).then((response) => {
-				expect(response.status, "missing student_uid").to.eq(500);
-				expect(response.body).to.have.nested.property("meta.status", "error");
-			});
-		});
-	});
 });

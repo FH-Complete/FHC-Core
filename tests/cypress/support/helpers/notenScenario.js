@@ -3,14 +3,10 @@
 import { notenApi, pruefungenOfTyp, gradesOf } from "../api/notenApi";
 import { expectNotenSuccess } from "./notenErrors";
 import { resetNotenState, seedBaseline } from "./notenTestData";
+import { retakeTypes } from "../../../../public/js/components/Cis/Benotungstool/notenRules.js";
 
-/** Enabled in-tool retake types, in attempt order. maxAntritte == 1 + this list's length. */
-export const enabledRetakeTypes = (context) => {
-	const types = [];
-	if (context.cisConfig.CIS_GESAMTNOTE_PRUEFUNG_TERMIN2) types.push("Termin2");
-	if (context.cisConfig.CIS_GESAMTNOTE_PRUEFUNG_TERMIN3) types.push("Termin3");
-	return types;
-};
+/** The real client rule, so a divergence from the server shows up as a failing API spec. */
+export const enabledRetakeTypes = (context) => retakeTypes(context.cisConfig);
 
 /**
  * Adds an attempt (no pruefung_id -> server runs validatePruefungAdd).

@@ -1,8 +1,5 @@
 /**
  * Wrappers over the Benotungstool API. Mirrors public/js/api/factory/noten.js.
- *
- * GET sends factory params as query string, POST as JSON body (the controller reads
- * getPostJSON()). Envelope: 200 {data, meta.status:'success'} / 500 {errors[], meta.status:'error'}.
  */
 
 const NOTEN_API = "/index.ci.php/api/frontend/v1/Noten";
@@ -35,6 +32,10 @@ export const notenApi = {
 	 * [studenten, pruefungen, DOMAIN, grades-by-uid, anwesenheiten]
 	 */
 	getStudentenNoten: (lv_id, sem_kurzbz) => apiGet("getStudentenNoten", { lv_id, sem_kurzbz }),
+
+	/** Reads through the UNFILTERED getter, so it sees notes getStudentenNoten hides. uid -> caller. */
+	getNotenvorschlagStudent: (lv_id, sem_kurzbz, uid = null) =>
+		apiGet("getNotenvorschlagStudent", { lv_id, sem_kurzbz, uid }),
 
 	/** data -> [lvgesamtnote] */
 	saveNotenvorschlag: (lv_id, sem_kurzbz, student_uid, note, punkte = null) =>

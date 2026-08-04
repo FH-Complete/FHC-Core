@@ -9,6 +9,7 @@
  * instead of inserting. "entschuldigt" and "Noch nicht eingetragen" never count towards the cap.
  */
 
+import { notenApi } from "../../../../support/api/notenApi";
 import { expectNotenError, expectNotenSuccess } from "../../../../support/helpers/notenErrors";
 import {
 	attemptDate,
@@ -50,6 +51,25 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 
 	// one student per test, so a leaked row cannot reach the next scenario
 	const studentFor = (index) => ctx.students[index % ctx.students.length];
+
+	// Every rule below is keyed on these PKs. resolveSpecialNotes() resolves them from tbl_note by
+	// Bezeichnung and only falls back to the config values - on demo data entschuldigt is 14, not the
+	// 17 in application/config/noten.php. If the fallback ever wins, the rules silently stop matching.
+	it("resolves the special notes from tbl_note, not from config", () => {
+		notenApi.getCisConfig().then((response) => {
+			const config = expectNotenSuccess(response, "getCisConfig");
+
+			expect(String(config.NOTE_ENTSCHULDIGT)).to.eq(String(ctx.notes.entschuldigt));
+			expect(config.NOTEN_OHNE_ANTRITT.map(String)).to.include.members([
+				String(ctx.notes.entschuldigt),
+				String(ctx.notes.nochNichtEingetragen),
+			]);
+			expect(
+				Object.keys(config.NOTEN_OCCURANCE_LIMIT_MAP).map(String),
+				"the occurrence limit must be keyed on the resolved PK",
+			).to.include(String(ctx.notes.entschuldigt));
+		});
+	});
 
 	describe("Rule A - maximum number of Prüfungsantritte", () => {
 		it("rejects an attempt once the configured maximum is reached", () => {
@@ -362,6 +382,34 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 					expectNotenSuccess(response, "date-only correction inside the neighbour bounds");
 				});
 			});
+		});
+
+		// The add-time limit is covered by Rule C; this is the edit-time re-check
+		// (validatePruefungEdit:1167). Its converse - re-saving the excused row itself, which the
+		// exclusion must let through - is the date-only correction above.
+		it("rejects an edit that would exceed the entschuldigt limit", () => {
+			const student = studentFor(0);
+
+			// the real Termin2 is the latest attempt, so no note lock masks the limit
+			givenThreeAttempts(student)
+				.then(() => readState(ctx))
+				.then((data) =>
+					attemptsOfTyp(data, student.uid, "Termin2").find(
+						(p) => String(p.note) !== String(ctx.notes.entschuldigt),
+					),
+				)
+				.then((real) => {
+					expect(real, "the non-excused Termin2").to.exist;
+					return editPruefung(ctx, student, {
+						pruefungId: real.pruefung_id,
+						note: ctx.notes.entschuldigt,
+						datum: attemptDate(ctx, 2),
+						typ: "Termin2",
+					});
+				})
+				.then((response) => {
+					expectNotenError(response, "noteOccuranceLimitReached");
+				});
 		});
 
 		it("rejects a date on or before the previous attempt", () => {

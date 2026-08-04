@@ -750,6 +750,10 @@ class Noten extends FHCAPI_Controller
 		$origLvNote = null;
 		$origLvPunkte = null;
 		$origBenotungsdatum = null;
+		
+//		// TODO: check if savePruefungstermin wont throw an error before updating/inserting lv note
+//		if(!$this->ableToSavePruefungstermin($typ))
+		
 		if(!isError($result) && !hasData($result)) {
 			
 			$id = $this->LvgesamtnoteModel->insert(
@@ -840,6 +844,7 @@ class Noten extends FHCAPI_Controller
 
 		$status = [];
 		
+		// TODO: config here?
 		// send $grades reference to moodle addon
 		Events::trigger(
 			'getEntschuldigungsStatusForStudentOnDate',
@@ -1000,7 +1005,8 @@ class Noten extends FHCAPI_Controller
 
 			}
 
-		} else if($typ == "Termin3" && defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
+		} 
+		else if($typ == "Termin3" && defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
 		{
 			// same entschuldigt-preservation handling as Termin2
 			$result3 = $this->LePruefungModel->getPruefungenByUidTypLvStudiensemester($student_uid, "Termin3", $lva_id, $stsem);
@@ -1060,7 +1066,8 @@ class Noten extends FHCAPI_Controller
 				$this->logLib->logInfoDB(array('termin3 inserted',$res, getAuthUID(), getAuthPersonId()));
 
 			}
-		} else {
+		}
+		else {
 			$this->terminateWithError($this->p->t('benotungstool', 'wrongPruefungType', [$student_uid, $typ]), 'general');
 		}
 		
