@@ -909,6 +909,7 @@ export default {
 			:logout-url="logoutUrl"
 			:searchbaroptions="searchbaroptions"
 			:searchfunction="searchfunction"
+      @language-changed="this.$refs.calendar.resetEventLoader();"
 		/>
 		<div class="container-fluid overflow-hidden heightfull">
 			<div class="row h-100">
