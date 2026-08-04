@@ -67,12 +67,16 @@ class Zeitsperre_model extends DB_Model
 	 * @ days: count of the intervall of the next days
 	 * @return array
 	 */
-	public function getZeitsperrenForNextDays($days)
+	public function getZeitsperrenForNextDays($days, $uid=null)
 	{
 		$von = date('Y-m-d');
 		$bis = date('Y-m-d', strtotime("+{$days} days"));
 
 		$paramsArray = [$von, $bis, $bis, $von];
+
+		if($uid)
+			$paramsArray[] = $uid;
+
 		$qry = "select
 					nachname,
 					vorname,
@@ -91,7 +95,12 @@ class Zeitsperre_model extends DB_Model
 					((? <= bisdatum
 						and ? >= bisdatum)
 					or (?>= vondatum
-						and ? <= vondatum))
+						and ? <= vondatum))";
+
+		if($uid)
+			$qry .= " and uid = ? ";
+
+		$qry .= "
 				order by nachname
 				";
 

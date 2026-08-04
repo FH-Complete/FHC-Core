@@ -4,6 +4,7 @@ import RoleInformation from "./ProfilComponents/RoleInformation.js";
 import ProfilEmails from "./ProfilComponents/ProfilEmails.js";
 import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
 import QuickLinks from "./ProfilComponents/QuickLinks.js";
+import ZeitsperrenUid from "../../Cis/ZeitsperrenMitarbeiter/Details/ZeitsperrenMitarbeiteruid.js";
 
 import { dateFilter } from "../../../tabulator/filters/Dates.js";
 
@@ -15,6 +16,7 @@ export default {
 		ProfilEmails,
 		ProfilInformation,
 		QuickLinks,
+		ZeitsperrenUid
 	},
 	inject: ["collapseFunction", "language"],
 	data() {
@@ -210,8 +212,10 @@ export default {
 			}
 			return quickLinks;
 		},
+		stringTimelocks(){
+			return `${this.$p.t("zeitsperren", "zeitsperrenVon")} ` +  this.data.vorname + " " + this.data.nachname;
+		}
 	},
-
 	template: /*html*/ `
 
 <div class="container-fluid text-break fhc-form"  >
@@ -277,6 +281,16 @@ export default {
 			<div v-if="quickLinks.length" class="row mb-3 d-none d-md-block">
 				<div class="col">
 					<quick-links :title="$p.t('profil/quickLinks')" :links="quickLinks" />
+				</div>
+			</div>
+			<!-- LINKS MITARBEITER -->
+			<div class="card mb-2">
+				<div class= "card-body">
+					<zeitsperren-uid
+						:maUid="data.username"
+						:days="14"
+						:title="stringTimelocks"
+					></zeitsperren-uid>
 				</div>
 			</div>
 			<!-- MAILVERTEILER -->

@@ -60661,6 +60661,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'zeitsperren',
+		'phrase' => 'zeitsperrenVon',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zeitsperren von',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Timelocks from',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// PHRASES ZEITSPERREN END
 
 );

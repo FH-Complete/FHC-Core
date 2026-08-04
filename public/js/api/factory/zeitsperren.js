@@ -63,4 +63,16 @@ export default {
 			url:'api/frontend/v1/MaZeitsperren/loadZeitsperrenLectorStg/' + days + '/' + stg,
 		};
 	},
+	loadZeitsperrenMa(days, uid) {
+		return {
+			method: 'get',
+			url:'api/frontend/v1/MaZeitsperren/loadZeitsperrenMa/' + days + '/' + uid,
+		};
+	},
+	getDetailsMa(uid){
+		return {
+			method: 'get',
+			url:'api/frontend/v1/MaZeitsperren/getDetailsMa/' + uid,
+		};
+	}
 }

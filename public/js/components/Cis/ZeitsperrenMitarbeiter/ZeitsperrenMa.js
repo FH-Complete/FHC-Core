@@ -1,9 +1,14 @@
-import listsZeitsperren from './Details/listsZeitsperren.js'
+import listsZeitsperren from './Details/listsZeitsperren.js';
+import MitarbeiterZeitsperren from './Details/ZeitsperrenMitarbeiteruid.js';
 
 export default {
 	name: 'ZeitsperrenMa',
 	components: {
 		listsZeitsperren,
+		MitarbeiterZeitsperren
+	},
+	props: {
+		propsViewData: Object
 	},
 	data(){
 		return {
@@ -45,33 +50,47 @@ export default {
 	methods: {
 		show(view) {
 			this.activeView = this.activeView === view ? null : view;
-		}
+		},
 	},
+	//TODO(only show main page if there is no prop
 	template: `
 		<div class="base-zeitsperren w-100 h-100">
 
-			<div class="row g-1">
-				<div
-					class="col"
-					v-for="button in buttons"
-					:key="button.key"
-				>
-					<button
-						class="btn w-100"
-						:class="button.class"
-						@click="show(button.key)"
+			<template v-if="!propsViewData.maUid && !propsViewData.type">
+
+				<div class="row g-1">
+					<div
+						class="col"
+						v-for="button in buttons"
+						:key="button.key"
 					>
-						{{ $p.t(button.title) }}
-					</button>
+						<button
+							class="btn w-100"
+							:class="button.class"
+							@click="show(button.key)"
+						>
+							{{ $p.t(button.title) }}
+						</button>
+					</div>
 				</div>
-			</div>
+
+				<lists-zeitsperren
+					v-if="activeView"
+					ref="listTimeLocks"
+					:type="activeView"
+				/>
+
+		</template>
+		<template v-else>
 
 			<lists-zeitsperren
-				v-if="activeView"
-				ref="listTimeLocks"
-				:type="activeView"
-			/>
-		</div>
+						:type="propsViewData.type"
+						:maUid="propsViewData.maUid"
+						:tage="propsViewData.days"
+					/>
+		</template>
+
+	</div>
 
 	`,
 }

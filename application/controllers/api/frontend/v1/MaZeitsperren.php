@@ -14,6 +14,8 @@ class MaZeitsperren extends FHCAPI_Controller
 			'getZeitsperrenAss' => self::PERM_LOGGED,
 			'getStgLectors' => self::PERM_LOGGED,
 			'loadZeitsperrenLectorStg' => self::PERM_LOGGED,
+			'loadZeitsperrenMa' => self::PERM_LOGGED,
+			'getDetailsMa' => self::PERM_LOGGED,
 		]);
 
 		// Load Libraries
@@ -116,6 +118,25 @@ class MaZeitsperren extends FHCAPI_Controller
 
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		$result = $this->StudiengangModel->execReadOnlyQuery($sql);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+	}
+
+	public function loadZeitsperrenMa($days, $uid)
+	{
+		$result = $this->ZeitsperreModel->getZeitsperrenForNextDays($days, $uid);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+	}
+
+	public function getDetailsMa($uid)
+	{
+		$this->load->model('ressource/Person_model', 'PersonModel');
+		$result = $this->PersonModel->getFullName($uid);
+
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);

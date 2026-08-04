@@ -23,7 +23,8 @@ $includesArray = array(
 		'public/css/components/FormUnderline.css',
 		'public/css/components/abgabetool/abgabe.css',
 		'public/css/Cis4/Cms.css',
-		'public/css/Cis4/Studium.css'
+		'public/css/Cis4/Studium.css',
+		'public/css/components/Zeitsperren.css',
 	),
 	'customJSs' => array(
 		'vendor/npm-asset/primevue/accordion/accordion.min.js',

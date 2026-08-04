@@ -23,9 +23,16 @@ export default {
 					'lector',
 					'oe',
 					'ass',
-					'lecStg'
+					'lecStg',
+					'ma'
 				].includes(value)
 			}
+		},
+		tage: {
+			type: String
+		},
+		maUid: {
+			type: String
 		}
 	},
 	data(){
@@ -41,7 +48,8 @@ export default {
 			filteredStg: [],
 			selectedStg: null,
 			studiengang_kz: null,
-			showTable: true
+			showTable: true,
+			fullName: null
 		}
 	},
 	methods: {
@@ -87,9 +95,15 @@ export default {
 					this.arrayMaTimelocks = result.data;
 				})
 		},
-		createDays() {
+		loadZeitsperrenMa(days, uid){
+			this.$api
+				.call(ApiMaTimelocks.loadZeitsperrenMa(days, uid))
+				.then(result => {
+					this.arrayMaTimelocks = result.data;
+				})
+		},
+		createDays(countDays) {
 			const today = new Date();
-
 			//get Monday before today
 			const mondayBeforeToday = new Date(today);
 			const day = today.getDay();
@@ -97,7 +111,7 @@ export default {
 
 			mondayBeforeToday.setDate(today.getDate() - diff);
 
-			this.days = Array.from({ length: this.interval+1 }, (_, i) => {
+			this.days = Array.from({ length: countDays + 1 }, (_, i) => {
 				const date = new Date(mondayBeforeToday);
 				date.setDate(mondayBeforeToday.getDate() + i);
 
@@ -112,44 +126,49 @@ export default {
 			});
 		},
 		createArrayMa(type){
-			this.showTable = true;
-			if(type == "fix") {
-				this.loadZeitsperrenFixeMa(this.interval);
-			}
-			else if(type == "lector") {
-				this.loadZeitsperrenLector(this.interval);
-			}
-			else if(type == "oe") {
-				this.showTable = false;
-				this.selectedOe = null;
-				this.$api
-					.call(ApiMaTimelocks.getAllOes())
-					.then(result => {
-						this.listOes = result.data;
+				this.showTable = true;
+				if(type == "fix") {
+					this.loadZeitsperrenFixeMa(this.interval);
+				}
+				else if(type == "lector") {
+					this.loadZeitsperrenLector(this.interval);
+				}
+				else if(type == "oe") {
+					this.showTable = false;
+					this.selectedOe = null;
+					this.$api
+						.call(ApiMaTimelocks.getAllOes())
+						.then(result => {
+							this.listOes = result.data.filter(item => item.aktiv);
+						})
+						.catch(this.$fhcAlert.handleSystemError);
+				}
+				else if(type == "lecStg") {
+					this.showTable = false;
+					this.selectedStg = null;
+					this.$api
+						.call(ApiMaTimelocks.getAllStg())
+						.then(result => {
+							this.listStg = result.data;
+						})
+						.catch(this.$fhcAlert.handleSystemError);
+				}
+				else if(type == "all") {
+					this.loadAllActiveZeitsperren(this.interval);
+				}
+				else if(type == "ass") {
+					this.loadZeitsperrenAss(this.interval);
+				}
+				else if(type == "ma") {
+					const countDays= this.tage ? this.tage : this.interval;
+					this.loadZeitsperrenMa(countDays, this.maUid);
+					this.loadDetailsMa(this.maUid);
+				}
+				else
+				{
+					this.$fhcAlert.alertError(this.$p.t('ui', 'error_fieldNotFound', {field: "Typ Zeitsperre"}));
+				}
 
-					})
-					.catch(this.$fhcAlert.handleSystemError);
-			}
-			else if(type == "lecStg") {
-				this.showTable = false;
-				this.selectedStg = null;
-				this.$api
-					.call(ApiMaTimelocks.getAllStg())
-					.then(result => {
-						this.listStg = result.data;
-					})
-					.catch(this.$fhcAlert.handleSystemError);
-			}
-			else if(type == "all") {
-				this.loadAllActiveZeitsperren(this.interval);
-			}
-			else if(type == "ass") {
-				this.loadZeitsperrenAss(this.interval);
-			}
-			else
-			{
-				this.$fhcAlert.alertError(this.$p.t('ui', 'error_fieldNotFound', {field: "Typ Zeitsperre"}));
-			}
 		},
 		isBlocked(mitarbeiter, tag) {
 			if (!mitarbeiter?.sperren) {
@@ -187,20 +206,18 @@ export default {
 			);
 		},
 		link(uid) {
-
-			//link to new profile
 			return (
 			FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router +
 				"/Cis/Profil/View/"+
 				uid
 			);
-
-			//link to old profile
-/*			return (
-				FHC_JS_DATA_STORAGE_OBJECT.app_root +
-				"cis/private/profile/index.php?uid=" +
-				uid
-			);*/
+		},
+		loadDetailsMa(uid){
+			this.$api
+				.call(ApiMaTimelocks.getDetailsMa(uid))
+				.then(result => {
+					this.fullName = result.data;
+				})
 		}
 	},
 	computed: {
@@ -273,11 +290,18 @@ export default {
 					else if(this.type == "ass") {
 						this.loadZeitsperrenAss(newVal);
 					}
+					else if(this.type == "lecStg") {
+						if(this.selectedStg )
+							this.loadZeitsperrenStg(newVal, this.studiengang_kz);
+					}
+					else if(this.type == "ma") {
+						this.loadZeitsperrenMa(newVal, this.maUid);
+					}
 					else
 					{
 						this.$fhcAlert.alertError(this.$p.t('ui', 'error_fieldNotFound', {field: "Typ Zeitsperre"}));
 					}
-					this.createDays();
+					this.createDays(newVal);
 				}
 			},
 			deep: true,
@@ -313,7 +337,10 @@ export default {
 	},
 	created(){
 		this.createArrayMa(this.type);
-		this.createDays();
+		if(this.tage)
+			this.createDays(Number(this.tage));
+		else
+			this.createDays(this.interval);
 	},
 	template: `
 	<div class="w-100 h-100">
@@ -324,6 +351,7 @@ export default {
 				<span v-if="type=='oe'">{{$p.t('zeitsperren/title_byOe')}}</span>
 				<span v-if="type=='lecStg'">{{$p.t('zeitsperren/title_lectStg')}}</span>
 				<span v-if="type=='ass'">{{$p.t('zeitsperren/title_ass')}}</span>
+				<span v-if="type=='ma'">{{$p.t('zeitsperren/zeitsperrenVon')}} {{fullName}}</span>
 				{{ mondayBeforeToday.toLocaleDateString('de-AT') }} - {{endInterval}}
 			</h4>
 			<div class="d-flex align-items-center gap-2 mb-3">

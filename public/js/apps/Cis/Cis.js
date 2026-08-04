@@ -233,6 +233,17 @@ const router = VueRouter.createRouter({
 			props: {dashboard: 'CIS'},
 		},
 		{
+			path: `/Cis/Zeitsperren/:type?/:maUid?/:days?`,
+			name: 'ZeitsperrenMa',
+			component: ZeitsperrenMa,
+			props: route => {
+				//console.log('ROUTE PARAMS', route.params);
+				return {
+					propsViewData: route.params
+				};
+			}
+		},
+		{
 			path: '/:pathMatch(.*)*',
 			name: 'Fallback',
 			component: FhcDashboard,
@@ -245,12 +256,6 @@ const router = VueRouter.createRouter({
 					},
 				};
 			},
-		},
-		{
-			path: `/Cis/ZeitsperrenMa`,
-			name: 'ZeitsperrenMa',
-			component: ZeitsperrenMa,
-			props: true
 		},
 	]
 })
