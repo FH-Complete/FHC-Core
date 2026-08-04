@@ -32,6 +32,7 @@ class KalenderLib
 		$this->_ci->load->model('ressource/Stunde_model', 'StundeModel');
 		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 		$this->_ci->load->model('system/Variable_model', 'VariableModel');
+		$this->_ci->load->model('system/Sprache_model', 'SpracheModel');
 		$this->_ci->load->model('organisation/Ferien_model', 'FerienModel');
 
 
@@ -44,6 +45,9 @@ class KalenderLib
 
 	private function _getBasePlan($start_date, $end_date)
 	{
+		$language = $this->getLanguageIndex();
+		$index_bezeichnung_mehrsprachig = $language - 1;
+
 		$end_date = date('Y-m-d', strtotime($end_date . ' +1 day'));
 
 		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id,
@@ -191,7 +195,7 @@ class KalenderLib
 				SELECT DISTINCT ON (n.notiz_id)
 					n.notiz_id AS id,
 					nt.typ_kurzbz,
-					array_to_json(nt.bezeichnung_mehrsprachig)->>0 AS beschreibung,
+					array_to_json(nt.bezeichnung_mehrsprachig::varchar[])->>". $index_bezeichnung_mehrsprachig. " as beschreibung,
 					n.text AS notiz,
 					nt.style,
 					n.erledigt AS done,
@@ -2160,4 +2164,11 @@ class KalenderLib
 		}
 	}
 
+	private function getLanguageIndex()
+	{
+		$this->_ci->SpracheModel->addSelect('index');
+		$result = $this->_ci->SpracheModel->loadWhere(array('sprache' => getUserLanguage()));
+
+		return hasData($result) ? getData($result)[0]->index : 1;
+	}
 }
