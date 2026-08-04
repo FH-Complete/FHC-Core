@@ -1,6 +1,6 @@
 import FhcCalendar from "./Base.js";
 
-import { useEventLoader } from '../../composables/EventLoader.js';
+import { useEventLoader } from '../../composables/Tempus/TempusEventLoader.js';
 
 import ModeWeek from './Mode/Week.js';
 import ModeMonth from './Mode/Month.js';
@@ -171,14 +171,10 @@ export default {
 	},
 	setup(props, context) {
 		const rangeInterval = Vue.ref(null);
-		const preserveRequestedRange = Vue.computed(() => {
-			return ['week', 'month'].includes(props.mode?.toLowerCase());
-		});
 
 		const { events, lv, reset } = useEventLoader(
 			rangeInterval,
 			props.getPromiseFunc,
-			preserveRequestedRange,
 			() => props.cacheMultiplier
 		);
 

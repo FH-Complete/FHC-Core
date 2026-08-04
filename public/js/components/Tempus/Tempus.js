@@ -1301,6 +1301,7 @@ export default {
 						:mode="currentMode"
 						:parkedEvents="parkedKeys"
 						:visible-lecturers="visibleLecturerUids"
+						:cacheMultiplier="currentMode === 'week' ? 0 : 0"
 						@drop="dropHandler"
 						@resize="resizeHandler"
 						@update:date="handleChangeDate"
