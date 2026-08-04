@@ -62,6 +62,9 @@ export default {
 
 				return [type, result];
 			}));
+		},
+		hiddenWidgets() {
+			return this.widgets.filter(widget => widget.hidden);
 		}
 	},
 	methods: {
@@ -69,6 +72,9 @@ export default {
 			this.$refs.widgetpicker
 				.getWidget()
 				.then(widget_id => {
+					if (widget_id.hidden)
+						this.widgetUnhide(widget_id, widget.place);
+					
 					widget.widget = widget_id;
 					// NOTE(chris): min size
 					widget.place = Object.fromEntries(Object.entries(widget.place).map(([key, value]) => {
@@ -131,17 +137,6 @@ export default {
 					this.widgets.forEach((widget, i) => {
 						if (failed.includes(widget.id)) {
 							this.widgets[i] = structuredClone(ObjectUtils.deepToRaw(this.originalWidgets[widget.id]));
-							/** NOTE(chris): if you wanna hide or unhide a
-							 * preset and it fails: switch around the hidden
-							 * value to revert it properly (checkboxes can't
-							 * really handle it otherwise)
-							 */
-							if (payload[widget.id].hidden !== undefined) {
-								this.widgets[i].hidden = payload[widget.id].hidden;
-								this.$nextTick(() => {
-									this.widgets[i] = structuredClone(ObjectUtils.deepToRaw(this.originalWidgets[widget.id]));
-								});
-							}
 						} else if (payload[widget.id]) {
 							payload[widget.id].id = widget.id;
 							payload[widget.id].index = widget.index;
@@ -159,6 +154,31 @@ export default {
 					this.widgets = this.widgets.filter(widget => widget.id != id);
 				})
 				.catch(this.$fhcAlert.handleSystemError);
+		},
+		widgetUnhide(orig, place) {
+			place = Object.fromEntries(Object.entries(place).map(([key, value]) => {
+				value.w = this.sizeLimits[orig.widget].width.min;
+				value.h = this.sizeLimits[orig.widget].height.min;
+				// NOTE(chris): unpin pinned widgets because they got a new placement
+				value.pinned = false;
+				return [key, value];
+			}));
+			// NOTE(chris): clear placement in other screensizes
+			Object.keys(orig.place).forEach(key => {
+				if (!place[key]) {
+					place[key] = {
+						x: undefined,
+						y: undefined,
+						pinned: false
+					};
+				}
+			});
+			let payload = {};
+			payload[orig.id] = {
+				hidden: false,
+				place
+			};
+			return this.widgetUpdate(payload);
 		},
 		async fetchViewData() {
 			let viewDataResult = await this.$api.call(ApiDashboard.getViewData());
@@ -223,6 +243,7 @@ export default {
 		<dashboard-widget-picker
 			ref="widgetpicker"
 			:widgets="widgetsSetup"
+			:hidden-widgets="hiddenWidgets"
 		></dashboard-widget-picker>
 	</div>`
 }
