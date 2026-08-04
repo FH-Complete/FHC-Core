@@ -135,6 +135,8 @@ $route['lvplan/html/detail'] = 'LvPlanHTMLDetail';
 // load routes from extensions, also look for environment-specific configs
 $subdirs = ['application/config/extensions', 'application/config/' . ENVIRONMENT . '/extensions'];
 
+$route['api/frontend/v1/tempus/Tags/getTagsByCalendar/(:num)'] = 'api/frontend/v1/tempus/Tags/getTagsByCalendar/$1';
+
 foreach($subdirs as $subdir)
 {
 	if(is_dir($subdir))

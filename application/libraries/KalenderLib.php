@@ -169,6 +169,69 @@ class KalenderLib
 		);
 		$this->_ci->KalenderModel->addJoin('public.tbl_studiengang le_studiengang', 'le_lehrverband.studiengang_kz = le_studiengang.studiengang_kz', 'LEFT');
 
+		// Include tags in the query
+		$this->_ci->load->config('tempus');
+		$tags = $this->_ci->config->item('tempus_tags');
+
+		$whereTags = '';
+		if (is_array($tags) && !isEmptyArray($tags)) {
+			$tags = array_keys($tags);
+
+			foreach ($tags as $key => $tag) {
+				$tags[$key] = $this->_ci->KalenderModel->escape($tag);
+			}
+			$whereTags = " AND nt.typ_kurzbz IN (" . implode(",", $tags) . ")";
+		}
+		$subQueryTag = "(
+			SELECT
+				tag.eindeutige_kalender_gruppen_id,
+				COALESCE(json_agg(tag ORDER BY tag.done, tag.prioritaet), '[]'::json) AS tags
+			FROM (
+				SELECT DISTINCT ON (n.notiz_id)
+					n.notiz_id AS id,
+					nt.typ_kurzbz,
+					array_to_json(nt.bezeichnung_mehrsprachig)->>0 AS beschreibung,
+					n.text AS notiz,
+					nt.style,
+					n.erledigt AS done,
+					nt.prioritaet AS prioritaet,
+					nz.eindeutige_kalender_gruppen_id
+				FROM public.tbl_notizzuordnung AS nz
+				JOIN public.tbl_notiz AS n ON nz.notiz_id = n.notiz_id
+				JOIN public.tbl_notiz_typ AS nt ON n.typ = nt.typ_kurzbz " . $whereTags . "
+			) AS tag
+			GROUP BY tag.eindeutige_kalender_gruppen_id
+		) AS tag_data_agg";
+
+		$this->_ci->KalenderModel->addJoin($subQueryTag, 'tag_data_agg.eindeutige_kalender_gruppen_id = tbl_kalender.eindeutige_gruppen_id', 'LEFT');
+		// End of tags inclusion
+
+		// Include assigned operational resources in the query
+		$subQueryResource = "(
+			SELECT
+				resource.eindeutige_kalender_gruppen_id,
+				COALESCE(json_agg(resource ORDER BY resource.beschreibung), '[]'::json) AS resources
+			FROM (
+				SELECT
+					betriebsmittel_kalender.*,
+					betriebsmittel.beschreibung,
+					betriebsmittel.verplanen
+				FROM lehre.tbl_betriebsmittel_kalender AS betriebsmittel_kalender
+				JOIN wawi.tbl_betriebsmittel AS betriebsmittel
+					ON betriebsmittel.betriebsmittel_id = betriebsmittel_kalender.betriebsmittel_id
+				WHERE betriebsmittel.verplanen = TRUE
+			) AS resource
+			GROUP BY resource.eindeutige_kalender_gruppen_id
+		) AS resource_data_agg";
+
+		$this->_ci->KalenderModel->addJoin(
+			$subQueryResource,
+			'resource_data_agg.eindeutige_kalender_gruppen_id = tbl_kalender.eindeutige_gruppen_id',
+			'LEFT'
+		);
+		// End of operational resources inclusion
+
+		
 		$this->_ci->KalenderModel->db->where('tbl_kalender.von >=', $start_date);
 		$this->_ci->KalenderModel->db->where('tbl_kalender.bis <', $end_date);
 	}
@@ -190,6 +253,8 @@ class KalenderLib
 			{
 				$von = new DateTime($row->von);
 				$bis = new DateTime($row->bis);
+				$resources = isset($row->resources) ? $row->resources : [];
+				$parsedResources = is_string($resources) ? json_decode($resources, true) : $resources;
 
 				$events[$id] = (object) [
 					'kalender_id' => $id,
@@ -235,6 +300,8 @@ class KalenderLib
 					'collisions' => false,
 					'has_assigned_resources' => isset($row->has_assigned_resources) ? $row->has_assigned_resources : false,
 					'updateamum' => isset($row->updateamum) ? $row->updateamum : null,
+					'resources' => is_array($parsedResources) ? $parsedResources : [],
+					'tags' => isset($row->tags) ? $row->tags : [],
 				];
 			}
 
@@ -566,15 +633,6 @@ class KalenderLib
 
 		$this->_ci->KalenderModel->db->where_not_in('status_kurzbz', array('deleted'));
 
-		$this->_ci->KalenderModel->addSelect([ 
-			"(
-				SELECT COUNT(*) FROM lehre.tbl_betriebsmittel_kalender 
-				WHERE tbl_betriebsmittel_kalender.eindeutige_kalender_gruppen_id = tbl_kalender.eindeutige_gruppen_id
-			) AS has_assigned_resources"
-		]);
-
-		$this->_ci->KalenderModel->addOrder('tbl_kalender.eindeutige_gruppen_id', 'DESC');
-		
 		$data = $this->_ci->KalenderModel->load();
 
 		return $this->_mapEvents($data);
@@ -1382,16 +1440,6 @@ class KalenderLib
 					return $specialgroupresult;
 				}
 			}
-
-		/*	foreach ($specialGroups as $group)
-			{
-				$this->_addSpecialGroupToEvent($kalender_id, $group['gruppe_kurzbz'], $group['rolle']);
-			}
-
-			foreach ($groups as $group)
-			{
-				$this->_addGroupToEvent($kalender_id, $group['stg_kz'], $group['semester'], $group['verband'], $group['gruppe'], $group['rolle']);
-			}*/
 
 			if (isSuccess($kalendereventresult) && !is_null($ort_kurzbz))
 			{

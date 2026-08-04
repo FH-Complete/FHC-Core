@@ -61242,6 +61242,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 	),
 	array(
 		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'tags_assignment_modal_title',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Tag-Zuweisung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Tag Assignment',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
 		'category' => 'lvplan',
 		'phrase' => 'room_reservation_restricted_to_period',
 		'insertvon' => 'system',
@@ -61255,6 +61275,66 @@ I have been informed that I am under no obligation to consent to the transmissio
 			array(
 				'sprache' => 'English',
 				'text' => 'Room reservation is limited to the period from {start_date} to {end_date}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'assigned_tags_subtitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zugewiesene Tags',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Assigned Tags',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'no_assigned_tags',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine zugewiesenen Tags',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No Assigned Tags',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'tags',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Tags',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Tags',
 				'description' => '',
 				'insertvon' => 'system'
 			)

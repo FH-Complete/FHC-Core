@@ -14,60 +14,51 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import CoreSearchbar from "../searchbar/searchbar.js";
-import NavLanguage from "../navigation/Language.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
 import FhcCalendar from "../Calendar/Tempus.js";
-import FhcCoursepicker from "./Coursepicker.js";
-import LectureSelection from "./Filters/LectureSelection.js";
-import VerbandSelection from "./Filters/VerbandSelection.js";
-import RoomSelection from "./Filters/RoomSelection.js";
-import ParkingSlot from "./ParkingSlot.js";
 import ApiKalender from "../../api/factory/tempus/kalender.js";
 import ApiSearchbar from "../../api/factory/searchbar.js";
 import ApiRenderers from "../../api/factory/renderers.js";
 import ApiTempusConfig from "../../api/factory/tempus/config.js";
 import ApiBetriebsmittel from "../../api/factory/betriebsmittel.js";
-import ApiOperationalResourceToCalender from "../../api/factory/operationalResourceToCalender.js";
-import AppMenu from "../AppMenu.js";
 import drop from "../../directives/drop.js";
 import AppConfig from "../AppConfig.js";
 import BsModal from "../Bootstrap/Modal.js";
 
-import StvVerband from "../Stv/Studentenverwaltung/Verband.js";
 import ApiStudiengangTree from "../../api/factory/tempus/studiengangtree.js";
 import ApiInfo from "../../api/factory/tempus/info.js";
-import StvStudiensemester from "../Stv/Studentenverwaltung/Studiensemester.js";
-import FormInput from "../../../js/components/Form/Input.js";
 import Reservierung from "./Reservierung.js";
 import { getTempusShortcuts } from "./shortcuts.js";
 import KeyboardShortcuts from "./KeyboardShortcuts.js";
 import { useContextMenuActions } from "../../composables/Tempus/ContextMenuActions.js";
 import MultiWeekPlanModal from "./MultiWeekPlanModal.js";
+import HistoryModal from "./HistoryModal.js";
+import ResourcesAssignmentModal from "./ResourcesAssignmentModal.js";
+import TagsAssignmentModal from "./TagsAssignmentModal.js";
 import { getTempusSearchbarOptions } from "./Filters/searchbarOptions.js";
+import TempusHeader from "./Header.js";
+import TempusAppMenu from "./AppMenu.js";
+import TempusVerbandMenu from "./VerbandMenu.js";
+import TempusSidebarMenu from "./SidebarMenu.js";
 
 export default {
   name: "Tempus",
   components: {
-    CoreSearchbar,
     VerticalSplit,
     FhcCalendar,
-    FhcCoursepicker,
-    LectureSelection,
-    VerbandSelection,
-    RoomSelection,
-    ParkingSlot,
     AppConfig,
-    AppMenu,
-    NavLanguage,
+    TempusAppMenu,
+    TempusHeader,
     BsModal,
-    StvVerband,
-    StvStudiensemester,
+    TempusVerbandMenu,
+    TempusSidebarMenu,
     Multiselect: primevue.multiselect,
-    FormInput,
     Reservierung,
     KeyboardShortcuts,
     MultiWeekPlanModal,
+    HistoryModal,
+    ResourcesAssignmentModal,
+    TagsAssignmentModal,
   },
   props: {
     defaultSemester: String,
@@ -92,8 +83,9 @@ export default {
       appConfig: Vue.computed(() => this.appconfig),
       contextMenuActions: useContextMenuActions({
         openRaumauswahl: (orig) => this.openRaumauswahl(orig),
-		openResourcesAssignmentModal: (orig) =>
-          this.openResourcesAssignmentModal(orig),
+		    openResourcesAssignmentModal: (orig) =>
+          this.$refs.resourcesAssignmentModal?.open(orig),
+        openTagsModal: (orig) => this.$refs.tagsAssignmentModal?.open(orig),
         openHistory: (orig) => this.openHistory(orig),
         deleteEntry: (orig) => this.deleteEntry(orig),
         syncToLecturer: (orig) => this.syncToLecturer(orig),
@@ -161,14 +153,6 @@ export default {
         endTime: null,
       },
       studiengaenge_all: [],
-      resourcesAssignmentModal: {
-        calendar: null,
-        availableResources: [],
-        filteredAvailableResources: [],
-        selectedAvailableResource: null,
-        assignedResources: [],
-        areFormButtonsDisplayed: false,
-      },
     };
   },
   computed: {
@@ -203,17 +187,6 @@ export default {
     searchbaroptions() {
       return getTempusSearchbarOptions(this);
     },
-    dropdownParsedAvailableResources() {
-      return this.resourcesAssignmentModal.availableResources
-        .map((unit) => {
-          return {
-            label: unit.beschreibung,
-            value: unit.betriebsmittel_id,
-            data: unit,
-          };
-        })
-        .sort((a, b) => a.label?.localeCompare(b.label));
-    },
   },
   methods: {
     async openRaumauswahl(orig) {
@@ -227,27 +200,12 @@ export default {
           this.$refs.raumModal.show();
         });
     },
-    async openResourcesAssignmentModal(orig) {
-      if (!orig?.kalender_id) return;
-
-      this.resourcesAssignmentModal.calendar = orig;
-      this.resourcesAssignmentModal.availableResources =
-        await this.fetchSchedulableResourcesByCalender(orig.kalender_id);
-      this.resourcesAssignmentModal.filteredAvailableResources = [
-        ...this.dropdownParsedAvailableResources,
-      ];
-
-      this.resourcesAssignmentModal.assignedResources =
-        await this.fetchAssignedResourcesByCalender(orig.kalender_id);
-
-      this.$refs.resourcesAssignmentModal.show();
-    },
     async deleteEntry(orig) {
       if (!orig?.kalender_id) return;
 
       await this.deleteEntryCall(orig);
       this.$refs.calendar.resetEventLoader();
-      this.$refs.coursepicker.reload();
+      this.$refs.sidebar.reloadCoursepicker();
     },
     async deleteEntries(origList) {
       let validList = (origList ?? []).filter((orig) => orig?.kalender_id);
@@ -257,13 +215,16 @@ export default {
         validList.map((orig) => this.deleteEntryCall(orig)),
       );
       this.$refs.calendar.resetEventLoader();
-      this.$refs.coursepicker.reload();
+      this.$refs.sidebar.reloadCoursepicker();
     },
     async deleteEntryCall(orig) {
       await this.$api
         .call(ApiKalender.deleteEntry(orig.kalender_id))
         .then(() => {
-          this.$refs.parking.unpark({ type: orig.type, id: orig.kalender_id });
+          this.$refs.sidebar.unpark({
+            type: orig.type,
+            id: orig.kalender_id,
+          });
         });
     },
     async openHistory(orig) {
@@ -272,7 +233,7 @@ export default {
         .call(ApiKalender.getHistory(orig.kalender_id))
         .then((result) => {
           this.historyEntries = result.data ?? [];
-          this.$refs.historyModel.show();
+          this.$refs.historyModal.show();
         });
     },
     syncToLecturer(orig) {
@@ -304,12 +265,6 @@ export default {
       this.ort_kurzbz = data.ort_kurzbz;
       this.rooms = [{ ort_kurzbz: data.ort_kurzbz }];
     },
-    onSelectVerbandAndClose(payload) {
-      console.log(payload);
-      this.onSelectVerband(payload);
-      bootstrap.Offcanvas.getOrCreateInstance(this.$refs.verbandMenu).hide();
-    },
-
     onSelectVerband({ link, studiengang_kz, semester, orgform_kurzbz, name }) {
       if (orgform_kurzbz) {
         semester = null;
@@ -570,7 +525,7 @@ export default {
         dates.end_time,
         () => {
           this.$refs.calendar.resetEventLoader();
-          this.$refs.coursepicker.reload();
+          this.$refs.sidebar.reloadCoursepicker();
         },
       );
     },
@@ -639,7 +594,7 @@ export default {
           .then((result) => result.data)
           .then((result) => {
             this.$refs.calendar.resetEventLoader();
-            this.$refs.coursepicker.reload();
+            this.$refs.sidebar.reloadCoursepicker();
             this.bcc.postMessage("dropped");
           });
       } else if (obj.type === "kalender") {
@@ -650,7 +605,7 @@ export default {
           start_time,
           end_time,
           () => {
-            this.$refs.parking.unpark({
+            this.$refs.sidebar.unpark({
               type: obj.type,
               id: obj.orig.kalender_id,
             });
@@ -674,7 +629,7 @@ export default {
     },
     onMultiWeekConfirmed() {
       this.$refs.calendar.resetEventLoader();
-      this.$refs.coursepicker.reload();
+      this.$refs.sidebar.reloadCoursepicker();
       this.bcc.postMessage("dropped");
     },
     handleRange(range) {
@@ -787,138 +742,6 @@ export default {
       this.extraBackgrounds = res;
     },
 
-    async fetchAssignedResourcesByCalender(calenderId) {
-      let getAssignedResources = await this.$api.call(
-        ApiOperationalResourceToCalender.getAssignedResourcesByCalender(
-          calenderId,
-        ),
-      );
-      if (getAssignedResources.meta.status === "success") {
-        return getAssignedResources.data
-          .filter((unit) => !!unit)
-          .map((unit) => {
-            return {
-              isNoteTextareaShown:
-                unit.anmerkung && unit.anmerkung.trim() !== "",
-              ...unit,
-            };
-          })
-          .filter((unit) => !!unit);
-      } else {
-        this.$fhcAlert.alertError(
-          this.$p.t("ui", "failed_assigned_resources_fetch_error_message"),
-        );
-      }
-
-      return [];
-    },
-    async fetchSchedulableResourcesByCalender(calendarID) {
-      let getSchedulableResourcesByCalendar = await this.$api.call(
-        ApiOperationalResourceToCalender.getSchedulableResourcesByCalendar(
-          calendarID,
-        ),
-      );
-      if (getSchedulableResourcesByCalendar.meta.status === "success") {
-        return getSchedulableResourcesByCalendar.data;
-      } else {
-        this.$fhcAlert.alertError(
-          this.$p.t("ui", "failed_schedulable_resources_fetch_error_message"),
-        );
-      }
-
-      return [];
-    },
-    filterAvailableResources(event) {
-      this.resourcesAssignmentModal.filteredAvailableResources;
-      const query = event.query.toLowerCase();
-      if (!query) {
-        return (this.resourcesAssignmentModal.filteredAvailableResources = [
-          ...this.dropdownParsedAvailableResources.filter((unit) => {
-            return !this.resourcesAssignmentModal.assignedResources.some(
-              (assigned) => assigned.betriebsmittel_id === unit.value,
-            );
-          }),
-        ]);
-      }
-
-      return (this.resourcesAssignmentModal.filteredAvailableResources =
-        this.dropdownParsedAvailableResources
-          .filter((unit) => {
-            return !this.resourcesAssignmentModal.assignedResources.some(
-              (assigned) => assigned.betriebsmittel_id === unit.value,
-            );
-          })
-          .filter((unit) => {
-            return unit.label.toLowerCase().includes(query);
-          }));
-    },
-    toggleAssignedResourceNoteInput(resource) {
-      const index = this.resourcesAssignmentModal.assignedResources.findIndex(
-        (assigned) => assigned.betriebsmittel_id === resource.betriebsmittel_id,
-      );
-      if (index !== -1) {
-        this.resourcesAssignmentModal.assignedResources[
-          index
-        ].isNoteTextareaShown =
-          !this.resourcesAssignmentModal.assignedResources[index]
-            .isNoteTextareaShown;
-      }
-
-      this.resourcesAssignmentModal.areFormButtonsDisplayed = true;
-    },
-    removeAssignedResource(resource) {
-      this.resourcesAssignmentModal.assignedResources =
-        this.resourcesAssignmentModal.assignedResources.filter(
-          (assigned) =>
-            assigned.betriebsmittel_id !== resource.betriebsmittel_id,
-        );
-
-      this.resourcesAssignmentModal.areFormButtonsDisplayed = true;
-    },
-    async refreshResourcesAssignmentModalData(calenderItem) {
-      this.resourcesAssignmentModal.availableResources =
-        await this.fetchSchedulableResourcesByCalender(
-          calenderItem.kalender_id,
-        );
-      this.resourcesAssignmentModal.filteredAvailableResources = [
-        ...this.dropdownParsedAvailableResources,
-      ];
-
-      this.resourcesAssignmentModal.assignedResources =
-        await this.fetchAssignedResourcesByCalender(calenderItem.kalender_id);
-      this.resourcesAssignmentModal.selectedAvailableResource = null;
-      this.resourcesAssignmentModal.areFormButtonsDisplayed = false;
-    },
-	async saveAssignedResourcesToCalendarItem(calenderItem, assignedResources) {
-      let getSchedulableResourcesByCalendar = await this.$api.call(
-        ApiOperationalResourceToCalender.storeResourcesToCalendarRelationship(
-          calenderItem.kalender_id,
-          assignedResources,
-        ),
-      );
-      if (getSchedulableResourcesByCalendar.meta.status === "success") {
-        this.$fhcAlert.alertSuccess(
-          this.$p.t("ui", "assigned_resources_save_success_message"),
-        );
-        await this.refreshResourcesAssignmentModalData(calenderItem);
-      } else {
-        this.$fhcAlert.alertError(
-          this.$p.t("ui", "failed_assigned_resources_save_error_message"),
-        );
-      }
-
-      this.$refs.calendar.resetEventLoader();
-      this.$refs.resourcesAssignmentModal.hide();
-    },
-    closeResourcesAssignmentModal() {
-      this.resourcesAssignmentModal = {
-        availableResources: [],
-        filteredAvailableResources: [],
-        selectedAvailableResource: null,
-        assignedResources: [],
-        areFormButtonsDisplayed: false,
-      };
-    },
     removeLecturer(uid) {
       if (uid == null) {
         for (const lect of this.lecturers) delete this.overlayCache[lect.uid];
@@ -932,6 +755,10 @@ export default {
         delete this.overlayCache[uid];
         this.$refs.calendar.resetEventLoader();
       }
+    },
+    handlePreviewRoleChange(role) {
+      this.previewRole = role;
+      this.$refs.calendar.resetEventLoader();
     },
     triggerSync() {
       this.$api
@@ -950,10 +777,13 @@ export default {
       const event = this.hoveredEvent;
       if (!event?.kalender_id) return;
 
-      if (this.$refs.parking.isParked(event.kalender_id)) {
-        this.$refs.parking.unpark({ type: event.type, id: event.kalender_id });
+      if (this.$refs.sidebar.isParked(event.kalender_id)) {
+        this.$refs.sidebar.unpark({
+          type: event.type,
+          id: event.kalender_id,
+        });
       } else {
-        this.$refs.parking.park(null, {
+        this.$refs.sidebar.park({
           type: "kalender",
           id: event.kalender_id,
           orig: event,
@@ -970,7 +800,7 @@ export default {
       this.hoveredEvent = null;
     },
     focusSearchbar() {
-      this.$refs.searchbar?.$refs?.input.focus();
+      this.$refs.header?.focusSearchbar();
     },
   },
   watch: {
@@ -988,19 +818,6 @@ export default {
       handler() {
         this.$refs.calendar.resetEventLoader();
       },
-    },
-	"resourcesAssignmentModal.selectedAvailableResource": function (newVal) {
-      if (!newVal) return;
-
-      this.resourcesAssignmentModal.assignedResources.push({
-        betriebsmittel_kalender_id: null,
-        betriebsmittel_id: newVal.data.betriebsmittel_id,
-        beschreibung: newVal.data.beschreibung,
-        anmerkung: "",
-        isNoteTextareaShown: false,
-      });
-
-      this.resourcesAssignmentModal.areFormButtonsDisplayed = true;
     },
   },
   mounted() {
@@ -1077,198 +894,41 @@ export default {
       this.studiengaenge_all = res.data;
     });
   },
-  template: `
+  template: /* html */`
 	<div
     class="tempus"
     data-cy="tempus"
   >
 		<keyboard-shortcuts :shortcuts="keyboardShortcuts" />
-		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
-			<div class="col-md-4 col-lg-3 col-xl-2 d-flex align-items-center">
-				<button
-					class="btn btn-outline-light border-0 m-1 collapsed"
-					type="button"
-					data-bs-toggle="offcanvas"
-					data-bs-target="#appMenu"
-					aria-controls="appMenu"
-					aria-expanded="false"
-					:aria-label="$p.t('ui/toggle_nav')"
-				>
-					<span class="svg-icon svg-icon-apps"></span>
-				</button>
-				<a class="navbar-brand me-0" :href="tempusRoot">Tempus</a>
-			</div>
-			<button
-				class="btn btn-outline-light border-0 d-md-none m-1 collapsed"
-				type="button"
-				data-bs-toggle="offcanvas"
-				data-bs-target="#sidebarMenu"
-				aria-controls="sidebarMenu"
-				aria-expanded="false"
-				:aria-label="$p.t('ui/toggle_nav')"
-			>
-				<span class="fa-solid fa-table-list"></span>
-			</button>
-			<core-searchbar
-				ref="searchbar"
-				:searchoptions="searchbaroptions"
-				:searchfunction="searchfunction"
-				class="searchbar position-relative w-100"
-				show-btn-submit
-			></core-searchbar>
-			<div id="nav-user" class="dropdown">
-				<button
-					id="nav-user-btn"
-					class="btn btn-link rounded-0 py-0"
-					type="button"
-					data-bs-toggle="dropdown"
-					data-bs-target="#nav-user-menu"
-					aria-expanded="false"
-					aria-controls="nav-user-menu"
-				>
-					<img
-						:src="avatarUrl"
-						:alt="$p.t('profilUpdate/profilBild')"
-						class="bg-light avatar rounded-circle border border-light"
-					/>
-				</button>
-				<ul
-					ref="navUserDropdown"
-					class="dropdown-menu dropdown-menu-dark dropdown-menu-end rounded-0 text-center m-0"
-					aria-labelledby="nav-user-btn"
-				>
-					<li>
-						<button
-							type="button"
-							class="dropdown-item"
-							data-bs-toggle="modal"
-							data-bs-target="#configModal"
-						>
-							{{ $p.t('ui/settings') }}
-						</button>
-					</li>
-					<li><hr class="dropdown-divider m-0"/></li>
-					<li>
-						<nav-language
-							item-class="dropdown-item border-left-dark"
-						/>
-					</li>
-					<li><hr class="dropdown-divider m-0"/></li>
-					<li>
-						<a class="dropdown-item" :href="logoutUrl">
-							{{ $p.t('ui/logout') }}
-						</a>
-					</li>
-				</ul>
-			</div>
-		</header>
+		<tempus-header
+			ref="header"
+			:tempus-root="tempusRoot"
+			:avatar-url="avatarUrl"
+			:logout-url="logoutUrl"
+			:searchbaroptions="searchbaroptions"
+			:searchfunction="searchfunction"
+		/>
 		<div class="container-fluid overflow-hidden heightfull">
 			<div class="row h-100">
-				<aside id="appMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">
-					<div class="offcanvas-header">
-						Tempus
-						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
-					</div>
-					<div class="offcanvas-body">
-						<app-menu app-identifier="tempus" />
-					</div>
-				</aside>
-				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100 d-flex flex-column">
-					<div class="sidebar-icons d-flex flex-row align-items-start py-2 gap-1 ps-2">
-						<button
-							class="btn btn-outline-secondary"
-							type="button"
-							data-bs-toggle="offcanvas"
-							data-bs-target="#verbandMenu"
-							aria-controls="verbandMenu"
-							aria-expanded="false"
-							title="Verband"
-						>
-							<span class="fa-solid fa-university"></span>
-						</button>
-						<button
-							class="btn btn-outline-secondary"
-							type="button"
-							data-bs-toggle="offcanvas"
-							data-bs-target="#verbandMenu"
-							aria-controls="verbandMenu"
-							aria-expanded="false"
-							title="Verband"
-						>
-							<span class="fa-solid fa-door-open"></span>
-						</button>
-					</div>
-					<div class="px-2 py-1 w-100">
-						<!--<Multiselect
-							:model-value="visibleStatusValue"
-							@update:model-value="val => toggleStatus(val.map(o => o.key))"
-							option-label="label"
-							:options="visibleStatusOptions"
-							placeholder="Status filtern"
-							:hide-selected="false"
-							:show-toggle-all="false"
-							class="w-100"
-						/>-->
-						
-						<div
-              class="d-flex gap-1 py-1"
-              data-cy="previewRoleOptionsHolder"
-            >
-							<button
-								class="btn btn-sm"
-								:class="previewRole === 'planer' ? 'btn-dark' : 'btn-outline-dark'"
-								@click="previewRole = 'planer'; $refs.calendar.resetEventLoader()"
-							>
-								<i class="fa-solid fa-pen-ruler me-1"></i>Planer
-							</button>
-							<button
-								class="btn btn-sm"
-								:class="previewRole === 'lektor' ? 'btn-primary' : 'btn-outline-primary'"
-								@click="previewRole = 'lektor'; $refs.calendar.resetEventLoader()"
-							>
-								<i class="fa-solid fa-chalkboard-user me-1"></i>Lektor
-							</button>
-							<button
-								class="btn btn-sm"
-								:class="previewRole === 'student' ? 'btn-success' : 'btn-outline-success'"
-								@click="previewRole = 'student'; $refs.calendar.resetEventLoader()"
-							>
-								<i class="fa-solid fa-user-graduate me-1"></i>Student
-							</button>
-							<button
-								class="btn btn-sm btn-outline-danger"
-								@click="triggerSync"
-							>
-								<i class="fa-solid fa-rotate me-1"></i>Sync
-							</button>
-						</div>
-					</div>
-					<room-selection
-						v-if="rooms.length"
-						v-model:rooms="rooms"
-					></room-selection>
-					<verband-selection
-						v-if="studiengaenge.length"
-						v-model:studiengaenge="studiengaenge"
-						:studiengaenge-all="studiengaenge_all"
-					></verband-selection>
-					<lecture-selection
-						v-if="lecturers.length"
-						:lecturers="lecturers"
-						@remove="removeLecturer"
-					></lecture-selection>
-					<div class="d-flex flex-column flex-grow-1" style="min-height: 0">
-						<parking-slot
-							ref="parking"
-							v-model:parked-keys="parkedKeys"
-						></parking-slot>
-						
-						<fhc-coursepicker ref="coursepicker" :studiengaenge="studiengaenge" @select-lecturer="setEmp" @select-kw="jumpToKw" :studiensemester="selectedStudiensemester"></fhc-coursepicker>
-
-					</div>
-					<stv-studiensemester v-model:studiensemester-kurzbz="selectedStudiensemester"></stv-studiensemester>
-
-				</nav>
+				<tempus-app-menu />
+				<tempus-sidebar-menu
+					ref="sidebar"
+					:preview-role="previewRole"
+					:rooms="rooms"
+					:studiengaenge="studiengaenge"
+					:studiengaenge-all="studiengaenge_all"
+					:lecturers="lecturers"
+					:selected-studiensemester="selectedStudiensemester"
+					@update:preview-role="handlePreviewRoleChange"
+					@update:rooms="rooms = $event"
+					@update:studiengaenge="studiengaenge = $event"
+					@update:parked-keys="parkedKeys = $event"
+					@update:selected-studiensemester="selectedStudiensemester = $event"
+					@remove-lecturer="removeLecturer"
+					@select-lecturer="setEmp"
+					@select-kw="jumpToKw"
+					@sync="triggerSync"
+				/>
 				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
 					<fhc-calendar
 						ref="calendar"
@@ -1293,16 +953,10 @@ export default {
 			</div>
 		</div>
 		<app-config ref="config" v-model="appconfig" :endpoints="configEndpoints"></app-config>
-		<div id="verbandMenu" ref="verbandMenu" class="offcanvas offcanvas-start col-md p-md-0 h-100" tabindex="-1" data-cy="verbandMenu">
-			<div class="offcanvas-header justify-content-end px-1 d-md-none">
-				<h5 class="offcanvas-title" id="verbandMenuLabel">
-					<i class="fa-solid fa-university me-2"></i>Verband
-				</h5>
-				<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
-			</div>
-			<stv-verband :endpoint="endpoint" @select-verband="onSelectVerbandAndClose" class="col" style="height:0%"></stv-verband>
-		</div>
-
+		<tempus-verband-menu
+			:endpoint="endpoint"
+			@select-verband="onSelectVerband"
+		/>
 		<bs-modal ref="raumModal" class="bootstrap-prompt">
 			<template #title>Raumauswahl</template>
 			<template #default>
@@ -1321,94 +975,15 @@ export default {
 				<p v-else class="text-muted mb-0">Keine freien Räume gefunden.</p>
 			</template>
 		</bs-modal>
-		 <bs-modal 
+    <resources-assignment-modal
       ref="resourcesAssignmentModal"
-      @hideBsModal="closeResourcesAssignmentModal"
-      class="bootstrap-prompt"
-      data-cy="resourcesAssignmentModal"
-    >
-			<template #title>{{$p.t('ui', 'resource_assignment_modal_title')}}</template>
-			<template #default>
-        <div class="mb-5">
-          <form-input
-            v-if="resourcesAssignmentModal.availableResources.length"
-            @itemSelect="(option) => { resourcesAssignmentModal.selectedAvailableResource = option.value; }"
-            :label="$p.t('ui', 'available_resources_label')"
-            :suggestions="resourcesAssignmentModal.filteredAvailableResources"
-            :optionValue="(option) => option.value"
-            :optionLabel="(option) => option.label" 
-            @complete="filterAvailableResources"
-            dropdown
-            forceSelection
-            type="autocomplete"
-            name="availableResources"  
-            :closeOnSelect="false"
-            >
-          </form-input>
-        </div>
-        <div>
-          <div class="d-flex align-items-center justify-content-between mb-2">
-            <h6 class="mb-2 mx-auto text-bold fw-1">{{$p.t('ui', 'assigned_resources_subtitle')}}</h6>
-          </div>
-          <div v-if="resourcesAssignmentModal.assignedResources.length" class="mb-4">
-            <div
-              v-for="resource in resourcesAssignmentModal.assignedResources"
-              :key="resource.betriebsmittel_id"
-              class=" shadow-sm p-2 mb-2 bg-body rounded"
-            >
-              <div class="d-flex justify-content-between align-items-center mb-1">
-                <p class="m-0">{{ resource.beschreibung }}</p>
-                <div class="d-flex justify-content-between align-items-center gap-2">
-                  <a href="#" @click.prevent="toggleAssignedResourceNoteInput(resource)" class="ms-auto"><i class="fa fa-edit text-primary"></i></a>
-                  <a href="#" @click.prevent="removeAssignedResource(resource)" class="ms-auto"><i class="fa fa-trash text-danger"></i></a>
-                </div>
-              </div>
-              <form-input
-                v-if="resource.isNoteTextareaShown"
-                v-model="resource.anmerkung"
-                @input="this.resourcesAssignmentModal.areFormButtonsDisplayed = true"
-                :placeholder="$capitalize($p.t('global/anmerkung'))"
-                :rows="1"
-                class="flex-grow-1"
-                type="textarea"
-                name="anmerkung"  
-                >
-              </form-input>
-            </div>
-          </div>
-          <div v-else class="d-flex align-items-center justify-content-center mb-2">
-            <p class="text-muted mb-0">{{$p.t('ui', 'no_assigned_resources')}}</p>
-          </div>
-          <div v-if="resourcesAssignmentModal.areFormButtonsDisplayed" class="d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-secondary" @click="refreshResourcesAssignmentModalData(resourcesAssignmentModal.calendar)">{{$p.t('ui', 'abbrechen')}}</button>
-            <button type="button" class="btn btn-primary" @click="saveAssignedResourcesToCalendarItem(resourcesAssignmentModal.calendar, resourcesAssignmentModal.assignedResources)">{{$p.t('ui', 'speichern')}}</button>
-          </div>
-        </div>
-			</template>
-		</bs-modal>
-		<bs-modal ref="historyModel" class="bootstrap-prompt" dialogClass="modal-lg" data-cy="historyModal">
-			<template #title>History</template>
-			<template #default>
-				<table v-if="historyEntries.length" class="table table-bordered table-hover">
-					<thead class="table-light">
-						<tr>
-							<th>Von</th>
-							<th>Bis</th>
-							<th>Status</th>
-							<th>Ort</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr v-for="entry in historyEntries" :key="entry.id">
-							<td>{{ entry.von }}</td>
-							<td>{{ entry.bis }}</td>
-							<td>{{ entry.status_kurzbz }}</td>
-							<td>{{ entry.ort }}</td>
-						</tr>
-					</tbody>
-				</table>
-			</template>
-		</bs-modal>
+      @save-finished="$refs.calendar.resetEventLoader()"
+    />
+    <tags-assignment-modal
+      ref="tagsAssignmentModal"
+      @tags-changed="$refs.calendar.resetEventLoader()"
+    />
+		<history-modal ref="historyModal" :entries="historyEntries" />
 		<reservierung
 			ref="reservierung"
 			:rooms="rooms"

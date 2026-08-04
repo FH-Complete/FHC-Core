@@ -9,6 +9,7 @@
 		'tabulator5' => true,
 		'vuedatepicker11' => true,
 		'momentjs2' => true,
+		'tags' => true,
 		'phrases' => array(
 			'global',
 			'ui',

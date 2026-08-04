@@ -177,6 +177,17 @@ VALUES
 (51006, 31),
 (51004, 32);
 
+-- Calendar setup for tags tests
+INSERT INTO lehre.tbl_kalender
+(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, eindeutige_gruppen_id, insertamum, insertvon, updateamum, updatevon)
+VALUES
+(date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '16:55:00', date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '17:40:00', 'lehreinheit', 'live', NULL, 'ec1bd001-facf-4b21-a671-bcb2d4f037fd', now(), 'demoadmin', NULL, 'demoadmin');
+
+INSERT INTO lehre.tbl_kalender_lehreinheit
+(lehreinheit_id, kalender_id)
+VALUES
+(51004, 33);
+
 -- INSERT INTO public.tbl_variablenname
 -- (name, defaultwert)
 -- VALUES('ignore_resources_collisions', 'false');

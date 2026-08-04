@@ -13,6 +13,11 @@ export function useContextMenuActions(handlers)
 				action: handlers.openResourcesAssignmentModal
 			},
 			{
+				label: 'Tags',
+				icon: 'fa-solid fa-tags',
+				action: handlers.openTagsModal
+			},
+			{
 				label: 'Freischalten für Voransicht',
 				icon: 'fa-solid fa-chalkboard-user',
 				action: handlers.syncToLecturer

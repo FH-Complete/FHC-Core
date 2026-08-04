@@ -77,7 +77,43 @@ export default {
 			return luxon.Duration
 				.fromISOTime(this.event.ende)
 				.toISOTime({ suppressSeconds: true });
-		}
+		},
+		tags() {
+			if (typeof this.event.tags === 'string') {
+				try {
+					return JSON.parse(this.event.tags);
+				} catch (e) {
+					console.error('Failed to parse tags:', e);
+					return [];
+				}
+			}
+			
+			return this.event.tags || [];
+		},
+		tagsTooltip() {
+			if (this.tags.length === 0) {
+				return '';
+			}
+
+			return this.tags.map(tag => tag.beschreibung).join("\n");
+		},
+		resourcesTooltip() {
+			if (!this.event.resources || this.event.resources.length === 0) {
+				return '';
+			}
+
+			let resources = this.event.resources;
+			if (typeof this.event.resources === 'string') {
+				try {
+					resources = JSON.parse(this.event.resources);
+				} catch (e) {
+					console.error('Failed to parse resources:', e);
+					return '';
+				}
+			}
+
+			return resources.map(resource => resource.beschreibung).join("\n");
+		},
 	},
 	template: /*html*/`
 	<div
@@ -85,9 +121,16 @@ export default {
 		class="position-relative"
 		@wheel.stop
 	>
-		<div v-if="event.has_assigned_resources" class="position-absolute top-0 start-0 m-1" >
+		<div v-if="event.has_assigned_resources || tags?.length" class="position-absolute top-0 start-0 m-1 d-flex gap-1" >
 			<i
-			  class="fa-solid fa-table-list text-muted"
+				v-tooltip="resourcesTooltip"
+				v-if="event.has_assigned_resources"
+			  	class="fa-solid fa-table-list text-muted"
+			></i>
+			<i 
+				v-tooltip="tagsTooltip"
+				v-if="tags?.length"
+				class="fa-solid fa-tags"
 			></i>
 		</div>
 		<div

@@ -73,6 +73,14 @@ class TempusPage {
       url: "**/tempus/OperationalResourceToCalenderAPI/getAssignedResourcesByCalender/**",
     }).as("fetchAssignedResources");
     cy.intercept({
+      method: "GET",
+      url: "**/tempus/Tags/getTags**",
+    }).as("fetchTags");
+    cy.intercept({
+      method: "GET",
+      url: "**/tempus/Tags/getTagsByCalendar/**",
+    }).as("fetchTagsByCalendar");
+    cy.intercept({
       method: "POST",
       url: "**/tempus/coursepicker/getByStg**",
     }).as("fetchCoursePickerCourses");
@@ -345,6 +353,8 @@ class TempusPage {
     cy
       .get("[data-cy='resourcesAssignmentModal']")
       .closest(".bootstrap-modal.show");
+  getTagsModal = () =>
+    cy.get("[data-cy='tagsAssignmentModal']").closest(".bootstrap-modal.show")
   getCalendarEventRoom = (id) =>
     this.getCalendarEventById(id).find("[data-cy='calendar-event-room']");
   getStundenrasterToggle = () =>

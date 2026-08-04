@@ -14,6 +14,10 @@ export default {
 		'deleted',
 	],
 	props: {
+		isListItemShown: {
+			type: Boolean,
+			default: true
+		},
 		endpoint: {
 			type: Object,
 			required: true
@@ -71,7 +75,7 @@ export default {
 				'id': tag_id
 			};
 
-			this.$api.call(this.endpoint.getTag(getData))
+			await this.$api.call(this.endpoint.getTag(getData))
 				.then(result => result.data)
 				.then(result => this.openModal(result))
 		},
@@ -119,7 +123,7 @@ export default {
 			{
 				postData.id = this.selectedTagId;
 				this.tagData.id = this.selectedTagId;
-				this.$api.call(this.endpoint.updateTag(postData));
+				await this.$api.call(this.endpoint.updateTag(postData));
 				this.$emit("updated", this.tagData);
 				this.$refs.tagModal.hide();
 			}
@@ -131,7 +135,7 @@ export default {
 						return;
 				}
 
-				this.$api.call(this.endpoint.addTag(postData))
+				await this.$api.call(this.endpoint.addTag(postData))
 					.then(response => response.data)
 					.then(response => {
 						if (typeof response === 'number') {
@@ -158,7 +162,7 @@ export default {
 				done: !this.tagData.done,
 				notiz: this.tagData.notiz,
 			}
-			this.$api.call(this.endpoint.doneTag(postData))
+			await this.$api.call(this.endpoint.doneTag(postData))
 			this.$emit("updated", this.tagData);
 			this.$refs.tagModal.hide();
 		},
@@ -167,7 +171,7 @@ export default {
 			let postData = {
 				id: this.selectedTagId
 			}
-			this.$api.call(this.endpoint.deleteTag(postData))
+			await this.$api.call(this.endpoint.deleteTag(postData))
 			this.$emit("deleted", this.selectedTagId)
 			this.$refs.tagModal.hide();
 		},
@@ -206,7 +210,7 @@ export default {
 		}
 	},
 	template: `
-		<div class="plus_button_container" @mouseleave="hideList">
+		<div v-if="isListItemShown" class="plus_button_container" @mouseleave="hideList">
 			<span :title="values.length === 0 ? 'Bitte Zeilen markieren' : ''">
 			<button @mouseover="showList = true" 
 					:disabled="!values || values.length === 0"

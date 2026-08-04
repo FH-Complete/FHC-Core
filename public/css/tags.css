@@ -17,6 +17,13 @@
 	transform: scale(1.15);
 }
 
+/* add prop that disasbles hover and cursor*/
+.tag.disabled:hover
+{
+	transform: none;
+	cursor: default;
+}
+
 .tag_rot {
 	background-color: #ff0000ff;
 }
