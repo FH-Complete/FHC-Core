@@ -792,7 +792,7 @@ export default {
 	</modal-loading>
 
     <div
-      class="tabulator-container d-flex flex-column h-100"
+      class="tabulator-container d-flex flex-column h-100 pe-2"
       :class="{'has-filter': filter.length}"
       tabindex="0"
       @focusin="onFocus"
@@ -834,7 +834,7 @@ export default {
      -->
 
        <template #additional>
-        <div class="pe-2">
+        <div class="pe-1">
           <a :href="linkXLS" target="_blank">
              <i class="fas fa-file-excel fa-xl text-success"   :title="$p.t('stv', 'text_exportXLS', { count: selectedPrestudents.length })"></i>
           </a>
