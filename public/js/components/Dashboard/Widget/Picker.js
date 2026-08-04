@@ -61,6 +61,19 @@ export default {
 					</div>
 					<template v-else>
 						<div
+							v-if="hiddenWidgets.length"
+							class="row g-2"
+							:class="widgets.length ? 'border-bottom pb-3 mb-3' : ''"
+						>
+							<div
+								v-for="widget in hiddenWidgets"
+								:key="widget.widget_id"
+								class="widget-icon-container col-sm-6 col-md-4 col-lg-3 col-xl-2"
+							>
+								<widget-icon @select="pick(widget)" :widget="widgets.find(w => w.widget_id == widget.widget)"></widget-icon>
+							</div>
+						</div>
+						<div
 							v-if="widgets.length"
 							class="row g-2"
 						>
@@ -70,19 +83,6 @@ export default {
 								class="widget-icon-container col-sm-6 col-md-4 col-lg-3 col-xl-2"
 							>
 								<widget-icon @select="pick" :widget="widget"></widget-icon>
-							</div>
-						</div>
-						<div
-							v-if="hiddenWidgets.length"
-							class="row g-2"
-							:class="widgets.length ? 'border-top mt-2' : ''"
-						>
-							<div
-								v-for="widget in hiddenWidgets"
-								:key="widget.widget_id"
-								class="widget-icon-container col-sm-6 col-md-4 col-lg-3 col-xl-2"
-							>
-								<widget-icon @select="pick(widget)" :widget="widgets.find(w => w.widget_id == widget.widget)"></widget-icon>
 							</div>
 						</div>
 					</template>
