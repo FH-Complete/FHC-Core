@@ -110,7 +110,8 @@ class KalenderLib
 												tbl_lehreinheitgruppe.verband as le_verband,
 												tbl_lehreinheitgruppe.gruppe as le_gruppe,
 												le_gruppe.direktinskription as le_direktinskription,
-												
+												tag_data_agg.tags as tags,
+												resource_data_agg.resources as resources
 												
 												');
 
@@ -195,7 +196,8 @@ class KalenderLib
 					nt.style,
 					n.erledigt AS done,
 					nt.prioritaet AS prioritaet,
-					nz.eindeutige_kalender_gruppen_id
+					nz.eindeutige_kalender_gruppen_id,
+					n.insertvon AS insertvon
 				FROM public.tbl_notizzuordnung AS nz
 				JOIN public.tbl_notiz AS n ON nz.notiz_id = n.notiz_id
 				JOIN public.tbl_notiz_typ AS nt ON n.typ = nt.typ_kurzbz " . $whereTags . "
@@ -298,8 +300,8 @@ class KalenderLib
 					'beschreibung' => isset($row->beschreibung) ? $row->beschreibung : '',
 					'topic' => [],
 					'collisions' => false,
-					'has_assigned_resources' => isset($row->has_assigned_resources) ? $row->has_assigned_resources : false,
 					'updateamum' => isset($row->updateamum) ? $row->updateamum : null,
+					'has_assigned_resources' => !empty($parsedResources),
 					'resources' => is_array($parsedResources) ? $parsedResources : [],
 					'tags' => isset($row->tags) ? $row->tags : [],
 				];

@@ -9,6 +9,8 @@ class LvPlanHTMLLib
 	const DETAIL_WINDOW_NAME = 'Details';
 	const DETAIL_WINDOW_OPTIONS = 'height=320,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes';
 
+	CONST NOTICE_TAG_ICON = '📝';
+
 	private $ci;
 
 	public function __construct()
@@ -191,6 +193,12 @@ class LvPlanHTMLLib
 			if ($title === '')
 				$title = $this->getScalar($event, 'lehrfach_bez');
 
+			$infoTag = $this->getOldTempusNoticeTag($event);
+			if (!empty($infoTag))
+			{
+				$title .= ' ' . self::NOTICE_TAG_ICON;
+			}
+
 			$normalized[] = array(
 				'start' => $start,
 				'end' => $end,
@@ -207,7 +215,8 @@ class LvPlanHTMLLib
 				'participants' => $this->getParticipants($event),
 				'groups' => $this->getGroups($event),
 				'note' => $this->getEventNote($event, $isReservation),
-				'color' => $this->getColor($event)
+				'color' => $this->getColor($event),
+				'infoTagTitle' => !empty($infoTag) && isset($infoTag['notiz']) ? $infoTag['notiz'] : '',
 			);
 		}
 
@@ -473,7 +482,17 @@ class LvPlanHTMLLib
 			: '';
 		$html = '<div align="center"'.$style.'>';
 		$detailUrl = $this->buildDetailUrl($event, $type, $filters, $hourNumber);
-		$html .= '<a class="stpl_detail" title="'.$this->escape($event['note']).'"';
+
+		$linkTitle = $this->escape($event['note']);
+		$infoTagTitle = isset($event['infoTagTitle']) && $event['infoTagTitle'] !== ''
+			? $event['infoTagTitle']
+			: null;
+		if ($infoTagTitle !== null)
+		{
+			$linkTitle = $this->escape($infoTagTitle);
+		}
+
+		$html .= '<a class="stpl_detail" title="'.$linkTitle.'"';
 		if ($detailUrl !== null)
 		{
 			$onclick = 'window.open('
@@ -824,5 +843,22 @@ class LvPlanHTMLLib
 		return '@page{size:landscape;margin:10mm}'
 			.'.outside{margin-top:10px}.outside>div{display:inline-block;vertical-align:top;min-width:180px;margin:0 3px 3px 0;padding:3px}'
 			.'@media print{.outside>div{break-inside:avoid}}';
+	}
+
+	private function getOldTempusNoticeTag($event)
+	{
+		if (empty($event->tags)) return null;
+
+		$parsedTags = $event->tags;
+		if (!is_array($event->tags)) 
+			$parsedTags = json_decode($event->tags, true);
+
+		foreach ($parsedTags as $tag)
+		{
+			if (isset($tag['typ_kurzbz']) && $tag['typ_kurzbz'] === 'hinweis' && isset($tag['insertvon']) && $tag['insertvon'] === 'oldToNewTempusMigration')
+				return $tag;
+		}
+
+		return null;
 	}
 }

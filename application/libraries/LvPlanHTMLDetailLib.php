@@ -308,7 +308,7 @@ class LvPlanHTMLDetailLib
 			$html .= $this->cell($this->renderSubjectValues($event, 'bezeichnung'));
 			$html .= $this->cell($this->renderTeachingGroups($event, false));
 			$html .= $this->cell($this->renderTeachingGroups($event, true));
-			$html .= $this->cell($this->renderDescription($event));
+			$html .= $this->cell($this->renderOldTempusNoticeTagNote($event));
 			$html .= '</tr>';
 		}
 
@@ -627,17 +627,21 @@ class LvPlanHTMLDetailLib
 		return $result;
 	}
 
-	private function renderDescription($event)
+	private function renderOldTempusNoticeTagNote($event)
 	{
-		$values = array();
-		foreach (array('titel', 'beschreibung') as $property)
+		if (empty($event->tags)) return null;
+
+		$parsedTags = $event->tags;
+		if (!is_array($event->tags)) 
+			$parsedTags = json_decode($event->tags, true);
+
+		foreach ($parsedTags as $tag)
 		{
-			$value = trim($this->getScalar($event, $property));
-			if ($value !== '')
-				$values[] = $this->renderText($value);
+			if (isset($tag['typ_kurzbz']) && $tag['typ_kurzbz'] === 'hinweis' && isset($tag['insertvon']) && $tag['insertvon'] === 'oldToNewTempusMigration')
+				return $tag['notiz'] ?? null;
 		}
 
-		return implode('<br>', array_unique($values));
+		return null;
 	}
 
 	private function renderText($value)
