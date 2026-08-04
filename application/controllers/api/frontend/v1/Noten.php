@@ -752,6 +752,7 @@ class Noten extends FHCAPI_Controller
 		$origBenotungsdatum = null;
 		
 //		// TODO: check if savePruefungstermin wont throw an error before updating/inserting lv note
+		// todo: also check if typ is wrong but another would be available?
 //		if(!$this->ableToSavePruefungstermin($typ))
 		
 		if(!isError($result) && !hasData($result)) {

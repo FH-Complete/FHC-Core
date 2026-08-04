@@ -1246,13 +1246,14 @@ export const Benotungstool = {
 			const noteBezeichnung = noteOption ? noteOption.bezeichnung : data.note_vorschlag
 			const dateLocale = this.$p.user_language?.value === 'English' ? 'en-GB' : 'de-AT'
 			const benotungsdatum = new Date().toLocaleString(dateLocale)
-			if(await this.$fhcAlert.confirm({
-				message: this.$p.t('benotungstool/c4notenvorschlagUebernehmenConfirm', [noteBezeichnung, data.vorname, data.nachname, data.uid, benotungsdatum]),
-				acceptClass: 'p-button-primary',
-				rejectClass: 'p-button-secondary'
-			}) === false) {
-				return
-			}
+		
+			// if(await this.$fhcAlert.confirm({
+			// 	message: this.$p.t('benotungstool/c4notenvorschlagUebernehmenConfirm', [noteBezeichnung, data.vorname, data.nachname, data.uid, benotungsdatum]),
+			// 	acceptClass: 'p-button-primary',
+			// 	rejectClass: 'p-button-secondary'
+			// }) === false) {
+			// 	return
+			// }
 
 			this.loading = true
 			this.$api.call(ApiNoten.saveNotenvorschlag(this.lv_id, this.sem_kurzbz, data.uid, data.note_vorschlag, data.punkte))
