@@ -62,7 +62,7 @@ export default {
 					},
 					{titlePhrase: 'lehre/studienplan', field: 'studienplanbezeichnung', minWidth: 200},
 					{titlePhrase: 'lehre/ausbildungssemester', field: 'ausbildungssemester'},
-					{titlePhrase: 'global/status', field: 'sync_status_kurzbz'},
+					{titlePhrase: 'global/status', field: 'sync_status'},
 					{titlePhrase: 'lehre/mail_benachrichtigung', field: 'mail', formatter: 'tickCross', hozAlign: 'center', minWidth: 80},
 					{titlePhrase:'global/insertamum', field: 'insertamum',
 						formatter: (cell) => {
@@ -92,7 +92,7 @@ export default {
 						width: 120,
 						formatter: (cell) => {
 							let container = document.createElement('div');
-							container.className = "d-flex gap-2";
+							container.className = "d-flex gap-3";
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
@@ -100,6 +100,15 @@ export default {
 								this.$refs.syncModal.openEdit(cell.getRow().getData())
 							);
 
+							container.append(button);
+
+							button = document.createElement('button');
+							button.className = 'btn btn-outline-secondary';
+							button.innerHTML = '<i class="fa fa-play"></i>';
+							button.addEventListener('click', () =>
+
+								this.$refs.syncModal.start(cell.getRow().getData())
+							);
 							container.append(button);
 
 							button = document.createElement('button');
@@ -138,6 +147,17 @@ export default {
 		openStartModal()
 		{
 			this.$refs.syncModal.openStart();
+		},
+		onSaved(studiensemester_kurzbz)
+		{
+			if (studiensemester_kurzbz && studiensemester_kurzbz !== this.studiensemester_kurzbz)
+			{
+				this.studiensemester_kurzbz = studiensemester_kurzbz;
+			}
+			else
+			{
+				this.reloadTable();
+			}
 		}
 	},
 	template: `
@@ -163,6 +183,7 @@ export default {
 							name="studiensemester_kurzbz"
 						>
 							<option :value="null" disabled>-- {{ $p.t('lehre', 'studiensemester') }} --</option>
+							<option value="all">{{ $p.t('ui', 'alleAnzeigen') }}</option>
 							<option
 								v-for="studiensemester in config.studiensemestern"
 								:key="studiensemester.studiensemester_kurzbz"
@@ -186,7 +207,7 @@ export default {
 					ref="syncModal"
 					:config="config"
 					:stsem_kurzbz="studiensemester_kurzbz"
-					@saved="reloadTable"
+					@saved="onSaved"
 					>
 				</tempus-sync-modal>
 			</template>

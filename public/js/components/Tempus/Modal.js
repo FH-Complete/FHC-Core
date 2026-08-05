@@ -34,29 +34,32 @@ export default {
 				return [];
 
 			return Array.from({length: this.max_semester}, (_, index) => index);
+		},
+		studienplanTrigger() {
+			return [
+				this.formData.oe_kurzbz,
+				this.formData.studiensemester_kurzbz,
+				this.formData.ausbildungssemester
+			].join('|');
 		}
 	},
 	watch: {
-		'formData.oe_kurzbz'(newOrganisation) {
+		'formData.oe_kurzbz'(newOrganisation)
+		{
 			if (!newOrganisation) {
 				this.max_semester = null;
 				this.studienplaene = [];
 				return;
 			}
 
-			let filtered_org = this.config.organisationen.filter(org => org.oe_kurzbz === newOrganisation)[0];
+			let filtered_org = (this.config.organisationen ?? []).filter(org => org.oe_kurzbz === newOrganisation)[0];
 
 			if (filtered_org && filtered_org.studiengang_kz)
 				this.getSemester(filtered_org.studiengang_kz);
 			else
 				this.max_semester = null;
-
-			this.getStudienplan();
 		},
-		'formData.studiensemester_kurzbz'() {
-			this.getStudienplan();
-		},
-		'formData.ausbildungssemester'() {
+		studienplanTrigger() {
 			this.getStudienplan();
 		}
 	},
@@ -123,7 +126,7 @@ export default {
 			this.$api.call(ApiTempusSync.getMaxSemester([stg_kz]))
 				.then(response => response.data)
 				.then(response => {
-					this.max_semester = response;
+					this.max_semester = response ?? null;
 
 					let found = this.semester.filter(semester => semester === this.formData.ausbildungssemester);
 					if (found.length === 0)
@@ -146,7 +149,7 @@ export default {
 				))
 				.then(response => response.data)
 				.then(response => {
-					this.studienplaene = response;
+					this.studienplaene = response ?? [];
 					let found = this.studienplaene.filter(plan => plan.studienplan_id === this.formData.studienplan_id);
 					if (found.length === 0)
 						this.formData.studienplan_id = null;
@@ -168,7 +171,8 @@ export default {
 				.call(ApiTempusSync.add(this.formData))
 				.then(() => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-					this.$emit('saved');
+					if (this.stsem_kurzbz !== this.formData.studiensemester_kurzbz)
+						this.$emit('saved', this.formData.studiensemester_kurzbz);
 					this.$refs.modal.hide();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -178,31 +182,35 @@ export default {
 				.call(ApiTempusSync.updateSync(this.formData))
 				.then(() => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-					this.$emit('saved');
+					if (this.stsem_kurzbz !== this.formData.studiensemester_kurzbz)
+						this.$emit('saved', this.formData.studiensemester_kurzbz);
 					this.$refs.modal.hide();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		start() {
+		start(data) {
 			this.$refs.form
-				.call(ApiTempusSync.start(this.formData))
+				.call(ApiTempusSync.start(data ?? this.formData))
 				.then(() => {
-					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-					this.$emit('saved');
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successStart'));
 					this.$refs.modal.hide();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
+		},
+		hideModal()
+		{
+			this.formData = {}
 		}
 	},
 	created() {
-		console.log(this.config)
+
 		this.$api
 			.call(ApiTempusSync.getSyncStatus())
-			.then(result => this.syncStati = result.data)
+			.then(result => this.syncStati = result.data ?? [])
 			.catch(error => this.$fhcAlert.handleSystemError(error));
 	},
 	template: `
-	<bs-modal ref="modal" >
+	<bs-modal ref="modal" @hideBsModal="hideModal">
 		<template #title>
 			<template v-if="mode === 'new'">{{ $p.t('lehre', 'tempus_sync_new') }}</template>
 			<template v-else-if="mode === 'edit'">{{ $p.t('lehre', 'tempus_sync_edit') }}</template>
@@ -225,7 +233,7 @@ export default {
 					:key="organisation.oe_kurzbz"
 					:value="organisation.oe_kurzbz"
 					>
-					{{ organisation.typ.toUpperCase() }}{{ organisation.kurzbz.toUpperCase() }} ({{ organisation.kurzbzlang }})
+					[{{ organisation.organisationseinheittyp_kurzbz }}] {{ organisation.bezeichnung }} {{ ['b', 'm'].includes(organisation.typ) ? organisation.stgbezeichnung : '' }}
 				</option>
 			</form-input>
 

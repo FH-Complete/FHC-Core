@@ -46,12 +46,18 @@ class KalenderSync extends FHCAPI_Controller
 
 		$language = getUserLanguage() == 'German' ? 0 : 1;
 
-		$this->_ci->KalenderStatusModel->addSelect('tbl_kalender_syncstatus.*, array_to_json(bezeichnung_mehrsprachig::varchar[])->>' . $language .' AS sync_status_kurzbz, tbl_organisationseinheit.bezeichnung as oebezeichnung, tbl_studienplan.bezeichnung as studienplanbezeichnung');
+		$this->_ci->KalenderStatusModel->addSelect('tbl_kalender_syncstatus.*, array_to_json(bezeichnung_mehrsprachig::varchar[])->>' . $language .' AS sync_status, tbl_organisationseinheit.bezeichnung as oebezeichnung, tbl_studienplan.bezeichnung as studienplanbezeichnung');
 		$this->_ci->KalenderStatusModel->addJoin('lehre.tbl_kalender_status', 'tbl_kalender_syncstatus.sync_status_kurzbz = tbl_kalender_status.status_kurzbz');
 		$this->_ci->KalenderStatusModel->addJoin('public.tbl_organisationseinheit', 'tbl_kalender_syncstatus.oe_kurzbz = tbl_organisationseinheit.oe_kurzbz');
 		$this->_ci->KalenderStatusModel->addJoin('lehre.tbl_studienplan', 'tbl_kalender_syncstatus.studienplan_id = tbl_studienplan.studienplan_id', 'LEFT');
+		$this->_ci->KalenderStatusModel->addJoin('public.tbl_studiensemester', 'tbl_kalender_syncstatus.studiensemester_kurzbz = tbl_studiensemester.studiensemester_kurzbz');
+		$this->_ci->KalenderStatusModel->addOrder('public.tbl_studiensemester.start', 'DESC');
 
-		$data = $this->_ci->KalendersyncstatusModel->loadWhere(array('studiensemester_kurzbz' => $studiensemester_kurzbz));
+
+		if ($studiensemester_kurzbz === 'all')
+			$data = $this->_ci->KalendersyncstatusModel->load();
+		else
+			$data = $this->_ci->KalendersyncstatusModel->loadWhere(array('tbl_kalender_syncstatus.studiensemester_kurzbz' => $studiensemester_kurzbz));
 
 		if (isError($data))
 			$this->terminateWithError(getError($data));

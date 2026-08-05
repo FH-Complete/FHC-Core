@@ -18,6 +18,7 @@ class KalenderSyncLib
 		$this->_ci->load->model('ressource/Kalender_model', 'KalenderModel');
 		$this->_ci->load->model('ressource/Kalendersyncstatus_model', 'KalendersyncstatusModel');
 		$this->_ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$this->_ci->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
 	}
 
 	public function run($studiensemester_kurzbz)
@@ -181,17 +182,26 @@ class KalenderSyncLib
 
 		$studiengang_kz = getData($studiengang_result);
 
+		if (!hasData($studiengang_result))
+		{
+			$organisationseinheiten = $this->_ci->OrganisationseinheitModel->getChilds($oe_kurzbz);
+			$oe_kurzbz = hasData($organisationseinheiten) ? array_column(getData($organisationseinheiten), 'oe_kurzbz') : [];
+		}
+
 		$this->_ci->KalenderModel->addDistinct('tbl_kalender.kalender_id');
 		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit', 'tbl_kalender.kalender_id = tbl_kalender_lehreinheit.kalender_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheit', 'tbl_kalender_lehreinheit.lehreinheit_id = tbl_lehreinheit.lehreinheit_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehrveranstaltung', 'tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id');
 
-		//TODO (david) oe_kurzbz rekursiv?
 		if (!is_null($studiengang_kz))
+		{
 			$this->_ci->KalenderModel->db->where('tbl_lehrveranstaltung.studiengang_kz', $studiengang_kz);
+		}
 		else
-			$this->_ci->KalenderModel->db->where('tbl_lehrveranstaltung.oe_kurzbz', $oe_kurzbz);
+		{
+			$this->_ci->KalenderModel->db->where_in('tbl_lehrveranstaltung.oe_kurzbz', $oe_kurzbz);
+		}
 
 		$this->_ci->KalenderModel->db->where('tbl_lehreinheit.studiensemester_kurzbz', $studiensemester_kurzbz);
 		$this->_ci->KalenderModel->db->where_in('tbl_kalender.status_kurzbz', $status_kurzbz_list);

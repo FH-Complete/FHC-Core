@@ -24,7 +24,6 @@ class RaumvorschlagLib
 		$this->_ci->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
 
 		$this->_ci->load->model('education/Lehreinheitgruppe_model', 'LehreinheitgruppeModel');
-		$this->_ci->load->model('education/Lehreinheitgruppe_model', 'LehreinheitgruppeModel');
 
 		$this->_ci->load->library('CollisionChecker');
 		$this->_ci->load->library('KalenderLib');

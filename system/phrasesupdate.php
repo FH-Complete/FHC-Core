@@ -39129,6 +39129,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'ui',
+		'phrase' => 'successStart',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '"Erfolgreich gestartet',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Started successfully',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
 		'phrase' => 'successDelete',
 		'insertvon' => 'system',
 		'phrases' => array(

@@ -34,10 +34,18 @@ class Tempus extends Auth_Controller
 		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
 		$this->load->model('ressource/Kalenderstatus_model', 'KalenderStatusModel');
 
-		$this->StudiengangModel->addOrder('typ');
-		$this->StudiengangModel->addOrder('kurzbz');
-		$this->StudiengangModel->addJoin('tbl_organisationseinheit', 'oe_kurzbz', 'LEFT');
-		$organisationen = getData($this->StudiengangModel->loadWhere(array('tbl_studiengang.aktiv' => 'true')));
+		$this->OrganisationseinheitModel->addJoin('tbl_studiengang', 'oe_kurzbz', 'LEFT');
+
+		$this->OrganisationseinheitModel->addSelect('public.tbl_organisationseinheit.organisationseinheittyp_kurzbz,
+															public.tbl_organisationseinheit.bezeichnung,
+															public.tbl_studiengang.studiengang_kz,
+															public.tbl_organisationseinheit.oe_kurzbz,
+															tbl_studiengang.typ,
+															COALESCE(public.tbl_studiengang.bezeichnung, \'\') as stgbezeichnung');
+		$this->OrganisationseinheitModel->addOrder('tbl_organisationseinheit.aktiv', 'DESC');
+		$this->OrganisationseinheitModel->addOrder('tbl_organisationseinheit.organisationseinheittyp_kurzbz');
+		$organisationen = getData($this->OrganisationseinheitModel->loadWhere(array("tbl_organisationseinheit.aktiv" => true)));
+
 
 		$this->StudiensemesterModel->addOrder('start', 'DESC');
 		$studiensemestern = getData($this->StudiensemesterModel->load());
