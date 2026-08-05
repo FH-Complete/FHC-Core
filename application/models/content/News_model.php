@@ -17,16 +17,22 @@ class News_model extends DB_Model
 	 * @param null $limit   Amount of news.
 	 * @return array
 	 */
-	public function getAll($limit = null)
+	public function getAll($limit = null, $maxAlter = 0)
 	{
 		$this->addJoin("campus.tbl_content","content_id");
+
+		$maxAlterQueryFilter = "datum_bis >= NOW()::date";
+		if ($maxAlter !== 0) {
+			$maxAlterQueryFilter .= " OR datum_bis IS NULL AND (NOW()-datum) < interval '" . $this->escape($maxAlter) . " days'";
+		}
+
 		return $this->execReadOnlyQuery('
 			SELECT *, TO_CHAR(campus.tbl_news.datum, ?) as datumformatted
 			FROM campus.tbl_news
 			JOIN campus.tbl_content content ON content.content_id = campus.tbl_news.content_id
-			WHERE
+			WHERE 
 			--text IS NOT NULL AND 	
-			datum <= NOW() AND (datum_bis IS NULL OR datum_bis >= now()::date)
+			datum <= NOW() AND (' . $maxAlterQueryFilter . ')
 			ORDER BY datum DESC
 			LIMIT ' . $this->escape($limit)
 		, ['DD/MM/YYYY']);
@@ -66,8 +72,9 @@ class News_model extends DB_Model
 		$fachbereich_kurzbz = trim($fachbereich_kurzbz);
 
 		$where = [];
-		if (trim($maxalter) != '0') {
-			$where[] = "(now()-datum) < interval " . $this->db->escape($maxalter) . " days";
+		if ($maxalter !== 0 && is_numeric($maxalter)) {
+			$maxalter = (int)$maxalter;
+			$where[] = "(now()-datum) < interval '" . $this->db->escape($maxalter) . " days'";
 
 		}
 		if (!$all) {
@@ -103,7 +110,7 @@ class News_model extends DB_Model
 
 		$where[] = "cs.version = (SELECT MAX(version) FROM campus.tbl_contentsprache cs3 WHERE cs3.content_id=" . $this->dbTable . ".content_id AND cs3.sprache = (CASE WHEN EXISTS(SELECT 1 FROM campus.tbl_contentsprache cs2 WHERE cs2.content_id=" . $this->dbTable . ".content_id AND sprache=" . $this->db->escape($sprache) . ") THEN " . $this->db->escape($sprache) . " ELSE " . $this->db->escape(DEFAULT_LANGUAGE) . " END))";
 
-
+		
 		$where = implode(" AND ", $where);
 
 		$this->db->where($where, NULL, FALSE);

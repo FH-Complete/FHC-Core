@@ -4,6 +4,8 @@ import BsConfirm from "../../Bootstrap/Confirm.js";
 
 import ApiCms from "../../../api/factory/cms.js";
 
+const MAX_NEW_AGE = 60;
+
 export default {
 	name: "NewsComponent",
 	components: {
@@ -32,7 +34,7 @@ export default {
 	methods: {
 		async fetchNews() {
 			let newsResponse = await this.$api.call(
-				ApiCms.getNews(this.page, this.page_size, this.sprache),
+				ApiCms.getNews(this.page, this.page_size, this.sprache, MAX_NEW_AGE),
 			);
 			this.content = newsResponse.data;
 
@@ -98,7 +100,7 @@ export default {
 		this.fetchNews();
 
 		this.$api
-			.call(ApiCms.getNewsRowCount())
+			.call(ApiCms.getNewsRowCount(MAX_NEW_AGE))
 			.then((res) => res.data)
 			.then((result) => {
 				this.maxPageCount = result;

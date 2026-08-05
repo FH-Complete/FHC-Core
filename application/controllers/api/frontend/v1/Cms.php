@@ -118,9 +118,14 @@ class Cms extends FHCAPI_Controller
 		$this->load->model('content/news_model', 'NewsModel');
 		
 		$limit =  $this->input->get('limit',TRUE);
-		
+		$passedInMaxAlter = $this->input->get('maxAlter', true);
+		if($passedInMaxAlter !== null)
+		{
+			$maxAlter = intval($passedInMaxAlter);
+		}
+
 		//query the news
-		$news = $this->NewsModel->getAll($limit);
+		$news = $this->NewsModel->getAll($limit, $maxAlter);
 
 		//get the data or terminate with error
 		$news = $this->getDataOrTerminateWithError($news);
@@ -163,8 +168,14 @@ class Cms extends FHCAPI_Controller
 		$all = $edit;
 		
 		$this->load->model('content/News_model','NewsModel');
+		
+		$passedInMaxAlter = $this->input->get('maxAlter', true);
+		if($passedInMaxAlter !== null)
+		{
+			$maxAlter = intval($passedInMaxAlter);
+		}
 
-		$num_rows = $this->NewsModel->countNewsWithContent(getSprache(), $studiengang_kz, $semester, $fachbereich_kurzbz, $sichtbar, $maxalter, $page, $page_size, $all, $mischen);
+		$num_rows = $this->NewsModel->countNewsWithContent(getSprache(), $studiengang_kz, $semester, $fachbereich_kurzbz, $sichtbar, $maxAlter, $page, $page_size, $all, $mischen);
 		
 		$num_rows = $this->getDataOrTerminateWithError($num_rows);
 		
@@ -173,7 +184,7 @@ class Cms extends FHCAPI_Controller
 	}
 
 
-	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true)
+	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true, $maxalter = 0)
 	{
 		//form validation
 		$this->load->library('form_validation');
@@ -194,7 +205,13 @@ class Cms extends FHCAPI_Controller
 		// default value for the page_size is 10
 		$page_size = $page_size ?? 10;
 		
-		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size, $sprache);
+		$passedInMaxAlter = $this->input->get('maxAlter', true);
+		if($passedInMaxAlter !== null)
+		{
+			$maxAlter = intval($passedInMaxAlter);
+		}
+	
+		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size, $sprache, $maxalter);
 		$news = $this->getDataOrTerminateWithError($news);
 
 		$this->addMeta('phrases', json_decode($this->p->getJson()));

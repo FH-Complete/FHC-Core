@@ -4,6 +4,7 @@ import { numberPadding } from '../../helpers/DateHelpers.js';
 import ApiCms from '../../api/factory/cms.js';
 
 const MAX_LOADED_NEWS = 30;
+const MAX_NEW_AGE = 60;
 
 export default {
 	name: "WidgetsNews",
@@ -183,7 +184,7 @@ export default {
 	created() {
 		this.$emit("setConfig", false);
 		this.$api
-			.call(ApiCms.news(MAX_LOADED_NEWS))
+			.call(ApiCms.news(MAX_LOADED_NEWS, MAX_NEW_AGE))
 			.then(res => res.data)
 			.then((news) => {
 				this.allNewsList = Array.from(Object.values(news));

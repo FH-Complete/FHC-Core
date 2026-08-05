@@ -29,29 +29,33 @@ export default {
 		};
 	},
 	//api function used for the news View that renders the html
-	getNews(page = 1, page_size = 10, sprache) {
+	getNews(page = 1, page_size = 10, sprache, maxAge = 60) {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/Cms/getNews',
 			params: {
 				page,
 				page_size,
-				sprache
+				sprache,
+				maxAlter: maxAge
 			},
 		};
 	},
 	//api function used for the widget component
-	news(limit) {
+	news(limit, maxAge = 60) {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/Cms/news',
-			params: { limit }
+			params: { limit, maxAlter: maxAge }
 		};
 	},
-	getNewsRowCount() {
+	getNewsRowCount(maxAge = 60) {
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/Cms/getNewsRowCount'
+			url: '/api/frontend/v1/Cms/getNewsRowCount',
+			params: {
+				maxAlter: maxAge
+			}
 		};
 	},
 	getNewsExtra() {
