@@ -4,8 +4,6 @@ export function useEventLoader(
   cacheMultiplier = 1,
 ) {
   let allEvents = Vue.ref([]);
-  const events = [];
-
   const lv = Vue.ref(null);
 
   let newlyLoadedEvents = [];
@@ -24,15 +22,16 @@ export function useEventLoader(
     return Math.round(currentlyDisplayedDateRange.length() * cacheSize) + 1;
   };
 
-  const reload = () => {
+  const reload = (isCacheEnabled = true) => {
     if (
       currentlyDisplayedDateRange &&
       currentlyDisplayedDateRange?.start?.ts ===
         rangeInterval?.value?.start?.ts &&
-      currentlyDisplayedDateRange?.end?.ts === rangeInterval?.value?.end?.ts
+      currentlyDisplayedDateRange?.end?.ts === rangeInterval?.value?.end?.ts &&
+      isCacheEnabled
     ) {
       console.log(
-        "cached range is the same as requested range, skipping reload",
+        "cached range is the same as requested range, skipping reload 2",
       );
       return;
     }
@@ -49,7 +48,8 @@ export function useEventLoader(
 
     if (
       cachedEventsStartTimestamp === currentlyDisplayedDateRange.start.ts &&
-      cachedEventsEndTimestamp === currentlyDisplayedDateRange.end.ts
+      cachedEventsEndTimestamp === currentlyDisplayedDateRange.end.ts &&
+      isCacheEnabled
     ) {
       console.log(
         "cached range is the same as requested range, skipping reload",
@@ -60,6 +60,7 @@ export function useEventLoader(
     const promises = requestEvents(
       currentlyDisplayedDateRange.start.ts,
       currentlyDisplayedDateRange.end.ts,
+      isCacheEnabled
     );
 
     ensureCacheRangeIsAllowedRange(
@@ -107,10 +108,11 @@ export function useEventLoader(
   Vue.watchEffect(reload);
 
   const reset = () => {
-    reload();
+    allEvents.value = [];
+    reload(false);
   };
 
-  const requestEvents = (startTimestamp, endTimestamp) => {
+  const requestEvents = (startTimestamp, endTimestamp, isCacheEnabled = true) => {
     let result = [];
 
     if (!startTimestamp || !endTimestamp) return result;
@@ -119,7 +121,7 @@ export function useEventLoader(
     let modifiedRequestStartTimestamp = startTimestamp;
     let modifiedRequestEndTimestamp = endTimestamp;
 
-    if (cachedEventsStartTimestamp && cachedEventsEndTimestamp) {
+    if (cachedEventsStartTimestamp && cachedEventsEndTimestamp && isCacheEnabled) {
       if (
         startTimestamp < cachedEventsStartTimestamp &&
         endTimestamp > cachedEventsEndTimestamp
@@ -145,7 +147,7 @@ export function useEventLoader(
       } else {
         return result;
       }
-    } else {
+    } else if (isCacheEnabled) {
       cachedEventsStartTimestamp = modifiedRequestStartTimestamp;
       cachedEventsEndTimestamp = modifiedRequestEndTimestamp;
     }
