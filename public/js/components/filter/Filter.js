@@ -26,6 +26,7 @@ import moduleLayoutFitDataStretchFrozen from "../../tabulator/layouts/fitDataStr
 import InternalToExternalEventBroadcastModule from "../../tabulator/customModules/InternalToExternalEventBroadcastModule.js";
 import MenuExtensionModule from "../../tabulator/customModules/MenuExtensionModule.js";
 import ResponsiveLayoutExtensionModule from "../../tabulator/customModules/ResponsiveLayoutExtensionModule.js";
+import TablePresetsModule from "../../tabulator/customModules/TablePresetsModule.js";
 
 import { debounce } from "../../helpers/DebounceHelper.js";
 
@@ -1057,6 +1058,7 @@ export const CoreFilterCmpt = {
 		Tabulator.registerModule(InternalToExternalEventBroadcastModule);
 		Tabulator.registerModule(MenuExtensionModule);
 		Tabulator.registerModule(ResponsiveLayoutExtensionModule);
+		Tabulator.registerModule(TablePresetsModule);
 	},
 	mounted() {
 		this.initTabulator().then(() => {
