@@ -18,8 +18,16 @@ export default {
 			type: String,
 			default: null
 		},
+		previewLehreinheitId: {
+			type: [String, Number],
+			default: null
+		},
+		previewLoading: {
+			type: Boolean,
+			default: false
+		},
 	},
-	emits: ['select-lecturer', 'select-kw'],
+	emits: ['select-lecturer', 'select-kw', 'preview-raumvorschlag'],
 	data() {
 		return {
 			searchparam: '',
@@ -209,6 +217,17 @@ export default {
 		{
 			return this.favorites.has(course.lehreinheit_id);
 		},
+		selectRaumvorschlag(course)
+		{
+			if (this.isRaumvorschlagActive(course))
+				this.$emit('preview-raumvorschlag', null);
+			else
+				this.$emit('preview-raumvorschlag', course.orig);
+		},
+		isRaumvorschlagActive(course)
+		{
+			return this.previewLehreinheitId != null && this.previewLehreinheitId === course.lehreinheit_id;
+		},
 	},
 	mounted() {
 		this.favorites = new Set(JSON.parse(localStorage.getItem('tempus_coursepicker_favs') || '[]'));
@@ -263,7 +282,7 @@ export default {
 				style="cursor:grab"
 				:style="courseStyle(course)"
 				class="course-picker-row rounded-3 mb-2 p-2"
-				:class="{ 'course-picker-row-pinned': isPinned(course) }"
+				:class="{ 'course-picker-row-pinned': isPinned(course), 'course-picker-row-preview': isRaumvorschlagActive(course) }"
 				v-draggable:move.noimage="dragLehreinheitCollection(course)"
 				tabindex="0"
 			>
@@ -282,6 +301,19 @@ export default {
 						style="cursor:pointer"
 						v-tooltip="isMultiWeek(course) ? 'MultiWeek aktiv' : 'MultiWeek Verplanung aktivieren'"
 						@click.stop="toggleMultiWeek(course)"
+					></i>
+					<i
+						v-if="!(previewLoading && isRaumvorschlagActive(course))"
+						class="fa fa-door-open"
+						:class="isRaumvorschlagActive(course) ? 'text-primary' : 'text-muted'"
+						style="cursor:pointer"
+						v-tooltip="isRaumvorschlagActive(course) ? 'Raumvorschlag ausblenden' : 'Raumvorschlag einblenden'"
+						@click.stop="selectRaumvorschlag(course)"
+					></i>
+					<i
+						v-else
+						class="fa fa-spinner fa-spin text-primary"
+						v-tooltip="'Räume werden geprüft...'"
 					></i>
 				</div>
 				

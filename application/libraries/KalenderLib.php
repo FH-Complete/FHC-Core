@@ -313,6 +313,7 @@ class KalenderLib
 
 			foreach ($lehrverband_gruppen as $lvg)
 			{
+				$lvg = (array) $lvg;
 				$this->_ci->KalenderModel->db->or_group_start();
 				$this->_ci->KalenderModel->db->where('tbl_lehreinheitgruppe.studiengang_kz', $lvg['studiengang_kz']);
 				$this->_ci->KalenderModel->db->where('tbl_lehreinheitgruppe.semester', $lvg['semester']);

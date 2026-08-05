@@ -24,7 +24,6 @@ class RaumvorschlagLib
 		$this->_ci->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
 
 		$this->_ci->load->model('education/Lehreinheitgruppe_model', 'LehreinheitgruppeModel');
-		$this->_ci->load->model('education/Lehreinheitgruppe_model', 'LehreinheitgruppeModel');
 
 		$this->_ci->load->library('CollisionChecker');
 		$this->_ci->load->library('KalenderLib');
@@ -37,13 +36,17 @@ class RaumvorschlagLib
 		$event = $this->_ci->kalenderlib->getByKalenderId($kalender_id);
 		$event = $event[0];
 
+		$raumkandidaten = $this->_getRaumkandidaten($event);
+		if (empty($kandidaten)) return [];
+
 		$lektor_uids = array_column($event->lektor, 'mitarbeiter_uid');
 		$gruppen_kurzbz = array_values(array_filter(array_column($event->gruppe, 'gruppe_kurzbz')));
 
-		$lehrverband_gruppen = array_values(array_filter($event->gruppe, function($gruppe)
-		{
+		$lehrverband_gruppen = array_values(array_filter($event->gruppe, function($gruppe) {
 			return empty($gruppe['gruppe_kurzbz']);
 		}));
+
+		$lehrverband_gruppen_bezeichnung = array_column($lehrverband_gruppen, 'bezeichnung');
 
 		$tages_events = $this->_ci->kalenderlib->getForRaumvorschlag(
 			$event->datum,
@@ -53,22 +56,170 @@ class RaumvorschlagLib
 			$lehrverband_gruppen
 		);
 
-		$lektor_davor = $this->_getEventDavor($tages_events, $event->isostart, $lektor_uids, 'lektor');
-		$gruppen_davor = $this->_getEventDavor($tages_events, $event->isostart, $gruppen_kurzbz, 'gruppe');
+		return $this->_getRatings($tages_events, $event, $raumkandidaten, $lektor_uids, $gruppen_kurzbz, $lehrverband_gruppen_bezeichnung);
+	}
+
+	public function getVorschlaegeSlots($lehreinheit_id, $start_date, $end_date)
+	{
+		$lehreinheit_result = $this->_ci->LehreinheitModel->load($lehreinheit_id);
+		if (!hasData($lehreinheit_result))
+			return error('Lehreinheit nicht gefunden');
+		$lehreinheit = getData($lehreinheit_result)[0];
+
+		$block = $lehreinheit->stundenblockung;
+		if ($block <= 0)
+			return error('Stundenblockung ist ungültig');
+
+		$this->_ci->StundeModel->addOrder('stunde', 'ASC');
+		$stunden_result = $this->_ci->StundeModel->load();
+		$stunden = hasData($stunden_result) ? array_values(getData($stunden_result)) : [];
+
+		if (empty($stunden))
+			return error('Kein Stunden-Raster gefunden');
+
+		$lektoren_result = $this->_ci->LehreinheitMitarbeiterModel->loadWhere(['lehreinheit_id' => $lehreinheit_id]);
+		$lektor_uids = hasData($lektoren_result) ? array_column(getData($lektoren_result), 'mitarbeiter_uid') : [];
+
+		$gruppen_result = $this->_ci->LehreinheitgruppeModel->getDirectGroup($lehreinheit_id);
+		$gruppen = getData($gruppen_result);
+		$gruppen_kurzbz = hasData($gruppen_result) ? array_column($gruppen, 'gruppe_kurzbz') : [];
+
+		$lehrverband_result = $this->_ci->LehreinheitgruppeModel->getByLehreinheit($lehreinheit_id);
+		$lehrverband_gruppen = hasData($lehrverband_result) ? getData($lehrverband_result) : [];
+		$lehrverband_gruppen_bezeichnung = array_column($lehrverband_gruppen, 'bezeichnung');
+
+		$verplante_events = $this->_ci->kalenderlib->getForRaumvorschlag(
+			$start_date,
+			$end_date,
+			$lektor_uids,
+			$gruppen_kurzbz,
+			$lehrverband_gruppen);
+
+		$start_day = strtotime($start_date);
+		$end_day = strtotime($end_date);
+
+		$moegliche_slots = array();
+		while ($start_day < $end_day)
+		{
+			$tag = date('Y-m-d', $start_day);
+
+			$verplante_tages_events = array_values(array_filter($verplante_events, function($event) use ($tag)
+			{
+				return $event->datum === $tag;
+			}));
+
+			foreach ($stunden as $index => $start_stunde)
+			{
+				if (!isset($stunden[$index + $block - 1]))
+					continue;
+
+				$end_stunde = $stunden[$index + $block - 1];
+
+				$slot_start = $tag . ' ' . $start_stunde->beginn;
+				$slot_end = $tag . ' ' . $end_stunde->ende;
+
+				if (!$this->_isFrei($slot_start, $slot_end, $verplante_tages_events, $lektor_uids, 'lektor'))
+					continue;
+
+				if (!$this->_isFrei($slot_start, $slot_end, $verplante_tages_events, $gruppen_kurzbz, 'gruppe'))
+					continue;
+
+				if (!$this->_isFrei($slot_start, $slot_end, $verplante_tages_events, $lehrverband_gruppen_bezeichnung, 'lehrverband'))
+					continue;
+
+				$moegliche_slots[] = [
+					'isostart' => (new DateTime($slot_start))->format('c'),
+					'isoend' => (new DateTime($slot_end))->format('c'),
+					'marker_isoend' => (new DateTime($tag . ' ' . $start_stunde->ende))->format('c'),
+				];
+			}
+
+			$start_day = strtotime('+1 day', $start_day);
+		}
+
+
+		$slots = [];
+		foreach ($moegliche_slots as $slot)
+		{
+			$event_obj = (object) [
+				'lehreinheit_id' => [$lehreinheit_id],
+				'isostart' => $slot['isostart'],
+				'isoend' => $slot['isoend'],
+			];
+
+			$raumkandidaten = $this->_getRaumkandidaten($event_obj);
+
+			if (empty($raumkandidaten))
+				continue;
+
+			$ratings = $this->_getRatings($verplante_events, $slot, $raumkandidaten, $lektor_uids, $gruppen_kurzbz, $lehrverband_gruppen_bezeichnung);
+			$best = $ratings[0];
+			$anzahl_weitere = count($ratings) - 1;
+
+			$slots[] = [
+				'isostart' => $slot['isostart'],
+				'isoend' => $slot['isoend'],
+				'marker_isoend' => $slot['marker_isoend'],
+				'rating' => $this->_scoreToRating($best['score']),
+				'label' => $anzahl_weitere > 0 ? $best['ort_kurzbz'] . ' (' . $best['score'] . ') + ' . $anzahl_weitere . ' weitere' : $best['ort_kurzbz'] . ' (' . $best['score'] . ')',
+				'raeume' => $ratings,
+			];
+		}
+		return success($slots);
+	}
+
+	//TODO (david) umbauen auf CollisionChecks
+	private function _isFrei($slot_start, $slot_end, $events, $check_array, $type)
+	{
+		if (empty($check_array)) return true;
+
+		$slot_start_ts = strtotime($slot_start);
+		$slot_end_ts = strtotime($slot_end);
+
+		foreach ($events as $event)
+		{
+			$event_start_ts = strtotime($event->isostart);
+			$event_end_ts = strtotime($event->isoend);
+
+			if ($event_end_ts <= $slot_start_ts || $event_start_ts >= $slot_end_ts)
+				continue;
+
+			$event_uids = $this->_getIds($event, $type);
+
+			if (!empty(array_intersect($event_uids, $check_array)))
+				return false;
+		}
+
+		return true;
+	}
+
+	private function _scoreToRating($score)
+	{
+		if ($score >= 90)
+			return 'good';
+		if ($score >= 60)
+			return 'mid';
+		return 'bad';
+	}
+
+	private function _getRatings($events, $event, $raumkandidaten, $lektor_uids, $gruppen_kurzbz, $lehrverband_gruppen_bezeichnung)
+	{
+		$event = (object)$event;
+		$lektor_davor = $this->_getEventDavor($events, $event->isostart, $lektor_uids, 'lektor');
+		$gruppen_davor = $this->_getEventDavor($events, $event->isostart, $gruppen_kurzbz, 'gruppe');
+		$lehrverband_davor = $this->_getEventDavor($events, $event->isostart, $lehrverband_gruppen_bezeichnung, 'lehrverband');
 
 		$lektor_davor_ort = $lektor_davor ? $this->_getOrtDetails($lektor_davor->ort_kurzbz) : null;
 		$gruppen_davor_ort = $gruppen_davor ? $this->_getOrtDetails($gruppen_davor->ort_kurzbz) : null;
-
-		$kandidaten = $this->_getRaumkandidaten($event);
-		if (empty($kandidaten)) return [];
-
+		$lehrverband_davor_ort = $lehrverband_davor ? $this->_getOrtDetails($lehrverband_davor->ort_kurzbz) : null;
 
 		$ratings = [];
-		foreach ($kandidaten as $raum)
+		foreach ($raumkandidaten as $raum)
 		{
 			$rating = ['ort_kurzbz' => $raum->ort_kurzbz, 'score' => 100, 'details' => []];
 			$this->_rateLektor($rating, $raum, $lektor_davor_ort);
 			$this->_rateGruppen($rating, $raum, $gruppen_davor_ort);
+			$this->_rateGruppen($rating, $raum, $lehrverband_davor_ort);
 
 			Events::trigger('room_rating',
 				function & () use (&$rating) {
@@ -86,7 +237,6 @@ class RaumvorschlagLib
 		});
 
 		return $ratings;
-
 	}
 
 	private function _getOrtDetails($ort_kurzbz_array)
@@ -196,10 +346,7 @@ class RaumvorschlagLib
 			if (empty($event->ort_kurzbz))
 				continue;
 
-			if ($type === 'lektor')
-				$event_uids = array_column($event->lektor, 'mitarbeiter_uid');
-			else
-				$event_uids = array_column($event->gruppe, 'gruppe_kurzbz');
+			$event_uids = $this->_getIds($event, $type);
 
 			if (empty(array_intersect($event_uids, $uids)))
 				continue;
@@ -209,6 +356,20 @@ class RaumvorschlagLib
 		}
 
 		return $kandidat;
+	}
+
+	private function _getIds($event, $type)
+	{
+		$event_uids = array();
+
+		if ($type === 'lektor')
+			$event_uids = array_column($event->lektor, 'mitarbeiter_uid');
+		else if ($type === 'gruppen')
+			$event_uids = array_column($event->gruppe, 'gruppe_kurzbz');
+		else if ($type === 'lehrverband')
+			$event_uids = array_column($event->gruppe, 'bezeichnung');
+
+		return $event_uids;
 	}
 
 	private function _getRaumkandidaten($event)
