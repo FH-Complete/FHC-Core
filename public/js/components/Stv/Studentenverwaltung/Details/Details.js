@@ -293,6 +293,7 @@ export default {
 						:label="$p.t('person', 'geburtsdatum')"
 						type="DatePicker"
 						v-model="data.gebdatum"
+						model-type="yyyy-MM-dd"
 						name="gebdatum"
 						:clearable="false"
 						no-today
