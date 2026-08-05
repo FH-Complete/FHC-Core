@@ -64,6 +64,7 @@ export default {
 		"update:date",
 		"update:mode",
 		"update:range",
+		"update:date-range",
 		"drop",
 		"resize",
 		"event-hover",
@@ -146,8 +147,17 @@ export default {
 			return '--event-bg:#' + event.farbe;
 		},
 		updateRange(rangeInterval) {
+			if (this.currentMode === 'tableList')
+				return;
+
 			this.rangeInterval = rangeInterval;
 			this.$emit('update:range', rangeInterval);
+		},
+		handleDateRange({ start, end }) {
+			this.rangeInterval = luxon.Interval.fromDateTimes(start.startOf('day'), end.endOf('day'));
+			this.reset();
+			this.$emit('update:range', this.rangeInterval);
+			this.$emit('update:date-range', { start, end });
 		},
 		ondrop(payload){
 			this.$emit('drop', payload);
@@ -224,6 +234,7 @@ export default {
 		@update:date="(newDate, newMode) => $emit('update:date', newDate, newMode)"
 		@update:mode="(newMode, newDate) => { currentMode = newMode; $emit('update:mode', newMode, newDate) }"
 		@update:range="updateRange"
+		@update:date-range="handleDateRange"
 	>
 		<template v-slot="{ event, mode }">
 			<div
