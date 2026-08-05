@@ -171,8 +171,7 @@ export default {
 				.call(ApiTempusSync.add(this.formData))
 				.then(() => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-					if (this.stsem_kurzbz !== this.formData.studiensemester_kurzbz)
-						this.$emit('saved', this.formData.studiensemester_kurzbz);
+					this.$emit('saved', this.formData.studiensemester_kurzbz);
 					this.$refs.modal.hide();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -182,8 +181,7 @@ export default {
 				.call(ApiTempusSync.updateSync(this.formData))
 				.then(() => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-					if (this.stsem_kurzbz !== this.formData.studiensemester_kurzbz)
-						this.$emit('saved', this.formData.studiensemester_kurzbz);
+					this.$emit('saved', this.formData.studiensemester_kurzbz);
 					this.$refs.modal.hide();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
