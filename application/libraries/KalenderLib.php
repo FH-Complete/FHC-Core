@@ -1714,6 +1714,7 @@ class KalenderLib
 			if ($entry->status_kurzbz === 'todelete')
 			{
 				$this->_ci->KalenderModel->update(array('kalender_id' => $entry->kalender_id), array('status_kurzbz' => 'deleted'));
+				$this->_archiveVorgaenger($entry->vorgaenger_kalender_id, false);
 				$mail_infos[] = array('entry' => $entry, 'new_status' => 'deleted', 'notify' => array('lektor', 'student'));
 			}
 
