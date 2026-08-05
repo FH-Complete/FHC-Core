@@ -6,6 +6,7 @@ import BaseTreemenu from '../Base/Treemenu.js';
 import StvStudiensemester from "../Stv/Studentenverwaltung/Studiensemester.js";
 import LvTable from "./Setup/Table.js";
 import LvTabs from "./Setup/Tabs.js";
+import NavLanguage from "../navigation/Language.js";
 
 import ApiDetails from "../../api/lehrveranstaltung/details.js";
 import ApiLektor from "../../api/lehrveranstaltung/lektor.js";
@@ -25,7 +26,8 @@ export default {
 		StvStudiensemester,
 		LvTable,
 		LvTabs,
-		AppConfig
+		AppConfig,
+		NavLanguage
 	},
 	props: {
 		avatarUrl: String,
