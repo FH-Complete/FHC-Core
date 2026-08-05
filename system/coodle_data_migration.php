@@ -27,22 +27,22 @@ require_once('../include/basis_db.class.php');
 
 $db = new basis_db();
 
+$todayDateTime = new DateTime();
+$today = $todayDateTime->format("Y-m-d");
+$sixMonthsAgo = $todayDateTime->modify("-6 months")->format("Y-m-d");
+
+
 // check if new coodle table is already populated
 $newSurveysCountQuery = "SELECT COUNT (*) FROM campus.tbl_coodle_surveys";
 $newSurveysCountResult = $db->db_query($newSurveysCountQuery);
 $newSurveysCount = $db->db_fetch_object($newSurveysCountResult)->count;
 if ($newSurveysCount > 0) {
+	echo ("ERROR: Coodle data migration not possible, new Coodle table is already populated!");
 	exit;
 }
 
-// make sure id autoincrement is set to 1
-// $autoIncrementResetQuery = "ALTER TABLE campus.tbl_coodle_surveys AUTO_INCREMENT = 1";
-// $autoIncrementResetQuery = "ALTER SEQUENCE campus.seq_tbl_coodle_surveys_id RESTART WITH 1";
-// $db->db_query($autoIncrementResetQuery);
-
-// todo: include all surveys once code tested
 // getting old surveys...
-$surveysQuery = "SELECT * FROM campus.tbl_coodle WHERE coodle_id < 101";
+$surveysQuery = "SELECT * FROM campus.tbl_coodle";
 $surveysResult = $db->db_query($surveysQuery);
 while ($survey = $db->db_fetch_object($surveysResult)) {
 	// getting old timeslots before importing survey, as timeslot count affects max_selections value
@@ -61,6 +61,7 @@ while ($survey = $db->db_fetch_object($surveysResult)) {
 	}
 
 	// importing survey...
+	$title = formatTitle($survey->titel);
 	$formattedDescription = formatDescription($survey->beschreibung ?? "");
 	$timeslotDuration = $survey->dauer ? $survey->dauer : 15;
 	if ($timeslotDuration % 5 !== 0) {
@@ -71,21 +72,39 @@ while ($survey = $db->db_fetch_object($surveysResult)) {
 	$maxSelections = count($timeslotsData) ? count($timeslotsData) : 1;
 	$completedAt = $survey->coodle_status_kurzbz === "abgeschlossen" ? "'$survey->updateamum'" : "NULL";
 	$canceledAt = $survey->coodle_status_kurzbz === "storniert" ? "'$survey->updateamum'" : "NULL";
+	$endsAt = $survey->endedatum ? "'$survey->endedatum'" : "NOW()";
+	$createdAt = $survey->insertamum ? "'$survey->insertamum'" : "NOW()";
+	$updatedAt = $survey->updateamum ? "'$survey->updateamum'" : "NOW()";
+
+	if (in_array($survey->coodle_status_kurzbz, ["neu", "laufend"])) {
+		$createdAtDate = explode(" ", $survey->insertamum)[0];
+		$futureTimeslots = array_filter(
+			$timeslotsData,
+			function ($timeslot) use ($today) {
+				$timeslotDate = explode(" ", $timeslot["startTime"])[0];
+				return $timeslotDate >= $today;
+			}
+		);
+		if ($createdAtDate < $sixMonthsAgo && !count($futureTimeslots)) {
+			$canceledAt = "NOW()";
+		}
+	}
+
 	$surveyInsertValues = [
 		"id" => $survey->coodle_id,
 		"creator_uid" => "'$survey->ersteller_uid'",
-		"title" => "'$survey->titel'",
+		"title" => "'$title'",
 		"description" => "'$formattedDescription'",
 		"timeslot_duration" => $timeslotDuration,
 		"are_selections_anonymized" => $areSelectionsAnonymized,
 		"are_participants_anonymized" => $areParticipantsAnonymized,
 		"max_selections" => $maxSelections,
 		"selected_timeslot_id" => "NULL",
-		"ends_at" => "'$survey->endedatum'",
+		"ends_at" => $endsAt,
 		"completed_at" => $completedAt,
 		"canceled_at" => $canceledAt,
-		"created_at" => "'$survey->insertamum'",
-		"updated_at" => "'$survey->updateamum'",
+		"created_at" => $createdAt,
+		"updated_at" => $updatedAt,
 	];
 	$columnsString = "(" . implode(", ", array_keys($surveyInsertValues)) . ")";
 	$valuesString = "(" . implode(", ", array_values($surveyInsertValues)) . ")";
@@ -118,7 +137,7 @@ while ($survey = $db->db_fetch_object($surveysResult)) {
 			$correspondingOldTimeslot = count($correspondingOldTimeslotArray) ? $correspondingOldTimeslotArray[0] : null;
 			$timeslotIds[] = [
 				"oldTimeslotId" => isset($correspondingOldTimeslot["oldTimeslotId"]) ? $correspondingOldTimeslot["oldTimeslotId"] : null,
-				"newTimeslotId" => $newTimeslot->id,
+				"newTimeslotId" => intval($newTimeslot->id),
 			];
 		}
 	}
@@ -140,8 +159,6 @@ while ($survey = $db->db_fetch_object($surveysResult)) {
 			$db->db_query($surveyUpdateQuery);
 		}
 	}
-
-	// todo: cancel survey if sufficiently old and all timeslots are in the past
 
 	// getting old timeslot votes...
 	$votes = [];
@@ -187,12 +204,12 @@ while ($survey = $db->db_fetch_object($surveysResult)) {
 				"selection" => null,
 			];
 
-			$participantVotes = array_filter(
+			$participantVotes = array_values(array_filter(
 				$votes,
 				function ($vote) use ($resource) {
 					return $vote["oldResourceId"] === $resource->coodle_ressource_id;
 				}
-			);
+			));
 			if (count($participantVotes)) {
 				$participantData["selection"] = array_map(
 					function ($vote) {
@@ -203,20 +220,20 @@ while ($survey = $db->db_fetch_object($surveysResult)) {
 			}
 
 			$participantsData[] = $participantData;
-		} else if ($resource->name && $resource->email && $resource->zugangscode) {
+		} else if ($resource->name && $resource->email && filter_var($resource->email, FILTER_VALIDATE_EMAIL) && $resource->zugangscode) {
 			$externalParticipantData = [
-				"name" => $resource->name,
-				"email" => $resource->email,
+				"name" => escapeSingleQuotes($resource->name),
+				"email" => escapeSingleQuotes($resource->email),
 				"accessKey" => $resource->zugangscode,
 				"selection" => null,
 			];
 
-			$externalParticipantVotes = array_filter(
+			$externalParticipantVotes = array_values(array_filter(
 				$votes,
 				function ($vote) use ($resource) {
 					return $vote["oldResourceId"] === $resource->coodle_ressource_id;
 				}
-			);
+			));
 			if (count($externalParticipantVotes)) {
 				$externalParticipantData["selection"] = array_map(
 					function ($vote) {
@@ -234,6 +251,9 @@ while ($survey = $db->db_fetch_object($surveysResult)) {
 		$participantInsertValues = array_map(
 			function ($participantData) use ($survey) {
 				$formattedSelectionString = $participantData["selection"] !== null ? ("'" . json_encode($participantData["selection"]) . "'") : "NULL";
+				if (strlen($formattedSelectionString) > 1000) {
+					$formattedSelectionString = "NULL";
+				}
 				$participantUid = $participantData["uid"];
 				return "($survey->coodle_id, '$participantUid', $formattedSelectionString)";
 			},
@@ -248,6 +268,9 @@ while ($survey = $db->db_fetch_object($surveysResult)) {
 		$externalParticipantInsertValues = array_map(
 			function ($externalParticipantData) use ($survey) {
 				$formattedSelectionString = $externalParticipantData["selection"] !== null ? ("'" . json_encode($externalParticipantData["selection"]) . "'") : "NULL";
+				if (strlen($formattedSelectionString) > 1000) {
+					$formattedSelectionString = "NULL";
+				}
 				$externalParticipantName = $externalParticipantData["name"];
 				$externalParticipantEmail = $externalParticipantData["email"];
 				$externalParticipantAccessKey = $externalParticipantData["accessKey"];
@@ -255,26 +278,44 @@ while ($survey = $db->db_fetch_object($surveysResult)) {
 			},
 			$externalParticipantsData
 		);
-		$externalParticipantInsertValues = implode(", ", $participantInsertValues);
+		$externalParticipantInsertValues = implode(", ", $externalParticipantInsertValues);
 		$externalParticipantInsertQuery = "INSERT INTO campus.tbl_coodle_survey_external_participants (survey_id, name, email, access_key, selection) VALUES $externalParticipantInsertValues";
 		$db->db_query($externalParticipantInsertQuery);
 	}
 
-	echo (json_encode($timeslotsData));
-	echo ("<br>");
-	echo (json_encode($participantsData));
-	echo ("<br>");
-	echo (json_encode($externalParticipantsData));
-	echo ("<br>");
-	echo ("-----");
-	echo ("<br>");
 }
+
+
+// set id autoincrement start value
+$lastSurveyQuery = "SELECT id FROM campus.tbl_coodle_surveys ORDER BY id DESC LIMIT 1";
+$lastSurveyQueryResult = $db->db_query($lastSurveyQuery);
+$lastSurvey = $db->db_fetch_object($lastSurveyQueryResult);
+$lastSurveyId = $lastSurvey->id + 1;
+$autoIncrementResetQuery = "ALTER SEQUENCE campus.seq_tbl_coodle_surveys_id RESTART WITH $lastSurveyId";
+$db->db_query($autoIncrementResetQuery);
+
+echo ("Coodle data migration successfully completed!");
+
 
 function formatDescription($oldDescription)
 {
 	$descriptionWithNewlines = preg_replace("/<br ?\/?>/i", "\n", $oldDescription);
-	$descriptionWithoutHtmlTags = preg_replace("/<.*>/i", "", $descriptionWithNewlines);
-	return trim($descriptionWithoutHtmlTags);
+	$descriptionWithoutHtmlTags = preg_replace("/<.*\/>/i", "", $descriptionWithNewlines);
+	$descriptionWithoutHtmlTags = preg_replace("/<.*>/i", " ", $descriptionWithNewlines);
+	$trimmedDescription = trim($descriptionWithoutHtmlTags);
+	$slicedDescription = substr($trimmedDescription, 0, 1000);
+	$retrimmedDescription = trim($slicedDescription);
+	return escapeSingleQuotes($retrimmedDescription);
+}
+
+function formatTitle($oldTitle)
+{
+	return escapeSingleQuotes(trim(substr(trim($oldTitle), 0, 255)));
+}
+
+function escapeSingleQuotes($string)
+{
+	return str_replace("'", "''", $string);
 }
 
 ?>
