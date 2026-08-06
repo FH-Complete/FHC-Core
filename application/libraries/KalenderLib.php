@@ -39,7 +39,7 @@ class KalenderLib
 		$end_date = date('Y-m-d', strtotime($end_date . ' +1 day'));
 
 		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id,
-												tbl_kalender.eindeutige_gruppen_id,
+												tbl_kalender.eindeutige_kalender_gruppen_id,
 												tbl_kalender.status_kurzbz,
 												tbl_kalender.typ,
 												tbl_kalender.von,
@@ -137,7 +137,7 @@ class KalenderLib
 		$this->_ci->KalenderModel->db->where('tbl_kalender.von >=', $start_date);
 		$this->_ci->KalenderModel->db->where('tbl_kalender.bis <', $end_date);
 
-		$this->_ci->KalenderModel->addOrder('tbl_kalender.eindeutige_gruppen_id', 'DESC');
+		$this->_ci->KalenderModel->addOrder('tbl_kalender.eindeutige_kalender_gruppen_id', 'DESC');
 	}
 
 	private function _mapEvents($data, $collisionCheck = true)
@@ -160,7 +160,7 @@ class KalenderLib
 
 				$events[$id] = (object) [
 					'kalender_id' => $id,
-					'eindeutige_gruppen_id' => $row->eindeutige_gruppen_id,
+					'eindeutige_kalender_gruppen_id' => $row->eindeutige_kalender_gruppen_id,
 					'type' => $row->typ,
 					'beginn' => $von->format('H:i:s'),
 					'ende' => $bis->format('H:i:s'),
@@ -398,7 +398,7 @@ class KalenderLib
 		$this->_ci->KalenderModel->addSelect([ 
 			"(
 				SELECT COUNT(*) FROM lehre.tbl_betriebsmittel_kalender 
-				WHERE tbl_betriebsmittel_kalender.eindeutige_kalender_gruppen_id = tbl_kalender.eindeutige_gruppen_id
+				WHERE tbl_betriebsmittel_kalender.eindeutige_kalender_gruppen_id = tbl_kalender.eindeutige_kalender_gruppen_id
 			) AS has_assigned_resources"
 		]);
 
@@ -600,7 +600,7 @@ class KalenderLib
 				'bis' => $end_date,
 				'typ' => 'lehreinheit',
 				'status_kurzbz' => 'planning',
-				'eindeutige_gruppen_id' => $this->_ci->KalenderModel->generateUniqueGroupId(),
+				'eindeutige_kalender_gruppen_id' => $this->_ci->KalenderModel->generateUniqueGroupId(),
 				'insertvon' => getAuthUID(),
 				'insertamum' => date('Y-m-d H:i:s')
 			)
@@ -1000,19 +1000,19 @@ class KalenderLib
 			";
 
 			$params = array_merge(
-				[$calendar->eindeutige_gruppen_id],
+				[$calendar->eindeutige_kalender_gruppen_id],
 				$allowedResourceIDs
 			);
 
 			$this->_ci->db->query($query, $params);
 		} else {
-			$this->_ci->db->where('eindeutige_kalender_gruppen_id', $calendar->eindeutige_gruppen_id);
+			$this->_ci->db->where('eindeutige_kalender_gruppen_id', $calendar->eindeutige_kalender_gruppen_id);
 			$this->_ci->db->delete('lehre.tbl_betriebsmittel_kalender');
 		}
 
 		foreach ($assignedResources as $assignedResource) {
 			$data = [
-				'eindeutige_kalender_gruppen_id' => $calendar->eindeutige_gruppen_id,
+				'eindeutige_kalender_gruppen_id' => $calendar->eindeutige_kalender_gruppen_id,
 				'betriebsmittel_id' => $assignedResource['betriebsmittel_id'],
 				'anmerkung' => $assignedResource['anmerkung'] ?? null,
 				'quelle' => 'tempus_neu',
@@ -1134,7 +1134,7 @@ class KalenderLib
 		
 		$kalender_entry = getData($entryResult);
 		
-		$calendarResources = $this->_ci->BetriebsmittelKalenderModel->loadWhere(['eindeutige_kalender_gruppen_id' => $kalender_entry->eindeutige_gruppen_id]);
+		$calendarResources = $this->_ci->BetriebsmittelKalenderModel->loadWhere(['eindeutige_kalender_gruppen_id' => $kalender_entry->eindeutige_kalender_gruppen_id]);
 		if (isError($calendarResources)) return $calendarResources;
 		
 		$calendarResourcesItems = getData($calendarResources);
@@ -1293,7 +1293,7 @@ class KalenderLib
 				'typ' => 'lehreinheit',
 				'status_kurzbz' => 'planning',
 				'vorgaenger_kalender_id' => $old_id,
-				'eindeutige_gruppen_id' => $kalender_entry->eindeutige_gruppen_id,
+				'eindeutige_kalender_gruppen_id' => $kalender_entry->eindeutige_kalender_gruppen_id,
 				'insertvon' => getAuthUID(),
 				'insertamum' => date('Y-m-d H:i:s')
 			)

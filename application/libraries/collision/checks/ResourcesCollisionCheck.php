@@ -28,7 +28,7 @@ class ResourcesCollisionCheck implements ICollisionCheck
 		if ($this->_ci->variablelib->getVar('ignore_resources_collisions') === 'true') return [];
 
 		$this->_ci->KalenderModel->addSelect('kalender_id, von, bis, bm.beschreibung AS betriebsmittel_beschreibung');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_betriebsmittel_kalender bk', 'bk.eindeutige_kalender_gruppen_id = tbl_kalender.eindeutige_gruppen_id');
+		$this->_ci->KalenderModel->addJoin('lehre.tbl_betriebsmittel_kalender bk', 'bk.eindeutige_kalender_gruppen_id = tbl_kalender.eindeutige_kalender_gruppen_id');
 		$this->_ci->KalenderModel->addJoin('wawi.tbl_betriebsmittel bm', 'bm.betriebsmittel_id = bk.betriebsmittel_id');
 
 		$this->_ci->KalenderModel->db->where('tbl_kalender.kalender_id !=', $data->kalender_id);
@@ -59,9 +59,9 @@ class ResourcesCollisionCheck implements ICollisionCheck
 		if (empty($kalender_ids)) return [];
 
 		$this->_ci->KalenderModel->addSelect('DISTINCT ON (tbl_kalender.kalender_id) tbl_kalender.kalender_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_betriebsmittel_kalender current_bk', 'current_bk.eindeutige_kalender_gruppen_id = tbl_kalender.eindeutige_gruppen_id');
+		$this->_ci->KalenderModel->addJoin('lehre.tbl_betriebsmittel_kalender current_bk', 'current_bk.eindeutige_kalender_gruppen_id = tbl_kalender.eindeutige_kalender_gruppen_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_betriebsmittel_kalender other_bk', 'other_bk.betriebsmittel_id = current_bk.betriebsmittel_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender other_kalender', 'other_kalender.eindeutige_gruppen_id = other_bk.eindeutige_kalender_gruppen_id');
+		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender other_kalender', 'other_kalender.eindeutige_kalender_gruppen_id = other_bk.eindeutige_kalender_gruppen_id');
 
 		$this->_ci->KalenderModel->db->where('other_kalender.kalender_id != tbl_kalender.kalender_id', null, false);
 		$this->_ci->KalenderModel->db->where('other_kalender.von < tbl_kalender.bis', null, false);

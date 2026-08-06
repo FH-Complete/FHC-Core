@@ -1029,7 +1029,7 @@ export default {
 
       setTimeout(() => {
         const eventEl = document.querySelector(
-          `[data-group-id="event-group-${this.currentlyUpdatedEvent.eindeutige_gruppen_id}"]`,
+          `[data-group-id="event-group-${this.currentlyUpdatedEvent.eindeutige_kalender_gruppen_id}"]`,
         );
         if (!eventEl) return;
 
