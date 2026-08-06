@@ -233,7 +233,7 @@ const router = VueRouter.createRouter({
 			props: {dashboard: 'CIS'},
 		},
 		{
-			path: `/Cis/Zeitsperren/:type?/:maUid?/:days?`,
+			path: '/Cis/Zeitsperren/:type(all|fix|lector|ma|oe|stg|ass)?/:id?/:days?',
 			name: 'ZeitsperrenMa',
 			component: ZeitsperrenMa,
 			props: route => {

@@ -4,8 +4,6 @@ import FhcHeader from "../DetailHeader/DetailHeader.js";
 import VertraegeMitarbeiter from "./Vertraege.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
 import ApiCoreVertraege from '../../api/factory/vertraege/vertraege.js';
-import ZeitsperrenProv from '../Cis/ZeitsperrenMitarbeiter/ZeitsperrenMa.js';
-
 
 export default {
 	name: 'Vertragsverwaltung',
@@ -14,8 +12,7 @@ export default {
 		VerticalSplit,
 		MitarbeiterHeader,
 		FhcHeader,
-		VertraegeMitarbeiter,
-		ZeitsperrenProv
+		VertraegeMitarbeiter
 	},
 	props: {
 		config: Object,
@@ -52,9 +49,6 @@ export default {
 	},
 	template: `
 		<!-- Navigation component -->
-		
-		<zeitsperren-prov/>
-		
 		<core-navigation-cmpt/>
 
 		<div id="content">

@@ -1,5 +1,6 @@
 import listsZeitsperren from './Details/listsZeitsperren.js';
 import MitarbeiterZeitsperren from './Details/ZeitsperrenMitarbeiteruid.js';
+export const DEFAULT_INTERVAL_DAYS = 14;
 
 export default {
 	name: 'ZeitsperrenMa',
@@ -40,7 +41,7 @@ export default {
 					class: 'btn-secondary'
 				},
 				{
-					key: 'lecStg',
+					key: 'stg',
 					title: 'zeitsperren/btn_lect_stg',
 					class: 'btn-secondary'
 				}
@@ -51,12 +52,19 @@ export default {
 		show(view) {
 			this.activeView = this.activeView === view ? null : view;
 		},
+		route(view) {
+			this.activeView = this.activeView === view ? null : view;
+			this.$router.push({
+				name: 'ZeitsperrenMa',
+				params: {
+					type: this.activeView,
+					days: DEFAULT_INTERVAL_DAYS
+				}
+			});
+		},
 	},
-	//TODO(only show main page if there is no prop
 	template: `
 		<div class="base-zeitsperren w-100 h-100">
-
-			<template v-if="!propsViewData.maUid && !propsViewData.type">
 
 				<div class="row g-1">
 					<div
@@ -67,28 +75,19 @@ export default {
 						<button
 							class="btn w-100"
 							:class="button.class"
-							@click="show(button.key)"
+							@click="route(button.key)"
 						>
 							{{ $p.t(button.title) }}
 						</button>
 					</div>
 				</div>
 
-				<lists-zeitsperren
-					v-if="activeView"
-					ref="listTimeLocks"
-					:type="activeView"
-				/>
 
-		</template>
-		<template v-else>
-
-			<lists-zeitsperren
+					<lists-zeitsperren
 						:type="propsViewData.type"
-						:maUid="propsViewData.maUid"
+						:id="propsViewData.id"
 						:tage="propsViewData.days"
 					/>
-		</template>
 
 	</div>
 

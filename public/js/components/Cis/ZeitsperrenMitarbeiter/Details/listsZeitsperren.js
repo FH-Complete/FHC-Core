@@ -23,7 +23,7 @@ export default {
 					'lector',
 					'oe',
 					'ass',
-					'lecStg',
+					'stg',
 					'ma'
 				].includes(value)
 			}
@@ -31,9 +31,9 @@ export default {
 		tage: {
 			type: String
 		},
-		maUid: {
+		id: {
 			type: String
-		}
+		},
 	},
 	data(){
 		return {
@@ -49,7 +49,10 @@ export default {
 			selectedStg: null,
 			studiengang_kz: null,
 			showTable: true,
-			fullName: null
+			fullName: null,
+			maUid: null,
+			validStgs: [],
+			validOes: []
 		}
 	},
 	methods: {
@@ -75,6 +78,14 @@ export default {
 				})
 		},
 		loadZeitsperrenOE(days, oe){
+			this.$router.push({
+				name: 'ZeitsperrenMa',
+				params: {
+					type: this.$route.params.type,
+					id: oe,
+					days: days
+				}
+			});
 			this.$api
 				.call(ApiMaTimelocks.loadAllZeitsperrenOE(days, oe))
 				.then(result => {
@@ -89,6 +100,14 @@ export default {
 				})
 		},
 		loadZeitsperrenStg(days, stg){
+			this.$router.push({
+				name: 'ZeitsperrenMa',
+				params: {
+					type: this.$route.params.type,
+					id: stg,
+					days: days
+				}
+			});
 			this.$api
 				.call(ApiMaTimelocks.loadZeitsperrenLectorStg(days, stg))
 				.then(result => {
@@ -128,47 +147,85 @@ export default {
 		createArrayMa(type){
 				this.showTable = true;
 				if(type == "fix") {
+					if(this.id && this.isZifferString(this.id))
+						this.interval = Number(this.id) < 100 ? Number(this.id) : this.interval;
+
 					this.loadZeitsperrenFixeMa(this.interval);
 				}
 				else if(type == "lector") {
+					if(this.id && this.isZifferString(this.id))
+						this.interval = Number(this.id) < 100 ? Number(this.id) : this.interval;
 					this.loadZeitsperrenLector(this.interval);
 				}
 				else if(type == "oe") {
-					this.showTable = false;
-					this.selectedOe = null;
-					this.$api
-						.call(ApiMaTimelocks.getAllOes())
-						.then(result => {
-							this.listOes = result.data.filter(item => item.aktiv);
-						})
-						.catch(this.$fhcAlert.handleSystemError);
+					this.loadOes().then(() => {
+						if(this.id && this.validOes.includes(this.id)) {
+							const countDays = this.tage ? Number(this.tage) : this.interval;
+
+							this.oe_temp = this.listOes.filter(
+								item => item.oe_kurzbz === this.id
+							);
+							this.selectedOe = this.oe_temp[0];
+
+							this.loadZeitsperrenOE(
+								countDays,
+								this.selectedOe.oe_kurzbz
+							);
+						} else {
+							if(this.id)
+								this.interval = Number(this.id) < 100
+									? Number(this.id)
+									: this.interval;
+
+							this.showTable = false;
+							this.selectedOe = null;
+						}
+					});
 				}
-				else if(type == "lecStg") {
-					this.showTable = false;
-					this.selectedStg = null;
-					this.$api
-						.call(ApiMaTimelocks.getAllStg())
-						.then(result => {
-							this.listStg = result.data;
-						})
-						.catch(this.$fhcAlert.handleSystemError);
+				else if(type == "stg") {
+					this.loadStgs().then(() => {
+						if(this.id && this.validStgs.includes(Number(this.id)))
+						{
+							const countDays= this.tage ? Number(this.tage) : this.interval;
+							this.stg_temp = this.listStg.filter(
+								item => item.studiengang_kz === Number(this.id)
+							);
+							this.selectedStg = this.stg_temp[0];
+							this.loadZeitsperrenStg(countDays, this.id)
+						}
+						else
+						{
+							if(this.id && this.isZifferString(this.id))
+								this.interval = Number(this.id) < 100 ? Number(this.id) : this.interval;
+							this.showTable = false;
+							this.selectedStg = null;
+						}
+					});
 				}
 				else if(type == "all") {
+					if(this.id && this.isZifferString(this.id))
+						this.interval = Number(this.id) < 100 ? Number(this.id) : this.interval;
 					this.loadAllActiveZeitsperren(this.interval);
 				}
 				else if(type == "ass") {
+					if(this.id && this.isZifferString(this.id))
+						this.interval = Number(this.id) < 100 ? Number(this.id) : this.interval;
 					this.loadZeitsperrenAss(this.interval);
 				}
 				else if(type == "ma") {
+					if(!this.id)
+						this.$fhcAlert.alertError(this.$p.t('ui', 'error_missingId', {id: "mitarbeiteruid"}));
 					const countDays= this.tage ? this.tage : this.interval;
-					this.loadZeitsperrenMa(countDays, this.maUid);
-					this.loadDetailsMa(this.maUid);
+					this.loadZeitsperrenMa(countDays, this.id);
+					this.loadDetailsMa(this.id);
 				}
 				else
 				{
-					this.$fhcAlert.alertError(this.$p.t('ui', 'error_fieldNotFound', {field: "Typ Zeitsperre"}));
+					//route back if no type found
+					this.$router.push({
+						name: 'ZeitsperrenMa',
+					});
 				}
-
 		},
 		isBlocked(mitarbeiter, tag) {
 			if (!mitarbeiter?.sperren) {
@@ -213,11 +270,50 @@ export default {
 			);
 		},
 		loadDetailsMa(uid){
+			if(!uid)
+				this.$fhcAlert.alertError(this.$p.t('ui', 'error_fieldNotFound', {field: "UID Mitarbeiter"}));
+
 			this.$api
 				.call(ApiMaTimelocks.getDetailsMa(uid))
 				.then(result => {
 					this.fullName = result.data;
 				})
+		},
+		isZifferString(wert) {
+			//to check if the wert of the route param is a ziffer or a real String
+			return typeof wert === 'string' && wert.trim() !== '' && !isNaN(wert);
+		},
+		async loadOes() {
+			try {
+				const result = await this.$api.call(ApiMaTimelocks.getAllOes());
+				this.listOes = result.data.filter(item => item.aktiv);
+				this.validOes = this.listOes.map(item => item.oe_kurzbz);
+			} catch (e) {
+				this.$fhcAlert.handleSystemError(e);
+			}
+			return this.validOes;
+		},
+		async loadStgs() {
+			try {
+				const result = await this.$api.call(ApiMaTimelocks.getAllStg());
+				this.listStg = result.data;
+				this.validStgs = this.listStg.map(item => item.studiengang_kz);
+			} catch (e) {
+				this.$fhcAlert.handleSystemError(e);
+			}
+			return this.validOes;
+		},
+		checkRoute(){
+			if (this.type === 'ma' && !this.id) {
+				//const errorString = this.$p.t('ui', 'successSave');
+				const errorString = "Keine ID für Mitarbeiter übergeben";
+				return errorString;
+			}
+			if (this.type === 'stg' && !this.isZifferString(this.id)) {
+				//const errorString = this.$p.t('ui', 'successSave');
+				const errorString = "Studiengangskennzahl darf nur aus Zahlen bestehen";
+				return errorString;
+			}
 		}
 	},
 	computed: {
@@ -290,7 +386,7 @@ export default {
 					else if(this.type == "ass") {
 						this.loadZeitsperrenAss(newVal);
 					}
-					else if(this.type == "lecStg") {
+					else if(this.type == "stg") {
 						if(this.selectedStg )
 							this.loadZeitsperrenStg(newVal, this.studiengang_kz);
 					}
@@ -336,11 +432,26 @@ export default {
 		},
 	},
 	created(){
+		const error = this.checkRoute();
+		if (error) {
+			console.log(error);
+			this.$fhcAlert.alertError(error);
+		return;
+		}
+
 		this.createArrayMa(this.type);
-		if(this.tage)
+		if(this.tage && Number(this.tage) < 100) {
 			this.createDays(Number(this.tage));
+			this.interval = Number(this.tage);
+		}
 		else
 			this.createDays(this.interval);
+
+		 if (this.type === 'oe') {
+			this.oe_kurzbz = this.id
+		} else if (this.type === 'stg'){
+			this.studiengang_kz = this.id;
+		}
 	},
 	template: `
 	<div class="w-100 h-100">
@@ -349,7 +460,7 @@ export default {
 				<span v-if="type=='fix'">{{$p.t('zeitsperren/title_fix')}}</span>
 				<span v-if="type=='lector'">{{$p.t('zeitsperren/title_fixLecturers')}}</span>
 				<span v-if="type=='oe'">{{$p.t('zeitsperren/title_byOe')}}</span>
-				<span v-if="type=='lecStg'">{{$p.t('zeitsperren/title_lectStg')}}</span>
+				<span v-if="type=='stg'">{{$p.t('zeitsperren/title_lectStg')}}</span>
 				<span v-if="type=='ass'">{{$p.t('zeitsperren/title_ass')}}</span>
 				<span v-if="type=='ma'">{{$p.t('zeitsperren/zeitsperrenVon')}} {{fullName}}</span>
 				{{ mondayBeforeToday.toLocaleDateString('de-AT') }} - {{endInterval}}
@@ -393,8 +504,8 @@ export default {
 						</form-input>
 					</form-form>
 				</div>
-				<label v-if="type=='lecStg'">{{$p.t('zeitsperren/lektor_innen')}}</label>
-				<div v-if="type=='lecStg'" class="flex-grow-1">
+				<label v-if="type=='stg'">{{$p.t('zeitsperren/lektor_innen')}}</label>
+				<div v-if="type=='stg'" class="flex-grow-1">
 					<form-form class="g-3" ref="oeSelectForm">
 						<form-input
 							container-class="w-50"
@@ -423,7 +534,7 @@ export default {
 			</div>
 		</div>
 
-		<table v-if="showTable" class="table table-dark table-striped table-bordered">
+		<table v-if="showTable" class="table table-striped table-bordered">
 			<thead>
 				<tr>
 				  <th scope="col"> UID </th>

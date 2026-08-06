@@ -18,7 +18,7 @@ export default {
 				name: 'ZeitsperrenMa',
 				params: {
 					type: 'ma',
-					maUid: maUid,
+					id: maUid,
 					days: days
 				}
 			});

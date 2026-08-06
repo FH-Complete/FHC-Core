@@ -60681,6 +60681,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_paramNoNumber',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Parameter {param} muss eine Zahl sein',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Parameter {param} has to be a number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// PHRASES ZEITSPERREN END
 
 );

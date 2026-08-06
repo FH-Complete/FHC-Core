@@ -78,6 +78,10 @@ class MaZeitsperren extends FHCAPI_Controller
 
 	public function getAllZeitsperrenOes($days, $oe)
 	{
+		if(!$oe)
+		{
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'OE Kurzbezeichnung']), self::ERROR_TYPE_GENERAL);
+		}
 		$von = date('Y-m-d');
 		$bis = date('Y-m-d', strtotime("+{$days} days"));
 		$result = $this->ZeitsperreModel->getMitarbeiterWithZeitsperren($von, $bis, false, false, $oe, false);
@@ -89,6 +93,15 @@ class MaZeitsperren extends FHCAPI_Controller
 
 	public function loadZeitsperrenLectorStg($days, $stg)
 	{
+		if(!$stg)
+		{
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Studiengangskennzahl']), self::ERROR_TYPE_GENERAL);
+		}
+		if(!is_numeric($stg))
+		{
+			return $this->terminateWithError($this->p->t('ui', 'error_paramNoNumber', ['param'=> 'Studiengangskennzahl']), self::ERROR_TYPE_GENERAL);
+		}
+
 		$von = date('Y-m-d');
 		$bis = date('Y-m-d', strtotime("+{$days} days"));
 		$result = $this->ZeitsperreModel->getMitarbeiterWithZeitsperren($von, $bis, false, true, false, false, $stg);
@@ -125,6 +138,10 @@ class MaZeitsperren extends FHCAPI_Controller
 
 	public function loadZeitsperrenMa($days, $uid)
 	{
+		if ($uid === null || $uid === '')
+		{
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Mitarbeiter UID']), self::ERROR_TYPE_GENERAL);
+		}
 		$result = $this->ZeitsperreModel->getZeitsperrenForNextDays($days, $uid);
 
 		$data = $this->getDataOrTerminateWithError($result);
@@ -134,6 +151,10 @@ class MaZeitsperren extends FHCAPI_Controller
 
 	public function getDetailsMa($uid)
 	{
+		if ($uid === null || $uid === '')
+		{
+			$this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Mitarbeiter UID']), self::ERROR_TYPE_GENERAL);
+		}
 		$this->load->model('ressource/Person_model', 'PersonModel');
 		$result = $this->PersonModel->getFullName($uid);
 
