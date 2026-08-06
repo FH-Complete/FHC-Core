@@ -290,6 +290,38 @@ class AbgabetoolJob extends JOB_Controller
 		}
 	}
 
+	/**
+	 * helper to tell apart an actually new/edited abgabetermin from an upload or a benotung, since all
+	 * three write updatevon/updateamum on the same paabgabe row and the row itself keeps no change history.
+	 * uploads and benotungen have their own notifications, reporting them as changed termine is what made
+	 * betreuer/assistenz receive "Termine hinzugefügt oder bearbeitet" after a student uploaded a file.
+	 */
+	private function isNewOrEditedTermin($abgabe) {
+		// never updated, so the termin itself was created within the interval
+		if (empty($abgabe->updatevon)) {
+			return true;
+		}
+
+		// the student can only ever write abgabedatum by uploading -> notifyBetreuerMail/notifyStudentMail report those
+		if ($abgabe->student_uid === $abgabe->updatevon) {
+			return false;
+		}
+
+		// upload done by assistenz/betreuer on behalf of the student: abgabedatum is written on the day of the update
+		if (!empty($abgabe->abgabedatum) && !empty($abgabe->updateamum)
+			&& substr($abgabe->abgabedatum, 0, 10) === substr($abgabe->updateamum, 0, 10)) {
+			return false;
+		}
+
+		// typ and datum of a benoteter termin are locked (see Abgabe->postProjektarbeitAbgabe), so an update
+		// on it is either the benotung itself or a cosmetic edit - neither is a termin change
+		if ($abgabe->note !== null) {
+			return false;
+		}
+
+		return true;
+	}
+
 	public function notifyAssistenzAboutChangedAbgaben() {
 
 		$this->_ci->logInfo('Start job FHC-Core->notifyAssistenzAboutChangedAbgaben');
@@ -298,7 +330,7 @@ class AbgabetoolJob extends JOB_Controller
 		$relevantTypes = $this->_ci->config->item('RELEVANT_PAABGABETYPEN_SAMMELMAIL_ASSISTENZ');
 		// get all new or changed termine in interval
 		$result = $this->_ci->PaabgabeModel->findAbgabenNewOrUpdatedSince($interval, $relevantTypes);
-		
+
 		$retval = getData($result);
 
 		if(count($retval) == 0) {
@@ -314,7 +346,12 @@ class AbgabetoolJob extends JOB_Controller
 			if (isset($newOrChangedAbgabe->projektarbeit_id)) {
 				$projektarbeitId = $newOrChangedAbgabe->projektarbeit_id;
 
-				// If the 'projektarbeit_id' is not yet a key in $projektarbeiten, 
+				// uploads and benotungen are no termin changes, they have their own notifications
+				if (!$this->isNewOrEditedTermin($newOrChangedAbgabe)) {
+					continue;
+				}
+
+				// If the 'projektarbeit_id' is not yet a key in $projektarbeiten,
 				// initialize it as an empty array.
 				if (!isset($projektarbeiten[$projektarbeitId])) {
 					$projektarbeiten[$projektarbeitId] = [];
@@ -323,6 +360,11 @@ class AbgabetoolJob extends JOB_Controller
 				// Add the current row to the array associated with its 'projektarbeit_id'.
 				$projektarbeiten[$projektarbeitId][] = $newOrChangedAbgabe;
 			}
+		}
+
+		if(count($projektarbeiten) == 0) {
+			$this->_ci->logInfo("Keine Emails an Assistenzen über neue oder veränderte Termine versandt");
+			return;
 		}
 
 		// for each projektarbeit fetch their assistenz and same them in their own dictionary to avoid too many mails
@@ -515,14 +557,12 @@ class AbgabetoolJob extends JOB_Controller
 			if (isset($newOrChangedAbgabe->projektarbeit_id)) {
 				$projektarbeitId = $newOrChangedAbgabe->projektarbeit_id;
 
-				// check if the updatevon field is NOT the same as the student the projektarbeit is assigned to
-				// since uploading a file to a paabgabe is also putting updateamum & updatevon
-				// we have our own "student has uploaded a file" emailjob anyways
-				if($newOrChangedAbgabe->student_uid === $newOrChangedAbgabe->updatevon) {
+				// uploads and benotungen are no termin changes, they have their own notifications
+				if (!$this->isNewOrEditedTermin($newOrChangedAbgabe)) {
 					continue;
 				}
-				
-				// If the 'projektarbeit_id' is not yet a key in $projektarbeiten, 
+
+				// If the 'projektarbeit_id' is not yet a key in $projektarbeiten,
 				// initialize it as an empty array.
 				if (!isset($projektarbeiten[$projektarbeitId])) {
 					$projektarbeiten[$projektarbeitId] = [];
@@ -720,61 +760,112 @@ class AbgabetoolJob extends JOB_Controller
 		forEach ($betreuer_uids as $person_id => $abgaben) {
 			// $person_id is from betreuer
 
-			$result = $this->_ci->ProjektarbeitModel->getProjektbetreuerAnrede($person_id);
-			$data = getData($result)[0];
+			// resolve the recipient by the person_id the mail was grouped by. resolving it by
+			// projektarbeit_id + betreuerart of the first abgabe addressed the wrong person as soon as a
+			// projektarbeit had two betreuer of the same art
+			$result = $this->_ci->ProjektbetreuerModel->getBetreuerByPersonId($person_id);
+			$betreuerArr = getData($result);
 
-			$anrede = $data->anrede;
-			$anredeFillString = $data->anrede == "Herr" ? "r" : "";
-			$fullFormattedNameString = $data->first;
-
-			// sorting $abgaben array by datum
-			usort($abgaben, function ($a, $b) {
-				return strtotime($a->datum) <=> strtotime($b->datum);
-			});
-
-			$projektarbeit_titel = $abgaben[0]->titel;
-
-			// initialize the table and headers
-			$abgabenString = '
-			<table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; color: #333; margin-top: 15px; margin-bottom: 15px;">
-				<thead>
-					<tr style="background-color: #f2f2f2; text-align: left;">
-						<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 15%;">Zieldatum</th>
-						<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 25%;">Studierende/r</th>
-						<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px;">Bezeichnung</th>
-						<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 15%;">Abgabedatum</th>
-					</tr>
-				</thead>
-				<tbody>';
-			
-			foreach ($abgaben as $abgabe) {
-				// format the student name
-				$nameParts = [];
-				if (!empty($abgabe->titelpre)) $nameParts[] = $abgabe->titelpre;
-				$nameParts[] = $abgabe->vorname;
-				$nameParts[] = $abgabe->nachname;
-				if (!empty($abgabe->titelpost)) $nameParts[] = $abgabe->titelpost;
-				$studentFullName = implode(' ', $nameParts);
-
-				// format dates inline
-				$dateEmailFormatted = (new DateTime($abgabe->datum))->format('d.m.Y');
-				$abgabedatumFormatted = (new DateTime($abgabe->abgabedatum))->format('d.m.Y');
-
-				// handle the optional Kurzbezeichnung
-				$kurzbzLine = !empty($abgabe->kurzbz) ? "<br/><small style='color: #666; font-style: italic;'>{$abgabe->kurzbz}</small>" : "";
-
-				$abgabenString .= "
-				<tr>
-					<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px; vertical-align: top;'>{$dateEmailFormatted}</td>
-					<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px; vertical-align: top;'>{$studentFullName}</td>
-					<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px;'>
-						<strong>{$abgabe->bezeichnung}</strong>{$kurzbzLine}
-					</td>
-					<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px; vertical-align: top;'>{$abgabedatumFormatted}</td>
-				</tr>";
+			if(!$betreuerArr) {
+				$this->_ci->logInfo('Could not load Betreuer PersonID: "'.$person_id.'".');
+				continue;
 			}
 
-			$abgabenString .= '</tbody></table>';
+			$betreuer = $betreuerArr[0];
+
+			$email = $betreuer->uid ? $betreuer->uid."@".DOMAIN : $betreuer->private_email;
+
+			// in rare cases there are betreuer (often zweitbetreuer) without uid and without private email
+			if(!$email) {
+				$this->_ci->logInfo('Could not send Email for Betreuer PersonID: "'.$person_id.'".');
+				continue;
+			}
+
+			$anrede = $betreuer->anrede;
+			$anredeFillString = $betreuer->anrede == "Herr" ? "r" : "";
+			$fullFormattedNameString = $betreuer->first;
+
+			// a betreuer can supervise several projektarbeiten, so group the uploads and give each one its
+			// own section instead of printing one projektarbeit title above uploads of all of them
+			$abgabenProProjektarbeit = [];
+			forEach($abgaben as $abgabe) {
+				$abgabenProProjektarbeit[$abgabe->projektarbeit_id][] = $abgabe;
+			}
+
+			// start the container
+			$abgabenString = '<div style="font-family: Arial, sans-serif; color: #333;">';
+
+			forEach($abgabenProProjektarbeit as $projektarbeit_id => $projektarbeitAbgaben) {
+
+				// sorting $projektarbeitAbgaben array by datum
+				usort($projektarbeitAbgaben, function ($a, $b) {
+					return strtotime($a->datum) <=> strtotime($b->datum);
+				});
+
+				// format the student name
+				$s = $projektarbeitAbgaben[0];
+				$nameParts = [];
+				if (!empty($s->titelpre)) $nameParts[] = $s->titelpre;
+				$nameParts[] = $s->vorname;
+				$nameParts[] = $s->nachname;
+				if (!empty($s->titelpost)) $nameParts[] = $s->titelpost;
+				$studentFullName = implode(' ', $nameParts);
+
+				$projektarbeit_titel = $s->titel ?? 'Kein Titel vergeben';
+
+				// project header section
+				$abgabenString .= "
+					<div style='margin-top: 25px; padding: 12px; background-color: #f8f9fa; border-left: 4px solid #007bff; border-bottom: 1px solid #eee;'>
+						<strong style='font-size: 16px; color: #0056b3;'>Projekt: {$projektarbeit_titel}</strong><br/>
+						<div style='margin-top: 5px; font-size: 14px;'>
+							<strong>Studierende/r:</strong> {$studentFullName}
+						</div>
+						<span style='color: #666; font-size: 12px;'>
+							ID: {$projektarbeit_id} | Rolle: {$s->betreuerart_kurzbz} |
+							Stg: {$s->stgtyp}{$s->stgkz} ({$s->studiensemester_kurzbz})
+						</span>
+					</div>";
+
+				// start table
+				$abgabenString .= '
+					<table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
+						<thead>
+							<tr style="background-color: #eee; text-align: left;">
+								<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 20%;">Zieldatum</th>
+								<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px;">Bezeichnung</th>
+								<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 20%;">Abgabedatum</th>
+							</tr>
+						</thead>
+						<tbody>';
+
+				foreach ($projektarbeitAbgaben as $abgabe) {
+					// format dates inline
+					$dateEmailFormatted = (new DateTime($abgabe->datum))->format('d.m.Y');
+					$abgabedatumFormatted = (new DateTime($abgabe->abgabedatum))->format('d.m.Y');
+
+					// handle the optional Kurzbezeichnung
+					$kurzbzLine = !empty($abgabe->kurzbz) ? "<br/><small style='color: #666; font-style: italic;'>{$abgabe->kurzbz}</small>" : "";
+
+					$abgabenString .= "
+						<tr>
+							<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px; vertical-align: top;'>{$dateEmailFormatted}</td>
+							<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px;'>
+								<strong>{$abgabe->bezeichnung}</strong>{$kurzbzLine}
+							</td>
+							<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px; vertical-align: top;'>{$abgabedatumFormatted}</td>
+						</tr>";
+				}
+
+				$abgabenString .= '</tbody></table>';
+			}
+
+			// close container
+			$abgabenString .= '</div>';
+
+			// the template prints one projektarbeit title, which only holds when the mail covers a single one
+			$paTitel = count($abgabenProProjektarbeit) === 1
+				? ($abgaben[0]->titel ?? 'Kein Titel vergeben')
+				: $this->p->t('abgabetool', 'c4mehrereProjektarbeiten');
 
 			$path = $this->_ci->config->item('URL_MITARBEITER');
 			$url = CIS_ROOT.$path;
@@ -783,28 +874,17 @@ class AbgabetoolJob extends JOB_Controller
 				'anrede' => $anrede,
 				'anredeFillString' => $anredeFillString,
 				'fullFormattedNameString' => $fullFormattedNameString,
-				'paTitel' => $projektarbeit_titel,
+				'paTitel' => $paTitel,
 				'abgabenString' => $abgabenString,
 				'linkAbgabetool' => $url
 			);
 
-			$result = $this->_ci->ProjektbetreuerModel->getBetreuerOfProjektarbeit($abgaben[0]->projektarbeit_id, $abgaben[0]->betreuerart_kurzbz);
-			$data = getData($result)[0];
-
-			$email = $data->uid ? $data->uid."@".DOMAIN : $data->private_email;
-
-			// in rare cases there are betreuer (often zweitbetreuer) without uid and without private email
-			if(!$email) {
-				$this->_ci->logInfo('Could not send Email for Betreuer PersonID: "'.$data->person_id.'".');
-				continue;
-			}
-			
 			// send email with bundled info
 			sendSanchoMail(
 				'PaabgabeUpdatesBetSM',
 				$body_fields,
 				$email,
-				$this->p->t('abgabetool', 'changedAbgabeterminev2')
+				$this->p->t('abgabetool', 'c4newUploadsNotification')
 			);
 
 			$count++;

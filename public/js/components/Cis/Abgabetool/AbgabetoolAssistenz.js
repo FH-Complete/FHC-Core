@@ -11,10 +11,12 @@ import AbgabeStudentTimeline from "./AbgabeStudentTimeline.js";
 import { splitMailsHelper } from "../../../helpers/EmailHelpers.js"
 import { getDateStyleClass} from "./getDateStyleClass.js";
 import { dateFilter } from '../../../tabulator/filters/DatesManual.js';
-import { compareISODateValues, formatISODate, getViennaTodayISO, toViennaDate } from "./dateUtils.js";
+import { compareISODateValues, getViennaTodayISO, toViennaDate } from "./dateUtils.js";
+import AbgabetoolTableMixin from "./AbgabetoolTableMixin.js";
 
 export const AbgabetoolAssistenz = {
 	name: "AbgabetoolAssistenz",
+	mixins: [AbgabetoolTableMixin],
 	components: {
 		AbgabeterminStatusLegende,
 		AbgabeStudentTimeline,
@@ -50,10 +52,6 @@ export const AbgabetoolAssistenz = {
 		return {
 			flatDataDirty: true,
 			mode: 'perProjectView',
-			qgate1FilterSelected: [],
-			qgate2FilterSelected: [],
-			pa_noteFilterSelected: [],
-			noteFilterSelected: [],
 			count: 0,
 			filteredcount: 0,
 			selectedcount: 0,
@@ -68,16 +66,9 @@ export const AbgabetoolAssistenz = {
 			curSem: null,
 			notenOptionFilter: null,
 			inplaceToggle: false,
-			headerFiltersRestored: false,
-			filtersRestored: false,
-			colLayoutRestored: false,
-			sortRestored: false,
-			stateRestored: false,
-			headerFiltersRestoredFlat: false,
-			filtersRestoredFlat: false,
-			colLayoutRestoredFlat: false,
-			sortRestoredFlat: false,
-			stateRestoredFlat: false,
+			// restore flags of the two tables, filled by initTablePersistence
+			tableState: {},
+			tableStateFlat: {},
 			timelineProjekte: [],
 			selectedStudiengangOption: null,
 			studiengaengeOptions: null,
@@ -211,7 +202,12 @@ export const AbgabetoolAssistenz = {
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4orgformv2'))), field: 'orgform', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 50, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4projekttyp'))), field: 'projekttyp_kurzbz', formatter: this.centeredTextFormatter, minWidth: 150, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 50, visible: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note_bez', headerFilter: true, sorter: this.notenSorter, visible: false, minWidth: 200, formatter: this.centeredTextFormatter},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note_bez',
+						headerFilter: this.notenHeaderFilterEditor,
+						headerFilterFunc: this.notenHeaderFilterFunc,
+						headerFilterParams: {},
+						headerFilterFuncParams: { idField: 'note' }, // column shows the bezeichnung, filter compares the note id
+						sorter: this.notenSorter, visible: false, minWidth: 200, formatter: this.centeredTextFormatter},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, visible: false, formatter: this.centeredTextFormatter, minWidth: 100},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true,  formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerv2'))), field: 'erstbetreuer', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
@@ -530,104 +526,8 @@ export const AbgabetoolAssistenz = {
 			const bData = bRow.getData()
 			return aData.pa_note - bData.pa_note
 		},
-		notenSorter(a, b, aRow, bRow, column, dir, sorterParams) {
-			const aData = aRow.getData()
-			const bData = bRow.getData()
-			return aData.note - bData.note
-		},
-		notenHeaderFilterEditor(cell, onRendered, success, cancel, editorParams) {
-			if (!this.notenOptions) return;
-
-			const field = cell.getField();
-			const stateKey = field + 'FilterSelected';
-			let selected = [...(this[stateKey] || [])];
-
-			const wrapper = document.createElement('div');
-			wrapper.style.cssText = 'position: relative; width: 100%;';
-
-			const display = document.createElement('input');
-			display.readOnly = true;
-			display.placeholder = '';
-			display.style.cssText = 'padding: 4px; width: 100%; box-sizing: border-box; cursor: default; border: 1px solid; outline: none; background: #fff; appearance: none; caret-color: transparent;';
-
-			const dropdown = document.createElement('div');
-			dropdown.style.cssText = 'display: none; position: fixed; background: #fff; border: 1px solid; z-index: 9999; min-width: 180px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);';
-
-
-			// mapping evaluated at render time, not at column definition time
-			const fieldOptionsMap = {
-				'pa_note': this.notenOptions,
-				'note': this.allowedNotenOptions,
-			};
-			const options = fieldOptionsMap[cell.getField()] ?? this.notenOptions;
-			if (!options) return;
-			
-			const updateDisplay = () => {
-				display.value = options
-					.filter(o => selected.includes(o.note))
-					.map(o => o.bezeichnung)
-					.join(', ');
-			};
-			options.forEach(opt => {
-				const row = document.createElement('label');
-				row.style.cssText = 'display: flex; align-items: center; gap: 6px; padding: 4px 8px; cursor: pointer; white-space: nowrap;';
-				row.addEventListener('mousedown', e => e.preventDefault());
-
-				const cb = document.createElement('input');
-				cb.type = 'checkbox';
-				cb.value = opt.note;
-				cb.checked = selected.includes(opt.note);
-				cb.style.cssText = 'margin: 0 6px;';
-				cb.addEventListener('change', () => {
-					selected = cb.checked
-						? [...selected, opt.note]
-						: selected.filter(v => v !== opt.note);
-					this[stateKey] = [...selected];
-					updateDisplay();
-					success([...selected]);
-				});
-
-				const labelText = document.createElement('span');
-				labelText.textContent = opt.bezeichnung;
-
-				row.appendChild(cb);
-				row.appendChild(labelText);
-				dropdown.appendChild(row);
-			});
-
-			updateDisplay();
-
-			display.addEventListener('click', () => {
-				if (dropdown.style.display === 'none') {
-					const rect = display.getBoundingClientRect();
-					dropdown.style.top = rect.bottom + 'px';
-					dropdown.style.left = rect.left + 'px';
-					dropdown.style.display = 'block';
-				} else {
-					dropdown.style.display = 'none';
-				}
-			});
-
-			display.addEventListener('blur', () => {
-				setTimeout(() => { dropdown.style.display = 'none'; }, 150);
-			});
-
-			document.body.appendChild(dropdown);
-			wrapper.appendChild(display);
-			cell.getElement().addEventListener('remove', () => dropdown.remove());
-			onRendered(() => display.focus());
-
-			return wrapper;
-		},
-
-		notenHeaderFilterFunc(filterVal, rowVal, rowData, filterParams) {
-			if (!filterVal || !filterVal.length) return true;
-			// rowVal is the raw integer note id or a note object
-			const noteId = typeof rowVal === 'object' ? rowVal?.note : rowVal;
-			return filterVal.some(val => val == noteId); // loose equality: filter vals are numbers, noteId might be string
-		},
 		handleFilterActiveChanged(active) {
-			if(!active && this.allSemOption && this.stateRestored) {
+			if(!active && this.allSemOption && this.tableState.stateRestored) {
 				this.curSem = this.allSemOption
 			}
 		},
@@ -779,213 +679,6 @@ export const AbgabetoolAssistenz = {
 				this.mode = 'perProjectView'
 			}
 		},
-		getDateStyleHtml(dateStyle) {
-			const iconMap = {
-				'verspaetet':              '<i class="fa-solid fa-triangle-exclamation"></i>',
-				'verpasst':                '<i class="fa-solid fa-calendar-xmark"></i>',
-				'abzugeben':               '<i class="fa-solid fa-hourglass-half"></i>',
-				'standard':                '<i class="fa-solid fa-clock"></i>',
-				'abgegeben':               '<i class="fa-solid fa-paperclip"></i>',
-				'beurteilungerforderlich': '<i class="fa-solid fa-list-check"></i>',
-				'bestanden':               '<i class="fa-solid fa-check"></i>',
-				'nichtbestanden':          '<i class="fa-solid fa-circle-exclamation"></i>',
-			};
-			return iconMap[dateStyle] ?? '';
-		},
-		statusHeaderFilterEditor(cell, onRendered, success, cancel, editorParams) {
-			const options = [
-				{ label: this.$p.t('abgabetool/c4positivBenotet'),    value: 'bestanden',              dateStyle: 'bestanden' },
-				{ label: this.$p.t('abgabetool/c4negativBenotet'),    value: 'nichtbestanden',         dateStyle: 'nichtbestanden' },
-				{ label: this.$p.t('abgabetool/c4tooltipVerspaetet'), value: 'verspaetet',             dateStyle: 'verspaetet' },
-				{ label: this.$p.t('abgabetool/c4tooltipVerpasst'),   value: 'verpasst',               dateStyle: 'verpasst' },
-				{ label: this.$p.t('abgabetool/c4tooltipAbzugeben'),  value: 'abzugeben',              dateStyle: 'abzugeben' },
-				{ label: this.$p.t('abgabetool/c4tooltipAbgegeben'),  value: 'abgegeben',              dateStyle: 'abgegeben' },
-				{ label: this.$p.t('abgabetool/c4tooltipBeurteilungerforderlich'), value: 'beurteilungerforderlich', dateStyle: 'beurteilungerforderlich' },
-				{ label: this.$p.t('abgabetool/c4tooltipStandardv2'), value: 'standard',               dateStyle: 'standard' },
-			];
-
-			const field = cell.getField();
-			const stateKey = field + 'FilterSelected'; // e.g. dateStyleFilterSelected
-			let selected = [...(this[stateKey] || [])];
-
-			const wrapper = document.createElement('div');
-			wrapper.style.cssText = 'position: relative; width: 100%;';
-
-			const display = document.createElement('input');
-			display.readOnly = true;
-			display.placeholder = '';
-			display.style.cssText = 'padding: 4px; width: 100%; box-sizing: border-box; cursor: default; border: 1px solid; outline: none; background: #fff; appearance: none; caret-color: transparent;';
-
-			const dropdown = document.createElement('div');
-			dropdown.style.cssText = 'display: none; position: fixed; background: #fff; border: 1px solid; z-index: 9999; min-width: 220px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);';
-
-			const updateDisplay = () => {
-				display.value = options
-					.filter(o => selected.includes(o.value))
-					.map(o => o.label)
-					.join(', ');
-			};
-
-			options.forEach(opt => {
-				const row = document.createElement('label');
-				row.style.cssText = 'display: flex; align-items: center; gap: 0; cursor: pointer; white-space: nowrap; padding-right: 8px;';
-				row.addEventListener('mousedown', e => e.preventDefault());
-
-				const cb = document.createElement('input');
-				cb.type = 'checkbox';
-				cb.value = opt.value;
-				cb.checked = selected.includes(opt.value);
-				cb.style.cssText = 'margin: 0 6px;';
-				cb.addEventListener('change', () => {
-					selected = cb.checked
-						? [...selected, opt.value]
-						: selected.filter(v => v !== opt.value);
-					this[stateKey] = [...selected];
-					updateDisplay();
-					success([...selected]);
-				});
-
-				// icon badge — same look as cell
-				const badge = document.createElement('div');
-				badge.className = opt.dateStyle + '-header';
-				badge.style.cssText = `min-width: 36px; height: 36px; display: flex; align-items: center; 
-				justify-content: center; flex-shrink: 0; padding: 0px 17px 0px 17px;`;
-				badge.innerHTML = this.getDateStyleHtml(opt.dateStyle);
-
-				const labelText = document.createElement('span');
-				labelText.textContent = opt.label;
-				labelText.style.cssText = 'margin-left: 6px;';
-
-				row.appendChild(cb);
-				row.appendChild(badge);
-				row.appendChild(labelText);
-				dropdown.appendChild(row);
-			});
-
-			updateDisplay();
-
-			display.addEventListener('click', () => {
-				if (dropdown.style.display === 'none') {
-					const rect = display.getBoundingClientRect();
-					dropdown.style.top = rect.bottom + 'px';
-					dropdown.style.left = rect.left + 'px';
-					dropdown.style.display = 'block';
-				} else {
-					dropdown.style.display = 'none';
-				}
-			});
-
-			display.addEventListener('blur', () => {
-				setTimeout(() => { dropdown.style.display = 'none'; }, 150);
-			});
-
-			document.body.appendChild(dropdown);
-			wrapper.appendChild(display);
-			cell.getElement().addEventListener('remove', () => dropdown.remove());
-			onRendered(() => display.focus());
-
-			return wrapper;
-		},
-		statusHeaderFilterFunc(filterVal, rowVal, rowData, filterParams) {
-			if (!filterVal || !filterVal.length) return true;
-			// rowVal is the raw dateStyle string on the flat table
-			return filterVal.some(val => val === rowVal);
-		},
-		qgateHeaderFilterEditor(cell, onRendered, success, cancel, editorParams) {
-
-			const options = [
-				{ label: '[+] ' + this.$p.t('abgabetool/c4positivBenotet'), value: 'positive' },
-				{ label: '[-] ' + this.$p.t('abgabetool/c4negativBenotet'), value: 'negative' },
-				{ label: '[~] ' + this.$p.t('abgabetool/c4notYetGraded'), value: 'not_graded' },
-				{ label: '[?] ' + this.$p.t('abgabetool/c4notSubmitted'), value: 'not_submitted' },
-				{ label: '[o] ' + this.$p.t('abgabetool/c4notHappenedYet'), value: 'not_happened' },
-				{ label: '[--] ' + this.$p.t('abgabetool/c4keinTerminVorhanden'), value: 'no_termin' },
-			];
-
-			const field = cell.getField();
-			const stateKey = field === 'qgate1Status' ? 'qgate1FilterSelected' : 'qgate2FilterSelected';
-			let selected = [...(this[stateKey] || [])]; // restore persistence state
-
-			const wrapper = document.createElement('div');
-			wrapper.style.cssText = 'position: relative; width: 100%;';
-
-			const display = document.createElement('input');
-			display.readOnly = true;
-			display.placeholder = '';
-			display.style.cssText = 'padding: 4px; width: 100%; box-sizing: border-box; cursor: default; border: 1px solid; outline: none; background: #fff; appearance: none; caret-color: transparent;';
-
-			const dropdown = document.createElement('div');
-			dropdown.style.cssText = 'display: none; position: fixed; background: #fff; border: 1px solid; z-index: 9999; min-width: 180px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);';
-
-			options.forEach(opt => {
-				const row = document.createElement('label');
-				row.style.cssText = 'display: flex; align-items: center; gap: 6px; padding: 4px 8px; cursor: pointer; white-space: nowrap;';
-				row.addEventListener('mousedown', e => e.preventDefault());
-
-				const cb = document.createElement('input');
-				cb.type = 'checkbox';
-				cb.value = opt.value;
-				cb.checked = selected.includes(opt.value); // sync with persistence
-				cb.addEventListener('change', () => {
-					if (cb.checked) {
-						selected.push(opt.value);
-					} else {
-						selected = selected.filter(v => v !== opt.value);
-					}
-					this[stateKey] = [...selected]; // sync with persistence
-					display.value = options.filter(o => selected.includes(o.value)).map(o => o.label).join(', ');
-					success([...selected]);
-				});
-
-				row.appendChild(cb);
-				row.appendChild(document.createTextNode(opt.label));
-				dropdown.appendChild(row);
-			});
-
-			display.value = options.filter(o => selected.includes(o.value)).map(o => o.label).join(', ');
-
-			display.addEventListener('click', () => {
-				if (dropdown.style.display === 'none') {
-					const rect = display.getBoundingClientRect();
-					dropdown.style.top = rect.bottom + 'px';
-					dropdown.style.left = rect.left + 'px';
-					dropdown.style.display = 'block';
-				} else {
-					dropdown.style.display = 'none';
-				}
-			});
-
-			display.addEventListener('blur', () => {
-				setTimeout(() => { dropdown.style.display = 'none'; }, 150);
-			});
-
-			document.body.appendChild(dropdown);
-			wrapper.appendChild(display);
-
-			cell.getElement().addEventListener('remove', () => dropdown.remove());
-
-			onRendered(() => display.focus());
-
-			return wrapper;
-		},
-		qgateHeaderFilterFunc(filterVal, rowVal, rowData, filterParams) {
-			if (!filterVal || !filterVal.length) return true;
-
-			const matches = (val) => {
-				switch (val) {
-					case 'positive':     return rowVal === this.$p.t('abgabetool/c4positivBenotet');
-					case 'negative':     return rowVal === this.$p.t('abgabetool/c4negativBenotet');
-					case 'not_graded':   return rowVal === this.$p.t('abgabetool/c4notYetGraded');
-					case 'not_submitted':return rowVal === this.$p.t('abgabetool/c4notSubmitted');
-					case 'not_happened': return rowVal === this.$p.t('abgabetool/c4notHappenedYet');
-					case 'no_termin':    return rowVal === this.$p.t('abgabetool/c4keinTerminVorhanden');
-					default:             return true;
-				}
-			};
-
-			// OR logic — row passes if it matches any selected filter
-			return filterVal.some(val => matches(val));
-		},
 		redrawTableScrollSave() {
 			const table = this.$refs.abgabeTable.tabulator;
 			const scrollX = table.rowManager.scrollLeft;
@@ -1000,91 +693,9 @@ export const AbgabetoolAssistenz = {
 				}
 			})
 		},
-		shortLongTitleFormatter(cell, formatterParams, onRendered) {
-			const longForm = cell.getValue()
-			const shortForm = formatterParams?.shortForm
-			
-			if(longForm && shortForm) {
-				return `<span class="full-text" style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin: 0px;">
-					${longForm}
-				</span>
-				<span class="short-text" style="font-weight: bold; display: none;">
-					${shortForm}
-				</span>`
-			} else {
-				return `<span class="full-text" style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin: 0px;">
-					${longForm}
-				</span>`
-			}
-		
-		},
-		toolTipFuncPrevTermin(e, cell, onRendered) {
-			const data = cell.getData();
-			if(!data.prevTermin) return ''
-			return this.mapDateStyleToTabulatorTooltip(data.prevTermin.dateStyle);
-		},
-		toolTipFuncNextTermin(e, cell, onRendered) {
-			const data = cell.getData();
-			if(!data.nextTermin) return ''
-			return this.mapDateStyleToTabulatorTooltip(data.nextTermin.dateStyle);
-		},
-		mapDateStyleToTabulatorTooltip(dateStyleString) {
-			switch(dateStyleString) {
-				case 'bestanden':
-					return this.$p.t('abgabetool/c4tooltipBestanden')
-				break;
-				case 'nichtbestanden':
-					return this.$p.t('abgabetool/c4tooltipNichtBestanden')
-				break;
-				case 'beurteilungerforderlich':
-					return this.$p.t('abgabetool/c4tooltipBeurteilungerforderlich')
-				break;
-				case 'verspaetet':
-					return this.$p.t('abgabetool/c4tooltipVerspaetet')
-				break;
-				case 'abgegeben':
-					return this.$p.t('abgabetool/c4tooltipAbgegeben')
-				break;
-				case 'verpasst':
-					return this.$p.t('abgabetool/c4tooltipVerpasst')
-				break;
-				case 'abzugeben':
-					return this.$p.t('abgabetool/c4tooltipAbzugeben')
-				break;
-				case 'standard':
-					return this.$p.t('abgabetool/c4tooltipStandardv2')
-				break;
-				default: return ''
-			}
-		},
 		handlePaUpdated(projektarbeit) {
 			this.checkAbgabetermineProjektarbeit(projektarbeit)
 			this.redrawTableScrollSave()
-		},
-		getQGateStatusList() {
-			return [
-				this.$p.t('abgabetool/c4keinTerminVorhanden'),
-				this.$p.t('abgabetool/c4positivBenotet'),
-				this.$p.t('abgabetool/c4negativBenotet'),
-				this.$p.t('abgabetool/c4notYetGraded'),
-				this.$p.t('abgabetool/c4notSubmitted'),
-				this.$p.t('abgabetool/c4notHappenedYet')
-			]	
-		},
-		sortFuncTerminCol(a, b, aRow, bRow, column, dir, params) {
-			if (a === null || typeof a === "undefined") return 1;
-			if (b === null || typeof b === "undefined") return -1;
-			
-			// try to handle the prev/next interpretation consistently
-			// can only make this wrong UX whise so whatever
-			if(column._column.field == 'prevTermin') {
-				return Math.abs(b.diffMs) - Math.abs(a.diffMs)
-			} else if (column._column.field == 'nextTermin') {
-				return Math.abs(a.diffMs) - Math.abs(b.diffMs)
-			}
-			
-			// just in case someone reuses this
-			return Math.abs(b.diffMs) - Math.abs(a.diffMs) 
 		},
 		headerFilterTerminColISO(filterVal, rowVal) {
 			if (!rowVal) {
@@ -1106,42 +717,6 @@ export const AbgabetoolAssistenz = {
 			};
 
 			const rowDate = toLuxon(rowVal);
-			const von = toLuxon(filterVal[0]);
-			const bis = toLuxon(filterVal[1]);
-
-			// specific day
-			if (von && !bis) {
-				return rowDate.hasSame(von, "day");
-			}
-
-			// range case
-			if (von && bis) {
-				return rowDate >= von.startOf("day") && rowDate <= bis.endOf("day");
-			}
-
-			return false
-		},
-		headerFilterTerminCol(filterVal, rowVal) {
-			if (!rowVal || !rowVal.luxonDate || !rowVal.luxonDate.isValid) {
-				return false;
-			}
-
-			const rowDate = rowVal.luxonDate;
-
-			const toLuxon = (val) => {
-				if (!val) return null;
-				let dt;
-				if (val instanceof Date) {
-					dt = luxon.DateTime.fromJSDate(val);
-				} else if (typeof val === "string") {
-					dt = toViennaDate(val);
-				} else { // fallback
-					dt = luxon.DateTime.fromMillis(Number(val));
-				}
-
-				return dt.isValid ? dt : null;
-			};
-
 			const von = toLuxon(filterVal[0]);
 			const bis = toLuxon(filterVal[1]);
 
@@ -1243,94 +818,6 @@ export const AbgabetoolAssistenz = {
 			e.stopPropagation();
 			return false;
 		},
-		checkQualityGateStatus(projekt) {
-			const qgate1Termine = []
-			const qgate2Termine = []
-			
-			projekt.qgate1Status = this.$p.t('abgabetool/c4keinTerminVorhanden')// 'Kein Termin vorhanden'
-			projekt.qgate1StatusRank = 0
-			projekt.qgate2Status = this.$p.t('abgabetool/c4keinTerminVorhanden')
-			projekt.qgate2StatusRank = 0
-			
-			projekt.abgabetermine.forEach(termin => {
-				if(termin.paabgabetyp_kurzbz == 'qualgate1') qgate1Termine.push(termin)
-				if(termin.paabgabetyp_kurzbz == 'qualgate2') qgate2Termine.push(termin)
-			})
-			
-			// calculate qgateStatusRank and display the highest order status rank of all quality gate termine until one
-			// counts as passed, which is just a positive note no matter if anything has been uploaded
-			
-			// reuse luxon calculated diffMs (termin.datum in relation to today) from previous datestyle check 
-			qgate1Termine.forEach(qgate => {
-				if(qgate.note != null && projekt.qgate1StatusRank <= 5) {
-					const noteOpt = typeof qgate.note !== 'object' ? this.notenOptions.find(opt => opt.note == qgate.note) : qgate.note
-					if(noteOpt.positiv) {
-						projekt.qgate1Status = this.$p.t('abgabetool/c4positivBenotet')
-						projekt.qgate1StatusRank = 5
-					} else {
-						projekt.qgate1Status = this.$p.t('abgabetool/c4negativBenotet')
-						projekt.qgate1StatusRank = 4
-					}
-				} else if (qgate.note == null && projekt.qgate1StatusRank <= 3) {
-					projekt.qgate1Status = this.$p.t('abgabetool/c4notYetGraded')
-					projekt.qgate1StatusRank = 3
-				} else if(qgate.upload_allowed == true && qgate.abgabedatum == null && projekt.qgate1StatusRank <= 2) {
-					projekt.qgate1Status = this.$p.t('abgabetool/c4notSubmitted')
-					projekt.qgate1StatusRank = 2
-				} else if (qgate.upload_allowed == false && qgate.diffMs <= 0 && projekt.qgate1StatusRank <= 1) {
-					projekt.qgate1Status = this.$p.t('abgabetool/c4notHappenedYet')
-					projekt.qgate1StatusRank = 1
-				}
-			})
-
-			qgate2Termine.forEach(qgate => {
-				if(qgate.note != null && projekt.qgate1StatusRank <= 5) {
-					const noteOpt = typeof qgate.note !== 'object' ? this.notenOptions.find(opt => opt.note == qgate.note) : qgate.note
-					if(noteOpt.positiv) {
-						projekt.qgate2Status = this.$p.t('abgabetool/c4positivBenotet')
-						projekt.qgate2StatusRank = 5
-					} else {
-						projekt.qgate2Status = this.$p.t('abgabetool/c4negativBenotet')
-						projekt.qgate2StatusRank = 4
-					}
-				} else if (qgate.note == null && projekt.qgate2StatusRank <= 3) {
-					projekt.qgate2Status = this.$p.t('abgabetool/c4notYetGraded')
-					projekt.qgate2StatusRank = 3
-				} else if(qgate.upload_allowed == true && qgate.abgabedatum == null && projekt.qgate2StatusRank <= 2) {
-					projekt.qgate2Status = this.$p.t('abgabetool/c4notSubmitted')
-					projekt.qgate2StatusRank = 2
-				} else if (qgate.upload_allowed == false && qgate.diffMs <= 0 && projekt.qgate2StatusRank <= 1) {
-					projekt.qgate2Status = this.$p.t('abgabetool/c4notHappenedYet')
-					projekt.qgate2StatusRank = 1
-				}
-			})
-			
-			// set shorthand statuscode once real status has been determined
-			projekt.qgate1StatusShort = this.mapRankToShortStatus(projekt.qgate1StatusRank)
-			projekt.qgate2StatusShort = this.mapRankToShortStatus(projekt.qgate2StatusRank)
-		},
-		mapRankToShortStatus(rank) {
-				switch(rank){
-					case 0: // kein termin vorhanden
-						return '--'
-						break;
-					case 1: // noch nicht stattgefunden
-						return 'o'
-						break;
-					case 2: // noch nicht abgegeben
-						return '?'
-						break;
-					case 3: // noch nicht benotet
-						return '~'
-						break;
-					case 4: // negativ benotet
-						return '-'
-						break;
-					case 5: // positiv benotet
-						return '+'
-						break;
-				}
-		},
 		getItemBezeichnung(item){
 			if(!item.bezeichnung) return ''
 			
@@ -1409,241 +896,15 @@ export const AbgabetoolAssistenz = {
 			// seperate check for quality gates
 			this.checkQualityGateStatus(projekt)
 		},
-		loadState() {
-			return JSON.parse(localStorage.getItem(this.abgabeTableOptions.persistenceID) || "null");
-		},
-		saveState(table) {
-			// avoid storing state after first restore part happened
-			if(!this.stateRestored) return
-			const rawLayout = table.getColumnLayout();
-			const state = {
-				columns: rawLayout.map(col => ({
-					field: col.field,
-					visible: col.visible,
-					width: col.width,
-				})),
-				sort: table.getSorters().map(s => ({
-					field: s.field,
-					dir: s.dir,
-				})),
-				filters: table.getFilters(),
-				headerFilters: table.getHeaderFilters()
-			};
-			
-			localStorage.setItem(this.abgabeTableOptions.persistenceID, JSON.stringify(state));
-		},
 		handleTableBuilt() {
-			const table = this.$refs.abgabeTable.tabulator
-
 			this.tableBuiltResolve()
-			
-			table.on("columnMoved", () => {
-				this.saveState(table);
-			});
 
-			table.on("columnResized", () => {
-				this.saveState(table);
-			});
-
-			table.on("columnVisibilityChanged", () => {
-				this.saveState(table);
-			});
-
-			table.on("filterChanged", () => {
-				this.saveState(table);
-			});
-
-			table.on("headerFilterChanged", () => {
-				this.saveState(table);
-			});
-
-			table.on("dataSorted", () => {
-				this.saveState(table);
-			});
-
-			table.on("columnSorted", () => {
-				this.saveState(table);
-			});
-
-			table.on("sortersChanged", () => {
-				this.saveState(table);
-			});
-
-			const saved = this.loadState();
-
-			table.on("renderComplete", () => {
-				if(!this.stateRestored) {
-					
-					if (saved?.columns && !this.colLayoutRestored) {
-						const layout = saved.columns.map(col => ({
-							field: col.field,
-							width: col.width,
-							visible: col.visible,
-							// add more if needed, but keep it simple
-						}));
-						
-						table.setColumnLayout(layout);
-
-						this.colLayoutRestored = true;
-					}
-
-					if (saved?.filters && !this.filtersRestored) {
-						this.filtersRestored = true // instantly avoid retriggers
-						table.setFilter(saved.filters);
-					}
-					if (saved?.headerFilters && !this.headerFiltersRestored) {
-						this.headerFiltersRestored = true // instantly avoid retriggers
-						for (let hf of saved.headerFilters) {
-							if (hf.field === 'qgate1Status') this.qgate1FilterSelected = hf.value || [];
-							if (hf.field === 'qgate2Status') this.qgate2FilterSelected = hf.value || [];
-							table.setHeaderFilterValue(hf.field, hf.value);
-						}
-					}
-
-					if (saved?.sort?.length && !this.sortRestored) {
-						this.sortRestored = true;
-
-						setTimeout(() => {
-							const sortList = saved.sort.map(s => {
-								const col = table.columnManager.findColumn(s.field);
-								if (!col) {
-									return null;
-								}
-								return { column: col, dir: s.dir };
-							}).filter(Boolean);
-
-							table.setSort(sortList);
-						}, 100);
-					}
-					this.stateRestored = true
-					
-					// ensure that the filterCollapseables thingy has the correct values
-					this.$refs.abgabeTable.setSelectedFields();
-
-				}
-
-			});
+			this.initTablePersistence(this.$refs.abgabeTable, this.abgabeTableOptions.persistenceID, this.tableState)
 		},
 		handleTableBuiltFlat() {
-			const table = this.$refs.abgabeTableFlat.tabulator
-
 			this.tableBuiltResolveFlat()
 
-			table.on("columnMoved", () => {
-				this.saveStateFlat(table);
-			});
-
-			table.on("columnResized", () => {
-				this.saveStateFlat(table);
-			});
-
-			table.on("columnVisibilityChanged", () => {
-				this.saveStateFlat(table);
-			});
-
-			table.on("filterChanged", () => {
-				this.saveStateFlat(table);
-			});
-
-			table.on("headerFilterChanged", () => {
-				this.saveStateFlat(table);
-			});
-
-			table.on("dataSorted", () => {
-				this.saveStateFlat(table);
-			});
-
-			table.on("columnSorted", () => {
-				this.saveStateFlat(table);
-			});
-
-			table.on("sortersChanged", () => {
-				this.saveStateFlat(table);
-			});
-
-			const saved = this.loadStateFlat();
-
-			table.on("renderComplete", () => {
-				if(!this.stateRestoredFlat) {
-					
-					if (saved?.columns && !this.colLayoutRestoredFlat) {
-						const layout = saved.columns.map(col => ({
-							field: col.field,
-							width: col.width,
-							visible: col.visible,
-							// add more if needed, but keep it simple
-						}));
-
-						table.setColumnLayout(layout);
-
-						this.colLayoutRestoredFlat = true;
-					}
-
-					if (saved?.filters && !this.filtersRestoredFlat) {
-						this.filtersRestoredFlat = true // instantly avoid retriggers
-						table.setFilter(saved.filters);
-					}
-					if (saved?.headerFilters && !this.headerFiltersRestoredFlat) {
-						this.headerFiltersRestoredFlat = true // instantly avoid retriggers
-						for (let hf of saved.headerFilters) {
-							if (hf.field === 'note') this.noteFilterSelected = hf.value || [];
-							if (hf.field === 'pa_note') this.pa_noteFilterSelected = hf.value || [];
-							table.setHeaderFilterValue(hf.field, hf.value);
-						}
-					}
-
-					if (saved?.sort?.length && !this.sortRestoredFlat) {
-						this.sortRestoredFlat = true;
-
-						setTimeout(() => {
-							const sortList = saved.sort.map(s => {
-								const col = table.columnManager.findColumn(s.field);
-								if (!col) {
-									return null;
-								}
-								return { column: col, dir: s.dir };
-							}).filter(Boolean);
-
-							table.setSort(sortList);
-						}, 100);
-					}
-					this.stateRestoredFlat = true
-
-					// ensure that the filterCollapseables thingy has the correct values
-					this.$refs.abgabeTableFlat.setSelectedFields();
-
-				}
-
-			});
-		},
-		loadStateFlat() {
-			return JSON.parse(localStorage.getItem(this.abgabeTableOptionsFlat.persistenceID) || "null");
-		},
-		saveStateFlat(table) {
-			// avoid storing state after first restore part happened
-			if(!this.stateRestoredFlat) return
-			const rawLayout = table.getColumnLayout();
-			const state = {
-				columns: rawLayout.map(col => ({
-					field: col.field,
-					visible: col.visible,
-					width: col.width,
-				})),
-				sort: table.getSorters().map(s => ({
-					field: s.field,
-					dir: s.dir,
-				})),
-				filters: table.getFilters(),
-				headerFilters: table.getHeaderFilters()
-			};
-
-			localStorage.setItem(this.abgabeTableOptionsFlat.persistenceID, JSON.stringify(state));
-		},
-		handleToggleFullscreenDetail() {
-			this.detailIsFullscreen = !this.detailIsFullscreen
-		},
-		getOptionLabelAbgabetyp(option){
-			return this.$p.t('abgabetool/c4paatyp' + option.paabgabetyp_kurzbz)
+			this.initTablePersistence(this.$refs.abgabeTableFlat, this.abgabeTableOptionsFlat.persistenceID, this.tableStateFlat)
 		},
 		getOptionLabelStg(option){
 			return option.kurzbzlang + ' ' + option.bezeichnung
@@ -1653,9 +914,6 @@ export const AbgabetoolAssistenz = {
 		},
 		getNotenFilterOptionLabel(option) {
 			return option.bezeichnung	
-		},
-		formatDate(dateParam) {
-			return formatISODate(dateParam);
 		},
 		formAction(cell) {
 			const actionButtons = document.createElement('div');
@@ -1707,15 +965,6 @@ export const AbgabetoolAssistenz = {
 			// this.$api.call(ApiAbgabe.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid))
 		},
 
-		undoSelection(cell) {
-			// checks if cells row is selected and unselects -> imitates columns which dont trigger row selection
-			// but actually just revert it after the fact
-
-			const row = cell.getRow()
-			if(row.isSelected()) {
-				row.deselect();
-			}
-		},
 		selectionCheck(row) {
 			const data = row.getData()
 			
@@ -1725,14 +974,6 @@ export const AbgabetoolAssistenz = {
 		},
 		selectionCheckFlat(row) {
 			return row.getData().selectable
-		},
-		showDeadlines(){
-			const link = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router
-				+ '/Cis/Abgabetool/Deadlines'
-			window.open(link, '_blank')
-		},
-		openAddSeriesModal() {
-			this.$refs.modalContainerAddSeries.show()
 		},
 		addSeries() {
 			const pids = this.selectedData?.map(projekt => projekt.projektarbeit_id)
@@ -1840,21 +1081,6 @@ export const AbgabetoolAssistenz = {
 
 			return null
 		},
-		createInfoString(data) {
-			let str = '';
-
-			data.forEach(name => {
-				str += name
-				str += '; '
-			})
-
-			return str
-		},
-		isPastDate(date) {
-			const deadline = luxon.DateTime.fromISO(date, { zone: 'Europe/Vienna' }).endOf('day');
-			const nowInVienna = luxon.DateTime.now().setZone('Europe/Vienna');
-			return nowInVienna > deadline;
-		},
 		setDetailComponent(details){
 			const pa = this.projektarbeiten.find(projektarbeit => projektarbeit.projektarbeit_id == details.projektarbeit_id)
 
@@ -1926,97 +1152,6 @@ export const AbgabetoolAssistenz = {
 			const key = cell.getValue()
 			return this.$p.t('abgabetool/c4paatyp' + key)
 		},
-		centeredTextFormatter(cell) {
-			const longForm = cell.getValue()
-			if(!longForm) return
-			const data = cell.getData()
-			const entry = Object.entries(data).find(entry => entry[1] == longForm)
-
-			// shortFormKey must have same keyname as longForm but with 'Short' appended 
-			const shortForm = data[entry[0]+'Short']
-
-			if(shortForm && longForm) {
-				return `<div style="display: flex; justify-content: start; align-items: center; height: 100%; width: 100%;">
-				<span class="full-text" style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin: 0px;">
-					${longForm}
-				</span>
-				<span class="short-text" style="font-weight: bold; display: none;">
-					${shortForm}
-				</span>
-				</div>`;
-			} else {
-				return '<div style="display: flex; justify-content: start; align-items: center; height: 100%">' +
-					'<p style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin: 0px;">'+longForm+'</p></div>'
-			}
-		},
-		pkzTextFormatter(cell) {
-			const val = cell.getValue()
-
-			return '<div style="display: flex; justify-content: start; align-items: center; height: 100%">' +
-				'<a style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">'+val+'</a></div>'
-		},
-		abgabeterminFormatter(cell, formatterParams, onRendered,) {
-			const val = cell.getValue()
-			const dateStyle = val?.dateStyle ?? val
-			
-			
-			if(val) {
-				let icon = ''
-				switch(dateStyle) {
-					case 'verspaetet':
-						icon = '<i style="color: #000000 !important;" class="fa-solid fa-triangle-exclamation"></i>'
-						break
-					case 'verpasst':
-						icon = '<i style="color: #000000 !important;" class="fa-solid fa-calendar-xmark"></i>'
-						break
-					case 'abzugeben':
-						icon = '<i style="color: #000000 !important;" class="fa-solid fa-hourglass-half"></i>'
-						break
-					case 'standard':
-						icon = '<i style="color: #000000 !important;" class="fa-solid fa-clock"></i>'
-						break
-					case 'abgegeben':
-						icon = '<i style="color: #000000 !important;" class="fa-solid fa-paperclip"></i>'
-						break
-					case 'beurteilungerforderlich':
-						icon = '<i style="color: #000000 !important;" class="fa-solid fa-list-check"></i>'
-						break
-					case 'bestanden':
-						icon = '<i style="color: #000000 !important;" class="fa-solid fa-check"></i>'
-						break
-					case 'nichtbestanden':
-						icon = '<i style="color: #000000 !important;" class="fa-solid fa-circle-exclamation"></i>'
-						break
-				}
-
-				const typKurzbz = val.paabgabetyp_kurzbz ?? val.bezeichnung?.paabgabetyp_kurzbz
-				const bezeichnung = this.$p.t('abgabetool/c4paatyp' + typKurzbz)
-				
-				if(formatterParams?.iconOnly) {
-					return '<div style="display: flex; height: 20px;">' +
-						'<div class=' + dateStyle + "-header" + ' style="min-width:48px; height: 100%; padding: 0px; display: flex; align-items: center; justify-content: center;">' +
-						icon +
-						'</div>' +
-						'</div>'
-				}
-				
-				return '<div style="display: flex; height: 20px;">' +
-					'<div class=' + dateStyle + "-header" + ' style="min-width:48px; height: 100%; padding: 0px; display: flex; align-items: center; justify-content: center;">' +
-						icon +
-					'</div>' + 
-					'<div style="margin-left: 4px;">' +
-						'<p style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">'+bezeichnung+' - '+ this.formatDate(val.datum)+'</p>' +
-					'</div>'+
-					'</div>'
-				
-			} else {
-				return ''
-			}
-			
-		},
-		tableResolve(resolve) {
-			this.tableBuiltResolve = resolve
-		},
 		tableResolveFlat(resolve) {
 			this.tableBuiltResolveFlat = resolve
 		},
@@ -2025,9 +1160,6 @@ export const AbgabetoolAssistenz = {
 		},
 		buildPKZ(projekt) {
 			return `${projekt.student_uid} / ${projekt.matrikelnr}`
-		},
-		buildStg(projekt) {
-			return (projekt.typ + projekt.kurzbz)?.toUpperCase()
 		},
 		buildErstbetreuer(projekt) {
 			if(projekt.erstbetreuer_full_name) return projekt.erstbetreuer_full_name
@@ -2076,17 +1208,6 @@ export const AbgabetoolAssistenz = {
 			}).finally(()=>{
 				this.loading = false
 			})
-		},
-		loadAbgaben(details) {
-			return new Promise((resolve) => {
-				this.$api.call(ApiAbgabe.getStudentProjektabgaben(details))
-					.then(res => {
-						resolve(res)
-					})
-			})
-		},
-		handleUuidDefined(uuid) {
-			this.tabulatorUuid = uuid
 		},
 		handleUuidDefinedFlat(uuid) {
 			this.tabulatorUuidFlat = uuid
@@ -2171,17 +1292,6 @@ export const AbgabetoolAssistenz = {
 				+ ' | '
 				+ this.$p.t('global/gesamt')
 				+ ': <strong>' + (this.countFlat || 0) + '</strong>';
-		},
-		countsToHTML() {
-			return this.$p.t('global/ausgewaehlt')
-				+ ': <strong>' + (this.selectedcount || 0) + '</strong>'
-				+ ' | '
-				+ this.$p.t('global/gefiltert')
-				+ ': '
-				+ '<strong>' + (this.filteredcount || 0) + '</strong>'
-				+ ' | '
-				+ this.$p.t('global/gesamt')
-				+ ': <strong>' + (this.count || 0) + '</strong>';
 		},
 		emailItems() {
 			const menu = []

@@ -66,7 +66,8 @@ class Paabgabe_model extends DB_Model
 
 		$query = "SELECT projektarbeit_id, paabgabe_id, paabgabetyp_kurzbz, fixtermin, datum, campus.tbl_paabgabe.kurzbz, campus.tbl_paabgabetyp.bezeichnung, campus.tbl_paabgabe.abgabedatum,
 			   campus.tbl_paabgabe.insertvon, campus.tbl_paabgabe.insertamum, campus.tbl_paabgabe.updatevon, campus.tbl_paabgabe.updateamum,
-			   campus.tbl_paabgabe.note, upload_allowed, beurteilungsnotiz, student_uid, tbl_projektarbeit.note, lehre.tbl_projektarbeit.titel,
+			   campus.tbl_paabgabe.note, upload_allowed, beurteilungsnotiz, student_uid,
+			   lehre.tbl_projektarbeit.note as projektarbeit_note, lehre.tbl_projektarbeit.titel,
 			   UPPER(tbl_studiengang.typ) as stgtyp, UPPER(tbl_studiengang.kurzbz) as stgkz, public.tbl_studiengang.studiengang_kz,
 			   public.tbl_studiengang.oe_kurzbz as stg_oe_kurzbz, tbl_lehreinheit.studiensemester_kurzbz,
 			   public.tbl_person.anrede, public.tbl_person.titelpre, public.tbl_person.vorname, public.tbl_person.nachname, public.tbl_person.titelpost
@@ -91,7 +92,8 @@ class Paabgabe_model extends DB_Model
 		$queryParams = [$interval];
 		$query = "SELECT projektarbeit_id, paabgabe_id, paabgabetyp_kurzbz, fixtermin, datum, campus.tbl_paabgabe.kurzbz, campus.tbl_paabgabetyp.bezeichnung, campus.tbl_paabgabe.abgabedatum,
 					   campus.tbl_paabgabe.insertvon, campus.tbl_paabgabe.insertamum, campus.tbl_paabgabe.updatevon, campus.tbl_paabgabe.updateamum,
-					   campus.tbl_paabgabe.note, upload_allowed, beurteilungsnotiz, student_uid, tbl_projektarbeit.note, lehre.tbl_projektarbeit.titel,
+					   campus.tbl_paabgabe.note, upload_allowed, beurteilungsnotiz, student_uid,
+					   lehre.tbl_projektarbeit.note as projektarbeit_note, lehre.tbl_projektarbeit.titel,
 					   UPPER(tbl_studiengang.typ) as stgtyp, UPPER(tbl_studiengang.kurzbz) as stgkz, public.tbl_studiengang.studiengang_kz,
 					   public.tbl_studiengang.oe_kurzbz as stg_oe_kurzbz, tbl_lehreinheit.studiensemester_kurzbz,
 					   lehre.tbl_projektbetreuer.betreuerart_kurzbz, lehre.tbl_projektbetreuer.person_id,

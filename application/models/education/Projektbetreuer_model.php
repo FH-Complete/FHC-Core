@@ -269,4 +269,37 @@ class Projektbetreuer_model extends DB_Model
 		return $this->execQuery($qry, array($projektarbeit_id));
 	}
 
+	/**
+	 * Gets anrede, name and mail address of a Betreuer by person_id.
+	 * Same account preference as getAllBetreuerOfProjektarbeit, but not bound to a single Projektarbeit.
+	 * @param int $person_id
+	 * @return array success with one row or error
+	 */
+	public function getBetreuerByPersonId($person_id)
+	{
+		$qry = "SELECT DISTINCT ON (pers.person_id) pers.person_id, anrede,
+				trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,
+				ben.uid,
+				(
+					SELECT kontakt
+					FROM public.tbl_kontakt
+					WHERE kontakttyp = 'email'
+					AND person_id = pers.person_id
+					ORDER BY
+						CASE WHEN zustellung THEN 0 ELSE 1 END,
+						insertamum DESC NULLS LAST
+					LIMIT 1
+				) AS private_email
+				FROM public.tbl_person pers
+				LEFT JOIN public.tbl_benutzer ben USING (person_id)
+				LEFT JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
+				WHERE (ben.aktiv OR ben.aktiv IS NULL)
+				AND pers.person_id = ?
+				ORDER BY pers.person_id, CASE WHEN ma.mitarbeiter_uid IS NULL THEN 1 ELSE 0 END, /*Mitarbeiter account first*/
+						CASE WHEN ben.uid IS NULL THEN 1 ELSE 0 END, /*user with account first*/
+						ben.insertamum";
+
+		return $this->execReadOnlyQuery($qry, array($person_id));
+	}
+
 }
