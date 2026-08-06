@@ -258,7 +258,9 @@ export const AbgabeStudentDetail = {
 				return false;
 			}
 
-			if(termin.bezeichnung?.paabgabetyp_kurzbz === 'end') {
+			// use the field from the backend, not the client side mapped bezeichnung object - a failed
+			// lookup there would silently route an endupload through the zwischenabgabe endpoint
+			if(termin.paabgabetyp_kurzbz === 'end') {
 				this.enduploadTermin = termin
 				this.$refs.modalContainerEnduploadZusatzdaten.show()
 			} else {
@@ -365,7 +367,12 @@ export const AbgabeStudentDetail = {
 			return this.$capitalize(this.$p.t('abgabetool/c4eidesstattlicheErklaerung'))
 		},
 		allowedToSaveZusatzdaten() {
-			return this.form.schlagwoerter.length > 0 && this.form.schlagwoerter_en.length > 0 && this.form.abstract.length > 0 && this.form.abstract_en.length > 0 && this.form.seitenanzahl > 0
+			// upper bounds mirror the column limits of lehre.tbl_projektarbeit, see Abgabe.php
+			return this.form.schlagwoerter.length > 0 && this.form.schlagwoerter.length <= 150
+				&& this.form.schlagwoerter_en.length > 0 && this.form.schlagwoerter_en.length <= 150
+				&& this.form.abstract.length > 0 && this.form.abstract.length <= 5000
+				&& this.form.abstract_en.length > 0 && this.form.abstract_en.length <= 5000
+				&& this.form.seitenanzahl > 0 && this.form.seitenanzahl <= 32767
 		},
 		getAllowedToSendEndupload() {
 			return this.eidAkzeptiert && this.allowedToSaveZusatzdaten
@@ -733,14 +740,16 @@ export const AbgabeStudentDetail = {
 				<div class="row mb-3 align-items-start">
 					<div class="row">{{$capitalize( $p.t('abgabetool/c4schlagwoerterGer') )}}</div>
 					<div class="row">
-						<Textarea v-model="form.schlagwoerter" class="w-100"></Textarea>
+						<Textarea v-model="form.schlagwoerter" maxlength="150" class="w-100"></Textarea>
+						<p>{{ form.schlagwoerter?.length ? form.schlagwoerter.length : 0 }} / 150 characters</p>
 					</div>
 				</div>
-				
+
 				<div class="row mb-3 align-items-start">
 					<div class="row">{{$capitalize( $p.t('abgabetool/c4schlagwoerterEng') )}}</div>
 					<div class="row">
-						<Textarea v-model="form.schlagwoerter_en" class="w-100"></Textarea>
+						<Textarea v-model="form.schlagwoerter_en" maxlength="150" class="w-100"></Textarea>
+						<p>{{ form.schlagwoerter_en?.length ? form.schlagwoerter_en.length : 0 }} / 150 characters</p>
 					</div>
 				</div>
 				
@@ -765,7 +774,7 @@ export const AbgabeStudentDetail = {
 					<div class="row">
 						<InputNumber 
 							v-model="form.seitenanzahl"
-							inputId="seitenanzahlInput" :min="1" :max="100000">
+							inputId="seitenanzahlInput" :min="1" :max="32767">
 						</InputNumber>
 					</div>		
 				</div>

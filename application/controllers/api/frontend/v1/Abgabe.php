@@ -22,6 +22,10 @@ use CI3_Events as Events;
 
 class Abgabe extends FHCAPI_Controller
 {
+	// col limits of lehre.tbl_projektarbeit, exceeding them aborts the zusatzdaten update and lead to unpublishable enduploads
+	const MAX_LEN_SCHLAGWOERTER = 150;	// varchar(150)
+	const MAX_LEN_ABSTRACT = 5000;		// text, capped to match the ui counter
+	const MAX_SEITENANZAHL = 32767;		// smallint
 
 	/**
 	 * Object initialization
@@ -326,6 +330,10 @@ class Abgabe extends FHCAPI_Controller
 		// block uploads for quality gate termine that are already graded
 		$this->checkPaabgabeForGradedStatus($paabgabe_id);
 
+		// the posted typ is client state only - verify it against the row so a stale ui cannot push an
+		// endabgabe through here, which would mark the abgabe without ever writing the zusatzdaten
+		$this->checkPaabgabeTypForZwischenabgabe($paabgabe_id, $paabgabetyp_kurzbz);
+
 		// load the $student_uid by $projektarbeit_id so we dont need any post params
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
@@ -403,8 +411,10 @@ class Abgabe extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		}
 
+		$this->checkZusatzdatenLengths($schlagwoerter, $schlagwoerter_en, $abstract, $abstract_en, $seitenanzahl);
+
 		$this->checkPaabgabeDeadline($paabgabe_id);
-		
+
 		$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
 		
 		// load the $student_uid by $projektarbeit_id so we dont need any post params
@@ -453,17 +463,25 @@ class Abgabe extends FHCAPI_Controller
 				$this->checkAbgabeSignatur($paabgabe, $projektarbeit->student_uid);
 				$signaturstatus = $paabgabe->signatur;
 
-					// update projektarbeit cols with zusatzdaten AND abgabedatum!
-					$this->ProjektarbeitModel->update($projektarbeit->projektarbeit_id, array(
-						'sprache' => $sprache,
-						'seitenanzahl' => $seitenanzahl,
-						'abgabedatum' => date('Y-m-d'),
-						'schlagwoerter_en' => $schlagwoerter_en,
-						'schlagwoerter' => $schlagwoerter,
-						'abstract' => $abstract,
-						'abstract_en' => $abstract_en
-					));
+				// update projektarbeit cols with zusatzdaten AND abgabedatum!
+				$updateRes = $this->ProjektarbeitModel->update($projektarbeit->projektarbeit_id, array(
+					'sprache' => $sprache,
+					'seitenanzahl' => $seitenanzahl,
+					'abgabedatum' => date('Y-m-d'),
+					'schlagwoerter_en' => $schlagwoerter_en,
+					'schlagwoerter' => $schlagwoerter,
+					'abstract' => $abstract,
+					'abstract_en' => $abstract_en
+				));
 
+				// abort before marking the abgabe - a failed update used to leave the projektarbeit without
+				// abgabedatum and zusatzdaten while the endupload counted as done, blocking the publication
+				if(isError($updateRes)) {
+					$this->logLib->logInfoDB(array('endupload projektarbeit update failed', getError($updateRes),
+						$projektarbeit_id, $paabgabe_id, getAuthUID(), getAuthPersonId()));
+
+					$this->terminateWithError($this->p->t('abgabetool', 'c4enduploadZusatzdatenSpeichernFehlgeschlagen'), 'general');
+				}
 
 				// update paabgabe datum
 				$res = $this->PaabgabeModel->update($paabgabe_id, array(
@@ -1070,6 +1088,22 @@ class Abgabe extends FHCAPI_Controller
 				$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 			}
 
+			// a termin with an upload or a note must keep its typ and datum.
+			// the table only hides those rows client side, so a student upload
+			// after the table was loaded would otherwise still let a zwischenabgabe be retyped to 'end'
+			$existingPaabgabe = $paabgabeArr[0];
+
+			if($existingPaabgabe->note !== null || $existingPaabgabe->abgabedatum !== null) {
+				if(isset($updateFields['paabgabetyp_kurzbz'])
+					&& $updateFields['paabgabetyp_kurzbz'] !== $existingPaabgabe->paabgabetyp_kurzbz) {
+					$this->terminateWithError($this->p->t('abgabetool', 'c4abgabetypAendernNichtErlaubt'));
+				}
+
+				if(isset($updateFields['datum']) && $updateFields['datum'] !== $existingPaabgabe->datum) {
+					$this->terminateWithError($this->p->t('abgabetool', 'c4datumAendernNichtErlaubt'));
+				}
+			}
+
 			$result = $this->PaabgabeModel->update(
 				$paabgabe_id,
 				array_merge($updateFields, [
@@ -1583,7 +1617,9 @@ class Abgabe extends FHCAPI_Controller
 
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		}
-			
+
+		$this->checkZusatzdatenLengths($schlagwoerter, $schlagwoerter_en, $abstract, $abstract_en, $seitenanzahl);
+
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 
 		
@@ -1618,7 +1654,7 @@ class Abgabe extends FHCAPI_Controller
 		}
 		
 		// update projektarbeit cols with zusatzdaten only
-		$this->ProjektarbeitModel->update($projektarbeit_id, array(
+		$updateRes = $this->ProjektarbeitModel->update($projektarbeit_id, array(
 			'sprache' => $sprache,
 			'seitenanzahl' => $seitenanzahl,
 			'schlagwoerter_en' => $schlagwoerter_en,
@@ -1626,6 +1662,9 @@ class Abgabe extends FHCAPI_Controller
 			'abstract' => $abstract,
 			'abstract_en' => $abstract_en
 		));
+
+		// dont report success on a failed update, otherwise a repair attempt silently changes nothing
+		$this->getDataOrTerminateWithError($updateRes, 'general');
 
 		$this->logLib->logInfoDB(array('zusatzdatenEditMitarbeiter', array(
 			'updatevon' => getAuthUID(),
@@ -2009,16 +2048,48 @@ class Abgabe extends FHCAPI_Controller
 
 		$data = getData($res)[0];
 		if($data->note !== NULL) {
-			// hardcode this error msg cause phrasen arent always being updated
-			$message = $this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeitv3');
-			if(strpos($message, "<<") === 0) { // phrase could not be loaded
-				$this->terminateWithError('Die Projektarbeit wurde bereits benotet, Sie dürfen deshalb keine weiteren Termine anlegen oder bearbeiten.', 'general');
-			} else {
-				$this->terminateWithError($message);
-			}
+			$this->terminateWithError($this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeitv3'));
 		}
 	}
-	
+
+	// validates the zusatzdaten against the column limits of lehre.tbl_projektarbeit.
+	private function checkZusatzdatenLengths($schlagwoerter, $schlagwoerter_en, $abstract, $abstract_en, $seitenanzahl) {
+		if(mb_strlen((string)$schlagwoerter) > self::MAX_LEN_SCHLAGWOERTER
+			|| mb_strlen((string)$schlagwoerter_en) > self::MAX_LEN_SCHLAGWOERTER) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4schlagwoerterZuLang', array(self::MAX_LEN_SCHLAGWOERTER)), 'general');
+		}
+
+		if(mb_strlen((string)$abstract) > self::MAX_LEN_ABSTRACT
+			|| mb_strlen((string)$abstract_en) > self::MAX_LEN_ABSTRACT) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4abstractZuLang', array(self::MAX_LEN_ABSTRACT)), 'general');
+		}
+
+		if(!is_numeric($seitenanzahl) || (int)$seitenanzahl < 1 || (int)$seitenanzahl > self::MAX_SEITENANZAHL) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4seitenanzahlUngueltig', array(self::MAX_SEITENANZAHL)), 'general');
+		}
+	}
+
+	// zwischenabgabe uploads must never touch an endabgabe termin, to avoid empty zusatzdaten
+	private function checkPaabgabeTypForZwischenabgabe($paabgabe_id, $posted_paabgabetyp_kurzbz) {
+		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
+		$res = $this->PaabgabeModel->load($paabgabe_id);
+
+		if(isError($res) || !hasData($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4projektabgabeNichtGefunden'), 'general');
+		}
+
+		$paabgabe = getData($res)[0];
+
+		if($paabgabe->paabgabetyp_kurzbz === 'end') {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4enduploadUeberZwischenabgabeNichtErlaubt'), 'general');
+		}
+
+		// typ changed between page load and upload -> the client would use the wrong upload path
+		if($paabgabe->paabgabetyp_kurzbz !== $posted_paabgabetyp_kurzbz) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4abgabeterminGeaendertNeuLaden'), 'general');
+		}
+	}
+
 	private function checkPaabgabeForGradedStatus($paabgabe_id) {
 		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
 		$res = $this->PaabgabeModel->load($paabgabe_id);
@@ -2029,13 +2100,7 @@ class Abgabe extends FHCAPI_Controller
 
 		$paabgabe = getData($res)[0];
 		if($paabgabe->note !== NULL) {
-			// hardcode a fallback cause phrasen arent reliable
-			$message = $this->p->t('abgabetool', 'c4studentAbgabeNotAllowedRegularv3');
-			if(strpos($message, "<<") === 0) { // phrase could not be loaded
-				$this->terminateWithError('Uploads sind für bereits benotete Quality Gates gesperrt. Sollten Sie trotzdem etwas hochladen wollen, wenden Sie sich bitte an Ihre Studiengangsassistenz.', 'general');
-			} else {
-				$this->terminateWithError($message);
-			}
+			$this->terminateWithError($this->p->t('abgabetool', 'c4studentAbgabeNotAllowedRegularv3'));
 		}
 	}
 

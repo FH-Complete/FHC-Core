@@ -48056,6 +48056,126 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4schlagwoerterZuLang',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Schlagwörter dürfen maximal {0} Zeichen lang sein.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Keywords may not exceed {0} characters.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4abstractZuLang',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Abstract darf maximal {0} Zeichen lang sein.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The abstract may not exceed {0} characters.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4seitenanzahlUngueltig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Seitenanzahl muss zwischen 1 und {0} liegen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The number of pages must be between 1 and {0}.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4enduploadZusatzdatenSpeichernFehlgeschlagen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Zusatzdaten konnten nicht gespeichert werden, der Upload wurde daher nicht abgeschlossen. Bitte wenden Sie sich an Ihre Studiengangsassistenz.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The additional data could not be saved, therefore the upload was not completed. Please contact your degree programme assistant.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4enduploadUeberZwischenabgabeNichtErlaubt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dieser Termin ist eine Endabgabe und kann nur über den Endupload inklusive Zusatzdaten hochgeladen werden. Bitte laden Sie die Seite neu.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This deadline is a final submission and can only be uploaded via the final upload including the additional data. Please reload the page.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4abgabeterminGeaendertNeuLaden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Abgabetermin wurde zwischenzeitlich geändert. Bitte laden Sie die Seite neu.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The submission deadline has been changed in the meantime. Please reload the page.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// ABGABETOOL PHRASEN END
 	array(
 		'app' => 'core',
