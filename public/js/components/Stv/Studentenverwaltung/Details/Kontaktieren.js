@@ -38,6 +38,7 @@ export default {
 	data(){
 		return {
 			mailLinks: [],
+			mailLinksClicked: [],
 			showMailDialog: false,
 			showDivKomp: false,
 			showDivKompLocalStorageId: 'studvw-contact-showDivKomp'
@@ -68,11 +69,13 @@ export default {
 				event.ctrlKey || event.metaKey,
 				this.authUid
 			);
+			this.mailLinksClicked = [];
 
 			this.showMailDialog = true;
 		},
-		handleMailLink(event){
-			window.open(event.target.href, '_blank', 'noopener');
+		handleMailLink(link, index){
+			this.mailLinksClicked.push(index);
+			window.open(link, '_blank', 'noopener');
 		},
 		reset(){
 			this.showMailDialog = false;
@@ -151,10 +154,11 @@ export default {
 							class="mb-2">
 							<a
 								:href="link"
-								@click.prevent="handleMailLink"
+								@click.prevent="handleMailLink(link, index)"
 								>
 									Email {{ index + 1 }}
 							</a>
+							<span v-show="mailLinksClicked.includes(index)">&nbsp;<i class="fa-solid fa-check text-success"></i></span>
 						</div>
 					</div>
 					<div v-else>
