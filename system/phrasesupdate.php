@@ -58220,18 +58220,38 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'ui',
-		'phrase' => 'kompatibilityMode_Sogo',
+		'phrase' => 'kompatibilityMode_WebmailClient',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Kompatibilitätsmodus für SOGO',
+				'text' => 'Kompatibilitätsmodus für Webmail',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Open in Compatibility mode (SOGO)',
+				'text' => 'Open in Compatibility mode (Webmail)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'webmailclient',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Webmail',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'webmail',
 				'description' => '',
 				'insertvon' => 'system'
 			)

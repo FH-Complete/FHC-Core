@@ -103,7 +103,7 @@ export default {
 			<form-input
 				container-class="form-switch mb-0"
 				type="checkbox"
-				:label="$p.t('ui/kompatibilityMode_Sogo')"
+				:label="$p.t('ui/kompatibilityMode_WebmailClient')"
 				v-model="showDivKomp"
 				@change="onSwitchChange"
 				>
@@ -132,14 +132,14 @@ export default {
 			<div v-if="!showMailDialog" class="row">
 				<div class="col-lg-2">
 					<button class="btn btn-secondary mb-2" @click="createMailLinks($event, 'intern')" :title="$p.t('stv', 'bccEMail')">
-						<i class="fa-solid fa-mail"></i> {{$p.t('stv', 'internEMail')}} (SOGO)
+						<i class="fa-solid fa-mail"></i> {{$p.t('stv', 'internEMail')}} ({{$p.t('ui', 'webmailclient')}})
 					</button>
 				</div>
 			</div>
 			<div v-if="!showMailDialog" class="row">
 				<div class="col-lg-2">
 					<button class="btn btn-secondary mb-2" @click="createMailLinks($event, 'private')" :title="$p.t('stv', 'bccEMail')">
-						<i class="fa-solid fa-mail"></i> {{$p.t('stv', 'privateEMail')}} (SOGO)
+						<i class="fa-solid fa-mail"></i> {{$p.t('stv', 'privateEMail')}} ({{$p.t('ui', 'webmailclient')}})
 					</button>
 				</div>
 			</div>
