@@ -161,7 +161,7 @@ VALUES
 
 -- Calendar setup for resources tests
 INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, eindeutige_gruppen_id, insertamum, insertvon, updateamum, updatevon)
+(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, eindeutige_kalender_gruppen_id, insertamum, insertvon, updateamum, updatevon)
 VALUES
 (date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, 'ec1bd001-facf-4b21-a671-bcb2d4f037fd', now(), 'demoadmin', NULL, 'demoadmin'),
 (date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '20:15:00', date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '21:00:00', 'lehreinheit', 'live', NULL, 'ec2bd001-facf-4b21-a671-bcb2d4f037fd', now(), 'demoadmin', NULL, 'demoadmin'),

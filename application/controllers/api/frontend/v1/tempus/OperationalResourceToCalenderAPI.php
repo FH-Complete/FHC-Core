@@ -45,7 +45,7 @@ class OperationalResourceToCalenderAPI extends FHCAPI_Controller
 		$result = $this->KalenderModel->loadWhere(['kalender_id' => $calenderID]);
 		if (empty($result)) $this->terminateWithError("Calendar with id '$calenderID' not found");
  
-		$calenderGroupID = $this->getDataOrTerminateWithError($result)[0]->eindeutige_gruppen_id;
+		$calenderGroupID = $this->getDataOrTerminateWithError($result)[0]->eindeutige_kalender_gruppen_id;
 		if (!isset($calenderGroupID)) $this->terminateWithError("Calendar with id '$calenderID' does not have a valid group id");
 
 
@@ -72,7 +72,7 @@ class OperationalResourceToCalenderAPI extends FHCAPI_Controller
 
 		$calendar = $this->getDataOrTerminateWithError($result)[0];
 		
-		$calenderGroupID = $calendar->eindeutige_gruppen_id;
+		$calenderGroupID = $calendar->eindeutige_kalender_gruppen_id;
 		if (!isset($calenderGroupID)) $this->terminateWithError("Calendar with id '$calenderID' does not have a valid group id");
 
 		$result = $this->kalenderlib->addOperationalResourcesToKalenderEvent($calendar, $assignedResources);

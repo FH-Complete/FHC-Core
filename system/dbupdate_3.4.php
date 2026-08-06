@@ -97,6 +97,7 @@ require_once('dbupdate_3.4/71566_studienordnungsdokument_neuer_organisationseinh
 require_once('dbupdate_3.4/70376_lohnguide.php');
 require_once('dbupdate_3.4/75888_reihungstest_mehrfachdurchfuehrung.php');
 require_once('dbupdate_3.4/77375_ressourcen.php');
+require_once('dbupdate_3.4/78318_rename_column_of_eindeutige_gruppen_id_to_eindeutige_kalender_gruppen_id_in_tbl_kalender.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
