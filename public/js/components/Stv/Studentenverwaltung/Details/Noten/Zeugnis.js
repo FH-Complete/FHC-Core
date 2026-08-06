@@ -34,6 +34,8 @@ export default {
 	},
 	data() {
 		return {
+			renderTabulator: false,
+			setOptinalTabulatorOptionsVisibility: false,
 			tabulatorEvents: [
 				{
 					event: "dataLoaded",
@@ -53,6 +55,21 @@ export default {
 				{
 					event: "rowDeselected",
 					handler: row => row.getElement().style.zIndex = ''
+				},
+				{
+					event: "tableBuilt",
+					handler: () => {
+						if(this.optionalTabulatorOptions?.visibleColumns
+							&& this.setOptinalTabulatorOptionsVisibility)
+						{
+							for(let key in this.optionalTabulatorOptions.visibleColumns) {
+								if(this.optionalTabulatorOptions.visibleColumns[key])
+									this.$refs.table.tabulator.showColumn(key);
+								else
+									this.$refs.table.tabulator.hideColumn(key);
+							}
+						}
+					}
 				}
 			],
 			stdsem: '',
@@ -205,7 +222,10 @@ export default {
 				{ field: 'lehrform', title: this.$p.t('lehre/lehrform'), visible: false },
 				{ field: 'kurzbz', title: this.$p.t('lehre/kurzbz'), visible: false },
 				{ field: 'punkte', title: this.$p.t('stv/grades_points'), visible: false },
-				{ field: 'lehrveranstaltung_bezeichnung_english', title: this.$p.t('stv/grades_lehrveranstaltung_bezeichnung_english'), visible: false }
+				{ field: 'lehrveranstaltung_bezeichnung_english', title: this.$p.t('stv/grades_lehrveranstaltung_bezeichnung_english'), visible: false },
+				{ field: 'uid', title: this.$p.t('person/uid'), visible: false },
+				{ field: 'vorname', title: this.$p.t('person/vorname'), visible: false },
+				{ field: 'nachname', title: this.$p.t('person/nachname'), visible: false }
 			];
 
 			const hasDocuments = ['both', 'inline'].includes(this.config.documents);
@@ -215,6 +235,7 @@ export default {
 				columns.push({
 					field: 'actions',
 					title: this.$p.t('global/actions'),
+					minWidth: 120,
 					cssClass: "overflow-visible",
 					headerSort: false,
 					formatter: cell => {
@@ -308,13 +329,19 @@ export default {
 	created() {
 		this.$p.loadCategory(['global', 'stv', 'lehre', 'person'])
 			.then(() => {
-				if (this.$refs.table.tableBuilt)
-					this.$refs.table.tabulator.columnManager.setColumns(this.tabulatorOptions.columns);
+				this.renderTabulator = true;
 			});
+
+		if(this?.optionalTabulatorOptions)
+		{
+			const localStorageKey = 'tabulator-' + this.optionalTabulatorOptions.persistenceZeugnisID + '-columns';
+			this.setOptinalTabulatorOptionsVisibility = (window.localStorage.getItem(localStorageKey) === null) ? true : false;
+		}
 	},
 	template: `
 	<div class="stv-details-noten-zeugnis h-100 d-flex flex-column">
 		<core-filter-cmpt
+			v-if="renderTabulator"
 			ref="table"
 			:title="$p.t('stv/grades_title_zeugnis')"
 			:tabulator-options="tabulatorOptions"
