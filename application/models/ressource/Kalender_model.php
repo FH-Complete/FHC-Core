@@ -16,7 +16,7 @@ class Kalender_model extends DB_Model
 	{
 		while (true) {
 			$uniqueGroupId = generateUUID();
-			$result = $this->loadWhere(['eindeutige_gruppen_id' => $uniqueGroupId]);
+			$result = $this->loadWhere(['eindeutige_kalender_gruppen_id' => $uniqueGroupId]);
 			if (!hasData($result)) {
 				return $uniqueGroupId;
 			}
