@@ -9,7 +9,7 @@
 
 import { notenApi } from "../api/notenApi";
 import { expectNotenSuccess } from "./notenErrors";
-// the client rule; the server's computeMaxAntritte must agree with it
+// the client rule; it now only reads back what the server derived, so a mismatch is a config bug
 import { maxAntrittCount as computeMaxAntritte } from "../../../../public/js/components/Cis/Benotungstool/notenRules.js";
 import {
 	describeFailure, performRead, performReset, performSeed, performSeedPruefung, resolveResetStrategy,
@@ -154,10 +154,16 @@ export const loadNotenContext = () => {
 			// administrative note the editor list excludes ("intern angerechnet" / "nicht zugelassen")
 			const nichtLehre = noten.find((n) => n.lehre === false);
 
+			// Anrechnungen block every Prüfung for the LV - keyed on the ZEUGNISnote
+			const angerechnet = byBezeichnung("angerechnet");
+			const internAngerechnet = byBezeichnung("intern angerechnet");
+
 			context.notes = {
 				entschuldigt: entschuldigt.note,
 				nochNichtEingetragen: nochNicht.note,
 				nichtLehre: nichtLehre ? nichtLehre.note : null,
+				angerechnet: angerechnet ? angerechnet.note : null,
+				internAngerechnet: internAngerechnet ? internAngerechnet.note : null,
 			};
 
 			return notenApi.getStudentenNoten(context.lvId, context.semKurzbz);
@@ -183,18 +189,40 @@ export const resetNotenState = (context, studentUids) =>
 	performReset(context, studentUids || context.studentUids);
 
 /**
- * Seeds the Antritt-1 baseline. Defaults to freigegeben:true because validatePruefungAdd reads the
- * implicit first Antritt through getLvGesamtNoten(), which filters `freigabedatum < NOW()` - an
- * offene note is invisible there and would not count as Antritt 1.
+ * Seeds the Antritt-1 baseline: a released LV note PLUS the Prüfung row that represents it.
+ *
+ * The row is what the production flow produces - since the refactor the first Antritt is created
+ * by the password-gated Freigabe (Noten::upsertErstantritt), not as a side effect of adding a
+ * retake. Without it the LV note only counts while no Prüfung exists at all, so the first added
+ * attempt would silently replace Antritt 1 instead of being Antritt 2.
+ *
+ * `erstantritt: false` seeds the legacy shape (LV note only, no row) for tests that need it.
+ * `freigegeben: false` implies it too: no Freigabe, no first Antritt.
  */
-export const seedBaseline = (context, studentUid, options = {}) =>
-	performSeed(context, studentUid, {
-		note: options.note !== undefined ? options.note : context.gradeNotes[0],
+export const seedBaseline = (context, studentUid, options = {}) => {
+	const note = options.note !== undefined ? options.note : context.gradeNotes[0];
+	const freigegeben = options.freigegeben !== undefined ? options.freigegeben : true;
+
+	return performSeed(context, studentUid, {
+		note,
 		punkte: options.punkte !== undefined ? options.punkte : null,
 		benotungsdatum: options.benotungsdatum || baselineBenotungsdatum(context),
-		freigegeben: options.freigegeben !== undefined ? options.freigegeben : true,
+		freigegeben,
 		freigabedatum: options.freigabedatum || null,
+	}).then((seeded) => {
+		if (options.erstantritt === false || !freigegeben) return cy.wrap(seeded, { log: false });
+
+		const student = context.students.find((s) => s.uid === studentUid);
+		expect(student, `student ${studentUid} in the loaded LV`).to.exist;
+
+		return performSeedPruefung(context, studentUid, {
+			lehreinheitId: student.lehreinheit_id,
+			note,
+			datum: baselineDate(context),
+			typ: "Termin1", // legacy projection of Antritt 1; the rules never read it back
+		}).then(() => seeded);
 	});
+};
 
 /** -> { pruefungId, note, datum, typ }. For attempt states the API cannot build. */
 export const seedPruefung = (context, student, { note, datum, typ }) =>

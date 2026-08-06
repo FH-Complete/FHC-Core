@@ -55,7 +55,7 @@ class Lvgesamtnote_model extends DB_Model
 		$params = [$student_uid, $studiensemester_kurzbz];
 		
 		if ($lehrveranstaltung_id) {
-			$qry .= "AND campus.tbl_lvgesamtnote.lehrveranstaltung_id = ?";
+			$qry .= " AND campus.tbl_lvgesamtnote.lehrveranstaltung_id = ?";
 			$params[] = $lehrveranstaltung_id;
 		}
 

@@ -49,18 +49,21 @@ export default {
 			params: { lv_id, sem_kurzbz, student_uid, note, punkte }
 		};
 	},
-	saveStudentPruefung(student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, typ, pruefung_id = null){
+	// kein Termintyp mehr: welchen Antritt die Prüfung darstellt, leitet der Server aus dem
+	// bestehenden Prüfungsverlauf des Studenten in dieser LV und diesem Semester ab
+	saveStudentPruefung(student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, pruefung_id = null){
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/Noten/saveStudentPruefung',
-			params: { student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, typ, pruefung_id }
+			params: { student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, pruefung_id }
 		};
 	},
-	createPruefungen(uids, datum, lva_id, sem_kurzbz){
+	// note/punkte optional: ohne Auswahl wird der Termin als "noch nicht eingetragen" angelegt
+	createPruefungen(uids, datum, lva_id, sem_kurzbz, note = null, punkte = null){
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/Noten/createPruefungen',
-			params: { uids, datum, lva_id, sem_kurzbz }
+			params: { uids, datum, lva_id, sem_kurzbz, note, punkte }
 		};
 	},
 	saveNotenvorschlagBulk(lv_id, sem_kurzbz, noten) {

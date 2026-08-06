@@ -41,12 +41,16 @@ export const notenApi = {
 	saveNotenvorschlag: (lv_id, sem_kurzbz, student_uid, note, punkte = null) =>
 		apiPost("saveNotenvorschlag", { lv_id, sem_kurzbz, student_uid, note, punkte }),
 
-	/** data -> [savedPruefung, lvgesamtnote, extraPruefung(auto-created Termin1)] */
+	/**
+	 * data -> [savedPruefung, lvgesamtnote, verlauf]
+	 * No `typ` on the wire: which attempt a Prüfung becomes is derived server-side from the
+	 * existing Prüfungsverlauf (PruefungsverlaufLib).
+	 */
 	saveStudentPruefung: ({
-		student_uid, note, punkte = null, datum, lva_id, lehreinheit_id, sem_kurzbz, typ, pruefung_id = null,
+		student_uid, note, punkte = null, datum, lva_id, lehreinheit_id, sem_kurzbz, pruefung_id = null,
 	}) =>
 		apiPost("saveStudentPruefung", {
-			student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, typ, pruefung_id,
+			student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, pruefung_id,
 		}),
 
 	/** LDAP-password gated. data -> [{uid, freigabedatum, benotungsdatum}] */
@@ -64,8 +68,9 @@ export const notenApi = {
 	savePruefungenBulk: (lv_id, sem_kurzbz, pruefungen) =>
 		apiPost("savePruefungenBulk", { lv_id, sem_kurzbz, pruefungen }),
 
-	createPruefungen: (uids, datum, lva_id, sem_kurzbz) =>
-		apiPost("createPruefungen", { uids, datum, lva_id, sem_kurzbz }),
+	// note/punkte are optional; without them the Prüfung is created as "Noch nicht eingetragen"
+	createPruefungen: (uids, datum, lva_id, sem_kurzbz, note = null, punkte = null) =>
+		apiPost("createPruefungen", { uids, datum, lva_id, sem_kurzbz, note, punkte }),
 };
 
 // --- selectors over the getStudentenNoten payload ---
@@ -73,7 +78,21 @@ export const notenApi = {
 export const pruefungenOf = (data, uid) =>
 	(data[1] || []).filter((p) => p.student_uid === uid);
 
+/**
+ * Attempts in Verlauf order. position/zaehlt/antritt_nr/terminal are derived by the server; the
+ * specs assert on those and never on pruefungstyp_kurzbz, which is only a legacy projection.
+ */
+export const attemptsOf = (data, uid) =>
+	[...pruefungenOf(data, uid)].sort((a, b) => Number(a.position) - Number(b.position));
+
+/** Only the attempts that consume one - excused / "noch nicht eingetragen" / nicht beurteilt do not. */
+export const countingAttemptsOf = (data, uid) => attemptsOf(data, uid).filter((p) => p.zaehlt);
+
+/** Legacy projection written for old reports. Asserted in exactly one spec, never used as a rule. */
 export const pruefungenOfTyp = (data, uid, typ) =>
 	pruefungenOf(data, uid).filter((p) => p.pruefungstyp_kurzbz === typ);
 
 export const gradesOf = (data, uid) => (data[3] || {})[uid];
+
+/** Server-derived rule state per student: antrittCount, maxAntritte, canAdd, terminal, angerechnet. */
+export const verlaufOf = (data, uid) => (gradesOf(data, uid) || {}).verlauf;

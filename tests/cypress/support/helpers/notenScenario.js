@@ -1,19 +1,19 @@
 /** Building attempt histories and reading the resulting state. */
 
-import { notenApi, pruefungenOfTyp, gradesOf } from "../api/notenApi";
+import { notenApi, attemptsOf, countingAttemptsOf, gradesOf, verlaufOf } from "../api/notenApi";
 import { expectNotenSuccess } from "./notenErrors";
 import { resetNotenState, seedBaseline } from "./notenTestData";
-import { retakeTypes } from "../../../../public/js/components/Cis/Benotungstool/notenRules.js";
-
-/** The real client rule, so a divergence from the server shows up as a failing API spec. */
-export const enabledRetakeTypes = (context) => retakeTypes(context.cisConfig);
 
 /**
  * Adds an attempt (no pruefung_id -> server runs validatePruefungAdd).
+ *
+ * No typ: the server derives from the Verlauf which attempt this is. One call writes exactly one
+ * Prüfung - the former Termin1 snapshot is gone, the first attempt is created by the Freigabe.
+ *
  * punkte stays null: with CIS_GESAMTNOTE_PUNKTE on, a punkte >= 0 makes the controller re-derive
- * the note from the Notenschlüssel and override the grade under test (Noten.php:692).
+ * the note from the Notenschlüssel and override the grade under test.
  */
-export const addPruefung = (context, student, { note, datum, typ = "Termin2" }) =>
+export const addPruefung = (context, student, { note, datum }) =>
 	notenApi.saveStudentPruefung({
 		student_uid: student.uid,
 		note,
@@ -22,12 +22,11 @@ export const addPruefung = (context, student, { note, datum, typ = "Termin2" }) 
 		lva_id: context.lvId,
 		lehreinheit_id: student.lehreinheit_id,
 		sem_kurzbz: context.semKurzbz,
-		typ,
 		pruefung_id: null,
 	});
 
 /** Edits an attempt (pruefung_id set -> server runs validatePruefungEdit). */
-export const editPruefung = (context, student, { pruefungId, note, datum, typ = "Termin2" }) =>
+export const editPruefung = (context, student, { pruefungId, note, datum }) =>
 	notenApi.saveStudentPruefung({
 		student_uid: student.uid,
 		note,
@@ -36,7 +35,6 @@ export const editPruefung = (context, student, { pruefungId, note, datum, typ = 
 		lva_id: context.lvId,
 		lehreinheit_id: student.lehreinheit_id,
 		sem_kurzbz: context.semKurzbz,
-		typ,
 		pruefung_id: pruefungId,
 	});
 
@@ -45,11 +43,14 @@ export const readState = (context) =>
 		.getStudentenNoten(context.lvId, context.semKurzbz)
 		.then((response) => expectNotenSuccess(response, "getStudentenNoten"));
 
-/** Attempts of one student and type, oldest first (the API returns datum DESC). */
-export const attemptsOfTyp = (data, uid, typ) =>
-	[...pruefungenOfTyp(data, uid, typ)].sort((a, b) =>
-		String(a.datum).slice(0, 10).localeCompare(String(b.datum).slice(0, 10)),
-	);
+/** All attempts of one student, in Verlauf order (position ascending). */
+export const attemptsOfStudent = (data, uid) => attemptsOf(data, uid);
+
+/** Attempts that consume an Antritt, in Verlauf order. */
+export const countingAttemptsOfStudent = (data, uid) => countingAttemptsOf(data, uid);
+
+/** The server's rule state for one student. */
+export const verlaufOfStudent = (data, uid) => verlaufOf(data, uid);
 
 export const lvNoteOf = (data, uid) => gradesOf(data, uid);
 

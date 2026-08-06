@@ -22,8 +22,7 @@ import {
 } from "../../../../support/helpers/notenTestData";
 import {
 	addPruefung,
-	attemptsOfTyp,
-	enabledRetakeTypes,
+	attemptsOfStudent,
 	readState,
 } from "../../../../support/helpers/notenScenario";
 
@@ -41,30 +40,28 @@ describe("Noten API - bulk paths", () => {
 		it("rejects only the row that breaks a §1 rule and accepts the rest", () => {
 			const atCap = ctx.students[0];
 			const fresh = ctx.students[1];
-			const retakes = enabledRetakeTypes(ctx);
 
 			resetNotenState(ctx);
 			seedBaseline(ctx, atCap.uid, { freigegeben: true });
 			seedBaseline(ctx, fresh.uid, { freigegeben: true });
 
-			// drive the first student up to the cap
-			retakes.forEach((typ, i) => {
+			// drive the first student up to the cap - the baseline already provides Antritt 1
+			for (let i = 0; i < ctx.maxAntritte - 1; i += 1) {
 				addPruefung(ctx, atCap, {
 					note: ctx.gradeNotes[0],
 					datum: attemptDate(ctx, i + 1),
-					typ,
 				}).then((response) => {
-					expectNotenSuccess(response, `bring ${atCap.uid} to the cap via ${typ}`);
+					expectNotenSuccess(response, `bring ${atCap.uid} to the cap (attempt ${i + 2})`);
 				});
-			});
+			}
 
-			const datum = attemptDate(ctx, retakes.length + 2);
+			const datum = attemptDate(ctx, ctx.maxAntritte + 1);
 
 			notenApi
 				.createPruefungen(
 					[
-						{ uid: atCap.uid, typ: retakes[retakes.length - 1], lehreinheit_id: atCap.lehreinheit_id },
-						{ uid: fresh.uid, typ: "Termin2", lehreinheit_id: fresh.lehreinheit_id },
+						{ uid: atCap.uid, lehreinheit_id: atCap.lehreinheit_id },
+						{ uid: fresh.uid, lehreinheit_id: fresh.lehreinheit_id },
 					],
 					datum,
 					ctx.lvId,
@@ -79,7 +76,7 @@ describe("Noten API - bulk paths", () => {
 				});
 
 			readState(ctx).then((data) => {
-				const created = attemptsOfTyp(data, fresh.uid, "Termin2");
+				const created = attemptsOfStudent(data, fresh.uid);
 				expect(
 					created.map((p) => String(p.datum).slice(0, 10)),
 					"the accepted row was really created",
@@ -97,14 +94,13 @@ describe("Noten API - bulk paths", () => {
 			addPruefung(ctx, student, {
 				note: ctx.notes.nochNichtEingetragen,
 				datum: attemptDate(ctx, 3),
-				typ: "Termin2",
 			}).then((response) => {
-				expectNotenSuccess(response, "seed an open Termin2");
+				expectNotenSuccess(response, "seed an open attempt");
 			});
 
 			notenApi
 				.createPruefungen(
-					[{ uid: student.uid, typ: "Termin2", lehreinheit_id: student.lehreinheit_id }],
+					[{ uid: student.uid, lehreinheit_id: student.lehreinheit_id }],
 					attemptDate(ctx, 2), // earlier than the existing attempt
 					ctx.lvId,
 					ctx.semKurzbz,
@@ -135,27 +131,21 @@ describe("Noten API - bulk paths", () => {
 		it("applies the §1 rules per row", () => {
 			const atCap = ctx.students[0];
 			const fresh = ctx.students[1];
-			const retakes = enabledRetakeTypes(ctx);
 
 			resetNotenState(ctx);
 			seedBaseline(ctx, atCap.uid, { freigegeben: true });
 			seedBaseline(ctx, fresh.uid, { freigegeben: true });
 
-			retakes.forEach((typ, i) => {
-				addPruefung(ctx, atCap, {
-					note: ctx.gradeNotes[0],
-					datum: attemptDate(ctx, i + 1),
-					typ,
-				});
-			});
+			for (let i = 0; i < ctx.maxAntritte - 1; i += 1) {
+				addPruefung(ctx, atCap, { note: ctx.gradeNotes[0], datum: attemptDate(ctx, i + 1) });
+			}
 
-			const datum = attemptDate(ctx, retakes.length + 2);
+			const datum = attemptDate(ctx, ctx.maxAntritte + 1);
 
 			notenApi
 				.savePruefungenBulk(ctx.lvId, ctx.semKurzbz, [
 					{
 						uid: atCap.uid,
-						typ: retakes[retakes.length - 1],
 						note: ctx.gradeNotes[0],
 						punkte: null,
 						datum,
@@ -163,7 +153,6 @@ describe("Noten API - bulk paths", () => {
 					},
 					{
 						uid: fresh.uid,
-						typ: "Termin2",
 						note: ctx.gradeNotes[0],
 						punkte: null,
 						datum,

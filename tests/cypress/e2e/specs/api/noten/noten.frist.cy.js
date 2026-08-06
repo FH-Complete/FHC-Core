@@ -59,8 +59,7 @@ describe("Noten API - Noteneintragungsfrist (Prüfungsordnung §1)", () => {
 						lva_id: ctx.lvId,
 						lehreinheit_id: ctx.students[0].lehreinheit_id,
 						sem_kurzbz: sem,
-						typ: "Termin2",
-						pruefung_id: null,
+							pruefung_id: null,
 					})
 					.then((response) => {
 						expectNotenError(response, "noteneintragungsfristVorbei");
@@ -109,7 +108,6 @@ describe("Noten API - Noteneintragungsfrist (Prüfungsordnung §1)", () => {
 			addPruefung(ctx, student, {
 				note: ctx.gradeNotes[0],
 				datum: attemptDate(ctx, 1),
-				typ: "Termin2",
 			}).then((response) => {
 				expectNotenSuccess(response, `grade entry within the deadline for ${ctx.semKurzbz}`);
 			});

@@ -1,16 +1,15 @@
 /**
- * savePruefungstermin - the write path shared by saveStudentPruefung, createPruefungen and
- * savePruefungenBulk. The existing specs cover the validators; this one covers the writer.
+ * savePruefungFuerStudent / savePruefungstermin - the write path shared by saveStudentPruefung,
+ * createPruefungen and savePruefungenBulk. The other specs cover the validators; this one covers
+ * the writer.
+ *
+ * Core invariant since the Prüfungsverlauf refactor: one action writes exactly one Prüfung. The
+ * former Termin1 snapshot is gone - Antritt 1 is created by the password-gated Freigabe.
  */
 
-import {
-	expectBulkRowError,
-	expectNotenError,
-	expectNotenSuccess,
-} from "../../../../support/helpers/notenErrors";
+import { expectNotenSuccess } from "../../../../support/helpers/notenErrors";
 import {
 	attemptDate,
-	baselineDate,
 	loadNotenContext,
 	readLvGesamtnote,
 	requireDbReset,
@@ -20,75 +19,118 @@ import {
 } from "../../../../support/helpers/notenTestData";
 import {
 	addPruefung,
-	attemptsOfTyp,
+	attemptsOfStudent,
 	editPruefung,
 	givenBaseline,
 	readState,
+	verlaufOfStudent,
 } from "../../../../support/helpers/notenScenario";
-import { notenApi, pruefungenOfTyp } from "../../../../support/api/notenApi";
+import { notenApi, pruefungenOf } from "../../../../support/api/notenApi";
 
 const dayOf = (value) => String(value).slice(0, 10);
 
-describe("Noten API - savePruefungstermin (write path)", () => {
+describe("Noten API - Prüfungstermin (write path)", () => {
 	let ctx;
 
 	before(() => {
 		requireDbReset();
 		loadNotenContext().then((context) => {
 			ctx = context;
-			expect(
-				context.cisConfig.CIS_GESAMTNOTE_PRUEFUNG_TERMIN2,
-				"needs TERMIN2 enabled - every test here writes a Termin2",
-			).to.be.ok;
+			expect(context.maxAntritte, "needs room for at least one retake").to.be.greaterThan(1);
 		});
 	});
 
 	const studentFor = (index) => ctx.students[index % ctx.students.length];
 
-	it("auto-creates Termin1 carrying the original LV note and its benotungsdatum", () => {
+	it("writes exactly one Prüfung per add - no snapshot alongside it", () => {
 		const student = studentFor(0);
 
 		givenBaseline(ctx, student);
 
-		addPruefung(ctx, student, { note: ctx.gradeNotes[1], datum: attemptDate(ctx, 1) }).then((response) => {
-			const [saved, , extra] = expectNotenSuccess(response, "first Termin2");
+		addPruefung(ctx, student, { note: ctx.gradeNotes[1], datum: attemptDate(ctx, 1) })
+			.then((response) => {
+				const [saved, lvgesamtnote, verlauf] = expectNotenSuccess(response, "add an attempt");
 
-			expect(extra, "Termin1 snapshot in extraPruefung").to.exist;
-			expect(extra.pruefungstyp_kurzbz).to.eq("Termin1");
-			expect(String(extra.note), "snapshot keeps the pre-retake LV note").to.eq(String(ctx.gradeNotes[0]));
-			expect(dayOf(extra.datum), "snapshot keeps the original benotungsdatum").to.eq(baselineDate(ctx));
-
-			expect(saved.pruefungstyp_kurzbz).to.eq("Termin2");
-			expect(String(saved.note)).to.eq(String(ctx.gradeNotes[1]));
-		});
+				expect(saved, "savedPruefung").to.exist;
+				expect(String(saved.note)).to.eq(String(ctx.gradeNotes[1]));
+				expect(lvgesamtnote, "lvgesamtnote is returned so the client can refresh the row").to.exist;
+				expect(verlauf, "verlauf is returned").to.exist;
+				expect(verlauf.pruefungen, "verlauf carries the attempts").to.be.an("array");
+			})
+			.then(() => readState(ctx))
+			.then((data) => {
+				const attempts = attemptsOfStudent(data, student.uid);
+				expect(attempts, "baseline Antritt 1 plus exactly one added row").to.have.length(2);
+			});
 	});
 
-	it("returns extraPruefung null once Termin1 exists", () => {
-		// On PHP 8 the null lands in count() (Noten.php:822) and turns this into a 500.
+	it("derives position and Antrittsnummer server-side", () => {
 		const student = studentFor(1);
 
 		givenBaseline(ctx, student);
 
 		addPruefung(ctx, student, { note: ctx.gradeNotes[1], datum: attemptDate(ctx, 1) })
-			.then((response) => expectNotenSuccess(response, "first Termin2")[0])
-			.then((created) =>
-				editPruefung(ctx, student, {
-					pruefungId: created.pruefung_id,
-					note: ctx.gradeNotes[0],
-					datum: attemptDate(ctx, 1),
-				}),
-			)
-			.then((response) => {
-				const [saved, lvgesamtnote, extra] = expectNotenSuccess(response, "edit of the Termin2");
+			.then(() => readState(ctx))
+			.then((data) => {
+				const attempts = attemptsOfStudent(data, student.uid);
 
-				expect(saved, "savedPruefung").to.exist;
-				expect(extra, "no second Termin1 is created").to.be.null;
-				expect(lvgesamtnote, "lvgesamtnote").to.exist;
+				expect(attempts.map((p) => p.position), "positions are 1..n in date order").to.deep.eq([1, 2]);
+				expect(attempts.map((p) => p.antritt_nr), "both count as attempts").to.deep.eq([1, 2]);
+				attempts.forEach((p) => expect(p.zaehlt, `zaehlt of position ${p.position}`).to.be.true);
+
+				const verlauf = verlaufOfStudent(data, student.uid);
+				expect(verlauf.antrittCount, "both attempts counted").to.eq(2);
+				expect(verlauf.maxAntritte, "the cap comes from the server").to.eq(ctx.maxAntritte);
+				expect(verlauf.canAdd, `canAdd with 2 of ${ctx.maxAntritte} used`).to.eq(2 < ctx.maxAntritte);
+			});
+	});
+
+	it("does not count an excused attempt, and keeps it as its own row", () => {
+		const student = studentFor(2);
+
+		givenBaseline(ctx, student);
+
+		addPruefung(ctx, student, { note: ctx.notes.entschuldigt, datum: attemptDate(ctx, 1) })
+			.then((response) => expectNotenSuccess(response, "excused attempt"))
+			.then(() => readState(ctx))
+			.then((data) => {
+				const attempts = attemptsOfStudent(data, student.uid);
+
+				expect(attempts, "the excused row is kept, not merged").to.have.length(2);
+
+				const excused = attempts[1];
+				expect(excused.zaehlt, "excused consumes no attempt").to.be.false;
+				expect(excused.antritt_nr, "and carries no Antrittsnummer").to.be.null;
+
+				expect(verlaufOfStudent(data, student.uid).antrittCount, "still one attempt used").to.eq(1);
+			});
+	});
+
+	it("appends a new row per add instead of overwriting the previous one", () => {
+		// The old writer re-derived its target as "the first non-excused Termin2" and updated it.
+		// Now only an explicit pruefung_id updates; an add always inserts.
+		const student = studentFor(0);
+
+		givenBaseline(ctx, student);
+
+		let firstId;
+		addPruefung(ctx, student, { note: ctx.notes.entschuldigt, datum: attemptDate(ctx, 1) })
+			.then((response) => {
+				firstId = expectNotenSuccess(response, "first add")[0].pruefung_id;
+				return addPruefung(ctx, student, { note: ctx.gradeNotes[1], datum: attemptDate(ctx, 2) });
+			})
+			.then((response) => expectNotenSuccess(response, "second add"))
+			.then(() => readState(ctx))
+			.then((data) => {
+				const attempts = attemptsOfStudent(data, student.uid);
+
+				expect(attempts, "baseline + two added rows").to.have.length(3);
+				expect(attempts.map((p) => p.pruefung_id), "the first add still exists").to.include(firstId);
 			});
 	});
 
 	it("edits the pruefung identified by pruefung_id", () => {
-		// An excused and a real Termin2 side by side - no endpoint builds this, hence the direct seed
+		// An excused and a real attempt side by side - no endpoint builds this, hence the direct seed
 		const student = studentFor(2);
 		const excusedDate = attemptDate(ctx, 1);
 		const gradedDate = attemptDate(ctx, 2);
@@ -99,7 +141,6 @@ describe("Noten API - savePruefungstermin (write path)", () => {
 		let excusedId;
 		seedPruefung(ctx, student, { note: ctx.notes.entschuldigt, datum: excusedDate, typ: "Termin2" })
 			.then((seeded) => {
-				console.log('ctx', ctx)
 				excusedId = seeded.pruefungId;
 				return seedPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: gradedDate, typ: "Termin2" });
 			})
@@ -111,60 +152,35 @@ describe("Noten API - savePruefungstermin (write path)", () => {
 					datum: movedTo,
 				}),
 			)
-			.then((response) => expectNotenSuccess(response, "moving the excused Termin2"))
+			.then((response) => expectNotenSuccess(response, "moving the excused attempt"))
 			.then(() => readState(ctx))
 			.then((data) => {
-				const rows = pruefungenOfTyp(data, student.uid, "Termin2");
+				const rows = pruefungenOf(data, student.uid);
 				const excused = rows.find((p) => p.pruefung_id === excusedId);
-				const graded = rows.find((p) => p.pruefung_id !== excusedId);
+				const graded = rows.find((p) => dayOf(p.datum) === gradedDate);
 
 				// the untargeted row first: silently rewriting a real grade is the worse outcome
-				expect(graded, "the other Termin2 still exists").to.exist;
-				expect(String(graded.note), "the untargeted Termin2 keeps its grade").to.eq(
+				expect(graded, "the other attempt still exists").to.exist;
+				expect(String(graded.note), "the untargeted attempt keeps its grade").to.eq(
 					String(ctx.gradeNotes[0]),
 				);
-				expect(dayOf(graded.datum), "the untargeted Termin2 keeps its date").to.eq(gradedDate);
 
-				expect(excused, "the excused Termin2 still exists").to.exist;
+				expect(excused, "the excused attempt still exists").to.exist;
 				expect(dayOf(excused.datum), "the row named by pruefung_id moved").to.eq(movedTo);
 			});
 	});
 
 	it("adds an attempt while the LV note is still offen", () => {
-		// freigegeben:false -> getLvGesamtNoten hides the row, so the writer takes the INSERT branch
-		// against an existing primary key.
+		// getLvGesamtNoten filters `freigabedatum < NOW()`. The writer must read the LV note through
+		// the UNFILTERED getter, otherwise it takes the INSERT branch against an existing primary key
+		// and answers "keine LV-Note eingetragen" forever.
 		const student = studentFor(3);
 
 		givenBaseline(ctx, student, { freigegeben: false });
 
 		addPruefung(ctx, student, { note: ctx.gradeNotes[1], datum: attemptDate(ctx, 1) }).then((response) => {
-			expectNotenSuccess(response, "Termin2 on an un-freigegebene LV note");
+			expectNotenSuccess(response, "attempt on an un-freigegebene LV note");
 		});
-	});
-
-	it("updates the existing Termin2 instead of appending a second one", () => {
-		// The cap has room (Termin3 is on here), so the second add is allowed and must land on the
-		// same row - the update branch is otherwise only reached through an edit.
-		const student = studentFor(0);
-
-		givenBaseline(ctx, student);
-
-		let firstId;
-		addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: attemptDate(ctx, 1) })
-			.then((response) => {
-				firstId = expectNotenSuccess(response, "first Termin2")[0].pruefung_id;
-				return addPruefung(ctx, student, { note: ctx.gradeNotes[1], datum: attemptDate(ctx, 2) });
-			})
-			.then((response) => expectNotenSuccess(response, "second Termin2"))
-			.then(() => readState(ctx))
-			.then((data) => {
-				const rows = attemptsOfTyp(data, student.uid, "Termin2");
-
-				expect(rows, "the second add must not append a row").to.have.length(1);
-				expect(rows[0].pruefung_id, "same row").to.eq(firstId);
-				expect(String(rows[0].note)).to.eq(String(ctx.gradeNotes[1]));
-				expect(dayOf(rows[0].datum)).to.eq(attemptDate(ctx, 2));
-			});
 	});
 
 	it("stores an empty note as 'Noch nicht eingetragen'", () => {
@@ -173,71 +189,74 @@ describe("Noten API - savePruefungstermin (write path)", () => {
 		givenBaseline(ctx, student);
 
 		addPruefung(ctx, student, { note: "", datum: attemptDate(ctx, 1) }).then((response) => {
-			const [saved] = expectNotenSuccess(response, "Termin2 without a grade");
+			const [saved] = expectNotenSuccess(response, "attempt without a grade");
 			expect(String(saved.note), "empty note is normalised").to.eq(
 				String(ctx.notes.nochNichtEingetragen),
 			);
 		});
 	});
 
-	describe("invalid pruefungstyp", () => {
-		// The only server-side typ check: which typ an attempt becomes is otherwise decided purely by
-		// the frontend (getPruefungstypForStudentByAntritt).
-		it("refuses a typ that is not an enabled retake", () => {
-			const student = studentFor(2);
+	it("writes the LV note from the attempt's grade", () => {
+		const student = studentFor(3);
 
-			givenBaseline(ctx, student);
+		givenBaseline(ctx, student);
 
-			// Termin1 is the snapshot, kommPruef is entered elsewhere, the third is nonsense
-			["Termin1", "kommPruef", "NichtsDergleichen"].forEach((typ) => {
-				addPruefung(ctx, student, {
-					note: ctx.gradeNotes[1],
-					datum: attemptDate(ctx, 1),
-					typ,
-				}).then((response) => {
-					expectNotenError(response, "wrongPruefungType");
-				});
+		addPruefung(ctx, student, { note: ctx.gradeNotes[1], datum: attemptDate(ctx, 1) })
+			.then((response) => expectNotenSuccess(response, "attempt with a grade"))
+			.then(() => readLvGesamtnote(ctx, student.uid))
+			.then((row) => {
+				expect(String(row.note), "the LV note follows the newest attempt").to.eq(
+					String(ctx.gradeNotes[1]),
+				);
 			});
-		});
-
-		
-		it("leaves the LV note untouched when the typ is rejected", () => {
-			const student = studentFor(3);
-
-			givenBaseline(ctx, student);
-
-			addPruefung(ctx, student, {
-				note: ctx.gradeNotes[1],
-				datum: attemptDate(ctx, 1),
-				typ: "NichtsDergleichen",
-			})
-				.then((response) => expectNotenError(response, "wrongPruefungType"))
-				.then(() => readLvGesamtnote(ctx, student.uid))
-				.then((row) => {
-					expect(String(row.note), "a rejected request must not re-grade the student").to.eq(
-						String(ctx.gradeNotes[0]),
-					);
-				});
-		});
 	});
 
-	it("refuses a Prüfung for a student who has no LV note yet", () => {
-		// Only reachable through the bulk path: saveStudentPruefung inserts the missing LV note itself,
-		// so its own guard (Noten.php:839) can never fire.
+	it("creates the LV note when a student has none yet", () => {
+		// Previously this answered c4keineLvNoteEingetragen. The bulk path now runs the same core as
+		// the single dialog, which writes the LV note before the Prüfung.
 		const student = studentFor(0);
 
 		resetNotenState(ctx);
 
 		notenApi
 			.createPruefungen(
-				[{ uid: student.uid, typ: "Termin2", lehreinheit_id: student.lehreinheit_id }],
+				[{ uid: student.uid, lehreinheit_id: student.lehreinheit_id }],
 				attemptDate(ctx, 1),
 				ctx.lvId,
 				ctx.semKurzbz,
 			)
 			.then((response) => {
 				const data = expectNotenSuccess(response, "createPruefungen without an LV note");
-				expectBulkRowError(data, student.uid, "c4keineLvNoteEingetragen");
+				expect(data[student.uid], `row result for ${student.uid}`).to.be.an("object");
+				expect(data[student.uid].savedPruefung, "the Prüfung was written").to.exist;
+			})
+			.then(() => readLvGesamtnote(ctx, student.uid))
+			.then((row) => {
+				expect(row, "the LV note was created alongside").to.not.be.null;
+				expect(String(row.note), "carries the Prüfung's note").to.eq(
+					String(ctx.notes.nochNichtEingetragen),
+				);
 			});
+	});
+
+	it("applies a chosen note to both the Prüfung and the LV note in the bulk path", () => {
+		const student = studentFor(1);
+
+		resetNotenState(ctx);
+
+		notenApi
+			.createPruefungen(
+				[{ uid: student.uid, lehreinheit_id: student.lehreinheit_id }],
+				attemptDate(ctx, 1),
+				ctx.lvId,
+				ctx.semKurzbz,
+				ctx.gradeNotes[1],
+			)
+			.then((response) => {
+				const data = expectNotenSuccess(response, "createPruefungen with a note");
+				expect(String(data[student.uid].savedPruefung[0].note)).to.eq(String(ctx.gradeNotes[1]));
+			})
+			.then(() => readLvGesamtnote(ctx, student.uid))
+			.then((row) => expect(String(row.note)).to.eq(String(ctx.gradeNotes[1])));
 	});
 });
