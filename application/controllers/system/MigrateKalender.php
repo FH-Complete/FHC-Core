@@ -290,7 +290,7 @@ class MigrateKalender extends CLI_Controller
 				 $createHelperTypeQuery .
 		"WITH test AS (
 			SELECT 
-				tk.eindeutige_gruppen_id AS eindeutige_gruppen_id,
+				tk.eindeutige_kalender_gruppen_id AS eindeutige_kalender_gruppen_id,
 				array_agg(tk.kalender_id),
 				array_agg(
 					ROW(tsb.betriebsmittel_id, tsb.insertamum, tsb.insertvon)::betriebsmittel_info
@@ -298,7 +298,7 @@ class MigrateKalender extends CLI_Controller
 			FROM sync.tbl_stundenplandev_kalender AS sk
 			JOIN lehre.tbl_kalender tk ON tk.kalender_id = sk.kalender_id
 			JOIN lehre.tbl_stundenplan_betriebsmittel tsb ON tsb.stundenplandev_id = sk.stundenplandev_id 
-			GROUP BY tk.eindeutige_gruppen_id 
+			GROUP BY tk.eindeutige_kalender_gruppen_id 
 			)
 			INSERT INTO lehre.tbl_betriebsmittel_kalender (
 				eindeutige_kalender_gruppen_id, 
@@ -307,7 +307,7 @@ class MigrateKalender extends CLI_Controller
 				insertvon
 				)
 			SELECT
-				t.eindeutige_gruppen_id,
+				t.eindeutige_kalender_gruppen_id,
 				bm.betriebsmittel_id,
 				bm.insertamum,
 				bm.insertvon
@@ -323,9 +323,9 @@ class MigrateKalender extends CLI_Controller
 		$dbModel = new DB_Model();
 
 		$query = "UPDATE lehre.tbl_kalender
-			SET eindeutige_gruppen_id = gen_random_uuid()
+			SET eindeutige_kalender_gruppen_id = gen_random_uuid()
 			WHERE vorgaenger_kalender_id IS NULL
-			AND eindeutige_gruppen_id IS NULL;";
+			AND eindeutige_kalender_gruppen_id IS NULL;";
 
 		$dbModel->db->query($query);
 
@@ -340,7 +340,7 @@ class MigrateKalender extends CLI_Controller
 					kalender_id,
 					vorgaenger_kalender_id,
 					kalender_id AS root_id,
-					eindeutige_gruppen_id as root_eindeutige_gruppen_id
+					eindeutige_kalender_gruppen_id as root_eindeutige_kalender_gruppen_id
 				FROM lehre.tbl_kalender
 				WHERE vorgaenger_kalender_id IS NULL
 
@@ -350,18 +350,18 @@ class MigrateKalender extends CLI_Controller
 					i.kalender_id,
 					i.vorgaenger_kalender_id,
 					t.root_id,
-					t.root_eindeutige_gruppen_id 
+					t.root_eindeutige_kalender_gruppen_id 
 				FROM lehre.tbl_kalender i
 				JOIN tree t
 				ON i.vorgaenger_kalender_id = t.kalender_id
-				where i.eindeutige_gruppen_id is NULL
+				where i.eindeutige_kalender_gruppen_id is NULL
 			
 			)
 			UPDATE lehre.tbl_kalender k
-			SET eindeutige_gruppen_id = t.root_eindeutige_gruppen_id
+			SET eindeutige_kalender_gruppen_id = t.root_eindeutige_kalender_gruppen_id
 			FROM tree t
 			WHERE k.kalender_id = t.kalender_id
-			AND k.eindeutige_gruppen_id IS NULL;";
+			AND k.eindeutige_kalender_gruppen_id IS NULL;";
 
 		$dbModel->db->query($query);
 	}
