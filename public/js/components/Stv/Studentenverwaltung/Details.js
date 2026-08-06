@@ -63,6 +63,10 @@ export default {
 			let tile = this.students[0].matrikelnr != null ? this.students[0].matrikelnr : '-';
 			return tile;
 		},
+		tile_PrestdId(){
+			let tile = this.students[0].prestudent_id != null ? this.students[0].prestudent_id : '-';
+			return tile;
+		},
 	},
 	watch: {
 		'$p.user_language.value'(n, o) {
@@ -150,6 +154,8 @@ export default {
 				<template #valueBetaTile>{{tile_MatrNr}}</template>
 				<template #titleGammaTile>PersKz</template>
 				<template #valueGammaTile>{{tile_PersKz}}</template>
+				<template #titleDeltaTile>PrestdID</template>
+				<template #valueDeltaTile>{{tile_PrestdId}}</template>
 			</fhc-header>
 			<fhc-tabs
 				v-if="students.length == 1"
