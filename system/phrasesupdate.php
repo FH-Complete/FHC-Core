@@ -49804,7 +49804,7 @@ array(
 	),
 	array(
 		'app' => 'core',
-		'category' => 'stv',
+		'category' => 'ui',
 		'phrase' => 'weitereEMail',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -62123,6 +62123,66 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 	// tabulator presets section phrases END
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'openInMailClient',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'In Mailanwendung öffnen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Open in Mailclient',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'kompatibilityMode_WebmailClient',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kompatibilitätsmodus für Webmail',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Open in Compatibility mode (Webmail)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'webmailclient',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Webmail',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'webmail',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

@@ -54,7 +54,8 @@ export default {
 		cisRoot: String,
 		avatarUrl: String,
 		logoutUrl: String,
-		activeAddons: String // semicolon separated list of active addons
+		activeAddons: String, // semicolon separated list of active addons
+		authUid: String
 	},
 	provide() {
 		return {
@@ -88,6 +89,7 @@ export default {
 			hasZGVMasterPermission: this.permissions['student/editMakkZgv'],
 			hasZGVDoctorPermission: this.permissions['student/editDokZgv'],
 			hasBismeldenPermission: this.permissions['student/editBismelden'],
+			authUid: this.authUid
 
 		}
 	},
