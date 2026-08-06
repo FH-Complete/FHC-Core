@@ -464,23 +464,30 @@ export default {
 			this.isFetchingAvailableRooms = false;
 			this.roomFilterText = "";
 		},
-		getParticipantProfileHref(participant) {
+		showParticipantProfile(participant) {
 			if (!participant?.uid) {
-				return "";
+				return;
 			}
 
-			return this.$router.resolve({
+			const participantHref = this.$router.resolve({
 				name: "ProfilView",
 				params: { uid: participant.uid },
 			}).href;
+
+			window.open(participantHref, "_blank");
 		},
-		getRoomInfoHref(roomId) {
-			return (
+		showRoomDetails(room) {
+			if (!room.id) {
+				return;
+			}
+
+			const roomHref =
 				FHC_JS_DATA_STORAGE_OBJECT.app_root +
 				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
 				"/CisVue/Cms/content/" +
-				roomId
-			);
+				room.id;
+
+			window.open(roomHref, "_blank");
 		},
 	},
 	created() {
@@ -535,14 +542,14 @@ export default {
 									<span>
 										{{ participant.name }}
 									</span>	
-									<a
+									<span
 										v-if="participant.uid"
-										:href="getParticipantProfileHref(participant)"
-										target="_blank"
+										@click="showParticipantProfile(participant)"
+										type="button"
 										class="px-1 fhc-primary-color"
 									>
 										<i class="fa-solid fa-up-right-from-square"></i>
-									</a>
+									</span>
 								</div>
 								<div v-else class="text-center">---</div>
 							</td>
@@ -712,9 +719,14 @@ export default {
 								class="px-2 py-1 border border-x-2 border-y-1 d-flex flex-row align-items-center gap-1"
 							>
 								<span>{{ room.shortName }}</span>
-								<a v-if="room.id" @click.stop="" :href="getRoomInfoHref(room.id)" target="_blank" class="px-1 fhc-primary-color">
+								<span
+									v-if="room.id"
+									@click.stop="showRoomDetails(room)"
+									type="button"
+									class="px-1 fhc-primary-color"
+								>
 									<i class="fa-solid fa-up-right-from-square"></i>
-								</a>
+								</span>
 							</div>
 						</div>
 					</div>

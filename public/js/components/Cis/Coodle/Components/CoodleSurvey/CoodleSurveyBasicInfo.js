@@ -59,16 +59,6 @@ export default {
 				return "";
 			}
 		},
-		surveyCreatorProfileHref() {
-			if (this.isNewSurvey) {
-				return "";
-			}
-
-			return this.$router.resolve({
-				name: "ProfilView",
-				params: { uid: this.survey?.creator?.uid },
-			}).href;
-		},
 		isNewSurvey() {
 			return !this.$props.survey?.id;
 		},
@@ -79,6 +69,19 @@ export default {
 			set(newValue) {
 				this.$emit("update:surveyFormDataModelValue", newValue);
 			},
+		},
+	},
+	methods: {
+		showCreatorProfile() {
+			if (this.isNewSurvey || !this.survey?.creator?.uid) {
+				return;
+			}
+
+			const creatorHref = this.$router.resolve({
+				name: "ProfilView",
+				params: { uid: this.survey?.creator?.uid },
+			}).href;
+			window.open(creatorHref, "_blank");
 		},
 	},
 	template: /*html*/ `
@@ -123,14 +126,14 @@ export default {
 					<span>
 						<span class="fw-bold">{{ $p.t("coodle/created_by") + ": " }}</span>
 						{{ this.$props.survey?.creator?.name }}
-						<a
+						<span
 							v-if="this.$props.survey?.creator?.uid"
-							:href="surveyCreatorProfileHref"
-							target="_blank"
+							@click="showCreatorProfile()"
+							type="button"
 							class="fhc-primary-color"
 						>
 							<i class="fa-solid fa-up-right-from-square"></i>
-						</a>
+						</span>
 						{{ " " + $p.t("ui/am") + " " + formattedSurveyCreatedAt}}
 					</span>
 				</div>
