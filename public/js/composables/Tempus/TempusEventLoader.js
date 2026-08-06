@@ -93,7 +93,7 @@ export function useEventLoader(
       let tempAllEvents = Array.from(
         new Map(
           [...allEvents.value, ...newlyLoadedEvents].map((event) => [
-            event.eindeutige_gruppen_id,
+            event.eindeutige_kalender_gruppen_id,
             event,
           ]),
         ).values(),

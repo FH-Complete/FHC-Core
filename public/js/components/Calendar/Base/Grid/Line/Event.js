@@ -148,7 +148,7 @@ export default {
 		v-cal-click:event="isHeaderOrFooter ? event : event.orig"
 		@contextmenu.prevent="onRightClick"
 		:data-id="'event-' + event.orig.kalender_id"
-		:data-group-id="'event-group-' + event.orig.eindeutige_gruppen_id"
+		:data-group-id="'event-group-' + event.orig.eindeutige_kalender_gruppen_id"
 		data-cy="calendar-event"
 	>
 		<div
