@@ -39,8 +39,13 @@ export default {
 		return {
 			mailLinks: [],
 			showMailDialog: false,
-			showDivKomp: false
+			showDivKomp: false,
+			showDivKompLocalStorageId: 'studvw-contact-showDivKomp'
 		}
+	},
+	activated() {
+		const showDivCompLocalStorage = window.localStorage.getItem(this.showDivKompLocalStorageId);
+		this.showDivKomp = (showDivCompLocalStorage === 'true') ? true : false;
 	},
 	methods: {
 		internMail(event) {
@@ -73,23 +78,25 @@ export default {
 			this.showMailDialog = false;
 		},
 		onSwitchChange(){
-			if (this.showDivKomp) {
-				console.log("zeigen");
-			}
-			else {
-				console.log("nicht zeigen");
-			}
-
-		},
-		showKompatiblitymode(){
-			this.showDivKomp = !this.showDivKomp;
+			window.localStorage.setItem(this.showDivKompLocalStorageId, this.showDivKomp);
 		}
 	},
 	template: `
-	<div class="core-kontaktieren>
+	<div class="core-kontaktieren">
 		<div id="elementID"></div>
 
-		<div class="d-flex justify-content-end pb-3">
+		<div class="d-flex justify-content-between align-items-start pb-3">
+			<a
+				v-if="showMailDialog"
+				class="btn btn-outline-secondary m-2"
+				@click.prevent="reset"
+				>
+					<span class="fa-solid fa-delete-left" :title="this.$p.t('ui','zurueck')" ></span>
+					&nbsp;
+					<span>{{ $p.t('ui','zurueck') }}</span>
+			</a>
+			<div v-else>&nbsp;</div>
+
 			<form-input
 				container-class="form-switch mb-0"
 				type="checkbox"
@@ -149,12 +156,6 @@ export default {
 									Email {{ index + 1 }}
 							</a>
 						</div>
-							<a
-								class="btn btn-outline-secondary m-2"
-								@click.prevent="reset"
-								>
-									<span class="fa-solid fa-rotate-right" :title="this.$p.t('ui','zurueck')" ></span>
-							</a>
 					</div>
 					<div v-else>
 							<a
@@ -164,15 +165,10 @@ export default {
 								>
 									{{$p.t('ui', 'openInMailClient')}}
 							</a>
-							<a
-								class="btn btn-outline-secondary m-2"
-								@click.prevent="reset"
-								>
-									<span class="fa-solid fa-rotate-right" :title="this.$p.t('ui','zurueck')" ></span>
-							</a>
 					</div>
 			</div>
 
 		</div>
+	</div>
 	`
 };
