@@ -55,7 +55,7 @@ export default {
       this.availableTags = await this.fetchAvailableTags();
       this.filteredAvailableTags = [...this.dropdownParsedAvailableTags];
       this.assignedTags = await this.fetchAssignedTagsByCalender(
-        calendar.eindeutige_gruppen_id,
+        calendar.eindeutige_kalender_gruppen_id,
       );
 
       this.show();
@@ -165,7 +165,7 @@ export default {
     async handleCalendarTagChange() {
       this.removeTagModalEscapeHandler();
 
-      const calendarGroupId = this.calendar?.eindeutige_gruppen_id;
+      const calendarGroupId = this.calendar?.eindeutige_kalender_gruppen_id;
       if (!calendarGroupId) return;
 
       this.assignedTags =
@@ -225,11 +225,11 @@ export default {
       </template>
     </bs-modal>
     <core-tag
-      v-if="calendar?.eindeutige_gruppen_id"
+      v-if="calendar?.eindeutige_kalender_gruppen_id"
       ref="tagComponent"
       :is-list-item-shown="false"
       :endpoint="tagEndpoint"
-      :values="[calendar.eindeutige_gruppen_id]"
+      :values="[calendar.eindeutige_kalender_gruppen_id]"
       zuordnung_typ="eindeutige_kalender_gruppen_id"
       @added="handleCalendarTagChange"
       @deleted="handleCalendarTagChange"

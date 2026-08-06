@@ -43,7 +43,7 @@ class Betriebsmittel_model extends DB_Model
 					AND 
 				NOT EXISTS(
 					SELECT 1 FROM lehre.tbl_betriebsmittel_kalender
-					JOIN lehre.tbl_kalender ON tbl_kalender.eindeutige_gruppen_id = tbl_betriebsmittel_kalender.eindeutige_kalender_gruppen_id
+					JOIN lehre.tbl_kalender ON tbl_kalender.eindeutige_kalender_gruppen_id = tbl_betriebsmittel_kalender.eindeutige_kalender_gruppen_id
 					WHERE
 						betriebsmittel_id=tbl_betriebsmittel.betriebsmittel_id
 					AND tbl_kalender.von < ?

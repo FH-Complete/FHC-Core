@@ -195,7 +195,7 @@ class LvPlanICALLib
 			$dtStamp = '19700101T000000Z';
 
 		$fragment = $this->buildICalLine('BEGIN', 'VEVENT')
-			.$this->buildICalTextLine('UID', $event->eindeutige_gruppen_id)
+			.$this->buildICalTextLine('UID', $event->eindeutige_kalender_gruppen_id)
 			.$this->buildICalLine('SEQUENCE', (int)$event->kalender_id)
 			.$this->buildICalTextLine('SUMMARY', $summary)
 			.$this->buildICalTextLine('DESCRIPTION', $description)

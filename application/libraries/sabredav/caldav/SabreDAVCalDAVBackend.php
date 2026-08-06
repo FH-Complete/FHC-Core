@@ -188,7 +188,7 @@ class SabreDAVCalDAVBackend extends \Sabre\CalDAV\Backend\AbstractBackend
 		$normalizedObjectUri = $this->normalizeObjectUri($objectUri);
 		foreach($data as $row)
 		{
-			if(md5($row->eindeutige_gruppen_id) == $normalizedObjectUri)
+			if(md5($row->eindeutige_kalender_gruppen_id) == $normalizedObjectUri)
 			{
 				return $row;
 			}
@@ -267,7 +267,7 @@ class SabreDAVCalDAVBackend extends \Sabre\CalDAV\Backend\AbstractBackend
 			$dtStamp = '19700101T000000Z';
 
 		$fragment = $this->buildICalLine('BEGIN', 'VEVENT')
-			.$this->buildICalTextLine('UID', $item->eindeutige_gruppen_id)
+			.$this->buildICalTextLine('UID', $item->eindeutige_kalender_gruppen_id)
 			.$this->buildICalLine('SEQUENCE', (int)$item->kalender_id)
 			.$this->buildICalTextLine('SUMMARY', $summary)
 			.$this->buildICalTextLine('DESCRIPTION', $description)
@@ -402,7 +402,7 @@ class SabreDAVCalDAVBackend extends \Sabre\CalDAV\Backend\AbstractBackend
 
 	protected function getObjectUri($row)
 	{
-		return md5($row->eindeutige_gruppen_id).'.ics';
+		return md5($row->eindeutige_kalender_gruppen_id).'.ics';
 	}
 
 	protected function normalizeObjectUri($objectUri)
@@ -435,7 +435,7 @@ class SabreDAVCalDAVBackend extends \Sabre\CalDAV\Backend\AbstractBackend
 		$calendarData = $this->makeCal($row->calendarDataFragment);
 
 		return array(
-			"id"=>$row->eindeutige_gruppen_id,
+			"id"=>$row->eindeutige_kalender_gruppen_id,
 			"calendardata"=>$calendarData,
 			"uri"=>$this->getObjectUri($row),
 			"lastmodified"=>$this->getLastModifiedTimestamp($row->updateamum),
