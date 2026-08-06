@@ -9,6 +9,7 @@ import MylvStudent from "../../components/Cis/Mylv/Student.js";
 import Profil from "../../components/Cis/Profil/Profil.js";
 import Raumsuche from "../../components/Cis/Raumsuche/Raumsuche.js";
 import CmsNews from "../../components/Cis/Cms/News.js";
+import NewsItemForm from "../../components/Cis/Cms/NewsItemForm.js";
 import CmsContent from "../../components/Cis/Cms/Content.js";
 import Info from "../../components/Cis/Mylv/Semester/Studiengang/Lv/Info.js";
 import RoomInformation, {DEFAULT_MODE_RAUMINFO_DESKTOP, DEFAULT_MODE_RAUMINFO_MOBILE} from "../../components/Cis/Mylv/RoomInformation.js";
@@ -146,6 +147,12 @@ const router = VueRouter.createRouter({
 			path: `/CisVue/Cms/News`,
 			name: 'News',
 			component: CmsNews,
+			props: true
+		},
+		{
+			path: `/CisVue/Cms/News/Create`,
+			name: 'NewsItemCreate',
+			component: NewsItemForm,
 			props: true
 		},
 		{
