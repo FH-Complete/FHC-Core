@@ -317,6 +317,7 @@ export default {
     "$p.user_language.value"(n, o) {
       if (n !== o && o !== undefined && this.$refs.table.tableBuilt) {
         this.translateTabulator();
+        this.$reloadList();
       }
     },
     "tagFilterState.selectedOptions": {
