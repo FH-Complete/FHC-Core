@@ -72,12 +72,15 @@ export default {
 				}
 			});
 		},
-		async handleCreateEvent(event)
-		{
+		async handleCreateEvent(event) {
 			event.ort_kurzbz = this.propsViewData.ort_kurzbz;
-			await this.$api.call(ApiRoomPlan.addRoomReservation(event));
-			this.$refs.calendar.resetEventLoader();
-			this.$refs.calendar.closeModal();
+			const reservationCreationResponse = await this.$api.call(
+				ApiRoomPlan.addRoomReservation(event),
+			);
+			if (reservationCreationResponse.meta.status === "success") {
+				this.$refs.calendar.resetEventLoader();
+				this.$refs.calendar.closeModal();
+			}
 		},
 		async handleDeleteEvent(event)
 		{
