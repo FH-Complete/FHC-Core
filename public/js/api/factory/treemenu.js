@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2025 fhcomplete.org
+ * Copyright (C) 2026 fhcomplete.org
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,26 +16,29 @@
  */
 
 export default {
-	get(path) {
-		let url = 'api/frontend/v1/stv/verband';
-		if (path)
-			url += '/' + path;
+	get(config, path = '') {
 		return {
 			method: 'get',
-			url
+			url: '/api/frontend/v1/treemenu/' + config + '/' + path
+		};
+	},
+	data(config, path = '') {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/treemenudata/' + config + '/' + path
 		};
 	},
 	favorites: {
-		get() {
+		get(config) {
 			return {
 				method: 'get',
-				url: 'api/frontend/v1/stv/favorites'
+				url: 'api/frontend/v1/favorites/get/' + config
 			};
 		},
-		set(favorites) {
+		set(config, favorites) {
 			return {
 				method: 'post',
-				url: 'api/frontend/v1/stv/favorites/set',
+				url: 'api/frontend/v1/favorites/set/' + config,
 				params: { favorites }
 			};
 		}

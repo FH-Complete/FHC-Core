@@ -1,67 +1,128 @@
-export function tagFormatter(cell, tagComponent)
-{
-	let tags = cell.getValue();
-	if (!tags) return;
+export function tagFormatter(cell, tagComponent, onRendered, tagKey = "tags") {
+  const mappedData = tagComponent[tagKey]?.map((tag) => ({
+    typ_kurzbz: tag.tag_typ_kurzbz,
+    automatisiert: tag.automatisiert,
+  }));
 
-	let container = document.createElement('div');
-	container.className = "d-flex gap-1";
+  let tags = cell.getValue();
+  if (!tags) return;
 
-	let parsedTags = JSON.parse(tags);
-	let maxVisibleTags = 2;
+  let container = document.createElement("div");
+  container.className = "d-flex gap-1";
 
-	const rowData = cell.getRow().getData();
-	if (rowData._tagExpanded === undefined) {
-		rowData._tagExpanded = false;
-	}
+  let parsedTags = [];
+  if (typeof tags === "string") {
+    parsedTags = JSON.parse(tags);
+  } else if (Array.isArray(tags)) {
+    parsedTags = tags;
+  }
 
-	const renderTags = () => {
-		container.innerHTML = '';
-		parsedTags = parsedTags.filter(item => item !== null);
+  let maxVisibleTags = 3;
 
-		parsedTags.sort((a, b) => {
-			let adone = a.done ? 1 : 0;
-			let bbone = b.done ? 1 : 0;
+  const rowData = cell.getRow().getData();
+  if (rowData._tagExpanded === undefined) {
+    rowData._tagExpanded = false;
+  }
 
-			if (adone !== bbone)
-			{
-				return adone - bbone;
-			}
-			return b.id - a.id;
-		});
-		const tagsToShow = rowData._tagExpanded ? parsedTags : parsedTags.slice(0, maxVisibleTags);
+  const renderTags = () => {
+    container.innerHTML = "";
+    parsedTags = parsedTags.filter((item) => item !== null);
 
-		tagsToShow.forEach(tag => {
-			if (!tag) return;
-			let tagElement = document.createElement('span');
-			tagElement.innerText = tag.beschreibung;
-			tagElement.title = tag.notiz;
-			tagElement.className = "tag " + tag.style;
-			if (tag.done) tagElement.className += " tag_done";
+    parsedTags.sort((a, b) => {
+      let adone = a.done ? 1 : 0;
+      let bbone = b.done ? 1 : 0;
 
-			tagElement.addEventListener('click', (event) => {
-				event.stopPropagation();
-				event.preventDefault();
-				tagComponent.editTag(tag.id);
-			});
+      if (adone !== bbone) {
+        return adone - bbone;
+      }
+      return a.prioritaet - b.prioritaet;
+    });
+    const tagsToShow = rowData._tagExpanded
+      ? parsedTags
+      : parsedTags.slice(0, maxVisibleTags);
 
-			container.appendChild(tagElement);
-		});
+    tagsToShow.forEach((tag) => {
+      if (!tag) return;
+      let tagElement = document.createElement("span");
+      tagElement.innerText = tag.beschreibung;
+      tagElement.title = tag.notiz;
+      tagElement.className = "tag " + tag.style;
+      if (tag.done) tagElement.className += " tag_done";
 
-		if (parsedTags.length > maxVisibleTags) {
-			let toggle = document.createElement('button');
-			toggle.innerText = (rowData._tagExpanded ? '- ' : '+ ') + (parsedTags.length - maxVisibleTags);
-			toggle.className = "display_all";
-			toggle.title = rowData._tagExpanded ? "Tags ausblenden" : "Tags einblenden";
+      const tagDef = mappedData?.find((t) => t.typ_kurzbz === tag.typ_kurzbz);
 
-			toggle.addEventListener('click', () => {
-				rowData._tagExpanded = !rowData._tagExpanded;
-				renderTags();
-			});
+      if (
+        (!tagDef && tag.typ_kurzbz?.includes("_auto")) ||
+        tagDef?.automatisiert
+      ) {
+        tagElement.className += " tag_auto";
+        tagElement.innerHTML =
+          "<i class='fa-solid fa-lock'></i> " + tag.beschreibung;
+      }
 
-			container.appendChild(toggle);
-		}
-	};
+      tagElement.addEventListener("click", (event) => {
+        event.stopPropagation();
+        event.preventDefault();
+        tagComponent.editTag(tag.id);
+      });
 
-	renderTags();
-	return container;
+      container.appendChild(tagElement);
+    });
+
+    if (parsedTags.length > maxVisibleTags) {
+      let toggle = document.createElement("button");
+      toggle.innerText =
+        (rowData._tagExpanded ? "- " : "+ ") +
+        (parsedTags.length - maxVisibleTags);
+      toggle.className = "display_all";
+      toggle.title = rowData._tagExpanded
+        ? "Tags ausblenden"
+        : "Tags einblenden";
+
+      toggle.addEventListener("click", () => {
+        rowData._tagExpanded = !rowData._tagExpanded;
+        renderTags();
+      });
+
+      container.appendChild(toggle);
+    }
+  };
+
+  const fitTags = () => {
+    if (rowData._tagExpanded) {
+      renderTags();
+      return;
+    }
+
+    let widthBuffer = 10;
+    maxVisibleTags = parsedTags.length;
+    renderTags();
+
+    while (
+      maxVisibleTags > 0 &&
+      container.scrollWidth > (container.clientWidth + widthBuffer)
+    ) {
+      maxVisibleTags--;
+      renderTags();
+    }
+  };
+
+  let animationFrame = null;
+  container.fitTags = () => {
+    if (animationFrame !== null) return;
+
+    animationFrame = requestAnimationFrame(() => {
+      animationFrame = null;
+      fitTags();
+    });
+  };
+
+  if (onRendered) {
+    onRendered(() => {
+      container.fitTags();
+    });
+  }
+
+  renderTags();
+  return container;
 }
