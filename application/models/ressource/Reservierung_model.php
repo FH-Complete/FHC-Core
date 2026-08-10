@@ -96,7 +96,7 @@ class Reservierung_model extends DB_Model
 		$query_result = $this->execReadOnlyQuery("
 		SELECT 
 		DISTINCT(insertvon),  
-		'reservierung' as type, beginn, ende, datum,
+		'reservierung' as type, beginn, ende, datum, array_agg(DISTINCT reservierung_id) AS reservierung_id,
 		COALESCE(titel, beschreibung) as topic,
 		array_agg(DISTINCT mitarbeiter_kurzbz) as lektor,
 		array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe, 

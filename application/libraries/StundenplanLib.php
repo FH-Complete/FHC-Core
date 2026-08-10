@@ -236,6 +236,7 @@ class StundenplanLib
 
 		if ($is_mitarbeiter && empty($ort_kurzbz)) {
 			// request for personal lvplan show only reservations of logged in user
+			$this->_ci->addMeta("meta", "adis");
 			$reservierungen = $this->_ci->ReservierungModel->getReservierungenMitarbeiter($start_date, $end_date, $uid);
 		} else {
 			// querying the reservierungen

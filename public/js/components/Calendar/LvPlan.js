@@ -215,18 +215,18 @@ export default {
  				:style="eventStyle(event)"
 			>
 				<component
-					v-if="mode == 'event'"
+					v-if="renderers && mode == 'event'"
 					:is="renderers[event.type]?.modalContent"
 					:event="event"
 					@create-event="(event) => $emit('create-event', event)"
 				></component>
 				<component
-					v-else-if="mode == 'eventheader'"
+					v-else-if="renderers && mode == 'eventheader'"
 					:is="renderers[event.type]?.modalTitle"
 					:event="event"
 				></component>
 				<component
-					v-else
+					v-else-if="renderers"
 					:is="renderers[event.type]?.calendarEvent"
 					:event="event"
 					@delete-event="(event) => $emit('delete-event', event)"
