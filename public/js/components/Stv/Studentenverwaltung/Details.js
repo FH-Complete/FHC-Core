@@ -15,7 +15,8 @@ export default {
 	data() {
 		return {
 			configStudent: {},
-			configStudents: {}
+			configStudents: {},
+			activeTab: null
 		};
 	},
 	props: {
@@ -74,6 +75,10 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
+		handleTabChanged(key) {
+			this.activeTab = key
+			this.reload()	
+		},
 		reload() {
 			if (this.$refs.tabs?.$refs?.current?.reload)
 				this.$refs.tabs.$refs.current.reload();
@@ -111,12 +116,12 @@ export default {
 				:useprimevue="true"
 				:modelValue="students[0]"
 				:config="config"
-				:default="$route.params.tab"
+				:default="activeTab ?? $route.params.tab"
 				style="flex: 1 1 0%; height: 0%"
-				@changed="reload"
+				@changed="handleTabChanged"
 				>
 				</fhc-tabs>
-			<fhc-tabs v-else ref="tabs" :useprimevue="true" :modelValue="students" :config="config" :default="$route.params.tab" style="flex: 1 1 0%; height: 0%" @changed="reload"></fhc-tabs>
+			<fhc-tabs v-else ref="tabs" :useprimevue="true" :modelValue="students" :config="config" :default="activeTab ?? $route.params.tab" style="flex: 1 1 0%; height: 0%" @changed="handleTabChanged"></fhc-tabs>
 		</div>
 		<div v-else>
 			Loading...
