@@ -28,6 +28,7 @@ class StudentListLib
 	private $_allowedStgs = [];
 	private $_selects = [];
 	private $_joins = [];
+	private $_wheres = [];
 	
 	/**
 	 * Gets the CI instance, loads model and prepares default values
@@ -40,6 +41,8 @@ class StudentListLib
 	{
 		$this->_ci =& get_instance(); // get code igniter instance
 
+		$this->_ci->load->config('stv');
+
 		$this->_ci->load->model('crm/Prestudent_model', 'PrestudentModel');
 
 		if (isset($params['allowedStgs']))
@@ -47,8 +50,6 @@ class StudentListLib
 
 		// Add default SELECTs
 		$this->addSelect("b.uid");
-		if (defined('STV_TAGS_ENABLED') && STV_TAGS_ENABLED)
-			$this->addSelect('tag_data_agg.tags');
 		$this->addSelect('titelpre');
 		$this->addSelect('nachname');
 		$this->addSelect('vorname');
@@ -72,6 +73,13 @@ class StudentListLib
 		$this->addSelect('pls.status_kurzbz AS status');
 		$this->addSelect('pls.datum AS status_datum');
 		$this->addSelect('pls.bestaetigtam AS status_bestaetigung');
+		$this->addSelect("
+			CASE
+				WHEN pls.status_kurzbz IN ('Interessent','Aufgenommener','Bewerber','Wartender')
+				THEN pls.ausbildungssemester
+				ELSE s.semester
+			END AS semester_berechnet
+		");
 		$this->addSelect(
 			"(SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung LIMIT 1) AS mail_privat",
 			false
@@ -111,7 +119,7 @@ class StudentListLib
 			) prest
 			WHERE laststatus NOT IN ('Abbrecher', 'Abgewiesener', 'Absolvent')
 			AND priorisierung <= tbl_prestudent.priorisierung
-		) || ' (' || COALESCE(tbl_prestudent.priorisierung::text, ' '::text) || ')' AS priorisierung_relativ", false); // TODO(chris): overwrite in fetchStudents
+		) || ' (' || COALESCE(tbl_prestudent.priorisierung::text, ' '::text) || ')' AS priorisierung_relativ", false);
 		$this->addSelect('mentor');
 		$this->addSelect('b.aktiv AS bnaktiv');
 		$this->addSelect('unruly');
@@ -119,7 +127,7 @@ class StudentListLib
 		// Add default JOINs
 		$this->addJoin('public.tbl_studiengang stg', 'studiengang_kz', 'LEFT');
 		$this->addJoin('public.tbl_person p', 'person_id');
-		$this->addJoin('public.tbl_student s', 'prestudent_id', 'LEFT'); // TODO(chris): overwrite in fetchStudents
+		$this->addJoin('public.tbl_student s', 'prestudent_id', 'LEFT');
 		$this->addJoin('public.tbl_prestudentstatus pls', '
 			pls.status_kurzbz=public.get_rolle_prestudent(tbl_prestudent.prestudent_id, NULL) 
 			AND pls.prestudent_id=tbl_prestudent.prestudent_id 
@@ -129,40 +137,14 @@ class StudentListLib
 		$this->addJoin('public.tbl_benutzer b', 's.student_uid=b.uid', 'LEFT');
 		$this->addJoin("v", "", ""); // Will be replaced later
 		$this->addJoin("ps", "", ""); // Will be replaced later
-		if (defined('STV_TAGS_ENABLED') && STV_TAGS_ENABLED) {
-			$this->_ci->load->config('stv');
-			$tags = $this->_ci->config->item('stv_prestudent_tags');
 
-			$whereTags = '';
-			if (is_array($tags) && !isEmptyArray($tags)) {
-				$tags = array_keys($tags);
-
-				foreach ($tags as $key => $tag) {
-					$tags[$key] = $this->_ci->PrestudentModel->escape($tag);
-				}
-				$whereTags = " AND nt.typ_kurzbz IN (" . implode(",", $tags) . ")";
-			}
-			$subQueryTag = "(
-				SELECT
-					tag.prestudent_id,
-					COALESCE(json_agg(tag ORDER BY tag.done), '[]'::json) AS tags
-				FROM (
-					SELECT DISTINCT ON (n.notiz_id)
-						n.notiz_id AS id,
-						nt.typ_kurzbz,
-						array_to_json(nt.bezeichnung_mehrsprachig)->>0 AS beschreibung,
-						n.text AS notiz,
-						nt.style,
-						n.erledigt AS done,
-						nz.prestudent_id
-					FROM public.tbl_notizzuordnung AS nz
-					JOIN public.tbl_notiz AS n ON nz.notiz_id = n.notiz_id
-					JOIN public.tbl_notiz_typ AS nt ON n.typ = nt.typ_kurzbz " . $whereTags . "
-				) AS tag
-				GROUP BY tag.prestudent_id
-			) AS tag_data_agg";
-
-			$this->addJoin($subQueryTag, 'tag_data_agg.prestudent_id = tbl_prestudent.prestudent_id', 'LEFT');
+		// Add SELECTs and JOINs from config
+		$config = $this->_ci->config->item('list_columns') ?: [];
+		foreach ($config as $conf) {
+			$this->addSelect($conf['default']);
+			if (isset($conf['joins']))
+				foreach ($conf['joins'] as $join)
+					call_user_func_array([$this, 'addJoin'], $join);
 		}
 	}
 
@@ -249,11 +231,7 @@ class StudentListLib
 	 */
 	public function addWhere($key, $value = null, $escape = true)
 	{
-		if (!is_array($key) && is_array($value)) {
-			$this->_ci->PrestudentModel->db->where_in($key, $value, $escape);
-		} else {
-			$this->_ci->PrestudentModel->db->where($key, $value, $escape);
-		}
+		$this->_wheres[] = [$key, $value, $escape, false];
 	}
 
 	/**
@@ -267,11 +245,7 @@ class StudentListLib
 	 */
 	public function addOrWhere($key, $value = null, $escape = true)
 	{
-		if (!is_array($key) && is_array($value)) {
-			$this->_ci->PrestudentModel->db->or_where_in($key, $value, $escape);
-		} else {
-			$this->_ci->PrestudentModel->db->or_where($key, $value, $escape);
-		}
+		$this->_wheres[] = [$key, $value, $escape, true];
 	}
 
 	/**
@@ -283,8 +257,9 @@ class StudentListLib
 	 */
 	public function execute($studiensemester_kurzbz)
 	{
-		$stdsemEsc = $studiensemester_kurzbz ? $this->_ci->PrestudentModel->escape($studiensemester_kurzbz) : 'NULL';
+		$this->addSelectAndJoinForTagsIfConfigured($studiensemester_kurzbz);
 
+		$stdsemEsc = $studiensemester_kurzbz ? $this->_ci->PrestudentModel->escape($studiensemester_kurzbz) : 'NULL';
 
 		$this->addSelect(
 			"public.get_rolle_prestudent(
@@ -315,6 +290,20 @@ class StudentListLib
 		foreach ($this->_selects as $select)
 			$this->_ci->PrestudentModel->addSelect($select[0], $select[1]);
 
+		foreach ($this->_wheres as $where) {
+			if (!is_array($where[0]) && is_array($where[1])) {
+				if ($where[3])
+					$this->_ci->PrestudentModel->db->or_where_in($where[0], $where[1], $where[2]);
+				else
+					$this->_ci->PrestudentModel->db->where_in($where[0], $where[1], $where[2]);
+			} else {
+				if ($where[3])
+					$this->_ci->PrestudentModel->db->or_where($where[0], $where[1], $where[2]);
+				else
+					$this->_ci->PrestudentModel->db->where($where[0], $where[1], $where[2]);
+			}
+		}
+
 		$this->_ci->PrestudentModel->addOrder('nachname');
 		$this->_ci->PrestudentModel->addOrder('vorname');
 
@@ -324,6 +313,81 @@ class StudentListLib
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Protected methods
+
+	/**
+	 * Add Select and Join for Tags if configured
+	 *
+	 * @param string studiensemester_kurzbz
+	 *
+	 */
+	 protected function addSelectAndJoinForTagsIfConfigured($studiensemester_kurzbz)
+	 {
+		if (defined('STV_TAGS_ENABLED') && STV_TAGS_ENABLED) {
+
+			$this->_ci->load->model('system/Sprache_model', 'SpracheModel');
+			$this->_ci->SpracheModel->addSelect('index');
+			$result = $this->_ci->SpracheModel->loadWhere(array('sprache' => getUserLanguage()));
+			$language = hasData($result) ? getData($result)[0]->index : 1;
+			$index_bezeichnung_mehrsprachig = $language - 1;
+
+			$this->_ci->load->config('stv');
+			$tags = $this->_ci->config->item('stv_prestudent_tags');
+
+			$whereTags = '';
+			if (is_array($tags) && !isEmptyArray($tags)) {
+				$tags = array_keys($tags);
+
+				foreach ($tags as $key => $tag) {
+					$tags[$key] = $this->_ci->PrestudentModel->escape($tag);
+				}
+				$whereTags = " AND nt.typ_kurzbz IN (" . implode(",", $tags) . ")";
+			}
+			$studiensemester_kurzbz_escaped = $this->_ci->PrestudentModel->escape($studiensemester_kurzbz);
+			$subQueryTag = "(
+				SELECT
+					tag.prestudent_id,
+					COALESCE(json_agg(tag ORDER BY tag.done, tag.prioritaet), '[]'::json) AS tags
+				FROM (
+					SELECT DISTINCT ON (n.notiz_id)
+						n.notiz_id AS id,
+						nt.typ_kurzbz,
+						array_to_json(nt.bezeichnung_mehrsprachig)->>". $index_bezeichnung_mehrsprachig . " AS beschreibung,
+						n.text AS notiz,
+						nt.style,
+						n.erledigt AS done,
+						nt.prioritaet AS prioritaet,
+						nt.automatisiert AS automatisiert,
+						nz.prestudent_id,
+						n.start,
+						n.ende
+					FROM public.tbl_notizzuordnung AS nz
+					JOIN public.tbl_notiz AS n ON nz.notiz_id = n.notiz_id AND nz.prestudent_id IS NOT NULL
+					JOIN public.tbl_notiz_typ AS nt ON n.typ = nt.typ_kurzbz " . $whereTags . "
+				WHERE
+				  COALESCE(n.start, '1970-01-01') <= (
+					SELECT
+					  ende
+					FROM
+					  public.tbl_studiensemester
+					WHERE
+					  studiensemester_kurzbz = " . $studiensemester_kurzbz_escaped . "
+				  )
+				  AND COALESCE(n.ende, '2170-12-31') >= (
+					SELECT
+					  start
+					FROM
+					  public.tbl_studiensemester
+					WHERE
+					  studiensemester_kurzbz = " . $studiensemester_kurzbz_escaped . "
+				  )
+				) AS tag
+				GROUP BY tag.prestudent_id
+			) AS tag_data_agg";
+
+			$this->addSelect('tag_data_agg.tags');
+			$this->addJoin($subQueryTag, 'tag_data_agg.prestudent_id = tbl_prestudent.prestudent_id', 'LEFT');
+		}
+	 }
 
 	/**
 	 * Get alias of a table or select statement
