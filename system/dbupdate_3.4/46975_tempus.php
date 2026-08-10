@@ -249,3 +249,32 @@ if ($result = @$db->db_query("SELECT 1 FROM public.tbl_variablenname WHERE name 
 			echo 'public.tbl_variablenname: Added name "tempus_favorites"<br>';
 	}
 }
+
+
+if(!$result = @$db->db_query("SELECT status_kurzbz_max FROM lehre.tbl_kalender LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_kalender ADD COLUMN status_kurzbz_max character varying(32);
+			
+			UPDATE lehre.tbl_kalender_status 
+			SET status_kurzbz = 'to_delete',
+				bezeichnung = 'to_delete',
+			WHERE status_kurzbz = 'todelete';
+			UPDATE lehre.tbl_kalender_status SET sort = 9 WHERE status_kurzbz = 'deleted';
+			UPDATE lehre.tbl_kalender_status SET sort = 10 WHERE status_kurzbz = 'archived';
+			INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'to_delete_preview', E'to_delete_preview', E'{\"Zur Löschung in Voransicht\", \"Marked for Deletion in Preview\"}', 7);
+			INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'to_delete_live', E'to_delete_live', E'{\"Zur Löschung in Live\", \"Marked for Deletion in Live\"}', 8);
+
+			ALTER TABLE lehre.tbl_kalender ADD CONSTRAINT tbl_kalender_status_max_fk FOREIGN KEY (status_kurzbz_max) 
+			REFERENCES lehre.tbl_kalender_status (status_kurzbz) MATCH FULL ON DELETE RESTRICT ON UPDATE CASCADE;
+";
+
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_kalender: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br />lehre.tbl_kalender: Spalte status_kurzbz_max hinzugefuegt.
+			<br />lehre.tbl_kalender_status: status_kurzbz von todelete auf to_delete umbenannt.
+			<br />lehre.tbl_kalender_status: status_kurzbz to_delete_preview hinzugefuegt.
+			<br />lehre.tbl_kalender_status: status_kurzbz to_delete_live hinzugefuegt.
+	';
+}
