@@ -215,23 +215,9 @@ export const CoreFilterCmpt = {
 		fieldIdsForVisibilty() {
 			if (!this.tableBuilt) return [];
 
-			const localizedColumnTitles = this.tabulator.getLang().columns;
-			const isTabulatorLocalized = !!this.$props.tabulatorOptions.locale;
-			return this.tabulator
-				.getColumns()
-				.filter((col) => {
-					let def = col.getDefinition();
-					let title =
-						isTabulatorLocalized && localizedColumnTitles[def.field]
-							? localizedColumnTitles[def.field]
-							: def.title;
-					return (
-						!def.frozen &&
-						title &&
-						def.formatter != "responsiveCollapse"
-					);
-				})
-				.map((col) => col.getField());
+			return this.$props.tabulatorOptions?.columns
+				?.filter((column) => column.formatter !== "responsiveCollapse")
+				.map((column) => column.field) ?? [];
 		},
 		idExtra() {
 			if (!this.uuid) return "";
