@@ -49,6 +49,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 			dienstverhaeltnis_id integer NOT NULL,
 			vertragsbestandteil_id integer,
 			gehaltstyp_kurzbz character varying(32) NOT NULL,
+			gehaltsanpassungtyp_kurzbz character varying(32),
 			von date,
 			bis date,
 			anmerkung text,
@@ -69,6 +70,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		COMMENT ON COLUMN hr.tbl_gehaltsbestandteil.auszahlungen IS E'Wie oft im Jahr wird das Gehalt bezahlt. zb 14x oder nur 12x';
 		COMMENT ON COLUMN hr.tbl_gehaltsbestandteil.valorisierung IS E'Wird dieser Bestandteil mitvalorisiert';
 		COMMENT ON COLUMN hr.tbl_gehaltsbestandteil.valorisierungssperre IS E'Bis zu welchem Datum ist dieser Bestandteil von der Valorisierung ausgenommen';
+		COMMENT ON COLUMN hr.tbl_gehaltsbestandteil.gehaltsanpassungtyp_kurzbz IS E'Ersteinstufung, indiv. Erhöhung, etc.';
 
 		ALTER TABLE hr.tbl_gehaltsbestandteil ADD CONSTRAINT tbl_dienstverhaeltnis_fk FOREIGN KEY (dienstverhaeltnis_id)
 		REFERENCES hr.tbl_dienstverhaeltnis (dienstverhaeltnis_id) MATCH FULL
@@ -118,6 +120,21 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 
 		ALTER TABLE hr.tbl_gehaltsbestandteil ADD CONSTRAINT tbl_gehaltstyp_fk FOREIGN KEY (gehaltstyp_kurzbz)
 		REFERENCES hr.tbl_gehaltstyp (gehaltstyp_kurzbz) MATCH FULL
+		ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		CREATE TABLE hr.tbl_gehaltsanpassungtyp
+		(
+			gehaltsanpassungtyp_kurzbz character varying(32) NOT NULL,
+			bezeichnung varchar(256),
+			sort smallint,
+			aktiv boolean NOT NULL DEFAULT true,
+			CONSTRAINT tbl_gehaltsanpassungtyp_pk PRIMARY KEY (gehaltsanpassungtyp_kurzbz)
+		);
+
+		COMMENT ON TABLE hr.tbl_gehaltsanpassungtyp IS E'Key-Table of Salary Adaption Types';
+
+		ALTER TABLE hr.tbl_gehaltsbestandteil ADD CONSTRAINT tbl_gehaltsanpassungtyp_fk FOREIGN KEY (gehaltsanpassungtyp_kurzbz)
+		REFERENCES hr.tbl_gehaltsanpassungtyp (gehaltsanpassungtyp_kurzbz) MATCH FULL
 		ON DELETE RESTRICT ON UPDATE CASCADE;
 
 		CREATE TABLE hr.tbl_vertragsart
@@ -368,6 +385,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_gehaltsbestandteil TO vilesci;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_gehaltshistorie TO vilesci;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_gehaltstyp TO vilesci;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_gehaltsanpassungtyp TO vilesci;
 
 		GRANT USAGE ON SCHEMA hr TO vilesci;
 		GRANT USAGE ON SCHEMA hr TO web;
@@ -397,6 +415,10 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		INSERT INTO hr.tbl_gehaltstyp(gehaltstyp_kurzbz, bezeichnung, valorisierung, sort, aktiv) VALUES('praemie','Prämie', false, 4, true);
 		INSERT INTO hr.tbl_gehaltstyp(gehaltstyp_kurzbz, bezeichnung, valorisierung, sort, aktiv) VALUES('lohnausgleichatz','Lohnausgleich ATZ', false, 5, true);
 		INSERT INTO hr.tbl_gehaltstyp(gehaltstyp_kurzbz, bezeichnung, valorisierung, sort, aktiv) VALUES('zusatzvereinbarung','Zusatzvereinbarung',false, 6, true);
+
+		INSERT INTO hr.tbl_gehaltsanpassungtyp(gehaltsanpassungtyp_kurzbz, bezeichnung, sort, aktiv) VALUES('ersteinstufung','Ersteinstufung', 1, true);
+		INSERT INTO hr.tbl_gehaltsanpassungtyp(gehaltsanpassungtyp_kurzbz, bezeichnung, sort, aktiv) VALUES('individuelle_anpassung','Indiv. Anpassung', 2, true);
+		INSERT INTO hr.tbl_gehaltsanpassungtyp(gehaltsanpassungtyp_kurzbz, bezeichnung, sort, aktiv) VALUES('strukturelle_anpassung','Strukturelle Anpassung', 3, true);
 
 		INSERT INTO hr.tbl_vertragsbestandteil_freitexttyp(freitexttyp_kurzbz, bezeichnung, ueberlappend, kuendigungsrelevant) VALUES('allin','All-In', false, false);
 		INSERT INTO hr.tbl_vertragsbestandteil_freitexttyp(freitexttyp_kurzbz, bezeichnung, ueberlappend, kuendigungsrelevant) VALUES('ersatzarbeitskraft','Ersatzarbeitskraft', false, true);
@@ -604,6 +626,24 @@ if ($result = $db->db_query("SELECT * FROM information_schema.columns WHERE colu
 			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
 		else
 			echo 'Spalte gehaltsbestandteil_bis wurde in hr.tbl_gehaltshistorie neu erstellt<br>';
+	}
+}
+
+
+if ($result = $db->db_query("SELECT * FROM information_schema.columns WHERE column_name='gehaltsanpassungtyp_kurzbz' AND table_name='tbl_gehaltsbestandteil' AND table_schema='hr'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+		    ALTER TABLE 
+			hr.tbl_gehaltsbestandteil 
+		    ADD COLUMN
+			gehaltsanpassungtyp_kurzbz character varying(32)
+		";
+		if (! $db->db_query($qry))
+			echo '<strong>Vertraege: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Spalte gehaltsanpassungtyp_kurzbz wurde in hr.tbl_gehaltsbestandteil neu erstellt<br>';
 	}
 }
 
