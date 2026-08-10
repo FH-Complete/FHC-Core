@@ -75,7 +75,7 @@ export default {
 		async handleCreateEvent(event)
 		{
 			event.ort_kurzbz = this.propsViewData.ort_kurzbz;
-			this.$api.call(ApiRoomPlan.addRoomReservation(event));
+			await this.$api.call(ApiRoomPlan.addRoomReservation(event));
 			this.$refs.calendar.resetEventLoader();
 			this.$refs.calendar.closeModal();
 		},
@@ -87,7 +87,7 @@ export default {
 			if (luxon.DateTime.fromISO(`${event.datum}T${event.beginn}`) < luxon.DateTime.now())
 				return;
 
-			this.$api.call(ApiRoomPlan.deleteRoomReservation(event.reservierung_id));
+			await this.$api.call(ApiRoomPlan.deleteRoomReservation(event.reservierung_id));
 
 			this.$refs.calendar.reset();
 
