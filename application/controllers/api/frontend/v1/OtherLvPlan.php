@@ -54,6 +54,7 @@ class OtherLvPlan extends FHCAPI_Controller
 		$resProfileData = $this->profillib->getView($uid);
 		$profileData = hasData($resProfileData) ? getData($resProfileData) : null;
 
+		$this->addMeta("data", $profileData->data);
 		$viewData = [
 			"user_data" => [
 				"username" => $uid,
@@ -62,6 +63,8 @@ class OtherLvPlan extends FHCAPI_Controller
 				"foto" => $profileData->data->foto,
 				"vorname" => $profileData->data->vorname,
 				"nachname" => $profileData->data->nachname,
+				"titel" => $profileData->data->titel,
+				"postnomen" => $profileData->data->postnomen,
 			],
 		];
 
