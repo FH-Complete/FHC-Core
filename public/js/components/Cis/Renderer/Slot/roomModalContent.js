@@ -130,6 +130,7 @@ export default {
 				:label="capitalize($p.t('global', 'titel'))"
 				type="text"
 				container-class="col-3"
+				maxlength="10"
 				v-model="title"
 				name="title"
 			/>
@@ -138,6 +139,7 @@ export default {
 				:label="capitalize($p.t('global', 'beschreibung'))"
 				type="text"
 				container-class="col-4"
+				maxlength="32"
 				v-model="beschreibung"
 				name="Beschreibung"
 			/>
