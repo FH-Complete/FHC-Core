@@ -167,7 +167,7 @@ export default {
 	<div class="fhc-roominformation d-flex flex-column h-100">
 		<h2>{{ $p.t('rauminfo/rauminfo') }} {{ propsViewData.ort_kurzbz }}</h2>
 		<span v-if="roomAdditionalInfo?.length">
-			Additional information:
+			{{ $p.t("search/result_equipment") + ":" }}
 			<span v-html="roomAdditionalInfo"></span>
 		</span>
 		<hr>
