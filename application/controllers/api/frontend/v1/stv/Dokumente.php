@@ -78,52 +78,32 @@ class Dokumente extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('ui', 'errorMissingValue', ['value' => 'Studiengang_kz']), self::ERROR_TYPE_GENERAL);
 
 		$resultPreDoc = $this->_getPrestudentDokumente($prestudent_id);
-
-		$arrayAccepted = [];
 		$person_id = $this->_getPersonId($prestudent_id);
 
-		$docNames = array_map(function ($item) {
-			return $item->dokument_kurzbz;
-		}, $resultPreDoc);
+		$mergedArray = [];
 
-		foreach($docNames as $doc)
+		foreach ($resultPreDoc as $pre)
 		{
-			$result = $this->AkteModel->getAktenFAS($person_id, $doc, $studiengang_kz, $prestudent_id, true);
+			$result = $this->AkteModel->getAktenFAS($person_id, $pre->dokument_kurzbz, $studiengang_kz, $prestudent_id, true);
 
 			if (isError($result))
-			{
 				return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-			}
+
 			if (hasData($result))
 			{
-				$data = getData($result);
-				foreach ($data as $value)
+				foreach (getData($result) as $doc)
 				{
-					array_push($arrayAccepted, $value);
+					$merged = clone $doc;
+					$merged->docdatum = $pre->docdatum;
+					$merged->insertvonma = $pre->insertvonma;
+					$merged->bezeichnung = $pre->bezeichnung;
+					$mergedArray[] = $merged;
 				}
 			}
-		}
-
-		//Mapping with document_kurzbz
-		$preDocMap = [];
-		foreach ($resultPreDoc as $pre) {
-			$preDocMap[$pre->dokument_kurzbz] = $pre;
-		}
-
-		$mergedArray = [];
-		foreach ($arrayAccepted as $doc) {
-			$merged = clone $doc;
-
-			if (isset($preDocMap[$doc->dokument_kurzbz])) {
-				$merged->docdatum = $preDocMap[$doc->dokument_kurzbz]->docdatum;
-				$merged->insertvonma = $preDocMap[$doc->dokument_kurzbz]->insertvonma;
-				$merged->bezeichnung = $preDocMap[$doc->dokument_kurzbz]->bezeichnung;
-			} else {
-				$merged->akzeptiertdatum = null;
-				$merged->akzeptiertvon = null;
+			else
+			{
+				$mergedArray[] = $pre;
 			}
-
-			$mergedArray[] = $merged;
 		}
 
 		$this->terminateWithSuccess($mergedArray);
@@ -190,6 +170,8 @@ class Dokumente extends FHCAPI_Controller
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
+		$nachgereicht_am =  $this->input->post('nachgereicht_am') == '' ? null : $this->input->post('nachgereicht_am');
+
 		$uid = getAuthUID();
 
 		$result = $this->AkteModel->update(
@@ -200,7 +182,7 @@ class Dokumente extends FHCAPI_Controller
 				'dokument_kurzbz' => $this->input->post('dokument_kurzbz'),
 				'anmerkung_intern' => $this->input->post('anmerkung_intern'),
 				'titel_intern' => $this->input->post('titel_intern'),
-				'nachgereicht_am' => $this->input->post('nachgereicht_am'),
+				'nachgereicht_am' => $nachgereicht_am,
 				'updateamum' => date('c'),
 				'updatevon' => $uid,
 			]
@@ -590,14 +572,14 @@ class Dokumente extends FHCAPI_Controller
 
 		$documents = [
 			buildDropdownEntryPrintArray("accountinfo", "Accountinfoblatt", "xml=accountinfoblatt.xml.php&xsl=AccountInfo&output=pdf", $uid, 10, null),
-			buildDropdownEntryPrintArray("ausbildungsvertrag", "Ausbildungsvertrag", "xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&output=pdf", $uid, 20, null),
-			buildDropdownEntryPrintArray("ausbildungsvertrag_en", "Ausbildungsvertrag Zweisprachig", "xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&output=pdf", $uid, 21, null),
+			buildDropdownEntryPrintArray("ausbildungsvertrag", "Ausbildungsvertrag", "xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&output=pdf&prestudent_id=$prestudent_id", null,20, null),
+			buildDropdownEntryPrintArray("ausbildungsvertrag_en", "Ausbildungsvertrag Zweisprachig", "xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&output=pdf&prestudent_id=$prestudent_id", null,21, null),
 
 			buildDropdownEntryPrintArray("bescheid", "Bescheid (nur Voransicht)", "xml=abschlusspruefung.rdf.php&xsl_stg_kz=$studiengang_kz&xsl=Bescheid&output=pdf", $uid, 25, null),
 			buildDropdownEntryPrintArray("diplomasupp", "Diploma Supplement (nur Voransicht)", "xml=diplomasupplement.xml.php&xsl_stg_kz=$studiengang_kz&xsl=DiplSupplement&output=pdf", $uid, 26, null),
 
-			buildDropdownEntryPrintArray("studienbestaetigung", "Studienbestätigung", "xml=student.rdf.php&xsl=Inskription&output=pdf", $uid, 50, null),
-			buildDropdownEntryPrintArray("studienbestaetigung_en", "Studienbestätigung Englisch", "xml=student.rdf.php&xsl=InskriptionEng&output=pdf", $uid, 51, null),
+			buildDropdownEntryPrintArray("studienbestaetigung", "Studienbestätigung", "xml=student.rdf.php&xsl=Inskription&output=pdf&ss=$studiensemester_kurzbz&xsl_stg_kz=$studiengang_kz", $uid, 50, null),
+			buildDropdownEntryPrintArray("studienbestaetigung_en", "Studienbestätigung Englisch", "xml=student.rdf.php&xsl=InskriptionEng&output=pdf&ss=$studiensemester_kurzbz&xsl_stg_kz=$studiengang_kz", $uid, 51, null),
 			buildDropdownEntryPrintArray("zutrittskarte", "Zutrittskarte", "xsl=ZutrittskarteStud&output=pdf&data=$uid", $uid,200, "zutrittskarte.php"),
 			buildDropdownEntryPrintArray("studienblatt", "Studienblatt", "xml=studienblatt.xml.php&xsl=Studienblatt&output=pdf&ss=$studiensemester_kurzbz", $uid, 60, null),
 			buildDropdownEntryPrintArray("studienblatt_eng", "Studienblatt Englisch", "xml=studienblatt.xml.php&xsl=StudienblattEng&output=pdf&ss=$studiensemester_kurzbz", $uid, 61, null),
@@ -686,8 +668,8 @@ class Dokumente extends FHCAPI_Controller
 			buildDropdownEntryPrintArray("accountinfo", "Accountinfoblatt", "xml=accountinfoblatt.xml.php&xsl=AccountInfo&output=pdf", $uidString, 10, null),
 			buildDropdownEntryPrintArray("ausbildungsvertrag", "Ausbildungsvertrag", "xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&output=pdf", $uidString, 20, null),
 			buildDropdownEntryPrintArray("ausbildungsvertrag_en", "Ausbildungsvertrag Englisch", "xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&output=pdf", $uidString, 21, null),
-			buildDropdownEntryPrintArray("studienbestaetigung", "Studienbestätigung", "xml=student.rdf.php&xsl=Inskription&output=pdf", $uidString, 50, null),
-			buildDropdownEntryPrintArray("studienbestaetigung_en", "Studienbestätigung Englisch", "xml=student.rdf.php&xsl=InskriptionEng&output=pdf", $uidString, 51, null),
+			buildDropdownEntryPrintArray("studienbestaetigung", "Studienbestätigung", "xml=student.rdf.php&xsl=Inskription&output=pdf&ss=$studiensemester_kurzbz&xsl_stg_kz=$studiengang_kz", $uidString, 50, null),
+			buildDropdownEntryPrintArray("studienbestaetigung_en", "Studienbestätigung Englisch", "xml=student.rdf.php&xsl=InskriptionEng&output=pdf&ss=$studiensemester_kurzbz&xsl_stg_kz=$studiengang_kz", $uidString, 51, null),
 			buildDropdownEntryPrintArray("zutrittskarte", "Zutrittskarte", "xsl=ZutrittskarteStud&output=pdf&data=$uidString", $uidString,200, "zutrittskarte.php"),
 			buildDropdownEntryPrintArray("studienblatt", "Studienblatt", "xml=studienblatt.xml.php&xsl=Studienblatt&output=pdf&ss=$studiensemester_kurzbz", $uidString, 60, null),
 			buildDropdownEntryPrintArray("studienblatt_eng", "Studienblatt Englisch", "xml=studienblatt.xml.php&xsl=StudienblattEng&output=pdf&ss=$studiensemester_kurzbz", $uidString, 61, null),
@@ -753,6 +735,10 @@ class Dokumente extends FHCAPI_Controller
 		);
 
 		$data = $this->getDataOrTerminateWithError($result);
+		if(!(is_array($data) && count($data) > 0))
+		{
+			return null;
+		}
 		$student = current($data);
 
 		return $student->student_uid;

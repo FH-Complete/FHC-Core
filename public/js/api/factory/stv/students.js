@@ -17,9 +17,9 @@
 
 export default {
 	uid(uid, studiensemester_kurzbz) {
-		let url = 'api/frontend/v1/stv/students/'
+		let url = 'api/frontend/v1/treemenudata/stv/stdsem/'
 			+ encodeURIComponent(studiensemester_kurzbz)
-			+ '/uid/'
+			+ '/student/'
 			+ encodeURIComponent(uid);
 		return {
 			method: 'get',
@@ -27,7 +27,7 @@ export default {
 		};
 	},
 	prestudent(prestudent_id, studiensemester_kurzbz) {
-		let url = 'api/frontend/v1/stv/students/'
+		let url = 'api/frontend/v1/treemenudata/stv/stdsem/'
 			+ encodeURIComponent(studiensemester_kurzbz)
 			+ '/prestudent/'
 			+ encodeURIComponent(prestudent_id);
@@ -37,7 +37,7 @@ export default {
 		};
 	},
 	person(person_id, studiensemester_kurzbz) {
-		let url = 'api/frontend/v1/stv/students/'
+		let url = 'api/frontend/v1/treemenudata/stv/stdsem/'
 			+ encodeURIComponent(studiensemester_kurzbz)
 			+ '/person/'
 			+ encodeURIComponent(person_id);
@@ -46,16 +46,24 @@ export default {
 			url: url
 		};
 	},
+	search(params, studiensemester_kurzbz) {
+		return {
+			method: 'post',
+			url: 'api/frontend/v1/stv/students/search/'
+				+ encodeURIComponent(studiensemester_kurzbz),
+			params
+		};
+	},
 	verband(relative_path) {
 		return {
 			method: 'get',
 			url: 'api/frontend/v1/stv/students/' + relative_path
 		};
 	},
-	check(params) {
+	getPerson(params) {
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/stv/student/check',
+			url: 'api/frontend/v1/stv/student/getPerson',
 			params
 		};
 	},

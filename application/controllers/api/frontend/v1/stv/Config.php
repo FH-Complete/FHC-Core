@@ -33,6 +33,8 @@ class Config extends FHCAPI_Controller
 	{
 		// TODO(chris): permissions
 		parent::__construct([
+			'get' => ['admin:r', 'assistenz:r'],
+			'set' => ['admin:r', 'assistenz:r'],
 			'filter' => ['admin:r', 'assistenz:r'],
 			'student' => ['admin:r', 'assistenz:r'],
 			'students' => ['admin:r', 'assistenz:r']
@@ -55,6 +57,95 @@ class Config extends FHCAPI_Controller
 	}
 
 	/**
+	 * get App config
+	 */
+	public function get()
+	{
+		$this->load->model('system/Variable_model', 'VariableModel');
+		$this->load->config('stv');
+
+		$config = [];
+
+		#number_displayed_past_studiensemester
+		$result = $this->VariableModel->getVariables(getAuthUID(), ['number_displayed_past_studiensemester']);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$number_displayed_past_studiensemester_default = $this->config->item('number_displayed_past_studiensemester_default');
+
+		$config['number_displayed_past_studiensemester'] = [
+			"type" => "number",
+			"label" => $this->p->t('stv', 'settings_no_displayed_past_sem'),
+			"value" => $data['number_displayed_past_studiensemester']
+				?? $number_displayed_past_studiensemester_default
+		];
+
+		#font_size
+		$result = $this->VariableModel->getVariables(getAuthUID(), ['stv_font_size']);
+		$data = $this->getDataOrTerminateWithError($result);
+		$config['font_size'] = [
+			"type" => "select",
+			"label" => $this->p->t('stv', 'settings_fontsize'),
+			"value" => $data['stv_font_size'] ?? "fs_normal",
+			"options" => [
+				"fs_xx-small" => $this->p->t('stv', 'settings_fontsize_xx-small'),
+				"fs_x-small" => $this->p->t('stv', 'settings_fontsize_x-small'),
+				"fs_small" => $this->p->t('stv', 'settings_fontsize_small'),
+				"fs_normal" => $this->p->t('stv', 'settings_fontsize_normal'),
+				"fs_big" => $this->p->t('stv', 'settings_fontsize_big'),
+				"fs_huge" => $this->p->t('stv', 'settings_fontsize_huge')
+			]
+		];
+
+		#others
+		Events::trigger('stv_config_get', function & () use (&$config) {
+			return $config;
+		});
+
+		$this->terminateWithSuccess($config);
+	}
+
+	/**
+	 * set App config
+	 */
+	public function set()
+	{
+		$this->load->model('system/Variable_model', 'VariableModel');
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules(
+			'number_displayed_past_studiensemester',
+			$this->p->t('stv', 'settings_no_displayed_past_sem'),
+			'required|integer'
+		);
+		$this->form_validation->set_rules(
+			'font_size',
+			$this->p->t('stv', 'settings_fontsize'),
+			'required|in_list[fs_xx-small,fs_x-small,fs_small,fs_normal,fs_big,fs_huge]'
+		);
+
+		Events::trigger('stv_config_validation', $this->form_validation);
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+
+		$this->VariableModel->setVariable(
+			getAuthUID(),
+			'number_displayed_past_studiensemester',
+			$this->input->post('number_displayed_past_studiensemester')
+		);
+		$this->VariableModel->setVariable(
+			getAuthUID(),
+			'stv_font_size',
+			$this->input->post('font_size')
+		);
+
+		Events::trigger('stv_config_set', $this->input);
+
+		$this->terminateWithSuccess();
+	}
+	
+	/*
 	 * Get the config for the student filters
 	 *
 	 * @return void
@@ -109,7 +200,8 @@ class Config extends FHCAPI_Controller
 					'type' => 'select',
 					'values' => $buchungstyp_kurzbz_plus_all,
 					'value_key' => 'buchungstyp_kurzbz',
-					'label_key' => 'beschreibung'
+					'label_key' => 'beschreibung',
+					'default' => 'all'
 				],
 				'samestg' => [
 					'type' => 'bool',
@@ -135,7 +227,8 @@ class Config extends FHCAPI_Controller
 					'type' => 'select',
 					'values' => $buchungstyp_kurzbz_plus_all,
 					'value_key' => 'buchungstyp_kurzbz',
-					'label_key' => 'beschreibung'
+					'label_key' => 'beschreibung',
+					'default' => 'all'
 				],
 				'samestg' => [
 					'type' => 'bool',
@@ -208,6 +301,7 @@ class Config extends FHCAPI_Controller
 
 	public function student()
 	{
+		$this->load->helper('hlp_document');
 		$result = [];
 		$config = $this->config->item('tabs');
 
@@ -240,7 +334,10 @@ class Config extends FHCAPI_Controller
 		];
 		$result['status'] = [
 			'title' => 'Status',
-			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/MultiStatus.js')
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/MultiStatus.js'),
+			'config' => [
+				'showStatusVorruecken' => defined('STATUS_VORRUECKEN_ANZEIGEN') ? STATUS_VORRUECKEN_ANZEIGEN : true,
+			]
 		];
 		$result['documents'] = [
 			'title' => $this->p->t('stv', 'tab_documents'),
@@ -271,7 +368,6 @@ class Config extends FHCAPI_Controller
 		$result['messages'] = [
 			'title' => $this->p->t('stv', 'tab_messages'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Messages.js'),
-			'showOnlyWithUid' => true
 		];
 
 		$result['grades'] = [
@@ -281,9 +377,9 @@ class Config extends FHCAPI_Controller
 			'config' => [
 				'usePoints' => defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE,
 				'edit' => 'both', // Possible values: both|header|inline
-				'delete' => 'both', // Possible values: both|header|inline
-				'documents' => 'both', // Possible values: both|header|inline
-				'documentslist' => $this->gradesDocumentsList()
+				'delete' => 'inline', // Possible values: both|header|inline
+				'documents' => 'inline', // Possible values: both|header|inline
+				'documentslist' => gradesDocumentsList()
 			]
 		];
 
@@ -407,9 +503,23 @@ class Config extends FHCAPI_Controller
 			]
 		];
 
+		if($this->permissionlib->isBerechtigt('basis/person'))
+		{
+			$result['combinePeople'] = [
+				'title' => $this->p->t('stv', 'tab_combine_people'),
+				'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/CombinePeople.js'),
+				'config' => $config['combinePeople']
+			];
+		}
+
 		$result['kontaktieren'] = [
 			'title' => $this->p->t('stv', 'tab_kontaktieren'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Kontaktieren.js'),
+		];
+
+		$result['messages'] = [
+			'title' => $this->p->t('stv', 'tab_messages'),
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Messages.js'),
 		];
 
 		Events::trigger('stv_conf_students', function & () use (&$result) {
@@ -511,188 +621,6 @@ class Config extends FHCAPI_Controller
 				'title' => $this->p->t('person', 'nachname')
 			]
 		] + $this->kontoColumns();
-	}
-
-	/**
-	 * Helper function to generate the default documentslist config for the
-	 * grades tab.
-	 *
-	 * The resulting array consists of elements which are associative arrays
-	 * that can have the following entries:
-	 * title			(required) on the first level this can be HTML code.
-	 * permissioncheck	(optional) an URL to an FHCAPI endpoint which returns
-	 * 						true or false.
-	 * link				(optional) an URL that will be called if "action" and
-	 * 						"children" are not defined.
-	 * action			(optional) an associative array that describes an
-	 * 						POST action that will be called if "children" is
-	 * 						not defined.
-	 * 						It can have the following entries:
-	 * - url			(required) an URL to an FHCAPI endpoint.
-	 * - post			(optional) an associative array with the POST data to
-	 * 						be sent.
-	 * - response		(optional) a string that will be displayed on success.
-	 * children			(optional) an array of child elements
-	 *
-	 * All strings that start with { and end with } in the URLs and the
-	 * actions post parameter will be replaced with the corresponding
-	 * attribute of the current dataset (e.G: {uid} will be replaced with the
-	 * uid of the current dataset)
-	 *
-	 * @return array
-	 */
-	protected function gradesDocumentsList()
-	{
-		$permissioncheck = site_url("api/frontend/v1/documents/permissionAlternativeFormat/{studiengang_kz}");
-
-		$title_ger = $this->p->t("global", "deutsch");
-		$title_eng = $this->p->t("global", "englisch");
-		$title_ff = $this->p->t("stv", "document_certificate");
-		$title_lv = $this->p->t("stv", "document_coursecertificate");
-
-		$link_ff = "documents/export/" .
-			"zertifikat.rdf.php/" .
-			"Zertifikat" .
-			"?stg_kz={studiengang_kz_lv}" .
-			"&uid={uid}" .
-			"&ss={studiensemester_kurzbz}" .
-			"&lvid={lehrveranstaltung_id}";
-		$link_lv_ger = "documents/export/" .
-			"lehrveranstaltungszeugnis.rdf.php/" .
-			"LVZeugnis" .
-			"?stg_kz={studiengang_kz}" .
-			"&uid={uid}" .
-			"&ss={studiensemester_kurzbz}" .
-			"&lvid={lehrveranstaltung_id}";
-		$link_lv_eng = "documents/export/" .
-			"lehrveranstaltungszeugnis.rdf.php/" .
-			"LVZeugnisEng" .
-			"?stg_kz={studiengang_kz}" .
-			"&uid={uid}" .
-			"&ss={studiensemester_kurzbz}" .
-			"&lvid={lehrveranstaltung_id}";
-
-		$archive_url = "api/frontend/v1/documents/archiveSigned";
-		$archive_response = $this->p->t("stv", "document_signed_and_archived");
-		$archive_post_ff = [
-			"xml" => "zertifikat.rdf.php",
-			"xsl" => "Zertifikat",
-			"stg_kz" => "{studiengang_kz_lv}",
-			"uid" => "{uid}",
-			"ss" => "{studiensemester_kurzbz}",
-			"lvid" => "{lehrveranstaltung_id}"
-		];
-		$archive_post_lv_ger = [
-			"xml" => "lehrveranstaltungszeugnis.rdf.php",
-			"xsl" => "LVZeugnis",
-			"stg_kz" => "{studiengang_kz}",
-			"uid" => "{uid}",
-			"ss" => "{studiensemester_kurzbz}",
-			"lvid" => "{lehrveranstaltung_id}"
-		];
-		$archive_post_lv_eng = [
-			"xml" => "lehrveranstaltungszeugnis.rdf.php",
-			"xsl" => "LVZeugnisEng",
-			"stg_kz" => "{studiengang_kz}",
-			"uid" => "{uid}",
-			"ss" => "{studiensemester_kurzbz}",
-			"lvid" => "{lehrveranstaltung_id}"
-		];
-
-		$list = [
-			[
-				'title' => '<i class="fa fa-download" title="' . $this->p->t("stv", "document_download") . '"></i>',
-				'children' => [
-					[
-						'title' => $title_ff,
-						'link' => site_url($link_ff)
-					],
-					[
-						'title' => $title_lv,
-						'children' => [
-							[
-								'title' => $title_ger,
-								'link' => site_url($link_lv_ger),
-								'children' => [
-									[
-										'title' => 'PDF',
-										'permissioncheck' => $permissioncheck,
-										'link' => site_url($link_lv_ger)
-									],
-									[
-										'title' => 'DOC',
-										'permissioncheck' => $permissioncheck,
-										'link' => site_url($link_lv_ger . "&output=doc")
-									],
-									[
-										'title' => 'ODT',
-										'permissioncheck' => $permissioncheck,
-										'link' => site_url($link_lv_ger . "&output=odt")
-									]
-								]
-							],
-							[
-								'title' => $title_eng,
-								'link' => site_url($link_lv_eng),
-								'children' => [
-									[
-										'title' => 'PDF',
-										'permissioncheck' => $permissioncheck,
-										'link' => site_url($link_lv_eng)
-									],
-									[
-										'title' => 'DOC',
-										'permissioncheck' => $permissioncheck,
-										'link' => site_url($link_lv_eng . "&output=doc")
-									],
-									[
-										'title' => 'ODT',
-										'permissioncheck' => $permissioncheck,
-										'link' => site_url($link_lv_eng . "&output=odt")
-									]
-								]
-							]
-						]
-					]
-				]
-			],
-			[
-				'title' => '<i class="fas fa-archive" title="' . $this->p->t("stv", "document_archive") . '"></i>',
-				'children' => [
-					[
-						'title' => $title_ff,
-						'action' => [
-							'url' => site_url($archive_url),
-							'post' => $archive_post_ff,
-							'response' => $archive_response
-						]
-					],
-					[
-						'title' => $title_lv,
-						'children' => [
-							[
-								'title' => $title_ger,
-								'action' => [
-									'url' => site_url($archive_url),
-									'post' => $archive_post_lv_ger,
-									'response' => $archive_response
-								]
-							],
-							[
-								'title' => $title_eng,
-								'action' => [
-									'url' => site_url($archive_url),
-									'post' => $archive_post_lv_eng,
-									'response' => $archive_response
-								]
-							]
-						]
-					]
-				]
-			]
-		];
-
-		return $list;
 	}
 
 	/**

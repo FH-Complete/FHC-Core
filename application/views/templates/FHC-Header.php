@@ -9,6 +9,8 @@
 	$title = isset($title) ? $title : null;
 	$refresh = isset($refresh) ? $refresh : null;
 	$customCSSs = isset($customCSSs) ? $customCSSs : null;
+	$customJSs = isset($customJSs) ? $customJSs : null;
+	$customJSModules = isset($customJSModules) ? $customJSModules : null;
 	$skipID = isset($skipID) ? $skipID : null;
 ?>
 <!-- Header start -->
@@ -130,10 +132,17 @@
 			if ($cis === true) generateCSSsInclude(defined('CIS4') ? 'public/css/cis4.css' : 'public/css/cis_bs5.css');
 
 			//Tags
-			if ($tags === true) generateCSSsInclude('public/css/tags.css');
+			if ($tags === true) 
+			{
+				generateCSSsInclude('public/css/tags.css');
+				generateCSSsIncludeIfExtensionCssExists('tags.css');
+			}
+
+			$extapphelper = ExtendableAppsHelper::getInstance();
+			$extapphelper->init($customCSSs, $customJSs, $customJSModules);
 
 			// Eventually required CSS
-			generateCSSsInclude($customCSSs); // Eventually required CSS
+			generateCSSsInclude($extapphelper->getCustomCSSs()); // Eventually required CSS
 		?>
 	</head>
 	<body>

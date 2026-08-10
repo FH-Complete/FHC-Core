@@ -49,6 +49,12 @@ export default {
 			url: 'api/frontend/v1/stv/projektarbeit/getNoten'
 		};
 	},
+	getStudiensemester() {
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/stv/projektarbeit/getStudiensemester'
+		};
+	},
 	loadProjektarbeit(projektarbeit_id) {
 		return {
 			method: 'get',

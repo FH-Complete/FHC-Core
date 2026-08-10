@@ -7,6 +7,9 @@ export default {
 	components: {
 		FilterItem
 	},
+	props: {
+		filterActive: Number,
+	},
 	emits: [
 		'change'
 	],
@@ -64,8 +67,14 @@ export default {
 		}
 	},
 	watch: {
-		cleanFilters(n) {
-			this.$emit('change', n);
+		cleanFilters: {
+			//only emit if filteredValue is not empty array
+			handler(newVal) {
+				if (newVal.length)
+					this.$emit("change", newVal);
+			},
+			deep: true,
+			immediate: false
 		}
 	},
 	methods: {
@@ -74,6 +83,11 @@ export default {
 		},
 		remove(index) {
 			this.filters.splice(index, 1);
+			this.$emit("change", this.filters);
+		},
+		resetFilter(){
+			this.filters = [];
+			this.$emit("change", this.filters);
 		}
 	},
 	created() {
@@ -95,7 +109,7 @@ export default {
 			:key="i"
 			v-model="filters[i]"
 			:filter-config="filterConfig"
-			class="mt-3"
+			class="mt-2"
 			@remove="remove(i)"
 		/>
 	</div>`

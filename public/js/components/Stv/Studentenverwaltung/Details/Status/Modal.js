@@ -185,24 +185,10 @@ export default{
 			.then(result => this.statusgruende = result.data)
 			.catch(this.$fhcAlert.handleSystemError);
 
-		//TODO(Manu) check why it is/was hard coded
 		this.$api
 			.call(ApiStvStatus.getStati())
 			.then(result => this.stati = result.data)
 			.catch(this.$fhcAlert.handleSystemError);
-/*		this.stati = [
-			{ status_kurzbz: 'Interessent', bezeichnung: 'Interessent'},
-			{ status_kurzbz: 'Bewerber', bezeichnung: 'Bewerber'},
-			{ status_kurzbz: 'Aufgenommener', bezeichnung: 'Aufgenommener'},
-			{ status_kurzbz: 'Student', bezeichnung: 'Student'},
-			{ status_kurzbz: 'Unterbrecher', bezeichnung: 'Unterbrecher'},
-			{ status_kurzbz: 'Diplomand', bezeichnung: 'Diplomand'},
-			{ status_kurzbz: 'Incoming', bezeichnung: 'Incoming'},
-			{ status_kurzbz: 'Absolvent', bezeichnung: 'Absolvent'},
-			{ status_kurzbz: 'Abbrecher', bezeichnung: 'Abbrecher'},
-			{ status_kurzbz: 'Abgewiesener', bezeichnung: 'Abgewiesener'},
-			{ status_kurzbz: 'Wartender', bezeichnung: 'Wartender'}
-		];*/
 	},
 	template: `
 	<bs-modal class="stv-status-modal" ref="modal" dialog-class="modal-dialog-scrollable">
@@ -220,7 +206,7 @@ export default{
 			<p v-if="bisLocked && isStatusBeforeStudent">
 				<b>{{$p.t('bismeldestichtag', 'info_MeldestichtagStatusgrundSemester')}}</b>
 			</p>
-			
+
 			<form-input
 				container-class="mb-3"
 				type="select"
@@ -290,6 +276,7 @@ export default{
 				container-class="mb-3"
 				type="DatePicker"
 				v-model="formData.datum"
+				model-type="yyyy-MM-dd"
 				name="datum"
 				:label="$p.t('global/datum')"
 				auto-apply
@@ -305,6 +292,7 @@ export default{
 				container-class="mb-3"
 				type="DatePicker"
 				v-model="formData.bestaetigtam"
+				model-type="yyyy-MM-dd"
 				name="bestaetigtam"
 				:label="$p.t('lehre/bestaetigt_am')"
 				auto-apply
@@ -320,13 +308,14 @@ export default{
 				container-class="mb-3"
 				type="DatePicker"
 				v-model="formData.bewerbung_abgeschicktamum"
+				model-type="yyyy-MM-dd HH:mm:ss"
 				name="bewerbung_abgeschicktamum"
 				:label="$p.t('lehre/bewerbung_abgeschickt_am')"
 				auto-apply
-				:enable-time-picker="false"
-				format="dd.MM.yyyy"
+				:enable-time-picker="true"
+				format="dd.MM.yyyy HH:mm:ss"
 				text-input
-				preview-format="dd.MM.yyyy"
+				preview-format="dd.MM.yyyy HH:mm:ss"
 				:teleport="true"
 				:disabled="bisLocked || !hasPrestudentstatusPermission"
 				>
@@ -353,7 +342,6 @@ export default{
 				v-model="formData.anmerkung"
 				name="anmerkung"
 				:label="$p.t('global/anmerkung')"
-				:disabled="bisLocked"
 				>
 			</form-input>
 			<form-input

@@ -8,7 +8,7 @@ $includesArray = array(
 	'axios027' => true,
 	'primevue3' => true,
 	'customJSModules' => array_merge([
-		'public/js/apps/Cis.js'
+		'public/js/apps/Cis/Menu.js'
 	], $customJSModules ?? []),
 	'customCSSs' => array_merge([
 		'public/css/Cis4/Cis.css',
@@ -36,4 +36,4 @@ $this->load->view('templates/FHC-Header', $includesArray);
 		></cis-menu>
 </header>
 
-<main id="cis-main" class="flex-grow-1 p-4 pt-2">
+<main id="cis-main" class="flex-grow-1 p-4 pt-2" style="min-width: 0;">

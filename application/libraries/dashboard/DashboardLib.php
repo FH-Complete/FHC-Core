@@ -37,7 +37,9 @@ class DashboardLib
 	
 	public function getDashboardByKurzbz($dashboard_kurzbz)
 	{
-		$result = $this->_ci->DashboardModel->getDashboardByKurzbz($dashboard_kurzbz);
+		$result = $this->_ci->DashboardModel->loadWhere([
+			'dashboard_kurzbz' => $dashboard_kurzbz
+		]);
 
 		if (hasData($result))
 		{
@@ -47,30 +49,55 @@ class DashboardLib
 		return null;
 	}
 	
-	public function getMergedConfig($dashboard_id, $uid)
+	public function getMergedUserConfig($dashboard_id, $uid)
 	{
-		$defaultconfig = $this->getDefaultConfig($dashboard_id, $uid);
-		$userconfig = $this->getUserConfig($dashboard_id, $uid);
+		$defaultconfig = $this->getUserBaseConfig($dashboard_id);
+		$userconfig = $this->getUserOverrideConfig($dashboard_id, $uid);
 		
-		$mergedconfig = array_replace_recursive($defaultconfig, $userconfig);
+		$sourceconfig = array_map(function ($value) {
+			return ['source' => $value['source']];
+		}, $defaultconfig);
+		
+		$mergedconfig = array_replace_recursive($defaultconfig, $userconfig, $sourceconfig);
 		
 		return $mergedconfig;
 	}
 	
-	public function getDefaultConfig($dashboard_id, $uid)
+	protected function getUserBaseConfig($dashboard_id)
 	{
-		$res_presets = $this->_ci->DashboardPresetModel->getPresets($dashboard_id, $uid);
+		$funktion_kurzbzs = [];
+		$rights = $this->_ci->permissionlib->getAccessRights();
+		if ($rights)
+			$funktion_kurzbzs = array_unique(array_map(function ($right) {
+				return $right->funktion_kurzbz;
+			}, $rights));
+		
+		$this->_ci->DashboardPresetModel->db
+			->group_start()
+				->where_in('funktion_kurzbz', $funktion_kurzbzs)
+				->or_where('funktion_kurzbz IS NULL')
+			->group_end();
+
+		$this->_ci->DashboardPresetModel->addOrder('funktion_kurzbz', 'DESC');
+		
+		$result = $this->_ci->DashboardPresetModel->loadWhere([
+			'dashboard_id' => $dashboard_id
+		]);
 		$defaultconfig = array();
 		
-		if (hasData($res_presets))
+		if (hasData($result))
 		{
-			$presets = getData($res_presets);
+			$presets = getData($result);
 			foreach ($presets as $presetobj)
 			{
 				$preset = json_decode($presetobj->preset, true);
 				if (null !== $preset)
 				{
-					$defaultconfig = array_replace_recursive($defaultconfig, $preset);
+					$preset = array_map(function ($value) use ($presetobj) {
+						$value['source'] = $presetobj->funktion_kurzbz ?: self::SECTION_IF_FUNKTION_KURZBZ_IS_NULL;
+						return $value;
+					}, $preset);
+					$defaultconfig = array_merge_recursive($defaultconfig, $preset);
 				}
 			}
 		}
@@ -78,7 +105,7 @@ class DashboardLib
 		return $defaultconfig;
 	}
 	
-	public function getUserConfig($dashboard_id, $uid)
+	protected function getUserOverrideConfig($dashboard_id, $uid)
 	{
 		$res_userconfig = $this->_ci->DashboardOverrideModel->getOverride($dashboard_id, $uid);
 		
@@ -107,7 +134,7 @@ class DashboardLib
 		$emptyoverride = new stdClass();
 		$emptyoverride->dashboard_id = $dashboard->dashboard_id;
 		$emptyoverride->uid = $uid;
-		$emptyoverride->override = '{"' . self::USEROVERRIDE_SECTION . '": {"widgets":{}}, "custom": { "widgets" : {}}}';
+		$emptyoverride->override = '[]';
 		
 		return $emptyoverride;
 	}
@@ -126,8 +153,7 @@ class DashboardLib
 		$emptypreset = new stdClass();
 		$emptypreset->dashboard_id = $dashboard->dashboard_id;
 		$emptypreset->funktion_kurzbz = $funktion_kurzbz;
-		$section = ($funktion_kurzbz !== null) ? $funktion_kurzbz : self::SECTION_IF_FUNKTION_KURZBZ_IS_NULL;
-		$emptypreset->preset = '{"' . $section . '": { "widgets" : {}},"custom": { "widgets" : {}}}';
+		$emptypreset->preset = '[]';
 		
 		return $emptypreset;
 	}
@@ -137,8 +163,10 @@ class DashboardLib
 		$dashboard = $this->getDashboardByKurzbz($dashboard_kurzbz);
 		
 		$funktion_kurzbz = ($section === self::SECTION_IF_FUNKTION_KURZBZ_IS_NULL) ? null : $section;
-		$result = $this->_ci->DashboardPresetModel
-			->getPresetByDashboardAndFunktion($dashboard->dashboard_id, $funktion_kurzbz);
+		$result = $this->_ci->DashboardPresetModel->loadWhere([
+			'dashboard_id' => $dashboard->dashboard_id,
+			'funktion_kurzbz' => $funktion_kurzbz
+		]);
 		
 		if (hasData($result))
 		{
@@ -189,45 +217,5 @@ class DashboardLib
 		}
 		
 		return $result;
-	}
-
-	public function addWidgetsToWidgets(&$widgets, $dashboard_kurzbz, $section, $addwigets)
-	{
-		foreach ($addwigets as $widget)
-		{
-			if(!isset($widget->widgetid))
-			{
-				$widget->widgetid = $this->generateWidgetId($dashboard_kurzbz);
-			}
-			$this->addWidgetToWidgets($widgets, $section, $widget, $widget->widgetid);
-		}
-	}
-	
-	public function addWidgetToWidgets(&$widgets, $section, $widget, $widgetid)
-	{
-		$section = ($section !== null) ? $section : self::SECTION_IF_FUNKTION_KURZBZ_IS_NULL;
-		if (!isset($widgets[$section]) || !isset($widgets[$section]["widgets"]) || !is_array($widgets[$section]))
-		{
-			$widgets[$section] = array();
-			$widgets[$section]["widgets"] = array();
-		}
-		
-		$widgets[$section]["widgets"][$widgetid] = $widget;
-	}
-	
-	public function removeWidgetFromWidgets(&$widgets, $section, $widgetid)
-	{
-		$section = ($section !== null) ? $section : self::SECTION_IF_FUNKTION_KURZBZ_IS_NULL;
-		if (isset($widgets[$section]) && isset($widgets[$section]["widgets"][$widgetid]))
-		{
-			unset($widgets[$section]["widgets"][$widgetid]);
-			if(empty($widgets[$section]["widgets"]) && $section !== self::USEROVERRIDE_SECTION) {
-				unset($widgets[$section]);
-			}
-			return true;
-		}
-		else {
-			return false;
-		}
 	}
 }

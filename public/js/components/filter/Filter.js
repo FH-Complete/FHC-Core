@@ -15,19 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {CoreFetchCmpt} from '../../components/Fetch.js';
-import FilterConfig from './Filter/Config.js';
-import FilterColumns from './Filter/Columns.js';
-import TableDownload from './Table/Download.js';
-import collapseAutoClose from '../../directives/collapseAutoClose.js';
+import { CoreFetchCmpt } from "../../components/Fetch.js";
+import FilterConfig from "./Filter/Config.js";
+import FilterColumns from "./Filter/Columns.js";
+import TablePresets from "./Filter/TablePresets.js";
+import TableDownload from "./Table/Download.js";
+import collapseAutoClose from "../../directives/collapseAutoClose.js";
 
-import moduleLayoutFitDataStretchFrozen from '../../tabulator/layouts/fitDataStretchFrozen.js';
+import moduleLayoutFitDataStretchFrozen from "../../tabulator/layouts/fitDataStretchFrozen.js";
+import InternalToExternalEventBroadcastModule from "../../tabulator/customModules/InternalToExternalEventBroadcastModule.js";
+import MenuExtensionModule from "../../tabulator/customModules/MenuExtensionModule.js";
+import ResponsiveLayoutExtensionModule from "../../tabulator/customModules/ResponsiveLayoutExtensionModule.js";
+import TablePresetsModule from "../../tabulator/customModules/TablePresetsModule.js";
 
-import ApiFilter from '../../api/factory/filter.js';
+import { debounce } from "../../helpers/DebounceHelper.js";
+
+import ApiFilter from "../../api/factory/filter.js";
+import ApiPhrases from "../../api/factory/phrasen.js";
 
 //
-const FILTER_COMPONENT_NEW_FILTER = 'Filter Component New Filter';
-const FILTER_COMPONENT_NEW_FILTER_TYPE = 'Filter Component New Filter Type';
+const FILTER_COMPONENT_NEW_FILTER = "Filter Component New Filter";
+const FILTER_COMPONENT_NEW_FILTER_TYPE = "Filter Component New Filter Type";
 
 var _uuid = 0;
 
@@ -39,16 +47,18 @@ export const CoreFilterCmpt = {
 		CoreFetchCmpt,
 		FilterConfig,
 		FilterColumns,
-		TableDownload
+		TablePresets,
+		TableDownload,
 	},
 	directives: {
-		collapseAutoClose
+		collapseAutoClose,
 	},
 	emits: [
-		'nwNewEntry',
-		'click:new',
-		'tableBuilt',
-		'uuidDefined'
+		"nwNewEntry",
+		"click:new",
+		"tableBuilt",
+		"uuidDefined",
+		"headerFilterOn",
 	],
 	props: {
 		onNwNewEntry: Function, // NOTE(chris): Hack to get the nwNewEntry listener into $props
@@ -56,20 +66,20 @@ export const CoreFilterCmpt = {
 		description: String,
 		sideMenu: {
 			type: Boolean,
-			default: true
+			default: true,
 		},
 		filterType: {
-			type: String
+			type: String,
 		},
 		tabulatorOptions: Object,
 		tabulatorEvents: Array,
 		tableOnly: Boolean,
-		noColumnFilter:Boolean,
+		noColumnFilter: Boolean,
 		reload: Boolean,
 		reloadBtnInfotext: String,
 		download: {
 			type: [Boolean, String, Function, Array, Object],
-			default: false
+			default: false,
 		},
 		newBtnShow: Boolean,
 		newBtnClass: [String, Array, Object],
@@ -82,10 +92,23 @@ export const CoreFilterCmpt = {
 		countOnly: Boolean,
 		useSelectionSpan: {
 			type: Boolean,
-			default: true
-		}
+			default: true,
+		},
+		isUsingPresets: {
+			Boolean,
+			default: false,
+		},
+		presetsId: {
+			String,
+			default: "",
+		},
+		generalPresets: {
+			type: Array,
+			default: [],
+		},
 	},
-	data: function() {
+	inject: ["language"],
+	data: function () {
 		return {
 			uuid: 0,
 			// FilterCmpt properties
@@ -119,42 +142,50 @@ export const CoreFilterCmpt = {
 				headerFilter: false,
 				group: false,
 				page: false,
-			}
+			},
+			collapsedHeadingLocalizationTimer: null,
+			hasPresetBeenModified: false,
+			appliedPreset: null,
 		};
 	},
 	computed: {
 		notSelectedFields() {
-			if (!this.fields || !this.selectedFields)
-				return null;
-			return this.fields.filter(x => this.selectedFields.indexOf(x) === -1)
+			if (!this.fields || !this.selectedFields) return null;
+			return this.fields.filter(
+				(x) => this.selectedFields.indexOf(x) === -1,
+			);
 		},
 		filteredData() {
-			if (!this.dataset)
-				return [];
+			if (!this.dataset) return [];
 			return JSON.parse(JSON.stringify(this.dataset));
 		},
 		filteredColumns() {
 			let fields = JSON.parse(JSON.stringify(this.fields)) || [];
-			let selectedFields = JSON.parse(JSON.stringify(this.selectedFields)) || [];
+			let selectedFields =
+				JSON.parse(JSON.stringify(this.selectedFields)) || [];
 
 			let columns = null;
 
 			// If the tabulator options has been provided and it contains the property columns
-			if (this.tabulatorOptions && this.tabulatorOptions.hasOwnProperty('columns'))
+			if (
+				this.tabulatorOptions &&
+				this.tabulatorOptions.hasOwnProperty("columns")
+			)
 				columns = this.tabulatorOptions.columns;
 
 			// If columns is not an array or it is an array with less elements then the array fields
-			if (!Array.isArray(columns) || (Array.isArray(columns) && columns.length < fields.length))
-			{
+			if (
+				!Array.isArray(columns) ||
+				(Array.isArray(columns) && columns.length < fields.length)
+			) {
 				columns = []; // set it as an empty array
 
 				// Loop throught all the retrieved columns from database
-				for (let field of fields)
-				{
+				for (let field of fields) {
 					// Create a new column having the title equal to the field name
 					let column = {
 						title: field,
-						field: field
+						field: field,
 					};
 
 					// If the column has to be displayed or not
@@ -163,18 +194,18 @@ export const CoreFilterCmpt = {
 					// Add the new column to the list of columns
 					columns.push(column);
 				}
-			}
-			else // the property columns has been provided in the tabulator options
+			} else // the property columns has been provided in the tabulator options
 			{
 				// Loop throught the property columns of the tabulator options
-				for (let col of columns)
-				{
+				for (let col of columns) {
 					// If the column has to be displayed or not
 					/* fields.indexOf(col.field) == -1; ensures displaying formatter colums
 					e.g. column with rowSelection checkboxes or with custom formatted action buttons */
-					col.visible = selectedFields.indexOf(col.field) >= 0 || fields.indexOf(col.field) == -1;
+					col.visible =
+						selectedFields.indexOf(col.field) >= 0 ||
+						fields.indexOf(col.field) == -1;
 
-					if (col.hasOwnProperty('resizable'))
+					if (col.hasOwnProperty("resizable"))
 						col.resizable = col.visible;
 				}
 			}
@@ -182,90 +213,136 @@ export const CoreFilterCmpt = {
 			return columns;
 		},
 		fieldIdsForVisibilty() {
-			if (!this.tableBuilt)
-				return [];
-			return this.tabulator.getColumns().filter(col => {
-				let def = col.getDefinition();
-				return !def.frozen && def.title && def.formatter != "responsiveCollapse";
-			}).map(col => col.getField());
-		},
-		fieldNames() {
-			if (!this.tableBuilt)
-				return {};
-			return this.tabulator.getColumns().reduce((res, col) => {
-				res[col.getField()] = col.getDefinition().title;
-				return res;
-			}, {});
+			if (!this.tableBuilt) return [];
+
+			return this.$props.tabulatorOptions?.columns
+				?.filter((column) => column.formatter !== "responsiveCollapse")
+				.map((column) => column.field) ?? [];
 		},
 		idExtra() {
-			if (!this.uuid)
-				return '';
-			return '-' + this.uuid;
+			if (!this.uuid) return "";
+			return "-" + this.uuid;
 		},
 		columnsForFilter() {
-			if (!this.filteredColumns || !this.datasetMetadata)
-				return [];
-			const filterTitles = this.filteredColumns.reduce((a,c) => {
-				a[c.field] = c.title;
-				return a;
-			}, {});
-			return this.datasetMetadata.map(el => ({...el, ...{title: filterTitles[el.name]}}));
-		}
+			if (!this.filteredColumns || !this.datasetMetadata) return [];
+
+			const isTabulatorLocalized = !!this.$props.tabulatorOptions.locale;
+
+			let filterTitles;
+			if (isTabulatorLocalized) {
+				const localizedColumnTitles = this.tabulator.getLang().columns;
+				filterTitles = this.filteredColumns.reduce((a, c) => {
+					a[c.field] = localizedColumnTitles[c.field];
+					return a;
+				}, {});
+			} else {
+				filterTitles = this.filteredColumns.reduce((a, c) => {
+					a[c.field] = c.title;
+					return a;
+				}, {});
+			}
+
+			return this.datasetMetadata.map((el) => ({
+				...el,
+				...{ title: filterTitles[el.name] },
+			}));
+		},
+	},
+	watch: {
+		"language.value": {
+			handler(newSelectedLanguage) {
+				if (!this.$props.tabulatorOptions.locale) return;
+
+				this.tabulator.setLocale(newSelectedLanguage);
+			},
+		},
 	},
 	methods: {
 		reloadTable() {
-			if (this.tableOnly)
-				this.tabulator.setData();
-			else
-				this.getFilter();
+			if (this.tableOnly) this.tabulator.setData();
+			else this.getFilter();
+		},
+		setSelectedFields() {
+			const cols = this.tabulator.getColumns();
+			this.selectedFields = cols
+				.filter((col) => col.isVisible())
+				.map((col) => col.getField());
 		},
 		async initTabulator() {
-			let placeholder = '< Phrasen Plugin not loaded! >';
+			let placeholder = "< Phrasen Plugin not loaded! >";
 			if (this.$p) {
-				await this.$p.loadCategory('ui');
-				placeholder = this.$p.t('ui/keineDatenVorhanden');
+				await this.$p.loadCategory("ui");
+				placeholder = this.$p.t("ui/keineDatenVorhanden");
 			}
 
 			if (!this.tableOnly) {
 				// prefetch data to get fields & selectedFields for filteredColumns & filteredData
-				await new Promise(resolve => {
-					const filterId = window.location.hash ? window.location.hash.slice(1) : null;
+				await new Promise((resolve) => {
+					const filterId = window.location.hash
+						? window.location.hash.slice(1)
+						: null;
 
-					const resolvePromiseFunc = data => {
+					const resolvePromiseFunc = (data) => {
 						this.setRenderData(data);
 						resolve();
 					};
 					// get the filter data
 					if (filterId === null)
 						this.startFetchCmpt(
-							wsParams => this.$api.call(ApiFilter.getFilter(wsParams)),
+							(wsParams) =>
+								this.$api.call(ApiFilter.getFilter(wsParams)),
 							null,
-							resolvePromiseFunc
+							resolvePromiseFunc,
 						);
 					else
 						this.startFetchCmpt(
-							wsParams => this.$api.call(ApiFilter.getFilterById(wsParams)),
+							(wsParams) =>
+								this.$api.call(
+									ApiFilter.getFilterById(wsParams),
+								),
 							{ filterId },
-							resolvePromiseFunc
+							resolvePromiseFunc,
 						);
 				});
 			}
 
 			// Define a default tabulator options in case it was not provided
-			let tabulatorOptions = {...{
+			let tabulatorOptions = {
+				...{
 					layout: "fitDataStretchFrozen",
 					movableColumns: true,
-					columnDefaults:{
-						tooltip: true
+					columnDefaults: {
+						tooltip: true,
 					},
 					placeholder,
 					persistence: this.persistence,
-				}, ...(this.tabulatorOptions || {})};
+				},
+				...(this.tabulatorOptions || {}),
+			};
+
+			if (
+				this.$props.isUsingPresets &&
+				"tabulatorPreset-" + this.$props.presetsId in
+					window.localStorage
+			) {
+				tabulatorOptions.persistence.columns = false;
+				tabulatorOptions.persistence.headerFilter = false;
+				tabulatorOptions.persistence.sort = false;
+			}
+
+			if (tabulatorOptions.locale) {
+				tabulatorOptions =
+					await this.configureTabulatorLocalizations(
+						tabulatorOptions,
+					);
+			}
 
 			// set default height if no height property is set
-			if (tabulatorOptions.height === undefined &&
+			if (
+				tabulatorOptions.height === undefined &&
 				tabulatorOptions.minHeight === undefined &&
-				tabulatorOptions.maxHeight === undefined) {
+				tabulatorOptions.maxHeight === undefined
+			) {
 				tabulatorOptions.height = 500;
 			}
 
@@ -273,13 +350,19 @@ export const CoreFilterCmpt = {
 				tabulatorOptions.data = this.filteredData;
 				tabulatorOptions.columns = this.filteredColumns;
 			} else {
-				tabulatorOptions.columns.forEach(col => {
-					if (col.visible === undefined)
-						col.visible = true;
+				tabulatorOptions.columns.forEach((col) => {
+					if (col.visible === undefined) col.visible = true;
 				});
 			}
 
-			if (tabulatorOptions.selectable || (tabulatorOptions.columns && tabulatorOptions.columns.filter(el => el.formatter == 'rowSelection').length))
+			if (
+				tabulatorOptions.selectable ||
+				tabulatorOptions.selectableRows ||
+				(tabulatorOptions.columns &&
+					tabulatorOptions.columns.filter(
+						(el) => el.formatter == "rowSelection",
+					).length)
+			)
 				this.tabulatorHasSelector = true;
 
 			if (this.idField) {
@@ -290,110 +373,268 @@ export const CoreFilterCmpt = {
 			}
 
 			// Start the tabulator with the build options
-			this.tabulator = new Tabulator(
-				this.$refs.table,
-				tabulatorOptions
-			);
+			this.tabulator = new Tabulator(this.$refs.table, {
+				...tabulatorOptions,
+				debugInvalidOptions: false,
+			});
 			// If event handlers have been provided
-			if (Array.isArray(this.tabulatorEvents) && this.tabulatorEvents.length > 0)
-			{
+			if (
+				Array.isArray(this.tabulatorEvents) &&
+				this.tabulatorEvents.length > 0
+			) {
 				// Attach all the provided event handlers to the started tabulator
 				for (let evt of this.tabulatorEvents)
 					this.tabulator.on(evt.event, evt.handler);
 			}
-			this.tabulator.on('tableBuilt', () => {this.tableBuilt = true; this.$emit('tableBuilt');});
-			this.tabulator.on("rowSelectionChanged", data => {
+			this.tabulator.on("tableBuilt", () => {
+				this.tableBuilt = true;
+				this.$emit("tableBuilt");
+			});
+			this.tabulator.on("rowSelectionChanged", (data) => {
 				this.selectedData = data;
+			});
+			this.tabulator.on("columnMoved", (column, columns) => {
+				this.checkAgainstAppliedPreset();
+			});
+			this.tabulator.on("dataSorted", (sorters, rows) => {
+				this.checkAgainstAppliedPreset();
 			});
 
 			// if nested tabulator, restructure data
 			if (this.parentIdField && this.idField) {
-				this.tabulator.on("dataLoading", data => {
+				this.tabulator.on("dataLoading", (data) => {
 					let toDelete = [];
 
 					// loop through all data
-					for (let childIdx = 0; childIdx < data.length; childIdx++)
-					{
+					for (let childIdx = 0; childIdx < data.length; childIdx++) {
 						let child = data[childIdx];
 
 						// if it has parent id, it is a child
-						if (child[this.parentIdField])
-						{
+						if (child[this.parentIdField]) {
 							// append the child on the right place. If parent found, mark original sw child on 0 level for deleting
-							if (this.appendChild(data, child)) toDelete.push(childIdx);
+							if (this.appendChild(data, child))
+								toDelete.push(childIdx);
 						}
 					}
 
 					// delete the marked children from 0 level
-					for (let counter = 0; counter < toDelete.length; counter++)
-					{
+					for (
+						let counter = 0;
+						counter < toDelete.length;
+						counter++
+					) {
 						// decrease index by counter as index of data array changes after every deletion
 						data.splice(toDelete[counter] - counter, 1);
 					}
 				});
 			}
 			if (this.tableOnly) {
-				this.tabulator.on('tableBuilt', () => {
+				this.tabulator.on("tableBuilt", () => {
 					const cols = this.tabulator.getColumns();
-					this.fields = cols.map(col => col.getField());
-					this.selectedFields = cols.filter(col => col.isVisible()).map(col => col.getField());
+					this.fields = cols.map((col) => col.getField());
+					this.setSelectedFields();
 					if (this.tabulator.options.persistence.headerFilter)
 						this._setHeaderFilter();
 				});
-
 			}
 
-			this.tabulator.on("dataFiltered", filters => {
+			this.tabulator.on("dataFiltered", (filters) => {
 				this.filterActive = filters.length > 0;
+				this.$emit("headerFilterOn", this.filterActive);
+				this.checkAgainstAppliedPreset();
 			});
+			this.tabulator.on("localized", () => {
+				this.tabulator.modules.responsiveLayout.generateCollapsedContent();
+			});
+		},
+		async configureTabulatorLocalizations(tabulatorOptions) {
+			tabulatorOptions.locale = this.$p.user_language.value;
+			tabulatorOptions.langs = {};
+
+			const genericTabulatorPhrasesResponse = await this.$api.call(
+				ApiPhrases.getTabulatorPhrases(),
+			);
+			const genericTabulatorPhrasesData =
+				genericTabulatorPhrasesResponse.data;
+			Object.keys(genericTabulatorPhrasesData).forEach((language) => {
+				let genericTabulatorPhraseToTranslationMapper = {};
+				genericTabulatorPhrasesData[language].forEach((phrase) => {
+					genericTabulatorPhraseToTranslationMapper[phrase.phrase] =
+						phrase.text;
+				});
+
+				tabulatorOptions.langs[language] = {
+					data: {
+						loading:
+							genericTabulatorPhraseToTranslationMapper[
+								"loading"
+							],
+						error: genericTabulatorPhraseToTranslationMapper[
+							"error"
+						],
+					},
+					groups: {
+						item: genericTabulatorPhraseToTranslationMapper["item"],
+						items: genericTabulatorPhraseToTranslationMapper[
+							"items"
+						],
+					},
+					pagination: {
+						page_size:
+							genericTabulatorPhraseToTranslationMapper[
+								"page_size"
+							],
+						page_title:
+							genericTabulatorPhraseToTranslationMapper[
+								"page_title"
+							],
+						first: genericTabulatorPhraseToTranslationMapper[
+							"first"
+						],
+						first_title:
+							genericTabulatorPhraseToTranslationMapper[
+								"first_title"
+							],
+						last: genericTabulatorPhraseToTranslationMapper["last"],
+						last_title:
+							genericTabulatorPhraseToTranslationMapper[
+								"last_title"
+							],
+						prev: genericTabulatorPhraseToTranslationMapper["prev"],
+						prev_title:
+							genericTabulatorPhraseToTranslationMapper[
+								"prev_title"
+							],
+						next: genericTabulatorPhraseToTranslationMapper["next"],
+						next_title:
+							genericTabulatorPhraseToTranslationMapper[
+								"next_title"
+							],
+						all: genericTabulatorPhraseToTranslationMapper["all"],
+						counter: {
+							showing:
+								genericTabulatorPhraseToTranslationMapper[
+									"showing"
+								],
+							of: genericTabulatorPhraseToTranslationMapper["of"],
+							rows: genericTabulatorPhraseToTranslationMapper[
+								"rows"
+							],
+							pages: genericTabulatorPhraseToTranslationMapper[
+								"pages"
+							],
+						},
+					},
+				};
+			});
+
+			let phrasesGroupedByCategoryRequestParam = {};
+			tabulatorOptions.columns.forEach((column) => {
+				if (!column.titlePhrase?.length) return;
+
+				let [category, phrase] = column.titlePhrase.split("/");
+				if (phrasesGroupedByCategoryRequestParam[category]) {
+					phrasesGroupedByCategoryRequestParam[category].push(phrase);
+				} else {
+					phrasesGroupedByCategoryRequestParam[category] = [phrase];
+				}
+			});
+			tabulatorOptions.menuItemPhrases?.forEach((menuItemPhrase) => {
+				let [category, phrase] = menuItemPhrase.split("/");
+				if (phrasesGroupedByCategoryRequestParam[category]) {
+					phrasesGroupedByCategoryRequestParam[category].push(phrase);
+				} else {
+					phrasesGroupedByCategoryRequestParam[category] = [phrase];
+				}
+			});
+
+			if (!Object.keys(phrasesGroupedByCategoryRequestParam).length) {
+				return tabulatorOptions;
+			}
+
+			const phrasesResponse = await this.$api.call(
+				ApiPhrases.getPhrases(phrasesGroupedByCategoryRequestParam),
+			);
+			const phrasesData = phrasesResponse.data;
+
+			Object.keys(phrasesData).forEach((language) => {
+				let phraseToTranslationMapper = {};
+				phrasesData[language].forEach((phrase) => {
+					phraseToTranslationMapper[
+						phrase.category + "/" + phrase.phrase
+					] = phrase.text;
+				});
+
+				let columnFieldToTranslationMapper = {};
+				tabulatorOptions.columns.forEach((column) => {
+					if (!column.titlePhrase?.length) return;
+
+					columnFieldToTranslationMapper[column.field] =
+						phraseToTranslationMapper[column.titlePhrase] ??
+						"<< PHRASE " + column.titlePhrase + " >>";
+				});
+				tabulatorOptions.langs[language].columns =
+					columnFieldToTranslationMapper;
+
+				let menuItemPhraseToTranslationMapper = {};
+				tabulatorOptions.menuItemPhrases?.forEach((menuItemPhrase) => {
+					menuItemPhraseToTranslationMapper[menuItemPhrase] =
+						phraseToTranslationMapper[menuItemPhrase] ??
+						"<< PHRASE " + menuItemPhrase + " >>";
+				});
+				tabulatorOptions.langs[language].menuItems =
+					menuItemPhraseToTranslationMapper;
+			});
+
+			return tabulatorOptions;
 		},
 		updateTabulator() {
 			if (this.tabulator) {
-				if (this.tableBuilt)
-					this._updateTabulator();
-				else
-					this.tabulator.on('tableBuilt', this._updateTabulator);
+				if (this.tableBuilt) this._updateTabulator();
+				else this.tabulator.on("tableBuilt", this._updateTabulator);
 			}
 		},
 		_updateTabulator() {
-			this.tabulatorHasSelector = this.tabulatorOptions.selectable || this.filteredColumns.filter(el => el.formatter == 'rowSelection').length;
+			this.tabulatorHasSelector =
+				this.tabulatorOptions.selectable ||
+				this.tabulatorOptions.selectableRows ||
+				this.filteredColumns.filter(
+					(el) => el.formatter == "rowSelection",
+				).length;
 			this.tabulator.setColumns(this.filteredColumns);
 			this.tabulator.setData(this.filteredData);
-			this._setHeaderFilter()
+			this._setHeaderFilter();
 		},
-		clearFilters()
-		{
+		clearFilters() {
 			let existingFilters = this.tabulator.getHeaderFilters();
-			existingFilters.forEach(filter => {
+			existingFilters.forEach((filter) => {
 				this.tabulator.setHeaderFilterValue(filter.field, "");
 			});
 			this.tabulator.clearFilter();
 			this.filterActive = false;
+			this.$emit("headerFilterOn", this.filterActive);
 		},
-		_setHeaderFilter()
-		{
+		_setHeaderFilter() {
 			const existingFilters = this.tabulator.getHeaderFilters();
-			existingFilters.forEach(filter => {
+			existingFilters.forEach((filter) => {
 				this.tabulator.setHeaderFilterValue(filter.field, filter.value);
 			});
 		},
-		/**
-		 *
-		 */
 		getFilter() {
 			if (this.selectedFilter === null)
 				this.startFetchCmpt(
-					wsParams => this.$api.call(ApiFilter.getFilter(wsParams)),
+					(wsParams) => this.$api.call(ApiFilter.getFilter(wsParams)),
 					null,
-					this.render
+					this.render,
 				);
 			else
 				this.startFetchCmpt(
-					wsParams => this.$api.call(ApiFilter.getFilterById(wsParams)),
+					(wsParams) =>
+						this.$api.call(ApiFilter.getFilterById(wsParams)),
 					{
-						filterId: this.selectedFilter
+						filterId: this.selectedFilter,
 					},
-					this.render
+					this.render,
 				);
 		},
 		setRenderData(data) {
@@ -406,12 +647,9 @@ export const CoreFilterCmpt = {
 			this.selectedFields = data.selectedFields;
 			this.filterFields = [];
 
-			for (let i = 0; i < data.datasetMetadata.length; i++)
-			{
-				for (let j = 0; j < data.filters.length; j++)
-				{
-					if (data.datasetMetadata[i].name == data.filters[j].name)
-					{
+			for (let i = 0; i < data.datasetMetadata.length; i++) {
+				for (let j = 0; j < data.filters.length; j++) {
+					if (data.datasetMetadata[i].name == data.filters[j].name) {
 						let filter = data.filters[j];
 						filter.type = data.datasetMetadata[i].type;
 
@@ -430,11 +668,9 @@ export const CoreFilterCmpt = {
 			this.setRenderData(data);
 
 			// If the side menu is active
-			if (this.sideMenu === true)
-			{
+			if (this.sideMenu === true) {
 				this.setSideMenu(data);
-			}
-			else // otherwise use the dropdown in the filter options
+			} else // otherwise use the dropdown in the filter options
 			{
 				this.setDropDownMenu(data);
 			}
@@ -448,51 +684,57 @@ export const CoreFilterCmpt = {
 			let personalFilters = data.sideMenu.personalFilters;
 			let filtersArray = [];
 
-			for (let filtersCount = 0; filtersCount < filters.length; filtersCount++)
-			{
+			for (
+				let filtersCount = 0;
+				filtersCount < filters.length;
+				filtersCount++
+			) {
 				let link = filters[filtersCount].link;
 
-				if (link == null) link = '#';
+				if (link == null) link = "#";
 
 				filtersArray[filtersArray.length] = {
 					id: filters[filtersCount].filter_id,
 					link: link + filters[filtersCount].filter_id,
 					description: filters[filtersCount].desc,
 					sort: filtersCount,
-					onClickCall: this.handlerGetFilterById
+					onClickCall: this.handlerGetFilterById,
 				};
 			}
 
-			for (let filtersCount = 0; filtersCount < personalFilters.length; filtersCount++)
-			{
+			for (
+				let filtersCount = 0;
+				filtersCount < personalFilters.length;
+				filtersCount++
+			) {
 				let link = personalFilters[filtersCount].link;
 
-				if (link == null) link = '#';
+				if (link == null) link = "#";
 
 				filtersArray[filtersArray.length] = {
 					id: personalFilters[filtersCount].filter_id,
 					link: link + personalFilters[filtersCount].filter_id,
 					description: personalFilters[filtersCount].desc,
-					subscriptDescription: personalFilters[filtersCount].subscriptDescription,
-					subscriptLinkClass: personalFilters[filtersCount].subscriptLinkClass,
-					subscriptLinkValue: personalFilters[filtersCount].subscriptLinkValue,
+					subscriptDescription:
+						personalFilters[filtersCount].subscriptDescription,
+					subscriptLinkClass:
+						personalFilters[filtersCount].subscriptLinkClass,
+					subscriptLinkValue:
+						personalFilters[filtersCount].subscriptLinkValue,
 					sort: filtersCount,
 					onClickCall: this.handlerGetFilterById,
-					onClickSubscriptCall: this.handlerRemoveCustomFilter
+					onClickSubscriptCall: this.handlerRemoveCustomFilter,
 				};
 			}
 
 			this.availableFilters = filtersArray;
 
-			this.$emit(
-				'nwNewEntry',
-				{
-					link: "#",
-					description: "Filters",
-					icon: "filter",
-					children: filtersArray
-				}
-			);
+			this.$emit("nwNewEntry", {
+				link: "#",
+				description: "Filters",
+				icon: "filter",
+				children: filtersArray,
+			});
 		},
 		/**
 		 * Set the drop down menu
@@ -502,29 +744,35 @@ export const CoreFilterCmpt = {
 			let personalFilters = data.sideMenu.personalFilters;
 			let filtersArray = [];
 
-			for (let filtersCount = 0; filtersCount < filters.length; filtersCount++)
-			{
+			for (
+				let filtersCount = 0;
+				filtersCount < filters.length;
+				filtersCount++
+			) {
 				let link = filters[filtersCount].link;
 
-				if (link == null) link = '#';
+				if (link == null) link = "#";
 
 				filtersArray[filtersArray.length] = {
 					id: filters[filtersCount].filter_id,
 					option: filters[filtersCount].filter_id,
-					description: filters[filtersCount].desc
+					description: filters[filtersCount].desc,
 				};
 			}
 
-			for (let filtersCount = 0; filtersCount < personalFilters.length; filtersCount++)
-			{
+			for (
+				let filtersCount = 0;
+				filtersCount < personalFilters.length;
+				filtersCount++
+			) {
 				let link = personalFilters[filtersCount].link;
 
-				if (link == null) link = '#';
+				if (link == null) link = "#";
 
 				filtersArray[filtersArray.length] = {
 					id: personalFilters[filtersCount].filter_id,
 					option: personalFilters[filtersCount].filter_id,
-					description: personalFilters[filtersCount].desc
+					description: personalFilters[filtersCount].desc,
 				};
 			}
 
@@ -533,7 +781,11 @@ export const CoreFilterCmpt = {
 		/**
 		 * Used to start/refresh the FetchCmpt
 		 */
-		startFetchCmpt(apiFunction, apiFunctionParameters, dataFetchedCallback) {
+		startFetchCmpt(
+			apiFunction,
+			apiFunctionParameters,
+			dataFetchedCallback,
+		) {
 			// Assign the function api of the FetchCmpt binded property
 			this.fetchCmptApiFunction = apiFunction;
 
@@ -541,11 +793,14 @@ export const CoreFilterCmpt = {
 			if (apiFunctionParameters == null) apiFunctionParameters = {};
 
 			// Always needed parameters
-			apiFunctionParameters.filterUniqueId = FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
+			apiFunctionParameters.filterUniqueId =
+				FHC_JS_DATA_STORAGE_OBJECT.called_path +
+				"/" +
+				FHC_JS_DATA_STORAGE_OBJECT.called_method;
 			apiFunctionParameters.filterType = this.filterType;
 
 			if (this.uniqueId)
-				apiFunctionParameters.filterUniqueId += '_' + this.uniqueId;
+				apiFunctionParameters.filterUniqueId += "_" + this.uniqueId;
 
 			// Assign parameters to the FetchCmpt binded properties
 			this.fetchCmptApiFunctionParams = apiFunctionParameters;
@@ -553,7 +808,9 @@ export const CoreFilterCmpt = {
 			this.fetchCmptDataFetched = dataFetchedCallback;
 			// Set the FetchCmpt binded property refresh to have the component to refresh
 			// NOTE: this should be the last one to be called because it triggers the FetchCmpt to start to refresh
-			this.fetchCmptRefresh === true ? this.fetchCmptRefresh = false : this.fetchCmptRefresh = true;
+			this.fetchCmptRefresh === true
+				? (this.fetchCmptRefresh = false)
+				: (this.fetchCmptRefresh = true);
 		},
 
 		// ------------------------------------------------------------------------------------------------------------------
@@ -566,47 +823,46 @@ export const CoreFilterCmpt = {
 			this.selectedFilter = null;
 			//
 			this.startFetchCmpt(
-				wsParams => this.$api.call(ApiFilter.saveCustomFilter(wsParams)),
+				(wsParams) =>
+					this.$api.call(ApiFilter.saveCustomFilter(wsParams)),
 				{
-					customFilterName
+					customFilterName,
 				},
-				this.getFilter
+				this.getFilter,
 			);
 		},
 		/**
 		 *
 		 */
 		handlerRemoveCustomFilter(event) {
-			let filterId = event.currentTarget.getAttribute("href").substring(1);
-			if (filterId === this.selectedFilter)
-				this.selectedFilter = null;
+			let filterId = event.currentTarget
+				.getAttribute("href")
+				.substring(1);
+			if (filterId === this.selectedFilter) this.selectedFilter = null;
 			//
 			this.startFetchCmpt(
-				wsParams => this.$api.call(ApiFilter.removeCustomFilter(wsParams)),
+				(wsParams) =>
+					this.$api.call(ApiFilter.removeCustomFilter(wsParams)),
 				{
-					filterId: filterId
+					filterId: filterId,
 				},
-				this.getFilter
+				this.getFilter,
 			);
 		},
 
 		/*
 		 *
 		 */
-		handlerGetFilterById: function(event) {
-
+		handlerGetFilterById: function (event) {
 			let filterId = null;
 
 			// Get the attribute href if side menu is rendered
 			let attr = event.currentTarget.getAttribute("href");
 
 			// Otherwise get the value of the drop down menu
-			if (attr == null)
-			{
+			if (attr == null) {
 				filterId = event.currentTarget.value;
-			}
-			else
-			{
+			} else {
 				filterId = attr.substring(1);
 			}
 
@@ -619,11 +875,12 @@ export const CoreFilterCmpt = {
 		applyFilterConfig(filterFields) {
 			this.selectedFilter = null;
 			this.startFetchCmpt(
-				wsParams => this.$api.call(ApiFilter.applyFilterFields(wsParams)),
+				(wsParams) =>
+					this.$api.call(ApiFilter.applyFilterFields(wsParams)),
 				{
-					filterFields
+					filterFields,
 				},
-				this.getFilter
+				this.getFilter,
 			);
 		},
 
@@ -633,50 +890,173 @@ export const CoreFilterCmpt = {
 			let parentId = child[this.parentIdField];
 
 			// loop thorugh all data
-			for (let parentIdx = 0; parentIdx < data.length; parentIdx++)
-			{
+			for (let parentIdx = 0; parentIdx < data.length; parentIdx++) {
 				let parent = data[parentIdx];
 
 				// if it's the parent
-				if (parent[this.idField] == parentId)
-				{
+				if (parent[this.idField] == parentId) {
 					// create children array if not done yet
 					if (!parent._children) parent._children = [];
 
 					// if child is not included in children array, append the child
-					if (!parent._children.includes(child)) parent._children.push(child);
+					if (!parent._children.includes(child))
+						parent._children.push(child);
 
 					// parent found
 					return true;
 				}
 				// search children for parents
-				else if (parent._children) this.appendChild(parent._children, child);
+				else if (parent._children)
+					this.appendChild(parent._children, child);
 			}
 
 			// parent not found
 			return false;
-		}
+		},
+		getColumnNames() {
+			if (!this.tableBuilt) {
+				return {};
+			} else if (this.tabulator.options.locale) {
+				return this.tabulator.getLang().columns;
+			}
+			return this.tabulator.getColumns().reduce((res, col) => {
+				res[col.getField()] = col.getDefinition().title;
+				return res;
+			}, {});
+		},
+		afterTablePresetApplied(preset) {
+			this.selectedFields = [...preset.displayedColumns];
+			this.appliedPreset = { ...preset };
+			this.hasPresetBeenModified = false;
+		},
+		updateTablePresetsSubCollapsibles() {
+			if (
+				!this.$refs.tablePresets.$el
+					.getAttribute("class")
+					.split(" ")
+					.includes("show")
+			) {
+				this.$refs.tablePresets?.hidePresetInfo();
+				this.$refs.tablePresets?.hideNewPresetForm();
+			}
+		},
+		hideColumn(column) {
+			this.tabulator.hideColumn(column);
+			this.checkAgainstAppliedPreset();
+		},
+		showColumn(column) {
+			this.tabulator.showColumn(column);
+			this.checkAgainstAppliedPreset();
+		},
+		checkAgainstAppliedPreset() {
+			if (!this.appliedPreset) return;
+
+			let hasPresetBeenModified = false;
+
+			const displayedColumns = this.tabulator.columnManager.columns
+				.filter((column) => column.field !== "collapse")
+				.filter((column) => column.visible)
+				.map((column) => column.field);
+
+			const displayedColumnsLength = displayedColumns.length;
+			const presetDisplayedColumnsLength =
+				this.appliedPreset.displayedColumns?.length ?? 0;
+
+			if (
+				displayedColumns.length !==
+				(this.appliedPreset.displayedColumns?.length ?? 0)
+			) {
+				hasPresetBeenModified = true;
+			}
+
+			displayedColumns.forEach((displayedColumn, index) => {
+				if (
+					this.appliedPreset.displayedColumns[index] !==
+					displayedColumn
+				) {
+					hasPresetBeenModified = true;
+				}
+			});
+
+			const unparsedHeaderFilters =
+				this.tabulator.modules.filter.headerFilters;
+			const headerFilterFieldValuePairs = Object.entries(
+				unparsedHeaderFilters,
+			).map(([columnField, filter]) => [columnField, filter.value]);
+			const headerFiltersFieldValuePairsExcludingHiddenColumns =
+				headerFilterFieldValuePairs.filter(
+					([columnField, filterValue]) => {
+						return displayedColumns.includes(columnField);
+					},
+				);
+			const headerFilters = Object.fromEntries(
+				headerFiltersFieldValuePairsExcludingHiddenColumns,
+			);
+			const headerFilterKeys = Object.keys(headerFilters);
+			const appliedHeaderFilterKeys = this.appliedPreset.headerFilters
+				? Object.keys(this.appliedPreset.headerFilters)
+				: [];
+
+			if (headerFilterKeys.length !== appliedHeaderFilterKeys.length) {
+				hasPresetBeenModified = true;
+			}
+
+			headerFilterKeys.forEach((key) => {
+				if (
+					!(key in this.appliedPreset.headerFilters) ||
+					this.appliedPreset.headerFilters[key] !== headerFilters[key]
+				) {
+					hasPresetBeenModified = true;
+				}
+			});
+
+			const activeSort = this.tabulator.getSorters()[0];
+			const sort = activeSort
+				? {
+						column: activeSort.field,
+						direction: activeSort.dir,
+					}
+				: null;
+			if (
+				sort?.column !== this.appliedPreset.sort?.column ||
+				sort?.direction !== this.appliedPreset.sort?.direction
+			) {
+				hasPresetBeenModified = true;
+			}
+
+			this.hasPresetBeenModified = hasPresetBeenModified;
+		},
 	},
 	beforeCreate() {
 		if (!this.tableOnly == !this.filterType)
-			alert('You can not have a filter-type in table-only mode!');
+			alert("You can not have a filter-type in table-only mode!");
 	},
 	created() {
-		if (this.sideMenu && (!this.$props.onNwNewEntry || !(this.$props.onNwNewEntry instanceof Function)))
+		if (
+			this.sideMenu &&
+			(!this.$props.onNwNewEntry ||
+				!(this.$props.onNwNewEntry instanceof Function))
+		)
 			alert('"nwNewEntry" listener is mandatory when sideMenu is true');
 		this.uuid = _uuid++;
-		this.$emit('uuidDefined', this.uuid)
+		this.$emit("uuidDefined", this.uuid);
+
+		Tabulator.registerModule(InternalToExternalEventBroadcastModule);
+		Tabulator.registerModule(MenuExtensionModule);
+		Tabulator.registerModule(ResponsiveLayoutExtensionModule);
+		Tabulator.registerModule(TablePresetsModule);
 	},
 	mounted() {
 		this.initTabulator().then(() => {
 			if (!this.tableOnly) {
-				this.selectedFilter = window.location.hash ? window.location.hash.slice(1) : null;
+				this.selectedFilter = window.location.hash
+					? window.location.hash.slice(1)
+					: null;
 				this.render(this.fetchResult);
 			}
 		});
-
 	},
-	template: `
+	template: /*html*/ `
 		<!-- Load filter data -->
 		<core-fetch-cmpt
 			v-if="!tableOnly && fetchCmptApiFunction"
@@ -723,9 +1103,35 @@ export const CoreFilterCmpt = {
 					<a aria-label="filter" href="#" class="btn btn-link px-0 fhc-text" data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra">
 						<span class="fa-solid fa-xl fa-table-columns"></span>
 					</a>
+					<a v-if="$props.isUsingPresets && $props.presetsId?.length" aria-label="filter" href="#" class="btn btn-link px-0 fhc-text" data-bs-toggle="collapse" :data-bs-target="'#tablePresets' + idExtra">
+						<span class="fa-solid fa-xl fa-sliders"></span>
+					</a>
+					<span
+						v-if="$props.isUsingPresets && $props.presetsId?.length && appliedPreset?.name?.length"
+						class="fw-bold"
+					>
+						{{ appliedPreset.name }}
+						<span v-if="hasPresetBeenModified"> {{ " [" + $p.t("tabulator_presets/modified") + "]" }} </span>
+					</span>
 					<table-download class="btn btn-link px-0 fhc-text" :tabulator="tabulator" :config="download"></table-download>
+					<slot name="additional"></slot>
 				</div>
 			</div>
+
+			<table-presets
+				v-if="$props.isUsingPresets && $props.presetsId?.length && tableBuilt"
+				v-collapse-auto-close
+				@tablePresetApplied="afterTablePresetApplied($event.preset)"
+				@[\`shown.bs.collapse\`]="updateTablePresetsSubCollapsibles()"
+				@[\`hidden.bs.collapse\`]="updateTablePresetsSubCollapsibles()"
+				:id="'tablePresets' + idExtra"
+				:data-bs-parent="'#filterCollapsables' + idExtra"
+				:presetsId="$props.presetsId"
+				:tabulator="tabulator"
+				:generalPresets="$props.generalPresets"
+				ref="tablePresets"
+				class="card-body collapse"
+			></table-presets>
 
 			<filter-columns
 				:id="'collapseColumns' + idExtra"
@@ -733,9 +1139,9 @@ export const CoreFilterCmpt = {
 				:data-bs-parent="'#filterCollapsables' + idExtra"
 				:fields="fieldIdsForVisibilty"
 				:selected="selectedFields"
-				:names="fieldNames"
-				@hide="tabulator.hideColumn($event)"
-				@show="tabulator.showColumn($event)"
+				:names="getColumnNames()"
+				@hide="hideColumn($event)"
+				@show="showColumn($event)"
 				v-collapse-auto-close
 			></filter-columns>
 
@@ -765,5 +1171,5 @@ export const CoreFilterCmpt = {
 
 		<!-- Tabulator -->
 		<div ref="table" :id="'filterTableDataset' + idExtra" class="filter-table-dataset"></div>
-	`
+	`,
 };

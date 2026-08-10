@@ -47,7 +47,6 @@ class Stundensatz_model extends DB_Model
 	{
 		$this->load->config('stv');
 
-		$useFixangestelltStundensatz = $this->config->item('tabs')['projektarbeit']['lvLektroinnenzuteilungFixangestelltStundensatz'];
 		$defaultStundensatz = $this->config->item('tabs')['projektarbeit']['defaultProjektbetreuerStundensatz'];
 
 		$stundensatz = '';
@@ -63,7 +62,7 @@ class Stundensatz_model extends DB_Model
 			{
 				$studiensemester = getData($result)[0];
 
-				if (isset($useFixangestelltStundensatz) && !$useFixangestelltStundensatz)
+				if (defined('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ') && !FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ)
 				{
 					// load Mitarbeiter
 					$params = [$person_id];
@@ -83,19 +82,30 @@ class Stundensatz_model extends DB_Model
 
 					if (hasData($result))
 					{
-						foreach (getData($result) as $ma)
-						{
-							if (!$ma->fixangestellt)
-							{
-								$stundensatzRes = $this->getStundensatzByDatum(
-									$ma->mitarbeiter_uid, $studiensemester->start, $studiensemester->ende, 'lehre'
-								);
+						$ma = getData($result)[0];
 
-								if (hasData($stundensatzRes))
-									$stundensatz = getData($stundensatzRes)[0]->stundensatz;
-								else
-									$stundensatz = '0.00';
-							}
+						$this->load->model('vertragsbestandteil/Dienstverhaeltnis_model','DienstverhaeltnisModel');
+						$echterdv_result = $this->DienstverhaeltnisModel->existsDienstverhaeltnis(
+							$ma->mitarbeiter_uid,
+							$studiensemester->start,
+							$studiensemester->ende,
+							'echterdv'
+						);
+
+						if (hasData($echterdv_result))
+						{
+							$stundensatz = null;
+						}
+						else
+						{
+							$stundensatzRes = $this->getStundensatzByDatum(
+								$ma->mitarbeiter_uid, $studiensemester->start, $studiensemester->ende, 'lehre'
+							);
+
+							if (hasData($stundensatzRes))
+								$stundensatz = getData($stundensatzRes)[0]->stundensatz;
+							else
+								$stundensatz = '0.00';
 						}
 					}
 					else

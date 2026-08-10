@@ -27,7 +27,7 @@ export default {
 		return {
 			filter: false,
 			studiengang_kz: false,
-			counterdate: new Date()
+			counterdate: luxon.DateTime.now().setZone(FHC_JS_DATA_STORAGE_OBJECT.timezone).toISODate()
 		};
 	},
 	computed: {
@@ -127,10 +127,10 @@ export default {
 				ajaxResponse: (url, params, response) => response.data,
 				dataTree: true,
 				columns: this.tabulatorColumns,
-				selectable: true,
-				selectableRangeMode: 'click',
+				selectableRows: true,
+				selectableRowsRangeMode: 'click',
 				index: 'buchungsnr',
-				persistenceID: 'stv-details-konto'
+				persistenceID: 'stv-details-konto-20260217'
 			};
 		},
 	},
@@ -259,6 +259,7 @@ export default {
 					<form-input
 						type="DatePicker"
 						v-model="counterdate"
+						model-type="yyyy-MM-dd"
 						input-group
 						:enable-time-picker="false"
 						text-input

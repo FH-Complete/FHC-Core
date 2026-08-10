@@ -16,11 +16,15 @@
 	padding: .5rem 1rem;
 	text-decoration: none;
 }
+.fhc-app-menu li a.disabled {
+	--bs-link-opacity: .5;
+}
 .fhc-app-menu li a.active,
 .fhc-app-menu li a:hover {
 	--bs-link-color-rgb: var(--bs-link-hover-color-rgb);
 	background: var(--surface-hover);
 }
+.fhc-app-menu li a.disabled,
 .fhc-app-menu li a.active {
 	pointer-events: none;
 }

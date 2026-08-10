@@ -24,6 +24,7 @@ export default {
 		}
 	},
 	methods:{
+
 		open(prestudent_id, dokument_kurzbz){
 			this.formData.dokument_kurzbz = dokument_kurzbz;
 			this.formData.prestudent_id = prestudent_id;

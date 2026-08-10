@@ -3,6 +3,7 @@ import FormInput from "../Form/Input.js";
 import BsModal from '../Bootstrap/Modal.js';
 
 export default {
+	name: 'TagComponent',
 	components: {
 		CoreForm,
 		FormInput,
@@ -44,7 +45,10 @@ export default {
 				insertvon: "",
 				updateamum: "",
 				updatevon: "",
-				response: ""
+				response: "",
+				start: "",
+				ende: "",
+				prioritaet: 100,
 			},
 			mode: "create"
 		};
@@ -87,7 +91,12 @@ export default {
 			this.tagData.bearbeiter = item.bearbeiter;
 			this.tagData.verfasser = item.verfasser;
 			this.tagData.readonly = item.readonly;
-
+			//add for automated tags
+			this.tagData.automatisiert = item.automatisiert;
+			this.tagData.start = this.formatDateTimeDay(item.start);
+			this.tagData.ende = this.formatDateTimeDay(item.ende);
+			this.tagData.prioritaet = item.prioritaet || 100;
+			
 			if (item && item.notiz_id)
 			{
 				this.selectedTagId = item.notiz_id;
@@ -185,7 +194,8 @@ export default {
 				updateamum: "",
 				bearbeiter: "",
 				response: "",
-				readonly: false
+				readonly: false,
+				prioritaet: 100,
 			};
 			this.selectedTagId = null;
 			this.mode = "create";
@@ -199,6 +209,14 @@ export default {
 				hour: "2-digit",
 				minute: "2-digit",
 				second: "2-digit"
+			});
+		},
+		formatDateTimeDay: (dateString) => {
+			if (!dateString) return null;
+			return new Date(dateString).toLocaleString('de-AT', {
+				year: "numeric",
+				month: "2-digit",
+				day: "2-digit",
 			});
 		},
 		async copy (){
@@ -238,6 +256,8 @@ export default {
 						field="notiz"
 						:readonly="tagData.readonly"
 						placeholder="Notiz..."
+						@keyup.stop=""
+						@keydown.stop=""
 					></form-input>
 					<button
 						type="button" 
@@ -255,6 +275,15 @@ export default {
 						<br />
 						<span v-if="tagData.bearbeiter && tagData.insertamum !== tagData.updateamum">
 							{{ $p.t('notiz', 'tag_bearbeiter', { 0: tagData.bearbeiter, 1: tagData.updateamum }) }}
+						</span>
+						<span v-if="tagData.start || tagData.ende" >
+							gültig
+						</span>
+						<span v-if="tagData.start">
+							von {{tagData.start}}
+						</span>
+						<span v-if="tagData.ende">
+							bis {{tagData.ende}}
 						</span>
 					</div>
 				</div>

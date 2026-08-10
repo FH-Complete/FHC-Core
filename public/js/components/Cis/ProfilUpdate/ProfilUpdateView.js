@@ -46,7 +46,6 @@ export default {
       loading: false,
       filter: "Pending",
       profil_update_id: Number(this.id),
-
   };
   },
 	computed: {
@@ -60,6 +59,10 @@ export default {
 		},
 		profilUpdateOptions: function () {
 			return {
+				persistence: {
+					columns: ["width", "visible", "frozen"],
+				},
+				persistenceID: 'cis-profilupdate-2025121702',
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: (url, config, params) => {
 					return this.$api.call(ApiProfilUpdate.getProfilUpdateWithPermission(params.filter));
@@ -205,7 +208,7 @@ export default {
             //responsive:0,
           },
           {
-            title: this.$p.t("lehre", "studiengang") + ' (' + this.$p.t("profil", "studentIn") + ')',
+            title: this.$p.t("profil", "stg_short") + ' (' + this.$p.t("profil", "studentIn") + ')',
             field: "studiengang",
             minWidth: 50,
             resizable: true,
@@ -213,8 +216,14 @@ export default {
             headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"},
             //responsive:0,
           },
-          {
-            title: this.$p.t("lehre", "organisationsform") + ' (' + this.$p.t("profil", "studentIn") + ')',
+		  {
+			title: this.$p.t("profil", "sem_short") + ' (' + this.$p.t("profil", "studentIn") + ')',
+			field: "semester",
+			headerFilter: "list",
+			headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}
+		  },
+		  {
+            title: this.$p.t("profil", "orgform_short") + ' (' + this.$p.t("profil", "studentIn") + ')',
             field: "orgform",
             minWidth: 50,
             resizable: true,
@@ -222,8 +231,8 @@ export default {
             headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"},
             //responsive:0,
           },
-          {
-            title: this.$p.t("lehre", "organisationseinheit") + ' (' + this.$p.t("profil", "mitarbeiterIn") + ')',
+		  {
+            title: this.$p.t("profil", "orgeinheit_short") + ' (' + this.$p.t("profil", "mitarbeiterIn") + ')',
             field: "oezuordnung",
             minWidth: 200,
             resizable: true,
@@ -231,7 +240,7 @@ export default {
             headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"},
             //responsive:0,
           },
-          {
+		  {
             title: this.$p.t("profilUpdate", "Topic"),
             field: "topic",
             resizable: true,
@@ -240,7 +249,7 @@ export default {
             headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"},
             //responsive:0,
           },
-          {
+		  {
             title: this.$p.t("profilUpdate", "insertamum"),
             field: "insertamum_iso",
             resizable: true,
@@ -251,7 +260,7 @@ export default {
 			formatterParams: this.datetimeFormatterParams(),
             //responsive:0,
           },
-          {
+		  {
             title: this.$p.t("profilUpdate", "Status"),
             field: "status_translated",
             hozAlign: "center",
@@ -273,7 +282,6 @@ export default {
               }
               return `<div class='row justify-content-center'><div class='col-2'><i class='${iconClasses}'></i></div> <div class='col-4'><span>${cell.getValue()}</span></div></div>`;
             },
-
             resizable: true,
             minWidth: 200,
             //responsive:0,
@@ -309,7 +317,6 @@ export default {
         ],
       };
     }
-    
   },
   methods: {
     denyProfilUpdate: function (data) {
@@ -351,7 +358,6 @@ export default {
       this.showModal = false;
       this.modalData = null;
     },
-
     showAcceptDenyModal(value) {
       this.modalData = value;
       if (!this.modalData) {
@@ -364,7 +370,6 @@ export default {
         this.$refs.AcceptDenyModal.show();
       });
     },
-
     updateData: function (event) {
       this.$refs.UpdatesTable.tabulator.setData();
       //? store the selected view in the session storage of the browser
@@ -415,22 +420,30 @@ export default {
   },
   template: /*html*/ `
     <div>
-   
-    <accept-deny-update :title="$p.t('profilUpdate','profilUpdateRequest')" v-if="showModal" ref="AcceptDenyModal" @hideBsModal="hideAcceptDenyModal" :value="JSON.parse(JSON.stringify(modalData))" :setLoading="setLoading" ></accept-deny-update>
-    <div  class="form-underline flex-fill ">
-      <div class="form-underline-titel">{{$p.t('ui','anzeigen')}} </div>
-      
-      <select class="mb-4 form-select" v-model="filter" @change="updateData" aria-label="Profil updates display selection">
-        <option :selected="true" :value="profilUpdateStates['Pending']" >{{$p.t('profilUpdate','pendingRequests')}}</option>
-        <option :value="profilUpdateStates['Accepted']">{{$p.t('profilUpdate','acceptedRequests')}}</option>
-        <option :value="profilUpdateStates['Rejected']">{{$p.t('profilUpdate','rejectedRequests')}}</option>
-        <option :value="'Alle'">{{$p.t('profilUpdate','allRequests')}}</option>
-      </select>
-  
-    </div>
-    <loading ref="loadingModalRef" :timeout="0"></loading>
-    
-    <core-filter-cmpt v-if="profilUpdateStates && categoryLoaded" :title="$p.t('profilUpdate','profilUpdateRequests')"  ref="UpdatesTable" :tabulatorEvents="profilUpdateEvents" :tabulator-options="profilUpdateOptions" tableOnly :sideMenu="false" />
+		<accept-deny-update :title="$p.t('profilUpdate','profilUpdateRequest')" v-if="showModal" ref="AcceptDenyModal" @hideBsModal="hideAcceptDenyModal" :value="JSON.parse(JSON.stringify(modalData))" :setLoading="setLoading" ></accept-deny-update>
+		<h3>{{$p.t('profilUpdate', 'profilUpdateRequests')}}</h3>
+		<loading ref="loadingModalRef" :timeout="0"></loading>
 
-    </div>`,
+		<core-filter-cmpt
+			v-if="profilUpdateStates && categoryLoaded"
+			ref="UpdatesTable"
+			:tabulatorEvents="profilUpdateEvents"
+			:tabulator-options="profilUpdateOptions"
+			table-only
+			:sideMenu="false">
+				  <template #actions>
+					<div style="width: 94vw;" class="d-flex justify-content-end">
+						<div>
+						  <select class="mb-4 form-select" v-model="filter" @change="updateData" aria-label="Profil updates display selection">
+							<option :selected="true" :value="profilUpdateStates['Pending']" >{{$p.t('profilUpdate','pendingRequests')}}</option>
+							<option :value="profilUpdateStates['Accepted']">{{$p.t('profilUpdate','acceptedRequests')}}</option>
+							<option :value="profilUpdateStates['Rejected']">{{$p.t('profilUpdate','rejectedRequests')}}</option>
+							<option :value="'Alle'">{{$p.t('profilUpdate','allRequests')}}</option>
+						  </select>
+						 </div>
+					</div>
+				</template>
+		</core-filter-cmpt>
+
+	</div>`,
 };

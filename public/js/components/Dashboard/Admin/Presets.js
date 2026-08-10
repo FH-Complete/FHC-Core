@@ -1,6 +1,7 @@
 import DashboardSection from "../Section.js";
 import DashboardWidgetPicker from "../Widget/Picker.js";
 import ObjectUtils from "../../../helpers/ObjectUtils.js";
+import ApiDashboardPreset from "../../../api/factory/dashboard/preset.js";
 
 export default {
 	components: {
@@ -11,23 +12,62 @@ export default {
 		dashboard: String,
 		widgets: Array
 	},
-	data: () => ({
-		funktionen: {},
-		sections: [],
-		tmpLoading: ''
-	}),
+	data() {
+		return {
+			funktionen: {},
+			sections: [],
+			selectedFunktionen: [],
+			abortController: null
+		};
+	},
 	computed: {
-		apiurl() {
-			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/dashboard';
-		},
 		pickerWidgets() {
 			return this.widgets.filter(widget => widget.allowed);
+		},
+		sizeLimits() {
+			return Object.fromEntries(this.widgets.map(({ setup, widget_id: type }) => {
+				const result = {}; // work on a copy
+				if (setup.height === undefined)
+					result.height = { min: 1, max: undefined };
+				else if (Number.isInteger(setup.height))
+					result.height = { min: setup.height, max: setup.height };
+				else
+					result.height = {
+						min: setup.height.min ?? 1,
+						max: setup.height.max
+					};
+
+				if (setup.width === undefined)
+					result.width = { min: 1, max: undefined };
+				else if (Number.isInteger(setup.width))
+					result.width = { min: setup.width, max: setup.width };
+				else
+					result.width = {
+						min: setup.width.min ?? 1,
+						max: setup.width.max
+					};
+
+				return [type, result];
+			}));
+		}
+	},
+	watch: {
+		dashboard() {
+			this.loadSections();
+			this.loadFunktionen();
 		}
 	},
 	methods: {
-		widgetAdd(section_name, widget) {
+		widgetAdd(widget, section_name) {
 			this.$refs.widgetpicker.getWidget().then(widget_id => {
 				widget.widget = widget_id;
+				// NOTE(chris): min size
+				widget.place = Object.fromEntries(Object.entries(widget.place).map(([key, value]) => {
+					value.w = this.sizeLimits[widget_id].width.min;
+					value.h = this.sizeLimits[widget_id].height.min;
+					return [key, value];
+				}));
+				widget.id = 'loading_' + String((new Date()).valueOf());
 				delete widget.custom;
 				widget.preset = 1;
 				let loading = {...widget};
@@ -36,136 +76,179 @@ export default {
 					if (section.name == section_name)
 						section.widgets.push(loading);
 				});
-				
-				axios.post(this.apiurl + '/Config/addWidgetsToPreset', {
-					db: this.dashboard,
+
+				delete widget.id;
+
+				const params = {
+					dashboard: this.dashboard,
 					funktion_kurzbz: section_name,
-					widgets: [widget]
-				}).then(result => {
-					let newId = Object.keys(result.data.retval.data[section_name].widgets).pop();
-					widget.id = newId;
-					widget.custom = 1;
-					this.sections.forEach(section => {
-						if (section.name == section_name) {
-							section.widgets.splice(section.widgets.indexOf(loading),1);
-							section.widgets.push(widget);
-						}
-					});
-				}).catch(error => {
-					console.error('ERROR: ', error);
-					alert('ERROR: ' + error.response.data.retval);
-				});
-			}).catch(() => {});
-		},
-		widgetUpdate(section_name, payload) {
-			payload = payload[section_name];
-			for (var k in payload) {
-				for (var i in this.sections) {
-					if (this.sections[i].name == section_name) {
-						for (var wid in this.sections[i].widgets) {
-							if (this.sections[i].widgets[wid].id == k) {
-								payload[k] = ObjectUtils.mergeDeep(this.sections[i].widgets[wid], payload[k]);
-								// NOTE(chris): remove internal props
-								for (var prop in {_x:1,_y:1,_w:1,_h:1,index:1,id:1})
-									if (payload[k][prop])
-										delete payload[k][prop];
-								break;
+					widget
+				};
+
+				return this.$api
+					.call(ApiDashboardPreset.addWidget(params))
+					.then(result => {
+						let newId = result.data;
+						widget.id = newId;
+						widget.custom = 1;
+						this.sections.forEach(section => {
+							if (section.name == section_name) {
+								section.widgets.splice(section.widgets.indexOf(loading),1);
+								section.widgets.push(widget);
 							}
-						}
+						});
+						this.funktionen.forEach(funktion => {
+							if(funktion.funktion_kurzbz === section_name && funktion.has_preset < 1) {
+								funktion.has_preset = 1;
+							}
+						});
+					})
+					.catch(this.$fhcAlert.handleSystemError);
+			})
+			.catch(() => {});
+		},
+		widgetUpdate(payload, section_name) {
+			for (var k in payload) {
+				const section = this.sections.find(section => section.name == section_name);
+				for (var wid in section.widgets) {
+					if (section.widgets[wid].id == k) {
+						const copy = ObjectUtils.mergeDeep(section.widgets[wid], payload[k]);
+						if (payload[k].config)
+							copy.config = payload[k].config;
+						payload[k] = copy;
+						// NOTE(chris): remove internal props
+						for (var prop of ['_x', '_y', '_w', '_h', 'index', 'id', 'custom'])
+							if (payload[k][prop])
+								delete payload[k][prop];
 						break;
 					}
 				}
+				if (payload[k].place) {
+					Object.values(payload[k].place).forEach(place => {
+						if (place.pinned === false)
+							delete place.pinned;
+					});
+				}
 				payload[k].widgetid = k;
-				delete payload[k].custom;
 			}
-			axios.post(this.apiurl + '/Config/addWidgetsToPreset', {
-				db: this.dashboard,
-				funktion_kurzbz: section_name,
-				widgets: payload
-			}).then(() => {
-				this.sections.forEach(section => {
-					if (section.name == section_name) {
-						section.widgets.forEach((widget, i) => {
-							if (payload[widget.id]) {
-								payload[widget.id].id = widget.id;
-								payload[widget.id].index = widget.index;
-								section.widgets[i] = payload[widget.id];
-								section.widgets[i].custom = 1;
-							}
-						});
-					}
-				});
-			}).catch(error => {
-				// TODO(chris): revert placement on failure
-				console.error('ERROR: ', error);
-				alert('ERROR: ' + error.response.data.retval);
-			});
+			this.$api
+				.call(Object.entries(payload).map(([key, widget]) => [
+					key,
+					ApiDashboardPreset.addWidget({
+						dashboard: this.dashboard,
+						funktion_kurzbz: section_name,
+						widget
+					})
+				]))
+				.then(result => {
+					this.sections.forEach(section => {
+						if (section.name == section_name) {
+							section.widgets.forEach((widget, i) => {
+								if (payload[widget.id]) {
+									payload[widget.id].id = widget.id;
+									payload[widget.id].index = widget.index;
+									section.widgets[i] = payload[widget.id];
+									section.widgets[i].custom = 1;
+								}
+							});
+						}
+					});
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
-		widgetRemove(section_name, id) {
-			axios.post(this.apiurl + '/Config/removeWidgetFromPreset', {
+		widgetRemove(id, section_name) {
+			const params = {
 				db: this.dashboard,
 				funktion_kurzbz: section_name,
 				widgetid: id
-			}).then(() => {
-				this.sections.forEach(section => {
-					if (section.name == section_name)
-						section.widgets = section.widgets.filter(widget => widget.id != id);
-				});
-			}).catch(error => {
-				console.error('ERROR: ', error);
-				alert('ERROR: ' + error.response.data.retval);
-			});
-		},
-		loadSections(evt) {
-			let funktionen = Array.from(evt.target.querySelectorAll("option:checked"),e=>e.value);
-			this.sections = [];
-			this.tmpLoading = funktionen.join('###');
-			axios.get(this.apiurl + '/Config/presetBatch', {params: {
-				db: this.dashboard,
-				funktionen
-			}}).then(res => {
-				if (this.tmpLoading !== funktionen.join('###'))
-					return; // NOTE(chris): prevent race condition
-				for (var section in res.data.retval) {
-					let widgets = [];
-					for (var wid in res.data.retval[section]) {
-						res.data.retval[section][wid].id = wid;
-						res.data.retval[section][wid].custom = 1;
-						widgets.push(res.data.retval[section][wid]);
-					}
-					this.sections.push({
-						name: section,
-						widgets
+			};
+			return this.$api
+				.call(ApiDashboardPreset.removeWidget(params))
+				.then(result => {
+					this.sections.forEach(section => {
+						if (section.name == section_name)
+							section.widgets = section.widgets.filter(widget => widget.id != id);
 					});
-				}
-			}).catch(err => console.error('ERROR:', err));
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		loadSections() {
+			const params = {
+				db: this.dashboard,
+				funktionen: this.selectedFunktionen
+			};
+
+			if (this.abortController)
+				this.abortController.abort();
+			this.abortController = new AbortController();
+			const signal = this.abortController.signal;
+
+			this.sections = [];
+			
+			return this.$api
+				.call(ApiDashboardPreset.getBatch(params), { signal })
+				.then(result => {
+					for (var section in result.data) {
+						let widgets = [];
+						for (var wid in result.data[section]) {
+							result.data[section][wid].id = wid;
+							result.data[section][wid].custom = 1;
+							widgets.push(result.data[section][wid]);
+						}
+						this.sections.push({
+							name: section,
+							widgets
+						});
+					}
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		loadFunktionen() {
+			this.$api
+				.call(ApiDashboardPreset.list(this.dashboard))
+				.then(result => {
+					this.funktionen = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
 	created() {
-		axios.get(this.apiurl + '/Config/funktionen').then(res => {
-			this.funktionen = {general: 'GENERAL'};
-			res.data.retval.forEach(funktion => {
-				this.funktionen[funktion.funktion_kurzbz] = funktion.beschreibung;
-			});
-		}).catch(err => console.error('ERROR:', err));
+		this.loadFunktionen();
 	},
-	watch: {
-		dashboard() {
-			// TODO(chris): this should be done without a watcher
-			this.loadSections({target:this.$refs.funktionenList});
-		}
-	},
-	template: `<div class="dashboard-admin-presets">
+	template: /* html */`
+	<div class="dashboard-admin-presets">
 		<div class="row">
 			<div class="col-3">
-				<select ref="funktionenList" style="height:30em" class="form-control" multiple @input="loadSections">
-					<option v-for="name,id in funktionen" :key="id" :value="id">{{ name }}</option>
+				<select
+					v-model="selectedFunktionen"
+					class="form-control"
+					style="height:30em"
+					multiple
+					@change="loadSections"
+				>
+					<option
+						v-for="funktion in funktionen"
+						:key="funktion.funktion_kurzbz"
+						:value="funktion.funktion_kurzbz"
+						:class="(funktion.has_preset > 0) ? 'fw-bold' : ''"
+					>{{ funktion.beschreibung }}</option>
 				</select>
 			</div>
 			<div class="col-9">
-				<dashboard-section v-for="section in sections" :key="section.name" :name="section.name" :widgets="section.widgets" @widget-add="widgetAdd" @widget-update="widgetUpdate" @widget-remove="widgetRemove"></dashboard-section>
+				<dashboard-section
+					v-for="section in sections"
+					:key="section.name"
+					:name="section.name"
+					:widgets="section.widgets"
+					@widget-add="widgetAdd"
+					@widget-update="widgetUpdate"
+					@widget-remove="widgetRemove"
+				></dashboard-section>
 			</div>
 		</div>
-		<dashboard-widget-picker ref="widgetpicker" :widgets="pickerWidgets"></dashboard-widget-picker>
+		<dashboard-widget-picker
+			ref="widgetpicker"
+			:widgets="pickerWidgets"
+		></dashboard-widget-picker>
 	</div>`
 }

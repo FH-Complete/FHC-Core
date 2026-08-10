@@ -2,12 +2,25 @@ import {CoreFilterCmpt} from "../../filter/Filter.js";
 import BsModal from "../../Bootstrap/Modal.js";
 import DetailsForm from "../Details/Form.js";
 import CoreTag from '../../Tag/Tag.js';
-import { tagHeaderFilter } from '../../../../js/tabulator/filters/extendedHeaderFilter.js';
-import { extendedHeaderFilter } from "../../../../js/tabulator/filters/extendedHeaderFilter.js";
+import {
+  buildTagHeaderFilterExpression,
+  buildTagOptionsFromRows,
+  customTagFilter,
+  setTagHeaderFilterValue,
+  tagHeaderFilter,
+  extendedHeaderFilter,
+  syncTagHeaderFilterOptions,
+  syncSelectedTagOptionsWithHeaderFilters
+} from "../../../../js/tabulator/filters/extendedHeaderFilter.js";
+import { tagFormatter } from "../../../../js/tabulator/formatter/tags.js";
+import { addTagInTable, deleteTagInTable, updateTagInTable } from "../../../../js/helpers/TagHelper.js";
 
 import ApiLv from "../../../api/lehrveranstaltung.js";
 import ApiTag from "../../../api/lehrveranstaltung/tag.js";
 import ApiLehreinheit from "../../../api/lehrveranstaltung/lehreinheit.js";
+import ApiTreemenu from "../../../api/factory/treemenu.js";
+
+import LvvColumns from '../../../../../index.ci.php/js/tabulatorcolumns/lvverwaltung';
 
 export default {
 	name: "LVVerwaltungTable",
@@ -52,6 +65,7 @@ export default {
 				if (this.$refs.table && this.$refs.table.tabulator)
 				{
 					this.expanded = [];
+					this.currentTreeLevel = 0;
 					this.reload();
 				}
 			},
@@ -63,7 +77,20 @@ export default {
 				this.lv_info_default.studiensemester_kurzbz = newVal
 				this.lv_info = false;
 			}
-		}
+		},
+		"tagFilterState.selectedOptions": {
+			handler() {
+				const selectedOptions = this.tagFilterState.selectedOptions;
+				const combinedFilterStatement =
+				buildTagHeaderFilterExpression(selectedOptions);
+
+				setTagHeaderFilterValue(
+					combinedFilterStatement,
+					this.$refs.table.tabulator
+				);
+			},
+			deep: true,
+		},
 	},
 	data() {
 		return {
@@ -94,8 +121,37 @@ export default {
 					handler: (data) => {
 						this.getExpandedRows()
 					}
-				}
+				},
+				{
+					event: "dataLoaded",
+					handler: (data) => {
+						syncTagHeaderFilterOptions(
+							Array.isArray(data) ? data : [],
+							this.tagFilterState.initialOptions,
+							this.tagFilterState.selectedOptions,
+						);
+					},
+				},
+				{
+					event: "dataFiltered",
+					handler: (filters, rows) => {
+						syncSelectedTagOptionsWithHeaderFilters(
+							filters,
+							this.tagFilterState.selectedOptions,
+							this.tagsEnabled,
+						);
+					},
+				},
+				{
+					event: "columnWidth",
+					handler: (column) => {
+						if (column.getField() !== "tags") return;
 
+						column.getCells().forEach((cell) => {
+						cell.getElement().firstElementChild?.fitTags?.();
+						});
+					},
+				},
 			],
 			formData: {},
 			lv_info: false,
@@ -109,7 +165,20 @@ export default {
 				raumtypalternativ: this.lehreinheitRaumtypAlternativeDefault,
 				lehrfach_id: ''
 
-			}
+			},
+			tagFilterState: {
+				initialOptions: [],
+				selectedOptions: [],
+			},
+			tagFilterLabels: {
+				tag: "Tag",
+				clear: "Clear",
+				connectors: {
+				AND: "AND",
+				OR: "OR",
+				NOT: "NOT",
+				},
+			},
 		}
 	},
 	computed: {
@@ -120,7 +189,7 @@ export default {
 				ajaxRequestFunc: async (url, config, params) => {
 					let realUrl = this.buildApiUrl();
 					if (realUrl)
-						return this.$api.call(ApiLv.getTable(this.buildApiUrl()));
+						return this.$api.call(this.buildApiUrl());
 				},
 				ajaxResponse: (url, params, response) => { return response?.data || [] },
 				dataTree: true,
@@ -138,7 +207,16 @@ export default {
 					headerFilterFunc: extendedHeaderFilter,
 				},
 				layout: 'fitDataStretch',
-				persistenceID: 'lehrveranstaltungen_2025_07_31_v1',
+				height: '100%',
+				persistenceID: 'lehrveranstaltungen_2026_07_15_v1',
+				persistence: {
+					sort: true,
+					columns: ["width", "visible"],
+					filter: false,
+					headerFilter: false,
+					group: false,
+					page: false,
+				},
 				selectableRowsRangeMode: 'click',
 				selectableRows: true,
 				rowContextMenu: (component, e) => {
@@ -188,156 +266,35 @@ export default {
 					];
 				},
 
-				columns: [
-					{
-						title: this.$p.t('lehre', 'kurzbz'),
-						field: "lv_kurzbz",
-						headerFilterFuncParams: {field: 'lv_kurzbz'},
-						headerFilter: true,
-						formatter: (cell, formatterParams) => {
-							const rowData = cell.getRow().getData();
-							const iconKey = (rowData.lehrtyp_kurzbz || '').toLowerCase();
-							const lvkurzbz = (cell.getValue()).toUpperCase();
-
-							const parentspan = document.createElement('span');
-							const span = document.createElement('span');
-
-
-							span.classList.add('lv_table_icon', `icon-${iconKey}`);
-							span.title = iconKey || 'LV-Teil';
-
-							parentspan.appendChild(span);
-							parentspan.appendChild(document.createTextNode(` ${lvkurzbz}`));
-
-							return parentspan
-						},
-
-						cellClick: (e, cell) => {
-							cell.getRow().treeToggle();
-						}
-					},
-					{
-						title: 'Tags',
-						field: 'tags',
-						tooltip: false,
-						headerFilter: "input",
-						headerFilterFunc: tagHeaderFilter,
-						headerFilterFuncParams: {field: 'tags'},
-						formatter: (cell) => {
-							let tags = cell.getValue();
-							if (!tags) return;
-
-							let container = document.createElement('div');
-							container.className = "d-flex gap-1";
-
-							let parsedTags = JSON.parse(tags);
-							let maxVisibleTags = 2;
-
-							const rowData = cell.getRow().getData();
-							if (rowData._tagExpanded === undefined) {
-								rowData._tagExpanded = false;
-							}
-
-							const renderTags = () => {
-								container.innerHTML = '';
-								parsedTags = parsedTags.filter(item => item !== null);
-
-								parsedTags.sort((a, b) => {
-									let adone = a.done ? 1 : 0;
-									let bbone = b.done ? 1 : 0;
-
-									if (adone !== bbone)
-									{
-										return adone - bbone;
-									}
-									return b.id - a.id;
-								});
-								const tagsToShow = rowData._tagExpanded ? parsedTags : parsedTags.slice(0, maxVisibleTags);
-
-								tagsToShow.forEach(tag => {
-									if (!tag) return;
-									let tagElement = document.createElement('span');
-									tagElement.innerText = tag.beschreibung;
-									tagElement.title = tag.notiz;
-									tagElement.className = "tag " + tag.style;
-									if (tag.done) tagElement.className += " tag_done";
-
-									tagElement.addEventListener('click', (event) => {
-										event.stopPropagation();
-										event.preventDefault();
-										this.$refs.tagComponent.editTag(tag.id);
-									});
-
-									container.appendChild(tagElement);
-								});
-
-								if (parsedTags.length > maxVisibleTags) {
-									let toggle = document.createElement('button');
-									toggle.innerText = (rowData._tagExpanded ? '- ' : '+ ') + (parsedTags.length - maxVisibleTags);
-									toggle.className = "display_all";
-									toggle.title = rowData._tagExpanded ? "Tags ausblenden" : "Tags einblenden";
-
-									toggle.addEventListener('click', () => {
-										rowData._tagExpanded = !rowData._tagExpanded;
-										renderTags();
-									});
-
-									container.appendChild(toggle);
-								}
-							};
-
-							renderTags();
-							return container;
-						},
-						width: 150,
-					},
-					{
-						title: this.$p.t('lehre', 'lehrveranstaltung_id'),
-						field: "lehrveranstaltung_id",
-						headerFilterFuncParams: {field: 'lehrveranstaltung_id'},
-						headerFilter: true,
-						visible: false
-					},
-					{title: this.$p.t('ui', 'bezeichnung'), field: "lv_bezeichnung", headerFilter: true, headerFilterFuncParams: {field: 'lv_bezeichnung'}},
-					{title: this.$p.t('lehre', 'bezeichnungeng'), field: "lv_bezeichnung_english", headerFilter: true, headerFilterFuncParams: {field: 'lv_bezeichnung_english'}, visible: false},
-					{
-						title: this.$p.t('lehre', 'studiengangskennzahlLehre'),
-						field: "lv_studiengang_kz",
-						headerFilter: true,
-						headerFilterFuncParams: {field: 'lv_studiengang_kz'},
-						visible: false
-					},
-					{title: this.$p.t('lehre', 'studiengang'), field: "studiengang", headerFilter: true, headerFilterFuncParams: {field: 'studiengang'}, visible: false},
-					{title: this.$p.t('lehre', 'semester'), field: "semester", headerFilter: true, headerFilterFuncParams: {field: 'semester'}},
-					{title: this.$p.t('global', 'sprache'), field: "sprache", headerFilter: true, headerFilterFuncParams: {field: 'sprache'}, visible: false},
-					{title: this.$p.t('lehre', 'ects'), field: "lv_ects", headerFilter: true, headerFilterFuncParams: {field: 'lv_ects'}, visible: false},
-					{title: this.$p.t('lehre', 'semesterstunden'), field: "semesterstunden", headerFilter: true, headerFilterFuncParams: {field: 'semesterstunden'}, visible: false},
-					{title: this.$p.t('global', 'anmerkung'), field: "anmerkung", headerFilter: true, headerFilterFuncParams: {field: 'anmerkung'}, visible: false},
-					{title: this.$p.t('lehre', 'lehre'), field: "lehre", headerFilter: true, headerFilterFuncParams: {field: 'lehre'}, formatter: (cell) => cell.getValue() ? this.toUpperCase(this.$p.t('ui', 'ja')) : this.toUpperCase(this.$p.t('ui', 'nein')), visible: false},
-					{title: this.$p.t('person', 'aktiv'), field: "aktiv", headerFilter: true, headerFilterFuncParams: {field: 'aktiv'}, formatter: (cell) => cell.getValue() ? this.toUpperCase(this.$p.t('ui', 'ja')) : this.toUpperCase(this.$p.t('ui', 'nein')), visible: false},
-					{title: this.$p.t('lehre', 'organisationsform'), field: "orgform_kurzbz", headerFilter: true, headerFilterFuncParams: {field: 'orgform_kurzbz'}},
-					{title: this.$p.t('ui', 'studienplan_id'), field: "studienplan_id", headerFilter: true, headerFilterFuncParams: {field: 'studienplan_id'}, visible: false},
-					{title: this.$p.t('lehre', 'studienplan'), field: "studienplan_bezeichnung", headerFilter: true, headerFilterFuncParams: {field: 'studienplan_bezeichnung'}, visible: false},
-					{title: this.$p.t('lehre', 'lehrtyp'), field: "lehrtyp_kurzbz", headerFilter: true, headerFilterFuncParams: {field: 'lehrtyp_kurzbz'}, visible: false},
-					{title: this.$p.t('lehre', 'lehrform'), field: "lehrform_kurzbz", headerFilter: true, headerFilterFuncParams: {field: 'lehrform_kurzbz'}},
-					{title: this.$p.t('lehre', 'leplanstunden'), field: "le_planstunden", headerFilter: true, headerFilterFuncParams: {field: 'le_planstunden'}, visible: false},
-					{title: this.$p.t('lehre', 'lehreinheit_id'), field: "lehreinheit_id", headerFilter: true, headerFilterFuncParams: {field: 'lehreinheit_id'}, visible: false},
-					{title: this.$p.t('lehre', 'studiensemester'), field: "studiensemester_kurzbz", headerFilter: true, headerFilterFuncParams: {field: 'studiensemester_kurzbz'}, visible: false},
-					{title: this.$p.t('lehre', 'unr'), field: "unr", headerFilter: true, headerFilterFuncParams: {field: 'unr'}, visible: false},
-					{title: this.$p.t('lehre', 'organisationseinheit'), field: "fachbereich", headerFilter: true, headerFilterFuncParams: {field: 'fachbereich'}, visible: false},
-					{title: this.$p.t('lehre', 'stundenblockung'), field: "stundenblockung", headerFilter: true, headerFilterFuncParams: {field: 'stundenblockung'}, visible: false},
-					{title: this.$p.t('lehre', 'wochenrhythmus'), field: "wochenrythmus", headerFilter: true, headerFilterFuncParams: {field: 'wochenrythmus'}, visible: false},
-					{title: this.$p.t('lehre', 'startkw'), field: "start_kw", headerFilter: true, headerFilterFuncParams: {field: 'startkw'}, visible: false},
-					{title: this.$p.t('lehre', 'raumtyp'), field: "raumtyp", headerFilter: true, headerFilterFuncParams: {field: 'raumtyp'}, visible: false},
-					{title: this.$p.t('lehre', 'raumtypalternativ'), field: "raumtypalternativ", headerFilter: true, headerFilterFuncParams: {field: 'raumtypalternativ'}, visible: false},
-					{title: this.$p.t('lehre', 'gruppen'), field: "gruppen", headerFilter: true, headerFilterFuncParams: {field: 'gruppen'}},
-					{title: this.$p.t('lehre', 'lehrende'), field: "lektoren", headerFilter: true, headerFilterFuncParams: {field: ['lektoren', 'vorname', 'nachname']}},
-				],
+				columns: LvvColumns,
+				locale: true
 			}
 
 		}
 	},
-
+	created() {
+		Tabulator.extendModule("format", "formatters", {
+			tagHeaderFilter,
+			tagFormatter: (cell, params, onRendered) => tagFormatter(cell, this.$refs.tagComponent, onRendered),
+			ja_nein: cell => cell.getValue()
+				? this.toUpperCase(this.$p.t('ui', 'ja'))
+				: this.toUpperCase(this.$p.t('ui', 'nein'))
+		});
+		LvvColumns.forEach(col => {
+			if (col.headerFilter == 'input' && col.headerFilterFunc == 'tagHeaderFilter') {
+				col.headerFilter = customTagFilter;
+				col.headerFilterParams = {
+					listOnEmpty: true,
+					autocomplete: true,
+					sort: "asc",
+					initialOptions: this.tagFilterState.initialOptions,
+					selectedOptions: this.tagFilterState.selectedOptions,
+					labels: this.tagFilterLabels,
+				};
+				col.headerSort = false;
+			}
+		});
+	},
 	mounted() {
 		if (this.shouldAutoLoad())
 		{
@@ -358,7 +315,8 @@ export default {
 
 			if (this.shouldAutoLoad)
 			{
-				this.$refs.table.reloadTable();
+				if (this.$refs.table.tabulator)
+					this.$refs.table.reloadTable();
 			}
 		},
 		rowSelectionChanged(data) {
@@ -367,14 +325,13 @@ export default {
 
 			if (data[0]?.lehreinheit_id !== undefined && this.selectedColumnValues.length === 1)
 			{
-				this.$emit('update:selected', [data[0]]);
 				this.lv_info = false
 			}
 			else if (data[0]?.lehrveranstaltung_id)
 			{
-				this.$emit('update:selected', {});
 				this.getLVInfos(data[0]);
 			}
+			this.$emit('update:selected', data);
 		},
 		getLVInfos(data)
 		{
@@ -398,17 +355,20 @@ export default {
 		},
 		buildApiUrl()
 		{
-			if (this.filter.activeFilter === 'employee' && this.filter.emp)
-			{
-				const { emp, stg, studiensemester_kurzbz } = this.filter;
-				return this.$api.getUri(ApiLv.getByEmp(studiensemester_kurzbz, emp, stg));
+			if (!['emp', 'treemenu'].includes(this.$route.name))
+				return null;
+
+			let url = 'stdsem/' + this.$route.params.stdsem;
+			
+			if (this.$route.params.emp) {
+				url += '/emp/' + this.$route.params.emp;
 			}
 
-			if (this.filter.activeFilter === 'verband' && this.filter.stg)
-			{
-				const { stg, semester, studiensemester_kurzbz } = this.filter;
-				return this.$api.getUri(ApiLv.getByStg(studiensemester_kurzbz, stg, semester));
+			if (this.$route.params.treemenu) {
+				url += '/' + this.$route.params.treemenu.join('/');
 			}
+			
+			return ApiTreemenu.data('lvverwaltung', url);
 		},
 		resetEmployeeFilter()
 		{
@@ -444,104 +404,31 @@ export default {
 		},
 		addedTag(addedTag)
 		{
-			const table = this.$refs.table.tabulator;
-
-			this.selectedRows.forEach(row =>
-			{
-				if (Array.isArray(addedTag.response))
-				{
-					addedTag.response.forEach(tag => {
-						const targetRow = this.allRows.find(row => row.getData().lehreinheit_id === tag.lehreinheit_id);
-						if (targetRow)
-						{
-							const rowData = targetRow.getData();
-							let tags = [];
-							try {
-								tags = JSON.parse(rowData.tags || '[]');
-							} catch (e) {}
-
-							const tagExists = tags.some((t) => t.id === tag.id);
-							if (!tagExists)
-							{
-								addedTag.id = tag.id;
-								tags.unshift({ ...addedTag });
-								targetRow.update({ tags: JSON.stringify(tags) });
-								targetRow.reformat();
-							}
-						}
-					});
-				}
-			});
+			addTagInTable(addedTag, this.allRows, 'lehreinheit_id');
+			syncTagHeaderFilterOptions(
+				this.$refs.table?.tabulator?.getData() || [],
+				this.tagFilterState.initialOptions,
+				this.tagFilterState.selectedOptions,
+			);
 		},
-		deletedTag(deletedTag) {
-			const targetRow = this.allRows.find(row => {
-				const rowData = row.getData();
-
-				let tags = [];
-				try {
-					tags = JSON.parse(rowData.tags || '[]');
-				} catch (e) {}
-
-				return tags.some(tag => tag.id === deletedTag);
-			});
-
-			if (targetRow) {
-				const rowData = targetRow.getData();
-				let tags = [];
-
-				try {
-					tags = JSON.parse(rowData.tags || '[]');
-				} catch (e) {}
-
-				const filteredTags = tags.filter(t => t.id !== deletedTag);
-				const updatedTags = JSON.stringify(filteredTags);
-
-				if (updatedTags !== rowData.tags) {
-					targetRow.update({
-						tags: updatedTags
-					});
-
-					targetRow.reformat();
-				}
-			}
+		deletedTag(deletedTag)
+		{
+			deleteTagInTable(deletedTag, this.allRows);
+			syncTagHeaderFilterOptions(
+				this.$refs.table?.tabulator?.getData() || [],
+				this.tagFilterState.initialOptions,
+				this.tagFilterState.selectedOptions,
+			);
 		},
 
-		updatedTag(updatedTag) {
-			const targetRow = this.allRows.find(row => {
-				const rowData = row.getData();
-				let tags = [];
-
-				try {
-					tags = JSON.parse(rowData.tags || '[]');
-				} catch (e) {}
-
-				return tags.some(t => t?.id === updatedTag.id);
-			});
-
-			if (targetRow)
-			{
-				const rowData = targetRow.getData();
-				let tags = [];
-				try {
-					tags = JSON.parse(rowData.tags || '[]');
-				} catch (e) {}
-
-				let changed = false;
-
-				const tagIndex = tags.findIndex(tag => tag?.id === updatedTag.id);
-				if (tagIndex !== -1) {
-					tags[tagIndex] = { ...updatedTag };
-					changed = true;
-				}
-
-				if (changed)
-				{
-					targetRow.update({
-						tags: JSON.stringify(tags),
-					});
-					targetRow.reformat();
-				}
-			}
+		updatedTag(updatedTag)
+		{
+			updateTagInTable(updatedTag, this.allRows);
+			syncTagHeaderFilterOptions(
+				this.$refs.table?.tabulator?.getData() || [],
+				this.tagFilterState.initialOptions,
+				this.tagFilterState.selectedOptions,
+			);
 		},
 		async copyLehreinheit(row, art)
 		{
@@ -669,47 +556,50 @@ export default {
 		},
 	},
 	template: `
-	<core-filter-cmpt
-		ref="table"
-		:tabulator-options="tabulatorOptions"
-		:tabulator-events="tabulatorEvents"
-		table-only
-		:side-menu="false"
-		:reload=true
-		new-btn-label="LV-Teil hinzufügen"
-		new-btn-show
-		:new-btn-disabled="!lv_info"
-		@click:new="showLehreinheitModal">
-		
-		<template #actions>
-			<button @click="expandTree" class="btn btn-outline-secondary" type="button" :title="$p.t('lehre', 'aufklappen')"><i class="fa-solid fa-maximize"></i></button>
-			<button @click="resetTree" class="btn btn-outline-secondary" type="button" :title="$p.t('lehre', 'zuklappen')"><i id="togglegroup" class="fa-solid fa-minimize"></i></button>
-			<core-tag ref="tagComponent"
-				:endpoint="tagEndpoint"
-				:values="selectedColumnValues"
-				@added="addedTag"
-				@deleted="deletedTag"
-				@updated="updatedTag"
-				zuordnung_typ="lehreinheit_id"
-			></core-tag>
-		</template>
-		<template #search>
-			<slot name="filterzuruecksetzen"></slot>
-		</template>
-	</core-filter-cmpt>
-	<bs-modal ref="lehreinheitModal" dialogClass="modal-xxl">
-		<template #title>
-			<p class="fw-bold mt-3">{{$p.t('lehre', 'newlehreinheit')}}</p>
-		</template>
-			
-		<template v-if="lv_info">
-			<details-form :data="lv_info"/>
-		</template>
-			
-		<template #footer>
-			<button type="button" class="btn btn-primary" @click="addNewLehreinheit">{{$p.t('ui', 'speichern')}}</button>
-		</template>
-	</bs-modal>
-
+	<div class="lv-list h-100 pt-3">
+		<div class="tabulator-container d-flex flex-column h-100">
+			<core-filter-cmpt
+				ref="table"
+				:tabulator-options="tabulatorOptions"
+				:tabulator-events="tabulatorEvents"
+				table-only
+				:side-menu="false"
+				:reload=true
+				new-btn-label="LV-Teil hinzufügen"
+				new-btn-show
+				:new-btn-disabled="!lv_info"
+				@click:new="showLehreinheitModal">
+				
+				<template #actions>
+					<button @click="expandTree" class="btn btn-outline-secondary" type="button" :title="$p.t('lehre', 'aufklappen')"><i class="fa-solid fa-maximize"></i></button>
+					<button @click="resetTree" class="btn btn-outline-secondary" type="button" :title="$p.t('lehre', 'zuklappen')"><i id="togglegroup" class="fa-solid fa-minimize"></i></button>
+					<core-tag ref="tagComponent"
+						:endpoint="tagEndpoint"
+						:values="selectedColumnValues"
+						@added="addedTag"
+						@deleted="deletedTag"
+						@updated="updatedTag"
+						zuordnung_typ="lehreinheit_id"
+					></core-tag>
+				</template>
+				<template #search>
+					<slot name="filterzuruecksetzen"></slot>
+				</template>
+			</core-filter-cmpt>
+		</div>
+		<bs-modal ref="lehreinheitModal" dialogClass="modal-xxl">
+			<template #title>
+				<p class="fw-bold mt-3">{{$p.t('lehre', 'newlehreinheit')}}</p>
+			</template>
+				
+			<template v-if="lv_info">
+				<details-form :data="lv_info"/>
+			</template>
+				
+			<template #footer>
+				<button type="button" class="btn btn-primary" @click="addNewLehreinheit">{{$p.t('ui', 'speichern')}}</button>
+			</template>
+		</bs-modal>
+	</div>
 `
 };
