@@ -166,7 +166,10 @@ export default {
 	template: /*html*/`
 	<div class="fhc-roominformation d-flex flex-column h-100">
 		<h2>{{ $p.t('rauminfo/rauminfo') }} {{ propsViewData.ort_kurzbz }}</h2>
-		<span v-if="roomAdditionalInfo?.length" v-html="roomAdditionalInfo"></span>
+		<span v-if="roomAdditionalInfo?.length">
+			Additional information:
+			<span v-html="roomAdditionalInfo"></span>
+		</span>
 		<hr>
 		<fhc-calendar 
 			ref="calendar"
