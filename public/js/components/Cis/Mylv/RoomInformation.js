@@ -2,6 +2,7 @@ import FhcCalendar from "../../Calendar/LvPlan.js";
 
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiRoomPlan from '../../../api/factory/calendar/roomPlan.js';
+import ApiRoom from '../../../api/factory/ort.js';
 
 export const DEFAULT_MODE_RAUMINFO_MOBILE = 'List';
 export const DEFAULT_MODE_RAUMINFO_DESKTOP = 'Week';
@@ -40,7 +41,8 @@ export default {
 					searchGroup: this.searchGroup,
 					searchLektor: this.searchLektor,
 				},
-			}
+			},
+			roomAdditionalInfo: null,
 		}
 	},
 	created() {
@@ -155,9 +157,16 @@ export default {
 			];
 		}
 	},
+	async created() {
+		const roomInfoResponse = await this.$api.call(
+			ApiRoom.getRoomInfo(this.$props.propsViewData.ort_kurzbz),
+		);
+		this.roomAdditionalInfo = roomInfoResponse.data.ausstattung;
+	},
 	template: /*html*/`
 	<div class="fhc-roominformation d-flex flex-column h-100">
 		<h2>{{ $p.t('rauminfo/rauminfo') }} {{ propsViewData.ort_kurzbz }}</h2>
+		<span v-if="roomAdditionalInfo?.length" v-html="roomAdditionalInfo"></span>
 		<hr>
 		<fhc-calendar 
 			ref="calendar"
