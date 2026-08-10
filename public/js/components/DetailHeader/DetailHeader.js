@@ -397,32 +397,37 @@ export default {
 
 				<div v-if="headerData.length == 1">
 					<div v-if="!isLoading" class="d-flex align-items-center gap-3">
-						<h2 class="h4">
+						<h2 class="h4 mt-2">
 							{{headerData[0].titelpre}}
 							{{headerData[0].vorname}}
 							{{headerData[0].nachname}}
 							<span v-if="headerData[0].titelpost">, </span>
 							{{headerData[0].titelpost}}
 						</h2>
-						<core-tag ref="tagComponent"
-							v-if="tagsEnabled"
-							:endpoint="tagEndpoint"
-							:values="prestudentIds"
-							@added="addedTag"
-							@deleted="deletedTag"
-							@updated="updatedTag"
-							zuordnung_typ="prestudent_id"
-						></core-tag>
-						<div
-							role="button"
-							v-if="tagsEnabled"
-							@click="rebuildPrestudentTags"
-							class="btn btn-outline btn-light mb-1"
-							:title="'Automatische Tags fuer ' + currentSemester + ' neu laden'"
-							>
-							<i class="fa-solid fa-refresh pe-1"></i>
-							<span>{{currentSemester}}</span>
+
+						<div class="d-flex border rounded align-items-center">
+							<core-tag ref="tagComponent"
+								v-if="tagsEnabled"
+								:endpoint="tagEndpoint"
+								:values="prestudentIds"
+								show-hover=true
+								@added="addedTag"
+								@deleted="deletedTag"
+								@updated="updatedTag"
+								zuordnung_typ="prestudent_id"
+							></core-tag>
+							<div
+								role="button"
+								v-if="tagsEnabled"
+								@click="rebuildPrestudentTags"
+								class="btn btn-outline btn-sm btn-hover m-1"
+								:title="$p.t('tag','rebuild_tags') +  ' ' + currentSemester"
+								>
+								<i class="fa-solid fa-refresh pe-1"></i>
+								<span>{{currentSemester}}</span>
+							</div>
 						</div>
+
 						<h6  v-if="headerData[0].unruly" class="badge" :class="'bg-unruly rounded-0'"><strong>unruly</strong></h6>
 					</div>
 					<div v-else class="d-flex align-items-center gap-3">
