@@ -75,52 +75,65 @@ $route['Abgabetool/Student'] = 'Cis/Abgabetool/Student';
 $route['Abgabetool/Student/(:any)'] = 'Cis/Abgabetool/Student/$1';
 $route['Abgabetool/Deadlines'] = 'Cis/Abgabetool/Deadlines';
 
+// Studierendenverwaltung App Routes
+$route['studvw'] = 'studentenverwaltung/index';
+$route['studvw/.*'] = 'studentenverwaltung/index';
+// Old routes
+$route['studentenverwaltung'] = 'redirect/301/studvw';
+$route['studentenverwaltung/(:any)'] = 'redirect/301/studvw/stdsem/$1';
+$route['studentenverwaltung/(:any)/(prestudent|student|person|search)/(:any)'] = 'redirect/301/studvw/stdsem/$1/$2/$3';
+$route['studentenverwaltung/(:any)/prestudent/(:any)/tab/:any'] = 'redirect/301/studvw/stdsem/$1/prestudent/$2';
+$route['studentenverwaltung/(:any)/search/(:any)/(:any)'] = 'redirect/301/studvw/stdsem/$1/search/$2/$3';
+$route['studentenverwaltung/(:any)/(:any)'] = 'redirect/301/studvw/stdsem/$1/stg/$2';
+
 // Studierendenverwaltung List Routes
-$route['api/frontend/v1/stv/[sS]tudents/inout'] = 'api/frontend/v1/stv/Students/index';
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})'] = 'api/frontend/v1/stv/Students/index';
+$route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/inout/1/incoming/1'] = 'api/frontend/v1/stv/students/getIncoming/$1';
+$route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/inout/1/outgoing/1'] = 'api/frontend/v1/stv/students/getOutgoing/$1';
+$route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/inout/1/shared_studies/1'] = 'api/frontend/v1/stv/students/getGemeinsamestudien/$1';
 
-// (studiensemester_kurzbz)/inout[/(incoming|outgoing|gemeinsamestudien)]
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/inout'] = 'api/frontend/v1/stv/Students/index';
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/inout/incoming'] = 'api/frontend/v1/stv/Students/getIncoming/$1';
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/inout/outgoing'] = 'api/frontend/v1/stv/Students/getOutgoing/$1';
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/inout/gemeinsamestudien'] = 'api/frontend/v1/stv/Students/getGemeinsamestudien/$1';
+$route['api/frontend/v1/treemenudata/stv/stdsem/:any/stg/(:any)/prestudent/1/stdsem/(:any)/:any/1/(:any)/1'] = 'api/frontend/v1/stv/students/getPrestudents/$1/$2/$3';
+$route['api/frontend/v1/treemenudata/stv/stdsem/:any/stg/(:any)/prestudent/1/stdsem/(:any)/(:any)/1'] = 'api/frontend/v1/stv/students/getPrestudents/$1/$2/$3';
+$route['api/frontend/v1/treemenudata/stv/stdsem/:any/stg/(:any)/prestudent/1/stdsem/(:any)'] = 'api/frontend/v1/stv/students/getPrestudents/$1/$2';
+$route['api/frontend/v1/treemenudata/stv/stdsem/:any/stg/(:any)/prestudent/1'] = 'api/frontend/v1/stv/students/getPrestudents/$1';
 
-// (studiengang_kz)/prestudent[/(studiensemester_kurzbz)[/(filter)[/(otherfilter)]]]
-$route['api/frontend/v1/stv/[sS]tudents/(-?[0-9]+)/prestudent'] = 'api/frontend/v1/stv/Students/getPrestudents/$1';
-$route['api/frontend/v1/stv/[sS]tudents/(-?[0-9]+)/prestudent/([WS]S[0-9]{4})'] = 'api/frontend/v1/stv/Students/getPrestudents/$1/$2';
-$route['api/frontend/v1/stv/[sS]tudents/(-?[0-9]+)/prestudent/([WS]S[0-9]{4})/(:any)'] = 'api/frontend/v1/stv/Students/getPrestudents/$1/$2/$3';
-$route['api/frontend/v1/stv/[sS]tudents/(-?[0-9]+)/prestudent/([WS]S[0-9]{4})/(:any)/(:any)'] = 'api/frontend/v1/stv/Students/getPrestudents/$1/$2/$4';
+$route['api/frontend/v1/treemenudata/stv/stdsem/:any/stg/(:any)/orgform/(:any)/prestudent/1/stdsem/(:any)/:any/1/(:any)/1'] = 'api/frontend/v1/stv/students/getPrestudentsOrgform/$1/$2/$3/$4';
+$route['api/frontend/v1/treemenudata/stv/stdsem/:any/stg/(:any)/orgform/(:any)/prestudent/1/stdsem/(:any)/(:any)/1'] = 'api/frontend/v1/stv/students/getPrestudentsOrgform/$1/$2/$3/$4';
+$route['api/frontend/v1/treemenudata/stv/stdsem/:any/stg/(:any)/orgform/(:any)/prestudent/1/stdsem/(:any)'] = 'api/frontend/v1/stv/students/getPrestudentsOrgform/$1/$2/$3';
+$route['api/frontend/v1/treemenudata/stv/stdsem/:any/stg/(:any)/orgform/(:any)/prestudent/1'] = 'api/frontend/v1/stv/students/getPrestudentsOrgform/$1/$2';
 
-// (studiengang_kz)/(orgform)/prestudent[/(studiensemester_kurzbz)[/(filter)[/(otherfilter)]]]
-$route['api/frontend/v1/stv/[sS]tudents/(-?[0-9]+)/([A-Z]{2,3})/prestudent'] = 'api/frontend/v1/stv/Students/getPrestudentsOrgform/$1/$2';
-$route['api/frontend/v1/stv/[sS]tudents/(-?[0-9]+)/([A-Z]{2,3})/prestudent/([WS]S[0-9]{4})'] = 'api/frontend/v1/stv/Students/getPrestudentsOrgform/$1/$2/$3';
-$route['api/frontend/v1/stv/[sS]tudents/(-?[0-9]+)/([A-Z]{2,3})/prestudent/([WS]S[0-9]{4})/(:any)'] = 'api/frontend/v1/stv/Students/getPrestudentsOrgform/$1/$2/$3/$4';
-$route['api/frontend/v1/stv/[sS]tudents/(-?[0-9]+)/([A-Z]{2,3})/prestudent/([WS]S[0-9]{4})/(:any)/(:any)'] = 'api/frontend/v1/stv/Students/getPrestudentsOrgform/$1/$2/$3/$5';
+$route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/stg/(:any)/semester/(:any)/verband/(:any)/group/(:any)'] = 'api/frontend/v1/stv/students/getStudents/$1/$2/$3/$4/$5';
+$route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/stg/(:any)/semester/(:any)/verband/(:any)'] = 'api/frontend/v1/stv/students/getStudents/$1/$2/$3/$4';
+$route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/stg/(:any)/semester/(:any)'] = 'api/frontend/v1/stv/students/getStudents/$1/$2/$3';
+$route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/stg/(:any)'] = 'api/frontend/v1/stv/students/getStudents/$1/$2';
 
-// (studiensemester_kurzbz)/(studiengang_kz)/(semester)/grp/(gruppe)
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/(-?[0-9]+)/(:num)/grp/(:any)'] = 'api/frontend/v1/stv/Students/getStudentsSpezialgruppe/$1/$2/$3/$4';
+$route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/stg/(:any)/orgform/(:any)/semester/(:any)/verband/(:any)/group/(:any)'] = 'api/frontend/v1/stv/students/getStudentsOrgform/$1/$2/$3/$4/$5/$6';
+$route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/stg/(:any)/orgform/(:any)/semester/(:any)/verband/(:any)'] = 'api/frontend/v1/stv/students/getStudentsOrgform/$1/$2/$3/$4/$5';
+$route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/stg/(:any)/orgform/(:any)/semester/(:any)'] = 'api/frontend/v1/stv/students/getStudentsOrgform/$1/$2/$3/$4';
+$route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/stg/(:any)/orgform/(:any)'] = 'api/frontend/v1/stv/students/getStudentsOrgform/$1/$2/$3';
 
-// (studiensemester_kurzbz)/(studiengang_kz)[/(semester)[/(verband)[/(gruppe)]]]
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/(-?[0-9]+)'] = 'api/frontend/v1/stv/Students/getStudents/$1/$2';
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/(-?[0-9]+)/(:num)'] = 'api/frontend/v1/stv/Students/getStudents/$1/$2/$3';
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/(-?[0-9]+)/(:num)/(:any)'] = 'api/frontend/v1/stv/Students/getStudents/$1/$2/$3/$4';
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/(-?[0-9]+)/(:num)/(:any)/(:any)'] = 'api/frontend/v1/stv/Students/getStudents/$1/$2/$3/$4/$5';
+$route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/stg/(:any)/semester/(:any)/group/(:any)'] = 'api/frontend/v1/stv/students/getStudentsSpezialgruppe/$1/$2/$3/$4';
 
-// (studiensemester_kurzbz)/(studiengang_kz)/(orgform)/(semester)/grp/(gruppe)
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/(-?[0-9]+)/([A-Z]{2,3})/(:num)/grp/(:any)'] = 'api/frontend/v1/stv/Students/getStudentsOrgformSpezialgruppe/$1/$2/$3/$4/$5';
+$route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/stg/(:any)/orgform/(:any)/semester/(:any)/group/(:any)'] = 'api/frontend/v1/stv/students/getStudentsOrgformSpezialgruppe/$1/$3/$2/$4/$5';
 
-// (studiensemester_kurzbz)/(studiengang_kz)/(orgform)[/(semester)[/(verband)[/(gruppe)]]]
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/(-?[0-9]+)/([A-Z]{2,3})'] = 'api/frontend/v1/stv/Students/getStudentsOrgform/$1/$2/$3';
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/(-?[0-9]+)/([A-Z]{2,3})/(:num)'] = 'api/frontend/v1/stv/Students/getStudentsOrgform/$1/$2/$3/$4';
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/(-?[0-9]+)/([A-Z]{2,3})/(:num)/(:any)'] = 'api/frontend/v1/stv/Students/getStudentsOrgform/$1/$2/$3/$4/$5';
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/(-?[0-9]+)/([A-Z]{2,3})/(:num)/(:any)/(:any)'] = 'api/frontend/v1/stv/Students/getStudentsOrgform/$1/$2/$3/$4/$5/$6';
+$route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/prestudent/(:any)'] = 'api/frontend/v1/stv/students/getPrestudent/$1/$2';
 
-// // (studiensemester_kurzbz)/uid/(uid)
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/uid/(:any)'] = 'api/frontend/v1/stv/Students/getStudent/$1/$2';
-// // (studiensemester_kurzbz)/prestudent/(prestudent_id)
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/prestudent/(:num)'] = 'api/frontend/v1/stv/Students/getPrestudent/$1/$2';
-// // (studiensemester_kurzbz)/person/(person_id)
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/person/(:num)'] = 'api/frontend/v1/stv/Students/getPerson/$1/$2';
+$route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/student/(:any)'] = 'api/frontend/v1/stv/students/getStudent/$1/$2';
+
+$route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/person/(:any)'] = 'api/frontend/v1/stv/students/getPerson/$1/$2';
+
+$route['api/frontend/v1/treemenudata/stv/.*'] = 'api/frontend/v1/stv/students/index';
+
+// Lvverwaltung List Routes
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByStg/$1/$2';
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/semester/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByStg/$1/$2/$3';
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/semester/(:any)/.*'] = 'api/frontend/v1/Lehrveranstaltung/getByStg/$1/$2/$3';
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/orgform/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByStg/$1/$2/$3';
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/orgform/(:any)/.*'] = 'api/frontend/v1/Lehrveranstaltung/getByStg/$1/$2/$3';
+
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/emp/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByEmp/$1/$2';
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/emp/(:any)/stg/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByEmp/$1/$2/$3';
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/emp/(:any)/stg/(:any)/.*'] = 'api/frontend/v1/Lehrveranstaltung/getByEmp/$1/$2/$3';
+
 
 // load routes from extensions, also look for environment-specific configs
 $subdirs = ['application/config/extensions', 'application/config/' . ENVIRONMENT . '/extensions'];
