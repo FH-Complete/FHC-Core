@@ -20,8 +20,8 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * This controller operates between (interface) the JS (GUI) and the back-end
- * Provides data to the ajax get calls about favorite verbände
- * Listens to ajax post calls to change the favorite verbände data
+ * Provides data to the ajax get calls about favorite treemenu entries
+ * Listens to ajax post calls to change the favorite treemenu entries
  * This controller works with JSON calls on the HTTP GET or POST and the output is always JSON
  */
 class Favorites extends FHCAPI_Controller
@@ -29,7 +29,7 @@ class Favorites extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'index' => self::PERM_LOGGED,
+			'get' => self::PERM_LOGGED,
 			'set' => self::PERM_LOGGED
 		]);
 
@@ -37,19 +37,19 @@ class Favorites extends FHCAPI_Controller
 		$this->load->model('system/Variable_model', 'VariableModel');
 	}
 
-	public function index()
+	public function get($app)
 	{
-		$result = $this->VariableModel->getVariables(getAuthUID(), ['stv_favorites']);
+		$result = $this->VariableModel->getVariables(getAuthUID(), [$app . '_favorites']);
 
 		$data = $this->getDataOrTerminateWithError($result);
 
 		if (!$data)
 			$this->terminateWithSuccess(null);
 		else
-			$this->terminateWithSuccess($data['stv_favorites'] ?? null);
+			$this->terminateWithSuccess($data[$app . '_favorites'] ?? null);
 	}
 
-	public function set()
+	public function set($app)
 	{
 		$this->load->library('form_validation');
 
@@ -60,7 +60,7 @@ class Favorites extends FHCAPI_Controller
 
 		$favorites = $this->input->post('favorites');
 
-		$result = $this->VariableModel->setVariable(getAuthUID(), 'stv_favorites', $favorites);
+		$result = $this->VariableModel->setVariable(getAuthUID(), $app . '_favorites', $favorites);
 
 		$this->getDataOrTerminateWithError($result);
 		
