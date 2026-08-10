@@ -5,6 +5,7 @@ import FormInput from "../Form/Input.js";
 import CoreBaseLayout from '../../components/layout/BaseLayout.js';
 import ApiTempusSync from '../../api/factory/tempus/sync.js';
 import TempusSyncModal from './Modal.js';
+import FhcLoader from '../../components/Loader.js';
 
 export default {
 	props: {
@@ -16,7 +17,8 @@ export default {
 		CoreBaseLayout,
 		CoreNavigationCmpt,
 		FormInput,
-		TempusSyncModal
+		TempusSyncModal,
+		FhcLoader
 	},
 	data() {
 		return {
@@ -92,40 +94,63 @@ export default {
 						width: 120,
 						formatter: (cell) => {
 							let container = document.createElement('div');
-							container.className = "d-flex gap-3";
-							let button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary';
-							button.innerHTML = '<i class="fa fa-edit"></i>';
-							button.addEventListener('click', () =>
-								this.$refs.syncModal.openEdit(cell.getRow().getData())
-							);
+							container.className = 'd-flex gap-3';
 
-							container.append(button);
+							const editButton = document.createElement('button');
+							editButton.className = 'btn btn-outline-secondary';
+							editButton.innerHTML =  '<i class="fa fa-edit"></i>';
+							editButton.addEventListener('click', () => {
+								this.$refs.syncModal.openEdit(cell.getRow().getData());
+							});
+							container.append(editButton);
 
-							button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary';
-							button.innerHTML = '<i class="fa fa-play"></i>';
-							button.addEventListener('click', () =>
 
-								this.$refs.syncModal.start(cell.getRow().getData())
-							);
-							container.append(button);
+							const startButton = document.createElement('button');
+							startButton.className = 'btn btn-outline-secondary';
+							startButton.innerHTML = '<i class="fa fa-play"></i>';
 
-							button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary';
-							button.innerHTML = '<i class="fa fa-trash"></i>';
-							button.addEventListener('click', evt => {
+							startButton.addEventListener('click', () => {
+								startButton.disabled = true;
+								this.$refs.loader.show();
+
+								this.$refs.syncModal
+									.start(cell.getRow().getData())
+									.then(() => {
+										startButton.disabled = false;
+										this.$refs.loader.hide();
+
+									})
+									.catch(() => {
+										this.$refs.loader.hide();
+										startButton.disabled = false;
+									});
+							});
+
+							container.append(startButton);
+
+
+							const deleteButton = document.createElement('button');
+							deleteButton.className = 'btn btn-outline-secondary';
+							deleteButton.innerHTML = '<i class="fa fa-trash"></i>';
+
+							deleteButton.addEventListener('click', evt => {
 								evt.stopPropagation();
 								this.$fhcAlert
 									.confirmDelete()
-									.then(result => result ? cell.getData().kalender_syncstatus_id : Promise.reject({handled:true}))
-									.then(kalender_syncstatus_id => this.$api.call(ApiTempusSync.delete(kalender_syncstatus_id)))
+									.then(result =>
+										result
+											? cell.getData().kalender_syncstatus_id
+											: Promise.reject({ handled: true })
+									)
+									.then(kalender_syncstatus_id =>
+										this.$api.call(ApiTempusSync.delete(kalender_syncstatus_id))
+									)
 									.then(() => {
 										this.reloadTable();
 									})
 									.catch(this.$fhcAlert.handleSystemError);
 							});
-							container.append(button);
+							container.append(deleteButton);
 
 							return container;
 						}
@@ -164,6 +189,7 @@ export default {
 		<core-navigation-cmpt></core-navigation-cmpt>
 		<core-base-layout>
 			<template #main>
+			<fhc-loader ref="loader" :timeout="0"></fhc-loader>
 
 				<core-filter-cmpt
 					ref="syncTable"

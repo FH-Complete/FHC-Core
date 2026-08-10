@@ -25,7 +25,8 @@ export default {
 			formData: {},
 			studienplaene: [],
 			max_semester: null,
-			syncStati: []
+			syncStati: [],
+			loading: false
 		};
 	},
 	computed: {
@@ -187,13 +188,18 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		start(data) {
-			this.$refs.form
+			this.loading = true;
+			return this.$refs.form
 				.call(ApiTempusSync.start(data ?? this.formData))
 				.then(() => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successStart'));
 					this.$refs.modal.hide();
+					this.loading = false;
 				})
-				.catch(this.$fhcAlert.handleSystemError);
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					this.loading = false;
+				});
 		},
 		hideModal()
 		{
@@ -337,6 +343,7 @@ export default {
 			type="button"
 			class="btn btn-primary"
 			@click="save"
+			:disabled="loading"
 			>
 			<template v-if="mode === 'start'">{{ $p.t('global', 'jetztStarten') }}</template>
 			<template v-else>{{ $p.t('ui', 'ok') }}</template>
