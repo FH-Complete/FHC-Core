@@ -129,7 +129,7 @@ export const Raumsuche =  {
 			this.$api.call(ApiOrt.getRoomTypes())
 				.then(res => {
 				res?.data?.forEach(type => {
-					type.beschreibung = type.beschreibung.replace('&amp;', '&')
+					type.beschreibung = type.beschreibung?.replace('&amp;', '&')
 				})
 				this.selectedType = this.defaultType
 				this.roomtypes = res?.data ?? []
