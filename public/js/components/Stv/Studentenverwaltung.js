@@ -89,8 +89,9 @@ export default {
 			hasZGVMasterPermission: this.permissions['student/editMakkZgv'],
 			hasZGVDoctorPermission: this.permissions['student/editDokZgv'],
 			hasBismeldenPermission: this.permissions['student/editBismelden'],
-			authUid: this.authUid
-
+			authUid: this.authUid,
+			language: Vue.computed(() => this.$p.user_language),
+			isMobile: false,
 		}
 	},
 	data() {
@@ -313,6 +314,11 @@ export default {
 		sidebarCollapsed(newVal) {
 			if(newVal) this.$refs.hSplit.collapseLeft()
 			else this.$refs.hSplit.showBoth()
+		},
+		studiengangKz(newVal, oldVal) {
+			if (newVal !== oldVal) {
+				this.$refs.stvList.clearSelection();
+			}
 		}
 	},
 	methods: {
