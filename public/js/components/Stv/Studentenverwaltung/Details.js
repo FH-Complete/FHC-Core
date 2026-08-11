@@ -67,6 +67,10 @@ export default {
 			let tile = this.students[0].prestudent_id != null ? this.students[0].prestudent_id : '-';
 			return tile;
 		},
+		tile_UID(){
+			let tile = this.students[0].uid != null ? this.students[0].uid : '-';
+			return tile;
+		},
 	},
 	watch: {
 		'$p.user_language.value'(n, o) {
@@ -147,15 +151,15 @@ export default {
 				fotoEditable
 				:isLoading="isLoading"
 			>
-				<template #uid>{{students[0].uid}}</template>
-				<template #titleAlphaTile>PersID</template>
-				<template #valueAlphaTile>{{tile_PersId}}</template>
-				<template #titleBetaTile>MatrNr</template>
-				<template #valueBetaTile>{{tile_MatrNr}}</template>
-				<template #titleGammaTile>PersKz</template>
-				<template #valueGammaTile>{{tile_PersKz}}</template>
-				<template #titleDeltaTile>PrestdID</template>
-				<template #valueDeltaTile>{{tile_PrestdId}}</template>
+				<template #uid>{{tile_UID}}</template>
+				<template #titleAlphaTile>PrestdID</template>
+				<template #valueAlphaTile>{{tile_PrestdId}}</template>
+				<template #titleBetaTile>PersID</template>
+				<template #valueBetaTile>{{tile_PersId}}</template>
+				<template #titleGammaTile>MatrNr</template>
+				<template #valueGammaTile>{{tile_MatrNr}}</template>
+				<template #titleDeltaTile>PersKz</template>
+				<template #valueDeltaTile>{{tile_PersKz}}</template>
 			</fhc-header>
 			<fhc-tabs
 				v-if="students.length == 1"
