@@ -77,7 +77,12 @@ class CoodleSurvey extends FHCAPI_Controller
 	public function getSurvey()
 	{
 		$surveyId = $this->input->post("surveyId");
-		$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
+		$surveyResult = $this->CoodleSurveyModel->getSurvey($surveyId);
+		$survey = $this->getDataOrTerminateWithError($surveyResult);
+		$survey = count($survey) ? $survey[0] : null;
+		if (!$survey) {
+			$this->terminateWithError("Survey not found!");
+		}
 
 		$timeslots = $this->CoodleSurveyTimeslotModel->getTimeslots($surveyId);
 		$survey->timeslots = $timeslots;
@@ -243,7 +248,9 @@ class CoodleSurvey extends FHCAPI_Controller
 			$this->terminateWithError("Missing survey id!");
 		}
 
-		$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
+		$surveyResult = $this->CoodleSurveyModel->getSurvey($surveyId);
+		$survey = $this->getDataOrTerminateWithError($surveyResult);
+		$survey = count($survey) ? $survey[0] : null;
 
 		if (!$survey)
 			$this->terminateWithError("Survey not found!");
@@ -281,7 +288,9 @@ class CoodleSurvey extends FHCAPI_Controller
 		$surveyId = $this->input->post("surveyId");
 		$selection = $this->input->post("selection");
 
-		$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
+		$surveyResult = $this->CoodleSurveyModel->getSurvey($surveyId);
+		$survey = $this->getDataOrTerminateWithError($surveyResult);
+		$survey = count($survey) ? $survey[0] : null;
 		if (!$survey) {
 			$this->terminateWithError("Survey not found!");
 		}
@@ -365,7 +374,9 @@ class CoodleSurvey extends FHCAPI_Controller
 	public function cancelSurvey()
 	{
 		$surveyId = $this->input->post("surveyId");
-		$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
+		$surveyResult = $this->CoodleSurveyModel->getSurvey($surveyId);
+		$survey = $this->getDataOrTerminateWithError($surveyResult);
+		$survey = count($survey) ? $survey[0] : null;
 
 		if (!$survey) {
 			$this->terminateWithError("Survey not found!");
@@ -387,7 +398,9 @@ class CoodleSurvey extends FHCAPI_Controller
 		$selectedTimeslotId = $this->input->post("selectedTimeslotId");
 		$selectedRoomId = $this->input->post("selectedRoomId");
 
-		$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
+		$surveyResult = $this->CoodleSurveyModel->getSurvey($surveyId);
+		$survey = $this->getDataOrTerminateWithError($surveyResult);
+		$survey = count($survey) ? $survey[0] : null;
 		if (!$survey) {
 			$this->terminateWithError("Survey not found!");
 		} else if ($survey->creator_uid !== getAuthUID()) {
@@ -432,7 +445,9 @@ class CoodleSurvey extends FHCAPI_Controller
 	public function sendVotingReminders()
 	{
 		$surveyId = $this->input->post("surveyId");
-		$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
+		$surveyResult = $this->CoodleSurveyModel->getSurvey($surveyId);
+		$survey = $this->getDataOrTerminateWithError($surveyResult);
+		$survey = count($survey) ? $survey[0] : null;
 		if (!$survey) {
 			$this->terminateWithError("Survey not found!");
 		} else if ($survey->creator_uid !== getAuthUID()) {
@@ -488,7 +503,9 @@ class CoodleSurvey extends FHCAPI_Controller
 			$this->terminateWithError("Missing survey id!");
 		}
 
-		$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
+		$surveyResult = $this->CoodleSurveyModel->getSurvey($surveyId);
+		$survey = $this->getDataOrTerminateWithError($surveyResult);
+		$survey = count($survey) ? $survey[0] : null;
 
 		if (!$survey)
 			$this->terminateWithError("Survey not found!");
@@ -711,7 +728,11 @@ class CoodleSurvey extends FHCAPI_Controller
 			if (!$timeslot)
 				continue;
 
-			$survey = $this->CoodleSurveyModel->getSurvey($timeslot->survey_id);
+			$surveyResult = $this->CoodleSurveyModel->getSurvey($timeslot->survey_id);
+			$survey = $this->getDataOrTerminateWithError($surveyResult);
+			$survey = count($survey) ? $survey[0] : null;
+			if (!$survey)
+				continue;
 
 			$startTime = new DateTime($timeslot->starts_at, $localTimezone);
 			$endTime = new DateTime($timeslot->starts_at, $localTimezone);
@@ -789,7 +810,9 @@ class CoodleSurvey extends FHCAPI_Controller
 		if (!$surveyId || !$accessKey)
 			return null;
 
-		$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
+		$surveyResult = $this->CoodleSurveyModel->getSurvey($surveyId);
+		$survey = $this->getDataOrTerminateWithError($surveyResult);
+		$survey = count($survey) ? $survey[0] : null;
 		$externalParticipant = $this->CoodleSurveyExternalParticipantModel->getExternalParticipantByAccessKey($surveyId, $accessKey);
 
 		if (!$survey || !$externalParticipant)

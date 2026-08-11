@@ -21,7 +21,7 @@ class CoodleSurvey_model extends DB_Model
 			WHERE id = $surveyId
 			LIMIT 1
 		";
-		return $this->execQuery($query)->retval[0];
+		return $this->execQuery($query);
 	}
 
 	public function getSurveys($surveyIds)
