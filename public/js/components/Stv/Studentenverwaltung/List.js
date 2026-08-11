@@ -746,6 +746,7 @@ export default {
 		}
 
 		this.isLoading = false;
+		this.$reloadList();
 	},
 	showModal(){
 		this.$refs.modalLocked.open();
