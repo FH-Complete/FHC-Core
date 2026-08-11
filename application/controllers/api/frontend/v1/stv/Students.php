@@ -756,6 +756,8 @@ class Students extends FHCAPI_Controller
 			'studiensemester_kurzbz' => $studiensemester_kurzbz
 		));
 
+		$studiensemester_kurzbz = $this->getStudiensemesterKurzbz($studiensemester_kurzbz);
+
 		$this->load->library('SearchLib', [ 'config' => 'searchstv' ]);
 		$this->load->library('form_validation');
 

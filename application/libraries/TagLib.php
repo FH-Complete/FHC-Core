@@ -37,7 +37,7 @@ class TagLib
 		$this->_ci->load->library('PermissionLib');
 		$this->_ci->load->library('PrestudentLib');
 
-		$batchUser = $this->_ci->config->item('userAutomatedTags');
+		$this->batchUser = $this->_ci->config->item('userAutomatedTags');
 	}
 
 	public function updateAutomatedTags($paramsTag)

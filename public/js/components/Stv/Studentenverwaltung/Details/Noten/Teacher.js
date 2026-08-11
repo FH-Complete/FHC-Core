@@ -28,11 +28,28 @@ export default {
 	},
 	data() {
 		return {
+			renderTabulator: false,
+			setOptinalTabulatorOptionsVisibility: false,
 			tabulatorEvents: [
 				{
 					event: "dataProcessed",
 					handler: () => this.$emit("loaded"),
 				},
+				{
+					event: "tableBuilt",
+					handler: () => {
+						if(this.optionalTabulatorOptions?.visibleColumns
+							&& this.setOptinalTabulatorOptionsVisibility)
+						{
+							for(let key in this.optionalTabulatorOptions.visibleColumns) {
+								if(this.optionalTabulatorOptions.visibleColumns[key])
+									this.$refs.table.tabulator.showColumn(key);
+								else
+									this.$refs.table.tabulator.hideColumn(key);
+							}
+						}
+					}
+				}
 			]
 		};
 	},
@@ -86,6 +103,8 @@ export default {
 					{ field: 'studiensemester_kurzbz', title: this.$p.t('lehre/studiensemester'), visible: false },
 					{ field: 'note', title: this.$p.t('stv/grades_numericgrade'), visible: false },
 					{ field: 'student_uid', title: this.$p.t('profil/studentIn'), visible: false },
+					{ field: 'vorname', title: this.$p.t('person/vorname'), visible: false },
+					{ field: 'nachname', title: this.$p.t('person/nachname'), visible: false },
 					{ field: 'lehrveranstaltung_id', title: this.$p.t('lehre/lehrveranstaltung_id'), visible: false },
 					{ field: 'punkte', title: this.$p.t('stv/grades_points'), visible: false }
 				],
@@ -132,13 +151,19 @@ export default {
 	created() {
 		this.$p.loadCategory(['stv', 'lehre', 'profil'])
 			.then(() => {
-				if (this.$refs.table.tableBuilt)
-					this.$refs.table.tabulator.columnManager.setColumns(this.tabulatorOptions.columns);
+				this.renderTabulator = true;
 			});
+
+		if(this?.optionalTabulatorOptions)
+		{
+			const localStorageKey = 'tabulator-' + this.optionalTabulatorOptions.persistenceTeacherID + '-columns';
+			this.setOptinalTabulatorOptionsVisibility = (window.localStorage.getItem(localStorageKey) === null) ? true : false;
+		}
 	},
 	template: `
 	<div class="stv-details-noten-teacher d-flex flex-column">
 		<core-filter-cmpt
+			v-if="renderTabulator"
 			ref="table"
 			:title="$p.t('stv/grades_title_teacher')"
 			:tabulator-options="tabulatorOptions"

@@ -349,16 +349,27 @@ class Tag_Controller extends FHCAPI_Controller
 
 	public function rebuildTagsForTypeId()
 	{
-		$id = $this->input->post('id');
+		$ids = $this->input->post('ids');
 		$typeId = $this->input->post('typeId');
 		$semester = $this->input->post('sem');
 
-		$result = $this->taglib->rebuildTagsForTypeId($typeId, $id, $semester);
+		$idsSuccess = [];
+		$idsError = [];
+		$outputResult = [];
 
-		if (isError($result))
-			return error ('Error occurred during updateAutomatedTags');
+		foreach ($ids as $id)
+		{
+			$result = $this->taglib->rebuildTagsForTypeId($typeId, $id, $semester);
 
-		$this->terminateWithSuccess($result);
+			if (isError($result))
+				$idsError[] = $id;
+			else
+				$idsSuccess[] = $id;
+
+			$outputResult[] = $result;
+		}
+
+		$this->terminateWithSuccess([$outputResult, $idsSuccess, $idsError]);
 	}
 
 	private function _setAuthUID()

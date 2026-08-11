@@ -54,7 +54,8 @@ export default {
 		cisRoot: String,
 		avatarUrl: String,
 		logoutUrl: String,
-		activeAddons: String // semicolon separated list of active addons
+		activeAddons: String, // semicolon separated list of active addons
+		authUid: String
 	},
 	provide() {
 		return {
@@ -88,7 +89,9 @@ export default {
 			hasZGVMasterPermission: this.permissions['student/editMakkZgv'],
 			hasZGVDoctorPermission: this.permissions['student/editDokZgv'],
 			hasBismeldenPermission: this.permissions['student/editBismelden'],
-
+			authUid: this.authUid,
+			language: Vue.computed(() => this.$p.user_language),
+			isMobile: false,
 		}
 	},
 	data() {
@@ -216,6 +219,28 @@ export default {
 
 			return extraItems;
 		},
+		appMenuBisItems() {
+			const extraItems = [];
+
+			if (this.studiengangKz !== undefined) {
+				const studiengang_kz = String(this.studiengangKz);
+
+				extraItems.push({
+					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+						+ 'vilesci/bis/studentenmeldung.php?'
+						+ 'stg_kz=' + studiengang_kz,
+					description: 'stv/bis_stud_meldung'
+				});
+				extraItems.push({
+					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+						+ 'system/checkStudenten.php?'
+						+ 'stg_kz=' + studiengang_kz,
+					description: 'stv/bis_stud_plausicheck'
+				});
+			}
+
+			return extraItems;
+		},
 		linkRt(){
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root + '/vilesci/stammdaten/reihungstestverwaltung.php'
 		},
@@ -289,6 +314,11 @@ export default {
 		sidebarCollapsed(newVal) {
 			if(newVal) this.$refs.hSplit.collapseLeft()
 			else this.$refs.hSplit.showBoth()
+		},
+		studiengangKz(newVal, oldVal) {
+			if (newVal !== oldVal) {
+				this.$refs.stvList.clearSelection();
+			}
 		}
 	},
 	methods: {
@@ -400,6 +430,9 @@ export default {
 		},
 		showAlertNoGroupChosen(){
 			this.$fhcAlert.alertError(this.$p.t('ui', 'alert_chooseGroupSem'));
+		},
+		showAlertNoDegreeProgramChosen(){
+			this.$fhcAlert.alertError(this.$p.t('ui', 'alert_chooseDegreeProgram'));
 		},
 		showMenu(refName) {
 			bootstrap.Dropdown.getOrCreateInstance(this.$refs[refName]).show();
@@ -613,13 +646,13 @@ export default {
 									</li>
 								</ul>
 							</li>
-							<li :class="{ dropend: appMenuExtraItems.length }"
-								@mouseenter="appMenuExtraItems.length && showMenu('lvPlanungToggle')"
-								@mouseleave="appMenuExtraItems.length && hideMenu('lvPlanungToggle')"
+							<li :class="{ dropend: appMenuLvPlanungItems.length }"
+								@mouseenter="appMenuLvPlanungItems.length && showMenu('lvPlanungToggle')"
+								@mouseleave="appMenuLvPlanungItems.length && hideMenu('lvPlanungToggle')"
 							>
 								<a
 									ref="lvPlanungToggle"
-									v-if="appMenuExtraItems.length"
+									v-if="appMenuLvPlanungItems.length"
 									class="dropdown-toggle"
 									href="#"
 									role="button"
@@ -636,7 +669,7 @@ export default {
 								>
 									{{ $p.t('stv/lvplanung') }}
 								</a>
-								<ul v-if="appMenuExtraItems.length" class="dropdown-menu p-0">
+								<ul v-if="appMenuLvPlanungItems.length" class="dropdown-menu p-0">
 									<li
 										v-for="(item, key) in appMenuLvPlanungItems"
 										:key="key"
@@ -663,6 +696,42 @@ export default {
 									{{ $p.t('stv/studienverlauf') }}
 								</a>
 							</li>
+
+							<li :class="{ dropend: appMenuBisItems.length }"
+								@mouseenter="appMenuBisItems.length && showMenu('bisToggle')"
+								@mouseleave="appMenuBisItems.length && hideMenu('bisToggle')"
+							>
+								<a
+									ref="bisToggle"
+									v-if="appMenuBisItems.length"
+									class="dropdown-toggle"
+									href="#"
+									role="button"
+									data-bs-toggle="dropdown"
+									aria-expanded="false"
+									data-bs-popper-config='{"strategy":"fixed"}'
+									>
+										{{ $p.t('stv/bis_stud') }}
+								</a>
+								<a
+									v-else
+									href="#"
+									@click.prevent="showAlertNoDegreeProgramChosen"
+								>
+									{{ $p.t('stv/bis_stud') }}
+								</a>
+								<ul v-if="appMenuBisItems.length" class="dropdown-menu p-0">
+									<li
+										v-for="(item, key) in appMenuBisItems"
+										:key="key"
+									>
+										<a class="dropdown-item" :href="item.link" target="_blank">
+											{{ $p.t(item.description) }}
+										</a>
+									</li>
+								</ul>
+							</li>
+
 						</app-menu>
 					</div>
 				</aside>
