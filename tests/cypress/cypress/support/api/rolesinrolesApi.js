@@ -1,18 +1,38 @@
-const DummyPermissionsAPI = "/index.ci.php/system/DummyPermissions";
+const DummyPermissionsAPI = "/index.ci.php/system/DummyPermissions/";
 
 export const rolesinrolesApi = {
-	mainRoleR: function() {
+	permissionToMainRole: () => {
 		cy
 			.request({
 				method: 'GET',
-				url: DummyPermissionsAPI,
+				url: DummyPermissionsAPI + "permissionToMainRole",
 			})
 			.then((response) => {
 				expect(response.status).to.eq(200);
-				expect(response.body).to.have.nested.property("meta.status", "success");
-				expect(response.body.data).to.be.an("array");
+				expect(response.body).to.equals("DummyPermissions::permissionToMainRole");
+			})
+	},
+	permissionToBasicRole: () => {
 
-				return response.body.data;
+		cy
+			.request({
+				method: 'GET',
+				url: DummyPermissionsAPI + "permissionToBasicRole",
+			})
+			.then((response) => {
+				expect(response.status).to.eq(200);
+				expect(response.body).to.equals("DummyPermissions::permissionToBasicRole");
+			})
+	},
+	permissionToUser: () => {
+		cy
+			.request({
+				method: 'GET',
+				url: DummyPermissionsAPI + "permissionToUser",
+			})
+			.then((response) => {
+				expect(response.status).to.eq(200);
+				expect(response.body).to.equals("DummyPermissions::permissionToUser");
 			})
 	},
 };
