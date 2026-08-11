@@ -101,7 +101,7 @@ if(defined('CIS4')){
 										</div>
 
 										<div class="modal-footer">
-											<button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal"><?= $this->p->t('ui', 'abbrechen'); ?></button>
+											<button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal"><?= $this->p->t('ui', 'cancel'); ?></button>
 											<a
 													href="<?= site_url('lehre/Studierendenantrag/abmeldung/' . $prestudent_id); ?>"
 													class="btn btn-outline-primary"
