@@ -34,6 +34,7 @@ export default {
 			presetInfo: null,
 			newPreset: null,
 			newPresetName: "",
+			presetIndexBeingApplied: null,
 		};
 	},
 	computed: {
@@ -161,6 +162,9 @@ export default {
 		},
 	},
 	methods: {
+		getPresetIndex() {
+			return this.presetIndexBeingApplied;
+		},
 		async showPresetInfo(preset) {
 			let shouldUpdatePresetInfo;
 			if (!this.presetInfo) {
@@ -393,14 +397,22 @@ export default {
 				this.fetchCustomUserTabulatorPresets();
 			}
 		},
-		async applyPreset(preset) {
-			preset = this.syncPresetWithConfig(preset);
-			window.localStorage["tabulatorPreset-" + this.$props.presetsId] =
-				preset.id ? "custom:" + preset.id : "general:" + preset.name;
+		async applyPreset(preset, index) {
+			this.presetIndexBeingApplied = index;
 
-			this.$props.tabulator.modules.tablePresets.applyPreset(preset);
-			
-			this.$emit("tablePresetApplied", { preset });
+			// workaround for updating DOM and displaying preset-loading spinner
+			// conventional use of $nextTick ineffective
+			setTimeout(() => {
+				preset = this.syncPresetWithConfig(preset);
+				window.localStorage["tabulatorPreset-" + this.$props.presetsId] =
+					preset.id ? "custom:" + preset.id : "general:" + preset.name;
+	
+				this.$props.tabulator.modules.tablePresets.applyPreset(preset);
+				
+				this.$emit("tablePresetApplied", { preset });
+	
+				this.presetIndexBeingApplied = null;
+			}, 50);
 		},
 		async fetchCustomUserTabulatorPresets() {
 			let tabulatorPresetsResponse = await this.$api.call(
@@ -453,7 +465,7 @@ export default {
 
 			if (!preset) return;
 
-			this.applyPreset(preset);
+			this.applyPreset(preset, null);
 		},
 	},
 	async created() {
@@ -467,8 +479,19 @@ export default {
 			<div class="card-header">{{ $p.t("tabulator_presets/table_presets") }}</div>
 			<div class="card-body d-flex flex-column">
 				<div class="d-flex flex-row gap-1 justify-content-start flex-wrap">
-					<div v-for="preset in allPresets" class="d-flex flex-column gap-1 mb-2">
-						<div @click="applyPreset(preset)" class="btn btn-dark py-1 px-2">{{ preset.name }}</div>
+					<div v-for="(preset, index) in allPresets" class="d-flex flex-column gap-1 mb-2">
+						<div @click="applyPreset(preset, index)" class="position-relative btn btn-dark py-1 px-2">
+							<span :class="{'opacity-0': getPresetIndex() === index}">{{ preset.name }}</span>
+							<div
+								v-if="getPresetIndex() === index"
+								class="position-absolute d-flex flex-row align-items-center justify-content-center"
+								style="inset:0;"
+							>
+								<div class="spinner-border spinner-border-sm" role="status" style>
+									<span class="visually-hidden">Loading...</span>
+								</div>
+							</div>
+						</div>
 						<div class="d-flex flex-row justify-content-center">
 							<div class="d-flex flex-row gap-2 px-3">
 								<span @click="showPresetInfo(preset)" type="button" class="fa-solid fa-circle-info"></span>
