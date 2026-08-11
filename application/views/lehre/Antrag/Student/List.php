@@ -269,7 +269,7 @@ if(defined('CIS4')){
 										</a>
 										<lv-popup
 											id="modallv<?= $antrag->studierendenantrag_id; ?>"
-											antrag-id = "<?= $antrag->studierendenantrag_id; ?>"
+											:antrag-id = "<?= $antrag->studierendenantrag_id; ?>"
 											>
 											<?= $this->p->t('studierendenantrag', 'my_lvs'); ?>
 										</lv-popup>
