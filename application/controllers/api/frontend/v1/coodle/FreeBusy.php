@@ -126,7 +126,9 @@ class FreeBusy extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t("coodle", "url_not_working"));
 		}
 
-		$existingFreeBusyEntry = $this->FreeBusyModel->load($id)->retval[0];
+		$existingFreeBusyEntryResult = $this->FreeBusyModel->load($id);
+		$existingFreeBusyEntry = $this->getDataOrTerminateWithError($existingFreeBusyEntryResult);
+		$existingFreeBusyEntry = $existingFreeBusyEntry && count($existingFreeBusyEntry) ? $existingFreeBusyEntry[0] : null;
 		if (!$existingFreeBusyEntry) {
 			$this->terminateWithError("FreeBusy entry not found!");
 		} else if ($existingFreeBusyEntry->uid !== getAuthUID()) {
@@ -151,7 +153,9 @@ class FreeBusy extends FHCAPI_Controller
 	{
 		$id = $this->input->post("id");
 
-		$existingFreeBusyEntry = $this->FreeBusyModel->load($id)->retval[0];
+		$existingFreeBusyEntryResult = $this->FreeBusyModel->load($id);
+		$existingFreeBusyEntry = $this->getDataOrTerminateWithError($existingFreeBusyEntryResult);
+		$existingFreeBusyEntry = $existingFreeBusyEntry && count($existingFreeBusyEntry) ? $existingFreeBusyEntry[0] : null;
 		if (!$existingFreeBusyEntry) {
 			$this->terminateWithError("FreeBusy entry not found!");
 		} else if ($existingFreeBusyEntry->uid !== getAuthUID()) {
