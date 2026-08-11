@@ -318,7 +318,7 @@ export default {
 		async updateSurvey(surveyData) {
 			const shouldInformParticipants = await this.$fhcAlert.confirm({
 				header: this.$p.t("coodle/inform_participants"),
-				message: this.$p.t("coodle/email_participants_created"),
+				message: this.$p.t("coodle/email_participants_updated"),
 				acceptLabel: this.$p.t("coodle/yes"),
 				rejectLabel: this.$p.t("coodle/no"),
 			});
