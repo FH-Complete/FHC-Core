@@ -27,13 +27,7 @@ class MyLvPlan extends Auth_Controller
 	 * @return void
 	 */
 	public function index()
-	{
-		
-		$viewData = array(
-			'uid'=>getAuthUID(),
-			'timezone' => $this->config->item('timezone')
-		);
-		
-		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'MyLvPlan']);
+	{		
+		$this->load->view('CisRouterView/CisRouterView.php', ['route' => 'MyLvPlan']);
 	}
 }

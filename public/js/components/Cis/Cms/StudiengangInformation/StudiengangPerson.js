@@ -27,7 +27,7 @@ export default {
 
 			<dl class="stgkontaktinfo">
 				<dt><i class="fa fa-phone me-2"></i></dt>
-				<dd class="mb-3"><a class="fhc-link-color" :href="phone.link">{{phone.number}}</a></dd>
+				<dd class="mb-3"><a class="fhc-link-color" :href="phone?.link">{{phone?.number}}</a></dd>
 
 				<dt><i class="fa fa-home me-2"></i></dt>
 				<dd class="mb-3">{{ort}}</dd>

@@ -169,6 +169,33 @@ $config['stgkz_blacklist_wiederholung'] = [];
  */
 $config['note_blacklist_wiederholung'] = [];
 
+/**
+ *  Enable/disable the Abmeldung StG process
+ *
+ * @var bool
+ */
+$config['abmeldung_stg_enabled'] = true;
+
+/**
+ *  Enable/disable the Abmeldung process
+ *
+ * @var bool
+ */
+$config['abmeldung_enabled'] = true;
+
+/**
+ *  Enable/disable the Unterbrecher process
+ *
+ * @var bool
+ */
+$config['unterbrechung_enabled'] = true;
+
+/**
+ *  Enable/disable the Wiederholer process
+ *
+ * @var bool
+ */
+$config['wiederholung_enabled'] = true;
 
 /**
  * Modal with Infotext of TLC

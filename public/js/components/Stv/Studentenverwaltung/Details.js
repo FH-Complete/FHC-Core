@@ -2,12 +2,18 @@ import FhcTabs from "../../Tabs.js";
 import FhcHeader from "../../DetailHeader/DetailHeader.js";
 
 import ApiStvApp from '../../../api/factory/stv/app.js';
+import ApiStudent from '../../../api/factory/stv/students.js';
 
 // TODO(chris): alt & title
 // TODO(chris): phrasen
 
 export default {
 	name: "DetailsPrestudent",
+	inject: {
+		currentSemester: {
+			from: 'currentSemester',
+		},
+	},
 	components: {
 		FhcTabs,
 		FhcHeader
@@ -15,7 +21,9 @@ export default {
 	data() {
 		return {
 			configStudent: {},
-			configStudents: {}
+			configStudents: {},
+			activeTab: null,
+			localStudent: null
 		};
 	},
 	props: {
@@ -40,6 +48,9 @@ export default {
 			}
 			return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithUid && !value.showOnlyWithUid));
 		},
+		isLoading() {
+			return this.students === null; //null-> loading, [] -> empty, [...] -> data, necessary for skeleton in child
+		},
 		tile_PersId(){
 			let tile = this.students[0].person_id != null ? this.students[0].person_id : '-';
 			return tile;
@@ -57,6 +68,21 @@ export default {
 		'$p.user_language.value'(n, o) {
 			if (n !== o && o !== undefined)
 				this.loadConfig();
+		},
+		currentSemester(newVal) {
+			if (
+				Array.isArray(this.students) &&
+				this.students.length === 1 &&
+				newVal !== this.students[0].query_studiensemester_kurzbz
+			) {
+				this.reloadDataStudent();
+			}
+			else {
+				this.localStudent = null;
+			}
+		},
+		students() {
+			this.localStudent = null;
 		}
 	},
 	methods: {
@@ -74,9 +100,27 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
+		handleTabChanged(key) {
+			this.activeTab = key
+			this.reload()	
+		},
 		reload() {
 			if (this.$refs.tabs?.$refs?.current?.reload)
 				this.$refs.tabs.$refs.current.reload();
+		},
+		reloadDataStudent(){
+			this.localStudent = null;
+			const studentArr = this.students;
+
+			if (!studentArr || !studentArr.length) {
+				return;
+			}
+
+			this.$api
+				.call(ApiStudent.uid(studentArr[0].uid, this.currentSemester))
+				.then(result => {
+					this.localStudent = result.data;
+				});
 		},
 		reloadList() {
 			this.$emit('reload');
@@ -92,10 +136,12 @@ export default {
 		</div>
 		<div v-else-if="configStudent && configStudents" class="d-flex flex-column h-100">
 			<fhc-header
-				:headerData="students"
+				:headerData="localStudent || students"
+				:currentSemester="currentSemester"
 				typeHeader="student"
 				@reload="reloadList"
 				fotoEditable
+				:isLoading="isLoading"
 			>
 				<template #uid>{{students[0].uid}}</template>
 				<template #titleAlphaTile>PersID</template>
@@ -107,16 +153,16 @@ export default {
 			</fhc-header>
 			<fhc-tabs
 				v-if="students.length == 1"
-				ref="tabs" 
+				ref="tabs"
 				:useprimevue="true"
-				:modelValue="students[0]"
+				:modelValue="(Array.isArray(localStudent) && localStudent[0]) || students[0]"
 				:config="config"
-				:default="$route.params.tab"
+				:default="activeTab ?? $route.params.tab"
 				style="flex: 1 1 0%; height: 0%"
-				@changed="reload"
+				@changed="handleTabChanged"
 				>
 				</fhc-tabs>
-			<fhc-tabs v-else ref="tabs" :useprimevue="true" :modelValue="students" :config="config" :default="$route.params.tab" style="flex: 1 1 0%; height: 0%" @changed="reload"></fhc-tabs>
+			<fhc-tabs v-else ref="tabs" :useprimevue="true" :modelValue="students" :config="config" :default="activeTab ?? $route.params.tab" style="flex: 1 1 0%; height: 0%" @changed="handleTabChanged"></fhc-tabs>
 		</div>
 		<div v-else>
 			Loading...
