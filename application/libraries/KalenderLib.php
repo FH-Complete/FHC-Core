@@ -591,6 +591,16 @@ class KalenderLib
 
 	}
 
+	private function _checkCollisionForLehreinheit($start_date, $end_date, $lehreinheit_id)
+	{
+		$checkerData = new stdClass();
+		$checkerData->von = $start_date;
+		$checkerData->bis = $end_date;
+		$checkerData->lehreinheit_id = $lehreinheit_id;
+
+		return $this->_ci->collisionchecker->run($checkerData);
+	}
+
 	public function addToKalenderEvent($target_kalender_id, $lehreinheit_id)
 	{
 		$entryResult = $this->_loadKalenderEntry($target_kalender_id);
@@ -733,16 +743,6 @@ class KalenderLib
 				return ['kalender_id' => $kalender_id, 'result' => $ortresult];
 		}
 
-		$entryResult = $this->_loadKalenderEntry($kalender_id);
-		if (isError($entryResult))
-			return ['kalender_id' => $kalender_id, 'result' => $entryResult];
-
-		$kalender_entry = getData($entryResult);
-		$errors = $this->_ci->collisionchecker->run($kalender_entry);
-
-		if (!empty($errors))
-			return ['kalender_id' => $kalender_id, 'result' => error($errors)];
-
 		return ['kalender_id' => $kalender_id, 'result' => $kalenderlehreinheitresult];
 	}
 
@@ -807,7 +807,6 @@ class KalenderLib
 			'false'
 		);
 
-		$this->_ci->KalenderModel->db->trans_start();
 
 		while ($rest > 0 && new DateTime($current_date) < $ende)
 		{
@@ -849,18 +848,9 @@ class KalenderLib
 			$start_str = $current_date . ' ' . $start_time;
 			$end_str = $current_date . ' ' . $end_time;
 
-			$insert = $this->_insertKalenderEventRaw($start_str, $end_str, $lehreinheit_id, $ort_kurzbz);
-			$kalender_id = $insert['kalender_id'];
-			$insert_result = $insert['result'];
+			$collisions = $this->_checkCollisionForLehreinheit($start_str, $end_str, $lehreinheit_id);
 
-			$collisions = isError($insert_result) ? getError($insert_result) : [];
-
-			$raum_vorschlaege = [];
-			if ($kalender_id)
-			{
-				$vorschlaege = $this->_ci->raumvorschlaglib->getVorschlaege($kalender_id);
-				$raum_vorschlaege = is_array($vorschlaege) ? $vorschlaege : [];
-			}
+			$raum_vorschlaege = $this->_ci->raumvorschlaglib->getVorschlaegeByLehreinheit($lehreinheit_id, $start_str, $end_str);
 
 			$plan[] = [
 				'datum' => $current_date,
@@ -869,14 +859,13 @@ class KalenderLib
 				'block' => $current_block,
 				'ort_kurzbz' => $ort_kurzbz,
 				'collisions' => $collisions,
-				'raum_vorschlaege' => $raum_vorschlaege,
+				'raum_vorschlaege' => is_array($raum_vorschlaege) ? $raum_vorschlaege : [],
 			];
 
 			$rest -= $current_block;
 			$current_date = $this->_addWeeks($current_date, $wochenrythmus);
 		}
 
-		$this->_ci->KalenderModel->db->trans_rollback();
 
 		$this->_ci->VariableModel->setVariable(
 			getAuthUID(),
@@ -939,6 +928,12 @@ class KalenderLib
 
 	public function addKalenderEvent($start_date, $end_date, $lehreinheit_id, $ort_kurzbz)
 	{
+
+		$errors = $this->_checkCollisionForLehreinheit($start_date, $end_date, $lehreinheit_id);
+
+		if (!empty($errors))
+			return error($errors);
+
 		$this->_ci->KalenderModel->db->trans_start();
 
 		$insert = $this->_insertKalenderEventRaw($start_date, $end_date, $lehreinheit_id, $ort_kurzbz);
@@ -970,9 +965,9 @@ class KalenderLib
 			if (hasData($reservierung_vorhanden) && !$this->_ci->permissionlib->isBerechtigt('lehre/reservierungAdvanced'))
 			{
 				return error([
-						'message' => $this->_ci->phraseslib->t('ui', 'already_reserved'),
-						'errorCode' => 'already_reserved'
-					]);
+					'message' => $this->_ci->phraseslib->t('ui', 'already_reserved'),
+					'errorCode' => 'already_reserved'
+				]);
 
 			}
 		}
@@ -1022,15 +1017,15 @@ class KalenderLib
 				}
 			}
 
-		/*	foreach ($specialGroups as $group)
-			{
-				$this->_addSpecialGroupToEvent($kalender_id, $group['gruppe_kurzbz'], $group['rolle']);
-			}
+			/*	foreach ($specialGroups as $group)
+				{
+					$this->_addSpecialGroupToEvent($kalender_id, $group['gruppe_kurzbz'], $group['rolle']);
+				}
 
-			foreach ($groups as $group)
-			{
-				$this->_addGroupToEvent($kalender_id, $group['stg_kz'], $group['semester'], $group['verband'], $group['gruppe'], $group['rolle']);
-			}*/
+				foreach ($groups as $group)
+				{
+					$this->_addGroupToEvent($kalender_id, $group['stg_kz'], $group['semester'], $group['verband'], $group['gruppe'], $group['rolle']);
+				}*/
 
 			if (isSuccess($kalendereventresult) && !is_null($ort_kurzbz))
 			{
@@ -1088,7 +1083,7 @@ class KalenderLib
 		if (!empty($errors)) {
 			return error($errors);
 		}
-		
+
 		$this->_ci->db->trans_start();
 
 		$allowedResourceIDs = array_filter(array_map(
@@ -1243,14 +1238,14 @@ class KalenderLib
 
 		$calendarResources = $this->_ci->BetriebsmittelKalenderModel->loadWhere(['eindeutige_kalender_gruppen_id' => $kalender_entry->eindeutige_gruppen_id]);
 		if (isError($calendarResources)) return $calendarResources;
-		
+
 		$calendarResourcesItems = getData($calendarResources);
 		$calendarResourcesIDs = [];
- 		if (is_array($calendarResourcesItems)) {
+		if (is_array($calendarResourcesItems)) {
 			$calendarResourcesIDs = array_map(function($resource) {
 				return $resource->betriebsmittel_id;
 			}, getData($calendarResources));
-		} 
+		}
 
 		$kalender_entry->betriebsmittel_ids = $calendarResourcesIDs;
 		$kalender_entry->ort_kurzbz = !is_null($ort_kurzbz) ? (array) $ort_kurzbz : $kalender_entry->ort_kurzbz;
@@ -1588,7 +1583,7 @@ class KalenderLib
 		if (isError($result_ort)) return $result_ort;
 		$has_ort = hasData($result_ort) ? getData($result_ort)[0] : false;
 
-	if ($entry->status_kurzbz === 'sync_preview' || $entry->status_kurzbz === 'sync_live' || $entry->status_kurzbz === 'planning')
+		if ($entry->status_kurzbz === 'sync_preview' || $entry->status_kurzbz === 'sync_live' || $entry->status_kurzbz === 'planning')
 		{
 			$history = $this->getHistory($entry->kalender_id, false, false);
 

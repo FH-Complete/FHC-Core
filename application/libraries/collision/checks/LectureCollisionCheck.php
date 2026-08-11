@@ -10,6 +10,7 @@ class LectureCollisionCheck implements ICollisionCheck
 		$this->_ci =& get_instance();
 		$this->_ci->load->model('ressource/Kalender_model', 'KalenderModel');
 		$this->_ci->load->model('ressource/Zeitsperre_model', 'ZeitsperreModel');
+		$this->_ci->load->model('education/LehreinheitMitarbeiter_model', 'LehreinheitMitarbeiterModel');
 		$this->_ci->load->library('VariableLib', array('uid' => getAuthUID()));
 		$this->_ci->load->library('PhrasesLib', array('ui'));
 
@@ -22,11 +23,17 @@ class LectureCollisionCheck implements ICollisionCheck
 
 	public function check($data)
 	{
-		if (!isset($data->von, $data->bis, $data->kalender_id)) return [];
+		if (!isset($data->von, $data->bis)) return [];
+		if (empty($data->kalender_id) && empty($data->lehreinheit_id) && empty($data->uids)) return [];
 
 		if ($this->_ci->variablelib->getVar('ignore_kollision') === 'true') return [];
 
-		$uids = $this->_getUids($data->kalender_id);
+		if (!empty($data->kalender_id))
+			$uids = $this->_getUids($data->kalender_id);
+		else if (!empty($data->lehreinheit_id))
+			$uids = $this->_getUidsFromLehreinheit($data->lehreinheit_id);
+		else
+			$uids = $data->uids;
 
 		if (empty($uids)) return [];
 
@@ -58,9 +65,17 @@ class LectureCollisionCheck implements ICollisionCheck
 		$this->_ci->KalenderModel->db->where('other_kalender.kalender_id != tbl_kalender.kalender_id', null, false);
 		$this->_ci->KalenderModel->db->where('other_kalender.von < tbl_kalender.bis', null, false);
 		$this->_ci->KalenderModel->db->where('other_kalender.bis > tbl_kalender.von', null, false);
-		$this->_ci->KalenderModel->db->where_not_in('other_kalender.status_kurzbz', ['archived', 'deleted', 'to_delete']);
+		$this->_ci->KalenderModel->db->where_not_in('other_kalender.status_kurzbz', array('archived', 'deleted', 'to_delete', 'to_delete_live', 'to_delete_preview'));
 		$this->_ci->KalenderModel->db->where_not_in('current_lehreinheit_ma.mitarbeiter_uid', $kollisionsfreie_user);
-		$this->_ci->KalenderModel->db->where_in('tbl_kalender.kalender_id', $kalender_ids);
+
+		$this->_ci->KalenderModel->db->group_start();
+		$where_ids_chunks = array_chunk($kalender_ids,25);
+		foreach($where_ids_chunks as $where_ids)
+		{
+			$this->_ci->KalenderModel->db->or_where_in('tbl_kalender.kalender_id', $where_ids);
+		}
+		$this->_ci->KalenderModel->db->group_end();
+
 		$this->_ci->KalenderModel->db->where(
 			'other_kalender.kalender_id NOT IN (SELECT vorgaenger_kalender_id FROM lehre.tbl_kalender WHERE vorgaenger_kalender_id IS NOT NULL)',
 			null, false
@@ -85,9 +100,17 @@ class LectureCollisionCheck implements ICollisionCheck
 		$this->_ci->KalenderModel->db->where('other_kalender.kalender_id != tbl_kalender.kalender_id', null, false);
 		$this->_ci->KalenderModel->db->where('other_kalender.von < tbl_kalender.bis', null, false);
 		$this->_ci->KalenderModel->db->where('other_kalender.bis > tbl_kalender.von', null, false);
-		$this->_ci->KalenderModel->db->where_not_in('other_kalender.status_kurzbz', ['archived', 'deleted', 'to_delete']);
+		$this->_ci->KalenderModel->db->where_not_in('other_kalender.status_kurzbz', ['archived', 'deleted', 'to_delete', 'to_delete_live', 'to_delete_preview']);
 		$this->_ci->KalenderModel->db->where_not_in('current_lehreinheit_ma.mitarbeiter_uid', $kollisionsfreie_user);
-		$this->_ci->KalenderModel->db->where_in('tbl_kalender.kalender_id', $kalender_ids);
+
+		$this->_ci->KalenderModel->db->group_start();
+		$where_ids_chunks = array_chunk($kalender_ids,25);
+		foreach($where_ids_chunks as $where_ids)
+		{
+			$this->_ci->KalenderModel->db->or_where_in('tbl_kalender.kalender_id', $where_ids);
+		}
+		$this->_ci->KalenderModel->db->group_end();
+
 		$this->_ci->KalenderModel->db->where(
 			'other_kalender.kalender_id NOT IN (SELECT vorgaenger_kalender_id FROM lehre.tbl_kalender WHERE vorgaenger_kalender_id IS NOT NULL)',
 			null, false
@@ -114,7 +137,13 @@ class LectureCollisionCheck implements ICollisionCheck
 		$this->_ci->KalenderModel->db->where('(z.vondatum + COALESCE(vonstunde_z.beginn, \'00:00\'))::timestamp < tbl_kalender.bis', null, false);
 		$this->_ci->KalenderModel->db->where('(z.bisdatum + COALESCE(bisstunde_z.ende, \'23:59\'))::timestamp > tbl_kalender.von', null, false);
 		$this->_ci->KalenderModel->db->where_not_in('current_lehreinheit_ma.mitarbeiter_uid', $kollisionsfreie_user);
-		$this->_ci->KalenderModel->db->where_in('tbl_kalender.kalender_id', $kalender_ids);
+		$this->_ci->KalenderModel->db->group_start();
+		$where_ids_chunks = array_chunk($kalender_ids,25);
+		foreach($where_ids_chunks as $where_ids)
+		{
+			$this->_ci->KalenderModel->db->or_where_in('tbl_kalender.kalender_id', $where_ids);
+		}
+		$this->_ci->KalenderModel->db->group_end();
 		$result = $this->_ci->KalenderModel->load();
 
 
@@ -159,6 +188,20 @@ class LectureCollisionCheck implements ICollisionCheck
 		return array_unique(array_merge($mitarbeiter_uids, $event_teilnehmer));
 	}
 
+	private function _getUidsFromLehreinheit($lehreinheit_id)
+	{
+		$kollisionsfreie_user = unserialize(KOLLISIONSFREIE_USER);
+
+		$result = $this->_ci->LehreinheitMitarbeiterModel->loadWhere(array('lehreinheit_id' => $lehreinheit_id));
+
+		if (isError($result) || !hasData($result)) return [];
+
+		$uids = array_column(getData($result), 'mitarbeiter_uid');
+		$uids = array_diff(array_filter($uids), $kollisionsfreie_user);
+
+		return array_values(array_unique($uids));
+	}
+
 	private function _checkLehreinheit($uids, $data)
 	{
 		$kollisionsfreie_user = unserialize(KOLLISIONSFREIE_USER);
@@ -170,8 +213,9 @@ class LectureCollisionCheck implements ICollisionCheck
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter', 'lehreinheit_id', 'LEFT');
 
 		$this->_ci->KalenderModel->db->where_in('mitarbeiter_uid', $uids);
-		$this->_ci->KalenderModel->db->where('tbl_kalender.kalender_id !=', $data->kalender_id);
-		$this->_ci->KalenderModel->db->where_not_in('tbl_kalender.status_kurzbz', array('archived', 'deleted', 'to_delete'));
+		if (!empty($data->kalender_id))
+			$this->_ci->KalenderModel->db->where('tbl_kalender.kalender_id !=', $data->kalender_id);
+		$this->_ci->KalenderModel->db->where_not_in('tbl_kalender.status_kurzbz', array('archived', 'deleted', 'to_delete', 'to_delete_live', 'to_delete_preview'));
 		$this->_ci->KalenderModel->db->where_not_in('mitarbeiter_uid', $kollisionsfreie_user);
 		$this->_ci->KalenderModel->db->where(
 			'tbl_kalender.kalender_id NOT IN (SELECT vorgaenger_kalender_id FROM lehre.tbl_kalender WHERE vorgaenger_kalender_id IS NOT NULL)',
@@ -207,8 +251,9 @@ class LectureCollisionCheck implements ICollisionCheck
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event_teilnehmer', 'tbl_kalender_event.kalender_id = tbl_kalender_event_teilnehmer.kalender_id', 'LEFT');
 
 		$this->_ci->KalenderModel->db->where_in('tbl_kalender_event_teilnehmer.uid', $uids);
-		$this->_ci->KalenderModel->db->where('tbl_kalender.kalender_id !=', $data->kalender_id);
-		$this->_ci->KalenderModel->db->where_not_in('tbl_kalender.status_kurzbz', array('archived', 'deleted', 'to_delete'));
+		if (!empty($data->kalender_id))
+			$this->_ci->KalenderModel->db->where('tbl_kalender.kalender_id !=', $data->kalender_id);
+		$this->_ci->KalenderModel->db->where_not_in('tbl_kalender.status_kurzbz', array('archived', 'deleted', 'to_delete', 'to_delete_live', 'to_delete_preview'));
 		$this->_ci->KalenderModel->db->where_not_in('uid', $kollisionsfreie_user);
 		$this->_ci->KalenderModel->db->where(
 			'tbl_kalender.kalender_id NOT IN (SELECT vorgaenger_kalender_id FROM lehre.tbl_kalender WHERE vorgaenger_kalender_id IS NOT NULL)',
