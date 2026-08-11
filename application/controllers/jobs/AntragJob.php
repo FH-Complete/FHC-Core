@@ -125,7 +125,7 @@ class AntragJob extends JOB_Controller
 					$stgLeitungen[$leitung->uid]['stgs'][] = $antrag->studiengang_kz;
 				}
 
-				$result = $this->StudierendenantragModel->getStgAndSem($antrag->studierendenantrag_id);
+				$result = $this->StudierendenantragModel->getStgAndDetails($antrag->studierendenantrag_id);
 				if (isError($result))
 				{
 					$this->logError(getError($result));
