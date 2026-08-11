@@ -161,7 +161,8 @@ class CoodleSurvey extends FHCAPI_Controller
 	public function getActiveSurveys()
 	{
 		$uid = getAuthUID();
-		$activeSurveys = $this->CoodleSurveyModel->getActiveSurveys($uid);
+		$activeSurveysResult = $this->CoodleSurveyModel->getActiveSurveys($uid);
+		$activeSurveys = $this->getDataOrTerminateWithError($activeSurveysResult);
 		$activeSurveys = array_map(
 			function ($survey) {
 				$survey->creator = [
@@ -180,7 +181,8 @@ class CoodleSurvey extends FHCAPI_Controller
 	public function getInactiveSurveys()
 	{
 		$uid = getAuthUID();
-		$inactiveSurveys = $this->CoodleSurveyModel->getInactiveSurveys($uid);
+		$inactiveSurveysResult = $this->CoodleSurveyModel->getInactiveSurveys($uid);
+		$inactiveSurveys = $this->getDataOrTerminateWithError($inactiveSurveysResult);
 		$inactiveSurveys = array_map(
 			function ($survey) {
 				$survey->creator = [
@@ -215,7 +217,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
-		$surveyId = getData($this->CoodleSurveyModel->createSurvey($surveyData, getAuthUID()));
+		$surveyId = $this->getDataOrTerminateWithError($this->CoodleSurveyModel->createSurvey($surveyData, getAuthUID()));
 		$this->CoodleSurveyTimeslotModel->updateTimeslots($surveyId, $surveyData["timeslots"]);
 		$timeslots = $this->CoodleSurveyTimeslotModel->getTimeslots($surveyId);
 		$this->CoodleSurveyParticipantModel->updateParticipants($surveyId, $surveyData["participants"], $timeslots);

@@ -33,7 +33,7 @@ class CoodleSurvey_model extends DB_Model
 			FROM $this->dbTable
 			WHERE id IN $surveyIds
 		";
-		return $this->execQuery($query)->retval;
+		return $this->execQuery($query);
 	}
 
 	public function getActiveSurveys($uid)
@@ -65,7 +65,7 @@ class CoodleSurvey_model extends DB_Model
 			AND completed_at IS NULL
 			AND canceled_at IS NULL";
 
-		return $this->execQuery($query)->retval;
+		return $this->execQuery($query);
 	}
 
 	public function getInactiveSurveys($uid)
@@ -97,7 +97,7 @@ class CoodleSurvey_model extends DB_Model
 		$query .= "creator_uid = '$uid')
 			AND (completed_at IS NOT NULL OR canceled_at IS NOT NULL)";
 
-		return $this->execQuery($query)->retval;
+		return $this->execQuery($query);
 	}
 
 	public function createSurvey($surveyData, $creatorUid)
@@ -122,7 +122,7 @@ class CoodleSurvey_model extends DB_Model
 			return error('Something went wrong during survey creation!');
 		}
 
-		return success($surveyCreationResult->retval);
+		return $surveyCreationResult;
 	}
 
 	public function updateSurvey($surveyId, $surveyData)
@@ -142,7 +142,7 @@ class CoodleSurvey_model extends DB_Model
 			return error('Something went wrong during survey update!');
 		}
 
-		return success($surveyUpdateResult->retval);
+		return $surveyUpdateResult;
 	}
 
 	public function cancelSurvey($surveyId)
