@@ -41,6 +41,7 @@ with gbt as (
 	    gb.anmerkung,
 	    gb.dienstverhaeltnis_id,
 	    gb.gehaltstyp_kurzbz,
+		gb.gehaltsanpassungtyp_kurzbz,
 	    gb.valorisierungssperre,
 	    gb.valorisierung,
 	    gb.grundbetrag as grund_betrag_decrypted,
@@ -76,11 +77,13 @@ select
     gbt.anmerkung,
     gbt.dienstverhaeltnis_id,
     gbt.gehaltstyp_kurzbz,
+	gbt.gehaltsanpassungtyp_kurzbz,
     gbt.valorisierungssperre,
     gbt.valorisierung,
     gbt.grund_betrag_decrypted,
     gbt.betrag_val_decrypted,
 	gt.bezeichnung as gehaltstyp_bezeichnung,
+	ga.bezeichnung as gehaltsanpassungtyp_bezeichnung,
 	vb.vertragsbestandteiltyp_kurzbz,
 	bf.funktion_kurzbz,
 	bf.oe_kurzbz,
@@ -93,6 +96,8 @@ from
 	gbt
 LEFT JOIN 
 	hr.tbl_gehaltstyp gt using(gehaltstyp_kurzbz)
+LEFT JOIN 
+	hr.tbl_gehaltsanpassungtyp ga using(gehaltsanpassungtyp_kurzbz)
 LEFT JOIN 
 	hr.tbl_vertragsbestandteil vb using(vertragsbestandteil_id)
 LEFT JOIN 
@@ -202,6 +207,7 @@ SELECT
 	g.dienstverhaeltnis_id, 
 	g.vertragsbestandteil_id, 
 	g.gehaltstyp_kurzbz, 
+	g.gehaltsanpassungtyp_kurzbz,
 	g.von, 
 	g.bis, 
 	g.anmerkung, 
@@ -263,7 +269,7 @@ EOSQL;
 		// Note: replaced gb.betrag_valorisiert with vh.betrag_valorisiert!
 		$qry = "
         	SELECT 
-				gb.gehaltsbestandteil_id,gb.dienstverhaeltnis_id,gb.vertragsbestandteil_id,gb.gehaltstyp_kurzbz,
+				gb.gehaltsbestandteil_id,gb.dienstverhaeltnis_id,gb.vertragsbestandteil_id,gb.gehaltstyp_kurzbz,gb.gehaltsanpassungtyp_kurzbz,
 				gb.von,gb.bis,gb.anmerkung,gb.grundbetrag as grundbetrag,gb.valorisierungssperre,gb.insertamum,
 				gb.insertvon,gb.updateamum,gb.updatevon,gb.valorisierung,gb.auszahlungen,
 				vh.valorisierungsdatum, vh.betrag_valorisiert as betrag_valorisiert
