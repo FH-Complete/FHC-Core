@@ -1,21 +1,20 @@
 /**
- * Prüfungsordnung §1 rules as the client applies them.
+ * The examination rules as the client applies them.
  *
- * Die Regeln selbst liegen im Server (PruefungsverlaufLib): er liefert je Student einen `verlauf`
- * mit Antrittszahl, Grenze und der nächsten möglichen Rolle, und je Termin dessen Position sowie
- * ob er einen Antritt verbraucht. Hier wird das nur noch ausgewertet - damit gibt es keine zweite
- * Implementierung der Regeln mehr, die auseinanderlaufen kann.
+ * PruefungsverlaufLib sends one `verlauf` for each student. It contains the attempt count, the
+ * limit and the next possible role. For each exam it contains the position and a flag that tells
+ * you if the exam uses an attempt.
  *
- * Der lokale Fallback greift nur, solange der Verlauf für eine Zeile noch nicht geladen ist.
+ * The local fallback applies only while the client has no `verlauf` for a row.
  */
 
-/** Maximale Anzahl zählender Antritte in diesem Tool (serverseitig abgeleitet). */
+/** The maximum number of attempts that count in this tool. The server derives this value. */
 export const maxAntrittCount = (config) => config?.CIS_GESAMTNOTE_MAX_ANTRITTE ?? 1;
 
 /**
- * Zählende Prüfungsantritte. Gezählt wird über die NOTE, nicht über den Termintyp: Noten in
- * NOTEN_OHNE_ANTRITT (entschuldigt, nicht beurteilt, noch nicht eingetragen) verbrauchen keinen
- * Antritt. Ohne zählenden Termin gilt die LV-Note selbst als erster Antritt, sofern sie zählt.
+ * The attempts that count. The NOTE decides, not the exam type: the grades in NOTEN_OHNE_ANTRITT
+ * (excused, not assessed, not entered yet) use no attempt. If no exam counts, the course grade
+ * itself is the first attempt, but only if that grade counts.
  */
 export const antrittCountStudent = (student, config, notenOptions) => {
 	if (student.verlauf) return student.verlauf.antrittCount;
@@ -34,21 +33,25 @@ export const antrittCountStudent = (student, config, notenOptions) => {
 	return count;
 };
 
-/** Ob für den Studenten überhaupt noch ein Antritt angelegt werden darf. */
+/** Tells you if the student can get one more attempt. */
 export const canAddPruefung = (student, config) => {
 	if (student.verlauf) return student.verlauf.canAdd;
 	return !student.kommPruef && antrittCountStudent(student, config) < maxAntrittCount(config);
 };
 
 /**
- * Ob mit der neuen Prüfung auch erst die LV-Note entsteht. Kommt aus dem Verlauf und nicht aus
- * `lv_note`: letzteres kennt nur FREIGEGEBENE Noten, eine erfasste aber nicht freigegebene LV-Note
- * existiert trotzdem. Nur für den Hinweis in der Oberfläche.
+ * Tells you if the new exam also creates the course grade. The value comes from the `verlauf` and
+ * not from `lv_note`, because `lv_note` contains RELEASED grades only. An entered grade that is
+ * not released still exists. The user interface uses this for a hint only.
  */
 export const brauchtNeueLvNote = (student) => student.verlauf ? !student.verlauf.hatLvNote : !student.lv_note;
 
-/** Grade state from the two timestamps. */
+/**
+ * The grade state from the two timestamps: offen = no grade entered (an empty row), changed = a
+ * grade is entered but not released, ok = released and not changed since the release.
+ */
 export const checkFreigabe = (freigabedatum, benotungsdatum) => {
-	if (!freigabedatum) return "offen";
+	if (!benotungsdatum) return "offen";
+	if (!freigabedatum) return "changed";
 	return benotungsdatum > freigabedatum ? "changed" : "ok";
 };

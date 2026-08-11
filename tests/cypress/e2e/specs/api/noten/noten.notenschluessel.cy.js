@@ -1,9 +1,8 @@
 /**
- * Notenschlüssel - points to grade (P0, case 10). Read-only.
+ * Notenschlüssel - Punkte zu Note (P0, case 10). Read-only.
  *
- * getNote() picks the aufteilung row with the highest punkte <= input, and returns null when the LV
- * has no Notenschlüssel. Rather than re-implementing that lookup, this sweeps the range and asserts
- * the properties a correct scale must have: total, monotonic, exact at each boundary.
+ * Statt die Zuordnung nachzubauen, wird der Bereich abgetastet und auf die Eigenschaften einer
+ * korrekten Skala geprüft: lückenlos, monoton, exakt an jeder Grenze.
  */
 
 import { notenApi } from "../../../../support/api/notenApi";
@@ -47,8 +46,8 @@ describe("Noten API - Notenschlüssel (getNoteByPunkte)", () => {
 					`for every value in 0..${MAX_PUNKTE}. Pin NOTEN_LV_ID to an LV that has one.`,
 			).to.be.greaterThan(0);
 
-			// (4) below the lowest threshold the model answers null, and that region must be a
-			// contiguous prefix - a null appearing *after* a graded value would mean a gap in the scale
+			// unter der niedrigsten Schwelle antwortet das Modell null; das muss ein zusammenhängender
+			// Anfang sein, ein null NACH einer Note wäre eine Lücke in der Skala
 			const firstGradedIndex = observed.findIndex((e) => e.note !== null && e.note !== undefined);
 			observed.slice(firstGradedIndex).forEach((entry) => {
 				expect(
@@ -57,7 +56,7 @@ describe("Noten API - Notenschlüssel (getNoteByPunkte)", () => {
 				).to.not.be.oneOf([null, undefined]);
 			});
 
-			// (2) monotonic: grade PKs run 1 (best) .. 5 (worst), so the number must never increase
+			// monoton: die PKs laufen 1 (beste) .. 5, die Zahl darf also nie steigen
 			for (let i = 1; i < graded.length; i += 1) {
 				expect(
 					Number(graded[i].note),
@@ -65,7 +64,7 @@ describe("Noten API - Notenschlüssel (getNoteByPunkte)", () => {
 				).to.be.at.most(Number(graded[i - 1].note));
 			}
 
-			// (3) exact boundaries: report each step so a shifted threshold is visible in the output
+			// jede Stufe einzeln melden, damit eine verschobene Schwelle in der Ausgabe sichtbar wird
 			const boundaries = [];
 			for (let i = 1; i < graded.length; i += 1) {
 				if (Number(graded[i].note) !== Number(graded[i - 1].note)) {
@@ -109,8 +108,7 @@ describe("Noten API - Notenschlüssel (getNoteByPunkte)", () => {
 	});
 
 	it("reports no grade for an LV without a Notenschlüssel", () => {
-		// A non-existent LV id can have no Notenschlüssel assigned, so the model's success(null)
-		// contract is observable without depending on a particular fixture.
+		// eine nicht existierende LV hat garantiert keinen Schlüssel - fixturefrei prüfbar
 		notenApi.getNoteByPunkte(50, 0, ctx.semKurzbz).then((response) => {
 			const note = expectNotenSuccess(response, "getNoteByPunkte for an LV without a schluessel");
 			expect(note, "no Notenschlüssel -> no grade").to.be.oneOf([null, undefined]);

@@ -1,9 +1,7 @@
 /**
- * Fixture reset over a direct DB connection - the only mechanism.
- *
- * A gated HTTP reset endpoint existed briefly and was removed: it deleted grade data, and no
- * gating makes that as safe as not having it. Consequence: the runner needs DB reachability, which
- * from a workstation means the SSH tunnel (cypress/tasks/sshTunnel.js).
+ * Fixture-Reset ausschliesslich über eine direkte DB-Verbindung - ein HTTP-Endpunkt, der
+ * Notendaten löscht, ist durch keine Absicherung so sicher wie sein Nichtvorhandensein.
+ * Von der Workstation aus braucht das den SSH-Tunnel (cypress/tasks/sshTunnel.js).
  */
 
 let available = null;
@@ -70,6 +68,17 @@ export const performSeed = (context, studentUid, payload) =>
 export const performSeedPruefung = (context, studentUid, payload) =>
 	authUid().then((uid) =>
 		cy.task("noten:db:seedPruefung", {
+			lvId: context.lvId,
+			semKurzbz: context.semKurzbz,
+			studentUid,
+			mitarbeiterUid: uid,
+			...payload,
+		}),
+	);
+
+export const performSeedZeugnisnote = (context, studentUid, payload) =>
+	authUid().then((uid) =>
+		cy.task("noten:db:seedZeugnisnote", {
 			lvId: context.lvId,
 			semKurzbz: context.semKurzbz,
 			studentUid,

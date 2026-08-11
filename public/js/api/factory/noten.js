@@ -51,19 +51,28 @@ export default {
 	},
 	// kein Termintyp mehr: welchen Antritt die Prüfung darstellt, leitet der Server aus dem
 	// bestehenden Prüfungsverlauf des Studenten in dieser LV und diesem Semester ab
-	saveStudentPruefung(student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, pruefung_id = null){
+	// mitarbeiter_uid: der benotende Lektor. Nur nötig, wenn die Lehreinheit mehrere hat - sonst
+	// löst der Server ihn selbst auf.
+	saveStudentPruefung(student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, pruefung_id = null, mitarbeiter_uid = null){
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/Noten/saveStudentPruefung',
-			params: { student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, pruefung_id }
+			params: { student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, pruefung_id, mitarbeiter_uid }
 		};
 	},
 	// note/punkte optional: ohne Auswahl wird der Termin als "noch nicht eingetragen" angelegt
-	createPruefungen(uids, datum, lva_id, sem_kurzbz, note = null, punkte = null){
+	createPruefungen(uids, datum, lva_id, sem_kurzbz, note = null, punkte = null, mitarbeiter_uid = null){
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/Noten/createPruefungen',
-			params: { uids, datum, lva_id, sem_kurzbz, note, punkte }
+			params: { uids, datum, lva_id, sem_kurzbz, note, punkte, mitarbeiter_uid }
+		};
+	},
+	getLehrendeFuerLehreinheit(lehreinheit_id, lv_id, sem_kurzbz) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Noten/getLehrendeFuerLehreinheit',
+			params: { lehreinheit_id, lv_id, sem_kurzbz }
 		};
 	},
 	saveNotenvorschlagBulk(lv_id, sem_kurzbz, noten) {

@@ -1,10 +1,8 @@
 /**
- * savePruefungFuerStudent / savePruefungstermin - the write path shared by saveStudentPruefung,
- * createPruefungen and savePruefungenBulk. The other specs cover the validators; this one covers
- * the writer.
+ * Der Schreibpfad (savePruefungFuerStudent), den saveStudentPruefung, createPruefungen und
+ * savePruefungenBulk teilen. Die Validatoren decken die anderen Specs ab.
  *
- * Core invariant since the Prüfungsverlauf refactor: one action writes exactly one Prüfung. The
- * former Termin1 snapshot is gone - Antritt 1 is created by the password-gated Freigabe.
+ * Invariante: eine Aktion schreibt genau eine Prüfung; Antritt 1 entsteht bei der Freigabe.
  */
 
 import { expectNotenSuccess } from "../../../../support/helpers/notenErrors";
@@ -107,8 +105,7 @@ describe("Noten API - Prüfungstermin (write path)", () => {
 	});
 
 	it("appends a new row per add instead of overwriting the previous one", () => {
-		// The old writer re-derived its target as "the first non-excused Termin2" and updated it.
-		// Now only an explicit pruefung_id updates; an add always inserts.
+		// nur eine explizite pruefung_id aktualisiert, ein Add fügt immer ein
 		const student = studentFor(0);
 
 		givenBaseline(ctx, student);
@@ -171,9 +168,8 @@ describe("Noten API - Prüfungstermin (write path)", () => {
 	});
 
 	it("adds an attempt while the LV note is still offen", () => {
-		// getLvGesamtNoten filters `freigabedatum < NOW()`. The writer must read the LV note through
-		// the UNFILTERED getter, otherwise it takes the INSERT branch against an existing primary key
-		// and answers "keine LV-Note eingetragen" forever.
+		// liest der Schreibpfad gefiltert, sieht er die Note nicht, versucht ein INSERT gegen den
+		// bestehenden PK und antwortet für immer "keine LV-Note eingetragen"
 		const student = studentFor(3);
 
 		givenBaseline(ctx, student, { freigegeben: false });
@@ -212,8 +208,7 @@ describe("Noten API - Prüfungstermin (write path)", () => {
 	});
 
 	it("creates the LV note when a student has none yet", () => {
-		// Previously this answered c4keineLvNoteEingetragen. The bulk path now runs the same core as
-		// the single dialog, which writes the LV note before the Prüfung.
+		// der Bulk-Pfad läuft durch denselben Kern und schreibt die LV-Note vor dem Termin
 		const student = studentFor(0);
 
 		resetNotenState(ctx);

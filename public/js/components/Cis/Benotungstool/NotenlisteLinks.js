@@ -13,9 +13,9 @@ export const NotenlisteLinks = {
 			return LehreinheitenModule;
 		},
 		lehreinheiten() {
-			// reuse the already-loaded LE options from the shared module
+			// use the teaching unit options that the shared module loaded before
 			const all = LehreinheitenModule.options ?? [];
-			// when a single Lehreinheit is selected, restrict the list to just that one
+			// if the user selected one teaching unit, show only that one
 			if (this.selectedLehreinheit?.lehreinheit_id != null) {
 				return all.filter(le => le.lehreinheit_id === this.selectedLehreinheit.lehreinheit_id);
 			}

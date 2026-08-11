@@ -1,10 +1,9 @@
 /**
  * Prüfungsordnung §1 - Noteneintragungsfrist (P0, cases 8-9).
  *
- * enforceNoteneintragungsfrist runs after assertLvAccess but before any write, so a request naming
- * a past-deadline semester is rejected without touching a row. The message carries the derived
- * deadline, which doubles as a check of computeNoteneintragungsfrist
- * (SS -> 15.11.yyyy, WS -> 15.05.yyyy+1).
+ * Die Prüfung läuft vor jedem Schreibzugriff, ein abgelaufenes Semester wird also abgelehnt ohne
+ * eine Zeile anzufassen. Die Fehlermeldung nennt die Frist und prüft damit zugleich deren
+ * Ableitung (SS -> 15.11.yyyy, WS -> 15.05.yyyy+1).
  */
 
 import { notenApi } from "../../../../support/api/notenApi";
@@ -31,6 +30,42 @@ describe("Noten API - Noteneintragungsfrist (Prüfungsordnung §1)", () => {
 			ctx = context;
 			enforced = Boolean(ctx.cisConfig.CIS_GESAMTNOTE_NOTENEINTRAGUNGSFRIST);
 			cy.log(`CIS_GESAMTNOTE_NOTENEINTRAGUNGSFRIST = ${enforced}`);
+		});
+	});
+
+	// §7 und §11: nicht nur der Zeitpunkt der Eingabe zählt, sondern auch das Prüfungsdatum selbst.
+	// Die kommissionelle Prüfung muss bis zur Frist STATTFINDEN, sonst verliert der Student ein
+	// Semester. Das ist eine andere Frage als "darf jetzt noch eingetragen werden".
+	describe("Prüfungsdatum nach der Frist", () => {
+		beforeEach(function () {
+			if (!enforced) {
+				cy.log("Übersprungen: CIS_GESAMTNOTE_NOTENEINTRAGUNGSFRIST ist aus.");
+				this.skip();
+			}
+			requireDbReset();
+		});
+
+		it("lehnt einen Termin ab, der nach der Frist liegt", () => {
+			const student = ctx.students[0];
+			const jahr = Number(ctx.semKurzbz.slice(2, 6));
+			// die Frist des laufenden Semesters liegt in der Zukunft, ein Datum dahinter ist ungültig
+			const nachDerFrist = `${jahr + 1}-12-31`;
+
+			givenBaseline(ctx, student);
+
+			addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: nachDerFrist }).then((response) => {
+				expectNotenError(response, "pruefungsdatumNachFrist");
+			});
+		});
+
+		it("nimmt einen Termin vor der Frist an", () => {
+			const student = ctx.students[1];
+
+			givenBaseline(ctx, student);
+
+			addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: attemptDate(ctx, 1) }).then(
+				(response) => expectNotenSuccess(response, "Termin innerhalb der Frist"),
+			);
 		});
 	});
 
@@ -93,7 +128,7 @@ describe("Noten API - Noteneintragungsfrist (Prüfungsordnung §1)", () => {
 
 		it("accepts grade entry in a semester whose deadline has not passed", function () {
 			if (enforced && fristHasPassed(ctx.semKurzbz)) {
-				// writing is impossible here; the whole mutating suite would be blocked too
+				// hier ist kein Schreiben möglich, damit wäre die gesamte mutierende Suite blockiert
 				throw new Error(
 					`Noteneintragungsfrist enforcement is ON and the deadline for the test semester ` +
 						`${ctx.semKurzbz} (${expectedFristString(ctx.semKurzbz)}) has already passed, so no ` +
@@ -114,7 +149,6 @@ describe("Noten API - Noteneintragungsfrist (Prüfungsordnung §1)", () => {
 		});
 	});
 
-	// The SS/WS derivation is asserted against the SERVER in the two "deadline has passed" tests,
-	// which compare the deadline it names in the error message. A local check of expectedFristString()
-	// against constants only tested the helper, so it was removed.
+	// Die SS/WS-Ableitung wird gegen den SERVER geprüft (die Frist in der Fehlermeldung oben) -
+	// ein lokaler Vergleich von expectedFristString() gegen Konstanten testet nur den Helfer.
 });

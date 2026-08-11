@@ -1,8 +1,8 @@
 /**
- * Access control (P2) - assertLvAccess scoping (Noten.php:243).
+ * Access control (P2) - das Scoping von assertLvAccess.
  *
- * There is no impersonation in this API, so testing teacher scoping needs that teacher's real
- * credentials: NOTEN_TEACHER_USER / NOTEN_TEACHER_PASSWORD / NOTEN_FOREIGN_LV_ID.
+ * Diese API kennt keine Impersonation, der Lektoren-Scope braucht daher echte Zugangsdaten:
+ * NOTEN_TEACHER_USER / NOTEN_TEACHER_PASSWORD / NOTEN_FOREIGN_LV_ID.
  */
 
 import { notenApi } from "../../../../support/api/notenApi";
@@ -81,10 +81,7 @@ describe("Noten API - access control", () => {
 			password: Cypress.env("NOTEN_TEACHER_PASSWORD"),
 		});
 
-		/**
-		 * Without this the denials below pass on a 401 from the LOGIN, never reaching assertLvAccess -
-		 * a scoping suite that is green because the second account cannot log in at all.
-		 */
+		/** Ohne das wären die Ablehnungen unten grün, weil der zweite Account gar nicht erst reinkommt. */
 		it("authenticates as the configured teacher", () => {
 			cy.request({
 				method: "GET",
@@ -158,9 +155,8 @@ describe("Noten API - access control", () => {
 		});
 	});
 
-	// getLvForStudiengang's refusal is NOT covered: the configured user is an admin, so
-	// isBerechtigt('admin') short-circuits the entitlement check and every call succeeds. It needs
-	// the same non-admin login as the teacher tests above.
+	// getLvForStudiengang ist NICHT abgedeckt: als Admin greift isBerechtigt('admin') und jeder
+	// Aufruf gelingt. Braucht denselben Nicht-Admin-Login wie die Lektorentests oben.
 
 	describe("getBenotungstoolContext shape", () => {
 		it("returns the role-determining payload", () => {

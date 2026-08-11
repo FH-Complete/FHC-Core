@@ -1,14 +1,9 @@
 /**
- * Notenvorschlag - LV note write and resulting state (P1, case 11).
+ * Notenvorschlag - LV-Note schreiben und der resultierende Status (P1, case 11).
  *
- * State comes from two timestamps (Benotungstool.js::checkFreigabe): no freigabedatum -> offen,
- * benotungsdatum > freigabedatum -> changed, else freigegeben. The "changed" case is produced by
- * seeding an already-freigegebene baseline, which keeps this spec free of the LDAP password check
- * and the Freigabe mail.
- *
- * Caveat: getLvGesamtNoten() (behind getStudentenNoten) filters `freigabedatum < NOW()`, and
- * NULL < NOW() is NULL - so offene notes are dropped, while saveNotenvorschlag writes through the
- * unfiltered getLvGesamtNoteVorschlag(). The tests below separate write from read for that reason.
+ * Status aus zwei Zeitstempeln (notenRules.js::checkFreigabe). Der "changed nach Freigabe"-Fall
+ * wird über eine bereits freigegebene Baseline erzeugt, damit dieser Spec ohne LDAP-Passwort und
+ * ohne Freigabemail auskommt.
  */
 
 import { notenApi } from "../../../../support/api/notenApi";
@@ -59,7 +54,7 @@ describe("Noten API - Notenvorschlag", () => {
 				});
 		});
 
-		it("persists the row with freigabedatum NULL (state: offen)", () => {
+		it("persists the row with freigabedatum NULL (not freigegeben)", () => {
 			const student = ctx.students[0];
 
 			resetNotenState(ctx);
@@ -73,8 +68,6 @@ describe("Noten API - Notenvorschlag", () => {
 			});
 		});
 
-		// The unfiltered getter behind getNotenvorschlagStudent sees the same row fine - which is the
-		// getter finding 1 says getStudentenNoten should be using.
 		it("reports the offen note through getNotenvorschlagStudent", () => {
 			const student = ctx.students[0];
 
@@ -88,8 +81,8 @@ describe("Noten API - Notenvorschlag", () => {
 			});
 		});
 
-		// EXPECTED TO FAIL while getLvGesamtNoten filters `freigabedatum < NOW()`: the row exists
-		// (test above proves it) but the read model drops it until the note is freigegeben.
+		// getStudentenNoten liest seit dem Wechsel auf den ungefilterten Getter auch noch nicht
+		// freigegebene Noten - sonst sind LV-Note und Freigabestatus nach einem Reload leer.
 		it("reports the offen note back through getStudentenNoten", () => {
 			const student = ctx.students[0];
 
@@ -109,6 +102,9 @@ describe("Noten API - Notenvorschlag", () => {
 		});
 	});
 
+	// `erstantritt: false` ist die Altdatenform: freigegebene LV-Note ohne Prüfungszeile. Nur dort
+	// ist ein direktes Umbenoten erlaubt - existiert eine Prüfung, lehnt der Server ab
+	// (validateNotenvorschlag, siehe noten.ueberschreiben).
 	describe("re-grading an already freigegebene note", () => {
 		it("moves the state from freigegeben to changed", () => {
 			const student = ctx.students[1];
@@ -117,6 +113,7 @@ describe("Noten API - Notenvorschlag", () => {
 			seedBaseline(ctx, student.uid, {
 				note: ctx.gradeNotes[0],
 				freigegeben: true,
+				erstantritt: false,
 				benotungsdatum: baselineBenotungsdatum(ctx),
 			});
 
@@ -154,7 +151,11 @@ describe("Noten API - Notenvorschlag", () => {
 			const student = ctx.students[1];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, { note: ctx.gradeNotes[0], freigegeben: true });
+			seedBaseline(ctx, student.uid, {
+				note: ctx.gradeNotes[0],
+				freigegeben: true,
+				erstantritt: false,
+			});
 
 			notenApi.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, ctx.gradeNotes[1]);
 

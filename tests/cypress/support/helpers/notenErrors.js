@@ -1,9 +1,8 @@
 /**
- * Assertions for the Noten error envelope.
+ * Assertions für die Noten-Fehlerhülle.
  *
- * These errors carry no errorCode, only a localized message (terminateWithError + p->t()), so we
- * match against the de/en phrase templates from system/phrasesupdate.php. Both languages accepted.
- * Adding an errorCode server-side would remove this coupling.
+ * Die Fehler tragen keinen errorCode, nur eine lokalisierte Meldung - daher der Abgleich gegen die
+ * de/en-Templates aus system/phrasesupdate.php. Ein errorCode serverseitig würde das erübrigen.
  */
 
 const PHRASES = {
@@ -31,13 +30,37 @@ const PHRASES = {
 		de: "Die Noteneintragungsfrist ({0}) für dieses Studiensemester ist abgelaufen. Es können keine Noten oder Prüfungen mehr eingetragen werden.",
 		en: "The grade entry deadline ({0}) for this study semester has passed. Grades and exams can no longer be entered.",
 	},
-	wrongPruefungType: {
-		de: "Prüfung für Studierenden {0} konnte nicht bearbeitet werden, {1} ist keine gültiger Prüfungstyp.",
-		en: "Exam for Student {0} was not saved, {1} is not a valid exam type.",
-	},
 	c4keineLvNoteEingetragen: {
 		de: "Keine LV Note eingetragen",
 		en: "No Subject Grade entered",
+	},
+	c4angerechnetKeinePruefung: {
+		de: "Für {0} ist die Lehrveranstaltung angerechnet. Dafür können keine Prüfungen eingetragen werden.",
+		en: "The course is credited for {0}. No exams can be recorded for it.",
+	},
+	c4pruefungNichtGespeichert: {
+		de: "Die Prüfung für {0} konnte nicht gespeichert werden.",
+		en: "The exam for {0} could not be saved.",
+	},
+	pruefungsdatumNachFrist: {
+		de: "Das Prüfungsdatum für Studierenden {0} liegt nach dem Ende der Noteneintragungsfrist ({1}). Es wurde keine Prüfung angelegt.",
+		en: "The exam date for student {0} is after the grade entry deadline ({1}). No exam was created.",
+	},
+	c4punkteKeineNoteErmittelt: {
+		de: "Für Studierenden {0} konnte aus den Punkten keine Note ermittelt werden. Die Zeile wurde übersprungen.",
+		en: "No grade could be derived from the points for student {0}. The row was skipped.",
+	},
+	c4noteNichtInLehre: {
+		de: "Die gewählte Note ist für eine Lehrveranstaltung nicht zugelassen. Die LV-Note für {0} bleibt unverändert.",
+		en: "The selected grade is not permitted for a course. The course grade for {0} stays unchanged.",
+	},
+	c4notenvorschlagGesperrt: {
+		de: "Für {0} existiert bereits eine Prüfung. Ändern Sie die LV-Note über den Prüfungstermin.",
+		en: "An exam already exists for {0}. Change the course grade through the exam.",
+	},
+	c4zeugnisnoteGesperrt: {
+		de: "Die Zeugnisnote von {0} ist für Lehrende gesperrt. Die LV-Note bleibt unverändert.",
+		en: "The transcript grade of {0} is locked for teachers. The course grade stays unchanged.",
 	},
 	keineBerechtigungNoten: {
 		de: 'Keine Berechtigung, um in der Lehrveranstaltung "{0}" im Semester {1} Noten einzutragen.',

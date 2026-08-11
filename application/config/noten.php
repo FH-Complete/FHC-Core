@@ -23,15 +23,23 @@ $config['NOTEN_OCCURANCE_LIMIT_MAP'] = [17 => 1]; // über alle Antritte hinweg 
 // entry when a new pruefung of the same type is created (instead of being overwritten).
 $config['NOTE_ENTSCHULDIGT'] = 17;
 
-// Maximale Anzahl zählender Prüfungsantritte, die IN DIESEM TOOL eingetragen werden können
-// (inkl. erstem Antritt). null = aus den Alt-Flags CIS_GESAMTNOTE_PRUEFUNG_TERMIN2/TERMIN3
-// ableiten (1 + je aktiviertem Termin), damit bestehende Installationen unverändert laufen.
-// Der abschliessende Antritt (kommPruef) wird woanders eingetragen und zählt hier nicht mit.
+// The maximum number of attempts that count, the first attempt and the kommissionelle attempt
+// included. null derives the number from the old flags:
+//   1 (the original assessment) + TERMIN2 + TERMIN3 + KOMMPRUEF
+// The examination rules permit three attempts. With TERMIN2 and KOMMPRUEF the formula gives 3.
+// An installation with TERMIN3 gets 4, which is one more attempt in the same chain.
 $config['CIS_GESAMTNOTE_MAX_ANTRITTE'] = null;
 
-// Prüfungstypen die den Verlauf abschliessen: danach ist kein weiterer Antritt möglich. Das ist
-// die einzige Stelle, an der der Typ eines Termins noch eine Bedeutung trägt.
-$config['PRUEFUNG_TERMINAL_TYPEN'] = ['kommPruef', 'zusKommPruef'];
+// The exam types that take place before a commission.
+$config['PRUEFUNG_KOMMISSIONELL_TYPEN'] = ['kommPruef', 'zusKommPruef'];
+
+// The type that the tool writes for the last attempt. The last attempt is always kommissionell.
+$config['PRUEFUNG_TYP_KOMMISSIONELL'] = 'kommPruef';
+
+// Exam types that never use an attempt. A zusKommPruef repeats a kommissionelle Prüfung that had
+// a procedural fault. It stands outside the attempt chain, and the student administration enters
+// it. The examination rules do not describe it.
+$config['PRUEFUNG_TYPEN_OHNE_ANTRITT'] = ['zusKommPruef'];
 
 // Spaltenaufteilung der Prüfungen in der Notentabelle:
 //   'antritt' - eine Spalte je Antrittsnummer, Datum steht in der Zelle (robust bei Einzelterminen)

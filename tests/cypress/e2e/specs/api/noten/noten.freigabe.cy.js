@@ -1,9 +1,9 @@
 /**
  * Notenfreigabe (P1, cases 12-14).
  *
- * A successful saveStudentenNoten ALWAYS sends the Notenfreigabe mail (Noten.php:585, not behind a
- * config flag), so the happy path is opt-in via NOTEN_FREIGABE_ENABLED. The wrong-password test
- * needs no gate: the check runs before any write and before the mail.
+ * Ein erfolgreiches saveStudentenNoten verschickt IMMER die Freigabemail (kein Config-Flag),
+ * deshalb ist der Happy Path opt-in über NOTEN_FREIGABE_ENABLED. Der Passworttest braucht das
+ * nicht: die Prüfung läuft vor jedem Schreibzugriff.
  */
 
 import { notenApi } from "../../../../support/api/notenApi";
@@ -109,6 +109,15 @@ describe("Noten API - Notenfreigabe", () => {
 					const entry = data.find((r) => r.uid === student.uid);
 					expect(entry, `${student.uid} must be reported as freigegeben`).to.exist;
 					expect(entry.freigabedatum, "freigabedatum is stamped").to.exist;
+
+					// Die Freigabe legt den ersten Antritt an. Ohne den Verlauf in der Antwort
+					// zeigt die Tabelle den neuen Termin erst nach einem Reload.
+					expect(entry.verlauf, "der Verlauf kommt mit der Antwort zurück").to.exist;
+					expect(entry.verlauf.pruefungen, "inklusive der Termine").to.be.an("array");
+					expect(
+						entry.verlauf.pruefungen.length,
+						"der erste Antritt ist dabei",
+					).to.be.greaterThan(0);
 				});
 
 			readState(ctx).then((data) => {

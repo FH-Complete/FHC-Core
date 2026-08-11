@@ -5,13 +5,10 @@ import { expectNotenSuccess } from "./notenErrors";
 import { resetNotenState, seedBaseline } from "./notenTestData";
 
 /**
- * Adds an attempt (no pruefung_id -> server runs validatePruefungAdd).
+ * Neuer Antritt (ohne pruefung_id -> validatePruefungAdd). Kein typ auf der Leitung.
  *
- * No typ: the server derives from the Verlauf which attempt this is. One call writes exactly one
- * Prüfung - the former Termin1 snapshot is gone, the first attempt is created by the Freigabe.
- *
- * punkte stays null: with CIS_GESAMTNOTE_PUNKTE on, a punkte >= 0 makes the controller re-derive
- * the note from the Notenschlüssel and override the grade under test.
+ * punkte bleibt null: mit CIS_GESAMTNOTE_PUNKTE würde ein punkte >= 0 die Note aus dem
+ * Notenschlüssel neu ableiten und die zu testende Note überschreiben.
  */
 export const addPruefung = (context, student, { note, datum }) =>
 	notenApi.saveStudentPruefung({

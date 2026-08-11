@@ -1,10 +1,8 @@
 /**
- * Runtime discovery + fixture helpers.
+ * Runtime discovery + Fixture-Helfer.
  *
- * No hardcoded fixture ids: the rule parameters (maxAntritte, the special note PKs) come from
- * server-side config that is not in the repo, and Noten.php resolves the special notes by
- * Bezeichnung. Everything is therefore read back from the API at runtime.
- * Override via NOTEN_SEM / NOTEN_LV_ID.
+ * Keine fixen Ids: maxAntritte und die Sondernoten-PKs stehen in Server-Config, die nicht im Repo
+ * liegt, und werden daher zur Laufzeit über die API gelesen. Override: NOTEN_SEM / NOTEN_LV_ID.
  */
 
 import { notenApi } from "../api/notenApi";
@@ -12,8 +10,10 @@ import { expectNotenSuccess } from "./notenErrors";
 // the client rule; it now only reads back what the server derived, so a mismatch is a config bug
 import { maxAntrittCount as computeMaxAntritte } from "../../../../public/js/components/Cis/Benotungstool/notenRules.js";
 import {
-	describeFailure, performRead, performReset, performSeed, performSeedPruefung, resolveResetStrategy,
+	describeFailure, performRead, performReset, performSeed, performSeedPruefung,
+	performSeedZeugnisnote, resolveResetStrategy,
 } from "./notenReset";
+import { assertPunkteModus } from "./notenConfig";
 
 const BEZ_ENTSCHULDIGT = "entschuldigt";
 const BEZ_NOCH_NICHT = "Noch nicht eingetragen";
@@ -123,6 +123,9 @@ export const loadNotenContext = () => {
 		.then((response) => {
 			context.cisConfig = expectNotenSuccess(response, "getCisConfig");
 			context.maxAntritte = computeMaxAntritte(context.cisConfig);
+			// ein Lauf, der den falschen Konfigurationsmodus erwartet, soll hier scheitern und nicht
+			// alles stillschweigend überspringen
+			assertPunkteModus(context);
 			return notenApi.getNoten();
 		})
 		.then((response) => {
@@ -154,6 +157,9 @@ export const loadNotenContext = () => {
 			// administrative note the editor list excludes ("intern angerechnet" / "nicht zugelassen")
 			const nichtLehre = noten.find((n) => n.lehre === false);
 
+			// as a ZEUGNISnote this one locks the LV note, in the client and in the server
+			const nichtUeberschreibbar = noten.find((n) => n.lkt_ueberschreibbar === false);
+
 			// Anrechnungen block every Prüfung for the LV - keyed on the ZEUGNISnote
 			const angerechnet = byBezeichnung("angerechnet");
 			const internAngerechnet = byBezeichnung("intern angerechnet");
@@ -162,9 +168,13 @@ export const loadNotenContext = () => {
 				entschuldigt: entschuldigt.note,
 				nochNichtEingetragen: nochNicht.note,
 				nichtLehre: nichtLehre ? nichtLehre.note : null,
+				nichtUeberschreibbar: nichtUeberschreibbar ? nichtUeberschreibbar.note : null,
 				angerechnet: angerechnet ? angerechnet.note : null,
 				internAngerechnet: internAngerechnet ? internAngerechnet.note : null,
 			};
+
+			// die GUI-Specs wählen und lesen über die Bezeichnung, nicht über die PK
+			context.notenOptions = noten;
 
 			return notenApi.getStudentenNoten(context.lvId, context.semKurzbz);
 		})
@@ -189,15 +199,11 @@ export const resetNotenState = (context, studentUids) =>
 	performReset(context, studentUids || context.studentUids);
 
 /**
- * Seeds the Antritt-1 baseline: a released LV note PLUS the Prüfung row that represents it.
+ * Baseline für Antritt 1: freigegebene LV-Note PLUS die Prüfungszeile dazu - das ist, was die
+ * Freigabe produziert. Ohne die Zeile zählt die LV-Note nur solange gar kein Termin existiert, und
+ * der erste hinzugefügte Antritt würde Antritt 1 ersetzen statt Antritt 2 zu werden.
  *
- * The row is what the production flow produces - since the refactor the first Antritt is created
- * by the password-gated Freigabe (Noten::upsertErstantritt), not as a side effect of adding a
- * retake. Without it the LV note only counts while no Prüfung exists at all, so the first added
- * attempt would silently replace Antritt 1 instead of being Antritt 2.
- *
- * `erstantritt: false` seeds the legacy shape (LV note only, no row) for tests that need it.
- * `freigegeben: false` implies it too: no Freigabe, no first Antritt.
+ * `erstantritt: false` (bzw. `freigegeben: false`) seedet die Altdaten-Form ohne diese Zeile.
  */
 export const seedBaseline = (context, studentUid, options = {}) => {
 	const note = options.note !== undefined ? options.note : context.gradeNotes[0];
@@ -232,6 +238,10 @@ export const seedPruefung = (context, student, { note, datum, typ }) =>
 		datum,
 		typ,
 	});
+
+/** Zeugnisnote setzen. Nur die Studierendenverwaltung schreibt sie, kein Endpunkt dieses Tools. */
+export const seedZeugnisnote = (context, studentUid, note) =>
+	performSeedZeugnisnote(context, studentUid, { note });
 
 /** Raw row, bypassing the freigabedatum filter of getLvGesamtNoten. */
 export const readLvGesamtnote = (context, studentUid) => performRead(context, studentUid);

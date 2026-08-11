@@ -56,7 +56,19 @@ const resetStudents = async (scope) => {
 			[studentUids, lvId, semKurzbz],
 		);
 
-		return { deletedPruefungen: pruefungen.rowCount, deletedLvGesamtnoten: noten.rowCount };
+		// a seeded Zeugnisnote can lock the LV note (lkt_ueberschreibbar), so the reset owns it too
+		const zeugnisnoten = await client.query(
+			`DELETE FROM lehre.tbl_zeugnisnote
+			  WHERE student_uid = ANY($1::varchar[])
+			    AND lehrveranstaltung_id = $2 AND studiensemester_kurzbz = $3`,
+			[studentUids, lvId, semKurzbz],
+		);
+
+		return {
+			deletedPruefungen: pruefungen.rowCount,
+			deletedLvGesamtnoten: noten.rowCount,
+			deletedZeugnisnoten: zeugnisnoten.rowCount,
+		};
 	});
 };
 
@@ -142,6 +154,38 @@ const seedPruefung = async (scope) => {
 	});
 };
 
+/**
+ * Seeds the transcript grade. The student administration writes it, no endpoint of this tool does.
+ * It decides two rules: an Anrechnung blocks every exam, and lkt_ueberschreibbar locks the LV note.
+ */
+const seedZeugnisnote = async (scope) => {
+	assertWritable();
+	assertScope({ ...scope, studentUids: [scope.studentUid] });
+
+	const { lvId, semKurzbz, studentUid, note, mitarbeiterUid } = scope;
+
+	if (note === undefined || note === null) throw new Error("noten:db seedZeugnisnote - note is required");
+	if (!mitarbeiterUid) throw new Error("noten:db seedZeugnisnote - mitarbeiterUid is required");
+
+	return withClient(async (client) => {
+		await client.query(
+			`DELETE FROM lehre.tbl_zeugnisnote
+			  WHERE student_uid = $1 AND lehrveranstaltung_id = $2 AND studiensemester_kurzbz = $3`,
+			[studentUid, lvId, semKurzbz],
+		);
+
+		await client.query(
+			`INSERT INTO lehre.tbl_zeugnisnote
+			     (student_uid, lehrveranstaltung_id, studiensemester_kurzbz, note, benotungsdatum,
+			      insertamum, insertvon)
+			 VALUES ($1, $2, $3, $4, NOW(), NOW(), $5)`,
+			[studentUid, lvId, semKurzbz, note, mitarbeiterUid],
+		);
+
+		return { studentUid, note };
+	});
+};
+
 /** Raw row, without the `freigabedatum < NOW()` filter getLvGesamtNoten applies. */
 const readLvGesamtnote = async ({ lvId, semKurzbz, studentUid }) => {
 	if (!dbConfigured()) throw new Error("noten:db refused - database is not configured");
@@ -162,6 +206,7 @@ const registerNotenDbTasks = (on) => {
 		"noten:db:reset": (scope) => resetStudents(scope),
 		"noten:db:seedLvGesamtnote": (scope) => seedLvGesamtnote(scope),
 		"noten:db:seedPruefung": (scope) => seedPruefung(scope),
+		"noten:db:seedZeugnisnote": (scope) => seedZeugnisnote(scope),
 		"noten:db:readLvGesamtnote": (scope) => readLvGesamtnote(scope),
 		"noten:db:close": () => closeDb(),
 	});

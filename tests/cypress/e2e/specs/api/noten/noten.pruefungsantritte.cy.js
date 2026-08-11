@@ -1,12 +1,11 @@
 /**
  * Prüfungsordnung §1 - Prüfungsantritte.
  *
- * Rules fire in order A (max Antritte) -> B (chronology) -> C (occurrence limit), so each test
- * builds a state where exactly one can fire; otherwise an earlier rule masks the one under test.
+ * Die Regeln greifen in der Reihenfolge A (Maximum) -> B (Chronologie) -> C (Vorkommenslimit).
+ * Jeder Test baut einen Zustand, in dem genau eine davon feuern kann, sonst maskiert die frühere.
  *
- * Bookkeeping since the Prüfungsverlauf refactor: one add writes one row. Antritt 1 is a real
- * Prüfung (created by the Freigabe, seeded by givenBaseline). Attempts are counted by NOTE, not by
- * type: "entschuldigt", "Noch nicht eingetragen" and "Nicht beurteilt" never count towards the cap.
+ * Gezählt wird über die NOTE: entschuldigt, "Noch nicht eingetragen" und "Nicht beurteilt" zählen
+ * nie mit. Antritt 1 ist eine echte Prüfung (von givenBaseline geseedet).
  */
 
 import { notenApi } from "../../../../support/api/notenApi";
@@ -65,9 +64,8 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 		return attemptDate(ctx, firstIndex + ctx.maxAntritte - 1);
 	};
 
-	// Every rule below is keyed on these PKs. getSpecialNotes() resolves them from tbl_note by
-	// Bezeichnung and only falls back to the config values - on demo data entschuldigt is 14, not the
-	// 17 in application/config/noten.php. If the fallback ever wins, the rules silently stop matching.
+	// Alle Regeln hängen an diesen PKs. Auf Demodaten ist entschuldigt 14, nicht die 17 aus
+	// application/config/noten.php - gewinnt der Fallback, greifen die Regeln stillschweigend nicht mehr.
 	it("resolves the special notes from tbl_note, not from config", () => {
 		notenApi.getCisConfig().then((response) => {
 			const config = expectNotenSuccess(response, "getCisConfig");
@@ -119,8 +117,7 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 	});
 
 	describe("Rule B - attempts are taken in chronological order", () => {
-		// "Noch nicht eingetragen" occupies a date without counting towards the cap, so Rule A
-		// cannot fire first and mask Rule B.
+		// "Noch nicht eingetragen" belegt ein Datum ohne zu zählen, damit Regel A nicht maskiert
 		const givenOpenAttemptOn = (student, datum) => {
 			givenBaseline(ctx, student);
 			addPruefung(ctx, student, { note: ctx.notes.nochNichtEingetragen, datum }).then((response) => {
@@ -240,7 +237,61 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 		});
 	});
 
-	describe("kommPruef is the terminal attempt", () => {
+	describe("die kommissionelle Prüfung ist der letzte Antritt", () => {
+		// §17 Abs 1: die zweite Wiederholung ist kommissionell. Der Server leitet den Typ aus der
+		// Position ab und schreibt ihn in pruefungstyp_kurzbz, weil die Studierendenverwaltung
+		// diese Spalte weiterhin liest.
+		it("schreibt den letzten Antritt als kommPruef", () => {
+			const student = studentFor(3);
+
+			givenBaseline(ctx, student);
+
+			// bis zum vorletzten Antritt auffüllen
+			for (let i = 1; i < ctx.maxAntritte - 1; i += 1) {
+				addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: attemptDate(ctx, i) }).then(
+					(response) => expectNotenSuccess(response, `Antritt ${i + 1}`),
+				);
+			}
+
+			addPruefung(ctx, student, {
+				note: ctx.gradeNotes[0],
+				datum: attemptDate(ctx, ctx.maxAntritte),
+			}).then((response) => {
+				const [saved] = expectNotenSuccess(response, "letzter Antritt");
+				expect(saved.pruefungstyp_kurzbz, "der letzte Antritt ist kommissionell").to.eq("kommPruef");
+			});
+
+			readState(ctx).then((data) => {
+				const verlauf = verlaufOfStudent(data, student.uid);
+				expect(verlauf.antrittCount, "die kommissionelle zählt als Antritt").to.eq(ctx.maxAntritte);
+				expect(verlauf.canAdd, "danach ist kein Antritt mehr möglich").to.be.false;
+			});
+		});
+
+		// Auch eine kommissionelle Prüfung ohne zählende Note schliesst die Kette. Sonst liesse sich
+		// nach einer noch unbenoteten kommissionellen ein weiterer Antritt anlegen.
+		it("sperrt weitere Antritte auch bei einer kommPruef ohne zählende Note", () => {
+			const student = studentFor(1);
+
+			givenBaseline(ctx, student);
+
+			seedPruefung(ctx, student, {
+				note: ctx.notes.nochNichtEingetragen,
+				datum: attemptDate(ctx, 1),
+				typ: "kommPruef",
+			});
+
+			readState(ctx).then((data) => {
+				const verlauf = verlaufOfStudent(data, student.uid);
+				expect(verlauf.terminal, "die Kette ist geschlossen").to.be.true;
+				expect(verlauf.canAdd, "kein weiterer Antritt möglich").to.be.false;
+			});
+
+			addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: attemptDate(ctx, 2) }).then(
+				(response) => expectNotenError(response, "maxAntritteReached"),
+			);
+		});
+
 		it("refuses a further attempt once a kommPruef exists", () => {
 			const student = studentFor(0);
 
@@ -295,8 +346,7 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 				return;
 			}
 
-			// the students of this LV carry their Zeugnisnote from the fixture; pick one that has an
-			// Anrechnung, otherwise there is nothing to assert here
+			// braucht einen Studenten, dessen Fixture-Zeugnisnote eine Anrechnung ist
 			readState(ctx).then((data) => {
 				const target = (data[0] || []).find((s) => String(s.note) === String(angerechnet));
 				if (!target) {
@@ -316,10 +366,7 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 	});
 
 	describe("edit guards", () => {
-		/**
-		 * Builds: Antritt 1 (baseline date) < excused (attempt 1) < real grade (attempt 2)
-		 * and yields the excused row, which now has both an earlier and a later neighbour.
-		 */
+		/** Antritt 1 < entschuldigt < echte Note; liefert die entschuldigte Zeile (Nachbarn beidseits). */
 		const givenThreeAttempts = (student) => {
 			givenBaseline(ctx, student);
 
@@ -371,9 +418,8 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 			});
 		});
 
-		// The add-time limit is covered by Rule C; this is the edit-time re-check. Its converse -
-		// re-saving the excused row itself, which the exclusion must let through - is the date-only
-		// correction above.
+		// Regel C beim Bearbeiten; die Gegenprobe (die entschuldigte Zeile selbst neu speichern)
+		// ist die reine Datumskorrektur oben
 		it("rejects an edit that would exceed the entschuldigt limit", () => {
 			const student = studentFor(0);
 
