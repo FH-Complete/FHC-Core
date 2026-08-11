@@ -12,7 +12,7 @@ class CoodleSurveyExternalParticipant_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'campus.tbl_coodle_survey_external_participants';
 		$this->pk = 'id';
-		
+
 		$this->_ci =& get_instance();
 	}
 
@@ -23,7 +23,7 @@ class CoodleSurveyExternalParticipant_model extends DB_Model
 				FROM $this->dbTable
 				WHERE survey_id = $surveyId
 		";
-		return $this->execQuery($query)->retval;
+		return $this->execQuery($query);
 	}
 
 	public function getExternalParticipant($externalParticipantId, $includeAccessKey = false)
@@ -34,7 +34,7 @@ class CoodleSurveyExternalParticipant_model extends DB_Model
 			WHERE id = $externalParticipantId
 			LIMIT 1
 		";
-		return $this->execQuery($query)->retval[0];
+		return $this->execQuery($query);
 	}
 
 	public function getExternalParticipantByAccessKey($surveyId, $accessKey)
@@ -44,12 +44,16 @@ class CoodleSurveyExternalParticipant_model extends DB_Model
 			WHERE survey_id = $surveyId AND access_key = '$accessKey'
 			LIMIT 1
 		";
-		return $this->execQuery($query)->retval[0];
+		return $this->execQuery($query);
 	}
 
 	public function updateExternalParticipants($surveyId, $externalParticipants, $timeslots)
 	{
-		$oldExternalParticipants = $this->getExternalParticipants($surveyId);
+		$participantsQuery = "SELECT *
+			FROM $this->dbTable
+			WHERE survey_id = $surveyId
+			";
+		$oldExternalParticipants = getData($this->execQuery($participantsQuery));
 		$oldExternalParticipantIds = array_map(
 			function ($oldExternalParticipant) {
 				return $oldExternalParticipant->id;
@@ -104,8 +108,7 @@ class CoodleSurveyExternalParticipant_model extends DB_Model
 			$this->execQuery($insertQuery);
 		}
 
-
-		$updatedExternalParticipants = $this->getExternalParticipants($surveyId);
+		$updatedExternalParticipants = getData($this->execQuery($participantsQuery));
 		$timeslotIds = array_map(
 			function ($timeslot) {
 				return $timeslot->id;

@@ -38,7 +38,7 @@ class CoodleSurvey_model extends DB_Model
 
 	public function getActiveSurveys($uid)
 	{
-		$userParticipantEntries = $this->CoodleSurveyParticipantModel->getParticipantEntriesByUid($uid);
+		$userParticipantEntries = getData($this->CoodleSurveyParticipantModel->getParticipantEntriesByUid($uid));
 		$surveyIdsWhereUserIsParticipant = array_map(
 			function ($userParticipantEntry) {
 				return $userParticipantEntry->survey_id;
@@ -70,7 +70,7 @@ class CoodleSurvey_model extends DB_Model
 
 	public function getInactiveSurveys($uid)
 	{
-		$userParticipantEntries = $this->CoodleSurveyParticipantModel->getParticipantEntriesByUid($uid);
+		$userParticipantEntries = getData($this->CoodleSurveyParticipantModel->getParticipantEntriesByUid($uid));
 		$surveyIdsWhereUserIsParticipant = array_map(
 			function ($userParticipantEntry) {
 				return $userParticipantEntry->survey_id;

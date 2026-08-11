@@ -18,7 +18,7 @@ class CoodleSurveyTimeslot_model extends DB_Model
 			FROM $this->dbTable
 			WHERE survey_id = $surveyId
 		";
-		return $this->execQuery($query)->retval;
+		return $this->execQuery($query);
 	}
 
 	public function getTimeslotsForMultipleSurveys($surveyIds)
@@ -30,7 +30,7 @@ class CoodleSurveyTimeslot_model extends DB_Model
 			FROM $this->dbTable
 			WHERE survey_id IN $surveyIds
 		";
-		return $this->execQuery($query)->retval;
+		return $this->execQuery($query);
 	}
 
 	public function getTimeslot($timeslotId)
@@ -40,7 +40,7 @@ class CoodleSurveyTimeslot_model extends DB_Model
 			WHERE id = $timeslotId
 			LIMIT 1
 		";
-		return $this->execQuery($query)->retval[0];
+		return $this->execQuery($query);
 	}
 
 	public function updateTimeslots($surveyId, $timeslots)
@@ -68,7 +68,7 @@ class CoodleSurveyTimeslot_model extends DB_Model
 			FROM $this->dbTable
 			WHERE survey_id = $surveyId
 		";
-		$existingTimeslots = $this->execQuery($existingTimeslotsQuery)->retval;
+		$existingTimeslots = getData($this->execQuery($existingTimeslotsQuery));
 		$existingTimeslotIds = array_map(
 			function ($existingTimeslot) {
 				return $existingTimeslot->id;

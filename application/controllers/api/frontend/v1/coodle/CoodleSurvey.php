@@ -79,15 +79,17 @@ class CoodleSurvey extends FHCAPI_Controller
 		$surveyId = $this->input->post("surveyId");
 		$surveyResult = $this->CoodleSurveyModel->getSurvey($surveyId);
 		$survey = $this->getDataOrTerminateWithError($surveyResult);
-		$survey = count($survey) ? $survey[0] : null;
+		$survey = $survey && count($survey) ? $survey[0] : null;
 		if (!$survey) {
 			$this->terminateWithError("Survey not found!");
 		}
 
-		$timeslots = $this->CoodleSurveyTimeslotModel->getTimeslots($surveyId);
+		$timeslotsResult = $this->CoodleSurveyTimeslotModel->getTimeslots($surveyId);
+		$timeslots = $this->getDataOrTerminateWithError($timeslotsResult);
 		$survey->timeslots = $timeslots;
 
-		$participants = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
+		$participantsResult = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
+		$participants = $this->getDataOrTerminateWithError($participantsResult);
 		$participants = $this->parseParticipantSelections($participants);
 
 		$authUserUID = getAuthUID();
@@ -105,7 +107,8 @@ class CoodleSurvey extends FHCAPI_Controller
 			$this->terminateWithError("You are not authorized to view this survey!");
 		}
 
-		$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId);
+		$externalParticipantsResult = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId);
+		$externalParticipants = $this->getDataOrTerminateWithError($externalParticipantsResult);
 		$externalParticipants = $this->parseParticipantSelections($externalParticipants);
 
 		$survey->participants = $participants;
@@ -134,14 +137,17 @@ class CoodleSurvey extends FHCAPI_Controller
 		$survey = $validatedAccessKey["survey"];
 		$externalParticipant = $validatedAccessKey["externalParticipant"];
 
-		$timeslots = $this->CoodleSurveyTimeslotModel->getTimeslots($survey->id);
+		$timeslotsResult = $this->CoodleSurveyTimeslotModel->getTimeslots($survey->id);
+		$timeslots = $this->getDataOrTerminateWithError($timeslotsResult);
 		$survey->timeslots = $timeslots;
 
-		$participants = $this->CoodleSurveyParticipantModel->getParticipants($survey->id);
+		$participantsResult = $this->CoodleSurveyParticipantModel->getParticipants($survey->id);
+		$participants = $this->getDataOrTerminateWithError($participantsResult);
 		$participants = $this->parseParticipantSelections($participants);
 		$survey->participants = $participants;
 
-		$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($survey->id);
+		$externalParticipantsResult = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($survey->id);
+		$externalParticipants = $this->getDataOrTerminateWithError($externalParticipantsResult);
 		$externalParticipants = $this->parseParticipantSelections($externalParticipants);
 		$survey->external_participants = $externalParticipants;
 
@@ -219,7 +225,8 @@ class CoodleSurvey extends FHCAPI_Controller
 
 		$surveyId = $this->getDataOrTerminateWithError($this->CoodleSurveyModel->createSurvey($surveyData, getAuthUID()));
 		$this->CoodleSurveyTimeslotModel->updateTimeslots($surveyId, $surveyData["timeslots"]);
-		$timeslots = $this->CoodleSurveyTimeslotModel->getTimeslots($surveyId);
+		$timeslotsResult = $this->CoodleSurveyTimeslotModel->getTimeslots($surveyId);
+		$timeslots = $this->getDataOrTerminateWithError($timeslotsResult);
 		$this->CoodleSurveyParticipantModel->updateParticipants($surveyId, $surveyData["participants"], $timeslots);
 		$this->CoodleSurveyExternalParticipantModel->updateExternalParticipants($surveyId, $surveyData["externalParticipants"], $timeslots);
 
@@ -252,7 +259,7 @@ class CoodleSurvey extends FHCAPI_Controller
 
 		$surveyResult = $this->CoodleSurveyModel->getSurvey($surveyId);
 		$survey = $this->getDataOrTerminateWithError($surveyResult);
-		$survey = count($survey) ? $survey[0] : null;
+		$survey = $survey && count($survey) ? $survey[0] : null;
 
 		if (!$survey)
 			$this->terminateWithError("Survey not found!");
@@ -261,7 +268,8 @@ class CoodleSurvey extends FHCAPI_Controller
 
 		$this->CoodleSurveyModel->updateSurvey($surveyId, $surveyData);
 		$this->CoodleSurveyTimeslotModel->updateTimeslots($surveyId, $surveyData["timeslots"]);
-		$timeslots = $this->CoodleSurveyTimeslotModel->getTimeslots($surveyId);
+		$timeslotsResult = $this->CoodleSurveyTimeslotModel->getTimeslots($surveyId);
+		$timeslots = $this->getDataOrTerminateWithError($timeslotsResult);
 		$this->CoodleSurveyParticipantModel->updateParticipants($surveyId, $surveyData["participants"], $timeslots);
 		$this->CoodleSurveyExternalParticipantModel->updateExternalParticipants($surveyId, $surveyData["externalParticipants"], $timeslots);
 
@@ -292,7 +300,7 @@ class CoodleSurvey extends FHCAPI_Controller
 
 		$surveyResult = $this->CoodleSurveyModel->getSurvey($surveyId);
 		$survey = $this->getDataOrTerminateWithError($surveyResult);
-		$survey = count($survey) ? $survey[0] : null;
+		$survey = $survey && count($survey) ? $survey[0] : null;
 		if (!$survey) {
 			$this->terminateWithError("Survey not found!");
 		}
@@ -301,7 +309,8 @@ class CoodleSurvey extends FHCAPI_Controller
 			$this->terminateWithError("You can no longer vote in this survey!");
 		}
 
-		$participants = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
+		$participantsResult = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
+		$participants = $this->getDataOrTerminateWithError($participantsResult);
 		$participantUids = array_map(
 			function ($participant) {
 				return $participant->uid;
@@ -313,7 +322,8 @@ class CoodleSurvey extends FHCAPI_Controller
 		}
 
 		if ($selection && count($selection)) {
-			$timeslots = $this->CoodleSurveyTimeslotModel->getTimeslots($surveyId);
+			$timeslotsResult = $this->CoodleSurveyTimeslotModel->getTimeslots($surveyId);
+			$timeslots = $this->getDataOrTerminateWithError($timeslotsResult);
 			$timeslotIds = array_map(
 				function ($timeslot) {
 					return $timeslot->id;
@@ -352,7 +362,8 @@ class CoodleSurvey extends FHCAPI_Controller
 		}
 
 		if ($selection && count($selection)) {
-			$timeslots = $this->CoodleSurveyTimeslotModel->getTimeslots($survey->id);
+			$timeslotsResult = $this->CoodleSurveyTimeslotModel->getTimeslots($survey->id);
+			$timeslots = $this->getDataOrTerminateWithError($timeslotsResult);
 			$timeslotIds = array_map(
 				function ($timeslot) {
 					return $timeslot->id;
@@ -378,7 +389,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		$surveyId = $this->input->post("surveyId");
 		$surveyResult = $this->CoodleSurveyModel->getSurvey($surveyId);
 		$survey = $this->getDataOrTerminateWithError($surveyResult);
-		$survey = count($survey) ? $survey[0] : null;
+		$survey = $survey && count($survey) ? $survey[0] : null;
 
 		if (!$survey) {
 			$this->terminateWithError("Survey not found!");
@@ -402,7 +413,7 @@ class CoodleSurvey extends FHCAPI_Controller
 
 		$surveyResult = $this->CoodleSurveyModel->getSurvey($surveyId);
 		$survey = $this->getDataOrTerminateWithError($surveyResult);
-		$survey = count($survey) ? $survey[0] : null;
+		$survey = $survey && count($survey) ? $survey[0] : null;
 		if (!$survey) {
 			$this->terminateWithError("Survey not found!");
 		} else if ($survey->creator_uid !== getAuthUID()) {
@@ -415,7 +426,9 @@ class CoodleSurvey extends FHCAPI_Controller
 
 		$selectedTimeslot = null;
 		if ($selectedTimeslotId) {
-			$selectedTimeslot = $this->CoodleSurveyTimeslotModel->getTimeslot($selectedTimeslotId);
+			$selectedTimeslotResult = $this->CoodleSurveyTimeslotModel->getTimeslot($survey->selected_timeslot_id);
+			$selectedTimeslot = $this->getDataOrTerminateWithError($selectedTimeslotResult);
+			$selectedTimeslot = $selectedTimeslot && (count($selectedTimeslot)) ? $selectedTimeslot[0] : null;
 			if (!$selectedTimeslot) {
 				$this->terminateWithError("Selected timeslot not found!");
 			} else if ($selectedTimeslot->survey_id !== $surveyId) {
@@ -449,7 +462,7 @@ class CoodleSurvey extends FHCAPI_Controller
 		$surveyId = $this->input->post("surveyId");
 		$surveyResult = $this->CoodleSurveyModel->getSurvey($surveyId);
 		$survey = $this->getDataOrTerminateWithError($surveyResult);
-		$survey = count($survey) ? $survey[0] : null;
+		$survey = $survey && count($survey) ? $survey[0] : null;
 		if (!$survey) {
 			$this->terminateWithError("Survey not found!");
 		} else if ($survey->creator_uid !== getAuthUID()) {
@@ -507,7 +520,7 @@ class CoodleSurvey extends FHCAPI_Controller
 
 		$surveyResult = $this->CoodleSurveyModel->getSurvey($surveyId);
 		$survey = $this->getDataOrTerminateWithError($surveyResult);
-		$survey = count($survey) ? $survey[0] : null;
+		$survey = $survey && count($survey) ? $survey[0] : null;
 
 		if (!$survey)
 			$this->terminateWithError("Survey not found!");
@@ -713,7 +726,8 @@ class CoodleSurvey extends FHCAPI_Controller
 
 	private function generateCoodleIcal($uid, $shouldIncludeIdentifyingInformation)
 	{
-		$activeParticipantEntries = $this->CoodleSurveyParticipantModel->getActiveParticipantEntriesByUid($uid);
+		$activeParticipantEntriesResult = $this->CoodleSurveyParticipantModel->getActiveParticipantEntriesByUid($uid);
+		$activeParticipantEntries = $this->getDataOrTerminateWithError($activeParticipantEntriesResult);
 		$selectedTimeslotIds = [];
 		foreach ($activeParticipantEntries as $participantEntry) {
 			if ($participantEntry->selection === null)
@@ -726,13 +740,15 @@ class CoodleSurvey extends FHCAPI_Controller
 		$localTimezone = new DateTimeZone("Europe/Vienna");
 		$utcTimezone = new DateTimeZone("UTC");
 		foreach ($selectedTimeslotIds as $timeslotId) {
-			$timeslot = $this->CoodleSurveyTimeslotModel->getTimeslot($timeslotId);
+			$timeslotResult = $this->CoodleSurveyTimeslotModel->getTimeslot($timeslotId);
+			$timeslot = $this->getDataOrTerminateWithError($timeslotResult);
+			$timeslot = $timeslot && (count($timeslot)) ? $timeslot[0] : null;
 			if (!$timeslot)
 				continue;
 
 			$surveyResult = $this->CoodleSurveyModel->getSurvey($timeslot->survey_id);
 			$survey = $this->getDataOrTerminateWithError($surveyResult);
-			$survey = count($survey) ? $survey[0] : null;
+			$survey = $survey && count($survey) ? $survey[0] : null;
 			if (!$survey)
 				continue;
 
@@ -814,8 +830,10 @@ class CoodleSurvey extends FHCAPI_Controller
 
 		$surveyResult = $this->CoodleSurveyModel->getSurvey($surveyId);
 		$survey = $this->getDataOrTerminateWithError($surveyResult);
-		$survey = count($survey) ? $survey[0] : null;
-		$externalParticipant = $this->CoodleSurveyExternalParticipantModel->getExternalParticipantByAccessKey($surveyId, $accessKey);
+		$survey = $survey && count($survey) ? $survey[0] : null;
+		$externalParticipantResult = $this->CoodleSurveyExternalParticipantModel->getExternalParticipantByAccessKey($surveyId, $accessKey);
+		$externalParticipant = $this->getDataOrTerminateWithError($externalParticipantResult);
+		$externalParticipant = $externalParticipant && count($externalParticipant) ? $externalParticipant[0] : null;
 
 		if (!$survey || !$externalParticipant)
 			return null;
@@ -828,8 +846,10 @@ class CoodleSurvey extends FHCAPI_Controller
 
 	private function sendSurveyCreationEmail($survey)
 	{
-		$participants = $this->CoodleSurveyParticipantModel->getParticipants($survey->id);
-		$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($survey->id, true);
+		$participantsResult = $this->CoodleSurveyParticipantModel->getParticipants($survey->id);
+		$participants = $this->getDataOrTerminateWithError($participantsResult);
+		$externalParticipantsResult = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($survey->id, true);
+		$externalParticipants = $this->getDataOrTerminateWithError($externalParticipantsResult);
 		$creatorFullName = getData($this->PersonModel->getFullName($survey->creator_uid));
 
 		foreach ($participants as $participant) {
@@ -864,8 +884,10 @@ class CoodleSurvey extends FHCAPI_Controller
 
 	private function sendSurveyUpdateEmail($survey)
 	{
-		$participants = $this->CoodleSurveyParticipantModel->getParticipants($survey->id);
-		$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($survey->id, true);
+		$participantsResult = $this->CoodleSurveyParticipantModel->getParticipants($survey->id);
+		$participants = $this->getDataOrTerminateWithError($participantsResult);
+		$externalParticipantsResult = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($survey->id, true);
+		$externalParticipants = $this->getDataOrTerminateWithError($externalParticipantsResult);
 		$creatorFullName = getData($this->PersonModel->getFullName($survey->creator_uid));
 
 		foreach ($participants as $participant) {
@@ -900,7 +922,8 @@ class CoodleSurvey extends FHCAPI_Controller
 
 	private function sendSurveyReminderEmail($survey)
 	{
-		$participants = $this->CoodleSurveyParticipantModel->getParticipants($survey->id);
+		$participantsResult = $this->CoodleSurveyParticipantModel->getParticipants($survey->id);
+		$participants = $this->getDataOrTerminateWithError($participantsResult);
 		$participantsWithoutVote = array_filter(
 			$participants,
 			function ($participant) {
@@ -908,7 +931,8 @@ class CoodleSurvey extends FHCAPI_Controller
 			}
 		);
 
-		$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($survey->id, true);
+		$externalParticipantsResult = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($survey->id, true);
+		$externalParticipants = $this->getDataOrTerminateWithError($externalParticipantsResult);
 		$externalParticipantsWithoutVote = array_filter(
 			$externalParticipants,
 			function ($externalParticipant) {
@@ -955,8 +979,10 @@ class CoodleSurvey extends FHCAPI_Controller
 
 	private function sendSurveyCancellationEmail($survey)
 	{
-		$participants = $this->CoodleSurveyParticipantModel->getParticipants($survey->id);
-		$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($survey->id, true);
+		$participantsResult = $this->CoodleSurveyParticipantModel->getParticipants($survey->id);
+		$participants = $this->getDataOrTerminateWithError($participantsResult);
+		$externalParticipantsResult = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($survey->id, true);
+		$externalParticipants = $this->getDataOrTerminateWithError($externalParticipantsResult);
 		$creatorFullName = getData($this->PersonModel->getFullName($survey->creator_uid));
 
 		foreach ($participants as $participant) {
@@ -991,13 +1017,17 @@ class CoodleSurvey extends FHCAPI_Controller
 
 	private function sendSurveyCompletionEmail($survey, $selectedRoomId)
 	{
-		$participants = $this->CoodleSurveyParticipantModel->getParticipants($survey->id);
-		$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($survey->id, true);
+		$participantsResult = $this->CoodleSurveyParticipantModel->getParticipants($survey->id);
+		$participants = $this->getDataOrTerminateWithError($participantsResult);
+		$externalParticipantsResult = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($survey->id, true);
+		$externalParticipants = $this->getDataOrTerminateWithError($externalParticipantsResult);
 		$creatorFullName = getData($this->PersonModel->getFullName($survey->creator_uid));
 
 		$selectedTimeslot = null;
 		if ($survey->selected_timeslot_id) {
-			$selectedTimeslot = $this->CoodleSurveyTimeslotModel->getTimeslot($survey->selected_timeslot_id);
+			$selectedTimeslotResult = $this->CoodleSurveyTimeslotModel->getTimeslot($survey->selected_timeslot_id);
+			$selectedTimeslot = $this->getDataOrTerminateWithError($selectedTimeslotResult);
+			$selectedTimeslot = $selectedTimeslot && (count($selectedTimeslot)) ? $selectedTimeslot[0] : null;
 		}
 
 		if ($selectedTimeslot) {

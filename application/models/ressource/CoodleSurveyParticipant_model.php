@@ -23,13 +23,13 @@ class CoodleSurveyParticipant_model extends DB_Model
 				JOIN public.tbl_person person ON(person.person_id = benutzer.person_id)
 				WHERE survey_id = $surveyId
 		";
-		return $this->execQuery($query)->retval;
+		return $this->execQuery($query);
 	}
 
 	public function getParticipantEntriesByUid($uid)
 	{
 		$query = "SELECT * FROM $this->dbTable WHERE participant_uid = '$uid'";
-		return $this->execQuery($query)->retval;
+		return $this->execQuery($query);
 	}
 
 	public function getActiveParticipantEntriesByUid($uid)
@@ -43,7 +43,7 @@ class CoodleSurveyParticipant_model extends DB_Model
 		WHERE surveyParticipant.participant_uid = '$uid'
 		AND survey.completed_at IS NULL
 		AND survey.canceled_at IS NULL";
-		return $this->execQuery($query)->retval;
+		return $this->execQuery($query);
 	}
 
 	public function updateParticipants($surveyId, $participants, $timeslots)
@@ -53,7 +53,7 @@ class CoodleSurveyParticipant_model extends DB_Model
 		}, $participants);
 
 		$existingParticipantsQuery = "SELECT * FROM " . $this->dbTable . " WHERE survey_id = " . $surveyId;
-		$existingParticipants = $this->execQuery($existingParticipantsQuery)->retval;
+		$existingParticipants = getData($this->execQuery($existingParticipantsQuery));
 		$existingParticipantUids = array_map(
 			function ($existingParticipant) {
 				return $existingParticipant->participant_uid;
@@ -101,7 +101,7 @@ class CoodleSurveyParticipant_model extends DB_Model
 			$timeslots
 		);
 
-		$updatedExistingParticipants = $this->execQuery($existingParticipantsQuery)->retval;
+		$updatedExistingParticipants = getData($this->execQuery($existingParticipantsQuery));
 		foreach ($updatedExistingParticipants as $participant) {
 			if (!$participant->selection)
 				continue;
