@@ -421,11 +421,13 @@ export default {
 					this.$props.survey.id,
 					selectedTimeslotId,
 					this.selectedRoomIdentifier,
-					shouldInformParticipants,
 				),
 			);
 			if (completionResponse.meta.status === "success") {
-				this.$emit("surveyCompleted");
+				this.$emit("surveyCompleted", {
+					shouldInformParticipants,
+					selectedRoomId: this.selectedRoomIdentifier,
+				});
 			}
 		},
 		async fetchAvailableRooms() {

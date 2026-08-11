@@ -94,6 +94,44 @@ export default {
 				voteTallies: surveyData.vote_tallies,
 			};
 		},
+		async afterSurveyCreated(surveyId, shouldInformParticipants) {
+			await this.showSurveyDetails(surveyId);
+			if (shouldInformParticipants) {
+				this.$api.call(
+					CoodleApi.emailParticipants(surveyId, "created"),
+				);
+			}
+		},
+		async afterSurveyUpdated(surveyId, shouldInformParticipants) {
+			await this.showSurveyDetails(surveyId);
+			if (shouldInformParticipants) {
+				this.$api.call(
+					CoodleApi.emailParticipants(surveyId, "updated"),
+				);
+			}
+		},
+		async afterSurveyCanceled(surveyId, shouldInformParticipants) {
+			await this.showSurveyDetails(surveyId);
+			if (shouldInformParticipants) {
+				this.$api.call(
+					CoodleApi.emailParticipants(surveyId, "canceled"),
+				);
+			}
+		},
+		async afterSurveyCompleted(
+			surveyId,
+			shouldInformParticipants,
+			selectedRoomId,
+		) {
+			await this.showSurveyDetails(surveyId);
+			if (shouldInformParticipants) {
+				this.$api.call(
+					CoodleApi.emailParticipants(surveyId, "completed", {
+						selectedRoomId,
+					}),
+				);
+			}
+		},
 	},
 	async created() {
 		await this.getAuthInfo();
@@ -172,8 +210,12 @@ export default {
 			<coodle-survey
 				v-else-if="view === 'survey'"
 				@surveyCreationCanceled="switchToTab('activeSurveysTable')"
-				@surveyCreated="showSurveyDetails($event.surveyId)"
-				@surveyUpdated="showSurveyDetails($event.surveyId)"
+				@surveyCreated="afterSurveyCreated($event.surveyId, $event.shouldInformParticipants)"
+				@surveyUpdated="afterSurveyUpdated($event.surveyId, $event.shouldInformParticipants)"
+				@surveyCanceled="afterSurveyCanceled($event.surveyId, $event.shouldInformParticipants)"
+				@surveyCompleted="
+					afterSurveyCompleted($event.surveyId, $event.shouldInformParticipants, $event.selectedRoomId)
+				"
 				:survey="survey"
 				:authInfo="authInfo"
 			/>

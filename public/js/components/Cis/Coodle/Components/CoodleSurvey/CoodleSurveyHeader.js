@@ -56,11 +56,10 @@ export default {
 			const cancellationResponse = await this.$api.call(
 				CoodleApi.cancelSurvey(
 					this.$props.survey.id,
-					shouldInformParticipants,
 				),
 			);
 			if ((cancellationResponse.meta.status = "success")) {
-				this.$emit("surveyCanceled");
+				this.$emit("surveyCanceled", { shouldInformParticipants });
 			}
 		},
 		async sendReminders() {
@@ -86,7 +85,7 @@ export default {
 			});
 			if (!reminderConfirmation) return;
 
-			const remindersResponse = this.$api.call(
+			const remindersResponse = await this.$api.call(
 				CoodleApi.sendReminders(this.$props.survey.id),
 			);
 			if (remindersResponse.meta.status === "success") {

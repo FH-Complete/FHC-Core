@@ -25,7 +25,13 @@ export default {
 		authExternalParticipantId: { type: Number | null },
 		isExternal: { type: Boolean, default: false },
 	},
-	emits: ["surveyCreationCanceled", "surveyCreated", "surveyUpdated"],
+	emits: [
+		"surveyCreationCanceled",
+		"surveyCreated",
+		"surveyUpdated",
+		"surveyCanceled",
+		"surveyCompleted",
+	],
 	data() {
 		return {
 			surveyFormData: null,
@@ -300,11 +306,12 @@ export default {
 			});
 
 			const surveyCreationResponse = await this.$api.call(
-				CoodleApi.createSurvey(surveyData, shouldInformParticipants),
+				CoodleApi.createSurvey(surveyData),
 			);
 			if (surveyCreationResponse.meta.status === "success") {
 				this.$emit("surveyCreated", {
 					surveyId: surveyCreationResponse.data,
+					shouldInformParticipants,
 				});
 			}
 		},
@@ -317,15 +324,12 @@ export default {
 			});
 
 			const surveyUpdateResponse = await this.$api.call(
-				CoodleApi.updateSurvey(
-					surveyData.id,
-					surveyData,
-					shouldInformParticipants,
-				),
+				CoodleApi.updateSurvey(surveyData.id, surveyData),
 			);
 			if (surveyUpdateResponse.meta.status === "success") {
 				this.$emit("surveyUpdated", {
 					surveyId: surveyData.id,
+					shouldInformParticipants,
 				});
 			}
 		},
@@ -341,7 +345,12 @@ export default {
 		<div class="card-header">
 			<coodle-survey-header
 				@editSurvey="isEditInProgress = true"
-				@surveyCanceled="$emit('surveyUpdated', {surveyId: $props.survey.id})"
+				@surveyCanceled="
+					$emit('surveyCanceled', {
+						surveyId: $props.survey.id,
+						shouldInformParticipants: $event.shouldInformParticipants
+					})
+				"
 				:survey="$props.survey"
 				:isEditInProgress="isEditInProgress"
 				:authUid="$props.authInfo?.uid"
@@ -384,7 +393,13 @@ export default {
 				<div v-if="!isEditInProgress && $props.survey" class="d-flex flex-column gap-2">
 					<coodle-survey-voting-table
 						@selectionSubmitted="$emit('surveyUpdated', {surveyId: $props.survey.id})"
-						@surveyCompleted="$emit('surveyUpdated', {surveyId: $props.survey.id})"
+						@surveyCompleted="
+							$emit('surveyCompleted',{
+								surveyId: $props.survey.id,
+								shouldInformParticipants: $event.shouldInformParticipants,
+								selectedRoomId: $event.selectedRoomId
+							})
+						"
 						:authUid="$props.authInfo?.uid"
 						:timeslots="parsedTimeslotsForVotingTable"
 						:survey="$props.survey"

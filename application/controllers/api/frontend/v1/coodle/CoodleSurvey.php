@@ -48,6 +48,7 @@ class CoodleSurvey extends FHCAPI_Controller
 			'getCoodleIcalUrl' => self::PERM_LOGGED,
 			'getCoodleIcal' => self::PERM_ANONYMOUS,
 			'getCoodleIcalEncrypted' => self::PERM_ANONYMOUS,
+			'emailParticipants' => self::PERM_LOGGED,
 		]);
 
 		$this->load->library('form_validation');
@@ -193,7 +194,6 @@ class CoodleSurvey extends FHCAPI_Controller
 	public function createSurvey()
 	{
 		$surveyData = $this->input->post("surveyData");
-		$shouldInformParticipants = $this->input->post("shouldInformParticipants");
 
 		$this->form_validation->set_data([
 			"title" => $surveyData["title"],
@@ -216,42 +216,6 @@ class CoodleSurvey extends FHCAPI_Controller
 		$this->CoodleSurveyParticipantModel->updateParticipants($surveyId, $surveyData["participants"], $timeslots);
 		$this->CoodleSurveyExternalParticipantModel->updateExternalParticipants($surveyId, $surveyData["externalParticipants"], $timeslots);
 
-		if ($shouldInformParticipants) {
-			$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
-			$participants = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
-			$authUserFullName = getData($this->PersonModel->getFullName(getAuthUID()));
-
-			foreach ($participants as $participant) {
-				sendSanchoMail(
-					"Sancho_Mail_Coodle_Created",
-					[
-						"surveyParticipantName" => $participant->name,
-						"surveyCreatorName" => $authUserFullName,
-						"surveyTitle" => $survey->title,
-						"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
-					],
-					$participant->uid . "@" . DOMAIN,
-					"Coodle Umfrage erstellt / Coodle survey created"
-				);
-			}
-
-			$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId, true);
-			foreach ($externalParticipants as $externalParticipant) {
-				sendSanchoMail(
-					"Sancho_Mail_Coodle_Created_Ext",
-					[
-						"surveyParticipantName" => $externalParticipant->name,
-						"surveyCreatorName" => $authUserFullName,
-						"org" => CAMPUS_NAME,
-						"surveyTitle" => $survey->title,
-						"surveyHref" => $this->getUrlForExternalParticipant($externalParticipant),
-					],
-					$externalParticipant->email,
-					"Coodle Umfrage erstellt / Coodle survey created"
-				);
-			}
-		}
-
 		$this->terminateWithSuccess($surveyId);
 	}
 
@@ -259,7 +223,6 @@ class CoodleSurvey extends FHCAPI_Controller
 	{
 		$surveyId = $this->input->post("surveyId");
 		$surveyData = $this->input->post("surveyData");
-		$shouldInformParticipants = $this->input->post("shouldInformParticipants");
 
 		$this->form_validation->set_data([
 			"title" => $surveyData["title"],
@@ -292,42 +255,6 @@ class CoodleSurvey extends FHCAPI_Controller
 		$timeslots = $this->CoodleSurveyTimeslotModel->getTimeslots($surveyId);
 		$this->CoodleSurveyParticipantModel->updateParticipants($surveyId, $surveyData["participants"], $timeslots);
 		$this->CoodleSurveyExternalParticipantModel->updateExternalParticipants($surveyId, $surveyData["externalParticipants"], $timeslots);
-
-		if ($shouldInformParticipants) {
-			$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
-			$participants = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
-			$authUserFullName = getData($this->PersonModel->getFullName(getAuthUID()));
-
-			foreach ($participants as $participant) {
-				sendSanchoMail(
-					'Sancho_Mail_Coodle_Updated',
-					[
-						"surveyParticipantName" => $participant->name,
-						"surveyCreatorName" => $authUserFullName,
-						"surveyTitle" => $survey->title,
-						"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
-					],
-					$participant->uid . "@" . DOMAIN,
-					'Coodle Umfrage modifiziert / Coodle survey modified'
-				);
-			}
-
-			$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId, true);
-			foreach ($externalParticipants as $externalParticipant) {
-				sendSanchoMail(
-					"Sancho_Mail_Coodle_Updated_Ext",
-					[
-						"surveyParticipantName" => $externalParticipant->name,
-						"surveyCreatorName" => $authUserFullName,
-						"org" => CAMPUS_NAME,
-						"surveyTitle" => $survey->title,
-						"surveyHref" => $this->getUrlForExternalParticipant($externalParticipant),
-					],
-					$externalParticipant->email,
-					"Coodle Umfrage modifiziert / Coodle survey modified"
-				);
-			}
-		}
 
 		$this->terminateWithSuccess($surveyId);
 	}
@@ -437,7 +364,6 @@ class CoodleSurvey extends FHCAPI_Controller
 
 	public function cancelSurvey()
 	{
-		$shouldInformParticipants = $this->input->post("shouldInformParticipants");
 		$surveyId = $this->input->post("surveyId");
 		$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
 
@@ -452,47 +378,11 @@ class CoodleSurvey extends FHCAPI_Controller
 		}
 
 		$this->CoodleSurveyModel->cancelSurvey($surveyId);
-
-		if ($shouldInformParticipants) {
-			$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
-			$participants = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
-			$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId, true);
-			$authUserFullName = getData($this->PersonModel->getFullName(getAuthUID()));
-
-			foreach ($participants as $participant) {
-				sendSanchoMail(
-					'Sancho_Mail_Coodle_Canceled',
-					[
-						"surveyParticipantName" => $participant->name,
-						"surveyCreatorName" => $authUserFullName,
-						"surveyTitle" => $survey->title,
-						"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
-					],
-					$participant->uid . "@" . DOMAIN,
-					'Coodle Umfrage storniert / Coodle survey canceled'
-				);
-			}
-
-			foreach ($externalParticipants as $externalParticipant) {
-				sendSanchoMail(
-					"Sancho_Mail_Coodle_Canceled_Ext",
-					[
-						"surveyParticipantName" => $externalParticipant->name,
-						"surveyCreatorName" => $authUserFullName,
-						"org" => CAMPUS_NAME,
-						"surveyTitle" => $survey->title,
-						"surveyHref" => $this->getUrlForExternalParticipant($externalParticipant),
-					],
-					$externalParticipant->email,
-					'Coodle Umfrage storniert / Coodle survey canceled'
-				);
-			}
-		}
+		$this->terminateWithSuccess();
 	}
 
 	public function completeSurvey()
 	{
-		$shouldInformParticipants = $this->input->post("shouldInformParticipants");
 		$surveyId = $this->input->post("surveyId");
 		$selectedTimeslotId = $this->input->post("selectedTimeslotId");
 		$selectedRoomId = $this->input->post("selectedRoomId");
@@ -536,120 +426,6 @@ class CoodleSurvey extends FHCAPI_Controller
 
 		$this->CoodleSurveyModel->completeSurvey($surveyId, $selectedTimeslotId);
 
-		if ($shouldInformParticipants) {
-			$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
-			$participants = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
-			$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId, true);
-			$authUserFullName = getData($this->PersonModel->getFullName(getAuthUID()));
-
-			if ($selectedTimeslot) {
-				$localTimezone = new DateTimeZone('Europe/Vienna');
-				$timeslotStart = new DateTime($selectedTimeslot->starts_at, $localTimezone);
-				$timeslotEnd = new DateTime($selectedTimeslot->starts_at, $localTimezone);
-				$timeslotEnd = $timeslotEnd->modify("+$survey->timeslot_duration minutes");
-				$formattedTimeslot = $timeslotStart->format("d.m.Y H:i") . "-" . $timeslotEnd->format("H:i");
-
-				$utcTimezone = new DateTimeZone("UTC");
-				$timeslotStart->setTimezone($utcTimezone);
-				$timeslotEnd->setTimezone($utcTimezone);
-
-				$calendarFilePath = tempnam(sys_get_temp_dir(), "coodle_");
-				$this->writeToCoodleIcsFile(
-					$calendarFilePath,
-					$survey->id,
-					$survey->title,
-					$timeslotStart,
-					$timeslotEnd,
-					$selectedRoomId,
-					$authUserFullName,
-					getAuthUID() . "@" . DOMAIN
-				);
-
-				foreach ($participants as $participant) {
-					sendSanchoMail(
-						'Sancho_Mail_Coodle_Completed',
-						[
-							"surveyParticipantName" => $participant->name,
-							"surveyCreatorName" => $authUserFullName,
-							"surveyTitle" => $survey->title,
-							"selectedSurveyTimeslot" => $formattedTimeslot,
-							"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
-						],
-						$participant->uid . "@" . DOMAIN,
-						"Coodle Umfrage vollendet / Coodle survey completed",
-						"",
-						"",
-						null,
-						null,
-						null,
-						[
-							[
-								"filePath" => $calendarFilePath,
-								"altName" => "coodle.ics",
-							]
-						]
-					);
-				}
-
-				foreach ($externalParticipants as $externalParticipant) {
-					sendSanchoMail(
-						"Sancho_Mail_Coodle_Completed_Ext",
-						[
-							"surveyCreatorName" => $authUserFullName,
-							"surveyParticipantName" => $externalParticipant->name,
-							"org" => CAMPUS_NAME,
-							"surveyTitle" => $survey->title,
-							"selectedSurveyTimeslot" => $formattedTimeslot,
-							"surveyHref" => $this->getUrlForExternalParticipant($externalParticipant),
-						],
-						$externalParticipant->email,
-						"Coodle Umfrage vollendet / Coodle survey completed",
-						"",
-						"",
-						null,
-						null,
-						null,
-						[
-							[
-								"filePath" => $calendarFilePath,
-								"altName" => "coodle.ics",
-							]
-						]
-					);
-				}
-
-				unlink($calendarFilePath);
-			} else {
-				foreach ($participants as $participant) {
-					sendSanchoMail(
-						'Sancho_Mail_Coodle_Completed_No',
-						[
-							"surveyParticipantName" => $participant->name,
-							"surveyCreatorName" => $authUserFullName,
-							"surveyTitle" => $survey->title,
-							"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
-						],
-						$participant->uid . "@" . DOMAIN,
-						'Coodle Umfrage vollendet / Coodle survey completed'
-					);
-				}
-
-				foreach ($externalParticipants as $externalParticipant) {
-					sendSanchoMail(
-						"Sancho_Mail_Coodle_Cmpltd_No_Ext",
-						[
-							"surveyCreatorName" => $authUserFullName,
-							"surveyParticipantName" => $externalParticipant->name,
-							"org" => CAMPUS_NAME,
-							"surveyTitle" => $survey->title,
-							"surveyHref" => $this->getUrlForExternalParticipant($externalParticipant),
-						],
-						$externalParticipant->email,
-						"Coodle Umfrage vollendet / Coodle survey completed"
-					);
-				}
-			}
-		}
 		$this->terminateWithSuccess();
 	}
 
@@ -665,56 +441,7 @@ class CoodleSurvey extends FHCAPI_Controller
 			$this->terminateWithError("This survey is no longer active!");
 		}
 
-		$participants = $this->CoodleSurveyParticipantModel->getParticipants($surveyId);
-		$participantsWithoutVote = array_filter(
-			$participants,
-			function ($participant) {
-				return $participant->selection === null;
-			}
-		);
-
-		$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($surveyId, true);
-		$externalParticipantsWithoutVote = array_filter(
-			$externalParticipants,
-			function ($externalParticipant) {
-				return $externalParticipant->selection === null;
-			}
-		);
-
-		if (!count($participantsWithoutVote) && !count($externalParticipantsWithoutVote)) {
-			$this->terminateWithError("All participants have already voted!");
-		}
-
-		$authUserFullName = getData($this->PersonModel->getFullName(getAuthUID()));
-
-		foreach ($participantsWithoutVote as $participant) {
-			sendSanchoMail(
-				'Sancho_Mail_Coodle_Reminder',
-				[
-					"surveyParticipantName" => $participant->name,
-					"surveyCreatorName" => $authUserFullName,
-					"surveyTitle" => $survey->title,
-					"surveyHref" => $this->coodlePageUrl . "?id=" . $surveyId,
-				],
-				$participant->uid . "@" . DOMAIN,
-				'Coodle Umfrage Erinnerung / Coodle survey reminder'
-			);
-		}
-
-		foreach ($externalParticipantsWithoutVote as $externalParticipant) {
-			sendSanchoMail(
-				"Sancho_Mail_Coodle_Reminder_Ext",
-				[
-					"surveyCreatorName" => $authUserFullName,
-					"surveyParticipantName" => $externalParticipant->name,
-					"org" => CAMPUS_NAME,
-					"surveyTitle" => $survey->title,
-					"surveyHref" => $this->getUrlForExternalParticipant($externalParticipant),
-				],
-				$externalParticipant->email,
-				"Coodle Umfrage Erinnerung / Coodle survey reminder"
-			);
-		}
+		$this->sendSurveyReminderEmail($survey);
 
 		$this->terminateWithSuccess();
 	}
@@ -749,6 +476,42 @@ class CoodleSurvey extends FHCAPI_Controller
 
 		$coodleIcalFilePath = $this->generateCoodleIcal($uid, true);
 		$this->terminateWithFileOutput("text/calendar", file_get_contents($coodleIcalFilePath), "coodle_ical.ics");
+	}
+
+	public function emailParticipants()
+	{
+		$emailType = $this->input->post("emailType");
+		$surveyId = $this->input->post("surveyId");
+		$additionalData = $this->input->post("additionalData");
+
+		if (!$surveyId) {
+			$this->terminateWithError("Missing survey id!");
+		}
+
+		$survey = $this->CoodleSurveyModel->getSurvey($surveyId);
+
+		if (!$survey)
+			$this->terminateWithError("Survey not found!");
+		if ($survey->creator_uid !== getAuthUID())
+			$this->terminateWithError("You do not own this survey!");
+
+		switch ($emailType) {
+			case "created":
+				$this->sendSurveyCreationEmail($survey);
+				break;
+			case "updated":
+				$this->sendSurveyUpdateEmail($survey);
+				break;
+			case "canceled":
+				$this->sendSurveyCancellationEmail($survey);
+				break;
+			case "completed":
+				$selectedRoomId = isset($additionalData["selectedRoomId"]) ? $additionalData["selectedRoomId"] : null;
+				$this->sendSurveyCompletionEmail($survey, $selectedRoomId);
+				break;
+		}
+
+		$this->terminateWithSuccess();
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -1036,5 +799,288 @@ class CoodleSurvey extends FHCAPI_Controller
 			"survey" => $survey,
 			"externalParticipant" => $externalParticipant,
 		];
+	}
+
+	private function sendSurveyCreationEmail($survey)
+	{
+		$participants = $this->CoodleSurveyParticipantModel->getParticipants($survey->id);
+		$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($survey->id, true);
+		$creatorFullName = getData($this->PersonModel->getFullName($survey->creator_uid));
+
+		foreach ($participants as $participant) {
+			sendSanchoMail(
+				"Sancho_Mail_Coodle_Created",
+				[
+					"surveyParticipantName" => $participant->name,
+					"surveyCreatorName" => $creatorFullName,
+					"surveyTitle" => $survey->title,
+					"surveyHref" => $this->coodlePageUrl . "?id=" . $survey->id,
+				],
+				$participant->uid . "@" . DOMAIN,
+				"Coodle Umfrage erstellt / Coodle survey created"
+			);
+		}
+
+		foreach ($externalParticipants as $externalParticipant) {
+			sendSanchoMail(
+				"Sancho_Mail_Coodle_Created_Ext",
+				[
+					"surveyParticipantName" => $externalParticipant->name,
+					"surveyCreatorName" => $creatorFullName,
+					"org" => CAMPUS_NAME,
+					"surveyTitle" => $survey->title,
+					"surveyHref" => $this->getUrlForExternalParticipant($externalParticipant),
+				],
+				$externalParticipant->email,
+				"Coodle Umfrage erstellt / Coodle survey created"
+			);
+		}
+	}
+
+	private function sendSurveyUpdateEmail($survey)
+	{
+		$participants = $this->CoodleSurveyParticipantModel->getParticipants($survey->id);
+		$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($survey->id, true);
+		$creatorFullName = getData($this->PersonModel->getFullName($survey->creator_uid));
+
+		foreach ($participants as $participant) {
+			sendSanchoMail(
+				'Sancho_Mail_Coodle_Updated',
+				[
+					"surveyParticipantName" => $participant->name,
+					"surveyCreatorName" => $creatorFullName,
+					"surveyTitle" => $survey->title,
+					"surveyHref" => $this->coodlePageUrl . "?id=" . $survey->id,
+				],
+				$participant->uid . "@" . DOMAIN,
+				'Coodle Umfrage modifiziert / Coodle survey modified'
+			);
+		}
+
+		foreach ($externalParticipants as $externalParticipant) {
+			sendSanchoMail(
+				"Sancho_Mail_Coodle_Updated_Ext",
+				[
+					"surveyParticipantName" => $externalParticipant->name,
+					"surveyCreatorName" => $creatorFullName,
+					"org" => CAMPUS_NAME,
+					"surveyTitle" => $survey->title,
+					"surveyHref" => $this->getUrlForExternalParticipant($externalParticipant),
+				],
+				$externalParticipant->email,
+				"Coodle Umfrage modifiziert / Coodle survey modified"
+			);
+		}
+	}
+
+	private function sendSurveyReminderEmail($survey)
+	{
+		$participants = $this->CoodleSurveyParticipantModel->getParticipants($survey->id);
+		$participantsWithoutVote = array_filter(
+			$participants,
+			function ($participant) {
+				return $participant->selection === null;
+			}
+		);
+
+		$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($survey->id, true);
+		$externalParticipantsWithoutVote = array_filter(
+			$externalParticipants,
+			function ($externalParticipant) {
+				return $externalParticipant->selection === null;
+			}
+		);
+
+		if (!count($participantsWithoutVote) && !count($externalParticipantsWithoutVote)) {
+			$this->terminateWithError("All participants have already voted!");
+		}
+
+		$creatorFullName = getData($this->PersonModel->getFullName($survey->creator_uid));
+
+		foreach ($participantsWithoutVote as $participant) {
+			sendSanchoMail(
+				'Sancho_Mail_Coodle_Reminder',
+				[
+					"surveyParticipantName" => $participant->name,
+					"surveyCreatorName" => $creatorFullName,
+					"surveyTitle" => $survey->title,
+					"surveyHref" => $this->coodlePageUrl . "?id=" . $survey->id,
+				],
+				$participant->uid . "@" . DOMAIN,
+				'Coodle Umfrage Erinnerung / Coodle survey reminder'
+			);
+		}
+
+		foreach ($externalParticipantsWithoutVote as $externalParticipant) {
+			sendSanchoMail(
+				"Sancho_Mail_Coodle_Reminder_Ext",
+				[
+					"surveyCreatorName" => $creatorFullName,
+					"surveyParticipantName" => $externalParticipant->name,
+					"org" => CAMPUS_NAME,
+					"surveyTitle" => $survey->title,
+					"surveyHref" => $this->getUrlForExternalParticipant($externalParticipant),
+				],
+				$externalParticipant->email,
+				"Coodle Umfrage Erinnerung / Coodle survey reminder"
+			);
+		}
+
+	}
+
+	private function sendSurveyCancellationEmail($survey)
+	{
+		$participants = $this->CoodleSurveyParticipantModel->getParticipants($survey->id);
+		$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($survey->id, true);
+		$creatorFullName = getData($this->PersonModel->getFullName($survey->creator_uid));
+
+		foreach ($participants as $participant) {
+			sendSanchoMail(
+				'Sancho_Mail_Coodle_Canceled',
+				[
+					"surveyParticipantName" => $participant->name,
+					"surveyCreatorName" => $creatorFullName,
+					"surveyTitle" => $survey->title,
+					"surveyHref" => $this->coodlePageUrl . "?id=" . $survey->id,
+				],
+				$participant->uid . "@" . DOMAIN,
+				'Coodle Umfrage storniert / Coodle survey canceled'
+			);
+		}
+
+		foreach ($externalParticipants as $externalParticipant) {
+			sendSanchoMail(
+				"Sancho_Mail_Coodle_Canceled_Ext",
+				[
+					"surveyParticipantName" => $externalParticipant->name,
+					"surveyCreatorName" => $creatorFullName,
+					"org" => CAMPUS_NAME,
+					"surveyTitle" => $survey->title,
+					"surveyHref" => $this->getUrlForExternalParticipant($externalParticipant),
+				],
+				$externalParticipant->email,
+				'Coodle Umfrage storniert / Coodle survey canceled'
+			);
+		}
+	}
+
+	private function sendSurveyCompletionEmail($survey, $selectedRoomId)
+	{
+		$participants = $this->CoodleSurveyParticipantModel->getParticipants($survey->id);
+		$externalParticipants = $this->CoodleSurveyExternalParticipantModel->getExternalParticipants($survey->id, true);
+		$creatorFullName = getData($this->PersonModel->getFullName($survey->creator_uid));
+
+		$selectedTimeslot = null;
+		if ($survey->selected_timeslot_id) {
+			$selectedTimeslot = $this->CoodleSurveyTimeslotModel->getTimeslot($survey->selected_timeslot_id);
+		}
+
+		if ($selectedTimeslot) {
+			$localTimezone = new DateTimeZone('Europe/Vienna');
+			$timeslotStart = new DateTime($selectedTimeslot->starts_at, $localTimezone);
+			$timeslotEnd = new DateTime($selectedTimeslot->starts_at, $localTimezone);
+			$timeslotEnd = $timeslotEnd->modify("+$survey->timeslot_duration minutes");
+			$formattedTimeslot = $timeslotStart->format("d.m.Y H:i") . "-" . $timeslotEnd->format("H:i");
+
+			$utcTimezone = new DateTimeZone("UTC");
+			$timeslotStart->setTimezone($utcTimezone);
+			$timeslotEnd->setTimezone($utcTimezone);
+
+			$calendarFilePath = tempnam(sys_get_temp_dir(), "coodle_");
+			$this->writeToCoodleIcsFile(
+				$calendarFilePath,
+				$survey->id,
+				$survey->title,
+				$timeslotStart,
+				$timeslotEnd,
+				$selectedRoomId,
+				$creatorFullName,
+				getAuthUID() . "@" . DOMAIN
+			);
+
+			foreach ($participants as $participant) {
+				sendSanchoMail(
+					'Sancho_Mail_Coodle_Completed',
+					[
+						"surveyParticipantName" => $participant->name,
+						"surveyCreatorName" => $creatorFullName,
+						"surveyTitle" => $survey->title,
+						"selectedSurveyTimeslot" => $formattedTimeslot,
+						"surveyHref" => $this->coodlePageUrl . "?id=" . $survey->id,
+					],
+					$participant->uid . "@" . DOMAIN,
+					"Coodle Umfrage vollendet / Coodle survey completed",
+					"",
+					"",
+					null,
+					null,
+					null,
+					[
+						[
+							"filePath" => $calendarFilePath,
+							"altName" => "coodle.ics",
+						]
+					]
+				);
+			}
+
+			foreach ($externalParticipants as $externalParticipant) {
+				sendSanchoMail(
+					"Sancho_Mail_Coodle_Completed_Ext",
+					[
+						"surveyCreatorName" => $creatorFullName,
+						"surveyParticipantName" => $externalParticipant->name,
+						"org" => CAMPUS_NAME,
+						"surveyTitle" => $survey->title,
+						"selectedSurveyTimeslot" => $formattedTimeslot,
+						"surveyHref" => $this->getUrlForExternalParticipant($externalParticipant),
+					],
+					$externalParticipant->email,
+					"Coodle Umfrage vollendet / Coodle survey completed",
+					"",
+					"",
+					null,
+					null,
+					null,
+					[
+						[
+							"filePath" => $calendarFilePath,
+							"altName" => "coodle.ics",
+						]
+					]
+				);
+			}
+
+			unlink($calendarFilePath);
+		} else {
+			foreach ($participants as $participant) {
+				sendSanchoMail(
+					'Sancho_Mail_Coodle_Completed_No',
+					[
+						"surveyParticipantName" => $participant->name,
+						"surveyCreatorName" => $creatorFullName,
+						"surveyTitle" => $survey->title,
+						"surveyHref" => $this->coodlePageUrl . "?id=" . $survey->id,
+					],
+					$participant->uid . "@" . DOMAIN,
+					'Coodle Umfrage vollendet / Coodle survey completed'
+				);
+			}
+
+			foreach ($externalParticipants as $externalParticipant) {
+				sendSanchoMail(
+					"Sancho_Mail_Coodle_Cmpltd_No_Ext",
+					[
+						"surveyCreatorName" => $creatorFullName,
+						"surveyParticipantName" => $externalParticipant->name,
+						"org" => CAMPUS_NAME,
+						"surveyTitle" => $survey->title,
+						"surveyHref" => $this->getUrlForExternalParticipant($externalParticipant),
+					],
+					$externalParticipant->email,
+					"Coodle Umfrage vollendet / Coodle survey completed"
+				);
+			}
+		}
 	}
 }

@@ -25,13 +25,12 @@ export default {
 			},
 		};
 	},
-	createSurvey(surveyData, shouldInformParticipants) {
+	createSurvey(surveyData) {
 		return {
 			method: "post",
 			url: "/api/frontend/v1/coodle/CoodleSurvey/createSurvey",
 			params: {
 				surveyData,
-				shouldInformParticipants,
 			},
 		};
 	},
@@ -98,17 +97,16 @@ export default {
 			},
 		};
 	},
-	cancelSurvey(surveyId, shouldInformParticipants) {
+	cancelSurvey(surveyId) {
 		return {
 			method: "post",
 			url: "/api/frontend/v1/coodle/CoodleSurvey/cancelSurvey",
 			params: {
 				surveyId,
-				shouldInformParticipants,
 			},
 		};
 	},
-	completeSurvey(surveyId, selectedTimeslotId, selectedRoomId, shouldInformParticipants) {
+	completeSurvey(surveyId, selectedTimeslotId, selectedRoomId) {
 		return {
 			method: "post",
 			url: "/api/frontend/v1/coodle/CoodleSurvey/completeSurvey",
@@ -116,7 +114,6 @@ export default {
 				surveyId,
 				selectedTimeslotId,
 				selectedRoomId,
-				shouldInformParticipants
 			},
 		};
 	},
@@ -133,6 +130,17 @@ export default {
 		return {
 			method: "get",
 			url: "/api/frontend/v1/coodle/CoodleSurvey/getCoodleIcalUrl",
+		};
+	},
+	emailParticipants(surveyId, emailType, additionalData = null) {
+		return {
+			method: "post",
+			url: "/api/frontend/v1/coodle/CoodleSurvey/emailParticipants",
+			params: {
+				surveyId,
+				emailType,
+				additionalData,
+			},
 		};
 	},
 };
