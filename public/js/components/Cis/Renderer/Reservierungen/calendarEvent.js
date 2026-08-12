@@ -32,6 +32,11 @@ export default {
 				this.$p.t('person/ort'),
 				this.event.ort_kurzbz
 			].join(": "));
+
+			tooltipArray.push([
+				this.$p.t('lehre/gruppe'),
+				this.event.gruppe[0].kuerzel
+			].join(": "));
 			
 			if (Array.isArray(this.event.lektor) && this.event.lektor.length > 0) {
 				if (this.event.lektor.length > 3) {
@@ -103,6 +108,7 @@ export default {
 		
 			<span class="event-topic">{{ event.topic }}</span>
 			<span class="event-place">{{ event.ort_kurzbz }}</span>
+			<span>{{ event.gruppe[0].kuerzel }}</span>
 			<span
 				v-for="lektor in event.lektor.slice(0, 3)"
 				class="event-lectors"

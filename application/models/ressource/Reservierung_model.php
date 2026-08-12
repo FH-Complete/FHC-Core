@@ -24,7 +24,7 @@ class Reservierung_model extends DB_Model
 		$lvplan_reservierungen_query = "SELECT r.* , stund.beginn, stund.ende,
 			CASE
 				WHEN r.gruppe_kurzbz IS NOT NULL THEN r.gruppe_kurzbz 
-				ELSE CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',COALESCE(CAST(r.semester AS varchar),'/'),COALESCE(CAST(r.verband AS varchar),'/')) 
+				ELSE CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',COALESCE(CAST(r.semester AS varchar),'/'),COALESCE(CAST(r.verband AS varchar),'/'),COALESCE(CAST(res.gruppe AS varchar),'/')) 
 			END as gruppen_kuerzel
 			FROM campus.vw_reservierung r
 			JOIN public.tbl_studiengang studg ON studg.studiengang_kz=r.studiengang_kz
@@ -39,7 +39,7 @@ class Reservierung_model extends DB_Model
 		$raum_reservierungen_query = "SELECT res.*, beginn, ende,
 			CASE
 				WHEN res.gruppe_kurzbz IS NOT NULL THEN res.gruppe_kurzbz 
-				ELSE CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',COALESCE(CAST(res.semester AS varchar),'/'),COALESCE(CAST(res.verband AS varchar),'/')) 
+				ELSE CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',COALESCE(CAST(res.semester AS varchar),'/'),COALESCE(CAST(res.verband AS varchar),'/'),COALESCE(CAST(res.gruppe AS varchar),'/')) 
 			END as gruppen_kuerzel
 			FROM campus.vw_reservierung res
 			JOIN public.tbl_studiengang studg ON studg.studiengang_kz=res.studiengang_kz
@@ -83,7 +83,7 @@ class Reservierung_model extends DB_Model
 		$raum_reservierungen_query = "SELECT res.*, beginn, ende,
 			CASE
 				WHEN res.gruppe_kurzbz IS NOT NULL THEN res.gruppe_kurzbz 
-				ELSE CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',COALESCE(CAST(res.semester AS varchar),'/'),COALESCE(CAST(res.verband AS varchar),'/')) 
+				ELSE CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',COALESCE(CAST(res.semester AS varchar),'/'),COALESCE(CAST(res.verband AS varchar),'/'),COALESCE(CAST(res.gruppe AS varchar),'/')) 
 			END as gruppen_kuerzel
 			FROM campus.vw_reservierung res
 			JOIN public.tbl_studiengang studg ON studg.studiengang_kz=res.studiengang_kz
