@@ -28,10 +28,39 @@ class CoreMissingZgvTagLib
 		$this->ci->PrestudentModel->addJoin('public.tbl_prestudentstatus', 'prestudent_id');
 		$this->ci->PrestudentModel->addJoin('public.tbl_benutzer bn', 'person_id');
 		$this->ci->PrestudentModel->addJoin('public.tbl_studiengang', 'studiengang_kz');
-		$result = $this->ci->PrestudentModel-> loadWhere(array(
+
+/*		$result = $this->ci->PrestudentModel-> loadWhere(array(
 			'bn.aktiv' => true, //check if necessary
 			'zgvdatum' => null,
 			'typ' => 'b',
+			'studiensemester_kurzbz' => $semester
+		));	*/
+
+/*		$result = $this->ci->PrestudentModel-> loadWhere(array(
+			'bn.aktiv' => true, //check if necessary
+			'zgvmadatum' => null,
+			'typ' => 'm',
+			'studiensemester_kurzbz' => $semester
+		));*/
+
+		$this->ci->PrestudentModel->addJoin('public.tbl_prestudentstatus', 'prestudent_id');
+		$this->ci->PrestudentModel->addJoin('public.tbl_benutzer bn', 'person_id');
+		$this->ci->PrestudentModel->addJoin('public.tbl_studiengang', 'studiengang_kz');
+
+		$this->ci->PrestudentModel->db->group_start();
+
+		$this->ci->PrestudentModel->db->where('zgvdatum', null);
+		$this->ci->PrestudentModel->db->where('typ', 'b');
+
+		$this->ci->PrestudentModel->db->or_group_start();
+		$this->ci->PrestudentModel->db->where('zgvmadatum', null);
+		$this->ci->PrestudentModel->db->where('typ', 'm');
+		$this->ci->PrestudentModel->db->group_end();
+
+		$this->ci->PrestudentModel->db->group_end();
+
+		$result = $this->ci->PrestudentModel-> loadWhere(array(
+			'bn.aktiv' => true,
 			'studiensemester_kurzbz' => $semester
 		));
 
@@ -63,13 +92,41 @@ class CoreMissingZgvTagLib
 		$this->ci->PrestudentModel->addJoin('public.tbl_prestudentstatus', 'prestudent_id');
 		$this->ci->PrestudentModel->addJoin('public.tbl_benutzer bn', 'person_id');
 		$this->ci->PrestudentModel->addJoin('public.tbl_studiengang', 'studiengang_kz');
-		$result = $this->ci->PrestudentModel->loadWhere(array(
+
+/*		$result = $this->ci->PrestudentModel->loadWhere(array(
 			'bn.aktiv' => true, //check if necessary
 			'zgvdatum' => null,
 			'typ' => 'b',
 			'studiensemester_kurzbz' => $semester,
 			'prestudent_id' => $prestudent_id
+		));	*/
+
+/*		$result = $this->ci->PrestudentModel->loadWhere(array(
+			'bn.aktiv' => true, //check if necessary
+			'zgvmadatum' => null,
+			'typ' => 'm',
+			'studiensemester_kurzbz' => $semester,
+			'prestudent_id' => $prestudent_id
+		));*/
+
+		$this->ci->PrestudentModel->db->group_start();
+
+		$this->ci->PrestudentModel->db->where('zgvdatum', null);
+		$this->ci->PrestudentModel->db->where('typ', 'b');
+
+		$this->ci->PrestudentModel->db->or_group_start();
+		$this->ci->PrestudentModel->db->where('zgvmadatum', null);
+		$this->ci->PrestudentModel->db->where('typ', 'm');
+		$this->ci->PrestudentModel->db->group_end();
+
+		$this->ci->PrestudentModel->db->group_end();
+
+		$result = $this->ci->PrestudentModel-> loadWhere(array(
+			'bn.aktiv' => true,
+			'studiensemester_kurzbz' => $semester,
+			'prestudent_id' => $prestudent_id
 		));
+
 		if(hasData($result))
 		{
 			return $result;
