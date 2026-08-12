@@ -371,14 +371,13 @@ class vertrag extends basis_db
 			null::integer as pruefung_id,
 			projektarbeit_id,
 			(tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag,
-			tbl_lehreinheit.studiensemester_kurzbz,
+			tbl_projektarbeit.studiensemester_kurzbz,
 			tbl_projektbetreuer.betreuerart_kurzbz,
 			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=tbl_projektarbeit.student_uid)
 			as bezeichnung
 		FROM
 			lehre.tbl_projektbetreuer
 			JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
-			JOIN lehre.tbl_lehreinheit ON(lehre.tbl_projektarbeit.lehrveranstaltung_id = lehre.tbl_lehreinheit.lehrveranstaltung_id AND lehre.tbl_projektarbeit.studiensemester_kurzbz = lehre.tbl_lehreinheit.studiensemester_kurzbz)
 
 		WHERE
 			tbl_projektbetreuer.person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
@@ -462,9 +461,8 @@ class vertrag extends basis_db
 					OR
 					EXISTS (SELECT 1 FROM lehre.tbl_projektbetreuer
 								JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
-								JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 							WHERE
-								tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
+								tbl_projektarbeit.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
 								AND tbl_projektbetreuer.person_id=tbl_person.person_id
 								AND tbl_projektbetreuer.vertrag_id IS NULL
 							)
@@ -949,11 +947,9 @@ class vertrag extends basis_db
 							FROM
 								lehre.tbl_projektbetreuer
 								JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
-								JOIN lehre.tbl_lehreinheit ON(lehre.tbl_projektarbeit.lehrveranstaltung_id = lehre.tbl_lehreinheit.lehrveranstaltung_id AND lehre.tbl_projektarbeit.studiensemester_kurzbz = lehre.tbl_lehreinheit.studiensemester_kurzbz)
-
 							WHERE
 								vertrag_id=tbl_vertrag.vertrag_id
-								AND lehre.tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($stsem).")
+								AND lehre.tbl_projektarbeit.studiensemester_kurzbz=".$this->db_add_param($stsem).")
 				 	OR
 					(NOT EXISTS (SELECT
 								1
@@ -1087,10 +1083,8 @@ class vertrag extends basis_db
 					lehre.tbl_vertrag
 					JOIN lehre.tbl_projektbetreuer USING(vertrag_id)
 					JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
-					JOIN lehre.tbl_lehreinheit ON(lehre.tbl_projektarbeit.lehrveranstaltung_id = lehre.tbl_lehreinheit.lehrveranstaltung_id AND lehre.tbl_projektarbeit.studiensemester_kurzbz = lehre.tbl_lehreinheit.studiensemester_kurzbz)
-
 				WHERE
-					studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+					tbl_projektarbeit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
 					AND tbl_projektbetreuer.person_id!=tbl_vertrag.person_id";
 
 		if($result = $this->db_query($qry))

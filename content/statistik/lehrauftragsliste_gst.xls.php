@@ -163,16 +163,15 @@ if($result = $db->db_query($qry))
 		$qry = "
 			SELECT
 				tbl_projektbetreuer.stunden, tbl_projektbetreuer.stundensatz
-			FROM lehre.tbl_projektbetreuer, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung,
+			FROM lehre.tbl_projektbetreuer, lehre.tbl_lehrveranstaltung,
 				public.tbl_benutzer, lehre.tbl_projektarbeit, campus.vw_student
 			WHERE
 				tbl_projektbetreuer.person_id=tbl_benutzer.person_id
 				AND tbl_benutzer.uid=".$db->db_add_param($uid)."
 				AND tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id
 				AND student_uid=vw_student.uid
-				AND tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id
-				AND tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
-				AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
+				AND tbl_projektarbeit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
+				AND tbl_projektarbeit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
 				AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
 		if($semester!='')
 			$qry.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER);

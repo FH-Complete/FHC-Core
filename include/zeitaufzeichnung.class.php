@@ -756,7 +756,6 @@ or not exists
 					JOIN public.tbl_studiengang s USING (studiengang_kz)
 
 			WHERE
-				pa.lehreinheit_id = l.lehreinheit_id AND
 				pb.projektarbeit_id = pa.projektarbeit_id AND
 				pb.person_id = b.person_id AND
 				b.uid = ".$this->db_add_param($user)." AND
