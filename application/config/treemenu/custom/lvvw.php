@@ -22,10 +22,10 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 $config['root'] = [
 	'stg' => [
 		'semester' => [
-			/*'group',
+			'group',
 			'verband' => [
 				'group'
-			]*/
+			]
 		],
 		'orgform'
 	]

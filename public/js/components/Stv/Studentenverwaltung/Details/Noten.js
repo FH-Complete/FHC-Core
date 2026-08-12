@@ -31,6 +31,11 @@ export default {
 			teacherLoaded: false,
 		};
 	},
+	computed: {
+		gradeListLink() {
+			return this.$api.getUri('/person/gradelist/index/' + this.modelValue.uid);
+		}
+	},
 	methods: {
 		reload() {
 			this.$refs.zeugnis.$refs.table.reloadTable();
@@ -69,13 +74,21 @@ export default {
 		const savedPath = window.localStorage.getItem(LOCAL_STORAGE_ID);
 		this.stdsem = savedPath || '';
 	},
-	template: `
+	template: /* html */`
 	<div class="stv-details-noten d-flex flex-column overflow-hidden">
-		<div class="mb-3">
-			<select class="form-select" v-model="stdsem" @input="saveStdsem">
-				<option value="">{{ $p.t('ui/current_semester') }}</option>
-				<option value="true">{{ $p.t('ui/all_semester') }}</option>
-			</select>
+		<div class="d-flex justify-content-between my-2">
+			<div>
+				<select class="form-select" v-model="stdsem" @input="saveStdsem">
+					<option value="">{{ $p.t('ui/current_semester') }}</option>
+					<option value="true">{{ $p.t('ui/all_semester') }}</option>
+				</select>
+			</div>
+			<div>
+				<a :href="gradeListLink" target="_blank">
+					{{ $p.t('stv/grades_gradelist') }}
+					<i class="fa-solid fa-arrow-up-right-from-square"></i>
+				</a>
+			</div>
 		</div>
 		<div class="row">
 			<div class="col-8">

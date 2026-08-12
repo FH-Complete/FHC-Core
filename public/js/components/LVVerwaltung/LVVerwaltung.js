@@ -49,10 +49,13 @@ export default {
 			permissionLehrveranstaltung: this.permissions['lehre/lehrveranstaltung'],
 			permissionGruppenEntfernen: this.permissions['lv-plan/gruppenentfernen'],
 			permissionLektorEntfernen: this.permissions['lv-plan/lektorentfernen'],
+			language: Vue.computed(() => this.$p.user_language),
+			isMobile: false,
 		}
 	},
 	data() {
 		return {
+			sidebarCollapsed: false,
 			appconfig:{},
 			configEndpoints: ApiLvConfig,
 			selected: [],

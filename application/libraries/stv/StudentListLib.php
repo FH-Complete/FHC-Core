@@ -320,16 +320,9 @@ class StudentListLib
 	 * @param string studiensemester_kurzbz
 	 *
 	 */
-	 protected function addSelectAndJoinForTagsIfConfigured($studiensemester_kurzbz)
-	 {
+	protected function addSelectAndJoinForTagsIfConfigured($studiensemester_kurzbz)
+	{
 		if (defined('STV_TAGS_ENABLED') && STV_TAGS_ENABLED) {
-
-			$this->_ci->load->model('system/Sprache_model', 'SpracheModel');
-			$this->_ci->SpracheModel->addSelect('index');
-			$result = $this->_ci->SpracheModel->loadWhere(array('sprache' => getUserLanguage()));
-			$language = hasData($result) ? getData($result)[0]->index : 1;
-			$index_bezeichnung_mehrsprachig = $language - 1;
-
 			$this->_ci->load->config('stv');
 			$tags = $this->_ci->config->item('stv_prestudent_tags');
 
@@ -351,7 +344,11 @@ class StudentListLib
 					SELECT DISTINCT ON (n.notiz_id)
 						n.notiz_id AS id,
 						nt.typ_kurzbz,
-						array_to_json(nt.bezeichnung_mehrsprachig)->>". $index_bezeichnung_mehrsprachig . " AS beschreibung,
+						nt.bezeichnung_mehrsprachig[(
+							SELECT index
+							FROM tbl_sprache
+							WHERE sprache=" . $this->_ci->PrestudentModel->escape(getUserLanguage()) . "
+						)] AS beschreibung,
 						n.text AS notiz,
 						nt.style,
 						n.erledigt AS done,
@@ -387,7 +384,7 @@ class StudentListLib
 			$this->addSelect('tag_data_agg.tags');
 			$this->addJoin($subQueryTag, 'tag_data_agg.prestudent_id = tbl_prestudent.prestudent_id', 'LEFT');
 		}
-	 }
+	}
 
 	/**
 	 * Get alias of a table or select statement
