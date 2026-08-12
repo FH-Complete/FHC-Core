@@ -45,18 +45,6 @@ export default {
 			roomAdditionalInfo: null,
 		}
 	},
-	created() {
-
-		this.$api.call(ApiRoomPlan.getRoomCreationInfo())
-			.then(result => result.data)
-			.then(result => {
-				if (result.berechtigt)
-				{
-					this.createContext.room_create_information.studiengaenge = result.studiengaenge
-				}
-				this.createContext.show_all_fields = result.berechtigt;
-			});
-	},
 	methods:{
 		handleChangeDate(day, newMode) {
 			return this.handleChangeMode(newMode, day);
@@ -158,6 +146,19 @@ export default {
 		}
 	},
 	async created() {
+		const roomCreationInfoResponse = await this.$api.call(
+			ApiRoomPlan.getRoomCreationInfo(),
+		);
+		if (roomCreationInfoResponse.meta?.status === "success") {
+			const berechtigt = !!roomCreationInfoResponse.data?.berechtigt;
+			if (roomCreationInfoResponse.data?.berechtigt) {
+				this.createContext.room_create_information.studiengaenge =
+					roomCreationInfoResponse.data?.studiengaenge;
+			}
+			this.createContext.show_all_fields =
+				roomCreationInfoResponse.data?.berechtigt;
+		}
+
 		const roomInfoResponse = await this.$api.call(
 			ApiRoom.getRoomInfo(this.$props.propsViewData.ort_kurzbz),
 		);
