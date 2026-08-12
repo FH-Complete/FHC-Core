@@ -1237,6 +1237,7 @@ export default {
 						<parking-slot
 							ref="parking"
 							v-model:parked-keys="parkedKeys"
+							@select-kw="jumpToKw"
 						></parking-slot>
 						
 						<fhc-coursepicker ref="coursepicker" :studiengaenge="studiengaenge" @select-lecturer="setEmp" @select-kw="jumpToKw" :studiensemester="selectedStudiensemester"></fhc-coursepicker>
