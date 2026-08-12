@@ -56,7 +56,8 @@ export default {
 				anmerkung: null,
 				protokoll: null,
 				note: null,
-				link: null
+				link: null,
+				uhrzeit: null
 			},
 			statusNew: true,
 			arrTypen: [],
@@ -416,6 +417,7 @@ export default {
 			localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
 		},
 		addNewAbschlusspruefung() {
+			this.checkFormatUhrzeit();
 			const dataToSend = {
 				uid: this.student.uid,
 				formData: this.formData
@@ -436,6 +438,7 @@ export default {
 				});
 		},
 		async addNewAbschlusspruefungMulti(){
+			this.checkFormatUhrzeit();
 			try {
 				const arraySuccessfullySent = [];
 				const arrayError = [];
@@ -489,6 +492,7 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		updateAbschlusspruefung(abschlusspruefung_id) {
+			this.checkFormatUhrzeit();
 			const dataToSend = {
 				id: abschlusspruefung_id,
 				formData: this.formData
@@ -527,6 +531,7 @@ export default {
 			this.formData.abschlussbeurteilung_kurzbz = null;
 			this.formData.datum = null;
 			this.formData.sponsion = null;
+			this.formData.uhrzeit = null;
 			this.formData.pruefer1 = null;
 			this.formData.pruefer2 = null;
 			this.formData.pruefer3 = null;
@@ -617,6 +622,13 @@ export default {
 			  }
 			});
 		},
+		checkFormatUhrzeit(){
+			if(this.formData.uhrzeit) {
+				this.formData.uhrzeit = typeof (this.formData.uhrzeit) == 'object' ?
+					`${String(this.formData.uhrzeit.hours).padStart(2, '0')}:${String(this.formData.uhrzeit.minutes).padStart(2, '0')}`
+					: this.formData.uhrzeit;
+			}
+		}
 	},
 	created() {
 		this.$api
@@ -711,7 +723,6 @@ export default {
 			</template>
 
 			<form-form ref="formFinalExam" @submit.prevent>
-
 				<legend>{{this.$p.t('global','details')}}</legend>
 				<p v-if="statusNew">[{{$p.t('ui', 'neu')}}]</p>
 
@@ -910,6 +921,19 @@ export default {
 						name="anmerkung"
 						>
 					</form-input>
+				</div>
+
+				<div v-if="!config.hiddenFields?.includes('uhrzeit')" class="row mb-3">
+					<form-input
+						container-class="col-6 stv-details-uhrzeit"
+						:label="$p.t('global', 'uhrzeit')"
+						type="DatePicker"
+						v-model="formData.uhrzeit"
+						time-picker
+						text-input
+						name="uhrzeit"
+						:teleport="true"
+					/>
 				</div>
 
 				<div class="row mb-3">
