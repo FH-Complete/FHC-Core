@@ -55,6 +55,7 @@ export default {
 			previewBody: "",
 			replyData: null,
 			messageSent: false,
+			isSending: false
 		}
 	},
 	methods: {
@@ -104,16 +105,21 @@ export default {
 			data.append('data', JSON.stringify(this.formData));
 			data.append('ids', JSON.stringify(this.id));
 
+			//for disabling sendButton and show Spinner
+			this.isSending = true;
+
 			return this.$api
 				.call(ApiMessages.sendMessage(this.typeId, data))
 				.then(response => {
-					if(this.openMode == "inSamePage")
+					if(this.openMode == "inSamePage") {
 						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
+					}
 					this.hideTemplate();
 					this.resetForm();
 					this.messageSent = true;
 				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
+					this.isSending = false;
 					if(this.openMode == "inSamePage" && this.id.length == 1 ){
 						this.$emit('reloadTable');
 						}
@@ -413,7 +419,12 @@ export default {
 
 							<button class="btn btn-secondary" @click="resetForm">{{$p.t('ui', 'reset')}}</button>
 
-							<button v-if="statusNew" type="button" class="btn btn-primary" @click="sendMessage()">{{$p.t('ui', 'nachrichtSenden')}}</button>
+							<button v-if="statusNew" type="button" class="btn btn-primary" :disabled="isSending" @click="sendMessage()">
+								<span
+									v-if="isSending"
+									class="spinner-border spinner-border-sm me-2"
+								></span>
+								{{$p.t('ui', 'nachrichtSenden')}}</button>
 							<button v-else type="button" class="btn btn-primary" @click="replyMessage(formData.message_id)">{{$p.t('global', 'reply')}}</button>
 						</div>
 

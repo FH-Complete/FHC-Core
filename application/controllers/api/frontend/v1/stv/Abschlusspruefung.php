@@ -246,12 +246,12 @@ class Abschlusspruefung extends FHCAPI_Controller
 	{
 		$searchString = $this->input->get('searchString') ?? '';
 
-		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
+		$this->load->model('person/Person_model', 'PersonModel');
 
-		$result = $this->MitarbeiterModel->searchMitarbeiter($searchString, 'ohneMaUid');
+		$result = $this->PersonModel->searchPerson($searchString, 'mitMaUid');
 
 		if (isError($result)) {
-			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+			  $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
 
 		$this->terminateWithSuccess($result ?: []);
