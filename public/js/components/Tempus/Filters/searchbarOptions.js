@@ -43,6 +43,14 @@ export function getTempusSearchbarOptions(self)
 							self.addToFilter(data, 'mitarbeiter');
 						}
 					},
+					{
+						label: "zum Course Picker hinzufügen",
+						icon: "fas fa-plus",
+						type: "function",
+						action: (data) => {
+							self.addToCoursePicker(data);
+						}
+					},
 				]
 			},
 		}

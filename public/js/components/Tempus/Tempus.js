@@ -181,21 +181,11 @@ export default {
 				.filter((lecture) => lecture.showEvents)
 				.map((lecture) => lecture.uid);
 		},
-		visibleStatusOptions() {
-			return Object.entries(this.visibleStatusArray).map(([key, label]) => ({
-				key,
-				label,
-			}));
-		},
-		visibleStatusValue() {
-			if (this.visibleStatus.includes("all"))
-				return this.visibleStatusOptions.filter(
-					(visibleStatus) => visibleStatus.key === "all",
-				);
-			return this.visibleStatus.map((status) => ({
-				key: status,
-				label: this.visibleStatusArray[status],
-			}));
+		courseLecturers() {
+			if (!this.lecturers.length) return [];
+			return this.lecturers
+				.filter((lecture) => lecture.showCoursePicker)
+				.map((lecture) => lecture.uid);
 		},
 		keyboardShortcuts() {
 			return getTempusShortcuts(this);
@@ -276,12 +266,11 @@ export default {
 				.call(ApiKalender.syncToStudent(orig.kalender_id))
 				.then(() => this.$refs.calendar.resetEventLoader());
 		},
-		setOrt: function (data) {
+		setOrt (data) {
 			this.ort_kurzbz = data.ort_kurzbz;
 			this.rooms = [{ ort_kurzbz: data.ort_kurzbz }];
 		},
 		onSelectVerbandAndClose(payload) {
-			console.log(payload);
 			this.onSelectVerband(payload);
 			bootstrap.Offcanvas.getOrCreateInstance(this.$refs.verbandMenu).hide();
 		},
@@ -307,40 +296,61 @@ export default {
 				];
 			}
 		},
-		setEmp: function (data) {
+		addToCoursePicker(data)
+		{
 			const uid = data.uid;
-			const label = data.name;
+			let lecturer = this.lecturers.find((lecture) => lecture.uid === uid);
 
-			for (const lect of this.lecturers) delete this.overlayCache[lect.uid];
+			if (!lecturer)
+			{
+				this.addToFilter(data, 'mitarbeiter');
+				lecturer = this.lecturers.find((lecture) => lecture.uid === uid);
 
-			this.lecturers = [
+				if (lecturer)
 				{
-					uid,
-					label,
-					showEvents: true,
-					overlays: { blocks: true, wishes: true },
-				},
-			];
+					lecturer.overlays = {
+						blocks: false,
+						wishes: false
+					}
+				}
+			}
 
-			this.$refs.calendar.resetEventLoader();
-			if (this.lastRange) this.handleRange(this.lastRange);
+			if (lecturer)
+			{
+				lecturer.showCoursePicker = true
+			}
 		},
-		addToFilter: function (filter, type) {
-			if (type === "ort") {
+
+		addToFilter (filter, type) {
+			if (type === "ort")
+			{
 				const ort_kurzbz = filter.ort_kurzbz;
-				if (!this.rooms.some((room) => room.ort_kurzbz === ort_kurzbz)) {
+				if (!this.rooms.some((room) => room.ort_kurzbz === ort_kurzbz))
+				{
 					this.rooms.push({ ort_kurzbz });
 				}
-			} else if (type === "mitarbeiter") {
+			}
+			else if (type === "mitarbeiter")
+			{
 				const uid = filter.uid;
 				const label = filter.name;
-				if (!this.lecturers.some((l) => l.uid === uid)) {
+
+				let lecturer = this.lecturers.find((lecture) => lecture.uid === uid);
+
+				if (!lecturer)
+				{
 					this.lecturers.push({
 						uid,
 						label,
 						showEvents: true,
 						overlays: { blocks: true, wishes: true },
+						showCoursePicker: false
 					});
+				}
+				else
+				{
+					lecturer.showEvents = true;
+					lecturer.overlays = { blocks: true, wishes: true };
 				}
 			}
 
@@ -1175,21 +1185,10 @@ export default {
 						</button>
 					</div>
 					<div class="px-2 py-1 w-100">
-						<!--<Multiselect
-							:model-value="visibleStatusValue"
-							@update:model-value="val => toggleStatus(val.map(o => o.key))"
-							option-label="label"
-							:options="visibleStatusOptions"
-							placeholder="Status filtern"
-							:hide-selected="false"
-							:show-toggle-all="false"
-							class="w-100"
-						/>-->
-						
 						<div
-              class="d-flex gap-1 py-1"
-              data-cy="previewRoleOptionsHolder"
-            >
+							class="d-flex gap-1 py-1"
+							data-cy="previewRoleOptionsHolder"
+						>
 							<button
 								class="btn btn-sm"
 								:class="previewRole === 'planer' ? 'btn-dark' : 'btn-outline-dark'"
@@ -1239,7 +1238,13 @@ export default {
 							v-model:parked-keys="parkedKeys"
 						></parking-slot>
 						
-						<fhc-coursepicker ref="coursepicker" :studiengaenge="studiengaenge" @select-lecturer="setEmp" @select-kw="jumpToKw" :studiensemester="selectedStudiensemester"></fhc-coursepicker>
+						<fhc-coursepicker 
+							ref="coursepicker"
+							:studiengaenge="studiengaenge"
+							:lecturers="courseLecturers"
+							@select-lecturer="addToFilter($event, 'mitarbeiter')"
+							@select-kw="jumpToKw"
+							:studiensemester="selectedStudiensemester"/>
 
 					</div>
 					<stv-studiensemester v-model:studiensemester-kurzbz="selectedStudiensemester"></stv-studiensemester>

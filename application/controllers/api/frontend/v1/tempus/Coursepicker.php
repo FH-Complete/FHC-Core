@@ -5,11 +5,13 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 class Coursepicker extends FHCAPI_Controller
 {
 	private $_ci;
+
+	const ALLOWED_COURSE_FILTER = ['uid', 'stg'];
+
 	public function __construct()
 	{
 		parent::__construct([
-			'search' => self::PERM_LOGGED,
-			'getByStg' => self::PERM_LOGGED
+			'getCourses' => self::PERM_LOGGED,
 		]);
 
 		$this->_ci = &get_instance();
@@ -22,88 +24,40 @@ class Coursepicker extends FHCAPI_Controller
 		$this->loadPhrases(['ui']);
 	}
 
-	public function search()
-	{
-		$query = $this->input->get('query');
-		if (is_null($query))
-			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
-
-		$query_words = explode(' ', $query);
-
-		//TODO Where weiter anpassen z.B. Fachbereich
-		$this->_ci->LehreinheitModel->addSelect('tbl_lehreinheit.lehreinheit_id,
-												tbl_lehreinheit.lvnr,
-												tbl_lehreinheit.lehrfach_id,
-												lehrfach.kurzbz AS lehrfach,
-												lehrfach.bezeichnung AS lehrfach_bez,
-												lehrfach.farbe AS lehrfach_farbe,
-												tbl_lehreinheit.lehrform_kurzbz AS lehrform,
-												lema.mitarbeiter_uid AS lektor_uid,
-												tbl_mitarbeiter.kurzbz AS lektor,
-												tbl_studiengang.studiengang_kz,
-												upper(tbl_studiengang.typ::character varying::text || tbl_studiengang.kurzbz::text) AS studiengang,
-												lvb.semester,
-												lvb.verband,
-												lvb.gruppe,
-												lvb.gruppe_kurzbz,
-												tbl_lehreinheit.raumtyp,
-												tbl_lehreinheit.raumtypalternativ,
-												tbl_lehreinheit.stundenblockung,
-												tbl_lehreinheit.wochenrythmus,
-												lema.semesterstunden,
-												lema.planstunden,
-												tbl_lehreinheit.start_kw,
-												tbl_lehreinheit.anmerkung,
-												tbl_lehreinheit.studiensemester_kurzbz');
-
-		$this->_ci->LehreinheitModel->addJoin('lehre.tbl_lehreinheitmitarbeiter lema', 'tbl_lehreinheit.lehreinheit_id = lema.lehreinheit_id');
-		$this->_ci->LehreinheitModel->addJoin('lehre.tbl_lehreinheitgruppe lvb', 'tbl_lehreinheit.lehreinheit_id = lvb.lehreinheit_id');
-		$this->_ci->LehreinheitModel->addJoin('public.tbl_studiengang', 'lvb.studiengang_kz = tbl_studiengang.studiengang_kz');
-		$this->_ci->LehreinheitModel->addJoin('lehre.tbl_lehrveranstaltung lehrfach', 'tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id');
-		$this->_ci->LehreinheitModel->addJoin('public.tbl_mitarbeiter', 'lema.mitarbeiter_uid = tbl_mitarbeiter.mitarbeiter_uid');
-		$this->_ci->LehreinheitModel->addJoin('lehre.tbl_lehrform', 'tbl_lehrform.lehrform_kurzbz = tbl_lehreinheit.lehrform_kurzbz');
-
-		$this->_ci->MitarbeiterModel->db->group_start();
-
-		foreach ($query_words as $word)
-		{
-			$this->_ci->LehreinheitModel->db->group_start();
-			$this->_ci->LehreinheitModel->db->where('lema.mitarbeiter_uid ILIKE', "%" . $word . "%");
-			$this->_ci->LehreinheitModel->db->or_where('lvb.gruppe_kurzbz ILIKE', "%" . $word . "%");
-			$this->_ci->LehreinheitModel->db->or_where('tbl_studiengang.kurzbzlang ILIKE', "%" . $word . "%");
-			$this->_ci->LehreinheitModel->db->or_where('lvb.verband ILIKE', "%" . $word . "%");
-			$this->_ci->LehreinheitModel->db->or_where('lvb.gruppe ILIKE', "%" . $word . "%");
-			$this->_ci->LehreinheitModel->db->or_where('lehrfach.bezeichnung ILIKE', "%" . $word . "%");
-
-			if (is_numeric($word))
-			{
-				$this->_ci->LehreinheitModel->db->or_where('tbl_studiengang.studiengang_kz', $word);
-				$this->_ci->LehreinheitModel->db->or_where('lvb.semester', $word);
-			}
-			$this->_ci->LehreinheitModel->db->group_end();
-
-		}
-		$this->_ci->LehreinheitModel->db->group_end();
-		$this->_ci->LehreinheitModel->db->where('tbl_lehreinheit.studiensemester_kurzbz = \'SS2025\'');
-		$this->_ci->LehreinheitModel->db->where(array('tbl_lehrform.verplanen' => true));
-
-		$result = $this->_ci->LehreinheitModel->load();
-
-		$this->terminateWithSuccess(hasData($result) ? getData($result) : array());
-	}
-
-	public function getByStg()
+	public function getCourses()
 	{
 		$this->_ci->form_validation->set_data($_POST);
-		$this->_ci->form_validation->set_rules('studiengaenge[]',"studiengaenge","required");
 		$this->_ci->form_validation->set_rules('studiensemester_kurzbz',"studiensemester_kurzbz","required");
 
 		if($this->_ci->form_validation->run() === FALSE)
 			$this->terminateWithValidationErrors($this->_ci->form_validation->error_array());
 
-		$studiengaenge = $this->input->post('studiengaenge');
-		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
+		$studiensemester_kurzbz = $this->_ci->input->post('studiensemester_kurzbz', TRUE);
 
+		$filter = $this->_checkFilter(self::ALLOWED_COURSE_FILTER);
+
+		$this->_getBasePlan($studiensemester_kurzbz);
+
+		$this->_ci->LehreinheitModel->db->group_start();
+		if (isset($filter->stg))
+			$this->_addStgWhere($filter->stg);
+
+		if (isset($filter->uid))
+		{
+			$uid_array = (array) $filter->uid;
+			$this->_ci->LehreinheitModel->db->or_where_in('tbl_benutzer.uid', $uid_array);
+		}
+
+		$this->_ci->LehreinheitModel->db->group_end();
+
+		$this->_ci->LehreinheitModel->addOrder('lehreinheit_id');
+		$result = $this->_ci->LehreinheitModel->load();
+		$result = hasData($result) ? getData($result) : array();
+		$this->terminateWithSuccess($this->_mapEvents($result));
+	}
+
+	private function _getBasePlan($studiensemester_kurzbz)
+	{
 		$this->_ci->LehreinheitModel->addSelect('
 			tbl_lehreinheit.lehreinheit_id,
 			tbl_lehreinheit.lvnr,
@@ -143,6 +97,15 @@ class Coursepicker extends FHCAPI_Controller
 		$this->_ci->LehreinheitModel->addJoin('public.tbl_person', 'tbl_benutzer.person_id = tbl_person.person_id');
 
 		$this->_ci->LehreinheitModel->db->group_start();
+		$this->_ci->LehreinheitModel->db->where('tbl_lehrform.verplanen', true);
+		$this->_ci->LehreinheitModel->db->where('tbl_lehreinheit.studiensemester_kurzbz', $studiensemester_kurzbz);
+		$this->_ci->LehreinheitModel->db->group_end();
+
+	}
+
+	private function _addStgWhere($studiengaenge)
+	{
+		$this->_ci->LehreinheitModel->db->group_start();
 		$first = true;
 		foreach ($studiengaenge as $studiengang)
 		{
@@ -165,14 +128,10 @@ class Coursepicker extends FHCAPI_Controller
 			$this->_ci->LehreinheitModel->db->group_end();
 		}
 		$this->_ci->LehreinheitModel->db->group_end();
+	}
 
-		$result = $this->_ci->LehreinheitModel->loadWhere(array(
-			'tbl_lehrform.verplanen' => true,
-			'tbl_lehreinheit.studiensemester_kurzbz' => $studiensemester_kurzbz
-		));
-
-		$result = hasData($result) ? getData($result) : array();
-
+	private function _mapEvents($result)
+	{
 		$lehreinheit_ids = array_values(array_unique(array_column($result, 'lehreinheit_id')));
 
 		$offen_map = array();
@@ -281,10 +240,8 @@ class Coursepicker extends FHCAPI_Controller
 			$group->verplant = $this->_formatArr($group->verplant);
 			$group->offenestunden = $this->_formatArr($group->offenestunden);
 		}
-
-		$this->terminateWithSuccess(array_values($grouped));
+		return array_values($grouped);
 	}
-
 	private function _formatArr($arr)
 	{
 		$values = array_values(array_unique($arr));
@@ -294,6 +251,25 @@ class Coursepicker extends FHCAPI_Controller
 			$formatted .= ' ?';
 
 		return $formatted;
+	}
+
+	private function _checkFilter($filters)
+	{
+		$filter_valid = false;
+		$filter_object = new stdClass();
+		foreach ($filters as $filter)
+		{
+			if ($this->_ci->input->post($filter))
+			{
+				$filter_valid = true;
+				$filter_object->$filter = $this->_ci->input->post($filter);
+			}
+		}
+
+		if (!$filter_valid)
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+		return $filter_object;
 	}
 
 

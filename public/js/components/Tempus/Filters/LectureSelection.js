@@ -47,6 +47,10 @@ export default {
 							<i :class="l.overlays.wishes ? 'fa-solid fa-toggle-on text-primary' : 'fa-solid fa-toggle-off text-muted'"></i>
 							<span class="form-check-label">Zeitwünsche</span>
 						</div>
+						<div class="d-flex align-items-center gap-2" @click="l.showCoursePicker = !l.showCoursePicker" style="cursor:pointer">
+							<i :class="l.showCoursePicker ? 'fa-solid fa-toggle-on text-primary' : 'fa-solid fa-toggle-off text-muted'"></i>
+							<span class="form-check-label">Course Picker</span>
+						</div>
 					</div>
 				</div>
 			</div>
