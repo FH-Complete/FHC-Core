@@ -402,7 +402,7 @@ export default {
 						name="foto"
 						@actionbutton-clicked="sendInfomail"
  						>
- 						<img alt="No Image" :src="noImageSrc" class="w-100">
+ 						<img alt="No Image" :src="noImageSrc" />
 					</form-input>
 					<form-input
 						v-if="!config.hiddenFields.includes('anmerkung')"

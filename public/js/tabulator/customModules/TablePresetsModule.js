@@ -34,10 +34,21 @@ export default class TablePresetsModule extends Module {
 		if (preset.headerFilters) {
 			Object.entries(preset.headerFilters).forEach(
 				([columnField, filterValue]) => {
-					this.table.setHeaderFilterValue(
-						columnField,
-						filterValue,
-					);
+					this.table.setHeaderFilterValue(columnField, filterValue);
+
+					// double checking if filter inputs are filled in due to issues with custom header filters
+					const headerFilterInputElement =
+						this.table.columnManager.columns
+							.find((column) => column.field === columnField)
+							?.element.querySelector(
+								".tabulator-header-filter input",
+							);
+					if (
+						headerFilterInputElement &&
+						headerFilterInputElement.value !== filterValue
+					) {
+						headerFilterInputElement.value = filterValue;
+					}
 				},
 			);
 		}

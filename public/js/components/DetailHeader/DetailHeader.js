@@ -82,6 +82,9 @@ export default {
 		hasTileGammaSlot() {
 			return !!this.$slots.titleGammaTile
 		},
+		hasTileDeltaSlot() {
+			return !!this.$slots.titleDeltaTile
+		},
 		hasTileUIDSlot() {
 			return !!this.$slots.uid
 		},
@@ -492,6 +495,13 @@ export default {
 					<div class="px-2" style="min-width: 100px;">
 						<slot name="issues"></slot>
 					</div>
+					<div v-if="hasTileDeltaSlot" class="px-2" style="border-left: 1px solid #EEE">
+						<h4 class="mb-1 text-center"><slot name="titleDeltaTile"></slot></h4>
+						<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
+							<pv-skeleton v-if="isLoading" width="4rem"></pv-skeleton>
+							<slot v-else name="valueDeltaTile"></slot>
+						</h6>
+					</div>
 					<div v-if="hasTileGammaSlot" class="px-2" style="border-left: 1px solid #EEE">
 						<h4 class="mb-1 text-center"><slot name="titleGammaTile"></slot></h4>
 						<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
@@ -611,6 +621,13 @@ export default {
 					<div class="d-flex py-1">
 						<div class="px-2" style="min-width: 100px;">
 							<slot name="issues"></slot>
+						</div>
+						<div v-if="hasTileDeltaSlot" class="px-2" style="border-left: 1px solid #EEE">
+							<h4 class="mb-1 text-center"><slot name="titleDeltaTile"></slot></h4>
+							<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
+								<pv-skeleton v-if="isLoading" width="4rem"></pv-skeleton>
+								<slot v-else name="valueDeltaTile"></slot>
+							</h6>
 						</div>
 						<div v-if="hasTileGammaSlot" class="px-2" style="border-left: 1px solid #EEE">
 							<h4 class="mb-1 text-center"><slot name="titleGammaTile"></slot></h4>
