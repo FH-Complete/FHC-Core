@@ -102,7 +102,7 @@ export default {
 					{title: "Titel", field: "titel"},
 					{title: "Gesamtnote", field: "note"},
 					{
-						title: "Abgabe Endupload",
+						title: "Abgabe Enduplad",
 						field: "abgabedatum",
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
@@ -254,10 +254,6 @@ export default {
 		actionEditProjektarbeit() {
 			this.statusNew = false;
 			this.toggleMenu('details');
-			this.$refs.projektarbeitDetails.getFormData(false, this.editedProjektarbeit?.studiensemester_kurzbz, this.editedProjektarbeit?.lehrveranstaltung_id)
-			this.$refs.projektbetreuer.getFormData(
-				this.editedProjektarbeit ? this.editedProjektarbeit.projekttyp_kurzbz : null
-			);
 			this.$refs.projektbetreuer.getProjektbetreuer(this.editedProjektarbeit?.projektarbeit_id, this.editedProjektarbeit?.studiensemester_kurzbz);
 			this.$refs.projektarbeitModal.show();
 		},
@@ -293,10 +289,8 @@ export default {
 		},
 		updateProjektarbeit() {
 			this.$refs.projektarbeitDetails.updateProjektarbeit()
-				.then((result) => {
-					console.log('res update', result)
-					this.projektarbeitSaved();
-				})
+				.then(() => this.$refs.projektbetreuer.saveIfOpen())
+				.then(() => this.projektarbeitSaved())
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		deleteProjektarbeit(projektarbeit_id) {
@@ -328,12 +322,12 @@ export default {
 		toggleMenu(tabId) {
 			this.activeTab = tabId;
 			if (this.statusNew == false && tabId == 'details') {
-
+				
 				this.$refs.projektarbeitDetails.getFormData(
 					this.statusNew, this.editedProjektarbeit?.studiensemester_kurzbz, this.editedProjektarbeit?.lehrveranstaltung_id
 				);
 				this.$refs.projektarbeitDetails.loadProjektarbeit(this.editedProjektarbeit?.projektarbeit_id);
-			} else if (tabId == 'betreuer') {
+			} else if(tabId == 'betreuer') {
 				this.$refs.projektbetreuer.getFormData(
 					this.editedProjektarbeit ? this.editedProjektarbeit.projekttyp_kurzbz : null
 				);
@@ -364,9 +358,10 @@ export default {
 		</core-filter-cmpt>
 
 		<!--Modal: projektarbeitModal-->
-		<bs-modal ref="projektarbeitModal" :dialog-class="(statusNew ? 'modal-xl ' : 'fhc-xxl-modal ' ) + 'modal-dialog-scrollable'" 
-			header-class="flex-wrap pb-0"
-			@hideBsModal="resetFormData">
+		<bs-modal ref="projektarbeitModal" :dialog-class="(statusNew ? 'modal-xl ' : 'fhc-xxl-modal ' ) + 'modal-dialog-scrollable'"
+		 	header-class="flex-wrap pb-0"
+		 	@hideBsModal="resetFormData"
+		 	>
 			<template #title>
 				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('projektarbeit', 'projektarbeitAnlegen')}}</p>
 				<p v-else class="fw-bold mt-3">{{$p.t('projektarbeit', 'projektarbeitBearbeiten')}}</p>

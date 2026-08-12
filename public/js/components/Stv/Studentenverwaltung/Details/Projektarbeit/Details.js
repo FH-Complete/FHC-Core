@@ -153,8 +153,7 @@ export default {
 			return this.$api
 				.call(ApiStvProjektarbeit.loadProjektarbeit(projektarbeit_id))
 				.then(result => {
-					this.formData = result.data;
-					if (this.formData.firma_id) this.formData.firma = {firma_id: this.formData.firma_id, name: this.formData.firma_name};
+					this.setFormData(result.data)
 					return result;
 				})
 				.catch(this.$fhcAlert.handleSystemError)

@@ -98,23 +98,21 @@ class Projektarbeit extends FHCAPI_Controller
 
 		$this->terminateWithSuccess(current($data));
 	}
-
+	
 	private function fetchProjektarbeitById($projektarbeit_id) {
 		$this->ProjektarbeitModel->resetQuery();
 		$this->ProjektarbeitModel->addSelect(
-			'lehre.tbl_projektarbeit.projektarbeit_id, titel, titel_english, themenbereich, projekttyp_kurzbz, 
-			lehre.tbl_projektarbeit.lehrveranstaltung_id, lehreinheit_id, 
+			'lehre.tbl_projektarbeit.projektarbeit_id, titel, titel_english, themenbereich, projekttyp_kurzbz, lehrveranstaltung_id, lehreinheit_id, 
 			firma_id, beginn, ende, gesperrtbis, note, final, freigegeben, tbl_projektarbeit.anmerkung, fa.name AS firma_name'
 		);
-		$this->ProjektarbeitModel->addJoin('lehre.tbl_lehreinheit le', 'lehreinheit_id', 'LEFT');
-		$this->ProjektarbeitModel->addJoin('lehre.tbl_lehrveranstaltung lv', 'lehre.tbl_projektarbeit.lehrveranstaltung_id = lv.lehrveranstaltung_id');
+		$this->ProjektarbeitModel->addJoin('lehre.tbl_lehreinheit le', 'lehreinheit_id');
+		$this->ProjektarbeitModel->addJoin('lehre.tbl_lehrveranstaltung lv', 'lehrveranstaltung_id');
 		$this->ProjektarbeitModel->addJoin('public.tbl_firma fa', 'firma_id', 'LEFT');
 		
 		
 		return $this->ProjektarbeitModel->loadWhere(
 			array('projektarbeit_id' => $projektarbeit_id)
 		);
-
 	}
 
 	/**
@@ -241,7 +239,7 @@ class Projektarbeit extends FHCAPI_Controller
 	}
 
 	/**
-	 * Get Lehrveranstaltungen by params, including lehreinheiten for a specific Studiensemester..
+	 * Get Lehrveranstaltungen by params, incling lehreinheiten for a specific Studiensemester..
 	 */
 	public function getLehrveranstaltungen()
 	{
@@ -316,10 +314,7 @@ class Projektarbeit extends FHCAPI_Controller
 	 */
 	public function getNoten()
 	{
-		$this->NoteModel->addOrder('notenwert', 'ASC');
-		$this->NoteModel->addOrder('bezeichnung', 'ASC');
-
-		$result = $this->NoteModel->load();
+		$result = $this->NoteModel->getAllActive();
 
 		if (isError($result)) return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 

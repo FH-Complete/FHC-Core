@@ -10,7 +10,7 @@ import Vertrag from "./Vertrag.js";
 import ApiStvProjektbetreuer from '../../../../../api/factory/stv/projektbetreuer.js';
 
 export default {
-	name: 'ProjektarbeitBetreuer',
+	name: 'Projektbetreuer',
 	components: {
 		CoreFilterCmpt,
 		BsModal,
@@ -55,7 +55,7 @@ export default {
 					{
 						title: 'Aktionen',
 						field: 'actions',
-						minWidth: 100, // Ensures Action-buttons will be always fully displayed
+						minWidth: 150, // Ensures Action-buttons will be always fully displayed
 						formatter: (cell, formatterParams, onRendered) => {
 							let container = document.createElement('div');
 							container.className = "d-flex gap-2";
@@ -117,11 +117,11 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitColumns',
+				layout: 'fitData',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				minHeight: '100',
-				selectableRows: true,
+				selectableRows: 1,
 				index: 'betreuer_id',
 				persistence:{
 					columns: true, //persist column layout
@@ -219,8 +219,10 @@ export default {
 					);
 
 				if (idx >= 0) { // if betreuer found
+
 					// set currently edited betreuer (deep copy)
 					this.formData = JSON.parse(JSON.stringify(projektbetreuerListe[idx]));
+
 					// set download link
 					if (this.formData.beurteilungDownloadLink !== null) this.beurteilungDownloadLink = this.formData.beurteilungDownloadLink;
 
@@ -291,21 +293,44 @@ export default {
 						this.$refs.projektbetreuerTable.tabulator.replaceData(this.addIds(result.data));
 					})
 					.catch(this.$fhcAlert.handleSystemError);
+
+				// get other initial data
+				this.$api
+					.call(ApiStvProjektbetreuer.getBetreuerarten())
+					.then(result => {
+						this.arrBetreuerart = result.data;
+					})
+					.catch(this.$fhcAlert.handleSystemError);
+
+				this.$api
+					.call(ApiStvProjektbetreuer.getNoten())
+					.then(result => {
+						this.arrNoten = result.data;
+					})
+					.catch(this.$fhcAlert.handleSystemError);
 			} else {
 				this.emptyBetreuerList();
 			}
 		},
-		saveProjektbetreuer() {
-			this.$refs.formProjektbetreuer.call(
+		_doSaveBetreuer() {
+			return this.$refs.formProjektbetreuer.call(
 				ApiStvProjektbetreuer.saveProjektbetreuer(this.projektarbeit_id, this.getFormDataWithBetreuer())
-			)
-			.then(result => {
-				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+			).then(result => {
 				this.getProjektbetreuer(this.projektarbeit_id, this.studiensemester_kurzbz);
 				this.resetModes();
 				this.$emit('betreuerSaved');
-			})
-			.catch(this.$fhcAlert.handleSystemError);
+				return result;
+			});
+		},
+		// called by combined save button
+		saveIfOpen() {
+			if (!this.betreuerFormOpened) return Promise.resolve(null);
+			return this._doSaveBetreuer();
+		},
+		saveProjektbetreuer() {
+			this._doSaveBetreuer()
+				.then(() => this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave')))
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		searchBetreuer(event) {
 			if (this.abortController.betreuer) {
@@ -538,7 +563,7 @@ export default {
 			</form-form>
 
 			<button class="btn btn-primary" v-show="betreuerFormOpened" @click="saveProjektbetreuer">
-				{{ $p.t('projektarbeit', 'betreuerSpeichern') }}
+				{{ $p.t('projektarbeit', 'betreuerSpeichernv2') }}
 			</button>
 			<!-- <div class = "mt-5" v-if="beurteilungDownloadLink !== null">
 				<div class="mb-1">

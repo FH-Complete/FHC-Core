@@ -15,7 +15,12 @@ export function addTagInTable(addedTag, rows, matchKey, tagsKey = "tags")
 
 			let tags;
 			try {
-				tags = JSON.parse(rowData[tagsKey] || "[]");
+				let initialTags = rowData[tagsKey] || "[]";
+				if (typeof initialTags === 'string') {
+					tags = JSON.parse(initialTags);
+				} else {
+					tags = initialTags;
+				}
 			} catch (e) {
 				tags = [];
 			}
@@ -28,8 +33,14 @@ export function addTagInTable(addedTag, rows, matchKey, tagsKey = "tags")
 
 			let newTag = { ...addedTag, id: tag.id };
 
-			tags.unshift(newTag);
+			tags.push(newTag);
+			tags.sort((a, b) => {
+				let adone = a.done ? 1 : 0;
+				let bdone = b.done ? 1 : 0;
 
+				if (adone !== bdone) return adone - bdone;
+				return a.prioritaet - b.prioritaet;
+			});
 			rowData[tagsKey] = JSON.stringify(tags);
 			updated = true;
 		});
@@ -53,7 +64,12 @@ export function deleteTagInTable(deletedTag, rows, tagsKeys = ['tags'])
 			let tags;
 
 			try {
-				tags = JSON.parse(rowData[key] || "[]");
+				let initialTags = rowData[key] || "[]";
+				if (typeof initialTags === 'string') {
+					tags = JSON.parse(initialTags);
+				} else {
+					tags = initialTags;
+				}
 			} catch (e) {
 				tags = [];
 			}
@@ -62,7 +78,6 @@ export function deleteTagInTable(deletedTag, rows, tagsKeys = ['tags'])
 				return;
 
 			let filtered = tags.filter(tag => tag?.id !== deletedTag);
-
 			if (filtered.length !== tags.length)
 			{
 				updates[key] = JSON.stringify(filtered);
@@ -95,7 +110,12 @@ export function updateTagInTable(updatedTag, rows, fields = ['tags'])
 
 			let fieldData;
 			try {
-				fieldData = JSON.parse(rowData[field] || "[]");
+				let initialTags = rowData[field] || "[]";
+				if (typeof initialTags === 'string') {
+					fieldData = JSON.parse(initialTags);
+				} else {
+					fieldData = initialTags;
+				}
 			} catch (e) {
 				return;
 			}
@@ -108,6 +128,14 @@ export function updateTagInTable(updatedTag, rows, fields = ['tags'])
 			if (index !== -1)
 			{
 				fieldData[index] = { ...updatedTag };
+				fieldData.sort((a, b) => {
+					let adone = a.done ? 1 : 0;
+					let bdone = b.done ? 1 : 0;
+
+					if (adone !== bdone) return adone - bdone;
+					return a.prioritaet - b.prioritaet;
+				});
+
 				let updatedFieldData = JSON.stringify(fieldData);
 
 				if (updatedFieldData !== rowData[field])

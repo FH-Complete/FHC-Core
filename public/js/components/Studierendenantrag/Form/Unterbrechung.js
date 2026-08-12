@@ -90,6 +90,17 @@ export default {
 								msg,
 								severity: this.statusSeverity
 							});
+
+							if (this.data.status === 'Abgelehnt' &&  this.data?.status_grund?.trim())
+							{
+								this.$emit('setInfos', [
+									{
+										title: this.$p.t('studierendenantrag', 'status_grund_abgelehnt'),
+										body: this.data.status_grund,
+										severity: this.statusSeverity
+									}
+								]);
+							}
 						}
 						return result;
 					}

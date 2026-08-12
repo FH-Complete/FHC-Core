@@ -40,13 +40,16 @@ class StundenplanLib
 	 * @return stdClass
 	 * @access public
 	 */
-	public function getEventsUser($start, $end)
+	public function getEventsUser($start, $end, $uid = null)
 	{
 		$this->_ci =& get_instance();
 
 		$this->_ci->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 
-		$uid = getAuthUID();
+		if (!$uid) {
+			$uid = getAuthUID();
+		}
+		
 		if (is_null($uid))
 			return error("No UID");
 		
@@ -77,10 +80,12 @@ class StundenplanLib
 		if (isError($semester_range))
 			return $semester_range;
 		$semester_range = getData($semester_range);
+		$this->_ci->addMeta('semester_range', $semester_range);
 
 		$this->sortStudienSemester($semester_range);
 
 		$function_error = $this->applyLoadUeberSemesterHaelfte($semester_range);
+		$this->_ci->addMeta('nach_apply_semester_range', $semester_range);
 		if ($function_error)
 			return $function_error;
 		
@@ -181,6 +186,21 @@ class StundenplanLib
 		return success($stundenplan_data);
 	}
 
+	public function getEventsByLE($lehreinheit_id, $start, $end, $stundenplan)
+	{
+		$this->_ci =& get_instance();
+
+		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+		return $this->_ci->StundenplanModel->getStundenplanLE($lehreinheit_id, $start, $end, $stundenplan);
+	}
+
+	public function getEventsByLV($lehrveranstaltung_id, $start, $end, $stundenplan)
+	{
+		$this->_ci =& get_instance();
+
+		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+		return $this->_ci->StundenplanModel->getStundenplanLV($lehrveranstaltung_id, $start, $end, $stundenplan);
+	}
 	/**
 	 * Get stundenplan for a room
 	 *
@@ -217,7 +237,7 @@ class StundenplanLib
 	 * @param string	$ort_kurzbz
 	 * @return stdClass
 	 */
-	public function getReservierungen($start_date, $end_date, $ort_kurzbz = '')
+	public function getReservierungen($start_date, $end_date, $ort_kurzbz = '', $uid = null)
 	{
 		$this->_ci =& get_instance();
 
@@ -228,14 +248,14 @@ class StundenplanLib
 		$this->_ci->load->model('ressource/Reservierung_model', 'ReservierungModel');
 		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
 
-		$is_mitarbeiter = getData($this->_ci->MitarbeiterModel->isMitarbeiter(getAuthUID()));
+		$is_mitarbeiter = getData($this->_ci->MitarbeiterModel->isMitarbeiter($uid ?? getAuthUID()));
 
 		if ($is_mitarbeiter && empty($ort_kurzbz)) {
 			// request for personal lvplan show only reservations of logged in user
-			$reservierungen = $this->_ci->ReservierungModel->getReservierungenMitarbeiter($start_date, $end_date);
+			$reservierungen = $this->_ci->ReservierungModel->getReservierungenMitarbeiter($start_date, $end_date, $uid);
 		} else {
 			// querying the reservierungen
-			$reservierungen = $this->_ci->ReservierungModel->getReservierungen($start_date, $end_date, $ort_kurzbz);
+			$reservierungen = $this->_ci->ReservierungModel->getReservierungen($start_date, $end_date, $ort_kurzbz, $uid);
 		}
 		
 		if (isError($reservierungen))
@@ -357,7 +377,10 @@ class StundenplanLib
 				if (isError($ort_content_object)) {
 					return error(getData($ort_content_object));
 				}
-				$ort_content_object = getData($ort_content_object)[0];
+				$ort_content_object_data = getData($ort_content_object);
+				$ort_content_object = (is_array($ort_content_object_data) && count($ort_content_object_data) > 0)
+					? $ort_content_object_data[0]
+					: null;
 				if($ort_content_object) {
 					$item->ort_content_id = $ort_content_object->content_id;
 				}
@@ -443,6 +466,24 @@ class StundenplanLib
 		}, $ferienEventsFlattened);
 		
 		return success($ferienEventsFlattened);
+	}
+
+	public function getEventsStgOrg( $start, $end, $stg_kz, $sem, $verband, $gruppe)
+	{
+		$this->_ci =& get_instance();
+
+		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+
+		$stundenplan_data = $this->_ci->StundenplanModel->getStundenplanStudiengang($start, $end, $stg_kz, $sem, $verband, $gruppe);
+		if (isError($stundenplan_data))
+			return $stundenplan_data;
+		$stundenplan_data = getData($stundenplan_data) ?? [];
+
+		$function_error = $this->expandObjectInformation($stundenplan_data);
+		if ($function_error)
+			return $function_error;
+
+		return success($stundenplan_data);
 	}
 
 	// start of the private functions ########################################################################################################
@@ -760,7 +801,8 @@ class StundenplanLib
 		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		// gets all studiensemester from the student from start_date to end_date
-		$semester_range = $this->_ci->StudiensemesterModel->getByDateRange($start_date, $end_date);
+		//$semester_range = $this->_ci->StudiensemesterModel->getByDateRange($start_date, $end_date);
+		$semester_range = $this->_ci->StudiensemesterModel->getContainingOrNearestByDateRange($start_date, $end_date);
 		if (isError($semester_range))
 			return $semester_range;
 		
