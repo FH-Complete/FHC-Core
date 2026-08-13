@@ -35,6 +35,8 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		INSERT INTO hr.tbl_gehaltsanpassungtyp(gehaltsanpassungtyp_kurzbz, bezeichnung, sort, aktiv) VALUES('ersteinstufung','Ersteinstufung', 1, true);
 		INSERT INTO hr.tbl_gehaltsanpassungtyp(gehaltsanpassungtyp_kurzbz, bezeichnung, sort, aktiv) VALUES('individuelle_anpassung','Indiv. Anpassung', 2, true);
 		INSERT INTO hr.tbl_gehaltsanpassungtyp(gehaltsanpassungtyp_kurzbz, bezeichnung, sort, aktiv) VALUES('strukturelle_anpassung','Strukturelle Anpassung', 3, true);
+		INSERT INTO hr.tbl_gehaltsanpassungtyp(gehaltsanpassungtyp_kurzbz, bezeichnung, sort, aktiv) VALUES('funktionsaenderung','Funktionsänderung', 4, true);
+		
 		";
 
 		if (! $db->db_query($qry))
