@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "869cbc35bd1ba90ab90934fcb41b0f51",
+    "content-hash": "bc21de2a48b960781c1ed028c4b8d7b9",
     "packages": [
         {
             "name": "afarkas/html5shiv",
@@ -960,10 +960,10 @@
         },
         {
             "name": "fortawesome/font-awesome6",
-            "version": "6.1.1",
+            "version": "6.7.2",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/6.1.1.zip"
+                "url": "https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/6.7.2.zip"
             },
             "type": "library"
         },
@@ -1565,10 +1565,10 @@
         },
         {
             "name": "npm-asset/primeicons",
-            "version": "5.0.0",
+            "version": "6.0.1",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/primeicons/-/primeicons-5.0.0.tgz"
+                "url": "https://registry.npmjs.org/primeicons/-/primeicons-6.0.1.tgz"
             },
             "type": "npm-asset",
             "license": [
