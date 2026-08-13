@@ -146,4 +146,40 @@ class Reservierung_model extends DB_Model
 		return $this->execReadOnlyQuery($qry, [$uid, $datum, $stunde]);
 	}
 
+	public function deleteReservation($reservierung_id) {
+		$uid = getAuthUID();
+
+		$result = $this->load($reservierung_id);
+
+		if (isError($result))
+			return $result;
+
+		if (!hasData($result))
+			return error('Reservierung nicht gefunden');
+
+		$row = $result->retval[0];
+
+		if ($row->uid !== $uid && $row->insertvon !== $uid)
+			return error('Keine Berechtigung');
+
+		return $this->delete($reservierung_id);
+	}
+
+	public function getMyReservation() {
+		$uid = getAuthUID();
+		$date = date("Y-m-d",time());
+
+		$qry = "SELECT vw_reservierung.*, 
+					trim(COALESCE(vw_mitarbeiter.titelpre,'')||' '||COALESCE(vw_mitarbeiter.vorname,'')||' '||COALESCE(vw_mitarbeiter.nachname,'')||' '||COALESCE(vw_mitarbeiter.titelpost,'')) as reserviert_fuer,
+					trim(COALESCE(reserviert_von.titelpre,'')||' '||COALESCE(reserviert_von.vorname,'')||' '||COALESCE(reserviert_von.nachname,'')||' '||COALESCE(reserviert_von.titelpost,'')) as reserviert_von
+				FROM campus.vw_reservierung
+				JOIN campus.vw_mitarbeiter ON vw_reservierung.uid=vw_mitarbeiter.uid
+				LEFT JOIN campus.vw_mitarbeiter reserviert_von ON vw_reservierung.insertvon=reserviert_von.uid
+				WHERE datum >= ?
+ 				AND (vw_reservierung.uid= ? OR vw_reservierung.insertvon= ? )
+				ORDER BY  datum, titel, ort_kurzbz, stunde";
+		
+		return $this->execReadOnlyQuery($qry, [$date, $uid, $uid]);
+	}
+	
 }
