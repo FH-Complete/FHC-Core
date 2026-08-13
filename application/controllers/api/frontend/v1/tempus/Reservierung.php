@@ -162,9 +162,9 @@ class Reservierung extends FHCAPI_Controller
 		if ($this->_ci->form_validation->run() === FALSE)
 			$this->terminateWithValidationErrors($this->_ci->form_validation->error_array());
 
-		$ort_kurzbz = $this->_ci->input->post('ort_kurzbz', TRUE);
+		$orte = $this->_ci->input->post('orte', TRUE);
 
-		if (empty($ort_kurzbz) || !is_array($ort_kurzbz))
+		if (empty($orte) || (empty($orte['ort_kurzbz']) && empty($orte['location'])))
 		{
 			$this->terminateWithValidationErrors(['ort_kurzbz' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Raum'])]);
 		}
@@ -189,7 +189,7 @@ class Reservierung extends FHCAPI_Controller
 			$teilnehmer[] = array('uid' => getAuthUID(), 'rolle' => 'organisator');
 
 
-		$result = $this->_ci->kalenderlib->addReservierung($titel, $beschreibung, $ort_kurzbz, $start_date, $end_date, $teilnehmer, $specialFinalGroups, $specialGroups, $groups);
+		$result = $this->_ci->kalenderlib->addReservierung($titel, $beschreibung, $orte, $start_date, $end_date, $teilnehmer, $specialFinalGroups, $specialGroups, $groups);
 
 
 		if (isError($result))

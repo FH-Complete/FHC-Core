@@ -32,7 +32,17 @@ class Config extends FHCAPI_Controller
 	{
 		$config = [];
 
-		$result = $this->_ci->VariableModel->getVariables(getAuthUID(), ['ignore_kollision', 'kollision_student', 'ignore_reservierung', 'ignore_zeitsperre', 'ignore_resources_collisions']);
+		$var_array = array(
+			'ignore_kollision',
+			'kollision_student',
+			'ignore_reservierung',
+			'ignore_zeitsperre',
+			'ignore_resources_collisions',
+			'roomless_planning',
+			'priority_room_planning',
+			'dialog_room_planning'
+		);
+		$result = $this->_ci->VariableModel->getVariables(getAuthUID(), $var_array);
 
 		$data = $this->getDataOrTerminateWithError($result);
 		$config['ignore_kollision'] = [
@@ -67,6 +77,25 @@ class Config extends FHCAPI_Controller
 			"value" => ($data['ignore_resources_collisions'] ?? 'false') === 'true'
 		];
 
+		$config['roomless_planning'] = [
+			"type"  => "checkbox",
+			"label" => $this->p->t('ui', 'roomless_planning'),
+			"value" => ($data['roomless_planning'] ?? 'false') === 'true'
+		];
+
+		$config['priority_room_planning'] = [
+			"type"  => "checkbox",
+			"label" => $this->p->t('ui', 'priority_room_planning'),
+			"value" => ($data['priority_room_planning'] ?? 'false') === 'true'
+		];
+
+		$config['dialog_room_planning'] = [
+			"type"  => "checkbox",
+			"label" => $this->p->t('ui', 'dialog_room_planning'),
+			"value" => ($data['dialog_room_planning'] ?? 'false') === 'true'
+		];
+
+
 		$this->terminateWithSuccess($config);
 	}
 	public function getHeader()
@@ -92,31 +121,26 @@ class Config extends FHCAPI_Controller
 
 	public function set()
 	{
-		$this->_ci->VariableModel->setVariable(
-			getAuthUID(),
+		$configs = array(
 			'ignore_kollision',
-			$this->input->post('ignore_kollision') === true ? 'true' : 'false'
-		);
-		$this->_ci->VariableModel->setVariable(
-			getAuthUID(),
 			'kollision_student',
-			$this->input->post('kollision_student') === true ? 'true' : 'false'
-		);
-		$this->_ci->VariableModel->setVariable(
-			getAuthUID(),
 			'ignore_reservierung',
-			$this->input->post('ignore_reservierung') === true ? 'true' : 'false'
-		);
-		$this->_ci->VariableModel->setVariable(
-			getAuthUID(),
 			'ignore_zeitsperre',
-			$this->input->post('ignore_zeitsperre') === true ? 'true' : 'false'
-		);
-		$this->_ci->VariableModel->setVariable(
-			getAuthUID(),
 			'ignore_resources_collisions',
-			$this->input->post('ignore_resources_collisions') === true ? 'true' : 'false'
+			'roomless_planning',
+			'priority_room_planning',
+			'dialog_room_planning'
 		);
+
+		foreach ($configs as $config)
+		{
+			$this->_ci->VariableModel->setVariable(
+				getAuthUID(),
+				$config,
+				$this->input->post($config) === true ? 'true' : 'false'
+			);
+		}
+
 		$this->terminateWithSuccess();
 	}
 
