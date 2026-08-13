@@ -197,3 +197,11 @@ $config['unterbrechung_enabled'] = true;
  */
 $config['wiederholung_enabled'] = true;
 
+/**
+ * Modal with Infotext of TLC
+ * if true, there will be shown an info modal in the studentsView after the first button ABMELDUNG
+ *
+ * @var boolean
+ */
+$config['showInfoModalAbmeldung'] = true;
+
