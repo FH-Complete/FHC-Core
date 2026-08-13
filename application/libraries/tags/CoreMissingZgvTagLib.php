@@ -29,24 +29,6 @@ class CoreMissingZgvTagLib
 		$this->ci->PrestudentModel->addJoin('public.tbl_benutzer bn', 'person_id');
 		$this->ci->PrestudentModel->addJoin('public.tbl_studiengang', 'studiengang_kz');
 
-/*		$result = $this->ci->PrestudentModel-> loadWhere(array(
-			'bn.aktiv' => true, //check if necessary
-			'zgvdatum' => null,
-			'typ' => 'b',
-			'studiensemester_kurzbz' => $semester
-		));	*/
-
-/*		$result = $this->ci->PrestudentModel-> loadWhere(array(
-			'bn.aktiv' => true, //check if necessary
-			'zgvmadatum' => null,
-			'typ' => 'm',
-			'studiensemester_kurzbz' => $semester
-		));*/
-
-		$this->ci->PrestudentModel->addJoin('public.tbl_prestudentstatus', 'prestudent_id');
-		$this->ci->PrestudentModel->addJoin('public.tbl_benutzer bn', 'person_id');
-		$this->ci->PrestudentModel->addJoin('public.tbl_studiengang', 'studiengang_kz');
-
 		$this->ci->PrestudentModel->db->group_start();
 
 		$this->ci->PrestudentModel->db->where('zgvdatum', null);
@@ -89,25 +71,16 @@ class CoreMissingZgvTagLib
 		$semester = $params['studiensemester_kurzbz'];
 		$prestudent_id = $params['id'];
 
+		$this->ci->PrestudentModel->addSelect('prestudent_id');
+		$this->ci->PrestudentModel->addSelect('start as von');
+		$this->ci->PrestudentModel->addSelect('ende as bis');
 		$this->ci->PrestudentModel->addJoin('public.tbl_prestudentstatus', 'prestudent_id');
+
+		//add studiensemester also here for manual rebuild
+		$this->ci->PrestudentModel->addJoin('public.tbl_studiensemester', 'studiensemester_kurzbz');
+
 		$this->ci->PrestudentModel->addJoin('public.tbl_benutzer bn', 'person_id');
 		$this->ci->PrestudentModel->addJoin('public.tbl_studiengang', 'studiengang_kz');
-
-/*		$result = $this->ci->PrestudentModel->loadWhere(array(
-			'bn.aktiv' => true, //check if necessary
-			'zgvdatum' => null,
-			'typ' => 'b',
-			'studiensemester_kurzbz' => $semester,
-			'prestudent_id' => $prestudent_id
-		));	*/
-
-/*		$result = $this->ci->PrestudentModel->loadWhere(array(
-			'bn.aktiv' => true, //check if necessary
-			'zgvmadatum' => null,
-			'typ' => 'm',
-			'studiensemester_kurzbz' => $semester,
-			'prestudent_id' => $prestudent_id
-		));*/
 
 		$this->ci->PrestudentModel->db->group_start();
 
@@ -120,6 +93,7 @@ class CoreMissingZgvTagLib
 		$this->ci->PrestudentModel->db->group_end();
 
 		$this->ci->PrestudentModel->db->group_end();
+		$this->ci->PrestudentModel->db->limit(1);
 
 		$result = $this->ci->PrestudentModel-> loadWhere(array(
 			'bn.aktiv' => true,
