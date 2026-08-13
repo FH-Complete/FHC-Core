@@ -23,6 +23,10 @@ export default{
 		lists: {
 			from: 'lists'
 		},
+		config: {
+			from: 'config',
+			required: true
+		},
 	},
 	props: {
 		uid: String
@@ -87,7 +91,10 @@ export default{
 					{title: "LehreinheitId", field: "lehreinheit_id", visible: false},
 					{title: "Student_uid", field: "student_uid", visible: false},
 					{title: "Mitarbeiter_uid", field: "mitarbeiter_uid", visible: false},
-					{title: "Punkte", field: "punkte", visible: false},
+					{title: "Punkte", field: "punkte", visible: false, formatter: function(cell) {
+							return Math.round(cell.getValue());
+						}
+					},
 					{
 						title: 'Aktionen', field: 'actions',
 						formatter: (cell, formatterParams, onRendered) => {
@@ -182,6 +189,8 @@ export default{
 				.call(ApiStvExam.loadPruefung(pruefung_id))
 				.then(result => {
 					this.pruefungData = result.data;
+					if(this.pruefungData.punkte)
+						this.pruefungData.punkte = Math.round(this.pruefungData.punkte);
 					return result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -519,7 +528,17 @@ export default{
 						{{ note.bezeichnung }}
 					</option>
 				</form-input>
-		
+
+				<form-input
+					v-if="config?.showPunkte !== false"
+					container-class="mb-3"
+					type="text"
+					name="punkte"
+					:label="$p.t('stv/grades_points')"
+					v-model="pruefungData.punkte"
+				>
+				</form-input>
+
 				<!--DropDown Datum-->
 				<form-input
 					container-class="mb-3"

@@ -5,6 +5,11 @@ export default {
 	components: {
 		PruefungList
 	},
+	provide() {
+		return {
+			config: this.config
+		};
+	},
 	props: {
 		modelValue: Object,
 		config: Object

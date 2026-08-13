@@ -386,7 +386,10 @@ class Config extends FHCAPI_Controller
 		$result['exam'] = [
 			'title' => $this->p->t('stv', 'tab_exam'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Pruefung.js'),
-			'showOnlyWithUid' => true
+			'showOnlyWithUid' => true,
+			'config' => [
+				'showPunkte' => defined('CIS_GESAMTNOTE_PUNKTE') ? CIS_GESAMTNOTE_PUNKTE : false,
+			]
 		];
 
 		$result['exemptions'] = [

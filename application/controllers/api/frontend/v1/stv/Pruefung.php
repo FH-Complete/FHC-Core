@@ -113,7 +113,7 @@ class Pruefung extends FHCAPI_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
-			'global', 'ui', 'lehre', 'exam'
+			'global', 'ui', 'lehre', 'exam', 'stv'
 		]);
 	}
 
@@ -383,6 +383,9 @@ class Pruefung extends FHCAPI_Controller
 		$this->form_validation->set_rules('pruefungstyp_kurzbz', $this->p->t('lehre', 'pruefung'), 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('global', 'typ')]),
 		]);
+		$this->form_validation->set_rules('punkte', $this->p->t('stv', 'grades_points'), 'numeric', [
+			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric', ['field' => $this->p->t('stv', 'grades_points')]),
+		]);
 		$this->form_validation->set_rules(
 			'datum',
 			$this->p->t('global', 'datum'),
@@ -460,6 +463,7 @@ class Pruefung extends FHCAPI_Controller
 					'student_uid' =>  $this->input->post('student_uid'),
 					'mitarbeiter_uid' =>  $this->input->post('mitarbeiter_uid'),
 					'note' => $this->input->post('note'),
+					'punkte' => $this->input->post('punkte'),
 					'pruefungstyp_kurzbz' => $this->input->post('pruefungstyp_kurzbz'),
 					'datum' => $datum,
 					'anmerkung' => $this->input->post('anmerkung'),
