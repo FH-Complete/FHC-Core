@@ -9,7 +9,7 @@ if (!defined("BASEPATH")) exit("No direct script access allowed");
 class LRTDummy extends LRT_Controller
 {
 	/**
-	 * This method must be implemented!
+	 *
 	 */
 	public function run($jobid)
 	{

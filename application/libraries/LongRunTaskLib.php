@@ -280,6 +280,27 @@ class LongRunTaskLib extends JobsQueueLib
 		return success('LRT added to the queue');
 	}
 
+	/**
+	 * Get all the LRT that are currently running for the given user
+	 */
+	public function getRunningLRTsUser($uid)
+	{
+		// Return the result of the query
+		return $this->_ci->JobsQueueModel->execReadOnlyQuery('
+			SELECT jq.*
+		          FROM system.tbl_jobsqueue jq
+			 WHERE jq.type IN ?
+			   AND jq.status = ?
+			   AND jq.uid = ?
+		      ORDER BY jq.creationtime DESC',
+			array(
+				$this->_ci->config->item(self::CFG_LRT_TYPES),
+				JobsQueueLib::STATUS_RUNNING,
+				$uid
+			)
+		);
+	}
+
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods used by the LRT implementation (controllers/ltrs/*, ex. controllers/ltrs/LRTDummy)
 
