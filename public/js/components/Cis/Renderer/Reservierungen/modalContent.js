@@ -96,7 +96,7 @@ export default {
 							$p.t('lehre','gruppe')+':'
 							:''
 						}}</th>
-						<td>{{event.gruppe[0].kuerzel}}</td>
+						<td>{{event.gruppe[0].kuerzel.split("/")[0]}}</td>
 					</tr>
 					<tr>
 						<th>{{
