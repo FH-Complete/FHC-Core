@@ -34,9 +34,6 @@ export default {
 				scope: 'slot_room',
 				show_all_fields: false,
 				room_create_information: {
-					semester: [1, 2, 3, 4, 5, 6, 7, 8],
-						verband: ['A', 'B', 'C', 'D', 'E', 'F', 'V'],
-					gruppe: [1, 2, 3, 4],
 					studiengaenge: [],
 					searchGroup: this.searchGroup,
 					searchLektor: this.searchLektor,
