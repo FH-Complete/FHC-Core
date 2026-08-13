@@ -15,11 +15,11 @@ class Mylv extends Auth_Controller
 	{
 		
 		parent::__construct([
-			'Student' => ['student/anrechnung_beantragen:r','user:r', 'basis/cis:r'], // TODO(chris): permissions?
-			'Studiensemester' => ['student/anrechnung_beantragen:r','user:r', 'basis/cis:r'], // TODO(chris): permissions?
-			'Lvs' => ['student/anrechnung_beantragen:r','user:r', 'basis/cis:r'], // TODO(chris): permissions?
-			'Info' => ['student/anrechnung_beantragen:r','user:r', 'basis/cis:r'], // TODO(chris): permissions?
-			'Pruefungen' => ['student/anrechnung_beantragen:r','user:r', 'basis/cis:r'] // TODO(chris): permissions?
+			'Student' => self::PERM_LOGGED,
+			'Studiensemester' => self::PERM_LOGGED,
+			'Lvs' => self::PERM_LOGGED,
+			'Info' => self::PERM_LOGGED,
+			'Pruefungen' => self::PERM_LOGGED
 		]);
 	}
 

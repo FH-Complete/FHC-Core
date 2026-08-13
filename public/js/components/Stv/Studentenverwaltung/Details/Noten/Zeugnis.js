@@ -2,8 +2,6 @@ import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import ZeugnisActions from './Zeugnis/Actions.js';
 import ZeugnisDocuments from './Zeugnis/Documents.js';
 
-import ApiStvGrades from '../../../../../api/factory/stv/grades.js';
-
 export default {
 	name: 'Zeugnis',
 	components: {
@@ -11,6 +9,7 @@ export default {
 		ZeugnisActions,
 		ZeugnisDocuments
 	},
+	emits: ['loaded'],
 	inject: {
 		config: {
 			from: 'config',
@@ -22,11 +21,21 @@ export default {
 		}
 	},
 	props: {
-		student: Object,
+		endpoint: {
+			type: Object,
+			required: true
+		},
+		id: {
+			type: [Number, String],
+			required: true
+		},
+		optionalTabulatorOptions: Object,
 		allSemester: Boolean
 	},
 	data() {
 		return {
+			renderTabulator: false,
+			setOptinalTabulatorOptionsVisibility: false,
 			tabulatorEvents: [
 				{
 					event: "dataLoaded",
@@ -36,12 +45,31 @@ export default {
 					})
 				},
 				{
+					event: "dataProcessed",
+					handler: () => this.$emit("loaded")
+				},
+				{
 					event: "rowSelected",
 					handler: row => row.getElement().style.zIndex = 12
 				},
 				{
 					event: "rowDeselected",
 					handler: row => row.getElement().style.zIndex = ''
+				},
+				{
+					event: "tableBuilt",
+					handler: () => {
+						if(this.optionalTabulatorOptions?.visibleColumns
+							&& this.setOptinalTabulatorOptionsVisibility)
+						{
+							for(let key in this.optionalTabulatorOptions.visibleColumns) {
+								if(this.optionalTabulatorOptions.visibleColumns[key])
+									this.$refs.table.tabulator.showColumn(key);
+								else
+									this.$refs.table.tabulator.hideColumn(key);
+							}
+						}
+					}
 				}
 			],
 			stdsem: '',
@@ -53,7 +81,7 @@ export default {
 	computed: {
 		tabulatorOptions() {
 			const listPromise = this.$api
-				.call(ApiStvGrades.list())
+				.call(this.endpoint.list())
 				.then(res => res.data.map(({bezeichnung: label, note: value}) => ({label, value})));
 
 			let gradeField = {
@@ -86,7 +114,7 @@ export default {
 							note_bezeichnung
 						}))
 						// send to backend
-						.then(data => this.$api.call(ApiStvGrades.updateCertificate(data)))
+						.then(data => this.$api.call(this.endpoint.updateCertificate(data)))
 						// get bezeichnung again
 						.then(() => listPromise)
 						.then(list => list.find(el => el.value == note))
@@ -109,7 +137,7 @@ export default {
 							if (filterTerm) {
 								return this.$api
 									.call(
-										ApiStvGrades.getGradeFromPoints(
+										this.endpoint.getGradeFromPoints(
 											filterTerm,
 											cell.getData().lehrveranstaltung_id,
 											this.currentSemester
@@ -142,6 +170,8 @@ export default {
 					.then(() => node.innerText = this.$p.t('ui/loading'))
 					.catch(this.$fhcAlert.handleSystemError);
 				gradeField.editorParams.placeholderLoading = node;
+				gradeField.visible = this.optionalTabulatorOptions?.visibleColumns?.note ?? true
+				gradeField.headerFiler = this.optionalTabulatorOptions?.headerFilter?.note || this.optionalTabulatorOptions?.note || false
 			}
 
 			const columns = [
@@ -192,7 +222,10 @@ export default {
 				{ field: 'lehrform', title: this.$p.t('lehre/lehrform'), visible: false },
 				{ field: 'kurzbz', title: this.$p.t('lehre/kurzbz'), visible: false },
 				{ field: 'punkte', title: this.$p.t('stv/grades_points'), visible: false },
-				{ field: 'lehrveranstaltung_bezeichnung_english', title: this.$p.t('stv/grades_lehrveranstaltung_bezeichnung_english'), visible: false }
+				{ field: 'lehrveranstaltung_bezeichnung_english', title: this.$p.t('stv/grades_lehrveranstaltung_bezeichnung_english'), visible: false },
+				{ field: 'uid', title: this.$p.t('person/uid'), visible: false },
+				{ field: 'vorname', title: this.$p.t('person/vorname'), visible: false },
+				{ field: 'nachname', title: this.$p.t('person/nachname'), visible: false }
 			];
 
 			const hasDocuments = ['both', 'inline'].includes(this.config.documents);
@@ -202,6 +235,7 @@ export default {
 				columns.push({
 					field: 'actions',
 					title: this.$p.t('global/actions'),
+					minWidth: 120,
 					cssClass: "overflow-visible",
 					headerSort: false,
 					formatter: cell => {
@@ -238,8 +272,8 @@ export default {
 
 			return {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: () => this.$api.call(ApiStvGrades.getCertificate(
-					this.student.prestudent_id,
+				ajaxRequestFunc: () => this.$api.call(this.endpoint.getCertificate(
+					this.id,
 						(!this.allSemester ? this.currentSemester : null)
 				)),
 				ajaxResponse: (url, params, response) => {
@@ -248,9 +282,10 @@ export default {
 				columns,
 				height: '100%',
 				layout: 'fitDataStretchFrozen',
-				selectableRows: 1,
+				selectable: true,
 				selectableRowsRangeMode: 'click',
-				persistenceID: 'stv-details-noten-zeugnis-20260217',
+				selectableRows: true,
+				persistenceID: this.optionalTabulatorOptions?.persistenceZeugnisID ?? 'stv-details-noten-zeugnis-20260217',
 				persistence:{
 					columns: ["width", "visible", "frozen"]
 				}
@@ -258,7 +293,8 @@ export default {
 		}
 	},
 	watch: {
-		student(n) {
+		id()
+		{
 			this.$refs.table.reloadTable();
 		},
 		allSemester(n) {
@@ -269,7 +305,7 @@ export default {
 		setGrade(data) {
 			this.$api
 				.call(
-					ApiStvGrades.updateCertificate(data),
+					this.endpoint.updateCertificate(data),
 					{ errorHeader: data.lehrveranstaltung_bezeichnung }
 				)
 				.then(this.$refs.table.reloadTable)
@@ -282,7 +318,7 @@ export default {
 				.confirmDelete()
 				.then(result => result ? data : Promise.reject({handled:true}))
 				.then(data => this.$api.call(
-					ApiStvGrades.deleteCertificate(data),
+					this.endpoint.deleteCertificate(data),
 					{ errorHeader: data.lehrveranstaltung_bezeichnung }
 				))
 				.then(this.$refs.table.reloadTable)
@@ -291,15 +327,21 @@ export default {
 		}
 	},
 	created() {
-		this.$p.loadCategory(['global', 'stv', 'lehre'])
+		this.$p.loadCategory(['global', 'stv', 'lehre', 'person'])
 			.then(() => {
-				if (this.$refs.table.tableBuilt)
-					this.$refs.table.tabulator.columnManager.setColumns(this.tabulatorOptions.columns);
+				this.renderTabulator = true;
 			});
+
+		if(this?.optionalTabulatorOptions)
+		{
+			const localStorageKey = 'tabulator-' + this.optionalTabulatorOptions.persistenceZeugnisID + '-columns';
+			this.setOptinalTabulatorOptionsVisibility = (window.localStorage.getItem(localStorageKey) === null) ? true : false;
+		}
 	},
 	template: `
 	<div class="stv-details-noten-zeugnis h-100 d-flex flex-column">
 		<core-filter-cmpt
+			v-if="renderTabulator"
 			ref="table"
 			:title="$p.t('stv/grades_title_zeugnis')"
 			:tabulator-options="tabulatorOptions"

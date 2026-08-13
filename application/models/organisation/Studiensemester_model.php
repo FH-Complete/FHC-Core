@@ -230,6 +230,82 @@ class Studiensemester_model extends DB_Model
 	}
 
 	/**
+	 * Gets all Studiensemester where the range dates are contained
+	 * or the nearest if date is not contained
+	 * @param $from
+	 * @param $to
+	 * @return array|null
+	 */
+	public function getContainingOrNearestByDateRange($from, $to)
+	{
+		if (date_format(date_create($from), 'Y-m-d') > (date_format(date_create($to), 'Y-m-d')))
+			return success(array());
+
+		$query = <<<EOSQL
+			WITH semester_interval_startdate AS (
+				SELECT
+					s.*
+				FROM
+					public.tbl_studiensemester s
+				WHERE
+					{$this->db->escape($from)}::date BETWEEN s.start AND s.ende
+				ORDER BY
+					s.start DESC
+				LIMIT 1
+			),
+			semester_interval_enddate AS (
+				SELECT
+					s.*
+				FROM
+					public.tbl_studiensemester s
+				WHERE
+					{$this->db->escape($to)}::date BETWEEN s.start AND s.ende
+				ORDER BY
+					s.start DESC
+				LIMIT 1
+			),
+			nearest_semester_interval_startdate AS (
+				SELECT
+					LEAST(ABS(s.start - {$this->db->escape($from)}::date), ABS(s.ende - {$this->db->escape($from)}::date)) AS mindiff,
+					s.*
+				FROM
+					public.tbl_studiensemester s
+				WHERE
+					s.ende < {$this->db->escape($from)}::date
+				ORDER BY
+					1 ASC
+				LIMIT 1
+			),
+			nearest_semester_interval_enddate AS (
+				SELECT
+					LEAST(ABS(s.start - {$this->db->escape($to)}::date), ABS(s.ende - {$this->db->escape($to)}::date)) AS mindiff,
+					s.*
+				FROM
+					public.tbl_studiensemester s
+				WHERE
+					s.start > {$this->db->escape($to)}::date
+				ORDER BY
+					1 ASC
+				LIMIT 1
+			)
+			SELECT
+				COALESCE(
+					(SELECT studiensemester_kurzbz FROM semester_interval_startdate),
+					(SELECT studiensemester_kurzbz FROM nearest_semester_interval_startdate)
+				) AS studiensemester_kurzbz
+			UNION
+			SELECT
+				COALESCE(
+					(SELECT studiensemester_kurzbz FROM semester_interval_enddate),
+					(SELECT studiensemester_kurzbz FROM nearest_semester_interval_enddate)
+				) AS studiensemester_kurzbz
+
+EOSQL;
+
+		return $this->execReadonlyQuery($query);
+	}
+
+	/**
 	 * Gets all Studiensemester between two dates
 	 * @param $from
 	 * @param $to
