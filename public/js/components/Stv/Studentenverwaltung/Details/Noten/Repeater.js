@@ -21,6 +21,7 @@ export default {
 	},
 	data() {
 		return {
+			renderTabulator: false,
 			tabulatorEvents: []
 		};
 	},
@@ -118,13 +119,13 @@ export default {
 	created() {
 		this.$p.loadCategory(['global', 'stv', 'lehre', 'profil'])
 			.then(() => {
-				if (this.$refs.table.tableBuilt)
-					this.$refs.table.tabulator.columnManager.setColumns(this.tabulatorOptions.columns);
+				this.renderTabulator = true
 			});
 	},
 	template: `
 	<div class="stv-details-noten-repeater d-flex flex-column">
 		<core-filter-cmpt
+			v-if="renderTabulator"
 			ref="table"
 			:title="$p.t('stv/grades_title_repeater')"
 			:tabulator-options="tabulatorOptions"

@@ -433,6 +433,7 @@ export default {
 						:label="$p.t('wawi/ausgegebenam')"
 						name="ausgegebenam"
 						v-model="formData.ausgegebenam"
+						model-type="yyyy-MM-dd"
 						auto-apply
 						:enable-time-picker="false"
 						text-input
@@ -449,6 +450,7 @@ export default {
 						:label="$p.t('wawi/retouram')"
 						name="retouram"
 						v-model="formData.retouram"
+						model-type="yyyy-MM-dd"
 						auto-apply
 						:enable-time-picker="false"
 						text-input
