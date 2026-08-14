@@ -151,7 +151,7 @@ export default {
         toggleCollapse(evt) {
 			if (this.active)
 			{
-				this.makeParentContentActive(this.entry.content_id); 
+				this.makeParentContentActive(this.entry.content_id);
 			}
 			else
 			{
@@ -176,7 +176,7 @@ export default {
         <template v-if="hasChilds">
 			<div class="btn-group w-100">
  				<cis-menu-link :target="target"
- 					:href="(entry.menu_open && hasFullLink) ? entry.url : null"
+ 					:href="hasFullLink ? entry.url : null"
 					@click="toggleCollapse"
                     :class="{
                         'btn btn-default rounded-0 text-start': true,

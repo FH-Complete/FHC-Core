@@ -8,9 +8,19 @@ import {capitalize} from "../../helpers/StringHelpers.js";
 import ApiAuthinfo from "../../api/factory/authinfo.js";
 
 import {router} from "../../routers/Cis/CisRouter.js";
+import CisMenu from "../../components/Cis/Menu.js";
 
 const app = Vue.createApp({
 	name: 'CisApp',
+	components: {
+		CisMenu,
+	},
+	template: `
+		<Teleport to="#cis-header">
+			<CisMenu />
+		</Teleport>
+		<router-view />
+	`,
 	data: () => ({
 		appSideMenuEntries: {},
 		windowWidth: 0,
@@ -18,12 +28,13 @@ const app = Vue.createApp({
 		isMitarbeiter: null,
 	}),
 	provide() {
-		return { // provide injectable & watchable language property
+		return {
 			language: Vue.computed(() => this.$p.user_language),
+			isNarrow: Vue.computed(() => this.windowWidth < 992),
 			isMobile: Vue.computed(() => this.isMobile),
 			isStudent: Vue.computed(() => this.isStudent),
 			isMitarbeiter: Vue.computed(() => this.isMitarbeiter)
-		}	
+		}
 	},
 	computed: {
 		isMobile: function() {
@@ -103,6 +114,9 @@ app.directive('tooltip', primevue.tooltip);
 app.use(PluginsPhrasen);
 app.use(Theme);
 app.directive('contrast', contrast);
+
+// Clear the Teleport target before mounting (removes the static <cis-menu> tag from PHP)
+document.getElementById('cis-header').innerHTML = '';
 app.mount('#fhccontent');
 
 router.afterEach((to, from, failure) => {

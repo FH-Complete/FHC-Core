@@ -3,6 +3,8 @@ import FhcSearchbar from "../searchbar/searchbar.js";
 import CisSprachen from "./Sprachen.js"
 import ThemeSwitch from "./ThemeSwitch.js";
 import ApiCisMenu from '../../api/factory/cis/menu.js';
+import ApiSearchbar from '../../api/factory/searchbar.js';
+import ApiLvPlan from "../../api/factory/lvPlan.js";
 
 export default {
     components: {
@@ -12,15 +14,24 @@ export default {
 		ThemeSwitch,
     },
     props: {
-		rootUrl: String,
-        logoUrl: String,
-        avatarUrl: String,
-        logoutUrl: String,
-		selectedtypes: Array,
-        searchbaroptions: Object,
-        searchfunction: Function
+		rootUrl: {
+			type: String,
+			default: () => document.getElementById('cis-header')?.dataset.rootUrl ?? ''
+		},
+		logoUrl: {
+			type: String,
+			default: () => document.getElementById('cis-header')?.dataset.logoUrl ?? ''
+		},
+		avatarUrl: {
+			type: String,
+			default: () => document.getElementById('cis-header')?.dataset.avatarUrl ?? ''
+		},
+		logoutUrl: {
+			type: String,
+			default: () => document.getElementById('cis-header')?.dataset.logoutUrl ?? ''
+		},
     },
-    data: () => {
+    data: function() {
         return {
             entries: [],
 			activeEntry:null,
@@ -28,6 +39,112 @@ export default {
 			urlMatchRankings:[],
 			navUserDropdown:null,
 			menuOpen:true,
+			searchbaroptions: {
+				origin: "cis",
+				cssclass: "",
+				calcheightonly: true,
+				types: {
+					employee: Vue.computed(() => this.$p.t("search/type_employee")),
+					student: Vue.computed(() => this.$p.t("search/type_student")),
+					room: Vue.computed(() => this.$p.t("search/type_room")),
+					organisationunit: Vue.computed(() => this.$p.t("search/type_organisationunit")),
+					cms: Vue.computed(() => this.$p.t("search/type_cms")),
+					dms: Vue.computed(() => this.$p.t("search/type_dms"))
+				},
+				actions: {
+					employee: {
+						defaultaction: {
+							type: "link",
+							action: function(data) {
+								return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+									"/Cis/Profil/View/" + data.uid;
+							}
+						},
+						childactions: []
+					},
+					student: {
+						defaultaction: {
+							type: "link",
+							action: function(data) {
+								return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+									"/Cis/Profil/View/" + data.uid;
+							}
+						},
+						childactions: []
+					},
+					room: {
+						defaultaction: {
+							type: "link",
+							renderif: function(data) {
+								return data.content_id !== null;
+							},
+							action: function(data) {
+								return FHC_JS_DATA_STORAGE_OBJECT.app_root +
+									FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+									'/CisVue/Cms/content/' + data.content_id;
+							}
+						},
+						childactions: [
+							{
+								label: "LV-Plan",
+								icon: "fas fa-bookmark",
+								type: "link",
+								action: function(data) {
+									return FHC_JS_DATA_STORAGE_OBJECT.app_root +
+										FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+										'/CisVue/Cms/getRoomInformation/' + data.ort_kurzbz;
+								}
+							},
+							{
+								label: "Rauminformation",
+								icon: "fas fa-info-circle",
+								type: "link",
+								renderif: function(data) {
+									return data.content_id !== null;
+								},
+								action: function(data) {
+									return FHC_JS_DATA_STORAGE_OBJECT.app_root +
+										FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+										'/CisVue/Cms/content/' + data.content_id;
+								}
+							},
+						]
+					},
+					organisationunit: {
+						defaultaction: {
+							type: "link",
+							renderif: function(data) {
+								return !!data.mailgroup;
+							},
+							action: function(data) {
+								return 'mailto:' + data.mailgroup;
+							}
+						},
+						childactions: []
+					},
+					cms: {
+						defaultaction: {
+							type: "link",
+							action: function(data) {
+								return FHC_JS_DATA_STORAGE_OBJECT.app_root +
+									FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+									'/CisVue/Cms/content/' + data.content_id;
+							}
+						},
+						childactions: []
+					},
+					dms: {
+						defaultaction: {
+							type: "link",
+							action: function(data) {
+								return FHC_JS_DATA_STORAGE_OBJECT.app_root +
+									'cms/dms.php?id=' + data.dms_id;
+							}
+						},
+						childactions: []
+					}
+				}
+			},
         };
     },
 	inject: ["isNarrow", "isMobile"],
@@ -102,15 +219,35 @@ export default {
 		setActiveEntry(content_id){
 			this.activeEntry = content_id;
 		},
+		searchfunction(searchsettings) {
+			return this.$api.call(ApiSearchbar.searchCis(searchsettings));
+		},
 	},
 	created(){
 		this.fetchMenu();
 	},
-	mounted(){
+	async mounted(){
 		this.$p.loadCategory(['ui', 'global', 'profilUpdate'])
 		this.navUserDropdown = new bootstrap.Collapse(this.$refs.navUserDropdown,{
 			toggle: false
 		});
+
+		const openOtherLvPlanAction = {
+			label: Vue.computed(() => this.$p.t("lehre/stundenplan")),
+			icon: "fas fa-calendar-days",
+			type: "link",
+			action: function(data) {
+				const uid = JSON.parse(data.data).uid;
+				return FHC_JS_DATA_STORAGE_OBJECT.app_root +
+					FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+					"/Cis/OtherLvPlan/" + uid;
+			},
+		};
+		let result = await this.$api.call(ApiLvPlan.checkPermissionOtherLvPlan());
+		if (result.meta.status === "success" && result.data) {
+			this.searchbaroptions.actions.employee.childactions.push(openOtherLvPlanAction);
+			this.searchbaroptions.actions.student.childactions.push(openOtherLvPlanAction);
+		}
 	},
     template: /*html*/`
 	<div id="cis-header-bar" class="d-flex flex-row flex-grow-1">

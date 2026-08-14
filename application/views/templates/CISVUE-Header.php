@@ -29,14 +29,18 @@ $this->load->view('templates/FHC-Header', $includesArray);
 		document.body.classList.add("in-frame");
 </script>
 
-<header id="cis-header" class="navbar-dark">
-	<cis-menu 
-		root-url="<?= site_url(''); ?>" 
-		logo-url="<?= base_url($this->config->item('theme_logo')); ?>" 
-		avatar-url="<?= site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>" 
+<!-- used by cis4 native pages, teleported menu needs data attributes-->
+<header id="cis-header" class="navbar-dark"
+	data-root-url="<?= site_url(''); ?>"
+	data-logo-url="<?= base_url($this->config->item('theme_logo')); ?>"
+	data-avatar-url="<?= site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>"
+	data-logout-url="<?= site_url('Cis/Auth/logout'); ?>">
+<!-- used by legacy cis pages & content pages which use component props -->
+	<cis-menu
+		root-url="<?= site_url(''); ?>"
+		logo-url="<?= base_url($this->config->item('theme_logo')); ?>"
+		avatar-url="<?= site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>"
 		logout-url="<?= site_url('Cis/Auth/logout'); ?>"
-		:searchbaroptions="searchbaroptions" 
-		:searchfunction="searchfunction"
 		></cis-menu>
 </header>
 
