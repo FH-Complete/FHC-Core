@@ -32,7 +32,7 @@ export default {
 		},
 		activeContent: function(newValue){
 			if(newValue == this.entry.content_id){
-				// wenn der Menupunkt nicht bereits offen ist
+				// only open if not already open
 				if (!this.entry.menu_open){
 					this.entry.menu_open = true;
 				}

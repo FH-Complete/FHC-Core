@@ -7,15 +7,15 @@ export default {
 		}
 	},
 	computed: {
-		// Generaliserung von isRouterLink() aus CompatLinkHelpers.js:
-		// prüft ALLE bekannten Routen, nicht nur Compat-URLs.
+		// generalizes isRouterLink() from CompatLinkHelpers.js:
+		// checks ALL known routes, not just Compat URLs.
 		resolvedRoute() {
-			// Legacy-Seiten haben keinen Router (Menu.js mountet ohne)
+			// legacy pages have no router (Menu.js mounts without one)
 			if (!this.href || !this.$router) return null;
 
 			let path = this.href;
 
-			// Menu-API liefert absolute URLs —> Pfad extrahieren, externe Links ignorieren
+			// menu API returns absolute URLs — extract path, ignore external links
 			if (path.startsWith('http')) {
 				try {
 					const url = new URL(path);
@@ -26,11 +26,11 @@ export default {
 				}
 			}
 
-			// Nur Pfade unterhalb der Router-Base kommen in Frage
+			// only paths below the router base are candidates
 			const base = this.$router.options.history.base;
 			if (!path.startsWith(base)) return null;
 
-			// Router die Route auflösen lassen
+			// let the router resolve the route
 			const route = path.substring(base.length) || '/';
 			const resolved = this.$router.resolve(route);
 
