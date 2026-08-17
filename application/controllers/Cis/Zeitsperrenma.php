@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  *
  */
-class Zeitsperren extends Auth_Controller
+class Zeitsperrenma extends Auth_Controller
 {
 	/**
 	 * Constructor
@@ -26,6 +26,6 @@ class Zeitsperren extends Auth_Controller
 	 */
 	public function index()
 	{
-		$this->load->view('CisRouterView/CisRouterView.php', ['route' => 'Zeitsperren']);
+		$this->load->view('CisRouterView/CisRouterView.php', ['route' => 'Zeitsperrenma']);
 	}
 }

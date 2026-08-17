@@ -64,7 +64,7 @@ export default {
 		},
 	},
 	template: `
-		<div class="base-zeitsperren w-100 h-100">
+		<div class="base-zeitsperrenma w-100 h-100">
 
 				<div class="row g-1">
 					<div
