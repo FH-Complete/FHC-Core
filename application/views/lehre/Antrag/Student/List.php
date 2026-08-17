@@ -57,6 +57,9 @@ if(defined('CIS4')){
 									if($type == 'Abmeldung' && $showInfoModalAbmeldung){
 										$href = "#modalinfo" . $prestudent_id;
 									}
+									elseif($type == 'Unterbrechung' && $array['hasStatusUnterbrecher']){
+										$href = "#modalalreadyinterruptor" . $prestudent_id;
+									}
 									else
 										$href = site_url('lehre/Studierendenantrag/' . strtolower($type) . '/' . $prestudent_id);
 								?>
@@ -67,9 +70,51 @@ if(defined('CIS4')){
 									<?php if($type == 'Abmeldung' && $showInfoModalAbmeldung): ?>
 										data-bs-toggle="modal"
 									<?php endif; ?>
+									<?php if($type == 'Unterbrechung' && $array['hasStatusUnterbrecher']): ?>
+										data-bs-toggle="modal"
+									<?php endif; ?>
 									>
 									<i class="fa fa-plus"></i> <?= $this->p->t('studierendenantrag', 'antrag_typ_' . $type); ?>
 								</a>
+
+							<!-- Modal interruptor-->
+
+							<div
+									class="modal fade"
+									id="modalalreadyinterruptor<?= $prestudent_id; ?>"
+									tabindex="-1"
+									aria-labelledby="modalalreadyinterruptorLabel<?= $prestudent_id; ?>"
+									aria-hidden="true"
+							>
+								<div class="modal-dialog modal-dialog modal-lg">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h5
+													class="modal-title"
+													id="modalalreadyinterruptorLabel<?= $prestudent_id; ?>"
+											><?= $this->p->t('studierendenantrag', 'info_only_one_interruption'); ?>
+											</h5>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</div>
+										<?php
+										$hrefUnterbrechung = site_url('lehre/Studierendenantrag/unterbrechung/' . $prestudent_id);
+										?>
+										<div class="modal-body">
+											<div
+													class="form-control"
+													style="width: 100%; height: 250px;overflow:auto; white-space: normal;"
+											><?= $this->p->t('studierendenantrag', 'modalHinweistext_UB'); ?>
+											</div>
+										</div>
+
+										<div class="modal-footer">
+											<button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal"><?= $this->p->t('ui', 'cancel'); ?></button>
+										</div>
+
+
+									</div>
+								</div>
+							</div>
 
 							<!-- Modal -->
 							<div

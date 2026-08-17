@@ -62351,6 +62351,48 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'modalHinweistext_UB',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Du hast bereits einmal zuvor dein Studium unterbrochen.
+					Eine weitere Unterbrechung ist gemäß § 12 Z 5 Prüfungsordnung nicht vorgesehen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You have already interrupted your studies once before.
+					A further interruption is not permitted according to Section 12 Z 5 of the examination regulations.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'info_only_one_interruption',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hinweis Unterbrechung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Note Interruption',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

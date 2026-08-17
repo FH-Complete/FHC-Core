@@ -22,6 +22,7 @@ class Studierendenantrag extends FHC_Controller
 		// Load Models
 		$this->load->model('education/Studierendenantrag_model', 'StudierendenantragModel');
 		$this->load->model('person/Person_model', 'PersonModel');
+		$this->load->model('crm/Prestudenstatus_model', 'PrestudentstatusModel');
 
 		// Load language phrases
 		$this->loadPhrases([
@@ -55,7 +56,8 @@ class Studierendenantrag extends FHC_Controller
 					'allowedNewTypes' => array(),
 					'antraege'=> array(),
 					'bezeichnungStg' => $antrag->bezeichnung,
-					'bezeichnungOrgform' => $antrag->orgform
+					'bezeichnungOrgform' => $antrag->orgform,
+					'hasStatusUnterbrecher' => false
 				);
 
 				if ($this->config->item('wiederholung_enabled') === true)
@@ -70,6 +72,11 @@ class Studierendenantrag extends FHC_Controller
 					$result = $this->antraglib->getPrestudentUnterbrechungsBerechtigt($antrag->prestudent_id);
 					if (getData($result) == 1)
 						$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Unterbrechung';
+					//check if already status unterbrecher
+					elseif (getData($result) == -4){
+						$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Unterbrechung';
+						$prestudentenArr[$antrag->prestudent_id]['hasStatusUnterbrecher'] = true;
+					}
 				}
 
 				if ($this->config->item('abmeldung_enabled') === true)
