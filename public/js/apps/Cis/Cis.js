@@ -4,7 +4,7 @@ import Theme from '../../plugins/Theme.js';
 import contrast from '../../directives/contrast.js';
 import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers.js";
 import LvPlan from "../../components/Cis/LvPlan/Lehrveranstaltung.js";
-import MyLvPlan from "../../components/Cis/LvPlan/MyLvPlan.js";
+import MyLvPlan from "../../components/Cis/LvPlan/Personal.js";
 import MylvStudent from "../../components/Cis/Mylv/Student.js";
 import Profil from "../../components/Cis/Profil/Profil.js";
 import Raumsuche from "../../components/Cis/Raumsuche/Raumsuche.js";
@@ -20,6 +20,7 @@ import Studium from "../../components/Cis/Studium/Studium.js";
 import StgOrgLvPlan from "../../components/Cis/LvPlan/StgOrg.js";
 import OtherLvPlan from "../../components/Cis/LvPlan/OtherLvPlan.js";
 import ZeitsperrenMa from "../../components/Cis/ZeitsperrenMitarbeiter/ZeitsperrenMa.js";
+import Zeitsperren from "../../components/Cis/Zeitsperren/Zeitsperren.js";
 
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
 import {capitalize} from "../../helpers/StringHelpers.js";
@@ -242,6 +243,12 @@ const router = VueRouter.createRouter({
 					propsViewData: route.params
 				};
 			}
+		},
+		{
+			path: `/Cis/Zeitsperren`,
+			name: 'Zeitsperren',
+			component: Zeitsperren,
+			props: true
 		},
 		{
 			path: '/:pathMatch(.*)*',
