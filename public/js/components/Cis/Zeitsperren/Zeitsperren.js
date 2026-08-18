@@ -219,6 +219,39 @@ export default {
 			});
 			return diff;
 		},
+		async updateTableTranslations() {
+			await this.$p.loadCategory(['global', 'person', 'zeitsperren', 'ui', 'abschlusspruefung']);
+
+			let cm = this.$refs.table.tabulator.columnManager;
+
+			cm.getColumnByField('bezeichnung').component.updateDefinition({
+				title: this.$capitalize(this.$p.t('person', 'grund'))
+			});
+			cm.getColumnByField('beschreibung').component.updateDefinition({
+				title: this.$capitalize(this.$p.t('global', 'bezeichnung'))
+			});
+			cm.getColumnByField('vondatum').component.updateDefinition({
+				title: this.$capitalize(this.$p.t('ui', 'von'))
+			});
+			cm.getColumnByField('bisdatum').component.updateDefinition({
+				title: this.$capitalize(this.$p.t('global', 'bis'))
+			});
+			cm.getColumnByField('vonstunde').component.updateDefinition({
+				title: this.$capitalize(this.$p.t('zeitsperren', 'stunde_von'))
+			});
+			cm.getColumnByField('bisstunde').component.updateDefinition({
+				title: this.$capitalize(this.$p.t('zeitsperren', 'stunde_bis'))
+			});
+			cm.getColumnByField('vertretung').component.updateDefinition({
+				title: this.$capitalize(this.$p.t('person', 'vertretung'))
+			});
+			cm.getColumnByField('erreichbarkeit_beschreibung').component.updateDefinition({
+				title: this.$capitalize(this.$p.t('person', 'erreichbarkeit'))
+			});
+			cm.getColumnByField('freigabeamum').component.updateDefinition({
+				title: this.$capitalize(this.$p.t('abschlusspruefung', 'freigabe'))
+			});
+		}
 	},
 	watch: {
 		selectedVertretung(newVal) {
@@ -233,6 +266,12 @@ export default {
 				}
 			} else {
 				this.zeitsperreData.bezeichnung = '';
+			}
+		},
+		'$p.user_language.value'(n, o) {
+			if (n !== o && o !== undefined && this.$refs.table.tableBuilt) {
+				this.updateTableTranslations();
+				this.reload();
 			}
 		}
 	},
@@ -340,43 +379,7 @@ export default {
 					{
 						event: 'tableBuilt',
 						handler: async() => {
-							await this.$p.loadCategory(['global', 'person', 'zeitsperren', 'ui', 'abschlusspruefung']);
-
-							let cm = this.$refs.table.tabulator.columnManager;
-
-							cm.getColumnByField('bezeichnung').component.updateDefinition({
-								title: this.$p.t('person', 'grund')
-							});
-							cm.getColumnByField('beschreibung').component.updateDefinition({
-								title: this.$p.t('global', 'bezeichnung')
-							});
-							cm.getColumnByField('vondatum').component.updateDefinition({
-								title: this.$p.t('ui', 'von')
-							});
-							cm.getColumnByField('bisdatum').component.updateDefinition({
-								title: this.$p.t('global', 'bis')
-							});
-							cm.getColumnByField('vonstunde').component.updateDefinition({
-								title: this.$p.t('zeitsperren', 'stunde_von')
-							});
-							cm.getColumnByField('bisstunde').component.updateDefinition({
-								title: this.$p.t('zeitsperren', 'stunde_bis')
-							});
-							cm.getColumnByField('vertretung').component.updateDefinition({
-								title: this.$p.t('person', 'vertretung')
-							});
-
-							cm.getColumnByField('erreichbarkeit_beschreibung').component.updateDefinition({
-								title: this.$p.t('person', 'erreichbarkeit')
-							});
-							cm.getColumnByField('freigabeamum').component.updateDefinition({
-								title: this.$p.t('abschlusspruefung', 'freigabe')
-							});
-
-	/*						cm.getColumnByField('actions').component.updateDefinition({
-							title: this.$p.t('global', 'aktionen')
-							});*/
-
+							await this.updateTableTranslations();
 						}
 					}
 				];
@@ -406,7 +409,7 @@ export default {
 	},
 	template: /* html */`
 	<div class="zeitsperre">
-		<h4>{{$p.t('zeitsperren', 'header_zeitsperren')}} ({{uid}}) </h4>
+		<h4>{{$p.t('zeitsperren', 'header_zeitsperren')}} ({{uid}})</h4>
 
 			<form-form class="row g-3 mt-3" ref="dataZeitsperre">
 				<div class= "w-50">
@@ -415,7 +418,7 @@ export default {
 							type="select"
 							:class="showInfo ? 'is-info' : ''"
 							name="zeitsperretyp_kurzbz"
-							:label="$p.t('person/grund')"
+							:label="$capitalize($p.t('person/grund'))"
 							v-model="zeitsperreData.zeitsperretyp_kurzbz"
 							@change="handleStunden"
 						>
@@ -437,7 +440,7 @@ export default {
 						<form-input
 							type="select"
 							name="beschreibung"
-							:label="$p.t('ui/bezeichnung')"
+							:label="$capitalize($p.t('ui/bezeichnung'))"
 							v-model="zeitsperreData.bezeichnung"
 						>
 							<option v-for="(beschreibung, key) in dienstverhinderungen"
@@ -451,7 +454,7 @@ export default {
 						<form-input
 							type="text"
 							name="beschreibung"
-							:label="$p.t('ui/bezeichnung')"
+							:label="$capitalize($p.t('ui/bezeichnung'))"
 							v-model="zeitsperreData.bezeichnung"
 						>
 						</form-input>
@@ -464,7 +467,7 @@ export default {
 							<form-input
 								type="DatePicker"
 								name="vondatum"
-								:label="$p.t('ui/from')"
+								:label="$capitalize($p.t('ui/from'))"
 								v-model="zeitsperreData.vondatum"
 								auto-apply
 								:enable-time-picker="false"
@@ -491,7 +494,7 @@ export default {
 								v-if="!typesHideStunden.includes(zeitsperreData.zeitsperretyp_kurzbz)"
 								type="select"
 								name="vonstunde"
-								:label="$p.t('zeitsperren/stunde')"
+								:label="$capitalize($p.t('zeitsperren/stunde'))"
 								v-model="zeitsperreData.vonstunde"
 								@change="handleChangeVonStunde"
 							>
@@ -533,7 +536,7 @@ export default {
 							<form-input
 								type="DatePicker"
 								name="bisdatum"
-								:label="$p.t('global/bis')"
+								:label="$capitalize($p.t('global/bis'))"
 								v-model="zeitsperreData.bisdatum"
 								auto-apply
 								:enable-time-picker="false"
@@ -552,7 +555,7 @@ export default {
 								v-if="!typesHideStunden.includes(zeitsperreData.zeitsperretyp_kurzbz)"
 								type="select"
 								name="bisstunde"
-								:label="$p.t('zeitsperren/stunde')"
+								:label="$capitalize($p.t('zeitsperren/stunde'))"
 								v-model="zeitsperreData.bisstunde"
 								@change="handleChangeBisStunde"
 							>
@@ -592,7 +595,7 @@ export default {
 							<form-input
 								type="autocomplete"
 								name="vertretung_uid"
-								:label="$p.t('person/vertretung')"
+								:label="$capitalize($p.t('person/vertretung'))"
 								v-model="selectedVertretung"
 								optionLabel="label"
 								optionValue="mitarbeiter_uid"
@@ -611,7 +614,7 @@ export default {
 							<form-input
 								type="select"
 								name="erreichbarkeit"
-								:label="$p.t('person/erreichbarkeit')"
+								:label="$capitalize($p.t('person/erreichbarkeit'))"
 								v-model="zeitsperreData.erreichbarkeit_kurzbz"
 								>
 								<option
@@ -630,14 +633,14 @@ export default {
 							  type="button"
 							  class="btn btn-primary"
 							  @click="saveZeitsperre()">
-							  {{$p.t('zeitsperren', 'addZeitsperre')}}
+							  {{$capitalize($p.t('zeitsperren', 'addZeitsperre'))}}
 							</button>							
 							<button
 							  v-else
 							  type="button"
 							  class="btn btn-warning"
 							  @click="saveZeitsperre(zeitsperreData.zeitsperre_id)">
-							  {{$p.t('zeitsperren', 'saveZeitsperre')}}
+							  {{$capitalize($p.t('zeitsperren', 'saveZeitsperre'))}}
 							</button>
 						  </div>
 					</div>
@@ -649,7 +652,7 @@ export default {
 			<div class="d-flex align-items-start text-muted small">
 			  <i class="fa fa-circle-info me-2 mt-1"></i>
 			  <div>
-				<strong>{{$p.t('alert', 'attention')}}</strong><br>
+				<strong>{{$capitalize($p.t('alert', 'attention'))}}</strong><br>
 				{{$p.t('zeitsperren', 'info_zeitsperrenMoreDays')}}
 			  </div>
 			</div>
