@@ -91,11 +91,13 @@ $route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/inout/1/incoming/1'] = 'a
 $route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/inout/1/outgoing/1'] = 'api/frontend/v1/stv/students/getOutgoing/$1';
 $route['api/frontend/v1/treemenudata/stv/stdsem/(:any)/inout/1/shared_studies/1'] = 'api/frontend/v1/stv/students/getGemeinsamestudien/$1';
 
+$route['api/frontend/v1/treemenudata/stv/stdsem/:any/stg/(:any)/prestudent/1/stdsem/(:any)/:any/1/:any/1/(:any)/1'] = 'api/frontend/v1/stv/students/getPrestudents/$1/$2/$3';
 $route['api/frontend/v1/treemenudata/stv/stdsem/:any/stg/(:any)/prestudent/1/stdsem/(:any)/:any/1/(:any)/1'] = 'api/frontend/v1/stv/students/getPrestudents/$1/$2/$3';
 $route['api/frontend/v1/treemenudata/stv/stdsem/:any/stg/(:any)/prestudent/1/stdsem/(:any)/(:any)/1'] = 'api/frontend/v1/stv/students/getPrestudents/$1/$2/$3';
 $route['api/frontend/v1/treemenudata/stv/stdsem/:any/stg/(:any)/prestudent/1/stdsem/(:any)'] = 'api/frontend/v1/stv/students/getPrestudents/$1/$2';
 $route['api/frontend/v1/treemenudata/stv/stdsem/:any/stg/(:any)/prestudent/1'] = 'api/frontend/v1/stv/students/getPrestudents/$1';
 
+$route['api/frontend/v1/treemenudata/stv/stdsem/:any/stg/(:any)/orgform/(:any)/prestudent/1/stdsem/(:any)/:any/1/:any/1/(:any)/1'] = 'api/frontend/v1/stv/students/getPrestudentsOrgform/$1/$2/$3/$4';
 $route['api/frontend/v1/treemenudata/stv/stdsem/:any/stg/(:any)/orgform/(:any)/prestudent/1/stdsem/(:any)/:any/1/(:any)/1'] = 'api/frontend/v1/stv/students/getPrestudentsOrgform/$1/$2/$3/$4';
 $route['api/frontend/v1/treemenudata/stv/stdsem/:any/stg/(:any)/orgform/(:any)/prestudent/1/stdsem/(:any)/(:any)/1'] = 'api/frontend/v1/stv/students/getPrestudentsOrgform/$1/$2/$3/$4';
 $route['api/frontend/v1/treemenudata/stv/stdsem/:any/stg/(:any)/orgform/(:any)/prestudent/1/stdsem/(:any)'] = 'api/frontend/v1/stv/students/getPrestudentsOrgform/$1/$2/$3';
