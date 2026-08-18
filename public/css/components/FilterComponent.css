@@ -70,6 +70,10 @@
 	margin-top: 20px;
 }
 
+.filter-table-dataset .tabulator-tableholder {
+	padding-bottom: 16px;
+}
+
 .tabulator {
 	font-size: 1rem;
 }
