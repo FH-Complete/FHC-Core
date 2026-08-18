@@ -661,4 +661,49 @@ class Prestudentstatus_model extends DB_Model
 			'status_kurzbz' => self::STATUS_BEWERBER
 		]);
 	}
+
+	/**
+	 * Checks if a prestudent is allowed to interrupt regarding examination regulations
+	 *
+	 * @param integer		$prestudent_id
+	 *
+	 * @return \stdClass	on success retval 0 means no Unterbrecher status in history;
+	 *                      retval 1 means one Unterbrecher status, but in the last semester
+	 * 						retval -1 means one Unterbrecher status in the past but not last semester
+	 * 						retval -2 means more than one Unterbrecherstati
+	 */
+	public function isUnterbrechungsberechtigtRegardingLaw($prestudent_id)
+	{
+		$this->addSelect('COUNT(*) AS anzahl', false);
+
+		$result = $this->loadWhere([
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => self::STATUS_UNTERBRECHER
+		]);
+
+		if (isError($result))
+			return $result;
+		$count = current(getData($result));
+
+		if($count->anzahl == 1)
+		{
+			$result = $this->getLastStatus($prestudent_id);
+			if (isError($result))
+				return $result;
+			if (!hasData($result))
+				return success(0);
+			$result = current(getData($result));
+			$lastStatus = $result->status_kurzbz;
+			if($lastStatus == self::STATUS_UNTERBRECHER)
+			{
+				return 1;
+			}
+			else
+				return -1;
+		}
+		elseif ($count->anzahl == 0)
+			return 0;
+		else
+			return -2;
+	}
 }

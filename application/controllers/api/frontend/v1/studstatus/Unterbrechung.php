@@ -152,6 +152,8 @@ class Unterbrechung extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('studierendenantrag', 'error_no_student'), self::ERROR_TYPE_GENERAL);
 		elseif ($result == -3)
 			$this->terminateWithError($this->p->t('studierendenantrag', 'error_stg_blacklist'), self::ERROR_TYPE_GENERAL);
+		elseif ($result == -4)
+			$this->terminateWithError($this->p->t('studierendenantrag', 'error_regarding_law'), self::ERROR_TYPE_GENERAL);
 		elseif ($result < 0)
 			$this->terminateWithError($this->p->t('studierendenantrag', 'error_antrag_exists'), self::ERROR_TYPE_GENERAL);
 		

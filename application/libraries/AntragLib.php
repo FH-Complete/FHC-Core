@@ -1424,20 +1424,20 @@ class AntragLib
 	 *
 	 * @return \stdClass	on success retval 0 means not a student;
 	 *                      retval 1 means Berechtigt;
+	 * 						retval 2 means Berechtigt, but just for another additional semester
 	 * 						retval -1 means has already an Antrag pending;
 	 * 						retval -2 means other Antrag pending;
 	 * 						retval -3 means in blacklist stg
-	 * 						retval -4 means existing Unterbrecher status in prestudent history
+	 * 						retval -4 means not Berechtigt regarding examination regulations
 	 */
 	public function getPrestudentUnterbrechungsBerechtigt($prestudent_id, $studiensemester_kurzbz = null, $datum_wiedereinstieg = null)
 	{
-		//check if Unterbrecherstatus
-		$result = $this->_ci->PrestudentstatusModel->loadWhere([
-			'prestudent_id' => $prestudent_id,
-			'status_kurzbz' => Prestudentstatus_model::STATUS_UNTERBRECHER
-		]);
-		$hasStatusUnterbrecher = hasData($result) ? true : false;
-		if ($hasStatusUnterbrecher)
+		// check if berechtigt according to examination regulations
+		$allowedRegardingLaw = $this->_ci->PrestudentstatusModel->isUnterbrechungsberechtigtRegardingLaw($prestudent_id);
+
+		if($allowedRegardingLaw == 1)
+			return success(2);
+		if($allowedRegardingLaw < 0)
 			return success(-4);
 
 		$result = $this->_ci->PrestudentModel->load($prestudent_id);

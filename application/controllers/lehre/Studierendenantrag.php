@@ -72,8 +72,15 @@ class Studierendenantrag extends FHC_Controller
 					$result = $this->antraglib->getPrestudentUnterbrechungsBerechtigt($antrag->prestudent_id);
 					if (getData($result) == 1)
 						$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Unterbrechung';
-					//check if already status unterbrecher
-					elseif (getData($result) == -4){
+
+					//enabled for one semester
+					if (getData($result) == 2){
+						$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Unterbrechung';
+						$prestudentenArr[$antrag->prestudent_id]['enabledForOneSemester'] = true;
+						//TODO(Manu) check: other actions?
+					}
+					//not enabled according to examination regulations, triggers Modal
+					if (getData($result) == -4){
 						$prestudentenArr[$antrag->prestudent_id]['allowedNewTypes'][] = 'Unterbrechung';
 						$prestudentenArr[$antrag->prestudent_id]['hasStatusUnterbrecher'] = true;
 					}

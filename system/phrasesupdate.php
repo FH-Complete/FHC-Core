@@ -62360,14 +62360,14 @@ I have been informed that I am under no obligation to consent to the transmissio
 			array(
 				'sprache' => 'German',
 				'text' => 'Du hast bereits einmal zuvor dein Studium unterbrochen.
-					Eine weitere Unterbrechung ist gemäß § 12 Z 5 Prüfungsordnung nicht vorgesehen.',
+				Gemäß § 12 Z 5 Prüfungsordnung darf ein weiterer Unterbrechungsantrag nur für das darauffolgende Semester gestellt werden.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
 				'text' => 'You have already interrupted your studies once before.
-					A further interruption is not permitted according to Section 12 Z 5 of the examination regulations.',
+					According to § 12 Z 5 of the examination regulations, a further application for interruption may only be submitted for the following semester.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -62388,6 +62388,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 			array(
 				'sprache' => 'English',
 				'text' => 'Note Interruption',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_regarding_law',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bekanntgabe nicht zulässig gemäß Prüfungsordnung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Announcement not permitted according to examination regulations',
 				'description' => '',
 				'insertvon' => 'system'
 			)
