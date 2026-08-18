@@ -448,8 +448,10 @@ class Pruefung extends FHCAPI_Controller
 			}
 		}
 
+		$datum = $this->input->post('datum') == '' ? null : $this->input->post('datum');
 		if(intval($pruefung_id) > 0)
 		{
+
 			$result = $this->PruefungModel->update(
 				[
 					'pruefung_id' => $pruefung_id
@@ -459,7 +461,7 @@ class Pruefung extends FHCAPI_Controller
 					'mitarbeiter_uid' =>  $this->input->post('mitarbeiter_uid'),
 					'note' => $this->input->post('note'),
 					'pruefungstyp_kurzbz' => $this->input->post('pruefungstyp_kurzbz'),
-					'datum' => $this->input->post('datum'),
+					'datum' => $datum,
 					'anmerkung' => $this->input->post('anmerkung'),
 					'updatevon' => $authUID,
 					'updateamum' => date('c'),
@@ -472,7 +474,7 @@ class Pruefung extends FHCAPI_Controller
 				'lehreinheit_id' => $this->input->post('lehreinheit_id'),
 				'student_uid' => $this->input->post('student_uid'),
 				'mitarbeiter_uid' => $this->input->post('mitarbeiter_uid'),
-				'datum' => $this->input->post('datum'),
+				'datum' => $datum,
 				'pruefungstyp_kurzbz' => $this->input->post('pruefungstyp_kurzbz'),
 				'note' => $this->input->post('note'),
 				'anmerkung' => $this->input->post('anmerkung'),
@@ -520,7 +522,7 @@ class Pruefung extends FHCAPI_Controller
 				'studiensemester_kurzbz' => $studiensemester_kurzbz,
 				'note' => $this->input->post('note'),
 				'uebernahmedatum' => date('c'),
-				'benotungsdatum' => $this->input->post('datum'),
+				'benotungsdatum' => $datum,
 				'insertamum' => date('c'),
 				'insertvon' =>  $authUID,
 				'punkte' => $this->input->post('punkte') ? str_replace(',', '.', $this->input->post('punkte')) : null
@@ -555,7 +557,7 @@ class Pruefung extends FHCAPI_Controller
 		], [
 			'note' => $this->input->post('note'),
 			'uebernahmedatum' => date('c'),
-			'benotungsdatum' => $this->input->post('datum'),
+			'benotungsdatum' => $datum,
 			'updateamum' => date('c'),
 			'updatevon' =>  $authUID,
 			'punkte' => $this->input->post('punkte') ? str_replace(',', '.', $this->input->post('punkte')) : null

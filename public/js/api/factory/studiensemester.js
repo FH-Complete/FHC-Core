@@ -36,4 +36,19 @@ export default {
 			url: '/api/frontend/v1/Studiensemester/getStudiensemester'
 		};
 	},
+	current() {
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/organisation/studiensemester/current'
+		};
+	},
+	set(studiensemester_kurzbz) {
+		return {
+			method: 'post',
+			url: 'api/frontend/v1/organisation/studiensemester/set',
+			params: {
+				studiensemester_kurzbz
+			}
+		};
+	}
 };
