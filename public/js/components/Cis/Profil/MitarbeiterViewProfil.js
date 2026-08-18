@@ -45,6 +45,7 @@ export default {
 						maxWidth: 40,
 						headerClick: this.collapseFunction,
 						visible: true,
+						responsive: 0,
 					},
 					{
 						title: "placeholder",
@@ -53,6 +54,7 @@ export default {
 						headerFilter: true,
 						minWidth: 200,
 						visible: true,
+						responsive: 0,
 					},
 					{
 						title: "placeholder",
@@ -61,6 +63,7 @@ export default {
 						headerFilter: true,
 						minWidth: 200,
 						visible: true,
+						responsive: 1,
 					},
 					{
 						title: "placeholder",
@@ -73,6 +76,7 @@ export default {
 						visible: true,
 						formatter: "datetime",
 						formatterParams: this.datetimeFormatterParams(),
+						responsive: 4,
 					},
 					{
 						title: "placeholder",
@@ -85,6 +89,7 @@ export default {
 						visible: true,
 						formatter: "datetime",
 						formatterParams: this.datetimeFormatterParams(),
+						responsive: 3,
 					},
 					{
 						title: "placeholder",
@@ -93,6 +98,7 @@ export default {
 						headerFilter: true,
 						minWidth: 200,
 						visible: true,
+						responsive: 2,
 					},
 				],
 			},
