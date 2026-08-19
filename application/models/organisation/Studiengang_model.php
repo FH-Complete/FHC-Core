@@ -490,7 +490,7 @@ class Studiengang_model extends DB_Model
                 AND studiengang_kz IN (' . $studiengang_kz. ')';
 			;
 		}
-var_dump($condition);
+
 		return $this->loadWhere($condition);
 	}
 
