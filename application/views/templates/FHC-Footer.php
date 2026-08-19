@@ -154,6 +154,7 @@
 		generateJSsInclude('vendor/npm-asset/primevue/confirmdialog/confirmdialog.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/confirmationservice/confirmationservice.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/tieredmenu/tieredmenu.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/progressbar/progressbar.min.js');
 	}
 
 	if($vuedatepicker11) generateJSsInclude('vendor/vuejs/vuedatepicker_js11/vue-datepicker.iife.js');

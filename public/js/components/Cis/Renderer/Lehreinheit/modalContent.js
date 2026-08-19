@@ -51,6 +51,16 @@ export default {
 			return numberPadding(this.event.ende.getHours()) + ":" + numberPadding(this.event.ende.getMinutes());
 		}
 	},
+	watch: {
+		event: {
+			async handler() {
+				if (this.$props.event.type == "lehreinheit") {
+					await this.getLvMenu();
+				}
+			},
+			deep: true,
+		},
+	},
 	methods: {
 		mehtodNumberPadding: function (number) {
 			return numberPadding(number);
@@ -58,21 +68,31 @@ export default {
 		methodFormatDate: function (d) {
 			return formatDate(d);
 		},
+		async getLvMenu() {
+			const semesterResponse = await this.$api.call(
+				ApiLvPlan.getLehreinheitStudiensemester(
+					Array.isArray(this.event.lehreinheit_id)
+						? this.event.lehreinheit_id[0]
+						: this.event.lehreinheit_id,
+				),
+			);
+			if (semesterResponse.meta.status !== "success") return;
+
+			const studiensemesterKurzbz = semesterResponse.data;
+			const lvMenuResponse = await this.$api.call(
+				ApiAddons.getLvMenu(
+					this.event.lehrveranstaltung_id,
+					studiensemesterKurzbz,
+				),
+			);
+			if (lvMenuResponse.meta.status !== "success") return;
+
+			this.lvMenu = lvMenuResponse.data;
+		},
 	},
-	created() {
-		if (this.event.type == 'lehreinheit') {
-			this.$api
-				.call(ApiLvPlan.getLehreinheitStudiensemester(Array.isArray(this.event.lehreinheit_id) ? this.event.lehreinheit_id[0] : this.event.lehreinheit_id))
-				.then(res => res.data)
-				.then(studiensemester_kurzbz => this.$api.call(
-					ApiAddons.getLvMenu(
-						this.event.lehrveranstaltung_id,
-						studiensemester_kurzbz
-					)
-				))
-				.then(res => {
-					this.lvMenu = res.data;
-				});
+	async created() {
+		if (this.$props.event.type == 'lehreinheit') {
+			await this.getLvMenu();
 		}
 	},
 	template: `
