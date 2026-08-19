@@ -1,13 +1,12 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 
-import ApiStvGrades from '../../../../../api/factory/stv/grades.js';
-
 export default {
 	components: {
 		CoreFilterCmpt
 	},
 	emits: [
-		"copied"
+		"copied",
+		"loaded"
 	],
 	inject: {
 		currentSemester: {
@@ -16,20 +15,50 @@ export default {
 		}
 	},
 	props: {
-		student: Object,
-		allSemester: Boolean
+		endpoint: {
+			type: Object,
+			required: true
+		},
+		id: {
+			type: [Number, String],
+			required: true
+		},
+		allSemester: Boolean,
+		optionalTabulatorOptions: Object,
 	},
 	data() {
 		return {
-			tabulatorEvents: []
+			renderTabulator: false,
+			setOptinalTabulatorOptionsVisibility: false,
+			tabulatorEvents: [
+				{
+					event: "dataProcessed",
+					handler: () => this.$emit("loaded"),
+				},
+				{
+					event: "tableBuilt",
+					handler: () => {
+						if(this.optionalTabulatorOptions?.visibleColumns
+							&& this.setOptinalTabulatorOptionsVisibility)
+						{
+							for(let key in this.optionalTabulatorOptions.visibleColumns) {
+								if(this.optionalTabulatorOptions.visibleColumns[key])
+									this.$refs.table.tabulator.showColumn(key);
+								else
+									this.$refs.table.tabulator.hideColumn(key);
+							}
+						}
+					}
+				}
+			]
 		};
 	},
 	computed: {
 		tabulatorOptions() {
 			return {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: () => this.$api.call(ApiStvGrades.getTeacherProposal(
-					this.student.prestudent_id,
+				ajaxRequestFunc: () => this.$api.call(this.endpoint.getTeacherProposal(
+					this.id,
 						(!this.allSemester ? this.currentSemester : null)
 				)),
 				ajaxResponse: (url, params, response) => {
@@ -74,19 +103,24 @@ export default {
 					{ field: 'studiensemester_kurzbz', title: this.$p.t('lehre/studiensemester'), visible: false },
 					{ field: 'note', title: this.$p.t('stv/grades_numericgrade'), visible: false },
 					{ field: 'student_uid', title: this.$p.t('profil/studentIn'), visible: false },
+					{ field: 'vorname', title: this.$p.t('person/vorname'), visible: false },
+					{ field: 'nachname', title: this.$p.t('person/nachname'), visible: false },
 					{ field: 'lehrveranstaltung_id', title: this.$p.t('lehre/lehrveranstaltung_id'), visible: false },
 					{ field: 'punkte', title: this.$p.t('stv/grades_points'), visible: false }
 				],
+				columnDefaults: {
+					headerFilter: this.optionalTabulatorOptions?.headerFilter ?? false,
+				},
 				layout: 'fitDataStretch',
 				height: '100%',
 				selectableRows: true,
 				selectableRowsRangeMode: 'click',
-				persistenceID: 'stv-details-noten-teacher-20260217'
+				persistenceID: this.optionalTabulatorOptions?.persistenceTeacherID ?? 'stv-details-noten-teacher-2025120401',
 			};
 		}
 	},
 	watch: {
-		student(n) {
+		id() {
 			this.$refs.table.reloadTable();
 		},
 		allSemester(n) {
@@ -97,7 +131,7 @@ export default {
 		copyGrades(selected) {
 			const promises = selected.map(
 				grade => this.$api
-					.call(ApiStvGrades.copyTeacherProposalToCertificate(grade), {
+					.call(this.endpoint.copyTeacherProposalToCertificate(grade), {
 						errorHeader: grade.lehrveranstaltung_bezeichnung
 					})
 					.then(() => {
@@ -117,13 +151,19 @@ export default {
 	created() {
 		this.$p.loadCategory(['stv', 'lehre', 'profil'])
 			.then(() => {
-				if (this.$refs.table.tableBuilt)
-					this.$refs.table.tabulator.columnManager.setColumns(this.tabulatorOptions.columns);
+				this.renderTabulator = true;
 			});
+
+		if(this?.optionalTabulatorOptions)
+		{
+			const localStorageKey = 'tabulator-' + this.optionalTabulatorOptions.persistenceTeacherID + '-columns';
+			this.setOptinalTabulatorOptionsVisibility = (window.localStorage.getItem(localStorageKey) === null) ? true : false;
+		}
 	},
 	template: `
 	<div class="stv-details-noten-teacher d-flex flex-column">
 		<core-filter-cmpt
+			v-if="renderTabulator"
 			ref="table"
 			:title="$p.t('stv/grades_title_teacher')"
 			:tabulator-options="tabulatorOptions"
