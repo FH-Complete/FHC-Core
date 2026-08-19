@@ -143,6 +143,12 @@ class Plausichecks extends Auth_Controller
 
 		if (isError($currSemRes)) show_error(getError($currSemRes));
 
+		if (!hasData($currSemRes))
+		{
+			$currSemRes = $this->StudiensemesterModel->getNext();
+			if (isError($currSemRes)) show_error(getError($currSemRes));
+		}
+
 		$this->StudiengangModel->addSelect('studiengang_kz, tbl_studiengang.bezeichnung, tbl_studiengang.typ,
 			tbl_studiengangstyp.bezeichnung AS typbezeichnung, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kuerzel');
 		$this->StudiengangModel->addJoin('public.tbl_studiengangstyp', 'typ');
