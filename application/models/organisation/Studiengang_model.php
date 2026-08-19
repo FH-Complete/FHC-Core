@@ -885,6 +885,14 @@ class Studiengang_model extends DB_Model
 		return success($ass);
 	}
 	
+	public function getDegreePrograms() {
+		$query = "SELECT *
+				FROM public.tbl_studiengang
+				ORDER BY public.tbl_studiengang.kurzbzlang";
+
+		return $this->execReadOnlyQuery($query);
+	}
+
 	private function addEmailProperty(&$benutzerfunktionen) {
 		if(count($benutzerfunktionen) && defined('DOMAIN'))
 		{

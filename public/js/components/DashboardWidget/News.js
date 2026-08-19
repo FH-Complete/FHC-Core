@@ -7,18 +7,17 @@ const MAX_LOADED_NEWS = 30;
 const MAX_NEW_AGE = 60;
 
 export default {
-	name: "WidgetsNews",
+	name: 'WidgetsNews',
 	components: {
-		BsModal
+		BsModal,
 	},
 	data: () => ({
 		allNewsList: [],
 		singleNews: {},
 		selected: null,
-		size:0,
+		size: 0,
 	}),
-	props: ['width', 'height']
-	,
+	props: ['width', 'height'],
 	mixins: [AbstractWidget],
 	computed: {
 		sizeClass() {
@@ -28,7 +27,6 @@ export default {
 			//Return news amount depending on widget width and size
 			// let quantity = this.width;
 			let quantity = MAX_LOADED_NEWS;
-
 
 			if (this.width === 1) {
 				quantity = this.height === 1 ? 4 : MAX_LOADED_NEWS;
@@ -40,107 +38,129 @@ export default {
 		},
 		carouselItems() {
 			return this.allNewsList.reduce((acc, cur) => {
-				const el = document.getElementById('card-'+cur.news_id)
+				const el = document.getElementById('card-' + cur.news_id);
 				acc.push(el);
-				return acc
-			}, [])
-		}
+				return acc;
+			}, []);
+		},
 	},
 	methods: {
-		updateNewsContentClasses:function(){
+		updateNewsContentClasses: function () {
 			Vue.nextTick(() => {
-				document.querySelectorAll(".fhc-news-card-item .card-body, .fhc-news-card-item .card, .fhc-news-card-item .card-header").forEach((el) => {
-					if (!el.classList.contains("border-0")) {
-						el.classList.add("border-0");
-					}
-				});
-				document.querySelectorAll(".fhc-news-card-item .card-header").forEach((el) => {
-					if (!el.classList.contains("px-5")) {
-						el.classList.add("px-5");
-					}
-					if (!el.classList.contains("fhc-primary")) {
-						el.classList.add("fhc-primary");
-					}
-					if (!el.classList.contains("position-sticky")) {
-						el.classList.add("position-sticky");
-					}
-					if (!el.classList.contains("top-0")) {
-						el.classList.add("top-0");
-					}
-					
-					
-				});
-				document.querySelectorAll(".fhc-news-card-item .card-header .row").forEach((el) => {
-					if (!el.classList.contains("w-100")) {
-						el.classList.add("w-100");
-					}
-					if (!el.classList.contains("align-items-center")) {
-						el.classList.add("align-items-center");
-					}
-				});
-				document.querySelectorAll(".fhc-news-card-item .card-header .row h2").forEach((el) => {
-					if (!el.classList.contains("mb-0")) {
-						el.classList.add("mb-0");
-					}
-				});
-			})
+				document
+					.querySelectorAll(
+						'.fhc-news-card-item .card-body, .fhc-news-card-item .card, .fhc-news-card-item .card-header',
+					)
+					.forEach((el) => {
+						if (!el.classList.contains('border-0')) {
+							el.classList.add('border-0');
+						}
+					});
+				document
+					.querySelectorAll('.fhc-news-card-item .card-header')
+					.forEach((el) => {
+						if (!el.classList.contains('px-5')) {
+							el.classList.add('px-5');
+						}
+						if (!el.classList.contains('fhc-primary')) {
+							el.classList.add('fhc-primary');
+						}
+						if (!el.classList.contains('position-sticky')) {
+							el.classList.add('position-sticky');
+						}
+						if (!el.classList.contains('top-0')) {
+							el.classList.add('top-0');
+						}
+					});
+				document
+					.querySelectorAll('.fhc-news-card-item .card-header .row')
+					.forEach((el) => {
+						if (!el.classList.contains('w-100')) {
+							el.classList.add('w-100');
+						}
+						if (!el.classList.contains('align-items-center')) {
+							el.classList.add('align-items-center');
+						}
+					});
+				document
+					.querySelectorAll('.fhc-news-card-item .card-header .row h2')
+					.forEach((el) => {
+						if (!el.classList.contains('mb-0')) {
+							el.classList.add('mb-0');
+						}
+					});
+			});
 		},
 		formatDate: function (dateTime) {
 			const dt = new Date(dateTime);
-			return numberPadding(dt.getDate()) + '.' + numberPadding((dt.getMonth() + 1)) + '.' + dt.getFullYear();				
+			return (
+				numberPadding(dt.getDate()) +
+				'.' +
+				numberPadding(dt.getMonth() + 1) +
+				'.' +
+				dt.getFullYear()
+			);
 		},
 		formatTime: function (dateTime) {
 			const dt = new Date(dateTime);
-			return numberPadding(dt.getHours()) + ':' + numberPadding(dt.getMinutes());
+			return (
+				numberPadding(dt.getHours()) + ':' + numberPadding(dt.getMinutes())
+			);
 		},
-		isString(value){
+		isString(value) {
 			return Object.prototype.toString.call(value) === '[object String]';
 		},
-		setNext(){
-			const thisIndex = this.allNewsList.findIndex(n=>n.news_id == this.selected.news_id)
-			const nextIndex = thisIndex == (this.allNewsList.length - 1) ? 0 : thisIndex + 1
+		setNext() {
+			const thisIndex = this.allNewsList.findIndex(
+				(n) => n.news_id == this.selected.news_id,
+			);
+			const nextIndex =
+				thisIndex == this.allNewsList.length - 1 ? 0 : thisIndex + 1;
 
-			this.setSelected(this.allNewsList[nextIndex])
+			this.setSelected(this.allNewsList[nextIndex]);
 			this.updateNewsContentClasses();
-			
 		},
 		setPrev() {
-			const thisIndex = this.allNewsList.findIndex(n=>n.news_id == this.selected.news_id)
-			const prevIndex = thisIndex ? thisIndex - 1 : this.allNewsList.length - 1
+			const thisIndex = this.allNewsList.findIndex(
+				(n) => n.news_id == this.selected.news_id,
+			);
+			const prevIndex = thisIndex ? thisIndex - 1 : this.allNewsList.length - 1;
 
-			this.setSelected(this.allNewsList[prevIndex])
+			this.setSelected(this.allNewsList[prevIndex]);
 			this.updateNewsContentClasses();
 		},
 		getMenuItemClass(news) {
-			let classString = ''
-			if(this.selected && this.selected.news_id === news.news_id) {
-				classString += 'selected'
+			let classString = '';
+			if (this.selected && this.selected.news_id === news.news_id) {
+				classString += 'selected';
 			}
-			return classString
+			return classString;
 		},
 		async setSelected(news) {
-			const clickedElement = document.getElementById('card-'+news.news_id);
+			const clickedElement = document.getElementById('card-' + news.news_id);
 			const clickedElementIndex = this.allNewsList.indexOf(news);
 			const oldElementIndex = this.allNewsList.indexOf(this.selected);
-			
+
 			//if the clicked element is already active, do nothing
-			if(clickedElementIndex === oldElementIndex) return;
+			if (clickedElementIndex === oldElementIndex) return;
 			//add prev/next class to the clicked element
-			if(clickedElementIndex > oldElementIndex) {
+			if (clickedElementIndex > oldElementIndex) {
 				clickedElement.classList.add('carousel-item-next');
-			}else{
+			} else {
 				clickedElement.classList.add('carousel-item-prev');
 			}
 
 			// move to clicked element
-			await Vue.nextTick(() => { this.carouselInstance.to(clickedElementIndex); })
+			await Vue.nextTick(() => {
+				this.carouselInstance.to(clickedElementIndex);
+			});
 			this.selected = news;
 		},
 		contentURI: function (content_id) {
 			return (
 				FHC_JS_DATA_STORAGE_OBJECT.app_root +
 				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-				"/CisVue/Cms/content/" +
+				'/CisVue/Cms/content/' +
 				content_id
 			);
 		},
@@ -148,7 +168,7 @@ export default {
 			return (
 				FHC_JS_DATA_STORAGE_OBJECT.app_root +
 				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-				"/CisVue/Cms/news"
+				'/CisVue/Cms/news'
 			);
 		},
 		setSingleNews(singleNews) {
@@ -156,73 +176,72 @@ export default {
 			this.$refs.newsModal.show();
 		},
 		initCarouselInstance() {
-			Vue.nextTick(()=> {
-				if(this.$refs.carousel) { // carousel ref might not exist in every widget width/height
+			Vue.nextTick(() => {
+				if (this.$refs.carousel) {
+					// carousel ref might not exist in every widget width/height
 					this.carouselInstance = new bootstrap.Carousel(this.$refs.carousel, {
 						wrap: false, // keep this off even though it actually wraps
-						interval: false
+						interval: false,
 					});
 				}
-			})
+			});
 		},
 		initActiveItem() {
-			Vue.nextTick(()=> {
-				if (Array.isArray(this.$refs.carouselItems) && this.$refs.carouselItems.length >0) {
-					this.$refs.carouselItems[0].classList.add("active")
+			Vue.nextTick(() => {
+				if (
+					Array.isArray(this.$refs.carouselItems) &&
+					this.$refs.carouselItems.length > 0
+				) {
+					this.$refs.carouselItems[0].classList.add('active');
 				}
-			})
-		}
+			});
+		},
 	},
 	watch: {
 		width(newVal, oldVal) {
-			if(oldVal == 1 && newVal > 1) { // carousel instance will have been disposed
-				this.initCarouselInstance()
-				this.initActiveItem()
+			if (oldVal == 1 && newVal > 1) {
+				// carousel instance will have been disposed
+				this.initCarouselInstance();
+				this.initActiveItem();
 			}
-		}
+		},
 	},
 	created() {
-		this.$emit("setConfig", false);
+		this.$emit('setConfig', false);
 		this.$api
-			.call(ApiCms.news(MAX_LOADED_NEWS, MAX_NEW_AGE))
-			.then(res => res.data)
+			.call(ApiCms.newsForWidget(MAX_LOADED_NEWS, MAX_NEW_AGE))
+			.then((res) => res.data)
 			.then((news) => {
 				this.allNewsList = Array.from(Object.values(news));
 				this.allNewsList.sort((a, b) => {
 					return new Date(b.datum) - new Date(a.datum);
 				});
-				this.selected = this.allNewsList.length ? this.allNewsList[0] : null
-				this.initActiveItem()
+				this.selected = this.allNewsList.length ? this.allNewsList[0] : null;
+				this.initActiveItem();
 
 				this.updateNewsContentClasses();
-				
 			})
 			.catch((err) => {
-				console.error("ERROR: ", err);
+				console.error('ERROR: ', err);
 			});
-		
 	},
 	mounted() {
 		if (this.$refs.container) {
-			new ResizeObserver(entries => {
+			new ResizeObserver((entries) => {
 				for (const entry of entries) {
-					let w = entry.contentBoxSize ? entry.contentBoxSize[0].inlineSize : entry.contentRect.width;
+					let w = entry.contentBoxSize
+						? entry.contentBoxSize[0].inlineSize
+						: entry.contentRect.width;
 					// TODO(chris): rework sizing
-					if (w > 600)
-						this.size = 3;
-					else if (w > 350)
-					this.size = 2;
-				else if (w > 250)
-				this.size = 1;
-			else
-			this.size = 0;
-			}
+					if (w > 600) this.size = 3;
+					else if (w > 350) this.size = 2;
+					else if (w > 250) this.size = 1;
+					else this.size = 0;
+				}
 			}).observe(this.$refs.container);
 		}
-		
-		this.initCarouselInstance()
 
-	
+		this.initCarouselInstance();
 	},
 	template: /*html*/ `
 <div ref="container" class="widgets-news h-100" :class="sizeClass" >

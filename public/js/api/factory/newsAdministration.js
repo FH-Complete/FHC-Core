@@ -16,19 +16,6 @@
  */
 
 export default {
-	content(content_id, version = null, sprache = null, sichtbar = null) {
-		return {
-			method: 'get',
-			url: '/api/frontend/v1/Cms/content',
-			params: {
-				content_id,
-				...(version ? { version } : {}),
-				...(sprache ? { sprache } : {}),
-				...(sichtbar ? { sichtbar } : {}),
-			},
-		};
-	},
-	//api function used for the news View that renders the html
 	getNews(
 		page = 1,
 		page_size = 10,
@@ -38,7 +25,7 @@ export default {
 	) {
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/Cms/getNews',
+			url: '/api/frontend/v1/NewsAdministrationAPI/getNews',
 			params: {
 				page,
 				page_size,
@@ -48,12 +35,31 @@ export default {
 			},
 		};
 	},
-	//api function used for the widget component
-	newsForWidget(limit, maxAge = 60) {
+	getNewsItem(newsId) {
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/Cms/newsForWidget',
-			params: { limit, maxAlter: maxAge },
+			url: `/api/frontend/v1/NewsAdministrationAPI/getNewsItem/${newsId}`,
+		};
+	},
+	storeNewsItem(data) {
+		console.log('Storing news item:', data);
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/NewsAdministrationAPI/storeNewsItem',
+			params: data,
+		};
+	},
+	updateNewsItem(newsId, data) {
+		return {
+			method: 'post',
+			url: `/api/frontend/v1/NewsAdministrationAPI/updateNewsItem/${newsId}`,
+			params: data,
+		};
+	},
+	deleteNewsItem(newsId) {
+		return {
+			method: 'post',
+			url: `/api/frontend/v1/NewsAdministrationAPI/deleteNewsItem/${newsId}`,
 		};
 	},
 };

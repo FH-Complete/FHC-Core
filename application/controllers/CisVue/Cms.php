@@ -17,9 +17,9 @@ class Cms extends Auth_Controller
 		    array(
 			'content' => 'basis/cis:r',
 			'getNews' => 'basis/cis:r',
-			'getNewsRowCount' => 'basis/cis:r',
 			'getRoomInformation' => 'basis/cis:r',
-			'news' => 'basis/cis:r'
+			'news' => 'basis/cis:r',
+			'newsAdministration' => ['basis/news:r', 'basis/cis:r'],
 		    )
 		);
 
@@ -87,6 +87,12 @@ class Cms extends Auth_Controller
 		$this->load->view('CisRouterView/CisRouterView.php', ['viewData'=>$viewData, 'route' => 'News']);
 	}
 	
+	public function newsAdministration()
+	{
+		$viewData = array();
+		$this->load->view('CisRouterView/CisRouterView.php', ['viewData'=>$viewData, 'route' => 'NewsAdministration']);
+	}
+
 	public function getRoomInformation($ort_kurzbz)
 	{
 		// Load Config

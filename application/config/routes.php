@@ -61,6 +61,12 @@ $route['api/v1/organisation/[O|o]rganisationseinheit/(:any)'] = 'api/v1/organisa
 $route['api/v1/ressource/[B|b]etriebsmittelperson/(:any)'] = 'api/v1/ressource/betriebsmittelperson2/$1';
 $route['api/v1/system/[S|s]prache/(:any)'] = 'api/v1/system/sprache2/$1';
 
+// Legacy CMS news routes
+$route['api/frontend/v1/Cms/getNewsItem/(:num)'] = 'api/frontend/v1/NewsAdministrationAPI/getNewsItem/$1';
+$route['api/frontend/v1/Cms/storeNewsItem'] = 'api/frontend/v1/NewsAdministrationAPI/storeNewsItem';
+$route['api/frontend/v1/Cms/updateNewsItem/(:num)'] = 'api/frontend/v1/NewsAdministrationAPI/updateNewsItem/$1';
+$route['api/frontend/v1/Cms/deleteNewsItem/(:num)'] = 'api/frontend/v1/NewsAdministrationAPI/deleteNewsItem/$1';
+
 $route['Cis/LvPlan/.*'] = 'Cis/LvPlan/index/$1';
 $route['Cis/MyLvPlan/.*'] = 'Cis/MyLvPlan/index/$1';
 $route['Cis/MyLv/.*'] = 'Cis/MyLv/index/$1';

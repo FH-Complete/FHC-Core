@@ -27,7 +27,7 @@ class Studgang extends FHCAPI_Controller
 	{
 		parent::__construct([
 			'getStudiengangInfo'=> self::PERM_LOGGED,
-
+			'getDegreePrograms'=> self::PERM_LOGGED,
 		]);
 
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
@@ -42,6 +42,22 @@ class Studgang extends FHCAPI_Controller
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
+
+	public function getDegreePrograms() {
+		$entitledDegreePrograms = $this->permissionlib->getSTG_isEntitledFor("basis/news");
+		if (!$entitledDegreePrograms) {
+			$this->terminateWithError("User is not entitled for any degree program");
+		}
+
+		$activeDegreePrograms = $this->StudiengangModel->getDegreePrograms();
+		$activeDegreePrograms= $this->getDataOrTerminateWithError($activeDegreePrograms);
+
+		$activeDegreePrograms = array_values(array_filter($activeDegreePrograms, function($degreeProgram) use ($entitledDegreePrograms) {
+			return in_array($degreeProgram->studiengang_kz, $entitledDegreePrograms);
+		}));
+
+		$this->terminateWithSuccess($activeDegreePrograms);
+	}
 
 	public function getStudiengangInfo(){
 		$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter(getAuthUID());

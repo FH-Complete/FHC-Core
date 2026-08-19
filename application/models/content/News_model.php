@@ -63,9 +63,10 @@ class News_model extends DB_Model
 	 * TODO(chris): this is not a good function -> the params are all over the place
 	 * 
 	 */
-	protected function prepareNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz = null, $sichtbar = true, $maxalter = 0, $page = 1, $page_size = 10, $all = false, $mischen = true)
+	protected function prepareNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz = null, $sichtbar = true, $maxalter = 0, $page = 1, $page_size = 10, $all = false, $mischen = true, $filterForDegreePrograms = false, $allowedDegreePrograms = [])
 	{
 
+		$this->addSelect(["*", "COUNT(*) OVER() AS full_count"]);
 		$this->addOrder('datum', 'DESC');
 
 		$studiengang_kz = trim($studiengang_kz);
@@ -99,44 +100,45 @@ class News_model extends DB_Model
 				$where[] = "semester = 0";
 		} elseif ($studiengang_kz != '') {
 			$add = $mischen === true ? " OR (studiengang_kz = 0 AND semester IS NULL)" : "";
-			$where[] = "((studiengang_kz = " . $this->db->escape($studiengang_kz) . " AND semester = " . $this->db->escape($semester) . ") OR (studiengang_kz = " . $this->db->escape($studiengang_kz) . " AND semester = 0) OR (studiengang_kz = 0 AND semester = " . $this->db->escape($semester) . ")" . $add . ")";
+			$allowedSemesterValues = [$semester, 0, null];
+			$where[] = "(studiengang_kz = " . $this->db->escape($studiengang_kz) . " AND (semester in (" . implode(',', array_map([$this->db, 'escape'], $allowedSemesterValues)) . ") OR semester IS NULL) OR (studiengang_kz = 0 AND semester = " . $this->db->escape($semester) . ")" . $add . ")";
 
 		}
 		$this->addJoin('campus.tbl_contentsprache cs', 'content_id');
 
-		$where[] = "cs.sichtbar = " . ($sichtbar ? "true" : "false");
+		if (is_bool($sichtbar) || $sichtbar === 'true' || $sichtbar === 'false') {
+			$where[] = "cs.sichtbar = " . ($sichtbar ? "true" : "false");
+		}
 
 		$where[] = "cs.sprache = (CASE WHEN EXISTS(SELECT 1 FROM campus.tbl_contentsprache cs2 WHERE cs2.content_id=" . $this->dbTable . ".content_id AND sprache=" . $this->db->escape($sprache) . ") THEN " . $this->db->escape($sprache) . " ELSE " . $this->db->escape(DEFAULT_LANGUAGE) . " END)";
 
 
 		$where[] = "cs.version = (SELECT MAX(version) FROM campus.tbl_contentsprache cs3 WHERE cs3.content_id=" . $this->dbTable . ".content_id AND cs3.sprache = (CASE WHEN EXISTS(SELECT 1 FROM campus.tbl_contentsprache cs2 WHERE cs2.content_id=" . $this->dbTable . ".content_id AND sprache=" . $this->db->escape($sprache) . ") THEN " . $this->db->escape($sprache) . " ELSE " . $this->db->escape(DEFAULT_LANGUAGE) . " END))";
 
-		
+		if ($filterForDegreePrograms) {
+			if (empty($allowedDegreePrograms)) {
+				$where[] = "1=0";
+			} else {
+				$where[] = "studiengang_kz IN (" . implode(',', array_map([$this->db, 'escape'], $allowedDegreePrograms)) . ")";
+			}
+		}
+
 		$where = implode(" AND ", $where);
 
 		$this->db->where($where, NULL, FALSE);
 
 	}
 
-	public function getNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz = null, $sichtbar = true, $maxalter = 0, $page = 1, $page_size = 10, $all = false, $mischen = true)
+	public function getNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz = null, $sichtbar = true, $maxalter = 0, $page = 1, $page_size = 10, $all = false, $mischen = true, $filterForDegreePrograms = false, $allowedDegreePrograms = [])
 	{
-		$this->prepareNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz, $sichtbar, $maxalter, $page, $page_size, $all, $mischen);
-
+		$this->prepareNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz, $sichtbar, $maxalter, $page, $page_size, $all, $mischen, $filterForDegreePrograms, $allowedDegreePrograms);
 		// getting the number of rows of the query and adding pagination to the query result
 		$num_rows = $this->getNumRows(true);
 		$this->addPagination($page, $page_size, $num_rows);
 
 		// preparing the query again because every call to get_compiled_select or cour_all_results will add the from clause to the query
-		$this->prepareNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz, $sichtbar, $maxalter, $page, $page_size, $all, $mischen);
+		$this->prepareNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz, $sichtbar, $maxalter, $page, $page_size, $all, $mischen, $filterForDegreePrograms, $allowedDegreePrograms);
 
 		return $this->load();
 	}
-
-	public function countNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz = null, $sichtbar = true, $maxalter = 0, $page = 1, $page_size = 10, $all = false, $mischen = true)
-	{
-		$this->prepareNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz, $sichtbar, $maxalter, $page, $page_size, $all, $mischen);
-		return $this->getNumRows();
-	}
-
-
 }
