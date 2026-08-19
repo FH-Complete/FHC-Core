@@ -13,6 +13,7 @@ class Gehaltsbestandteil extends AbstractBestandteil implements \JsonSerializabl
 	protected $dienstverhaeltnis_id;
 	protected $vertragsbestandteil_id;
 	protected $gehaltstyp_kurzbz;
+	protected $gehaltsanpassungtyp_kurzbz = '';
 	protected $von;
     protected $bis;
 	protected $anmerkung;
@@ -39,6 +40,10 @@ class Gehaltsbestandteil extends AbstractBestandteil implements \JsonSerializabl
 		isset($data->dienstverhaeltnis_id) && $this->setDienstverhaeltnis_id($data->dienstverhaeltnis_id);
 		isset($data->vertragsbestandteil_id) && $this->setVertragsbestandteil_id($data->vertragsbestandteil_id);
 		isset($data->gehaltstyp_kurzbz) && $this->setGehaltstyp_kurzbz($data->gehaltstyp_kurzbz);
+		//isset($data->gehaltsanpassungtyp_kurzbz) && $this->setGehaltsanpassungtyp_kurzbz($data->gehaltsanpassungtyp_kurzbz);
+		if (!empty($data->gehaltsanpassungtyp_kurzbz)) {
+			$this->setGehaltsanpassungtyp_kurzbz($data->gehaltsanpassungtyp_kurzbz);
+		}
 		isset($data->von) && $this->setVon($data->von);
 		isset($data->bis) && $this->setBis($data->bis);
 		isset($data->anmerkung) && $this->setAnmerkung($data->anmerkung);
@@ -73,6 +78,11 @@ class Gehaltsbestandteil extends AbstractBestandteil implements \JsonSerializabl
 	public function getGehaltstyp_kurzbz()
 	{
 		return $this->gehaltstyp_kurzbz;
+	}
+
+	public function getGehaltsanpassungtyp_kurzbz()
+	{
+		return $this->gehaltsanpassungtyp_kurzbz;
 	}
 
 	public function getVon()
@@ -175,6 +185,13 @@ class Gehaltsbestandteil extends AbstractBestandteil implements \JsonSerializabl
 	{
 		$this->markDirty('gehaltstyp_kurzbz', $this->gehaltstyp_kurzbz, $gehaltstyp_kurzbz);
 		$this->gehaltstyp_kurzbz = $gehaltstyp_kurzbz;
+		return $this;
+	}
+
+	public function setGehaltsanpassungtyp_kurzbz($gehaltsanpassungtyp_kurzbz)
+	{
+		$this->markDirty('gehaltsanpassungtyp_kurzbz', $this->gehaltsanpassungtyp_kurzbz, $gehaltsanpassungtyp_kurzbz);
+		$this->gehaltsanpassungtyp_kurzbz = $gehaltsanpassungtyp_kurzbz;
 		return $this;
 	}
 
@@ -284,6 +301,7 @@ class Gehaltsbestandteil extends AbstractBestandteil implements \JsonSerializabl
 			'dienstverhaeltnis_id' => $this->getDienstverhaeltnis_id(),
 			'vertragsbestandteil_id' => $this->getVertragsbestandteil_id(),
 			'gehaltstyp_kurzbz' => $this->getGehaltstyp_kurzbz(),
+			'gehaltsanpassungtyp_kurzbz' => $this->getGehaltsanpassungtyp_kurzbz(),
 			'von' => $this->getVon(),
 			'bis' => $this->getBis(),
 			'anmerkung' => $this->getAnmerkung(),
@@ -312,6 +330,7 @@ class Gehaltsbestandteil extends AbstractBestandteil implements \JsonSerializabl
 		dienstverhaeltnis_id: {$this->getDienstverhaeltnis_id()}
 		vertragsbestandteil_id: {$this->getVertragsbestandteil_id()}
 		gehaltstyp_kurzbz: {$this->getGehaltstyp_kurzbz()}
+		gehaltsanpassungtyp_kurzbz: {$this->getGehaltsanpassungtyp_kurzbz()}
 		von: {$this->getVon()}
 		bis: {$this->getBis()}
 		anmerkung: {$this->getAnmerkung()}
