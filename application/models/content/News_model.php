@@ -21,9 +21,9 @@ class News_model extends DB_Model
 	{
 		$this->addJoin("campus.tbl_content","content_id");
 
-		$maxAlterQueryFilter = "datum_bis >= NOW()::date";
+		$maxAlterQueryFilter = null;
 		if ($maxAlter !== 0) {
-			$maxAlterQueryFilter .= " OR datum_bis IS NULL AND (NOW()-datum) < interval '" . $this->escape($maxAlter) . " days'";
+			$maxAlterQueryFilter .= " (NOW()-datum) < interval '" . $this->escape($maxAlter) . " days'";
 		}
 
 		return $this->execReadOnlyQuery('
@@ -32,7 +32,7 @@ class News_model extends DB_Model
 			JOIN campus.tbl_content content ON content.content_id = campus.tbl_news.content_id
 			WHERE 
 			--text IS NOT NULL AND 	
-			datum <= NOW() AND (' . $maxAlterQueryFilter . ')
+			datum <= NOW() AND (datum_bis >= NOW()::date OR datum_bis IS NULL)' . ($maxAlterQueryFilter ? ' AND ' . $maxAlterQueryFilter : '') . '
 			ORDER BY datum DESC
 			LIMIT ' . $this->escape($limit)
 		, ['DD/MM/YYYY']);
@@ -72,15 +72,16 @@ class News_model extends DB_Model
 		$fachbereich_kurzbz = trim($fachbereich_kurzbz);
 
 		$where = [];
+		
+		if (!$all) {
+			$where[] = "datum <= NOW() AND (datum_bis >= NOW()::date OR datum_bis IS NULL)";
+		}
 		if ($maxalter !== 0 && is_numeric($maxalter)) {
 			$maxalter = (int)$maxalter;
-			$where[] = "(now()-datum) < interval '" . $this->db->escape($maxalter) . " days'";
+			$where[] = "(NOW()-datum) < interval '" . $this->escape($maxalter) . " days'";
 
 		}
-		if (!$all) {
-			$where[] = "datum <= now()";
-			$where[] = "(datum_bis >= now()::date OR datum_bis IS NULL)";
-		}
+
 		if ($fachbereich_kurzbz != '*') {
 			if ($fachbereich_kurzbz == '') {
 				$where[] = "fachbereich_kurzbz IS NULL";

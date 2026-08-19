@@ -184,7 +184,7 @@ class Cms extends FHCAPI_Controller
 	}
 
 
-	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true, $maxalter = 0)
+	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true, $maxAlter = 0)
 	{
 		//form validation
 		$this->load->library('form_validation');
@@ -211,7 +211,7 @@ class Cms extends FHCAPI_Controller
 			$maxAlter = intval($passedInMaxAlter);
 		}
 	
-		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size, $sprache, $maxalter);
+		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size, $sprache, $maxAlter);
 		$news = $this->getDataOrTerminateWithError($news);
 
 		$this->addMeta('phrases', json_decode($this->p->getJson()));
