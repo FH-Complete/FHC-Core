@@ -225,6 +225,10 @@ class Gehaltsbestandteil extends AbstractBestandteil implements \JsonSerializabl
 		    $grundbetrag = number_format($grundbetrag, 2, '.', '');
 		}
 		$this->markDirty('grundbetrag', $this->grundbetrag, $grundbetrag);
+		if(in_array('grundbetrag', $this->modifiedcolumns))
+		{
+			$this->setBetrag_valorisiert($grundbetrag);
+		}
 		$this->grundbetrag = $grundbetrag;
 		return $this;
 	}
