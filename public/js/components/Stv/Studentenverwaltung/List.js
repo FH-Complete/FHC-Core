@@ -844,7 +844,7 @@ export default {
        </template>
 
       <template #tags>
-        <div class="d-flex border rounded align-items-center">
+        <div class="d-flex border rounded align-items-center ps-1">
           <core-tag ref="tagComponent"
             v-if="tagsEnabled"
             :endpoint="tagEndpoint"
@@ -875,7 +875,7 @@ export default {
         </div>
       </template>
 
-        <template v-if="filter.length || headerFilterActive">
+      <template v-if="filter.length || headerFilterActive">
         <div class="d-flex justify-content-center align-items-center gap-2 ps-4 position-absolute start-50 translate-middle-x">
           <p class="text-danger mb-0">
             <strong>{{$p.t('filter','filterActive')}}</strong>
@@ -889,8 +889,6 @@ export default {
             <span class="fa-solid fa-filter-circle-xmark"></span>
           </button>
         </div>
-        </template>
-
       </template>
 
       <template #filter>
@@ -900,6 +898,7 @@ export default {
           </div>
         </div>
       </template>
+
       </core-filter-cmpt>
     </div>
     <list-new ref="new" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz"></list-new>

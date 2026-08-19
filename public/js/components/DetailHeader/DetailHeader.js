@@ -408,12 +408,12 @@ export default {
 							{{headerData[0].titelpost}}
 						</h2>
 
-						<div class="d-flex border rounded align-items-center">
+						<div class="d-flex border rounded align-items-center ps-1">
 							<core-tag ref="tagComponent"
 								v-if="tagsEnabled"
 								:endpoint="tagEndpoint"
 								:values="prestudentIds"
-								show-hover=true
+								:show-hover="true"
 								@added="addedTag"
 								@deleted="deletedTag"
 								@updated="updatedTag"
