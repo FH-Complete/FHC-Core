@@ -242,8 +242,7 @@ class IssuesLib
 		$fehlercode_extern = null,
 		$inhalt_extern = null
 	) {
-		if (isEmptyString($person_id) && isEmptyString($oe_kurzbz))
-			return error("Person_id or oe_kurzbz must be set, fehlercode: $fehlercode");
+		if (!is_numeric($person_id) && isEmptyString($oe_kurzbz)) return error("Person_id or oe_kurzbz must be set, fehlercode: $fehlercode");
 
 		// get fehlertextVorlage and replace it with params
 		$fehlerRes = $this->_ci->FehlerModel->loadWhere(['fehlercode' => $fehlercode]);

@@ -225,6 +225,8 @@ class FehlerUpdateLib
 			// update fehler, if needed
 			foreach (self::FEHLER_ATTRIBUTES as $attributeName => $attributeInfo)
 			{
+				if (!array_key_exists($attributeName, $fehler)) continue;
+
 				// set attributes to be updated
 				if (isset($attributeInfo['updateable']) && $attributeInfo['updateable'] && $foundFehler->{$attributeName} != $fehler[$attributeName])
 				{
