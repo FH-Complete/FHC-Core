@@ -208,6 +208,9 @@ export default {
 			>
 				{{ $p.t('lehre/noLvFound') }}
 			</div>
+			<div v-else-if="!renderers || !renderers[event.type]" class="placeholder-glow">
+				<span class="placeholder col-12"></span>
+			</div>
 			<div
 				v-else
 				:class="'event-type-' + event.type + ' ' + mode + 'PageContainer'"
