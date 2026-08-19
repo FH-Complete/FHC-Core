@@ -22,6 +22,7 @@ class Gehaltsbestandteil extends AbstractBestandteil implements \JsonSerializabl
 	protected $valorisierungssperre;
 	protected $valorisierung;
 	protected $auszahlungen;
+	protected $gehaltstyp_bezeichnung;
 	
 	protected $insertamum;
 	protected $insertvon;
@@ -52,7 +53,8 @@ class Gehaltsbestandteil extends AbstractBestandteil implements \JsonSerializabl
 		isset($data->valorisierungssperre) && $this->setValorisierungssperre($data->valorisierungssperre);
 		isset($data->valorisierung) && $this->setValorisierung($data->valorisierung);
 		isset($data->auszahlungen) && $this->setAuszahlungen($data->auszahlungen);
-		
+		isset($data->gehaltstyp_bezeichnung) && $this->setGehaltstyp_bezeichnung($data->gehaltstyp_bezeichnung);
+
 		isset($data->insertamum) && $this->setInsertamum($data->insertamum);
 		isset($data->insertvon) && $this->setInsertvon($data->insertvon);
 		isset($data->updateamum) && $this->setUpdateamum($data->updateamum);
@@ -256,6 +258,13 @@ class Gehaltsbestandteil extends AbstractBestandteil implements \JsonSerializabl
 	{
 		$this->markDirty('auszahlungen', $this->auszahlungen, $auszahlungen);
 		$this->auszahlungen = $auszahlungen;
+		return $this;
+	}
+
+	public function setGehaltstyp_bezeichnung($gehaltstyp_bezeichnung)
+	{
+		$this->markDirty('gehaltstyp_bezeichnung', $this->gehaltstyp_bezeichnung, $gehaltstyp_bezeichnung);
+		$this->gehaltstyp_bezeichnung = $gehaltstyp_bezeichnung;
 		return $this;
 	}
 
