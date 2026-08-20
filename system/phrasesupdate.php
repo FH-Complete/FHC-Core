@@ -65700,7 +65700,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Time lock of type {type} exists',
+				'text' => 'Time lock of type {typ} exists',
 				'description' => '',
 				'insertvon' => 'system'
 			)
