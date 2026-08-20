@@ -11,7 +11,6 @@ $includesArray = array(
 	'skipID' => '#fhccontent',
 	'vuedatepicker11' => true,
 	'customCSSs' => array(
-		'vendor/vuejs/vuedatepicker_css/main.css',
 		'public/css/components/verticalsplit.css',
 		'public/css/components/searchbar/searchbar.css',
 		'public/css/Fhc.css',

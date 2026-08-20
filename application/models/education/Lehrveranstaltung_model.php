@@ -1410,4 +1410,50 @@ class Lehrveranstaltung_model extends DB_Model
 		
 		return $this->execReadOnlyQuery($qry, [$sem_kurzbz, $mitarbeiter_uid, $sem_kurzbz, $mitarbeiter_uid]);
 	}
+
+	/**
+	 * All Lehrveranstaltungen of a Studiengang offered in a Studiensemester.
+	 */
+	public function getLvForStudiengangInSemester($sem_kurzbz, $studiengang_kz) {
+		$qry = "SELECT DISTINCT (tbl_lehrveranstaltung.lehrveranstaltung_id),
+				UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg_kurzbz,
+				tbl_studiengang.studiengang_kz,
+				tbl_lehrveranstaltung.semester as lv_semester,
+				tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
+				tbl_lehrveranstaltung.orgform_kurzbz as orgform
+			FROM
+				lehre.tbl_lehrveranstaltung JOIN public.tbl_studiengang USING(studiengang_kz)
+			WHERE
+				tbl_lehrveranstaltung.studiengang_kz = ?
+			  AND tbl_lehrveranstaltung.aktiv = TRUE
+			  AND EXISTS (
+					SELECT 1 FROM lehre.tbl_lehreinheit le
+					WHERE le.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
+					  AND le.studiensemester_kurzbz = ?
+			  )
+			ORDER BY stg_kurzbz,lv_semester,lv_bezeichnung";
+
+		return $this->execReadOnlyQuery($qry, array($studiengang_kz, $sem_kurzbz));
+	}
+
+	/**
+	 * Number of Lehreinheit assignments the given mitarbeiter has for a Lehrveranstaltung (i.e. whether
+	 * they teach it), optionally restricted to a Studiensemester. Returns a single row with a `teaches`
+	 * count - check `teaches > 0`. Used to scope teacher access in the Benotungstool to their own LVs.
+	 */
+	public function getLektorIsTeachingLva($lva_id, $ma_uid, $studiensemester_kurzbz = null)
+	{
+		$params = array($lva_id, $ma_uid);
+		$query = "SELECT COUNT(*) AS teaches
+				FROM lehre.tbl_lehreinheitmitarbeiter
+					JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
+					JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
+				WHERE lehrveranstaltung_id = ? AND mitarbeiter_uid = ?";
+		if ($studiensemester_kurzbz !== null && $studiensemester_kurzbz !== '') {
+			$query .= " AND tbl_lehreinheit.studiensemester_kurzbz = ?";
+			$params[] = $studiensemester_kurzbz;
+		}
+
+		return $this->execReadOnlyQuery($query, $params);
+	}
 }

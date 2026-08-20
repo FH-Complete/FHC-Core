@@ -13,7 +13,7 @@ class Benotungstool extends Auth_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'index' => self::PERM_LOGGED
+			'index' => array('lehre/benotungstool:rw', 'lehre/benotungstool_assistenz:rw')
 		]);
 
 		$this->_ci =& get_instance();
