@@ -12,7 +12,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 	public function __construct($permissions)
 	{
 		$default_permissions = [
-			'getUid' => self::DEFAULT_PERMISSION_R,
+			'getDefaultVerfasser' => self::DEFAULT_PERMISSION_R,
 			'getNotizen' => self::DEFAULT_PERMISSION_R,
 			'loadNotiz' => self::DEFAULT_PERMISSION_R,
 			'addNewNotiz' => self::DEFAULT_PERMISSION_RW,
@@ -21,7 +21,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 			'loadDokumente' => self::DEFAULT_PERMISSION_R,
 			'getMitarbeiter' => self::DEFAULT_PERMISSION_R,
 			'isBerechtigt' => self::DEFAULT_PERMISSION_R,
-			'getCountNotes' => self::DEFAULT_PERMISSION_R,
+			'getCountNotes' => self::DEFAULT_PERMISSION_R
 		];
 		
 		if(!is_array($permissions))
@@ -46,9 +46,20 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		]);
 	}
 
-	public function getUid()
+	public function getDefaultVerfasser()
 	{
-		$this->terminateWithSuccess(getAuthUID());
+		$uid = getAuthUID();
+		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
+		$this->MitarbeiterModel->addSelect('p.person_id, p.nachname, p.vorname, p.titelpost, p.titelpre, ben.uid');
+		$this->MitarbeiterModel->addJoin('public.tbl_benutzer ben', 'ON (ben.uid = public.tbl_mitarbeiter.mitarbeiter_uid)', 'LEFT');
+		$this->MitarbeiterModel->addJoin('public.tbl_person p', 'ON (p.person_id = ben.person_id)', 'LEFT');
+
+		$result = $this->MitarbeiterModel->loadWhere(
+			array('mitarbeiter_uid' => $uid)
+		);
+		if(hasData($result))
+			$data = getData($result);
+		$this->terminateWithSuccess(current($data));
 	}
 
 
@@ -106,7 +117,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		$this->terminateWithError("in abstract function: define right in extension", self::ERROR_TYPE_GENERAL);
 	}
 
-	public function loadNotiz()
+/*	public function loadNotiz()
 	{
 		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
 
@@ -116,6 +127,43 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		$this->NotizModel->addSelect('*');
 		$this->NotizModel->addSelect("TO_CHAR(CASE WHEN public.tbl_notiz.updateamum >= public.tbl_notiz.insertamum 
 			THEN public.tbl_notiz.updateamum ELSE public.tbl_notiz.insertamum END::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS lastUpdate");
+		$this->NotizModel->addLimit(1);
+
+		$result = $this->NotizModel->loadWhere(
+			array('notiz_id' => $notiz_id)
+		);
+		if (isError($result))
+		{
+			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
+		elseif (!hasData($result))
+		{
+			$this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=>'Notiz_id']), self::ERROR_TYPE_GENERAL);
+		}
+		else
+		{
+			$this->terminateWithSuccess(current(getData($result)));
+		}
+	}*/
+
+	public function loadNotiz()
+	{
+		$_POST = json_decode(utf8_encode($this->input->raw_input_stream), true);
+
+		$notiz_id = $this->input->post('notiz_id');
+
+		$this->NotizModel->addSelect('public.tbl_notiz.*');
+		$this->NotizModel->addSelect("TO_CHAR(CASE WHEN public.tbl_notiz.updateamum >= public.tbl_notiz.insertamum 
+			THEN public.tbl_notiz.updateamum ELSE public.tbl_notiz.insertamum END::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS lastUpdate");
+		$this->NotizModel->addSelect('perb.person_id AS perb_person_id, perb.vorname AS perb_vorname, perb.nachname AS perb_nachname,
+			perb.titelpre AS perb_titelpre, perb.titelpost AS perb_titelpost, benb.uid AS perb_uid');
+		$this->NotizModel->addSelect('perv.person_id AS perv_person_id, perv.vorname AS perv_vorname, perv.nachname AS perv_nachname,
+			perv.titelpre AS perv_titelpre, perv.titelpost AS perv_titelpost,  benv.uid AS perv_uid');
+		$this->NotizModel->addJoin('public.tbl_notiz_dokument', 'notiz_id', 'LEFT');
+		$this->NotizModel->addJoin('public.tbl_benutzer benb', 'ON (benb.uid = public.tbl_notiz.bearbeiter_uid)', 'LEFT');
+		$this->NotizModel->addJoin('public.tbl_person perb', 'ON (perb.person_id = benb.person_id)', 'LEFT');
+		$this->NotizModel->addJoin('public.tbl_benutzer benv', 'ON (benv.uid = public.tbl_notiz.verfasser_uid)', 'LEFT');
+		$this->NotizModel->addJoin('public.tbl_person perv', 'ON (perv.person_id = benv.person_id)', 'LEFT');
 		$this->NotizModel->addLimit(1);
 
 		$result = $this->NotizModel->loadWhere(
@@ -238,7 +286,6 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 
 	public function updateNotiz()
 	{
-
 		$this->load->library('form_validation');
 		$this->load->library('DmsLib');
 
@@ -269,7 +316,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		$uid = getAuthUID();
 		$titel = $post_data['titel'];
 		$text = $post_data['text'];
-		$bearbeiter_uid = isset($post_data['bearbeiter']) ? $post_data['bearbeiter'] : $post_data['bearbeiter_uid'];
+		$bearbeiter_uid = $post_data['bearbeiter'];
 		$erledigt = $post_data['erledigt'];
 		$start = $post_data['start'];
 		$ende = $post_data['ende'];
@@ -436,14 +483,15 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		$this->terminateWithSuccess(getData($result));
 	}
 
-	public function getMitarbeiter($searchString)
+	public function getMitarbeiter()
 	{
+		$searchString = $this->input->get('searchString') ?? '';
 		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
-		$result = $this->MitarbeiterModel->searchMitarbeiter($searchString);
+		$result = $this->MitarbeiterModel->searchMitarbeiter($searchString, 'mitAkadGrad');
 		if (isError($result)) {
 			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
-		$this->terminateWithSuccess($result);
+		$this->terminateWithSuccess($result ?: []);
 	}
 
 	public function getCountNotes($person_id)

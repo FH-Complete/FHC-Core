@@ -4,7 +4,7 @@ import {CoreFilterCmpt} from "../filter/Filter.js";
 import BsModal from "../Bootstrap/Modal.js";
 import FormForm from '../Form/Form.js';
 import FormInput from '../Form/Input.js';
-
+import PvAutoComplete from "../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 
 export default {
 	components: {
@@ -13,7 +13,8 @@ export default {
 		FormUploadDms,
 		FormForm,
 		FormInput,
-		BsModal
+		BsModal,
+		PvAutoComplete
 	},
 	props: {
 		endpoint: {
@@ -52,7 +53,6 @@ export default {
 			multiupload: true,
 			mitarbeiter: [],
 			filteredMitarbeiter: [],
-			zwischenvar: '',
 			editorInitialized: false,
 			editor: null,
 			notizData: {
@@ -85,7 +85,11 @@ export default {
 				showId: false,
 				showLastupdate: false
 			},
-			currentVerfasserUid: null
+			selectedBearbeiter: null,
+			selectedVerfasser: null,
+			abortController: {
+				mitarbeiter: null
+			}
 		}
 	},
 	computed: {
@@ -297,6 +301,15 @@ export default {
 		},
 		actionEditNotiz(notiz_id) {
 			this.loadNotiz(notiz_id).then(() => {
+				this.selectedBearbeiter = {
+					label: this.getLabelUid(this.notizData.perb_titelpre, this.notizData.perb_nachname, this.notizData.perb_vorname, this.notizData.perb_titelpost, this.notizData.perb_uid),
+					uid: this.notizData.perb_uid
+				}
+				this.selectedVerfasser = {
+					label: this.getLabelUid(this.notizData.perv_titelpre, this.notizData.perv_nachname, this.notizData.perv_vorname, this.notizData.perv_titelpost, this.notizData.perv_uid),
+					uid: this.notizData.perv_uid
+				}
+
 				if (this.notizen.notiz_id) {
 					this.notizData.typeId = this.typeId;
 					this.notizData.titel = this.notizen.titel;
@@ -308,8 +321,13 @@ export default {
 					this.notizData.bis = this.notizen.ende;
 					this.notizData.document = this.notizen.dms_id;
 					this.notizData.erledigt = this.notizen.erledigt;
-					this.notizData.intBearbeiter = this.notizen.bearbeiter_uid;
-					this.notizData.bearbeiter = this.notizen.bearbeiter_uid;
+					//this.notizData.bearbeiter_uid = this.notizen.bearbeiter_uid;
+					//for saving
+					//this.notizData.intBearbeiter = this.notizen.bearbeiter_uid;
+					//this.notizData.bearbeiter = this.notizen.bearbeiter_uid;
+					//new way
+					this.notizData.bearbeiter = this.selectedBearbeiter.uid;
+					this.notizData.verfasser = this.selectedVerfasser.uid;
 				}
 			})
 				.then(() => {
@@ -324,6 +342,7 @@ export default {
 		},
 		actionNewNotiz() {
 			this.resetFormData();
+			this.getDefaultVerfasser();
 			if(this.notizLayout == 'popupModal') {
 				this.$refs.NotizModal.show();
 			}
@@ -374,7 +393,6 @@ export default {
 					this.notizData = result.data;
 					this.notizData.typeId = this.typeId;
 					this.notizData.anhang = [];
-					this.currentVerfasserUid = result.data.verfasser_uid;
 					return result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -431,23 +449,53 @@ export default {
 				bearbeiter: null,
 				anhang: [],
 			};
-			this.currentVerfasserUid = this.uid
+			this.selectedBearbeiter = null;
+			this.selectedVerfasser = null;
 		},
-		getUid() {
+		getDefaultVerfasser() {
 			return this.$api
-				.call(this.endpoint.getUid())
+				.call(this.endpoint.getDefaultVerfasser())
 				.then(result => {
-					this.currentVerfasserUid = result.data;
-					this.uid = result.data;
+					const verfasser = result.data;
+					this.selectedVerfasser = {
+						label: this.getLabelUid(verfasser.titelpre, verfasser.nachname, verfasser.vorname, verfasser.titelpost, verfasser.mitarbeiter_uid),
+						uid: verfasser.uid
+					}
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		search(event) {
+		searchMitarbeiter(event) {
+			if (this.abortController.mitarbeiter) {
+				this.abortController.mitarbeiter.abort();
+			}
+
+			this.abortController.mitarbeiter = new AbortController();
+
 			return this.$api
 				.call(this.endpoint.getMitarbeiter(event.query))
 				.then(result => {
-					this.filteredMitarbeiter = result.data.retval;
+					//this.filteredMitarbeiter = result.data.retval;
+					this.filteredMitarbeiter = [];
+					for (let mitarbeiter of result.data.retval) {
+						this.filteredMitarbeiter.push(
+							{
+								label: this.getLabelUid(
+									mitarbeiter.titelpre,
+									mitarbeiter.nachname,
+									mitarbeiter.vorname,
+									mitarbeiter.titelpost,
+									mitarbeiter.mitarbeiter_uid
+								),
+								uid: mitarbeiter.mitarbeiter_uid
+							}
+						);
+					}
 				});
+		},
+		getLabelUid(titelpre, nachname, vorname, titelpost, uid) {
+			if (!nachname && !vorname && !uid)
+				return '';
+			return nachname + ' ' + vorname + (titelpre ? ' ' + titelpre : '') + (titelpost ? ' ' + titelpost : '') + (uid ? ' (' + uid + ')' : '');
 		},
 		initTinyMCE() {
 			const vm = this;
@@ -491,7 +539,7 @@ export default {
 	},
 	created() {
 		this.initializeShowVariables();
-		this.getUid();
+		this.getDefaultVerfasser();
 	},
 	async mounted() {
 		if (this.showTinyMce) {
@@ -512,18 +560,14 @@ export default {
 				}
 			}
 		},
-		//Watcher für autocomplete Bearbeiter und Verfasser
-		'notizData.intBearbeiter': {
-			handler(newVal) {
-				if (typeof newVal === 'object') {
-					this.notizData.bearbeiter = newVal.mitarbeiter_uid;
-				}
-			},
-			deep: true
-		},
-
 		id() {
 			this.reload();
+		},
+		selectedBearbeiter(newVal) {
+			this.notizData.bearbeiter = newVal?.uid || null;
+		},
+		selectedVerfasser(newVal) {
+			this.notizData.verfasser = newVal?.uid || null;
 		}
 	},
 	beforeUnmount() {
@@ -1140,44 +1184,43 @@ export default {
 									>
 								</form-input>
 							</div>
-							
-					
+
 							<div class="row mb-3">
-								<form-input 
+								<form-input
+									type="autocomplete"
 									container-class="col-6"
 									:label="$p.t('notiz', 'verfasser')"
-									type="text"
-									readonly="readonly"
-									v-model="currentVerfasserUid"
-									name="verfasser"
-									>
-								</form-input>
-					
-								<form-input
-									v-if="notizData.bearbeiter_uid"
-									container-class="col-6"
-									:label="$p.t('notiz', 'bearbeiter')"
-									v-model="notizData.bearbeiter_uid"
+									v-model="selectedVerfasser"
+									optionLabel="label"
+									optionValue="uid"
+									disabled
+									dropdown
+									forceSelection
 									name="bearbeiter"
-									minlength="3"
+									:suggestions="filteredMitarbeiter"
+									@complete="searchMitarbeiter"
+									:min-length="3"
 									>
 								</form-input>
-								
+
 								<form-input
-									v-else
-									container-class="col-6"
-									:label="$p.t('notiz', 'bearbeiter')"
 									type="autocomplete"
-									v-model="notizData.intBearbeiter"
-									:suggestions="filteredMitarbeiter" 
-									@complete="search" 
-									optionLabel="mitarbeiter"
+									container-class="col-6"
+									:label="$p.t('notiz', 'bearbeiter')"
+									v-model="selectedBearbeiter"
+									optionLabel="label"
+									optionValue="uid"
+									dropdown
+									forceSelection
 									name="bearbeiter"
-									minlength="3"
+									:suggestions="filteredMitarbeiter"
+									@complete="searchMitarbeiter"
+									:min-length="3"
 									>
-								</form-input>	
+								</form-input>
+
 							</div>
-															
+
 							<div class="row mb-3">
 								<div class="col-2 pt-4 d-flex align-items-center">
 									<form-input

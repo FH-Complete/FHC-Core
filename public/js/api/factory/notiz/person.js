@@ -28,6 +28,12 @@ export default {
 			url: 'api/frontend/v1/notiz/notizPerson/getUid/'
 		};
 	},
+	getDefaultVerfasser() {
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/notiz/notizPerson/getDefaultVerfasser/'
+		};
+	},
 	addNewNotiz(id, params) {
 		return {
 			method: 'post',
@@ -71,10 +77,11 @@ export default {
 			params
 		};
 	},
-	getMitarbeiter(event) {
+	getMitarbeiter(searchString) {
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/notiz/notizPerson/getMitarbeiter/' + event
+			url: 'api/frontend/v1/notiz/notizPerson/getMitarbeiter',
+			params: { searchString }
 		};
 	},
 	isBerechtigt(id, type_id) {
