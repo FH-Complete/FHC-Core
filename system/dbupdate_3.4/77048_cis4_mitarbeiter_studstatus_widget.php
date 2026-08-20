@@ -54,10 +54,10 @@ if($result = @$db->db_query("SELECT 1 FROM dashboard.tbl_dashboard_widget WHERE 
 			VALUES
 			  (1, 9);
 			";
-	}
 
-	if(!$db->db_query($qry))
-		echo '<strong>dashboard.tbl_dashboard_widget: '.$db->db_last_error().'</strong><br>';
-	else
-		echo '<br>dashboard.tbl_dashboard_widget: Widget studstatus hinzugefuegt!<br>';
+		if(!$db->db_query($qry))
+			echo '<strong>dashboard.tbl_dashboard_widget: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>dashboard.tbl_dashboard_widget: Widget studstatus hinzugefuegt!<br>';
+	}
 }
