@@ -233,8 +233,9 @@ export default {
 				});
 				extraItems.push({
 					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
-						+ 'system/checkStudenten.php?'
-						+ 'stg_kz=' + studiengang_kz,
+						+ FHC_JS_DATA_STORAGE_OBJECT.ci_router
+						+ '/system/issues/Plausichecks?'
+						+ 'studiengang_kz=' + studiengang_kz,
 					description: 'stv/bis_stud_plausicheck'
 				});
 			}

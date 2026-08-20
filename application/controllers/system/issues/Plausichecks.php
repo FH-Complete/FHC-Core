@@ -190,7 +190,8 @@ class Plausichecks extends Auth_Controller
 			'semester' => hasData($studiensemesterRes) ? getData($studiensemesterRes) : array(),
 			'currsemester' => hasData($currSemRes) ? getData($currSemRes) : array(),
 			'studiengaenge' => hasData($studiengaengeRes) ? getData($studiengaengeRes) : array(),
-			'fehlerKurzbzCodeMappings' => $fehlerKurzbzCodeMappings
+			'fehlerKurzbzCodeMappings' => $fehlerKurzbzCodeMappings,
+			'studiengang_kz' => $this->input->get('studiengang_kz') ?? ''
 		);
 	}
 }
