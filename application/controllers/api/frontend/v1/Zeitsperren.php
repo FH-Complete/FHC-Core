@@ -58,8 +58,8 @@ class Zeitsperren extends FHCAPI_Controller
 
 	public function getTypenZeitsperren()
 	{
-		$this->ZeitsperretypModel->addOrder('beschreibung', 'ASC');
-		$result = $this->ZeitsperretypModel->load();
+		$excludedTypes = array('ZVerfueg');
+		$result = $this->ZeitsperretypModel->getTypenZeitsperren($excludedTypes);
 		if (isError($result)) {
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
