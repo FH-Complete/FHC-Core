@@ -5,6 +5,7 @@ import PvAutoComplete from "../../../../../../../index.ci.php/public/js/componen
 import ApiStvProjektarbeit from '../../../../../api/factory/stv/projektarbeit.js';
 
 export default {
+	name: 'ProjektarbeitDetails',
 	components: {
 		FormForm,
 		FormInput,
@@ -14,6 +15,9 @@ export default {
 	inject: {
 		defaultSemester: {
 			from: 'defaultSemester'
+		},
+		currentSemester: {
+			from: 'currentSemester'
 		}
 	},
 	computed: {
@@ -95,8 +99,9 @@ export default {
 			this.formData.themenbereich = null;
 			this.formData.projekttyp_kurzbz = null;
 			this.formData.firma = null;
-			this.formData.lehrveranstaltung_id = null;
-			this.formData.lehreinheit_id = null;
+			// dont reset these form fields for UX reasons
+			// this.formData.lehrveranstaltung_id = null;
+			// this.formData.lehreinheit_id = null;
 			this.formData.beginn = null;
 			this.formData.ende = null;
 			this.formData.freigegeben = true;
@@ -106,10 +111,14 @@ export default {
 			this.formData.anmerkung = null;
 			this.$refs.formDetails.clearValidation();
 		},
+		setFormData(projektarbeit) {
+			this.formData = projektarbeit;
+			if (this.formData.firma_id) this.formData.firma = {firma_id: this.formData.firma_id, name: this.formData.firma_name};
+		},
 		getFormData(newProjektarbeit, studiensemester_kurzbz, additional_lehrveranstaltung_id) {
 
 			this.additional_lehrveranstaltung_id = additional_lehrveranstaltung_id;
-			this.studiensemester = studiensemester_kurzbz || this.defaultSemester;
+			this.studiensemester = studiensemester_kurzbz || this.currentSemester;
 			this.newProjektarbeit = newProjektarbeit;
 
 			this.$api
@@ -144,8 +153,7 @@ export default {
 			return this.$api
 				.call(ApiStvProjektarbeit.loadProjektarbeit(projektarbeit_id))
 				.then(result => {
-					this.formData = result.data;
-					if (this.formData.firma_id) this.formData.firma = {firma_id: this.formData.firma_id, name: this.formData.firma_name};
+					this.setFormData(result.data)
 					return result;
 				})
 				.catch(this.$fhcAlert.handleSystemError)

@@ -364,9 +364,10 @@ class entwicklungsteam extends basis_db
 		$bismeldung_jahr = $datetime->format('Y');
 
 		//laden des Datensatzes
-			$qry = "SELECT *
+			$qry = "SELECT tbl_entwicklungsteam.*, tbl_besqual.*, tbl_studiengang.studiengang_kz, tbl_studiengang.melderelevant
 					FROM bis.tbl_entwicklungsteam
 					JOIN bis.tbl_besqual USING(besqualcode)
+					JOIN public.tbl_studiengang USING(studiengang_kz)
 					WHERE mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid)."
 					AND (beginn is NULL OR beginn <= make_date(". $this->db_add_param($bismeldung_jahr). "::INTEGER, 12, 31))
 					AND (ende is NULL OR ende >= make_date(". $this->db_add_param($bismeldung_jahr). "::INTEGER, 1, 1))";
@@ -394,6 +395,7 @@ class entwicklungsteam extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->ext_id = $row->ext_id;
 				$obj->besqual = $row->besqualbez;
+				$obj->melderelevant = $this->db_parse_bool($row->melderelevant);
 
 				$this->result[] = $obj;
 			}

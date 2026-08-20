@@ -193,3 +193,6 @@
 	word-break: break-word;
 }
 
+.news-list-item p {
+	word-break: break-word;
+}

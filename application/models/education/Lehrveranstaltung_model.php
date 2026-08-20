@@ -402,14 +402,17 @@ class Lehrveranstaltung_model extends DB_Model
 			SELECT
 				vorname, nachname, mitarbeiter_uid, lehrfunktion_kurzbz
 			FROM
-				lehre.tbl_lehreinheit
+				lehre.tbl_lehreinheit le
 				JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
 				JOIN public.tbl_benutzer b ON b.uid = lema.mitarbeiter_uid
 				JOIN public.tbl_person p using (person_id) 
 			WHERE
-				tbl_lehreinheit.lehrveranstaltung_id= ?
-				AND tbl_lehreinheit.studiensemester_kurzbz = ?
+				le.lehrveranstaltung_id= ?
+				AND le.studiensemester_kurzbz = ?
 				AND lehrfunktion_kurzbz = 'LV-Leitung'
+				AND lema.mitarbeiter_uid NOT like '_Dummy%' 
+			  	AND b.aktiv = TRUE 
+			  	AND p.aktiv = TRUE
             ORDER BY 
                 lema.insertamum DESC
 			LIMIT 1
@@ -1242,7 +1245,7 @@ class Lehrveranstaltung_model extends DB_Model
 	{
 		return "
 		SELECT
-				lehrveranstaltung_id, tbl_lehrveranstaltung.kurzbz as lv_kurzbz, tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung, bezeichnung_english as lv_bezeichnung_english, studiengang_kz,
+				distinct on (lehrveranstaltung_id) lehrveranstaltung_id, tbl_lehrveranstaltung.kurzbz as lv_kurzbz, tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung, bezeichnung_english as lv_bezeichnung_english, studiengang_kz,
 				tbl_studienplan_lehrveranstaltung.semester, tbl_lehrveranstaltung.sprache,
 				ects as lv_ects, semesterstunden, anmerkung, lehre, lehreverzeichnis as lv_lehreverzeichnis, tbl_lehrveranstaltung.aktiv,
 				planfaktor as lv_planfaktor, planlektoren as lv_planlektoren, planpersonalkosten as lv_planpersonalkosten,

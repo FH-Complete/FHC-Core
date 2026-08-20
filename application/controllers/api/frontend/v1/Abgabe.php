@@ -35,9 +35,12 @@ class Abgabe extends FHCAPI_Controller
 			'getStudentProjektabgaben' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_student:rw', 'basis/abgabe_lektor:rw'),
 			'postStudentProjektarbeitZwischenabgabe' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_student:rw'),
 			'postStudentProjektarbeitEndupload' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_student:rw'),
+			'postStudentProjektarbeitTitel' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_student:rw'),
 			'getMitarbeiterProjektarbeiten' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_lektor:rw'),
 			'postProjektarbeitAbgabe' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_lektor:rw'),
+			'patchProjektarbeitAbgabeMultiple' => array('basis/abgabe_assistenz:rw'),
 			'deleteProjektarbeitAbgabe' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_lektor:rw'),
+			'deleteProjektarbeitAbgabeMultiple' => array('basis/abgabe_assistenz:rw'),
 			'postSerientermin' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_lektor:rw'),
 			'fetchDeadlines' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_lektor:rw'),
 			'getPaAbgabetypen' => self::PERM_LOGGED,
@@ -46,7 +49,9 @@ class Abgabe extends FHCAPI_Controller
 			'getStudiengaenge' => array('basis/abgabe_assistenz:rw'),
 			'getStudentProjektarbeitAbgabeFile' => array('basis/abgabe_student:rw', 'basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
 			'postStudentProjektarbeitZusatzdaten' => array('basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
-			'getSignaturStatusForProjektarbeitAbgaben' => array('basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw')
+			'getSignaturStatusForProjektarbeitAbgaben' => array('basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
+			'sendZweitbetreuerTokenMail' => array('basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
+			'fetchProjektarbeitenHistory' => array('basis/abgabe_assistenz:rw')
 		]);
 
 		$this->load->library('PhrasesLib');
@@ -90,6 +95,7 @@ class Abgabe extends FHCAPI_Controller
 		$ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT = $this->config->item('ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT');
 		$ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER = $this->config->item('ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER');
 		$BETREUER_SAMMELMAIL_BUTTON_STUDENT = $this->config->item('BETREUER_SAMMELMAIL_BUTTON_STUDENT');
+		$MULTIEDIT_TABLE = $this->config->item('MULTIEDIT_TABLE');
 		
 		$ret = array(
 			'old_abgabe_beurteilung_link' => $old_abgabe_beurteilung_link,
@@ -98,6 +104,7 @@ class Abgabe extends FHCAPI_Controller
 			'ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT' => $ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT,
 			'ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER' => $ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER,
 			'BETREUER_SAMMELMAIL_BUTTON_STUDENT' => $BETREUER_SAMMELMAIL_BUTTON_STUDENT,
+			'MULTIEDIT_TABLE' => $MULTIEDIT_TABLE,
 		);
 		
 		$this->terminateWithSuccess($ret);
@@ -107,10 +114,18 @@ class Abgabe extends FHCAPI_Controller
 	 * loads config related to abgabetool for students to avoid handing out links reserved for employees
 	 */
 	public function getConfigStudent() {
-		$moodle_link =$this->config->item('STG_MOODLE_LINK');
-
+		$moodle_link = $this->config->item('STG_MOODLE_LINK');
+		$title_edit_allowed = $this->config->item('STUDENT_EDIT_PROJEKTARBEIT_TITLE');
+		$confetti_on_endupload = $this->config->item('CONFETTI_ON_ENDUPLOAD');
+		$siginfolink_german = $this->config->item('SIGNATUR_INFO_LINK_GERMAN');
+		$siginfolink_english = $this->config->item('SIGNATUR_INFO_LINK_ENGLISH');
+		
 		$ret = array(
 			'moodle_link' => $moodle_link,
+			'title_edit_allowed' => $title_edit_allowed,
+			'confetti_on_endupload' => $confetti_on_endupload,
+			'siginfolink_german' => $siginfolink_german,
+			'siginfolink_english' => $siginfolink_english
 		);
 
 		$this->terminateWithSuccess($ret);
@@ -146,23 +161,26 @@ class Abgabe extends FHCAPI_Controller
 		}
 		$data = getData($res)[0];
 		$student_uid = $data->uid;
-
-		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID());
-		if(getAuthUID() == $student_uid || $zugeordnet) {
-			$projektarbeitIsCurrent = false;
-			$returnFunc = function ($result) use (&$projektarbeitIsCurrent) {
-				$projektarbeitIsCurrent = $result;
-			};
-			Events::trigger('projektarbeit_is_current', $projektarbeit_id, $returnFunc);
-
-			$ret = $this->ProjektarbeitModel->getProjektarbeitAbgabetermine($projektarbeit_id);
-
-			foreach ($ret->retval as $termin) {
-				$this->checkAbgabeSignatur($termin, $projektarbeit->student_uid);
-			}
-
-			$this->terminateWithSuccess(array($ret, $projektarbeitIsCurrent));
+		$studiengang_kz = $data->studiengang_kz;
+		
+		if(!$this->checkZuordnung($projektarbeit_id, getAuthUID(), $student_uid, $studiengang_kz)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent', [getAuthUID(), $student_uid]));
 		}
+
+		$projektarbeitIsCurrent = false;
+		$returnFunc = function ($result) use (&$projektarbeitIsCurrent) {
+			$projektarbeitIsCurrent = $result;
+		};
+		Events::trigger('projektarbeit_is_current', $projektarbeit_id, $returnFunc);
+
+		$ret = $this->ProjektarbeitModel->getProjektarbeitAbgabetermine($projektarbeit_id);
+
+		foreach ($ret->retval as $termin) {
+			$this->checkAbgabeSignatur($termin, $projektarbeit->student_uid);
+		}
+
+		$this->terminateWithSuccess(array($ret, $projektarbeitIsCurrent));
+		
 	}
 
 	/**
@@ -188,7 +206,7 @@ class Abgabe extends FHCAPI_Controller
 			$result = $this->ProjektarbeitModel->getStudentProjektarbeitenWithBetreuer(getAuthUID());
 		}
 
-		$projektarbeiten = getData($result);
+		$projektarbeiten = hasData($result) ? getData($result) : array();
 		
 		if(count($projektarbeiten)) {
 			foreach($projektarbeiten as $pa) {
@@ -275,6 +293,8 @@ class Abgabe extends FHCAPI_Controller
 					if(count($data) > 0) {
 						$pa->zweitbetreuer = $data[0];
 					}
+
+					$pa->zweitbetreuer_mail = $this->getProjektbetreuerEmailByPersonID($pa->zweitbetreuer_person_id);
 				}
 			}
 		}
@@ -293,55 +313,62 @@ class Abgabe extends FHCAPI_Controller
 
 		$projektarbeit_id = $this->input->post('projektarbeit_id');
 		$paabgabe_id = $this->input->post('paabgabe_id');
-		$student_uid = $this->input->post('student_uid');
-		$bperson_id = $this->input->post('bperson_id');
 		$paabgabetyp_kurzbz = $this->input->post('paabgabetyp_kurzbz');
 
 		if ($projektarbeit_id === NULL || trim((string)$projektarbeit_id) === ''
 			|| $paabgabe_id === NULL || trim((string)$paabgabe_id) === ''
-			|| $student_uid === NULL || trim((string)$student_uid) === ''
 			|| $paabgabetyp_kurzbz === NULL || trim((string)$paabgabetyp_kurzbz) === '') {
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		}
 
 		$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
+
+		// load the $student_uid by $projektarbeit_id so we dont need any post params
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+		$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
+		if(isError($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingStudentForProjektarbeitID'), 'general');
+		}
+		if(!hasData($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'), 'general');
+		}
+		$data = getData($res)[0];
+		$student_uid = $data->uid;
+		$studiengang_kz = $data->studiengang_kz;
 		
-		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID());
-		if(getAuthUID() == $student_uid || $zugeordnet) {
+		if(!$this->checkZuordnung($projektarbeit_id, getAuthUID(), $student_uid, $studiengang_kz)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent', [getAuthUID(), $student_uid]));
+		}
 			
+		$path = PAABGABE_PATH.$paabgabe_id.'_'.$student_uid.'.pdf';
 		
-			$path = PAABGABE_PATH.$paabgabe_id.'_'.$student_uid.'.pdf';
-			
-			if ((isset($_FILES) and isset($_FILES['file']) and ! $_FILES['file']['error'])) {
-				move_uploaded_file($_FILES['file']['tmp_name'], $path);
-	
-				if(file_exists($path)) {
-	
-					chmod($path, 0640);
-					
-					$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
-					$res = $this->PaabgabeModel->update($paabgabe_id, array(
-						'abgabedatum' => date('Y-m-d'),
-						'updatevon' => getAuthUID(),
-						'updateamum' => date('Y-m-d H:i:s')
-					));
-	
-					$this->logLib->logInfoDB(array('zwischenupload',$res, array(
-						'abgabedatum' => date('Y-m-d'),
-						'updatevon' => getAuthUID(),
-						'updateamum' => date('Y-m-d H:i:s')
-					), getAuthUID(), getAuthPersonId(), $student_uid));
-					
-					$this->terminateWithSuccess($res);
-				} else {
-					$this->terminateWithError('Error moving File', 'general');
-				}
-	
+		if ((isset($_FILES) and isset($_FILES['file']) and ! $_FILES['file']['error'])) {
+			move_uploaded_file($_FILES['file']['tmp_name'], $path);
+
+			if(file_exists($path)) {
+
+				chmod($path, 0640);
+				
+				$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
+				$res = $this->PaabgabeModel->update($paabgabe_id, array(
+					'abgabedatum' => date('Y-m-d'),
+					'updatevon' => getAuthUID(),
+					'updateamum' => date('Y-m-d H:i:s')
+				));
+
+				$this->logLib->logInfoDB(array('zwischenupload',$res, array(
+					'abgabedatum' => date('Y-m-d'),
+					'updatevon' => getAuthUID(),
+					'updateamum' => date('Y-m-d H:i:s')
+				), getAuthUID(), getAuthPersonId(), $student_uid));
+				
+				$this->terminateWithSuccess($res);
 			} else {
-				$this->terminateWithError('File missing', 'general');
+				$this->terminateWithError('Error moving File', 'general');
 			}
+
 		} else {
-			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'));
+			$this->terminateWithError('File missing', 'general');
 		}
 
 }
@@ -355,7 +382,6 @@ class Abgabe extends FHCAPI_Controller
 
 		$projektarbeit_id = $this->input->post('projektarbeit_id');
 		$paabgabe_id = $this->input->post('paabgabe_id');
-		$student_uid = $this->input->post('student_uid');
 		$sprache = $this->input->post('sprache');
 		$abstract = $this->input->post('abstract');
 		$abstract_en = $this->input->post('abstract_en');
@@ -367,7 +393,6 @@ class Abgabe extends FHCAPI_Controller
 
 		if ($projektarbeit_id === NULL || trim((string)$projektarbeit_id) === ''
 			|| $paabgabe_id === NULL || trim((string)$paabgabe_id) === ''
-			|| $student_uid === NULL || trim((string)$student_uid) === ''
 			|| $paabgabetyp_kurzbz === NULL || trim((string)$paabgabetyp_kurzbz) === ''
 			|| $abstract === NULL || $abstract_en === NULL
 			|| $schlagwoerter === NULL || $schlagwoerter_en === NULL
@@ -379,76 +404,317 @@ class Abgabe extends FHCAPI_Controller
 		
 		$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
 		
-		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID());
-		if(getAuthUID() == $student_uid || $zugeordnet) {
-			if ((isset($_FILES) and isset($_FILES['file']) and !$_FILES['file']['error'])) {
-				move_uploaded_file($_FILES['file']['tmp_name'], PAABGABE_PATH . $paabgabe_id . '_' . $student_uid . '.pdf');
+		// load the $student_uid by $projektarbeit_id so we dont need any post params
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+		$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
+		if(isError($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingStudentForProjektarbeitID'), 'general');
+		}
+		if(!hasData($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'), 'general');
+		}
+		$data = getData($res)[0];
+		$student_uid = $data->uid;
+		$studiengang_kz = $data->studiengang_kz;
+		
+		if(!$this->checkZuordnung($projektarbeit_id, getAuthUID(), $student_uid, $studiengang_kz)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent', [getAuthUID(), $student_uid]));
+		}
 
-				if (file_exists(PAABGABE_PATH . $paabgabe_id . '_' . $student_uid . '.pdf')) {
+		if ((isset($_FILES) and isset($_FILES['file']) and !$_FILES['file']['error'])) {
+			move_uploaded_file($_FILES['file']['tmp_name'], PAABGABE_PATH . $paabgabe_id . '_' . $student_uid . '.pdf');
 
-					$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+			if (file_exists(PAABGABE_PATH . $paabgabe_id . '_' . $student_uid . '.pdf')) {
 
-					$result = $this->ProjektarbeitModel->load($projektarbeit_id);
-					$projektarbeitArr = $this->getDataOrTerminateWithError($result, 'general');
+				$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 
-					if (count($projektarbeitArr) > 0) {
-						$projektarbeit = $projektarbeitArr[0];
-					} else {
-						$this->terminateWithError($this->p->t('abgabetool', 'c4projektarbeitNichtGefunden'), 'general');
-					}
+				$result = $this->ProjektarbeitModel->load($projektarbeit_id);
+				$projektarbeitArr = $this->getDataOrTerminateWithError($result, 'general');
 
-					$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
-					$result = $this->PaabgabeModel->load($paabgabe_id);
-					$paabgabeArr = $this->getDataOrTerminateWithError($result, 'general');
-
-					if (count($paabgabeArr) > 0) {
-						$paabgabe = $paabgabeArr[0];
-					} else {
-						$this->terminateWithError($this->p->t('abgabetool', 'c4projektabgabeNichtGefunden'), 'general');
-					}
-
-					$this->checkAbgabeSignatur($paabgabe, $projektarbeit->student_uid);
-					$signaturstatus = $paabgabe->signatur;
-
-					// update projektarbeit cols
-					$this->ProjektarbeitModel->updateProjektarbeit($projektarbeit_id, $sprache, $abstract, $abstract_en
-						, $schlagwoerter, $schlagwoerter_en, $seitenanzahl);
-
-
-					// update paabgabe datum
-					$res = $this->PaabgabeModel->update($paabgabe_id, array(
-						'abgabedatum' => date('Y-m-d'),
-						'updatevon' => getAuthUID(),
-						'updateamum' => date('Y-m-d H:i:s')
-					));
-
-					$res = $this->PaabgabeModel->load($res->retval);
-					$abgabe = getData($res)[0];
-					$abgabe->signatur = $signaturstatus;
-
-					$this->sendUploadEmail($bperson_id, $projektarbeit_id, $paabgabetyp_kurzbz, $student_uid);
-
-					$this->logLib->logInfoDB(array('endupload', $res, array(
-						'abgabedatum' => date('Y-m-d'),
-						'updatevon' => getAuthUID(),
-						'updateamum' => date('Y-m-d H:i:s')
-					), getAuthUID(), getAuthPersonId(), array($projektarbeit_id, $sprache, $abstract, $abstract_en
-					, $schlagwoerter, $schlagwoerter_en, $seitenanzahl)));
-
-					$this->terminateWithSuccess($abgabe);
+				if (count($projektarbeitArr) > 0) {
+					$projektarbeit = $projektarbeitArr[0];
 				} else {
-					$this->terminateWithError('Error moving File', 'general');
+					$this->terminateWithError($this->p->t('abgabetool', 'c4projektarbeitNichtGefunden'), 'general');
 				}
 
+				$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
+				$result = $this->PaabgabeModel->load($paabgabe_id);
+				$paabgabeArr = $this->getDataOrTerminateWithError($result, 'general');
+
+				if (count($paabgabeArr) > 0) {
+					$paabgabe = $paabgabeArr[0];
+				} else {
+					$this->terminateWithError($this->p->t('abgabetool', 'c4projektabgabeNichtGefunden'), 'general');
+				}
+
+				$this->checkAbgabeSignatur($paabgabe, $projektarbeit->student_uid);
+				$signaturstatus = $paabgabe->signatur;
+
+					// update projektarbeit cols with zusatzdaten AND abgabedatum!
+					$this->ProjektarbeitModel->update($projektarbeit->projektarbeit_id, array(
+						'sprache' => $sprache,
+						'seitenanzahl' => $seitenanzahl,
+						'abgabedatum' => date('Y-m-d'),
+						'schlagwoerter_en' => $schlagwoerter_en,
+						'schlagwoerter' => $schlagwoerter,
+						'abstract' => $abstract,
+						'abstract_en' => $abstract_en
+					));
+
+
+				// update paabgabe datum
+				$res = $this->PaabgabeModel->update($paabgabe_id, array(
+					'abgabedatum' => date('Y-m-d'),
+					'updatevon' => getAuthUID(),
+					'updateamum' => date('Y-m-d H:i:s')
+				));
+
+				$res = $this->PaabgabeModel->load($res->retval);
+				$abgabe = getData($res)[0];
+				$abgabe->signatur = $signaturstatus;
+
+				$this->sendUploadEmail($bperson_id, $projektarbeit_id, $paabgabetyp_kurzbz, $student_uid);
+
+				$this->logLib->logInfoDB(array('endupload', $res, array(
+					'abgabedatum' => date('Y-m-d'),
+					'updatevon' => getAuthUID(),
+					'updateamum' => date('Y-m-d H:i:s')
+				), getAuthUID(), getAuthPersonId(), array($projektarbeit_id, $sprache, $abstract, $abstract_en
+				, $schlagwoerter, $schlagwoerter_en, $seitenanzahl)));
+
+				$this->terminateWithSuccess($abgabe);
 			} else {
-				$this->terminateWithError('File missing', 'general');
+				$this->terminateWithError('Error moving File', 'general');
 			}
+
 		} else {
-			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'));
+			$this->terminateWithError('File missing', 'general');
 		}
 
 	}
-	
+
+	/**
+	 * POST METHOD
+	 * allows a student (or assistenz on their behalf) to update the titel of their own projektarbeit.
+	 * blocked once the projektarbeit has been graded (checkProjektarbeitForFinishedStatus).
+	 */
+	public function postStudentProjektarbeitTitel()
+	{
+		if(!$this->config->item('STUDENT_EDIT_PROJEKTARBEIT_TITLE')) {
+			$this->terminateWithError($this->p->t('global', 'c4studentEditNotAllowed'), 'general');
+		};
+		
+		$projektarbeit_id = $this->input->post('projektarbeit_id');
+		$titel            = $this->input->post('titel');
+
+		if ($projektarbeit_id === NULL || trim((string)$projektarbeit_id) === ''
+			|| $titel === NULL || trim((string)$titel) === '') {
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
+
+		// strip all HTML tags to prevent XSS in mail bodies, table views and Projektarbeitsbenotung
+		$titel = trim(strip_tags($titel));
+		if ($titel === '') {
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
+
+		// Reject emojis and pictographs
+		// allows foreign letters, math symbols, accents, and standard punctuation.
+		$emojiPattern = '/[\x{1F300}-\x{1F5FF}\x{1F600}-\x{1F64F}\x{1F680}-\x{1F6FF}\x{1F900}-\x{1FAFF}\x{23E9}-\x{23EF}\x{2b50}\x{2700}-\x{27BF}]/u';
+		
+		// i would like this much more but our server does not recognize this utf-8 character range this way, so hexcodes it is 
+//		if (preg_match('/\p{Extended_Pictographic}/u', $titel)) {
+		if (preg_match($emojiPattern, $titel)) {
+
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
+		
+		$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
+
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+
+		// Verify the projektarbeit actually belongs to the supplied student_uid
+		$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
+		if (isError($res) || !hasData($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4projektarbeitNichtGefunden'), 'general');
+		}
+		$assignedStudentUid = getData($res)[0]->uid;
+
+		// A student may only update their own title; assistenz is covered by checkZuordnung
+
+		$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
+		if(isError($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingStudentForProjektarbeitID'), 'general');
+		}
+
+		if(!hasData($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'), 'general');
+		}
+		$data = getData($res)[0];
+		$student_uid = $data->uid;
+		$studiengang_kz = $data->studiengang_kz;
+		
+		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID(), $student_uid, $studiengang_kz);
+		if (getAuthUID() !== $assignedStudentUid && !$zugeordnet) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'), 'general');
+		}
+		
+		$result = $this->ProjektarbeitModel->load($projektarbeit_id);
+		$data = getData($result);
+		
+		$oldTitle = $data[0]->titel ?? '';
+		
+		$result = $this->ProjektarbeitModel->update(
+			$projektarbeit_id,
+			array(
+				'titel'      => $titel,
+				'updatevon'  => getAuthUID(),
+				'updateamum' => date('Y-m-d H:i:s')
+			)
+		);
+
+		$this->getDataOrTerminateWithError($result, 'general');
+
+		$this->logLib->logInfoDB(array(
+			'titelUpdate',
+			array(
+				'projektarbeit_id' => $projektarbeit_id,
+				'titel'            => $titel,
+				'updatevon'        => getAuthUID(),
+				'updateamum'       => date('Y-m-d H:i:s')
+			),
+			getAuthUID(),
+			getAuthPersonId()
+		));
+
+		$this->sendTitelChangedEmail(
+			$projektarbeit_id,
+			$titel,
+			$oldTitle,
+			$assignedStudentUid
+		);
+		
+		$result = $this->ProjektarbeitModel->load($projektarbeit_id);
+		$titel = hasData($result) ? getData($result)[0]->titel : $titel;
+		$this->terminateWithSuccess($titel);
+	}
+
+	/**
+	 * Notifies all betreuer of a projektarbeit and all assistenzen responsible for its studiengang
+	 * when a student updates the titel of their projektarbeit.
+	 *
+	 * Betreuer retrieval mirrors AbgabetoolJob->notifyBetreuerAboutChangedAbgaben.
+	 * Assistenz retrieval mirrors AbgabetoolJob->notifyAssistenzAboutChangedAbgaben.
+	 *
+	 * @param int    $projektarbeit_id
+	 * @param string $new_titel         The titel as it was saved
+	 * @param string $student_uid
+	 */
+	private function sendTitelChangedEmail($projektarbeit_id, $new_titel, $old_titel, $student_uid)
+	{
+		$this->load->model('education/Projektarbeit_model',      'ProjektarbeitModel');
+		$this->load->model('education/Projektbetreuer_model',    'ProjektbetreuerModel');
+		$this->load->model('organisation/Studiengang_model',     'StudiengangModel');
+		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
+		$this->load->model('person/Person_model',                     'PersonModel');
+
+		$this->load->model('person/Person_model', 'PersonModel');
+		$studentNameResult = $this->PersonModel->getFullName($student_uid);
+		$studentFullName   = hasData($studentNameResult) ? getData($studentNameResult) : $student_uid;
+
+		$studentInfoResult = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
+		if (isError($studentInfoResult) || !hasData($studentInfoResult)) {
+			$this->logLib->logInfoDB(array('sendTitelChangedEmail: student info not found', $projektarbeit_id));
+			return;
+		}
+		$studentInfo    = getData($studentInfoResult)[0];
+		$studiengang_kz = $studentInfo->studiengang_kz;
+
+		$stgResult = $this->StudiengangModel->load($studiengang_kz);
+		$oe_kurzbz = null;
+		if (!isError($stgResult) && hasData($stgResult)) {
+			$oe_kurzbz = getData($stgResult)[0]->oe_kurzbz ?? null;
+		}
+
+		// build shared mail data
+		$base_mail_data = array(
+			'studentFullName'      => $studentFullName,
+			'new_titel'         => $new_titel,
+			'old_titel'         => $old_titel
+		);
+
+		// notify all betreuer
+		$betreuerResult = $this->ProjektbetreuerModel->getAllBetreuerOfProjektarbeit($projektarbeit_id);
+		if (!isError($betreuerResult) && hasData($betreuerResult)) {
+
+			$linkAbgabetool = APP_ROOT . $this->config->item('URL_MITARBEITER');
+			
+			foreach (getData($betreuerResult) as $betreuer) {
+				$email = $betreuer->uid ? $betreuer->uid . '@' . DOMAIN : ($betreuer->private_email ?? null);
+				if (!$email) {
+					$this->logLib->logInfoDB(array('sendTitelChangedEmail: no email for betreuer', $betreuer->person_id));
+					continue;
+				}
+
+				$anredeResult = $this->ProjektarbeitModel->getProjektbetreuerAnrede($betreuer->person_id);
+				$anrede       = (!isError($anredeResult) && hasData($anredeResult)) ? getData($anredeResult)[0] : null;
+
+				$mail_data = array_merge($base_mail_data, array(
+					'anredeFillString'        => ($anrede->anrede ?? '') === 'Herr' ? 'r' : '',
+					'anrede'                  => $anrede->anrede  ?? '',
+					'fullFormattedNameString'  => $anrede->first  ?? $email,
+					'linkAbgabetool'           => $linkAbgabetool,
+				));
+
+				sendSanchoMail(
+					'PATitleUpdated',
+					$mail_data,
+					$email,
+					$this->p->t('abgabetool', 'c4PATitleChanged')
+				);
+			}
+		}
+
+		// notify assistenz for the studiengang OE
+		if (!$oe_kurzbz) {
+			$this->logLib->logInfoDB(array('sendTitelChangedEmail: no oe_kurzbz resolved, skipping assistenz', $studiengang_kz));
+			return;
+		}
+
+		$assistenzResult = $this->OrganisationseinheitModel->getAssistenzForOE($oe_kurzbz);
+		if (isError($assistenzResult) || !hasData($assistenzResult)) {
+			return;
+		}
+
+		$linkAbgabetool = APP_ROOT . $this->config->item('URL_ASSISTENZ');
+		
+		// similar pattern as job uses via the assistenzMap
+		$sentTo = [];
+		foreach (getData($assistenzResult) as $assistenz) {
+			if (in_array($assistenz->person_id, $sentTo)) {
+				continue;
+			}
+			$sentTo[] = $assistenz->person_id;
+
+			$email = $assistenz->uid . '@' . DOMAIN;
+
+			$mail_data = array_merge($base_mail_data, array(
+				'anredeFillString'        => $assistenz->anrede === 'Herr' ? 'r' : '',
+				'anrede'                  => $assistenz->anrede ?? '',
+				'fullFormattedNameString'  => $assistenz->first  ?? ($assistenz->uid . '@' . DOMAIN),
+				'linkAbgabetool'           => $linkAbgabetool,
+			));
+			
+			sendSanchoMail(
+				'PATitleUpdated',
+				$mail_data,
+				$email,
+				$this->p->t('abgabetool', 'c4PATitleChanged')
+			);
+		}
+	}
+
+
 	// validate paabgabe deadline against servertime just in case a student spoofs their local clock and thus
 	// unlocks the upload ui
 	private function checkPaabgabeDeadline($paabgabe_id) {
@@ -504,34 +770,33 @@ class Abgabe extends FHCAPI_Controller
 			$showAllBool = false;
 		}
 
-		$projektarbeiten = $this->ProjektarbeitModel->getMitarbeiterProjektarbeiten(getAuthUID(), $showAllBool);
+		$projektarbeiten = $this->ProjektarbeitModel->getMitarbeiterProjektarbeiten(getAuthPersonId(), $showAllBool);
 
 
 		$mapFunc = function($projektarbeit) {
 			return $projektarbeit->projektarbeit_id;
 		};
 		$projektarbeiten_ids = array_map($mapFunc, $projektarbeiten->retval);
-
-		$ret = $this->ProjektarbeitModel->getProjektarbeitenAbgabetermine($projektarbeiten_ids);
-		$projektabgaben = $this->getDataOrTerminateWithError($ret, 'general');
 		
+		if(count($projektarbeiten_ids) > 0) {
+			$ret = $this->ProjektarbeitModel->getProjektarbeitenAbgabetermine($projektarbeiten_ids);
+			$projektabgaben = $this->getDataOrTerminateWithError($ret, 'general');
+		}
 		
 		forEach($projektarbeiten->retval as $pa) {
 			
-			$result = $this->ProjektarbeitModel->getProjektbetreuerAnrede($pa->betreuer_person_id);
-			$anredeArr = $this->getDataOrTerminateWithError($result, 'general');
-			$pa->betreuer = $anredeArr[0];
-			
 			$oldLink = ''; // show this when paIsCurrent == false -> moodle course template
 			$newLink = ''; // get curated path for betreuer type
-			$returnFunc = function ( $resultOld, $resultNew) use (&$oldLink, &$newLink) {
+			$returnFunc = function ($resultOld, $resultNew) use (&$oldLink, &$newLink) {
 				$newLink = $resultNew;
 				$oldLink = $resultOld;
 			};
 			
-			Events::trigger('projektbeurteilung_formular_link', $pa->betreuerart_kurzbz, APP_ROOT, $pa->projektarbeit_id, $pa->student_uid, $returnFunc);
+			$own_betreuerart_kurzbz = $pa->betreuer_person_id == getAuthPersonId() ? $pa->betreuer_betreuerart_kurzbz : $pa->zweitbetreuer_betreuerart_kurzbz;
+			Events::trigger('projektbeurteilung_formular_link', $own_betreuerart_kurzbz, APP_ROOT, $pa->projektarbeit_id, $pa->student_uid, $returnFunc);
 			$pa->beurteilungLinkNew = $newLink;
 			$pa->beurteilungLinkOld = $oldLink;
+			$pa->betreuerart_kurzbz = $own_betreuerart_kurzbz;
 
 			// has previously been retrieved via getStudentProjektabgaben but is fetched in advance to avoid having to reload abgaben
 			$projektarbeitIsCurrent = false;
@@ -578,9 +843,22 @@ class Abgabe extends FHCAPI_Controller
 
 		$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
 
-		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID());
+		// load the $student_uid by $projektarbeit_id so we dont need any post params
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+		$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
+		if(isError($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingStudentForProjektarbeitID'), 'general');
+		}
+		if(!hasData($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'), 'general');
+		}
+		$data = getData($res)[0];
+		$student_uid = $data->uid;
+		$studiengang_kz = $data->studiengang_kz;
+		
+		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID(), $student_uid, $studiengang_kz);
 		if(!$zugeordnet) {
-			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'));
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent', [getAuthUID(), $student_uid]));
 		}
 		
 		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
@@ -617,11 +895,21 @@ class Abgabe extends FHCAPI_Controller
 			// load existing entry of paabgabe and check if note has changed to negativ, to avoid sending when
 			// only notiz has changed.
 			
-			// TODO: what if paabgabe is a qualgate1, is benotet negativ and then its type is changed to gate2?
-			
 			$existingResult = $this->PaabgabeModel->load($paabgabe_id);
 			$existingPaabgabeArr = getData($existingResult);
 			if(count($existingPaabgabeArr) > 0) $existingPaabgabe = $existingPaabgabeArr[0];
+			
+			if($existingPaabgabe->note !== null || $existingPaabgabe->abgabedatum !== null) {
+				// check if a change of paabgabetyp is being attempted -> not allowed at this point
+				if($paabgabetyp_kurzbz !== $existingPaabgabe->paabgabetyp_kurzbz) {
+					$this->terminateWithError($this->p->t('abgabetool', 'c4abgabetypAendernNichtErlaubt'));
+				}
+				
+				// check if a change of deadline aka datum is being attempted -> notallowed at this point
+				if($datum !== $existingPaabgabe->datum) {
+					$this->terminateWithError($this->p->t('abgabetool', 'c4datumAendernNichtErlaubt'));
+				}
+			}
 			
 			$result = $this->PaabgabeModel->update(
 				$paabgabe_id,
@@ -687,6 +975,112 @@ class Abgabe extends FHCAPI_Controller
 	}
 
 	/**
+	 * called by abgabetool/assistenz when bulk-editing multiple abgabetermine via the flat termine table view
+	 * only fields present in the payload are updated - absent fields are left untouched
+	 */
+	public function patchProjektarbeitAbgabeMultiple() {
+		$paabgabe_ids = $this->input->post('paabgabe_ids');
+
+		if ($paabgabe_ids === NULL || !is_array($paabgabe_ids) || count($paabgabe_ids) === 0) {
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
+
+		// collect only fields that were actually sent
+		$updateFields = [];
+
+		$datum = $this->input->post('datum');
+		if ($datum !== NULL && trim((string)$datum) !== '') {
+			$updateFields['datum'] = $datum;
+		}
+
+		$paabgabetyp_kurzbz = $this->input->post('paabgabetyp_kurzbz');
+		if ($paabgabetyp_kurzbz !== NULL && trim((string)$paabgabetyp_kurzbz) !== '') {
+			$updateFields['paabgabetyp_kurzbz'] = $paabgabetyp_kurzbz;
+		}
+
+		$kurzbz = $this->input->post('kurzbz');
+		if ($kurzbz !== NULL) {
+			$updateFields['kurzbz'] = $kurzbz;
+		}
+
+		// booleans: only include if explicitly posted
+		$upload_allowed = $this->input->post('upload_allowed');
+		if ($upload_allowed !== NULL) {
+			$updateFields['upload_allowed'] = filter_var($upload_allowed, FILTER_VALIDATE_BOOLEAN);
+		}
+
+		$fixtermin = $this->input->post('fixtermin');
+		if ($fixtermin !== NULL) {
+			$updateFields['fixtermin'] = filter_var($fixtermin, FILTER_VALIDATE_BOOLEAN);
+		}
+
+		if (empty($updateFields)) {
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
+
+		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
+
+		$results = [];
+		foreach ($paabgabe_ids as $paabgabe_id) {
+			$paabgabe_id = trim((string)$paabgabe_id);
+
+			if ($paabgabe_id === '') {
+				$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+			}
+
+			$projektarbeit_id = $this->getProjektarbeitIDForPaabgabeID($paabgabe_id);
+
+			$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
+
+			// load the $student_uid by $projektarbeit_id so we dont need any post params
+			$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+			$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
+			if(isError($res)) {
+				$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingStudentForProjektarbeitID'), 'general');
+			}
+			if(!hasData($res)) {
+				$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'), 'general');
+			}
+			$data = getData($res)[0];
+			$student_uid = $data->uid;
+			$studiengang_kz = $data->studiengang_kz;
+			
+			$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID(), $student_uid, $studiengang_kz);
+			if (!$zugeordnet) {
+				$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'), 'general');
+			}
+
+			$paabgabeResult = $this->PaabgabeModel->load($paabgabe_id);
+			$paabgabeArr = $this->getDataOrTerminateWithError($paabgabeResult, 'general');
+
+			if (count($paabgabeArr) === 0) {
+				$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+			}
+
+			$result = $this->PaabgabeModel->update(
+				$paabgabe_id,
+				array_merge($updateFields, [
+					'updatevon' => getAuthUID(),
+					'updateamum' => date('Y-m-d H:i:s')
+				])
+			);
+
+			$this->getDataOrTerminateWithError($result, 'general');
+			$results[] = getData($this->PaabgabeModel->load($paabgabe_id))[0];
+
+			$this->logLib->logInfoDB(array(
+				'paabgabe bulk updated',
+				$paabgabe_id,
+				$updateFields,
+				getAuthUID(),
+				getAuthPersonId()
+			));
+		}
+
+		$this->terminateWithSuccess($results);
+	}
+
+	/**
 	 * called by abgabetool/mitarbeiter in mitarbeiterdetail.js when deleting an abgabetermin
 	 * deletion is only possible if user is assistenz OR betreuer deletes their own custom termin
 	 * none of these roles are allowed to delete if students uploaded something for that termin
@@ -698,12 +1092,28 @@ class Abgabe extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		}
 		
-		$this->checkProjektarbeitForFinishedStatus($this->getProjektarbeitIDForPaabgabeID($paabgabe_id));
+		$projektarbeit_id = $this->getProjektarbeitIDForPaabgabeID($paabgabe_id);
+		
+		$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
 
-		$zugeordnet = $this->checkZuordnungByPaabgabe($paabgabe_id, getAuthUID());
+		
+		// load the $student_uid by $projektarbeit_id so we dont need any post params
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+		$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
+		if(isError($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingStudentForProjektarbeitID'), 'general');
+		}
+		if(!hasData($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'), 'general');
+		}
+		$data = getData($res)[0];
+		$student_uid = $data->uid;
+		$studiengang_kz = $data->studiengang_kz;
+		
+		$zugeordnet = $this->checkZuordnungByPaabgabe($paabgabe_id, getAuthUID(), $student_uid, $studiengang_kz);
 		
 		if(!$zugeordnet) {
-			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'), 'general');
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent', [getAuthUID(), $student_uid]), 'general');
 		}
 
 		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
@@ -718,9 +1128,67 @@ class Abgabe extends FHCAPI_Controller
 		$result = $this->PaabgabeModel->delete($paabgabe_id);
 		$result = $this->getDataOrTerminateWithError($result, 'general');
 
-		// TODO: consider this in nightly email job
 		$this->logLib->logInfoDB(array($paabgabeArr[0], getAuthUID(), getAuthPersonId()));
 		$this->terminateWithSuccess($result);
+	}
+
+	/**
+	 * called by abgabetool/assistenz when deleting multiple abgabetermine via the flat termine table view
+	 */
+	public function deleteProjektarbeitAbgabeMultiple() {
+		$paabgabe_ids = $this->input->post('paabgabe_ids');
+
+		if ($paabgabe_ids === NULL || !is_array($paabgabe_ids) || count($paabgabe_ids) === 0) {
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
+
+		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
+		
+		$results = [];
+		foreach ($paabgabe_ids as $paabgabe_id) {
+			$paabgabe_id = trim((string)$paabgabe_id);
+
+			if ($paabgabe_id === '') {
+				$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+			}
+
+			$this->checkProjektarbeitForFinishedStatus($this->getProjektarbeitIDForPaabgabeID($paabgabe_id));
+
+			$projektarbeit_id = $this->getProjektarbeitIDForPaabgabeID($paabgabe_id);
+
+			$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+			$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
+			if(isError($res)) {
+				$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingStudentForProjektarbeitID'), 'general');
+			}
+			if(!hasData($res)) {
+				$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'), 'general');
+			}
+			$data = getData($res)[0];
+			$student_uid = $data->uid;
+			$studiengang_kz = $data->studiengang_kz;
+
+			$zugeordnet = $this->checkZuordnungByPaabgabe($paabgabe_id, getAuthUID(), $student_uid, $studiengang_kz);
+
+			if (!$zugeordnet) {
+				$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'), 'general');
+			}
+
+			$paabgabeResult = $this->PaabgabeModel->load($paabgabe_id);
+			$paabgabeArr = $this->getDataOrTerminateWithError($paabgabeResult, 'general');
+
+			if (count($paabgabeArr) == 0) {
+				$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+			}
+
+			$result = $this->PaabgabeModel->delete($paabgabe_id);
+			$result = $this->getDataOrTerminateWithError($result, 'general');
+			$results[] = $result;
+			
+			$this->logLib->logInfoDB(array($paabgabeArr[0], getAuthUID(), getAuthPersonId()));
+		}
+
+		$this->terminateWithSuccess($results);
 	}
 
 	/**
@@ -756,16 +1224,27 @@ class Abgabe extends FHCAPI_Controller
 		// and should never unintentionally happen
 		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
-
-		$res = [];
+		
 		$abgaben = [];
 		foreach ($projektarbeit_ids as $projektarbeit_id) {
 
 			$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
+
+			// load the $student_uid by $projektarbeit_id so we dont need any post params
+			$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
+			if(isError($res)) {
+				$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingStudentForProjektarbeitID'), 'general');
+			}
+			if(!hasData($res)) {
+				$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'), 'general');
+			}
+			$data = getData($res)[0];
+			$student_uid = $data->uid;
+			$studiengang_kz = $data->studiengang_kz;
 			
-			$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID());
+			$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID(), $student_uid, $studiengang_kz);
 			if(!$zugeordnet) {
-				$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'), 'general');
+				$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent', [getAuthUID(), $student_uid]), 'general');
 			}
 			
 			$result = $this->PaabgabeModel->insert(
@@ -846,9 +1325,10 @@ class Abgabe extends FHCAPI_Controller
 	private function getProjektbetreuerEmailByProjektarbeitID($projektarbeit_id) {
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		$result = $this->ProjektarbeitModel->getProjektbetreuerEmail($projektarbeit_id);
-		$email = $this->getDataOrTerminateWithError($result, 'general');
-		
-		return $email[0]->uid ? $email[0]->uid.'@'.DOMAIN : $email[0]->private_email;
+		if(hasData($result)) {
+			$email = getData($result);
+			return $email[0]->uid ? $email[0]->uid.'@'.DOMAIN : $email[0]->private_email;
+		} else return null;
 
 	}
 
@@ -859,9 +1339,12 @@ class Abgabe extends FHCAPI_Controller
 	private function getProjektbetreuerEmailByPersonID($person_id) {
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		$result = $this->ProjektarbeitModel->getProjektbetreuerEmailByPersonID($person_id);
-		$email = $this->getDataOrTerminateWithError($result, 'general');
-
-		return $email[0]->uid ? $email[0]->uid.'@'.DOMAIN : $email[0]->private_email;
+		if(hasData($result)) {
+			$email = getData($result);
+			return $email[0]->uid ? $email[0]->uid.'@'.DOMAIN : $email[0]->private_email;
+		} else {
+			return null;
+		}
 	}
  
 	//TODO: SWITCH TO NOTEN API ONCE NOTENTOOL IS IN MASTER TO AVOID DUPLICATE API
@@ -1032,30 +1515,34 @@ class Abgabe extends FHCAPI_Controller
 
 		$projektarbeit_id = $this->input->get('projektarbeit_id');
 		$paabgabe_id = $this->input->get('paabgabe_id');
-		$student_uid = $this->input->get('student_uid');
 
 		if ($paabgabe_id === NULL || trim((string)$paabgabe_id) === ''
-			|| $projektarbeit_id === NULL || trim((string)$projektarbeit_id) === ''
-			|| $student_uid === NULL || trim((string)$student_uid) === '') {
+			|| $projektarbeit_id === NULL || trim((string)$projektarbeit_id) === '') {
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		}
 
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
-
-		// zuordnung function is supposed for mitarbeiter_uids, students should be allowed to download their own files
-		// without adapting zuordnung logic
-		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID());
-		if(getAuthUID() == $student_uid || $zugeordnet) {
-			$file_path = PAABGABE_PATH.$paabgabe_id.'_'.$student_uid.'.pdf';
-			
-			
-			if(file_exists($file_path)) {
-				$this->terminateWithFileOutput('application/octet-stream', file_get_contents($file_path), basename($file_path));
-			} else {
-				$this->terminateWithError('File not found', 'general');
-			}
+		$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
+		if(isError($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingStudentForProjektarbeitID'), 'general');
+		}
+		if(!hasData($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'), 'general');
+		}
+		$data = getData($res)[0];
+		$student_uid = $data->uid;
+		$studiengang_kz = $data->studiengang_kz;
+		
+		if(!$this->checkZuordnung($projektarbeit_id, getAuthUID(), $student_uid, $studiengang_kz)){
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent', [getAuthUID(), $student_uid]), 'general');
+		}
+		
+		$file_path = PAABGABE_PATH.$paabgabe_id.'_'.$student_uid.'.pdf';
+		
+		if(file_exists($file_path)) {
+			$this->terminateWithFileOutput('application/octet-stream', file_get_contents($file_path), basename($file_path));
 		} else {
-			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'), 'general');
+			$this->terminateWithError('File not found', 'general');
 		}
 	}
 
@@ -1099,14 +1586,33 @@ class Abgabe extends FHCAPI_Controller
 		
 		$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
 
-		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID());
+		// load the $student_uid by $projektarbeit_id so we dont need any post params
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+		$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
+		if(isError($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingStudentForProjektarbeitID'), 'general');
+		}
+		if(!hasData($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'), 'general');
+		}
+		$data = getData($res)[0];
+		$student_uid = $data->uid;
+		$studiengang_kz = $data->studiengang_kz;
+		
+		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID(), $student_uid, $studiengang_kz);
 		if(!$zugeordnet) {
-			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'), 'general');
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent', [getAuthUID(), $student_uid]), 'general');
 		}
 		
-		// update projektarbeit cols
-		$this->ProjektarbeitModel->updateProjektarbeit($projektarbeit_id,$sprache,$abstract,$abstract_en
-			,$schlagwoerter, $schlagwoerter_en, $seitenanzahl);
+		// update projektarbeit cols with zusatzdaten only
+		$this->ProjektarbeitModel->update($projektarbeit_id, array(
+			'sprache' => $sprache,
+			'seitenanzahl' => $seitenanzahl,
+			'schlagwoerter_en' => $schlagwoerter_en,
+			'schlagwoerter' => $schlagwoerter,
+			'abstract' => $abstract,
+			'abstract_en' => $abstract_en
+		));
 
 		$this->logLib->logInfoDB(array('zusatzdatenEditMitarbeiter', array(
 			'updatevon' => getAuthUID(),
@@ -1140,6 +1646,69 @@ class Abgabe extends FHCAPI_Controller
 		}
 		
 		$this->terminateWithSuccess($data);
+	}
+
+	public function sendZweitbetreuerTokenMail() {
+		$projektarbeit_id = $this->input->post('projektarbeit_id');
+		$bperson_id = $this->input->post('bperson_id');
+
+		
+		if ($projektarbeit_id === NULL || trim((string)$projektarbeit_id) === ''
+			|| $bperson_id === NULL || trim((string)$bperson_id) === '') {
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
+
+		$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
+
+		$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
+		if(isError($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingStudentForProjektarbeitID'), 'general');
+		}
+
+		if(!hasData($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'), 'general');
+		}
+		$data = getData($res)[0];
+		$student_uid = $data->uid;
+		$studiengang_kz = $data->studiengang_kz;
+		
+		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID(), $student_uid, $studiengang_kz);
+		if(!$zugeordnet) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'));
+		}
+		
+		$this->sendUploadEmailZweitbegutachterToken($bperson_id, $projektarbeit_id, $student_uid);
+	}
+
+	// basically what getStudentProjektarbeiten intends to do for the student page but 
+	// designed for the assistenz timeline component -> more extensive loading upfront
+	// with every abgabetermin fetched here aswell
+	public function fetchProjektarbeitenHistory() {
+		$student_uid = $this->input->post('student_uid');
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+
+		$projektarbeiten = $this->ProjektarbeitModel->getProjektarbeitenForStudent($student_uid);
+
+		$mapFunc = function($projektarbeit) {
+			return $projektarbeit->projektarbeit_id;
+		};
+		$projektarbeiten_ids = array_map($mapFunc, $projektarbeiten->retval);
+		
+		if(count($projektarbeiten_ids) > 0) {
+			$ret = $this->ProjektarbeitModel->getProjektarbeitenAbgabetermine($projektarbeiten_ids);
+			$projektabgaben = $this->getDataOrTerminateWithError($ret, 'general');
+		}
+
+		forEach($projektarbeiten->retval as $pa) {
+
+			$filterFunc = function($projektabgabe) use ($pa) {
+				return $projektabgabe->projektarbeit_id == $pa->projektarbeit_id;
+			};
+
+			$pa->abgabetermine = array_values(array_filter($projektabgaben, $filterFunc));
+		}
+		
+		$this->terminateWithSuccess($projektarbeiten->retval);
 	}
 
 	/**
@@ -1204,14 +1773,7 @@ class Abgabe extends FHCAPI_Controller
 		};
 		Events::trigger('projektarbeit_is_current', $projektarbeit_id, $returnFunc);
 		if(!$projektarbeitIsCurrent) {
-			$this->terminateWithError($this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeit'), 'general');
-		}
-
-		// Link to Abgabetool
-		if (defined('CIS4') && CIS4) {
-			$ci3BootstrapFilePath = "cis.php";
-		} else {
-			$ci3BootstrapFilePath = "index.ci.php";
+			$this->terminateWithError($this->p->t('abgabetool','c4fehlerPAIsNotCurrent'), 'general');
 		}
 
 		$path = $this->config->item('URL_MITARBEITER');
@@ -1225,7 +1787,6 @@ class Abgabe extends FHCAPI_Controller
 
 			// 1. Begutachter mail ohne Token
 			$mail_baselink = APP_ROOT.$this->config->item('PROJEKTARBEITSBEURTEILUNG_MAIL_BASELINK_ERSTBEGUTACHTER');
-//			$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/ProjektarbeitsbeurteilungErstbegutachter";
 			$mail_fulllink = "$mail_baselink?projektarbeit_id=".$projektarbeit_id."&uid=".$studentUser->uid;
 			$projekttyp_kurzbz = $projektarbeit->projekttyp_kurzbz;
 			$subject = $projektarbeit->projekttyp_kurzbz == 'Diplom' ? 'Masterarbeitsbetreuung' : 'Bachelorarbeitsbetreuung';
@@ -1245,7 +1806,7 @@ class Abgabe extends FHCAPI_Controller
 			$email = $this->getProjektbetreuerEmailByProjektarbeitID($projektarbeit_id);
 
 			if(!$email) $this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailBegutachterv2'), 'general');
-			
+
 			$mailres = sendSanchoMail(
 				'ParbeitsbeurteilungEndupload',
 				$maildata,
@@ -1263,89 +1824,115 @@ class Abgabe extends FHCAPI_Controller
 			// 2. Begutachter mail, wenn Endabgabe, mit Token wenn extern
 			if ($paabgabetyp_kurzbz == 'end')
 			{
-				// Zweitbegutachter holen
-				$this->load->model('education/Projektbetreuer_model', 'ProjektbetreuerModel');
-				$zweitbegutachterRetval = getData($this->ProjektbetreuerModel->getZweitbegutachterWithToken($bperson_id, $projektarbeit_id, $studentUser->uid));
+				$this->sendUploadEmailZweitbegutachterToken($bperson_id, $projektarbeit_id, $studentUser->uid);
 				
-				if ($zweitbegutachterRetval && count($zweitbegutachterRetval) > 0)
-				{
-
-					foreach ($zweitbegutachterRetval as $begutachter)
-					{
-						// token generieren, wenn noch nicht vorhanden und notwendig (wird in methode überprüft)
-						$tokenGenRes = $this->ProjektbetreuerModel->generateZweitbegutachterToken($begutachter->person_id, $projektarbeit_id);
-
-						if (!$tokenGenRes)
-						{
-							$this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailZweitBegutachterv2'), 'general');
-						}
-
-						$begutachterMitTokenRetval = getData($this->ProjektbetreuerModel->getZweitbegutachterWithToken($bperson_id, $projektarbeit_id, $studentUser->uid, $begutachter->person_id));
-						
-						if (!$begutachterMitTokenRetval && count($begutachterMitTokenRetval) <= 0)
-						{
-							$this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailZweitBegutachterv2'), 'general');
-						}
-
-						$begutachterMitToken = $begutachterMitTokenRetval[0];
-
-						$path = $begutachterMitToken->betreuerart_kurzbz == 'Zweitbegutachter' ? 'ProjektarbeitsbeurteilungZweitbegutachter' : 'ProjektarbeitsbeurteilungErstbegutachter';
-						$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/$path";
-						$mail_fulllink = "$mail_baselink?projektarbeit_id=".$projektarbeit_id."&uid=".$studentUser->uid;
-						$intern = isset($begutachterMitToken->uid);
-						$mail_link = $intern ? $mail_fulllink : $mail_baselink;
-
-						$zweitbetmaildata = array();
-						$zweitbetmaildata['geehrt'] = "geehrte" . ($begutachterMitToken->anrede == "Herr" ? "r" : "");
-						$zweitbetmaildata['anrede'] = $begutachterMitToken->anrede;
-						$zweitbetmaildata['betreuer_voller_name'] = $begutachterMitToken->voller_name;
-						$zweitbetmaildata['student_anrede'] = $maildata['student_anrede'];
-						$zweitbetmaildata['student_voller_name'] = $maildata['student_voller_name'];
-						$zweitbetmaildata['abgabetyp'] = $abgabetyp;
-						$zweitbetmaildata['parbeituebersichtlink'] = $intern ? $maildata['parbeituebersichtlink'] : "";
-						$zweitbetmaildata['bewertunglink'] = $projektarbeitIsCurrent ? "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>" : "";
-						$zweitbetmaildata['token'] = $projektarbeitIsCurrent && isset($begutachterMitToken->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $begutachterMitToken->zugangstoken . "</p>" : "";
-						
-						$mailres = sendSanchoMail(
-							'ParbeitsbeurteilungEndupload',
-							$zweitbetmaildata,
-							$begutachterMitToken->email,
-							$subject,
-							'sancho_header_min_bw.jpg',
-							'sancho_footer_min_bw.jpg',
-							get_uid()."@".DOMAIN
-						);
-
-						if (!$mailres)
-						{
-							$this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailBegutachterv2'), 'general');
-						}
-
-					}
-				}
 			}
 		}
 	}
 	
-	private function checkZuordnung($projektarbeit_id, $betreuer_uid) {
+	private function sendUploadEmailZweitbegutachterToken($bperson_id, $projektarbeit_id, $student_uid) {
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+		$projektarbeitArr = $this->getDataOrTerminateWithError($this->ProjektarbeitModel->load($projektarbeit_id));
+		if(count($projektarbeitArr) > 0) {
+			$projektarbeit = $projektarbeitArr[0];
+		} else {
+			$this->terminateWithError($this->p->t('abgabetool','c4projektarbeitNichtGefunden'), 'general');
+		}
+		
+		// Zweitbegutachter holen
+		$this->load->model('education/Projektbetreuer_model', 'ProjektbetreuerModel');
+		$zweitbegutachterRetval = getData($this->ProjektbetreuerModel->getZweitbegutachterWithToken($bperson_id, $projektarbeit_id, $student_uid));
+
+		$projektarbeitIsCurrent = false;
+		$returnFunc = function ($result) use (&$projektarbeitIsCurrent) {
+			$projektarbeitIsCurrent = $result;
+		};
+		Events::trigger('projektarbeit_is_current', $projektarbeit_id, $returnFunc);
+		if(!$projektarbeitIsCurrent) {
+			$this->terminateWithError($this->p->t('abgabetool','c4fehlerPAIsNotCurrent'), 'general');
+		}
+		
+		if ($zweitbegutachterRetval && count($zweitbegutachterRetval) > 0)
+		{
+
+			foreach ($zweitbegutachterRetval as $begutachter)
+			{
+				// token generieren, wenn noch nicht vorhanden und notwendig (wird in methode überprüft)
+				$tokenGenRes = $this->ProjektbetreuerModel->generateZweitbegutachterToken($begutachter->person_id, $projektarbeit_id);
+
+				if (!$tokenGenRes)
+				{
+					$this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailZweitBegutachterv2'), 'general');
+				}
+
+				$begutachterMitTokenRetval = getData($this->ProjektbetreuerModel->getZweitbegutachterWithToken($bperson_id, $projektarbeit_id, $student_uid, $begutachter->person_id));
+
+				if (!$begutachterMitTokenRetval && count($begutachterMitTokenRetval) <= 0)
+				{
+					$this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailZweitBegutachterv2'), 'general');
+				}
+
+				$begutachterMitToken = $begutachterMitTokenRetval[0];
+
+				$studentUser = $this->ProjektarbeitModel->getProjektarbeitBenutzer($student_uid)->retval[0];
+
+				$path = $begutachterMitToken->betreuerart_kurzbz == 'Zweitbegutachter' ? 'ProjektarbeitsbeurteilungZweitbegutachter' : 'ProjektarbeitsbeurteilungErstbegutachter';
+				$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/$path";
+				$mail_fulllink = "$mail_baselink?projektarbeit_id=".$projektarbeit_id."&uid=".$student_uid;
+				$intern = isset($begutachterMitToken->uid);
+				$mail_link = $intern ? $mail_fulllink : $mail_baselink;
+
+				// automatic email ensures that, client only exposes this method if that happened already
+				$paabgabetyp_kurzbz = 'end';
+				$abgabetyp = $paabgabetyp_kurzbz == 'end' ? 'Endabgabe' : 'Zwischenabgabe';
+
+				$path = $this->config->item('URL_MITARBEITER');
+				$url = APP_ROOT.$path;
+
+				$subject = $projektarbeit->projekttyp_kurzbz == 'Diplom' ? 'Masterarbeitsbetreuung' : 'Bachelorarbeitsbetreuung';
+
+				$zweitbetmaildata = array();
+				$zweitbetmaildata['geehrt'] = "geehrte" . ($begutachterMitToken->anrede == "Herr" ? "r" : "");
+				$zweitbetmaildata['anrede'] = $begutachterMitToken->anrede;
+				$zweitbetmaildata['betreuer_voller_name'] = $begutachterMitToken->voller_name;
+				$zweitbetmaildata['student_anrede'] = $studentUser->anrede;
+				$zweitbetmaildata['student_voller_name'] = trim($studentUser->titelpre." ".$studentUser->vorname." ".$studentUser->nachname." ".$studentUser->titelpost);
+				$zweitbetmaildata['abgabetyp'] = $abgabetyp;
+				$zweitbetmaildata['parbeituebersichtlink'] = $intern ? "<p><a href='$url'>Zur Projektarbeitsübersicht</a></p>" : "";
+				$zweitbetmaildata['bewertunglink'] = $projektarbeitIsCurrent ? "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>" : "";
+				$zweitbetmaildata['token'] = $projektarbeitIsCurrent && isset($begutachterMitToken->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $begutachterMitToken->zugangstoken . "</p>" : "";
+
+				$this->addMeta('$zweitbetmaildata', $zweitbetmaildata);
+
+				$mailres = sendSanchoMail(
+					'ParbeitsbeurteilungEndupload',
+					$zweitbetmaildata,
+					$begutachterMitToken->email,
+					$subject,
+					'sancho_header_min_bw.jpg',
+					'sancho_footer_min_bw.jpg',
+					get_uid()."@".DOMAIN
+				);
+
+				if (!$mailres)
+				{
+					$this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailBegutachterv2'), 'general');
+				}
+
+			}
+		}
+	}
+	
+	private function checkZuordnung($projektarbeit_id, $auth_uid, $student_uid, $studiengang_kz) {
 		// check if authenticated user is zugewiesen as betreuer to projektarbeit or has admin/assistenz berechtigung
 		// over the studiengang of the student working on that projektarbeit_id
 
-		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		
-		$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
-		if(isError($res)) {
-			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingStudentForProjektarbeitID'), 'general');
-		}
+		// student itself is always considered zugeordnet towards their own projektarbeit
+		if($auth_uid == $student_uid) return true;
 		
-		if(!hasData($res)) {
-			$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'), 'general');
-		}
-		$data = getData($res)[0];
-		$student_uid = $data->uid;
-		$studiengang_kz = $data->studiengang_kz;
-		
-		$res = $this->ProjektarbeitModel->checkZuordnung($student_uid, $betreuer_uid);
+		// if auth_uid is of a betreuer, look for actual betreuungszuordnung between those ids
+		$res = $this->ProjektarbeitModel->checkZuordnung($student_uid, $auth_uid);
 		if(isError($res)) {
 			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingBetreuerStudentZuordnung'), 'general');
 		}
@@ -1392,9 +1979,9 @@ class Abgabe extends FHCAPI_Controller
 		return $data->projektarbeit_id;
 	}
 	
-	private function checkZuordnungByPaabgabe($paabgabe_id, $betreuer_uid) {
+	private function checkZuordnungByPaabgabe($paabgabe_id, $auth_uid, $student_uid, $studiengang_kz) {
 		$projektarbeit_id = $this->getProjektarbeitIDForPaabgabeID($paabgabe_id);
-		return $this->checkZuordnung($projektarbeit_id, $betreuer_uid);
+		return $this->checkZuordnung($projektarbeit_id, $auth_uid, $student_uid, $studiengang_kz);
 	}
 
 	// loads a projektarbeit table row by id and looks if a note has been set. A non null note field
@@ -1409,7 +1996,13 @@ class Abgabe extends FHCAPI_Controller
 
 		$data = getData($res)[0];
 		if($data->note !== NULL) {
-			$this->terminateWithError($this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeit'), 'general');
+			// hardcode this error msg cause phrasen arent reliable and people keep bugging why the cant edit old entries they definitely shouldnt update
+			$message = $this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeitv3');
+			if(strpos($message, "<<") === 0) { // phrase could not be loaded
+				$this->terminateWithError('Die Projektarbeit wurde bereits benotet, Sie dürfen deshalb keine weiteren Termine anlegen oder bearbeiten.', 'general');
+			} else {
+				$this->terminateWithError($message);
+			}
 		}
 	}
 

@@ -706,6 +706,7 @@ class prestudent extends person
 				$rolle->bestaetigtam = $row->bestaetigtam;
 				$rolle->bestaetigtvon = $row->bestaetigtvon;
 				$rolle->fgm = $row->fgm;
+				$rolle->faktiv = $this->db_parse_bool($row->faktiv);
 				$rolle->anmerkung_status = $row->anmerkung;
 				$rolle->bewerbung_abgeschicktamum = $row->bewerbung_abgeschicktamum;
 				$rolle->rt_stufe = $row->rt_stufe;

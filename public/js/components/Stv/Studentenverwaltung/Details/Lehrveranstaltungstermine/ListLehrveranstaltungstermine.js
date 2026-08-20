@@ -2,8 +2,6 @@ import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import FormInput from "../../../../Form/Input.js";
 import FormForm from '../../../../Form/Form.js';
 
-import ApiStvCoursedates from "../../../../../api/factory/stv/coursedates.js";
-
 export default {
 	name: "TblCourseList",
 	components: {
@@ -17,7 +15,14 @@ export default {
 		},
 	},
 	props: {
-		student: Object
+		id: {
+			type: [Number, String],
+			required: true
+		},
+		endpoint: {
+			type: Object,
+			required: true
+		},
 	},
 	data(){
 		return {
@@ -48,17 +53,7 @@ export default {
 		initTabulatorOptions(){
 			this.tabulatorOptions = {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: () => this.$api.call(
-					ApiStvCoursedates.getCourselist({
-						student_uid: this.student.uid,
-						start_date: this.dataSem.start,
-						end_date: this.dataSem.ende,
-						group_consecutiveHours: true,
-						dbStundenplanTable: this.dbStundenplanTable,
-						showLvsStundenplan: true
-					})
-
-				),
+				ajaxRequestFunc: () => this.$api.call(this.endpoint.getCourselist(this.id, this.dataSem.start, this.dataSem.ende, this.dbStundenplanTable)),
 				ajaxResponse: (url, params, response) => {
 					return response.data;
 				},
@@ -134,7 +129,7 @@ export default {
 			this.dataSem = this.listStudiensemester.find(item => item.studiensemester_kurzbz === studiensemester_kurzbz);
 		},
 		exportToExcel(){
-			window.open(this.downloadLink, '_blank');
+			window.open(this.endpoint.exportCalendar(this.id, this.dbStundenplanTable), '_blank');
 		},
 		reload() {
 			this.$refs.table.reloadTable();
@@ -148,10 +143,13 @@ export default {
 		currentSemester(newVal, oldVal) {
 			this.getDatesOfSemester(newVal);
 		},
+		id() {
+			this.reload();
+		}
 	},
 	created(){
 		this.$api
-			.call(ApiStvCoursedates.getStudiensemester())
+			.call(this.endpoint.getStudiensemester())
 			.then(result => {
 				this.listStudiensemester = result.data;
 				this.getDatesOfSemester(this.currentSemester);
