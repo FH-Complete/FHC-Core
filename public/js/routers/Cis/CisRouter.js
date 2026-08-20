@@ -19,6 +19,7 @@ import PaabgabeUebersicht from "../../components/Cis/ProjektabgabeUebersicht/Pro
 import Benotungstool from "../../components/Cis/Benotungstool/Benotungstool.js";
 import Zeitsperren from "../../components/Cis/Zeitsperren/Zeitsperren.js";
 import Compat from "../../components/Cis/Compat.js";
+import ZeitsperrenMa from "../../components/Cis/ZeitsperrenMitarbeiter/ZeitsperrenMa.js";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 const isMobile = window.matchMedia("(max-width: 767px)").matches;
@@ -252,6 +253,23 @@ const router = VueRouter.createRouter({
 			component: FhcDashboard,
 			props: {dashboard: 'CIS'},
 		},
+		{
+			path: '/Cis/Zeitsperrenma/:type(all|fix|lector|ma|oe|stg|ass)?/:id?/:days?',
+			name: 'ZeitsperrenMa',
+			component: ZeitsperrenMa,
+			props: route => {
+				//console.log('ROUTE PARAMS', route.params);
+				return {
+					propsViewData: route.params
+				};
+			}
+		},
+		{
+			path: `/Cis/Zeitsperren`,
+			name: 'Zeitsperren',
+			component: Zeitsperren,
+			props: true
+		},
 /*
  *	TODO(ma0080): 2026-07-06: commented out => check if needed
  *
@@ -270,12 +288,6 @@ const router = VueRouter.createRouter({
 			},
 		},
  */
-		{
-			path: `/Cis/Zeitsperren`,
-			name: 'Zeitsperren',
-			component: Zeitsperren,
-			props: true
-		},
 	]
 });
 

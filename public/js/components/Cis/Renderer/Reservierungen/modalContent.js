@@ -92,6 +92,14 @@ export default {
 					</tr>
 					<tr>
 						<th>{{
+							$p.t('lehre','gruppe')?
+							$p.t('lehre','gruppe')+':'
+							:''
+						}}</th>
+						<td>{{event.gruppe[0].kuerzel.split("/")[0]}}</td>
+					</tr>
+					<tr>
+						<th>{{
 							$p.t('lehre','lektor')?
 							$p.t('lehre','lektor')+':'
 							:''

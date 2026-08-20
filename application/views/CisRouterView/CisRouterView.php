@@ -11,7 +11,6 @@ $includesArray = array(
 	'skipID' => '#fhccontent',
 	'vuedatepicker11' => true,
 	'customCSSs' => array(
-		'vendor/vuejs/vuedatepicker_css/main.css',
 		'public/css/components/verticalsplit.css',
 		'public/css/components/searchbar/searchbar.css',
 		'public/css/Fhc.css',
@@ -27,6 +26,8 @@ $includesArray = array(
 		'public/css/Cis4/Studium.css',
 		'public/css/Cis4/Benotungstool.css',
 		'public/css/Cis4/Zeitsperren.css',
+		'public/css/components/Zeitsperren.css', //70747
+		'public/css/Cis4/Zeitsperren.css', //77941
 	),
 	'customJSs' => array(
 		'vendor/npm-asset/primevue/accordion/accordion.min.js',
