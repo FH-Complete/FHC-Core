@@ -23,6 +23,8 @@ import PaabgabeUebersicht from "../../components/Cis/ProjektabgabeUebersicht/Pro
 import Benotungstool from "../../components/Cis/Benotungstool/Benotungstool.js";
 import Zeitsperren from "../../components/Cis/Zeitsperren/Zeitsperren.js";
 import Compat from "../../components/Cis/Compat.js";
+import ZeitsperrenMa from "../../components/Cis/ZeitsperrenMitarbeiter/ZeitsperrenMa.js";
+import Zeitsperren from "../../components/Cis/Zeitsperren/Zeitsperren.js";
 
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
 import {capitalize} from "../../helpers/StringHelpers.js";
@@ -261,6 +263,23 @@ const router = VueRouter.createRouter({
 			props: {dashboard: 'CIS'},
 		},
 		{
+			path: '/Cis/Zeitsperrenma/:type(all|fix|lector|ma|oe|stg|ass)?/:id?/:days?',
+			name: 'ZeitsperrenMa',
+			component: ZeitsperrenMa,
+			props: route => {
+				//console.log('ROUTE PARAMS', route.params);
+				return {
+					propsViewData: route.params
+				};
+			}
+		},
+		{
+			path: `/Cis/Zeitsperren`,
+			name: 'Zeitsperren',
+			component: Zeitsperren,
+			props: true
+		},
+		{
 			path: '/:pathMatch(.*)*',
 			name: 'Fallback',
 			component: FhcDashboard,
@@ -273,12 +292,6 @@ const router = VueRouter.createRouter({
 					},
 				};
 			},
-		},
-		{
-			path: `/Cis/Zeitsperren`,
-			name: 'Zeitsperren',
-			component: Zeitsperren,
-			props: true
 		},
 	]
 })
