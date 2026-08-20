@@ -24,7 +24,6 @@ import Benotungstool from "../../components/Cis/Benotungstool/Benotungstool.js";
 import Zeitsperren from "../../components/Cis/Zeitsperren/Zeitsperren.js";
 import Compat from "../../components/Cis/Compat.js";
 import ZeitsperrenMa from "../../components/Cis/ZeitsperrenMitarbeiter/ZeitsperrenMa.js";
-import Zeitsperren from "../../components/Cis/Zeitsperren/Zeitsperren.js";
 
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
 import {capitalize} from "../../helpers/StringHelpers.js";
