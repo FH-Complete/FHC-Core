@@ -341,6 +341,7 @@ export default {
 				});
 		},
 		actionNewNotiz() {
+			console.log("auf plus");
 			this.resetFormData();
 			this.getDefaultVerfasser();
 			if(this.notizLayout == 'popupModal') {
@@ -665,9 +666,21 @@ export default {
 					<div class="row mb-3">
 						<label for="bis" class="form-label col-sm-2">{{$p.t('notiz','verfasser')}}</label>
 											
-						<div class="col-sm-3">
-							<input type="text" readonly="readonly" class="form-control" id="name" v-model="currentVerfasserUid">
-						</div>
+						<form-input
+							type="autocomplete"
+							container-class="col-3"
+							v-model="selectedVerfasser"
+							optionLabel="label"
+							optionValue="uid"
+							disabled
+							dropdown
+							forceSelection
+							name="bearbeiter"
+							:suggestions="filteredMitarbeiter"
+							@complete="searchMitarbeiter"
+							:min-length="3"
+							>
+						</form-input>
 						
 						<label for="von" class="form-label col-sm-1">{{$p.t('global','gueltigVon')}}</label>
 						<div class="col-sm-3">
@@ -688,21 +701,20 @@ export default {
 					<div class="row mb-3">
 						<label for="bis" class="form-label col-sm-2">{{$p.t('notiz','bearbeiter')}}</label>
 						
-						<div v-if="notizData.bearbeiter_uid" class="col-sm-3">
-							<input type="text" class="form-control" id="name" v-model="notizData.bearbeiter_uid">
-						</div>
-						
-						<div v-else class="col-sm-3">
-							<form-input
-								type="autocomplete"
-								v-model="notizData.intBearbeiter"
-								:suggestions="filteredMitarbeiter" 
-								@complete="search" 
-								optionLabel="mitarbeiter"
-								minlength="3"
+						<form-input
+							type="autocomplete"
+							container-class="col-3"
+							v-model="selectedBearbeiter"
+							optionLabel="label"
+							optionValue="uid"
+							dropdown
+							forceSelection
+							name="bearbeiter"
+							:suggestions="filteredMitarbeiter"
+							@complete="searchMitarbeiter"
+							:min-length="3"
 							>
-							</form-input>
-						</div>
+						</form-input>
 						
 						
 						<label for="bis" class="form-label col-sm-1">{{$p.t('global','gueltigBis')}}</label>
@@ -860,35 +872,36 @@ export default {
 							</div>
 							
 							<div class="row mb-3">
-								<form-input 
+								<form-input
+									type="autocomplete"
 									container-class="col-6"
 									:label="$p.t('notiz', 'verfasser')"
-									type="text"
-									readonly="readonly"
-									v-model="currentVerfasserUid"
-									name="verfasser"
+									v-model="selectedVerfasser"
+									optionLabel="label"
+									optionValue="uid"
+									disabled
+									dropdown
+									forceSelection
+									name="bearbeiter"
+									:suggestions="filteredMitarbeiter"
+									@complete="searchMitarbeiter"
+									:min-length="3"
 									>
 								</form-input>
 
 								<form-input
-									v-if="notizData.bearbeiter_uid"
-									container-class="col-6"
-									:label="$p.t('notiz', 'bearbeiter')"
-									v-model="notizData.bearbeiter_uid"
-									minlength="3"
-									>
-								</form-input>
-								
-								<form-input
-									v-else
-									container-class="col-6"
-									:label="$p.t('notiz', 'bearbeiter')"
 									type="autocomplete"
-									v-model="notizData.intBearbeiter"
-									:suggestions="filteredMitarbeiter" 
-									@complete="search" 
-									optionLabel="mitarbeiter"
-									minlength="3"
+									container-class="col-6"
+									:label="$p.t('notiz', 'bearbeiter')"
+									v-model="selectedBearbeiter"
+									optionLabel="label"
+									optionValue="uid"
+									dropdown
+									forceSelection
+									name="bearbeiter"
+									:suggestions="filteredMitarbeiter"
+									@complete="searchMitarbeiter"
+									:min-length="3"
 									>
 								</form-input>	
 							</div>
@@ -1013,37 +1026,38 @@ export default {
 							
 					
 							<div class="row mb-3">
-								<form-input 
+								<form-input
+									type="autocomplete"
 									container-class="col-6"
 									:label="$p.t('notiz', 'verfasser')"
-									type="text"
-									readonly="readonly"
-									v-model="currentVerfasserUid"
-									name="verfasser"
+									v-model="selectedVerfasser"
+									optionLabel="label"
+									optionValue="uid"
+									disabled
+									dropdown
+									forceSelection
+									name="bearbeiter"
+									:suggestions="filteredMitarbeiter"
+									@complete="searchMitarbeiter"
+									:min-length="3"
 									>
 								</form-input>
 								
 								<form-input
-									v-if="notizData.bearbeiter_uid"
-									container-class="col-6"
-									:label="$p.t('notiz', 'bearbeiter')"
-									v-model="notizData.bearbeiter_uid"
-									minlength="3"
-									>
-								</form-input>
-								
-								<form-input
-									v-else
-									container-class="col-6"
-									:label="$p.t('notiz', 'bearbeiter')"
 									type="autocomplete"
-									v-model="notizData.intBearbeiter"
-									:suggestions="filteredMitarbeiter" 
-									@complete="search" 
-									optionLabel="mitarbeiter"
-									minlength="3"
+									container-class="col-6"
+									:label="$p.t('notiz', 'bearbeiter')"
+									v-model="selectedBearbeiter"
+									optionLabel="label"
+									optionValue="uid"
+									dropdown
+									forceSelection
+									name="bearbeiter"
+									:suggestions="filteredMitarbeiter"
+									@complete="searchMitarbeiter"
+									:min-length="3"
 									>
-								</form-input>	
+								</form-input>
 							</div>
 															
 							<div class="row mb-3">
