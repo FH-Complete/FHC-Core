@@ -145,3 +145,8 @@
 	float: right;
 	margin-top: 3px;
 }
+
+.btn-hover {
+	--bs-btn-hover-bg:  #e9ecef;
+	--bs-btn-hover-border-color: #e9ecef;
+}

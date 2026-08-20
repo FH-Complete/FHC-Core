@@ -69,6 +69,11 @@ $route['Cis/OtherLvPlan/.*'] = 'Cis/OtherLvPlan/index/$1';
 $route['Cis/StgOrgLvPlan/.*'] = 'Cis/StgOrgLvPlan/index/$1';
 $route['Cis/Benotungstool/.*'] = 'Cis/Benotungstool/index/$1';
 
+//Route for Zeitsperrenma
+$route['Cis/Zeitsperrenma/.*'] = 'Cis/Zeitsperrenma/index/$1';
+//Route für Zeitsperren
+$route['Cis/Zeitsperren/.*'] = 'Cis/Zeitsperren/index/$1';
+
 $route['Abgabetool/Assistenz'] = 'Cis/Abgabetool/Assistenz';
 $route['Abgabetool/Assistenz/(:any)'] = 'Cis/Abgabetool/Assistenz/$1';
 $route['Abgabetool/Mitarbeiter'] = 'Cis/Abgabetool/Mitarbeiter';
