@@ -114,6 +114,7 @@ class LvPlan extends FHCAPI_Controller
 
 		// fetching lvplan events
 		$result = $this->stundenplanlib->getEventsUser($start_date, $end_date, $uid);
+		$this->addMeta('bhsql', $this->db->last_query());
 		$lvplanEvents = $this->getDataOrTerminateWithError($result);
 
 		// fetching moodle events

@@ -561,6 +561,7 @@ class Stundenplan_model extends DB_Model
 		$query =
 		"select sp.*
 		from lehre.vw_".$db_stpl_table." sp
+		left join lehre.tbl_lehreinheit le on le.lehreinheit_id = sp.lehreinheit_id
 		WHERE
 		sp.datum >= ".$this->escape($start_date)."
 		AND sp.datum <= ".$this->escape($end_date);
@@ -610,11 +611,12 @@ class Stundenplan_model extends DB_Model
 				}
 				foreach($studentlehrverbaende[$sem_date] as $key=>$lehrverband)
 				{
-					$query .= "(((sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND sp.verband = ".$this->escape($lehrverband->verband)." AND sp.gruppe = ".$this->escape($lehrverband->gruppe)." AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)." AND ".$this->escape($sem_date_range->ende).")";
+					$studsemclause = "(le.studiensemester_kurzbz IS NULL OR le.studiensemester_kurzbz = " . $this->escape($lehrverband->studiensemester_kurzbz) . ")";
+					$query .= "(((" . $studsemclause . " AND sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND sp.verband = ".$this->escape($lehrverband->verband)." AND sp.gruppe = ".$this->escape($lehrverband->gruppe)." AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)." AND ".$this->escape($sem_date_range->ende).")";
 					// Eintraege fuer den ganzen Verband
-					$query .= "OR (sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND sp.verband = ".$this->escape($lehrverband->verband)." AND (sp.gruppe is null OR sp.gruppe='') AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)." AND ".$this->escape($sem_date_range->ende).")";
+					$query .= "OR (" . $studsemclause . " AND sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND sp.verband = ".$this->escape($lehrverband->verband)." AND (sp.gruppe is null OR sp.gruppe='') AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)." AND ".$this->escape($sem_date_range->ende).")";
 					// Eintraege fuer das ganze Semester
-					$query .= "OR (sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND (sp.verband is null OR sp.verband='') AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)
+					$query .= "OR (" . $studsemclause . " AND sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND (sp.verband is null OR sp.verband='') AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)
 						." AND ".$this->escape($sem_date_range->ende).")) AND gruppe_kurzbz is null)";
 
 					$query .="OR";
