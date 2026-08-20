@@ -2,6 +2,7 @@ import FhcCalendar from "../../Calendar/LvPlan.js";
 
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
+import ApiRoomPlan from '../../../api/factory/calendar/roomPlan.js';
 
 export const DEFAULT_MODE_LVPLAN_DESKTOP = "Week";
 export const DEFAULT_MODE_LVPLAN_MOBILE = "List";
@@ -134,6 +135,24 @@ export default {
 			this.isMitarbeiter = authInfo.isMitarbeiter;
 			this.isStudent = authInfo.isStudent;
 		},
+		deleteEvent(event) {
+			if (event.type === "reservierung") {
+				this.deleteReservation(event);
+			}
+		},
+		async deleteReservation(event) {
+			if (
+				luxon.DateTime.fromISO(`${event.datum}T${event.beginn}`) <
+				luxon.DateTime.now()
+			)
+				return;
+
+			await this.$api.call(
+				ApiRoomPlan.deleteRoomReservation(event.reservierung_id),
+			);
+
+			this.$refs.calendar.reset();
+		},
 	},
 	async created() {
 		await this.fetchAuthInfo();
@@ -157,6 +176,7 @@ export default {
 			@update:date="handleChangeDate"
 			@update:mode="handleChangeMode"
 			@update:range="updateRange"
+			@delete-event="(event) => deleteEvent(event)"
 			class="responsive-calendar"
 		>
 			<div

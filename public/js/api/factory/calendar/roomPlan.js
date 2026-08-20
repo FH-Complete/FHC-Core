@@ -40,5 +40,14 @@ export default {
 				reservierung_id: reservierung_id
 			}
 		};
+	},
+	getGroupOptions(studiengangKz) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/calendar/RoomPlan/getGroupOptions',
+			params: {
+				studiengangKz
+			}
+		};
 	}
 }
