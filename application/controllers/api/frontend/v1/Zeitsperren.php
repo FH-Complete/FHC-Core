@@ -7,11 +7,11 @@ class Zeitsperren extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getZeitsperrenUser' => self::PERM_LOGGED,
-			'getTypenZeitsperren' => self::PERM_LOGGED,
-			'getTypenErreichbarkeit' => self::PERM_LOGGED,
-			'getStunden' => self::PERM_LOGGED,
-			'loadZeitsperre' => self::PERM_LOGGED,
+			'getZeitsperrenUser' => ['basis/mitarbeiter:r', 'admin:r', 'assistenz:r'],
+			'getTypenZeitsperren' => ['basis/mitarbeiter:r', 'admin:r', 'assistenz:r'],
+			'getTypenErreichbarkeit' => ['basis/mitarbeiter:r', 'admin:r', 'assistenz:r'],
+			'getStunden' => ['basis/mitarbeiter:r', 'admin:r', 'assistenz:r'],
+			'loadZeitsperre' => ['basis/mitarbeiter:r', 'admin:r', 'assistenz:r'],
 			'add' => self::PERM_LOGGED,
 			'update' => self::PERM_LOGGED,
 			'delete' => self::PERM_LOGGED,

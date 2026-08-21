@@ -12,9 +12,9 @@ class Funktionen extends FHCAPI_Controller
 		parent::__construct(array(
 				'getAllFunctions' =>  ['admin:r', 'assistenz:r'],
 				'getAllUserFunctions' =>  ['admin:r', 'assistenz:r'],
-				'getOrgHeads' =>  ['admin:r', 'assistenz:r'],
-				'getOrgetsForCompany' => ['admin:r', 'assistenz:r'],
-				'getAllOrgUnits' => ['admin:r', 'assistenz:r'],
+				'getOrgHeads' =>  self::PERM_LOGGED,
+				'getOrgetsForCompany' => self::PERM_LOGGED,
+				'getAllOrgUnits' => self::PERM_LOGGED,
 				'loadFunction' => ['admin:r', 'assistenz:r'],
 				'insertFunction' => ['admin:rw', 'assistenz:rw'],
 				'updateFunction' => ['admin:rw', 'assistenz:rw'],
