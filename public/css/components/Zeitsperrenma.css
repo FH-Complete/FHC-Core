@@ -1,0 +1,15 @@
+.item-inactive {
+    text-decoration: line-through;
+}
+
+.table-scroll {
+    height: calc(100vh - 300px);
+    overflow: auto;
+}
+
+.zeitsperrenma-content thead th {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 2;
+}

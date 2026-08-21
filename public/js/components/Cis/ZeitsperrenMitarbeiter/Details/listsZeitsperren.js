@@ -454,8 +454,10 @@ export default {
 		}
 	},
 	template: `
-	<div class="w-100 h-100">
-		<div class="sticky-top bg-white p-3 border-bottom">
+	<div class="zeitsperrenma-container">
+
+		<!-- header-->
+		<div class="zeitsperrenma-header">
 			<h4 class="mt-3"><span v-if="type=='all'">{{$p.t('zeitsperren/title_allMa')}}</span>
 				<span v-if="type=='fix'">{{$p.t('zeitsperren/title_fix')}}</span>
 				<span v-if="type=='lector'">{{$p.t('zeitsperren/title_fixLecturers')}}</span>
@@ -534,43 +536,46 @@ export default {
 			</div>
 		</div>
 
-		<table v-if="showTable" class="table table-striped table-bordered">
-			<thead>
-				<tr>
-				  <th scope="col"> UID </th>
-					<th v-for="day in days" :key="day.date">
-						<div>{{ day.weekday }}</div>
-						<div>{{ day.day }}</div>
-					</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr
-					v-for="m in mitarbeiter"
-					:key="m.uid"
-				>
-					<td>{{m.sperren[0].nachname}} {{m.sperren[0].vorname}}</td>
-					<td
-						v-for="day in days"
-						:key="day.date"
-						:class="{ 'table-warning': day.weekday === 'Sa' || day.weekday === 'So' }"
+		<!-- table-->
+		<div class="zeitsperrenma-content table-scroll">
+			<table v-if="showTable" class="table table-striped table-bordered">
+				<thead>
+					<tr>
+					  <th scope="col"> UID </th>
+						<th v-for="day in days" :key="day.date">
+							<div>{{ day.weekday }}</div>
+							<div>{{ day.day }}</div>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr
+						v-for="m in mitarbeiter"
+						:key="m.uid"
 					>
-						<template v-if="sperre = getSperre(m, day.date)">
-							{{$p.t('zeitsperren/abwesend')}}
-							<div v-if="sperre.kurzbz">
-								V: <a :href="link(sperre.vertretung_uid)">
-								{{ sperre.kurzbz }}
-							</a>
-							</div>
-							<div v-if="sperre.erreichbarkeit_kurzbz">E: {{ sperre.erreichbarkeit_kurzbz }}</div>
-						</template>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+						<td>{{m.sperren[0].nachname}} {{m.sperren[0].vorname}}</td>
+						<td
+							v-for="day in days"
+							:key="day.date"
+							:class="{ 'table-warning': day.weekday === 'Sa' || day.weekday === 'So' }"
+						>
+							<template v-if="sperre = getSperre(m, day.date)">
+								{{$p.t('zeitsperren/abwesend')}}
+								<div v-if="sperre.kurzbz">
+									V: <a :href="link(sperre.vertretung_uid)">
+									{{ sperre.kurzbz }}
+								</a>
+								</div>
+								<div v-if="sperre.erreichbarkeit_kurzbz">E: {{ sperre.erreichbarkeit_kurzbz }}</div>
+							</template>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div v-if="!arrayMaTimelocks.length">
+				<p>{{$p.t('ui/keineEintraegeGefunden')}}</p>
+			</div>
 
-		<div v-if="!arrayMaTimelocks.length">
-			<p>{{$p.t('ui/keineEintraegeGefunden')}}</p>
 		</div>
 	</div>
 	`,
