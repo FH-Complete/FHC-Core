@@ -155,7 +155,7 @@ class MaZeitsperren extends FHCAPI_Controller
 		{
 			$this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Mitarbeiter UID']), self::ERROR_TYPE_GENERAL);
 		}
-		$this->load->model('ressource/Person_model', 'PersonModel');
+		$this->load->model('person/Person_model', 'PersonModel');
 		$result = $this->PersonModel->getFullName($uid);
 
 		$data = $this->getDataOrTerminateWithError($result);
