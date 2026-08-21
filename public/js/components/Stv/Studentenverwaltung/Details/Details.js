@@ -303,6 +303,7 @@ export default {
 						:label="$p.t('person', 'geburtsdatum')"
 						type="DatePicker"
 						v-model="data.gebdatum"
+						model-type="yyyy-MM-dd"
 						name="gebdatum"
 						:clearable="false"
 						no-today
@@ -401,7 +402,7 @@ export default {
 						name="foto"
 						@actionbutton-clicked="sendInfomail"
  						>
- 						<img alt="No Image" :src="noImageSrc" class="w-100">
+ 						<img alt="No Image" :src="noImageSrc" />
 					</form-input>
 					<form-input
 						v-if="!config.hiddenFields.includes('anmerkung')"

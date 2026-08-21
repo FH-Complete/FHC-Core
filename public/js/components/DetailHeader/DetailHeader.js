@@ -59,10 +59,6 @@ export default {
 			from: 'configStvTagsEnabled',
 			default: false
 		},
-		currentSemester: {
-			from: 'currentSemester',
-			required: true
-		},
 		lists: {
 			from: 'lists',
 			required: true
@@ -85,6 +81,9 @@ export default {
 		},
 		hasTileGammaSlot() {
 			return !!this.$slots.titleGammaTile
+		},
+		hasTileDeltaSlot() {
+			return !!this.$slots.titleDeltaTile
 		},
 		hasTileUIDSlot() {
 			return !!this.$slots.uid
@@ -293,14 +292,24 @@ export default {
 					this.semesterDates.ende
 				);
 
-			this.$refs.tagWrapper.innerHTML = '';
-			this.$refs.tagWrapper.appendChild(container);
+			if(this.headerData.length == 1) {
+				this.$refs.tagWrapper.innerHTML = '';
+				this.$refs.tagWrapper.appendChild(container);
+			}
 		},
 		getAllTags(prestudent_id){
 			return this.$api
 				.call(ApiTag.getAllTagsPrestudent({prestudent_id}))
 				.then(result => {
-					this.tagData = result.data;
+					this.tagData = result.data.sort((a, b) => {
+						let adone = a.done ? 1 : 0;
+						let bdone = b.done ? 1 : 0;
+
+						if (adone !== bdone) {
+							return adone - bdone;
+						}
+						return a.prioritaet - b.prioritaet;
+					});
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -317,8 +326,10 @@ export default {
 			this.reload();
 		},
 		rebuildPrestudentTags(){
+			const id = [this.headerData[0].prestudent_id];
+
 			const params = {
-				id : this.headerData[0].prestudent_id,
+				ids: id,
 				typeId: 'prestudent_id',
 				sem: this.currentSemester
 			};
@@ -389,32 +400,37 @@ export default {
 
 				<div v-if="headerData.length == 1">
 					<div v-if="!isLoading" class="d-flex align-items-center gap-3">
-						<h2 class="h4">
+						<h2 class="h4 mt-2">
 							{{headerData[0].titelpre}}
 							{{headerData[0].vorname}}
 							{{headerData[0].nachname}}
 							<span v-if="headerData[0].titelpost">, </span>
 							{{headerData[0].titelpost}}
 						</h2>
-						<core-tag ref="tagComponent"
-							v-if="tagsEnabled"
-							:endpoint="tagEndpoint"
-							:values="prestudentIds"
-							@added="addedTag"
-							@deleted="deletedTag"
-							@updated="updatedTag"
-							zuordnung_typ="prestudent_id"
-						></core-tag>
-						<div
-							role="button"
-							v-if="tagsEnabled"
-							@click="rebuildPrestudentTags"
-							class="btn btn-outline btn-light mb-1"
-							:title="'Automatische Tags fuer ' + currentSemester + ' neu laden'"
-							>
-							<i class="fa-solid fa-refresh pe-1"></i>
-							<span>{{currentSemester}}</span>
+
+						<div class="d-flex border rounded align-items-center ps-1">
+							<core-tag ref="tagComponent"
+								v-if="tagsEnabled"
+								:endpoint="tagEndpoint"
+								:values="prestudentIds"
+								:show-hover="true"
+								@added="addedTag"
+								@deleted="deletedTag"
+								@updated="updatedTag"
+								zuordnung_typ="prestudent_id"
+							></core-tag>
+							<div
+								role="button"
+								v-if="tagsEnabled"
+								@click="rebuildPrestudentTags"
+								class="btn btn-outline btn-sm btn-hover m-1"
+								:title="$p.t('tag','rebuild_tags') +  ' ' + currentSemester"
+								>
+								<i class="fa-solid fa-refresh pe-1"></i>
+								<span>{{currentSemester}}</span>
+							</div>
 						</div>
+
 						<h6  v-if="headerData[0].unruly" class="badge" :class="'bg-unruly rounded-0'"><strong>unruly</strong></h6>
 					</div>
 					<div v-else class="d-flex align-items-center gap-3">
@@ -437,6 +453,12 @@ export default {
 							{{headerData[0].verband}}
 						<strong v-if="headerData[0].gruppe !== null && headerData[0].gruppe != ' '" class="text-muted"> | {{$p.t('lehre', 'gruppe')}} </strong>
 							{{headerData[0].gruppe}}
+						<strong v-if="headerData[0].status=='Interessent'
+							|| headerData[0].status=='Aufgenommener'
+							|| headerData[0].status=='Bewerber'
+							|| headerData[0].status=='Wartender'"
+							class="text-muted"> | Einstiegssemester {{headerData[0].semester_berechnet}}
+						</strong>
 					</template>
 					<template v-else>
 					<strong class="text-muted"> | {{$p.t('lehre', 'semester')}} </strong>
@@ -456,6 +478,13 @@ export default {
 					<span v-else>
 						<pv-skeleton width="10rem"></pv-skeleton>
 					</span>
+					<strong class="text-muted"> | {{$p.t('ui', 'private')}} </strong>
+					<span v-if="!isLoading">
+						<a :href="'mailto:'+headerData[0]?.mail_privat">{{headerData[0].mail_privat}}</a>
+					</span>
+					<span v-else>
+						<pv-skeleton width="10rem"></pv-skeleton>
+					</span>
 					<strong class="text-muted"> | Status </strong>
 					<span v-if="noCurrentStatus">
 						<strong class="text-danger">{{$p.t('lehre', 'textNoStatusInSem', { sem: currentSemester}) }}</strong>
@@ -470,6 +499,13 @@ export default {
 				<div class="d-flex py-1">
 					<div class="px-2" style="min-width: 100px;">
 						<slot name="issues"></slot>
+					</div>
+					<div v-if="hasTileDeltaSlot" class="px-2" style="border-left: 1px solid #EEE">
+						<h4 class="mb-1 text-center"><slot name="titleDeltaTile"></slot></h4>
+						<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
+							<pv-skeleton v-if="isLoading" width="4rem"></pv-skeleton>
+							<slot v-else name="valueDeltaTile"></slot>
+						</h6>
 					</div>
 					<div v-if="hasTileGammaSlot" class="px-2" style="border-left: 1px solid #EEE">
 						<h4 class="mb-1 text-center"><slot name="titleGammaTile"></slot></h4>
@@ -590,6 +626,13 @@ export default {
 					<div class="d-flex py-1">
 						<div class="px-2" style="min-width: 100px;">
 							<slot name="issues"></slot>
+						</div>
+						<div v-if="hasTileDeltaSlot" class="px-2" style="border-left: 1px solid #EEE">
+							<h4 class="mb-1 text-center"><slot name="titleDeltaTile"></slot></h4>
+							<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
+								<pv-skeleton v-if="isLoading" width="4rem"></pv-skeleton>
+								<slot v-else name="valueDeltaTile"></slot>
+							</h6>
 						</div>
 						<div v-if="hasTileGammaSlot" class="px-2" style="border-left: 1px solid #EEE">
 							<h4 class="mb-1 text-center"><slot name="titleGammaTile"></slot></h4>

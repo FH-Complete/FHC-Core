@@ -1,6 +1,27 @@
 <?php
 
 $config['number_displayed_past_studiensemester_default'] = 5;
+
+# Additional columns:
+/*
+$config["list_columns"] = [
+	'fieldname' => [
+		'js' => 'path/to/snippet.js', // tabulator config snippet (eg: return { name: 'Name', field: 'fieldname' }; )
+		'default' => "SQL SELECT statement for value",
+		'joins' => [
+			// additional joins needed for the SELECT statement above
+			[
+				'tablename',
+				'join condition', // single fieldname for USING or full condition for ON
+				'LEFT|RIGHT', // optional - join type
+				'after_xxx|before_xxx|end' // optional - position in query
+			]
+			// ...
+		]
+	]
+];
+*/
+
 $config['tabs'] =
 	[
 		'details' => [
@@ -60,7 +81,13 @@ $config['tabs'] =
 		],
 		'notes' => [
 			//if true, the count of Messages will be shown in the header of the Tab Messages
-			'showCountNotes' => true
+			'showCountNotes' => true,
+
+			//if true: section with following fields will be displayed: 'verfasser', 'bearbeiter', 'von', 'bis' and 'erledigt'
+			'showErweitert' => false,
+
+			//notizlayout: choose of "classicFas", "twoColumnsFormLeft", twoColumnsFormRight, popupModal"
+			'notizLayout' => 'popupModal'
 		],
 		'combinePeople' => [
 			//multitab should only be shown with this length of selection
@@ -150,4 +177,8 @@ $config['stv_prestudent_tags'] = [
 	'unterbrecher_auto' => ['readonly' => true],
 	'stbtr_erh_auto' => ['readonly' => true],
 	'jgv_auto' => ['readonly' => true],
+	'in_auto' => ['readonly' => true],
+	'preabbr_auto' => ['readonly' => true],
 ];
+
+$config['userAutomatedTags'] = 'sftest';

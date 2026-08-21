@@ -36,7 +36,8 @@ class Ort extends FHCAPI_Controller
 			'ContentID' => self::PERM_LOGGED,
 			'getOrtKurzbzContent' => self::PERM_LOGGED,
 			'getRooms' => self::PERM_LOGGED,
-			'getTypes' => self::PERM_LOGGED
+			'getTypes' => self::PERM_LOGGED,
+			'getRoomInfo' => self::PERM_LOGGED
 		]);
 
 		$this->load->model('ressource/Ort_model', 'OrtModel');
@@ -74,6 +75,8 @@ class Ort extends FHCAPI_Controller
 		$vonStunde = getData($this->StundeModel->getStundeForTime($von))[0]->stunde;
 		$bisStunde = getData($this->StundeModel->getStundeForTime($bis))[0]->stunde;
 		
+		$this->load->model('ressource/Ort_model', 'OrtModel');
+
 		$params = array();
 		$qry = "SELECT DISTINCT tbl_ort.*
 			FROM public.tbl_ort JOIN public.tbl_ortraumtyp USING(ort_kurzbz)
@@ -173,6 +176,17 @@ class Ort extends FHCAPI_Controller
 		$content = hasData($content) ? getData($content) : null;
 
 		$this->terminateWithSuccess($content);
+	}
+
+	public function getRoomInfo()
+	{
+		$ortKurzbz = $this->input->get("ortKurzbz");
+
+		$roomResult = $this->OrtModel->getRoomInfo($ortKurzbz);
+		$roomData = $this->getDataOrTerminateWithError($roomResult);
+		$room = count($roomData) ? $roomData[0] : null;
+		
+		$this->terminateWithSuccess($room);
 	}
 }
 

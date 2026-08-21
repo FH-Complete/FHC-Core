@@ -2,6 +2,7 @@ import FhcCalendar from "../../Calendar/LvPlan.js";
 
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiRoomPlan from '../../../api/factory/calendar/roomPlan.js';
+import ApiRoom from '../../../api/factory/ort.js';
 
 export const DEFAULT_MODE_RAUMINFO_MOBILE = 'List';
 export const DEFAULT_MODE_RAUMINFO_DESKTOP = 'Week';
@@ -33,27 +34,13 @@ export default {
 				scope: 'slot_room',
 				show_all_fields: false,
 				room_create_information: {
-					semester: [1, 2, 3, 4, 5, 6, 7, 8],
-						verband: ['A', 'B', 'C', 'D', 'E', 'F', 'V'],
-					gruppe: [1, 2, 3, 4],
 					studiengaenge: [],
 					searchGroup: this.searchGroup,
 					searchLektor: this.searchLektor,
 				},
-			}
+			},
+			roomAdditionalInfo: null,
 		}
-	},
-	created() {
-
-		this.$api.call(ApiRoomPlan.getRoomCreationInfo())
-			.then(result => result.data)
-			.then(result => {
-				if (result.berechtigt)
-				{
-					this.createContext.room_create_information.studiengaenge = result.studiengaenge
-				}
-				this.createContext.show_all_fields = result.berechtigt;
-			});
 	},
 	methods:{
 		handleChangeDate(day, newMode) {
@@ -72,12 +59,15 @@ export default {
 				}
 			});
 		},
-		async handleCreateEvent(event)
-		{
+		async handleCreateEvent(event) {
 			event.ort_kurzbz = this.propsViewData.ort_kurzbz;
-			this.$api.call(ApiRoomPlan.addRoomReservation(event));
-			this.$refs.calendar.resetEventLoader();
-			this.$refs.calendar.closeModal();
+			const reservationCreationResponse = await this.$api.call(
+				ApiRoomPlan.addRoomReservation(event),
+			);
+			if (reservationCreationResponse.meta.status === "success") {
+				this.$refs.calendar.resetEventLoader();
+				this.$refs.calendar.closeModal();
+			}
 		},
 		async handleDeleteEvent(event)
 		{
@@ -87,7 +77,7 @@ export default {
 			if (luxon.DateTime.fromISO(`${event.datum}T${event.beginn}`) < luxon.DateTime.now())
 				return;
 
-			this.$api.call(ApiRoomPlan.deleteRoomReservation(event.reservierung_id));
+			await this.$api.call(ApiRoomPlan.deleteRoomReservation(event.reservierung_id));
 
 			this.$refs.calendar.reset();
 
@@ -152,9 +142,32 @@ export default {
 			];
 		}
 	},
+	async created() {
+		const roomCreationInfoResponse = await this.$api.call(
+			ApiRoomPlan.getRoomCreationInfo(),
+		);
+		if (roomCreationInfoResponse.meta?.status === "success") {
+			const berechtigt = !!roomCreationInfoResponse.data?.berechtigt;
+			if (roomCreationInfoResponse.data?.berechtigt) {
+				this.createContext.room_create_information.studiengaenge =
+					roomCreationInfoResponse.data?.studiengaenge;
+			}
+			this.createContext.show_all_fields =
+				roomCreationInfoResponse.data?.berechtigt;
+		}
+
+		const roomInfoResponse = await this.$api.call(
+			ApiRoom.getRoomInfo(this.$props.propsViewData.ort_kurzbz),
+		);
+		this.roomAdditionalInfo = roomInfoResponse.data.ausstattung;
+	},
 	template: /*html*/`
 	<div class="fhc-roominformation d-flex flex-column h-100">
 		<h2>{{ $p.t('rauminfo/rauminfo') }} {{ propsViewData.ort_kurzbz }}</h2>
+		<span v-if="roomAdditionalInfo?.length">
+			{{ $p.t("search/result_equipment") + ":" }}
+			<span v-html="roomAdditionalInfo"></span>
+		</span>
 		<hr>
 		<fhc-calendar 
 			ref="calendar"

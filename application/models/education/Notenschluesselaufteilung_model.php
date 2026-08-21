@@ -13,7 +13,7 @@ class Notenschluesselaufteilung_model extends DB_Model
 	}
 
 	/**
-	 * Liefert die Note zu Punkten einer Lehrveranstaltung
+	 * Gives the grade for the points of a course.
 	 *
 	 * @param number					$points
 	 * @param integer					$lehrveranstaltung_id
@@ -23,6 +23,12 @@ class Notenschluesselaufteilung_model extends DB_Model
 	 */
 	public function getNote($points, $lehrveranstaltung_id, $studiensemester_kurzbz)
 	{
+		// Without a valid points value you cannot derive a grade. Without this guard the query
+		// builder makes a bad statement from "punkte <=" => null ('punkte' < 'IS' 'NULL'). The
+		// request then fails with HTTP 500 instead of an answer that says "no grade".
+		if (!is_numeric($points))
+			return success(null);
+
 		$this->load->model('education/Notenschluesselzuordnung_model', 'NotenschluesselzuordnungModel');
 		$notenschluessel_kurzbz = $this->NotenschluesselzuordnungModel->getKurzbzForLv($lehrveranstaltung_id, $studiensemester_kurzbz);
 

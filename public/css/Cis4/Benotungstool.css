@@ -62,9 +62,63 @@
 	transform: translateY(-50%) rotate(180deg);
 }
 
-.pruefung-badge {
+/*
+ * Prueufungszelle: feste Spuren fuer Note | Datum | Aktion.
+ * Vorher war das eine zentrierte Flex-Zeile, dadurch verschoben laengere Notenbezeichnungen
+ * ("Nicht Genuegend" vs "Genuegend") Datum und Button - die Zellen standen von Zeile zu Zeile
+ * nicht mehr untereinander. Mit festen Spurbreiten fluchten sie immer.
+ */
+.pruefung-cell {
 	position: relative;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 6.5rem; /* Note | Aktion */
+	align-items: center;
+	column-gap: 0.5rem;
+	height: 100%;
 	padding-left: 32px; /* badge width (20) + its left offset (6) + gap (6) */
+	padding-right: 6px;
+	text-align: left;
+}
+
+/* Spaltenmodus 'antritt': das Datum steht in der Zelle, nicht im Spaltenkopf */
+.pruefung-cell.mit-datum {
+	grid-template-columns: minmax(0, 1fr) 4.75rem 6.5rem; /* Note | Datum | Aktion */
+}
+
+/*
+ * Zellen ohne Aktion (abschliessender Termin, wird in einem anderen Tool gepflegt): die Spur fuer
+ * den Button entfaellt, der Platz gehoert der Notenbezeichnung.
+ */
+.pruefung-cell.ohne-aktion {
+	grid-template-columns: minmax(0, 1fr); /* Note */
+}
+
+.pruefung-cell.ohne-aktion.mit-datum {
+	grid-template-columns: minmax(0, 1fr) 4.75rem; /* Note | Datum */
+}
+
+.pruefung-cell .pruefung-note {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.pruefung-cell .pruefung-datum {
+	font-size: 0.75rem;
+	white-space: nowrap;
+	text-align: right;
+	opacity: 0.7;
+}
+
+/* immer in der letzten Spur, auch wenn Note und Datum fehlen (leere Zelle mit "Hinzufuegen") */
+.pruefung-cell .pruefung-action {
+	grid-column: -2 / -1;
+	display: flex;
+	justify-content: flex-end;
+}
+
+.pruefung-cell .pruefung-action .btn {
+	white-space: nowrap;
 }
 
 .pruefung-badge::before {
@@ -88,3 +142,5 @@
 .pruefung-badge.attempt-t2::before { background: #E69F00; }
 .pruefung-badge.attempt-t3::before { background: #CC79A7; }
 .pruefung-badge.attempt-k::before  { background: #D55E00; }
+/* Termin ohne verbrauchten Antritt (entschuldigt, nicht beurteilt) - traegt keine Nummer */
+.pruefung-badge.attempt-none::before { background: #767676; }

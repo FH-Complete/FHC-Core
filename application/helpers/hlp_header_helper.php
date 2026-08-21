@@ -111,7 +111,8 @@ function generateJSDataStorageObject($indexPage, $calledPath, $calledMethod)
 		'theme' => [
 			'name'=>$ci->config->item('theme_name'),
 			'modes'=>$ci->config->item('theme_modes'),
-		]
+		],
+		'domain' => DOMAIN
 	);
 
 	$toPrint = "\n";

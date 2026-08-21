@@ -16,7 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH'))
+	exit('No direct script access allowed');
 
 class RoomPlan extends FHCAPI_Controller
 {
@@ -33,6 +34,7 @@ class RoomPlan extends FHCAPI_Controller
 			'getGruppen' => self::PERM_LOGGED,
 			'getLektor' => self::PERM_LOGGED,
 			'getReservableMap' => self::PERM_LOGGED,
+			'getGroupOptions' => self::PERM_LOGGED,
 		]);
 
 		$this->load->library('LogLib');
@@ -149,16 +151,14 @@ class RoomPlan extends FHCAPI_Controller
 
 		$this->GruppeModel->addOrder('gruppe_kurzbz');
 		$this->GruppeModel->db->group_start();
-		foreach ($query_words as $word)
-		{
+		foreach ($query_words as $word) {
 			$this->GruppeModel->db->group_start();
 			$this->GruppeModel->db->where('gruppe_kurzbz ILIKE', "%" . $word . "%");
 			$this->GruppeModel->db->or_where('bezeichnung ILIKE', "%" . $word . "%");
 			$this->GruppeModel->db->or_where('beschreibung ILIKE', "%" . $word . "%");
 			$this->GruppeModel->db->or_where('orgform_kurzbz ILIKE', "%" . $word . "%");
 
-			if (is_numeric($word))
-			{
+			if (is_numeric($word)) {
 				$this->GruppeModel->db->or_where('studiengang_kz', $word);
 			}
 			$this->GruppeModel->db->group_end();
@@ -193,8 +193,7 @@ class RoomPlan extends FHCAPI_Controller
 		$this->MitarbeiterModel->addJoin('public.tbl_person', 'person_id');
 		$this->MitarbeiterModel->db->where('public.tbl_benutzer.aktiv', true);
 		$this->MitarbeiterModel->db->group_start();
-		foreach ($query_words as $word)
-		{
+		foreach ($query_words as $word) {
 			$this->MitarbeiterModel->db->group_start();
 			$this->MitarbeiterModel->db->where('tbl_person.vorname ILIKE', "%" . $word . "%");
 			$this->MitarbeiterModel->db->or_where('tbl_person.nachname ILIKE', "%" . $word . "%");
@@ -227,6 +226,51 @@ class RoomPlan extends FHCAPI_Controller
 		$result = $this->stundenplanlib->getReservableMap($ort_kurzbz, $start_date, $end_date);
 
 		$this->terminateWithSuccess(array('reservierbarMap' => hasData($result) ? getData($result) : []));
+	}
+
+	public function getGroupOptions()
+	{
+		$studiengangKz = $this->input->get('studiengangKz');
+
+		$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
+		$this->LehrverbandModel->addSelect('semester, verband, gruppe');
+		$this->LehrverbandModel->db->where('aktiv', true);
+		$this->LehrverbandModel->db->where('studiengang_kz', $studiengangKz);
+		$lehrverbandResult = $this->LehrverbandModel->load();
+
+		if (isError($lehrverbandResult))
+			$this->terminateWithError($lehrverbandResult);
+
+		$lehrverbanden = hasData($lehrverbandResult) ? getData($lehrverbandResult) : [];
+
+		$grouppedValues = [];
+		foreach ($lehrverbanden as $lehrverband) {
+			if (isset($grouppedValues[$lehrverband->semester]) && $lehrverband->verband !== ' ') {
+				$grouppedValues[$lehrverband->semester][] = $lehrverband;
+			} else if (!isset($grouppedValues[$lehrverband->semester]) && $lehrverband->verband !== ' ') {
+				$grouppedValues[$lehrverband->semester] = [$lehrverband];
+			} else if (!isset($grouppedValues[$lehrverband->semester])) {
+				$grouppedValues[$lehrverband->semester] = [];
+			}
+		}
+		$grouppedValues = array_map(
+			function ($semester) {
+				$verbandGruppen = [];
+				foreach ($semester as $lehrverband) {
+					if (isset($verbandGruppen[$lehrverband->verband]) && $lehrverband->gruppe !== ' ') {
+						$verbandGruppen[$lehrverband->verband][] = $lehrverband->gruppe;
+					} else if (!isset($verbandGruppen[$lehrverband->verband]) && $lehrverband->gruppe !== ' ') {
+						$verbandGruppen[$lehrverband->verband] = [$lehrverband->gruppe];
+					} else if (!isset($verbandGruppen[$lehrverband->verband])) {
+						$verbandGruppen[$lehrverband->verband] = [];
+					}
+				}
+				return $verbandGruppen;
+			},
+			$grouppedValues
+		);
+
+		$this->terminateWithSuccess($grouppedValues);
 	}
 
 }

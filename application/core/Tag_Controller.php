@@ -7,7 +7,7 @@ class Tag_Controller extends FHCAPI_Controller
 {
 	private $_uid;
 
-	const BERECHTIGUNG_KURZBZ = 'admin:rw';
+	const BERECHTIGUNG_KURZBZ = ['admin:rw'];
 
 	public function __construct($permissions)
 	{
@@ -42,6 +42,9 @@ class Tag_Controller extends FHCAPI_Controller
 
 	public function getTag($readonly_tags = null)
 	{
+		$language = $this->_getLanguageIndex();
+		$index_bezeichnung_mehrsprachig = $language - 1;
+
 		$id = $this->input->get('id');
 
 		if (is_array($readonly_tags) && !isEmptyArray($readonly_tags))
@@ -66,10 +69,11 @@ class Tag_Controller extends FHCAPI_Controller
 		$this->NotizModel->addSelect(
 			"tbl_notiz.titel, 
 			tbl_notiz.text, 
-			array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung,
+			array_to_json(bezeichnung_mehrsprachig::varchar[])->>". $index_bezeichnung_mehrsprachig . " as bezeichnung,
 			tbl_notiz.notiz_id,
 			tbl_notiz_typ.style,
 			tbl_notiz_typ.automatisiert,
+			tbl_notiz_typ.prioritaet,
 			tbl_notiz.erledigt as done,
 			tbl_notiz.insertamum,
 			tbl_notiz.updateamum,
@@ -96,14 +100,16 @@ class Tag_Controller extends FHCAPI_Controller
 	public function getTags($tags = null)
 	{
 		$language = $this->_getLanguageIndex();
+		$index_bezeichnung_mehrsprachig = $language - 1;
 
 		$this->NotiztypModel->addSelect(
 			"typ_kurzbz as tag_typ_kurzbz,
-			array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung,
+			array_to_json(bezeichnung_mehrsprachig::varchar[])->>". $index_bezeichnung_mehrsprachig . " as bezeichnung,
 			style,
 			beschreibung,
 			tag,
-			automatisiert
+			automatisiert,
+			prioritaet
 			"
 		);
 		$this->NotiztypModel->addOrder('prioritaet');
@@ -282,10 +288,12 @@ class Tag_Controller extends FHCAPI_Controller
 		$this->terminateWithSuccess($deleteNotiz);
 	}
 
-	public function getAllTags($readonly_tags = false){
+	public function getAllTags($readonly_tags = false)
+	{
+		$language = $this->_getLanguageIndex();
+		$index_bezeichnung_mehrsprachig = $language - 1;
 		$prestudent_id = $this->input->get('prestudent_id');
 
-		//TODO check for readonly: necessary?
 		if (is_array($readonly_tags) && !isEmptyArray($readonly_tags))
 		{
 			$readonly_tags = $this->_filterTag($readonly_tags, true);
@@ -307,10 +315,11 @@ class Tag_Controller extends FHCAPI_Controller
 		$this->NotizModel->addSelect(
 			"tbl_notiz.titel,
 			tbl_notiz.text,
-			array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung,
+			array_to_json(bezeichnung_mehrsprachig::varchar[])->>". $index_bezeichnung_mehrsprachig . " as bezeichnung,
 			tbl_notiz.notiz_id,
 			tbl_notiz_typ.style,
 			tbl_notiz_typ.automatisiert,
+			tbl_notiz_typ.prioritaet,
 			tbl_notiz.erledigt as done,
 			tbl_notiz.insertamum,
 			tbl_notiz.updateamum,
@@ -330,6 +339,8 @@ class Tag_Controller extends FHCAPI_Controller
 
 		$this->NotizModel->addJoin('public.tbl_notizzuordnung notizzuordnung', 'tbl_notiz.notiz_id = notizzuordnung.notiz_id');
 
+		$this->NotizModel->addOrder('done');
+		$this->NotizModel->addOrder('tbl_notiz_typ.prioritaet');
 		$notiz = $this->NotizModel->loadWhere(array('prestudent_id' => $prestudent_id));
 
 
@@ -338,16 +349,27 @@ class Tag_Controller extends FHCAPI_Controller
 
 	public function rebuildTagsForTypeId()
 	{
-		$id = $this->input->post('id');
+		$ids = $this->input->post('ids');
 		$typeId = $this->input->post('typeId');
 		$semester = $this->input->post('sem');
 
-		$result = $this->taglib->rebuildTagsForTypeId($typeId, $id, $semester);
+		$idsSuccess = [];
+		$idsError = [];
+		$outputResult = [];
 
-		if (isError($result))
-			return error ('Error occurred during updateAutomatedTags');
+		foreach ($ids as $id)
+		{
+			$result = $this->taglib->rebuildTagsForTypeId($typeId, $id, $semester);
 
-		$this->terminateWithSuccess($result);
+			if (isError($result))
+				$idsError[] = $id;
+			else
+				$idsSuccess[] = $id;
+
+			$outputResult[] = $result;
+		}
+
+		$this->terminateWithSuccess([$outputResult, $idsSuccess, $idsError]);
 	}
 
 	private function _setAuthUID()

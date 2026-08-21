@@ -4,6 +4,7 @@ import RoleInformation from "./ProfilComponents/RoleInformation.js";
 import ProfilEmails from "./ProfilComponents/ProfilEmails.js";
 import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
 import QuickLinks from "./ProfilComponents/QuickLinks.js";
+import ZeitsperrenUid from "../../Cis/ZeitsperrenMitarbeiter/Details/ZeitsperrenMitarbeiteruid.js";
 
 import { dateFilter } from "../../../tabulator/filters/Dates.js";
 
@@ -15,12 +16,12 @@ export default {
 		ProfilEmails,
 		ProfilInformation,
 		QuickLinks,
+		ZeitsperrenUid
 	},
 	inject: ["collapseFunction", "language"],
 	data() {
 		return {
 			collapseIconFunktionen: true,
-			arePhrasesPreloaded: false,
 			funktionen_table_options: {
 				persistenceID: "filterTableMaViewProfilFunktionen",
 				persistence: {
@@ -31,6 +32,7 @@ export default {
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
 				responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
+				locale: true,
 				columns: [
 					//? option when wanting to hide the collapsed list
 
@@ -46,7 +48,8 @@ export default {
 						responsive: 0,
 					},
 					{
-						title: Vue.computed(() => this.$p.t("ui/bezeichnung")),
+						title: "placeholder",
+						titlePhrase: "ui/bezeichnung",
 						field: "Bezeichnung",
 						headerFilter: true,
 						minWidth: 200,
@@ -54,9 +57,8 @@ export default {
 						responsive: 0,
 					},
 					{
-						title: Vue.computed(() =>
-							this.$p.t("lehre/organisationseinheit"),
-						),
+						title: "placeholder",
+						titlePhrase: "lehre/organisationseinheit",
 						field: "Organisationseinheit",
 						headerFilter: true,
 						minWidth: 200,
@@ -64,9 +66,8 @@ export default {
 						responsive: 1,
 					},
 					{
-						title: Vue.computed(() =>
-							this.$p.t("global/gueltigVon"),
-						),
+						title: "placeholder",
+						titlePhrase: "global/gueltigVon",
 						field: "Gültig_von",
 						headerFilterFunc: "dates",
 						headerFilter: dateFilter,
@@ -78,9 +79,8 @@ export default {
 						responsive: 4,
 					},
 					{
-						title: Vue.computed(() =>
-							this.$p.t("global/gueltigBis"),
-						),
+						title: "placeholder",
+						titlePhrase: "global/gueltigBis",
 						field: "Gültig_bis",
 						headerFilterFunc: "dates",
 						headerFilter: dateFilter,
@@ -92,9 +92,8 @@ export default {
 						responsive: 3,
 					},
 					{
-						title: Vue.computed(() =>
-							this.$p.t("profil/wochenstunden"),
-						),
+						title: "placeholder",
+						titlePhrase: "profil/wochenstunden",
 						field: "Wochenstunden",
 						headerFilter: true,
 						minWidth: 200,
@@ -219,13 +218,10 @@ export default {
 			}
 			return quickLinks;
 		},
+		stringTimelocks(){
+			return `${this.$p.t("zeitsperren", "zeitsperrenVon")} ` +  this.data.vorname + " " + this.data.nachname;
+		}
 	},
-	created() {
-		this.$p.loadCategory(["ui", "lehre", "global", "profil"]).then(() => {
-			this.arePhrasesPreloaded = true;
-		});
-	},
-
 	template: /*html*/ `
 
 <div class="container-fluid text-break fhc-form"  >
@@ -279,7 +275,7 @@ export default {
             <div class="row">
                 <!-- FIRST TABLE -->
                 <div class="col-12 mb-4" >
-                    <core-filter-cmpt v-if="arePhrasesPreloaded" @tableBuilt="funktionenTableBuilt" :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
+                    <core-filter-cmpt @tableBuilt="funktionenTableBuilt" :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
                 </div>
                 <!-- END OF THE ROW WITH THE TABLES UNDER THE PROFIL INFORMATION -->
             </div>
@@ -291,6 +287,16 @@ export default {
 			<div v-if="quickLinks.length" class="row mb-3 d-none d-md-block">
 				<div class="col">
 					<quick-links :title="$p.t('profil/quickLinks')" :links="quickLinks" />
+				</div>
+			</div>
+			<!-- LINKS MITARBEITER -->
+			<div class="card mb-2">
+				<div class= "card-body">
+					<zeitsperren-uid
+						:maUid="data.username"
+						:days="14"
+						:title="stringTimelocks"
+					></zeitsperren-uid>
 				</div>
 			</div>
 			<!-- MAILVERTEILER -->

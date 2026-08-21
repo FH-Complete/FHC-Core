@@ -1,0 +1,20 @@
+{
+  "scripts": {
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "cy:noten": "cypress run --spec \"tests/cypress/e2e/specs/**/*.cy.js\"",
+    "cy:noten:api": "cypress run --spec \"tests/cypress/e2e/specs/{unit,api}/**/*.cy.js\"",
+    "cy:noten:ui": "cypress run --browser chrome --spec \"tests/cypress/e2e/specs/ui/**/*.cy.js\"",
+    "cy:noten:ui:watch": "cypress run --browser chrome --headed --no-exit --spec \"tests/cypress/e2e/specs/ui/**/*.cy.js\"",
+    "cy:noten:punkte-on": "cypress run --browser chrome --env NOTEN_PUNKTE_MODUS=on --spec \"tests/cypress/e2e/specs/**/*.cy.js\"",
+    "cy:noten:punkte-off": "cypress run --browser chrome --env NOTEN_PUNKTE_MODUS=off --spec \"tests/cypress/e2e/specs/**/*.cy.js\"",
+    "cy:noten:p0": "cypress run --spec \"tests/cypress/e2e/specs/unit/notenRules.cy.js,tests/cypress/e2e/specs/api/noten/noten.pruefungsantritte.cy.js,tests/cypress/e2e/specs/api/noten/noten.pruefungstermin.cy.js,tests/cypress/e2e/specs/api/noten/noten.ueberschreiben.cy.js\"",
+    "noten:check": "node tests/cypress/tools/dbCheck.js noten"
+  },
+  "dependencies": {
+    "cypress": "^15.11.0",
+    "dotenv": "^17.4.2",
+    "pg": "^8.13.1",
+    "ssh2": "^1.17.0"
+  }
+}

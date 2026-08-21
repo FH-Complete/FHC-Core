@@ -78,7 +78,7 @@ export default {
 			layout: 'fitDataStretchFrozen',
 			layoutColumnsOnNewData: false,
 			height: 'auto',
-			minHeight: '200',
+			minHeight: '200'
 		}
 	},
 	computed: {
@@ -302,7 +302,7 @@ export default {
 
 			//prepare local Storage
 			let STORAGE_KEY = 'finalExamDefaultData';
-			const id = '20260224_02';
+			const id = '20260625_01';
 			const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
 			if (stored[id]) {
@@ -312,6 +312,7 @@ export default {
 				this.formData.datum = data.datum;
 				this.formData.sponsion = data.sponsion;
 				this.formData.akadgrad_id = data.akadgrad_id;
+				this.formData.pruefungsantritt_kurzbz = data.pruefungsantritt_kurzbz;
 
 				if (data.vorsitz_uid) {
 					this.selectedVorsitz = {
@@ -393,11 +394,12 @@ export default {
 		saveOrUpdateLocalStorage(){
 			let STORAGE_KEY = 'finalExamDefaultData';
 
-			const id = '20260224_02';
+			const id = '20260625_01';
 			const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
 			stored[id] = {
 				pruefungstyp_kurzbz: this.formData.pruefungstyp_kurzbz,
+				pruefungsantritt_kurzbz: this.formData.pruefungsantritt_kurzbz,
 				vorsitz_uid: this.selectedVorsitz?.mitarbeiter_uid || null,
 				vorsitz_person_id: this.selectedVorsitz?.person_id || null,
 				vorsitz_label: this.selectedVorsitz?.label || null,
@@ -435,20 +437,37 @@ export default {
 		},
 		async addNewAbschlusspruefungMulti(){
 			try {
-				for (const student of this.studentUids) {
+				const arraySuccessfullySent = [];
+				const arrayError = [];
 
-					await this.$refs.formFinalExam.call(
-						ApiStvAbschlusspruefung.addNewAbschlusspruefung({
-							uid: student,
-							formData: this.formData
-						})
-					);
+				for (const student of this.studentUids) {
+					try {
+						await this.$refs.formFinalExam.call(
+							ApiStvAbschlusspruefung.addNewAbschlusspruefung({
+								uid: student,
+								formData: this.formData
+							})
+						);
+						arraySuccessfullySent.push(student);
+					} catch (error) {
+						arrayError.push(student);
+					}
 				}
-				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-				//save formData fields in LocalStorage
-				this.saveOrUpdateLocalStorage();
-				this.hideModal('finalexamModal');
-				this.resetForm();
+				if (arraySuccessfullySent.length) {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					//TODO(Manu) check if really needed in case of success
+					//this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave') + ': Uids: ' + arraySuccessfullySent.join(", "));
+				}
+
+				if (arrayError.length) {
+					this.$fhcAlert.alertError(this.$p.t('ui', 'errorSavingData') + ': Uids: ' + arrayError.join(", "));
+				}
+
+				if (arraySuccessfullySent.length) {
+					this.saveOrUpdateLocalStorage();
+					this.hideModal("finalexamModal");
+					this.resetForm();
+				}
 			} catch (error) {
 				this.$fhcAlert.handleSystemError(error);
 			}
@@ -534,7 +553,10 @@ export default {
 			}
 
 			if (!this.formData.akadgrad_id && this.arrAkadGrad.length > 0) {
-				this.formData.akadgrad_id = this.arrAkadGrad[0].akadgrad_id;
+				if(this.student.geschlecht == 'w')
+					this.formData.akadgrad_id = this.arrAkadGrad[1].akadgrad_id;
+				else
+					this.formData.akadgrad_id = this.arrAkadGrad[0].akadgrad_id;
 			}
 		},
 		printDocument(link) {
@@ -680,7 +702,12 @@ export default {
 			<template #title>
 				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('abschlusspruefung', 'abschluessPruefungAnlegen')}}</p>
 				<p v-else class="fw-bold mt-3">{{$p.t('abschlusspruefung', 'abschluessPruefungBearbeiten')}}</p>
-				<small v-if="this.student.length" class="text-muted">{{studentNames}}</small>
+				<div
+					v-if="this.student.length"
+					class="stv-details-abschlusspruefung-student-names"
+				>
+				<small class="text-muted">{{studentNames}}</small>
+				</div>
 			</template>
 
 			<form-form ref="formFinalExam" @submit.prevent>
@@ -839,7 +866,7 @@ export default {
 							:key="grad.akadgrad_id"
 							:value="grad.akadgrad_id"
 							>
-							{{grad.titel}}
+							{{ grad.titel }} <span v-if="grad.geschlecht !== null"> ({{ grad.geschlecht }}) </span>
 						</option>
 					</form-input>
 					<form-input

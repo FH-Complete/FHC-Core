@@ -80,7 +80,6 @@ require_once('dbupdate_3.4/61730_Dashboard_Anpassungen.php');
 require_once('dbupdate_3.4/40128_search.php');
 require_once('dbupdate_3.4/63394_Variablenbeschraenkung.php');
 require_once('dbupdate_3.4/63436_cis4_iframe_component.php');
-require_once('dbupdate_3.4/60882_lehrfaecherverteilung_favorites.php');
 require_once('dbupdate_3.4/66982_berufsschule.php');
 require_once('dbupdate_3.4/40314_electronic_onboarding_anbindung_ida.php');
 require_once('dbupdate_3.4/47972_pruefungsverwaltung_ects_angabe.php');
@@ -94,11 +93,15 @@ require_once('dbupdate_3.4/71399_dashboard_update_widget_paths.php');
 require_once('dbupdate_3.4/71645_studvw_messagetab_ladezeit.php');
 require_once('dbupdate_3.4/71566_studienordnungsdokument_neuer_organisationseinheitstyp_programm.php');
 require_once('dbupdate_3.4/70376_lohnguide.php');
+require_once('dbupdate_3.4/75888_reihungstest_mehrfachdurchfuehrung.php');
 require_once('dbupdate_3.4/76150_perm_other_lv_plan.php');
 require_once('dbupdate_3.4/68957_dashboard_bookmark_neue_Spalte_sort.php');
 require_once('dbupdate_3.4/68530_Dashboard_Cleanup.php');
-require_once('dbupdate_3.4/75888_reihungstest_mehrfachdurchfuehrung.php');
 require_once('dbupdate_3.4/75959_StudVw_Automatische_Tags.php');
+require_once('dbupdate_3.4/76160_lvv_favorites.php');
+require_once('dbupdate_3.4/77080_tabulator_presets_table.php');
+require_once('dbupdate_3.4/78292_gehaltsanpassungtyp.php');
+require_once('dbupdate_3.4/77048_cis4_mitarbeiter_studstatus_widget.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -396,6 +399,7 @@ $tabellen=array(
 	"public.tbl_studiengangstyp" => array("typ","bezeichnung","beschreibung","bezeichnung_mehrsprachig"),
 	"public.tbl_studienjahr"  => array("studienjahr_kurzbz","bezeichnung"),
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id","beschreibung","onlinebewerbung"),
+	"public.tbl_tabulator_presets" => array("preset_id", "benutzer_uid", "table_name", "preset_json"),
 	"public.tbl_tag"  => array("tag"),
 	"public.tbl_variable"  => array("name","uid","wert"),
 	"public.tbl_variablenname"  => array("name","defaultwert"),

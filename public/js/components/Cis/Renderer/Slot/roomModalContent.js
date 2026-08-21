@@ -1,9 +1,10 @@
-import FormInput from '../../../Form/Input.js';
+import FormInput from "../../../Form/Input.js";
+import ApiRoomPlan from "../../../../api/factory/calendar/roomPlan.js";
 
 export default {
-	emits: ['create-event'],
+	emits: ["create-event"],
 	components: {
-		FormInput
+		FormInput,
 	},
 	inject: {
 		timeGrid: "timeGrid",
@@ -26,38 +27,85 @@ export default {
 			verband: null,
 			gruppe: null,
 			selectedGruppe: null,
-			selectedLektoren: []
+			selectedLektoren: [],
+			nestedGroupOptions: {},
 		};
 	},
-	mounted() {
-		this.syncFromEvent(this.event);
-	},
+	computed: {
+		semesterOptions() {
+			if (!this.studiengang) return [];
 
+			return Object.keys(this.nestedGroupOptions)
+				.map((val) => parseInt(val))
+				.sort((a, b) => a - b);
+		},
+		verbandOptions() {
+			if (!this.semester) return [];
+
+			return Object.keys(this.nestedGroupOptions[this.semester]).sort();
+		},
+		gruppeOptions() {
+			if (!this.verband) return [];
+
+			return this.nestedGroupOptions[this.semester][this.verband]
+				.map((val) => parseInt(val))
+				.sort((a, b) => a - b);
+		},
+	},
 	watch: {
 		event: {
 			handler(newEvent) {
 				this.syncFromEvent(newEvent);
 			},
-			deep: true
-		}
+			deep: true,
+		},
+		studiengang() {
+			this.semester = null;
+			this.verband = null;
+			this.gruppe = null;
+			this.nestedGroupOptions = {};
+			this.fetchGroupOptions();
+		},
+		semester() {
+			this.verband = null;
+		},
+		verband() {
+			this.gruppe = null;
+		},
 	},
 	methods: {
 		syncFromEvent(newEvent) {
 			if (!newEvent) return;
 
-			const startTime = newEvent.start?.setZone?.(this.timezone)?.toFormat?.('HH:mm:ss');
-			const endTime = newEvent.end?.setZone?.(this.timezone)?.toFormat?.('HH:mm:ss');
+			const startTime = newEvent.start
+				?.setZone?.(this.timezone)
+				?.toFormat?.("HH:mm:ss");
+			const endTime = newEvent.end
+				?.setZone?.(this.timezone)
+				?.toFormat?.("HH:mm:ss");
 
-			this.selectedStart = this.timeGrid.find(t => t.start === startTime)?.start || this.timeGrid[0]?.start;
-			this.selectedEnd = this.timeGrid.find(t => t.end === endTime)?.end || this.timeGrid.at(-1)?.end;
+			this.selectedStart =
+				this.timeGrid.find((t) => t.start === startTime)?.start ||
+				this.timeGrid[0]?.start;
+			this.selectedEnd =
+				this.timeGrid.find((t) => t.end === endTime)?.end ||
+				this.timeGrid.at(-1)?.end;
 		},
 		saveEvent() {
-			const [startHour, startMinute] = this.selectedStart.split(':').map(Number);
-			const [endHour, endMinute] = this.selectedEnd.split(':').map(Number);
-			const selectedStart = this.event.start.startOf('day').set({ hour: startHour, minute: startMinute });
-			const selectedEnd = this.event.start.startOf('day').set({ hour: endHour, minute: endMinute });
+			const [startHour, startMinute] = this.selectedStart
+				.split(":")
+				.map(Number);
+			const [endHour, endMinute] = this.selectedEnd
+				.split(":")
+				.map(Number);
+			const selectedStart = this.event.start
+				.startOf("day")
+				.set({ hour: startHour, minute: startMinute });
+			const selectedEnd = this.event.start
+				.startOf("day")
+				.set({ hour: endHour, minute: endMinute });
 
-			const lektoren_uid = this.selectedLektoren.map(m => m.uid)
+			const lektoren_uid = this.selectedLektoren.map((m) => m.uid);
 
 			const spezialgruppe = this.selectedGruppe?.gruppe_kurzbz;
 
@@ -71,22 +119,41 @@ export default {
 				verband: this.verband,
 				gruppe: this.gruppe,
 				spezialgruppe: spezialgruppe,
-				lektoren: lektoren_uid
-			}
+				lektoren: lektoren_uid,
+			};
 
-			this.$emit('create-event', event);
+			this.$emit("create-event", event);
 		},
 		async searchGroup(event) {
-			this.filteredGroups = await this.event.createContext.room_create_information.searchGroup(event)
+			this.filteredGroups =
+				await this.event.createContext.room_create_information.searchGroup(
+					event,
+				);
 		},
 		async searchLektor(event) {
-			this.filteredLektoren = await this.event.createContext.room_create_information.searchLektor(event)
+			this.filteredLektoren =
+				await this.event.createContext.room_create_information.searchLektor(
+					event,
+				);
 		},
-		capitalize(text)
-		{
-			if (!text) return ''
-			return text.charAt(0).toUpperCase() + text.slice(1)
-		}
+		capitalize(text) {
+			if (!text) return "";
+			return text.charAt(0).toUpperCase() + text.slice(1);
+		},
+		async fetchGroupOptions() {
+			if (!this.studiengang) return;
+
+			const groupOptionsResponse = await this.$api.call(
+				ApiRoomPlan.getGroupOptions(this.studiengang),
+			);
+
+			if (groupOptionsResponse.meta.status === "success") {
+				this.nestedGroupOptions = groupOptionsResponse.data;
+			}
+		},
+	},
+	mounted() {
+		this.syncFromEvent(this.event);
 	},
 
 	template: `
@@ -130,6 +197,7 @@ export default {
 				:label="capitalize($p.t('global', 'titel'))"
 				type="text"
 				container-class="col-3"
+				maxlength="10"
 				v-model="title"
 				name="title"
 			/>
@@ -138,6 +206,7 @@ export default {
 				:label="capitalize($p.t('global', 'beschreibung'))"
 				type="text"
 				container-class="col-4"
+				maxlength="32"
 				v-model="beschreibung"
 				name="Beschreibung"
 			/>
@@ -184,7 +253,7 @@ export default {
 					name="semester"
 				>
 					<option
-						v-for="semester in event.createContext.room_create_information.semester"
+						v-for="semester in semesterOptions"
 						:value="semester"
 						:key="semester"
 					>
@@ -200,7 +269,7 @@ export default {
 					name="semester"
 				>
 					<option
-						v-for="verband in event.createContext.room_create_information.verband"
+						v-for="verband in verbandOptions"
 						:value="verband"
 						:key="verband"
 					>
@@ -216,7 +285,7 @@ export default {
 					name="gruppe"
 				>
 					<option
-						v-for="gruppe in event.createContext.room_create_information.gruppe"
+						v-for="gruppe in gruppeOptions"
 						:value="gruppe"
 						:key="gruppe"
 					>
@@ -242,5 +311,5 @@ export default {
 
 		<button class="btn btn-primary mt-3" @click="saveEvent">Speichern</button>
 	</div>
-	`
+	`,
 };

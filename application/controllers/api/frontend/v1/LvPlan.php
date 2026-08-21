@@ -49,6 +49,8 @@ class LvPlan extends FHCAPI_Controller
 			'getLehrverband' => self::PERM_LOGGED,
 			'permissionOtherLvPlan' => self::PERM_LOGGED,
 			'compactibleEventTypes' => self::PERM_LOGGED,
+			'getLeEvents' => self::PERM_LOGGED,
+			'getLvEvents' => self::PERM_LOGGED,
 		]);
 
 		$this->load->library('LogLib');
@@ -60,7 +62,13 @@ class LvPlan extends FHCAPI_Controller
 			'dbExecuteUser' => 'RESTful API'
 		));
 
-		$this->load->library('form_validation');
+        $this->load->library('form_validation');
+		$this->load->library('PhrasesLib');
+		$this->loadPhrases(
+			array(
+				'ui'
+			)
+		);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -194,6 +202,38 @@ class LvPlan extends FHCAPI_Controller
 			$lvplanEvents,
 			$ferienEvents
 		));
+	}
+
+	public function getLeEvents($le_id = null, $start_date = null, $end_date = null, $stundenplan = 'stundenplandev')
+	{
+
+		if (is_null($le_id) || is_null($start_date) || is_null($end_date))
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+		if ($stundenplan !== 'stundenplandev' && $stundenplan !== 'stundenplan')
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+		$this->load->library('StundenplanLib');
+
+		$result = $this->stundenplanlib->getEventsByLE($le_id, $start_date, $end_date, $stundenplan);
+		$lvplanEvents = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($lvplanEvents);
+	}
+
+	public function getLvEvents($lv_id = null, $start_date = null, $end_date = null, $stundenplan = 'stundenplandev')
+	{
+		if (is_null($lv_id) || is_null($start_date) || is_null($end_date))
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+		if ($stundenplan !== 'stundenplandev' && $stundenplan !== 'stundenplan')
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+		$this->load->library('StundenplanLib');
+
+		$result = $this->stundenplanlib->getEventsByLV($lv_id, $start_date, $end_date, $stundenplan);
+
+		$this->terminateWithSuccess(hasData($result) ? getData($result) : []);
 	}
 
 	//TODO: delete this function if we don't use the old calendar export endpoints anymore
@@ -418,6 +458,10 @@ class LvPlan extends FHCAPI_Controller
 	 */
 	private function fetchMoodleEvents($start_date, $end_date, $uid = null)
 	{
+		if ($uid && $uid !== getAuthUID()) {
+			return [];
+		}
+
 		$this->load->config('calendar');
 
 		$tz = new DateTimeZone($this->config->item('timezone'));

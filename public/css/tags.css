@@ -46,7 +46,6 @@
 	background-color: #ffA500ff;
 }
 
-
 .tag_braun {
 	background-color: #6d4c41;
 }
@@ -70,6 +69,35 @@
 .tag_limette {
 	background-color: #D3FFCE;
 	color: black;
+}
+
+.tag_turquoise {
+	background-color: #89cccf;
+	color: black;
+}
+
+.tag_bordeaux {
+	background-color: #7B1B38;
+	color: white;
+}
+
+.tag_olive {
+	background-color: #868d07;
+	color: white;
+}
+
+.tag_beige {
+	background-color: #E4D5B4;
+	color: black;
+}
+
+.tag_skyblue {
+	background-color: #90D5FF;
+	color: black;
+}
+.tag_blush {
+	background-color: #A83E3E;
+	color: white;
 }
 
 .tag_done {
@@ -116,4 +144,9 @@
 .copy-btn {
 	float: right;
 	margin-top: 3px;
+}
+
+.btn-hover {
+	--bs-btn-hover-bg:  #e9ecef;
+	--bs-btn-hover-border-color: #e9ecef;
 }

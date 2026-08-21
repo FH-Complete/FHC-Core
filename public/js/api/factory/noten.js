@@ -49,18 +49,30 @@ export default {
 			params: { lv_id, sem_kurzbz, student_uid, note, punkte }
 		};
 	},
-	saveStudentPruefung(student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, typ, pruefung_id = null){
+	// kein Termintyp mehr: welchen Antritt die Prüfung darstellt, leitet der Server aus dem
+	// bestehenden Prüfungsverlauf des Studenten in dieser LV und diesem Semester ab
+	// mitarbeiter_uid: der benotende Lektor. Nur nötig, wenn die Lehreinheit mehrere hat - sonst
+	// löst der Server ihn selbst auf.
+	saveStudentPruefung(student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, pruefung_id = null, mitarbeiter_uid = null){
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/Noten/saveStudentPruefung',
-			params: { student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, typ, pruefung_id }
+			params: { student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, pruefung_id, mitarbeiter_uid }
 		};
 	},
-	createPruefungen(uids, datum, lva_id, sem_kurzbz){
+	// note/punkte optional: ohne Auswahl wird der Termin als "noch nicht eingetragen" angelegt
+	createPruefungen(uids, datum, lva_id, sem_kurzbz, note = null, punkte = null, mitarbeiter_uid = null){
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/Noten/createPruefungen',
-			params: { uids, datum, lva_id, sem_kurzbz }
+			params: { uids, datum, lva_id, sem_kurzbz, note, punkte, mitarbeiter_uid }
+		};
+	},
+	getLehrendeFuerLehreinheit(lehreinheit_id, lv_id, sem_kurzbz) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Noten/getLehrendeFuerLehreinheit',
+			params: { lehreinheit_id, lv_id, sem_kurzbz }
 		};
 	},
 	saveNotenvorschlagBulk(lv_id, sem_kurzbz, noten) {
@@ -82,6 +94,20 @@ export default {
 			method: 'post',
 			url: '/api/frontend/v1/Noten/getNoteByPunkte',
 			params: { punkte, lv_id, sem_kurzbz }
+		};
+	},
+	getBenotungstoolContext(sem_kurzbz, lv_id = null) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Noten/getBenotungstoolContext',
+			params: { sem_kurzbz, lv_id }
+		};
+	},
+	getLvForStudiengang(studiengang_kz, sem_kurzbz) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Noten/getLvForStudiengang',
+			params: { studiengang_kz, sem_kurzbz }
 		};
 	}
 }
