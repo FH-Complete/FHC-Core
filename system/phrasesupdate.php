@@ -62411,6 +62411,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'dvuh',
+		'category' => 'datenverbund',
+		'phrase' => 'error_buchungNotDeletable',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Buchung kann nicht gelöscht werden, da sie bereits an den Datenverbund gesendet wurde.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Booking can\'t be deleted, because it has been already sent to Datenverbund.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	)
 );
 
 
