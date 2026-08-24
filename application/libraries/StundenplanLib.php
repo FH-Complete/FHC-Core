@@ -112,6 +112,7 @@ class StundenplanLib
 			return success([]);
 		
 		$stundenplan_data = $this->_ci->StundenplanModel->stundenplanGruppierung($stundenplan_query);
+		$this->_ci->addMeta('bhsql', $this->_ci->db->last_query());
 		if (isError($stundenplan_data))
 			return $stundenplan_data;
 		$stundenplan_data = getData($stundenplan_data) ?? [];
