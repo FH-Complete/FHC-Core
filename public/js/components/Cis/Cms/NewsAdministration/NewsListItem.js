@@ -63,6 +63,11 @@ export default {
 			}
 		},
 	},
+	created() {
+		this.$p.loadCategory(['global', 'ui']).then(() => {
+			this.phrasesLoaded = true;
+		});
+	},
 	template: /*html*/ `
 	<article
 		class="card mb-3"
@@ -86,7 +91,7 @@ export default {
 				></i>
 				<span class="h5 mb-0">{{ news.title }}</span>
 				<span v-if="!news.isPublished" class="badge text-bg-secondary">
-					Not published yet
+					{{ $p.t('ui', 'notPublishedYet') }}
 				</span>
 			</button>
 			<div class="d-flex align-items-center gap-2 flex-shrink-0">
@@ -98,14 +103,14 @@ export default {
 						{{ news.date }}
 					</time>
 				</div>
-				<div class="d-flex gap-1" aria-label="News actions">
+				<div class="d-flex gap-1" :aria-label="$p.t('global', 'actions')">
 					<button
 						type="button"
 						class="btn btn-sm rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center"
 						:class="news.isPublished ? 'btn-light text-primary' : 'btn-outline-secondary bg-white'"
 						style="width: 1.75rem; height: 1.75rem"
-						title="Edit news"
-						aria-label="Edit news"
+						:title="$p.t('ui', 'bearbeiten')"
+						:aria-label="$p.t('ui', 'bearbeiten')"
 						@click="editNews(news)"
 					>
 						<i class="fa-solid fa-pen" aria-hidden="true"></i>
@@ -115,8 +120,8 @@ export default {
 						class="btn btn-sm rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center"
 						:class="news.isPublished ? 'btn-light text-danger' : 'btn-outline-danger bg-white'"
 						style="width: 1.75rem; height: 1.75rem"
-						title="Delete news"
-						aria-label="Delete news"
+						:title="$p.t('ui', 'loeschen')"
+						:aria-label="$p.t('ui', 'loeschen')"
 						:disabled="isDeleting"
 						@click="deleteNews(news)"
 					>

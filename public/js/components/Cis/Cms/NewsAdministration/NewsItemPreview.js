@@ -21,6 +21,9 @@ export default {
 		};
 	},
 	computed: {
+		sprache() {
+			return this.$p.user_language.value;
+		},
 		availableLanguages() {
 			return (this.formData?.translations ?? [])
 				.map((translation) => translation.language)
@@ -54,6 +57,25 @@ export default {
 				: (languages[0] ?? '');
 		},
 	},
+	created() {
+		this.$p.loadCategory(['global', 'ui']).then(() => {
+			this.phrasesLoaded = true;
+		});
+	},
+	methods: {
+		getLanguageLabel(language) {
+			this.sprache;
+			const languagePhrases = {
+				German: ['global', 'deutsch'],
+				English: ['global', 'englisch'],
+				French: ['ui', 'franzoesisch'],
+				Spanish: ['ui', 'spanisch'],
+			};
+			const phrase = languagePhrases[language];
+
+			return phrase ? this.$p.t(phrase[0], phrase[1]) : language;
+		},
+	},
 	template: /*html*/ `
 		<section
 			id="news-item-preview"
@@ -63,7 +85,7 @@ export default {
 		>
 			<div class="card-body">
 				<div class="d-flex justify-content-between align-items-center gap-3 mb-3">
-					<h4 id="news-item-preview-heading" class="card-title fhc-primary-color mb-0">News preview</h4>
+					<h4 id="news-item-preview-heading" class="card-title fhc-primary-color mb-0">{{ $p.t('ui', 'newsPreview') }}</h4>
 					<form-input
 					v-if="availableLanguages.length > 1"
 					v-model="selectedLanguage"
@@ -76,24 +98,24 @@ export default {
 						:key="language"
 						:value="language"
 					>
-						{{ language }}
+						{{ getLanguageLabel(language) }}
 					</option>
 				</form-input>
 				</div>
 				<article v-if="translation" class="card border">
 					<header class="card-header" :class="translation.isPublished ? 'fhc-primary' : 'bg-secondary bg-opacity-25 text-secondary'">
 						<div class="d-flex justify-content-between align-items-start gap-3">
-							<h5 class="mb-0">{{ translation.title || 'Untitled news' }}</h5>
-							<span v-if="!translation.isPublished" class="badge text-bg-secondary">Not published yet</span>
+							<h5 class="mb-0">{{ translation.title || $p.t('ui', 'untitledNews') }}</h5>
+							<span v-if="!translation.isPublished" class="badge text-bg-secondary">{{ $p.t('ui', 'notPublishedYet') }}</span>
 						</div>
 						<address v-if="translation.author" class="small mb-0 mt-2">{{ translation.author }}</address>
 					</header>
 					<div class="card-body">
 						<div v-if="translation.text" class="card-text" v-html="translation.text"></div>
-						<p v-else class="text-muted mb-0">Enter text to see the news content preview.</p>
+						<p v-else class="text-muted mb-0">{{ $p.t('ui', 'newsContentPreviewHint') }}</p>
 					</div>
 				</article>
-				<p v-else class="text-muted mb-0">Select a language tab to preview its content.</p>
+				<p v-else class="text-muted mb-0">{{ $p.t('ui', 'selectLanguageTabToPreview') }}</p>
 			</div>
 		</section>
 	`,

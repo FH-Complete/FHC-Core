@@ -74,11 +74,7 @@ export default {
 				this.dmsFileBrowserMessageHandler = null;
 			}
 
-			if (
-				closePopup &&
-				this.dmsFileBrowser &&
-				!this.dmsFileBrowser.closed
-			) {
+			if (closePopup && this.dmsFileBrowser && !this.dmsFileBrowser.closed) {
 				this.dmsFileBrowser.close();
 			}
 
@@ -91,9 +87,7 @@ export default {
 				FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/\/+$/, '') + '/';
 			const fileType = meta && meta.filetype ? meta.filetype : 'file';
 			const fileBrowserUrl =
-				appRoot +
-				'cms/tinymce_dms.php?type=' +
-				encodeURIComponent(fileType);
+				appRoot + 'cms/tinymce_dms.php?type=' + encodeURIComponent(fileType);
 			const popupName = this.editor
 				? 'FHCFileBrowser_' + this.editor.id
 				: 'FHCFileBrowser';
@@ -126,18 +120,13 @@ export default {
 
 				try {
 					callback(
-						appRoot +
-							'cms/dms.php?id=' +
-							encodeURIComponent(message.dmsId),
+						appRoot + 'cms/dms.php?id=' + encodeURIComponent(message.dmsId),
 					);
 				} finally {
 					this.cleanupDmsFileBrowser(true);
 				}
 			};
-			window.addEventListener(
-				'message',
-				this.dmsFileBrowserMessageHandler,
-			);
+			window.addEventListener('message', this.dmsFileBrowserMessageHandler);
 
 			this.dmsFileBrowserClosePollId = window.setInterval(() => {
 				if (this.dmsFileBrowser === popup && popup.closed) {
@@ -162,14 +151,14 @@ export default {
 				},
 
 				style_formats: [
-					{ title: 'Blocks', block: 'div' },
-					{ title: 'Paragraph', block: 'p' },
-					{ title: 'Heading 1', block: 'h1' },
-					{ title: 'Heading 2', block: 'h2' },
-					{ title: 'Heading 3', block: 'h3' },
-					{ title: 'Heading 4', block: 'h4' },
-					{ title: 'Heading 5', block: 'h5' },
-					{ title: 'Heading 6', block: 'h6' },
+					{ title: vm.$p.t('ui', 'blocks'), block: 'div' },
+					{ title: vm.$p.t('ui', 'paragraph'), block: 'p' },
+					{ title: vm.$p.t('ui', 'heading1'), block: 'h1' },
+					{ title: vm.$p.t('ui', 'heading2'), block: 'h2' },
+					{ title: vm.$p.t('ui', 'heading3'), block: 'h3' },
+					{ title: vm.$p.t('ui', 'heading4'), block: 'h4' },
+					{ title: vm.$p.t('ui', 'heading5'), block: 'h5' },
+					{ title: vm.$p.t('ui', 'heading6'), block: 'h6' },
 				],
 				setup: (editor) => {
 					vm.editor = editor;
@@ -181,7 +170,8 @@ export default {
 			});
 		},
 	},
-	mounted() {
+	async mounted() {
+		await this.$p.loadCategory(['global', 'ui', 'notiz']);
 		this.initTinyMCE();
 	},
 	beforeUnmount() {
@@ -197,8 +187,8 @@ export default {
 		v-if="config.language !== 'German'"
 		type="button"
 		class="btn btn-sm btn-outline-danger position-absolute top-0 end-0"
-		title="Remove language"
-		aria-label="Remove language"
+		:title="$p.t('ui', 'removeLanguage')"
+		:aria-label="$p.t('ui', 'removeLanguage')"
 		@click="$emit('tab-action', { action: 'remove-language', language: config.language })"
 	>
 		<i class="fa-solid fa-trash-can" aria-hidden="true"></i>

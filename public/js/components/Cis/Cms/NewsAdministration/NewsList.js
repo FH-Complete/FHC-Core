@@ -58,7 +58,7 @@ export default {
 				this.maxPageCount = response.meta.row_count;
 			} catch (error) {
 				this.newsItems = [];
-				this.loadError = this.$p.t('global', 'fehlerBeimLadenDesDatensatzes');
+				this.loadError = this.$p.t('ui', 'fehlerBeimLesen');
 			} finally {
 				this.isLoading = false;
 			}
@@ -108,12 +108,15 @@ export default {
 		},
 	},
 	created() {
+		this.$p.loadCategory(['global', 'ui']).then(() => {
+			this.phrasesLoaded = true;
+		});
 		this.fetchNews();
 	},
 	template: /*html*/ `
 	<section class="mt-4" aria-labelledby="news-administration-list-heading">
 		<h3 id="news-administration-list-heading" ref="newsListHeading" class="fhc-primary-color">
-			News
+			{{ $p.t('ui', 'news') }}
 		</h3>
 		<hr>
 		<pagination
@@ -125,13 +128,13 @@ export default {
 		></pagination>
 		<div v-if="isLoading" class="d-flex justify-content-center py-4" role="status">
 			<span class="spinner-border" aria-hidden="true"></span>
-			<span class="visually-hidden">Loading news</span>
+			<span class="visually-hidden">{{ $p.t('ui', 'loadingNews') }}</span>
 		</div>
 		<div v-else-if="loadError" class="alert alert-danger" role="alert">
 			{{ loadError }}
 		</div>
 		<div v-else-if="!newsItems.length" class="alert alert-info" role="status">
-			No news available.
+			{{ $p.t('ui', 'noNewsAvailable') }}
 		</div>
 		<div v-else>
 			<news-list-item

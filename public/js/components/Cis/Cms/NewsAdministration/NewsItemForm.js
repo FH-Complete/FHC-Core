@@ -41,50 +41,6 @@ export default {
 			isSaving: false,
 			activeContentFormKey: 'germanContentForm',
 			contentFormRenderKey: 0,
-			availableLanguages: [
-				{ label: 'German', value: 'German' },
-				{ label: 'English', value: 'English' },
-				{ label: 'French', value: 'French' },
-				{ label: 'Spanish', value: 'Spanish' },
-			],
-			semesters: [
-				{
-					label: 'Alle Semester',
-					value: null,
-				},
-				{
-					label: '1. Semester',
-					value: '1',
-				},
-				{
-					label: '2. Semester',
-					value: '2',
-				},
-				{
-					label: '3. Semester',
-					value: '3',
-				},
-				{
-					label: '4. Semester',
-					value: '4',
-				},
-				{
-					label: '5. Semester',
-					value: '5',
-				},
-				{
-					label: '6. Semester',
-					value: '6',
-				},
-				{
-					label: '7. Semester',
-					value: '7',
-				},
-				{
-					label: '8. Semester',
-					value: '8',
-				},
-			],
 			formData: {
 				visibleFrom: null,
 				visibleTo: null,
@@ -102,7 +58,7 @@ export default {
 			},
 			contentFormItems: {
 				germanContentForm: {
-					title: 'German Content Form',
+					title: '',
 					component: BASE_COMPONENT_URL + 'NewsItemContentForm.js',
 					config: {
 						language: 'German',
@@ -120,8 +76,12 @@ export default {
 		};
 	},
 	watch: {
-		'$p.user_language.value': function (sprache) {
-			this.fetchNews();
+		'$p.user_language.value': function () {
+			Object.values(this.contentFormItems).forEach((item) => {
+				if (item.config?.language) {
+					item.title = this.getContentFormTitle(item.config.language);
+				}
+			});
 		},
 		formData: {
 			deep: true,
@@ -137,6 +97,29 @@ export default {
 	computed: {
 		sprache: function () {
 			return this.$p.user_language.value;
+		},
+		availableLanguages() {
+			this.sprache;
+
+			return ['German', 'English', 'French', 'Spanish'].map((language) => ({
+				label: this.getLanguageLabel(language),
+				value: language,
+			}));
+		},
+		semesters() {
+			this.sprache;
+			const semesterLabel = this.$p.t('lehre', 'semester');
+
+			return [
+				{
+					label: this.$p.t('ui', 'all_semester'),
+					value: null,
+				},
+				...Array.from({ length: 8 }, (_, index) => ({
+					label: `${index + 1}. ${semesterLabel}`,
+					value: String(index + 1),
+				})),
+			];
 		},
 		dropdownParsedDegreePrograms() {
 			return this.degreePrograms
@@ -192,7 +175,7 @@ export default {
 			const key = this.getContentFormKey(language);
 
 			return {
-				title: `${language} Content Form`,
+				title: this.getContentFormTitle(language),
 				component: BASE_COMPONENT_URL + 'NewsItemContentForm.js?124',
 				config: {
 					language,
@@ -208,11 +191,20 @@ export default {
 			this.$refs.copyTranslationModal.show();
 		},
 		getLanguageLabel(language) {
-			return (
-				this.availableLanguages.find(
-					(availableLanguage) => availableLanguage.value === language,
-				)?.label ?? language
-			);
+			const languagePhrases = {
+				German: ['global', 'deutsch'],
+				English: ['global', 'englisch'],
+				French: ['ui', 'franzoesisch'],
+				Spanish: ['ui', 'spanisch'],
+			};
+			const phrase = languagePhrases[language];
+
+			return phrase ? this.$p.t(phrase[0], phrase[1]) : language;
+		},
+		getContentFormTitle(language) {
+			return this.$p.t('ui', 'contentFormTitle', {
+				language: this.getLanguageLabel(language),
+			});
 		},
 		getTranslation(language) {
 			return this.formData.translations.find(
@@ -397,7 +389,7 @@ export default {
 		},
 		filterDegreePrograms(event) {
 			let defaultItem = {
-				label: this.$p.t('ui', 'dropdownEmptyOption'),
+				label: this.$p.t('ui', 'bitteWaehlen'),
 				value: null,
 			};
 
@@ -432,12 +424,12 @@ export default {
 				return;
 			}
 			if (response.meta.status !== 'success') {
-				this.$fhcAlert.alertError(this.$p.t('ui', 'errorStoringNewsItem'));
+				this.$fhcAlert.alertError(this.$p.t('ui', 'fehlerBeimSpeichern'));
 				return;
 			}
 
 			this.$fhcAlert.alertSuccess(
-				this.$p.t('ui', 'newsItemStoredSuccessfully'),
+				this.$p.t('ui', 'gespeichert'),
 			);
 			this.$emit('created');
 		},
@@ -462,12 +454,12 @@ export default {
 				);
 
 				if (response.meta.status !== 'success') {
-					this.$fhcAlert.alertError(this.$p.t('ui', 'errorStoringNewsItem'));
+					this.$fhcAlert.alertError(this.$p.t('ui', 'fehlerBeimSpeichern'));
 					return;
 				}
 
 				this.$fhcAlert.alertSuccess(
-					this.$p.t('ui', 'newsItemStoredSuccessfully'),
+					this.$p.t('ui', 'gespeichert'),
 				);
 				this.$emit('update');
 			} catch (error) {
@@ -480,6 +472,9 @@ export default {
 		},
 	},
 	async created() {
+		await this.$p.loadCategory(['global', 'ui', 'lehre']);
+		this.contentFormItems.germanContentForm.title =
+			this.getContentFormTitle('German');
 		this.fillFormData(this.news);
 
 		let getAllDegreePrograms = await this.$api.call(
@@ -491,7 +486,7 @@ export default {
 			);
 			this.fillFormData(this.news);
 		} else {
-			this.$fhcAlert.alertError(this.$p.t('ui', 'errorFetchingDegreePrograms'));
+			this.$fhcAlert.alertError(this.$p.t('ui', 'fehlerBeimLesen'));
 		}
 
 		console.log(FHC_JS_DATA_STORAGE_OBJECT);
@@ -504,13 +499,13 @@ export default {
 	>
 		<div class="card-body">
 			<div class="d-flex justify-content-between align-items-center gap-3 mb-3">
-				<h4 id="news-item-form-heading" ref="newsPageHeading" class="card-title fhc-primary-color mb-0">News Form</h4>
+				<h4 id="news-item-form-heading" ref="newsPageHeading" class="card-title fhc-primary-color mb-0">{{ $p.t('ui', 'newsForm') }}</h4>
 				<button
 					@click="$emit('toggle-preview')"
 					type="button"
 					class="btn btn-sm btn-outline-primary d-inline-flex align-items-center justify-content-center"
-					:title="isPreviewShown ? 'Hide preview' : 'Show preview'"
-					:aria-label="isPreviewShown ? 'Hide preview' : 'Show preview'"
+					:title="isPreviewShown ? $p.t('ui', 'hidePreview') : $p.t('ui', 'showPreview')"
+					:aria-label="isPreviewShown ? $p.t('ui', 'hidePreview') : $p.t('ui', 'showPreview')"
 					:aria-expanded="isPreviewShown"
 					aria-controls="news-item-preview"
 				>
@@ -592,11 +587,11 @@ export default {
 						@click="showCopyTranslationModal"
 						type="button"
 						class="btn btn-sm btn-outline-secondary"
-						:title="copySourceLanguages.length ? 'Copy content from another language' : 'Add another language to copy content'"
+						:title="$p.t('ui', 'copyContentFromAnotherLanguage')"
 						aria-haspopup="dialog"
 					>
 						<i class="fa-solid fa-copy me-1" aria-hidden="true"></i>
-						Copy content from another language
+						{{ $p.t('ui', 'copyContentFromAnotherLanguage') }}
 					</button>
 				</div>
 				<news-item-add-language-modal

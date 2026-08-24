@@ -20,6 +20,11 @@ export default {
 			this.$refs.modal.hide();
 		},
 	},
+	created() {
+		this.$p.loadCategory('ui').then(() => {
+			this.phrasesLoaded = true;
+		});
+	},
 	template: /*html*/ `
 		<bootstrap-modal
 			ref="modal"
@@ -27,7 +32,7 @@ export default {
 			body-class="p-4"
 			@hidden-bs-modal="$emit('hidden')"
 		>
-			<template #title>Add translation language</template>
+			<template #title>{{ $p.t('ui', 'addTranslationLanguage') }}</template>
 			<div v-if="languages.length" class="d-grid gap-2">
 				<button
 					v-for="language in languages"
@@ -39,7 +44,7 @@ export default {
 					{{ language.label }}
 				</button>
 			</div>
-			<p v-else class="mb-0 text-muted">All available languages have been added.</p>
+			<p v-else class="mb-0 text-muted">{{ $p.t('ui', 'allLanguagesAdded') }}</p>
 		</bootstrap-modal>
 	`,
 };

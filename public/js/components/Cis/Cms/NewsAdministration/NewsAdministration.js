@@ -73,18 +73,23 @@ export default {
 			this.newsPreview = preview;
 		},
 	},
+	created() {
+		this.$p.loadCategory('ui').then(() => {
+			this.phrasesLoaded = true;
+		});
+	},
 	template: /*html*/ `
 	<div :class="{'pb-3': isMobile}" class="overflow-x-hidden">
 		<div class="d-flex justify-content-between align-items-center mb-3">
-			<h2 ref="newsPageHeading" class="fhc-primary-color mb-0">News Administration</h2>
+			<h2 ref="newsPageHeading" class="fhc-primary-color mb-0">{{ $p.t('ui', 'newsAdministration') }}</h2>
 			<button
 				v-if="!isNewsFormShown"
 				@click="showCreateNewsForm"
 				type="button"
 				class="btn btn-primary rounded-circle d-inline-flex align-items-center justify-content-center p-0"
 				style="width: 2.5rem; height: 2.5rem"
-				:title="$p.t('news', 'createNews')"
-				:aria-label="$p.t('news', 'createNews')"
+				:title="$p.t('ui', 'createNews')"
+				:aria-label="$p.t('ui', 'createNews')"
 				aria-controls="news-item-form"
 			>
 				<i class="fa-solid fa-plus" aria-hidden="true"></i>

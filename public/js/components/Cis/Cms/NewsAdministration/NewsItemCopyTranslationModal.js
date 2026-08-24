@@ -52,6 +52,22 @@ export default {
 			this.selectedSourceLanguage = null;
 			this.$emit('hidden');
 		},
+		getCopyingTranslationText() {
+			return this.$p.t('ui', 'copyingTranslation', {
+				source: this.selectedSourceLanguage?.label ?? '',
+				target: this.targetLanguageLabel,
+			});
+		},
+		getChooseLanguageText() {
+			return this.$p.t('ui', 'chooseLanguageToCopyContent', {
+				target: this.targetLanguageLabel,
+			});
+		},
+	},
+	created() {
+		this.$p.loadCategory('ui').then(() => {
+			this.phrasesLoaded = true;
+		});
 	},
 	template: /*html*/ `
 		<bootstrap-modal
@@ -61,24 +77,24 @@ export default {
 			@hidden-bs-modal="resetSelection"
 		>
 			<template #title>
-				{{ selectedSourceLanguage ? 'Overwrite translation content?' : 'Copy translation content' }}
+				{{ selectedSourceLanguage ? $p.t('ui', 'overwriteTranslationContent') : $p.t('ui', 'copyTranslationContent') }}
 			</template>
 			<template v-if="selectedSourceLanguage">
 				<p class="mb-3">
-					Copying from <strong>{{ selectedSourceLanguage.label }}</strong> will replace the author, title, and text in <strong>{{ targetLanguageLabel }}</strong>.
+					{{ getCopyingTranslationText() }}
 				</p>
-				<p class="text-muted small">The existing content in the current language will be lost.</p>
+				<p class="text-muted small">{{ $p.t('ui', 'existingContentWillBeLost') }}</p>
 				<div class="d-flex justify-content-end gap-2 mt-4">
 					<button type="button" class="btn btn-outline-secondary" @click="selectedSourceLanguage = null">
-						Choose another language
+						{{ $p.t('ui', 'chooseAnotherLanguage') }}
 					</button>
 					<button type="button" class="btn btn-primary" @click="copyTranslation()">
-						Overwrite and copy
+						{{ $p.t('ui', 'overwriteAndCopy') }}
 					</button>
 				</div>
 			</template>
 			<template v-else>
-				<p class="text-muted">Choose the language whose content should be copied into {{ targetLanguageLabel }}.</p>
+				<p class="text-muted">{{ getChooseLanguageText() }}</p>
 				<div v-if="sourceLanguages.length" class="d-grid gap-2">
 					<button
 						v-for="language in sourceLanguages"
@@ -90,7 +106,7 @@ export default {
 						{{ language.label }}
 					</button>
 				</div>
-				<p v-else class="mb-0 text-muted">Add another language before copying content.</p>
+				<p v-else class="mb-0 text-muted">{{ $p.t('ui', 'addLanguageBeforeCopying') }}</p>
 			</template>
 		</bootstrap-modal>
 	`,
