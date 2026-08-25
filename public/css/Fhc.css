@@ -1,3 +1,26 @@
+.fhc-page-grid {
+  height: 100vh;
+  display: grid;
+  grid: "header header" auto "nav main" 1fr / auto 1fr;
+}
+.fhc-page-grid > * {
+  grid-area: header;
+}
+.fhc-page-grid > .navbar-left-side {
+  grid-area: nav;
+  position: initial;
+  align-items: start;
+}
+.fhc-page-grid > .content {
+  grid-area: main;
+  margin: 0;
+}
+@media (max-width: 992px) {
+  .fhc-page-grid {
+    grid: "header main" auto "nav main" 1fr / auto 1fr;
+  }
+}
+
 .fhc-header {
   display: flex;
   flex-direction: row;
@@ -100,10 +123,10 @@
 }
 
 .modal-msg {
-	max-width: 1378px;
+  max-width: 1378px;
 }
 .modal-msg .modal-content {
-	height: 95vh;
+  height: 95vh;
 }
 
 .fhcSkipLink {

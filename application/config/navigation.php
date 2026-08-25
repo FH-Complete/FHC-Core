@@ -170,13 +170,6 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 51,
 					'requiredPermissions' => 'vertrag/mitarbeiter:r'
-				),
-				'studierendenverwaltung' => array(
-					'link' => site_url('studentenverwaltung'),
-					'description' => 'Studierendenverwaltung',
-					'expand' => true,
-					'sort' => 52,
-					'requiredPermissions' => ['admin:r', 'assistenz:r']
 				)
 			)
 		),
@@ -385,8 +378,21 @@ $config['navigation_menu']['apps'] = [
 	],
 	'lav' => [
 		'link' => site_url('lehre/lehrauftrag/Lehrauftrag/Dashboard'),
-		'description' => 'Lehrauftragsverwaltung',
+		'description' => 'Lehraufträge',
 		#'icon' => 'person-chalkboard',
 		'requiredPermissions' => array('lehre/lehrauftrag_bestellen:r', 'lehre/lehrauftrag_erteilen:r')
+	]
+];
+
+$config['navigation_menu']['dashboard/*'] = [
+	'dashboards' => [
+		'link' => site_url('dashboard/Admin'),
+		'description' => 'Dashboard',
+		'requiredPermissions' => 'dashboard/admin:rw'
+	],
+	'widgets' => [
+		'link' => site_url('dashboard/Admin/widgets'),
+		'description' => 'Widgets',
+		'requiredPermissions' => 'dashboard/admin:rw'
 	]
 ];

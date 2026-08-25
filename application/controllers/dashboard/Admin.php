@@ -31,6 +31,7 @@ class Admin extends Auth_Controller
 		parent::__construct(
 			array(
 				'index' => 'dashboard/admin:rw',
+				'widgets' => 'dashboard/admin:rw',
 				'preview' => 'dashboard/admin:r',
 			)
 		);
@@ -41,6 +42,11 @@ class Admin extends Auth_Controller
 	public function index()
 	{
 		$this->load->view('dashboard/admin.php', []);
+	}
+
+	public function widgets()
+	{
+		$this->load->view('dashboard/widgets.php', [9]);
 	}
 
 	public function preview($dashboard_kurzbz = 'CIS')

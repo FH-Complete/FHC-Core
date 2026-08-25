@@ -34,6 +34,18 @@ export default {
 			url: '/api/frontend/v1/dashboard/widget/listAllowed/' + dashboard
 		};
 	},
+	listAll() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/dashboard/widget/listAll'
+		};
+	},
+	listAllOriginal() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/dashboard/widget/listAllOriginal'
+		};
+	},
 	setAllowed(dashboard_id, widget_id, allowed) {
 		return {
 			method: 'post',
@@ -42,5 +54,25 @@ export default {
 				dashboard_id, widget_id, allowed
 			}
 		};
-	}
+	},
+	create(params) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/dashboard/widget/create',
+			params
+		};
+	},
+	update(params) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/dashboard/widget/update',
+			params
+		};
+	},
+	generators() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/dashboard/widget/generators'
+		};
+	},
 };

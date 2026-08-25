@@ -530,6 +530,17 @@ function is_in_db($key, $model = '')
 }
 
 /**
+ * check if an entry does not exist in the database
+ */
+function is_not_in_db($key, $model = '')
+{
+	if (!$model)
+		return false;
+
+	return !is_in_db($key, $model);
+}
+
+/**
  * is building an array for Dropdown Entry in Print Dropdown
  * @param $id id for the Document to add to the Document Array
  * @param $name title of the dropdownEntry
