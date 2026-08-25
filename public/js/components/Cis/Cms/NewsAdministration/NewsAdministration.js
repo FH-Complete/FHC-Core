@@ -14,18 +14,46 @@ export default {
 		return {
 			isNewsFormShown: false,
 			isNewsPreviewShown: false,
-			newsToEdit: null,
+			editableNewsItem: null,
 			newsPreview: null,
+			newsFormCollapse: null,
 		};
 	},
+	watch: {
+		isNewsFormShown: async function (isShown) {
+			await this.$nextTick();
+			this.newsFormCollapse?.[isShown ? 'show' : 'hide']();
+		},
+		'$route.query.newsId': {
+			immediate: true,
+			handler(newNewsId, oldNewsId) {
+				if (!newNewsId) {
+					this.isNewsFormShown = false;
+					this.isNewsPreviewShown = false;
+					this.editableNewsItem = null;
+					this.newsPreview = null;
+					return;
+				}
+
+				this.editNewsItem({ newsId: this.$route.query.newsId });
+			},
+		},
+	},
 	methods: {
+		async scrollToNewsForm() {
+			await this.$nextTick();
+			this.$refs.newsItemForm?.$el?.scrollIntoView({
+				behavior: 'smooth',
+				block: 'start',
+			});
+		},
 		async reloadNews() {
-			await this.$refs.newsList.reload();
+			await this.$refs.newsList.fetchNews();
 		},
 		async handleNewsItemUpdated() {
 			this.isNewsFormShown = false;
 			this.isNewsPreviewShown = false;
-			this.newsToEdit = null;
+			this.editableNewsItem = null;
 			this.newsPreview = null;
 			await this.reloadNews();
 		},
@@ -33,29 +61,46 @@ export default {
 			this.reloadNews();
 			this.isNewsFormShown = false;
 			this.isNewsPreviewShown = false;
-			this.newsToEdit = null;
+			this.editableNewsItem = null;
 			this.newsPreview = null;
 		},
 		showCreateNewsForm() {
-			this.newsToEdit = null;
+			this.editableNewsItem = null;
 			this.isNewsPreviewShown = false;
 			this.isNewsFormShown = true;
+			this.scrollToNewsForm();
 		},
-		async editNews(news) {
-			console.log('Editing news item:', news);
+		async loadNewsItem(newsId) {
+			if (!newsId) {
+				return;
+			}
+
 			try {
 				const response = await this.$api.call(
-					ApiNewsAdministration.getNewsItem(news.newsId),
+					ApiNewsAdministration.getNewsItem(newsId),
 				);
-				const freshNews = response.data;
+				const newsItem = response.data;
 
-				if (!freshNews) {
-					return;
+				if (!newsItem) {
+					return null;
 				}
 
-				this.newsToEdit = freshNews;
+				return newsItem;
+			} catch (error) {
+				this.$fhcAlert.handleSystemError(error);
+			}
+		},
+		async editNewsItem(newsItem) {
+			try {
+				this.editableNewsItem = await this.loadNewsItem(newsItem.newsId);
 				this.isNewsPreviewShown = false;
-				this.isNewsFormShown = true;
+
+				await this.$nextTick();
+
+				setTimeout(() => {
+					this.isNewsFormShown = true;
+					this.scrollToNewsForm();
+				}, 100);
 			} catch (error) {
 				this.$fhcAlert.handleSystemError(error);
 			}
@@ -63,7 +108,7 @@ export default {
 		cancelNewsForm() {
 			this.isNewsFormShown = false;
 			this.isNewsPreviewShown = false;
-			this.newsToEdit = null;
+			this.editableNewsItem = null;
 			this.newsPreview = null;
 		},
 		toggleNewsPreview() {
@@ -78,30 +123,44 @@ export default {
 			this.phrasesLoaded = true;
 		});
 	},
+	mounted() {
+		this.newsFormCollapse = new bootstrap.Collapse(
+			this.$refs.newsFormCollapse,
+			{ toggle: false },
+		);
+
+		if (this.isNewsFormShown) {
+			this.newsFormCollapse.show();
+		}
+	},
+	beforeUnmount() {
+		this.newsFormCollapse?.dispose();
+	},
 	template: /*html*/ `
-	<div :class="{'pb-3': isMobile}" class="overflow-x-hidden">
+	<div class="pb-3 overflow-x-hidden">
 		<div class="d-flex justify-content-between align-items-center mb-3">
-			<h2 ref="newsPageHeading" class="fhc-primary-color mb-0">{{ $p.t('ui', 'newsAdministration') }}</h2>
+			<h2 ref="newsPageHeading" class="fhc-primary-color mb-0">{{ $capitalize($p.t('ui', 'newsAdministration')) }}</h2>
 			<button
 				v-if="!isNewsFormShown"
 				@click="showCreateNewsForm"
 				type="button"
 				class="btn btn-primary rounded-circle d-inline-flex align-items-center justify-content-center p-0"
 				style="width: 2.5rem; height: 2.5rem"
-				:title="$p.t('ui', 'createNews')"
-				:aria-label="$p.t('ui', 'createNews')"
-				aria-controls="news-item-form"
+				:title="$capitalize($p.t('ui', 'createNews'))"
+				:aria-label="$capitalize($p.t('ui', 'createNews'))"
+				aria-controls="news-item-form-collapse"
 			>
 				<i class="fa-solid fa-plus" aria-hidden="true"></i>
 			</button>
 		</div>
-		<Transition>
-			<div v-if="isNewsFormShown" class="row g-4 align-items-start">
+		<div ref="newsFormCollapse" id="news-item-form-collapse" class="collapse">
+			<div  class="row g-4 align-items-start">
 				<div :class="isNewsPreviewShown ? 'col-12 col-xl-6' : 'col-12'">
 					<news-item-form
-						:key="newsToEdit?.newsId || 'new-news-item'"
+						ref="newsItemForm"
+						:key="editableNewsItem?.newsId || 'new-news-item'"
 						id="news-item-form"
-						:news="newsToEdit"
+						:news-item="editableNewsItem"
 						:is-preview-shown="isNewsPreviewShown"
 						@created="handleNewsItemSaved"
 						@update="handleNewsItemUpdated"
@@ -117,10 +176,10 @@ export default {
 					></news-item-preview>
 				</div>
 			</div>
-		</Transition>
+		</div>
 		<news-list
 			ref="newsList"
-			@edit="editNews"
+			@edit="editNewsItem"
 		></news-list>
 	</div>
 	`,

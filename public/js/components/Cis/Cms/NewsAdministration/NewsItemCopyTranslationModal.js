@@ -53,15 +53,19 @@ export default {
 			this.$emit('hidden');
 		},
 		getCopyingTranslationText() {
-			return this.$p.t('ui', 'copyingTranslation', {
-				source: this.selectedSourceLanguage?.label ?? '',
-				target: this.targetLanguageLabel,
-			});
+			return this.$capitalize(
+				this.$p.t('ui', 'copyingTranslation', {
+					source: this.selectedSourceLanguage?.label ?? '',
+					target: this.targetLanguageLabel,
+				}),
+			);
 		},
 		getChooseLanguageText() {
-			return this.$p.t('ui', 'chooseLanguageToCopyContent', {
-				target: this.targetLanguageLabel,
-			});
+			return this.$capitalize(
+				this.$p.t('ui', 'chooseLanguageToCopyContent', {
+					target: this.targetLanguageLabel,
+				}),
+			);
 		},
 	},
 	created() {
@@ -77,19 +81,19 @@ export default {
 			@hidden-bs-modal="resetSelection"
 		>
 			<template #title>
-				{{ selectedSourceLanguage ? $p.t('ui', 'overwriteTranslationContent') : $p.t('ui', 'copyTranslationContent') }}
+				{{ $capitalize(selectedSourceLanguage ? $p.t('ui', 'overwriteTranslationContent') : $p.t('ui', 'copyTranslationContent')) }}
 			</template>
 			<template v-if="selectedSourceLanguage">
 				<p class="mb-3">
 					{{ getCopyingTranslationText() }}
 				</p>
-				<p class="text-muted small">{{ $p.t('ui', 'existingContentWillBeLost') }}</p>
+				<p class="text-muted small">{{ $capitalize($p.t('ui', 'existingContentWillBeLost')) }}</p>
 				<div class="d-flex justify-content-end gap-2 mt-4">
 					<button type="button" class="btn btn-outline-secondary" @click="selectedSourceLanguage = null">
-						{{ $p.t('ui', 'chooseAnotherLanguage') }}
+						{{ $capitalize($p.t('ui', 'chooseAnotherLanguage')) }}
 					</button>
 					<button type="button" class="btn btn-primary" @click="copyTranslation()">
-						{{ $p.t('ui', 'overwriteAndCopy') }}
+						{{ $capitalize($p.t('ui', 'overwriteAndCopy')) }}
 					</button>
 				</div>
 			</template>
@@ -106,7 +110,7 @@ export default {
 						{{ language.label }}
 					</button>
 				</div>
-				<p v-else class="mb-0 text-muted">{{ $p.t('ui', 'addLanguageBeforeCopying') }}</p>
+				<p v-else class="mb-0 text-muted">{{ $capitalize($p.t('ui', 'addLanguageBeforeCopying')) }}</p>
 			</template>
 		</bootstrap-modal>
 	`,

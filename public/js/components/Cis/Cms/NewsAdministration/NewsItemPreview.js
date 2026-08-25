@@ -37,6 +37,19 @@ export default {
 				(item) => item.language === this.displayedLanguage,
 			);
 		},
+		parsedTranslationText() {
+			const text = this.translation?.text ?? '';
+			if (!text) {
+				return '';
+			}
+
+			const appRoot = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/\/+$/, '');
+
+			return text.replace(
+				/(?:https?:\/\/|\/|\.\.\/)?[^"'<>\s]*?dms\.php(\?[^"'<>\s]*)/gi,
+				`${appRoot}/cms/dms.php$1`,
+			);
+		},
 	},
 	watch: {
 		activeLanguage: {
@@ -73,7 +86,9 @@ export default {
 			};
 			const phrase = languagePhrases[language];
 
-			return phrase ? this.$p.t(phrase[0], phrase[1]) : language;
+			return phrase
+				? this.$capitalize(this.$p.t(phrase[0], phrase[1]))
+				: language;
 		},
 	},
 	template: /*html*/ `
@@ -85,7 +100,7 @@ export default {
 		>
 			<div class="card-body">
 				<div class="d-flex justify-content-between align-items-center gap-3 mb-3">
-					<h4 id="news-item-preview-heading" class="card-title fhc-primary-color mb-0">{{ $p.t('ui', 'newsPreview') }}</h4>
+					<h4 id="news-item-preview-heading" class="card-title fhc-primary-color mb-0">{{ $capitalize($p.t('ui', 'newsPreview')) }}</h4>
 					<form-input
 					v-if="availableLanguages.length > 1"
 					v-model="selectedLanguage"
@@ -105,17 +120,17 @@ export default {
 				<article v-if="translation" class="card border">
 					<header class="card-header" :class="translation.isPublished ? 'fhc-primary' : 'bg-secondary bg-opacity-25 text-secondary'">
 						<div class="d-flex justify-content-between align-items-start gap-3">
-							<h5 class="mb-0">{{ translation.title || $p.t('ui', 'untitledNews') }}</h5>
-							<span v-if="!translation.isPublished" class="badge text-bg-secondary">{{ $p.t('ui', 'notPublishedYet') }}</span>
+							<h5 class="mb-0">{{ translation.title || $capitalize($p.t('ui', 'untitledNews')) }}</h5>
+							<span v-if="!translation.isPublished" class="badge text-bg-secondary">{{ $capitalize($p.t('ui', 'notPublishedYet')) }}</span>
 						</div>
 						<address v-if="translation.author" class="small mb-0 mt-2">{{ translation.author }}</address>
 					</header>
 					<div class="card-body">
-						<div v-if="translation.text" class="card-text" v-html="translation.text"></div>
-						<p v-else class="text-muted mb-0">{{ $p.t('ui', 'newsContentPreviewHint') }}</p>
+						<div v-if="parsedTranslationText" class="card-text" v-html="parsedTranslationText"></div>
+						<p v-else class="text-muted mb-0">{{ $capitalize($p.t('ui', 'newsContentPreviewHint')) }}</p>
 					</div>
 				</article>
-				<p v-else class="text-muted mb-0">{{ $p.t('ui', 'selectLanguageTabToPreview') }}</p>
+				<p v-else class="text-muted mb-0">{{ $capitalize($p.t('ui', 'selectLanguageTabToPreview')) }}</p>
 			</div>
 		</section>
 	`,

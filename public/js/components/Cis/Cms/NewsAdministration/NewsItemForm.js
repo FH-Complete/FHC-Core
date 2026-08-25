@@ -1,7 +1,6 @@
 import CoreForm from '../../../Form/Form.js';
 import FormInput from '../../../Form/Input.js';
 import FhcTabs from '../../../Tabs.js';
-import NewsItemAddLanguageModal from './NewsItemAddLanguageModal.js';
 import NewsItemCopyTranslationModal from './NewsItemCopyTranslationModal.js';
 import ApiStudiengang from '../../../../api/factory/studiengang.js';
 import ApiNewsAdministration from '../../../../api/factory/newsAdministration.js';
@@ -16,7 +15,6 @@ export default {
 		CoreForm,
 		FormInput,
 		FhcTabs,
-		NewsItemAddLanguageModal,
 		NewsItemCopyTranslationModal,
 	},
 	emits: [
@@ -28,7 +26,7 @@ export default {
 		'toggle-preview',
 	],
 	props: {
-		news: {
+		newsItem: {
 			type: Object,
 			default: null,
 		},
@@ -46,33 +44,9 @@ export default {
 				visibleTo: null,
 				degreeProgram: null,
 				semester: null,
-				translations: [
-					{
-						language: 'German',
-						author: '',
-						title: '',
-						text: '',
-						isPublished: false,
-					},
-				],
+				translations: [],
 			},
-			contentFormItems: {
-				germanContentForm: {
-					title: '',
-					component: BASE_COMPONENT_URL + 'NewsItemContentForm.js',
-					config: {
-						language: 'German',
-						type: 'news',
-					},
-					key: 'germanContentForm',
-				},
-				addLanguage: {
-					title: '+',
-					component: BASE_COMPONENT_URL + 'NewsItemAddLanguageTab.js',
-					config: { hasAvailableLanguages: true },
-					key: 'addLanguage',
-				},
-			},
+			contentFormItems: {},
 		};
 	},
 	watch: {
@@ -101,18 +75,22 @@ export default {
 		availableLanguages() {
 			this.sprache;
 
-			return ['German', 'English', 'French', 'Spanish'].map((language) => ({
-				label: this.getLanguageLabel(language),
-				value: language,
-			}));
+			return FHC_JS_DATA_STORAGE_OBJECT?.server_languages?.map(
+				(languageObject) => ({
+					label: this.getLanguageLabel(languageObject.sprache),
+					value: languageObject.sprache,
+				}),
+			);
 		},
 		semesters() {
 			this.sprache;
-			const semesterLabel = this.$p.t('lehre', 'semester');
+			const semesterLabel = this.$capitalize(
+				this.$p.t('lehre', 'semester'),
+			);
 
 			return [
 				{
-					label: this.$p.t('ui', 'all_semester'),
+					label: this.$capitalize(this.$p.t('ui', 'all_semester')),
 					value: null,
 				},
 				...Array.from({ length: 8 }, (_, index) => ({
@@ -184,8 +162,13 @@ export default {
 				key,
 			};
 		},
-		showLanguageModal() {
-			this.$refs.addLanguageModal.show();
+		createAddLanguageTab() {
+			return {
+				title: '+',
+				component: BASE_COMPONENT_URL + 'NewsItemAddLanguageTab.js',
+				config: { languages: [] },
+				key: 'addLanguage',
+			};
 		},
 		showCopyTranslationModal() {
 			this.$refs.copyTranslationModal.show();
@@ -199,12 +182,14 @@ export default {
 			};
 			const phrase = languagePhrases[language];
 
-			return phrase ? this.$p.t(phrase[0], phrase[1]) : language;
+			return phrase ? this.$capitalize(this.$p.t(phrase[0], phrase[1])) : language;
 		},
 		getContentFormTitle(language) {
-			return this.$p.t('ui', 'contentFormTitle', {
-				language: this.getLanguageLabel(language),
-			});
+			return this.$capitalize(
+				this.$p.t('ui', 'contentFormTitle', {
+					language: this.getLanguageLabel(language),
+				}),
+			);
 		},
 		getTranslation(language) {
 			return this.formData.translations.find(
@@ -237,20 +222,12 @@ export default {
 			});
 		},
 		handleContentTabChange(key) {
-			if (key === 'addLanguage') {
-				this.showLanguageModal();
-				return;
-			}
-
 			this.activeContentFormKey = key;
 		},
 		handleContentTabAction({ key, payload }) {
-			if (key === 'addLanguage') {
-				this.showLanguageModal();
-				return;
-			}
-
-			if (payload?.action === 'remove-language') {
+			if (payload?.action === 'add-language') {
+				this.addLanguage(payload.language);
+			} else if (payload?.action === 'remove-language') {
 				this.removeLanguage(payload.language);
 			}
 		},
@@ -329,22 +306,19 @@ export default {
 			}
 
 			this.activeContentFormKey = key;
-			this.$refs.addLanguageModal.hide();
 			this.$nextTick(() => this.$refs.tabs.change(key));
 		},
 		restoreActiveContentTab() {
 			this.$refs.tabs.change(this.activeContentFormKey);
 		},
-		fillFormData(news) {
-			if (!news) {
-				return;
-			}
-
+		fillFormData(newsItem) {
 			this.formData.visibleFrom =
-				news.visibleFrom ?? news.dateTime?.slice(0, 10) ?? null;
-			this.formData.visibleTo = news.visibleTo ?? null;
+				newsItem?.visibleFrom ?? newsItem?.dateTime?.slice(0, 10) ?? null;
+			this.formData.visibleTo = newsItem?.visibleTo ?? null;
 			const degreeProgramShortCode =
-				news.degreeProgramShortCode ?? news.degreeProgram?.value ?? null;
+				newsItem?.degreeProgramShortCode ??
+				newsItem?.degreeProgram?.value ??
+				null;
 			this.formData.degreeProgram =
 				this.dropdownParsedDegreePrograms.find(
 					(degreeProgram) =>
@@ -356,85 +330,87 @@ export default {
 							label: String(degreeProgramShortCode),
 							value: degreeProgramShortCode,
 						});
-			this.formData.semester = news.semester ?? null;
+			this.formData.semester = newsItem?.semester ?? null;
 
-			const translations = news.translations ?? [
+			const translations = newsItem?.translations ?? [
 				{
-					language: news.language,
-					author: news.author,
-					title: news.title,
-					text: news.content,
-					isPublished: news.isPublished,
+					language: newsItem?.language ?? 'German',
+					author: newsItem?.author ?? '',
+					title: newsItem?.title ?? '',
+					text: newsItem?.content ?? '',
+					isPublished: Boolean(newsItem?.isPublished),
 				},
 			];
 
-			translations.forEach((sourceTranslation) => {
-				const translation = this.formData.translations.find(
-					(item) => item.language === sourceTranslation.language,
-				);
+			this.formData.translations = translations.map((sourceTranslation) => ({
+				language: sourceTranslation.language,
+				author: sourceTranslation.author ?? '',
+				title: sourceTranslation.title ?? '',
+				text: sourceTranslation.text ?? '',
+				isPublished: Boolean(sourceTranslation.isPublished),
+			}));
 
-				if (translation) {
-					Object.assign(translation, sourceTranslation);
-					return;
+			const contentFormItems = {};
+
+			this.formData.translations.forEach((translation) => {
+				if (translation.language) {
+					contentFormItems[this.getContentFormKey(translation.language)] =
+						this.createContentFormItem(translation.language);
 				}
-
-				this.formData.translations.push({
-					language: sourceTranslation.language,
-					author: sourceTranslation.author ?? '',
-					title: sourceTranslation.title ?? '',
-					text: sourceTranslation.text ?? '',
-					isPublished: Boolean(sourceTranslation.isPublished),
-				});
 			});
+
+			contentFormItems.addLanguage = this.createAddLanguageTab();
+			this.contentFormItems = contentFormItems;
+			this.activeContentFormKey =
+				Object.keys(contentFormItems).find((key) => key !== 'addLanguage') ??
+				'addLanguage';
 		},
 		filterDegreePrograms(event) {
-			let defaultItem = {
-				label: this.$p.t('ui', 'bitteWaehlen'),
-				value: null,
-			};
-
 			const query = event.query.toLowerCase();
-			if (!query) {
-				return (this.filteredDegreePrograms = [
-					defaultItem,
-					...this.dropdownParsedDegreePrograms,
-				]);
-			}
 
-			return (this.filteredDegreePrograms = [defaultItem]
-				.concat(this.dropdownParsedDegreePrograms)
-				.filter((unit) => {
+			return (this.filteredDegreePrograms =
+				this.dropdownParsedDegreePrograms.filter((unit) => {
 					return unit.label.toLowerCase().includes(query);
 				}));
 		},
 		async storeNewsItem() {
+			if (this.isSaving) {
+				return;
+			}
+
 			let parsedFormData = JSON.parse(JSON.stringify(this.formData));
 			parsedFormData.degreeProgramShortCode =
 				parsedFormData.degreeProgram?.value;
 			delete parsedFormData.degreeProgram;
 
-			let response;
+			this.isSaving = true;
+
 			try {
-				response = await this.$refs.form.call(
+				const response = await this.$refs.form.call(
 					ApiNewsAdministration.storeNewsItem(parsedFormData),
 				);
-			} catch (error) {
-				console.error('Error storing news item:', error);
-				this.$fhcAlert.handleSystemError(error);
-				return;
-			}
-			if (response.meta.status !== 'success') {
-				this.$fhcAlert.alertError(this.$p.t('ui', 'fehlerBeimSpeichern'));
-				return;
-			}
 
-			this.$fhcAlert.alertSuccess(
-				this.$p.t('ui', 'gespeichert'),
-			);
-			this.$emit('created');
+				if (response.meta.status !== 'success') {
+					this.$fhcAlert.alertError(
+						this.$capitalize(this.$p.t('ui', 'fehlerBeimSpeichern')),
+					);
+					return;
+				}
+
+				this.$fhcAlert.alertSuccess(
+					this.$capitalize(this.$p.t('ui', 'gespeichert')),
+				);
+				this.$emit('created');
+			} catch (error) {
+				if (!error?.handled) {
+					this.$fhcAlert.handleSystemError(error);
+				}
+			} finally {
+				this.isSaving = false;
+			}
 		},
 		async updateNewsItem() {
-			if (!this.news || this.isSaving) {
+			if (!this.newsItem || this.isSaving) {
 				return;
 			}
 
@@ -448,18 +424,20 @@ export default {
 			try {
 				const response = await this.$refs.form.call(
 					ApiNewsAdministration.updateNewsItem(
-						this.news.newsId,
+						this.newsItem.newsId,
 						parsedFormData,
 					),
 				);
 
 				if (response.meta.status !== 'success') {
-					this.$fhcAlert.alertError(this.$p.t('ui', 'fehlerBeimSpeichern'));
+					this.$fhcAlert.alertError(
+						this.$capitalize(this.$p.t('ui', 'fehlerBeimSpeichern')),
+					);
 					return;
 				}
 
 				this.$fhcAlert.alertSuccess(
-					this.$p.t('ui', 'gespeichert'),
+					this.$capitalize(this.$p.t('ui', 'gespeichert')),
 				);
 				this.$emit('update');
 			} catch (error) {
@@ -473,9 +451,6 @@ export default {
 	},
 	async created() {
 		await this.$p.loadCategory(['global', 'ui', 'lehre']);
-		this.contentFormItems.germanContentForm.title =
-			this.getContentFormTitle('German');
-		this.fillFormData(this.news);
 
 		let getAllDegreePrograms = await this.$api.call(
 			ApiStudiengang.getDegreePrograms(),
@@ -484,28 +459,38 @@ export default {
 			this.degreePrograms = getAllDegreePrograms.data.sort((a, b) =>
 				a.bezeichnung.localeCompare(b.bezeichnung),
 			);
-			this.fillFormData(this.news);
 		} else {
-			this.$fhcAlert.alertError(this.$p.t('ui', 'fehlerBeimLesen'));
+			this.$fhcAlert.alertError(
+				this.$capitalize(this.$p.t('ui', 'fehlerBeimLesen')),
+			);
 		}
 
+		this.fillFormData(this.newsItem);
+
+		if (!this.$props.newsItem) {
+			this.formData.degreeProgram =
+				this.dropdownParsedDegreePrograms.find(
+					(degreeProgram) => degreeProgram.value === 0,
+				) ?? null;
+		}
 		console.log(FHC_JS_DATA_STORAGE_OBJECT);
+
+		this.contentFormItems.addLanguage.config.languages = this.languagesToAdd;
 	},
 	template: /*html*/ `
-	<section
-		:class="{'pb-3': isMobile}"
+	<section 
 		class="card bg-white shadow-sm border-0 mb-4 overflow-x-hidden"
 		aria-labelledby="news-item-form-heading"
 	>
 		<div class="card-body">
 			<div class="d-flex justify-content-between align-items-center gap-3 mb-3">
-				<h4 id="news-item-form-heading" ref="newsPageHeading" class="card-title fhc-primary-color mb-0">{{ $p.t('ui', 'newsForm') }}</h4>
+				<h4 id="news-item-form-heading" ref="newsPageHeading" class="card-title fhc-primary-color mb-0">{{ $capitalize($p.t('ui', 'newsForm')) }}</h4>
 				<button
 					@click="$emit('toggle-preview')"
 					type="button"
 					class="btn btn-sm btn-outline-primary d-inline-flex align-items-center justify-content-center"
-					:title="isPreviewShown ? $p.t('ui', 'hidePreview') : $p.t('ui', 'showPreview')"
-					:aria-label="isPreviewShown ? $p.t('ui', 'hidePreview') : $p.t('ui', 'showPreview')"
+					:title="$capitalize(isPreviewShown ? $p.t('ui', 'hidePreview') : $p.t('ui', 'showPreview'))"
+					:aria-label="$capitalize(isPreviewShown ? $p.t('ui', 'hidePreview') : $p.t('ui', 'showPreview'))"
 					:aria-expanded="isPreviewShown"
 					aria-controls="news-item-preview"
 				>
@@ -516,7 +501,7 @@ export default {
 				<div class="d-flex flex-row flex-md-row align-items-md-end gap-3">
 					<div class="d-flex flex-row flex-md-row align-items-md-end gap-3">
 						<form-input
-						:label="$p.t('ui', 'visible') + ' ' + $p.t('ui', 'von')"
+						:label="$capitalize($p.t('ui', 'visible') + ' ' + $p.t('ui', 'von'))"
 						:teleport="true"
 						:enable-time-picker="false"
 						type="datePicker"
@@ -527,7 +512,7 @@ export default {
 						auto-apply
 						/>
 						<form-input
-						:label="$p.t('ui', 'visible') + ' ' + $p.t('global', 'bis')"
+						:label="$capitalize($p.t('ui', 'visible') + ' ' + $p.t('global', 'bis'))"
 						:teleport="true"
 						:enable-time-picker="false"
 						type="datePicker"
@@ -548,9 +533,9 @@ export default {
 							type="autocomplete"
 							name="degreeProgramShortCode"
 							v-model="formData.degreeProgram"
-							dropdown 
+ 							dropdown  
 							forceSelection
-							>
+ 							>
 						</form-input>
 						<form-input
 							v-model="formData.semester"
@@ -587,19 +572,13 @@ export default {
 						@click="showCopyTranslationModal"
 						type="button"
 						class="btn btn-sm btn-outline-secondary"
-						:title="$p.t('ui', 'copyContentFromAnotherLanguage')"
+						:title="$capitalize($p.t('ui', 'copyContentFromAnotherLanguage'))"
 						aria-haspopup="dialog"
 					>
 						<i class="fa-solid fa-copy me-1" aria-hidden="true"></i>
-						{{ $p.t('ui', 'copyContentFromAnotherLanguage') }}
+						{{ $capitalize($p.t('ui', 'copyContentFromAnotherLanguage')) }}
 					</button>
 				</div>
-				<news-item-add-language-modal
-					ref="addLanguageModal"
-					:languages="languagesToAdd"
-					@add-language="addLanguage"
-					@hidden="restoreActiveContentTab"
-				></news-item-add-language-modal>
 				<news-item-copy-translation-modal
 					ref="copyTranslationModal"
 					:source-languages="copySourceLanguages"
@@ -607,22 +586,24 @@ export default {
 					:target-has-content="activeTranslationHasContent"
 					@copy="copyTranslation"
 				></news-item-copy-translation-modal>
-				<div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+				<div v-if="!isSaving" class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
 					<button
 						@click="$emit('cancel')"
 						type="button"
 						class="btn btn-secondary"
 					>
-						{{$p.t('ui', 'abbrechen')}}
+						{{ $capitalize($p.t('ui', 'abbrechen')) }}
 					</button>
 					<button
-						@click="news ? updateNewsItem() : storeNewsItem()"
+						@click="newsItem ? updateNewsItem() : storeNewsItem()"
 						type="button"
 						class="btn btn-primary"
-						:disabled="isSaving"
 					>
-						{{$p.t('global', 'speichern')}}
+						{{ $capitalize($p.t('global', 'speichern')) }}
 					</button>
+				</div>
+				<div v-else class="d-flex justify-content-end mt-4 pt-3 border-top" role="status">
+					<span class="spinner-border" aria-hidden="true"></span>
 				</div>
 			</core-form>
 		</div>

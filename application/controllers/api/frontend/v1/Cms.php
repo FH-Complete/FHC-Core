@@ -208,7 +208,7 @@ class Cms extends FHCAPI_Controller
 			$this->addMeta('semester', $semester);
 		}
 
-		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size, $sprache, $maxAlter);
+		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size, $sprache, $maxAlter, false, [], false);
 		$news = $this->getDataOrTerminateWithError($news);
 
 		$this->addMeta('row_count', $news["full_count"] ?? 0);

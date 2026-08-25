@@ -98,16 +98,23 @@ class News_model extends DB_Model
 				$where[] = "semester IS NULL";
 			elseif ($semester === 0)
 				$where[] = "semester = 0";
+			else 
+				$where[] = "semester = " . $this->db->escape($semester);
 		} elseif ($studiengang_kz != '') {
 			$add = $mischen === true ? " OR (studiengang_kz = 0 AND semester IS NULL)" : "";
 			$allowedSemesterValues = [$semester, 0, null];
 			$where[] = "(studiengang_kz = " . $this->db->escape($studiengang_kz) . " AND (semester in (" . implode(',', array_map([$this->db, 'escape'], $allowedSemesterValues)) . ") OR semester IS NULL) OR (studiengang_kz = 0 AND semester = " . $this->db->escape($semester) . ")" . $add . ")";
 
+		} elseif ($semester !== NULL) {
+			$where[] = "semester = " . $this->db->escape($semester);
 		}
+
 		$this->addJoin('campus.tbl_contentsprache cs', 'content_id');
 
 		if (is_bool($sichtbar) || $sichtbar === 'true' || $sichtbar === 'false') {
-			$where[] = "cs.sichtbar = " . ($sichtbar ? "true" : "false");
+			$isSichtbar = filter_var($sichtbar, FILTER_VALIDATE_BOOLEAN);
+			log_message('error', 'sichtbar: ' . ($isSichtbar ? "true" : "false"));
+			$where[] = "cs.sichtbar = " . ($isSichtbar ? "true" : "false");
 		}
 
 		$where[] = "cs.sprache = (CASE WHEN EXISTS(SELECT 1 FROM campus.tbl_contentsprache cs2 WHERE cs2.content_id=" . $this->dbTable . ".content_id AND sprache=" . $this->db->escape($sprache) . ") THEN " . $this->db->escape($sprache) . " ELSE " . $this->db->escape(DEFAULT_LANGUAGE) . " END)";

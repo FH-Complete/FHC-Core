@@ -14,17 +14,18 @@ export default {
 	},
 	template: /*html*/ `
 		<div class="py-4 text-center text-muted">
-			<button
-				v-if="config.hasAvailableLanguages"
-				type="button"
-				class="btn btn-link text-decoration-none"
-				:aria-label="$p.t('ui', 'addTranslationLanguage')"
-				@click="$emit('tab-action')"
-			>
-				<i class="fa-solid fa-plus-circle fs-4 mb-2" aria-hidden="true"></i>
-				<span class="d-block">{{ $p.t('ui', 'selectLanguageForTranslation') }}</span>
-			</button>
-			<p v-else class="mb-0">{{ $p.t('ui', 'allLanguagesAdded') }}</p>
+			<div v-if="config?.languages?.length" class="d-flex justify-content-center gap-2">
+				<button
+					v-for="language in config.languages"
+					:key="language.value"
+					type="button"
+					class="btn btn-outline-primary text-start"
+					@click="$emit('tab-action', { action: 'add-language', language: language.value })"
+				>
+					{{ language.label }}
+				</button>
+			</div>
+			<p v-else class="mb-0 text-muted">{{ $capitalize($p.t('ui', 'allLanguagesAdded')) }}</p>
 		</div>
 	`,
 };

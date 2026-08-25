@@ -1,14 +1,14 @@
 import Pagination from '../../../Pagination/Pagination.js';
 import ApiNewsAdministration from '../../../../api/factory/newsAdministration.js';
 import NewsListItem from './NewsListItem.js';
-
-const MAX_NEW_AGE = 60;
+import NewsListFilter from './NewsListFilter.js';
 
 export default {
 	name: 'NewsList',
 	emits: ['edit'],
 	components: {
 		NewsListItem,
+		NewsListFilter,
 		Pagination,
 	},
 	data() {
@@ -19,6 +19,10 @@ export default {
 			maxPageCount: 0,
 			page: 1,
 			pageSize: 10,
+			isPublishedFilter: 'all',
+			isActiveFilter: true,
+			degreeProgramShortCodeFilter: null,
+			semesterFilter: null,
 		};
 	},
 	watch: {
@@ -50,15 +54,19 @@ export default {
 						this.page,
 						this.pageSize,
 						this.sprache,
-						MAX_NEW_AGE,
-						'all',
+						this.isPublishedFilter,
+						this.isActiveFilter,
+						this.degreeProgramShortCodeFilter,
+						this.semesterFilter,
 					),
 				);
 				this.newsItems = this.parseNewsHtml(response.data);
 				this.maxPageCount = response.meta.row_count;
 			} catch (error) {
 				this.newsItems = [];
-				this.loadError = this.$p.t('ui', 'fehlerBeimLesen');
+				this.loadError = this.$capitalize(
+					this.$p.t('ui', 'fehlerBeimLesen'),
+				);
 			} finally {
 				this.isLoading = false;
 			}
@@ -75,7 +83,6 @@ export default {
 			);
 		},
 		parseNewsItem(article) {
-			console.log('Parsing news item:', article);
 			const newsId = article
 				.querySelector('[news-id]')
 				?.getAttribute('news-id');
@@ -86,7 +93,7 @@ export default {
 				'.card-header span[is-published]',
 			);
 			const content = article.querySelector('.card-text');
-
+			console.log(content.title);
 			return {
 				newsId: newsId ? Number(newsId) : null,
 				language: this.sprache,
@@ -106,9 +113,17 @@ export default {
 			this.fetchNews();
 			this.$refs.newsListHeading.scrollIntoView({ block: 'end' });
 		},
+		afterFilterChanged(filters) {
+			this.isPublishedFilter = filters.isPublished;
+			this.isActiveFilter = filters.isActive;
+			this.degreeProgramShortCodeFilter = filters.degreeProgramShortCode;
+			this.semesterFilter = filters.semester;
+			this.page = 1;
+			this.fetchNews();
+		},
 	},
 	created() {
-		this.$p.loadCategory(['global', 'ui']).then(() => {
+		this.$p.loadCategory(['filter', 'global', 'lehre', 'ui']).then(() => {
 			this.phrasesLoaded = true;
 		});
 		this.fetchNews();
@@ -116,9 +131,10 @@ export default {
 	template: /*html*/ `
 	<section class="mt-4" aria-labelledby="news-administration-list-heading">
 		<h3 id="news-administration-list-heading" ref="newsListHeading" class="fhc-primary-color">
-			{{ $p.t('ui', 'news') }}
+			{{ $capitalize($p.t('ui', 'news')) }}
 		</h3>
 		<hr>
+		<news-list-filter @filter-changed="afterFilterChanged"></news-list-filter>
 		<pagination
 			v-if="maxPageCount > pageSize"
 			:page="page"
@@ -128,13 +144,13 @@ export default {
 		></pagination>
 		<div v-if="isLoading" class="d-flex justify-content-center py-4" role="status">
 			<span class="spinner-border" aria-hidden="true"></span>
-			<span class="visually-hidden">{{ $p.t('ui', 'loadingNews') }}</span>
+			<span class="visually-hidden">{{ $capitalize($p.t('ui', 'loadingNews')) }}</span>
 		</div>
 		<div v-else-if="loadError" class="alert alert-danger" role="alert">
 			{{ loadError }}
 		</div>
 		<div v-else-if="!newsItems.length" class="alert alert-info" role="status">
-			{{ $p.t('ui', 'noNewsAvailable') }}
+			{{ $capitalize($p.t('ui', 'noNewsAvailable')) }}
 		</div>
 		<div v-else>
 			<news-list-item

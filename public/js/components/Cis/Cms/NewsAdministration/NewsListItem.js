@@ -37,7 +37,9 @@ export default {
 
 			if (
 				(await this.$fhcAlert.confirm({
-					message: this.$p.t('ui', 'frageSicherLoeschen'),
+					message: this.$capitalize(
+						this.$p.t('ui', 'frageSicherLoeschen'),
+					),
 					acceptClass: 'btn btn-danger',
 				})) === false
 			) {
@@ -91,7 +93,7 @@ export default {
 				></i>
 				<span class="h5 mb-0">{{ news.title }}</span>
 				<span v-if="!news.isPublished" class="badge text-bg-secondary">
-					{{ $p.t('ui', 'notPublishedYet') }}
+					{{ $capitalize($p.t('ui', 'notPublishedYet')) }}
 				</span>
 			</button>
 			<div class="d-flex align-items-center gap-2 flex-shrink-0">
@@ -103,14 +105,14 @@ export default {
 						{{ news.date }}
 					</time>
 				</div>
-				<div class="d-flex gap-1" :aria-label="$p.t('global', 'actions')">
+				<div class="d-flex gap-1" :aria-label="$capitalize($p.t('global', 'actions'))">
 					<button
 						type="button"
 						class="btn btn-sm rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center"
 						:class="news.isPublished ? 'btn-light text-primary' : 'btn-outline-secondary bg-white'"
 						style="width: 1.75rem; height: 1.75rem"
-						:title="$p.t('ui', 'bearbeiten')"
-						:aria-label="$p.t('ui', 'bearbeiten')"
+						:title="$capitalize($p.t('ui', 'bearbeiten'))"
+						:aria-label="$capitalize($p.t('ui', 'bearbeiten'))"
 						@click="editNews(news)"
 					>
 						<i class="fa-solid fa-pen" aria-hidden="true"></i>
@@ -120,8 +122,8 @@ export default {
 						class="btn btn-sm rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center"
 						:class="news.isPublished ? 'btn-light text-danger' : 'btn-outline-danger bg-white'"
 						style="width: 1.75rem; height: 1.75rem"
-						:title="$p.t('ui', 'loeschen')"
-						:aria-label="$p.t('ui', 'loeschen')"
+						:title="$capitalize($p.t('ui', 'loeschen'))"
+						:aria-label="$capitalize($p.t('ui', 'loeschen'))"
 						:disabled="isDeleting"
 						@click="deleteNews(news)"
 					>

@@ -1,72 +1,85 @@
-import CisMenuEntry from "./Menu/Entry.js";
-import FhcSearchbar from "../searchbar/searchbar.js";
-import CisSprachen from "./Sprachen.js"
-import ThemeSwitch from "./ThemeSwitch.js";
+import CisMenuEntry from './Menu/Entry.js';
+import FhcSearchbar from '../searchbar/searchbar.js';
+import CisSprachen from './Sprachen.js';
+import ThemeSwitch from './ThemeSwitch.js';
 import ApiCisMenu from '../../api/factory/cis/menu.js';
 
 export default {
-    components: {
-        CisMenuEntry,
-        FhcSearchbar,
+	components: {
+		CisMenuEntry,
+		FhcSearchbar,
 		CisSprachen,
 		ThemeSwitch,
-    },
-    props: {
+	},
+	props: {
 		rootUrl: String,
-        logoUrl: String,
-        avatarUrl: String,
-        logoutUrl: String,
+		logoUrl: String,
+		avatarUrl: String,
+		logoutUrl: String,
 		selectedtypes: Array,
-        searchbaroptions: Object,
-        searchfunction: Function
-    },
-    data: () => {
-        return {
-            entries: [],
-			activeEntry:null,
-			url:null,
-			urlMatchRankings:[],
-			navUserDropdown:null,
-			menuOpen:true,
-        };
-    },
-	inject: ["isNarrow", "isMobile"],
-	provide(){
-		return{
+		searchbaroptions: Object,
+		searchfunction: Function,
+	},
+	data: () => {
+		return {
+			entries: [],
+			activeEntry: null,
+			url: null,
+			urlMatchRankings: [],
+			navUserDropdown: null,
+			menuOpen: true,
+		};
+	},
+	inject: {
+		isNarrow: {
+			default: false,
+		},
+		isMobile: {
+			default: false,
+		},
+	},
+	provide() {
+		return {
 			setActiveEntry: this.setActiveEntry,
 			addUrlCount: this.addUrlCount,
 			makeParentContentActive: this.makeParentContentActive,
-		}
+		};
 	},
-	computed:{
-		menuCollapseAriaLabel(){
-			if(this.menuOpen){
+	computed: {
+		menuCollapseAriaLabel() {
+			if (this.menuOpen) {
 				return this.$p.t('global', 'collapseMenu');
-			}else{
+			} else {
 				return this.$p.t('global', 'extendMenu');
 			}
 		},
-		highestMatchingUrlCount(){
+		highestMatchingUrlCount() {
 			// gets the hightest ranking inside the array
 			let highestMatch = Math.max(...this.urlMatchRankings);
 
-			if(this.urlMatchRankings.length > 0){
+			if (this.urlMatchRankings.length > 0) {
 				// if more than one entry has the same ranking, none should be active
-				return this.urlMatchRankings.filter((value)=>value == highestMatch).length > 1 ? null : highestMatch;
+				return this.urlMatchRankings.filter((value) => value == highestMatch)
+					.length > 1
+					? null
+					: highestMatch;
 			}
 
 			return null;
 		},
-		site_url(){
-			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+		site_url() {
+			return (
+				FHC_JS_DATA_STORAGE_OBJECT.app_root +
+				FHC_JS_DATA_STORAGE_OBJECT.ci_router
+			);
 		},
 	},
 	methods: {
 		fetchMenu() {
 			return this.$api
 				.call(ApiCisMenu.getMenu())
-				.then(res => res.data)
-				.then(menu => {
+				.then((res) => res.data)
+				.then((menu) => {
 					this.entries = menu;
 				});
 		},
@@ -76,43 +89,54 @@ export default {
 				this.navUserDropdown.hide();
 			}
 		},
-		handleShowNavUser(){
-			document.addEventListener("click", this.checkSettingsVisibility);
+		handleShowNavUser() {
+			document.addEventListener('click', this.checkSettingsVisibility);
 		},
-		handleHideNavUser(){
-			document.removeEventListener("click", this.checkSettingsVisibility);
+		handleHideNavUser() {
+			document.removeEventListener('click', this.checkSettingsVisibility);
 		},
-		makeParentContentActive(content_id, collection=this.entries, parent=null){
-			if(!collection) return;
-			if (typeof collection == 'object' && !Array.isArray(collection) && Object.entries(collection).length > 0) {
+		makeParentContentActive(
+			content_id,
+			collection = this.entries,
+			parent = null,
+		) {
+			if (!collection) return;
+			if (
+				typeof collection == 'object' &&
+				!Array.isArray(collection) &&
+				Object.entries(collection).length > 0
+			) {
 				collection = Object.values(collection);
 			}
-			for(let entry of collection){
-				if(entry.content_id == content_id){
+			for (let entry of collection) {
+				if (entry.content_id == content_id) {
 					this.activeEntry = parent;
 				}
-				this.makeParentContentActive(content_id, entry.childs, entry.content_id);
+				this.makeParentContentActive(
+					content_id,
+					entry.childs,
+					entry.content_id,
+				);
 			}
-			
 		},
-		addUrlCount(count){
+		addUrlCount(count) {
 			this.urlMatchRankings.push(count);
 		},
 
-		setActiveEntry(content_id){
+		setActiveEntry(content_id) {
 			this.activeEntry = content_id;
 		},
 	},
-	created(){
+	created() {
 		this.fetchMenu();
 	},
-	mounted(){
-		this.$p.loadCategory(['ui', 'global', 'profilUpdate'])
-		this.navUserDropdown = new bootstrap.Collapse(this.$refs.navUserDropdown,{
-			toggle: false
+	mounted() {
+		this.$p.loadCategory(['ui', 'global', 'profilUpdate']);
+		this.navUserDropdown = new bootstrap.Collapse(this.$refs.navUserDropdown, {
+			toggle: false,
 		});
 	},
-    template: /*html*/`
+	template: /*html*/ `
 	<div id="cis-header-bar" class="d-flex flex-row flex-grow-1">
 		<div id="nav-logo" class="d-none d-lg-block">
 			<div class="d-flex h-100 justify-content-between">
@@ -212,5 +236,5 @@ export default {
 				</div>
 			</div>
 		</div>
-    </nav>`
+    </nav>`,
 };

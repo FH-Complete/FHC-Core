@@ -60407,7 +60407,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'News-Administration',
+				'text' => 'News-Verwaltung',
 				'description' => '',
 				'insertvon' => 'system'
 			),

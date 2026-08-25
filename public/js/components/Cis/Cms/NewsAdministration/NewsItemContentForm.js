@@ -139,6 +139,7 @@ export default {
 			const vm = this;
 			tinymce.init({
 				target: this.$refs.editor.$refs.input, // Important: enables multiple component instances
+				height: 500,
 				toolbar:
 					'styleselect fontsizeselect | bold italic underline | alignleft aligncenter alignright alignjustify | link unlink image | bullist | pastetext',
 				plugins: 'lists link image paste',
@@ -151,14 +152,14 @@ export default {
 				},
 
 				style_formats: [
-					{ title: vm.$p.t('ui', 'blocks'), block: 'div' },
-					{ title: vm.$p.t('ui', 'paragraph'), block: 'p' },
-					{ title: vm.$p.t('ui', 'heading1'), block: 'h1' },
-					{ title: vm.$p.t('ui', 'heading2'), block: 'h2' },
-					{ title: vm.$p.t('ui', 'heading3'), block: 'h3' },
-					{ title: vm.$p.t('ui', 'heading4'), block: 'h4' },
-					{ title: vm.$p.t('ui', 'heading5'), block: 'h5' },
-					{ title: vm.$p.t('ui', 'heading6'), block: 'h6' },
+					{ title: vm.$capitalize(vm.$p.t('ui', 'blocks')), block: 'div' },
+					{ title: vm.$capitalize(vm.$p.t('ui', 'paragraph')), block: 'p' },
+					{ title: vm.$capitalize(vm.$p.t('ui', 'heading1')), block: 'h1' },
+					{ title: vm.$capitalize(vm.$p.t('ui', 'heading2')), block: 'h2' },
+					{ title: vm.$capitalize(vm.$p.t('ui', 'heading3')), block: 'h3' },
+					{ title: vm.$capitalize(vm.$p.t('ui', 'heading4')), block: 'h4' },
+					{ title: vm.$capitalize(vm.$p.t('ui', 'heading5')), block: 'h5' },
+					{ title: vm.$capitalize(vm.$p.t('ui', 'heading6')), block: 'h6' },
 				],
 				setup: (editor) => {
 					vm.editor = editor;
@@ -172,7 +173,12 @@ export default {
 	},
 	async mounted() {
 		await this.$p.loadCategory(['global', 'ui', 'notiz']);
-		this.initTinyMCE();
+
+		setTimeout(() => {
+			if (this.$refs.editor?.$refs.input) {
+				this.initTinyMCE();
+			}
+		}, 100);
 	},
 	beforeUnmount() {
 		this.cleanupDmsFileBrowser(true);
@@ -182,13 +188,13 @@ export default {
 		}
 	},
 	template: /*html*/ `
-	<div :class="{'pb-3': isMobile}" class="position-relative overflow-x-hidden">
+	<div class="position-relative overflow-x-hidden">
 	<button
 		v-if="config.language !== 'German'"
 		type="button"
 		class="btn btn-sm btn-outline-danger position-absolute top-0 end-0"
-		:title="$p.t('ui', 'removeLanguage')"
-		:aria-label="$p.t('ui', 'removeLanguage')"
+		:title="$capitalize($p.t('ui', 'removeLanguage'))"
+		:aria-label="$capitalize($p.t('ui', 'removeLanguage'))"
 		@click="$emit('tab-action', { action: 'remove-language', language: config.language })"
 	>
 		<i class="fa-solid fa-trash-can" aria-hidden="true"></i>
@@ -196,21 +202,21 @@ export default {
     <div class="d-flex flex-column flex-md-row align-items-md-end gap-3">
       <form-input
         type="text"
-        :label="$p.t('notiz', 'verfasser')"
+		:label="$capitalize($p.t('notiz', 'verfasser'))"
         name="author"
         v-model="contentData.author"
         >
       </form-input>
       <form-input
         type="text"
-        :label="$p.t('global', 'betreff')"
+		:label="$capitalize($p.t('global', 'betreff'))"
         name="title"
         v-model="contentData.title"
         >
       </form-input>
       <form-input
         type="checkbox"
-        :label="$p.t('ui', 'publish')"
+		:label="$capitalize($p.t('ui', 'publish'))"
         name="isPublished"
         v-model="contentData.isPublished"
         >
@@ -218,12 +224,13 @@ export default {
     </div>
     <form-input
       ref="editor"
-      :label="$p.t('global','text')  + ' *'"
+		:label="$capitalize($p.t('global', 'text') + ' *')"
       type="textarea"
       name="text"
       v-model="contentData.text"
       rows="5"
       cols="75"
+      style="min-height: 500px"
       >
     </form-input>
 

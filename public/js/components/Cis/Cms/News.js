@@ -100,7 +100,15 @@ export default {
 	},
 	template: /*html*/ `
 	<div :class="{'pb-3': isMobile}" class="overflow-x-hidden">
-  		<h2 ref="newsPageHeading" class="fhc-primary-color">News</h2>
+  		<div class="d-flex justify-content-between align-items-center">
+			<h2 ref="newsPageHeading" class="fhc-primary-color">News</h2>
+			<router-link
+				class="btn btn-primary mb-3"
+				to="NewsAdministration"
+			>
+				{{ $p.t('ui', 'newsAdministration') }} <i class="fas fa-cog m-0"></i>
+			</router-link>
+		</div>
 		<hr/>
 		<pagination
 			v-if="content?true:false"

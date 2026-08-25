@@ -20,8 +20,10 @@ export default {
 		page = 1,
 		page_size = 10,
 		sprache,
-		maxAge = 60,
-		filterPublished = true,
+		publishedFilter = true,
+		isActive = true,
+		degreeProgramShortCode = null,
+		semester = null,
 	) {
 		return {
 			method: 'get',
@@ -30,8 +32,10 @@ export default {
 				page,
 				page_size,
 				sprache,
-				maxAlter: maxAge,
-				published: filterPublished,
+				published: publishedFilter,
+				isActive,
+				degreeProgramShortCode,
+				semester,
 			},
 		};
 	},
@@ -42,7 +46,6 @@ export default {
 		};
 	},
 	storeNewsItem(data) {
-		console.log('Storing news item:', data);
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/NewsAdministrationAPI/storeNewsItem',

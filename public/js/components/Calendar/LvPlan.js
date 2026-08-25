@@ -1,4 +1,4 @@
-import FhcCalendar from "./Base.js";
+import FhcCalendar from './Base.js';
 
 import ApiLvPlan from '../../api/factory/lvPlan.js';
 
@@ -11,50 +11,48 @@ import ModeMonth from './Mode/Month.js';
 import ModeList from './Mode/List.js';
 
 export default {
-	name: "CalendarLvPlan",
+	name: 'CalendarLvPlan',
 	components: {
-		FhcCalendar
+		FhcCalendar,
 	},
-	inject: ["isMobile"],
+	inject: {
+		isMobile: {
+			default: false,
+		},
+	},
 	props: {
 		date: {
 			type: [Date, String, Number, luxon.DateTime],
-			default: luxon.DateTime.local()
+			default: luxon.DateTime.local(),
 		},
 		mode: {
 			type: String,
-			default: 'Week'
+			default: 'Week',
 		},
 		getPromiseFunc: {
 			type: Function,
-			required: true
-		}
+			required: true,
+		},
 	},
 	provide() {
 		return {
 			shouldCompactEvents: Vue.computed(
-				() => this.$props.mode === "Month" && this.isMobile,
+				() => this.$props.mode === 'Month' && this.isMobile,
 			),
-			compactibleEventTypes: Vue.computed(
-				() => this.compactibleEventTypes,
-			),
+			compactibleEventTypes: Vue.computed(() => this.compactibleEventTypes),
 		};
 	},
-	emits: [
-		"update:date",
-		"update:mode",
-		"update:range"
-	],
+	emits: ['update:date', 'update:mode', 'update:range'],
 	data() {
 		return {
 			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone,
 			modeOptions: {
 				day: {
 					emptyMessage: Vue.computed(() => this.$p.t('lehre/noLvFound')),
-					emptyMessageDetails: Vue.computed(() => this.$p.t('lehre/noLvFound'))
+					emptyMessageDetails: Vue.computed(() => this.$p.t('lehre/noLvFound')),
 				},
 				week: {
-					collapseEmptyDays: false
+					collapseEmptyDays: false,
 				},
 				list: {
 					length: 7,
@@ -72,16 +70,18 @@ export default {
 				return [
 					{
 						class: 'background-past',
-						end: now.startOf('day')
-					}
+						end: now.startOf('day'),
+					},
 				];
 
 			return [
 				{
 					class: 'background-past',
 					end: now,
-					label: now.startOf('minute').toISOTime({ suppressSeconds: true, includeOffset: false })
-				}
+					label: now
+						.startOf('minute')
+						.toISOTime({ suppressSeconds: true, includeOffset: false }),
+				},
 			];
 		},
 		modes() {
@@ -100,8 +100,7 @@ export default {
 	},
 	methods: {
 		eventStyle(event) {
-			if (!event.farbe)
-				return undefined;
+			if (!event.farbe) return undefined;
 			return '--event-bg:#' + event.farbe;
 		},
 		updateRange(rangeInterval) {
@@ -128,10 +127,13 @@ export default {
 	},
 	setup(props, context) {
 		const rangeInterval = Vue.ref(null);
-		
-		const { events, lv, reset } = useEventLoader(rangeInterval, props.getPromiseFunc);
 
-		Vue.watch(lv, newValue => {
+		const { events, lv, reset } = useEventLoader(
+			rangeInterval,
+			props.getPromiseFunc,
+		);
+
+		Vue.watch(lv, (newValue) => {
 			context.emit('update:lv', newValue);
 		});
 
@@ -142,14 +144,14 @@ export default {
 			events,
 			lv,
 			reset,
-			renderers
+			renderers,
 		};
 	},
 	async created() {
 		await this.getStunden();
 		await this.getCompactibleEventTypes();
 	},
-	template: /* html */`
+	template: /* html */ `
 	<fhc-calendar
 		ref="calendar"
 		class="fhc-calendar-lvplan"
@@ -203,5 +205,5 @@ export default {
 		<template #actions>
 			<slot />
 		</template>
-	</fhc-calendar>`
-}
+	</fhc-calendar>`,
+};

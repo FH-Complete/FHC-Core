@@ -170,7 +170,7 @@ const router = VueRouter.createRouter({
 			props: true,
 		},
 		{
-			path: `/CisVue/Cms/NewsAdministration`,
+			path: `/CisVue/Cms/newsAdministration`,
 			name: 'NewsAdministration',
 			component: NewsAdministration,
 			props: true,

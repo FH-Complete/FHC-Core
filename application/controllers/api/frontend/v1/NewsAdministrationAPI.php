@@ -20,7 +20,6 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class NewsAdministrationAPI extends FHCAPI_Controller
 {
-	const GENERAL_DEGREE_PROGRAM_ID = 0;
 	/**
 	 * News API constructor.
 	 */
@@ -40,18 +39,21 @@ class NewsAdministrationAPI extends FHCAPI_Controller
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 		$this->load->model('system/Sprache_model', 'SpracheModel');
+		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 
 		$this->loadPhrases([
 			'global'
 		]);
 
 		$this->load->library('CmsLib');
+
+		$this->load->helper('hlp_sancho_helper');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
 
-	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = true, $sichtbar = true, $maxAlter = 0)
+	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $active = true, $sichtbar = true)
 	{
 		$this->load->library('form_validation');
 		$this->form_validation->set_data($_GET);
@@ -69,29 +71,74 @@ class NewsAdministrationAPI extends FHCAPI_Controller
 
 		// default value for the page_size is 10
 		$page_size = $page_size ?? 10;
-		
-		$passedInMaxAlter = $this->input->get('maxAlter', true);
-		if($passedInMaxAlter !== null)
-		{
-			$maxAlter = intval($passedInMaxAlter);
-		}
-
 
 		$passedSichtbar = $this->input->get('published', true);
 		if($passedSichtbar !== null)
 		{
 			$sichtbar = $passedSichtbar;
 		}
-		
-		$allowedDegreePrograms = $this->permissionlib->getSTG_isEntitledFor("basis/news");
-		array_push($allowedDegreePrograms, self::GENERAL_DEGREE_PROGRAM_ID);
+		$this->addMeta('published', $passedSichtbar);
 
-		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size, $sprache, $maxAlter, true, $allowedDegreePrograms);
+		$passedIsActive = $this->input->get('isActive', true);
+		if ($passedIsActive !== null)
+		{
+			$isActive = filter_var(
+				$passedIsActive,
+				FILTER_VALIDATE_BOOLEAN,
+				FILTER_NULL_ON_FAILURE
+			);
+			if ($isActive !== null)
+			{
+				$active = $isActive;
+			}
+		}
+		$this->addMeta('isActive', $active);
+
+		$degreeProgramShortCode = $this->input->get('degreeProgramShortCode', true);
+		if ($degreeProgramShortCode !== null && $degreeProgramShortCode !== '')
+		{
+			if (!ctype_digit((string)$degreeProgramShortCode))
+			{
+				$this->terminateWithValidationErrors([
+					'degreeProgramShortCode' => 'A valid degree program is required'
+				]);
+			}
+			$studiengang_kz = $degreeProgramShortCode;
+		}
+		$this->addMeta('degreeProgramShortCode', $studiengang_kz);
+
+		$passedSemester = $this->input->get('semester', true);
+		if ($passedSemester !== null && $passedSemester !== '')
+		{
+			if (
+				!ctype_digit((string)$passedSemester)
+				|| (int)$passedSemester < 1
+				|| (int)$passedSemester > 8
+			)
+			{
+				$this->terminateWithValidationErrors([
+					'semester' => 'A valid semester is required'
+				]);
+			}
+			$semester = filter_var($passedSemester, FILTER_VALIDATE_INT);
+		}
+		$this->addMeta('semester', $semester);
+
+		$allowedDegreePrograms = $this->permissionlib->getSTG_isEntitledFor("basis/news");
+
+		$edit = true;
+		$maxAlter = MAXNEWSALTER;
+		if (!$active) {
+			$maxAlter = null;
+		}
+
+		log_message('error', 'getNews: edit: ' . ($edit ? "true" : "false") . ', maxAlter: ' . ($maxAlter ?? "null"));
+
+		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, true, $sichtbar, $page, $page_size, $sprache, $maxAlter, true, $allowedDegreePrograms, $isActive);
 		$news = $this->getDataOrTerminateWithError($news);
 
-		$this->addMeta('phrases', json_decode($this->p->getJson()));
-
 		$this->addMeta('row_count', $news["full_count"] ?? 0);
+
 		$this->terminateWithSuccess($news["content"]);
 	}
 
@@ -126,7 +173,6 @@ class NewsAdministrationAPI extends FHCAPI_Controller
 
 		$news = current(getData($newsResult));
 		$allowedDegreePrograms = $this->permissionlib->getSTG_isEntitledFor("basis/news");
-		array_push($allowedDegreePrograms, self::GENERAL_DEGREE_PROGRAM_ID);
 		
 		if (!in_array($news->studiengang_kz, $allowedDegreePrograms)) {
 			$this->terminateWithError('You are not entitled to access this news entry', self::ERROR_TYPE_PERMISSION);
@@ -330,6 +376,8 @@ class NewsAdministrationAPI extends FHCAPI_Controller
 
 		foreach ($data['translations'] as $translation)
 		{
+			$translation['content'] = $this->formatContentURLsToRelative($translation['content']);
+
 			$translationResult = $this->ContentspracheModel->insert([
 				'sprache' => $translation['sprache'],
 				'content_id' => $contentId,
@@ -346,6 +394,15 @@ class NewsAdministrationAPI extends FHCAPI_Controller
 			$this->_getInsertedIdOrRollback($translationResult);
 		}
 
+		$newsItemResult = $this->NewsModel->load($newsId);
+		$newsItem = $this->getDataOrTerminateWithError($newsItemResult);
+		$newsItem = $newsItem[0];
+
+		$this->_sendNewsItemTranslationRequiredMail(
+			$newsItem
+		);
+
+		$this->addMeta("newsItem", json_encode($newsItem));
 		if ($this->db->trans_status() === false)
 		{
 			$error = $this->db->error();
@@ -359,12 +416,12 @@ class NewsAdministrationAPI extends FHCAPI_Controller
 			$this->db->trans_rollback();
 			$this->terminateWithError($error, self::ERROR_TYPE_DB);
 		}
-
+		
 		$this->terminateWithSuccess($newsId);
 	}
 
 	/**
-	 * Updates a news entry and creates new versions of its supplied translations.
+	 * Updates a news entry and its supplied translations.
 	 *
 	 * @return void
 	 */
@@ -529,29 +586,51 @@ class NewsAdministrationAPI extends FHCAPI_Controller
 			$this->terminateWithError(getError($existingTranslationsResult), self::ERROR_TYPE_DB);
 		}
 
-		$latestVersions = [];
+		$existingTranslations = [];
 
 		foreach ((array)getData($existingTranslationsResult) as $existingTranslation)
 		{
 			$language = $existingTranslation->sprache;
-			$version = (int)$existingTranslation->version;
-			$latestVersions[$language] = max($latestVersions[$language] ?? 0, $version);
+
+			if (
+				!isset($existingTranslations[$language])
+				|| (int)$existingTranslation->version > (int)$existingTranslations[$language]->version
+			)
+			{
+				$existingTranslations[$language] = $existingTranslation;
+			}
 		}
 
 		foreach ($data['translations'] as $translation)
 		{
-			$translationResult = $this->ContentspracheModel->insert([
-				'sprache' => $translation['sprache'],
-				'content_id' => $existingNews->content_id,
-				'version' => ($latestVersions[$translation['sprache']] ?? 0) + 1,
+			$translation['content'] = $this->formatContentURLsToRelative($translation['content']);
+			$translationData = [
 				'sichtbar' => $translation['sichtbar'],
 				'content' => $translation['content'],
 				'titel' => $translation['betreff'],
-				'insertamum' => $now,
-				'insertvon' => $uid,
 				'updateamum' => $now,
 				'updatevon' => $uid
-			]);
+			];
+
+			$existingTranslation = $existingTranslations[$translation['sprache']] ?? null;
+
+			if ($existingTranslation)
+			{
+				$translationResult = $this->ContentspracheModel->update(
+					$existingTranslation->contentsprache_id,
+					$translationData
+				);
+			}
+			else
+			{
+				$translationResult = $this->ContentspracheModel->insert([
+					'sprache' => $translation['sprache'],
+					'content_id' => $existingNews->content_id,
+					'version' => 1,
+					'insertamum' => $now,
+					'insertvon' => $uid
+				] + $translationData);
+			}
 
 			$this->_getInsertedIdOrRollback($translationResult);
 		}
@@ -809,7 +888,65 @@ class NewsAdministrationAPI extends FHCAPI_Controller
 
 		$parent->appendChild($element);
 	}
+    
+	private function _sendNewsItemTranslationRequiredMail($newsItem)
+	{
+		$translatorsResult = $this->BenutzerfunktionModel->getBenutzerFunktionen("translate", $newsItem->studiengang_kz);
+		$translators = $this->getDataOrTerminateWithError($translatorsResult);
 
+		$newsItemContentResult = $this->ContentspracheModel->loadWhere([
+			'content_id' => $newsItem->content_id,
+			'sprache' => 'German'
+		]);
+		$newsItemContentEntry = getData($newsItemContentResult)[0] ?? null;
+		if ($newsItemContentEntry) {
+			$newsItem->sichtbar = $newsItemContentEntry->sichtbar ?? false;
+			$newsItem->content = $newsItemContentEntry->content;
+		}
+		$content = getData(
+			$this->cmslib->createNewsContent(
+				$this->cmslib->createNewsWrapper($newsItem, true),
+				false,
+				""
+			)
+		);
+		$content = str_replace('dms.php', APP_ROOT . 'cms/dms.php', $content);
 
+		foreach ($translators as $translator) {
+			sendSanchoMail(
+				"Sancho_Mail_News_Translation_Req",
+				[
+					"newsItemUrl" => APP_ROOT . "cis.php/CisVue/Cms/newsAdministration?newsId=" . $newsItem->news_id,
+					"newsItem" => $content,
+					"newsItemAuthor" => $newsItem->verfasser,
+					"newsItemSubject" => $newsItem->betreff
+				],
+				$translator->uid . "@" . DOMAIN,
+				"Übersetzung erforderlich / Translation required"
+			);
+		}
+	}
 
+	private function formatContentURLsToRelative($content)
+	{
+		$content = preg_replace(
+			'#https?://[^"\'>\s]*/(dms\.php(?:\?[^"\'>\s]*)?)#i',
+			'$1',
+			$content
+		);
+
+		$content = preg_replace(
+			'#(?:\.\./)+[^"\'>\s]*/(dms\.php(?:\?[^"\'>\s]*)?)#i',
+			'$1',
+			$content
+		);
+
+		$content = preg_replace(
+			'#/[^"\'>\s]*/(dms\.php(?:\?[^"\'>\s]*)?)#i',
+			'$1',
+			$content
+		);
+
+		return $content;
+	}
 }

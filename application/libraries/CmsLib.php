@@ -176,47 +176,90 @@ class CmsLib
 	 * 
 	 * @return void
 	 */
-	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true, $page = 1, $page_size = 10, $sprache, $maxAlter = 0, $filterForDegreePrograms = false, $allowedDegreePrograms = [])
+	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true, $page = 1, $page_size = 10, $sprache, $maxAlter = 0, $filterForDegreePrograms = false, $allowedDegreePrograms = [], $active = true)
 
 	{
 		$this->ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		list($studiengang_kz, $semester) = $this->getStgAndSem($studiengang_kz, $semester);
-		log_message('error', 'cmslib getNews Studiengang: ' . $studiengang_kz . ', Semester: ' . $semester);
-		$all = $edit;
-
-		$xml = '<?xml version="1.0" encoding="UTF-8"?><content>';
 
 		$this->ci->load->model('content/News_model', 'NewsModel');
 	
 		
-		$news = $this->ci->NewsModel->getNewsWithContent($sprache, $studiengang_kz, $semester, null, $sichtbar, $maxAlter, $page, $page_size, $all, $mischen, $filterForDegreePrograms, $allowedDegreePrograms);
+		$news = $this->ci->NewsModel->getNewsWithContent($sprache, $studiengang_kz, $semester, null, $sichtbar, $maxAlter, $page, $page_size, $active, $mischen, $filterForDegreePrograms, $allowedDegreePrograms);
 		$news = getData($news) ?? [];
-	
+		$newsWrappers = [];
+
 		foreach ($news as $newsobj) {
 			if ($studiengang_kz && $edit && !$newsobj->studiengang_kz)
 				continue;
-			$date = new DateTime($newsobj->datum);
-			$datum = '<datum><![CDATA[' . $date->format('d.m.Y') . ']]></datum>';
-			$datum .= '<datumdetail><![CDATA[' . $date->format('Y-m-d H:i') . ']]></datumdetail>';
-			$id = $edit ? '<news_id><![CDATA[' . $newsobj->news_id . ']]></news_id>' : '';
-			$isPublished = $edit ? '<is_published><![CDATA[' . ($newsobj->sichtbar ? 'true' : 'false') . ']]></is_published>' : '';
-			$xml .= "<newswrapper>" . $newsobj->content . $datum . $id . $isPublished . "</newswrapper>";
+
+			$newsWrappers[] = $this->createNewsWrapper($newsobj, $edit);
 		}
+
+		$content = $this->createNewsContent($newsWrappers, $infoscreen, $titel);
+		if (isError($content))
+			return $content;
+
+		return success([
+			"content" => getData($content),
+			"full_count" => $news[0]->full_count ?? 0
+		]);
+	}
+
+	/**
+	 * Creates a newswrapper XML element from a news item.
+	 *
+	 * @param stdClass	$newsobj
+	 * @param boolean	$edit
+	 *
+	 * @return DOMElement
+	 */
+	public function createNewsWrapper($newsobj, $edit)
+	{
+		$date = new DateTime($newsobj->datum);
+		$datum = '<datum><![CDATA[' . $date->format('d.m.Y') . ']]></datum>';
+		$datum .= '<datumdetail><![CDATA[' . $date->format('Y-m-d H:i') . ']]></datumdetail>';
+		$id = $edit ? '<news_id><![CDATA[' . $newsobj->news_id . ']]></news_id>' : '';
+		$isPublished = $edit ? '<is_published><![CDATA[' . ($newsobj->sichtbar ? 'true' : 'false') . ']]></is_published>' : '';
+
+		$newsWrapper = new DOMDocument();
+		$newsWrapper->loadXML('<newswrapper>' . $newsobj->content . $datum . $id . $isPublished . '</newswrapper>');
+
+		return $newsWrapper->documentElement;
+	}
+
+	/**
+	 * Creates rendered news content from one or more newswrapper XML elements.
+	 *
+	 * @param DOMElement|array	$newsWrappers
+	 * @param boolean				$infoscreen
+	 * @param string				$titel
+	 *
+	 * @return stdClass
+	 */
+	public function createNewsContent($newsWrappers, $infoscreen, $titel)
+	{
+		if (!is_array($newsWrappers))
+			$newsWrappers = [$newsWrappers];
+
+		$XML = new DOMDocument('1.0', 'UTF-8');
+		$contentElement = $XML->createElement('content');
+		$XML->appendChild($contentElement);
+
+		foreach ($newsWrappers as $newsWrapper)
+			$contentElement->appendChild($XML->importNode($newsWrapper, true));
 
 		if ($titel != '') {
-			$xml .= '<news_titel>' . $titel . '</news_titel>';
+			$titleElement = $XML->createElement('news_titel');
+			$titleElement->appendChild($XML->createTextNode($titel));
+			$contentElement->appendChild($titleElement);
 		}
-
-		$xml .= '</content>';
 
 		//XSLT Vorlage laden
 		$template = $this->ci->TemplateModel->load($infoscreen ? 'news_infoscreen' : 'news');
 		if (isError($template))
 			return $template;
 		$template = current(getData($template));
-
-		$XML = new DOMDocument();
-		$XML->loadXML($xml);
 
 		$xsltemplate = new DOMDocument();
 		$xsltemplate->loadXML($template->xslt_xhtml_c4);
@@ -231,9 +274,6 @@ class CmsLib
 		$content = $content->saveHTML();
 		$content = str_replace('dms.php', APP_ROOT . 'cms/dms.php', $content);
 
-		return success([
-			"content" => $content,
-			"full_count" => $news[0]->full_count ?? 0
-		]);
+		return success($content);
 	}
 }
