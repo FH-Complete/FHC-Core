@@ -4,7 +4,11 @@ export default {
         defaultRatio: {
             type: Array,
             default: () => [50, 50]
-        }
+        },
+        useDivHeight: {
+            type: Boolean,
+            default: false,
+        },
     },
     data: function() {
       return {          
@@ -61,9 +65,16 @@ export default {
     },
     methods: {
         calcHeights: function() {
-            var windowheight = window.innerHeight;
+            var windowheight = 0;
+            if (this.useDivHeight) {
+                windowheight = this.$refs.verticalsplit.offsetHeight - this.$refs.vsplitter.offsetHeight;
+                this.selfOffsetTop = 0;
+            } else {
+                windowheight = window.innerHeight;
+                this.selfOffsetTop = this.$refs.verticalsplit.offsetTop;
+            }
+
             var oldavailHeight = this.availHeight;
-            this.selfOffsetTop = this.$refs.verticalsplit.offsetTop;
             this.availHeight = windowheight - this.selfOffsetTop - this.$refs.vsplitter.offsetHeight;
            
             if( (this.topheight === 0 && this.bottomheight === 0) || oldavailHeight === 0 ) {
