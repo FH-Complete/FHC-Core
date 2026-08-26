@@ -75,6 +75,10 @@ $route['Abgabetool/Student'] = 'Cis/Abgabetool/Student';
 $route['Abgabetool/Student/(:any)'] = 'Cis/Abgabetool/Student/$1';
 $route['Abgabetool/Deadlines'] = 'Cis/Abgabetool/Deadlines';
 
+// CMS Admin App Routes
+$route['cms'] = 'cms/index';
+$route['cms/.*'] = 'cms/index';
+
 // Studierendenverwaltung App Routes
 $route['studvw'] = 'studentenverwaltung/index';
 $route['studvw/.*'] = 'studentenverwaltung/index';
