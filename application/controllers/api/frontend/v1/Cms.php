@@ -217,7 +217,7 @@ class Cms extends FHCAPI_Controller
 		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size, $sprache, $maxAlter, false, [], false);
 		$news = $this->getDataOrTerminateWithError($news);
 
-		$this->addMeta('row_count', $news["full_count"] ?? 0);
+		$this->addMeta('row_count', $news["row_count"] ?? 0);
 		$this->terminateWithSuccess($news["content"]);
 
 	}

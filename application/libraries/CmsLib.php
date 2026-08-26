@@ -202,7 +202,7 @@ class CmsLib
 
 		return success([
 			"content" => getData($content),
-			"full_count" => $news[0]->full_count ?? 0
+			"row_count" => $news[0]->row_count ?? 0
 		]);
 	}
 

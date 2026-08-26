@@ -66,7 +66,7 @@ class News_model extends DB_Model
 	protected function prepareNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz = null, $sichtbar = true, $maxalter = 0, $page = 1, $page_size = 10, $all = false, $mischen = true, $filterForDegreePrograms = false, $allowedDegreePrograms = [])
 	{
 
-		$this->addSelect(["*", "COUNT(*) OVER() AS full_count"]);
+		$this->addSelect(["*", "COUNT(*) OVER() AS row_count"]);
 		$this->addOrder('datum', 'DESC');
 
 		$studiengang_kz = trim($studiengang_kz);
@@ -91,22 +91,33 @@ class News_model extends DB_Model
 
 			}
 		}
-		if ($studiengang_kz == '0') {
-			$where[] = "studiengang_kz = " . $this->db->escape($studiengang_kz);
 
-			if ($semester === NULL)
-				$where[] = "semester IS NULL";
-			elseif ($semester === 0)
-				$where[] = "semester = 0";
-			else 
-				$where[] = "semester = " . $this->db->escape($semester);
-		} elseif ($studiengang_kz != '') {
-			$add = $mischen === true ? " OR (studiengang_kz = 0 AND semester IS NULL)" : "";
-			$allowedSemesterValues = [$semester, 0, null];
-			$where[] = "(studiengang_kz = " . $this->db->escape($studiengang_kz) . " AND (semester in (" . implode(',', array_map([$this->db, 'escape'], $allowedSemesterValues)) . ") OR semester IS NULL) OR (studiengang_kz = 0 AND semester = " . $this->db->escape($semester) . ")" . $add . ")";
+		$sgAndSemesterCondition = [];
 
-		} elseif ($semester !== NULL) {
-			$where[] = "semester = " . $this->db->escape($semester);
+		if ($studiengang_kz !== '') {
+			$sgAndSemesterCondition[] = 'studiengang_kz = ' . $this->db->escape($studiengang_kz);
+		}
+		if ($semester !== null && $semester !== 0) {
+			$sgAndSemesterCondition[] = 'semester = ' . $this->db->escape($semester);
+		}
+
+		$targetedSgAndSemesterCondition = [];
+
+		if (!empty($sgAndSemesterCondition)) {
+			$targetedSgAndSemesterCondition[] = '(' . implode(' AND ', $sgAndSemesterCondition) . ')';
+		}
+		if ($mischen === true) {
+			$targetedSgAndSemesterCondition[] = '(studiengang_kz = 0 AND (semester = 0 OR semester IS NULL))';
+
+			if ($semester !== null && $semester !== 0) {
+				$targetedSgAndSemesterCondition[] = '(studiengang_kz = 0 AND semester = ' . $this->db->escape($semester) . ')';
+			}
+		}
+
+		$finalSgAndSemesterCondition = implode(' OR ', $targetedSgAndSemesterCondition);
+
+		if ($finalSgAndSemesterCondition !== '') {
+			$where[] = "(" . $finalSgAndSemesterCondition . ")";
 		}
 
 		$this->addJoin('campus.tbl_contentsprache cs', 'content_id');

@@ -53,7 +53,7 @@ class NewsAdministrationAPI extends FHCAPI_Controller
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
 
-	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $active = true, $sichtbar = true)
+	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $titel = '', $active = true, $sichtbar = true)
 	{
 		$this->load->library('form_validation');
 		$this->form_validation->set_data($_GET);
@@ -127,9 +127,10 @@ class NewsAdministrationAPI extends FHCAPI_Controller
 			$maxAlter = null;
 		}
 
-		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, true, $sichtbar, $page, $page_size, $sprache, $maxAlter, true, $entitledDegreePrograms, $active);
+		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, false, $titel, true, $sichtbar, $page, $page_size, $sprache, $maxAlter, true, $entitledDegreePrograms, $active);
 		$news = $this->getDataOrTerminateWithError($news);
 
+		$this->addMeta('row_count', $news["row_count"] ?? 0);
 		$this->terminateWithSuccess($news["content"]);
 	}
 

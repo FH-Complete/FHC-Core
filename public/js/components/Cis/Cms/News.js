@@ -111,19 +111,12 @@ export default {
 			<router-link
 				v-if="hasBasisNewsTypRPermission"
 				class="btn btn-primary mb-3"
-				to="NewsAdministration"
+				:to="{ name: 'NewsAdministration' }"
 			>
 				{{ $p.t('ui', 'newsAdministration') }} <i class="fas fa-cog m-0"></i>
 			</router-link>
 		</div>
 		<hr/>
-		<pagination
-			v-if="content?true:false"
-			:page="page"
-			:page_size="page_size"
-			@pageUpdated="afterPageUpdated($event)"
-			:maxPageCount="maxPageCount"
-		></pagination>
 		<div class="container-fluid mt-4">
 			<div class="row">
 				<div class="col" v-html="content">

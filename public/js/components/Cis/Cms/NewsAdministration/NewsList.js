@@ -133,13 +133,6 @@ export default {
 		</h3>
 		<hr>
 		<news-list-filter @filter-changed="afterFilterChanged"></news-list-filter>
-		<pagination
-			v-if="maxPageCount > pageSize"
-			:page="page"
-			:page_size="pageSize"
-			:maxPageCount="maxPageCount"
-			@pageUpdated="afterPageUpdated"
-		></pagination>
 		<div v-if="isLoading" class="d-flex justify-content-center py-4" role="status">
 			<span class="spinner-border" aria-hidden="true"></span>
 			<span class="visually-hidden">{{ $capitalize($p.t('ui', 'loadingNews')) }}</span>
@@ -150,7 +143,7 @@ export default {
 		<div v-else-if="!newsItems.length" class="alert alert-info" role="status">
 			{{ $capitalize($p.t('ui', 'noNewsAvailable')) }}
 		</div>
-		<div v-else>
+		<div v-else class="pt-3">
 			<news-list-item
 				v-for="(news, index) in newsItems"
 				:key="news.newsId || page + '-' + index"
@@ -158,14 +151,14 @@ export default {
 				@edit="$emit('edit', $event)"
 				@deleted="fetchNews()"
 			></news-list-item>
+			<pagination
+				v-if="maxPageCount > pageSize"
+				:page="page"
+				:page_size="pageSize"
+				:maxPageCount="maxPageCount"
+				@pageUpdated="afterPageUpdated"
+			></pagination>
 		</div>
-		<pagination
-			v-if="maxPageCount > pageSize"
-			:page="page"
-			:page_size="pageSize"
-			:maxPageCount="maxPageCount"
-			@pageUpdated="afterPageUpdated"
-		></pagination>
 	</section>
 	`,
 };

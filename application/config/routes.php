@@ -67,6 +67,9 @@ $route['api/frontend/v1/Cms/storeNewsItem'] = 'api/frontend/v1/NewsAdministratio
 $route['api/frontend/v1/Cms/updateNewsItem/(:num)'] = 'api/frontend/v1/NewsAdministrationAPI/updateNewsItem/$1';
 $route['api/frontend/v1/Cms/deleteNewsItem/(:num)'] = 'api/frontend/v1/NewsAdministrationAPI/deleteNewsItem/$1';
 
+// Keep legacy uppercase URLs refreshable while using the canonical controller method casing
+$route['CisVue/Cms/NewsAdministration'] = 'CisVue/Cms/newsAdministration';
+
 $route['Cis/LvPlan/.*'] = 'Cis/LvPlan/index/$1';
 $route['Cis/MyLvPlan/.*'] = 'Cis/MyLvPlan/index/$1';
 $route['Cis/MyLv/.*'] = 'Cis/MyLv/index/$1';
