@@ -113,7 +113,6 @@ class News_model extends DB_Model
 
 		if (is_bool($sichtbar) || $sichtbar === 'true' || $sichtbar === 'false') {
 			$isSichtbar = filter_var($sichtbar, FILTER_VALIDATE_BOOLEAN);
-			log_message('error', 'sichtbar: ' . ($isSichtbar ? "true" : "false"));
 			$where[] = "cs.sichtbar = " . ($isSichtbar ? "true" : "false");
 		}
 

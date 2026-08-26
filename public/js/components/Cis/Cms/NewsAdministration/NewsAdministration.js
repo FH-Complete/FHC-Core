@@ -10,6 +10,9 @@ export default {
 		NewsItemPreview,
 		NewsList,
 	},
+	props: {
+		permissions: Object,
+	},
 	data() {
 		return {
 			isNewsFormShown: false,
@@ -37,6 +40,14 @@ export default {
 
 				this.editNewsItem({ newsId: this.$route.query.newsId });
 			},
+		},
+	},
+	computed: {
+		hasBasisNewsTypRPermission() {
+			return this.permissions['basis/news_r'] || false;
+		},
+		hasBasisNewsTypWPermission() {
+			return this.permissions['basis/news_w'] || false;
 		},
 	},
 	methods: {
@@ -141,7 +152,7 @@ export default {
 		<div class="d-flex justify-content-between align-items-center mb-3">
 			<h2 ref="newsPageHeading" class="fhc-primary-color mb-0">{{ $capitalize($p.t('ui', 'newsAdministration')) }}</h2>
 			<button
-				v-if="!isNewsFormShown"
+				v-if="!isNewsFormShown && hasBasisNewsTypWPermission"
 				@click="showCreateNewsForm"
 				type="button"
 				class="btn btn-primary rounded-circle d-inline-flex align-items-center justify-content-center p-0"
@@ -178,6 +189,7 @@ export default {
 			</div>
 		</div>
 		<news-list
+			v-if="hasBasisNewsTypRPermission"
 			ref="newsList"
 			@edit="editNewsItem"
 		></news-list>

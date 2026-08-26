@@ -20,9 +20,7 @@ export default {
 	computed: {
 		semesters() {
 			this.$p.user_language.value;
-			const semesterLabel = this.$capitalize(
-				this.$p.t('lehre', 'semester'),
-			);
+			const semesterLabel = this.$capitalize(this.$p.t('lehre', 'semester'));
 
 			return [
 				{
@@ -50,9 +48,7 @@ export default {
 
 			return [
 				{
-					label: this.$capitalize(
-						this.$p.t('ui', 'dropdownEmptyOption'),
-					),
+					label: this.$capitalize(this.$p.t('ui', 'dropdownEmptyOption')),
 					value: null,
 				},
 				...degreePrograms,
@@ -104,7 +100,7 @@ export default {
 	},
 	template: /*html*/ `
 		<div class="mb-3">
-			<div class="border rounded p-3 mt-2 d-flex flex-wrap align-items-end gap-3">
+			<div class="border rounded p-3 mt-2 d-flex flex-wrap align-items-center gap-3">
 				<form-input
 					v-model="isPublished"
 					type="select"
@@ -117,13 +113,6 @@ export default {
 					<option :value="true">{{ $capitalize($p.t('ui', 'visible')) }}</option>
 					<option :value="false">{{ $capitalize($p.t('ui', 'notPublishedYet')) }}</option>
 				</form-input>
-				<form-input
-					v-model="isActive"
-					type="checkbox"
-					name="is-active-filter"
-					:label="$capitalize($p.t('global', 'aktiv'))"
-					container-class="mb-0"
-				></form-input>
 				<form-input
 					v-model="degreeProgram"
 					:label="$capitalize($p.t('lehre', 'studiengang'))"
@@ -151,6 +140,13 @@ export default {
 						{{ semesterOption.label }}
 					</option>
 				</form-input>
+				<form-input
+					v-model="isActive"
+					type="checkbox"
+					name="is-active-filter"
+					:label="$capitalize($p.t('global', 'aktiv'))"
+					container-class="mb-0 align-self-end"
+				></form-input>
 			</div>
 		</div>
 	`,

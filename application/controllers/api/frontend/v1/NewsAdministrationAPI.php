@@ -77,7 +77,6 @@ class NewsAdministrationAPI extends FHCAPI_Controller
 		{
 			$sichtbar = $passedSichtbar;
 		}
-		$this->addMeta('published', $passedSichtbar);
 
 		$passedIsActive = $this->input->get('isActive', true);
 		if ($passedIsActive !== null)
@@ -92,7 +91,6 @@ class NewsAdministrationAPI extends FHCAPI_Controller
 				$active = $isActive;
 			}
 		}
-		$this->addMeta('isActive', $active);
 
 		$degreeProgramShortCode = $this->input->get('degreeProgramShortCode', true);
 		if ($degreeProgramShortCode !== null && $degreeProgramShortCode !== '')
@@ -105,7 +103,6 @@ class NewsAdministrationAPI extends FHCAPI_Controller
 			}
 			$studiengang_kz = $degreeProgramShortCode;
 		}
-		$this->addMeta('degreeProgramShortCode', $studiengang_kz);
 
 		$passedSemester = $this->input->get('semester', true);
 		if ($passedSemester !== null && $passedSemester !== '')
@@ -122,22 +119,16 @@ class NewsAdministrationAPI extends FHCAPI_Controller
 			}
 			$semester = filter_var($passedSemester, FILTER_VALIDATE_INT);
 		}
-		$this->addMeta('semester', $semester);
 
-		$allowedDegreePrograms = $this->permissionlib->getSTG_isEntitledFor("basis/news");
+		$entitledDegreePrograms = $this->permissionlib->getSTG_isEntitledFor("basis/news");
 
-		$edit = true;
 		$maxAlter = MAXNEWSALTER;
 		if (!$active) {
 			$maxAlter = null;
 		}
 
-		log_message('error', 'getNews: edit: ' . ($edit ? "true" : "false") . ', maxAlter: ' . ($maxAlter ?? "null"));
-
-		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, true, $sichtbar, $page, $page_size, $sprache, $maxAlter, true, $allowedDegreePrograms, $isActive);
+		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, true, $sichtbar, $page, $page_size, $sprache, $maxAlter, true, $entitledDegreePrograms, $active);
 		$news = $this->getDataOrTerminateWithError($news);
-
-		$this->addMeta('row_count', $news["full_count"] ?? 0);
 
 		$this->terminateWithSuccess($news["content"]);
 	}
@@ -172,9 +163,9 @@ class NewsAdministrationAPI extends FHCAPI_Controller
 		}
 
 		$news = current(getData($newsResult));
-		$allowedDegreePrograms = $this->permissionlib->getSTG_isEntitledFor("basis/news");
+		$entitledDegreePrograms = $this->permissionlib->getSTG_isEntitledFor("basis/news");
 		
-		if (!in_array($news->studiengang_kz, $allowedDegreePrograms)) {
+		if (!in_array($news->studiengang_kz, $entitledDegreePrograms)) {
 			$this->terminateWithError('You are not entitled to access this news entry', self::ERROR_TYPE_PERMISSION);
 		}
 		$translationsResult = $this->ContentspracheModel->loadWhere([
@@ -229,7 +220,7 @@ class NewsAdministrationAPI extends FHCAPI_Controller
 				'language' => $language,
 				'author' => $author ? $author->nodeValue : '',
 				'title' => $title ? $title->nodeValue : '',
-				'text' => $text ? $text->nodeValue : '',
+				'text' => $text ? str_replace('dms.php', APP_ROOT . 'cms/dms.php', $text->nodeValue) : '',
 				'isPublished' => (bool)$content->sichtbar
 			];
 		}
@@ -402,7 +393,6 @@ class NewsAdministrationAPI extends FHCAPI_Controller
 			$newsItem
 		);
 
-		$this->addMeta("newsItem", json_encode($newsItem));
 		if ($this->db->trans_status() === false)
 		{
 			$error = $this->db->error();

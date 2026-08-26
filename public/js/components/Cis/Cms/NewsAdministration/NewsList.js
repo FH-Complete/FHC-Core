@@ -64,9 +64,7 @@ export default {
 				this.maxPageCount = response.meta.row_count;
 			} catch (error) {
 				this.newsItems = [];
-				this.loadError = this.$capitalize(
-					this.$p.t('ui', 'fehlerBeimLesen'),
-				);
+				this.loadError = this.$capitalize(this.$p.t('ui', 'fehlerBeimLesen'));
 			} finally {
 				this.isLoading = false;
 			}
@@ -93,7 +91,7 @@ export default {
 				'.card-header span[is-published]',
 			);
 			const content = article.querySelector('.card-text');
-			console.log(content.title);
+
 			return {
 				newsId: newsId ? Number(newsId) : null,
 				language: this.sprache,

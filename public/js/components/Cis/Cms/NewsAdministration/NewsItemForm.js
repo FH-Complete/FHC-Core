@@ -84,9 +84,7 @@ export default {
 		},
 		semesters() {
 			this.sprache;
-			const semesterLabel = this.$capitalize(
-				this.$p.t('lehre', 'semester'),
-			);
+			const semesterLabel = this.$capitalize(this.$p.t('lehre', 'semester'));
 
 			return [
 				{
@@ -182,7 +180,9 @@ export default {
 			};
 			const phrase = languagePhrases[language];
 
-			return phrase ? this.$capitalize(this.$p.t(phrase[0], phrase[1])) : language;
+			return phrase
+				? this.$capitalize(this.$p.t(phrase[0], phrase[1]))
+				: language;
 		},
 		getContentFormTitle(language) {
 			return this.$capitalize(
@@ -473,7 +473,6 @@ export default {
 					(degreeProgram) => degreeProgram.value === 0,
 				) ?? null;
 		}
-		console.log(FHC_JS_DATA_STORAGE_OBJECT);
 
 		this.contentFormItems.addLanguage.config.languages = this.languagesToAdd;
 	},

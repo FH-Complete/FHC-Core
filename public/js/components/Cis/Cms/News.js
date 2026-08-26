@@ -13,6 +13,9 @@ export default {
 		StudiengangInformation,
 	},
 	inject: ['isMobile'],
+	props: {
+		permissions: Object,
+	},
 	data() {
 		return {
 			content: null,
@@ -27,6 +30,9 @@ export default {
 		},
 	},
 	computed: {
+		hasBasisNewsTypRPermission() {
+			return this.permissions['basis/news_r'] || false;
+		},
 		sprache: function () {
 			return this.$p.user_language.value;
 		},
@@ -103,6 +109,7 @@ export default {
   		<div class="d-flex justify-content-between align-items-center">
 			<h2 ref="newsPageHeading" class="fhc-primary-color">News</h2>
 			<router-link
+				v-if="hasBasisNewsTypRPermission"
 				class="btn btn-primary mb-3"
 				to="NewsAdministration"
 			>

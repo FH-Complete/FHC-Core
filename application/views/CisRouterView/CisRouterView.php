@@ -51,6 +51,8 @@ $includesArray = array(
 $this->load->view('templates/CISVUE-Header', $includesArray);
 ?>
 <div id="fhccontent" class="h-100" route=<?php echo $route ?>>
-	<router-view></router-view>
+	<router-view
+		:permissions="<?= htmlspecialchars(json_encode($permissions ?? [])); ?>"
+	></router-view>
 </div>
 <?php $this->load->view('templates/CISVUE-Footer', $includesArray); ?>

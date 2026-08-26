@@ -43,7 +43,8 @@ class Cms extends FHCAPI_Controller
 
 		$this->load->model('content/News_model', 'NewsModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
-
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		
 		// setting up the papgination_size
 		$this->page_size = 10;
 
@@ -202,10 +203,15 @@ class Cms extends FHCAPI_Controller
 		}
 		if(hasData($student))
 		{
+
 			$student = current(getData($student));
-			$studiengang_kz = $student->studiengang_kz;
-			$semester = $student->semester;
-			$this->addMeta('semester', $semester);
+
+			$degreeProgramSemesterDataResult = $this->PrestudentModel->getStudiengaengAndAusbildungssemesterByStudentUid(getAuthUID());
+			$degreeProgramSemesterData = $this->getDataOrTerminateWithError($degreeProgramSemesterDataResult)[0];
+			if ($degreeProgramSemesterData) {
+				$studiengang_kz = isset($degreeProgramSemesterData->studiengang_kz) ? $degreeProgramSemesterData->studiengang_kz : null;
+				$semester = isset($degreeProgramSemesterData->ausbildungssemester) ? $degreeProgramSemesterData->ausbildungssemester : null;
+			}
 		}
 
 		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size, $sprache, $maxAlter, false, [], false);
