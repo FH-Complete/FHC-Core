@@ -47,6 +47,7 @@ import MultiWeekPlanModal from "./MultiWeekPlanModal.js";
 import { getTempusSearchbarOptions } from "./Filters/searchbarOptions.js";
 import RaumauswahlModal from "./RaumauswahlModal.js";
 import LehreinheitModal from "./LehreinheitModal.js";
+import HorizontalSplit from "../horizontalsplit/horizontalsplit.js";
 
 export default {
 	name: "Tempus",
@@ -71,7 +72,8 @@ export default {
 		KeyboardShortcuts,
 		MultiWeekPlanModal,
 		RaumauswahlModal,
-		LehreinheitModal
+		LehreinheitModal,
+		HorizontalSplit
 	},
 	props: {
 		defaultSemester: String,
@@ -978,6 +980,13 @@ export default {
 
 			this.resourcesAssignmentModal.areFormButtonsDisplayed = true;
 		},
+		sidebarCollapsed(newVal)
+		{
+			if(newVal)
+				this.$refs.hSplit.collapseLeft()
+			else
+				this.$refs.hSplit.showBoth()
+		},
 	},
 	mounted() {
 		this.reservierungPending = false;
@@ -1149,7 +1158,10 @@ export default {
 						<app-menu app-identifier="tempus" />
 					</div>
 				</aside>
-				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100 d-flex flex-column">
+				
+				<horizontal-split ref="hSplit" :defaultRatio="[15, 85]">
+				<template #left>
+				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100 w-100">
 					<div class="sidebar-icons d-flex flex-row align-items-start py-2 gap-1 ps-2">
 						<button
 							class="btn btn-outline-secondary"
@@ -1243,9 +1255,9 @@ export default {
 
 					</div>
 					<stv-studiensemester v-model:studiensemester-kurzbz="selectedStudiensemester"></stv-studiensemester>
-
 				</nav>
-				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
+				</template>
+				<template #right>
 					<fhc-calendar
 						ref="calendar"
 						:timezone="config.timezone"
@@ -1265,7 +1277,8 @@ export default {
 						@update:range="handleRange"
 						class="responsive-calendar"
 					/>
-				</main>
+				</template>
+				</horizontal-split>
 			</div>
 		</div>
 		<app-config ref="config" v-model="appconfig" :endpoints="configEndpoints"></app-config>

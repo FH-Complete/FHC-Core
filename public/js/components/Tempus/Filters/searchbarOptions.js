@@ -43,6 +43,17 @@ export function getTempusSearchbarOptions(self)
 							self.addToFilter(data, 'mitarbeiter');
 						}
 					},
+					{
+						label: "LVVerwaltung",
+						icon: "fas fa-up-right-from-square",
+						type: "function",
+						action: (data) => {
+							const link = FHC_JS_DATA_STORAGE_OBJECT.app_root +
+								FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+								"/LVVerwaltung/emp/" + self.selectedStudiensemester + "/" + data.uid;
+							window.open(link, "_blank");
+						}
+					},
 				]
 			},
 		}

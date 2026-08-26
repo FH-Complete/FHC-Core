@@ -86,9 +86,18 @@ class KalenderLib
 												tbl_lehreinheitgruppe.verband as le_verband,
 												tbl_lehreinheitgruppe.gruppe as le_gruppe,
 												le_gruppe.direktinskription as le_direktinskription,
-												
-												
-												');
+												CASE
+													WHEN vonstunde.stunde IS NOT NULL AND bisstunde.stunde IS NOT NULL
+													THEN bisstunde.stunde - vonstunde.stunde + 1
+												ELSE ROUND(
+														COALESCE(
+															(
+																SELECT SUM(EXTRACT(EPOCH FROM (LEAST(stunde.ende, tbl_kalender.bis::time) - GREATEST(stunde.beginn, tbl_kalender.von::time))) / 60) / 45
+																FROM lehre.tbl_stunde stunde
+																WHERE stunde.beginn < tbl_kalender.bis::time AND stunde.ende > tbl_kalender.von::time)
+															,0)
+													,2
+												) END AS verplante_stunden');
 
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit', 'tbl_kalender.kalender_id = tbl_kalender_lehreinheit.kalender_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event', 'tbl_kalender.kalender_id = tbl_kalender_event.kalender_id', 'LEFT');
@@ -134,6 +143,9 @@ class KalenderLib
 		);
 		$this->_ci->KalenderModel->addJoin('public.tbl_studiengang le_studiengang', 'le_lehrverband.studiengang_kz = le_studiengang.studiengang_kz', 'LEFT');
 
+		$this->_ci->KalenderModel->db->join('lehre.tbl_stunde vonstunde', 'tbl_kalender.von::time = vonstunde.beginn', 'LEFT', FALSE);
+		$this->_ci->KalenderModel->db->join('lehre.tbl_stunde bisstunde', 'tbl_kalender.bis::time = bisstunde.ende', 'LEFT', FALSE);
+
 		$this->_ci->KalenderModel->db->where('tbl_kalender.von >=', $start_date);
 		$this->_ci->KalenderModel->db->where('tbl_kalender.bis <', $end_date);
 
@@ -174,6 +186,7 @@ class KalenderLib
 					'lehrfach_bez' => isset($row->lehrfach_bezeichnung) ? $row->lehrfach_bezeichnung : '',
 					'farbe' => isset($row->farbe) ? $row->farbe : '',
 					'lehrveranstaltung_id' => $row->lehrveranstaltung_id,
+					'verplante_stunden' => $row->verplante_stunden,
 					'organisationseinheit' => isset($row->oe_kurzbz) ? $row->oe_kurzbz : '',
 					'kalender_id' => $id,
 					'lehreinheit_id' => [],

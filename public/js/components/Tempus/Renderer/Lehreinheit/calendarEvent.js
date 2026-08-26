@@ -15,6 +15,15 @@ export default {
 
 			return classes;
 		},
+		statusIcon()
+		{
+			if (['planning', 'sync_preview'].includes(this.event.status_kurzbz))
+				return 'fa-solid fa-pen-ruler text-muted';
+			else if (['preview', 'sync_live', 'to_delete_preview'].includes(this.event.status_kurzbz))
+				return 'fa-solid fa-chalkboard-user text-muted';
+			else if (['live', 'to_delete_live'].includes(this.event.status_kurzbz))
+				return 'fa-solid fa-user-graduate text-muted'
+		},
 		topicString() {
 			return Array.isArray(this.event.topic) ? this.event.topic.join(', ') : this.event.topic;
 		},
@@ -85,10 +94,12 @@ export default {
 		class="position-relative"
 		@wheel.stop
 	>
-		<div v-if="event.has_assigned_resources" class="position-absolute top-0 start-0 m-1" >
-			<i
-			  class="fa-solid fa-table-list text-muted"
-			></i>
+		<div class="position-absolute top-0 start-0 m-1">
+			<i :class="statusIcon"></i>
+			<i class="fa-solid fa-table-list text-muted" v-if="event.has_assigned_resources"></i>
+		</div>
+		<div class="position-absolute bottom-0 start-0 m-1">
+			{{event.verplante_stunden}}
 		</div>
 		<div
 			v-if="!event.allDayEvent && event?.beginn && event?.ende"
