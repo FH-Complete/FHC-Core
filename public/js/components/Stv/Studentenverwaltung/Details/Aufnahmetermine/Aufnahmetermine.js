@@ -470,6 +470,7 @@ export default {
 							:label="$p.t('admission', 'anmeldundRtAm')"
 							type="DatePicker"
 							v-model="formData.anmeldedatum"
+							model-type="yyyy-MM-dd"
 							auto-apply
 							:enable-time-picker="false"
 							text-input

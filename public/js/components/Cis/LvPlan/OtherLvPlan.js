@@ -32,7 +32,7 @@ export default {
 			listGroup: [],
 			rangeIntervalFirst: null,
 			otherPersonData: {
-				fullName: "",
+				fullNameWithTitle: "",
 				photo: "",
 			},
 			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone,
@@ -64,6 +64,9 @@ export default {
 			return this.propsViewData?.mode;
 		},
 		downloadLinks() {
+			// do not show download links in otherLvPlan Mode
+			return false;
+
 			if (
 				!this.studiensemester_start ||
 				!this.studiensemester_ende ||
@@ -207,10 +210,17 @@ export default {
 			this.isOtherPersonMitarbeiter =
 				!!viewData?.user_data?.is_mitarbeiter;
 			this.isOtherPersonStudent = !!viewData?.user_data?.is_student;
-			this.otherPersonData.fullName =
-				viewData?.user_data?.vorname +
-				" " +
-				viewData?.user_data?.nachname;
+			let fullNameWithTitleFragments = [
+				viewData?.user_data?.titel,
+				viewData?.user_data?.vorname,
+				viewData?.user_data?.nachname,
+				viewData?.user_data?.postnomen,
+			];
+			fullNameWithTitleFragments = fullNameWithTitleFragments.filter(
+				(fragment) => !!fragment,
+			);
+			this.otherPersonData.fullNameWithTitle =
+				fullNameWithTitleFragments.join(" ");
 			this.otherPersonData.photo = viewData?.user_data?.foto;
 		},
 		async redirectToMyLvPlanIfAuthUid() {
@@ -222,12 +232,21 @@ export default {
 				this.$router.push({ name: "MyLvPlan" });
 			}
 		},
+		copyFullNameWithTitleToClipboard() {
+			navigator.clipboard.writeText(
+				this.otherPersonData.fullNameWithTitle,
+			);
+			this.$fhcAlert.alertSuccess(
+				this.$p.t("profil/name_title_clipboard_copy_confirmation"),
+			);
+		},
 	},
 	async created() {
 		await this.redirectToMyLvPlanIfAuthUid();
 		await this.fetchViewData();
+		await this.$p.loadCategory(["profil"]);
 	},
-	template: `
+	template: /*html*/ `
     <div class="d-flex flex-column h-100">
         <h2>
             <div class="d-flex flex-row justify-content-between align-items-center">
@@ -235,8 +254,11 @@ export default {
                     {{ $p.t('lehre/stundenplan') + (studiensemester_kurzbz ? " " + studiensemester_kurzbz : "") }}
                 </span>
                 <div @click="this.$router.push({name: 'ProfilView', params: {uid: propsViewData.otherUid}})" type="button" class="d-flex flex-row align-items-center gap-3">
-                    <span v-if="otherPersonData.fullName?.length">
-                        {{ otherPersonData.fullName }}
+                    <span v-if="otherPersonData.fullNameWithTitle?.length">
+                        {{ otherPersonData.fullNameWithTitle }}
+						<span @click.stop="copyFullNameWithTitleToClipboard()" :title="$p.t('LvPlan/copy')" class="fs-4 h-100">
+							<i class="fa-regular fa-copy"></i>
+						</span>
                     </span>
                     <img v-if="otherPersonData.photo?.length" alt="profile picture" class=" img-thumbnail " style=" max-height:60px; "  :src="get_image_base64_src"/>
                 </div>

@@ -257,8 +257,13 @@ const app = Vue.createApp({
 	provide() {
 		return { // provide injectable & watchable language property
 			language: Vue.computed(() => this.$p.user_language),
-			isMobile: Vue.computed(() => this.windowWidth < 767),
+			isMobile: Vue.computed(() => this.isMobile),
 		}	
+	},
+	computed: {
+		isMobile: function() {
+			return (this.windowWidth < 767);
+		}
 	},
 	methods: {
 		isInternalRoute(href) {

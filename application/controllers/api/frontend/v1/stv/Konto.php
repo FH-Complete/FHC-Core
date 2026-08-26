@@ -429,9 +429,12 @@ class Konto extends FHCAPI_Controller
 			'updateamum' => date('c'),
 			'updatevon' => getAuthUID()
 		];
+
 		foreach ($allowed as $field)
 			if ($this->input->post($field) !== null)
 				$data[$field] = $this->input->post($field);
+			if($data['buchungsdatum'] == '')
+				$data['buchungsdatum'] = null;
 
 		$result = $this->KontoModel->update($id, $data);
 

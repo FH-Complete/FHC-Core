@@ -20,7 +20,6 @@ export default {
 	data() {
 		return {
 			collapseIconFunktionen: true,
-			arePhrasesPreloaded: false,
 			funktionen_table_options: {
 				persistenceID: "filterTableMaViewProfilFunktionen",
 				persistence: {
@@ -31,6 +30,7 @@ export default {
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
 				responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
+				locale: true,
 				columns: [
 					//? option when wanting to hide the collapsed list
 
@@ -43,27 +43,29 @@ export default {
 						maxWidth: 40,
 						headerClick: this.collapseFunction,
 						visible: true,
+						responsive: 0,
 					},
 					{
-						title: Vue.computed(() => this.$p.t("ui/bezeichnung")),
+						title: "placeholder",
+						titlePhrase: "ui/bezeichnung",
 						field: "Bezeichnung",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true,
+						responsive: 0,
 					},
 					{
-						title: Vue.computed(() =>
-							this.$p.t("lehre/organisationseinheit"),
-						),
+						title: "placeholder",
+						titlePhrase: "lehre/organisationseinheit",
 						field: "Organisationseinheit",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true,
+						responsive: 1,
 					},
 					{
-						title: Vue.computed(() =>
-							this.$p.t("global/gueltigVon"),
-						),
+						title: "placeholder",
+						titlePhrase: "global/gueltigVon",
 						field: "Gültig_von",
 						headerFilterFunc: "dates",
 						headerFilter: dateFilter,
@@ -72,11 +74,11 @@ export default {
 						visible: true,
 						formatter: "datetime",
 						formatterParams: this.datetimeFormatterParams(),
+						responsive: 4,
 					},
 					{
-						title: Vue.computed(() =>
-							this.$p.t("global/gueltigBis"),
-						),
+						title: "placeholder",
+						titlePhrase: "global/gueltigBis",
 						field: "Gültig_bis",
 						headerFilterFunc: "dates",
 						headerFilter: dateFilter,
@@ -85,15 +87,16 @@ export default {
 						visible: true,
 						formatter: "datetime",
 						formatterParams: this.datetimeFormatterParams(),
+						responsive: 3,
 					},
 					{
-						title: Vue.computed(() =>
-							this.$p.t("profil/wochenstunden"),
-						),
+						title: "placeholder",
+						titlePhrase: "profil/wochenstunden",
 						field: "Wochenstunden",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true,
+						responsive: 2,
 					},
 				],
 			},
@@ -214,11 +217,6 @@ export default {
 			return quickLinks;
 		},
 	},
-	created() {
-		this.$p.loadCategory(["ui", "lehre", "global", "profil"]).then(() => {
-			this.arePhrasesPreloaded = true;
-		});
-	},
 
 	template: /*html*/ `
 
@@ -273,7 +271,7 @@ export default {
             <div class="row">
                 <!-- FIRST TABLE -->
                 <div class="col-12 mb-4" >
-                    <core-filter-cmpt v-if="arePhrasesPreloaded" @tableBuilt="funktionenTableBuilt" :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
+                    <core-filter-cmpt @tableBuilt="funktionenTableBuilt" :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
                 </div>
                 <!-- END OF THE ROW WITH THE TABLES UNDER THE PROFIL INFORMATION -->
             </div>
