@@ -317,6 +317,7 @@ export default {
     "$p.user_language.value"(n, o) {
       if (n !== o && o !== undefined && this.$refs.table.tableBuilt) {
         this.translateTabulator();
+        this.$reloadList();
       }
     },
     "tagFilterState.selectedOptions": {
@@ -842,35 +843,39 @@ export default {
         </div>
        </template>
 
-      <template #actions>
-        <core-tag ref="tagComponent"
-          v-if="tagsEnabled"
-          :endpoint="tagEndpoint"
-          :values="selectedColumnValues"
-          @added="addedTag"
-          @deleted="deletedTag"
-          @updated="updatedTag"
-          zuordnung_typ="prestudent_id"
-        ></core-tag>
+      <template #tags>
+        <div class="d-flex border rounded align-items-center ps-1">
+          <core-tag ref="tagComponent"
+            v-if="tagsEnabled"
+            :endpoint="tagEndpoint"
+            :values="selectedColumnValues"
+            @added="addedTag"
+            @deleted="deletedTag"
+            @updated="updatedTag"
+            zuordnung_typ="prestudent_id"
+            show-hover
+          ></core-tag>
 
-		<button
-			v-if="!selected.length"
-			class="btn btn-outline btn-light mb-1"
-			@click="rebuild(selected)"
-			:title="$p.t('tag','rebuild_tags') + ' Stg ' + currentSemester"
-			>
-				<i class="fa-solid fa-refresh pe-1"></i> STG
-		</button>
-		<button
-			v-else
-			class="btn btn-outline btn-light mb-1"
-			@click="rebuild(selected)"
-			:title="$p.t('tag','rebuild_tags') + ' ' + $p.t('ui','selection') + ' ' + currentSemester"
-			>
-				<i class="fa-solid fa-refresh pe-1"></i> {{selected.length}}
-		</button>
+          <button
+              v-if="!selected.length"
+              class="btn btn-outline btn-sm m-1 btn-hover"
+              @click="rebuild(selected)"
+              :title="$p.t('tag','rebuild_tags') + ' Stg ' + currentSemester"
+              >
+                  <i class="fa-solid fa-refresh pe-1"></i> STG
+          </button>
+          <button
+              v-else
+              class="btn btn-outline btn-sm m-1 btn-hover"
+              @click="rebuild(selected)"
+              :title="$p.t('tag','rebuild_tags') + ' ' + $p.t('ui','selection') + ' ' + currentSemester"
+              >
+                  <i class="fa-solid fa-refresh pe-1"></i> {{selected.length}}
+          </button>
+        </div>
+      </template>
 
-        <template v-if="filter.length || headerFilterActive">
+      <template v-if="filter.length || headerFilterActive">
         <div class="d-flex justify-content-center align-items-center gap-2 ps-4 position-absolute start-50 translate-middle-x">
           <p class="text-danger mb-0">
             <strong>{{$p.t('filter','filterActive')}}</strong>
@@ -884,8 +889,6 @@ export default {
             <span class="fa-solid fa-filter-circle-xmark"></span>
           </button>
         </div>
-        </template>
-
       </template>
 
       <template #filter>
@@ -895,6 +898,7 @@ export default {
           </div>
         </div>
       </template>
+
       </core-filter-cmpt>
     </div>
     <list-new ref="new" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz"></list-new>
