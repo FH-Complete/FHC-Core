@@ -394,7 +394,12 @@ if (!$ansicht && (!defined('CIS_PROFIL_FHAUSWEIS_ANZEIGEN') || CIS_PROFIL_FHAUSW
 		//wenn es mehr Zutrittskarten gab, wird das letzte Ausgabedatum erhalten
 		$ausgegeben_am = $bm->result;
 		$ausgegeben_am = $datum_obj->formatDatum($ausgegeben_am, 'd.m.Y');
-		echo '<br>'.$p->t('profil/fhausweisWurdeBereitsAusgegeben', array($ausgegeben_am));
+
+		if ($ausgegeben_am) {
+			echo '<br>'.$p->t('profil/fhausweisWurdeBereitsAusgegeben', array($ausgegeben_am));
+		} else {
+			echo '<br>'.$p->t('profil/fhAusweisStatusKeine');
+		}
 	}
 	else
 	{

@@ -70,6 +70,7 @@ $this->phrasen['profil/profilfotoGesperrt']='Profilfoto gesperrt';
 $this->phrasen['profil/profilfotoUploadGesperrt']='Der Upload des Profilfotos ist nicht mehr möglich';
 $this->phrasen['profil/fhausweisStatus']='FH-Ausweis Status';
 $this->phrasen['profil/fhausweisWurdeBereitsAusgegeben']='Der FH Ausweis ist am %s ausgegeben worden.';
+$this->phrasen['profil/fhAusweisStatusKeine']='Der FH Ausweis wurde noch nicht ausgegeben.';
 $this->phrasen['profil/ladenSieBitteEinGueltigesFotoHoch']='Laden Sie bitte ein gültiges Foto hoch';
 $this->phrasen['profil/fotoWurdeNochNichtAkzeptiert']='Foto wurde noch nicht akzeptiert';
 $this->phrasen['profil/fhausweisGedrucktAm']='FH-Ausweis gedruckt am';

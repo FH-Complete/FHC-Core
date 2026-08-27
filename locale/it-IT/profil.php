@@ -21,6 +21,7 @@ $this->phrasen['profil/fhausweisAbholbereitAmEmpfangAb']='';
 $this->phrasen['profil/fhausweisGedrucktAm']='';
 $this->phrasen['profil/fhausweisStatus']='';
 $this->phrasen['profil/fhausweisWurdeBereitsAusgegeben']='Tesserino consegnato il %s.';
+$this->phrasen['profil/fhAusweisStatusKeine']='Der FH-Ausweis wurde noch nicht ausgestellt.';
 $this->phrasen['profil/fhausweisWurdeNochNichtGedruckt']='';
 $this->phrasen['profil/fotoAuswählen']='';
 $this->phrasen['profil/fotofreigeben']='';
