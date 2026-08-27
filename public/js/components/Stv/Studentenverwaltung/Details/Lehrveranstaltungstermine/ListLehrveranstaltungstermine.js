@@ -1,6 +1,7 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import FormInput from "../../../../Form/Input.js";
 import FormForm from '../../../../Form/Form.js';
+import { capitalize } from '../../../../../helpers/StringHelpers.js';
 
 export default {
 	name: "TblCourseList",
@@ -112,15 +113,15 @@ export default {
 							}
 						};
 
-						setHeader('lehrveranstaltung_id', this.$p.t('lehre', 'lehrveranstaltung_id'));
-						setHeader('lehreinheit_id', this.$p.t('global', 'lehreinheit_id'));
-						setHeader('datum', this.$p.t('global', 'datum'));
-						setHeader('beginn', this.$p.t('ui', 'dateFrom'));
-						setHeader('ende', this.$p.t('ui', 'dateTo'));
-						setHeader('gruppen_kuerzel', this.$p.t('global', 'gruppen'));
-						setHeader('ort_kurzbz', this.$p.t('global', 'ortLocation'));
-						setHeader('lektorname', this.$p.t('lehre', 'lektor'));
-						setHeader('lehrfach_bez', this.$p.t('global', 'lehrfach'));
+						setHeader('lehrveranstaltung_id', capitalize(this.$p.t('lehre','lehrveranstaltung_id')));
+						setHeader('lehreinheit_id', capitalize(this.$p.t('global','lehreinheit_id')));
+						setHeader('datum', capitalize(this.$p.t('global','datum')));
+						setHeader('beginn', capitalize(this.$p.t('ui','dateFrom')));
+						setHeader('ende', capitalize(this.$p.t('ui','dateTo')));
+						setHeader('gruppen_kuerzel', capitalize(this.$p.t('global','gruppen')));
+						setHeader('ort_kurzbz', capitalize(this.$p.t('global','ortLocation')));
+						setHeader('lektorname', capitalize(this.$p.t('lehre','lektor')));
+						setHeader('lehrfach_bez', capitalize(this.$p.t('global','lehrfach')));
 					}
 				}
 			];
