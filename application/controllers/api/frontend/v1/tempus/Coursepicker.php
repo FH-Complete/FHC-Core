@@ -8,8 +8,8 @@ class Coursepicker extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'search' => self::PERM_LOGGED,
-			'getByStg' => self::PERM_LOGGED
+			'search' => 'lehre/lvplan:rw',
+			'getByStg' => 'lehre/lvplan:rw'
 		]);
 
 		$this->_ci = &get_instance();

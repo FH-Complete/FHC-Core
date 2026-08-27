@@ -11,10 +11,10 @@ class Config extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'get' => ['admin:r', 'assistenz:r'],
-			'getHeader' => ['admin:r', 'assistenz:r'],
-			'set' => ['admin:r', 'assistenz:r'],
-			'updateCollision' => ['admin:r', 'assistenz:r'],
+			'get' => ['admin:r', 'assistenz:rw', 'lehre/lvplan:rw'],
+			'getHeader' => ['admin:r', 'assistenz:rw', 'lehre/lvplan:rw'],
+			'set' => ['admin:r', 'assistenz:rw', 'lehre/lvplan:rw'],
+			'updateCollision' => ['admin:r', 'assistenz:rw', 'lehre/lvplan:rw'],
 		]);
 
 		// Load Phrases

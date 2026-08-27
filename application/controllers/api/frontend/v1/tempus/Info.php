@@ -12,7 +12,7 @@ class Info extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getStudiengaenge' => self::PERM_LOGGED,
+			'getStudiengaenge' => 'lehre/lvplan:rw',
 		]);
 
 		$this->_ci =& get_instance();
