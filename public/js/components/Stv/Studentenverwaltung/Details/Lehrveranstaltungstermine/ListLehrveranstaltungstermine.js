@@ -30,7 +30,7 @@ export default {
 			tabulatorEvents: [],
 			listStudiensemester: [],
 			dataSem: {},
-			showStundenplanDev: false
+			stundenplanEnvironment: 'prod'
 		};
 	},
 	computed: {
@@ -46,7 +46,7 @@ export default {
 			return link;
 		},
 		dbStundenplanTable: function (){
-			return this.showStundenplanDev ? 'stundenplandev' : 'stundenplan';
+			return this.stundenplanEnvironment === 'dev' ? 'stundenplandev' : 'stundenplan';
 		},
 	},
 	methods: {
@@ -135,7 +135,6 @@ export default {
 			this.$refs.table.reloadTable();
 		},
 		switchStundenplan(){
-			this.showStundenplanDev = !this.showStundenplanDev;
 			this.reload();
 		}
 	},
@@ -172,18 +171,45 @@ export default {
 				reload
 				:reload-btn-infotext="this.$p.t('table', 'reload')"
 				>
-					<template #actions>	
+					<template #actions>
 						<button
-							class="btn btn-outline-secondary"
+							class="btn btn-outline-secondary me-2"
 							@click="exportToExcel">
 								{{$p.t('ui', 'export')}}
 						</button>
-						<button
-							class="btn btn-outline-secondary"
-							@click="switchStundenplan">
-								<span v-if="!showStundenplanDev">{{$p.t('lehre', 'stundenplan')}}</span>
-								<span v-else>{{$p.t('lehre', 'stundenplanDev')}}</span>
-						</button>
+
+						<div class="btn-group" role="group">
+							<input
+								type="radio"
+								class="btn-check"
+								name="btnradio"
+								id="btnradio_prod"
+								value="prod"
+								v-model="stundenplanEnvironment"
+								@change="switchStundenplan()"
+							>
+							<label
+								class="btn btn-outline-secondary"
+								for="btnradio_prod"
+							>
+								{{$p.t('lehre', 'btn_stundenplanProd')}}
+							</label>
+							<input
+								type="radio"
+								class="btn-check"
+								name="btnradio"
+								id="btnradio_dev"
+								value="dev"
+								v-model="stundenplanEnvironment"
+								@change="switchStundenplan()"
+							>
+							<label
+								class="btn btn-outline-secondary"
+								for="btnradio_dev"
+							>
+								{{$p.t('lehre', 'btn_stundenplanDev')}}
+							</label>
+						</div>
 					</template>
 			</core-filter-cmpt>
 		</div>

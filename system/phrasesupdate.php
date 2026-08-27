@@ -62411,6 +62411,46 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'btn_stundenplanDev',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LV-Plan (Planungs-Daten)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'LV-Plan (developing data)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'btn_stundenplanProd',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LV-Plan (Produktiv Daten)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'LV-Plan (produktive data',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 
