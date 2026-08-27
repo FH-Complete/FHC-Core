@@ -360,7 +360,8 @@ class Benutzerfunktion_model extends DB_Model
 			SELECT DISTINCT ps.prestudent_id, bf.datum_von, bf.datum_bis
 			FROM public.tbl_benutzerfunktion bf
 			JOIN public.tbl_benutzer bn USING (uid)
-			JOIN public.tbl_prestudent ps USING (person_id)
+			JOIN public.tbl_student stud ON (stud.student_uid = bn.uid)
+			JOIN public.tbl_prestudent ps USING (prestudent_id)
 			JOIN public.tbl_prestudentstatus pss ON (ps.prestudent_id = pss.prestudent_id)
 			JOIN public.tbl_studiensemester ss ON (pss.studiensemester_kurzbz = ss.studiensemester_kurzbz)
 			WHERE ss.studiensemester_kurzbz = ?
@@ -387,10 +388,11 @@ class Benutzerfunktion_model extends DB_Model
 	public function isJgv($semester, $prestudent_id)
 	{
 		$query = "
-			SELECT ps.prestudent_id, ss.start as von, ss.ende as bis
+			SELECT DISTINCT ps.prestudent_id, bf.datum_von, bf.datum_bis
 			FROM public.tbl_benutzerfunktion bf
 			JOIN public.tbl_benutzer bn USING (uid)
-			JOIN public.tbl_prestudent ps USING (person_id)
+			JOIN public.tbl_student stud ON (stud.student_uid = bn.uid)
+			JOIN public.tbl_prestudent ps USING (prestudent_id)
 			JOIN public.tbl_prestudentstatus pss ON (ps.prestudent_id = pss.prestudent_id)
 			JOIN public.tbl_studiensemester ss ON (pss.studiensemester_kurzbz = ss.studiensemester_kurzbz)
 			WHERE ss.studiensemester_kurzbz = ?
