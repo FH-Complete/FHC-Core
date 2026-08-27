@@ -85,7 +85,7 @@ class CmsAdminStruktur extends FHCAPI_Controller
 	public function postGruppe()
 	{
 		if (!$this->permissionlib->isBerechtigt('basis/cms', 'u'))
-			$this->terminateWithError('cms/keineBerechtigung');
+			$this->terminateWithError($this->p->t('cms', 'keineBerechtigung'));
 
 		$this->load->library('form_validation');
 		$this->form_validation->set_data($_POST);
@@ -103,7 +103,7 @@ class CmsAdminStruktur extends FHCAPI_Controller
 
 		if (isError($result))
 		{
-			$this->terminateWithError('cms/gruppeBereitsZugeordnet');
+			$this->terminateWithError($this->p->t('cms', 'gruppeBereitsZugeordnet'));
 		}
 
 		$this->terminateWithSuccess(true);
@@ -112,7 +112,7 @@ class CmsAdminStruktur extends FHCAPI_Controller
 	public function deleteGruppe()
 	{
 		if (!$this->permissionlib->isBerechtigt('basis/cms', 'u'))
-			$this->terminateWithError('cms/keineBerechtigung');
+			$this->terminateWithError($this->p->t('cms', 'keineBerechtigung'));
 
 		$this->load->library('form_validation');
 		$this->form_validation->set_data($_POST);
@@ -133,7 +133,7 @@ class CmsAdminStruktur extends FHCAPI_Controller
 	public function postChild()
 	{
 		if (!$this->permissionlib->isBerechtigt('basis/cms', 'u'))
-			$this->terminateWithError('cms/keineBerechtigung');
+			$this->terminateWithError($this->p->t('cms', 'keineBerechtigung'));
 
 		$this->load->library('form_validation');
 		$this->form_validation->set_data($_POST);
@@ -165,7 +165,7 @@ class CmsAdminStruktur extends FHCAPI_Controller
 	public function deleteChild()
 	{
 		if (!$this->permissionlib->isBerechtigt('basis/cms', 'u'))
-			$this->terminateWithError('cms/keineBerechtigung');
+			$this->terminateWithError($this->p->t('cms', 'keineBerechtigung'));
 
 		$this->load->library('form_validation');
 		$this->form_validation->set_data($_POST);
@@ -182,7 +182,7 @@ class CmsAdminStruktur extends FHCAPI_Controller
 	public function putChildSort()
 	{
 		if (!$this->permissionlib->isBerechtigt('basis/cms', 'u'))
-			$this->terminateWithError('cms/keineBerechtigung');
+			$this->terminateWithError($this->p->t('cms', 'keineBerechtigung'));
 
 		$this->load->library('form_validation');
 		$this->form_validation->set_data($_POST);

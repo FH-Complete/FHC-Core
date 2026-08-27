@@ -129,4 +129,16 @@ class Contentgruppe_model extends DB_Model
 
 		return success($map);
 	}
+
+	/**
+	 * @param int $content_id
+	 * @return stdClass
+	 */
+	public function deleteByContent($content_id)
+	{
+		return $this->execQuery(
+			'DELETE FROM campus.tbl_contentgruppe WHERE content_id = ?',
+			[$content_id]
+		);
+	}
 }

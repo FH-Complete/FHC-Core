@@ -9,9 +9,13 @@ const TreeNode = {
 		node: Object,
 		activeContentId: Number,
 		expandedKeys: Object,
-		flat: Boolean
+		flat: Boolean,
+		clicks: Object
 	},
 	computed: {
+		clickCount() {
+			return this.clicks ? (this.clicks[this.node.content_id] || 0) : null;
+		},
 		hasChildren() {
 			return this.node.children && this.node.children.length > 0;
 		},
@@ -54,6 +58,9 @@ const TreeNode = {
 				:style="labelStyle"
 				@click.prevent="treeSelect(node)">{{ node.titel }} ({{ node.content_id }})</a>
 			<span v-else :style="!node.aktiv ? 'opacity:0.5' : ''">{{ node.titel }} ({{ node.content_id }})</span>
+			<span v-if="clickCount !== null"
+				class="badge ms-1"
+				:class="clickCount ? 'bg-secondary' : 'bg-light text-muted'">{{ clickCount }}</span>
 			<ul v-if="!flat && isExpanded && hasChildren" class="list-unstyled ms-3">
 				<cms-tree-node
 					v-for="child in node.children"
@@ -62,6 +69,7 @@ const TreeNode = {
 					:active-content-id="activeContentId"
 					:expanded-keys="expandedKeys"
 					:flat="flat"
+					:clicks="clicks"
 				></cms-tree-node>
 			</ul>
 		</li>
@@ -86,8 +94,33 @@ export default {
 			filter: '',
 			nodes: [],
 			loading: false,
-			expandedKeys: {}
+			expandedKeys: {},
+			clicks: null,
+			clicksSince: null,
+			ranked: false,
+			clicksLoading: false,
+			months: 12,
+			loadedMonths: null
 		};
+	},
+	computed: {
+		// Flat on purpose: a relic sits at any depth, so per-level sorting would hide it.
+		visibleNodes() {
+			if (!this.ranked || !this.clicks) return this.nodes;
+
+			const flatList = [];
+			const walk = (nodes) => {
+				for (const node of nodes) {
+					flatList.push(node);
+					if (node.children && node.children.length) walk(node.children);
+				}
+			};
+			walk(this.nodes);
+
+			return flatList.slice().sort(
+				(a, b) => (this.clicks[b.content_id] || 0) - (this.clicks[a.content_id] || 0)
+			);
+		}
 	},
 	provide() {
 		return {
@@ -147,6 +180,37 @@ export default {
 				this.$emit('select-content', node.content_id);
 			}
 		},
+		toggleRanking() {
+			if (this.ranked) {
+				this.ranked = false;
+				return;
+			}
+			this.loadClicks();
+		},
+
+		// A wider period costs a longer query, so cache the counts per period.
+		loadClicks() {
+			if (this.clicks && this.loadedMonths === this.months) {
+				this.ranked = true;
+				return;
+			}
+			this.clicksLoading = true;
+			this.$api
+				.call(ApiCmsAdmin.getClickCounts(this.months))
+				.then(result => {
+					this.clicks = result.data.counts || {};
+					this.clicksSince = result.data.since;
+					this.loadedMonths = result.data.months;
+					this.ranked = true;
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => { this.clicksLoading = false; });
+		},
+
+		onMonthsChange() {
+			if (this.ranked || this.clicks) this.loadClicks();
+		},
+
 		onFilter(text) {
 			this.filter = text;
 			this.loadTree();
@@ -160,6 +224,9 @@ export default {
 					this.$emit('select-content', newId);
 				});
 		}
+	},
+	created() {
+		this.monthOptions = [3, 6, 12, 24, 0];
 	},
 	mounted() {
 		this.loadTree();
@@ -179,20 +246,47 @@ export default {
 					{{ $p.t('cms/neuenChildEintragHinzufuegen') }}
 				</button>
 			</div>
+			<div class="mb-2">
+				<div class="input-group input-group-sm">
+					<button class="btn"
+						:class="ranked ? 'btn-secondary' : 'btn-outline-secondary'"
+						:disabled="clicksLoading"
+						@click="toggleRanking">
+						<i class="fa-solid fa-fw"
+							:class="clicksLoading ? 'fa-spinner fa-spin' : 'fa-arrow-down-9-1'"></i>
+						{{ ranked ? $p.t('cms/hierarchieZeigen') : $p.t('cms/nachKlicksReihen') }}
+					</button>
+					<select class="form-select"
+						v-model.number="months"
+						:disabled="clicksLoading"
+						:title="$p.t('cms/zeitraum')"
+						@change="onMonthsChange">
+						<option v-for="m in monthOptions" :key="m" :value="m">
+							{{ m ? $p.t('cms/letzteNMonate', [m]) : $p.t('cms/gesamterZeitraum') }}
+						</option>
+					</select>
+				</div>
+				<div v-if="loadedMonths !== null" class="form-text mt-1">
+					{{ clicksSince
+						? $p.t('cms/klicksSeit', [clicksSince.substring(0, 10)])
+						: $p.t('cms/klicksGesamt') }}
+				</div>
+			</div>
 			<div v-if="loading" class="text-center text-muted py-3">
 				<i class="fa-solid fa-spinner fa-spin"></i>
 			</div>
-			<div v-else-if="nodes?.length === 0" class="text-muted py-2">
+			<div v-else-if="visibleNodes?.length === 0" class="text-muted py-2">
 				{{ filter ? $p.t('cms/keineTreffer') : $p.t('cms/keineEintraege') }}
 			</div>
 			<ul v-else class="list-unstyled mb-0">
 				<cms-tree-node
-					v-for="node in nodes"
+					v-for="node in visibleNodes"
 					:key="node.content_id"
 					:node="node"
 					:active-content-id="activeContentId"
 					:expanded-keys="expandedKeys"
-					:flat="menu === 'news'"
+					:flat="ranked || menu === 'news'"
+					:clicks="clicks"
 				></cms-tree-node>
 			</ul>
 		</div>

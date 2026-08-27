@@ -162,4 +162,53 @@ class Contentsprache_model extends DB_Model
 
 		return success($data[0]);
 	}
+
+	/**
+	 * Clears the lock of a version. Without a uid it clears whoever holds it, which is
+	 * what a forced release needs.
+	 * @param int $contentsprache_id
+	 * @param string|null $uid
+	 * @return stdClass
+	 */
+	public function releaseLock($contentsprache_id, $uid = null)
+	{
+		$query = 'UPDATE campus.tbl_contentsprache SET gesperrt_uid = NULL
+			WHERE contentsprache_id = ?';
+		$params = [$contentsprache_id];
+
+		if ($uid !== null)
+		{
+			$query .= ' AND gesperrt_uid = ?';
+			$params[] = $uid;
+		}
+
+		return $this->execQuery($query, $params);
+	}
+
+	/**
+	 * @param int $content_id
+	 * @return stdClass
+	 */
+	public function deleteByContent($content_id)
+	{
+		return $this->execQuery(
+			'DELETE FROM campus.tbl_contentsprache WHERE content_id = ?',
+			[$content_id]
+		);
+	}
+
+	/**
+	 * @param int $content_id
+	 * @param string $sprache
+	 * @param int $version
+	 * @return stdClass
+	 */
+	public function deleteVersion($content_id, $sprache, $version)
+	{
+		return $this->execQuery(
+			'DELETE FROM campus.tbl_contentsprache
+				WHERE content_id = ? AND sprache = ? AND version = ?',
+			[$content_id, $sprache, $version]
+		);
+	}
 }

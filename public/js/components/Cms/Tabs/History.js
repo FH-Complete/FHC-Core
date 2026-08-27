@@ -55,9 +55,9 @@ export default {
 						{{ $p.t('cms/unsichtbar') }}
 					</span>
 				</div>
-				<div>{{ $p.t('cms/erstelltAmVon', { amum: formatDate(v.insertamum), von: v.insertvon }) }}</div>
+				<div>{{ $p.t('cms/erstelltAmVon', [formatDate(v.insertamum), v.insertvon]) }}</div>
 				<div v-if="v.updatevon">
-					{{ $p.t('cms/letzteAenderungVonAm', { von: v.updatevon, amum: formatDate(v.updateamum) }) }}
+					{{ $p.t('cms/letzteAenderungVonAm', [formatDate(v.updateamum), v.updatevon]) }}
 				</div>
 			</div>
 		</div>

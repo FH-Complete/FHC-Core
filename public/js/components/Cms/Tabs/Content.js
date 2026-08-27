@@ -29,7 +29,22 @@ export default {
 		lockState() {
 			if (!this.sperre || this.sperre.gesperrt_uid === null) return 'free';
 			if (this.sperre.own) return 'own';
+			if (this.sperre.expired) return 'expired';
 			return 'foreign';
+		},
+		lockInfo() {
+			if (!this.sperre || this.sperre.gesperrt_uid === null) return '';
+
+			const start = this.formatDateTime(this.sperre.start);
+			const ende = this.formatDateTime(this.sperre.expires);
+
+			if (this.sperre.own)
+				return this.$p.t('cms/eigeneSperre', [start, ende]);
+
+			const uid = this.sperre.gesperrt_uid;
+			if (this.sperre.expired)
+				return this.$p.t('cms/gesperrtVonSeitAbgelaufen', [uid, start, ende]);
+			return this.$p.t('cms/gesperrtVonSeit', [uid, start, ende]);
 		}
 	},
 	watch: {
@@ -38,6 +53,12 @@ export default {
 		version() { this.loadFormData(); }
 	},
 	methods: {
+		formatDateTime(dateStr) {
+			if (!dateStr) return this.$p.t('cms/unbekannt');
+			const dt = luxon.DateTime.fromSQL(dateStr);
+			return dt.isValid ? dt.toFormat('dd.MM.yyyy HH:mm') : dateStr;
+		},
+
 		loadFormData() {
 			if (this.contentId == null || !this.sprache || !this.version) return;
 			this.loading = true;
@@ -63,7 +84,6 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 
-		// LEGACY-QUIRK: Releasing a lock releases all locks of this user, not just this page's. See Q1.
 		unlock() {
 			this.$api
 				.call(ApiCmsAdmin.deleteLock(this.sperre.contentsprache_id))
@@ -101,6 +121,12 @@ export default {
 	template: `
 		<div class="p-3" v-if="contentId != null">
 			<template v-if="!loading && sperre">
+				<div v-if="sperre.gesperrt_uid !== null"
+					class="alert"
+					:class="lockState === 'expired' ? 'alert-warning' : 'alert-info'">
+					{{ lockInfo }}
+				</div>
+
 				<template v-if="lockState === 'free'">
 					<button class="btn btn-primary mb-3" @click="lock">
 						{{ $p.t('cms/zurBearbeitungSperren') }}
@@ -108,9 +134,6 @@ export default {
 				</template>
 
 				<template v-else-if="lockState === 'own'">
-					<div class="alert alert-warning">
-						{{ $p.t('cms/freigabeGibtAlleSperrenFrei') }}
-					</div>
 					<button class="btn btn-outline-secondary mb-3" @click="unlock">
 						{{ $p.t('cms/sperreFreigeben') }}
 					</button>
@@ -125,10 +148,13 @@ export default {
 					</button>
 				</template>
 
+				<template v-else-if="lockState === 'expired'">
+					<button class="btn btn-warning mb-3" @click="lock">
+						{{ $p.t('cms/sperreUebernehmen') }}
+					</button>
+				</template>
+
 				<template v-else>
-					<div class="alert alert-info">
-						{{ $p.t('cms/gesperrtVonSeit', { uid: sperre.gesperrt_uid, start: sperre.start }) }}
-					</div>
 					<button v-if="sperre.may_force" class="btn btn-danger mb-3" @click="forceUnlock">
 						{{ $p.t('cms/freigabeErzwingen') }}
 					</button>

@@ -7,6 +7,13 @@ use \DOMDocument as DOMDocument;
 
 class XsdSchemaLib
 {
+	private $ci;
+
+	public function __construct()
+	{
+		$this->ci =& get_instance();
+	}
+
 	/**
 	 * Converts an XSD into a field schema.
 	 * @param string $xsd            the XSD as a string
@@ -21,7 +28,7 @@ class XsdSchemaLib
 		if (!$dom->loadXML($xsd))
 		{
 			libxml_clear_errors();
-			return error('cms/xsdUngueltig');
+			return error($this->ci->p->t('cms', 'xsdUngueltig'));
 		}
 
 		libxml_clear_errors();
@@ -105,7 +112,7 @@ class XsdSchemaLib
 		if (!$check->loadXML($xml))
 		{
 			libxml_clear_errors();
-			return error('cms/xmlUngueltig');
+			return error($this->ci->p->t('cms', 'xmlUngueltig'));
 		}
 
 		libxml_clear_errors();

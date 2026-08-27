@@ -147,4 +147,18 @@ class Contentchild_model extends DB_Model
 
 		return success(true);
 	}
+
+	/**
+	 * Removes a content from the child table, as parent and as child.
+	 * @param int $content_id
+	 * @return stdClass
+	 */
+	public function deleteByContent($content_id)
+	{
+		return $this->execQuery(
+			'DELETE FROM campus.tbl_contentchild
+				WHERE content_id = ? OR child_content_id = ?',
+			[$content_id, $content_id]
+		);
+	}
 }

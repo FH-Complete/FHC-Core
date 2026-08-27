@@ -23,6 +23,13 @@ export default {
 			params: { content_id, sprache, version }
 		};
 	},
+	getClickCounts(months) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/CmsAdmin/getClickCounts',
+			params: { months }
+		};
+	},
 	getTemplates() {
 		return {
 			method: 'get',

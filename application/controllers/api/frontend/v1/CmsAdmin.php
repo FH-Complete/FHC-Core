@@ -16,6 +16,7 @@ class CmsAdmin extends FHCAPI_Controller
 			'getOrganisationseinheiten' => ['basis/cms:r'],
 			'getSprachen'               => ['basis/cms:r'],
 			'getUsage'                  => ['basis/cms:r'],
+			'getClickCounts'            => ['basis/cms:r'],
 			'postContent'               => ['basis/cms:rw'],
 			'postTranslation'           => ['basis/cms:rw'],
 			'postVersion'               => ['basis/cms:rw'],
@@ -144,13 +145,13 @@ class CmsAdmin extends FHCAPI_Controller
 		$entitled = $this->getDataOrTerminateWithError($entitledResult);
 
 		if (!$entitled)
-			$this->terminateWithError('cms/keineBerechtigungFuerDiesenEintrag');
+			$this->terminateWithError($this->p->t('cms', 'keineBerechtigungFuerDiesenEintrag'));
 
 		$this->ContentModel->resetQuery();
 		$contentResult = $this->ContentModel->load($content_id);
 		$contentData = $this->getDataOrTerminateWithError($contentResult);
 		if (empty($contentData))
-			$this->terminateWithError('cms/contentNichtGefunden');
+			$this->terminateWithError($this->p->t('cms', 'contentNichtGefunden'));
 		$content = $contentData[0];
 
 		$langResult = $this->ContentspracheModel->getLanguages($content_id);
@@ -198,12 +199,50 @@ class CmsAdmin extends FHCAPI_Controller
 
 		$result = $this->ContentspracheModel->getOne($content_id, $sprache, $version);
 		if (isError($result))
-			$this->terminateWithError('cms/versionNichtGefunden');
+			$this->terminateWithError($this->p->t('cms', 'versionNichtGefunden'));
 
 		$data = getData($result);
 		$data->sichtbar = ($data->sichtbar === 't' || $data->sichtbar === true);
 
 		$this->terminateWithSuccess($data);
+	}
+
+	/**
+	 * Views per content for the tree ranking. Empty if LOG_CONTENT is off.
+	 */
+	public function getClickCounts()
+	{
+		$this->load->library('form_validation');
+		$this->form_validation->set_data($_GET);
+		$this->form_validation->set_rules('months', 'Monate', 'is_natural');
+		if ($this->form_validation->run() == FALSE)
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$this->load->model('system/Webservicelog_model', 'WebservicelogModel');
+		$this->config->load('cms');
+
+		$months = $this->input->get('months');
+		if ($months === null || $months === '')
+			$months = $this->config->item('clickstats_months');
+		$months = (int) $months;
+
+		// 0 counts the whole log. That is the slowest case and stays an explicit choice.
+		$since = ($months > 0)
+			? date('Y-m-d H:i:s', strtotime('-' . $months . ' months'))
+			: null;
+
+		$result = $this->WebservicelogModel->getContentClickCounts($since);
+		$rows = $this->getDataOrTerminateWithError($result);
+
+		$counts = [];
+		foreach ((array) $rows as $row)
+			$counts[(int) $row->request_id] = (int) $row->hits;
+
+		$this->terminateWithSuccess([
+			'since' => $since,
+			'months' => $months,
+			'counts' => $counts
+		]);
 	}
 
 	public function getTemplates()
@@ -251,7 +290,7 @@ class CmsAdmin extends FHCAPI_Controller
 	public function postContent()
 	{
 		if (!$this->permissionlib->isBerechtigt('basis/cms', 'i'))
-			$this->terminateWithError('cms/keineBerechtigung');
+			$this->terminateWithError($this->p->t('cms', 'keineBerechtigung'));
 
 		$this->load->library('form_validation');
 		$this->form_validation->set_data($_POST);
@@ -270,7 +309,7 @@ class CmsAdmin extends FHCAPI_Controller
 	public function postTranslation()
 	{
 		if (!$this->permissionlib->isBerechtigt('basis/cms', 'i'))
-			$this->terminateWithError('cms/keineBerechtigung');
+			$this->terminateWithError($this->p->t('cms', 'keineBerechtigung'));
 
 		$this->load->library('form_validation');
 		$this->form_validation->set_data($_POST);
@@ -293,7 +332,7 @@ class CmsAdmin extends FHCAPI_Controller
 	public function postVersion()
 	{
 		if (!$this->permissionlib->isBerechtigt('basis/cms', 'i'))
-			$this->terminateWithError('cms/keineBerechtigung');
+			$this->terminateWithError($this->p->t('cms', 'keineBerechtigung'));
 
 		$this->load->library('form_validation');
 		$this->form_validation->set_data($_POST);
@@ -312,7 +351,7 @@ class CmsAdmin extends FHCAPI_Controller
 	public function putProperties()
 	{
 		if (!$this->permissionlib->isBerechtigt('basis/cms', 'u'))
-			$this->terminateWithError('cms/keineBerechtigung');
+			$this->terminateWithError($this->p->t('cms', 'keineBerechtigung'));
 
 		$this->load->library('form_validation');
 		$this->form_validation->set_data($_POST);
@@ -345,7 +384,7 @@ class CmsAdmin extends FHCAPI_Controller
 	public function deleteContent()
 	{
 		if (!$this->permissionlib->isBerechtigt('basis/cms', 'd'))
-			$this->terminateWithError('cms/keineBerechtigung');
+			$this->terminateWithError($this->p->t('cms', 'keineBerechtigung'));
 
 		$this->load->library('form_validation');
 		$this->form_validation->set_data($_POST);
@@ -360,7 +399,7 @@ class CmsAdmin extends FHCAPI_Controller
 	public function deleteContentsprache()
 	{
 		if (!$this->permissionlib->isBerechtigt('basis/cms', 'd'))
-			$this->terminateWithError('cms/keineBerechtigung');
+			$this->terminateWithError($this->p->t('cms', 'keineBerechtigung'));
 
 		$this->validateContentSpracheVersion();
 

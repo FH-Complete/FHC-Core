@@ -40,7 +40,7 @@ class CmsAdminInhalt extends FHCAPI_Controller
 		$templateResult = $this->TemplateModel->load($template_kurzbz);
 		$templateData = $this->getDataOrTerminateWithError($templateResult);
 		if (empty($templateData))
-			$this->terminateWithError('cms/vorlageNichtGefunden');
+			$this->terminateWithError($this->p->t('cms', 'vorlageNichtGefunden'));
 
 		$schemaResult = $this->xsdschemalib->parseSchema(
 			$templateData[0]->xsd, $template_kurzbz
@@ -70,13 +70,13 @@ class CmsAdminInhalt extends FHCAPI_Controller
 		$contentResult = $this->ContentModel->load($content_id);
 		$contentData = $this->getDataOrTerminateWithError($contentResult);
 		if (empty($contentData))
-			$this->terminateWithError('cms/contentNichtGefunden');
+			$this->terminateWithError($this->p->t('cms', 'contentNichtGefunden'));
 
 		$this->TemplateModel->resetQuery();
 		$templateResult = $this->TemplateModel->load($contentData[0]->template_kurzbz);
 		$templateData = $this->getDataOrTerminateWithError($templateResult);
 		if (empty($templateData))
-			$this->terminateWithError('cms/vorlageNichtGefunden');
+			$this->terminateWithError($this->p->t('cms', 'vorlageNichtGefunden'));
 
 		$schemaResult = $this->xsdschemalib->parseSchema(
 			$templateData[0]->xsd, $contentData[0]->template_kurzbz
@@ -132,8 +132,6 @@ class CmsAdminInhalt extends FHCAPI_Controller
 
 	public function putFormData()
 	{
-		// LEGACY-QUIRK: the legacy XSDFormPrinter_XML branch in admin.php checks neither the
-		// permission type nor the lock. Kept as a functional copy. See Q3 in the contract.
 		$this->load->library('form_validation');
 		$this->form_validation->set_data($_POST);
 		$this->form_validation->set_rules('content_id', 'Content ID', 'required|is_natural');
@@ -153,6 +151,11 @@ class CmsAdminInhalt extends FHCAPI_Controller
 		if (!is_array($values))
 			$values = [];
 
+		$lockResult = $this->cmsadminlib->getLockState($content_id, $sprache, $version);
+		$lock = $this->getDataOrTerminateWithError($lockResult);
+		if (!$lock['own'])
+			$this->terminateWithError($this->p->t('cms', 'speichernNurMitSperre'));
+
 		$result = $this->cmsadminlib->saveContentXml($content_id, $sprache, $version, $values);
 		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result));
 	}
@@ -160,7 +163,7 @@ class CmsAdminInhalt extends FHCAPI_Controller
 	public function postLock()
 	{
 		if (!$this->permissionlib->isBerechtigt('basis/cms', 'u'))
-			$this->terminateWithError('cms/keineBerechtigungFuerDieseAktion');
+			$this->terminateWithError($this->p->t('cms', 'keineBerechtigungFuerDieseAktion'));
 
 		$contentsprache_id = $this->input->post('contentsprache_id');
 
@@ -170,20 +173,19 @@ class CmsAdminInhalt extends FHCAPI_Controller
 
 	public function deleteLock()
 	{
-		// LEGACY-QUIRK: releaseOwnLocks releases all locks of the user. This method ignores
-		// the given contentsprache_id on purpose. The parameter stays in the API contract, so
-		// that a later fix does not change the interface. See Q1 in the contract.
 		if (!$this->permissionlib->isBerechtigt('basis/cms', 'u'))
-			$this->terminateWithError('cms/keineBerechtigungFuerDieseAktion');
+			$this->terminateWithError($this->p->t('cms', 'keineBerechtigungFuerDieseAktion'));
 
-		$result = $this->cmsadminlib->releaseOwnLocks();
+		$contentsprache_id = $this->input->post('contentsprache_id');
+
+		$result = $this->cmsadminlib->releaseOwnLock($contentsprache_id);
 		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result));
 	}
 
 	public function deleteLockForced()
 	{
 		if (!$this->permissionlib->isBerechtigt('basis/cms_sperrfreigabe', 'su'))
-			$this->terminateWithError('cms/keineBerechtigungFuerDieseAktion');
+			$this->terminateWithError($this->p->t('cms', 'keineBerechtigungFuerDieseAktion'));
 
 		$contentsprache_id = $this->input->post('contentsprache_id');
 

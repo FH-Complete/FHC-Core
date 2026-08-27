@@ -7,6 +7,7 @@ import Permissions from './Tabs/Permissions.js';
 import Children from './Tabs/Children.js';
 import History from './Tabs/History.js';
 import Delete from './Tabs/Delete.js';
+import HorizontalSplit from '../horizontalsplit/horizontalsplit.js';
 
 const TAB_COMPONENTS = {
 	properties: Properties,
@@ -31,6 +32,7 @@ export default {
 	components: {
 		'cms-tree': ContentTree,
 		'cms-content-header': ContentHeader,
+		'horizontal-split': HorizontalSplit,
 		...TAB_COMPONENTS
 	},
 	props: {
@@ -45,12 +47,17 @@ export default {
 			version: null,
 			tab: 'properties',
 			contentInfo: null,
-			treeKey: 0
+			treeKey: 0,
+			pending: 0
 		};
 	},
 	computed: {
 		activeTabComponent() {
 			return TAB_COMPONENTS[this.tab] || null;
+		},
+		// Two switches in flight can resolve out of order, so block the view during one.
+		busy() {
+			return this.pending > 0;
 		}
 	},
 	watch: {
@@ -82,11 +89,14 @@ export default {
 				this.contentInfo = null;
 				return;
 			}
+			this.pending++;
 			this.$api
 				.call(ApiCmsAdmin.getContent(this.contentId))
 				.then(result => {
 					this.contentInfo = result.data;
-				});
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => { this.pending--; });
 		},
 
 		selectContent(content_id) {
@@ -100,14 +110,19 @@ export default {
 				return;
 			}
 
-			this.contentId = content_id;
+			// Set id, language and version in one flush, or the tabs query the new content
+			// with the version of the old one.
+			this.pending++;
 			this.$api
 				.call(ApiCmsAdmin.getContent(content_id))
 				.then(result => {
+					this.contentId = content_id;
 					this.contentInfo = result.data;
 					this.preselectLanguageVersion();
 					this.pushRoute();
-				});
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => { this.pending--; });
 		},
 
 		selectTab(tab) {
@@ -161,16 +176,18 @@ export default {
 		}
 	},
 	template: `
-		<div class="cms-admin d-flex h-100">
-			<div class="cms-admin-tree">
+		<div class="cms-admin h-100">
+			<horizontal-split :default-ratio="[25, 75]">
+			<template #left>
 				<cms-tree
 					:key="treeKey"
 					:active-content-id="contentId"
 					@select-content="selectContent"
 					@entry-created="reloadTree"
 				></cms-tree>
-			</div>
-			<div class="cms-admin-main flex-grow-1 d-flex flex-column" v-if="contentId !== null">
+			</template>
+			<template #right>
+			<div class="cms-admin-main h-100 d-flex flex-column" v-if="contentId !== null">
 				<cms-content-header
 					:content-id="contentId"
 					:sprache="sprache"
@@ -202,8 +219,16 @@ export default {
 					></component>
 				</div>
 			</div>
-			<div class="cms-admin-main flex-grow-1 d-flex align-items-center justify-content-center text-muted" v-else>
+			<div class="cms-admin-main h-100 d-flex align-items-center justify-content-center text-muted" v-else>
 				{{ $p.t('cms/keinEintragGewaehlt') }}
+			</div>
+			</template>
+			</horizontal-split>
+
+			<div v-if="busy" class="cms-admin-overlay">
+				<div class="spinner-border text-primary" role="status">
+					<span class="visually-hidden">{{ $p.t('ui/loading') }}</span>
+				</div>
 			</div>
 		</div>
 	`,

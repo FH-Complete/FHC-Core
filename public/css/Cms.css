@@ -1,13 +1,33 @@
+/* Full-height shell. Without a height chain down to .cms-admin the page itself scrolls
+   and the tabs leave the screen while paging through the tree. */
+html,
+body {
+	height: 100%;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+#main {
+	flex: 1 1 auto;
+	min-height: 0;
+}
+
 .cms-admin {
 	min-height: 0;
 }
 
-.cms-admin-tree {
-	width: 300px;
-	min-width: 200px;
-	max-width: 400px;
-	overflow-y: auto;
-	border-right: 1px solid var(--fhc-border, #dee2e6);
+/* The split component only caps its height with max-height, so give it a definite one. */
+.cms-admin .horizontalsplit-container {
+	height: 100%;
+}
+
+.cms-admin .horizontalsplitted {
+	min-width: 0;
+	overscroll-behavior: contain;
 }
 
 .cms-admin-main {
@@ -17,4 +37,20 @@
 
 .cms-admin-tab-content {
 	min-height: 0;
+}
+
+/* Anchor for the overlay that blocks the view during a content switch. */
+.cms-admin {
+	position: relative;
+}
+
+.cms-admin-overlay {
+	position: absolute;
+	inset: 0;
+	z-index: 1050;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(255, 255, 255, 0.6);
+	cursor: wait;
 }

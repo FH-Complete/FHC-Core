@@ -65,10 +65,10 @@ export default {
 
 		deleteContent() {
 			this.$fhcAlert.confirm({
-				message: this.$p.t('cms/contentLoeschenBestaetigen', {
-					sprachen: this.contentInfo.languages.length,
-					versionen: this.totalVersionCount
-				}),
+				message: this.$p.t('cms/contentLoeschenBestaetigen', [
+					this.contentInfo.languages.length,
+					this.totalVersionCount
+				]),
 				acceptLabel: this.$p.t('ui/loeschen'),
 				acceptClass: 'p-button-danger'
 			}).then(confirmed => {

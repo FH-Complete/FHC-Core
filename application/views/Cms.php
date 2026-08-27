@@ -11,6 +11,7 @@
 		'phrases'    => array('global', 'ui', 'cms'),
 		'customCSSs' => [
 			'public/css/components/verticalsplit.css',
+			'public/css/components/horizontalsplit.css',
 			'public/css/Cms.css'
 		],
 		'customJSs' => [

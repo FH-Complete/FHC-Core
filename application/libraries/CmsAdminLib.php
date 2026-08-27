@@ -69,7 +69,7 @@ class CmsAdminLib
 		$entitled = getData($entitledResult);
 
 		if (empty($entitled))
-			return error('cms/keineBerechtigteOe');
+			return error($this->ci->p->t('cms', 'keineBerechtigteOe'));
 
 		if (in_array($default, $entitled))
 			return success($default);
@@ -88,7 +88,7 @@ class CmsAdminLib
 			return $templatesResult;
 		$templates = getData($templatesResult);
 		if (empty($templates))
-			return error('cms/keineVorlageVorhanden');
+			return error($this->ci->p->t('cms', 'keineVorlageVorhanden'));
 		$template = $templates[0];
 
 		$oeResult = $this->getDefaultOe();
@@ -96,11 +96,7 @@ class CmsAdminLib
 			return $oeResult;
 		$oe = getData($oeResult);
 
-		$this->ci->load->library('PhrasesLib');
-		$phraseResult = $this->ci->phraseslib->getPhrases(
-			'cms', DEFAULT_LANGUAGE, 'neuerEintrag', null, null, 'no'
-		);
-		$titel = $phraseResult->retval[0]->text;
+		$titel = $this->ci->p->t('cms', 'neuerEintrag');
 
 		$now = date('Y-m-d H:i:s');
 		$uid = getAuthUID();
@@ -153,7 +149,7 @@ class CmsAdminLib
 		$this->ci->db->trans_complete();
 
 		if ($this->ci->db->trans_status() === false)
-			return error('cms/speichernFehlgeschlagen');
+			return error($this->ci->p->t('cms', 'speichernFehlgeschlagen'));
 
 		return success([
 			'content_id' => $content_id,
@@ -175,7 +171,7 @@ class CmsAdminLib
 		if (isError($existsResult))
 			return $existsResult;
 		if (getData($existsResult))
-			return error('cms/uebersetzungExistiert');
+			return error($this->ci->p->t('cms', 'uebersetzungExistiert'));
 
 		$sourceResult = $this->ci->ContentspracheModel->getOne($content_id, $sprache, $version);
 		if (isError($sourceResult))
@@ -291,7 +287,7 @@ class CmsAdminLib
 		$this->ci->db->trans_complete();
 
 		if ($this->ci->db->trans_status() === false)
-			return error('cms/speichernFehlgeschlagen');
+			return error($this->ci->p->t('cms', 'speichernFehlgeschlagen'));
 
 		return success(true);
 	}
@@ -318,14 +314,14 @@ class CmsAdminLib
 			return $contentResult;
 		$content = getData($contentResult);
 		if (empty($content))
-			return error('cms/contentNichtGefunden');
+			return error($this->ci->p->t('cms', 'contentNichtGefunden'));
 
 		$templateResult = $this->ci->TemplateModel->load($content[0]->template_kurzbz);
 		if (isError($templateResult))
 			return $templateResult;
 		$template = getData($templateResult);
 		if (empty($template))
-			return error('cms/keineVorlageVorhanden');
+			return error($this->ci->p->t('cms', 'keineVorlageVorhanden'));
 
 		$schemaResult = $this->ci->xsdschemalib->parseSchema(
 			$template[0]->xsd, $content[0]->template_kurzbz
@@ -347,9 +343,10 @@ class CmsAdminLib
 		return success(true);
 	}
 
-	// LEGACY-QUIRK: content::sperren does not check for an existing lock.
-	// A second user overwrites the first lock. See Q2 in the contract.
+	// DEVIATION: content::sperren overwrites a live lock without a check (Q2). Locking now
+	// refuses a live foreign lock and takes over only an expired one.
 	/**
+	 * Locks a version for the current user, or takes over an expired lock.
 	 * @param int $contentsprache_id
 	 * @return object success(true) or error
 	 */
@@ -357,7 +354,28 @@ class CmsAdminLib
 	{
 		$uid = getAuthUID();
 
+		$rowResult = $this->ci->ContentspracheModel->load($contentsprache_id);
+		if (isError($rowResult))
+			return $rowResult;
+		$rowData = getData($rowResult);
+		if (empty($rowData))
+			return error($this->ci->p->t('cms', 'versionNichtGefunden'));
+
+		$holder = ($rowData[0]->gesperrt_uid === '') ? null : $rowData[0]->gesperrt_uid;
+
+		if ($holder !== null && $holder !== $uid)
+		{
+			$openResult = $this->ci->ContentlogModel->getOpenLock($contentsprache_id, $holder);
+			$openEntry = (!isError($openResult)) ? getData($openResult) : null;
+
+			if (!$this->isLockExpired($holder, $openEntry))
+				return error($this->ci->p->t('cms', 'bereitsGesperrt'));
+		}
+
 		$this->ci->db->trans_start();
+
+		// Close every open entry: a take-over ends the previous one, and the legacy leaks them.
+		$this->ci->ContentlogModel->closeOpenEntries($contentsprache_id);
 
 		$logResult = $this->ci->ContentlogModel->insert([
 			'uid' => $uid,
@@ -376,36 +394,31 @@ class CmsAdminLib
 		$this->ci->db->trans_complete();
 
 		if ($this->ci->db->trans_status() === false)
-			return error('cms/speichernFehlgeschlagen');
+			return error($this->ci->p->t('cms', 'speichernFehlgeschlagen'));
 
 		return success(true);
 	}
 
-	// LEGACY-QUIRK: content::freigabeUser releases ALL locks of the user, not only the
-	// lock on this page. Kept as a functional copy. See Q1 in the contract.
+	// DEVIATION: content::freigabeUser releases ALL locks of the user (Q1). Releasing now
+	// ends one lock. The uid predicate stops a user releasing a lock of somebody else.
 	/**
+	 * Releases the lock of the current user on one version.
+	 * @param int $contentsprache_id
 	 * @return object success(true)
 	 */
-	public function releaseOwnLocks()
+	public function releaseOwnLock($contentsprache_id)
 	{
 		$uid = getAuthUID();
 
 		$this->ci->db->trans_start();
 
-		$this->ci->db->query(
-			'UPDATE campus.tbl_contentlog SET ende = now() WHERE uid = ? AND ende IS NULL',
-			[$uid]
-		);
-
-		$this->ci->db->query(
-			'UPDATE campus.tbl_contentsprache SET gesperrt_uid = NULL WHERE gesperrt_uid = ?',
-			[$uid]
-		);
+		$this->ci->ContentlogModel->closeOpenEntries($contentsprache_id, $uid);
+		$this->ci->ContentspracheModel->releaseLock($contentsprache_id, $uid);
 
 		$this->ci->db->trans_complete();
 
 		if ($this->ci->db->trans_status() === false)
-			return error('cms/speichernFehlgeschlagen');
+			return error($this->ci->p->t('cms', 'speichernFehlgeschlagen'));
 
 		return success(true);
 	}
@@ -418,20 +431,13 @@ class CmsAdminLib
 	{
 		$this->ci->db->trans_start();
 
-		$this->ci->db->query(
-			'UPDATE campus.tbl_contentlog SET ende = now() WHERE contentsprache_id = ? AND ende IS NULL',
-			[$contentsprache_id]
-		);
-
-		$this->ci->db->query(
-			'UPDATE campus.tbl_contentsprache SET gesperrt_uid = NULL WHERE contentsprache_id = ?',
-			[$contentsprache_id]
-		);
+		$this->ci->ContentlogModel->closeOpenEntries($contentsprache_id);
+		$this->ci->ContentspracheModel->releaseLock($contentsprache_id);
 
 		$this->ci->db->trans_complete();
 
 		if ($this->ci->db->trans_status() === false)
-			return error('cms/speichernFehlgeschlagen');
+			return error($this->ci->p->t('cms', 'speichernFehlgeschlagen'));
 
 		return success(true);
 	}
@@ -449,20 +455,62 @@ class CmsAdminLib
 			return $versionResult;
 		$row = getData($versionResult);
 
-		$lockResult = $this->ci->ContentlogModel->getOpenLock($row->contentsprache_id);
-		$logEntry = (!isError($lockResult)) ? getData($lockResult) : null;
-
 		// LEGACY-QUIRK: admin.php inserts an empty string, releasing writes NULL. Both mean
 		// free. The contract reports NULL.
 		$gesperrt_uid = ($row->gesperrt_uid === '') ? null : $row->gesperrt_uid;
+
+		$logEntry = null;
+		if ($gesperrt_uid !== null)
+		{
+			$lockResult = $this->ci->ContentlogModel->getOpenLock(
+				$row->contentsprache_id, $gesperrt_uid
+			);
+			$logEntry = (!isError($lockResult)) ? getData($lockResult) : null;
+		}
 
 		return success([
 			'contentsprache_id' => (int) $row->contentsprache_id,
 			'gesperrt_uid' => $gesperrt_uid,
 			'start' => $logEntry ? $logEntry->start : null,
 			'own' => ($gesperrt_uid !== null && $gesperrt_uid === getAuthUID()),
+			'expired' => $this->isLockExpired($gesperrt_uid, $logEntry),
+			'expires' => $this->lockExpiryDate($logEntry),
 			'may_force' => $this->ci->permissionlib->isBerechtigt('basis/cms_sperrfreigabe', 'su')
 		]);
+	}
+
+	/**
+	 * End of the lock window, null if the entry carries no start.
+	 * @param stdClass|null $logEntry
+	 * @return string|null
+	 */
+	private function lockExpiryDate($logEntry)
+	{
+		if ($logEntry === null || empty($logEntry->start))
+			return null;
+
+		$ttlHours = (int) $this->ci->config->item('lock_ttl_hours');
+
+		// lock() writes start with PHP time, so stay on PHP time.
+		return date('Y-m-d H:i:s', strtotime($logEntry->start) + $ttlHours * 3600);
+	}
+
+	// DEVIATION: the legacy holds a lock until its owner or a superuser releases it, so a
+	// forgotten lock blocks a page forever. Locks now age out after lock_ttl_hours.
+	/**
+	 * A lock without a log entry has no age and counts as expired.
+	 * @param string|null $gesperrt_uid
+	 * @param stdClass|null $logEntry
+	 * @return bool
+	 */
+	private function isLockExpired($gesperrt_uid, $logEntry)
+	{
+		if ($gesperrt_uid === null)
+			return false;
+
+		$expires = $this->lockExpiryDate($logEntry);
+
+		return $expires === null || strtotime($expires) < time();
 	}
 
 	// DEVIATION: admin.php ignores the return value of deleteContent and tells the user
@@ -475,40 +523,16 @@ class CmsAdminLib
 	{
 		$this->ci->db->trans_start();
 
-		$this->ci->db->query(
-			'DELETE FROM campus.tbl_contentchild WHERE content_id = ?',
-			[$content_id]
-		);
-
-		$this->ci->db->query(
-			'DELETE FROM campus.tbl_contentchild WHERE child_content_id = ?',
-			[$content_id]
-		);
-
-		$this->ci->db->query(
-			'DELETE FROM campus.tbl_contentlog WHERE contentsprache_id IN (SELECT contentsprache_id FROM campus.tbl_contentsprache WHERE content_id = ?)',
-			[$content_id]
-		);
-
-		$this->ci->db->query(
-			'DELETE FROM campus.tbl_contentsprache WHERE content_id = ?',
-			[$content_id]
-		);
-
-		$this->ci->db->query(
-			'DELETE FROM campus.tbl_contentgruppe WHERE content_id = ?',
-			[$content_id]
-		);
-
-		$this->ci->db->query(
-			'DELETE FROM campus.tbl_content WHERE content_id = ?',
-			[$content_id]
-		);
+		$this->ci->ContentchildModel->deleteByContent($content_id);
+		$this->ci->ContentlogModel->deleteByContent($content_id);
+		$this->ci->ContentspracheModel->deleteByContent($content_id);
+		$this->ci->ContentgruppeModel->deleteByContent($content_id);
+		$this->ci->ContentModel->delete($content_id);
 
 		$this->ci->db->trans_complete();
 
 		if ($this->ci->db->trans_status() === false)
-			return error('cms/loeschenNichtMoeglichReferenzen');
+			return error($this->ci->p->t('cms', 'loeschenNichtMoeglichReferenzen'));
 
 		return success(true);
 	}
@@ -527,7 +551,7 @@ class CmsAdminLib
 			if (isError($countResult))
 				return $countResult;
 			if (getData($countResult) === 1)
-				return error('cms/letzteVersionNichtLoeschbar');
+				return error($this->ci->p->t('cms', 'letzteVersionNichtLoeschbar'));
 		}
 
 		$versionResult = $this->ci->ContentspracheModel->getOne($content_id, $sprache, $version);
@@ -537,20 +561,13 @@ class CmsAdminLib
 
 		$this->ci->db->trans_start();
 
-		$this->ci->db->query(
-			'DELETE FROM campus.tbl_contentlog WHERE contentsprache_id = ?',
-			[$row->contentsprache_id]
-		);
-
-		$this->ci->db->query(
-			'DELETE FROM campus.tbl_contentsprache WHERE content_id = ? AND sprache = ? AND version = ?',
-			[$content_id, $sprache, $version]
-		);
+		$this->ci->ContentlogModel->deleteByContentsprache($row->contentsprache_id);
+		$this->ci->ContentspracheModel->deleteVersion($content_id, $sprache, $version);
 
 		$this->ci->db->trans_complete();
 
 		if ($this->ci->db->trans_status() === false)
-			return error('cms/loeschenFehlgeschlagen');
+			return error($this->ci->p->t('cms', 'loeschenFehlgeschlagen'));
 
 		return success(true);
 	}
