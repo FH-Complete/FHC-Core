@@ -1,4 +1,5 @@
 import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
+import FormInput from "../../Form/Input.js";
 import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiOrt from '../../../api/factory/ort.js'
 export const Raumsuche =  {
@@ -6,7 +7,7 @@ export const Raumsuche =  {
 	components: {
 		VueDatePicker,
 		CoreFilterCmpt,
-		InputNumber: primevue.inputnumber,
+		FormInput,
 	},
 	inject: ["isMobile"],
 	data() {
@@ -22,6 +23,7 @@ export const Raumsuche =  {
 				beschreibung: Vue.computed(() => this.$p.t('global/alle'))
 			},
 			anzahl: 1,
+			anzahlInput: '1',
 			selectedType: null,
 			datum: new Date(),
 			von: Vue.ref({
@@ -144,7 +146,18 @@ export const Raumsuche =  {
 		handleUuidDefined(uuid) {
 			this.tabulatorUuid = uuid
 		},
+		editAnzahl() {
+			this.anzahlInput = String(this.anzahl)
+		},
+		normalizeAnzahl() {
+			const value = Number(String(this.anzahlInput).replace(/,/g, ''))
+			this.anzahl = Number.isFinite(value)
+				? Math.min(1000, Math.max(1, value))
+				: 1
+			this.anzahlInput = this.anzahl.toLocaleString('en-US')
+		},
 		search(){
+			this.normalizeAnzahl()
 			this.loadRooms()
 		},
 		setRoute(val) {
@@ -245,11 +258,22 @@ export const Raumsuche =  {
 		
 
 		<div :class="{'pb-2': isMobile}" class="col-12 col-lg-3">
-			<InputNumber v-model="anzahl" 
-			:prefix="$p.t('rauminfo/minCapacity') + ': '" 
-			inputId="anzahlInput" :min="1" :max="1000" 
-			:style="{'width': '100%'}"
-			/>
+			<div class="input-group">
+				<span class="input-group-text">{{ $p.t('rauminfo/minCapacity') }}:</span>
+				<FormInput
+					v-model="anzahlInput"
+					type="text"
+					input-group
+					inputmode="numeric"
+					pattern="[0-9,]*"
+					:aria-label="$p.t('rauminfo/minCapacity')"
+					min="1"
+					max="1000"
+					step="1"
+					@focus="editAnzahl"
+					@change="normalizeAnzahl"
+				/>
+			</div>
 		</div>
 		<div class="col-12 col-lg-2">
 			<button class="btn btn-primary border-0" @click="search">{{ $p.t('rauminfo/roomSearch') }} <i class="fa fa-magnifying-glass"></i></button>
