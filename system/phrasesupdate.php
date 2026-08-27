@@ -61285,7 +61285,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
 	// ### End Anwesenheiten Sprint 25.2
 	// generic tabulator phrases START
 	array(
@@ -62620,7 +62620,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 				'insertvon' => 'system'
 			)
 		)
-	),
+	)
 );
 
 
