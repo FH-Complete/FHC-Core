@@ -9,6 +9,13 @@ export default {
 			params: { menu, ...(filter ? { filter } : {}) }
 		};
 	},
+	getSubtree(content_id) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/CmsAdmin/getSubtree',
+			params: { content_id }
+		};
+	},
 	getContent(content_id) {
 		return {
 			method: 'get',

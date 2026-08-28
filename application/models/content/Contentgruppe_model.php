@@ -10,6 +10,8 @@ class Contentgruppe_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'campus.tbl_contentgruppe';
 		$this->pk = array('gruppe_kurzbz', 'content_id');
+		// Composite key without a sequence, so insert() must skip insert_id() and its LASTVAL().
+		$this->hasSequence = false;
 	}
 
 	/**

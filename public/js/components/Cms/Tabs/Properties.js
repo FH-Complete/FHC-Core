@@ -8,7 +8,7 @@ export default {
 		version: Number,
 		contentInfo: Object
 	},
-	emits: ['reload-content-info', 'reload-tree', 'select-content'],
+	emits: ['reload-content-info', 'refresh-tree-node', 'select-content'],
 	data() {
 		return {
 			titel: '',
@@ -86,7 +86,8 @@ export default {
 				.then(() => {
 					this.$fhcAlert.alertSuccess(this.$p.t('cms/gespeichert'));
 					this.$emit('reload-content-info');
-					this.$emit('reload-tree');
+					// Title, active flag and organisational unit all show in the tree.
+					this.$emit('refresh-tree-node', this.contentId);
 				})
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => { this.saving = false; });

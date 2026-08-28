@@ -13,8 +13,10 @@ const router = VueRouter.createRouter({
 			component: CmsAdmin,
 			children: [
 				{
+					// Only the content_id is required. CmsAdmin fills the missing parts
+					// from the content itself and rewrites the address.
 					name: 'content',
-					path: 'content/:content_id/:sprache/:version/:tab',
+					path: 'content/:content_id/:sprache?/:version?/:tab?',
 					component: CmsAdmin
 				}
 			]

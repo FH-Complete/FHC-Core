@@ -10,6 +10,7 @@ class CmsAdmin extends FHCAPI_Controller
 	{
 		parent::__construct([
 			'getTree'                   => ['basis/cms:r'],
+			'getSubtree'                => ['basis/cms:r'],
 			'getContent'                => ['basis/cms:r'],
 			'getContentsprache'         => ['basis/cms:r'],
 			'getTemplates'              => ['basis/cms:r'],
@@ -129,6 +130,48 @@ class CmsAdmin extends FHCAPI_Controller
 		}
 
 		$this->terminateWithSuccess($result);
+	}
+
+	// One subtree in the shape of a getTree root node. Lets the client replace a branch
+	// instead of rebuilding the whole tree after a change.
+	// The visited map starts empty here, so a node with several parents can show up twice
+	// until the next full reload. Rebuilding the whole tree on every change costs more.
+	public function getSubtree()
+	{
+		$this->load->library('form_validation');
+		$this->form_validation->set_data($_GET);
+		$this->form_validation->set_rules('content_id', 'Content ID', 'required|is_natural');
+		if ($this->form_validation->run() == FALSE)
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$content_id = (int) $this->input->get('content_id', TRUE);
+
+		$entitledResult = $this->cmsadminlib->getEntitledOe();
+		$entitledOe = isError($entitledResult) ? [] : getData($entitledResult);
+
+		$visited = [];
+		$node = $this->buildTreeNode($content_id, 0, $visited);
+
+		// Deleted meanwhile. The client drops the branch.
+		if ($node === null)
+			$this->terminateWithSuccess(null);
+
+		$nodes = [$node];
+
+		$allIds = [];
+		$this->collectContentIds($nodes, $allIds);
+
+		$groupMap = [];
+		if (!empty($allIds))
+		{
+			$gResult = $this->ContentgruppeModel->getGruppenForContents($allIds);
+			if (!isError($gResult))
+				$groupMap = getData($gResult);
+		}
+
+		$this->applyMeta($nodes, $entitledOe, $groupMap);
+
+		$this->terminateWithSuccess($this->pruneUnentitled($node));
 	}
 
 	public function getContent()
@@ -270,7 +313,10 @@ class CmsAdmin extends FHCAPI_Controller
 	{
 		$this->load->model('system/Sprache_model', 'SpracheModel');
 		$this->SpracheModel->addSelect('sprache, bezeichnung');
-		$result = $this->SpracheModel->loadWhere([]);
+		// DEVIATION: admin.php offers every row of tbl_sprache. The column content marks a
+		// language as relevant for the content language choice, so a retired language stays
+		// out of the list. Phrasen.php filters the same table the same way.
+		$result = $this->SpracheModel->loadWhere(['content' => true]);
 		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result));
 	}
 

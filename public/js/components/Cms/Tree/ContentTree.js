@@ -86,7 +86,7 @@ export default {
 	props: {
 		activeContentId: Number
 	},
-	emits: ['select-content', 'entry-created'],
+	emits: ['select-content'],
 	data() {
 		const stored = localStorage.getItem('cms/menu');
 		return {
@@ -139,19 +139,71 @@ export default {
 		}
 	},
 	methods: {
+		// Keeps the expanded branches. A reload must not fold the tree back up.
 		loadTree() {
 			this.loading = true;
-			this.$api
+			return this.$api
 				.call(ApiCmsAdmin.getTree(this.menu, this.filter))
 				.then(result => {
-					
 					this.nodes = result.data;
-					this.expandedKeys = {};
 					if (this.activeContentId != null) {
 						this.expandPathTo(this.activeContentId);
 					}
-					this.loading = false;
-				});
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => { this.loading = false; });
+		},
+
+		// --- Public: the parent calls these instead of rebuilding the component ---
+
+		reload() {
+			return this.loadTree();
+		},
+
+		// Replaces one branch. Use it after a change to the children, the title, the
+		// active flag or the organisational unit of that content.
+		refreshNode(contentId) {
+			// The news menu is a flat list of its own. Only a full reload fits it.
+			if (this.menu === 'news' || contentId == null) return this.loadTree();
+
+			const slot = this.findSlot(this.nodes, contentId);
+			// Not in the tree, so the change may add a new root. Rebuild.
+			if (slot === null) return this.loadTree();
+
+			return this.$api
+				.call(ApiCmsAdmin.getSubtree(contentId))
+				.then(result => {
+					if (result.data) {
+						slot.list.splice(slot.index, 1, result.data);
+					} else {
+						slot.list.splice(slot.index, 1);
+					}
+					if (this.activeContentId != null) {
+						this.expandPathTo(this.activeContentId);
+					}
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+
+		// Writes known fields straight into one node. Groups do not change the structure,
+		// so they need no request.
+		patchNode(contentId, patch) {
+			const slot = this.findSlot(this.nodes, contentId);
+			if (slot === null) return;
+			Object.assign(slot.node, patch);
+		},
+
+		findSlot(nodes, contentId) {
+			for (let i = 0; i < nodes.length; i++) {
+				if (nodes[i].content_id === contentId) {
+					return { list: nodes, index: i, node: nodes[i] };
+				}
+				if (nodes[i].children && nodes[i].children.length) {
+					const found = this.findSlot(nodes[i].children, contentId);
+					if (found !== null) return found;
+				}
+			}
+			return null;
 		},
 		expandPathTo(targetId) {
 			const search = (nodes) => {
@@ -220,9 +272,17 @@ export default {
 				.call(ApiCmsAdmin.postContent(parentId))
 				.then(result => {
 					const newId = result.data.content_id;
-					this.$emit('entry-created');
-					this.$emit('select-content', newId);
-				});
+					this.$fhcAlert.alertSuccess(this.$p.t('cms/eintragAngelegt'));
+					// A new root is not under any branch, so only a reload shows it.
+					const refreshed = parentId == null
+						? this.loadTree()
+						: this.refreshNode(parentId);
+					// Select after the node exists, or expandPathTo finds nothing.
+					return refreshed.then(() => {
+						this.$emit('select-content', newId);
+					});
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
 	created() {

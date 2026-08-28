@@ -8,7 +8,7 @@ export default {
 		version: Number,
 		contentInfo: Object
 	},
-	emits: ['reload-content-info', 'reload-tree', 'select-content'],
+	emits: ['reload-content-info', 'reload-tree', 'refresh-tree-node', 'select-content'],
 	data() {
 		return {
 			usages: [],
@@ -59,7 +59,10 @@ export default {
 				);
 			}).then(result => {
 				if (!result) return;
+				this.$fhcAlert.alertSuccess(this.$p.t('cms/versionGeloescht'));
 				this.$emit('reload-content-info');
+				// The tree shows the title of the newest version, so the label can change.
+				this.$emit('refresh-tree-node', this.contentId);
 			}).catch(this.$fhcAlert.handleSystemError);
 		},
 
@@ -76,6 +79,9 @@ export default {
 				return this.$api.call(ApiCmsAdmin.deleteContent(this.contentId));
 			}).then(result => {
 				if (!result) return;
+				this.$fhcAlert.alertSuccess(this.$p.t('cms/contentGeloescht'));
+				// Children of the deleted entry can reappear under another parent, so the
+				// whole tree has to be rebuilt here.
 				this.$emit('reload-tree');
 				this.$nextTick(() => {
 					this.$emit('select-content', null);

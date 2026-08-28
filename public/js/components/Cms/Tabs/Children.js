@@ -8,7 +8,7 @@ export default {
 		version: Number,
 		contentInfo: Object
 	},
-	emits: ['reload-content-info', 'reload-tree', 'select-content'],
+	emits: ['reload-content-info', 'refresh-tree-node', 'select-content'],
 	data() {
 		return {
 			childs: [],
@@ -65,7 +65,9 @@ export default {
 					ApiCmsAdmin.postChild(this.contentId, this.selectedChild)
 				);
 				this.loadAll();
-				this.$emit('reload-tree');
+				// Only this branch changes, so refresh this branch.
+				this.$emit('refresh-tree-node', this.contentId);
+				this.$fhcAlert.alertSuccess(this.$p.t('cms/childHinzugefuegt'));
 			} catch (e) {
 				this.$fhcAlert.handleSystemError(e);
 			}
@@ -79,7 +81,8 @@ export default {
 			try {
 				await this.$api.call(ApiCmsAdmin.deleteChild(contentchild_id));
 				this.loadAll();
-				this.$emit('reload-tree');
+				this.$emit('refresh-tree-node', this.contentId);
+				this.$fhcAlert.alertSuccess(this.$p.t('cms/childEntfernt'));
 			} catch (e) {
 				this.$fhcAlert.handleSystemError(e);
 			}
@@ -91,7 +94,8 @@ export default {
 					ApiCmsAdmin.putChildSort(contentchild_id, direction)
 				);
 				this.loadChilds();
-				this.$emit('reload-tree');
+				this.$emit('refresh-tree-node', this.contentId);
+				this.$fhcAlert.alertSuccess(this.$p.t('cms/sortierungGespeichert'));
 			} catch (e) {
 				this.$fhcAlert.handleSystemError(e);
 			}

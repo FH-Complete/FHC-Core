@@ -47,7 +47,6 @@ export default {
 			version: null,
 			tab: 'properties',
 			contentInfo: null,
-			treeKey: 0,
 			pending: 0
 		};
 	},
@@ -75,8 +74,12 @@ export default {
 					this.version = version;
 					this.tab = tab;
 
-					if (id !== null && this.contentInfo?.content_id !== id) {
-						this.loadContentInfo();
+					if (id === null) return;
+
+					if (this.contentInfo?.content_id !== id) {
+						this.loadContentInfo().then(() => { this.applyRouteDefaults(); });
+					} else {
+						this.applyRouteDefaults();
 					}
 				}
 			},
@@ -87,16 +90,47 @@ export default {
 		loadContentInfo() {
 			if (this.contentId === null) {
 				this.contentInfo = null;
-				return;
+				return Promise.resolve();
 			}
 			this.pending++;
-			this.$api
+			return this.$api
 				.call(ApiCmsAdmin.getContent(this.contentId))
 				.then(result => {
 					this.contentInfo = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => { this.pending--; });
+		},
+
+		// Language, version and tab are optional in the address. Fill in what the address
+		// leaves out, and replace a value that the content does not have. Then write the
+		// complete address back, so a reload and a copied link both work.
+		applyRouteDefaults() {
+			if (this.contentId === null || !this.contentInfo) return;
+
+			const languages = this.contentInfo.languages || [];
+			const versions = this.contentInfo.versions || {};
+
+			let lang = this.sprache;
+			if (lang === null || !languages.includes(lang)) {
+				lang = languages.includes(this.defaultLanguage)
+					? this.defaultLanguage
+					: languages[0] || null;
+			}
+
+			const langVersions = (lang && versions[lang]) ? versions[lang] : [];
+			let ver = this.version;
+			if (ver === null || !langVersions.includes(ver)) {
+				ver = langVersions.length ? Math.max(...langVersions) : null;
+			}
+
+			if (lang === this.sprache && ver === this.version) return;
+
+			this.sprache = lang;
+			this.version = ver;
+			// Replace, or the short address stays in the history and the back button
+			// walks through both forms of the same page.
+			this.pushRoute(true);
 		},
 
 		selectContent(content_id) {
@@ -136,8 +170,19 @@ export default {
 			this.pushRoute();
 		},
 
+		// Three grades of tree update. Pick the cheapest one that stays correct.
+		// A full reload drops the filter, the expanded branches and the click ranking,
+		// so keep it for changes that move nodes between branches.
 		reloadTree() {
-			this.treeKey++;
+			if (this.$refs.tree) this.$refs.tree.reload();
+		},
+
+		refreshTreeNode(contentId) {
+			if (this.$refs.tree) this.$refs.tree.refreshNode(contentId);
+		},
+
+		patchTreeNode(payload) {
+			if (this.$refs.tree) this.$refs.tree.patchNode(payload.content_id, payload.patch);
 		},
 
 		preselectLanguageVersion() {
@@ -159,20 +204,29 @@ export default {
 			this.version = ver;
 		},
 
-		pushRoute() {
+		pushRoute(replace = false) {
 			if (this.contentId === null) {
 				this.$router.push({ name: 'index' });
 				return;
 			}
-			this.$router.push({
-				name: 'content',
-				params: {
-					content_id: this.contentId,
-					sprache: this.sprache,
-					version: this.version,
-					tab: this.tab
+
+			// The optional parts are positional. Stop at the first missing one, or the
+			// address carries an empty segment.
+			const params = { content_id: this.contentId };
+			if (this.sprache !== null) {
+				params.sprache = this.sprache;
+				if (this.version !== null) {
+					params.version = this.version;
+					params.tab = this.tab;
 				}
-			});
+			}
+
+			const target = { name: 'content', params };
+			if (replace) {
+				this.$router.replace(target);
+			} else {
+				this.$router.push(target);
+			}
 		}
 	},
 	template: `
@@ -180,10 +234,9 @@ export default {
 			<horizontal-split :default-ratio="[25, 75]">
 			<template #left>
 				<cms-tree
-					:key="treeKey"
+					ref="tree"
 					:active-content-id="contentId"
 					@select-content="selectContent"
-					@entry-created="reloadTree"
 				></cms-tree>
 			</template>
 			<template #right>
@@ -195,7 +248,6 @@ export default {
 					:contentInfo="contentInfo"
 					@select-language-version="selectLanguageVersion"
 					@reload-content-info="loadContentInfo"
-					@reload-tree="reloadTree"
 				></cms-content-header>
 				<ul class="nav nav-tabs px-3">
 					<li class="nav-item" v-for="t in tabs" :key="t.key">
@@ -215,6 +267,8 @@ export default {
 						:contentInfo="contentInfo"
 						@reload-content-info="loadContentInfo"
 						@reload-tree="reloadTree"
+						@refresh-tree-node="refreshTreeNode"
+						@patch-tree-node="patchTreeNode"
 						@select-content="selectContent"
 					></component>
 				</div>

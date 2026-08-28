@@ -8,7 +8,7 @@ export default {
 		version: Number,
 		contentInfo: Object
 	},
-	emits: ['reload-content-info', 'reload-tree', 'select-content'],
+	emits: ['reload-content-info', 'patch-tree-node', 'select-content'],
 	data() {
 		return {
 			gruppen: [],
@@ -28,14 +28,23 @@ export default {
 	},
 	methods: {
 		loadGruppen() {
-			if (this.contentId == null) return;
-			this.$api
+			if (this.contentId == null) return Promise.resolve();
+			return this.$api
 				.call(ApiCmsAdmin.getGruppen(this.contentId))
 				.then(result => {
 					this.gruppen = result.data || [];
 					this.selectedGruppe = '';
 				})
 				.catch(this.$fhcAlert.handleSystemError);
+		},
+
+		// A group only draws the lock icon. It never moves a node, so the tree needs no
+		// request here.
+		patchTree() {
+			this.$emit('patch-tree-node', {
+				content_id: this.contentId,
+				patch: { groups: this.gruppen.map(g => g.gruppe_kurzbz) }
+			});
 		},
 
 		loadAllGruppen() {
@@ -55,8 +64,9 @@ export default {
 				await this.$api.call(
 					ApiCmsAdmin.postGruppe(this.contentId, this.selectedGruppe)
 				);
-				this.loadGruppen();
-				this.$emit('reload-tree');
+				await this.loadGruppen();
+				this.patchTree();
+				this.$fhcAlert.alertSuccess(this.$p.t('cms/gruppeHinzugefuegt'));
 			} catch (e) {
 				this.$fhcAlert.handleSystemError(e);
 			}
@@ -73,8 +83,9 @@ export default {
 				await this.$api.call(
 					ApiCmsAdmin.deleteGruppe(this.contentId, gruppe_kurzbz)
 				);
-				this.loadGruppen();
-				this.$emit('reload-tree');
+				await this.loadGruppen();
+				this.patchTree();
+				this.$fhcAlert.alertSuccess(this.$p.t('cms/gruppeEntfernt'));
 			} catch (e) {
 				this.$fhcAlert.handleSystemError(e);
 			}

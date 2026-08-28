@@ -14,7 +14,7 @@ export default {
 		version: Number,
 		contentInfo: Object
 	},
-	emits: ['reload-content-info', 'reload-tree', 'select-content'],
+	emits: ['reload-content-info', 'refresh-tree-node', 'select-content'],
 	data() {
 		return {
 			schema: null,
@@ -109,6 +109,8 @@ export default {
 				))
 				.then(() => {
 					this.$fhcAlert.alertSuccess(this.$p.t('cms/gespeichert'));
+					// The form holds the title, and the tree shows it.
+					this.$emit('refresh-tree-node', this.contentId);
 					if (this.$refs.preview) this.$refs.preview.neuLaden();
 				})
 				.catch(this.$fhcAlert.handleSystemError)

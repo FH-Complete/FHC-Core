@@ -14,13 +14,12 @@ export default {
 		version: Number,
 		contentInfo: Object
 	},
-	emits: ['select-language-version', 'reload-content-info', 'reload-tree'],
+	emits: ['select-language-version', 'reload-content-info'],
 	data() {
 		return {
 			titel: '',
 			allSprachen: [],
-			versionDetails: [],
-			newSprache: null
+			versionDetails: []
 		};
 	},
 	computed: {
@@ -95,6 +94,7 @@ export default {
 				.call(ApiCmsAdmin.postVersion(this.contentId, this.sprache))
 				.then(result => {
 					const newVersion = result.data.version;
+					this.$fhcAlert.alertSuccess(this.$p.t('cms/neueVersionAngelegt'));
 					this.$fhcAlert.alertInfo(this.$p.t('cms/neueVersionIstUnsichtbar'));
 					this.$emit('reload-content-info');
 					this.$emit('select-language-version', this.sprache, newVersion);
@@ -102,17 +102,16 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 
-		createTranslation() {
-			if (!this.newSprache) return;
+		createTranslation(newSprache) {
+			if (!newSprache) return;
 			this.$api
 				.call(ApiCmsAdmin.postTranslation(
-					this.contentId, this.sprache, this.version, this.newSprache
+					this.contentId, this.sprache, this.version, newSprache
 				))
 				.then(() => {
-					const lang = this.newSprache;
-					this.newSprache = null;
+					this.$fhcAlert.alertSuccess(this.$p.t('cms/uebersetzungAngelegt'));
 					this.$emit('reload-content-info');
-					this.$emit('select-language-version', lang, this.version);
+					this.$emit('select-language-version', newSprache, this.version);
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		}
@@ -149,17 +148,11 @@ export default {
 						@click="createVersion"
 					>{{ $p.t('cms/neueVersionAnlegen') }}</button>
 				</div>
-				<div class="d-flex align-items-center gap-1" v-if="availableSprachen.length">
-					<select class="form-select form-select-sm" v-model="newSprache"
-						style="width:auto">
-						<option :value="null" disabled>{{ $p.t('cms/spracheWaehlen') }}</option>
-						<option v-for="s in availableSprachen" :key="s.sprache"
-							:value="s.sprache">{{ s.bezeichnung }}</option>
-					</select>
-					<button class="btn btn-sm btn-outline-primary"
-						:disabled="!newSprache"
-						@click="createTranslation"
-					>{{ $p.t('cms/uebersetzungAnlegen') }}</button>
+				<div class="d-flex align-items-center gap-1">
+					<button v-for="s in availableSprachen" :key="s.sprache"
+						class="btn btn-sm btn-outline-primary"
+						@click="createTranslation(s.sprache)"
+					>{{ $p.t('cms/uebersetzungAnlegenIn', [s.sprache]) }}</button>
 				</div>
 			</div>
 		</div>
