@@ -19,6 +19,8 @@
 if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
+use CI3_Events as Events;
+
 class Setup extends FHCAPI_Controller
 {
 	private $_ci;
@@ -64,7 +66,7 @@ class Setup extends FHCAPI_Controller
 		);
 		$tabs['termine'] = array (
 			'title' =>  'Termine',
-			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/Termine.js',
+			'component' => absoluteJsImportUrl('public/js/components/LVVerwaltung/Tabs/Termine.js'),
 			'config' => []
 		);
 		$tabs['notiz'] = array (
@@ -72,6 +74,11 @@ class Setup extends FHCAPI_Controller
 			'component' => absoluteJsImportUrl('public/js/components/LVVerwaltung/Tabs/Notiz.js'),
 			'config' => []
 		);
+
+		Events::trigger('lvv_conf_tabs', function & () use (&$tabs) {
+			return $tabs;
+		});
+
 		$this->terminateWithSuccess($tabs);
 	}
 
@@ -79,12 +86,12 @@ class Setup extends FHCAPI_Controller
 	{
 		$tabs['termine'] = array (
 			'title' =>  'Termine',
-			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/LVTermine.js',
+			'component' => absoluteJsImportUrl('public/js/components/LVVerwaltung/Tabs/LVTermine.js'),
 			'config' => []
 		);
 		$tabs['noten'] = array (
 			'title' =>  'Noten',
-			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/Noten.js',
+			'component' => absoluteJsImportUrl('public/js/components/LVVerwaltung/Tabs/Noten.js'),
 			'config' => [
 				'usePoints' => defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE,
 				'edit' => 'both', // Possible values: both|header|inline

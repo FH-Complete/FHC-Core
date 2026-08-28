@@ -120,12 +120,12 @@ function isValidTransferData(event, allowedTypes, strict) {
 function getTransferData(event, strict) {
 	const result = [];
 
-	for (const type of event.dataTransfer.types) {
-		if (type.substr(0, 16) != 'application/fhc-') {
-			if (strict)
-				return null;
-			continue;
-		}
+	const dataTypes = [...event.dataTransfer.types].filter(type => type.startsWith('application/fhc-'));
+
+	if (!dataTypes.length)
+		return null;
+
+	for (const type of dataTypes) {
 		let base_type = type.substr(16);
 		let collection = false;
 		if (base_type.substr(-11) == '-collection') {
@@ -270,18 +270,16 @@ function eventHasTypes(event, allowedTypes, strict) {
 		allowedTypes = VALID_TYPES;
 	allowedTypes = allowedTypes.map(type => 'application/fhc-' + type);
 
-	const dataTypes = [...event.dataTransfer.types];
-	
+	const dataTypes = [...event.dataTransfer.types].filter(type => type.startsWith('application/fhc-'));
 	// NOTE(chris): if dragging across browsers the dataTransfer object is
 	// set to a default one without data. Since we do not support dragging
 	// across browsers (yet) we return false which will disallow dropping.
 	if (!dataTypes.length)
 		return false;
-	
+
 	if (!strict)
-		return allowedTypes.some(type => [...event.dataTransfer.types].includes(type));
-	
-	return [...event.dataTransfer.types].every(type => allowedTypes.includes(type));
+		return allowedTypes.some(type => dataTypes.includes(type));
+	return dataTypes.every(type => allowedTypes.includes(type));
 }
 
 function bindDragEnterLeave(el, onEnter, onLeave) {

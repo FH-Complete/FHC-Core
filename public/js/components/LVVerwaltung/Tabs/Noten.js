@@ -25,18 +25,34 @@ export default {
 		return {
 			stdsem: '',
 			endpoint: ApiLVNoten,
-			tabulatorOptions: {
+			tabulatorOptionsZeugnis: {
 				visibleColumns: {
 					vorname: true,
 					nachname: true,
+					uid: true,
 					lehrveranstaltung_bezeichnung: false
 				},
 				headerFilter: {
 					vorname: true,
 					nachname: true,
+					uid: true,
 					lehrveranstaltung_bezeichnung: false
 				},
 				persistenceZeugnisID: 'lv-details-noten-zeugnis-2025120401',
+			},
+			tabulatorOptionsTeacher: {
+				visibleColumns: {
+					vorname: true,
+					nachname: true,
+					student_uid: true,
+					lehrveranstaltung_bezeichnung: false
+				},
+				headerFilter: {
+					vorname: true,
+					nachname: true,
+					student_uid: true,
+					lehrveranstaltung_bezeichnung: false
+				},
 				persistenceTeacherID: 'lv-details-noten-teacher-2025120401',
 			},
 			zeugnisLoaded: false,
@@ -98,7 +114,7 @@ export default {
 					:id="modelValue.lehrveranstaltung_id"
 					:all-semester="!!stdsem"
 					:endpoint="endpoint"
-					:optionalTabulatorOptions="tabulatorOptions"
+					:optionalTabulatorOptions="tabulatorOptionsZeugnis"
 					@loaded="onZeugnisLoaded"/>
 			</div>
 			<div class="col-4">
@@ -108,7 +124,7 @@ export default {
 					:all-semester="!!stdsem"
 					:endpoint="endpoint"
 					@copied="reload"
-					:optionalTabulatorOptions="tabulatorOptions"
+					:optionalTabulatorOptions="tabulatorOptionsTeacher"
 					@loaded="onTeacherLoaded"/>
 			</div>
 		</div>

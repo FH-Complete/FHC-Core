@@ -234,9 +234,9 @@ class Content_model extends DB_Model
 							FROM
 								campus.tbl_content c1
 							LEFT JOIN
-								campus.tbl_contentsprache s1 ON c1.content_id=s1.content_id AND s1.sprache=?
+								campus.tbl_contentsprache s1 ON c1.content_id=s1.content_id AND s1.sprache=? AND sichtbar=true
 							WHERE
-								sichtbar=true
+								c1.aktiv = true
 						) s2
 						LEFT JOIN
 							campus.tbl_contentsprache s3 USING(content_id, sprache)
@@ -277,7 +277,7 @@ class Content_model extends DB_Model
 			JOIN 
 				campus.tbl_contentsprache s USING(contentsprache_id)
 			LEFT JOIN 
-				campus.tbl_contentchild k ON(m.content_id=k.content_id)
+				campus.tbl_contentchild k ON(m.content_id=k.content_id) and c.aktiv = true
 			WHERE EXISTS (
 				SELECT 1 
 				FROM campus.tbl_contentgruppe 
@@ -322,5 +322,210 @@ class Content_model extends DB_Model
 		}
 
 		return success(isset($result[$root_content_id]) ? $result[$root_content_id] : null);
+	}
+
+	/**
+	 * Root contents without a parent in tbl_contentchild. Excludes news.
+	 * @return stdClass success with array of rows or error
+	 */
+	public function getRootContent()
+	{
+		$query = '
+			SELECT *
+			FROM (
+				SELECT DISTINCT ON (content_id) *
+				FROM campus.tbl_content
+					LEFT JOIN campus.tbl_contentchild USING (content_id)
+				WHERE tbl_content.template_kurzbz <> ?
+					AND content_id NOT IN (
+						SELECT child_content_id FROM campus.tbl_contentchild
+						WHERE child_content_id = tbl_content.content_id)
+			) AS a
+			ORDER BY sort, content_id
+		';
+
+		return $this->execReadOnlyQuery($query, ['news']);
+	}
+
+	/**
+	 * Recent news from the last two months, max 100 rows.
+	 * @return stdClass success with array of rows or error
+	 */
+	public function getNewsContent()
+	{
+		$query = "
+			SELECT *
+			FROM campus.tbl_content
+				JOIN campus.tbl_news USING (content_id)
+			WHERE tbl_news.datum >= now() - '2 month'::interval
+			ORDER BY datum DESC
+			LIMIT 100
+		";
+
+		return $this->execReadOnlyQuery($query);
+	}
+
+	/**
+	 * Search contents by content_id or titel. Excludes news. Returns content_ids only.
+	 * @param array $searchItems search terms
+	 * @return stdClass success with array of rows or error
+	 */
+	public function searchCms($searchItems)
+	{
+		if (empty($searchItems))
+			return success([]);
+
+		$conditions = [];
+		$params = [];
+		foreach ($searchItems as $term)
+		{
+			$conditions[] = '(content_id::text = ? OR lower(titel) LIKE lower(?))';
+			$params[] = $term;
+			$params[] = '%' . $term . '%';
+		}
+
+		$query = '
+			SELECT DISTINCT tbl_content.content_id
+			FROM campus.tbl_contentsprache
+				JOIN campus.tbl_content USING (content_id)
+			WHERE tbl_content.template_kurzbz <> ?
+				AND (' . implode(' OR ', $conditions) . ')
+			ORDER BY content_id
+		';
+
+		array_unshift($params, 'news');
+
+		return $this->execReadOnlyQuery($query, $params);
+	}
+
+	/**
+	 * All contents eligible as children: excludes ancestors, self, and news.
+	 * @param int $content_id the content to find children for
+	 * @param string $sprache language for the titel subselect
+	 * @return stdClass success with array of rows or error
+	 */
+	public function getPossibleChilds($content_id, $sprache)
+	{
+		$query = '
+			SELECT content_id, oe_kurzbz, template_kurzbz,
+				(SELECT titel FROM campus.tbl_contentsprache
+				 WHERE sprache = ? AND content_id = tbl_content.content_id
+				 ORDER BY version LIMIT 1) AS titel
+			FROM campus.tbl_content
+			WHERE content_id NOT IN (
+					WITH RECURSIVE parents(content_id, child_content_id) AS (
+						SELECT content_id, child_content_id FROM campus.tbl_contentchild
+						WHERE child_content_id = ?
+						UNION ALL
+						SELECT cc.content_id, cc.child_content_id
+						FROM campus.tbl_contentchild cc, parents
+						WHERE cc.child_content_id = parents.content_id)
+					SELECT content_id FROM parents GROUP BY content_id)
+				AND content_id <> ?
+				AND template_kurzbz <> ?
+			ORDER BY titel
+		';
+
+		return $this->execReadOnlyQuery($query, [$sprache, $content_id, $content_id, 'news']);
+	}
+
+	/**
+	 * Where a content is referenced. Returns [{table, label}] for the delete dialog.
+	 * Tolerates missing addon/testtool schemas.
+	 * @param int $content_id
+	 * @return stdClass success with flat array or error
+	 */
+	public function getUsage($content_id)
+	{
+		$coreQuery = "
+			SELECT 'campus.tbl_infoscreen_content' AS \"table\",
+				infoscreen_id::text AS label
+			FROM campus.tbl_infoscreen_content WHERE content_id = ?
+			UNION ALL
+			SELECT 'campus.tbl_news', betreff
+			FROM campus.tbl_news WHERE content_id = ?
+			UNION ALL
+			SELECT 'public.tbl_ort', ort_kurzbz
+			FROM public.tbl_ort WHERE content_id = ?
+			UNION ALL
+			SELECT 'public.tbl_service', bezeichnung
+			FROM public.tbl_service WHERE content_id = ?
+			UNION ALL
+			SELECT 'public.tbl_statistik', bezeichnung
+			FROM public.tbl_statistik WHERE content_id = ?
+		";
+		$coreParams = [$content_id, $content_id, $content_id, $content_id, $content_id];
+
+		$coreResult = $this->execReadOnlyQuery($coreQuery, $coreParams);
+		$rows = [];
+
+		if (!isError($coreResult) && getData($coreResult))
+			$rows = getData($coreResult);
+
+		// Optional schemas: testtool and addon may not exist. A failing query still writes a
+		// db error into the response envelope, so check for the table before querying it.
+		$optionalQueries = [
+			[
+				'testtool', 'tbl_ablauf_vorgaben',
+				"SELECT 'testtool.tbl_ablauf_vorgaben' AS \"table\",
+					ablauf_vorgaben_id::text AS label
+				FROM testtool.tbl_ablauf_vorgaben WHERE content_id = ?"
+			],
+			[
+				'addon', 'tbl_software',
+				"SELECT 'addon.tbl_software' AS \"table\",
+					software_id::text AS label
+				FROM addon.tbl_software WHERE content_id = ?"
+			]
+		];
+
+		foreach ($optionalQueries as $opt)
+		{
+			if (!$this->tableExists($opt[0], $opt[1]))
+				continue;
+
+			$result = $this->execReadOnlyQuery($opt[2], [$content_id]);
+			if (!isError($result) && getData($result))
+				$rows = array_merge($rows, getData($result));
+		}
+
+		return success($rows);
+	}
+
+	/**
+	 * True if a base table exists. Guards the optional testtool and addon schemas.
+	 * @param string $schema
+	 * @param string $table
+	 * @return bool
+	 */
+	private function tableExists($schema, $table)
+	{
+		$query = "
+			SELECT 1 AS exists
+			FROM information_schema.tables
+			WHERE table_catalog = ? AND table_schema = ? AND table_name = ?
+		";
+
+		return hasData($this->execReadOnlyQuery($query, [DB_NAME, $schema, $table]));
+	}
+
+	/**
+	 * Returns oe_kurzbz for a content as a string.
+	 * @param int $content_id
+	 * @return stdClass success with string or error
+	 */
+	public function getOeKurzbz($content_id)
+	{
+		$query = 'SELECT oe_kurzbz FROM campus.tbl_content WHERE content_id = ?';
+		$result = $this->execReadOnlyQuery($query, [$content_id]);
+
+		if (isError($result))
+			return $result;
+
+		$data = getData($result);
+		if (empty($data))
+			return error('Content not found');
+
+		return success($data[0]->oe_kurzbz);
 	}
 }
