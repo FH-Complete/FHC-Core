@@ -3,6 +3,8 @@
  */
 import DatePicker from './Header/Datepicker.js';
 
+import ApiStudiensemester from "../../../api/factory/studiensemester.js"
+
 export default {
 	name: "CalendarHeader",
 	components: {
@@ -24,7 +26,8 @@ export default {
 		btnMonth: Boolean,
 		btnWeek: Boolean,
 		btnDay: Boolean,
-		btnList: Boolean
+		btnList: Boolean,
+		btnRange: Boolean,
 	},
 	emits: [
 		"next",
@@ -35,7 +38,8 @@ export default {
 	],
 	data() {
 		return {
-			open: false
+			open: false,
+			semesterOptions: [],
 		};
 	},
 	methods: {
@@ -45,6 +49,11 @@ export default {
 				this.$emit('update:mode', mode);
 		}
 	},
+	
+	async created() {
+		const semesterResponse = await this.$api.call(ApiStudiensemester.getAll());
+		// this.semesterOptions = semesterResponse.data;
+	},
 	template: /* html */`
 	<div class="fhc-calendar-base-header">
 		<div class="header-actions">
@@ -53,6 +62,15 @@ export default {
 			</div>
 			<div class="header-modes">
 				<div class="d-flex gap-1 justify-content-end" role="group">
+					<button
+						v-if="btnRange"
+						type="button"
+						class="btn btn-outline-secondary"
+						:class="{active: mode === 'range'}"
+						@click="clickMode($event, 'range')"
+					>
+						<i class="fa fa-calendar"></i>
+					</button>
 					<button
 						v-if="btnMonth"
 						type="button"
@@ -95,9 +113,10 @@ export default {
 		<div class="header-picker">
 			<div class="btn-group" role="group">
 				<button
-					class="btn btn-outline-secondary border-0"
+					v-if="$props.mode !== 'range'"
 					@click="$emit('prev')"
 					:disabled="open"
+					class="btn btn-outline-secondary border-0"
 				>
 					<i class="fa fa-chevron-left"></i>
 				</button>
@@ -110,9 +129,10 @@ export default {
 					:list-length="modeOptions.length"
 				/>
 				<button
-					class="btn btn-outline-secondary border-0"
+					v-if="$props.mode !== 'range'"
 					@click="$emit('next')"
 					:disabled="open"
+					class="btn btn-outline-secondary border-0"
 				>
 					<i class="fa fa-chevron-right"></i>
 				</button>

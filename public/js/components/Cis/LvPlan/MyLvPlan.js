@@ -26,6 +26,9 @@ export default {
 		};
 	},
 	inject: ["isMobile"],
+	provide() {
+		return { rangeLength: Vue.computed(() => this.$route.params.range_length || 30) };
+	},
 	computed:{
 		currentDay() {
 			if (!this.propsViewData?.focus_date || isNaN(new Date(this.propsViewData?.focus_date)))
@@ -34,7 +37,11 @@ export default {
 		},
 		currentMode() {
 			let validModes = ["day", "month"];
-			validModes.push(this.isMobile ? "list" : "week");
+			if (!this.isMobile) {
+				validModes.push("week", "range");
+			} else {
+				validModes.push("list");
+			}
 
 			const defaultMode = this.isMobile
 				? DEFAULT_MODE_LVPLAN_MOBILE
@@ -94,10 +101,10 @@ export default {
 		},
 	},
 	methods: {
-		handleChangeDate(day, newMode) {
-			return this.handleChangeMode(newMode, day);
+		handleChangeDate(day, newMode, rangeLength) {
+			return this.handleChangeMode(newMode, day, rangeLength);
 		},
-		handleChangeMode(newMode, day) {
+		handleChangeMode(newMode, day, range_length = null) {
 			const mode = newMode[0].toUpperCase() + newMode.slice(1)
 			const focus_date = day.toISODate();
 			
@@ -105,7 +112,8 @@ export default {
 				name: "MyLvPlan",
 				params: {
 					mode,
-					focus_date
+					focus_date,
+					range_length,
 				}
 			});
 		},

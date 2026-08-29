@@ -163,8 +163,8 @@ export default {
 				return date.setLocale(this.locale);
 			},
 			set(value) {
-				this.internalDate = value;
-				this.$emit('update:date', value, this.cMode);
+				this.internalDate = value.date;
+				this.$emit('update:date', value.date, this.cMode, value.rangeLength);
 			}
 		},
 		sMode() {
@@ -221,20 +221,20 @@ export default {
 			case 'day':
 				if (this.cMode != 'day' && this.modes['day']) {
 					evt.stopPropagation();
-					this.cDate = evt.detail.value;
+					this.cDate = {date: evt.detail.value};
 					this.cMode = 'day';
 				}
 				break;
 			case 'week':
 				if (this.cMode != 'week' && this.modes['week']) {
 					evt.stopPropagation();
-					this.cDate = luxon.DateTime.fromObject({
+					this.cDate = {date: luxon.DateTime.fromObject({
 						localWeekNumber: evt.detail.value.number,
 						localWeekYear: evt.detail.value.year
 					}, {
 						zone: this.cDate.zoneName,
 						locale: this.cDate.locale
-					});
+					})};
 					this.cMode = 'week';
 				}
 				break;
@@ -282,6 +282,7 @@ export default {
 				:btn-week="!!modes['week'] && (btnWeek || (showBtns && btnWeek !== false))"
 				:btn-month="!!modes['month'] && (btnMonth || (showBtns && btnMonth !== false))"
 				:btn-list="!!modes['list'] && (btnList || (showBtns && btnList !== false))"
+				:btn-range="!!modes['range'] && (btnRange || (showBtns && btnList !== false))"
 				:mode-options="modeOptions ? modeOptions[cMode] : undefined"
 			>
 				<slot name="actions" />

@@ -9,6 +9,7 @@ import ModeDay from './Mode/Day.js';
 import ModeWeek from './Mode/Week.js';
 import ModeMonth from './Mode/Month.js';
 import ModeList from './Mode/List.js';
+import ModeRange from './Mode/Range.js';
 
 export default {
 	name: "CalendarLvPlan",
@@ -89,10 +90,11 @@ export default {
 				day: Vue.markRaw(ModeDay),
 				month: Vue.markRaw(ModeMonth),
 			};
-			if (this.isMobile) {
-				modes.list = Vue.markRaw(ModeList);
-			} else {
+			if (!this.isMobile) {
 				modes.week = Vue.markRaw(ModeWeek);
+				modes.range = Vue.markRaw(ModeRange);
+			} else {
+				modes.list = Vue.markRaw(ModeList);
 			}
 
 			return modes;
@@ -163,7 +165,7 @@ export default {
 		:backgrounds="backgrounds"
 		:time-grid="teachingunits"
 		show-btns
-		@update:date="(newDate, newMode) => $emit('update:date', newDate, newMode)"
+		@update:date="(newDate, newMode, newRangeLength) => $emit('update:date', newDate, newMode, newRangeLength)"
 		@update:mode="(newMode, newDate) => $emit('update:mode', newMode, newDate)"
 		@update:range="updateRange"
 	>
