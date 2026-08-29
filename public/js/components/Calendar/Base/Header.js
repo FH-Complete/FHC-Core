@@ -3,8 +3,6 @@
  */
 import DatePicker from './Header/Datepicker.js';
 
-import ApiStudiensemester from "../../../api/factory/studiensemester.js"
-
 export default {
 	name: "CalendarHeader",
 	components: {
@@ -48,11 +46,6 @@ export default {
 			if (!evt.defaultPrevented)
 				this.$emit('update:mode', mode);
 		}
-	},
-	
-	async created() {
-		const semesterResponse = await this.$api.call(ApiStudiensemester.getAll());
-		// this.semesterOptions = semesterResponse.data;
 	},
 	template: /* html */`
 	<div class="fhc-calendar-base-header">

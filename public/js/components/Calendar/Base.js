@@ -294,6 +294,7 @@ export default {
 				@update:range="$emit('update:range', $event)"
 				@request-modal-open="showEventModal"
 				@request-modal-close="hideEventModal"
+				@update:date="cDate = $event"
 				v-bind="modeOptions ? modeOptions[cMode] : null || {}"
 			>
 				<template v-slot="slot"><slot v-bind="slot" /></template>

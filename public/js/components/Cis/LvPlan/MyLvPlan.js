@@ -2,6 +2,7 @@ import FhcCalendar from "../../Calendar/LvPlan.js";
 
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
+import ApiStudiensemester from '../../../api/factory/studiensemester.js';
 
 export const DEFAULT_MODE_LVPLAN_DESKTOP = "Week";
 export const DEFAULT_MODE_LVPLAN_MOBILE = "List";
@@ -23,11 +24,18 @@ export default {
 			isMitarbeiter: false,
 			isStudent: false,
 			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone,
+			semesterRangePresets: {
+				label: null,
+				presets: [],
+			},
 		};
 	},
 	inject: ["isMobile"],
 	provide() {
-		return { rangeLength: Vue.computed(() => this.$route.params.range_length || 30) };
+		return { 
+			rangeLength: Vue.computed(() => this.$route.params.range_length || 30),
+			rangeViewPresets: Vue.computed(() => this.semesterRangePresets)
+		};
 	},
 	computed:{
 		currentDay() {
@@ -142,9 +150,28 @@ export default {
 			this.isMitarbeiter = authInfo.isMitarbeiter;
 			this.isStudent = authInfo.isStudent;
 		},
+		async fetchSemesters() {
+			const semestersResponse = await this.$api.call(ApiStudiensemester.getAll());
+			if (semestersResponse.meta.status === "success") {
+				this.semesterRangePresets = {
+					label: "View specific semester",
+					presets: semestersResponse.data.map((semester) => {
+						let startDate = luxon.DateTime.fromISO(semester.start);
+						let endDate = luxon.DateTime.fromISO(semester.ende);
+						return {
+							startDate,
+							endDate,
+							name: semester.studiensemester_kurzbz,
+							description: semester.bezeichnung,
+						};
+					})
+				};
+			}
+		},
 	},
 	async created() {
 		await this.fetchAuthInfo();
+		await this.fetchSemesters();
 	},
 	template: /*html*/`
 	<div class="cis-lvplan-personal d-flex flex-column h-100">
