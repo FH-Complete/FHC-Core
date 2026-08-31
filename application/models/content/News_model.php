@@ -57,13 +57,13 @@ class News_model extends DB_Model
 	 * @param integer           $maxalter
 	 * @param integer           $page
 	 * @param integer           $page_size
-	 * @param boolean           $all
+	 * @param boolean           $active
 	 * @param boolean           $mischen
 	 * 
 	 * TODO(chris): this is not a good function -> the params are all over the place
 	 * 
 	 */
-	protected function prepareNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz = null, $sichtbar = true, $maxalter = 0, $page = 1, $page_size = 10, $all = false, $mischen = true, $filterForDegreePrograms = false, $allowedDegreePrograms = [])
+	protected function prepareNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz = null, $sichtbar = true, $maxalter = 0, $page = 1, $page_size = 10, $active = true, $mischen = true, $filterForDegreePrograms = false, $allowedDegreePrograms = [])
 	{
 
 		$this->addSelect(["*", "COUNT(*) OVER() AS row_count"]);
@@ -74,7 +74,7 @@ class News_model extends DB_Model
 
 		$where = [];
 		
-		if (!$all) {
+		if ($active) {
 			$where[] = "datum <= NOW() AND (datum_bis >= NOW()::date OR datum_bis IS NULL)";
 		}
 		if ($maxalter !== 0 && is_numeric($maxalter)) {
@@ -146,15 +146,15 @@ class News_model extends DB_Model
 
 	}
 
-	public function getNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz = null, $sichtbar = true, $maxalter = 0, $page = 1, $page_size = 10, $all = false, $mischen = true, $filterForDegreePrograms = false, $allowedDegreePrograms = [])
+	public function getNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz = null, $sichtbar = true, $maxalter = 0, $page = 1, $page_size = 10, $active = true, $mischen = true, $filterForDegreePrograms = false, $allowedDegreePrograms = [])
 	{
-		$this->prepareNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz, $sichtbar, $maxalter, $page, $page_size, $all, $mischen, $filterForDegreePrograms, $allowedDegreePrograms);
+		$this->prepareNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz, $sichtbar, $maxalter, $page, $page_size, $active, $mischen, $filterForDegreePrograms, $allowedDegreePrograms);
 		// getting the number of rows of the query and adding pagination to the query result
 		$num_rows = $this->getNumRows(true);
 		$this->addPagination($page, $page_size, $num_rows);
 
 		// preparing the query again because every call to get_compiled_select or cour_all_results will add the from clause to the query
-		$this->prepareNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz, $sichtbar, $maxalter, $page, $page_size, $all, $mischen, $filterForDegreePrograms, $allowedDegreePrograms);
+		$this->prepareNewsWithContent($sprache, $studiengang_kz, $semester, $fachbereich_kurzbz, $sichtbar, $maxalter, $page, $page_size, $active, $mischen, $filterForDegreePrograms, $allowedDegreePrograms);
 
 		return $this->load();
 	}
