@@ -33,7 +33,11 @@ export default {
 	inject: ["isMobile"],
 	provide() {
 		return { 
-			rangeLength: Vue.computed(() => this.$route.params.range_length || 30),
+			rangeLength: Vue.computed(() => {
+				if (!this.$route.params.range_length) return 30;
+				else if (this.$route.params.range_length > 365) return 365;
+				else return this.$route.params.range_length;
+			}),
 			rangeViewPresets: Vue.computed(() => this.semesterRangePresets)
 		};
 	},

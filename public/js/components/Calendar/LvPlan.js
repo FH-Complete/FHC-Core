@@ -16,7 +16,14 @@ export default {
 	components: {
 		FhcCalendar
 	},
-	inject: ["isMobile"],
+	inject: {
+		isMobile: {
+			default: false,
+		},
+		rangeLength: {
+			default: 30,
+		}
+	},
 	props: {
 		date: {
 			type: [Date, String, Number, luxon.DateTime],
@@ -69,21 +76,43 @@ export default {
 		backgrounds() {
 			let now = luxon.DateTime.now().setZone(this.timezone);
 
-			if (this.mode == 'Month')
+			if (this.mode == 'Month') {
 				return [
 					{
 						class: 'background-past',
 						end: now.startOf('day')
 					}
 				];
+			} else if (this.mode == 'Range') {
+				return [];
+				const start = luxon.DateTime.fromISO(this.$props.date);
+				const end = start.plus({days: this.rangeLength});
+				let backgrounds = [];
 
-			return [
-				{
-					class: 'background-past',
-					end: now,
-					label: now.startOf('minute').toISOTime({ suppressSeconds: true, includeOffset: false })
+				let saturdayOffset = 6 - start.weekday;
+				let saturday = start.plus({days: saturdayOffset});
+				while (saturday.ts < end.ts) {
+					backgrounds.push(
+						{
+							class: "background-weekend",
+							start: saturday.startOf("day"),
+							end: saturday.plus({days: 1}).endOf("day"),
+						}
+					);
+
+					saturday = saturday.plus({days: 7});
 				}
-			];
+
+				return backgrounds;
+			} else {
+				return [
+					{
+						class: 'background-past',
+						end: now,
+						label: now.startOf('minute').toISOTime({ suppressSeconds: true, includeOffset: false })
+					}
+				];
+			}
 		},
 		modes() {
 			let modes = {

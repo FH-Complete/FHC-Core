@@ -104,6 +104,13 @@
 .fhc-calendar-base-grid-line {
 	grid-gap: var(--fhc-calendar-gap-events, var(--fhc-calendar-gap, 1px));
 }
+.fhc-calendar-mode-range .main-header-sunday,
+.fhc-calendar-mode-range .all-day-events-sunday,
+.fhc-calendar-mode-range .fhc-calendar-base-grid-line-sunday {
+	border: solid;
+	border-width: 0 0 8px 0;
+	border-color: var(--fhc-calendar-gap);
+}
 .fhc-calendar-base-label-time {
 	display: flex;
 	flex-direction: column;

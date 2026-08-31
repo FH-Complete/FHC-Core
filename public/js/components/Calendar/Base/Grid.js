@@ -328,7 +328,10 @@ export default {
 				v-for="(date, index) in axisMain"
 				:key="index"
 				class="main-header"
-				:class="{'collapsed-header': axisMainCollapsible && hasValidEvents && !events[index].length}"
+				:class="{
+					'collapsed-header': axisMainCollapsible && hasValidEvents && !events[index].length,
+					'main-header-sunday': date.weekday === 7
+				}"
 				:style="'grid-' + axisCol + ':' + (2+index)"
 			>
 				<slot name="main-header" v-bind="{ index, date }" />
@@ -344,6 +347,7 @@ export default {
 				v-for="(events, index) in eventsAllDay"
 				:key="index"
 				class="all-day-events"
+				:class="{'all-day-events-sunday': axisMain[index].weekday === 7}"
 				:style="'grid-' + axisCol + ':' + (2+index)"
 			>
 				<grid-line-event
@@ -373,7 +377,7 @@ export default {
 					v-for="(part, index) in axisPartsSave"
 					:key="index"
 					class="part-header"
-					:style="'grid-' + axisCol + ':1;grid-' + axisRow + ': ps_' + index + '/pe_' + index"
+					:style="'grid-' + axisCol + ':1;grid-' + axisRow + ': ps_' + index + '/pe_' + index + ';min-width:50px;'"
 				>
 					<slot name="part-header" v-bind="{ index, part }" />
 				</div>

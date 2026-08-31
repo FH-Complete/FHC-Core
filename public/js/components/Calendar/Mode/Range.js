@@ -87,7 +87,7 @@ export default {
 	},
 	template: /*html*/ `
 	<div
-		class="fhc-calendar-mode-range flex-grow-1 position-relative"
+		class="fhc-calendar-mode-range flex-grow-1 position-relative d-flex flex-column"
 		@cal-click-default.capture="handleClickDefaults"
 	>
 		<div
@@ -109,7 +109,7 @@ export default {
 				</option>
 			</form-input>
 		</div>
-		<base-slider ref="slider" v-slot="slot">
+		<base-slider ref="slider" v-slot="slot" class="flex-grow-1">
 			<range-view ref="view" v-bind="viewAttrs()">
 				<template v-slot="slot"><slot v-bind="slot" mode="range" /></template>
 			</range-view>
