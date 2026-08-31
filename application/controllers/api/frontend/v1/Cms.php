@@ -162,7 +162,7 @@ class Cms extends FHCAPI_Controller
         
 	}
 
-	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true, $maxAlter = 0)
+	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = false, $titel = '', $edit = false, $sichtbar = true, $maxAlter = 0)
 	{
 		//form validation
 		$this->load->library('form_validation');
@@ -196,6 +196,8 @@ class Cms extends FHCAPI_Controller
 			$sichtbar = $passedSichtbar;
 		}
 		
+		$filterForDegreePrograms = false;
+		$entitledDegreePrograms = [];
 		$student = $this->StudentModel->loadWhere(['student_uid' => getAuthUID()]);
 		if(isError($student))
 		{
@@ -203,7 +205,6 @@ class Cms extends FHCAPI_Controller
 		}
 		if(hasData($student))
 		{
-
 			$student = current(getData($student));
 
 			$degreeProgramSemesterDataResult = $this->PrestudentModel->getStudiengaengAndAusbildungssemesterByStudentUid(getAuthUID());
@@ -212,9 +213,15 @@ class Cms extends FHCAPI_Controller
 				$studiengang_kz = isset($degreeProgramSemesterData->studiengang_kz) ? $degreeProgramSemesterData->studiengang_kz : null;
 				$semester = isset($degreeProgramSemesterData->ausbildungssemester) ? $degreeProgramSemesterData->ausbildungssemester : null;
 			}
+
+			$mischen = true;
+		} else {
+			$filterForDegreePrograms = true;
+			$entitledDegreePrograms = $this->permissionlib->getSTG_isEntitledFor("basis/news");
+			array_push($entitledDegreePrograms, 0);
 		}
 
-		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size, $sprache, $maxAlter, false, [], false);
+		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size, $sprache, $maxAlter, $filterForDegreePrograms, $entitledDegreePrograms, false);
 		$news = $this->getDataOrTerminateWithError($news);
 
 		$this->addMeta('row_count', $news["row_count"] ?? 0);
