@@ -37,9 +37,7 @@ export default {
 
 			if (
 				(await this.$fhcAlert.confirm({
-					message: this.$capitalize(
-						this.$p.t('ui', 'frageSicherLoeschen'),
-					),
+					message: this.$capitalize(this.$p.t('ui', 'frageSicherLoeschen')),
 					acceptClass: 'btn btn-danger',
 				})) === false
 			) {
@@ -73,11 +71,14 @@ export default {
 	template: /*html*/ `
 	<article
 		class="card mb-3"
-		:class="{'border-secondary': !news.isPublished}"
+		:class="{'border-secondary': !news.isPublished || !news.isActive}"
 		>
 		<header
 			class="card-header d-flex justify-content-between align-items-center gap-3"
-			:class="news.isPublished ? 'fhc-primary' : 'bg-secondary bg-opacity-25 text-secondary'"
+			:class="{
+				'fhc-primary': news.isPublished && news.isActive,
+				'bg-secondary bg-opacity-25 text-secondary': !news.isPublished || !news.isActive,
+			}"
 			>
 			<button
 				type="button"
@@ -94,6 +95,9 @@ export default {
 				<span class="h5 mb-0">{{ news.title }}</span>
 				<span v-if="!news.isPublished" class="badge text-bg-secondary">
 					{{ $capitalize($p.t('ui', 'notPublishedYet')) }}
+				</span>
+				<span v-if="!news.isActive" class="badge text-bg-secondary">
+					{{ $capitalize($p.t('ui', 'noLongerActive')) }}
 				</span>
 			</button>
 			<div class="d-flex align-items-center gap-2 flex-shrink-0">

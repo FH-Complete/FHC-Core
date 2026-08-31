@@ -90,6 +90,12 @@ export default {
 			const isPublished = article.querySelector(
 				'.card-header span[is-published]',
 			);
+
+			const isActive =
+				article
+					.querySelector('.card-header span[is-active]')
+					?.getAttribute('is-active') === 'true';
+
 			const content = article.querySelector('.card-text');
 
 			return {
@@ -103,6 +109,7 @@ export default {
 				isPublished: isPublished
 					? isPublished.getAttribute('is-published') === 'true'
 					: null,
+				isActive,
 			};
 		},
 		afterPageUpdated(event) {

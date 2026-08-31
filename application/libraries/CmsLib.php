@@ -4,6 +4,7 @@ if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
 use \DateTime as DateTime;
+use \DateInterval as DateInterval;
 use \DOMDocument as DOMDocument;
 use \XSLTProcessor as XSLTProcessor;
 
@@ -216,14 +217,25 @@ class CmsLib
 	 */
 	public function createNewsWrapper($newsobj, $edit)
 	{
-		$date = new DateTime($newsobj->datum);
-		$datum = '<datum><![CDATA[' . $date->format('d.m.Y') . ']]></datum>';
-		$datum .= '<datumdetail><![CDATA[' . $date->format('Y-m-d H:i') . ']]></datumdetail>';
 		$id = $edit ? '<news_id><![CDATA[' . $newsobj->news_id . ']]></news_id>' : '';
 		$isPublished = $edit ? '<is_published><![CDATA[' . ($newsobj->sichtbar ? 'true' : 'false') . ']]></is_published>' : '';
 
-		$newsWrapper = new DOMDocument();
-		$newsWrapper->loadXML('<newswrapper>' . $newsobj->content . $datum . $id . $isPublished . '</newswrapper>');
+		$date = new DateTime($newsobj->datum);
+		$datum = '<datum><![CDATA[' . $date->format('d.m.Y') . ']]></datum>';
+		$datum .= '<datumdetail><![CDATA[' . $date->format('Y-m-d H:i') . ']]></datumdetail>';
+
+		$hasVisibleToDate = isset($newsobj->datum_bis) && $newsobj->datum_bis !== '';
+		$datumTo = $hasVisibleToDate
+			? new DateTime($newsobj->datum_bis)
+			: (clone $date)->add(new DateInterval('P' . MAXNEWSALTER . 'D'));
+		if ($hasVisibleToDate)
+			$datumTo->setTime(23, 59, 59);
+
+		$now = new DateTime();
+		$isActive = '<is_active><![CDATA[' . ($datumTo >= $now ? 'true' : 'false') . ']]></is_active>';
+
+		$newsWrapper = new DOMDocument(); 
+		$newsWrapper->loadXML('<newswrapper>' . $newsobj->content . $datum . $id . $isPublished . $isActive . '</newswrapper>');
 
 		return $newsWrapper->documentElement;
 	}
