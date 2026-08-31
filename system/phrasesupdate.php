@@ -1096,7 +1096,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Bewerber*In möglicherweise vorhanden',
+				'text' => 'BewerberIn möglicherweise vorhanden',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -3911,7 +3911,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Lektor*In',
+				'text' => 'LektorIn',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -4540,7 +4540,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Bewerber*In',
+				'text' => 'BewerberIn',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -5440,7 +5440,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Bewerber*In parken',
+				'text' => 'BewerberIn parken',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -5460,7 +5460,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Bewerber*In ausparken',
+				'text' => 'BewerberIn ausparken',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -5540,7 +5540,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Bewerber*In geparkt bis',
+				'text' => 'BewerberIn geparkt bis',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -5600,7 +5600,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Bewerber*In zurückstellen',
+				'text' => 'BewerberIn zurückstellen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -5640,7 +5640,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Bewerber*In zurückgestellt bis',
+				'text' => 'BewerberIn zurückgestellt bis',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -5720,8 +5720,8 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Geparkte und zurückgestellte Bewerber*Innen werden von der Bearbeitung temporär ausgenommen.
-Geparkte Bewerber*Innen werden zum angegebenen Datum automatisch entparkt, während zurückgestellte Bewerber*Innen nur manuell durch Drücken des Buttons den Zurückgestellt-Status verlieren.
+				'text' => 'Geparkte und zurückgestellte BewerberInnen werden von der Bearbeitung temporär ausgenommen.
+Geparkte BewerberInnen werden zum angegebenen Datum automatisch entparkt, während zurückgestellte BewerberInnen nur manuell durch Drücken des Buttons den Zurückgestellt-Status verlieren.
 Bei einer Zurückstellung dient das Datum nur der Erinnerung.',
 				'description' => '',
 				'insertvon' => 'system'
@@ -8951,7 +8951,7 @@ The invoice will be sent to you again. <u><strong>The amount is only to be trans
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ANNEHMEN<br>(Lektor*In)',
+				'text' => 'ANNEHMEN<br>(LektorIn)',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -13822,7 +13822,7 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Student*In',
+				'text' => 'StudentIn',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -15998,7 +15998,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Alle anzeigen, die auf Empfehlung von Lektor*In warten.",
+				'text' => "Alle anzeigen, die auf Empfehlung von LektorIn warten.",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -25325,7 +25325,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Student*In ({prestudent_id})',
+				'text' => 'StudentIn ({prestudent_id})',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -28368,7 +28368,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Mitarbeiter*In',
+				'text' => 'MitarbeiterIn',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -29371,7 +29371,7 @@ array(
 			'phrases' => array(
 				array(
 					'sprache' => 'German',
-					'text' => 'Mitarbeiter*In',
+					'text' => 'MitarbeiterIn',
 					'description' => '',
 					'insertvon' => 'system'
 				),
@@ -29411,7 +29411,7 @@ array(
 			'phrases' => array(
 				array(
 					'sprache' => 'German',
-					'text' => 'Mitarbeiter*In Information',
+					'text' => 'Mitarbeiter Information',
 					'description' => '',
 					'insertvon' => 'system'
 				),
@@ -29431,7 +29431,7 @@ array(
 			'phrases' => array(
 				array(
 					'sprache' => 'German',
-					'text' => 'Student*In',
+					'text' => 'StudentIn',
 					'description' => '',
 					'insertvon' => 'system'
 				),
@@ -29451,7 +29451,7 @@ array(
 			'phrases' => array(
 				array(
 					'sprache' => 'German',
-					'text' => 'Student*In Information',
+					'text' => 'Student Information',
 					'description' => '',
 					'insertvon' => 'system'
 				),
@@ -29885,6 +29885,46 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'profil',
+		'phrase' => 'name_title_clipboard_copy_confirmation',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Name mit Titel in die Zwischenablage kopiert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Full name with title copied to clipboard.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'profil',
+		'phrase' => 'name_title_copy',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Name mit Titel kopieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Copy full name with title',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'profil',
 		'phrase' => 'alleStudentenVon',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -29903,6 +29943,88 @@ array(
 		)
 	),
 	//Profil Phrasen ende
+	//Studium Phrasen start
+	array(
+		'app' => 'core',
+		'category' => 'studium',
+		'phrase' => 'studium',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studium',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Study',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studium',
+		'phrase' => 'studienordnung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studienordnung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Study regulation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studium',
+		'phrase' => 'lektoren',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lektoren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lecturers',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studium',
+		'phrase' => 'studiensemester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studiensemester',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Study semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// Studium Phrasen Ende
 	// LvPlan Phrasen start
 	array(
 			'app' => 'core',
@@ -34744,7 +34866,7 @@ array(
 				'sprache' => 'German',
 				'text' => 'Sie können eine Entschuldigung für einen Zeitraum von bis zu {0} Tagen in die Vergangenheit und bis zum Ende des aktuellen Semesters hochladen. Die erlaubten Dateitypen für das Dokument sind .pdf, .png und .jpg.
 
-				Sobald Sie eine Entschuldigung hochladen wird die zugehörige Studiengangsassistenz informiert und Ihr Anliegen überprüft. Solange Ihre Entschuldigung noch keinen akzeptierten oder abgelehnten Status erhalten hat, steht es Ihnen frei diese inklusive Datei zu löschen. Sobald sie entweder akzeptiert oder abgelehnt wurde können Sie den Eintrag nicht mehr löschen.
+				Sobald Sie eine Entschuldigung hochladen wird die zugehörige Studiengangsassistenz informiert und Ihr Anliegen überprüft. Solange Ihre Entschuldigung noch keinen akzeptierten oder abgelehnten Status erhalten hat, steht es Ihnen frei diese inklusive Datei zu löschen. Sobald sie entweder akzeptiert oder abgelehnt wurde können Sie den Eintrag nichtmehr löschen.
 
 				Bei einer akzeptierten Entschuldigung werden sämtliche digitalen Anwesenheiten in diesem Zeitraum als positiv gewertet. Eine abgelehnte Entschuldigung hat keine Auswirkungen auf ihre Anwesenheitsquote.',
 				'description' => '',
@@ -38052,7 +38174,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'In welches Semester sollen diese {count} Prestudent*Innen ({status})verschoben werden?',
+				'text' => 'In welches Semester sollen diese {count} PrestudentInnen ({status})verschoben werden?',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -40128,6 +40250,447 @@ array(
 			)
 		)
 	),
+	//****************************	 CORE/treemenu
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'filter_interessenten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Interessenten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Candidates',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'filter_bewerbungnichtabgeschickt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bewerbung nicht abgeschickt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Application not submitted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'filter_bewerbungabgeschickt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bewerbung abgeschickt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Application submitted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'filter_zgv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV erfüllt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV fulfilled',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'filter_statusbestaetigt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status bestätigt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Status confirmed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'filter_statusbestaetigtrtnichtangemeldet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Reihungstest nicht angemeldet',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Ranking test not registered',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'filter_statusbestaetigtrtangemeldet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Reihungstest angemeldet',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Ranking test registered',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'filter_reihungstestnichtangemeldet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Reihungstest nicht angemeldet',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Ranking test not registered',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'filter_reihungstestangemeldet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Reihungstest angemeldet',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' =>  'Ranking test registered',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'filter_bewerber',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bewerber',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Applicants',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'filter_bewerberrtnichtangemeldet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Reihungstest nicht angemeldet',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Ranking test not registered',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'filter_bewerberrtangemeldet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Reihungstest angemeldet',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Ranking test registered',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'filter_bewerberrtangemeldetteilgenommen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Teilgenommen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Participated',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'filter_bewerberrtangemeldetnichtteilgenommen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nicht teilgenommen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Not participated',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'filter_aufgenommen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Aufgenommen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Accepted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'filter_warteliste',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Warteliste',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Waiting list',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'filter_absage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Absage',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Rejected',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'filter_incoming',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Incoming',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Incoming',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'inout_inout',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'International',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'International',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'inout_incoming',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Incoming',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Incoming',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'inout_outgoing',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Outgoing',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Outgoing',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'treemenu',
+		'phrase' => 'inout_shared_studies',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gemeinsame Studien',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Shared studies',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	//****************************	 CORE/stv
 	array(
 		'app' => 'core',
@@ -40297,7 +40860,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Interessent*In',
+				'text' => 'InteressentIn',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -40477,7 +41040,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'PreStudent*In',
+				'text' => 'PreStudentIn',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -41176,6 +41739,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'stv',
+		'phrase' => 'grades_gradelist',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studienverlauf',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Grade list',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
 		'phrase' => 'grades_zeugnis',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -41441,7 +42024,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Lektor*In',
+				'text' => 'LektorIn',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -41581,7 +42164,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Student*In hat keinen Status in diesem Semester',
+				'text' => 'StudentIn hat keinen Status in diesem Semester',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -42336,6 +42919,206 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Change status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'neuerTerminBachelorMasterbetreuung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Neuer Termin Bachelor-/Masterarbeitsbetreuung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "New date for Bachelor/Master thesis supervision",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'neueTerminserie',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Terminserie anlegen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Create recurring deadline",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4Sprache',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Sprache",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Language",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4fehlerAktualitaetProjektarbeit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Projektarbeit ist nichtmehr aktuell",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Project work is not current anymore",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'serienTerminEmailSentInfo',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Email über neuen Abgabetermin versendet an: {0}",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Email about new deadline sent to: {0}",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'serienTerminGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Serientermin wurde erfolgreich eingetragen!",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Series dates were successfully entered!",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'errorSerienterminSpeichern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Fehler beim speichern des Serientermins!",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Error saving Series dates!",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4abgabeMitarbeiterbereich',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Dokumentabgabe - MitarbeiterInbereich",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "File submission - Employee area",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4all',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Alle",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'All',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'abgabe',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Abgabe",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Submission',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -44355,7 +45138,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Betreuer*In",
+				'text' => "BetreuerIn",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -44451,6 +45234,26 @@ array(
 		'app' => 'core',
 		'category' => 'abgabetool',
 		'phrase' => 'c4abgabeStudentenbereichv2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Dokumentabgabe - Studierendenbereich",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "File submission - Student area",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4abgabeStudentenbereich',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -45495,7 +46298,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Projektarbeit Detailansicht Mitarbeiter*In",
+				'text' => "Projektarbeit Detailansicht MitarbeiterIn",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -45930,6 +46733,30 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
+		'phrase' => 'c4studentAbgabeNotAllowedRegular',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Verspätete Projektabgabe ist bei Terminen, welche von der Studiengangsassistenz für den gesamten Studiengang fixiert wurden nicht erlaubt!
+
+				Um einen Endupload durchführen zu können, müssen Sie ein positiv benotetes Quality Gate 1 & Quality Gate 2 in der relevanten Projektarbeit absolviert haben.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Late project submissions are not permitted for deadlines set by the program assistant for the entire program!
+
+				To be able to complete a final upload, you must have successfully completed Quality Gate 1 and Quality Gate 2 for the relevant project work.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
 		'phrase' => 'c4benotet',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -46095,7 +46922,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "E-Mail Betreuer*In",
+				'text' => "E-Mail BetreuerIn",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -46155,7 +46982,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Erstbetreuer*In Beurteilung herunterladen",
+				'text' => "ErstbetreuerIn Beurteilung herunterladen",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -46175,7 +47002,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Zweitbetreuer*In Beurteilung herunterladen",
+				'text' => "ZweitbetreuerIn Beurteilung herunterladen",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -46355,7 +47182,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Fehler beim Laden der Projektarbeit - Student*In Zuordnung",
+				'text' => "Fehler beim Laden der Projektarbeit - StudentIn Zuordnung",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -46375,7 +47202,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Kein zugeteilter Student*In gefunden für Projektarbeit",
+				'text' => "Kein zugeteilter StudentIn gefunden für Projektarbeit",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -46650,7 +47477,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Erstbetreuer*In',
+				'text' => 'ErstbetreuerIn',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -46670,7 +47497,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Zweitbetreuer*In',
+				'text' => 'ZweitbetreuerIn',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -47375,7 +48202,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Betreuer*In Berufspraktikum oder Projektarbeit',
+				'text' => 'BetreuerIn Berufspraktikum oder Projektarbeit',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -47656,7 +48483,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Erstbetreuer*In Titel Pre',
+				'text' => 'ErstbetreuerIn Titel Pre',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -47676,7 +48503,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Erstbetreuer*In Vorname',
+				'text' => 'ErstbetreuerIn Vorname',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -47696,7 +48523,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Erstbetreuer*In Nachname',
+				'text' => 'ErstbetreuerIn Nachname',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -47716,7 +48543,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Erstbetreuer*In Titel Post',
+				'text' => 'ErstbetreuerIn Titel Post',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -47736,7 +48563,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Zweitbetreuer*In Titel Pre',
+				'text' => 'ZweitbetreuerIn Titel Pre',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -47756,7 +48583,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Zweitbetreuer*In Vorname',
+				'text' => 'ZweitbetreuerIn Vorname',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -47776,7 +48603,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Zweitbetreuer*In Nachname',
+				'text' => 'ZweitbetreuerIn Nachname',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -47796,7 +48623,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Zweitbetreuer*In Titel Post',
+				'text' => 'ZweitbetreuerIn Titel Post',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -47816,21 +48643,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Keine Zuordnung oder Berechtigung für die Projektarbeit gefunden! 
-				
-				Der eingeloggte User "{0}" konnte nicht als StudentIn "{1}" identifiziert werden, hat keine Betreuungszuordnung und keine Administrationsrechte. 
-				
-				Falls Sie diese Fehlermeldung als StudentIn erhalten loggen Sie sich bitte neu ein, indem Sie den Browser schließen und erneut die CIS Seite aufrufen!',
+				'text' => 'Keine Zuordnung oder Berechtigung für die Projektarbeit gefunden!',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No assignment or authorization found for the project!
-				
-				The logged-in user "{0}" could not be identified as student "{1}", has no reviewer assignment and no administrative rights. 
-
-				If you receive this error message as a student, please log in again by closing your browser and reopening the CIS page!',
+				'text' => 'No assignment or authorization found for the project!',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -48871,7 +49690,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Prüfer*In 1',
+				'text' => 'PrüferIn 1',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -48891,7 +49710,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Prüfer*In 2',
+				'text' => 'PrüferIn 2',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -48911,7 +49730,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Prüfer*In 3',
+				'text' => 'PrüferIn 3',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -49605,7 +50424,7 @@ array(
 	),
 	array(
 		'app' => 'core',
-		'category' => 'stv',
+		'category' => 'ui',
 		'phrase' => 'weitereEMail',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -50435,7 +51254,7 @@ array(
 	'phrases' => array(
 		array(
 			'sprache' => 'German',
-			'text' => 'Prestudent*In ID',
+			'text' => 'PrestudentIn ID',
 			'description' => '',
 			'insertvon' => 'system'
 		),
@@ -51346,6 +52165,126 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Source Course',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'berichte',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Berichte',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reports',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lvplanung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LV-Planung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course Planning',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lehrauftragsliste',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrauftragsliste',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Teaching Assignments',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lehrauftraege',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehraufträge',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lectureships',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lehrauftragslisteemp',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrauftrag Lehrende',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Teaching Assignment Lecturers',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'extrakvverwaltung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrveranstaltung Verwaltung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course Management',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -53141,7 +54080,7 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Lektor*In hinzufügen',
+				'text' => 'LektorIn hinzufügen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -53523,7 +54462,7 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Sender*In',
+				'text' => 'SenderIn',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -53543,7 +54482,7 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Empfänger*In',
+				'text' => 'EmpfängerIn',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -53583,7 +54522,7 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Empfänger*In ID',
+				'text' => 'EmpfängerIn ID',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -55620,7 +56559,7 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Bitte Student*In auswählen!',
+				'text' => 'Bitte StudentIn auswählen!',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -55749,6 +56688,46 @@ and represent the current state of research on the topic. The prescribed citatio
 			array(
 				'sprache' => 'English',
 				'text' => 'The Input Field {field} has to be a valid number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'mailText_profilfoto',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Hallo,\n\nIhr Profilbild wurde entfernt, da es nicht den aktuellen Bildrichtlinen entspricht. Bitte laden Sie unter CIS->Profil ein neues Profilbild hoch!\n\nDanke!",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Hello,\n\nYour profile picture has been removed because it does not comply with the current image guidelines. Please upload a new profile picture under CIS->Profile!\n\nThank you!",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'betreffProfilfoto',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Profilbild',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Profile picture',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -56085,7 +57064,7 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Mitarbeiter*In',
+				'text' => 'MitarbeiterIn',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -57521,7 +58500,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Betreuer*In',
+				'text' => 'BetreuerIn',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -57541,7 +58520,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Betreuer*In',
+				'text' => 'BetreuerIn',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -57761,7 +58740,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Löschen nicht möglich, dieser Projektarbeit sind bereits Betreuer*Innen zugewiesen',
+				'text' => 'Löschen nicht möglich, dieser Projektarbeit sind bereits BetreuerInnen zugewiesen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -57801,7 +58780,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Projektbetreuer*In ungültig',
+				'text' => 'ProjektbetreuerIn ungültig',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -57821,7 +58800,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Löschen nicht möglich, Projektbetreuer*In hat bereits einen Vertrag',
+				'text' => 'Löschen nicht möglich, ProjektbetreuerIn hat bereits einen Vertrag',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58261,7 +59240,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Betreuer*In bearbeiten',
+				'text' => 'BetreuerIn bearbeiten',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58282,6 +59261,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 			array(
 				'sprache' => 'German',
 				'text' => 'Betreuer*In speichern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Save reviewer',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'projektarbeit',
+		'phrase' => 'betreuerSpeichern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'BetreuerIn speichern',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -59418,7 +60417,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Saved on {date} by {name}',
+				'text' => 'Saved on {date} von {name}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -60138,13 +61137,93 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Student*In ist in diesem Semester keinem Lehrverband zugeteilt',
+				'text' => 'StudentIn ist in diesem Semester keinem Lehrverband zugeteilt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
 				'text' => 'Student has no assignment to any teaching association',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'lvplanung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LV-Planung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course-Planning',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'lvplanung_xls',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LV-Planung EXCEL',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course-Planning EXCEL',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'lvplanung_html',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LV-Planung HTML',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course-Planning HTML',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'RTVerwaltung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Reihungstestverwaltung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Administration Placement Test',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -60368,6 +61447,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 			array(
 				'sprache' => 'English',
 				'text' => 'Select a verband',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'LvPlan',
+		'phrase' => 'copy',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kopieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Copy',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -61080,6 +62179,958 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 	// generic tabulator phrases END
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'text_exportXLS',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{count} Prestudent(Innen) als Excel exportieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Export {count} prestudent(s) to Excel',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'alert_chooseStudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte eine/n Studierende/n markieren!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select a student!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'studienverlauf',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studienverlauf',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Gradelist',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'textNoStatusInSem',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Status im {sem}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No status in {sem}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'alert_chooseOnlyOneStudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte nur eine/n Studierende/n markieren!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select only one student!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'alert_chooseGroupSem',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte eine Gruppe auswählen!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select a group!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'errorSavingData',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Speichern der Daten nicht erfolgreich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' =>'Data saving failed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'private',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Privat',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'private',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'andCondition',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'und',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'and',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'orCondition',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'oder',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'or',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'notCondition',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'nicht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'not',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	//Start Finetuning StudVW
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'fenster_schliessen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie können nun das Fenster schließen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This window can be closed now',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tag',
+		'phrase' => 'rebuild_tags',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neuberechnen Tags',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Rebuild Tags',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'selection',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Auswahl',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'selection',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tag',
+		'phrase' => 'messageModalWait',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte warten Sie, bis alle Tags neu berechnet wurden!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please wait until all tags have been recalculated!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tag',
+		'phrase' => 'alertSuccessRebuild',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Tags erfolgreich neuberechnet ({count} Prestudent*innnen)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Tags successfully recalculated ({count} prestudents)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tag',
+		'phrase' => 'alertErrorRebuild',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler bei Neuberechnen Tags, PrestudentId(s): ',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error during Recalculating tags, PrestudentId(s): ',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	//End Finetuning StudVW
+	// tabulator presets section phrases START
+	array(
+		'app' => 'core',
+		'category' => 'tabulator_presets',
+		'phrase' => 'displayed_columns',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Angezeigte Spalten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Displayed columns',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tabulator_presets',
+		'phrase' => 'in_order',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'in Reihenfolge',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'in order',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tabulator_presets',
+		'phrase' => 'column_header_filters',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Spalten Header Filter',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Column header filters',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tabulator_presets',
+		'phrase' => 'asc',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'aufsteigend',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ascending',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tabulator_presets',
+		'phrase' => 'desc',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'absteigend',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'descending',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tabulator_presets',
+		'phrase' => 'sort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sortierung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Sort',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tabulator_presets',
+		'phrase' => 'preset_deletion_confirmation',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sind Sie sicher, dass Sie die Voreinstellung (((presetName))) löschen möchten?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Are you sure you want to delete preset (((presetName)))?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tabulator_presets',
+		'phrase' => 'table_presets',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Tabelle Voreinstellungen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Table presets',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tabulator_presets',
+		'phrase' => 'save_current_config',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Aktuelle Einstellung speichern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Save current configuration',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tabulator_presets',
+		'phrase' => 'preset_name',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Voreinstellung Name',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Preset name',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tabulator_presets',
+		'phrase' => 'max_presets_count_err_msg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Maximale Anzahl an Voreinstellungen erreicht!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Maximum number of presets reached!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tabulator_presets',
+		'phrase' => 'preset_name_duplicate_err_msg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Doppelte Voreinstellunge Namen sind nicht zulässig!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Preset name duplicate not allowed!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tabulator_presets',
+		'phrase' => 'preset_not_found_err_msg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Voreinstellung nicht gefunden!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Preset not found!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tabulator_presets',
+		'phrase' => 'preset_not_own_update_err_msg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie dürfen diese Voreinstellung nicht ändern!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You are not allowed to update this preset!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tabulator_presets',
+		'phrase' => 'preset_not_own_delete_err_msg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie dürfen diese Voreinstellung nicht löschen!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You are not allowed to delete this preset!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tabulator_presets',
+		'phrase' => 'preset_creation_generic_err_msg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bei der Erstellung der Voreinstellung ist ein Fehler aufgetreten!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Something went wrong during preset creation!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tabulator_presets',
+		'phrase' => 'preset_update_generic_err_msg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bei der Voreinstellungsänderung ist ein Fehler aufgetreten!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Something went wrong during preset update!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tabulator_presets',
+		'phrase' => 'preset_deletion_generic_err_msg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Beim Löschen der Voreinstellung ist ein Fehler aufgetreten!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Something went wrong during preset deletion!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tabulator_presets',
+		'phrase' => 'invalid_params_err_msg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ungültige Parameterübergabe!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Invalid parameters!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tabulator_presets',
+		'phrase' => 'modified',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'modifiziert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'modified',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// tabulator presets section phrases END
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'openInMailClient',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'In Mailanwendung öffnen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Open in Mailclient',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'kompatibilityMode_WebmailClient',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kompatibilitätsmodus für Webmail',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Open in Compatibility mode (Webmail)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'webmailclient',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Webmail',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'webmail',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// StudVw legacy Bis Links begin
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'bis_stud',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'BIS (Studierende)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'BIS (Students)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'bis_stud_meldung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Meldung generieren (Studierende)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Generate Report (Students)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'bis_stud_plausicheck',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Plausibilitätsprüfung (Studierende)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Plausibility Check (Students)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'alert_chooseDegreeProgram',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte einen Studiengang auswählen!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select a degree program!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// StudVw legacy Bis Links ende
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'link_Abmeldung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Weiter zur Abmeldung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Continue to De-registration',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'modalHinweistext_Abmeldung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bevor du deine Abmeldung abschließt, möchten wir dir gerne ein Gespräch anbieten. Vielleicht gibt es Fragen, Unsicherheiten oder Herausforderungen, bei denen wir dich unterstützen können.<br>
+<br>Du kannst dich jederzeit unverbindlich an deine Studiengangsassistenz, Studiengangsleitung oder das <a href='https://cis.technikum-wien.at/cis.php/CisVue/Cms/content/9248' target='_blank'>Student Support Team</a> wenden. Ein Gespräch ist natürlich freiwillig – manchmal hilft es aber, gemeinsam Optionen zu besprechen, zum Beispiel auch eine vorübergehende
+<a href={linkUnterbrechung} target='_blank'>Studienunterbrechung</a>.
+<br><br>Wenn du deine Abmeldung fortsetzen möchtest, kannst du das selbstverständlich tun.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Before you finalize your deregistration, we would like to offer you a consultation. Perhaps you have questions, uncertainties, or challenges that we can help you with. <br>
+<br>You can contact your program assistant, program director, or the <a href='https://cis.technikum-wien.at/cis.php/CisVue/Cms/content/9248' target='_blank'>Student Support Team</a> at any time without obligation. A consultation is, of course, voluntary; however, sometimes it helps to discuss options together, such as a
+<a href={linkUnterbrechung} target='_blank'>temporary break</a> from your studies.
+<br><br>If you wish to proceed with your deregistration, you can, of course, do so.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'info_consultation',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hinweis Beratungsgespräch',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Note Consultation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

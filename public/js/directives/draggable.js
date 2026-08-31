@@ -28,7 +28,7 @@ export default {
 		// i.e: for dragging multiple elements
 		// otherwise set draggable attribute
 		if (!binding.modifiers.capture) {
-			el.draggable = true;
+			updateAttributes(el);
 		}
 
 		const bcc = new BroadcastChannel('fhc-dnd');
@@ -79,11 +79,21 @@ export default {
 		el.fhcDraggableCleanup = () => {
 			el.removeEventListener('dragstart', onStart, binding.modifiers.capture);
 			el.removeEventListener('dragend', onEnd, true);
+			if (el.dataset.fhcDraggableValue) {
+				delete el.dataset.fhcDraggableValue;
+			}
+			if (el.dataset.fhcEffectAllowed) {
+				delete el.dataset.fhcEffectAllowed;
+			}
+			updateAttributes(el);
 		};
 	},
 	updated(el, binding) {
 		updateValue(el, binding.value);
 		updateEffectAllowed(el, binding.arg);
+		if (!binding.modifiers.capture) {
+			updateAttributes(el);
+		}
 	},
 	beforeUnmount(el) {
 		el.fhcDraggableCleanup();
@@ -93,7 +103,8 @@ export default {
 
 // Helper functions
 function updateValue(el, value) {
-	value = convertToValidDragObject(value);
+	if (value)
+		value = convertToValidDragObject(value);
 	if (value) {
 		el.dataset.fhcDraggableValue = JSON.stringify(value);
 	} else if (el.dataset.fhcDraggableValue) {
@@ -106,4 +117,10 @@ function updateEffectAllowed(el, effectAllowed) {
 	} else if (el.dataset.fhcEffectAllowed) {
 		delete el.dataset.fhcEffectAllowed;
 	}
+}
+function updateAttributes(el) {
+	if (el.dataset.fhcEffectAllowed && el.dataset.fhcDraggableValue)
+		el.draggable = true;
+	else if (el.hasAttribute('draggable'))
+		el.removeAttribute('draggable');
 }
