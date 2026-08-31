@@ -118,14 +118,9 @@ class Cms extends FHCAPI_Controller
 		$this->load->model('content/news_model', 'NewsModel');
 		
 		$limit =  $this->input->get('limit',TRUE);
-		$passedInMaxAlter = $this->input->get('maxAlter', true);
-		if($passedInMaxAlter !== null)
-		{
-			$maxAlter = intval($passedInMaxAlter);
-		}
 
 		//query the news
-		$news = $this->NewsModel->getAll($limit, $maxAlter);
+		$news = $this->NewsModel->getAll($limit);
 
 		//get the data or terminate with error
 		$news = $this->getDataOrTerminateWithError($news);
@@ -162,7 +157,7 @@ class Cms extends FHCAPI_Controller
         
 	}
 
-	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = false, $titel = '', $edit = false, $sichtbar = true, $maxAlter = 0)
+	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = false, $titel = '', $edit = false, $sichtbar = true)
 	{
 		//form validation
 		$this->load->library('form_validation');
@@ -182,13 +177,6 @@ class Cms extends FHCAPI_Controller
 
 		// default value for the page_size is 10
 		$page_size = $page_size ?? 10;
-		
-		$passedInMaxAlter = $this->input->get('maxAlter', true);
-		if($passedInMaxAlter !== null)
-		{
-			$maxAlter = intval($passedInMaxAlter);
-		}
-
 
 		$passedSichtbar = $this->input->get('published', true);
 		if($passedSichtbar !== null)
@@ -221,7 +209,7 @@ class Cms extends FHCAPI_Controller
 			array_push($entitledDegreePrograms, 0);
 		}
 
-		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size, $sprache, $maxAlter, $filterForDegreePrograms, $entitledDegreePrograms, false);
+		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size, $sprache, $filterForDegreePrograms, $entitledDegreePrograms, true);
 		$news = $this->getDataOrTerminateWithError($news);
 
 		$this->addMeta('row_count', $news["row_count"] ?? 0);

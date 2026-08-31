@@ -61,25 +61,41 @@ export default {
 		async reloadNews() {
 			await this.$refs.newsList.fetchNews();
 		},
+		async showCreateNewsForm() {
+			this.editableNewsItem = null;
+			await this.$refs.newsItemForm?.fillFormData();
+
+			await this.$nextTick();
+
+			this.isNewsPreviewShown = false;
+			this.isNewsFormShown = true;
+
+			this.scrollToNewsForm();
+		},
+		async hideNewsForm() {
+			this.isNewsFormShown = false;
+			this.isNewsPreviewShown = false;
+
+			this.editableNewsItem = null;
+			await this.$refs.newsItemForm?.fillFormData();
+
+			this.newsPreview = null;
+		},
+		handleNewsItemSaved() {
+			this.isNewsFormShown = false;
+			this.isNewsPreviewShown = false;
+			this.editableNewsItem = null;
+			this.newsPreview = null;
+			this.reloadNews();
+			this.$refs.newsItemForm?.fillFormData();
+		},
 		async handleNewsItemUpdated() {
 			this.isNewsFormShown = false;
 			this.isNewsPreviewShown = false;
 			this.editableNewsItem = null;
 			this.newsPreview = null;
-			await this.reloadNews();
-		},
-		handleNewsItemSaved() {
 			this.reloadNews();
-			this.isNewsFormShown = false;
-			this.isNewsPreviewShown = false;
-			this.editableNewsItem = null;
-			this.newsPreview = null;
-		},
-		showCreateNewsForm() {
-			this.editableNewsItem = null;
-			this.isNewsPreviewShown = false;
-			this.isNewsFormShown = true;
-			this.scrollToNewsForm();
+			this.$refs.newsItemForm?.fillFormData();
 		},
 		async loadNewsItem(newsId) {
 			if (!newsId) {
@@ -115,12 +131,6 @@ export default {
 			} catch (error) {
 				this.$fhcAlert.handleSystemError(error);
 			}
-		},
-		cancelNewsForm() {
-			this.isNewsFormShown = false;
-			this.isNewsPreviewShown = false;
-			this.editableNewsItem = null;
-			this.newsPreview = null;
 		},
 		toggleNewsPreview() {
 			this.isNewsPreviewShown = !this.isNewsPreviewShown;
@@ -175,7 +185,7 @@ export default {
 						:is-preview-shown="isNewsPreviewShown"
 						@created="handleNewsItemSaved"
 						@update="handleNewsItemUpdated"
-						@cancel="cancelNewsForm"
+						@cancel="hideNewsForm"
 						@preview-change="handlePreviewChange"
 						@toggle-preview="toggleNewsPreview"
 					></news-item-form>

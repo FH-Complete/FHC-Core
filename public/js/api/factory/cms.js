@@ -29,13 +29,7 @@ export default {
 		};
 	},
 	//api function used for the news View that renders the html
-	getNews(
-		page = 1,
-		page_size = 10,
-		sprache,
-		maxAge = 60,
-		filterPublished = true,
-	) {
+	getNews(page = 1, page_size = 10, sprache, filterPublished = true) {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/Cms/getNews',
@@ -43,17 +37,16 @@ export default {
 				page,
 				page_size,
 				sprache,
-				maxAlter: maxAge,
 				published: filterPublished,
 			},
 		};
 	},
 	//api function used for the widget component
-	newsForWidget(limit, maxAge = 60) {
+	newsForWidget(limit) {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/Cms/newsForWidget',
-			params: { limit, maxAlter: maxAge },
+			params: { limit },
 		};
 	},
 };

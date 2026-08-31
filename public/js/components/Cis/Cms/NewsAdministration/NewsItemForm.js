@@ -474,7 +474,10 @@ export default {
 				) ?? null;
 		}
 
-		this.contentFormItems.addLanguage.config.languages = this.languagesToAdd;
+		const addLanguageTab = this.contentFormItems.addLanguage;
+		if (addLanguageTab?.config) {
+			addLanguageTab.config.languages = this.languagesToAdd;
+		}
 	},
 	template: /*html*/ `
 	<section 

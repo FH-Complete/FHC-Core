@@ -122,12 +122,7 @@ class NewsAdministrationAPI extends FHCAPI_Controller
 
 		$entitledDegreePrograms = $this->permissionlib->getSTG_isEntitledFor("basis/news");
 
-		$maxAlter = MAXNEWSALTER;
-		if (!$active) {
-			$maxAlter = null;
-		}
-
-		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, false, $titel, true, $sichtbar, $page, $page_size, $sprache, $maxAlter, true, $entitledDegreePrograms, $active);
+		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, false, $titel, true, $sichtbar, $page, $page_size, $sprache, true, $entitledDegreePrograms, $active);
 		$news = $this->getDataOrTerminateWithError($news);
 
 		$this->addMeta('row_count', $news["row_count"] ?? 0);
@@ -901,16 +896,15 @@ class NewsAdministrationAPI extends FHCAPI_Controller
 				""
 			)
 		);
-		$content = str_replace('dms.php', APP_ROOT . 'cms/dms.php', $content);
 
 		foreach ($translators as $translator) {
 			sendSanchoMail(
 				"Sancho_Mail_News_Translation_Req",
 				[
 					"newsItemUrl" => APP_ROOT . "cis.php/CisVue/Cms/newsAdministration?newsId=" . $newsItem->news_id,
-					"newsItem" => $content,
 					"newsItemAuthor" => $newsItem->verfasser,
-					"newsItemSubject" => $newsItem->betreff
+					"newsItemSubject" => $newsItem->betreff,
+					"newsItemContent" => $content
 				],
 				$translator->uid . "@" . DOMAIN,
 				"Übersetzung erforderlich / Translation required"

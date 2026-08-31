@@ -177,7 +177,7 @@ class CmsLib
 	 * 
 	 * @return void
 	 */
-	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true, $page = 1, $page_size = 10, $sprache, $maxAlter = 0, $filterForDegreePrograms = false, $allowedDegreePrograms = [], $active = true)
+	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true, $page = 1, $page_size = 10, $sprache, $filterForDegreePrograms = false, $allowedDegreePrograms = [], $active = true)
 
 	{
 		$this->ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
@@ -186,7 +186,7 @@ class CmsLib
 		$this->ci->load->model('content/News_model', 'NewsModel');
 	
 		
-		$news = $this->ci->NewsModel->getNewsWithContent($sprache, $studiengang_kz, $semester, null, $sichtbar, $maxAlter, $page, $page_size, $active, $mischen, $filterForDegreePrograms, $allowedDegreePrograms);
+		$news = $this->ci->NewsModel->getNewsWithContent($sprache, $studiengang_kz, $semester, null, $sichtbar, $page, $page_size, $active, $mischen, $filterForDegreePrograms, $allowedDegreePrograms);
 		$news = getData($news) ?? [];
 		$newsWrappers = [];
 
