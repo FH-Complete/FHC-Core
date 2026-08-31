@@ -24,7 +24,11 @@ export default {
 	inject: {
 		dropdowns: {
 			from: 'dropdowns'
-		}
+		},
+		$reloadList: {
+			from: '$reloadList',
+			required: true
+		},
 	},
 	watch: {
 		modelValue(newValue)
@@ -92,6 +96,10 @@ export default {
 			return this.$refs.form.call(ApiLehreinheit.update(updatedData))
 				.then(result => {
 					this.original = {...this.data};
+
+					if (this.modelValue.lehrveranstaltung_id !== this.changed.lehrveranstaltung_id && this.changed.lehrveranstaltung_id)
+						this.$reloadList();
+
 					this.changed = {};
 					this.$refs.form.setFeedback(true, result.data);
 				})

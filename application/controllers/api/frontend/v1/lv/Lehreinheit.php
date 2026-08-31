@@ -47,14 +47,13 @@ class Lehreinheit extends FHCAPI_Controller
 
 	private function getLehrfaecher($lehreinheit)
 	{
-		$lehrfacher_array = array($lehreinheit->lehrfach_id);
+		$lehrfaecher_array = array($lehreinheit->lehrfach_id);
 		$this->_ci->LehreinheitModel->addSelect('lehrveranstaltung_id_kompatibel');
 		$this->_ci->LehreinheitModel->addJoin('lehre.tbl_lehrveranstaltung_kompatibel', 'lehrveranstaltung_id');
 		$lehrfaecher = $this->_ci->LehreinheitModel->loadWhere(array('lehrveranstaltung_id' => $lehreinheit->lehrveranstaltung_id));
 
-
 		if (hasData($lehrfaecher))
-			$lehrfaecher_array = array_merge($lehrfacher_array, array_column(getData($lehrfaecher), 'lehrveranstaltung_id_kompatibel'));
+			$lehrfaecher_array = array_merge($lehrfaecher_array, array_column(getData($lehrfaecher), 'lehrveranstaltung_id_kompatibel'));
 
 		$lehrfaecher_array[] = $lehreinheit->lehrveranstaltung_id;
 

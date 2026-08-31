@@ -51,6 +51,9 @@ export default {
 			permissionLektorEntfernen: this.permissions['lv-plan/lektorentfernen'],
 			language: Vue.computed(() => this.$p.user_language),
 			isMobile: false,
+			$reloadList: () => {
+				this.$refs.lvTable.reload();
+			},
 		}
 	},
 	data() {

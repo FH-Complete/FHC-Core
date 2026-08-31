@@ -96,6 +96,8 @@ export default {
 		return {
 			expanded: [],
 			selectedColumnValues: [],
+			selectedRows: [],
+			lastSelectedData: [],
 			tagEndpoint: ApiTag,
 			tabulatorEvents: [
 				{
@@ -107,7 +109,7 @@ export default {
 					event: 'dataProcessed',
 					handler: (data) => {
 						this.reexpandRows()
-						this.$emit('update:selected', {})
+						this.reselectRows()
 					}
 				},
 				{
@@ -319,9 +321,14 @@ export default {
 					this.$refs.table.reloadTable();
 			}
 		},
-		rowSelectionChanged(data) {
+		rowSelectionChanged(data, rows, selected, deselected) {
 			this.selectedRows = this.$refs.table.tabulator.getSelectedRows();
 			this.selectedColumnValues = this.selectedRows.filter(row => row.getData().lehreinheit_id !== undefined && row.getData().lehreinheit_id).map(row => row.getData().lehreinheit_id);
+
+			if (selected.length > 0 || deselected.length > 0)
+			{
+				this.lastSelectedData = this.selectedRows.map(row => row.getData());
+			}
 
 			if (data[0]?.lehreinheit_id !== undefined && this.selectedColumnValues.length === 1)
 			{
@@ -332,6 +339,39 @@ export default {
 				this.getLVInfos(data[0]);
 			}
 			this.$emit('update:selected', data);
+		},
+		reselectRows()
+		{
+			if (!Array.isArray(this.lastSelectedData) || !this.lastSelectedData.length)
+				return;
+
+			let rowToSelect = this.allRows.filter(row => {
+				const data = row.getData();
+
+				return this.lastSelectedData.some(selectedRow => {
+					if (selectedRow.lehreinheit_id !== undefined && selectedRow.lehreinheit_id !== null)
+					{
+						return data.lehreinheit_id === selectedRow.lehreinheit_id;
+					}
+
+					if (selectedRow.lehrveranstaltung_id !== undefined && selectedRow.lehrveranstaltung_id !== null)
+					{
+						return data.lehrveranstaltung_id === selectedRow.lehrveranstaltung_id && (data.lehreinheit_id === undefined || data.lehreinheit_id === null);
+					}
+
+					return false;
+				})
+			})
+
+
+			if (rowToSelect.length)
+			{
+				this.$refs.table.tabulator.selectRow(rowToSelect);
+			}
+			else
+			{
+				this.lastSelectedData = [];
+			}
 		},
 		getLVInfos(data)
 		{
