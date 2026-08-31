@@ -109,11 +109,13 @@ export default {
 				</option>
 			</form-input>
 		</div>
-		<base-slider ref="slider" v-slot="slot" class="flex-grow-1">
-			<range-view ref="view" v-bind="viewAttrs()">
-				<template v-slot="slot"><slot v-bind="slot" mode="range" /></template>
-			</range-view>
-		</base-slider>
+		<div class="flex-grow-1">
+			<base-slider ref="slider" v-slot="slot">
+				<range-view ref="view" v-bind="viewAttrs()">
+					<template v-slot="slot"><slot v-bind="slot" mode="range" /></template>
+				</range-view>
+			</base-slider>
+		</div>
 	</div>
 	`,
 };
