@@ -412,7 +412,7 @@ class KalenderLib
 			foreach ($studiengaenge as $studiengang)
 			{
 				$conditions = array();
-				$conditions[] = 'filter_lv.studiengang_kz = ' . $db->escape($studiengang['studiengang_kz']);
+				$conditions[] = 'filter_lv.studiengang_kz = ' . $db->escape($studiengang['stg_kz']);
 
 				if (isset($studiengang['semester']))
 					$conditions[] = 'filter_lv.semester = ' . $db->escape($studiengang['semester']);

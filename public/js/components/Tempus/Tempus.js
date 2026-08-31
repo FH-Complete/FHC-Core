@@ -34,7 +34,8 @@ import AppConfig from "../AppConfig.js";
 
 import BsModal from "../Bootstrap/Modal.js";
 
-import StvVerband from "../Stv/Studentenverwaltung/Verband.js";
+import BaseTreemenu from '../Base/Treemenu.js';
+
 import ApiStudiengangTree from "../../api/factory/tempus/studiengangtree.js";
 import ApiInfo from "../../api/factory/tempus/info.js";
 import StvStudiensemester from "../Stv/Studentenverwaltung/Studiensemester.js";
@@ -63,7 +64,7 @@ export default {
 		AppMenu,
 		NavLanguage,
 		BsModal,
-		StvVerband,
+		BaseTreemenu,
 		StvStudiensemester,
 		Multiselect: primevue.multiselect,
 		FormInput,
@@ -281,29 +282,23 @@ export default {
 			this.rooms = [{ ort_kurzbz: data.ort_kurzbz }];
 		},
 		onSelectVerbandAndClose(payload) {
-			console.log(payload);
 			this.onSelectVerband(payload);
 			bootstrap.Offcanvas.getOrCreateInstance(this.$refs.verbandMenu).hide();
 		},
 
-		onSelectVerband({ link, studiengang_kz, semester, orgform_kurzbz, name }) {
-			if (orgform_kurzbz) {
-				semester = null;
-			} else if (typeof link === "string") {
-				[studiengang_kz, semester] = link.split("/");
-			}
+		onSelectVerband({ path, stg_kz, semester, orgform_kurzbz, name }) {
 
 			let exists = this.studiengaenge.some(
 				(stg) =>
-					stg.studiengang_kz == studiengang_kz &&
+					stg.stg_kz == stg_kz &&
 					stg.semester == semester &&
-					stg.orgform_kurzbz === orgform_kurzbz,
+					(!orgform_kurzbz || stg.orgform_kurzbz === orgform_kurzbz),
 			);
 
 			if (!exists) {
 				this.studiengaenge = [
 					...this.studiengaenge,
-					{ studiengang_kz, semester, orgform_kurzbz, name },
+					{ stg_kz, semester, orgform_kurzbz, name },
 				];
 			}
 		},
@@ -408,8 +403,8 @@ export default {
 			if (hasRooms) filter.ort = this.rooms.map((room) => room.ort_kurzbz);
 			if (hasStg) {
 				filter.stg = this.studiengaenge.map(
-					({ studiengang_kz, semester, orgform_kurzbz }) => ({
-						studiengang_kz,
+					({ stg_kz, semester, orgform_kurzbz }) => ({
+						stg_kz,
 						semester,
 						orgform_kurzbz,
 					}),
@@ -1276,7 +1271,7 @@ export default {
 				</h5>
 				<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
 			</div>
-			<stv-verband :endpoint="endpoint" @select-verband="onSelectVerbandAndClose" class="col" style="height:0%"></stv-verband>
+			<base-treemenu config="tempus" @select-entry="onSelectVerbandAndClose" class="col" style="height:0%"></base-treemenu>
 		</div>
 
 		<raumauswahl-modal ref="raumModal" @saved="$refs.calendar.resetEventLoader()"/>

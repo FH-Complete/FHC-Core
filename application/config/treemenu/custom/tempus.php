@@ -19,16 +19,14 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-$config['stv'] = [
-	"library" => "treemenu/StudVwLib",
-	"permissions" => ["admin:r", "assistenz:r"]
-];
-$config['lvv'] = [
-	"library" => "treemenu/LvVwLib",
-	"permissions" => ["admin:r", "assistenz:r"]
-];
-
-$config['tempus'] = [
-	"library" => "treemenu/TempusLib",
-	"permissions" => ["admin:r", "assistenz:r", "lehre/lvplan:r"]
+$config['root'] = [
+	'stg' => [
+		'semester' => [
+			'group',
+			'verband' => [
+				'group'
+			]
+		],
+		'orgform'
+	]
 ];

@@ -103,8 +103,8 @@ export default {
 				return;
 			}
 
-			let payload = stg.map(({ studiengang_kz, semester, orgform_kurzbz }) => ({
-				studiengang_kz,
+			let payload = stg.map(({ stg_kz, semester, orgform_kurzbz }) => ({
+				stg_kz,
 				semester,
 				orgform_kurzbz
 			}));
