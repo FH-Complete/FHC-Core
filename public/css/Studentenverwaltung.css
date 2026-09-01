@@ -8,6 +8,8 @@
 @import './components/Notiz.css';
 @import './components/Messages.css';
 @import './components/AppMenu.css';
+@import './components/horizontalsplit.css';
+
 
 html {
   font-size: .875em;
