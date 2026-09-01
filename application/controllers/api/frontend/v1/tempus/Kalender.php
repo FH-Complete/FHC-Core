@@ -15,11 +15,11 @@ class Kalender extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getStunden' => self::PERM_LOGGED,
-			'getCalendarHours' => self::PERM_LOGGED,
-			'getPlan' => self::PERM_LOGGED,
-			'getPlanByOrt' => self::PERM_LOGGED,
-			'getRaumvorschlag' => self::PERM_LOGGED,
+			'getStunden' => 'lehre/lvplan:rw',
+			'getCalendarHours' => 'lehre/lvplan:rw',
+			'getPlan' => 'lehre/lvplan:rw',
+			'getPlanByOrt' => 'lehre/lvplan:rw',
+			'getRaumvorschlag' => 'lehre/lvplan:rw',
 			'getLehreinheiten' => 'lehre/lvplan:rw',
 			'getHistory' => 'lehre/lvplan:rw',
 			'deleteEntry' => 'lehre/lvplan:rw',
@@ -27,8 +27,8 @@ class Kalender extends FHCAPI_Controller
 			'syncToStudent' => 'lehre/lvplan:rw',
 			'getPlanLecturer' =>'lehre/lvplan:rw',
 			'getPlanStudent' => 'lehre/lvplan:rw',
-			'getZeitwuensche' => self::PERM_LOGGED,
-			'getZeitsperren' => self::PERM_LOGGED,
+			'getZeitwuensche' => 'lehre/lvplan:rw',
+			'getZeitsperren' => 'lehre/lvplan:rw',
 			'updateKalenderEvent' => 'lehre/lvplan:rw',
 			'deleteOrtEntry' => 'lehre/lvplan:rw',
 			'deleteFromKalenderEvent' => 'lehre/lvplan:rw',

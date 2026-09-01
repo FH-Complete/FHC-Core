@@ -11,7 +11,7 @@ class Coursepicker extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getCourses' => self::PERM_LOGGED,
+			'getCourses' => 'lehre/lvplan:rw',
 		]);
 
 		$this->_ci = &get_instance();

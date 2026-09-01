@@ -598,6 +598,14 @@ class KalenderLib
 
 		$kalender_entry = getData($entryResult);
 
+		if (!$this->_checkPermission($kalender_entry->lehreinheit_id))
+		{
+			return error([
+				'message' => $this->_ci->phraseslib->t('ui', 'keineBerechtigung'),
+				'errorCode' => 'not_allowed'
+			]);
+		}
+
 		if (in_array($kalender_entry->status_kurzbz, array('to_delete', 'to_delete_live', 'to_delete_preview', 'deleted')))
 		{
 			return error([
@@ -640,6 +648,14 @@ class KalenderLib
 		if (isError($entryResult)) return $entryResult;
 
 		$kalender_entry = getData($entryResult);
+
+		if (!$this->_checkPermission($kalender_entry->lehreinheit_id))
+		{
+			return error([
+				'message' => $this->_ci->phraseslib->t('ui', 'keineBerechtigung'),
+				'errorCode' => 'not_allowed'
+			]);
+		}
 
 		if (in_array($kalender_entry->status_kurzbz, array('to_delete', 'to_delete_live', 'to_delete_preview', 'deleted')))
 		{
@@ -939,6 +955,14 @@ class KalenderLib
 
 	public function addKalenderEvent($start_date, $end_date, $lehreinheit_id, $ort_kurzbz)
 	{
+		if (!$this->_checkPermission((array)$lehreinheit_id))
+		{
+			return error([
+				'message' => $this->_ci->phraseslib->t('ui', 'keineBerechtigung'),
+				'errorCode' => 'not_allowed'
+			]);
+		}
+
 		$this->_ci->KalenderModel->db->trans_start();
 
 		$insert = $this->_insertKalenderEventRaw($start_date, $end_date, $lehreinheit_id, $ort_kurzbz);
@@ -1241,6 +1265,14 @@ class KalenderLib
 
 		$kalender_entry = getData($entryResult);
 
+		if (!$this->_checkPermission($kalender_entry->lehreinheit_id))
+		{
+			return error([
+				'message' => $this->_ci->phraseslib->t('ui', 'keineBerechtigung'),
+				'errorCode' => 'not_allowed'
+			]);
+		}
+
 		$calendarResources = $this->_ci->BetriebsmittelKalenderModel->loadWhere(['eindeutige_kalender_gruppen_id' => $kalender_entry->eindeutige_kalender_gruppen_id]);
 		if (isError($calendarResources)) return $calendarResources;
 		
@@ -1358,6 +1390,14 @@ class KalenderLib
 
 		if ($kalender_entry->typ === 'lehreinheit')
 		{
+			if (!$this->_checkPermission($kalender_entry->lehreinheit_id))
+			{
+				return error([
+					'message' => $this->_ci->phraseslib->t('ui', 'keineBerechtigung'),
+					'errorCode' => 'not_allowed'
+				]);
+			}
+
 			if (in_array($kalender_entry->status_kurzbz, array('to_delete', 'to_delete_live', 'to_delete_preview', 'deleted')))
 			{
 				return error([
@@ -1398,6 +1438,14 @@ class KalenderLib
 		if (isError($entryResult)) return $entryResult;
 
 		$kalender_entry = getData($entryResult);
+
+		if (!$this->_checkPermission($kalender_entry->lehreinheit_id))
+		{
+			return error([
+				'message' => $this->_ci->phraseslib->t('ui', 'keineBerechtigung'),
+				'errorCode' => 'not_allowed'
+			]);
+		}
 
 		$allowed = array(
 			'planning' => array('sync_preview', 'sync_live'),
@@ -1580,24 +1628,30 @@ class KalenderLib
 
 	private function _deleteTypLehreinheit($entry)
 	{
-		$result_lehreinheit = $this->_ci->KalenderLehreinheitModel->loadWhere(array('kalender_id' => $entry->kalender_id));
-		if (isError($result_lehreinheit)) return $result_lehreinheit;
-		$has_lehreinheit = hasData($result_lehreinheit) ? getData($result_lehreinheit)[0] : false;
+		$entryResult = $this->_loadKalenderEntry($entry->kalender_id);
 
-		$result_ort = $this->_ci->KalenderOrtModel->loadWhere(array('kalender_id' => $entry->kalender_id));
-		if (isError($result_ort)) return $result_ort;
-		$has_ort = hasData($result_ort) ? getData($result_ort)[0] : false;
+		if (isError($entryResult)) return $entryResult;
 
-	if ($entry->status_kurzbz === 'sync_preview' || $entry->status_kurzbz === 'sync_live' || $entry->status_kurzbz === 'planning')
+		$kalender_entry = getData($entryResult);
+
+		if (!$this->_checkPermission($kalender_entry->lehreinheit_id))
 		{
-			$history = $this->getHistory($entry->kalender_id, false, false);
+			return error([
+				'message' => $this->_ci->phraseslib->t('ui', 'keineBerechtigung'),
+				'errorCode' => 'not_allowed'
+			]);
+		}
+
+		if ($kalender_entry->status_kurzbz === 'sync_preview' || $kalender_entry->status_kurzbz === 'sync_live' || $kalender_entry->status_kurzbz === 'planning')
+		{
+			$history = $this->getHistory($kalender_entry->kalender_id, false, false);
 
 			$history = hasData($history) && getData($history);
 
 			if ($history)
 			{
 				$result = $this->_ci->KalenderModel->update(
-					array('kalender_id' => $entry->kalender_id),
+					array('kalender_id' => $kalender_entry->kalender_id),
 					array('status_kurzbz' => 'to_delete','status_kurzbz_max' => 'planning')
 				);
 
@@ -1606,37 +1660,36 @@ class KalenderLib
 			}
 			else
 			{
-				if ($has_ort)
+				if (!isEmptyArray($kalender_entry->ort_kurzbz))
 				{
-					$result = $this->_deleteOrtEntry($has_ort);
-					if (isError($result))
-						return error($result);
-
-				}
-
-
-				if ($has_lehreinheit)
-				{
-					$result = $this->_deleteLehreinheitEntry($has_lehreinheit);
+					$result = $this->_deleteOrtEntry($kalender_entry->ort_kurzbz);
 					if (isError($result))
 						return error($result);
 				}
 
-				$result = $this->_ci->KalenderModel->delete(array('tbl_kalender.kalender_id' => $entry->kalender_id));
+
+				if (!isEmptyArray($kalender_entry->lehreinheit_id))
+				{
+					$result = $this->_deleteLehreinheitEntry($kalender_entry->lehreinheit_id);
+					if (isError($result))
+						return error($result);
+				}
+
+				$result = $this->_ci->KalenderModel->delete(array('tbl_kalender.kalender_id' => $kalender_entry->kalender_id));
 
 				if (isError($result))
 					return error($result);
 			}
 		}
-		else if ($entry->status_kurzbz === 'preview' || $entry->status_kurzbz === 'live')
+		else if ($kalender_entry->status_kurzbz === 'preview' || $kalender_entry->status_kurzbz === 'live')
 		{
-			if ($entry->status_kurzbz === 'preview')
+			if ($kalender_entry->status_kurzbz === 'preview')
 				$new_status = 'to_delete_preview';
 			else
 				$new_status = 'to_delete_live';
 
 			$result = $this->_ci->KalenderModel->update(
-				array('kalender_id' => $entry->kalender_id),
+				array('kalender_id' => $kalender_entry->kalender_id),
 				array('status_kurzbz' => $new_status)
 			);
 
@@ -1722,6 +1775,35 @@ class KalenderLib
 		$history_sql .= " ORDER BY kalender_id DESC" . ($only_previous ? ' LIMIT 1' : '');
 
 		return $dbModel->execReadOnlyQuery($history_sql, $params);
+	}
+
+	private function _checkPermission($lehreinheit_ids)
+	{
+		if (isEmptyArray($lehreinheit_ids))
+			return true;
+
+		$allowed = false;
+
+		$this->_ci->LehreinheitModel->addSelect('studiengang_kz');
+		$this->_ci->LehreinheitModel->addJoin('lehre.tbl_lehrveranstaltung', 'tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id');
+		$this->_ci->LehreinheitModel->db->where_in('lehreinheit_id', $lehreinheit_ids);
+
+		$lehreinheit = $this->_ci->LehreinheitModel->load();
+		if (!hasData($lehreinheit))
+			return error('Lehreinheit nicht gefunden');
+
+		$studiengaenge = array_unique(array_column(getData($lehreinheit), 'studiengang_kz'));
+
+		foreach ($studiengaenge as $studiengang_kz)
+		{
+			if ($this->_ci->permissionlib->isBerechtigt('lehre/lvplan', 'suid', $studiengang_kz))
+			{
+				$allowed = true;
+				break;
+			}
+		}
+
+		return $allowed;
 	}
 
 }
