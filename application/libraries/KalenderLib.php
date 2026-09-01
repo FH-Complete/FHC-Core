@@ -459,7 +459,7 @@ class KalenderLib
 	{
 		$this->_getBasePlan($start_date, $end_date);
 
-		$this->_ci->KalenderModel->db->where('status_kurzbz', 'live');
+		$this->_ci->KalenderModel->db->where_in('status_kurzbz', array('live', 'to_delete_live'));
 
 		$data = $this->_ci->KalenderModel->load();
 
@@ -598,7 +598,7 @@ class KalenderLib
 
 		$kalender_entry = getData($entryResult);
 
-		if (in_array($kalender_entry->status_kurzbz, array('todelete', 'deleted')))
+		if (in_array($kalender_entry->status_kurzbz, array('to_delete', 'to_delete_live', 'to_delete_preview', 'deleted')))
 		{
 			return error([
 				'message' => $this->_ci->phraseslib->t('ui', 'entry_not_editable'),
@@ -641,7 +641,7 @@ class KalenderLib
 
 		$kalender_entry = getData($entryResult);
 
-		if (in_array($kalender_entry->status_kurzbz, array('todelete', 'deleted')))
+		if (in_array($kalender_entry->status_kurzbz, array('to_delete', 'to_delete_live', 'to_delete_preview', 'deleted')))
 		{
 			return error([
 				'message' => $this->_ci->phraseslib->t('ui', 'entry_not_editable'),
@@ -1292,7 +1292,7 @@ class KalenderLib
 
 		if ($kalender_entry->typ === 'lehreinheit')
 		{
-			if (in_array($kalender_entry->status_kurzbz, array('todelete', 'deleted')))
+			if (in_array($kalender_entry->status_kurzbz, array('to_delete', 'to_delete_live', 'to_delete_preview', 'deleted')))
 			{
 				return error([
 					'message' => $this->_ci->phraseslib->t('ui', 'entry_not_editable'),
@@ -1358,7 +1358,7 @@ class KalenderLib
 
 		if ($kalender_entry->typ === 'lehreinheit')
 		{
-			if (in_array($kalender_entry->status_kurzbz, array('todelete', 'deleted')))
+			if (in_array($kalender_entry->status_kurzbz, array('to_delete', 'to_delete_live', 'to_delete_preview', 'deleted')))
 			{
 				return error([
 					'message' => $this->_ci->phraseslib->t('ui', 'entry_not_editable'),
@@ -1588,36 +1588,60 @@ class KalenderLib
 		if (isError($result_ort)) return $result_ort;
 		$has_ort = hasData($result_ort) ? getData($result_ort)[0] : false;
 
-		if ($entry->status_kurzbz === 'planning')
+	if ($entry->status_kurzbz === 'sync_preview' || $entry->status_kurzbz === 'sync_live' || $entry->status_kurzbz === 'planning')
 		{
-			if ($has_ort)
-				$this->_deleteOrtEntry($has_ort);
+			$history = $this->getHistory($entry->kalender_id, false, false);
 
-			if ($has_lehreinheit)
-				$this->_deleteLehreinheitEntry($has_lehreinheit);
+			$history = hasData($history) && getData($history);
 
-			$this->_ci->KalenderModel->delete(array('tbl_kalender.kalender_id' => $entry->kalender_id));
-		}
-		else if ($entry->status_kurzbz === 'sync_preview' || $entry->status_kurzbz === 'sync_live')
-		{
-			$history = $this->getHistory($entry->kalender_id);
-			$history = hasData($history) ? getData($history) : false;
+			if ($history)
+			{
+				$result = $this->_ci->KalenderModel->update(
+					array('kalender_id' => $entry->kalender_id),
+					array('status_kurzbz' => 'to_delete','status_kurzbz_max' => 'planning')
+				);
 
-			if ($has_ort)
-				$result = $this->_deleteOrtEntry($has_ort);
+				if (isError($result))
+					return error($result);
+			}
+			else
+			{
+				if ($has_ort)
+				{
+					$result = $this->_deleteOrtEntry($has_ort);
+					if (isError($result))
+						return error($result);
 
-			if ($has_lehreinheit)
-				$result = $this->_deleteLehreinheitEntry($has_lehreinheit);
+				}
 
-			$this->_ci->KalenderModel->delete(array('tbl_kalender.kalender_id' => $entry->kalender_id));
+
+				if ($has_lehreinheit)
+				{
+					$result = $this->_deleteLehreinheitEntry($has_lehreinheit);
+					if (isError($result))
+						return error($result);
+				}
+
+				$result = $this->_ci->KalenderModel->delete(array('tbl_kalender.kalender_id' => $entry->kalender_id));
+
+				if (isError($result))
+					return error($result);
+			}
 		}
 		else if ($entry->status_kurzbz === 'preview' || $entry->status_kurzbz === 'live')
 		{
-			//TODO (david) überprüfen ob sinnvoll, verschwindet direkt in den ansichten (student, lecturer)
+			if ($entry->status_kurzbz === 'preview')
+				$new_status = 'to_delete_preview';
+			else
+				$new_status = 'to_delete_live';
+
 			$result = $this->_ci->KalenderModel->update(
 				array('kalender_id' => $entry->kalender_id),
-				array('status_kurzbz' => 'todelete')
+				array('status_kurzbz' => $new_status)
 			);
+
+			if (isError($result))
+				return error($result);
 		}
 
 		return success();
@@ -1642,11 +1666,11 @@ class KalenderLib
 		return $this->_ci->KalenderEventModel->delete(array('kalender_id' => $entry->kalender_id));
 	}
 
-	public function getHistory($kalender_id, $only_previous = false)
+	public function getHistory($kalender_id, $only_previous = false, $include_self = true)
 	{
 		$dbModel = new DB_Model();
-		$history_entries = $dbModel->execReadOnlyQuery("
-				WITH RECURSIVE 
+		$history_sql ="
+			WITH RECURSIVE 
 				vorgaenger(kalender_id, vorgaenger_kalender_id) AS (
 					SELECT kalender_id, vorgaenger_kalender_id
 					FROM lehre.tbl_kalender
@@ -1685,12 +1709,19 @@ class KalenderLib
 					SELECT kalender_id FROM nachfolger
 				) combined
 				JOIN lehre.tbl_kalender USING(kalender_id)
-					LEFT JOIN orte USING(kalender_id)
-				ORDER BY kalender_id DESC
-				
-			" . ($only_previous ? ' LIMIT 1' : ''), array($kalender_id, $kalender_id));
+					LEFT JOIN orte USING(kalender_id)";
 
-		return $history_entries;
+		$params =  array($kalender_id, $kalender_id);
+
+		if (!$include_self)
+		{
+			$history_sql .= " WHERE kalender_id != ?";
+			$params[] = $kalender_id;
+		}
+
+		$history_sql .= " ORDER BY kalender_id DESC" . ($only_previous ? ' LIMIT 1' : '');
+
+		return $dbModel->execReadOnlyQuery($history_sql, $params);
 	}
 
 }

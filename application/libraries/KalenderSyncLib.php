@@ -19,6 +19,7 @@ class KalenderSyncLib
 		$this->_ci->load->model('ressource/Kalendersyncstatus_model', 'KalendersyncstatusModel');
 		$this->_ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		$this->_ci->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
+		$this->_ci->load->library('KalenderLib');
 	}
 
 	public function run($studiensemester_kurzbz)
@@ -41,7 +42,7 @@ class KalenderSyncLib
 
 			$ziel_status = isEmptyString($config->sync_status_kurzbz) ? 'live' : $config->sync_status_kurzbz;
 
-			$relevante_stati = array_merge($this->status_map[$ziel_status], array('todelete'));
+			$relevante_stati = array_merge($this->status_map[$ziel_status], array('to_delete', 'to_delete_live', 'to_delete_preview'));
 
 			$kalender_ids_result = $this->getKalenderIds(
 				$config->oe_kurzbz,
@@ -89,7 +90,7 @@ class KalenderSyncLib
 
 	public function runManual($oe_kurzbz, $studiensemester_kurzbz, $ausbildungssemester = null, $studienplan_id = null, $mail = true, $datum_bis = null, $ziel_status = 'live')
 	{
-		$relevante_stati = array_merge($this->status_map[$ziel_status], array('todelete'));
+		$relevante_stati = array_merge($this->status_map[$ziel_status], array('to_delete', 'to_delete_live', 'to_delete_preview'));
 
 		$kalender_ids_result = $this->getKalenderIds(
 			$oe_kurzbz,
@@ -126,7 +127,7 @@ class KalenderSyncLib
 		$mail_infos_gesamt = [];
 		$synced_gesamt = 0;
 
-		$todelete_ids_result = $this->_getManuallySetStatus(array('todelete'));
+		$todelete_ids_result = $this->_getManuallySetStatus(array('to_delete', 'to_delete_live', 'to_delete_preview'));
 
 		if (isError($todelete_ids_result))
 			return $todelete_ids_result;
@@ -264,30 +265,34 @@ class KalenderSyncLib
 
 	private function _archiveVorgaenger($vorgaenger_kalender_id, $stop_at_live = false)
 	{
-		if (!$vorgaenger_kalender_id) return;
+		$return_array = array();
+		if (!$vorgaenger_kalender_id) return success($return_array);
 
 		$current_id = $vorgaenger_kalender_id;
 
 		while ($current_id)
 		{
 			$vorgaenger = $this->_ci->KalenderModel->load(array('kalender_id' => $current_id));
-			if (!hasData($vorgaenger)) return;
+			if (!hasData($vorgaenger)) return success($return_array);
 
 			$vorgaenger = getData($vorgaenger)[0];
 
 			if ($stop_at_live && $vorgaenger->status_kurzbz === 'live')
-				return;
+				return success($return_array);
 
 			if (in_array($vorgaenger->status_kurzbz, array('preview', 'live')))
 			{
 				$this->_ci->KalenderModel->update(
 					array('kalender_id' => $current_id),
-					array('status_kurzbz' => 'archived')
+					array('status_kurzbz' => 'archived', 'status_kurzbz_max' => $vorgaenger->status_kurzbz)
 				);
+
+				$return_array[] = $vorgaenger;
 			}
 
 			$current_id = $vorgaenger->vorgaenger_kalender_id;
 		}
+		return success($return_array);
 	}
 
 	private function _syncKalenderIds($kalender_ids, $ziel_status)
@@ -312,11 +317,63 @@ class KalenderSyncLib
 
 		foreach (getData($to_update) as $entry)
 		{
-			if ($entry->status_kurzbz === 'todelete')
+			if (in_array($entry->status_kurzbz, array('to_delete', 'to_delete_live', 'to_delete_preview')))
 			{
-				$this->_ci->KalenderModel->update(array('kalender_id' => $entry->kalender_id), array('status_kurzbz' => 'deleted'));
-				$this->_archiveVorgaenger($entry->vorgaenger_kalender_id, false);
-				$mail_infos[] = array('entry' => $entry, 'new_status' => 'deleted', 'notify' => array('lektor', 'student'));
+				$notify = array();
+				if ($entry->status_kurzbz === 'to_delete_live')
+				{
+					$status_max = 'live';
+					$notify = array('lektor', 'student');
+				}
+				else if ($entry->status_kurzbz === 'to_delete_preview')
+				{
+					$status_max = 'preview';
+					$notify = array('lektor');
+				}
+				else if ($entry->status_kurzbz === 'to_delete')
+				{
+					$status_max = 'planning';
+				}
+
+				$this->_ci->KalenderModel->update(array('kalender_id' => $entry->kalender_id), array('status_kurzbz' => 'deleted', 'status_kurzbz_max' => $status_max));
+				$mail_infos[] = array('entry' => $entry, 'new_status' => 'deleted', 'notify' => $notify);
+
+				$vorgaenger_array = $this->_archiveVorgaenger($entry->vorgaenger_kalender_id);
+
+
+
+				if (hasData($vorgaenger_array))
+				{
+					foreach(getData($vorgaenger_array) as $vorgaenger)
+					{
+						$archive_notify = array();
+
+						if ($vorgaenger->status_kurzbz === 'preview')
+							$archive_notify = array('lektor');
+						else if ($vorgaenger->status_kurzbz === 'live')
+						{
+							$archive_notify = array('student', 'lektor');
+
+							$history = $this->_ci->kalenderlib->getHistory($vorgaenger->kalender_id, false, false);
+							if (hasData($history))
+							{
+								$history = getData($history);
+
+								foreach ($history as $entry)
+								{
+									if ($entry->status_kurzbz === 'deleted' && $entry->status_kurzbz_max === 'preview')
+									{
+										$archive_notify = array('student');
+										break;
+									}
+								}
+							}
+						}
+
+						$mail_infos[] = array('entry' => $vorgaenger, 'new_status' => 'deleted', 'notify' => $archive_notify);
+					}
+				}
+
 				$synced++;
 				continue;
 			}

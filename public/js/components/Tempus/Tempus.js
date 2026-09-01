@@ -1362,6 +1362,7 @@ export default {
 							<th>Von</th>
 							<th>Bis</th>
 							<th>Status</th>
+							<th>Max Status</th>
 							<th>Ort</th>
 						</tr>
 					</thead>
@@ -1370,6 +1371,7 @@ export default {
 							<td>{{ entry.von }}</td>
 							<td>{{ entry.bis }}</td>
 							<td>{{ entry.status_kurzbz }}</td>
+							<td>{{ entry.status_kurzbz_max }}</td>
 							<td>{{ entry.ort }}</td>
 						</tr>
 					</tbody>
