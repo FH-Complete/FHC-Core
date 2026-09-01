@@ -14,6 +14,10 @@ export default {
 			type: Array,
 			default: [],
 		},
+		lecturers: {
+			type: Array,
+			default: [],
+		},
 		studiensemester: {
 			type: String,
 			default: null
@@ -26,7 +30,8 @@ export default {
 			allCourses: [],
 			sortBy: null,
 			multiWeekIds: new Set(),
-			favorites: new Set()
+			favorites: new Set(),
+			filter: {}
 		}
 	},
 	computed: {
@@ -86,32 +91,45 @@ export default {
 		studiengaenge: {
 			deep: true,
 			handler(val) {
-				this.searchparam = '';
-				this.loadCoursesByStg(val);
+				this.loadCourses();
+			}
+		},
+		lecturers: {
+			deep: true,
+			handler() {
+				this.loadCourses();
 			}
 		},
 		studiensemester() {
 			if (this.studiengaenge)
-				this.loadCoursesByStg(this.studiengaenge);
+				this.loadCourses();
 		},
 	},
 	methods: {
-		async loadCoursesByStg(stg) {
-			if (stg.length <= 0)
-			{
-				this.allCourses = [];
-				return;
+		async loadCourses()
+		{
+			const hasLektoren = this.lecturers.length > 0;
+			const hasStg = this.studiengaenge.length > 0;
+
+			this.filter = {};
+			if (hasLektoren)
+				this.filter.uid = this.lecturers;
+
+			if (hasStg) {
+				this.filter.stg = this.studiengaenge.map(
+					({ studiengang_kz, semester, orgform_kurzbz }) => ({
+						studiengang_kz,
+						semester,
+						orgform_kurzbz,
+					}),
+				);
 			}
 
-			let payload = stg.map(({ stg_kz, semester, orgform_kurzbz }) => ({
-				stg_kz,
-				semester,
-				orgform_kurzbz
-			}));
-
-			this.$api.call(ApiCoursePicker.getByStg(payload, this.studiensemester))
+			if (Object.keys(this.filter).length === 0)
+				return this.allCourses = [];
+			this.$api.call(ApiCoursePicker.getCourses(this.filter, this.studiensemester))
 				.then(result => {
-					this.allCourses = result.data.map(e => ({
+					this.allCourses = result?.data?.map(e => ({
 						lehreinheit_id: e.lehreinheit_id,
 						lektoren: e.lektoren,
 						raumtyp: e.raumtyp,
@@ -177,7 +195,7 @@ export default {
 		},
 		reload()
 		{
-			this.loadCoursesByStg(this.studiengaenge);
+			this.loadCourses();
 		},
 		toggleMultiWeek(course)
 		{
@@ -253,7 +271,7 @@ export default {
 				</button>
 			</div>
 		</div>
-		<div v-if="studiengaenge.length <= 0" class="d-flex flex-column align-items-center justify-content-center text-center text-muted py-5 px-3 h-100">
+		<div v-if="Object.keys(filter).length <= 0" class="d-flex flex-column align-items-center justify-content-center text-center text-muted py-5 px-3 h-100">
 			<span class="small fw-semibold mb-1">{{$p.t('lehre', 'cptitleempty')}}</span>
 			<span class="small">{{$p.t('lehre', 'cpempty')}}</span>
 		</div>

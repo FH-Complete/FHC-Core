@@ -1,16 +1,9 @@
 export default {
-	search(query) {
-		return {
-			method: 'get',
-			url: 'api/frontend/v1/tempus/coursepicker/search',
-			params: { query }
-		};
-	},
-	getByStg(studiengaenge, studiensemester_kurzbz) {
+	getCourses(filter, studiensemester_kurzbz) {
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/tempus/coursepicker/getByStg',
-			params: { studiengaenge, studiensemester_kurzbz }
+			url: 'api/frontend/v1/tempus/coursepicker/getCourses',
+			params: { ...filter, studiensemester_kurzbz }
 		};
 	},
 

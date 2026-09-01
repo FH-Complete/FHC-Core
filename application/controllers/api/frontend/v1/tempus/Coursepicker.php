@@ -5,10 +5,13 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 class Coursepicker extends FHCAPI_Controller
 {
 	private $_ci;
+
+	const ALLOWED_COURSE_FILTER = ['uid', 'stg'];
+
 	public function __construct()
 	{
 		parent::__construct([
-			'getByStg' => self::PERM_LOGGED
+			'getCourses' => self::PERM_LOGGED,
 		]);
 
 		$this->_ci = &get_instance();
@@ -20,18 +23,41 @@ class Coursepicker extends FHCAPI_Controller
 
 		$this->loadPhrases(['ui']);
 	}
-	public function getByStg()
+
+	public function getCourses()
 	{
 		$this->_ci->form_validation->set_data($_POST);
-		$this->_ci->form_validation->set_rules('studiengaenge[]',"studiengaenge","required");
 		$this->_ci->form_validation->set_rules('studiensemester_kurzbz',"studiensemester_kurzbz","required");
 
 		if($this->_ci->form_validation->run() === FALSE)
 			$this->terminateWithValidationErrors($this->_ci->form_validation->error_array());
 
-		$studiengaenge = $this->input->post('studiengaenge');
-		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
+		$studiensemester_kurzbz = $this->_ci->input->post('studiensemester_kurzbz', TRUE);
 
+		$filter = $this->_checkFilter(self::ALLOWED_COURSE_FILTER);
+
+		$this->_getBasePlan($studiensemester_kurzbz);
+
+		$this->_ci->LehreinheitModel->db->group_start();
+		if (isset($filter->stg))
+			$this->_addStgWhere($filter->stg);
+
+		if (isset($filter->uid))
+		{
+			$uid_array = (array) $filter->uid;
+			$this->_ci->LehreinheitModel->db->or_where_in('tbl_benutzer.uid', $uid_array);
+		}
+
+		$this->_ci->LehreinheitModel->db->group_end();
+
+		$this->_ci->LehreinheitModel->addOrder('lehreinheit_id');
+		$result = $this->_ci->LehreinheitModel->load();
+		$result = hasData($result) ? getData($result) : array();
+		$this->terminateWithSuccess($this->_mapEvents($result));
+	}
+
+	private function _getBasePlan($studiensemester_kurzbz)
+	{
 		$this->_ci->LehreinheitModel->addSelect('
 			tbl_lehreinheit.lehreinheit_id,
 			tbl_lehreinheit.lvnr,
@@ -71,6 +97,15 @@ class Coursepicker extends FHCAPI_Controller
 		$this->_ci->LehreinheitModel->addJoin('public.tbl_person', 'tbl_benutzer.person_id = tbl_person.person_id');
 
 		$this->_ci->LehreinheitModel->db->group_start();
+		$this->_ci->LehreinheitModel->db->where('tbl_lehrform.verplanen', true);
+		$this->_ci->LehreinheitModel->db->where('tbl_lehreinheit.studiensemester_kurzbz', $studiensemester_kurzbz);
+		$this->_ci->LehreinheitModel->db->group_end();
+
+	}
+
+	private function _addStgWhere($studiengaenge)
+	{
+		$this->_ci->LehreinheitModel->db->group_start();
 		$first = true;
 		foreach ($studiengaenge as $studiengang)
 		{
@@ -93,14 +128,10 @@ class Coursepicker extends FHCAPI_Controller
 			$this->_ci->LehreinheitModel->db->group_end();
 		}
 		$this->_ci->LehreinheitModel->db->group_end();
+	}
 
-		$result = $this->_ci->LehreinheitModel->loadWhere(array(
-			'tbl_lehrform.verplanen' => true,
-			'tbl_lehreinheit.studiensemester_kurzbz' => $studiensemester_kurzbz
-		));
-
-		$result = hasData($result) ? getData($result) : array();
-
+	private function _mapEvents($result)
+	{
 		$lehreinheit_ids = array_values(array_unique(array_column($result, 'lehreinheit_id')));
 
 		$offen_map = array();
@@ -209,10 +240,8 @@ class Coursepicker extends FHCAPI_Controller
 			$group->verplant = $this->_formatArr($group->verplant);
 			$group->offenestunden = $this->_formatArr($group->offenestunden);
 		}
-
-		$this->terminateWithSuccess(array_values($grouped));
+		return array_values($grouped);
 	}
-
 	private function _formatArr($arr)
 	{
 		$values = array_values(array_unique($arr));
@@ -222,6 +251,25 @@ class Coursepicker extends FHCAPI_Controller
 			$formatted .= ' ?';
 
 		return $formatted;
+	}
+
+	private function _checkFilter($filters)
+	{
+		$filter_valid = false;
+		$filter_object = new stdClass();
+		foreach ($filters as $filter)
+		{
+			if ($this->_ci->input->post($filter))
+			{
+				$filter_valid = true;
+				$filter_object->$filter = $this->_ci->input->post($filter);
+			}
+		}
+
+		if (!$filter_valid)
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+		return $filter_object;
 	}
 
 
