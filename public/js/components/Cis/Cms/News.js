@@ -117,6 +117,7 @@ export default {
 		></pagination>
 		<div class="container-fluid mt-4">
 			<div class="row">
+				<!-- No contentcomponent-host on purpose: news stays static by convention. -->
 				<div class="col" v-html="content">
 				</div>
 				<div class="col-auto">

@@ -84,65 +84,18 @@ if (! $rechte->isberechtigt('basis/dms', null, 's', null))
 	}
 
 	/*
-	 * ---------------------------------------------------------------------------------
-	 * CIS4 BRIDGE -- ticket 78489, CMS admin on CI3 and Vue
-	 * ---------------------------------------------------------------------------------
+	 * CIS4 bridge, ticket 78489.
 	 *
-	 * WHY THIS CHANGE IS HERE AND NOT SOMEWHERE ELSE
+	 * The TinyMCE 5 editor of the new CMS admin cannot receive a selection through the
+	 * TinyMCE 3 API below, so this window posts the URL back to its opener instead.
 	 *
-	 * The new CMS admin (application/controllers/Cms.php, public/js/components/Cms/) uses
-	 * TinyMCE 5. This file returns its selection through the TinyMCE 3 API, that is
-	 * through the global object tinyMCEPopup:
+	 *     message: { typ: 'fhc-dms-selection', url: 'dms.php?id=<dms_id>' }
+	 *     target:  window.opener, origin checked on both sides
 	 *
-	 *     tinyMCEPopup.getWindowArg("window")   -> the calling window
-	 *     tinyMCEPopup.getWindowArg("input")    -> the target field id in that window
-	 *     tinyMCEPopup.close()                  -> close this window
-	 *
-	 * tinyMCEPopup does not exist in TinyMCE 5. It came with the plugin "inlinepopups",
-	 * which TinyMCE 4 removed. TinyMCE 5 uses file_picker_callback instead and expects
-	 * the caller to hand back the URL.
-	 *
-	 * The return code must run IN THIS window, because only this window knows which
-	 * dms_id the editor clicked. A wrapper in the new admin cannot catch that: it sees
-	 * the opened window, not the click inside it. A proxy controller does not help for
-	 * the same reason. The selection happens here.
-	 *
-	 * WHAT WAS DELIBERATELY NOT CHANGED
-	 *
-	 * The ticket excludes the DMS input interface, because branches for it are open.
-	 * This change respects that:
-	 *
-	 *   - It only adds. The legacy branch below stays line for line and still runs
-	 *     unchanged as soon as tinyMCEPopup is present.
-	 *   - It touches exactly one JavaScript function. No PHP, no markup, no query,
-	 *     no view, no layout.
-	 *   - It changes none of the four callers of mySubmit.
-	 *
-	 * When these branches are merged, only this one function needs attention.
-	 *
-	 * WHY NO GET PARAMETER TELLS THE TWO PATHS APART
-	 *
-	 * A switch such as ?cis4=1 on open looks obvious, but it does not hold: the file
-	 * browser navigates internally (search, paging, category change) and rebuilds its
-	 * links from $_REQUEST. An extra parameter is lost on the way, and the bridge would
-	 * be dead after the first search. The runtime check through tinyMCEPopup and
-	 * window.opener survives every internal navigation and needs no change to the links.
-	 *
-	 * THE CONTRACT WITH THE NEW ADMIN
-	 *
-	 *     message:  { typ: 'fhc-dms-selection', url: 'dms.php?id=<dms_id>' }
-	 *     target:   window.opener
-	 *     origin:   window.location.origin  (the receiver checks against it)
-	 *
-	 * The URL stays RELATIVE. This is mandatory, not carelessness:
-	 *   - The legacy view runs under /cms/ and resolves dms.php?id=N directly.
-	 *   - The CIS4 view replaces the string 'dms.php' in CmsLib::getContent() with
-	 *     APP_ROOT . 'cms/dms.php'.
-	 * An absolute URL breaks both paths. Stored content must stay interchangeable
-	 * between the two interfaces.
+	 * The path is chosen by window.name, which the opener sets and which survives the
+	 * internal navigation of this browser.
 	 *
 	 * Receiving side: public/js/components/Cms/Form/FieldWysiwyg.js
-	 * ---------------------------------------------------------------------------------
 	 */
 	var FileBrowserDialog=
 	{
@@ -151,8 +104,9 @@ if (! $rechte->isberechtigt('basis/dms', null, 's', null))
 		mySubmit : function (id) {
 			var URL = "dms.php?id="+id;
 
-			// CIS4 path: see the comment block above this function.
-			if (typeof tinyMCEPopup === 'undefined' && window.opener && !window.opener.closed) {
+			// CIS4 path: see the comment block above this function. Do not test for
+			// tinyMCEPopup, this page loads tiny_mce_popup.js itself and always defines it.
+			if (window.name === 'DMS_CIS4' && window.opener && !window.opener.closed) {
 				window.opener.postMessage({ typ: 'fhc-dms-selection', url: URL }, window.location.origin);
 				window.close();
 				return;

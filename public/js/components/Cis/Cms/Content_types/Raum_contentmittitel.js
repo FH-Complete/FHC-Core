@@ -1,4 +1,4 @@
-
+import ContentcomponentHost from "../../../Contentcomponents/ContentcomponentHost.js";
 export default {
 	name: "RaumComponent",
 	data() {
@@ -15,6 +15,9 @@ export default {
 		type: [Number, String],
 	  }
     },
+	components: {
+		ContentcomponentHost
+	},
 	methods: {
 		sanitizeLegacyTables(table) {
 
@@ -135,7 +138,7 @@ export default {
       <!-- div that contains the content -->
 <!--       TODO: test with more img content from cms-->
       <div v-if="imgContent"><img v-bind="imgContent"/></div>
-      <div v-html="content" v-else-if="content" ></div>
+      <contentcomponent-host v-else-if="content" :content="content" :content-id="content_id"></contentcomponent-host>
       <p v-else>Content was not found</p>
       `,
   };

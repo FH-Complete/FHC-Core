@@ -16,6 +16,9 @@ class CmsAdmin extends FHCAPI_Controller
 			'getTemplates'              => ['basis/cms:r'],
 			'getOrganisationseinheiten' => ['basis/cms:r'],
 			'getSprachen'               => ['basis/cms:r'],
+			'getDmsKategorien'          => ['basis/cms:r'],
+			'getMitarbeiter'            => ['basis/cms:r'],
+			'getDmsKategorieDokumente'  => ['basis/cms:r'],
 			'getUsage'                  => ['basis/cms:r'],
 			'getClickCounts'            => ['basis/cms:r'],
 			'postContent'               => ['basis/cms:rw'],
@@ -554,4 +557,46 @@ class CmsAdmin extends FHCAPI_Controller
 
 		return null;
 	}
+
+	/**
+	 * Lists the DMS categories for the contentcomponent insert dialog.
+	 */
+	public function getDmsKategorien()
+	{
+		$this->load->model('content/Dms_model', 'DmsModel');
+
+		$result = $this->DmsModel->getKategorien();
+		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result));
+	}
+
+
+	/**
+	 * Lists active staff for the contentcomponent insert dialog.
+	 * Names only. See Mitarbeiter_model::getAktivesPersonalNamen().
+	 */
+	public function getMitarbeiter()
+	{
+		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
+
+		$result = $this->MitarbeiterModel->getAktivesPersonalNamen();
+		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result));
+	}
+
+
+	/**
+	 * Lists the documents of one DMS category for the contentcomponent insert dialog.
+	 */
+	public function getDmsKategorieDokumente()
+	{
+		$this->load->library('form_validation');
+		$this->form_validation->set_data($_GET);
+		$this->form_validation->set_rules('kategorie_kurzbz', 'DMS-Kategorie', 'required');
+		if ($this->form_validation->run() == FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$this->load->model('content/Dms_model', 'DmsModel');
+
+		$result = $this->DmsModel->getKategorieDokumenteAlle($this->input->get('kategorie_kurzbz', TRUE));
+		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result) ?: array());
+	}
+
 }

@@ -134,6 +134,7 @@ export default {
 	template: /*html*/ `
 	  <!-- div that contains the content -->
 	  <div v-if="content" class="container" style="max-width: 100%;"><div class="row"><div class="col">
+		<!-- No contentcomponent-host on purpose: news contents stay static by convention. -->
 		<div v-html="content"  ></div>
 	  </div></div></div>
 	  <p v-else>Content was not found</p>
