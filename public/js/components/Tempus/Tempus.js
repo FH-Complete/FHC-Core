@@ -14,22 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import VerticalSplit from '../verticalsplit/verticalsplit.js';
 import FhcCalendar from '../Calendar/Tempus.js';
 import ApiKalender from '../../api/factory/tempus/kalender.js';
 import ApiSearchbar from '../../api/factory/searchbar.js';
 import ApiRenderers from '../../api/factory/renderers.js';
 import ApiTempusConfig from '../../api/factory/tempus/config.js';
-import ApiBetriebsmittel from '../../api/factory/betriebsmittel.js';
-import ApiOperationalResourceToCalender from '../../api/factory/operationalResourceToCalender.js';
-import AppMenu from '../AppMenu.js';
 import drop from '../../directives/drop.js';
 import AppConfig from '../AppConfig.js';
-
-import BsModal from '../Bootstrap/Modal.js';
-
-import BaseTreemenu from '../Base/Treemenu.js';
-
 import ApiStudiengangTree from '../../api/factory/tempus/studiengangtree.js';
 import ApiInfo from '../../api/factory/tempus/info.js';
 import Reservierung from './Reservierung.js';
@@ -51,15 +42,12 @@ import LehreinheitModal from './LehreinheitModal.js';
 export default {
 	name: 'Tempus',
 	components: {
-		VerticalSplit,
 		FhcCalendar,
 		AppConfig,
 		TempusAppMenu,
 		TempusHeader,
-		BsModal,
 		TempusVerbandMenu,
 		TempusSidebarMenu,
-		Multiselect: primevue.multiselect,
 		Reservierung,
 		KeyboardShortcuts,
 		MultiWeekPlanModal,
@@ -68,7 +56,6 @@ export default {
 		TagsAssignmentModal,
 		RaumauswahlModal,
 		LehreinheitModal,
-		BaseTreemenu,
 	},
 	props: {
 		defaultSemester: String,
@@ -122,7 +109,6 @@ export default {
 			minimized: false,
 			currentlySelectedEvent: null,
 			hoveredEvent: null,
-			//currentDay: new Date(),
 			studiensemesterKurzbz: this.defaultSemester,
 			lists: {
 				nations: [],
@@ -200,7 +186,7 @@ export default {
 
 			await this.deleteEntryCall(orig);
 			this.$refs.calendar.resetEventLoader();
-			this.$refs.coursepicker.reload();
+			this.$refs.sidebar.reloadCoursepicker();
 		},
 		async deleteEntries(origList) {
 			let validList = (origList ?? []).filter((orig) => orig?.kalender_id);
@@ -210,13 +196,13 @@ export default {
 				validList.map((orig) => this.deleteEntryCall(orig)),
 			);
 			this.$refs.calendar.resetEventLoader();
-			this.$refs.coursepicker.reload();
+			this.$refs.sidebar.reloadCoursepicker();
 		},
 		async deleteEntryCall(orig) {
 			await this.$api
 				.call(ApiKalender.deleteEntry(orig.kalender_id))
 				.then(() => {
-					this.$refs.parking.unpark({ type: orig.type, id: orig.kalender_id });
+					this.$refs.sidebar.unpark({ type: orig.type, id: orig.kalender_id });
 				});
 		},
 		async openHistory(orig) {
@@ -246,7 +232,10 @@ export default {
 		},
 		onSelectVerbandAndClose(payload) {
 			this.onSelectVerband(payload);
-			bootstrap.Offcanvas.getOrCreateInstance(this.$refs.verbandMenu).hide();
+
+			const verbandMenu = this.$refs.verbandMenu?.$el;
+			if (verbandMenu)
+				bootstrap.Offcanvas.getOrCreateInstance(verbandMenu).hide();
 		},
 		onSelectVerband({ path, stg_kz, semester, orgform_kurzbz, name }) {
 			let exists = this.studiengaenge.some(
@@ -504,7 +493,7 @@ export default {
 				dates.end_time,
 				() => {
 					this.$refs.calendar.resetEventLoader();
-					this.$refs.coursepicker.reload();
+					this.$refs.sidebar.reloadCoursepicker();
 				},
 			);
 		},
@@ -572,7 +561,7 @@ export default {
 					.then((result) => result.data)
 					.then((result) => {
 						this.$refs.calendar.resetEventLoader();
-						this.$refs.coursepicker.reload();
+						this.$refs.sidebar.reloadCoursepicker();
 						this.bcc.postMessage('dropped');
 					});
 			} else if (obj.type === 'kalender') {
@@ -583,7 +572,7 @@ export default {
 					start_time,
 					end_time,
 					() => {
-						this.$refs.parking.unpark({
+						this.$refs.sidebar.unpark({
 							type: obj.type,
 							id: obj.orig.kalender_id,
 						});
@@ -607,7 +596,7 @@ export default {
 		},
 		onMultiWeekConfirmed() {
 			this.$refs.calendar.resetEventLoader();
-			this.$refs.coursepicker.reload();
+			this.$refs.sidebar.reloadCoursepicker();
 			this.bcc.postMessage('dropped');
 		},
 		handleRange(range) {
@@ -755,10 +744,10 @@ export default {
 			const event = this.hoveredEvent;
 			if (!event?.kalender_id) return;
 
-			if (this.$refs.parking.isParked(event.kalender_id)) {
-				this.$refs.parking.unpark({ type: event.type, id: event.kalender_id });
+			if (this.$refs.sidebar.isParked(event.kalender_id)) {
+				this.$refs.sidebar.unpark({ type: event.type, id: event.kalender_id });
 			} else {
-				this.$refs.parking.park(null, {
+				this.$refs.sidebar.park(null, {
 					type: 'kalender',
 					id: event.kalender_id,
 					orig: event,
@@ -775,7 +764,7 @@ export default {
 			this.hoveredEvent = null;
 		},
 		focusSearchbar() {
-			this.$refs.searchbar?.$refs?.input.focus();
+			this.$refs.header?.focusSearchbar();
 		},
 	},
 	watch: {
@@ -930,8 +919,9 @@ export default {
 		</div>
 		<app-config ref="config" v-model="appconfig" :endpoints="configEndpoints"></app-config>
 		<tempus-verband-menu
+			ref="verbandMenu"
 			:endpoint="endpoint"
-			@select-verband="onSelectVerband"
+			@select-verband-and-close="onSelectVerbandAndClose"
 		/>
 		<raumauswahl-modal ref="raumModal" @saved="$refs.calendar.resetEventLoader()"/>
 		<lehreinheit-modal ref="lehreinheitModal" @saved="$refs.calendar.resetEventLoader()"/>
