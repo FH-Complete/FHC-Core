@@ -154,7 +154,7 @@ class Coursepicker extends FHCAPI_Controller
 			}
 			$first = false;
 
-			$this->_ci->LehreinheitModel->db->where('tbl_lehrveranstaltung.studiengang_kz', $studiengang['studiengang_kz']);
+			$this->_ci->LehreinheitModel->db->where('tbl_lehrveranstaltung.studiengang_kz', $studiengang['stg_kz']);
 
 			if (isset($studiengang['semester']))
 				$this->_ci->LehreinheitModel->db->where('tbl_lehrveranstaltung.semester', $studiengang['semester']);

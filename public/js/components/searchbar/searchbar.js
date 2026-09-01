@@ -40,7 +40,7 @@ export default {
 			query: Vue.computed(() => this.lastQuery),
 		};
 	},
-	inject: ["isMobile"],
+	inject: { isMobile: { default: false } },
 	data: function () {
 		return {
 			searchtimer: null,

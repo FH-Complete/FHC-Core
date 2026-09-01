@@ -27,7 +27,8 @@ export default {
 	provide() {
 		return {
 			flipAxis: Vue.computed(() => this.flipAxis),
-			axisRow: Vue.computed(() => this.axisRow)
+			axisRow: Vue.computed(() => this.axisRow),
+			onDropEvent: Vue.computed(() => this.onDropEvent),
 		};
 	},
 	props: {
@@ -376,6 +377,13 @@ export default {
 			return dropStart.startOf('day').plus(lastBlock.end);
 		},
 
+		onDropEvent(evt, items, date)
+		{
+			if (this.snapToGrid)
+				this.onDropSnap(evt, items, date)
+			else
+				this.onDropFree(evt, items, date)
+		},
 		onDropSnap(evt, items, date, part) {
 			let obj = items;
 			if (!obj?.orig) return;
@@ -389,8 +397,12 @@ export default {
 			const blocks = this.axisPartsWithBreaks.filter(p => p.index !== undefined);
 			const grabOffset = grabTime.diff(dropDay);
 
-			const snappedPart = blocks.find(b => grabOffset >= b.start && grabOffset < b.end) || part;
-			const dropStart = dropDay.plus(snappedPart.start);
+			let snappedPart = blocks.find(b => grabOffset >= b.start && grabOffset < b.end);
+
+			if (!snappedPart)
+				snappedPart = blocks.find(b => b.start >= grabOffset) || blocks[blocks.length - 1];
+
+			const dropStart = snappedPart ? dropDay.plus(snappedPart.start) : grabTime;
 
 			let nettoDuration = this._getNettoDurationForDrop(obj);
 			let dropEnd = this.calculateDropEnd(dropStart, nettoDuration);

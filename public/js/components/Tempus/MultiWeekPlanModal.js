@@ -59,7 +59,11 @@ export default {
 				.then(result => {
 					this.plan = (result.plan || []).map(termin => ({
 						...termin,
-						selected_ort_kurzbz: termin.raum_vorschlaege?.[0]?.ort_kurzbz ?? termin.ort_kurzbz,
+						selected_ort_kurzbz: (
+							termin.raum_vorschlaege?.find(termin => termin.ort_kurzbz === this.ortKurzbz)?.ort_kurzbz
+							?? termin.raum_vorschlaege?.[0]?.ort_kurzbz
+							?? termin.ort_kurzbz
+						),
 						planen: (termin.collisions && termin.collisions.length > 0) ? false : true,
 					}));
 
@@ -98,6 +102,10 @@ export default {
 		formatDate(date)
 		{
 			return luxon.DateTime.fromISO(date).toFormat('dd.MM.yyyy');
+		},
+		formatTime(time)
+		{
+			return luxon.DateTime.fromISO(time).toFormat('HH:mm');
 		}
 
 	},
@@ -120,7 +128,7 @@ export default {
 			</div>
 
 			<div v-if="skippedWeeks.length" class="alert alert-warning small">
-				Übersprungende Ferienwochen: <div style="white-space: pre-line;">{{ formattedSkippedWeeks  }}</div>
+				Übergesprungene Ferienwochen: <div style="white-space: pre-line;">{{ formattedSkippedWeeks  }}</div>
 			</div>
 
 			<div v-if="errors.length" class="alert alert-danger small">
@@ -140,7 +148,7 @@ export default {
 				<tbody>
 					<tr v-for="(termin, i) in plan" :key="i" :class="hasCollision(termin) ? 'table-danger' : 'table-success'">
 						<td>{{ formatDate(termin.datum) }}</td>
-						<td>{{ termin.start.split(' ')[1] }} - {{ termin.ende.split(' ')[1] }}</td>
+						<td>{{ formatTime(termin.start.split(' ')[1]) }} - {{ formatTime(termin.ende.split(' ')[1]) }}</td>
 						<td>
 							<span v-if="hasCollision(termin)" class="text-danger small">
 								<div style="white-space: pre-line;">{{ termin.collisions.map(c => c.message).join('\\n') }}</div>

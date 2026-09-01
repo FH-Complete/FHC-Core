@@ -18,6 +18,14 @@ export default {
 			params: newData
 		};
 	},
+	getGruppe(gruppe)
+	{
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/lv/gruppe/getGruppe/',
+			params: gruppe
+		};
+	},
 	getByLehreinheit(lehreinheit_id)
 	{
 		return {

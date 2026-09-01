@@ -381,13 +381,13 @@ export default {
 	<template v-for="lehrveranstaltung in lehrveranstaltungen" :key="lehrveranstaltung.lehrveranstaltung_id">
 		<div  class="card" v-if="Array.isArray(lehrveranstaltung.lehrveranstaltungen) && lehrveranstaltung.lehrveranstaltungen.length >0" >
 			<div class="card-header">
-				<h5 class=" card-title">{{isGermanLanguage == 'German' ? lehrveranstaltung.bezeichnung : lehrveranstaltung.bezeichnung_english }}</h5>
+				<h5 class=" card-title">{{isGermanLanguage ? lehrveranstaltung.bezeichnung : lehrveranstaltung.bezeichnung_english }}</h5>
 				<h6 class=" card-subtitle">{{lehrveranstaltung.lehrform_kurzbz}}</h6>
 			</div>
 			<div class="card-body">
 				<ul class="list-group list-group-flush">
 					<li class="d-flex list-group-item" v-for="lv in lehrveranstaltung.lehrveranstaltungen">
-						<a class="fhc-link-color d-block me-auto" href="#" @click="openLvUebersicht(lv)">{{isGermanLanguage == 'German' ? lv.bezeichnung : lv.bezeichnung_english}}</a>
+						<a class="fhc-link-color d-block me-auto" href="#" @click="openLvUebersicht(lv)">{{isGermanLanguage ? lv.bezeichnung : lv.bezeichnung_english}}</a>
 						<p>{{lv.lehrform_kurzbz}}</p>
 					</li>	
 				</ul>
