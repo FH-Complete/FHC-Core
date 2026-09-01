@@ -1,4 +1,4 @@
-import FhcCalendar from "./Base.js";
+import FhcCalendar from './Base.js';
 
 import { useEventLoader } from '../../composables/EventLoader.js';
 
@@ -8,20 +8,19 @@ import ModeTable from './Mode/Table.js';
 import ApiKalender from '../../api/factory/tempus/kalender.js';
 import draggable from '../../directives/draggable.js';
 
-
 export default {
-	name: "CalendarTempus",
+	name: 'CalendarTempus',
 	components: {
-		FhcCalendar
+		FhcCalendar,
 	},
 	inject: {
-		renderers: {from: 'renderers'},
+		renderers: { from: 'renderers' },
 		appConfig: {
 			from: 'appConfig',
 			default: {
-				visible_status: 'all'
-			}
-		}
+				visible_status: 'all',
+			},
+		},
 	},
 	directives: {
 		draggable,
@@ -29,45 +28,45 @@ export default {
 	props: {
 		timezone: {
 			type: String,
-			required: true
+			required: true,
 		},
 		date: {
 			type: [Date, String, Number, luxon.DateTime],
-			default: luxon.DateTime.local()
+			default: luxon.DateTime.local(),
 		},
 		mode: {
 			type: String,
-			default: 'Week'
+			default: 'Week',
 		},
 		getPromiseFunc: {
 			type: Function,
-			required: true
+			required: true,
 		},
 		parkedEvents: {
 			type: Object,
-			default: () => new Set()
+			default: () => new Set(),
 		},
 		visibleLecturers: {
 			type: Array,
-			default: null
+			default: null,
 		},
 		extraBackgrounds: {
 			type: Array,
-			default: () => []
+			default: () => [],
 		},
 		visibleStatus: {
 			type: Array,
-			default: () => ['all']
+			default: () => ['all'],
 		},
 	},
 	emits: [
-		"update:date",
-		"update:mode",
-		"update:range",
-		"drop",
-		"resize",
-		"event-hover",
-		"event-unhover"
+		'update:date',
+		'update:mode',
+		'update:range',
+		'drop',
+		'resize',
+		'event-hover',
+		'event-unhover',
 	],
 
 	data() {
@@ -80,11 +79,11 @@ export default {
 			modeOptions: {
 				day: {
 					emptyMessage: Vue.computed(() => this.$p.t('lehre/noLvFound')),
-					emptyMessageDetails: Vue.computed(() => this.$p.t('lehre/noLvFound'))
+					emptyMessageDetails: Vue.computed(() => this.$p.t('lehre/noLvFound')),
 				},
 				week: {
-					collapseEmptyDays: false
-				}
+					collapseEmptyDays: false,
+				},
 			},
 			currentMode: this.mode,
 			teachingunits: null,
@@ -97,62 +96,62 @@ export default {
 			let now = luxon.DateTime.now().setZone(this.timezone);
 
 			let past = [];
-			if (this.mode == 'Month')
-			{
-				past = [{
-					class: 'background-past',
-					end: now.startOf('day')
-				}];
-			}
-			else
-			{
-				past = [{
-					class: 'background-past',
-					end: now,
-					label: now.startOf('minute').toISOTime({ suppressSeconds: true, includeOffset: false })
-				}];
+			if (this.mode == 'Month') {
+				past = [
+					{
+						class: 'background-past',
+						end: now.startOf('day'),
+					},
+				];
+			} else {
+				past = [
+					{
+						class: 'background-past',
+						end: now,
+						label: now
+							.startOf('minute')
+							.toISOTime({ suppressSeconds: true, includeOffset: false }),
+					},
+				];
 			}
 
-			return [
-				...past,
-				...(this.extraBackgrounds || [])
-			];
+			return [...past, ...(this.extraBackgrounds || [])];
 		},
-		visibleEvents()
-		{
+		visibleEvents() {
 			let list = this.events;
 
-			if (Array.isArray(this.visibleLecturers))
-			{
+			if (Array.isArray(this.visibleLecturers)) {
 				const visibleLectures = new Set(this.visibleLecturers);
 
-				list = list.filter(event => {
-					if (!event.lektor?.length)
-						return true;
-					return event.lektor.some(lektor => visibleLectures.has(lektor.mitarbeiter_uid));
+				list = list.filter((event) => {
+					if (!event.lektor?.length) return true;
+					return event.lektor.some((lektor) =>
+						visibleLectures.has(lektor.mitarbeiter_uid),
+					);
 				});
 			}
 
 			if (!this.visibleStatus.length || this.visibleStatus.includes('all'))
 				return list;
 
-			return list.filter(event => this.visibleStatus.includes(event.status_kurzbz));
+			return list.filter((event) =>
+				this.visibleStatus.includes(event.status_kurzbz),
+			);
 		},
 	},
 	methods: {
 		eventStyle(event) {
-			if (!event.farbe)
-				return undefined;
+			if (!event.farbe) return undefined;
 			return '--event-bg:#' + event.farbe;
 		},
 		updateRange(rangeInterval) {
 			this.rangeInterval = rangeInterval;
 			this.$emit('update:range', rangeInterval);
 		},
-		ondrop(payload){
+		ondrop(payload) {
 			this.$emit('drop', payload);
 		},
-		onresize(payload){
+		onresize(payload) {
 			this.$emit('resize', payload);
 		},
 		resetEventLoader() {
@@ -164,13 +163,34 @@ export default {
 		navigateNext() {
 			this.$refs.calendar.clickNext();
 		},
+		clearOutCalendarEventEmphasis() {
+			this.$refs.calendar.$el
+				.querySelectorAll(
+					'.fhc-calendar-base-grid .fhc-calendar-base-grid-line-event',
+				)
+				.forEach((el) => {
+					const spinner = el.querySelector('.spinner-overlay');
+					if (spinner) {
+						spinner.remove();
+					}
+
+					el.classList.remove(
+						'updating-event',
+						'updated-event',
+						'updated-event-long',
+					);
+				});
+		},
 	},
 	setup(props, context) {
 		const rangeInterval = Vue.ref(null);
 
-		const { events, lv, reset } = useEventLoader(rangeInterval, props.getPromiseFunc);
+		const { events, lv, reset } = useEventLoader(
+			rangeInterval,
+			props.getPromiseFunc,
+		);
 
-		Vue.watch(lv, newValue => {
+		Vue.watch(lv, (newValue) => {
 			context.emit('update:lv', newValue);
 		});
 
@@ -178,31 +198,27 @@ export default {
 			rangeInterval,
 			events,
 			lv,
-			reset
+			reset,
 		};
 	},
 
 	created() {
-		this.$api
-			.call(ApiKalender.getStunden())
-			.then(res => {
-				return this.teachingunits = res.data.map(el => ({
-					id: el.stunde,
-					start: el.beginn,
-					end: el.ende
-				}));
-			});
+		this.$api.call(ApiKalender.getStunden()).then((res) => {
+			return (this.teachingunits = res.data.map((el) => ({
+				id: el.stunde,
+				start: el.beginn,
+				end: el.ende,
+			})));
+		});
 
-		this.$api
-			.call(ApiKalender.getCalendarHours())
-			.then(res => {
-				this.hoursplan = {
-					start: res.data.start,
-					end: res.data.end
-				};
-			});
+		this.$api.call(ApiKalender.getCalendarHours()).then((res) => {
+			this.hoursplan = {
+				start: res.data.start,
+				end: res.data.end,
+			};
+		});
 	},
-	template: /* html */`
+	template: /* html */ `
 	<fhc-calendar
 		ref="calendar"
 		class="fhc-calendar-lvplan"
@@ -280,5 +296,5 @@ export default {
 				</div>
 			</div>
 		</template>
-	</fhc-calendar>`
-}
+	</fhc-calendar>`,
+};
