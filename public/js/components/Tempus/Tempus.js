@@ -149,9 +149,11 @@ export default {
 			visibleStatus: ["all"],
 			selectedStudiensemester:
 				this.studiensemester_kurzbz ?? this.defaultSemester,
-			calendarDate: luxon.DateTime.now()
-				.setZone(this.config.timezone)
-				.toISODate(),
+			calendarDatesByMode: {
+				week: luxon.DateTime.now().setZone(this.config.timezone).toISODate(),
+				month: luxon.DateTime.now().setZone(this.config.timezone).toISODate(),
+				tableList: luxon.DateTime.now().setZone(this.config.timezone).toISODate(),
+			},
 			historyEntries: [],
 			previewRole: "planer",
 			multiWeekModal: {
@@ -175,6 +177,9 @@ export default {
 	computed: {
 		currentDay() {
 			return luxon.DateTime.now().setZone(this.config.timezone).toISODate();
+		},
+		calendarDate() {
+			return this.calendarDatesByMode[this.currentMode] ?? this.calendarDatesByMode.week;
 		},
 		visibleLecturerUids() {
 			if (!this.lecturers.length) return null;
@@ -354,17 +359,23 @@ export default {
 				},
 				{ zone: this.config.timezone },
 			);
-			this.calendarDate = date.toISODate();
+			this.calendarDatesByMode = {...this.calendarDatesByMode, week: date.toISODate()};
+			this.currentMode = "week";
 		},
 		handleChangeDate(newDate) {
-			if (newDate && luxon.DateTime.isDateTime(newDate) && newDate.isValid)
-				this.calendarDate = newDate.toISODate();
+			if (!(newDate && luxon.DateTime.isDateTime(newDate) && newDate.isValid))
+				return;
+
+			this.calendarDatesByMode = {...this.calendarDatesByMode, [this.currentMode]: newDate.toISODate()};
 		},
 		handleChangeMode(newMode, newDate) {
 			if (!newMode) return;
+
+			if (newDate && luxon.DateTime.isDateTime(newDate) && newDate.isValid) {
+				this.calendarDatesByMode = {...this.calendarDatesByMode, [this.currentMode]: newDate.toISODate()};
+			}
+
 			this.currentMode = newMode;
-			if (newDate && luxon.DateTime.isDateTime(newDate) && newDate.isValid)
-				this.calendarDate = newDate.toISODate();
 		},
 		updateCollision() {
 			this.$api
