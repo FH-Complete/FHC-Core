@@ -20,13 +20,14 @@ export default {
 			}
 			else
 			{
-				this.$emit('update:studiengaenge', this.studiengaenge.filter(studiengang => !(studiengang.studiengang_kz === stg_kz && studiengang.semester === semester && studiengang.orgform_kurzbz === orgform_kurzbz)));
+				this.$emit('update:studiengaenge', this.studiengaenge.filter(studiengang => !(studiengang.stg_kz === stg_kz && studiengang.semester === semester && (!orgform_kurzbz || studiengang.orgform_kurzbz === orgform_kurzbz))));
 			}
 		},
 		stgLabel(stg)
 		{
-			let found = this.studiengaengeAll.find(s => s.studiengang_kz == stg.studiengang_kz);
-			let name = found?.name ?? stg.studiengang_kz;
+			let found = this.studiengaengeAll.find(s => s.studiengang_kz == stg.stg_kz);
+			let name = found?.name ?? stg.stg_kz;
+
 
 			if (stg.orgform_kurzbz)
 				return `${name} - ${stg.orgform_kurzbz}`;
@@ -56,7 +57,7 @@ export default {
 					<button
 						type="button"
 						class="btn btn-sm btn-link text-danger p-0"
-						@click="removeStg(studiengang.studiengang_kz, studiengang.semester, studiengang.orgform_kurzbz)"
+						@click="removeStg(studiengang.stg_kz, studiengang.semester, studiengang.orgform_kurzbz)"
 						title="Studiengang entfernen"
 					>
 						<i class="fa-solid fa-xmark"></i>

@@ -97,6 +97,13 @@ export default {
 			params: { kalender_id, updatedInfos}
 		};
 	},
+	deleteOrtEntry(kalender_id) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/tempus/Kalender/deleteOrtEntry',
+			params: { kalender_id}
+		};
+	},
 	addKalenderEvent(lehreinheit_id, ort_kurzbz, start_date, end_date) {
 		return {
 			method: 'post',
@@ -133,6 +140,13 @@ export default {
 			params: { kalender_id }
 		};
 	},
+	getLehreinheiten(kalender_id) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/tempus/Kalender/getLehreinheiten',
+			params: { kalender_id }
+		};
+	},
 
 	getHistory(kalender_id) {
 		return {
@@ -146,6 +160,13 @@ export default {
 			method: 'post',
 			url: '/api/frontend/v1/tempus/Kalender/deleteEntry',
 			params: { kalender_id }
+		};
+	},
+	deleteFromKalenderEvent(kalender_id, lehreinheit_ids) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/tempus/Kalender/deleteFromKalenderEvent',
+			params: { kalender_id, lehreinheit_ids }
 		};
 	},
 

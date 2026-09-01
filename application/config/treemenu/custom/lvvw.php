@@ -1,5 +1,7 @@
+<?php
+
 /**
- * Copyright (C) 2025 fhcomplete.org
+ * Copyright (C) 2026 fhcomplete.org
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,29 +17,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export default {
-	get(path) {
-		let url = 'api/frontend/v1/lv/StgTree';
-		if (path)
-			url += '/' + path;
-		return {
-			method: 'get',
-			url
-		};
-	},
-	favorites: {
-		get() {
-			return {
-				method: 'get',
-				url: 'api/frontend/v1/lv/favorites'
-			};
-		},
-		set(favorites) {
-			return {
-				method: 'post',
-				url: 'api/frontend/v1/lv/favorites/set',
-				params: { favorites }
-			};
-		}
-	}
-};
+if (!defined('BASEPATH')) exit('No direct script access allowed');
+
+$config['root'] = [
+	'stg' => [
+		'semester' => [
+			'group',
+			'verband' => [
+				'group'
+			]
+		],
+		'orgform'
+	]
+];

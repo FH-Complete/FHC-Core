@@ -34,7 +34,8 @@ import AppConfig from "../AppConfig.js";
 
 import BsModal from "../Bootstrap/Modal.js";
 
-import StvVerband from "../Stv/Studentenverwaltung/Verband.js";
+import BaseTreemenu from '../Base/Treemenu.js';
+
 import ApiStudiengangTree from "../../api/factory/tempus/studiengangtree.js";
 import ApiInfo from "../../api/factory/tempus/info.js";
 import StvStudiensemester from "../Stv/Studentenverwaltung/Studiensemester.js";
@@ -45,6 +46,8 @@ import KeyboardShortcuts from "./KeyboardShortcuts.js";
 import { useContextMenuActions } from "../../composables/Tempus/ContextMenuActions.js";
 import MultiWeekPlanModal from "./MultiWeekPlanModal.js";
 import { getTempusSearchbarOptions } from "./Filters/searchbarOptions.js";
+import RaumauswahlModal from "./RaumauswahlModal.js";
+import LehreinheitModal from "./LehreinheitModal.js";
 
 export default {
 	name: "Tempus",
@@ -61,13 +64,15 @@ export default {
 		AppMenu,
 		NavLanguage,
 		BsModal,
-		StvVerband,
+		BaseTreemenu,
 		StvStudiensemester,
 		Multiselect: primevue.multiselect,
 		FormInput,
 		Reservierung,
 		KeyboardShortcuts,
 		MultiWeekPlanModal,
+		RaumauswahlModal,
+		LehreinheitModal
 	},
 	props: {
 		defaultSemester: String,
@@ -91,9 +96,9 @@ export default {
 			renderers: Vue.computed(() => this.renderers),
 			appConfig: Vue.computed(() => this.appconfig),
 			contextMenuActions: useContextMenuActions({
-				openRaumauswahl: (orig) => this.openRaumauswahl(orig),
-				openResourcesAssignmentModal: (orig) =>
-					this.openResourcesAssignmentModal(orig),
+				openRaumauswahl: (orig) => this.$refs.raumModal.show(orig),
+				openLehreinheit: (orig) => this.$refs.lehreinheitModal.show(orig),
+				openResourcesAssignmentModal: (orig) => this.openResourcesAssignmentModal(orig),
 				openHistory: (orig) => this.openHistory(orig),
 				deleteEntry: (orig) => this.deleteEntry(orig),
 				syncToLecturer: (orig) => this.syncToLecturer(orig),
@@ -101,7 +106,7 @@ export default {
 			}),
 			tableActions: {
 				deleteEntries: (origList) => this.deleteEntries(origList),
-				openRaumauswahl: (orig) => this.openRaumauswahl(orig),
+				openRaumauswahl: (orig) => this.$refs.raumModal.show(orig),
 			},
 		};
 	},
@@ -139,12 +144,7 @@ export default {
 			stg: null,
 			semester: null,
 			studiensemester_kurzbz: null,
-			raumModal: {
-				show: false,
-				loading: false,
-				vorschlaege: [],
-				event: null,
-			},
+
 			visibleStatusArray: {},
 			visibleStatus: ["all"],
 			selectedStudiensemester:
@@ -218,17 +218,6 @@ export default {
 		},
 	},
 	methods: {
-		async openRaumauswahl(orig) {
-			if (!orig?.kalender_id) return;
-			this.raumModal = orig;
-
-			await this.$api
-				.call(ApiKalender.getRaumvorschlag(orig.kalender_id))
-				.then((result) => {
-					this.raumVorschlaege = result.data ?? [];
-					this.$refs.raumModal.show();
-				});
-		},
 		async openResourcesAssignmentModal(orig) {
 			if (!orig?.kalender_id) return;
 
@@ -289,47 +278,28 @@ export default {
 				.call(ApiKalender.syncToStudent(orig.kalender_id))
 				.then(() => this.$refs.calendar.resetEventLoader());
 		},
-		async selectRaum(ort_kurzbz) {
-			const orig = this.raumModal;
-			await this.$api
-				.call(
-					ApiKalender.updateKalenderEvent(orig.kalender_id, {
-						ort_kurzbz,
-						start_time: orig.von,
-						end_time: orig.bis,
-					}),
-				)
-				.then(() => this.$refs.raumModal.hide());
-			this.$refs.calendar.resetEventLoader();
-		},
 		setOrt: function (data) {
 			this.ort_kurzbz = data.ort_kurzbz;
 			this.rooms = [{ ort_kurzbz: data.ort_kurzbz }];
 		},
 		onSelectVerbandAndClose(payload) {
-			console.log(payload);
 			this.onSelectVerband(payload);
 			bootstrap.Offcanvas.getOrCreateInstance(this.$refs.verbandMenu).hide();
 		},
 
-		onSelectVerband({ link, studiengang_kz, semester, orgform_kurzbz, name }) {
-			if (orgform_kurzbz) {
-				semester = null;
-			} else if (typeof link === "string") {
-				[studiengang_kz, semester] = link.split("/");
-			}
+		onSelectVerband({ path, stg_kz, semester, orgform_kurzbz, name }) {
 
 			let exists = this.studiengaenge.some(
 				(stg) =>
-					stg.studiengang_kz == studiengang_kz &&
+					stg.stg_kz == stg_kz &&
 					stg.semester == semester &&
-					stg.orgform_kurzbz === orgform_kurzbz,
+					(!orgform_kurzbz || stg.orgform_kurzbz === orgform_kurzbz),
 			);
 
 			if (!exists) {
 				this.studiengaenge = [
 					...this.studiengaenge,
-					{ studiengang_kz, semester, orgform_kurzbz, name },
+					{ stg_kz, semester, orgform_kurzbz, name },
 				];
 			}
 		},
@@ -437,8 +407,8 @@ export default {
 			if (hasRooms) filter.ort = this.rooms.map((room) => room.ort_kurzbz);
 			if (hasStg) {
 				filter.stg = this.studiengaenge.map(
-					({ studiengang_kz, semester, orgform_kurzbz }) => ({
-						studiengang_kz,
+					({ stg_kz, semester, orgform_kurzbz }) => ({
+						stg_kz,
 						semester,
 						orgform_kurzbz,
 					}),
@@ -1323,33 +1293,18 @@ export default {
 				</h5>
 				<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
 			</div>
-			<stv-verband :endpoint="endpoint" @select-verband="onSelectVerbandAndClose" class="col" style="height:0%"></stv-verband>
+			<base-treemenu config="tempus" @select-entry="onSelectVerbandAndClose" class="col" style="height:0%"></base-treemenu>
 		</div>
 
-		<bs-modal ref="raumModal" class="bootstrap-prompt">
-			<template #title>Raumauswahl</template>
-			<template #default>
-				<ul v-if="raumVorschlaege.length" class="list-group">
-					<li
-						v-for="raum in raumVorschlaege"
-						:key="raum.ort_kurzbz"
-						class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-						style="cursor:pointer"
-						@click="selectRaum(raum.ort_kurzbz)"
-					>
-						<span><i class="fa-solid fa-door-open me-2"></i>{{ raum.ort_kurzbz }}</span>
-						<span class="text-muted" v-tooltip="{ value: raum.details.join('\\n'), class: 'custom-tooltip' }">{{ raum.score }}</span>
-					</li>
-				</ul>
-				<p v-else class="text-muted mb-0">Keine freien Räume gefunden.</p>
-			</template>
-		</bs-modal>
-		 <bs-modal 
-      ref="resourcesAssignmentModal"
-      @hideBsModal="closeResourcesAssignmentModal"
-      class="bootstrap-prompt"
-      data-cy="resourcesAssignmentModal"
-    >
+		<raumauswahl-modal ref="raumModal" @saved="$refs.calendar.resetEventLoader()"/>
+		<lehreinheit-modal ref="lehreinheitModal" @saved="$refs.calendar.resetEventLoader()"/>
+
+		<bs-modal 
+			ref="resourcesAssignmentModal"
+			@hideBsModal="closeResourcesAssignmentModal"
+			class="bootstrap-prompt"
+		data-cy="resourcesAssignmentModal"
+			>
 			<template #title>{{$p.t('ui', 'resource_assignment_modal_title')}}</template>
 			<template #default>
         <div class="mb-5">
