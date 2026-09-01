@@ -57,7 +57,8 @@ class Tempus extends Auth_Controller
 	{
 		$this->load->view('Tempus', [
 			'permissions' => [
-				'admin' => $this->permissionlib->isBerechtigt('admin')
+				'admin' => $this->permissionlib->isBerechtigt('admin'),
+				'stundenraster' => $this->permissionlib->isBerechtigt('basis/tempus_stundenraster'),
 			],
 			'variables' => array_merge([
 				'semester_aktuell' => $this->variablelib->getVar('semester_aktuell'),

@@ -16,6 +16,10 @@ export default {
 	},
 	inject: {
 		renderers: {from: 'renderers'},
+		canToggleGrid: {
+			from: 'canToggleGrid',
+			default: false
+		},
 		appConfig: {
 			from: 'appConfig',
 			default: {
@@ -267,6 +271,7 @@ export default {
 					class="d-flex align-items-center gap-2" 
 					style="cursor:pointer"
 					@click="showRaster = !showRaster"
+					v-if="canToggleGrid"
 				>
 					<i :class="showRaster ? 'fa-solid fa-toggle-on text-primary' : 'fa-solid fa-toggle-off text-muted'"></i>
 					<span class="form-check-label">Stundenraster</span>

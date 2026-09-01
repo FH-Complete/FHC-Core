@@ -108,6 +108,7 @@ export default {
 				deleteEntries: (origList) => this.deleteEntries(origList),
 				openRaumauswahl: (orig) => this.$refs.raumModal.show(orig),
 			},
+			canToggleGrid: this.permissions.stundenraster
 		};
 	},
 	data() {
