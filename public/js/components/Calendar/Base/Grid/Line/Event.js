@@ -35,6 +35,10 @@ export default {
 		onDrop: {
 			from: "onDrop",
 			default: () => null
+		},
+		onDropEvent: {
+			from: "onDropEvent",
+			default: () => () => {}
 		}
 	},
 	props: {
@@ -81,7 +85,8 @@ export default {
 		activeContextActions() {
 			if (this.isHeaderOrFooter) return [];
 			const type = this.event.orig?.type ?? 'lehreinheit';
-			return this.contextMenuActions[type] ?? this.contextMenuActions['default'] ?? [];
+			const actions = this.contextMenuActions[type] ?? this.contextMenuActions['default'] ?? [];
+			return actions.filter(action => !action.visible || action.visible(this.event.orig));
 		}
 	},
 	methods: {
@@ -128,13 +133,7 @@ export default {
 				});
 			}
 
-			return this.onDrop({
-				item: [obj],
-				start: this.event.start.toISO(),
-				end: this.event.end.toISO(),
-				ctrlKey: false,
-				targetKalenderId: null
-			});
+			return this.onDropEvent(evt, items, this.event.start.startOf('day'));
 		},
 	},
 	template:`

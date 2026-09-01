@@ -23,9 +23,8 @@
 			'public/css/components/function.css'
 		],
 		'customJSs' => [
-			#'vendor/npm-asset/primevue/tree/tree.min.js',
-			#'vendor/npm-asset/primevue/toast/toast.min.js'
-			'vendor/moment/luxonjs/luxon.min.js'
+			'vendor/moment/luxonjs/luxon.min.js',
+			'vendor/npm-asset/primevue/listbox/listbox.min.js'
 		],
 		'customJSModules' => [
 			'public/js/apps/Tempus.js'

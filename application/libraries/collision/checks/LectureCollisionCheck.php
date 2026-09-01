@@ -9,7 +9,7 @@ class LectureCollisionCheck implements ICollisionCheck
 	{
 		$this->_ci =& get_instance();
 		$this->_ci->load->model('ressource/Kalender_model', 'KalenderModel');
-		$this->_ci->load->model('ressource/zeitsperre_model', 'ZeitsperreModel');
+		$this->_ci->load->model('ressource/Zeitsperre_model', 'ZeitsperreModel');
 		$this->_ci->load->library('VariableLib', array('uid' => getAuthUID()));
 		$this->_ci->load->library('PhrasesLib', array('ui'));
 

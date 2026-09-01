@@ -86,7 +86,7 @@ export default {
 			return Array.isArray(this.event.ort_kurzbz) ? this.event.ort_kurzbz.join(', ') : this.event.ort_kurzbz;
 		},
 		topicString() {
-			return Array.isArray(this.event.topic) ? this.event.topic.join(', ') : this.event.topic;
+			return Array.isArray(this.event.titel) ? this.event.titel.join(', ') : this.event.titel;
 		},
 		gruppeString() {
 			return Array.isArray(this.event.teilnehmer_gruppe)
