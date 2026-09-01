@@ -193,6 +193,7 @@ export default {
 			:get-promise-func="getPromiseFunc"
 			:date="currentDay"
 			:mode="currentMode"
+			:shouldIncludeRangeMode="true"
 			@update:date="handleChangeDate"
 			@update:mode="handleChangeMode"
 			@update:range="updateRange"

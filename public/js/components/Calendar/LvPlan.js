@@ -36,7 +36,11 @@ export default {
 		getPromiseFunc: {
 			type: Function,
 			required: true
-		}
+		},
+		shouldIncludeRangeMode: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	provide() {
 		return {
@@ -83,28 +87,6 @@ export default {
 						end: now.startOf('day')
 					}
 				];
-			} else if (this.mode == 'Range') {
-				// todo: remove
-				return [];
-				const start = luxon.DateTime.fromISO(this.$props.date);
-				const end = start.plus({days: this.rangeLength});
-				let backgrounds = [];
-
-				let saturdayOffset = 6 - start.weekday;
-				let saturday = start.plus({days: saturdayOffset});
-				while (saturday.ts < end.ts) {
-					backgrounds.push(
-						{
-							class: "background-weekend",
-							start: saturday.startOf("day"),
-							end: saturday.plus({days: 1}).endOf("day"),
-						}
-					);
-
-					saturday = saturday.plus({days: 7});
-				}
-
-				return backgrounds;
 			} else {
 				return [
 					{
@@ -122,7 +104,9 @@ export default {
 			};
 			if (!this.isMobile) {
 				modes.week = Vue.markRaw(ModeWeek);
-				modes.range = Vue.markRaw(ModeRange);
+				if (this.$props.shouldIncludeRangeMode) {
+					modes.range = Vue.markRaw(ModeRange);
+				}
 			} else {
 				modes.list = Vue.markRaw(ModeList);
 			}
