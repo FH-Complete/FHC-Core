@@ -53,7 +53,11 @@ export default {
 		flipAxis: Boolean,
 		allDayEvents: Boolean,
 		axisMainCollapsible: Boolean,
-		snapToGrid: Boolean
+		snapToGrid: Boolean,
+		arePartHeadersRepeated: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	data() {
 		return {
@@ -110,6 +114,19 @@ export default {
 				return this.axisParts.slice(0, -1);
 			return this.axisParts;
 		},
+		displayedAxisMain() {
+			if (!this.$props.arePartHeadersRepeated)
+				return this.$props.axisMain;
+
+			let displayedAxisMain = [];
+			this.$props.axisMain.forEach((part, index) => {
+				if (part.weekday === 1 && index > 0) {
+					displayedAxisMain.push(null);
+				}
+				displayedAxisMain.push(part);
+			});
+			return displayedAxisMain;
+		},
 		start() {
 			return this.axisPartsWithBreaks[0].start;
 		},
@@ -128,15 +145,17 @@ export default {
 			return ends;
 		},
 		axisMainBorders() {
-			return this.axisMain.reduce(
-				(res, curr) => res.concat([curr.plus(this.start), curr.plus(this.end)]),
+			return this.displayedAxisMain.reduce(
+				(res, curr) => res.concat(curr ? [curr.plus(this.start), curr.plus(this.end)] : [null, null]),
 				[]
 			);
 		},
 		eventsAllDay() {
 			if (!this.allDayEvents)
 				return [];
-			return this.mapIntoMainAxis(this.originalEvents.filter(event => event.orig.allDayEvent));
+
+			let eventsAllDay = this.mapIntoMainAxis(this.originalEvents.filter(event => event.orig.allDayEvent));
+			return eventsAllDay;
 		},
 		eventsNormal() {
 			if (!this.allDayEvents)
@@ -153,7 +172,7 @@ export default {
 			return this.events.find(e => e.length);
 		},
 		styleGridCols() {
-			let cols = 'repeat(' + this.axisMain.length + ', 1fr)';
+			let cols = 'repeat(' + this.displayedAxisMain.length + ', 1fr)';
 			if (this.axisMainCollapsible) {
 				if (this.hasValidEvents)
 					cols = this.events
@@ -181,7 +200,7 @@ export default {
 			});
 
 			this.eventsNormal.forEach((events, mainIndex) => {
-				let day = this.axisMain[mainIndex];
+				let day = this.displayedAxisMain[mainIndex];
 				events.forEach(event => {
 					if (!event.startsHere && !event.endsHere)
 						return;
@@ -211,15 +230,17 @@ export default {
 	},
 	methods: {
 		mapIntoMainAxis(target) {
-			const result = Array.from({length: this.axisMain.length}, () => Array());
+			const result = Array.from({length: this.displayedAxisMain.length}, () => Array());
 
 			target.forEach(event => {
 				const start = event.start || this.axisMainBorders[0].plus(-1);
 				const end = event.end || this.axisMainBorders[this.axisMainBorders.length - 1].plus(1);
 
-				for (var i = 0; i < this.axisMain.length; i++) {
-					let laneStart = this.axisMainBorders[i * 2];
-					let laneEnd = this.axisMainBorders[i * 2 + 1];
+				this.displayedAxisMain.forEach((part, index) => {
+					if (!part) return;
+
+					let laneStart = this.axisMainBorders[index * 2];
+					let laneEnd = this.axisMainBorders[index * 2 + 1];
 					if (event.orig?.allDayEvent) {
 						laneStart = laneStart.startOf('day');
 						laneEnd = laneEnd.endOf('day');
@@ -227,13 +248,13 @@ export default {
 					if (start < laneEnd && end > laneStart) {
 						const startsHere = start >= laneStart;
 						const endsHere = end <= laneEnd;
-						result[i].push({
+						result[index].push({
 							...event,
 							startsHere,
 							endsHere
 						});
 					}
-				}
+				});
 			});
 
 			return result;
@@ -324,18 +345,24 @@ export default {
 			style="display:grid"
 			:style="'grid-template-' + axisCol + 's:subgrid;grid-' + axisCol + ':1/-1'"
 		>
-			<div
-				v-for="(date, index) in axisMain"
-				:key="index"
-				class="main-header"
-				:class="{
-					'collapsed-header': axisMainCollapsible && hasValidEvents && !events[index].length,
-					'main-header-sunday': date.weekday === 7
-				}"
-				:style="'grid-' + axisCol + ':' + (2+index)"
-			>
-				<slot name="main-header" v-bind="{ index, date }" />
-			</div>
+			<template v-for="(date, index) in displayedAxisMain" :key="index">
+				<div
+					v-if="date"
+					class="main-header"
+					:class="{
+						'collapsed-header': axisMainCollapsible && hasValidEvents && !events[index].length,
+						'main-header-sunday': date.weekday === 7
+					}"
+					:style="'grid-' + axisCol + ':' + (2+index)"
+				>
+					<slot name="main-header" v-bind="{ index, date }" />
+				</div>
+				<div
+					v-else
+					class="main-header"
+					:style="'grid-' + axisCol + ':' + (2+index)"
+				></div>
+			</template>
 		</div>
 		<div
 			v-if="allDayEvents"
@@ -343,23 +370,29 @@ export default {
 			style="display:grid"
 			:style="'grid-template-' + axisCol + 's:subgrid;grid-' + axisCol + ':1/-1'"
 		>
-			<div
-				v-for="(events, index) in eventsAllDay"
-				:key="index"
-				class="all-day-events"
-				:class="{'all-day-events-sunday': axisMain[index].weekday === 7}"
-				:style="'grid-' + axisCol + ':' + (2+index)"
-			>
-				<grid-line-event
-					v-for="(event, i) in events"
-					:key="i"
-					:event="event"
+			<template v-for="(events, index) in eventsAllDay" :key="index">
+				<div
+					v-if="displayedAxisMain[index]"
+					class="all-day-events"
+					:class="{'all-day-events-sunday': displayedAxisMain[index].weekday === 7}"
+					:style="'grid-' + axisCol + ':' + (2+index)"
 				>
-					<template v-slot="slot">
-						<slot name="event" v-bind="slot" />
-					</template>
-				</grid-line-event>
-			</div>
+					<grid-line-event
+						v-for="(event, i) in events"
+						:key="i"
+						:event="event"
+					>
+						<template v-slot="slot">
+							<slot name="event" v-bind="slot" />
+						</template>
+					</grid-line-event>
+				</div>
+				<div
+					v-else
+					class="all-day-events"
+					:style="'grid-' + axisCol + ':' + (2+index)"
+				></div>
+			</template>
 		</div>
 		<div
 			ref="scroller"
@@ -393,43 +426,56 @@ export default {
 					@dragover="dropAllowed ? $event.preventDefault() : null"
 				>
 					<template
-						v-for="(date, index) in axisMain"
+						v-for="(date, index) in displayedAxisMain"
 						:key="index"
 					>
-						<div
-							v-for="(part, i) in axisPartsSave"
-							:key="i"
-							class="part-body"
-							style="position:relative"
-							:style="'grid-' + axisCol + ':' + (1+index) + ';grid-' + axisRow + ':ps_' + i + '/pe_' + i"
-						>
-							<slot name="part-body" v-bind="{ index, part }" />
+						<template v-if="date">
 							<div
-								v-if="snapToGrid && dragging"
-								style="position:absolute;inset:0;z-index:1"
-								v-cal-dnd:dropzone.once="{date: date.plus(part.start || part), ends: ends.slice(ends.findIndex(end => end > date))}"
-							></div>
-						</div>
-						<grid-line
-							:start="date.plus(start)"
-							:end="date.plus(end)"
-							:date="date"
-							:events="eventsNormal[index]"
-							:backgrounds="backgrounds[index]"
-							style="position:relative"
-							:style="'grid-' + axisRow + ':1/-1;grid-' + axisCol + ':' + (1+index)"
-						>
-							<template #event="slot">
-								<slot name="event" v-bind="slot" />
-							</template>
-							<template #dropzone>
+								v-for="(part, i) in axisPartsSave"
+								:key="i"
+								class="part-body"
+								style="position:relative"
+								:style="'grid-' + axisCol + ':' + (1+index) + ';grid-' + axisRow + ':ps_' + i + '/pe_' + i"
+							>
+								<slot name="part-body" v-bind="{ index, part }" />
 								<div
-									v-if="!snapToGrid && dragging"
+									v-if="snapToGrid && dragging"
 									style="position:absolute;inset:0;z-index:1"
-									v-cal-dnd:dropzone="evt => getTimestampFromMouse(evt, date)"
+									v-cal-dnd:dropzone.once="{date: date.plus(part.start || part), ends: ends.slice(ends.findIndex(end => end > date))}"
 								></div>
-							</template>
-						</grid-line>
+							</div>
+							<grid-line
+								:start="date.plus(start)"
+								:end="date.plus(end)"
+								:date="date"
+								:events="eventsNormal[index]"
+								:backgrounds="backgrounds[index]"
+								style="position:relative"
+								:style="'grid-' + axisRow + ':1/-1;grid-' + axisCol + ':' + (1+index)"
+							>
+								<template #event="slot">
+									<slot name="event" v-bind="slot" />
+								</template>
+								<template #dropzone>
+									<div
+										v-if="!snapToGrid && dragging"
+										style="position:absolute;inset:0;z-index:1"
+										v-cal-dnd:dropzone="evt => getTimestampFromMouse(evt, date)"
+									></div>
+								</template>
+							</grid-line>
+						</template>
+						<template v-else>
+							<div
+								v-for="(part, i) in axisPartsSave"
+								:key="i"
+								class="part-header-repeat part-body"
+								style="position:relative"
+								:style="'grid-' + axisCol + ':' + (1+index) + ';grid-' + axisRow + ':ps_' + i + '/pe_' + i"
+							>
+								<slot name="part-header-repeat" v-bind="{ index, part }" />
+							</div>
+						</template>
 					</template>
 				</div>
 			</div>

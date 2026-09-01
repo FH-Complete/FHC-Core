@@ -84,6 +84,7 @@ export default {
 					}
 				];
 			} else if (this.mode == 'Range') {
+				// todo: remove
 				return [];
 				const start = luxon.DateTime.fromISO(this.$props.date);
 				const end = start.plus({days: this.rangeLength});

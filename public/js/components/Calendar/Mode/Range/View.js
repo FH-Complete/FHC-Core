@@ -56,6 +56,7 @@ export default {
 			:axis-main-collapsible="collapseEmptyDays"
 			:snap-to-grid="!!timeGrid"
 			:flip-axis="true"
+			:arePartHeadersRepeated="true"
 			all-day-events
 		>
 			<template #main-header="{ date }">
@@ -70,6 +71,9 @@ export default {
 				</div>
 			</template>
 			<template #part-header="{ part }">
+				<label-time v-bind="{ part }" :alignItemsClassSuffix="'center'" />
+			</template>
+			<template #part-header-repeat="{ part }">
 				<label-time v-bind="{ part }" :alignItemsClassSuffix="'center'" />
 			</template>
 			<template #event="slot">
