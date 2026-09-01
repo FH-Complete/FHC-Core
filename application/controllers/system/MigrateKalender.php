@@ -121,7 +121,14 @@ class MigrateKalender extends CLI_Controller
 				$ids = is_array($block->stundenplandev_ids) ? $block->stundenplandev_ids : explode(',', $block->stundenplandev_ids);
 				/*$ids = array_map('intval', $ids);*/
 
-				$this->SyncModel->db->where_in('stundenplandev_id', $ids);
+				$this->SyncModel->db->group_start();
+				$where_ids_chunks = array_chunk($ids,25);
+				foreach($where_ids_chunks as $where_ids)
+				{
+					$this->SyncModel->db->or_where_in('stundenplandev_id', $where_ids);
+				}
+				$this->SyncModel->db->group_end();
+
 				$sync_result = $this->SyncModel->load();
 
 				if (!hasData($sync_result))
@@ -230,7 +237,14 @@ class MigrateKalender extends CLI_Controller
 
 				$ids = is_array($block->reservierung_ids) ? $block->reservierung_ids : explode(',', $block->reservierung_ids);
 
-				$this->SyncReservierungModel->db->where_in('reservierung_id', $ids);
+				$this->SyncReservierungModel->db->group_start();
+				$where_ids_chunks = array_chunk($ids,25);
+				foreach($where_ids_chunks as $where_ids)
+				{
+					$this->SyncReservierungModel->db->or_where_in('reservierung_id', $where_ids);
+				}
+				$this->SyncReservierungModel->db->group_end();
+
 				$sync_result = $this->SyncReservierungModel->load();
 
 				if (!hasData($sync_result))
