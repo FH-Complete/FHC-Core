@@ -10,7 +10,7 @@ class KalenderNotificationLib
 		$this->_ci =& get_instance();
 		$this->_ci->load->library('MailLib');
 		$this->_ci->load->config('tempus');
-
+		$this->_ci->load->model('ressource/Kalender_model', 'KalenderModel');
 	}
 
 	public function sendMails($mail_infos)
@@ -90,6 +90,7 @@ class KalenderNotificationLib
 		if (!empty($student_deleted))
 			$student_entries .= $this->_addToList($student_deleted, 'gelöscht') . '<hr/>';
 
+		//TODO (david) richtigen Empfänger
 		if (!empty($lektor_entries))
 			$this->_ci->maillib->send('', 'ma0048@technikum-wien.at', 'Lektor Tempus Update', $lektor_entries);
 		if (!empty($student_entries))
