@@ -105,6 +105,7 @@ require_once('dbupdate_3.4/76160_lvv_favorites.php');
 require_once('dbupdate_3.4/77080_tabulator_presets_table.php');
 require_once('dbupdate_3.4/78292_gehaltsanpassungtyp.php');
 require_once('dbupdate_3.4/77949_tempus_synchronisation.php');
+require_once('dbupdate_3.4/78287_tempus_raumzuordnung.php');
 
 require_once('dbupdate_3.4/78285_tempus_stundenraster.php');
 

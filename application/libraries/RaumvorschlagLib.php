@@ -114,7 +114,8 @@ class RaumvorschlagLib
 		$ratings = [];
 		foreach ($raumkandidaten as $raum)
 		{
-			$rating = ['ort_kurzbz' => $raum->ort_kurzbz, 'score' => 100, 'details' => []];
+			$rating = ['ort_kurzbz' => $raum->ort_kurzbz, 'score' => 100, 'details' => [],
+				'raumtyp_kurzbz' => $raum->raumtyp_kurzbz, 'max_person' => $raum->max_person, 'ausstattung' => $raum->ausstattung];
 			$this->_rateLektor($rating, $raum, $lektor_davor_ort);
 			$this->_rateGruppen($rating, $raum, $gruppen_davor_ort);
 			$this->_rateGruppen($rating, $raum, $lehrverband_davor_ort);
@@ -335,8 +336,7 @@ class RaumvorschlagLib
 
 	private function _getFreieRaeume($raumtyp, $belegte_orte)
 	{
-		$this->_ci->OrtModel->addDistinct('ort_kurzbz, stockwerk, standort_id');
-		$this->_ci->OrtModel->addSelect('ort_kurzbz, stockwerk, standort_id');
+		$this->_ci->OrtModel->addSelect('ort_kurzbz, stockwerk, standort_id, max_person, raumtyp_kurzbz');
 		$this->_ci->OrtModel->addJoin('public.tbl_ortraumtyp', 'ort_kurzbz');
 
 		if (!empty($raumtyp))
@@ -349,8 +349,8 @@ class RaumvorschlagLib
 
 		if (!empty($belegte_orte))
 			$this->_ci->OrtModel->db->where_not_in('ort_kurzbz', $belegte_orte);
+		$this->_ci->OrtModel->addOrder('hierarchie, ort_kurzbz');
 
 		return $this->_ci->OrtModel->load();
 	}
-
 }

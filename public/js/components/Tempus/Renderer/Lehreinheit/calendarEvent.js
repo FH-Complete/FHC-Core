@@ -28,7 +28,8 @@ export default {
 			return Array.isArray(this.event.topic) ? this.event.topic.join(', ') : this.event.topic;
 		},
 		ortString() {
-			return Array.isArray(this.event.ort_kurzbz) ? this.event.ort_kurzbz.join(', ') : this.event.ort_kurzbz;
+			let orte = [...(this.event.ort_kurzbz || []), this.event.location?.trim()].filter(Boolean)
+			return orte.join(', ')
 		},
 		gruppeString() {
 			return Array.isArray(this.event.gruppe)

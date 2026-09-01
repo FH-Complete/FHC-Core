@@ -598,6 +598,7 @@ export default {
 					)
 					.then(() => {
 						this.$refs.calendar.resetEventLoader();
+						this.$refs.coursepicker.reload();
 						this.bcc.postMessage("dropped");
 					});
 			}
@@ -634,6 +635,12 @@ export default {
 					)
 					.then((result) => result.data)
 					.then((result) => {
+						if (result.needs_room_selection)
+						{
+							this.$refs.raumModal.showForNew(obj.orig.lehreinheit_id, start_time, end_time, result.raum_vorschlaege)
+							return;
+						}
+
 						this.$refs.calendar.resetEventLoader();
 						this.$refs.coursepicker.reload();
 						this.bcc.postMessage("dropped");
@@ -1306,8 +1313,8 @@ export default {
 			<base-treemenu config="tempus" @select-entry="onSelectVerbandAndClose" class="col" style="height:0%"></base-treemenu>
 		</div>
 
-		<raumauswahl-modal ref="raumModal" @saved="$refs.calendar.resetEventLoader()"/>
-		<lehreinheit-modal ref="lehreinheitModal" @saved="$refs.calendar.resetEventLoader()"/>
+		<raumauswahl-modal ref="raumModal" @saved="() => {$refs.calendar.resetEventLoader(); $refs.coursepicker.reload();}"/>
+		<lehreinheit-modal ref="lehreinheitModal" @saved="() => {$refs.calendar.resetEventLoader(); $refs.coursepicker.reload();}"/>
 
 		<bs-modal 
 			ref="resourcesAssignmentModal"

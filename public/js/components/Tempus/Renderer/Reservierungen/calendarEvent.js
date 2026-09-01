@@ -83,7 +83,8 @@ export default {
 				.toISOTime({ suppressSeconds: true });
 		},
 		ortString() {
-			return Array.isArray(this.event.ort_kurzbz) ? this.event.ort_kurzbz.join(', ') : this.event.ort_kurzbz;
+			let orte = [...(this.event.ort_kurzbz || []), this.event.location?.trim()].filter(Boolean)
+			return orte.join(', ')
 		},
 		topicString() {
 			return Array.isArray(this.event.titel) ? this.event.titel.join(', ') : this.event.titel;

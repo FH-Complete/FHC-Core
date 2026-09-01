@@ -193,3 +193,9 @@ body {
 }
 
 
+.room-option {
+	display: grid;
+	grid-template-columns: 20px minmax(80px, 110px) minmax(100px, 1fr) auto 20px 50px;
+	align-items: center;
+	width: 100%;
+}

@@ -8,7 +8,7 @@ class Kalender extends FHCAPI_Controller
 	const ALLOWED_PLAN_FILTER = ['ort', 'uid', 'stg'];
 	const ALLOWED_ROOM_FILTER = ['lehreinheit_id', 'kalender_id'];
 
-	const ALLOWED_TO_UPDATE = ['start_time', 'end_time', 'ort_kurzbz'];
+	const ALLOWED_TO_UPDATE = ['start_time', 'end_time', 'orte'];
 	/**
 	 * Object initialization
 	 */
@@ -223,7 +223,7 @@ class Kalender extends FHCAPI_Controller
 		$updateFields = $this->_checkUpdate($this->_ci->input->post('updatedInfos', TRUE));
 		$kalender_id = $this->_ci->input->post('kalender_id', TRUE);
 
-		$result = $this->_ci->kalenderlib->updateKalenderEvent($kalender_id, $updateFields->ort_kurzbz ?? null,  $updateFields->start_time ?? null,  $updateFields->end_time ?? null);
+		$result = $this->_ci->kalenderlib->updateKalenderEvent($kalender_id, $updateFields->orte ?? null,  $updateFields->start_time ?? null,  $updateFields->end_time ?? null, $updateFields->location ?? null);
 
 		if (isError($result))
 			$this->terminateWithError(getError($result),  $result->code);
