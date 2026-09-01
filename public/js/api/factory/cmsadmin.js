@@ -55,6 +55,28 @@ export default {
 			url: '/api/frontend/v1/CmsAdmin/getSprachen'
 		};
 	},
+	// Fills the DMS category field of the contentcomponent insert dialog.
+	getDmsKategorien() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/CmsAdmin/getDmsKategorien'
+		};
+	},
+	// Fills the person field of the contentcomponent insert dialog.
+	getMitarbeiter() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/CmsAdmin/getMitarbeiter'
+		};
+	},
+	// Fills the document field of the contentcomponent insert dialog.
+	getDmsKategorieDokumente(kategorie_kurzbz) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/CmsAdmin/getDmsKategorieDokumente',
+			params: { kategorie_kurzbz }
+		};
+	},
 	getUsage(content_id) {
 		return {
 			method: 'get',

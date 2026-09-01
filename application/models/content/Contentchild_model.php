@@ -33,6 +33,68 @@ class Contentchild_model extends DB_Model
 		return $this->execReadOnlyQuery($query, [$sprache, $content_id]);
 	}
 
+
+	/**
+	 * Children of a content as a reader may see them.
+	 *
+	 * Differs from getChilds() on purpose. getChilds() serves the admin and returns every
+	 * child with the lowest version. A reader needs the newest visible version, only active
+	 * contents, and no page that a group rule keeps from them.
+	 *
+	 * The group rule follows CmsLib::getContent(): a content without a row in
+	 * tbl_contentgruppe is open, a content with rows needs membership in one of them.
+	 *
+	 * @param int $content_id
+	 * @param string $sprache
+	 * @param string $uid
+	 * @return stdClass success with array of rows or error
+	 */
+	public function getChildsForReader($content_id, $sprache, $uid)
+	{
+		$query = '
+			SELECT
+				cc.child_content_id AS content_id,
+				cc.sort,
+				COALESCE(
+					(SELECT cs.titel FROM campus.tbl_contentsprache cs
+						WHERE cs.content_id = cc.child_content_id
+							AND cs.sprache = ?
+							AND cs.sichtbar
+							AND LENGTH(cs.titel) > 0
+						ORDER BY cs.version DESC NULLS LAST LIMIT 1),
+					(SELECT cs.titel FROM campus.tbl_contentsprache cs
+						WHERE cs.content_id = cc.child_content_id
+							AND cs.sichtbar
+							AND LENGTH(cs.titel) > 0
+						ORDER BY cs.version DESC NULLS LAST LIMIT 1),
+					c.beschreibung
+				) AS titel
+			FROM campus.tbl_contentchild cc
+				JOIN campus.tbl_content c ON c.content_id = cc.child_content_id
+			WHERE cc.content_id = ?
+				AND c.aktiv
+				-- Without a visible version the reader cannot open the page at all.
+				AND EXISTS (
+					SELECT 1 FROM campus.tbl_contentsprache cs
+					WHERE cs.content_id = cc.child_content_id AND cs.sichtbar
+				)
+				AND (
+					NOT EXISTS (
+						SELECT 1 FROM campus.tbl_contentgruppe cg
+						WHERE cg.content_id = cc.child_content_id
+					)
+					OR EXISTS (
+						SELECT 1 FROM campus.tbl_contentgruppe cg
+							JOIN public.vw_gruppen vg ON vg.gruppe_kurzbz = cg.gruppe_kurzbz
+						WHERE cg.content_id = cc.child_content_id AND vg.uid = ?
+					)
+				)
+			ORDER BY cc.sort, cc.contentchild_id
+		';
+
+		return $this->execReadOnlyQuery($query, [$sprache, $content_id, $uid]);
+	}
+
 	/**
 	 * Highest sort value. Returns 0 if no row exists.
 	 * @param int $content_id

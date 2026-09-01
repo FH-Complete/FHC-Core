@@ -54,6 +54,46 @@ export default {
 			url: '/api/frontend/v1/Cms/getNewsRowCount'
 		};
 	},
+	// Used by the CMS content component "oe-personen".
+	getOePersonen(oe_kurzbz, foto) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Cms/getOePersonen',
+			params: { oe_kurzbz, ...(foto ? { foto: 1 } : {}) }
+		};
+	},
+	// Used by the CMS content component "person-block".
+	getPerson(uid, foto) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Cms/getPerson',
+			params: { uid, ...(foto ? { foto: 1 } : {}) }
+		};
+	},
+	// Used by the CMS content component "dms-dokumente".
+	getDmsDokumente(dms_ids) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Cms/getDmsDokumente',
+			params: { dms_ids }
+		};
+	},
+	// Used by the CMS content component "dms-liste".
+	getDmsKategorie(kategorie_kurzbz) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Cms/getDmsKategorie',
+			params: { kategorie_kurzbz }
+		};
+	},
+	// Used by the CMS content component "contentchild-menu".
+	getContentChilds(content_id, sprache) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Cms/getContentChilds',
+			params: { content_id, ...(sprache ? { sprache } : {}) }
+		};
+	},
 	getNewsExtra() {
 		// TODO(chris): seems to be called from nowhere?
 		return {

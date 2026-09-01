@@ -243,6 +243,58 @@ class Person_model extends DB_Model
 	 * @param $uid
 	 * @return array
 	 */
+	/**
+	 * Contact data of the named users, for the CMS content components.
+	 *
+	 * The joins follow Benutzerfunktion_model::getBenutzerFunktionenDetailed() and the view
+	 * Cis/Cms/News/Xml/Address/Detailed.php, so a person reads the same everywhere.
+	 *
+	 * foto_sperre is honoured. A person who blocked their photo never gets one on a public
+	 * content page, no matter what the page asks for.
+	 *
+	 * @param array $uids
+	 * @param boolean $mitFoto photos are large, so they are read only on request
+	 * @return object
+	 */
+	public function getCmsKontakt($uids, $mitFoto = false)
+	{
+		if (empty($uids))
+			return success(array());
+
+		$platzhalter = implode(', ', array_fill(0, count($uids), '?'));
+		$fotoSpalte = $mitFoto
+			? 'CASE WHEN p.foto_sperre THEN NULL ELSE p.foto END'
+			: 'NULL';
+
+		$query = '
+			SELECT
+				b.uid,
+				b.alias,
+				p.vorname,
+				p.nachname,
+				p.titelpre,
+				p.titelpost,
+				m.telefonklappe,
+				k.kontakt,
+				o.planbezeichnung,
+				' . $fotoSpalte . ' AS foto
+			FROM public.tbl_benutzer b
+				JOIN public.tbl_person p ON p.person_id = b.person_id
+				LEFT JOIN public.tbl_mitarbeiter m ON m.mitarbeiter_uid = b.uid
+				LEFT JOIN public.tbl_kontakt k
+					ON k.standort_id = m.standort_id AND k.kontakttyp = ?
+				LEFT JOIN public.tbl_ort o ON o.ort_kurzbz = m.ort_kurzbz
+			WHERE b.uid IN (' . $platzhalter . ')
+				AND b.aktiv
+		';
+
+		$parameter = array('telefon');
+		foreach ($uids as $uid)
+			$parameter[] = $uid;
+
+		return $this->execReadOnlyQuery($query, $parameter);
+	}
+
 	public function getByUid($uid)
 	{
 		$this->addSelect('vorname, nachname, gebdatum, person_id, bpk, matr_nr, foto');

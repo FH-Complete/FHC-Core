@@ -1,6 +1,7 @@
 import ApiCmsAdmin from '../../../api/factory/cmsadmin.js';
 import XsdForm from '../Form/XsdForm.js';
 import CmsPreview from '../Preview.js';
+import { CONTENTCOMPONENT_ATTR } from '../../Contentcomponents/catalog.js';
 
 export default {
 	name: 'CmsContent',
@@ -26,6 +27,13 @@ export default {
 		};
 	},
 	computed: {
+		// The preview below uses the legacy renderer, which runs no Vue. Tell the editor
+		// as soon as the content holds a marker, so an empty preview is not a surprise.
+		hasContentcomponents() {
+			return Object.values(this.values || {}).some(
+				value => typeof value === 'string' && value.indexOf(CONTENTCOMPONENT_ATTR) !== -1
+			);
+		},
 		lockState() {
 			if (!this.sperre || this.sperre.gesperrt_uid === null) return 'free';
 			if (this.sperre.own) return 'own';
@@ -161,6 +169,12 @@ export default {
 						{{ $p.t('cms/freigabeErzwingen') }}
 					</button>
 				</template>
+
+				<div v-if="hasContentcomponents" class="alert alert-info">
+					Dieser Inhalt enthält Contentcomponents. Die Vorschau unten zeigt sie nicht,
+					weil sie den alten Renderer ohne Vue verwendet. Prüfe sie über den Link
+					"In CIS4 ansehen".
+				</div>
 
 				<cms-preview
 					ref="preview"
