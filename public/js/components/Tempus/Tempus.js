@@ -281,7 +281,8 @@ export default {
 		},
 		rebuildRaumvorschlag()
 		{
-			this.previewRaumvorschlag({ lehreinheit_id: this.raumvorschlagPreview.lehreinheit_id });
+			if (this.raumvorschlagPreview)
+				this.previewRaumvorschlag({ lehreinheit_id: this.raumvorschlagPreview?.lehreinheit_id });
 		},
 		async previewRaumvorschlag(orig)
 		{
@@ -1434,7 +1435,7 @@ export default {
 			<base-treemenu config="tempus" @select-entry="onSelectVerbandAndClose" class="col" style="height:0%"></base-treemenu>
 		</div>
 
-		<raumauswahl-modal ref="raumModal" @saved="() => {$refs.calendar.resetEventLoader(); $refs.coursepicker.reload();}"/>
+		<raumauswahl-modal ref="raumModal" @saved="() => {$refs.calendar.resetEventLoader(); $refs.coursepicker.reload(); rebuildRaumvorschlag();}"/>
 		<lehreinheit-modal ref="lehreinheitModal" @saved="() => {$refs.calendar.resetEventLoader(); $refs.coursepicker.reload();}"/>
 
 		<bs-modal 
