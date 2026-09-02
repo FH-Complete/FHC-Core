@@ -1,6 +1,7 @@
 <?php
 	$includesArray = array(
 		'title' => 'LVVerwaltung',
+		'favicon' => '/public/images/favicons/lv_verwaltung.ico',
 		'axios027' => true,
 		'bootstrap5' => true,
 		'fontawesome6' => true,

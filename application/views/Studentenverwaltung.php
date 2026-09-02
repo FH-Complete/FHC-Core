@@ -1,6 +1,7 @@
 <?php
 	$includesArray = array(
 		'title' => 'Studentenverwaltung',
+		'favicon' => '/public/images/favicons/studierendenverwaltung.ico',
 		'axios027' => true,
 		'bootstrap5' => true,
 		'fontawesome6' => true,
@@ -68,4 +69,3 @@ $configArray = [
 	</div>
 
 <?php $this->load->view('templates/FHC-Footer', $includesArray); ?>
-

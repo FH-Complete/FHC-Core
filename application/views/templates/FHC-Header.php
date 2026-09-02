@@ -7,6 +7,7 @@
 	// All the following variables are used only in this view
 	// By default set the parameters to null
 	$title = isset($title) ? $title : null;
+	$favicon = !empty($favicon) ? $favicon : 'favicon.ico';
 	$refresh = isset($refresh) ? $refresh : null;
 	$customCSSs = isset($customCSSs) ? $customCSSs : null;
 	$customJSs = isset($customJSs) ? $customJSs : null;
@@ -24,6 +25,8 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
 		<meta charset="UTF-8">
+
+		<link rel="icon" href="<?php echo htmlspecialchars(base_url($favicon), ENT_QUOTES, 'UTF-8'); ?>">
 
 		<?php printRefreshMeta($refresh); ?>
 
@@ -150,4 +153,3 @@
 		<?php if($skipID) generateSkipLink($skipID); ?>
 
 <!-- Header end -->
-
