@@ -22,6 +22,7 @@ import OtherLvPlan from "../../components/Cis/LvPlan/OtherLvPlan.js";
 
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
 import {capitalize} from "../../helpers/StringHelpers.js";
+import { getTodayISO, toDateTime } from "../../helpers/DateHelpers.js";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 const isMobile = window.matchMedia("(max-width: 767px)").matches;
@@ -88,7 +89,7 @@ const router = VueRouter.createRouter({
 					params: { // in this case always populate other params since they are not optional
 						ort_kurzbz: to.params.ort_kurzbz,
 						mode: isMobile ? DEFAULT_MODE_RAUMINFO_MOBILE : DEFAULT_MODE_RAUMINFO_DESKTOP,
-						focus_date: new Date().toISOString().split("T")[0]
+						focus_date: getTodayISO()
 					},
 				};
 			},
@@ -107,8 +108,7 @@ const router = VueRouter.createRouter({
 					: (isMobile ? DEFAULT_MODE_RAUMINFO_MOBILE : DEFAULT_MODE_RAUMINFO_DESKTOP);
 
 				// default to today date if not provided
-				const d = new Date(route.params.focus_date)
-				const focus_date = !isNaN(d) ? route.params.focus_date : new Date().toISOString().split("T")[0];
+				const focus_date = toDateTime(route.params.focus_date) ? route.params.focus_date : getTodayISO();
 
 				// for consistency reasons format the props into one object but actually use a new name to we dont collide with
 				// existing viewData declaration written from codeigniter 3 into routerview tag
@@ -127,7 +127,7 @@ const router = VueRouter.createRouter({
 						name: "RoomInformation",
 						params: {
 							mode: to.params.mode || DEFAULT_MODE_RAUMINFO,
-							focus_date: to.params.focus_date || new Date().toISOString().split("T")[0],
+							focus_date: to.params.focus_date || getTodayISO(),
 							ort_kurzbz: route.params.ort_kurzbz
 						}
 					});

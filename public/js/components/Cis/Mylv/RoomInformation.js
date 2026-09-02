@@ -1,6 +1,7 @@
 import FhcCalendar from "../../Calendar/LvPlan.js";
 
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
+import { getTodayISO } from "../../../helpers/DateHelpers.js";
 
 export const DEFAULT_MODE_RAUMINFO_MOBILE = 'List';
 export const DEFAULT_MODE_RAUMINFO_DESKTOP = 'Week';
@@ -17,7 +18,7 @@ export default {
 	inject: ["isMobile"],
 	computed: {
 		currentDay() {
-			return this.propsViewData?.focus_date || luxon.DateTime.now().setZone(FHC_JS_DATA_STORAGE_OBJECT.timezone).toISODate();
+			return this.propsViewData?.focus_date || getTodayISO();
 		},
 		currentMode() {
 			const defaultMode = this.isMobile ? DEFAULT_MODE_RAUMINFO_MOBILE : DEFAULT_MODE_RAUMINFO_DESKTOP;

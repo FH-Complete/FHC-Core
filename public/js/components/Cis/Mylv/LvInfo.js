@@ -1,4 +1,4 @@
-import { numberPadding, formatDate } from "../../../helpers/DateHelpers.js"
+import { formatDate, formatTime } from "../../../helpers/DateHelpers.js"
 
 export default {
 	props: {
@@ -25,27 +25,14 @@ export default {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + `/CisVue/Cms/content/${this.event.ort_content_id}`
 		},
 		start_time: function () {
-			if (!this.event.start) return 'N/A';
-			if (!this.event.start instanceof Date) {
-				return this.event.start;
-			}
-			return numberPadding(this.event.start.getHours()) + ":" + numberPadding(this.event.start.getMinutes());
+			return this.event.start ? formatTime(this.event.start) : 'N/A';
 		},
 		end_time: function () {
-			if (!this.event.end) return 'N/A';
-			if (!this.event.end instanceof Date) {
-				return this.event.end;
-			}
-			return numberPadding(this.event.end.getHours()) + ":" + numberPadding(this.event.end.getMinutes());
+			return this.event.end ? formatTime(this.event.end) : 'N/A';
 		}
 	},
 	methods: {
-		mehtodNumberPadding: function (number) {
-			return numberPadding(number);
-		},
-		methodFormatDate: function (d) {
-			return formatDate(d);
-		},
+		methodFormatDate: formatDate,
 	},
 	template:/*html*/`
 		<table class="table table-hover mb-4">

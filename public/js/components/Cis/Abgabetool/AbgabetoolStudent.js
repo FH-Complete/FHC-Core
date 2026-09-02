@@ -4,6 +4,7 @@ import ApiAuthinfo from '../../../api/factory/authinfo.js';
 import BsModal from "../../Bootstrap/Modal.js";
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import { getDateStyleClass} from "./getDateStyleClass.js";
+import { getNow, toDateTime } from "../../../helpers/DateHelpers.js";
 import { validateThesisTitle } from './titleValidation.js'
 
 export const AbgabetoolStudent = {
@@ -171,9 +172,7 @@ export const AbgabetoolStudent = {
 			return qgate1positiv && qgate2positiv
 		},
 		isPastDate(date) {
-			const deadline = luxon.DateTime.fromISO(date, { zone: 'Europe/Vienna' }).endOf('day');
-			const nowInVienna = luxon.DateTime.now().setZone('Europe/Vienna');
-			return nowInVienna > deadline;
+			return getNow() > toDateTime(date).endOf("day");
 		},
 		setDetailComponent(details){
 			this.loading = true

@@ -1,6 +1,7 @@
 import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
 import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiOrt from '../../../api/factory/ort.js'
+import { getNow, getTodayISO } from "../../../helpers/DateHelpers.js";
 export const Raumsuche =  {
 	name: "Raumsuche",
 	components: {
@@ -10,6 +11,8 @@ export const Raumsuche =  {
 	},
 	inject: ["isMobile"],
 	data() {
+		const now = getNow();
+
 		return {
 			phrasenPromise: null,
 			phrasenResolved: false,
@@ -23,14 +26,14 @@ export const Raumsuche =  {
 			},
 			anzahl: 1,
 			selectedType: null,
-			datum: new Date(),
+			datum: getTodayISO(),
 			von: Vue.ref({
-				hours: new Date().getHours(),
-				minutes: new Date().getMinutes()
+				hours: now.hour,
+				minutes: now.minute
 			}),
 			bis: Vue.ref({
-				hours: new Date().getHours() + 1,
-				minutes: new Date().getMinutes()
+				hours: now.plus({ hours: 1 }).hour,
+				minutes: now.minute
 			}),
 			datepickerTextInputOptions: {
 				enterSubmit: true,
@@ -136,7 +139,7 @@ export const Raumsuche =  {
 			})
 		},
 		loadRooms() {
-			this.$api.call(ApiOrt.getRooms(this.datum.toISOString(), this.getTimeString(this.von), this.getTimeString(this.bis), this.selectedType?.raumtyp_kurzbz ?? '', this.anzahl))
+			this.$api.call(ApiOrt.getRooms(this.datum, this.getTimeString(this.von), this.getTimeString(this.bis), this.selectedType?.raumtyp_kurzbz ?? '', this.anzahl))
 				.then(res => {
 					if(res?.data?.retval) this.setupData(res.data.retval)
 			})
@@ -149,17 +152,6 @@ export const Raumsuche =  {
 		},
 		setRoute(val) {
 			// TODO: router push
-		},
-		dateFormat(date) {
-			const day = String(date.getDate()).padStart(2, '0');
-			const month = String(date.getMonth() + 1).padStart(2, '0');
-			const year = date.getFullYear();
-			return `${day}.${month}.${year}`
-		},
-		timeFormat(date) {
-			const hours = String(date.getHours()).padStart(2, '0');
-			const minutes = String(date.getMinutes()).padStart(2, '0');
-			return `${hours}:${minutes}`;
 		},
 		async setupMounted() {
 			
@@ -199,7 +191,8 @@ export const Raumsuche =  {
 				:dark="isDarkMode"
 				:clearable="false"
 				:enable-time-picker="false"
-				:format="dateFormat"
+				format="dd.MM.yyyy"
+				model-type="yyyy-MM-dd"
 				:text-input="datepickerTextInputOptions"
 				:min-date="new Date()"
 				date-picker
@@ -213,7 +206,7 @@ export const Raumsuche =  {
 				v-model="von"
 				:dark="isDarkMode"
 				:clearable="false"
-				:format="timeFormat"
+				format="HH:mm"
 				:text-input="timepickerTextInputOptions"
 				:is-24="true"
 				time-picker
@@ -227,7 +220,7 @@ export const Raumsuche =  {
 				v-model="bis"
 				:dark="isDarkMode"
 				:clearable="false"
-				:format="timeFormat"
+				format="HH:mm"
 				:text-input="timepickerTextInputOptions"
 				:is-24="true"
 				time-picker

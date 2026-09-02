@@ -11,7 +11,7 @@ import AbgabeStudentTimeline from "./AbgabeStudentTimeline.js";
 import { splitMailsHelper } from "../../../helpers/EmailHelpers.js"
 import { getDateStyleClass} from "./getDateStyleClass.js";
 import { dateFilter } from '../../../tabulator/filters/DatesManual.js';
-import { compareISODateValues, formatISODate, getViennaTodayISO, toViennaDate } from "./dateUtils.js";
+import { compareISODateValues, formatDate, getNow, getTodayISO, toDateTime } from "../../../helpers/DateHelpers.js";
 
 export const AbgabetoolAssistenz = {
 	name: "AbgabetoolAssistenz",
@@ -114,7 +114,7 @@ export const AbgabetoolAssistenz = {
 				fixtermin: false,
 			},
 			serienTermin: Vue.reactive({
-				datum: getViennaTodayISO(),
+				datum: getTodayISO(),
 				bezeichnung: {
 					paabgabetyp_kurzbz: 'zwischen',
 					bezeichnung: 'Zwischenabgabe'
@@ -643,7 +643,7 @@ export const AbgabetoolAssistenz = {
 				upload_allowed: false,
 				fixtermin: false,
 			}
-			this.serienEdit.datum = getViennaTodayISO()
+			this.serienEdit.datum = getTodayISO()
 			this.serienEdit.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === 'zwischen')
 			this.serienEdit.kurzbz = ''
 			this.serienEdit.upload_allowed = false
@@ -1091,23 +1091,9 @@ export const AbgabetoolAssistenz = {
 				return false;
 			}
 
-			const toLuxon = (val) => {
-				if (!val) return null;
-				let dt;
-				if (val instanceof Date) {
-					dt = luxon.DateTime.fromJSDate(val);
-				} else if (typeof val === "string") {
-					dt = toViennaDate(val);
-				} else { // fallback
-					dt = luxon.DateTime.fromMillis(Number(val));
-				}
-
-				return dt.isValid ? dt : null;
-			};
-
-			const rowDate = toLuxon(rowVal);
-			const von = toLuxon(filterVal[0]);
-			const bis = toLuxon(filterVal[1]);
+			const rowDate = toDateTime(rowVal);
+			const von = toDateTime(filterVal[0]);
+			const bis = toDateTime(filterVal[1]);
 
 			// specific day
 			if (von && !bis) {
@@ -1128,22 +1114,8 @@ export const AbgabetoolAssistenz = {
 
 			const rowDate = rowVal.luxonDate;
 
-			const toLuxon = (val) => {
-				if (!val) return null;
-				let dt;
-				if (val instanceof Date) {
-					dt = luxon.DateTime.fromJSDate(val);
-				} else if (typeof val === "string") {
-					dt = toViennaDate(val);
-				} else { // fallback
-					dt = luxon.DateTime.fromMillis(Number(val));
-				}
-
-				return dt.isValid ? dt : null;
-			};
-
-			const von = toLuxon(filterVal[0]);
-			const bis = toLuxon(filterVal[1]);
+			const von = toDateTime(filterVal[0]);
+			const bis = toDateTime(filterVal[1]);
 
 			// specific day
 			if (von && !bis) {
@@ -1372,7 +1344,7 @@ export const AbgabetoolAssistenz = {
 			
 		},
 		checkAbgabetermineProjektarbeit(projekt) {
-			const now = luxon.DateTime.now()
+			const now = getNow()
 			
 			// calculate Abgabetermin time diff to now and assign last and next to projekt
 			projekt.abgabetermine.forEach(termin => {
@@ -1387,7 +1359,7 @@ export const AbgabetoolAssistenz = {
 				// while already looping through each termin, calculate datestyle beforehand
 				termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
 
-				const date = toViennaDate(termin.datum).endOf('day')
+				const date = toDateTime(termin.datum).endOf('day')
 				termin.luxonDate = date
 				termin.diffMs = date.toMillis() - now.toMillis(); // positive = future, negative = past
 
@@ -1654,9 +1626,7 @@ export const AbgabetoolAssistenz = {
 		getNotenFilterOptionLabel(option) {
 			return option.bezeichnung	
 		},
-		formatDate(dateParam) {
-			return formatISODate(dateParam);
-		},
+		formatDate,
 		formAction(cell) {
 			const actionButtons = document.createElement('div');
 			actionButtons.className = "d-flex gap-3";
@@ -1851,9 +1821,7 @@ export const AbgabetoolAssistenz = {
 			return str
 		},
 		isPastDate(date) {
-			const deadline = luxon.DateTime.fromISO(date, { zone: 'Europe/Vienna' }).endOf('day');
-			const nowInVienna = luxon.DateTime.now().setZone('Europe/Vienna');
-			return nowInVienna > deadline;
+			return getNow() > toDateTime(date).endOf("day");
 		},
 		setDetailComponent(details){
 			const pa = this.projektarbeiten.find(projektarbeit => projektarbeit.projektarbeit_id == details.projektarbeit_id)

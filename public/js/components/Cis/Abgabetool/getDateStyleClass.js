@@ -1,12 +1,12 @@
 
-const zone = 'Europe/Vienna';
+import { getNow, toDateTime } from "../../../helpers/DateHelpers.js";
 
 export function getDateStyleClass(termin, notenOptions) {
-	const today = luxon.DateTime.now().setZone(zone);
-	const datum = luxon.DateTime.fromISO(termin.datum, { zone }).endOf('day');
-	const abgabedatum = termin.abgabedatum ? luxon.DateTime.fromISO(termin.abgabedatum, { zone }) : null;
-	termin.diffindays = datum.diff(today, 'days').days;
-	const isLate = abgabedatum && abgabedatum > datum;
+	const today = getNow();
+	const datum = toDateTime(termin.datum)?.endOf('day');
+	const abgabedatum = toDateTime(termin.abgabedatum);
+	termin.diffindays = datum ? datum.diff(today, 'days').days : NaN;
+	const isLate = abgabedatum && datum && abgabedatum > datum;
 
 	// GRADE STATUS
 	if (termin.note) {

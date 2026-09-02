@@ -2,7 +2,7 @@ import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiAbgabe from '../../../api/factory/abgabe.js'
 import { getDateStyleClass } from "./getDateStyleClass.js";
-import {compareISODateValues, formatDateTime, formatISODate, getViennaTodayISO} from "./dateUtils.js";
+import { compareISODateValues, formatDate, formatDateTime, getTodayISO } from "../../../helpers/DateHelpers.js";
 
 
 export const AbgabeMitarbeiterDetail = {
@@ -174,7 +174,7 @@ export const AbgabeMitarbeiterDetail = {
 							'fixtermin': false,
 							'invertedFixtermin': true,
 							'kurzbz': '', // todo kurzbz textfield value vorschlag für qualgates
-							'datum': getViennaTodayISO(),
+							'datum': getTodayISO(),
 							'note': this.allowedNotenOptions.find(opt => opt.note == 9),
 							'beurteilungsnotiz': '',
 							'upload_allowed': false,
@@ -351,9 +351,7 @@ export const AbgabeMitarbeiterDetail = {
 				}
 			}
 		},
-		formatDate(dateParam) {
-			return formatISODate(dateParam)
-		},
+		formatDate,
 		openCreateNewAbgabeModal() {
 			if(this.projektarbeit?.betreuerart_kurzbz == 'Zweitbegutachter') {
 				// maybe alert that this is not allowed or smth
@@ -370,7 +368,7 @@ export const AbgabeMitarbeiterDetail = {
 					'fixtermin': false,
 					'invertedFixtermin': true,
 					'kurzbz': '',
-					'datum': getViennaTodayISO(),
+					'datum': getTodayISO(),
 					'note': this.allowedNotenOptions.find(opt => opt.note == 9),
 					'beurteilungsnotiz': '',
 					'upload_allowed': typ.upload_allowed_default,
@@ -404,7 +402,7 @@ export const AbgabeMitarbeiterDetail = {
 				'fixtermin': false,
 				'invertedFixtermin': true,
 				'kurzbz': '',
-				'datum': getViennaTodayISO(),
+				'datum': getTodayISO(),
 				'note': this.allowedNotenOptions.find(opt => opt.note == 9),
 				'beurteilungsnotiz': '',
 				'upload_allowed': false,
@@ -603,7 +601,7 @@ export const AbgabeMitarbeiterDetail = {
 				'fixtermin': false,
 				'invertedFixtermin': true,
 				'kurzbz': '',
-				'datum': getViennaTodayISO(),
+				'datum': getTodayISO(),
 				'note': this.allowedNotenOptions.find(opt => opt.note == 9),
 				'beurteilungsnotiz': '',
 				'upload_allowed': typ.upload_allowed_default,

@@ -7,7 +7,7 @@ import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import { getDateStyleClass } from "./getDateStyleClass.js";
 import { dateFilter } from '../../../tabulator/filters/DatesManual.js';
 import {splitMailsHelper} from "../../../helpers/EmailHelpers.js";
-import { formatISODate, getViennaTodayISO, toViennaDate } from "./dateUtils.js";
+import { formatDate, getNow, getTodayISO, toDateTime } from "../../../helpers/DateHelpers.js";
 
 export const AbgabetoolMitarbeiter = {
 	name: "AbgabetoolMitarbeiter",
@@ -54,7 +54,7 @@ export const AbgabetoolMitarbeiter = {
 			allowedNotenOptions: null,
 			notenOptionsNonFinal: null,
 			serienTermin: Vue.reactive({
-				datum: getViennaTodayISO(),
+				datum: getTodayISO(),
 				bezeichnung: {
 					paabgabetyp_kurzbz: 'zwischen',
 					bezeichnung: 'Zwischenabgabe'
@@ -668,22 +668,8 @@ export const AbgabetoolMitarbeiter = {
 			
 			const rowDate = rowVal.luxonDate;
 			
-			const toLuxon = (val) => {
-				if (!val) return null;
-				let dt;
-				if (val instanceof Date) {
-					dt = luxon.DateTime.fromJSDate(val);
-				} else if (typeof val === "string") {
-					dt = toViennaDate(val);
-				} else { // fallback
-					dt = luxon.DateTime.fromMillis(Number(val));
-				}
-
-				return dt.isValid ? dt : null;
-			};
-
-			const von = toLuxon(filterVal[0]);
-			const bis = toLuxon(filterVal[1]);
+			const von = toDateTime(filterVal[0]);
+			const bis = toDateTime(filterVal[1]);
 
 			// specific day
 			if (von && !bis) {
@@ -899,14 +885,14 @@ export const AbgabetoolMitarbeiter = {
 			}
 		},
 		checkAbgabetermineProjektarbeit(projekt) {
-			const now = luxon.DateTime.now()
+			const now = getNow()
 			// calculate Abgabetermin time diff to now and assign last and next to projekt
 			projekt.abgabetermine.forEach(termin => {
 				
 				// while already looping through each termin, calculate datestyle beforehand
 				termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
 
-				const date = toViennaDate(termin.datum).endOf('day')
+				const date = toDateTime(termin.datum).endOf('day')
 				termin.luxonDate = date
 				termin.diffMs = date.toMillis() - now.toMillis(); // positive = future, negative = past
 
@@ -1017,9 +1003,7 @@ export const AbgabetoolMitarbeiter = {
 		getOptionLabelAbgabetyp(option){
 			return this.$p.t('abgabetool/c4paatyp' + option.paabgabetyp_kurzbz)
 		},
-		formatDate(dateParam) {
-			return formatISODate(dateParam);
-		},
+		formatDate,
 		undoSelection(cell) {
 			// checks if cells row is selected and unselects -> imitates columns which dont trigger row selection
 			// but actually just revert it after the fact
@@ -1104,9 +1088,7 @@ export const AbgabetoolMitarbeiter = {
 			return str
 		},
 		isPastDate(date) {
-			const deadline = luxon.DateTime.fromISO(date, { zone: 'Europe/Vienna' }).endOf('day');
-			const nowInVienna = luxon.DateTime.now().setZone('Europe/Vienna');
-			return nowInVienna > deadline;
+			return getNow() > toDateTime(date).endOf("day");
 		},
 		setDetailComponent(details){
 			this.loading=true

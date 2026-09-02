@@ -1,5 +1,5 @@
 import AbgabeterminStatusLegende from "./StatusLegende.js";
-import {formatDateTime} from "./dateUtils.js";
+import { formatDateTime } from "../../../helpers/DateHelpers.js";
 
 export const AbgabeStudentTimeline = {
 	name: "AbgabeStudentTimeline",

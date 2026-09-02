@@ -1,61 +1,69 @@
 
-// HELPER FILE -- that contains multiple functions which create, handle and manipulate js dates
+// Everything parses and formats with luxon in the server timezone. new Date("2026-09-02")
+// reads UTC midnight and shows the day before west of Greenwich.
 
-// custom Error class for DateHelpers.js misuse
-class DateHelperError extends Error {
-	constructor(message) {
-		super(message);
-		this.name = "DateHelperError";
-	}
+
+function getZone() {
+	return globalThis.FHC_JS_DATA_STORAGE_OBJECT?.timezone || 'Europe/Vienna';
 }
 
 /**
- * adds padding to a number 
+ * converts a date value into a luxon DateTime in the server timezone
  *
- * @param {number|string} number - the number on which padding should be added.
- * @returns {string} number with padding.
+ * @param {string|number|Date|Object} value - ISO string, SQL string, milliseconds, Date or luxon DateTime.
+ * @returns {Object|null} luxon DateTime, or null if the value is empty or unparsable.
  */
+export function toDateTime(value) {
+	if (!value) return null;
+
+	const zone = getZone();
+	let date;
+
+	if (value instanceof luxon.DateTime) date = value.setZone(zone);
+	else if (value instanceof Date) date = luxon.DateTime.fromJSDate(value, { zone });
+	else if (typeof value === 'number') date = luxon.DateTime.fromMillis(value, { zone });
+	// fromISO rejects the space that SQL puts between date and time
+	else if (typeof value === 'string') date = value.includes(' ')
+		? luxon.DateTime.fromSQL(value, { zone })
+		: luxon.DateTime.fromISO(value, { zone });
+	else return null;
+
+	return date.isValid ? date : null;
+}
+
+// current time in the server timezone
+export function getNow() {
+	return luxon.DateTime.now().setZone(getZone());
+}
+
+// today in the server timezone, as yyyy-MM-dd
+export function getTodayISO() {
+	return getNow().toISODate();
+}
+
+// the three formatters return '' for an empty or unparsable value
+export function formatDate(value) {
+	return toDateTime(value)?.toFormat('dd.MM.yyyy') ?? '';
+}
+
+export function formatTime(value) {
+	return toDateTime(value)?.toFormat('HH:mm') ?? '';
+}
+
+export function formatDateTime(value) {
+	return toDateTime(value)?.toFormat('dd.MM.yyyy HH:mm') ?? '';
+}
+
+// tabulator sorter for ISO dates, sorts empty values last
+export function compareISODateValues(a, b) {
+	if (!a && !b) return 0;
+	if (!a) return 1;
+	if (!b) return -1;
+
+	return String(a).localeCompare(String(b));
+}
+
+// pads hours and minutes to two digits
 export function numberPadding(number) {
-	if(typeof number !== "string" && typeof number !== "number")
-	{
-		throw new TypeError("function numberPadding in file DateHelpers.js is only usable with strings or numbers");
-	}
-	if(number.toString().length > 2) 
-	{
-		throw new DateHelperError("The number on which the padding should be added should not be longer than to 2 characters, please refere to the function numberPadding in the helper file DateHelpers.js");
-	}
-	return number.toString().length == 1 ? '0' + number.toString() : number.toString();
-}
-
-/**
- * formats date to dd.mm.yyyy
- *
- * @param {string|Date} d - the date that should be formatted.
- * @returns {string} formatted date string.
- */
-export function formatDate(d) {
-	// parameter is of type Date
-	if(d instanceof Date)
-	{
-		if (isNaN(date.valueOf())) {
-			return 'N/A';
-		}
-		// if the date is an invalid string then creating a date from the string will fail and N/A is returned
-		return `${numberPadding(d.getDate())}.${numberPadding(d.getMonth() + 1)}.${d.getFullYear()}`;
-	}
-	// parameter is of type string
-	else if (typeof d === "string")
-	{
-		let date = new Date(d);
-		// if the date is an invalid string then creating a date from the string will fail and N/A is returned
-		if (isNaN(date.valueOf())) {
-			return 'N/A';
-		}
-		return `${numberPadding(date.getDate())}.${numberPadding(date.getMonth() + 1)}.${date.getFullYear()}`;
-	}
-	// parameter is not of type string or Date and an exception is thrown
-	else
-	{
-		throw new TypeError("The parameter provided for this function is not a string or a Date object, please refere to the function formatDate in the DateHelpers.js file");
-	}
+	return String(number).padStart(2, '0');
 }

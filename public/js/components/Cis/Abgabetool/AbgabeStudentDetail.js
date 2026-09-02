@@ -3,7 +3,7 @@ import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiAbgabe from '../../../api/factory/abgabe.js'
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
-import { formatISODate, getViennaTodayISO } from "./dateUtils.js";
+import { formatDate, getTodayISO } from "../../../helpers/DateHelpers.js";
 import { validateThesisTitle } from './titleValidation.js'
 
 
@@ -248,9 +248,7 @@ export const AbgabeStudentDetail = {
 
 			window.open(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + url)
 		},
-		formatDate(dateParam) {
-			return formatISODate(dateParam)
-		},
+		formatDate,
 		async upload(termin) {
 
 			if (! await this.validate(termin))
@@ -286,7 +284,7 @@ export const AbgabeStudentDetail = {
 			if(res.meta.status == "success") {
 				this.$fhcAlert.alertSuccess(this.$capitalize(this.$p.t('abgabetool/c4fileUploadSuccessv3')))
 
-				termin.abgabedatum = getViennaTodayISO();
+				termin.abgabedatum = getTodayISO();
 				if(res?.data?.signatur !== undefined) {
 					termin.signatur = res.data.signatur
 				}

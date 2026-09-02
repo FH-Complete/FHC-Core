@@ -1,6 +1,6 @@
 import AbstractWidget from './Abstract.js';
 import BsModal from '../Bootstrap/Modal.js';
-import { numberPadding } from '../../helpers/DateHelpers.js';
+import { formatDate, formatTime } from '../../helpers/DateHelpers.js';
 import ApiCms from '../../api/factory/cms.js';
 
 const MAX_LOADED_NEWS = 30;
@@ -84,14 +84,8 @@ export default {
 				});
 			})
 		},
-		formatDate: function (dateTime) {
-			const dt = new Date(dateTime);
-			return numberPadding(dt.getDate()) + '.' + numberPadding((dt.getMonth() + 1)) + '.' + dt.getFullYear();				
-		},
-		formatTime: function (dateTime) {
-			const dt = new Date(dateTime);
-			return numberPadding(dt.getHours()) + ':' + numberPadding(dt.getMinutes());
-		},
+		formatDate,
+		formatTime,
 		isString(value){
 			return Object.prototype.toString.call(value) === '[object String]';
 		},
