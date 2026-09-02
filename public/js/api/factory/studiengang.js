@@ -16,10 +16,11 @@
  */
 
 export default {
-	studiengangInformation() {
+	studiengangInformation(studiengang_kz, semester) {
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/Studgang/getStudiengangInfo'
+			url: '/api/frontend/v1/Studgang/getStudiengangInfo',
+			params: { studiengang_kz, semester }
 		};
 	},
 	getStudiengangByKz(studiengang_kz) {

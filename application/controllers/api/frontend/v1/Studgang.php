@@ -44,14 +44,29 @@ class Studgang extends FHCAPI_Controller
 	// Public methods
 
 	public function getStudiengangInfo(){
-		$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter(getAuthUID());
-		$isMitarbeiter = $this->getDataOrTerminateWithError($isMitarbeiter);
-		if($isMitarbeiter) {
-			$this->terminateWithSuccess(null);
+		$studiengang_kz = $this->input->get('studiengang_kz', true);
+		$semester = $this->input->get('semester', true);
+
+		// without a Studiengang the info of the logged in Student is returned
+		if (!is_numeric($studiengang_kz))
+		{
+			$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter(getAuthUID());
+			$isMitarbeiter = $this->getDataOrTerminateWithError($isMitarbeiter);
+			if($isMitarbeiter) {
+				$this->terminateWithSuccess(null);
+			}
+
+			$studiengang_kz = null;
+			$semester = null;
 		}
-		
+		else
+		{
+			$studiengang_kz = (int)$studiengang_kz;
+			$semester = is_numeric($semester) ? (int)$semester : null;
+		}
+
 		// fetches the Studiengang Information which is used next to the news
-		$studiengangInfo = $this->StudiengangModel->getStudiengangInfoForNews();
+		$studiengangInfo = $this->StudiengangModel->getStudiengangInfoForNews($studiengang_kz, $semester);
 		$studiengangInfo= $this->getDataOrTerminateWithError($studiengangInfo);
 		$this->terminateWithSuccess($studiengangInfo);
 	}

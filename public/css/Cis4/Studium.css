@@ -56,5 +56,35 @@
 	}
 }
 
+/* without min-width the flex item never shrinks below its content and the page scrolls sideways */
+#fhc-studiengang-info-column {
+	min-width: 0;
+}
 
+#studiengang-info-toggle {
+	cursor: pointer;
+}
 
+#studiengang-info-toggle:hover {
+	background-color: var(--fhc-secondary-highlight);
+}
+
+#studiengang-info-toggle .fa-chevron-right {
+	transition: all 0.5s ease-in-out;
+}
+
+#studiengang-info-toggle.collapsed .fa-chevron-right {
+	transform: scaleX(-1);
+	color: var(--fhc-black-40);
+}
+
+/* the mobile view stacks the block, so the chevron points up and down */
+@media (max-width: 767px) {
+	#studiengang-info-toggle .fa-chevron-right {
+		transform: rotate(-90deg);
+	}
+
+	#studiengang-info-toggle.collapsed .fa-chevron-right {
+		transform: rotate(90deg);
+	}
+}

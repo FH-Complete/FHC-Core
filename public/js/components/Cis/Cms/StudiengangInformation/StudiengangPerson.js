@@ -12,10 +12,32 @@ export default {
 		displayWidget:{
 			type:Boolean,
 			default:false,
+		},
+		// compact drops the photo and the card chrome, like the old CIS teambox
+		compact:{
+			type:Boolean,
+			default:false,
 		}
 	},
 	template:/*html*/`
-	<div class="card border-0" :style="{'width':displayWidget?'12rem':'15rem'}">
+	<div v-if="compact" class="mb-2">
+		<div class="fw-semibold">{{fullname}} <a v-if="profilViewLink" :href="profilViewLink" :aria-label="$p.t('profil','profil')" :title="$p.t('profil','profil')"><i class="ms-1 fa fa-arrow-up-right-from-square fhc-primary-color" aria-hidden="true"></i></a></div>
+		<dl class="stgkontaktinfo mb-0">
+			<template v-if="phone">
+				<dt><i class="fa fa-phone me-2"></i></dt>
+				<dd class="mb-0"><a class="fhc-link-color" :href="phone.link">{{phone.number}}</a></dd>
+			</template>
+			<template v-if="ort">
+				<dt><i class="fa fa-home me-2"></i></dt>
+				<dd class="mb-0">{{ort}}</dd>
+			</template>
+			<template v-if="email">
+				<dt><i class="fa-regular fa-envelope me-2"></i></dt>
+				<dd class="mb-0"><a class="fhc-link-color" :href="email_link" v-html="formattedEmail"></a></dd>
+			</template>
+		</dl>
+	</div>
+	<div v-else class="card border-0" :style="{'width':displayWidget?'12rem':'15rem'}">
 		<div class="d-flex justify-content-center">
 			<img  :src="base64Image" alt="mitarbeiter_foto" style="width: 110px; height: auto; object-fir:scale-down;" class="card-img-top" >
 		</div>

@@ -49059,6 +49059,86 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'studiengangInformation',
+		'phrase' => 'studiengangsinformationen_anzeigen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Studiengangsinformationen einblenden",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Show degree program information",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studiengangInformation',
+		'phrase' => 'studiengangsinformationen_ausblenden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Studiengangsinformationen ausblenden",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Hide degree program information",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studiengangInformation',
+		'phrase' => 'studiengangsinformationen_kompakt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Kompakte Darstellung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Compact layout",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studiengangInformation',
+		'phrase' => 'studiengangsinformationen_ausfuehrlich',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Ausführliche Darstellung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Detailed layout",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// ### STUDIENGANG_INFORMATIONEN PHRASEN ENDE
 	array(
 		'app' => 'core',

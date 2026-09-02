@@ -1,4 +1,5 @@
 import LvUebersicht from "../Mylv/LvUebersicht.js";
+import StudiengangInformation from "../Cms/StudiengangInformation/StudiengangInformation.js";
 
 import ApiCisStudium from '../../../api/factory/cis/studium.js';
 
@@ -16,6 +17,8 @@ export default {
 			lehrveranstaltungen: [],
 			selectedLehrveranstaltung: null,
 			menu:null,
+			showStudiengangInfo: false,
+			compactStudiengangInfo: true,
 		}
 	},
 	provide(){
@@ -28,8 +31,10 @@ export default {
 		}
 	},
 	name: "OverviewStudiengaenge",
+	inject: ["isMobile"],
 	components: {
 		LvUebersicht,
+		StudiengangInformation,
 	},
 	watch:{
 		selectedStudiensemester: function(newVal, oldVal){
@@ -118,6 +123,14 @@ export default {
 		getDataFromLocalStorage(key){
 			const value = localStorage.getItem(key);
 			return value;
+		},
+		toggleStudiengangInfo(){
+			this.showStudiengangInfo = !this.showStudiengangInfo;
+			this.storeDataToLocalStorage("studiengangInfo", this.showStudiengangInfo);
+		},
+		toggleStudiengangInfoCompact(){
+			this.compactStudiengangInfo = !this.compactStudiengangInfo;
+			this.storeDataToLocalStorage("studiengangInfoCompact", this.compactStudiengangInfo);
 		},
 		changeSelectedStudienSemester(studiensemester_kurzbz) {
 			return this.$api
@@ -245,6 +258,16 @@ export default {
 	},
 
 	computed:{
+		studiengangInfoCompactTitel(){
+			return this.compactStudiengangInfo
+				? this.$p.t('studiengangInformation', 'studiengangsinformationen_ausfuehrlich')
+				: this.$p.t('studiengangInformation', 'studiengangsinformationen_kompakt');
+		},
+		studiengangInfoToggleTitel(){
+			return this.showStudiengangInfo
+				? this.$p.t('studiengangInformation', 'studiengangsinformationen_ausblenden')
+				: this.$p.t('studiengangInformation', 'studiengangsinformationen_anzeigen');
+		},
 		isGermanLanguage(){
 			return this.$p.user_language.value == "German"
 		},
@@ -284,6 +307,11 @@ export default {
 	},
 	
 	created(){
+
+		// the last toggle wins, otherwise the desktop view shows the information and the mobile view hides it
+		const studiengangInfo = this.getDataFromLocalStorage("studiengangInfo");
+		this.showStudiengangInfo = studiengangInfo === null ? !this.isMobile : studiengangInfo === "true";
+		this.compactStudiengangInfo = this.getDataFromLocalStorage("studiengangInfoCompact") !== "false";
 
 		const studiensemester = this.getDataFromLocalStorage("sudiensemester") ?? undefined;
 		const studiengang = JSON.parse(this.getDataFromLocalStorage("studiengang")) ?? undefined;
@@ -377,6 +405,29 @@ export default {
 
 	<hr>
 
+	<div class="row g-3">
+	<div class="order-last d-flex flex-column flex-md-row" :class="showStudiengangInfo ? 'col-12 col-md-4' : 'col-12 col-md-auto'" v-if="selectedStudiengang">
+		<button id="studiengang-info-toggle" type="button" class="d-flex align-items-center justify-content-center p-2 border-0 bg-transparent"
+			:class="{collapsed: !showStudiengangInfo}"
+			@click="toggleStudiengangInfo"
+			:aria-label="studiengangInfoToggleTitel" :title="studiengangInfoToggleTitel"
+			:aria-expanded="showStudiengangInfo" aria-controls="fhc-studiengang-info-column">
+			<i aria-hidden="true" class="fa-solid fa-chevron-right fhc-text"></i>
+			<span class="d-md-none ms-2">{{studiengangInfoToggleTitel}}</span>
+		</button>
+		<div id="fhc-studiengang-info-column" class="flex-grow-1" v-show="showStudiengangInfo">
+			<div class="d-flex justify-content-end">
+				<button class="btn btn-sm btn-link fhc-link-color text-decoration-none p-0" type="button"
+					@click="toggleStudiengangInfoCompact"
+					:aria-label="studiengangInfoCompactTitel" :title="studiengangInfoCompactTitel"
+					:aria-pressed="compactStudiengangInfo">
+					<i class="fa-solid" :class="compactStudiengangInfo ? 'fa-expand' : 'fa-compress'" aria-hidden="true"></i>
+				</button>
+			</div>
+			<studiengang-information :compact="compactStudiengangInfo" :displayWidget="!compactStudiengangInfo" :studiengang_kz="selectedStudiengang" :semester="selectedSemester"></studiengang-information>
+		</div>
+	</div>
+	<div :class="selectedStudiengang && showStudiengangInfo ? 'col-12 col-md-8' : 'col-12 col-md'">
 	<div class="lvUebersicht " >
 	<template v-for="lehrveranstaltung in lehrveranstaltungen" :key="lehrveranstaltung.lehrveranstaltung_id">
 		<div  class="card" v-if="Array.isArray(lehrveranstaltung.lehrveranstaltungen) && lehrveranstaltung.lehrveranstaltungen.length >0" >
@@ -394,6 +445,8 @@ export default {
 			</div>
 		</div>
 	</template>
+	</div>
+	</div>
 	</div>
 
 
