@@ -20,7 +20,6 @@ export default {
 			layoutColumnsOnNewData: false,
 			height: 300,
 			listDocuments: [],
-			prestudentDocumentData: [],
 		}
 	},
 	computed: {
@@ -68,21 +67,36 @@ export default {
 							let value = cell.getValue();
 							let rowData = cell.getRow().getData();  // Zugriff auf gesamte Zeile
 							let dueDate = rowData["nachgereicht_am"];
-							const date = new Date(dueDate);
-							let dateFormatted = date.toLocaleString("de-DE", {
+
+							let vorhanden = rowData["vorhanden"];
+							let hochgeladenamum = vorhanden ? rowData["hochgeladenamum"] : '';
+
+							const dateDue = new Date(dueDate);
+							let dateFormatted = dateDue.toLocaleString("de-DE", {
 								day: "2-digit",
 								month: "2-digit",
 								year: "numeric",
 								hour12: false
 							});
 
+							let hochgeladenamumFormatted = hochgeladenamum
+								? new Date(hochgeladenamum.replace(" ", "T")).toLocaleDateString("de-DE", {
+									day: "2-digit",
+									month: "2-digit",
+									year: "numeric"
+								})
+								: dateFormatted;
+
+
+							const date = vorhanden && hochgeladenamum ? hochgeladenamumFormatted : dateFormatted;
+
 							let tickCrossIcon = value
 								? '<i class="fa fa-check text-success"></i>'
 								: '<i class="fa fa-xmark text-danger"></i>';
 
-							// if nachgereicht_am show datum
+							// if nachgereicht_am show datum nachgereicht_am oder hochgeladenamum
 							let pill = dueDate
-								? `<span>${dateFormatted}</span>`
+								? `<span>${date}</span>`
 								: '';
 
 							return `${tickCrossIcon} ${pill}`;
@@ -206,7 +220,7 @@ export default {
 						setHeader('anmerkung_intern', this.$p.t('global', 'anmerkung'));
 						setHeader('akte_id', this.$p.t('global', 'akte_id'));
 						setHeader('pflicht', this.$p.t('ampeln', 'mandatory'));
-						setHeader('nachgereicht_am', this.$p.t('global', 'dokument'));
+						setHeader('nachgereicht_am', this.$p.t('dokumente', 'nachreichungAm'));
 					}
 				},
 				{

@@ -55,15 +55,7 @@ class Profil extends Auth_Controller
 	 */
 	public function index()
 	{
-		
-		$this->load->library('ProfilLib');
-		$profil_data = $this->profillib->getView(getAuthUID());
-		$profil_data = hasData($profil_data) ? getData($profil_data) : null;
-		$viewData = array(
-			'editable'=>true,
-			'profil_data' => $profil_data,
-		);
-		$this->load->view('CisRouterView/CisRouterView.php',['viewData' => $viewData, 'route' => 'profilIndex']);
+		$this->load->view('CisRouterView/CisRouterView.php', ['route' => 'profilIndex']);
 	}
 
 	/**
@@ -73,23 +65,13 @@ class Profil extends Auth_Controller
 	 */
 	public function View($uid)
 	{
-		$this->load->library('ProfilLib');
-		$profil_data = $this->profillib->getView($uid);
-		$profil_data = hasData($profil_data) ? getData($profil_data) : null;
-		$viewData = array (
-			'uid' => $uid,
-			'profil_data'=>$profil_data,
-		);
-		if($uid == getAuthUID()){
-			$viewData['editable'] = true;
-		}
-		$this->load->view('CisRouterView/CisRouterView.php',['viewData' => $viewData, 'route' => 'profilViewUid']);
+		$this->load->view('CisRouterView/CisRouterView.php', ['route' => 'profilViewUid']);
 	}
 
 	/**
-	 * checks whether a specific userID is a mitarbeiter or not (foreword declaration of the function isMitarbeiter in Mitarbeiter_model.php)
+	 * checks whether a specific userID is a student or not (foreword declaration of the function isStudent in Student_model.php)
 	 * @access public
-	 * @param  $uid the userID used to check if it is a mitarbeiter
+	 * @param  $uid the userID used to check if it is a student
 	 * @return boolean 
 	 */
 	public function isStudent($uid)
@@ -119,7 +101,7 @@ class Profil extends Auth_Controller
 	}
 
 	/**
-	 * gets the adressen that are marked as zustell from the currenlty logged in user
+	 * gets the adressen that are marked as zustell from the currently logged in user
 	 * @access public
 	 * @return array a list of adresse_id's 
 	 */
@@ -262,23 +244,23 @@ class Profil extends Auth_Controller
 		$this->GemeindeModel->addDistinct();
 		$this->GemeindeModel->addSelect(["name"]);
 		if ($nation == "A") {
-				if (isset($zip) && $zip > 999 && $zip < 32000) {
+			if (isset($zip) && $zip > 999 && $zip < 32000) {
 
-						$gemeinde_res = $this->GemeindeModel->loadWhere(['plz' => $zip]);
-						if (isError($gemeinde_res)) {
-								show_error("error while trying to query bis.tbl_gemeinde");
-						}
-						$gemeinde_res = hasData($gemeinde_res) ? getData($gemeinde_res) : null;
-						$gemeinde_res = array_map(function ($obj) {
-								return $obj->name;
-						}, $gemeinde_res);
-						echo json_encode($gemeinde_res);
-
-				} else {
-						echo json_encode(error("ortschaftskennziffer code was not valid"));
+				$gemeinde_res = $this->GemeindeModel->loadWhere(['plz' => $zip]);
+				if (isError($gemeinde_res)) {
+					show_error("error while trying to query bis.tbl_gemeinde");
 				}
+				$gemeinde_res = hasData($gemeinde_res) ? getData($gemeinde_res) : null;
+				$gemeinde_res = array_map(function ($obj) {
+					return $obj->name;
+				}, $gemeinde_res);
+				echo json_encode($gemeinde_res);
+
+			} else {
+				echo json_encode(error("ortschaftskennziffer code was not valid"));
+			}
 		} else {
-				echo json_encode(error("Nation was not 'A' (Austria)"));
+			echo json_encode(error("Nation was not 'A' (Austria)"));
 		}
 	}
 
@@ -750,6 +732,4 @@ class Profil extends Auth_Controller
 		$zutrittskarte_ausgegebenam = str_replace("-", ".", $zutrittskarte_ausgegebenam);
 		return $zutrittskarte_ausgegebenam;
 	}
-
-
 }
