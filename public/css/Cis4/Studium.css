@@ -56,13 +56,47 @@
 	}
 }
 
-/* without min-width the flex item never shrinks below its content and the page scrolls sideways */
+/* min-width lets the flex item shrink, the fr row animates to the real content height.
+   without the row the collapsed panel keeps its height and blows up the row. */
 #fhc-studiengang-info-column {
 	min-width: 0;
+	overflow: hidden;
+	display: grid;
+	grid-template-rows: 1fr;
+	transition: grid-template-rows 0.35s ease-in-out, opacity 0.35s ease-in-out, visibility 0s linear 0s;
 }
 
+/* the delay keeps the panel visible while it fades out, then takes it out of the tab order */
+.studiengang-info-col.collapsed #fhc-studiengang-info-column {
+	grid-template-rows: 0fr;
+	opacity: 0;
+	visibility: hidden;
+	transition: grid-template-rows 0.35s ease-in-out, opacity 0.35s ease-in-out, visibility 0s linear 0.35s;
+}
+
+.studiengang-info-body {
+	min-height: 0;
+	overflow: hidden;
+	padding-top: 0.5rem;
+}
+
+.studiengang-info-title {
+	font-size: 0.875rem;
+	font-weight: 600;
+	line-height: 1.25;
+	margin-bottom: 0.25rem;
+}
+
+
+/* the rail stays visible when the panel is collapsed and names what it opens */
 #studiengang-info-toggle {
 	cursor: pointer;
+	color: inherit;
+	align-items: center;
+	background-color: var(--fhc-secondary);
+	border: 1px solid var(--fhc-border);
+	border-radius: var(--bs-border-radius);
+	transition: width 0.35s ease-in-out, background-color 0.2s ease-in-out;
 }
 
 #studiengang-info-toggle:hover {
@@ -73,9 +107,51 @@
 	transition: all 0.5s ease-in-out;
 }
 
-#studiengang-info-toggle.collapsed .fa-chevron-right {
+.studiengang-info-col.collapsed #studiengang-info-toggle .fa-chevron-right {
 	transform: scaleX(-1);
 	color: var(--fhc-black-40);
+}
+
+/* the desktop view slides the column, same duration as the bootstrap collapse of the menu */
+@media (min-width: 768px) {
+	.studiengang-info-col {
+		flex: 0 0 auto;
+		width: 25%;
+		transition: width 0.35s ease-in-out;
+	}
+
+	/* wide enough for the heading, the collapsed panel adds nothing */
+	.studiengang-info-col.collapsed {
+		width: 9.5rem;
+	}
+
+	/* the collapsed rail fills the column, the open one is a narrow strip beside the panel */
+	.studiengang-info-col.collapsed #studiengang-info-toggle {
+		width: 100%;
+	}
+
+	/* the strip can get very tall, so the chevron stays at the top where the heading is */
+	#studiengang-info-toggle {
+		align-items: flex-start;
+	}
+
+	/* the heading must not rewrap while the column slides, a wider font ellipsizes instead of overflowing */
+	.studiengang-info-title {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	/* only the narrow collapsed column breaks the heading into two lines */
+	.studiengang-info-col.collapsed .studiengang-info-title span {
+		display: block;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.studiengang-info-body {
+		padding-left: 1rem;
+	}
 }
 
 /* the mobile view stacks the block, so the chevron points up and down */
@@ -84,7 +160,7 @@
 		transform: rotate(-90deg);
 	}
 
-	#studiengang-info-toggle.collapsed .fa-chevron-right {
+	.studiengang-info-col.collapsed #studiengang-info-toggle .fa-chevron-right {
 		transform: rotate(90deg);
 	}
 }
