@@ -6,6 +6,7 @@
 	background-color: white !important;
 	color: black !important;
 	font-size: x-small !important;
+	overflow: visible !important;
 }
 
 .fhc-calendar-base-slider > div {
@@ -13,6 +14,7 @@
 }
 
 header,
+#skiplink,
 #cis-lvplan-personal-heading,
 .cis-lvplan-personal hr,
 .fhc-calendar-base-header,
@@ -22,17 +24,28 @@ header,
 	display: none !important;
 }
 
-.fhc-calendar-mode-range .fhc-calendar-base-grid,
-.fhc-calendar-mode-range #grid-main-scrollable {
-	overflow: visible !important;
-}
-
 .fhc-calendar-mode-range .main-header-sunday,
 .fhc-calendar-mode-range .fhc-calendar-base-grid-line-sunday {
 	border-bottom-width: 0 !important;
 }
 
 .fhc-calendar-base-grid-line-sunday,
-.main-header-sunday {
+.fhc-calendar-mode-range .main-header-sunday {
 	break-after: page !important;
+}
+
+.fhc-calendar-mode-range .fhc-calendar-base-grid {
+	grid-template-rows: auto repeat(var(--fhc-grid-displayed-axis-main-count), auto) !important;
+	gap: 0px !important;
+}
+
+.fhc-calendar-mode-range .fhc-calendar-base-grid * {
+	gap: 0px !important;
+}
+
+.fhc-calendar-mode-range .main-header:not(.main-header-empty),
+.fhc-calendar-mode-range .fhc-calendar-base-grid-line {
+	border-top: solid !important;
+	border-top-color: black !important;
+	border-top-width: 1px !important;
 }

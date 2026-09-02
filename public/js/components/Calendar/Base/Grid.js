@@ -338,7 +338,7 @@ export default {
 	<div
 		class="fhc-calendar-base-grid"
 		style="display:grid;width:100%;height:100%;overflow:auto"
-		:style="'grid-template-' + axisRow + 's:auto' + (allDayEvents ? ' auto ' : ' ') + '1fr;grid-template-' + axisCol + 's:auto ' + styleGridCols"
+		:style="'--fhc-grid-displayed-axis-main-count: ' + displayedAxisMain.length + ';grid-template-' + axisRow + 's:auto' + (allDayEvents ? ' auto ' : ' ') + '1fr;grid-template-' + axisCol + 's:auto ' + styleGridCols"
 	>
 		<div
 			class="grid-header"
@@ -351,7 +351,8 @@ export default {
 					class="main-header"
 					:class="{
 						'collapsed-header': axisMainCollapsible && hasValidEvents && !events[index].length,
-						'main-header-sunday': date.weekday === 7
+						'main-header-monday': date.weekday === 1,
+						'main-header-sunday': date.weekday === 7,
 					}"
 					:style="'grid-' + axisCol + ':' + (2+index)"
 				>
@@ -359,7 +360,7 @@ export default {
 				</div>
 				<div
 					v-else
-					class="main-header"
+					class="main-header main-header-empty"
 					:style="'grid-' + axisCol + ':' + (2+index)"
 				></div>
 			</template>
@@ -409,7 +410,7 @@ export default {
 			>
 				<div
 					v-for="(part, index) in axisPartsSave"
-					:key="index"
+					:key="index"2
 					class="part-header"
 					:style="'grid-' + axisCol + ':1;grid-' + axisRow + ': ps_' + index + '/pe_' + index + ';min-width:50px;'"
 				>

@@ -123,7 +123,10 @@ export default {
 	template: /* html */ `
 	<div
 		class="fhc-calendar-base-grid-line"
-		:class="{'fhc-calendar-base-grid-line-sunday': $props.date.weekday === 7}"
+		:class="{
+			'fhc-calendar-base-grid-line-monday': $props.date.weekday === 1,
+			'fhc-calendar-base-grid-line-sunday': $props.date.weekday === 7
+		}"
 		style="position:relative;display:grid;grid-auto-flow:dense"
 		:style="'grid-template-' + axisRow + 's:subgrid'"
 	>
