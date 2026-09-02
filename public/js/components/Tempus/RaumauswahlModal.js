@@ -18,7 +18,8 @@ export default {
 			event: null,
 			loading: false,
 			mode: 'edit',
-			pendingEvent: null
+			pendingEvent: null,
+			location: null,
 		};
 	},
 	methods: {
@@ -178,16 +179,10 @@ export default {
 						<span class="text-muted small text-nowrap">
 							{{ option.max_person }} Pers.
 						</span>
-						<i
-							v-if="option.ausstattung?.length"
-							class="fa-solid fa-circle-info text-muted"
-							v-tooltip.bottom="{
-								value: option.ausstattung,
-								class: 'custom-tooltip',
-							}"
-						></i>
-						<span v-else></span>
-						<span class="text-muted text-end">
+						<span
+							class="text-muted  text-end"
+							v-tooltip="{ value: (option.details || []).join('\\n'), class: 'custom-tooltip' }"
+						>
 							{{ option.score }}
 						</span>
 					</div>

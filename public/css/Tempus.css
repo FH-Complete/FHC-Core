@@ -179,6 +179,21 @@ body {
 }
 
 
+.bg-raumvorschlag-slot {
+	opacity: .70;
+}
+
+.bg-raumvorschlag-slot.rating-good {
+	background-color: var(--bs-success);
+}
+.bg-raumvorschlag-slot.rating-mid {
+	background-color: var(--bs-warning);
+}
+.bg-raumvorschlag-slot.rating-bad {
+	background-color: var(--bs-danger);
+}
+
+
 .wish-w--2 {
 	background-color: #FF2200;
 }

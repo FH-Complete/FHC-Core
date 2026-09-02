@@ -10,7 +10,7 @@ class LectureCollisionCheck implements ICollisionCheck
 		$this->_ci =& get_instance();
 		$this->_ci->load->model('ressource/Kalender_model', 'KalenderModel');
 		$this->_ci->load->model('ressource/Zeitsperre_model', 'ZeitsperreModel');
-		$this->_ci->load->model('education/LehreinheitMitarbeiter_model', 'LehreinheitMitarbeiterModel');
+		$this->_ci->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
 		$this->_ci->load->library('VariableLib', array('uid' => getAuthUID()));
 		$this->_ci->load->library('PhrasesLib', array('ui'));
 
@@ -192,7 +192,7 @@ class LectureCollisionCheck implements ICollisionCheck
 	{
 		$kollisionsfreie_user = unserialize(KOLLISIONSFREIE_USER);
 
-		$result = $this->_ci->LehreinheitMitarbeiterModel->loadWhere(array('lehreinheit_id' => $lehreinheit_id));
+		$result = $this->_ci->LehreinheitmitarbeiterModel->loadWhere(array('lehreinheit_id' => $lehreinheit_id));
 
 		if (isError($result) || !hasData($result)) return [];
 

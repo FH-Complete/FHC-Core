@@ -175,6 +175,9 @@ export default {
 				assignedResources: [],
 				areFormButtonsDisplayed: false,
 			},
+			raumvorschlagPreview: null,
+			raumvorschlagLoading: false,
+			showEvents: true
 		};
 	},
 	computed: {
@@ -236,6 +239,7 @@ export default {
 			await this.deleteEntryCall(orig);
 			this.$refs.calendar.resetEventLoader();
 			this.$refs.coursepicker.reload();
+			this.rebuildRaumvorschlag();
 		},
 		async deleteEntries(origList) {
 			let validList = (origList ?? []).filter((orig) => orig?.kalender_id);
@@ -275,6 +279,66 @@ export default {
 				.call(ApiKalender.syncToStudent(orig.kalender_id))
 				.then(() => this.$refs.calendar.resetEventLoader());
 		},
+		rebuildRaumvorschlag()
+		{
+			this.previewRaumvorschlag({ lehreinheit_id: this.raumvorschlagPreview.lehreinheit_id });
+		},
+		async previewRaumvorschlag(orig)
+		{
+			if (!orig)
+			{
+				this.clearRaumvorschlagPreview();
+				return;
+			}
+			if (!this.lastRange) return;
+
+			this.raumvorschlagLoading = true;
+			this.raumvorschlagPreview = { lehreinheit_id: orig.lehreinheit_id, slots: [] };
+
+			await this.$api
+				.call(
+					ApiKalender.getRaumvorschlagSlots(
+						orig.lehreinheit_id,
+						this.lastRange.start.toISODate(),
+						this.lastRange.end.toISODate(),
+					),
+				)
+				.then((result) => {
+					this.raumvorschlagPreview.slots = (result.data ?? []).map((slot) => ({
+						class: `rounded-3 bg-raumvorschlag-slot rating-${slot.rating}`,
+						start: slot.isostart,
+						matchEnd: slot.isoend,
+						end: slot.marker_isoend,
+						label: slot.label,
+						raeume: slot.raeume,
+					}));
+
+					if (this.raumvorschlagPreview.slots.length > 0)
+						this.showEvents = false;
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					this.raumvorschlagLoading = false;
+					this.rebuildExtraBackgrounds();
+				});
+		},
+		clearRaumvorschlagPreview() {
+			this.raumvorschlagPreview = null;
+			this.rebuildExtraBackgrounds();
+			this.showEvents = true;
+		},
+		findRaumvorschlagSlot(lehreinheit_id, startDT, endDT) {
+			if (this.raumvorschlagPreview?.lehreinheit_id !== lehreinheit_id) return null;
+
+			return this.raumvorschlagPreview.slots.find((slot) => {
+				const slotStart = luxon.DateTime.fromISO(slot.start);
+				const slotEnd = luxon.DateTime.fromISO(slot.matchEnd);
+				return (
+					slotStart.toMillis() === startDT.toMillis() &&
+					slotEnd.toMillis() === endDT.toMillis()
+				);
+			}) ?? null;
+		},
 		setOrt (data) {
 			this.ort_kurzbz = data.ort_kurzbz;
 			this.rooms = [{ ort_kurzbz: data.ort_kurzbz }];
@@ -284,7 +348,7 @@ export default {
 			bootstrap.Offcanvas.getOrCreateInstance(this.$refs.verbandMenu).hide();
 		},
 
-		onSelectVerband({ path, stg_kz, semester, orgform_kurzbz, name }) {
+		onSelectVerband({ stg_kz, semester, orgform_kurzbz, name }) {
 
 			let exists = this.studiengaenge.some(
 				(stg) =>
@@ -569,6 +633,7 @@ export default {
 				() => {
 					this.$refs.calendar.resetEventLoader();
 					this.$refs.coursepicker.reload();
+					this.rebuildRaumvorschlag();
 				},
 			);
 		},
@@ -583,7 +648,9 @@ export default {
 			const obj = item[0];
 			if (!obj?.type) return alert("Unbekannter Drop-Typ");
 
-			if (payload.targetKalenderId) {
+
+			if (payload.targetKalenderId)
+			{
 				if (obj.type !== "lehreinheit" || !obj.orig?.lehreinheit_id)
 					return alert(
 						"Nur Lehreinheiten können einem Termin hinzugefügt werden",
@@ -599,6 +666,7 @@ export default {
 					.then(() => {
 						this.$refs.calendar.resetEventLoader();
 						this.$refs.coursepicker.reload();
+						this.rebuildRaumvorschlag();
 						this.bcc.postMessage("dropped");
 					});
 			}
@@ -608,11 +676,15 @@ export default {
 
 			const { startDT, endDT, start_time, end_time } = dates;
 
-			if (obj.type === "reservierung") {
+			if (obj.type === "reservierung")
+			{
 				this.reservierungPending = true;
 				this.$refs.reservierung.show(start_time, end_time);
-			} else if (obj.type === "lehreinheit") {
-				if (obj.multiweek) {
+			}
+			else if (obj.type === "lehreinheit")
+			{
+				if (obj.multiweek)
+				{
 					this.openMultiWeekPreview(
 						obj.orig.lehreinheit_id,
 						this.ort_kurzbz ? this.ort_kurzbz : obj.orig.ort_kurzbz,
@@ -622,30 +694,64 @@ export default {
 					return;
 				}
 
-				return this.$api
-					.call(
-						ApiKalender.addKalenderEvent(
-							obj.orig.lehreinheit_id,
-							this.rooms.length
-								? this.rooms.map((r) => r.ort_kurzbz)
-								: obj.orig.ort_kurzbz ?? [],
-							start_time,
-							end_time,
-						),
-					)
-					.then((result) => result.data)
-					.then((result) => {
-						if (result.needs_room_selection)
-						{
-							this.$refs.raumModal.showForNew(obj.orig.lehreinheit_id, start_time, end_time, result.raum_vorschlaege)
-							return;
-						}
+				const matchedSlot = this.findRaumvorschlagSlot(
+					obj.orig.lehreinheit_id,
+					startDT,
+					endDT,
+				);
+				const raeume = matchedSlot?.raeume ?? null;
 
-						this.$refs.calendar.resetEventLoader();
-						this.$refs.coursepicker.reload();
-						this.bcc.postMessage("dropped");
-					});
-			} else if (obj.type === "kalender") {
+				if (!raeume)
+				{
+					return this.$api
+						.call(
+							ApiKalender.addKalenderEvent(
+								obj.orig.lehreinheit_id,
+								this.rooms.length
+									? this.rooms.map((r) => r.ort_kurzbz)
+									: obj.orig.ort_kurzbz ?? [],
+								start_time,
+								end_time,
+							),
+						)
+						.then((result) => result.data)
+						.then((result) => {
+							if (result.needs_room_selection)
+							{
+								this.$refs.raumModal.showForNew(obj.orig.lehreinheit_id, start_time, end_time, result.raum_vorschlaege)
+								return;
+							}
+
+							this.$refs.calendar.resetEventLoader();
+							this.$refs.coursepicker.reload();
+							this.rebuildRaumvorschlag();
+							this.bcc.postMessage("dropped");
+						});
+				}
+
+				if (raeume.length === 1)
+				{
+					return this.$api
+						.call(
+							ApiKalender.addKalenderEvent(
+								obj.orig.lehreinheit_id,
+								raeume[0].ort_kurzbz,
+								start_time,
+								end_time,
+							),
+						)
+						.then(() => {
+							this.$refs.calendar.resetEventLoader();
+							this.$refs.coursepicker.reload();
+							this.bcc.postMessage("dropped");
+							this.rebuildRaumvorschlag();
+						});
+				}
+
+				this.$refs.raumModal.showForNew(obj.orig.lehreinheit_id, start_time, end_time, raeume)
+			}
+			else if (obj.type === "kalender")
+			{
 				return this._updateKalenderEvent(
 					obj,
 					startDT,
@@ -658,10 +764,13 @@ export default {
 							id: obj.orig.kalender_id,
 						});
 						this.$refs.calendar.resetEventLoader();
+						this.rebuildRaumvorschlag();
 						this.bcc.postMessage("dropped");
 					},
 				);
-			} else {
+			}
+			else
+			{
 				alert("Unbekannter Drop-Typ: " + obj.type);
 			}
 		},
@@ -678,6 +787,7 @@ export default {
 		onMultiWeekConfirmed() {
 			this.$refs.calendar.resetEventLoader();
 			this.$refs.coursepicker.reload();
+			this.rebuildRaumvorschlag();
 			this.bcc.postMessage("dropped");
 		},
 		handleRange(range) {
@@ -701,6 +811,9 @@ export default {
 			}
 
 			this.rebuildExtraBackgrounds();
+
+			if (this.raumvorschlagPreview)
+				this.previewRaumvorschlag({ lehreinheit_id: this.raumvorschlagPreview.lehreinheit_id });
 		},
 
 		getOverlays(uid, range, rangeKey) {
@@ -786,6 +899,9 @@ export default {
 
 				if (lect.overlays.wishes) res.push(...(entry.wishes || []));
 			}
+
+			if (this.raumvorschlagPreview)
+				res.push(...this.raumvorschlagPreview.slots);
 
 			this.extraBackgrounds = res;
 		},
@@ -989,6 +1105,7 @@ export default {
 		studiengaenge: {
 			deep: true,
 			handler() {
+				this.clearRaumvorschlagPreview();
 				this.$refs.calendar.resetEventLoader();
 			},
 		},
@@ -1270,9 +1387,12 @@ export default {
 							ref="coursepicker"
 							:studiengaenge="studiengaenge"
 							:lecturers="courseLecturers"
+							:studiensemester="selectedStudiensemester"
+							:preview-lehreinheit-id="raumvorschlagPreview?.lehreinheit_id ?? null"
+							:preview-loading="raumvorschlagLoading"
+							@preview-raumvorschlag="previewRaumvorschlag"
 							@select-lecturer="addToFilter($event, 'mitarbeiter')"
-							@select-kw="jumpToKw"
-							:studiensemester="selectedStudiensemester"/>
+							@select-kw="jumpToKw"/>
 
 					</div>
 					<stv-studiensemester v-model:studiensemester-kurzbz="selectedStudiensemester"></stv-studiensemester>
@@ -1288,6 +1408,7 @@ export default {
 						:mode="currentMode"
 						:parkedEvents="parkedKeys"
 						:visible-lecturers="visibleLecturerUids"
+						:show-events="showEvents"
 						@drop="dropHandler"
 						@resize="resizeHandler"
 						@update:date="handleChangeDate"

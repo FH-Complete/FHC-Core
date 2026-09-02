@@ -58,7 +58,7 @@ export function getTempusSearchbarOptions(self)
 						action: (data) => {
 							const link = FHC_JS_DATA_STORAGE_OBJECT.app_root +
 								FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-								"/LVVerwaltung/emp/" + self.selectedStudiensemester + "/" + data.uid;
+								"/LVVerwaltung/stdsem/" + self.selectedStudiensemester + "/emp/" + data.uid;
 							window.open(link, "_blank");
 						}
 					},

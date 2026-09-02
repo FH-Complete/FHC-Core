@@ -63,6 +63,10 @@ export default {
 			type: Array,
 			default: () => ['all']
 		},
+		showEvents: {
+			type: Boolean,
+			default: true
+		}
 	},
 	emits: [
 		"update:date",
@@ -242,7 +246,7 @@ export default {
 	>
 		<template v-slot="{ event, mode }">
 			<div
-				:class="['event-type-' + event.type + ' ' + mode + 'PageContainer', { 'event--parked': parkedEvents.has(String(event.kalender_id)) }]"
+				:class="['event-type-' + event.type + ' ' + mode + 'PageContainer', { 'event--parked': parkedEvents.has(String(event.kalender_id)) }, {'event--opacity': !showEvents}]"
 				:type="mode == 'day' ? 'button' : undefined"
  				:style="eventStyle(event)"
 				@mouseenter="$emit('event-hover', event)"

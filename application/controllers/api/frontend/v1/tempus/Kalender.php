@@ -20,6 +20,7 @@ class Kalender extends FHCAPI_Controller
 			'getPlan' => 'lehre/lvplan:rw',
 			'getPlanByOrt' => 'lehre/lvplan:rw',
 			'getRaumvorschlag' => 'lehre/lvplan:rw',
+			'getRaumvorschlagSlots' => 'lehre/lvplan:rw',
 			'getLehreinheiten' => 'lehre/lvplan:rw',
 			'getHistory' => 'lehre/lvplan:rw',
 			'deleteEntry' => 'lehre/lvplan:rw',
@@ -254,6 +255,22 @@ class Kalender extends FHCAPI_Controller
 
 		$filter = $this->_checkFilter(self::ALLOWED_ROOM_FILTER);
 		$this->terminateWithSuccess($this->_ci->raumvorschlaglib->getVorschlaege($filter->kalender_id));
+	}
+
+	public function getRaumvorschlagSlots()
+	{
+		$this->_ci->form_validation->set_data($_GET);
+		$this->_ci->form_validation->set_rules('lehreinheit_id',"lehreinheit_id","required");
+		$this->_ci->form_validation->set_rules('start_date',"start_date","required");
+		$this->_ci->form_validation->set_rules('end_date',"end_date","required");
+
+		if($this->_ci->form_validation->run() === FALSE)
+			$this->terminateWithValidationErrors($this->_ci->form_validation->error_array());
+
+		$lehreinheit_id = $this->_ci->input->get('lehreinheit_id', TRUE);
+		$start_date = $this->_ci->input->get('start_date', TRUE);
+		$end_date = $this->_ci->input->get('end_date', TRUE);
+		$this->terminateWithSuccess(getData($this->_ci->raumvorschlaglib->getVorschlaegeSlots($lehreinheit_id, $start_date, $end_date)));
 	}
 
 	public function getLehreinheiten()

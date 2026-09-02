@@ -17,7 +17,6 @@ class KalenderLib
 		$this->_ci->load->model('ressource/BetriebsmittelKalender_model', 'BetriebsmittelKalenderModel');
 		$this->_ci->load->model('education/Lehreinheit_model', 'LehreinheitModel');
 		$this->_ci->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
-		$this->_ci->load->model('education/LehreinheitMitarbeiter_model', 'LehreinheitMitarbeiterModel');
 		$this->_ci->load->model('ressource/Ort_model', 'OrtModel');
 		$this->_ci->load->model('organisation/gruppe_model', 'GruppeModel');
 		$this->_ci->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
@@ -304,8 +303,6 @@ class KalenderLib
 		return $this->_mapEvents($data);
 	}
 
-
-
 	public function getForRaumvorschlag($start_date, $end_date, $lektor_uids = [], $gruppen_kurzbz = [], $lehrverband_gruppen = [])
 	{
 		$start_date = date('Y-m-d', strtotime($start_date));
@@ -331,6 +328,7 @@ class KalenderLib
 
 			foreach ($lehrverband_gruppen as $lvg)
 			{
+				$lvg = (array) $lvg;
 				$this->_ci->KalenderModel->db->or_group_start();
 				$this->_ci->KalenderModel->db->where('tbl_lehreinheitgruppe.studiengang_kz', $lvg['studiengang_kz']);
 				$this->_ci->KalenderModel->db->where('tbl_lehreinheitgruppe.semester', $lvg['semester']);
@@ -1735,6 +1733,7 @@ class KalenderLib
 	{
 		$entryResult = $this->_loadKalenderEntry($entry->kalender_id);
 
+
 		if (isError($entryResult)) return $entryResult;
 
 		$kalender_entry = getData($entryResult);
@@ -1746,6 +1745,7 @@ class KalenderLib
 				'errorCode' => 'not_allowed'
 			]);
 		}
+
 
 		if ($kalender_entry->status_kurzbz === 'sync_preview' || $kalender_entry->status_kurzbz === 'sync_live' || $kalender_entry->status_kurzbz === 'planning')
 		{
@@ -1765,9 +1765,10 @@ class KalenderLib
 			}
 			else
 			{
+
 				if (!isEmptyArray($kalender_entry->ort_kurzbz))
 				{
-					$result = $this->_deleteOrtEntry($kalender_entry->ort_kurzbz);
+					$result = $this->_deleteOrtEntry($kalender_entry);
 					if (isError($result))
 						return error($result);
 				}
@@ -1775,7 +1776,7 @@ class KalenderLib
 
 				if (!isEmptyArray($kalender_entry->lehreinheit_id))
 				{
-					$result = $this->_deleteLehreinheitEntry($kalender_entry->lehreinheit_id);
+					$result = $this->_deleteLehreinheitEntry($kalender_entry);
 					if (isError($result))
 						return error($result);
 				}
