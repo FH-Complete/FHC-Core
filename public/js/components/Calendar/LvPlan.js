@@ -87,6 +87,8 @@ export default {
 						end: now.startOf('day')
 					}
 				];
+			} else if (this.mode == 'Range') {
+				return [];
 			} else {
 				return [
 					{

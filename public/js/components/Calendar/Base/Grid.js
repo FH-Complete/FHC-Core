@@ -397,6 +397,7 @@ export default {
 		<div
 			ref="scroller"
 			@scrollend="userScroll ? disableAutoScroll() : userScroll = true"
+			id="grid-main-scrollable"
 			style="display:grid;overflow:auto"
 			:style="'grid-' + axisCol + ':1/-1;grid-template-' + axisCol + 's:subgrid'"
 		>

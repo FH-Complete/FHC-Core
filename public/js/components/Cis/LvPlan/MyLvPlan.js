@@ -179,7 +179,7 @@ export default {
 	},
 	template: /*html*/`
 	<div class="cis-lvplan-personal d-flex flex-column h-100">
-		<h2>
+		<h2 id="cis-lvplan-personal-heading">
 			{{ $p.t('lehre/stundenplan') }}
 			<span v-if="studiensemester_kurzbz" class="ps-3">
 				{{ studiensemester_kurzbz }}

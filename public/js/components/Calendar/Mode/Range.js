@@ -92,6 +92,7 @@ export default {
 	>
 		<div
 			v-if="rangeViewPresets?.presets?.length"
+			id="rangePresetSelector"
 			class="w-100 d-flex flex-row gap-2 justify-content-center align-items-center py-2"
 		>
 			<span>{{ rangeViewPresets.label }}</span>
