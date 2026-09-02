@@ -351,7 +351,6 @@ export default {
 					class="main-header"
 					:class="{
 						'collapsed-header': axisMainCollapsible && hasValidEvents && !events[index].length,
-						'main-header-monday': date.weekday === 1,
 						'main-header-sunday': date.weekday === 7,
 					}"
 					:style="'grid-' + axisCol + ':' + (2+index)"
