@@ -16,6 +16,10 @@ export default {
 	},
 	inject: {
 		renderers: {from: 'renderers'},
+		canToggleGrid: {
+			from: 'canToggleGrid',
+			default: false
+		},
 		appConfig: {
 			from: 'appConfig',
 			default: {
@@ -59,15 +63,21 @@ export default {
 			type: Array,
 			default: () => ['all']
 		},
+		showEvents: {
+			type: Boolean,
+			default: true
+		}
 	},
 	emits: [
 		"update:date",
 		"update:mode",
 		"update:range",
+		"update:date-range",
 		"drop",
 		"resize",
 		"event-hover",
-		"event-unhover"
+		"event-unhover",
+		"open-reservierung"
 	],
 
 	data() {
@@ -146,8 +156,17 @@ export default {
 			return '--event-bg:#' + event.farbe;
 		},
 		updateRange(rangeInterval) {
+			if (this.currentMode === 'tableList')
+				return;
+
 			this.rangeInterval = rangeInterval;
 			this.$emit('update:range', rangeInterval);
+		},
+		handleDateRange({ start, end }) {
+			this.rangeInterval = luxon.Interval.fromDateTimes(start.startOf('day'), end.endOf('day'));
+			this.reset();
+			this.$emit('update:range', this.rangeInterval);
+			this.$emit('update:date-range', { start, end });
 		},
 		ondrop(payload){
 			this.$emit('drop', payload);
@@ -224,10 +243,11 @@ export default {
 		@update:date="(newDate, newMode) => $emit('update:date', newDate, newMode)"
 		@update:mode="(newMode, newDate) => { currentMode = newMode; $emit('update:mode', newMode, newDate) }"
 		@update:range="updateRange"
+		@update:date-range="handleDateRange"
 	>
 		<template v-slot="{ event, mode }">
 			<div
-				:class="['event-type-' + event.type + ' ' + mode + 'PageContainer', { 'event--parked': parkedEvents.has(String(event.kalender_id)) }]"
+				:class="['event-type-' + event.type + ' ' + mode + 'PageContainer', { 'event--parked': parkedEvents.has(String(event.kalender_id)) }, {'event--opacity': !showEvents}]"
 				:type="mode == 'day' ? 'button' : undefined"
  				:style="eventStyle(event)"
 				@mouseenter="$emit('event-hover', event)"
@@ -256,6 +276,7 @@ export default {
 					class="d-flex align-items-center gap-2" 
 					style="cursor:pointer"
 					@click="showRaster = !showRaster"
+					v-if="canToggleGrid"
 				>
 					<i :class="showRaster ? 'fa-solid fa-toggle-on text-primary' : 'fa-solid fa-toggle-off text-muted'"></i>
 					<span class="form-check-label">Stundenraster</span>

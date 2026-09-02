@@ -43,6 +43,25 @@ export function getTempusSearchbarOptions(self)
 							self.addToFilter(data, 'mitarbeiter');
 						}
 					},
+					{
+						label: "zum Course Picker hinzufügen",
+						icon: "fas fa-plus",
+						type: "function",
+						action: (data) => {
+							self.addToCoursePicker(data);
+						}
+					},
+					{
+						label: "LVVerwaltung",
+						icon: "fas fa-up-right-from-square",
+						type: "function",
+						action: (data) => {
+							const link = FHC_JS_DATA_STORAGE_OBJECT.app_root +
+								FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+								"/LVVerwaltung/stdsem/" + self.selectedStudiensemester + "/emp/" + data.uid;
+							window.open(link, "_blank");
+						}
+					},
 				]
 			},
 		}

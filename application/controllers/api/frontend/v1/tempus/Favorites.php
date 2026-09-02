@@ -7,8 +7,8 @@ class Favorites extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'index' => self::PERM_LOGGED,
-			'set' => self::PERM_LOGGED
+			'index' => 'lehre/lvplan:rw',
+			'set' => 'lehre/lvplan:rw'
 		]);
 
 		// Load models

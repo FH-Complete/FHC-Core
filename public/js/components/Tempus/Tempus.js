@@ -21,7 +21,6 @@ import ApiRenderers from '../../api/factory/renderers.js';
 import ApiTempusConfig from '../../api/factory/tempus/config.js';
 import drop from '../../directives/drop.js';
 import AppConfig from '../AppConfig.js';
-import ApiStudiengangTree from '../../api/factory/tempus/studiengangtree.js';
 import ApiInfo from '../../api/factory/tempus/info.js';
 import Reservierung from './Reservierung.js';
 import { getTempusShortcuts } from './shortcuts.js';
@@ -38,6 +37,7 @@ import TempusVerbandMenu from './VerbandMenu.js';
 import TempusSidebarMenu from './SidebarMenu.js';
 import RaumauswahlModal from './RaumauswahlModal.js';
 import LehreinheitModal from './LehreinheitModal.js';
+import HorizontalSplit from '../horizontalsplit/horizontalsplit.js';
 
 export default {
 	name: 'Tempus',
@@ -56,6 +56,7 @@ export default {
 		TagsAssignmentModal,
 		RaumauswahlModal,
 		LehreinheitModal,
+		HorizontalSplit,
 	},
 	props: {
 		defaultSemester: String,
@@ -93,6 +94,7 @@ export default {
 				deleteEntries: (origList) => this.deleteEntries(origList),
 				openRaumauswahl: (orig) => this.$refs.raumModal.show(orig),
 			},
+			canToggleGrid: this.permissions.stundenraster,
 		};
 	},
 	data() {
@@ -100,41 +102,25 @@ export default {
 			appconfig: {},
 			currentMode: 'week',
 			configEndpoints: ApiTempusConfig,
-			endpoint: ApiStudiengangTree,
-			raumVorschlaege: [],
-			selected: [],
-
-			lv_id: null,
-			events: null,
-			minimized: false,
-			currentlySelectedEvent: null,
 			hoveredEvent: null,
-			studiensemesterKurzbz: this.defaultSemester,
-			lists: {
-				nations: [],
-				sprachen: [],
-				geschlechter: [],
-			},
-			renderers: null,
+			renderers: {},
 			ort_kurzbz: null,
-			view: 'room',
 			parkedKeys: new Set(),
 			lecturers: [],
 			studiengaenge: [],
 			rooms: [],
-			overlayCache: [],
+			overlayCache: {},
 			extraBackgrounds: [],
 			lastRange: null,
-			stg: null,
-			semester: null,
-			studiensemester_kurzbz: null,
-			visibleStatusArray: {},
 			visibleStatus: ['all'],
-			selectedStudiensemester:
-				this.studiensemester_kurzbz ?? this.defaultSemester,
-			calendarDate: luxon.DateTime.now()
-				.setZone(this.config.timezone)
-				.toISODate(),
+			selectedStudiensemester: this.defaultSemester,
+			calendarDatesByMode: {
+				week: luxon.DateTime.now().setZone(this.config.timezone).toISODate(),
+				month: luxon.DateTime.now().setZone(this.config.timezone).toISODate(),
+				tableList: luxon.DateTime.now()
+					.setZone(this.config.timezone)
+					.toISODate(),
+			},
 			historyEntries: [],
 			previewRole: 'planer',
 			multiWeekModal: {
@@ -145,33 +131,25 @@ export default {
 				endTime: null,
 			},
 			studiengaenge_all: [],
+			raumvorschlagPreview: null,
+			raumvorschlagLoading: false,
+			showEvents: true,
+			reservierungPending: false,
+			bcc: null,
 		};
 	},
 	computed: {
-		currentDay() {
-			return luxon.DateTime.now().setZone(this.config.timezone).toISODate();
+		calendarDate() {
+			return (
+				this.calendarDatesByMode[this.currentMode] ??
+				this.calendarDatesByMode.week
+			);
 		},
 		visibleLecturerUids() {
 			if (!this.lecturers.length) return null;
 			return this.lecturers
 				.filter((lecture) => lecture.showEvents)
 				.map((lecture) => lecture.uid);
-		},
-		visibleStatusOptions() {
-			return Object.entries(this.visibleStatusArray).map(([key, label]) => ({
-				key,
-				label,
-			}));
-		},
-		visibleStatusValue() {
-			if (this.visibleStatus.includes('all'))
-				return this.visibleStatusOptions.filter(
-					(visibleStatus) => visibleStatus.key === 'all',
-				);
-			return this.visibleStatus.map((status) => ({
-				key: status,
-				label: this.visibleStatusArray[status],
-			}));
 		},
 		keyboardShortcuts() {
 			return getTempusShortcuts(this);
@@ -187,6 +165,7 @@ export default {
 			await this.deleteEntryCall(orig);
 			this.$refs.calendar.resetEventLoader();
 			this.$refs.sidebar.reloadCoursepicker();
+			this.rebuildRaumvorschlag();
 		},
 		async deleteEntries(origList) {
 			let validList = (origList ?? []).filter((orig) => orig?.kalender_id);
@@ -226,7 +205,80 @@ export default {
 				.call(ApiKalender.syncToStudent(orig.kalender_id))
 				.then(() => this.$refs.calendar.resetEventLoader());
 		},
-		setOrt: function (data) {
+		rebuildRaumvorschlag() {
+			if (!this.raumvorschlagPreview?.lehreinheit_id) return;
+
+			this.previewRaumvorschlag({
+				lehreinheit_id: this.raumvorschlagPreview.lehreinheit_id,
+			});
+		},
+
+		clearRaumvorschlagPreview() {
+			this.raumvorschlagPreview = null;
+			this.raumvorschlagLoading = false;
+			this.rebuildExtraBackgrounds();
+			this.showEvents = true;
+		},
+		async previewRaumvorschlag(orig) {
+			if (!orig?.lehreinheit_id) {
+				this.clearRaumvorschlagPreview();
+				return;
+			}
+			if (!this.lastRange) return;
+
+			const preview = {
+				lehreinheit_id: orig.lehreinheit_id,
+				slots: [],
+			};
+			this.raumvorschlagPreview = preview;
+			this.raumvorschlagLoading = true;
+
+			try {
+				const result = await this.$api.call(
+					ApiKalender.getRaumvorschlagSlots(
+						orig.lehreinheit_id,
+						this.lastRange.start.toISODate(),
+						this.lastRange.end.toISODate(),
+					),
+				);
+
+				if (this.raumvorschlagPreview !== preview) return;
+
+				preview.slots = (result.data ?? []).map((slot) => ({
+					class: `rounded-3 bg-raumvorschlag-slot rating-${slot.rating}`,
+					start: slot.isostart,
+					matchEnd: slot.isoend,
+					end: slot.marker_isoend,
+					label: slot.label,
+					raeume: slot.raeume,
+				}));
+				this.showEvents = preview.slots.length === 0;
+			} catch (error) {
+				if (this.raumvorschlagPreview === preview) this.showEvents = true;
+				this.$fhcAlert.handleSystemError(error);
+			} finally {
+				if (this.raumvorschlagPreview === preview) {
+					this.raumvorschlagLoading = false;
+					this.rebuildExtraBackgrounds();
+				}
+			}
+		},
+		findRaumvorschlagSlot(lehreinheit_id, startDT, endDT) {
+			if (this.raumvorschlagPreview?.lehreinheit_id !== lehreinheit_id)
+				return null;
+
+			return (
+				this.raumvorschlagPreview.slots.find((slot) => {
+					const slotStart = luxon.DateTime.fromISO(slot.start);
+					const slotEnd = luxon.DateTime.fromISO(slot.matchEnd);
+					return (
+						slotStart.toMillis() === startDT.toMillis() &&
+						slotEnd.toMillis() === endDT.toMillis()
+					);
+				}) ?? null
+			);
+		},
+		setOrt(data) {
 			this.ort_kurzbz = data.ort_kurzbz;
 			this.rooms = [{ ort_kurzbz: data.ort_kurzbz }];
 		},
@@ -237,7 +289,7 @@ export default {
 			if (verbandMenu)
 				bootstrap.Offcanvas.getOrCreateInstance(verbandMenu).hide();
 		},
-		onSelectVerband({ path, stg_kz, semester, orgform_kurzbz, name }) {
+		onSelectVerband({ stg_kz, semester, orgform_kurzbz, name }) {
 			let exists = this.studiengaenge.some(
 				(stg) =>
 					stg.stg_kz == stg_kz &&
@@ -252,25 +304,46 @@ export default {
 				];
 			}
 		},
-		setEmp: function (data) {
-			const uid = data.uid;
-			const label = data.name;
+		setEmp(data) {
+			if (!data?.uid) return;
 
 			for (const lect of this.lecturers) delete this.overlayCache[lect.uid];
 
 			this.lecturers = [
 				{
-					uid,
-					label,
+					uid: data.uid,
+					label: data.name,
 					showEvents: true,
 					overlays: { blocks: true, wishes: true },
+					showCoursePicker: false,
 				},
 			];
 
 			this.$refs.calendar.resetEventLoader();
 			if (this.lastRange) this.handleRange(this.lastRange);
 		},
-		addToFilter: function (filter, type) {
+		addToCoursePicker(data) {
+			const uid = data.uid;
+			let lecturer = this.lecturers.find((lecture) => lecture.uid === uid);
+
+			if (!lecturer) {
+				this.addToFilter(data, 'mitarbeiter');
+				lecturer = this.lecturers.find((lecture) => lecture.uid === uid);
+
+				if (lecturer) {
+					lecturer.overlays = {
+						blocks: false,
+						wishes: false,
+					};
+				}
+			}
+
+			if (lecturer) {
+				lecturer.showCoursePicker = true;
+			}
+		},
+
+		addToFilter(filter, type) {
 			if (type === 'ort') {
 				const ort_kurzbz = filter.ort_kurzbz;
 				if (!this.rooms.some((room) => room.ort_kurzbz === ort_kurzbz)) {
@@ -279,13 +352,20 @@ export default {
 			} else if (type === 'mitarbeiter') {
 				const uid = filter.uid;
 				const label = filter.name;
-				if (!this.lecturers.some((l) => l.uid === uid)) {
+
+				let lecturer = this.lecturers.find((lecture) => lecture.uid === uid);
+
+				if (!lecturer) {
 					this.lecturers.push({
 						uid,
 						label,
 						showEvents: true,
 						overlays: { blocks: true, wishes: true },
+						showCoursePicker: false,
 					});
+				} else {
+					lecturer.showEvents = true;
+					lecturer.overlays = { blocks: true, wishes: true };
 				}
 			}
 
@@ -304,17 +384,32 @@ export default {
 				},
 				{ zone: this.config.timezone },
 			);
-			this.calendarDate = date.toISODate();
+			this.calendarDatesByMode = {
+				...this.calendarDatesByMode,
+				week: date.toISODate(),
+			};
+			this.currentMode = 'week';
 		},
 		handleChangeDate(newDate) {
-			if (newDate && luxon.DateTime.isDateTime(newDate) && newDate.isValid)
-				this.calendarDate = newDate.toISODate();
+			if (!(newDate && luxon.DateTime.isDateTime(newDate) && newDate.isValid))
+				return;
+
+			this.calendarDatesByMode = {
+				...this.calendarDatesByMode,
+				[this.currentMode]: newDate.toISODate(),
+			};
 		},
 		handleChangeMode(newMode, newDate) {
 			if (!newMode) return;
+
+			if (newDate && luxon.DateTime.isDateTime(newDate) && newDate.isValid) {
+				this.calendarDatesByMode = {
+					...this.calendarDatesByMode,
+					[this.currentMode]: newDate.toISODate(),
+				};
+			}
+
 			this.currentMode = newMode;
-			if (newDate && luxon.DateTime.isDateTime(newDate) && newDate.isValid)
-				this.calendarDate = newDate.toISODate();
 		},
 		updateCollision() {
 			this.$api
@@ -324,21 +419,6 @@ export default {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui/settings_saved'));
 				})
 				.catch(this.$fhcAlert.handleSystemErrors);
-		},
-		toggleStatus(selected) {
-			if (!selected || selected.length === 0) {
-				this.visibleStatus = ['all'];
-				return;
-			}
-			const hasAll = selected.includes('all');
-			const hadAll = this.visibleStatus.includes('all');
-
-			if (hasAll && !hadAll) {
-				this.visibleStatus = ['all'];
-				return;
-			}
-			this.visibleStatus = selected.filter((k) => k !== 'all');
-			if (this.visibleStatus.length === 0) this.visibleStatus = ['all'];
 		},
 		searchfunction(params) {
 			return this.$api.call(ApiSearchbar.search(params));
@@ -382,51 +462,6 @@ export default {
 					ApiKalender.getPlan(filter, start.toISODate(), end.toISODate()),
 				),
 			];
-		},
-		toDateTime(value, timezone) {
-			if (luxon.DateTime.isDateTime(value)) return value;
-
-			if (value?.date?.isValid) return value.date;
-
-			if (typeof value === 'number')
-				return luxon.DateTime.fromMillis(value, { zone: timezone });
-
-			if (value instanceof Date)
-				return luxon.DateTime.fromJSDate(value, { zone: timezone });
-
-			if (typeof value === 'string')
-				return luxon.DateTime.fromISO(value, { zone: timezone });
-
-			return luxon.DateTime.invalid('invalid datetime');
-		},
-		getLastEndOfSameDay(startDT, ends) {
-			if (!ends?.length) return null;
-
-			const dayKey = startDT.toISODate();
-			let lastSameDay = null;
-
-			for (const end of ends) {
-				const dt = luxon.DateTime.isDateTime(end)
-					? end
-					: luxon.DateTime.fromISO(String(end), { zone: startDT.zoneName });
-
-				if (!dt.isValid) continue;
-
-				if (dt.toISODate() === dayKey) lastSameDay = dt;
-			}
-
-			return lastSameDay;
-		},
-		clampEndToGrid(startDT, durationMin, ends) {
-			const calculatedEnd = startDT.plus({ minutes: durationMin });
-
-			const lastGridEndSameDay = this.getLastEndOfSameDay(startDT, ends);
-
-			if (!lastGridEndSameDay) return calculatedEnd;
-
-			return calculatedEnd > lastGridEndSameDay
-				? lastGridEndSameDay
-				: calculatedEnd;
 		},
 		_parseDates(start, end) {
 			const startDT = luxon.DateTime.fromISO(start);
@@ -494,6 +529,7 @@ export default {
 				() => {
 					this.$refs.calendar.resetEventLoader();
 					this.$refs.sidebar.reloadCoursepicker();
+					this.rebuildRaumvorschlag();
 				},
 			);
 		},
@@ -523,6 +559,8 @@ export default {
 					)
 					.then(() => {
 						this.$refs.calendar.resetEventLoader();
+						this.$refs.sidebar.reloadCoursepicker();
+						this.rebuildRaumvorschlag();
 						this.bcc.postMessage('dropped');
 					});
 			}
@@ -546,24 +584,68 @@ export default {
 					return;
 				}
 
-				return this.$api
-					.call(
-						ApiKalender.addKalenderEvent(
-							obj.orig.lehreinheit_id,
-							this.rooms.length
-								? this.rooms.map((r) => r.ort_kurzbz)
-								: (obj.orig.ort_kurzbz ?? []),
+				const matchedSlot = this.findRaumvorschlagSlot(
+					obj.orig.lehreinheit_id,
+					startDT,
+					endDT,
+				);
+				const raeume = matchedSlot?.raeume ?? null;
 
-							start_time,
-							end_time,
-						),
-					)
-					.then((result) => result.data)
-					.then((result) => {
-						this.$refs.calendar.resetEventLoader();
-						this.$refs.sidebar.reloadCoursepicker();
-						this.bcc.postMessage('dropped');
-					});
+				if (!raeume) {
+					return this.$api
+						.call(
+							ApiKalender.addKalenderEvent(
+								obj.orig.lehreinheit_id,
+								this.rooms.length
+									? this.rooms.map((r) => r.ort_kurzbz)
+									: (obj.orig.ort_kurzbz ?? []),
+								start_time,
+								end_time,
+							),
+						)
+						.then((result) => result.data)
+						.then((result) => {
+							if (result.needs_room_selection) {
+								this.$refs.raumModal.showForNew(
+									obj.orig.lehreinheit_id,
+									start_time,
+									end_time,
+									result.raum_vorschlaege,
+								);
+								return;
+							}
+
+							this.$refs.calendar.resetEventLoader();
+								this.$refs.sidebar.reloadCoursepicker();
+							this.rebuildRaumvorschlag();
+							this.bcc.postMessage('dropped');
+						});
+				}
+
+				if (raeume.length === 1) {
+					return this.$api
+						.call(
+							ApiKalender.addKalenderEvent(
+								obj.orig.lehreinheit_id,
+								raeume[0].ort_kurzbz,
+								start_time,
+								end_time,
+							),
+						)
+						.then(() => {
+							this.$refs.calendar.resetEventLoader();
+								this.$refs.sidebar.reloadCoursepicker();
+							this.bcc.postMessage('dropped');
+							this.rebuildRaumvorschlag();
+						});
+				}
+
+				this.$refs.raumModal.showForNew(
+					obj.orig.lehreinheit_id,
+					start_time,
+					end_time,
+					raeume,
+				);
 			} else if (obj.type === 'kalender') {
 				return this._updateKalenderEvent(
 					obj,
@@ -577,6 +659,7 @@ export default {
 							id: obj.orig.kalender_id,
 						});
 						this.$refs.calendar.resetEventLoader();
+						this.rebuildRaumvorschlag();
 						this.bcc.postMessage('dropped');
 					},
 				);
@@ -597,6 +680,7 @@ export default {
 		onMultiWeekConfirmed() {
 			this.$refs.calendar.resetEventLoader();
 			this.$refs.sidebar.reloadCoursepicker();
+			this.rebuildRaumvorschlag();
 			this.bcc.postMessage('dropped');
 		},
 		handleRange(range) {
@@ -620,6 +704,11 @@ export default {
 			}
 
 			this.rebuildExtraBackgrounds();
+
+			if (this.raumvorschlagPreview)
+				this.previewRaumvorschlag({
+					lehreinheit_id: this.raumvorschlagPreview.lehreinheit_id,
+				});
 		},
 
 		getOverlays(uid, range, rangeKey) {
@@ -706,6 +795,9 @@ export default {
 				if (lect.overlays.wishes) res.push(...(entry.wishes || []));
 			}
 
+			if (this.raumvorschlagPreview)
+				res.push(...this.raumvorschlagPreview.slots);
+
 			this.extraBackgrounds = res;
 		},
 
@@ -727,10 +819,14 @@ export default {
 			this.previewRole = role;
 			this.$refs.calendar.resetEventLoader();
 		},
+		openReservierung() {
+			this.reservierungPending = false;
+			this.$refs.reservierung?.show();
+		},
 		triggerSync() {
 			this.$api
 				.call(ApiKalender.sync())
-				.then(this.$refs.calendar.resetEventLoader());
+				.then(() => this.$refs.calendar.resetEventLoader());
 		},
 		onEventHover(event) {
 			this.hoveredEvent = event;
@@ -747,7 +843,7 @@ export default {
 			if (this.$refs.sidebar.isParked(event.kalender_id)) {
 				this.$refs.sidebar.unpark({ type: event.type, id: event.kalender_id });
 			} else {
-				this.$refs.sidebar.park(null, {
+				this.$refs.sidebar.park({
 					type: 'kalender',
 					id: event.kalender_id,
 					orig: event,
@@ -759,9 +855,6 @@ export default {
 			if (!event?.kalender_id) return;
 
 			this.deleteEntry(event);
-		},
-		clearHoveredEvent() {
-			this.hoveredEvent = null;
 		},
 		focusSearchbar() {
 			this.$refs.header?.focusSearchbar();
@@ -780,6 +873,7 @@ export default {
 		studiengaenge: {
 			deep: true,
 			handler() {
+				this.clearRaumvorschlagPreview();
 				this.$refs.calendar.resetEventLoader();
 			},
 		},
@@ -793,7 +887,7 @@ export default {
 		});
 	},
 	beforeUnmount() {
-		this.bcc.close();
+		this.bcc?.close();
 	},
 	async created() {
 		await this.$api
@@ -838,9 +932,6 @@ export default {
 						}
 					}
 
-					if (this.renderers === null) {
-						this.renderers = {};
-					}
 					if (!this.renderers[rendertype]) {
 						this.renderers[rendertype] = {};
 					}
@@ -850,10 +941,6 @@ export default {
 				}
 			});
 
-		this.$api.call(ApiTempusConfig.getHeader()).then((res) => {
-			this.visibleStatusArray = res.data.visible_status;
-			this.visibleStatus = ['all'];
-		});
 		this.$api.call(ApiInfo.getStudiengaenge()).then((res) => {
 			this.studiengaenge_all = res.data;
 		});
@@ -871,56 +958,65 @@ export default {
 			:logout-url="logoutUrl"
 			:searchbaroptions="searchbaroptions"
 			:searchfunction="searchfunction"
-      @language-changed="this.$refs.calendar.resetEventLoader();"
+			@language-changed="this.$refs.calendar.resetEventLoader();"
 		/>
 		<div class="container-fluid overflow-hidden heightfull">
 			<div class="row h-100">
 				<tempus-app-menu />
-				<tempus-sidebar-menu
-					ref="sidebar"
-					:preview-role="previewRole"
-					:rooms="rooms"
-					:studiengaenge="studiengaenge"
-					:studiengaenge-all="studiengaenge_all"
-					:lecturers="lecturers"
-					:selected-studiensemester="selectedStudiensemester"
-					@update:preview-role="handlePreviewRoleChange"
-					@update:rooms="rooms = $event"
-					@update:studiengaenge="studiengaenge = $event"
-					@update:parked-keys="parkedKeys = $event"
-					@update:selected-studiensemester="selectedStudiensemester = $event"
-					@remove-lecturer="removeLecturer"
-					@select-lecturer="setEmp"
-					@select-kw="jumpToKw"
-					@sync="triggerSync"
-				/>
-				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
-					<fhc-calendar
-						ref="calendar"
-						:timezone="config.timezone"
-						:get-promise-func="getPromiseFunc"
-						:visible-status="visibleStatus"
-						:date="calendarDate"
-						:mode="currentMode"
-						:parkedEvents="parkedKeys"
-						:visible-lecturers="visibleLecturerUids"
-						@drop="dropHandler"
-						@resize="resizeHandler"
-						@update:date="handleChangeDate"
-						@update:mode="handleChangeMode"
-						@event-hover="onEventHover"
-						@event-unhover="onEventUnhover"
-						:extra-backgrounds="extraBackgrounds"
-						@update:range="handleRange"
-						class="responsive-calendar"
-					/>
-				</main>
+
+				<horizontal-split :defaultRatio="[15, 85]">
+					<template #left>
+						<tempus-sidebar-menu
+							ref="sidebar"
+							:preview-role="previewRole"
+							:rooms="rooms"
+							:studiengaenge="studiengaenge"
+							:studiengaenge-all="studiengaenge_all"
+							:lecturers="lecturers"
+							:selected-studiensemester="selectedStudiensemester"
+							:raumvorschlag-preview="raumvorschlagPreview"
+							:raumvorschlag-loading="raumvorschlagLoading"
+							@update:preview-role="handlePreviewRoleChange"
+							@update:rooms="rooms = $event"
+							@update:studiengaenge="studiengaenge = $event"
+							@update:parked-keys="parkedKeys = $event"
+							@update:selected-studiensemester="selectedStudiensemester = $event"
+							@remove-lecturer="removeLecturer"
+							@select-lecturer="addToFilter($event, 'mitarbeiter')"
+							@select-kw="jumpToKw"
+							@sync="triggerSync"
+							@preview-raumvorschlag="previewRaumvorschlag"
+						/>
+					</template>
+					<template #right>
+						<fhc-calendar
+							ref="calendar"
+							:timezone="config.timezone"
+							:get-promise-func="getPromiseFunc"
+							:visible-status="visibleStatus"
+							:date="calendarDate"
+							:mode="currentMode"
+							:parkedEvents="parkedKeys"
+							:visible-lecturers="visibleLecturerUids"
+							:show-events="showEvents"
+							@drop="dropHandler"
+							@resize="resizeHandler"
+							@update:date="handleChangeDate"
+							@update:mode="handleChangeMode"
+							@event-hover="onEventHover"
+							@event-unhover="onEventUnhover"
+							@open-reservierung="openReservierung"
+							:extra-backgrounds="extraBackgrounds"
+							@update:range="handleRange"
+							class="responsive-calendar"
+						/>
+					</template>
+				</horizontal-split>
 			</div>
 		</div>
 		<app-config ref="config" v-model="appconfig" :endpoints="configEndpoints"></app-config>
 		<tempus-verband-menu
 			ref="verbandMenu"
-			:endpoint="endpoint"
 			@select-verband-and-close="onSelectVerbandAndClose"
 		/>
 		<raumauswahl-modal ref="raumModal" @saved="$refs.calendar.resetEventLoader()"/>

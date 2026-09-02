@@ -33,7 +33,8 @@ export default {
 			show_all_fields: false,
 			filteredUsers: [],
 			filteredGroups: [],
-			abortController: null
+			abortController: null,
+			location: null
 		};
 	},
 	created()
@@ -141,11 +142,16 @@ export default {
 		},
 		save()
 		{
+
+			let orte = {
+				ort_kurzbz: this.selected_rooms.map(r => r.ort_kurzbz),
+				location: this.location
+			}
 			this.$api.call(
 				ApiReservierung.addReservierung(
 					this.titel,
 					this.beschreibung,
-					this.selected_rooms.map(r => r.ort_kurzbz),
+					orte,
 					luxon.DateTime.fromFormat(this.start, 'yyyy-MM-dd HH:mm').toISO(),
 					luxon.DateTime.fromFormat(this.end, 'yyyy-MM-dd HH:mm').toISO(),
 					this.teilnehmer.filter(t => t.uid && t.rolle).map(nehmer => ({ uid: nehmer.uid, rolle: nehmer.rolle })),
@@ -219,6 +225,14 @@ export default {
 								{{ option.ort_kurzbz }} {{ option.bezeichnung }}
 							</template>
 						</Multiselect>
+					</div>
+					<div class="col-6">
+						<form-input
+							:label="$p.t('global', 'raum')"
+							type="textarea"
+							name="location"
+							v-model="location"
+						></form-input>
 					</div>
 					<div class="col-12" v-if="show_all_fields">
 						<div v-for="(nehmer, i) in teilnehmer" :key="i" class="d-flex gap-2 mb-2 align-items-end">

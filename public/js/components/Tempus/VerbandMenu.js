@@ -5,12 +5,6 @@ export default {
 	components: {
 		BaseTreemenu,
 	},
-	props: {
-		endpoint: {
-			type: Object,
-			required: true,
-		},
-	},
 	emits: ['select-verband-and-close'],
 	methods: {
 		onSelectVerbandAndClose(payload) {

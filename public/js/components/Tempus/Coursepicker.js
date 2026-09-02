@@ -14,19 +14,32 @@ export default {
 			type: Array,
 			default: [],
 		},
+		lecturers: {
+			type: Array,
+			default: [],
+		},
 		studiensemester: {
 			type: String,
 			default: null
 		},
+		previewLehreinheitId: {
+			type: [String, Number],
+			default: null
+		},
+		previewLoading: {
+			type: Boolean,
+			default: false
+		},
 	},
-	emits: ['select-lecturer', 'select-kw'],
+	emits: ['select-lecturer', 'select-kw', 'preview-raumvorschlag'],
 	data() {
 		return {
 			searchparam: '',
 			allCourses: [],
 			sortBy: null,
 			multiWeekIds: new Set(),
-			favorites: new Set()
+			favorites: new Set(),
+			filter: {}
 		}
 	},
 	computed: {
@@ -86,32 +99,45 @@ export default {
 		studiengaenge: {
 			deep: true,
 			handler(val) {
-				this.searchparam = '';
-				this.loadCoursesByStg(val);
+				this.loadCourses();
+			}
+		},
+		lecturers: {
+			deep: true,
+			handler() {
+				this.loadCourses();
 			}
 		},
 		studiensemester() {
 			if (this.studiengaenge)
-				this.loadCoursesByStg(this.studiengaenge);
+				this.loadCourses();
 		},
 	},
 	methods: {
-		async loadCoursesByStg(stg) {
-			if (stg.length <= 0)
-			{
-				this.allCourses = [];
-				return;
+		async loadCourses()
+		{
+			const hasLektoren = this.lecturers.length > 0;
+			const hasStg = this.studiengaenge.length > 0;
+
+			this.filter = {};
+			if (hasLektoren)
+				this.filter.uid = this.lecturers;
+
+			if (hasStg) {
+				this.filter.stg = this.studiengaenge.map(
+					({ stg_kz, semester, orgform_kurzbz }) => ({
+						stg_kz,
+						semester,
+						orgform_kurzbz,
+					}),
+				);
 			}
 
-			let payload = stg.map(({ stg_kz, semester, orgform_kurzbz }) => ({
-				stg_kz,
-				semester,
-				orgform_kurzbz
-			}));
-
-			this.$api.call(ApiCoursePicker.getByStg(payload, this.studiensemester))
+			if (Object.keys(this.filter).length === 0)
+				return this.allCourses = [];
+			this.$api.call(ApiCoursePicker.getCourses(this.filter, this.studiensemester))
 				.then(result => {
-					this.allCourses = result.data.map(e => ({
+					this.allCourses = result?.data?.map(e => ({
 						lehreinheit_id: e.lehreinheit_id,
 						lektoren: e.lektoren,
 						raumtyp: e.raumtyp,
@@ -177,7 +203,7 @@ export default {
 		},
 		reload()
 		{
-			this.loadCoursesByStg(this.studiengaenge);
+			this.loadCourses();
 		},
 		toggleMultiWeek(course)
 		{
@@ -209,6 +235,17 @@ export default {
 		isPinned(course)
 		{
 			return this.favorites.has(course.lehreinheit_id);
+		},
+		selectRaumvorschlag(course)
+		{
+			if (this.isRaumvorschlagActive(course))
+				this.$emit('preview-raumvorschlag', null);
+			else
+				this.$emit('preview-raumvorschlag', course.orig);
+		},
+		isRaumvorschlagActive(course)
+		{
+			return this.previewLehreinheitId != null && this.previewLehreinheitId === course.lehreinheit_id;
 		},
 	},
 	mounted() {
@@ -253,7 +290,7 @@ export default {
 				</button>
 			</div>
 		</div>
-		<div v-if="studiengaenge.length <= 0" class="d-flex flex-column align-items-center justify-content-center text-center text-muted py-5 px-3 h-100">
+		<div v-if="Object.keys(filter).length <= 0" class="d-flex flex-column align-items-center justify-content-center text-center text-muted py-5 px-3 h-100">
 			<span class="small fw-semibold mb-1">{{$p.t('lehre', 'cptitleempty')}}</span>
 			<span class="small">{{$p.t('lehre', 'cpempty')}}</span>
 		</div>
@@ -264,7 +301,7 @@ export default {
 				style="cursor:grab"
 				:style="courseStyle(course)"
 				class="course-picker-row rounded-3 mb-2 p-2"
-				:class="{ 'course-picker-row-pinned': isPinned(course) }"
+				:class="{ 'course-picker-row-pinned': isPinned(course), 'course-picker-row-preview': isRaumvorschlagActive(course) }"
 				v-draggable:move.noimage="dragLehreinheitCollection(course)"
 				tabindex="0"
 			>
@@ -283,6 +320,19 @@ export default {
 						style="cursor:pointer"
 						v-tooltip="isMultiWeek(course) ? 'MultiWeek aktiv' : 'MultiWeek Verplanung aktivieren'"
 						@click.stop="toggleMultiWeek(course)"
+					></i>
+					<i
+						v-if="!(previewLoading && isRaumvorschlagActive(course))"
+						class="fa fa-door-open"
+						:class="isRaumvorschlagActive(course) ? 'text-primary' : 'text-muted'"
+						style="cursor:pointer"
+						v-tooltip="isRaumvorschlagActive(course) ? 'Raumvorschlag ausblenden' : 'Raumvorschlag einblenden'"
+						@click.stop="selectRaumvorschlag(course)"
+					></i>
+					<i
+						v-else
+						class="fa fa-spinner fa-spin text-primary"
+						v-tooltip="'Räume werden geprüft...'"
 					></i>
 				</div>
 				

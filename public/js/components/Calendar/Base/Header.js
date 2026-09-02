@@ -32,7 +32,8 @@ export default {
 		"prev",
 		"click:mode",
 		"update:date",
-		"update:mode"
+		"update:mode",
+		"update:date-range"
 	],
 	data() {
 		return {
@@ -109,6 +110,7 @@ export default {
 					class="btn btn-outline-secondary border-0"
 					@click="$emit('prev')"
 					:disabled="open"
+					v-if="mode !== 'tableList'"
 				>
 					<i class="fa fa-chevron-left"></i>
 				</button>
@@ -116,6 +118,7 @@ export default {
 					:mode="mode"
 					:date="date"
 					@update:date="$emit('update:date', $event)"
+					@update:date-range="$emit('update:date-range', $event)"
 					@open="open = true"
 					@closed="open = false"
 					:list-length="modeOptions.length"
@@ -124,6 +127,7 @@ export default {
 					class="btn btn-outline-secondary border-0"
 					@click="$emit('next')"
 					:disabled="open"
+					v-if="mode !== 'tableList'"
 				>
 					<i class="fa fa-chevron-right"></i>
 				</button>

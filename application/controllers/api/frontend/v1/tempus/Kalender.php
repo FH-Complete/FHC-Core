@@ -8,18 +8,19 @@ class Kalender extends FHCAPI_Controller
 	const ALLOWED_PLAN_FILTER = ['ort', 'uid', 'stg'];
 	const ALLOWED_ROOM_FILTER = ['lehreinheit_id', 'kalender_id'];
 
-	const ALLOWED_TO_UPDATE = ['start_time', 'end_time', 'ort_kurzbz'];
+	const ALLOWED_TO_UPDATE = ['start_time', 'end_time', 'orte'];
 	/**
 	 * Object initialization
 	 */
 	public function __construct()
 	{
 		parent::__construct([
-			'getStunden' => self::PERM_LOGGED,
-			'getCalendarHours' => self::PERM_LOGGED,
-			'getPlan' => self::PERM_LOGGED,
-			'getPlanByOrt' => self::PERM_LOGGED,
-			'getRaumvorschlag' => self::PERM_LOGGED,
+			'getStunden' => 'lehre/lvplan:rw',
+			'getCalendarHours' => 'lehre/lvplan:rw',
+			'getPlan' => 'lehre/lvplan:rw',
+			'getPlanByOrt' => 'lehre/lvplan:rw',
+			'getRaumvorschlag' => 'lehre/lvplan:rw',
+			'getRaumvorschlagSlots' => 'lehre/lvplan:rw',
 			'getLehreinheiten' => 'lehre/lvplan:rw',
 			'getHistory' => 'lehre/lvplan:rw',
 			'deleteEntry' => 'lehre/lvplan:rw',
@@ -27,8 +28,8 @@ class Kalender extends FHCAPI_Controller
 			'syncToStudent' => 'lehre/lvplan:rw',
 			'getPlanLecturer' =>'lehre/lvplan:rw',
 			'getPlanStudent' => 'lehre/lvplan:rw',
-			'getZeitwuensche' => self::PERM_LOGGED,
-			'getZeitsperren' => self::PERM_LOGGED,
+			'getZeitwuensche' => 'lehre/lvplan:rw',
+			'getZeitsperren' => 'lehre/lvplan:rw',
 			'updateKalenderEvent' => 'lehre/lvplan:rw',
 			'deleteOrtEntry' => 'lehre/lvplan:rw',
 			'deleteFromKalenderEvent' => 'lehre/lvplan:rw',
@@ -44,6 +45,7 @@ class Kalender extends FHCAPI_Controller
 		$this->_ci->load->library('LogLib');
 		$this->_ci->load->library('form_validation');
 		$this->_ci->load->library('KalenderLib');
+		$this->_ci->load->library('KalenderSyncLib');
 		$this->_ci->load->library('RaumvorschlagLib');
 		$this->loadPhrases([
 			'ui'
@@ -222,7 +224,7 @@ class Kalender extends FHCAPI_Controller
 		$updateFields = $this->_checkUpdate($this->_ci->input->post('updatedInfos', TRUE));
 		$kalender_id = $this->_ci->input->post('kalender_id', TRUE);
 
-		$result = $this->_ci->kalenderlib->updateKalenderEvent($kalender_id, $updateFields->ort_kurzbz ?? null,  $updateFields->start_time ?? null,  $updateFields->end_time ?? null);
+		$result = $this->_ci->kalenderlib->updateKalenderEvent($kalender_id, $updateFields->orte ?? null,  $updateFields->start_time ?? null,  $updateFields->end_time ?? null, $updateFields->location ?? null);
 
 		if (isError($result))
 			$this->terminateWithError(getError($result),  $result->code);
@@ -253,6 +255,22 @@ class Kalender extends FHCAPI_Controller
 
 		$filter = $this->_checkFilter(self::ALLOWED_ROOM_FILTER);
 		$this->terminateWithSuccess($this->_ci->raumvorschlaglib->getVorschlaege($filter->kalender_id));
+	}
+
+	public function getRaumvorschlagSlots()
+	{
+		$this->_ci->form_validation->set_data($_GET);
+		$this->_ci->form_validation->set_rules('lehreinheit_id',"lehreinheit_id","required");
+		$this->_ci->form_validation->set_rules('start_date',"start_date","required");
+		$this->_ci->form_validation->set_rules('end_date',"end_date","required");
+
+		if($this->_ci->form_validation->run() === FALSE)
+			$this->terminateWithValidationErrors($this->_ci->form_validation->error_array());
+
+		$lehreinheit_id = $this->_ci->input->get('lehreinheit_id', TRUE);
+		$start_date = $this->_ci->input->get('start_date', TRUE);
+		$end_date = $this->_ci->input->get('end_date', TRUE);
+		$this->terminateWithSuccess(getData($this->_ci->raumvorschlaglib->getVorschlaegeSlots($lehreinheit_id, $start_date, $end_date)));
 	}
 
 	public function getLehreinheiten()
@@ -306,7 +324,7 @@ class Kalender extends FHCAPI_Controller
 
 	public function sync()
 	{
-		$result = $this->_ci->kalenderlib->sync();
+		$result = $this->_ci->kalendersynclib->sync();
 		$this->terminateWithSuccess(getData($result));
 	}
 	public function syncToLecturer()
