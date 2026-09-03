@@ -344,6 +344,21 @@ export default {
 			this.ort_kurzbz = data.ort_kurzbz;
 			this.rooms = [{ ort_kurzbz: data.ort_kurzbz }];
 		},
+		setEmp (data) {
+			const uid = data.uid;
+			const label = data.name;
+
+			this.lecturers = [{
+				uid,
+				label,
+				showEvents: true,
+				overlays: {blocks: true, wishes: true},
+				showCoursePicker: false
+			}];
+
+			this.$refs.calendar.resetEventLoader();
+			if (this.lastRange) this.handleRange(this.lastRange);
+		},
 		onSelectVerbandAndClose(payload) {
 			this.onSelectVerband(payload);
 			bootstrap.Offcanvas.getOrCreateInstance(this.$refs.verbandMenu).hide();
