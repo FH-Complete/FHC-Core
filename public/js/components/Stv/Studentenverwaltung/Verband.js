@@ -65,6 +65,12 @@ export default {
 			} else {
 				const { semester, verband, gruppe } = drop;
 				const params = { semester, verband, gruppe };
+				//if the student is dragged into a parent category (eg.BEL-1), reset verband, gruppe to ""
+				if (!params.verband)
+					params.verband = "";
+				if (!params.gruppe)
+					params.gruppe = "";
+
 				endpoint = drag.map(student => [
 					this.getStudentAjaxId(student),
 					ApiStvDetails.saveStudent(

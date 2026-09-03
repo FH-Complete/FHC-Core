@@ -115,11 +115,31 @@ export default {
 			this.$refs.newGroupModal.show()
 		},
 		changeLvb(params) {
-			let data = { semester: params.semester };
-			if (params.verband && params.verband != " ") {
-				data.verband = params.verband;
-				if (params.gruppe && params.gruppe != " ")
-					data.gruppe = params.gruppe;
+			let data = {
+				semester: params.semester,
+				verband: params.verband,
+				gruppe: params.gruppe
+			};
+			if (params.verband == null)
+			{
+				data.verband = "";
+				if (params.gruppe == null)
+					data.gruppe = "";
+			}
+
+			const dropdowns = {
+				semester: this.$p.t('lehre/semester'),
+				verband: this.$p.t('lehre/verband'),
+				gruppe: this.$p.t('lehre/gruppe')
+			};
+
+			for (const [key, label] of Object.entries(dropdowns)) {
+				if (params[key] === false) {
+					this.$fhcAlert.alertError(
+						this.$p.t('ui/alert_chooseEntry', { dropdown: label })
+					);
+					return;
+				}
 			}
 
 			let endpoint;

@@ -17,8 +17,8 @@ export default {
 		return {
 			lvbList: [],
 			selectedSemester: false,
-			selectedVerband: false,
-			selectedGruppe: false
+			selectedVerband: undefined, //to distinguish from null and false
+			selectedGruppe: undefined //to distinguish from null and false
 		};
 	},
 	computed: {
@@ -63,11 +63,10 @@ export default {
 			get() {
 				if (this.semester === false)
 					return false;
-				if (this.selectedVerband !== false) {
-					if (this.lvbListVerband.some(item => item.verband == this.selectedVerband))
-						return this.selectedVerband;
-					return false;
-				}
+
+				if (this.selectedVerband !== undefined)
+					return this.selectedVerband;
+
 				if (Array.isArray(this.students)) {
 					const first = this.students.find(Boolean);
 					if (this.lvbListVerband.every(item => item.verband != first.verband))
@@ -86,13 +85,11 @@ export default {
 		},
 		gruppe: {
 			get() {
-				if (this.verband === false)
-					return false;
-				if (this.selectedGruppe !== false) {
-					if (this.lvbListGruppe.some(item => item.gruppe == this.selectedGruppe))
-						return this.selectedGruppe;
-					return false;
-				}
+				if (this.verband === false || this.verband === null)
+					return null;
+				if (this.selectedGruppe !== undefined)
+					return this.selectedGruppe;
+
 				if (Array.isArray(this.students)) {
 					const first = this.students.find(Boolean);
 					if (this.lvbListGruppe.every(item => item.gruppe != first.gruppe))
@@ -195,6 +192,7 @@ export default {
 				v-model="semester"
 				class="form-select"
 			>
+				<option :value="false" disabled> -- {{ $p.t('exam/keineAuswahl') }} -- </option>
 				<option v-for="semester in stgSemester">{{ semester }}</option>
 			</select>
 			<span
@@ -208,25 +206,27 @@ export default {
 				class="form-select"
 				:disabled="semester === false"
 			>
+				<option :value="false" disabled> -- {{ $p.t('exam/keineAuswahl') }} -- </option>
 				<option v-for="verband in semesterVerband">{{ verband }}</option>
+				<option :value="null"></option>
 			</select>
 			<span
 				class="input-group-text"
-				:class="{'text-muted': verband === false}"
 			>
 				{{ $p.t('lehre/gruppe') }}
 			</span>
 			<select
 				v-model="gruppe"
 				class="form-select"
-				:disabled="verband === false"
 			>
+				<option :value="false" disabled> -- {{ $p.t('exam/keineAuswahl') }} -- </option>
 				<option v-for="gruppe in verbandGruppe">{{ gruppe }}</option>
+				<option :value="null"></option>
 			</select>
+
 			<button
 				type="submit"
 				class="btn btn-primary"
-				:disabled="gruppe === false && verband === false"
 			>
 				{{ $p.t('ui/change') }}
 			</button>

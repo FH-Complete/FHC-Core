@@ -215,6 +215,17 @@ class Student extends FHCAPI_Controller
 			]
 		);
 
+		$this->form_validation->set_rules('verband', 'Verband', 'callback_validateDropdown', [
+			'validateDropdown' => $this->p->t('ui', 'error_fieldRequired', ['dropdown' => 'Verband'])
+		]);
+		$this->form_validation->set_rules('semester', 'Semester', 'callback_validateDropdown', [
+			'validateDropdown' => $this->p->t('ui', 'error_fieldRequired', ['dropdown' => 'Semester'])
+		]);
+
+		$this->form_validation->set_rules('gruppe', 'Gruppe', 'callback_validateDropdown', [
+			'validateDropdown' => $this->p->t('ui', 'error_fieldRequired', ['dropdown' => 'Gruppe'])
+		]);
+
 		$this->form_validation->set_rules('alias', 'Alias', 'regex_match[/^[-a-z0-9\_\.]*[a-z0-9]{1,}\.[-a-z0-9\_]{1,}$/]',
 		[
 			'regex_match' => $this->p->t('ui', 'error_fieldInvalidAlias')
@@ -788,6 +799,13 @@ class Student extends FHCAPI_Controller
 		if ((isset($_POST['incoming']) && $_POST['incoming']) || $this->requiredIfStudentFunc($value))
 			return true;
 		return !!$value;
+	}
+
+	public function validateDropdown($value)
+	{
+		if ($value === false || $value === 'false')
+			return false;
+		return true;
 	}
 
 	/**

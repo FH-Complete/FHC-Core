@@ -62411,6 +62411,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'alert_chooseEntry',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte einen Wert aus dem DropDown {dropdown} wählen!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select a value of dropdown {dropdown}!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 
