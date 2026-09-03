@@ -206,11 +206,10 @@ export default {
 				.then(() => this.$refs.calendar.resetEventLoader());
 		},
 		rebuildRaumvorschlag() {
-			if (!this.raumvorschlagPreview?.lehreinheit_id) return;
-
-			this.previewRaumvorschlag({
-				lehreinheit_id: this.raumvorschlagPreview.lehreinheit_id,
-			});
+			if (this.raumvorschlagPreview)
+				this.previewRaumvorschlag({
+					lehreinheit_id: this.raumvorschlagPreview?.lehreinheit_id,
+				});
 		},
 
 		clearRaumvorschlagPreview() {
@@ -277,6 +276,23 @@ export default {
 		setOrt(data) {
 			this.ort_kurzbz = data.ort_kurzbz;
 			this.rooms = [{ ort_kurzbz: data.ort_kurzbz }];
+		},
+		setEmp(data) {
+			const uid = data.uid;
+			const label = data.name;
+
+			this.lecturers = [
+				{
+					uid,
+					label,
+					showEvents: true,
+					overlays: { blocks: true, wishes: true },
+					showCoursePicker: false,
+				},
+			];
+
+			this.$refs.calendar.resetEventLoader();
+			if (this.lastRange) this.handleRange(this.lastRange);
 		},
 		onSelectVerbandAndClose(payload) {
 			this.onSelectVerband(payload);
@@ -1016,7 +1032,8 @@ export default {
 			@select-verband-and-close="onSelectVerbandAndClose"
 		/>
 		<raumauswahl-modal ref="raumModal" @saved="$refs.calendar.resetEventLoader()"/>
-		<lehreinheit-modal ref="lehreinheitModal" @saved="$refs.calendar.resetEventLoader()"/>
+		<raumauswahl-modal ref="raumModal" @saved="() => {$refs.calendar.resetEventLoader(); $refs.sidebar.reloadCoursepicker(); rebuildRaumvorschlag();}"/>
+		<lehreinheit-modal ref="lehreinheitModal" @saved="$refs.calendar.resetEventLoader(); $refs.sidebar.reloadCoursepicker();"/>
 		<resources-assignment-modal
 		ref="resourcesAssignmentModal"
 		@save-finished="$refs.calendar.resetEventLoader()"
