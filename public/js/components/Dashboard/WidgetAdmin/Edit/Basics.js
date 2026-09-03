@@ -12,18 +12,12 @@ export default {
 	emits: [
 		"update:modelValue"
 	],
-	data() {
-		return {
-		};
-	},
 	computed: {
 		img() {
 			if (this.modelValue.setup?.icon)
 				return this.modelValue.setup.icon;
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root + 'skin/images/fh_technikum_wien_illustration_klein.png';
 		}
-	},
-	methods: {
 	},
 	template: /* html */`
 	<div class="widgets-admin-edit-basics border-bottom mb-3">
