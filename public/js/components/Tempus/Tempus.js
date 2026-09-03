@@ -220,48 +220,44 @@ export default {
 			this.showEvents = true;
 		},
 		async previewRaumvorschlag(orig) {
-			if (!orig?.lehreinheit_id) {
+			if (!orig) {
 				this.clearRaumvorschlagPreview();
 				return;
 			}
 			if (!this.lastRange) return;
 
-			const preview = {
+			this.raumvorschlagLoading = true;
+			this.raumvorschlagPreview = {
 				lehreinheit_id: orig.lehreinheit_id,
 				slots: [],
 			};
-			this.raumvorschlagPreview = preview;
-			this.raumvorschlagLoading = true;
 
-			try {
-				const result = await this.$api.call(
+			await this.$api
+				.call(
 					ApiKalender.getRaumvorschlagSlots(
 						orig.lehreinheit_id,
 						this.lastRange.start.toISODate(),
 						this.lastRange.end.toISODate(),
 					),
-				);
+				)
+				.then((result) => {
+					this.raumvorschlagPreview.slots = (result.data ?? []).map((slot) => ({
+						class: `rounded-3 bg-raumvorschlag-slot rating-${slot.rating}`,
+						start: slot.isostart,
+						matchEnd: slot.isoend,
+						end: slot.marker_isoend,
+						label: slot.label,
+						raeume: slot.raeume,
+					}));
 
-				if (this.raumvorschlagPreview !== preview) return;
-
-				preview.slots = (result.data ?? []).map((slot) => ({
-					class: `rounded-3 bg-raumvorschlag-slot rating-${slot.rating}`,
-					start: slot.isostart,
-					matchEnd: slot.isoend,
-					end: slot.marker_isoend,
-					label: slot.label,
-					raeume: slot.raeume,
-				}));
-				this.showEvents = preview.slots.length === 0;
-			} catch (error) {
-				if (this.raumvorschlagPreview === preview) this.showEvents = true;
-				this.$fhcAlert.handleSystemError(error);
-			} finally {
-				if (this.raumvorschlagPreview === preview) {
+					if (this.raumvorschlagPreview.slots.length > 0)
+						this.showEvents = false;
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
 					this.raumvorschlagLoading = false;
 					this.rebuildExtraBackgrounds();
-				}
-			}
+				});
 		},
 		findRaumvorschlagSlot(lehreinheit_id, startDT, endDT) {
 			if (this.raumvorschlagPreview?.lehreinheit_id !== lehreinheit_id)
@@ -616,7 +612,7 @@ export default {
 							}
 
 							this.$refs.calendar.resetEventLoader();
-								this.$refs.sidebar.reloadCoursepicker();
+							this.$refs.sidebar.reloadCoursepicker();
 							this.rebuildRaumvorschlag();
 							this.bcc.postMessage('dropped');
 						});
@@ -634,7 +630,7 @@ export default {
 						)
 						.then(() => {
 							this.$refs.calendar.resetEventLoader();
-								this.$refs.sidebar.reloadCoursepicker();
+							this.$refs.sidebar.reloadCoursepicker();
 							this.bcc.postMessage('dropped');
 							this.rebuildRaumvorschlag();
 						});
