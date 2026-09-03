@@ -27,6 +27,7 @@ export default {
 		name: String,
 		containerClass: [String, Array, Object],
 		label: String,
+		labelClass: [String, Array, Object],
 		// NOTE(chris): remove these from $attrs array to prevent doubled event listeners
 		onInput: [Array, Function],
 		'onUpdate:modelValue': [Array, Function],
@@ -63,7 +64,7 @@ export default {
 			if (this.noAutoClass)
 				return this.acc;
 			
-			const acc = {...this.acc};
+			const acc = { ...this.acc };
 			
 			if (this.inputGroup)
 				acc['input-group-item'] = true;
@@ -77,6 +78,31 @@ export default {
 				acc['input-group-text'] = true;
 			}
 			return acc;
+		},
+		alc() {
+			if (!this.labelClass || !this.label)
+				return {};
+			if (typeof this.labelClass === 'string' || this.labelClass instanceof String)
+				return this.labelClass.split(' ').reduce((a,c) => {a[c] = true; return a}, {});
+			if (Array.isArray(this.labelClass))
+				return this.labelClass.reduce((a,c) => {a[c] = true; return a}, {});
+			return this.labelClass;
+		},
+		autoLabelClass() {
+			if (!this.label)
+				return {};
+
+			if (this.noAutoClass)
+				return this.alc;
+			
+			const alc = { ...this.alc };
+			
+			if (this.lcType == 'radio' || this.lcType == 'checkbox')
+				alc['form-check-label'] = true;
+			else
+				alc['form-label'] = true;
+			
+			return alc;
 		},
 		lcType() {
 			if (!this.type)
@@ -243,7 +269,7 @@ export default {
 	},
 	template: `
 	<component :is="!hasContainer ? 'FhcFragment' : 'div'" class="position-relative" :class="autoContainerClass">
-		<label v-if="label && lcType != 'radio' && lcType != 'checkbox'" :class="!noAutoClass && 'form-label'" :for="idCmp">{{label}}</label>
+		<label v-if="label && lcType != 'radio' && lcType != 'checkbox'" :class="autoLabelClass" :for="idCmp">{{label}}</label>
 		<input v-if="tag == 'input'" :type="lcType" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="$emit('input', $event)">
 		<textarea v-else-if="tag == 'textarea'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="$emit('input', $event)"></textarea>
 		<select v-else-if="tag == 'select'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="$emit('input', $event)">
@@ -323,7 +349,7 @@ export default {
 			>
 			<slot></slot>
 		</component>
-		<label v-if="label && (lcType == 'radio' || lcType == 'checkbox')" :for="idCmp" :class="!noAutoClass && 'form-check-label'" v-html="label"></label>
+		<label v-if="label && (lcType == 'radio' || lcType == 'checkbox')" :for="idCmp" :class="autoLabelClass" v-html="label"></label>
 		<div v-if="valid !== undefined && feedback.length && !noFeedback" :class="feedbackClass">
 			<template v-for="(msg, i) in feedback" :key="i">
 				<hr v-if="i" class="m-0">
