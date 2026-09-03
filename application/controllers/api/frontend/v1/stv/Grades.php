@@ -695,6 +695,9 @@ class Grades extends FHCAPI_Controller
 		if ($this->permissionlib->isBerechtigt('student/noten', 'suid', $oe->oe_kurzbz))
 			return true;
 
+		if ($this->permissionlib->isBerechtigt('student/noten', 'suid', $oe->studiengang_kz))
+			return true;
+
 		return false;
 	}
 }
