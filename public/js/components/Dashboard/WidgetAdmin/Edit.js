@@ -1,5 +1,6 @@
 import CoreForm from "../../Form/Form.js";
 import EditBasics from "./Edit/Basics.js";
+import EditSetup from "./Edit/Setup.js";
 
 import ApiWidget from "../../../api/factory/dashboard/widget.js";
 
@@ -8,6 +9,7 @@ export default {
 	components: {
 		CoreForm,
 		EditBasics,
+		EditSetup,
 	},
 	props: {
 		originalData: Object,
@@ -64,6 +66,7 @@ export default {
 		<template v-if="generator">
 			<component :is="generator" v-model="modelValue" :original="originalData" :key="modelValue.widget_id" />
 		</template>
+		<edit-setup v-else v-model="modelValue.setup" />
 		<div class="position-absolute bottom-0 end-0 z-1">
 			<button
 				type="submit"
