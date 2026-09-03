@@ -138,8 +138,11 @@ export default {
 		handleHideBsModal() {
 			this.$emit('configClosed')
 		},
+		createTmpConfig() {
+			this.tmpConfig = JSON.parse(JSON.stringify(this.arguments));
+		},
 		openConfig() {
-			this.tmpConfig = { ...this.arguments };
+			this.createTmpConfig();
 			this.$refs.config.show();
 		},
 		setConfig(hasConfig) {
@@ -173,14 +176,14 @@ export default {
 				this.$options.components["widget" + this.widgetTemplate.widget_id] = component;
 				this.component = "widget" + this.widgetTemplate.widget_id;
 				this.arguments = { ...this.widgetTemplate.arguments, ...this.config };
-				this.tmpConfig = { ...this.arguments };
+				this.createTmpConfig();
 			}
 		}
 	},
 	watch: {
 		config() {
 			this.arguments = { ...this.widgetTemplate?.arguments, ...this.config };
-			this.tmpConfig = { ...this.arguments };
+			this.createTmpConfig();
 			this.$refs.config && this.$refs.config.hide();
 			this.isLoading = false;
 		},
