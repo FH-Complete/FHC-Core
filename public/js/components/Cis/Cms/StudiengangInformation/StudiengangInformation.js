@@ -82,7 +82,7 @@ template:/*html*/`
 				<studiengang-vertretung showBezeichnung :compact="compact" :title="$p.t('studiengangInformation', 'Hochschulvertretung')" :vertretungsList="hochschulvertr"></studiengang-vertretung>
 			</template>
 			<template v-if="stdv && Array.isArray(stdv) && stdv.length >0">
-				<studiengang-vertretung :compact="compact" :title="$p.t('studiengangInformation', 'Studienvertretung').concat(studiengang?.kurzbzlang??'')" :vertretungsList="stdv"></studiengang-vertretung>
+				<studiengang-vertretung :compact="compact" :title="$p.t('studiengangInformation', 'Studienvertretung').concat(' ' + studiengang?.kurzbzlang??'')" :vertretungsList="stdv"></studiengang-vertretung>
 			</template>
 			<template v-if="jahrgangsvertr && Array.isArray(jahrgangsvertr) && jahrgangsvertr.length >0">
 				<studiengang-vertretung :compact="compact" :title="$p.t('studiengangInformation', 'Jahrgangsvertretung')" :vertretungsList="jahrgangsvertr"></studiengang-vertretung>
