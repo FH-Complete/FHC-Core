@@ -317,14 +317,13 @@ export default {
 			}
 		},
 		setEmp(data) {
-			if (!data?.uid) return;
-
-			for (const lect of this.lecturers) delete this.overlayCache[lect.uid];
+			const uid = data.uid;
+			const label = data.name;
 
 			this.lecturers = [
 				{
-					uid: data.uid,
-					label: data.name,
+					uid,
+					label,
 					showEvents: true,
 					overlays: { blocks: true, wishes: true },
 					showCoursePicker: false,
