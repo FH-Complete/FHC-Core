@@ -334,7 +334,7 @@ export default {
 				</template>
 				<template v-slot:default>
 					<component
-						:is="component"
+						:is="hasConfig !== true ? hasConfig : component"
 						v-if="ready && !isLoading"
 						v-model:shared-data="sharedData"
 						:config="tmpConfig"
