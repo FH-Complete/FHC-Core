@@ -320,6 +320,8 @@ export default {
 			const uid = data.uid;
 			const label = data.name;
 
+			for (const lect of this.lecturers) delete this.overlayCache[lect.uid];
+
 			this.lecturers = [
 				{
 					uid,
