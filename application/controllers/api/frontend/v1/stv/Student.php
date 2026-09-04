@@ -345,6 +345,10 @@ class Student extends FHCAPI_Controller
 		}
 
 		// Do Updates
+
+		// use transactions
+		$this->db->trans_begin();
+
 		if (count($update_lehrverband)) {
 
 			$curstudlvb = $this->StudentlehrverbandModel->load([
@@ -435,6 +439,18 @@ class Student extends FHCAPI_Controller
 			);
 			$this->getDataOrTerminateWithError($result);
 		}
+
+		if ($this->db->trans_status() === FALSE)
+		{
+			$this->db->trans_rollback();
+
+			$this->terminateWithError(
+				$this->p->t('ui', 'error_save'),
+				self::ERROR_TYPE_GENERAL
+			);
+		}
+
+		$this->db->trans_commit();
 
 		$this->terminateWithSuccess(array_fill_keys(array_merge(
 			array_keys($update_lehrverband),
