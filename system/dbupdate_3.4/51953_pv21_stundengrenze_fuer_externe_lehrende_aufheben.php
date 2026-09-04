@@ -10,7 +10,7 @@ if (!$result = @$db->db_query("SELECT 1 FROM hr.tbl_stundengrenze LIMIT 1"))
 				mitarbeiter_uid character varying(32) NOT NULL,
 				studiensemester_kurzbz varchar(16) NOT NULL,
 				oe_kurzbz character varying(32),
-				stundengrenze smallint,
+				stundengrenze numeric(8, 2),
 				insertvon character varying(32) NOT NULL,
 				insertamum timestamp without time zone DEFAULT now() NOT NULL,
 				updatevon character varying(32),
