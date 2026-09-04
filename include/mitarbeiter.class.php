@@ -2065,5 +2065,67 @@ class mitarbeiter extends benutzer
 			return true;
 		}
 	}
+
+	/**
+	 * Holt sich Stundengrenze für MitarbeiterInnen.
+	 * @param mitarbeiter_uid
+	 * @param studiensemester_kurzbz
+	 * @param oe_kurzbz
+	 * @return boolean
+	 */
+	public function getStundengrenze($mitarbeiter_uid, $studiensemester_kurzbz, $oe_kurzbz = null)
+	{
+		$oeRecursive = '';
+		$oeWhere = '';
+		$oeOrder = '';
+
+		if (isset($oe_kurzbz))
+		{
+			$oeRecursive = "
+				WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz, level) as
+				(
+					SELECT oe_kurzbz, oe_parent_kurzbz, 0 AS level FROM public.tbl_organisationseinheit
+					WHERE oe_kurzbz=". $this->db_add_param($oe_kurzbz)."
+					UNION ALL
+					SELECT o.oe_kurzbz, o.oe_parent_kurzbz, oes.level + 1 AS level FROM public.tbl_organisationseinheit o, oes
+					WHERE o.oe_kurzbz=oes.oe_parent_kurzbz
+				)";
+			$oeJoin = "LEFT JOIN oes ON gr.oe_kurzbz = oes.oe_kurzbz";
+			$oeWhere = "AND (gr.oe_kurzbz IS NULL OR EXISTS (SELECT 1 FROM oes WHERE oe_kurzbz = gr.oe_kurzbz))";
+			$oeOrder = "oes.level NULLS LAST, ";
+		}
+
+		$qry = "
+			{$oeRecursive}
+			SELECT
+				gr.stundengrenze, gr.mitarbeiter_uid, gr.oe_kurzbz, gr.studiensemester_kurzbz
+			FROM
+				hr.tbl_stundengrenze gr
+				{$oeJoin}
+			WHERE
+				gr.mitarbeiter_uid = ". $this->db_add_param($mitarbeiter_uid)."
+				AND gr.studiensemester_kurzbz = ". $this->db_add_param($studiensemester_kurzbz)."
+				{$oeWhere}
+			ORDER BY
+				{$oeOrder}stundengrenze_id DESC
+			LIMIT 1";
+
+		if ($result = $this->db_query($qry))
+		{
+			$this->result = [];
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new StdClass();
+				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$obj->stundengrenze = $row->stundengrenze;
+
+				$this->result []= $obj;
+			}
+			return true;
+		}
+		return false;
+	}
 }
 ?>

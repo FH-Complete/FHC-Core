@@ -13,6 +13,7 @@ class LektorLib
 		$this->_ci->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
 		$this->_ci->load->model('organisation/Studiensemester_model','StudiensemesterModel');
 		$this->_ci->load->model('ressource/Stundensatz_model', 'StundensatzModel');
+		$this->_ci->load->model('ressource/Stundengrenze_model', 'StundengrenzeModel');
 		$this->_ci->load->model('vertragsbestandteil/Dienstverhaeltnis_model','DienstverhaeltnisModel');
 		$this->_ci->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
 		$this->_ci->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
@@ -58,6 +59,9 @@ class LektorLib
 		}
 
 		$maxstunden = $this->getMaxStunden($mitarbeiter_uid, $studiensemester->studiensemester_kurzbz, $lehreinheit->studiengang_kz, $echter_dv);
+		if (isError($maxstunden)) return $maxstunden;
+
+		$maxstunden = getData($maxstunden);
 
 		$newData['semesterstunden'] = 0;
 		$newData['planstunden'] = 0;
@@ -159,10 +163,19 @@ class LektorLib
 
 			$stundengrenze_result = $this->_ci->OrganisationseinheitModel->getStundengrenze($studiengang->oe_kurzbz, $echter_dv);
 			if (isError($stundengrenze_result)) return $stundengrenze_result;
+			$stundengrenze = hasData($stundengrenze_result) ? getData($stundengrenze_result)[0] : null;
 
-			$stundengrenze = getData($stundengrenze_result)[0];
+			$stundengrenze_mitarbeiter_result
+				= $this->_ci->StundengrenzeModel->getStundengrenze($new_uid, $studiensemester->studiensemester_kurzbz, $studiengang->oe_kurzbz);
+			if (isError($stundengrenze_mitarbeiter_result)) return $stundengrenze_mitarbeiter_result;
+			$stundengrenze_mitarbeiter = hasData($stundengrenze_mitarbeiter_result) ? getData($stundengrenze_mitarbeiter_result)[0] : null;
 
-			$oe_result = $this->_ci->OrganisationseinheitModel->getChilds($stundengrenze->oe_kurzbz);
+			$stundengrenze_stunden = 9999;
+
+			if (isset($stundengrenze->stunden)) $stundengrenze_stunden = $stundengrenze->stunden;
+			if (isset($stundengrenze_mitarbeiter->stundengrenze)) $stundengrenze_stunden = $stundengrenze_mitarbeiter->stundengrenze;
+
+			$oe_result = isset($stundengrenze->oe_kurzbz) ? $this->_ci->OrganisationseinheitModel->getChilds($stundengrenze->oe_kurzbz) : array();
 			$oe_array = hasData($oe_result) ? array_column(getData($oe_result), 'oe_kurzbz') : array();
 
 			$semesterstunden_alt_sql = is_null($semesterstunden_alt) ? 0 : $semesterstunden_alt;
@@ -206,16 +219,16 @@ class LektorLib
 
 			$summe = getData($summe_result)[0]->summe;
 
-			if ($summe > $stundengrenze->stunden)
+			if ($summe > $stundengrenze_stunden)
 			{
 				if (!$echter_dv && (!$this->_ci->permissionlib->isBerechtigt('admin')))
 				{
 					if (!$this->LehrauftragAufFirma($new_uid))
-						return error("ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $summe Stunden ($stundengrenze->stunden) wurde ueberschritten!\nDaten wurden NICHT gespeichert!\n\n");
+						return error("ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $stundengrenze_stunden wurde mit $summe Stunden ueberschritten!\nDaten wurden NICHT gespeichert!\n\n");
 				}
 				else
 				{
-					$warning .= "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $summe Stunden ($stundengrenze->stunden) wurde ueberschritten!\nDaten wurden gespeichert!\n\n";
+					$warning .= "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $stundengrenze_stunden wurde mit $summe Stunden ueberschritten!\nDaten wurden gespeichert!\n\n";
 				}
 
 				$stunden_limit_result = $this->getStundenInstitut($new_uid, $lehreinheit->studiensemester_kurzbz, $oe_array);
@@ -312,14 +325,21 @@ class LektorLib
 		$stundengrenze_result = $this->_ci->OrganisationseinheitModel->getStundengrenze($studiengang->oe_kurzbz, $echter_dv);
 		if (isError($stundengrenze_result)) return $stundengrenze_result;
 
-		$stundengrenze = getData($stundengrenze_result)[0];
-		$maxstunden = $stundengrenze->stunden;
+		$stundengrenze_mitarbeiter_result =
+			$this->_ci->StundengrenzeModel->getStundengrenze($mitarbeiter_uid, $studiensemester_kurzbz, $studiengang->oe_kurzbz);
+		if (isError($stundengrenze_mitarbeiter_result)) return $stundengrenze_mitarbeiter_result;
+
+		if (hasData($stundengrenze_result)) $stundengrenze = getData($stundengrenze_result)[0];
+		if (hasData($stundengrenze_mitarbeiter_result)) $stundengrenze_mitarbeiter = getData($stundengrenze_mitarbeiter_result)[0];
+
+		if (isset($stundengrenze->stunden)) $maxstunden = $stundengrenze->stunden;
+		if (isset($stundengrenze_mitarbeiter->stundengrenze)) $maxstunden = $stundengrenze_mitarbeiter->stundengrenze;
 
 		$lehrauftrag_firma = $this->LehrauftragAufFirma($mitarbeiter_uid);
 
 		if (!$echter_dv && !$lehrauftrag_firma)
 		{
-			$oe_result = $this->_ci->OrganisationseinheitModel->getChilds($stundengrenze->oe_kurzbz);
+			$oe_result = isset($stundengrenze->oe_kurzbz) ? $this->_ci->OrganisationseinheitModel->getChilds($stundengrenze->oe_kurzbz) : array();
 			$oe_array = hasData($oe_result) ? array_column(getData($oe_result), 'oe_kurzbz') : array('');
 
 			$stunden_summe_result = $this->getSumSemesterstunden($mitarbeiter_uid, $studiensemester_kurzbz, $oe_array);
@@ -330,7 +350,7 @@ class LektorLib
 			{
 				$stunden_limit_result = $this->getStundenInstitut($mitarbeiter_uid, $studiensemester_kurzbz, $oe_array);
 
-				$error = "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $maxstunden Stunden ($stundengrenze->oe_kurzbz) wurde ueberschritten!\n
+				$error = "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $maxstunden Stunden".(isset($stundengrenze->oe_kurzbz) ? " (".$stundengrenze->oe_kurzbz.")" : "")." wurde ueberschritten!\n
 				 			Daten wurden NICHT gespeichert!\n\n";
 
 				if (hasData($stunden_limit_result))
@@ -347,7 +367,7 @@ class LektorLib
 			else
 				$maxstunden =- $stunden_summe;
 		}
-		return $maxstunden;
+		return success($maxstunden);
 	}
 
 	private function LehrauftragAufFirma($mitarbeiter_uid)

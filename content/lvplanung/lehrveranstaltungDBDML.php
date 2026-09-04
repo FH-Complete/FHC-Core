@@ -338,6 +338,12 @@ if(!$error)
 					else
 						list($stunden_oe_kurzbz, $max_stunden) = $oe_obj->getStundengrenze($stg_obj->oe_kurzbz, false);
 
+					$ma_stundengrenze = new mitarbeiter();
+					if ($ma_stundengrenze->getStundengrenze($lem->mitarbeiter_uid, $le->studiensemester_kurzbz, $stg_obj->oe_kurzbz))
+					{
+						if (isset($ma_stundengrenze->result[0])) $max_stunden = $ma_stundengrenze->result[0]->stundengrenze;
+					}
+
 					if($lem->bismelden==false)
 						$neue_stunden_eingerechnet=false;
 					else
@@ -612,6 +618,12 @@ if(!$error)
 					list($stunden_oe_kurzbz, $max_stunden) = $oe_obj->getStundengrenze($stg_obj->oe_kurzbz, true);
 				else
 					list($stunden_oe_kurzbz, $max_stunden) = $oe_obj->getStundengrenze($stg_obj->oe_kurzbz, false);
+
+				$ma_stundengrenze = new mitarbeiter();
+				if ($ma_stundengrenze->getStundengrenze($mitarbeiter->uid, $studiensemester->studiensemester_kurzbz, $stg_obj->oe_kurzbz))
+				{
+					if (isset($ma_stundengrenze->result[0])) $max_stunden = $ma_stundengrenze->result[0]->stundengrenze;
+				}
 
 				//Bei freien Lektoren muss geprueft werden ob die Stundengrenze erreicht wurde
 				if(!$fixangestellt && !LehrauftragAufFirma($lem->mitarbeiter_uid))
