@@ -9,9 +9,9 @@ class OperationalResourceToCalenderAPI extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getAssignedResourcesByCalender' => ['admin:r', 'assistenz:r'],
-			'storeResourcesToCalendarRelationship' => ['admin:w', 'assistenz:w'],
-			'getSchedulableResourcesByCalendar' => ['admin:r', 'assistenz:r'],
+			'getAssignedResourcesByCalender' => ['admin:r', 'assistenz:r', 'lehre/lvplan:rw'],
+			'storeResourcesToCalendarRelationship' => ['admin:w', 'assistenz:w', 'lehre/lvplan:rw'],
+			'getSchedulableResourcesByCalendar' => ['admin:r', 'assistenz:r', 'lehre/lvplan:rw'],
 		]);
 
 		$this->load->model('ressource/BetriebsmittelKalender_model', 'BetriebsmittelKalenderModel');

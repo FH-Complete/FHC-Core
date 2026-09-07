@@ -137,12 +137,14 @@ export default {
 		"update:date",
 		"update:mode",
 		"update:range",
+		"update:date-range",
 		"drop"
 	],
 	data() {
 		return {
 			internalView: null,
 			internalDate: null,
+			pickedRangeEnd: null,
 			modalEvent: null
 		};
 	},
@@ -272,6 +274,10 @@ export default {
 			}
 		},
 
+		handleDateRange({ start, end }) {
+			this.pickedRangeEnd = end;
+			this.$emit('update:date-range', { start, end });
+		},
 		showEventModal(eventObj) {
 			this.modalEvent = eventObj;
 			this.$refs.modal.show();
@@ -300,6 +306,7 @@ export default {
 				class="card-header"
 				v-model:date="cDate"
 				v-model:mode="cMode"
+				@update:date-range="handleDateRange"
 				@prev="clickPrev"
 				@next="clickNext"
 				@click:mode="$emit('click:mode', $event)"
@@ -316,6 +323,7 @@ export default {
 				:is="modes ? modes[cMode] : null || 'div'"
 				ref="mode"
 				v-model:current-date="cDate"
+				:range-end="pickedRangeEnd"
 				@update:range="$emit('update:range', $event)"
 				@request-modal-open="showEventModal"
 				@request-modal-close="hideEventModal"

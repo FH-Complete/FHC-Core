@@ -61,7 +61,11 @@ export default {
 		flipAxis: Boolean,
 		allDayEvents: Boolean,
 		axisMainCollapsible: Boolean,
-		snapToGrid: Boolean
+		snapToGrid: Boolean,
+		dayVisibility: {
+			type: Array,
+			default: null
+		}
 	},
 	data() {
 		return {
@@ -160,7 +164,17 @@ export default {
 		hasValidEvents() {
 			return this.events.find(e => e.length);
 		},
-		styleGridCols() {
+		styleGridCols()
+		{
+			if (this.dayVisibility)
+			{
+				let anyVisible = this.dayVisibility.some(day => day);
+				if (anyVisible)
+				{
+					return this.axisMain.map((day, i) => this.isDayCollapsed(i) ? 'var(--fhc-calendar-axis-collapsible-manual, 0.1fr)' : '1fr').join(' ');
+				}
+			}
+
 			let cols = 'repeat(' + this.axisMain.length + ', 1fr)';
 			if (this.axisMainCollapsible) {
 				if (this.hasValidEvents)
@@ -479,6 +493,16 @@ export default {
 				}
 			});
 		},
+		isDayCollapsed(index)
+		{
+			if (this.dayVisibility)
+			{
+				let anyVisible = this.dayVisibility.some(day => day);
+				if (anyVisible)
+					return !this.dayVisibility[index];
+			}
+			return this.axisMainCollapsible && this.hasValidEvents && !this.events[index].length;
+		}
 	},
 	setup()
 	{
@@ -504,7 +528,7 @@ export default {
 				v-for="(date, index) in axisMain"
 				:key="index"
 				class="main-header"
-				:class="{'collapsed-header': axisMainCollapsible && hasValidEvents && !events[index].length}"
+				:class="{'collapsed-header': isDayCollapsed(index)}"
 				:style="'grid-' + axisCol + ':' + (2+index)"
 			>
 				<slot name="main-header" v-bind="{ index, date }" />
@@ -592,6 +616,7 @@ export default {
 							:date="date"
 							:events="eventsNormal[index]"
 							:backgrounds="backgrounds[index]"
+							:class="{ 'fhc-calendar-base-grid-line-collapsed': isDayCollapsed(index) }"
 							style="position:relative"
 							@resize-start="handleResizeStart"
 							:style="'grid-' + axisRow + ':1/-1;grid-' + axisCol + ':' + (1+index)"

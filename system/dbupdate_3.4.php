@@ -99,11 +99,17 @@ require_once('dbupdate_3.4/76150_perm_other_lv_plan.php');
 require_once('dbupdate_3.4/68957_dashboard_bookmark_neue_Spalte_sort.php');
 require_once('dbupdate_3.4/68530_Dashboard_Cleanup.php');
 require_once('dbupdate_3.4/77375_ressourcen.php');
+require_once('dbupdate_3.4/78052_tempus_tag_events.php');
+require_once('dbupdate_3.4/78318_rename_column_of_eindeutige_gruppen_id_to_eindeutige_kalender_gruppen_id_in_tbl_kalender.php');
 require_once('dbupdate_3.4/78318_rename_column_of_eindeutige_gruppen_id_to_eindeutige_kalender_gruppen_id_in_tbl_kalender.php');
 require_once('dbupdate_3.4/75959_StudVw_Automatische_Tags.php');
 require_once('dbupdate_3.4/76160_lvv_favorites.php');
 require_once('dbupdate_3.4/77080_tabulator_presets_table.php');
 require_once('dbupdate_3.4/78292_gehaltsanpassungtyp.php');
+require_once('dbupdate_3.4/77949_tempus_synchronisation.php');
+require_once('dbupdate_3.4/78287_tempus_raumzuordnung.php');
+
+require_once('dbupdate_3.4/78285_tempus_stundenraster.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
