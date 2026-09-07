@@ -206,6 +206,8 @@ export default {
 			});
 
 			this.lehrveranstaltungen.forEach((lehrveranstaltung)=>{
+				// a lehrveranstaltung without a modul has no children
+				if(!Array.isArray(lehrveranstaltung.lehrveranstaltungen)) return;
 				lehrveranstaltung.lehrveranstaltungen.sort((lv1,lv2)=>{
 					if (lv1.bezeichnung.toLowerCase() > lv2.bezeichnung.toLowerCase()) {
 						return 1;
@@ -390,6 +392,16 @@ export default {
 						<a class="fhc-link-color d-block me-auto" href="#" @click="openLvUebersicht(lv)">{{isGermanLanguage ? lv.bezeichnung : lv.bezeichnung_english}}</a>
 						<p>{{lv.lehrform_kurzbz}}</p>
 					</li>	
+				</ul>
+			</div>
+		</div>
+		<div class="card" v-else-if="!Array.isArray(lehrveranstaltung.lehrveranstaltungen)">
+			<div class="card-body">
+				<ul class="list-group list-group-flush">
+					<li class="d-flex list-group-item">
+						<a class="fhc-link-color d-block me-auto" href="#" @click="openLvUebersicht(lehrveranstaltung)">{{isGermanLanguage ? lehrveranstaltung.bezeichnung : lehrveranstaltung.bezeichnung_english}}</a>
+						<p>{{lehrveranstaltung.lehrform_kurzbz}}</p>
+					</li>
 				</ul>
 			</div>
 		</div>
