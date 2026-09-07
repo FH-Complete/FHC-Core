@@ -8,6 +8,14 @@ export default {
 			params: { ...filter, start_date, end_date }
 		};
 	},
+	getRaumvorschlagSlots(lehreinheit_id, start_date, end_date)
+	{
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/tempus/Kalender/getRaumvorschlagSlots',
+			params: { lehreinheit_id, start_date, end_date }
+		};
+	},
 	getPlanLecturer(start_date, end_date)
 	{
 		return {

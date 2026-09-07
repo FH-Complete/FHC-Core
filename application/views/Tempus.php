@@ -7,12 +7,14 @@
 		'vue3' => true,
 		'primevue3' => true,
 		'tabulator5' => true,
+		'filtercomponent' => true,
+		'navigationcomponent' => true,
 		'vuedatepicker11' => true,
 		'tags' => true,
 		'phrases' => array(
 			'global',
 			'ui',
-			'notiz',
+			'lehre'
 		),
 		'customCSSs' => [
 			'public/css/components/vue-datepicker.css',

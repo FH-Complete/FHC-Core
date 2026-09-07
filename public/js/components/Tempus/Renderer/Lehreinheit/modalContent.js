@@ -80,9 +80,6 @@ export default {
 		},
 	},
 	methods: {
-		mehtodNumberPadding: function (number) {
-			return numberPadding(number);
-		},
 		methodFormatDate: function (d) {
 			return formatDate(d);
 		},

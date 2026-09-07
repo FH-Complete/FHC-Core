@@ -68,9 +68,16 @@
 /* Grid */
 .fhc-calendar-base-grid {
 	--fhc-calendar-axis-collapsible: .2fr;
+	--fhc-calendar-axis-collapsible-manual: .1fr;
+
 	background-color: var(--fhc-calendar-bg-gap);
 	grid-gap: var(--fhc-calendar-gap-header, calc(var(--fhc-calendar-gap, 1px) * 2));
 }
+
+.fhc-calendar-base-grid-line-collapsed {
+	overflow: hidden;
+}
+
 .fhc-calendar-base-grid .grid-header {
 	background-color: var(--fhc-calendar-bg-header-gap, var(--fhc-calendar-bg-gap));
 }

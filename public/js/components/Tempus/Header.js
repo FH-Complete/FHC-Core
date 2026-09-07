@@ -20,11 +20,10 @@ export default {
       required: true,
     },
   },
-  emits: ["focus-searchbar", "language-changed"],
+  emits: ["language-changed"],
   methods: {
     focusSearchbar() {
       this.$refs.searchbar?.$refs?.input?.focus();
-      this.$emit("focus-searchbar");
     },
   },
   template: /* html */ `
