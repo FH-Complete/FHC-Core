@@ -38,6 +38,15 @@ export default {
 				? this.event.gruppe.map((gruppe) => gruppe.bezeichnung).join(', ')
 				: this.event.gruppe;
 		},
+		statusIcon()
+		{
+			if (['planning', 'sync_preview'].includes(this.event.status_kurzbz))
+				return 'fa-solid fa-pen-ruler text-muted';
+			else if (['preview', 'sync_live', 'to_delete_preview'].includes(this.event.status_kurzbz))
+				return 'fa-solid fa-chalkboard-user text-muted';
+			else if (['live', 'to_delete_live'].includes(this.event.status_kurzbz))
+				return 'fa-solid fa-user-graduate text-muted'
+		},
 		tooltipString() {
 			const tooltipArray = [];
 
@@ -139,7 +148,8 @@ export default {
 		class="position-relative"
 		@wheel.stop
 	>
-		<div v-if="event.has_assigned_resources || tags?.length" class="position-absolute top-0 start-0 m-1 d-flex gap-1" >
+		<div class="position-absolute top-0 start-0 m-1 d-flex gap-1" >
+			<i :class="statusIcon"></i>
 			<i
 				v-tooltip="resourcesTooltip"
 				v-if="event.has_assigned_resources"
