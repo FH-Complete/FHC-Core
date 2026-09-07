@@ -93,6 +93,10 @@ export default {
 			type: Boolean,
 			default: undefined
 		},
+		btnRange: {
+			type: Boolean,
+			default: undefined
+		},
 		timeGrid: Array,
 		draggableEvents: [Boolean, Array, Function],
 		dropableEvents: [Boolean, Array, Function],
@@ -282,7 +286,7 @@ export default {
 				:btn-week="!!modes['week'] && (btnWeek || (showBtns && btnWeek !== false))"
 				:btn-month="!!modes['month'] && (btnMonth || (showBtns && btnMonth !== false))"
 				:btn-list="!!modes['list'] && (btnList || (showBtns && btnList !== false))"
-				:btn-range="!!modes['range'] && (btnRange || (showBtns && btnList !== false))"
+				:btn-range="!!modes['range'] && (btnRange || (showBtns && btnRange !== false))"
 				:mode-options="modeOptions ? modeOptions[cMode] : undefined"
 			>
 				<slot name="actions" />
