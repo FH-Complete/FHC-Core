@@ -71,6 +71,20 @@ context("Tempus smoke tests", () => {
     tempusPage.getResourcesModal().should("be.visible");
   });
 
+  it("shows tags modal when selecting Tags from event context menu", () => {
+    tempusPage.waitForCalendarToFinishLoading();
+    tempusPage
+      .getCalendarEventsByWeekdayAndStartTime("Sunday", "16:55:00")
+      .should("have.length.greaterThan", 0);
+
+    tempusPage.getCalendarEventsByWeekdayAndStartTime("Sunday", "16:55:00").first().rightclick();
+    tempusPage.getEventContextMenuOption("Tags").click({ force: true });
+    waitForOk("@fetchTags");
+    waitForOk("@fetchTagsByCalendar");
+
+    tempusPage.getTagsModal().should("be.visible");
+  });
+
   it("shows history modal when selecting History from event context menu", () => {
     tempusPage.waitForCalendarToFinishLoading();
     tempusPage.getCalendarEvents().should("have.length.greaterThan", 0);

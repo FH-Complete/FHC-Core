@@ -76,7 +76,8 @@ export default {
 		"drop",
 		"resize",
 		"event-hover",
-		"event-unhover"
+		"event-unhover",
+		"open-reservierung"
 	],
 
 	data() {

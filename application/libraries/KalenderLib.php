@@ -23,6 +23,7 @@ class KalenderLib
 		$this->_ci->load->model('ressource/Stunde_model', 'StundeModel');
 		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 		$this->_ci->load->model('system/Variable_model', 'VariableModel');
+		$this->_ci->load->model('system/Sprache_model', 'SpracheModel');
 		$this->_ci->load->model('organisation/Ferien_model', 'FerienModel');
 
 
@@ -35,69 +36,75 @@ class KalenderLib
 
 	private function _getBasePlan($start_date, $end_date)
 	{
+		$language = $this->getLanguageIndex();
+		$index_bezeichnung_mehrsprachig = $language - 1;
+
 		$end_date = date('Y-m-d', strtotime($end_date . ' +1 day'));
 
 		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id,
-												tbl_kalender.eindeutige_kalender_gruppen_id,
-												tbl_kalender.status_kurzbz,
-												tbl_kalender.typ,
-												tbl_kalender.von,
-												tbl_kalender.bis,
-												tbl_kalender_ort.location,
-												tbl_kalender_ort.ort_kurzbz,
-												tbl_lehreinheit.lehreinheit_id,
-												tbl_lehreinheit.lehrveranstaltung_id,
-												tbl_lehreinheit.lehrfach_id,
-												tbl_lehreinheit.lehrform_kurzbz,
-												tbl_lehrveranstaltung.oe_kurzbz,
-												lehrfach.kurzbz AS lehrfach_kurzbz,
-												lehrfach.bezeichnung AS lehrfach_bezeichnung,
-												lehrfach.farbe,
-												COALESCE(orginasator.uid, tbl_lehreinheitmitarbeiter.mitarbeiter_uid) as mitarbeiter_uid,
-												COALESCE(reservierung_person.vorname, tbl_person.vorname) as vorname,
-												COALESCE(reservierung_person.nachname, tbl_person.nachname) as nachname,
-												COALESCE(reservierung_ma.kurzbz, tbl_mitarbeiter.kurzbz) AS ma_kurzbz,
-												teilnehmergruppe.gruppe_kurzbz as teilnehmerg_grp,
-												COALESCE (
-													UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) || 
-													COALESCE(verbandgruppe.semester::varchar, \'\') || 
-													COALESCE(verbandgruppe.verband::varchar, \'\') || 
-													COALESCE(verbandgruppe.gruppe, \'\'), 
-												\'\') as verband_grp,
-												tbl_kalender_event.beschreibung,
-												tbl_kalender_event.titel,
-												teilmitarbeiter.kurzbz as teilnehmer_kurzbz,
-												teilperson.vorname as teilnehmer_vorname,
-												teilperson.nachname as teilnehmer_nachname,
-												teilbenutzer.uid as teilnehmer_uid,
-												CASE 
-													WHEN tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL THEN 
-														COALESCE(
-															UPPER(le_studiengang.typ || le_studiengang.kurzbz) || 
-															COALESCE(tbl_lehreinheitgruppe.semester::varchar, \'\') || 
-															COALESCE(tbl_lehreinheitgruppe.verband::varchar, \'\') || 
-															COALESCE(tbl_lehreinheitgruppe.gruppe, \'\'), 
-														\'\')
-													ELSE tbl_lehreinheitgruppe.gruppe_kurzbz
-												END AS lehreinheit_gruppe_bezeichnung,
-												tbl_lehreinheitgruppe.gruppe_kurzbz as le_gruppe_kurzbz,
-												tbl_lehreinheitgruppe.studiengang_kz as le_studiengang_kz,
-												tbl_lehreinheitgruppe.semester as le_semester,
-												tbl_lehreinheitgruppe.verband as le_verband,
-												tbl_lehreinheitgruppe.gruppe as le_gruppe,
-												le_gruppe.direktinskription as le_direktinskription,
-												CASE
-													WHEN vonstunde.stunde IS NOT NULL AND bisstunde.stunde IS NOT NULL
-													THEN bisstunde.stunde - vonstunde.stunde + 1
-												ELSE ROUND(
-														COALESCE(
-															(
-																SELECT SUM(EXTRACT(EPOCH FROM (LEAST(stunde.ende, tbl_kalender.bis::time) - GREATEST(stunde.beginn, tbl_kalender.von::time))) / 60) / 45
-																FROM lehre.tbl_stunde stunde
-																WHERE stunde.beginn < tbl_kalender.bis::time AND stunde.ende > tbl_kalender.von::time)
-															,0)
-													,2
-												) END AS verplante_stunden');
+			tbl_kalender.eindeutige_kalender_gruppen_id,
+			tbl_kalender.status_kurzbz,
+			tbl_kalender.typ,
+			tbl_kalender.von,
+			tbl_kalender.bis,
+			tbl_kalender_ort.location,
+			tbl_kalender_ort.ort_kurzbz,
+			tbl_lehreinheit.lehreinheit_id,
+			tbl_lehreinheit.lehrveranstaltung_id,
+			tbl_lehreinheit.lehrfach_id,
+			tbl_lehreinheit.lehrform_kurzbz,
+			tbl_lehrveranstaltung.oe_kurzbz,
+			lehrfach.kurzbz AS lehrfach_kurzbz,
+			lehrfach.bezeichnung AS lehrfach_bezeichnung,
+			lehrfach.farbe,
+			COALESCE(orginasator.uid, tbl_lehreinheitmitarbeiter.mitarbeiter_uid) as mitarbeiter_uid,
+			COALESCE(reservierung_person.vorname, tbl_person.vorname) as vorname,
+			COALESCE(reservierung_person.nachname, tbl_person.nachname) as nachname,
+			COALESCE(reservierung_ma.kurzbz, tbl_mitarbeiter.kurzbz) AS ma_kurzbz,
+			teilnehmergruppe.gruppe_kurzbz as teilnehmerg_grp,
+			COALESCE (
+				UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) || 
+				COALESCE(verbandgruppe.semester::varchar, \'\') || 
+				COALESCE(verbandgruppe.verband::varchar, \'\') || 
+				COALESCE(verbandgruppe.gruppe, \'\'), 
+			\'\') as verband_grp,
+			tbl_kalender_event.beschreibung,
+			tbl_kalender_event.titel,
+			teilmitarbeiter.kurzbz as teilnehmer_kurzbz,
+			teilperson.vorname as teilnehmer_vorname,
+			teilperson.nachname as teilnehmer_nachname,
+			teilbenutzer.uid as teilnehmer_uid,
+			CASE 
+				WHEN tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL THEN 
+					COALESCE(
+						UPPER(le_studiengang.typ || le_studiengang.kurzbz) || 
+						COALESCE(tbl_lehreinheitgruppe.semester::varchar, \'\') || 
+						COALESCE(tbl_lehreinheitgruppe.verband::varchar, \'\') || 
+						COALESCE(tbl_lehreinheitgruppe.gruppe, \'\'), 
+					\'\')
+				ELSE tbl_lehreinheitgruppe.gruppe_kurzbz
+			END AS lehreinheit_gruppe_bezeichnung,
+			tbl_lehreinheitgruppe.gruppe_kurzbz as le_gruppe_kurzbz,
+			tbl_lehreinheitgruppe.studiengang_kz as le_studiengang_kz,
+			tbl_lehreinheitgruppe.semester as le_semester,
+			tbl_lehreinheitgruppe.verband as le_verband,
+			tbl_lehreinheitgruppe.gruppe as le_gruppe,
+			le_gruppe.direktinskription as le_direktinskription,
+			tag_data_agg.tags as tags,
+			resource_data_agg.resources as resources,
+			CASE
+				WHEN vonstunde.stunde IS NOT NULL AND bisstunde.stunde IS NOT NULL
+				THEN bisstunde.stunde - vonstunde.stunde + 1
+			ELSE ROUND(
+					COALESCE(
+						(
+							SELECT SUM(EXTRACT(EPOCH FROM (LEAST(stunde.ende, tbl_kalender.bis::time) - GREATEST(stunde.beginn, tbl_kalender.von::time))) / 60) / 45
+							FROM lehre.tbl_stunde stunde
+							WHERE stunde.beginn < tbl_kalender.bis::time AND stunde.ende > tbl_kalender.von::time)
+						,0)
+				,2
+			) END AS verplante_stunden
+			'); 
 
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit', 'tbl_kalender.kalender_id = tbl_kalender_lehreinheit.kalender_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event', 'tbl_kalender.kalender_id = tbl_kalender_event.kalender_id', 'LEFT');
@@ -143,6 +150,69 @@ class KalenderLib
 		);
 		$this->_ci->KalenderModel->addJoin('public.tbl_studiengang le_studiengang', 'le_lehrverband.studiengang_kz = le_studiengang.studiengang_kz', 'LEFT');
 
+		// Include tags in the query
+		$this->_ci->load->config('tempus');
+		$tags = $this->_ci->config->item('tempus_tags');
+
+		$whereTags = '';
+		if (is_array($tags) && !isEmptyArray($tags)) {
+			$tags = array_keys($tags);
+
+			foreach ($tags as $key => $tag) {
+				$tags[$key] = $this->_ci->KalenderModel->escape($tag);
+			}
+			$whereTags = " AND nt.typ_kurzbz IN (" . implode(",", $tags) . ")";
+		}
+		$subQueryTag = "(
+			SELECT
+				tag.eindeutige_kalender_gruppen_id,
+				COALESCE(json_agg(tag ORDER BY tag.done, tag.prioritaet), '[]'::json) AS tags
+			FROM (
+				SELECT DISTINCT ON (n.notiz_id)
+					n.notiz_id AS id,
+					nt.typ_kurzbz,
+					array_to_json(nt.bezeichnung_mehrsprachig::varchar[])->>". $index_bezeichnung_mehrsprachig. " as beschreibung,
+					n.text AS notiz,
+					nt.style,
+					n.erledigt AS done,
+					nt.prioritaet AS prioritaet,
+					nz.eindeutige_kalender_gruppen_id
+				FROM public.tbl_notizzuordnung AS nz
+				JOIN public.tbl_notiz AS n ON nz.notiz_id = n.notiz_id
+				JOIN public.tbl_notiz_typ AS nt ON n.typ = nt.typ_kurzbz " . $whereTags . "
+			) AS tag
+			GROUP BY tag.eindeutige_kalender_gruppen_id
+		) AS tag_data_agg";
+
+		$this->_ci->KalenderModel->addJoin($subQueryTag, 'tag_data_agg.eindeutige_kalender_gruppen_id = tbl_kalender.eindeutige_kalender_gruppen_id', 'LEFT');
+		// End of tags inclusion
+
+		// Include assigned operational resources in the query
+		$subQueryResource = "(
+			SELECT
+				resource.eindeutige_kalender_gruppen_id,
+				COALESCE(json_agg(resource ORDER BY resource.beschreibung), '[]'::json) AS resources
+			FROM (
+				SELECT
+					betriebsmittel_kalender.*,
+					betriebsmittel.beschreibung,
+					betriebsmittel.verplanen
+				FROM lehre.tbl_betriebsmittel_kalender AS betriebsmittel_kalender
+				JOIN wawi.tbl_betriebsmittel AS betriebsmittel
+					ON betriebsmittel.betriebsmittel_id = betriebsmittel_kalender.betriebsmittel_id
+				WHERE betriebsmittel.verplanen = TRUE
+			) AS resource
+			GROUP BY resource.eindeutige_kalender_gruppen_id
+		) AS resource_data_agg";
+
+		$this->_ci->KalenderModel->addJoin(
+			$subQueryResource,
+			'resource_data_agg.eindeutige_kalender_gruppen_id = tbl_kalender.eindeutige_kalender_gruppen_id',
+			'LEFT'
+		);
+		// End of operational resources inclusion
+
+		
 		$this->_ci->KalenderModel->db->join('lehre.tbl_stunde vonstunde', 'tbl_kalender.von::time = vonstunde.beginn', 'LEFT', FALSE);
 		$this->_ci->KalenderModel->db->join('lehre.tbl_stunde bisstunde', 'tbl_kalender.bis::time = bisstunde.ende', 'LEFT', FALSE);
 
@@ -169,6 +239,8 @@ class KalenderLib
 			{
 				$von = new DateTime($row->von);
 				$bis = new DateTime($row->bis);
+				$resources = isset($row->resources) ? $row->resources : [];
+				$parsedResources = is_string($resources) ? json_decode($resources, true) : $resources;
 
 				$events[$id] = (object) [
 					'eindeutige_kalender_gruppen_id' => $row->eindeutige_kalender_gruppen_id,
@@ -199,7 +271,9 @@ class KalenderLib
 					'beschreibung' => isset($row->beschreibung) ? $row->beschreibung : '',
 					'topic' => [],
 					'collisions' => false,
-					'has_assigned_resources' => isset($row->has_assigned_resources) ? $row->has_assigned_resources : false,
+					'has_assigned_resources' => !empty($parsedResources),
+					'resources' => is_array($parsedResources) ? $parsedResources : [],
+					'tags' => isset($row->tags) ? $row->tags : [],
 				];
 			}
 
@@ -1912,4 +1986,11 @@ class KalenderLib
 		return $allowed;
 	}
 
+	private function getLanguageIndex()
+	{
+		$this->_ci->SpracheModel->addSelect('index');
+		$result = $this->_ci->SpracheModel->loadWhere(array('sprache' => getUserLanguage()));
+
+		return hasData($result) ? getData($result)[0]->index : 1;
+	}
 }

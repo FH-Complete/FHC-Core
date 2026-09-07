@@ -257,7 +257,7 @@ if(!$result = @$db->db_query("SELECT status_kurzbz_max FROM lehre.tbl_kalender L
 			
 			UPDATE lehre.tbl_kalender_status 
 			SET status_kurzbz = 'to_delete',
-				bezeichnung = 'to_delete',
+				bezeichnung = 'to_delete'
 			WHERE status_kurzbz = 'todelete';
 			UPDATE lehre.tbl_kalender_status SET sort = 9 WHERE status_kurzbz = 'deleted';
 			UPDATE lehre.tbl_kalender_status SET sort = 10 WHERE status_kurzbz = 'archived';
