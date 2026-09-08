@@ -20,7 +20,10 @@ class CmsAdmin extends FHCAPI_Controller
 			'getMitarbeiter'            => ['basis/cms:r'],
 			'getDmsKategorieDokumente'  => ['basis/cms:r'],
 			'getUsage'                  => ['basis/cms:r'],
-			'getClickCounts'            => ['basis/cms:r'],
+			'getTreeMeta'               => ['basis/cms:r'],
+			'getAncestors'              => ['basis/cms:r'],
+			'getClickCount'             => ['basis/cms:r'],
+			'getClickRanking'           => ['basis/cms:r'],
 			'postContent'               => ['basis/cms:rw'],
 			'postTranslation'           => ['basis/cms:rw'],
 			'postVersion'               => ['basis/cms:rw'],
@@ -52,7 +55,7 @@ class CmsAdmin extends FHCAPI_Controller
 		$filter = $this->input->get('filter', TRUE);
 
 		$entitledResult = $this->cmsadminlib->getEntitledOe();
-		$entitledOe = isError($entitledResult) ? [] : getData($entitledResult);
+		$entitledOe = isError($entitledResult) ? [] : getData($entitledResult) ?? [];
 
 		$nodes = [];
 
@@ -226,6 +229,10 @@ class CmsAdmin extends FHCAPI_Controller
 		$result->languages = $languages;
 		$result->versions = $versions;
 
+		// Tells the CIS4 preview whether this template renders there at all.
+		$cis4Result = $this->TemplateModel->hasCis4Stylesheet($content->template_kurzbz);
+		$result->has_cis4_stylesheet = !isError($cis4Result) && getData($cis4Result);
+
 		$this->terminateWithSuccess($result);
 	}
 
@@ -253,11 +260,161 @@ class CmsAdmin extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
+	// The tree lists a search hit out of its place, so a generic title carries no context.
+	// This answers where each one sits. One walk for the whole list, not one per node.
+	const MAX_ANCESTOR_TIEFE = 12;
+
 	/**
-	 * Views per content for the tree ranking. Empty if LOG_CONTENT is off.
+	 * Ancestors of the given contents, keyed by content_id and ordered from the top down.
 	 */
-	public function getClickCounts()
+	public function getAncestors()
 	{
+		$this->load->library('form_validation');
+		$this->form_validation->set_data($_GET);
+		$this->form_validation->set_rules('content_ids', 'Content IDs', 'required');
+		if ($this->form_validation->run() == FALSE)
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$ids = [];
+		foreach (explode(',', $this->input->get('content_ids', TRUE)) as $teil)
+		{
+			$teil = trim($teil);
+			if (is_numeric($teil))
+				$ids[] = (int) $teil;
+		}
+		$ids = array_values(array_unique($ids));
+
+		if (empty($ids))
+			$this->terminateWithSuccess(new stdClass());
+
+		$result = $this->ContentchildModel->getAncestors(
+			$ids, self::MAX_ANCESTOR_TIEFE, DEFAULT_LANGUAGE
+		);
+		$rows = $this->getDataOrTerminateWithError($result);
+
+		// Same rule as the tree: an entry of an organisational unit the editor is not
+		// entitled for stays readable but cannot be opened.
+		$entitledResult = $this->cmsadminlib->getEntitledOe();
+		$entitledOe = isError($entitledResult) ? [] : getData($entitledResult) ?? [];
+
+		// The query orders by the distance, farthest first, so appending keeps the path
+		// reading from the top down.
+		$pfade = [];
+		foreach ((array) $rows as $row)
+		{
+			$start = (int) $row->start_id;
+
+			if (!isset($pfade[$start]))
+				$pfade[$start] = [];
+
+			$pfade[$start][] = [
+				'content_id' => (int) $row->content_id,
+				'titel' => $row->titel,
+				'tiefe' => (int) $row->tiefe,
+				'entitled' => in_array($row->oe_kurzbz, $entitledOe)
+			];
+		}
+
+		$this->terminateWithSuccess($pfade ?: new stdClass());
+	}
+
+	/**
+	 * Per content metadata for the tree filter, keyed by content_id.
+	 * One query for the whole tree, so the client filters and sorts without a round trip.
+	 */
+	public function getTreeMeta()
+	{
+		$result = $this->ContentModel->getTreeMeta(getAuthUID(), DEFAULT_LANGUAGE);
+		$rows = $this->getDataOrTerminateWithError($result);
+
+		$meta = [];
+		foreach ((array) $rows as $row)
+		{
+			$meta[(int) $row->content_id] = [
+				'childcount' => (int) $row->childcount,
+				'insertamum' => $row->insertamum,
+				'updateamum' => $row->updateamum,
+				'mine' => ($row->mine === 't' || $row->mine === true),
+				'contentlength' => (int) $row->contentlength
+			];
+		}
+
+		$this->terminateWithSuccess($meta);
+	}
+
+	/**
+	 * Two gates guard every click statistics request: the config flag switches the feature
+	 * off for everybody, the admin right decides who may read the numbers.
+	 */
+	private function checkClickstatsAccess()
+	{
+		$this->config->load('cms');
+
+		if (!$this->config->item('clickstats_enabled'))
+			$this->terminateWithError($this->p->t('cms', 'klickstatistikDeaktiviert'));
+
+		if (!$this->permissionlib->isBerechtigt('admin'))
+			$this->terminateWithError($this->p->t('cms', 'keineBerechtigung'));
+	}
+
+	/**
+	 * Period of a click statistics request. 0 counts the whole log.
+	 * Call it after checkClickstatsAccess, which loads the config.
+	 * @return array months and the start date, null for the whole log
+	 */
+	private function clickstatsPeriod()
+	{
+		$months = $this->input->get('months');
+		if ($months === null || $months === '')
+			$months = $this->config->item('clickstats_months');
+		$months = (int) $months;
+
+		$since = ($months > 0)
+			? date('Y-m-d H:i:s', strtotime('-' . $months . ' months'))
+			: null;
+
+		return [$months, $since];
+	}
+
+	/**
+	 * Views of one content. One counting query, so the tab loads it right away.
+	 * Empty if LOG_CONTENT is off.
+	 */
+	public function getClickCount()
+	{
+		$this->checkClickstatsAccess();
+
+		$this->load->library('form_validation');
+		$this->form_validation->set_data($_GET);
+		$this->form_validation->set_rules('content_id', 'Content ID', 'required|is_natural');
+		$this->form_validation->set_rules('months', 'Monate', 'is_natural');
+		if ($this->form_validation->run() == FALSE)
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$this->load->model('system/Webservicelog_model', 'WebservicelogModel');
+
+		list($months, $since) = $this->clickstatsPeriod();
+
+		$result = $this->WebservicelogModel->getContentClickCount(
+			(int) $this->input->get('content_id', TRUE), $since
+		);
+
+		$this->terminateWithSuccess([
+			'since' => $since,
+			'months' => $months,
+			'own' => $this->getDataOrTerminateWithError($result)
+		]);
+	}
+
+	/**
+	 * The ranking of the most viewed contents. It groups the whole log and resolves a
+	 * title per row, which takes seconds, so the tab fetches it only on request.
+	 * Empty if LOG_CONTENT is off.
+	 */
+	public function getClickRanking()
+	{
+		$this->checkClickstatsAccess();
+
 		$this->load->library('form_validation');
 		$this->form_validation->set_data($_GET);
 		$this->form_validation->set_rules('months', 'Monate', 'is_natural');
@@ -265,29 +422,32 @@ class CmsAdmin extends FHCAPI_Controller
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
 		$this->load->model('system/Webservicelog_model', 'WebservicelogModel');
-		$this->config->load('cms');
 
-		$months = $this->input->get('months');
-		if ($months === null || $months === '')
-			$months = $this->config->item('clickstats_months');
-		$months = (int) $months;
+		list($months, $since) = $this->clickstatsPeriod();
 
-		// 0 counts the whole log. That is the slowest case and stays an explicit choice.
-		$since = ($months > 0)
-			? date('Y-m-d H:i:s', strtotime('-' . $months . ' months'))
-			: null;
+		$sprache = $this->input->get('sprache', TRUE);
+		if (empty($sprache))
+			$sprache = DEFAULT_LANGUAGE;
 
-		$result = $this->WebservicelogModel->getContentClickCounts($since);
+		$result = $this->WebservicelogModel->getContentClickCounts(
+			$since, $sprache, (int) $this->config->item('clickstats_limit')
+		);
 		$rows = $this->getDataOrTerminateWithError($result);
 
-		$counts = [];
+		$ranked = [];
 		foreach ((array) $rows as $row)
-			$counts[(int) $row->request_id] = (int) $row->hits;
+		{
+			$ranked[] = [
+				'content_id' => (int) $row->content_id,
+				'titel' => $row->titel,
+				'hits' => (int) $row->hits
+			];
+		}
 
 		$this->terminateWithSuccess([
 			'since' => $since,
 			'months' => $months,
-			'counts' => $counts
+			'ranked' => $ranked
 		]);
 	}
 
@@ -316,9 +476,7 @@ class CmsAdmin extends FHCAPI_Controller
 	{
 		$this->load->model('system/Sprache_model', 'SpracheModel');
 		$this->SpracheModel->addSelect('sprache, bezeichnung');
-		// DEVIATION: admin.php offers every row of tbl_sprache. The column content marks a
-		// language as relevant for the content language choice, so a retired language stays
-		// out of the list. Phrasen.php filters the same table the same way.
+		
 		$result = $this->SpracheModel->loadWhere(['content' => true]);
 		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result));
 	}

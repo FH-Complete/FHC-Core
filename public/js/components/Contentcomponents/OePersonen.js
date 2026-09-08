@@ -24,6 +24,12 @@ export default {
 		foto: {
 			type: Boolean,
 			default: false
+		},
+		// 0 lists the unit itself, which is what a marker without the attribute means.
+		// Higher takes that many levels of sub units with it.
+		tiefe: {
+			type: Number,
+			default: 0
 		}
 	},
 	data() {
@@ -38,7 +44,7 @@ export default {
 			this.loading = true;
 			this.failed = false;
 			this.$api
-				.call(ApiCms.getOePersonen(this.oeKurzbz, this.foto))
+				.call(ApiCms.getOePersonen(this.oeKurzbz, this.foto, this.tiefe))
 				.then(res => { this.personen = res.data || []; })
 				.catch(() => { this.failed = true; })
 				.finally(() => { this.loading = false; });
@@ -46,7 +52,8 @@ export default {
 	},
 	watch: {
 		oeKurzbz() { this.load(); },
-		foto() { this.load(); }
+		foto() { this.load(); },
+		tiefe() { this.load(); }
 	},
 	created() {
 		this.load();
@@ -55,10 +62,10 @@ export default {
 		<div class="fhc-contentcomponent-oepersonen">
 			<div v-if="loading" class="text-muted">...</div>
 			<div v-else-if="failed" class="alert alert-warning py-2">
-				Die Personen konnten nicht geladen werden.
+				{{ $p.t('cms/ccLadefehlerPersonen') }}
 			</div>
 			<div v-else-if="!personen.length" class="text-muted">
-				Keine Personen zugeordnet.
+				{{ $p.t('cms/ccKeinePersonen') }}
 			</div>
 			<template v-else>
 				<person-block

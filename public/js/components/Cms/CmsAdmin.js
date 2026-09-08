@@ -4,16 +4,17 @@ import ContentHeader from './Header/ContentHeader.js';
 import Properties from './Tabs/Properties.js';
 import ContentTab from './Tabs/Content.js';
 import Permissions from './Tabs/Permissions.js';
-import Children from './Tabs/Children.js';
+import Hierarchy from './Tabs/Hierarchy.js';
 import History from './Tabs/History.js';
 import Delete from './Tabs/Delete.js';
+import Clickstats from './Tabs/Clickstats.js';
 import HorizontalSplit from '../horizontalsplit/horizontalsplit.js';
 
 const TAB_COMPONENTS = {
 	properties: Properties,
 	content: ContentTab,
 	permissions: Permissions,
-	children: Children,
+	hierarchy: Hierarchy,
 	history: History,
 	delete: Delete
 };
@@ -22,10 +23,14 @@ const TABS = [
 	{ key: 'properties', phrase: 'cms/tabEigenschaften' },
 	{ key: 'content', phrase: 'cms/tabInhalt' },
 	{ key: 'permissions', phrase: 'cms/tabRechte' },
-	{ key: 'children', phrase: 'cms/tabChilds' },
+	{ key: 'hierarchy', phrase: 'cms/tabHierarchie' },
 	{ key: 'history', phrase: 'cms/tabHistory' },
 	{ key: 'delete', phrase: 'cms/tabLoeschen' }
 ];
+
+// The view renders the clickstats attribute only for an admin, and only with the config
+// flag set.
+const CLICKSTATS_TAB = { key: 'clickstats', phrase: 'cms/tabKlickstatistik' };
 
 export default {
 	name: 'CmsAdmin',
@@ -38,7 +43,8 @@ export default {
 	props: {
 		cmsRoot: String,
 		authUid: String,
-		defaultLanguage: { type: String, default: 'German' }
+		defaultLanguage: { type: String, default: 'German' },
+		clickstats: { type: Boolean, default: false }
 	},
 	data() {
 		return {
@@ -51,10 +57,17 @@ export default {
 		};
 	},
 	computed: {
-		activeTabComponent() {
-			return TAB_COMPONENTS[this.tab] || null;
+		tabs() {
+			return this.clickstats ? TABS.concat([CLICKSTATS_TAB]) : TABS;
 		},
-		// Two switches in flight can resolve out of order, so block the view during one.
+		tabComponents() {
+			return this.clickstats
+				? { ...TAB_COMPONENTS, clickstats: Clickstats }
+				: TAB_COMPONENTS;
+		},
+		activeTabComponent() {
+			return this.tabComponents[this.tab] || null;
+		},
 		busy() {
 			return this.pending > 0;
 		}
@@ -65,7 +78,8 @@ export default {
 				const id = params.content_id ? Number(params.content_id) : null;
 				const sprache = params.sprache || null;
 				const version = params.version ? Number(params.version) : null;
-				const tab = params.tab || 'properties';
+				// unknown tab fallback
+				const tab = this.tabComponents[params.tab] ? params.tab : 'properties';
 
 				if (id !== this.contentId || sprache !== this.sprache
 					|| version !== this.version || tab !== this.tab) {
@@ -171,7 +185,7 @@ export default {
 		},
 
 		// Three grades of tree update. Pick the cheapest one that stays correct.
-		// A full reload drops the filter, the expanded branches and the click ranking,
+		// A full reload drops the expanded branches and refetches the filter meta,
 		// so keep it for changes that move nodes between branches.
 		reloadTree() {
 			if (this.$refs.tree) this.$refs.tree.reload();
@@ -285,8 +299,5 @@ export default {
 				</div>
 			</div>
 		</div>
-	`,
-	created() {
-		this.tabs = TABS;
-	}
+	`
 };

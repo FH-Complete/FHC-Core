@@ -49,10 +49,10 @@ and `DokumentListe.js`.
 
 ```js
 {
-	name: 'mein-baustein',    // data-fhc-component, and the key in components.js
-	label: 'Mein Baustein',   // shown in the picker
+	name: 'mein-baustein',            // data-fhc-component, and the key in components.js
+	labelPhrase: 'ccMeinBaustein',    // phrase in category cms, shown in the picker
 	props: {
-		'mein-wert': { type: 'string', required: true, label: 'Mein Wert' }
+		'mein-wert': { type: 'string', required: true, labelPhrase: 'ccMeinWert' }
 	}
 }
 ```

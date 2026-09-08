@@ -54,3 +54,44 @@ body {
 	background: rgba(255, 255, 255, 0.6);
 	cursor: wait;
 }
+
+/* content locker to groups get a gold padlock - resembles legacy cms */
+.cms-tree-lock {
+	color: #f0c000;
+	text-shadow: 0 0 1px #8a6000;
+}
+
+/* A frame swallows the mouse events that reach it, so dragging the split handle over the
+   preview ends the drag. Both frames go through for the length of the drag, so the events
+   reach the page underneath. Only a drag sets this class, so the preview stays clickable
+   the rest of the time. */
+.cms-preview-dragging iframe {
+	pointer-events: none;
+}
+
+/* The path down to a search hit, and the subtree under it. Both are context, so they step
+   back and let the hit itself carry the normal weight. */
+.cms-tree-ancestor {
+	font-size: 0.8em;
+	color: #6c757d;
+	line-height: 1.4;
+}
+
+/* The path is context and keeps the grey, but it leads somewhere, so it underlines on
+   hover like any other link. */
+.cms-tree-ancestor a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.cms-tree-ancestor a:hover,
+.cms-tree-ancestor a:focus {
+	color: var(--bs-link-color, #0d6efd);
+	text-decoration: underline;
+}
+
+.cms-tree-context > div > a,
+.cms-tree-context > div > span {
+	font-size: 0.85em;
+	color: #6c757d;
+}

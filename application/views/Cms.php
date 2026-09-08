@@ -29,6 +29,7 @@
 			cms-root="<?= site_url('cms'); ?>"
 			auth-uid="<?= getAuthUID(); ?>"
 			default-language="<?= defined('DEFAULT_LANGUAGE') ? DEFAULT_LANGUAGE : 'German'; ?>"
+			<?= !empty($clickstats) ? 'clickstats' : ''; ?>
 		></router-view>
 	</div>
 <?php $this->load->view('templates/FHC-Footer', $includesArray); ?>

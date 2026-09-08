@@ -68,7 +68,7 @@ export default {
 		<div class="fhc-contentcomponent-contentchildmenu">
 			<div v-if="loading" class="text-muted">...</div>
 			<div v-else-if="failed" class="alert alert-warning py-2">
-				Das Menü konnte nicht geladen werden.
+				{{ $p.t('cms/ccLadefehlerMenue') }}
 			</div>
 			<!-- An empty menu renders nothing. A reader has no use for the note that a
 			     page has no children, and the group rule may have removed every entry. -->

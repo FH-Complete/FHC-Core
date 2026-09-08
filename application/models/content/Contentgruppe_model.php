@@ -20,7 +20,7 @@ class Contentgruppe_model extends DB_Model
 	 * 
 	 * @param int			$content_id
 	 * 
-	 * @return stdClass		success(true) wenn eingeschraenkt sonst success(false)
+	 * @return stdClass		success(true) wenn locked sonst success(false)
 	 */
 	public function islocked($content_id)
 	{
@@ -32,7 +32,7 @@ class Contentgruppe_model extends DB_Model
 	}
 	
 	/**
-	 * Prueft ob ein User die Berechtigung fuer das Anzeigen des 
+	 * Prüft ob ein User die Berechtigung fuer das Anzeigen des 
 	 * Contents besitzt
 	 * 
 	 * @param int			$content_id	ID des Contents

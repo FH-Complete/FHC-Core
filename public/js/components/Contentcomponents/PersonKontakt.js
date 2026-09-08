@@ -60,7 +60,7 @@ export default {
 		<div class="fhc-contentcomponent-personkontakt">
 			<div v-if="loading" class="text-muted">...</div>
 			<div v-else-if="failed" class="alert alert-warning py-2">
-				Die Person konnte nicht geladen werden.
+				{{ $p.t('cms/ccLadefehlerPerson') }}
 			</div>
 			<person-block
 				v-else-if="person"

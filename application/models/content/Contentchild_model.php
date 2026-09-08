@@ -1,6 +1,9 @@
 <?php
 class Contentchild_model extends DB_Model
 {
+	// swapSort reports the two boundary cases with this. See swapSort().
+	const NO_NEIGHBOUR = 'no neighbour';
+
 
 	/**
 	 * Constructor
@@ -33,6 +36,28 @@ class Contentchild_model extends DB_Model
 		return $this->execReadOnlyQuery($query, [$sprache, $content_id]);
 	}
 
+
+	/**
+	 * Parents of a content, with the title of each parent.
+	 * A content can hang under more than one parent, so this returns a list.
+	 * @param int $content_id
+	 * @param string $sprache
+	 * @return stdClass success with array of rows or error
+	 */
+	public function getParents($content_id, $sprache)
+	{
+		$query = '
+			SELECT cc.contentchild_id, cc.content_id, cc.sort,
+				(SELECT titel FROM campus.tbl_contentsprache
+				 WHERE content_id = cc.content_id AND sprache = ?
+				 ORDER BY version LIMIT 1) AS titel
+			FROM campus.tbl_contentchild cc
+			WHERE cc.child_content_id = ?
+			ORDER BY cc.content_id
+		';
+
+		return $this->execReadOnlyQuery($query, [$sprache, $content_id]);
+	}
 
 	/**
 	 * Children of a content as a reader may see them.
@@ -185,8 +210,10 @@ class Contentchild_model extends DB_Model
 			return $neighbourResult;
 
 		$neighbourData = getData($neighbourResult);
+		// A marker, not a message. The controller owns the wording, because a model has no
+		// phrases. Returning a phrase key here put the key itself in front of the user.
 		if (empty($neighbourData))
-			return error($direction === 'up' ? 'cms/bereitsGanzOben' : 'cms/bereitsGanzUnten');
+			return error(self::NO_NEIGHBOUR);
 
 		$neighbour = $neighbourData[0];
 
@@ -208,6 +235,111 @@ class Contentchild_model extends DB_Model
 			return error('Sort swap failed');
 
 		return success(true);
+	}
+
+	/**
+	 * Writes the whole order of one content in one transaction. Serves the drag and drop.
+	 * The list must hold every child of the content exactly once, or the rows left out
+	 * would keep a stale sort value.
+	 * @param int $content_id
+	 * @param array $contentchild_ids in the wanted order
+	 * @return stdClass success(true) or error
+	 */
+	public function setSortOrder($content_id, $contentchild_ids)
+	{
+		$currentResult = $this->execReadOnlyQuery(
+			'SELECT contentchild_id FROM campus.tbl_contentchild WHERE content_id = ?',
+			[$content_id]
+		);
+		if (isError($currentResult))
+			return $currentResult;
+
+		$current = [];
+		foreach ((array) getData($currentResult) as $row)
+			$current[] = (int) $row->contentchild_id;
+
+		$wanted = array_map('intval', array_values($contentchild_ids));
+
+		$check = $wanted;
+		sort($current);
+		sort($check);
+		if ($current !== $check)
+			return error('Sort order does not match the children of the content');
+
+		$this->db->trans_start();
+
+		foreach ($wanted as $position => $contentchild_id)
+		{
+			$this->execQuery(
+				'UPDATE campus.tbl_contentchild SET sort = ? WHERE contentchild_id = ?',
+				[$position + 1, $contentchild_id]
+			);
+		}
+
+		$this->db->trans_complete();
+
+		if ($this->db->trans_status() === false)
+			return error('Sort order update failed');
+
+		return success(true);
+	}
+
+	/**
+	 * Every ancestor of the given contents, with the distance to the content it belongs to.
+	 *
+	 * The tree shows a search result out of its place: a title like "Team" says nothing
+	 * about which unit it belongs to. This delivers the way down to it.
+	 *
+	 * A content can hang under more than one parent, so a level can hold more than one
+	 * ancestor. Every one of them comes back, with tiefe 1 for the direct parent. The
+	 * caller decides how to draw that.
+	 *
+	 * tiefe also ends a cycle: a content whose parent chain leads back to itself would
+	 * otherwise recurse forever.
+	 *
+	 * @param array $content_ids contents to walk up from
+	 * @param int $maxTiefe how many levels to climb
+	 * @param string $sprache language of the ancestor titles
+	 * @return stdClass success with array of rows or error
+	 */
+	public function getAncestors($content_ids, $maxTiefe, $sprache)
+	{
+		if (empty($content_ids))
+			return success([]);
+
+		$platzhalter = implode(', ', array_fill(0, count($content_ids), '?'));
+
+		// The aggregate and the title sit in the final select. The recursive term names
+		// the working table once and carries no subquery, which is what Postgres allows.
+		$query = '
+			WITH RECURSIVE auf(start_id, content_id, tiefe) AS (
+				SELECT cc.child_content_id, cc.content_id, 1
+				FROM campus.tbl_contentchild cc
+				WHERE cc.child_content_id IN (' . $platzhalter . ')
+				UNION ALL
+				SELECT auf.start_id, cc.content_id, auf.tiefe + 1
+				FROM campus.tbl_contentchild cc
+					JOIN auf ON cc.child_content_id = auf.content_id
+				WHERE auf.tiefe < ?
+			)
+			SELECT auf.start_id, auf.content_id, MIN(auf.tiefe) AS tiefe,
+				(SELECT titel FROM campus.tbl_contentsprache cs
+				 WHERE cs.content_id = auf.content_id AND cs.sprache = ?
+				 ORDER BY cs.version LIMIT 1) AS titel,
+				-- The caller turns this into the entitled flag, so the path can offer a
+				-- link only for an ancestor the editor may open.
+				(SELECT c.oe_kurzbz FROM campus.tbl_content c
+				 WHERE c.content_id = auf.content_id) AS oe_kurzbz
+			FROM auf
+			GROUP BY auf.start_id, auf.content_id
+			ORDER BY auf.start_id, MIN(auf.tiefe) DESC, auf.content_id
+		';
+
+		$params = array_map('intval', array_values($content_ids));
+		$params[] = (int) $maxTiefe;
+		$params[] = $sprache;
+
+		return $this->execReadOnlyQuery($query, $params);
 	}
 
 	/**

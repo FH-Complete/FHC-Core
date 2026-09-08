@@ -17,6 +17,12 @@ export default {
 		kategorieKurzbz: {
 			type: String,
 			required: true
+		},
+		// 0 lists the category itself, which is what a marker without the attribute
+		// means. Higher takes that many levels of sub categories with it.
+		tiefe: {
+			type: Number,
+			default: 0
 		}
 	},
 	data() {
@@ -32,7 +38,7 @@ export default {
 			this.loading = true;
 			this.failed = false;
 			this.$api
-				.call(ApiCms.getDmsKategorie(this.kategorieKurzbz))
+				.call(ApiCms.getDmsKategorie(this.kategorieKurzbz, this.tiefe))
 				.then(res => {
 					this.zugriff = res.data.zugriff;
 					this.dokumente = res.data.dokumente || [];
@@ -42,7 +48,8 @@ export default {
 		}
 	},
 	watch: {
-		kategorieKurzbz() { this.load(); }
+		kategorieKurzbz() { this.load(); },
+		tiefe() { this.load(); }
 	},
 	created() {
 		this.load();
@@ -51,13 +58,13 @@ export default {
 		<div class="fhc-contentcomponent-dmsliste">
 			<div v-if="loading" class="text-muted">...</div>
 			<div v-else-if="failed" class="alert alert-warning py-2">
-				Die Dokumentenliste konnte nicht geladen werden.
+				{{ $p.t('cms/ccLadefehlerDokumente') }}
 			</div>
 			<!-- A reader without the entitlement sees nothing at all, not a hint that
 			     something is hidden here. -->
 			<template v-else-if="zugriff">
 				<div v-if="!dokumente.length" class="text-muted">
-					Keine Dokumente vorhanden.
+					{{ $p.t('cms/ccKeineDokumente') }}
 				</div>
 				<dokument-liste v-else :dokumente="dokumente"></dokument-liste>
 			</template>

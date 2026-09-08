@@ -19,7 +19,9 @@ export default {
 		return {
 			titel: '',
 			allSprachen: [],
-			versionDetails: []
+			versionDetails: [],
+			// Target of the translation dropdown, used once the list grows past a pair.
+			neueSprache: ''
 		};
 	},
 	computed: {
@@ -104,6 +106,7 @@ export default {
 
 		createTranslation(newSprache) {
 			if (!newSprache) return;
+			this.neueSprache = '';
 			this.$api
 				.call(ApiCmsAdmin.postTranslation(
 					this.contentId, this.sprache, this.version, newSprache
@@ -149,10 +152,27 @@ export default {
 					>{{ $p.t('cms/neueVersionAnlegen') }}</button>
 				</div>
 				<div class="d-flex align-items-center gap-1">
-					<button v-for="s in availableSprachen" :key="s.sprache"
-						class="btn btn-sm btn-outline-primary"
-						@click="createTranslation(s.sprache)"
-					>{{ $p.t('cms/uebersetzungAnlegenIn', [s.sprache]) }}</button>
+					<!-- One button per missing language is fine for a pair. An institution
+					     with more content languages would get a wall of them, each
+					     carrying the full label. -->
+					<template v-if="availableSprachen.length > 2">
+						<select class="form-select form-select-sm w-auto"
+							v-model="neueSprache">
+							<option value="">{{ $p.t('cms/spracheWaehlen') }}</option>
+							<option v-for="s in availableSprachen" :key="s.sprache"
+								:value="s.sprache">{{ s.sprache }}</option>
+						</select>
+						<button class="btn btn-sm btn-outline-primary"
+							:disabled="!neueSprache"
+							@click="createTranslation(neueSprache)"
+						>{{ $p.t('cms/uebersetzungAnlegen') }}</button>
+					</template>
+					<template v-else>
+						<button v-for="s in availableSprachen" :key="s.sprache"
+							class="btn btn-sm btn-outline-primary"
+							@click="createTranslation(s.sprache)"
+						>{{ $p.t('cms/uebersetzungAnlegenIn', [s.sprache]) }}</button>
+					</template>
 				</div>
 			</div>
 		</div>

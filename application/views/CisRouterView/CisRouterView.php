@@ -11,7 +11,6 @@ $includesArray = array(
 	'skipID' => '#fhccontent',
 	'vuedatepicker11' => true,
 	'customCSSs' => array(
-		'vendor/vuejs/vuedatepicker_css/main.css',
 		'public/css/components/verticalsplit.css',
 		'public/css/components/searchbar/searchbar.css',
 		'public/css/Fhc.css',
@@ -24,26 +23,26 @@ $includesArray = array(
 		'public/css/components/FormUnderline.css',
 		'public/css/components/abgabetool/abgabe.css',
 		'public/css/Cis4/Cms.css',
-		'public/css/Cis4/Studium.css',
+		'public/css/Cis4/Contentcomponents.css',
+		'public/css/Cis4/Studium.css'
 	),
 	'customJSs' => array(
 		'vendor/npm-asset/primevue/accordion/accordion.min.js',
 		'vendor/npm-asset/primevue/accordiontab/accordiontab.min.js',
 		'vendor/npm-asset/primevue/checkbox/checkbox.min.js',
+		'vendor/npm-asset/primevue/chips/chips.min.js',
+		'vendor/npm-asset/primevue/multiselect/multiselect.min.js',
 		'vendor/npm-asset/primevue/inputnumber/inputnumber.min.js',
 		'vendor/npm-asset/primevue/speeddial/speeddial.min.js',
 		'vendor/npm-asset/primevue/textarea/textarea.min.js',
-		'vendor/moment/luxonjs/luxon.min.js',
-		'vendor/npm-asset/primevue/password/password.min.js',
-		'vendor/npm-asset/primevue/multiselect/multiselect.min.js',
 		'vendor/npm-asset/primevue/timeline/timeline.min.js',
 		'vendor/npm-asset/primevue/inplace/inplace.min.js',
 		'vendor/npm-asset/primevue/message/message.min.js',
 		'vendor/npm-asset/primevue/tieredmenu/tieredmenu.js',
+		'vendor/moment/luxonjs/luxon.min.js'
 	),
 	'customJSModules' => array(
-		'public/js/apps/Dashboard/Fhc.js',
-		'vendor/olifolkerd/tabulator5/src/js/modules/ColumnCalcs/ColumnCalcs.js'
+		'public/js/apps/Cis/Cis.js',
 	),
 
 );
@@ -51,8 +50,6 @@ $includesArray = array(
 $this->load->view('templates/CISVUE-Header', $includesArray);
 ?>
 <div id="fhccontent" class="h-100" route=<?php echo $route ?>>
-	<router-view 
-			:view-data='<?php echo json_encode($viewData) ?>'
-	></router-view>
+	<router-view></router-view>
 </div>
 <?php $this->load->view('templates/CISVUE-Footer', $includesArray); ?>

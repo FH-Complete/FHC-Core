@@ -43,7 +43,7 @@ export default {
 		<div class="fhc-contentcomponent-dmsdokumente">
 			<div v-if="loading" class="text-muted">...</div>
 			<div v-else-if="failed" class="alert alert-warning py-2">
-				Die Dokumentenliste konnte nicht geladen werden.
+				{{ $p.t('cms/ccLadefehlerDokumente') }}
 			</div>
 			<!-- An empty list renders nothing. Every named document may have dropped out
 			     through the category rule, and that is not the reader's business. -->

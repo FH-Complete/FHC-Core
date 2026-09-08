@@ -25,6 +25,10 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  */
 class Cms extends FHCAPI_Controller
 {
+	// Upper bound for the tiefe of oe-personen and dms-liste. A hierarchy this deep does
+	// not occur, and the cap keeps one marker from walking a whole tree.
+	const MAX_TIEFE = 10;
+
 	
 	/**
 	 * Object initialization
@@ -81,7 +85,10 @@ class Cms extends FHCAPI_Controller
         $sprache = $this->input->get("sprache",TRUE);
         $sichtbar = $this->input->get("sichtbar",TRUE);
 
-		$content = $this->cmslib->getContent($content_id, $version, $sprache, $sichtbar);
+		// cms admin preview renders a content without counting a view
+		$preview = $this->input->get("preview",TRUE);
+
+		$content = $this->cmslib->getContent($content_id, $version, $sprache, $sichtbar, !$preview);
 		$content = $this->getDataOrTerminateWithError($content);
 
 		$this->terminateWithSuccess($content);
@@ -218,28 +225,46 @@ class Cms extends FHCAPI_Controller
 		if ($this->form_validation->run() == FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array());
 
 		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
+		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
 
 		$oe_kurzbz = $this->input->get('oe_kurzbz', TRUE);
 		$mitFoto = $this->input->get('foto', TRUE) ? true : false;
 
-		// 'oezuordnung' is the function that assigns an employee to an organisation unit.
-		// The model already filters datum_von and datum_bis.
-		$rows = $this->BenutzerfunktionModel->getBenutzerFunktionenDetailed('oezuordnung', $oe_kurzbz);
-		$rows = $this->getDataOrTerminateWithError($rows) ?: array();
-
-		// The model returns the aktiv flag but does not filter on it.
-		$rows = array_values(array_filter($rows, function ($row) {
-			return $row->aktiv;
-		}));
+		// tiefe 0 asks about the one unit. Deeper takes the sub units with it.
+		$oeResult = $this->OrganisationseinheitModel->getMitUntereinheiten(
+			$oe_kurzbz, $this->_tiefe()
+		);
+		$oeRows = $this->getDataOrTerminateWithError($oeResult) ?: array();
 
 		$uids = array();
 		$funktionen = array();
-		foreach ($rows as $row)
+
+		foreach ($oeRows as $oe)
 		{
-			$uids[] = $row->uid;
-			// tbl_benutzerfunktion.bezeichnung is the free label of one assignment, for
-			// example "Bibliothekarin". tbl_funktion.beschreibung is the generic name.
-			$funktionen[$row->uid] = $row->bezeichnung ?: $row->beschreibung;
+			// 'oezuordnung' is the function that assigns an employee to an organisation
+			// unit. The model already filters datum_von and datum_bis.
+			$rows = $this->BenutzerfunktionModel->getBenutzerFunktionenDetailed(
+				'oezuordnung', $oe->oe_kurzbz
+			);
+			$rows = $this->getDataOrTerminateWithError($rows) ?: array();
+
+			foreach ($rows as $row)
+			{
+				// The model returns the aktiv flag but does not filter on it.
+				if (!$row->aktiv)
+					continue;
+
+				// One person can hold the assignment in several units of the walk. The
+				// first one wins, so the list keeps one block per person.
+				if (isset($funktionen[$row->uid]))
+					continue;
+
+				$uids[] = $row->uid;
+				// tbl_benutzerfunktion.bezeichnung is the free label of one assignment,
+				// for example "Bibliothekarin". tbl_funktion.beschreibung is the generic
+				// name.
+				$funktionen[$row->uid] = $row->bezeichnung ?: $row->beschreibung;
+			}
 		}
 
 		$this->terminateWithSuccess($this->_cmsPersonen($uids, $funktionen, $mitFoto));
@@ -292,8 +317,28 @@ class Cms extends FHCAPI_Controller
 		$dokumente = array();
 		if ($erlaubt)
 		{
-			$dokumente = $this->DmsModel->getKategorieDokumente($kategorie_kurzbz);
-			$dokumente = $this->getDataOrTerminateWithError($dokumente) ?: array();
+			// tiefe 0 asks about the one category. Deeper takes the sub categories with it.
+			$katResult = $this->DmsModel->getMitUnterkategorien(
+				$kategorie_kurzbz, $this->_tiefe()
+			);
+			$kategorien = $this->getDataOrTerminateWithError($katResult) ?: array();
+
+			foreach ($kategorien as $kat)
+			{
+				// Every category carries its own group rule, so a sub category can be
+				// closed while the parent is open. Ask for each one instead of letting the
+				// entitlement of the root stand for the whole walk. The root is already
+				// answered above.
+				if ($kat->kategorie_kurzbz !== $kategorie_kurzbz
+					&& $this->_dmsKategorieErlaubt($kat->kategorie_kurzbz) !== true)
+					continue;
+
+				$rows = $this->DmsModel->getKategorieDokumente($kat->kategorie_kurzbz);
+				$rows = $this->getDataOrTerminateWithError($rows) ?: array();
+
+				foreach ($rows as $row)
+					$dokumente[] = $row;
+			}
 		}
 
 		$this->terminateWithSuccess(array(
@@ -451,6 +496,23 @@ class Cms extends FHCAPI_Controller
 	 * @param string $kategorie_kurzbz
 	 * @return boolean|null null when the category does not exist
 	 */
+	/**
+	 * Reads the tiefe parameter of a content component. 0 keeps the component to the unit
+	 * or category it names, which is what a marker without the attribute means.
+	 * Capped, because the depth drives a recursive walk and one query per level found.
+	 *
+	 * @return int
+	 */
+	private function _tiefe()
+	{
+		$tiefe = (int) $this->input->get('tiefe', TRUE);
+
+		if ($tiefe < 0)
+			return 0;
+
+		return min($tiefe, self::MAX_TIEFE);
+	}
+
 	private function _dmsKategorieErlaubt($kategorie_kurzbz)
 	{
 		$this->load->library('PermissionLib');

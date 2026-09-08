@@ -27,12 +27,18 @@ export default {
 		};
 	},
 	computed: {
-		// The preview below uses the legacy renderer, which runs no Vue. Tell the editor
-		// as soon as the content holds a marker, so an empty preview is not a surprise.
+		// The legacy renderer runs no Vue and draws nothing for a marker. The preview says
+		// so, but only while the legacy view is the one on screen.
 		hasContentcomponents() {
 			return Object.values(this.values || {}).some(
 				value => typeof value === 'string' && value.indexOf(CONTENTCOMPONENT_ATTR) !== -1
 			);
+		},
+		// The redirect template carries a URL, and its preview opens in a new window
+		// instead of an iframe. So without the lock nothing on this tab shows the values.
+		// Read only fields spare the editor a lock that blocks the content for 24 hours.
+		isRedirect() {
+			return this.contentInfo?.template_kurzbz === 'redirect';
 		},
 		lockState() {
 			if (!this.sperre || this.sperre.gesperrt_uid === null) return 'free';
@@ -170,11 +176,12 @@ export default {
 					</button>
 				</template>
 
-				<div v-if="hasContentcomponents" class="alert alert-info">
-					Dieser Inhalt enthält Contentcomponents. Die Vorschau unten zeigt sie nicht,
-					weil sie den alten Renderer ohne Vue verwendet. Prüfe sie über den Link
-					"In CIS4 ansehen".
-				</div>
+				<xsd-form
+					v-if="isRedirect && lockState !== 'own'"
+					:schema="schema"
+					:modelValue="values"
+					:disabled="true"
+				></xsd-form>
 
 				<cms-preview
 					ref="preview"
@@ -182,6 +189,8 @@ export default {
 					:sprache="sprache"
 					:version="version"
 					:template-kurzbz="contentInfo?.template_kurzbz"
+					:has-cis4-stylesheet="contentInfo?.has_cis4_stylesheet !== false"
+					:has-contentcomponents="hasContentcomponents"
 					:sichtbar="sichtbar"
 				></cms-preview>
 			</template>
