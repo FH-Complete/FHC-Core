@@ -1,8 +1,6 @@
 import {CoreFilterCmpt} from "../../../../components/filter/Filter.js";
 import BsModal from '../../../Bootstrap/Modal.js';
 import FormInput from "../../../Form/Input.js";
-import ApiDetails from "../../../../api/lehrveranstaltung/details.js";
-
 
 export default {
 	name: "TableView",
@@ -20,6 +18,10 @@ export default {
 		day: {
 			type: luxon.DateTime,
 			required: true
+		},
+		end: {
+			type: luxon.DateTime,
+			required: true
 		}
 	},
 	data()
@@ -30,10 +32,13 @@ export default {
 	},
 	computed: {
 		start() {
-			return this.day.startOf('week', { useLocaleWeeks: true });
+			return this.day.startOf('day');
+		},
+		tableEnd() {
+			return this.end.endOf('day');
 		},
 		preparedEvents() {
-			const end = this.start.plus({ days: 7 });
+			const end = this.tableEnd;
 			return this.events
 				.filter(e => e.start < end && e.end > this.start)
 				.sort((a, b) => a.start.ts - b.start.ts)
@@ -112,15 +117,6 @@ export default {
 			this.$refs.tableViewTable?.tabulator?.setData(newData);
 		}
 	},
-/*	mounted() {
-
-		this.$api.call(ApiDetails.getRaumtyp())
-			.then(result => {
-				this.raumtyp_array = result.data;
-			})
-			.catch(this.$fhcAlert.handleSystemError);
-
-	},*/
 	template: /* html */`
 	<div class="fhc-calendar-mode-table-view h-100 overflow-auto">
 		<core-filter-cmpt

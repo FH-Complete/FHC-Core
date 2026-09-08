@@ -9,7 +9,7 @@ export default {
 	directives: {
 		drop
 	},
-	emits: ['update:parkedKeys'],
+	emits: ['update:parkedKeys', 'select-kw'],
 	data() {
 		return {
 			parked: [],
@@ -66,11 +66,12 @@ export default {
 			>
 				<i v-if="!parked.length" class="fa-solid fa-square-parking"></i>
 				<event-card
-					class="parkingevent"
 					v-for="parkedEvent in parked"
 					:key="parkedEvent.id"
 					:event="parkedEvent"
 					parked
+					@select-kw="$emit('select-kw', $event)"
+					@unpark="unpark"
 				/>
 			</div>
 		</div>
