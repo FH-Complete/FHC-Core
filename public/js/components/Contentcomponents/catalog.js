@@ -27,9 +27,9 @@ export const CONTENTCOMPONENT_MAX = 20;
 /**
  * One entry per available component.
  *
- * name   value of data-fhc-component, and the key in components.js
- * label  shown in the insert dialog. TODO(phrases): move to category cms.
- * props  attribute name (kebab-case) => { type, required, label, source }
+ * name         value of data-fhc-component, and the key in components.js
+ * labelPhrase  phrase in category cms, shown in the insert dialog
+ * props        attribute name (kebab-case) => { type, required, labelPhrase, source }
  *
  * Attribute names must be kebab-case. The HTML parser lowercases every attribute name,
  * so camelCase would not survive. Vue maps the kebab key back to the camelCase prop.
@@ -40,51 +40,56 @@ export const CONTENTCOMPONENT_MAX = 20;
 export const catalog = [
 	{
 		name: 'oe-personen',
-		label: 'Team einer Organisationseinheit (automatisch)',
+		labelPhrase: 'ccOePersonen',
 		props: {
 			'oe-kurzbz': {
 				type: 'string',
 				required: true,
-				label: 'Organisationseinheit',
+				labelPhrase: 'ccOrganisationseinheit',
 				source: 'oe'
 			},
 			'foto': {
 				type: 'boolean',
 				required: false,
-				label: 'Fotos anzeigen'
+				labelPhrase: 'ccFotosAnzeigen'
+			},
+			'tiefe': {
+				type: 'number',
+				required: false,
+				labelPhrase: 'ccTiefeOe'
 			}
 		}
 	},
 	{
 		name: 'person-block',
-		label: 'Einzelne Person (Kontaktblock)',
+		labelPhrase: 'ccPersonBlock',
 		props: {
 			'uid': {
 				type: 'string',
 				required: true,
-				label: 'Person',
+				labelPhrase: 'ccPerson',
 				source: 'person'
 			},
 			'funktion': {
 				type: 'string',
 				required: false,
-				label: 'Funktionsbezeichnung (leer = aus den Personaldaten)'
+				labelPhrase: 'ccFunktionsbezeichnung'
 			},
 			'foto': {
 				type: 'boolean',
 				required: false,
-				label: 'Foto anzeigen'
+				labelPhrase: 'ccFotoAnzeigen'
 			}
 		}
 	},
 	{
 		name: 'dms-dokumente',
-		label: 'Dokumentenliste (einzelne Dokumente)',
+		labelPhrase: 'ccDmsDokumente',
 		props: {
 			'dms-ids': {
 				type: 'string',
 				required: true,
-				label: 'DMS-IDs, mit Komma getrennt',
+				labelPhrase: 'ccDmsIds',
 				// Adds a category filter and a document list to the dialog. Choosing a
 				// document appends its id to this field.
 				picker: 'dms'
@@ -93,24 +98,29 @@ export const catalog = [
 	},
 	{
 		name: 'dms-liste',
-		label: 'Dokumentenliste (ganze DMS-Kategorie)',
+		labelPhrase: 'ccDmsListe',
 		props: {
 			'kategorie-kurzbz': {
 				type: 'string',
 				required: true,
-				label: 'DMS-Kategorie',
+				labelPhrase: 'ccDmsKategorie',
 				source: 'dmskategorie'
+			},
+			'tiefe': {
+				type: 'number',
+				required: false,
+				labelPhrase: 'ccTiefeDms'
 			}
 		}
 	},
 	{
 		name: 'contentchild-menu',
-		label: 'Menü der Kindelemente',
+		labelPhrase: 'ccContentchildMenu',
 		props: {
 			'content-id': {
 				type: 'number',
 				required: false,
-				label: 'Content-ID (leer = diese Seite)'
+				labelPhrase: 'ccContentId'
 			}
 		}
 	}

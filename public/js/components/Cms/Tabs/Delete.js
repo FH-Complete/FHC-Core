@@ -19,7 +19,7 @@ export default {
 		hasRestrict() {
 			return this.usages.some(u => u.table !== 'campus.tbl_infoscreen_content');
 		},
-		// Request to T07: forward defaultLanguage prop to tabs. Using 'German' as fallback.
+		// forward defaultLanguage prop to tabs. Using 'German' as fallback.
 		isLastVersion() {
 			if (!this.contentInfo?.versions || !this.sprache) return false;
 			const defaultLang = 'German';
@@ -125,13 +125,19 @@ export default {
 					</div>
 					<ul class="list-group mb-3">
 						<li v-for="(u, i) in usages" :key="i"
-							class="list-group-item d-flex justify-content-between align-items-center">
-							<span>{{ u.label }}</span>
+							class="list-group-item d-flex justify-content-between
+								align-items-center gap-3">
+							<span class="me-auto">
+								<span class="d-block">{{ u.label || '—' }}</span>
+								<!-- The value alone says nothing about where the entry
+								     sits. The table is a database name and stays as it is. -->
+								<code class="small text-muted">{{ u.table }}</code>
+							</span>
 							<span v-if="u.table === 'campus.tbl_infoscreen_content'"
-								class="badge bg-danger">
+								class="badge bg-danger text-nowrap">
 								{{ $p.t('cms/wirdMitgeloescht') }}
 							</span>
-							<span v-else class="badge bg-warning text-dark">
+							<span v-else class="badge bg-warning text-dark text-nowrap">
 								{{ $p.t('cms/verhindertLoeschen') }}
 							</span>
 						</li>

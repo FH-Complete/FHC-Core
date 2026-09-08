@@ -16,7 +16,8 @@
  */
 
 export default {
-	content(content_id, version=null, sprache=null, sichtbar=null) {
+	// preview flag to suppress click log entry. The CMS admin preview passes it.
+	content(content_id, version=null, sprache=null, sichtbar=null, preview=false) {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/Cms/content',
@@ -24,7 +25,8 @@ export default {
 				content_id,
 				...(version ? { version } : {}),
 				...(sprache ? { sprache } : {}),
-				...(sichtbar ? { sichtbar } : {})
+				...(sichtbar ? { sichtbar } : {}),
+				...(preview ? { preview: 1 } : {})
 			}
 		};
 	},
@@ -55,11 +57,16 @@ export default {
 		};
 	},
 	// Used by the CMS content component "oe-personen".
-	getOePersonen(oe_kurzbz, foto) {
+	// tiefe 0 asks about the one unit, higher takes that many levels of sub units with it.
+	getOePersonen(oe_kurzbz, foto, tiefe) {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/Cms/getOePersonen',
-			params: { oe_kurzbz, ...(foto ? { foto: 1 } : {}) }
+			params: {
+				oe_kurzbz,
+				...(foto ? { foto: 1 } : {}),
+				...(tiefe ? { tiefe } : {})
+			}
 		};
 	},
 	// Used by the CMS content component "person-block".
@@ -79,11 +86,13 @@ export default {
 		};
 	},
 	// Used by the CMS content component "dms-liste".
-	getDmsKategorie(kategorie_kurzbz) {
+	// tiefe 0 asks about the one category, higher takes that many levels of sub categories
+	// with it. The server checks the entitlement of every category it reaches.
+	getDmsKategorie(kategorie_kurzbz, tiefe) {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/Cms/getDmsKategorie',
-			params: { kategorie_kurzbz }
+			params: { kategorie_kurzbz, ...(tiefe ? { tiefe } : {}) }
 		};
 	},
 	// Used by the CMS content component "contentchild-menu".

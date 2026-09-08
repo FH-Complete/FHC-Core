@@ -10,12 +10,14 @@ class CmsAdminStruktur extends FHCAPI_Controller
 			'getGruppen'        => ['basis/cms:r'],
 			'getAllGruppen'     => ['basis/cms:r'],
 			'getChilds'        => ['basis/cms:r'],
+			'getParents'       => ['basis/cms:r'],
 			'getPossibleChilds' => ['basis/cms:r'],
 			'postGruppe'       => ['basis/cms:rw'],
 			'deleteGruppe'     => ['basis/cms:rw'],
 			'postChild'        => ['basis/cms:rw'],
 			'deleteChild'      => ['basis/cms:rw'],
-			'putChildSort'     => ['basis/cms:rw']
+			'putChildSort'     => ['basis/cms:rw'],
+			'putChildOrder'    => ['basis/cms:rw']
 		]);
 
 		$this->load->library('PermissionLib');
@@ -61,6 +63,24 @@ class CmsAdminStruktur extends FHCAPI_Controller
 			$sprache = DEFAULT_LANGUAGE;
 
 		$result = $this->ContentchildModel->getChilds($content_id, $sprache);
+		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result));
+	}
+
+	public function getParents()
+	{
+		$this->load->library('form_validation');
+		$this->form_validation->set_data($_GET);
+		$this->form_validation->set_rules('content_id', 'Content ID', 'required|is_natural');
+		if ($this->form_validation->run() == FALSE)
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$content_id = $this->input->get('content_id', TRUE);
+		$sprache = $this->input->get('sprache', TRUE);
+
+		if (empty($sprache))
+			$sprache = DEFAULT_LANGUAGE;
+
+		$result = $this->ContentchildModel->getParents($content_id, $sprache);
 		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result));
 	}
 
@@ -146,10 +166,7 @@ class CmsAdminStruktur extends FHCAPI_Controller
 
 		$sortResult = $this->ContentchildModel->getMaxSort($content_id);
 		$sort = $this->getDataOrTerminateWithError($sortResult) + 1;
-
-		// LEGACY-QUIRK: tbl_contentchild has no unique index on (content_id,
-		// child_content_id). The legacy code does not check for a duplicate, so a child can be
-		// attached more than once. Kept as a functional copy. See section 3 of the contract.
+		
 		$result = $this->ContentchildModel->insert([
 			'content_id'       => $content_id,
 			'child_content_id' => $this->input->post('child_content_id'),
@@ -191,10 +208,58 @@ class CmsAdminStruktur extends FHCAPI_Controller
 		if ($this->form_validation->run() == FALSE)
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
+		$direction = $this->input->post('direction');
+
 		$result = $this->ContentchildModel->swapSort(
 			$this->input->post('contentchild_id'),
-			$this->input->post('direction')
+			$direction
 		);
-		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result));
+
+		if (isError($result))
+		{
+			// The child already sits at the end it was moved towards. That is a normal
+			// answer, not a failure, and the direction decides the wording.
+			if (getError($result) === Contentchild_model::NO_NEIGHBOUR)
+			{
+				$this->terminateWithError($this->p->t('cms',
+					$direction === 'up' ? 'bereitsGanzOben' : 'bereitsGanzUnten'));
+			}
+
+			$this->terminateWithError($this->p->t('cms', 'sortierungFehlgeschlagen'));
+		}
+
+		$this->terminateWithSuccess(true);
+	}
+
+	// Writes the whole order at once. The drag and drop moves a child over any distance,
+	// and putChildSort would need one request per position.
+	public function putChildOrder()
+	{
+		if (!$this->permissionlib->isBerechtigt('basis/cms', 'u'))
+			$this->terminateWithError($this->p->t('cms', 'keineBerechtigung'));
+
+		$this->load->library('form_validation');
+		$this->form_validation->set_data($_POST);
+		$this->form_validation->set_rules('content_id', 'Content ID', 'required|is_natural');
+		if ($this->form_validation->run() == FALSE)
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$ids = $this->input->post('contentchild_ids');
+
+		if (is_string($ids))
+			$ids = json_decode($ids, true);
+
+		if (!is_array($ids) || empty($ids))
+			$this->terminateWithError($this->p->t('cms', 'sortierungFehlgeschlagen'));
+
+		$result = $this->ContentchildModel->setSortOrder(
+			$this->input->post('content_id'),
+			$ids
+		);
+
+		if (isError($result))
+			$this->terminateWithError($this->p->t('cms', 'sortierungFehlgeschlagen'));
+
+		$this->terminateWithSuccess(true);
 	}
 }

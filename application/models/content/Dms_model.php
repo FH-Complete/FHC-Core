@@ -232,4 +232,39 @@ class Dms_model extends DB_Model
 
 		return $this->execReadOnlyQuery($query);
 	}
+
+	/**
+	 * The category itself plus its sub categories, down to a depth.
+	 *
+	 * tiefe 0 returns only the category named. The depth bound also ends a cycle: a
+	 * category whose parent chain leads back to itself would otherwise recurse forever.
+	 *
+	 * The caller must still check the entitlement of every category it gets back. A sub
+	 * category carries its own group rule and may be closed while the parent is open.
+	 *
+	 * @param string $kategorie_kurzbz root of the walk
+	 * @param int $tiefe how many levels below the root to include
+	 * @return object success with array of rows or error
+	 */
+	public function getMitUnterkategorien($kategorie_kurzbz, $tiefe)
+	{
+		$query = '
+			WITH RECURSIVE unter(kategorie_kurzbz, tiefe) AS (
+				SELECT kategorie_kurzbz, 0
+				FROM campus.tbl_dms_kategorie
+				WHERE kategorie_kurzbz = ?
+				UNION ALL
+				SELECT k.kategorie_kurzbz, unter.tiefe + 1
+				FROM campus.tbl_dms_kategorie k
+					JOIN unter ON k.parent_kategorie_kurzbz = unter.kategorie_kurzbz
+				WHERE unter.tiefe < ?
+			)
+			SELECT kategorie_kurzbz, MIN(tiefe) AS tiefe
+			FROM unter
+			GROUP BY kategorie_kurzbz
+			ORDER BY MIN(tiefe), kategorie_kurzbz
+		';
+
+		return $this->execReadOnlyQuery($query, [$kategorie_kurzbz, (int) $tiefe]);
+	}
 }

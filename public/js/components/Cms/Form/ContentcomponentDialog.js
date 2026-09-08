@@ -18,7 +18,12 @@ import {
 const FELD_KATEGORIE = '__kategorie';
 const FELD_DOKUMENT = '__dokument';
 
-const LEERE_AUSWAHL = { value: '', text: '— auswählen —' };
+// Filled in createContentcomponentDialog. The factory is no Vue component, so the
+// phrases plugin is handed in instead of read from an instance.
+let t = key => key;
+
+// A function, not a constant: the text is translated when the dialog is built.
+const leereAuswahl = () => ({ value: '', text: t('ccAuswaehlen') });
 
 // A prop source fills a dialog field with a list from the server. The key is the
 // "source" value in the catalog. A prop without a known source gets a plain text field.
@@ -27,7 +32,8 @@ const SOURCES = {
 		request: () => ApiCmsAdmin.getOrganisationseinheiten(),
 		item: oe => ({
 			value: oe.oe_kurzbz,
-			text: (oe.bezeichnung || oe.oe_kurzbz) + (oe.aktiv ? '' : ' (inaktiv)')
+			text: (oe.bezeichnung || oe.oe_kurzbz)
+				+ (oe.aktiv ? '' : ' (' + t('inaktiv') + ')')
 		})
 	},
 	dmskategorie: {
@@ -100,6 +106,8 @@ export function createContentcomponentDialog(options)
 	const api = options.api;
 	const onChanged = options.onChanged || function () {};
 
+	t = (key, args) => options.p.t('cms/' + key, args);
+
 	const sourceItems = {};
 	const sourceRequests = {};
 
@@ -127,20 +135,23 @@ export function createContentcomponentDialog(options)
 			return;
 
 		editor.windowManager.open({
-			title: 'Contentcomponent einfügen',
+			title: t('ccDialogTitel'),
 			initialData: { component: catalog[0].name },
 			body: {
 				type: 'panel',
 				items: [{
 					type: 'selectbox',
 					name: 'component',
-					label: 'Contentcomponent',
-					items: catalog.map(entry => ({ value: entry.name, text: entry.label }))
+					label: t('ccContentcomponent'),
+					items: catalog.map(entry => ({
+						value: entry.name,
+						text: t(entry.labelPhrase)
+					}))
 				}]
 			},
 			buttons: [
-				{ type: 'cancel', text: 'Abbrechen' },
-				{ type: 'submit', text: 'Weiter', primary: true }
+				{ type: 'cancel', text: t('abbrechen') },
+				{ type: 'submit', text: t('weiter'), primary: true }
 			],
 			onSubmit(dialog) {
 				const name = dialog.getData().component;
@@ -183,7 +194,7 @@ export function createContentcomponentDialog(options)
 				const wert = values && values[propName];
 
 				if (wert && !liste.some(eintrag => eintrag.value === wert))
-					liste.unshift({ value: wert, text: wert + ' (nicht in der Auswahl)' });
+					liste.unshift({ value: wert, text: t('ccNichtInDerAuswahl', [wert]) });
 
 				return liste;
 			}
@@ -196,7 +207,7 @@ export function createContentcomponentDialog(options)
 						alle.push({
 							type: 'selectbox',
 							name: propName,
-							label: spec.label || propName,
+							label: spec.labelPhrase ? t(spec.labelPhrase) : propName,
 							items: listeFuer(propName, spec)
 						});
 						return alle;
@@ -207,7 +218,7 @@ export function createContentcomponentDialog(options)
 						alle.push({
 							type: 'checkbox',
 							name: propName,
-							label: spec.label || propName
+							label: spec.labelPhrase ? t(spec.labelPhrase) : propName
 						});
 						return alle;
 					}
@@ -215,7 +226,7 @@ export function createContentcomponentDialog(options)
 					alle.push({
 						type: 'input',
 						name: propName,
-						label: spec.label || propName
+						label: spec.labelPhrase ? t(spec.labelPhrase) : propName
 					});
 
 					if (spec.picker === 'dms')
@@ -223,14 +234,14 @@ export function createContentcomponentDialog(options)
 						alle.push({
 							type: 'selectbox',
 							name: propName + FELD_KATEGORIE,
-							label: 'Kategorie',
-							items: [LEERE_AUSWAHL].concat(sourceItems.dmskategorie || [])
+							label: t('ccKategorie'),
+							items: [leereAuswahl()].concat(sourceItems.dmskategorie || [])
 						});
 						alle.push({
 							type: 'selectbox',
 							name: propName + FELD_DOKUMENT,
-							label: 'Dokument hinzufügen',
-							items: [LEERE_AUSWAHL].concat(dokumente)
+							label: t('ccDokumentHinzufuegen'),
+							items: [leereAuswahl()].concat(dokumente)
 						});
 					}
 
@@ -241,15 +252,15 @@ export function createContentcomponentDialog(options)
 			function konfigBauen(daten)
 			{
 				return {
-					title: descriptor.label,
+					title: t(descriptor.labelPhrase),
 					initialData: daten,
 					body: { type: 'panel', items: itemsBauen() },
 					onChange(dialog, details) {
 						aufAenderung(dialog, details.name);
 					},
 					buttons: [
-						{ type: 'cancel', text: 'Abbrechen' },
-						{ type: 'submit', text: 'Übernehmen', primary: true }
+						{ type: 'cancel', text: t('abbrechen') },
+						{ type: 'submit', text: t('uebernehmen'), primary: true }
 					],
 					onSubmit(dialog) {
 						const html = markerHtml(name, descriptor, dialog.getData());
@@ -291,8 +302,9 @@ export function createContentcomponentDialog(options)
 								value: String(dokument.dms_id),
 								// A document outside the CIS search still renders here, so
 								// the editor has to see which one that is.
-								text: dokument.name
-									+ (dokument.cis_suche ? '' : ' (nicht in der CIS-Suche)')
+								text: dokument.cis_suche
+									? dokument.name
+									: t('ccNichtInCisSuche', [dokument.name])
 							}));
 						})
 						.catch(() => { dokumente = []; })

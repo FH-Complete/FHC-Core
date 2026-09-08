@@ -60,6 +60,10 @@ export default {
 		return false;
 	},
 	mounted() {
+		// The components below carry their texts in category cms. $p.t would fetch it by
+		// itself on the first miss and fill in when it arrives, which shows an empty line
+		// for that moment. One request here from the single gateway spares that.
+		this.$p.loadCategory('cms');
 		this.rescan();
 	},
 	beforeUnmount() {

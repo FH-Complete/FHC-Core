@@ -399,6 +399,63 @@ class Content_model extends DB_Model
 	}
 
 	/**
+	 * Per content metadata for the tree filter. Excludes news, like getRootContent().
+	 * updateamum is the last touch on the content or on any of its versions.
+	 *
+	 * contentlength counts the visible characters of the newest version, the way getOne()
+	 * picks it: the default language first, then the highest version. The XML scaffolding,
+	 * the CDATA markers, the HTML tags, the entities and every space drop out, so a content
+	 * that nobody ever filled measures 0 whatever empty shape it carries. The title counts
+	 * too, so a content with a title and no body measures short instead of zero.
+	 *
+	 * @param string $uid current user, decides the mine flag
+	 * @param string $sprache preferred language of the measured version
+	 * @return stdClass success with array of rows or error
+	 */
+	public function getTreeMeta($uid, $sprache)
+	{
+		$query = "
+			SELECT tbl_content.content_id,
+				(SELECT COUNT(*) FROM campus.tbl_contentchild
+				 WHERE tbl_contentchild.content_id = tbl_content.content_id) AS childcount,
+				tbl_content.insertamum,
+				GREATEST(
+					tbl_content.updateamum,
+					(SELECT MAX(updateamum) FROM campus.tbl_contentsprache
+					 WHERE tbl_contentsprache.content_id = tbl_content.content_id)
+				) AS updateamum,
+				COALESCE(
+					tbl_content.insertvon = ? OR tbl_content.updatevon = ? OR EXISTS (
+						SELECT 1 FROM campus.tbl_contentsprache
+						WHERE tbl_contentsprache.content_id = tbl_content.content_id
+							AND (tbl_contentsprache.insertvon = ?
+								OR tbl_contentsprache.updatevon = ?)
+					),
+					false
+				) AS mine,
+				(SELECT length(
+						regexp_replace(
+							regexp_replace(
+								regexp_replace(
+									replace(replace(cs.content::text, '<![CDATA[', ''), ']]>', ''),
+									'<[^>]*>', '', 'g'),
+								'&[a-zA-Z]+;|&#[0-9]+;', '', 'g'),
+							'\s+', '', 'g')
+					)
+				 FROM campus.tbl_contentsprache cs
+				 WHERE cs.content_id = tbl_content.content_id
+				 ORDER BY (cs.sprache = ?) DESC, cs.version DESC
+				 LIMIT 1) AS contentlength
+			FROM campus.tbl_content
+			WHERE tbl_content.template_kurzbz <> ?
+		";
+
+		return $this->execReadOnlyQuery(
+			$query, [$uid, $uid, $uid, $uid, $sprache, 'news']
+		);
+	}
+
+	/**
 	 * All contents eligible as children: excludes ancestors, self, and news.
 	 * @param int $content_id the content to find children for
 	 * @param string $sprache language for the titel subselect

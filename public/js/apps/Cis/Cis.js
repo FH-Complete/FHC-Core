@@ -137,7 +137,8 @@ const router = VueRouter.createRouter({
 			}
 		},
 		{
-			path: `/CisVue/Cms/Content/:content_id`,
+			// optional version for cms admin preview
+			path: `/CisVue/Cms/Content/:content_id/:version?`,
 			name: 'Content',
 			component: CmsContent,
 			props: true
@@ -337,5 +338,9 @@ app.directive('contrast', contrast);
 app.mount('#fhccontent');
 
 router.afterEach((to, from, failure) => {
+	// dont log cms admin preview
+	if (to.query.preview === '1')
+		return;
+
 	app.config.globalProperties.$api.call(ApiRouteInfo.info('cis4', to.fullPath));
 });

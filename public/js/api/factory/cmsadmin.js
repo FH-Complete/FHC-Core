@@ -30,11 +30,38 @@ export default {
 			params: { content_id, sprache, version }
 		};
 	},
-	getClickCounts(months) {
+	// Feeds the tree filter: child count, insertamum, updateamum and the own-edit flag.
+	getTreeMeta() {
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/CmsAdmin/getClickCounts',
-			params: { months }
+			url: '/api/frontend/v1/CmsAdmin/getTreeMeta'
+		};
+	},
+	// Where each content sits. The tree asks for the whole visible list at once, so the
+	// hierarchy toggle costs one request and not one per node.
+	getAncestors(content_ids) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/CmsAdmin/getAncestors',
+			params: { content_ids: content_ids.join(',') }
+		};
+	},
+	// Views of one content. One counting query, so the tab loads it right away.
+	// The server gates both click endpoints on the config flag and on the admin right,
+	// so a caller without both gets an error instead of numbers.
+	getClickCount(content_id, months) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/CmsAdmin/getClickCount',
+			params: { content_id, months }
+		};
+	},
+	// The ranking over the whole log. Takes seconds, so the tab asks for it on request.
+	getClickRanking(months, sprache) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/CmsAdmin/getClickRanking',
+			params: { months, sprache }
 		};
 	},
 	getTemplates() {
@@ -208,6 +235,14 @@ export default {
 			params: { content_id, sprache }
 		};
 	},
+	// The hierarchy tab lists them above the children. A content can have several parents.
+	getParents(content_id, sprache) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/CmsAdminStruktur/getParents',
+			params: { content_id, sprache }
+		};
+	},
 	getPossibleChilds(content_id, sprache) {
 		return {
 			method: 'get',
@@ -248,6 +283,14 @@ export default {
 			method: 'post',
 			url: '/api/frontend/v1/CmsAdminStruktur/putChildSort',
 			params: { contentchild_id, direction }
+		};
+	},
+	// Writes the whole order after a drag and drop. The ids carry the wanted order.
+	putChildOrder(content_id, contentchild_ids) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/CmsAdminStruktur/putChildOrder',
+			params: { content_id, contentchild_ids }
 		};
 	}
 };

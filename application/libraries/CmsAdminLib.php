@@ -35,10 +35,7 @@ class CmsAdminLib
 
 		return success($oe);
 	}
-
-	// LEGACY-QUIRK: the legacy code checks the organisational unit only when it loads the
-	// page. It does not check on each write. This method exists, but it is called only
-	// where the legacy code calls it. See Q7 in the contract.
+	
 	/**
 	 * @param int $content_id
 	 * @return object success(bool)
@@ -188,9 +185,7 @@ class CmsAdminLib
 			'sichtbar' => true,
 			'titel' => $source->titel,
 			'content' => $source->content,
-			// The review feature is gone from this admin, but the columns stay and the
-			// legacy admin still writes them. A copied row must not inherit the review
-			// stamp of its source, so we clear it here.
+			// The review feature is gone from this admin, but the columns stay
 			'reviewvon' => null,
 			'reviewamum' => null,
 			'gesperrt_uid' => null,
@@ -232,9 +227,7 @@ class CmsAdminLib
 			'sichtbar' => false,
 			'titel' => $source->titel,
 			'content' => $source->content,
-			// The review feature is gone from this admin, but the columns stay and the
-			// legacy admin still writes them. A copied row must not inherit the review
-			// stamp of its source, so we clear it here.
+			// The review feature is gone from this admin, but the columns stay
 			'reviewvon' => null,
 			'reviewamum' => null,
 			'gesperrt_uid' => null,
@@ -250,7 +243,9 @@ class CmsAdminLib
 	}
 
 	/**
-	 * @param array $daten fields from contract 7.7
+	 * Writes the properties of one content version.
+	 * @param array $daten content_id, sprache, version, template_kurzbz, oe_kurzbz,
+	 *        aktiv, menu_open, beschreibung, titel, sichtbar
 	 * @return object success(true) or error
 	 */
 	public function saveProperties($daten)
@@ -277,11 +272,11 @@ class CmsAdminLib
 			'updatevon' => $uid
 		]);
 
-		// LEGACY-QUIRK: prefs_save sets updateamum and updatevon in tbl_content only.
-		// It does not touch tbl_contentsprache. Kept as a functional copy.
 		$this->ci->ContentspracheModel->update($row->contentsprache_id, [
 			'titel' => $daten['titel'],
-			'sichtbar' => $daten['sichtbar']
+			'sichtbar' => $daten['sichtbar'],
+			'updateamum' => $now,
+			'updatevon' => $uid
 		]);
 
 		$this->ci->db->trans_complete();
@@ -292,9 +287,9 @@ class CmsAdminLib
 		return success(true);
 	}
 
-	// LEGACY-QUIRK: the legacy XSDFormPrinter_XML branch checks neither the permission
+	// legacy cms checks neither the permission
 	// type nor the lock. The form appears only when the user holds the lock, but the POST
-	// itself is unprotected. See Q3 in the contract.
+	// itself is unprotected.
 	/**
 	 * @param int $content_id
 	 * @param string $sprache
@@ -342,9 +337,7 @@ class CmsAdminLib
 
 		return success(true);
 	}
-
-	// DEVIATION: content::sperren overwrites a live lock without a check (Q2). Locking now
-	// refuses a live foreign lock and takes over only an expired one.
+	
 	/**
 	 * Locks a version for the current user, or takes over an expired lock.
 	 * @param int $contentsprache_id
@@ -373,8 +366,7 @@ class CmsAdminLib
 		}
 
 		$this->ci->db->trans_start();
-
-		// Close every open entry: a take-over ends the previous one, and the legacy leaks them.
+		
 		$this->ci->ContentlogModel->closeOpenEntries($contentsprache_id);
 
 		$logResult = $this->ci->ContentlogModel->insert([
@@ -399,8 +391,8 @@ class CmsAdminLib
 		return success(true);
 	}
 
-	// DEVIATION: content::freigabeUser releases ALL locks of the user (Q1). Releasing now
-	// ends one lock. The uid predicate stops a user releasing a lock of somebody else.
+	// legacy released ALL locks of the user. Releasing now ends one lock.
+	// The uid predicate stops a user releasing a lock of somebody else.
 	/**
 	 * Releases the lock of the current user on one version.
 	 * @param int $contentsprache_id
@@ -446,7 +438,7 @@ class CmsAdminLib
 	 * @param int $content_id
 	 * @param string $sprache
 	 * @param int $version
-	 * @return object success(array) lock state per contract 7.8
+	 * @return object success(array) gesperrt_uid, start, expires, own, expired, may_force
 	 */
 	public function getLockState($content_id, $sprache, $version)
 	{
@@ -455,8 +447,8 @@ class CmsAdminLib
 			return $versionResult;
 		$row = getData($versionResult);
 
-		// LEGACY-QUIRK: admin.php inserts an empty string, releasing writes NULL. Both mean
-		// free. The contract reports NULL.
+		// legacy admin.php inserts an empty string, releasing writes NULL.
+		// this code reports NULL.
 		$gesperrt_uid = ($row->gesperrt_uid === '') ? null : $row->gesperrt_uid;
 
 		$logEntry = null;
@@ -495,8 +487,7 @@ class CmsAdminLib
 		return date('Y-m-d H:i:s', strtotime($logEntry->start) + $ttlHours * 3600);
 	}
 
-	// DEVIATION: the legacy holds a lock until its owner or a superuser releases it, so a
-	// forgotten lock blocks a page forever. Locks now age out after lock_ttl_hours.
+	// Locks now age out after lock_ttl_hours.
 	/**
 	 * A lock without a log entry has no age and counts as expired.
 	 * @param string|null $gesperrt_uid
@@ -512,9 +503,7 @@ class CmsAdminLib
 
 		return $expires === null || strtotime($expires) < time();
 	}
-
-	// DEVIATION: admin.php ignores the return value of deleteContent and tells the user
-	// nothing. This code reports the error. See Q5 in the contract.
+	
 	/**
 	 * @param int $content_id
 	 * @return object success(true) or error
