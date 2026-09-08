@@ -280,7 +280,7 @@ class Stundenplan_model extends DB_Model
 
 	/**
 	 * queries Stundenplan but for a whole lva, irrespective of who is requesting it
-	 * 
+	 *
 	 * @return void
 	 */
 	public function getStundenplanLVA($start_date, $end_date, $lv_id) {
@@ -528,7 +528,7 @@ class Stundenplan_model extends DB_Model
 
 		return $this->execReadOnlyQuery($qry, $qry_params);
 	}
-	
+
 	/**
 	 * NO STANDALONE FUNCTION - Generates a SQL query string to fetch 'stundenplan' events for a specific student within the current semester.
 	 *
@@ -537,8 +537,14 @@ class Stundenplan_model extends DB_Model
 	 *
 	 * @return mixed
 	 */
-	public function getStundenplanQuery($start_date, $end_date, $semester, $gruppen, $studentlehrverbaende, $db_stpl_table='stundenplan', $showLvsStundenplan=false)
+	public function getStundenplanQuery($start_date, $end_date, $semester, $gruppen, $studentlehrverbaende, $db_stpl_table='stundenplan', $showLvsStundenplan=false, $endDateNextSemHalf=null, $semesterFilter=null)
 	{
+		//only use longer intervall with given semesterfilter
+		if($endDateNextSemHalf != null && $semesterFilter != null)
+		{
+			$end_date = $endDateNextSemHalf;
+		}
+
 		// helper function to check if either $gruppen or $studentlehrverbaende are empty for each semester
 		$emptyCheck = function($toBeCheckedArray) use ($semester){
 			$result = true;
@@ -552,24 +558,30 @@ class Stundenplan_model extends DB_Model
 			return $result;
 		};
 
-		// if both the gruppen and the studentlehrverbaende are empty we early return 
+		// if both the gruppen and the studentlehrverbaende are empty we early return
 		if($emptyCheck($gruppen) && $emptyCheck($studentlehrverbaende))
 		{
 			return false;
 		}
 
 		$query =
-		"select sp.*
+			"select sp.*
 		from lehre.vw_".$db_stpl_table." sp
 		WHERE
 		sp.datum >= ".$this->escape($start_date)."
 		AND sp.datum <= ".$this->escape($end_date);
-		
+
+		//necessary for new prolonged interval
+		if($semesterFilter && $endDateNextSemHalf)
+		{
+			$query .= " AND sp.semester = " . $semesterFilter;
+		}
+
 		// adds the AND sql chain only if both $gruppen and $studentlehrverbaende are not empty
 		if(!$emptyCheck($gruppen) || !$emptyCheck($studentlehrverbaende))
 		{
 			$query .= " AND ( ";
-		} 
+		}
 
 		foreach($semester as $sem => $semester_date_range)
 		{
@@ -583,10 +595,10 @@ class Stundenplan_model extends DB_Model
 				}
 				// converts the array of gruppen strings into a sql IN (_,_,_) chain
 				$query .="(sp.gruppe_kurzbz IN (" .implode(',',$gruppen[$sem_date]).") AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)." AND ".$this->escape($sem_date_range->ende)." )";
-				
+
 				$query .="OR";
 			}
-		} 
+		}
 
 		// if there are no studentlehrverbaende and the gruppen are not empty, we can remove the last OR added after the groups
 		if($emptyCheck($studentlehrverbaende) && !$emptyCheck($gruppen))
@@ -598,17 +610,27 @@ class Stundenplan_model extends DB_Model
 		{
 			foreach($semester_date_range as $sem_date => $sem_date_range)
 			{
-				if(!array_key_exists($sem,$studentlehrverbaende) || count($studentlehrverbaende[$sem]) == 0)
+				//old working
+				if(!array_key_exists($sem_date,$studentlehrverbaende) || count($studentlehrverbaende[$sem_date]) == 0)
+								{
+									continue;
+								}
+
+/*				if(!array_key_exists($sem,$studentlehrverbaende) || count($studentlehrverbaende[$sem]) == 0)
 				{
 					continue;
-				}
-				$studlvbds = array_filter(
+				}*/
+
+				//TODO(MANU) check error
+/*				$studlvbds = array_filter(
 					$studentlehrverbaende[$sem],
 					function($value) use ($sem_date) {
 						return $value->studiensemester_kurzbz === $sem_date;
 					}
-				);
-				foreach($studlvbds as $key=>$lehrverband)
+				);*/
+
+				foreach($studentlehrverbaende[$sem_date] as $key=>$lehrverband)
+				//foreach($studlvbds as $key=>$lehrverband)
 				{
 					$query .= "(((sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND sp.verband = ".$this->escape($lehrverband->verband)." AND sp.gruppe = ".$this->escape($lehrverband->gruppe)." AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)." AND ".$this->escape($sem_date_range->ende).")";
 					// Eintraege fuer den ganzen Verband
@@ -617,7 +639,7 @@ class Stundenplan_model extends DB_Model
 					$query .= "OR (sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND (sp.verband is null OR sp.verband='') AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)
 						." AND ".$this->escape($sem_date_range->ende).")) AND gruppe_kurzbz is null)";
 
-					// Eintraege vom Stundenplan
+					// Eintraege vom Stundenplan //not in master
 					if($showLvsStundenplan)
 					{
 						$query .= "
@@ -634,7 +656,7 @@ class Stundenplan_model extends DB_Model
 
 					$query .= "OR";
 				}
-			}	
+			}
 		}
 
 		// if the studentlehrverbaende is not empty we can remove the last OR that was added to the query
@@ -647,7 +669,7 @@ class Stundenplan_model extends DB_Model
 		if(!$emptyCheck($gruppen) || !$emptyCheck($studentlehrverbaende))
 		{
 			$query .= ")";
-		} 
+		}
 
 		return $query;
 	}
