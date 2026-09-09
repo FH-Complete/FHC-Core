@@ -76,7 +76,8 @@ export default {
 		"resize",
 		"event-hover",
 		"event-unhover",
-		"open-reservierung"
+		"open-reservierung",
+		"events-reloaded",
 	],
 
 	data() {
@@ -100,6 +101,11 @@ export default {
 			hoursplan: null,
 			showRaster: true,
 		};
+	},
+	watch: {
+		events() {
+			this.$emit('events-reloaded');
+		}
 	},
 	computed: {
 		backgrounds() {
