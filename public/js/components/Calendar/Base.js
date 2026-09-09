@@ -114,7 +114,8 @@ export default {
 			type: Boolean,
 			default: undefined
 		},
-		btnTableList: {
+		btnTableList: {},
+		btnRange: {
 			type: Boolean,
 			default: undefined
 		},
@@ -193,8 +194,16 @@ export default {
 				return date.setLocale(this.locale);
 			},
 			set(value) {
-				this.internalDate = value;
-				this.$emit('update:date', value, this.cMode);
+				let date;
+				let rangeLength;
+				if (value instanceof luxon.DateTime) {
+					date = value;
+				} else {
+					date = value.date;
+					rangeLength = value.rangeLength;
+				}
+				this.internalDate = date;
+				this.$emit('update:date', date, this.cMode, rangeLength);
 			}
 		},
 		sMode() {
@@ -315,6 +324,7 @@ export default {
 				:btn-month="!!modes['month'] && (btnMonth || (showBtns && btnMonth !== false))"
 				:btn-list="!!modes['list'] && (btnList || (showBtns && btnList !== false))"
 				:btn-table-list="!!modes['tableList'] && (btnTableList || (showBtns && btnTableList !== false))"
+				:btn-range="!!modes['range'] && (btnRange || (showBtns && btnList !== false))"
 				:mode-options="modeOptions ? modeOptions[cMode] : undefined"
 			>
 				<slot name="actions" />
@@ -328,6 +338,7 @@ export default {
 				@request-modal-open="showEventModal"
 				@request-modal-close="hideEventModal"
 				@drop="$emit('drop', $event)"
+				@update:date="cDate = $event"
 				v-bind="modeOptions ? modeOptions[cMode] : null || {}"
 			>
 				<template v-slot="slot"><slot v-bind="slot" /></template>

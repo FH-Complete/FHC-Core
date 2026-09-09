@@ -25,7 +25,8 @@ export default {
 		btnWeek: Boolean,
 		btnDay: Boolean,
 		btnList: Boolean,
-		btnTableList: Boolean
+		btnTableList: Boolean,
+		btnRange: Boolean,
 	},
 	emits: [
 		"next",
@@ -37,7 +38,8 @@ export default {
 	],
 	data() {
 		return {
-			open: false
+			open: false,
+			semesterOptions: [],
 		};
 	},
 	methods: {
@@ -55,6 +57,15 @@ export default {
 			</div>
 			<div class="header-modes">
 				<div class="d-flex gap-1 justify-content-end" role="group">
+					<button
+						v-if="btnRange"
+						type="button"
+						class="btn btn-outline-secondary"
+						:class="{active: mode === 'range'}"
+						@click="clickMode($event, 'range')"
+					>
+						<i class="fa fa-calendar"></i>
+					</button>
 					<button
 						v-if="btnMonth"
 						type="button"
@@ -107,10 +118,10 @@ export default {
 		<div class="header-picker">
 			<div class="btn-group" role="group">
 				<button
-					class="btn btn-outline-secondary border-0"
+					v-if="$props.mode !== 'range' && $props.mode !== 'tableList'"
 					@click="$emit('prev')"
 					:disabled="open"
-					v-if="mode !== 'tableList'"
+					class="btn btn-outline-secondary border-0"
 				>
 					<i class="fa fa-chevron-left"></i>
 				</button>
@@ -124,10 +135,10 @@ export default {
 					:list-length="modeOptions.length"
 				/>
 				<button
-					class="btn btn-outline-secondary border-0"
+					v-if="$props.mode !== 'range' && $props.mode !== 'tableList'"
 					@click="$emit('next')"
 					:disabled="open"
-					v-if="mode !== 'tableList'"
+					class="btn btn-outline-secondary border-0"
 				>
 					<i class="fa fa-chevron-right"></i>
 				</button>

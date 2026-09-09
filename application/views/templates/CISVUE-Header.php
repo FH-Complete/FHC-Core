@@ -7,6 +7,7 @@ $includesArray = array(
 	'fontawesome6' => true,
 	'axios027' => true,
 	'primevue3' => true,
+	'printCssPath' => 'public/css/Cis4/print.css',
 	'customJSModules' => array_merge([
 		'public/js/apps/Cis/Menu.js'
 	], $customJSModules ?? []),
