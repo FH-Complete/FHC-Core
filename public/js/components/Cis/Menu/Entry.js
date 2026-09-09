@@ -172,7 +172,7 @@ export default {
 			<div class="btn-group w-100">
  				<a :target="target" 
  					:href="(entry.menu_open && hasFullLink) ? entry.url : null"
-					@click="toggleCollapse"
+					@click="setActiveEntry(entry.content_id)"
                     :class="{
                         'btn btn-default rounded-0 text-start': true,
                         ['btn-level-' + level]: true,
