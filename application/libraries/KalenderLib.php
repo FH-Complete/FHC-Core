@@ -243,6 +243,7 @@ class KalenderLib
 				$parsedResources = is_string($resources) ? json_decode($resources, true) : $resources;
 
 				$events[$id] = (object) [
+					'kalender_id' => $id,					
 					'eindeutige_kalender_gruppen_id' => $row->eindeutige_kalender_gruppen_id,
 					'type' => $row->typ,
 					'beginn' => $von->format('H:i:s'),
@@ -261,7 +262,6 @@ class KalenderLib
 					'lehrveranstaltung_id' => $row->lehrveranstaltung_id,
 					'verplante_stunden' => $row->verplante_stunden,
 					'organisationseinheit' => isset($row->oe_kurzbz) ? $row->oe_kurzbz : '',
-					'kalender_id' => $id,
 					'lehreinheit_id' => [],
 					'lektor' => [],
 					'teilnehmer_gruppe' => [],

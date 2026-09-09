@@ -1,5 +1,5 @@
-import LineEvent from "./Line/Event.js";
-import LineBackground from "./Line/Background.js";
+import LineEvent from './Line/Event.js';
+import LineBackground from './Line/Background.js';
 
 /**
  * TODO(chris):
@@ -7,19 +7,19 @@ import LineBackground from "./Line/Background.js";
  */
 
 export default {
-	name: "GridLine",
+	name: 'GridLine',
 	components: {
 		LineEvent,
 		LineBackground,
 	},
 	inject: {
-		axisRow: "axisRow",
+		axisRow: 'axisRow',
 		shouldCompactEvents: {
-			from: "shouldCompactEvents",
+			from: 'shouldCompactEvents',
 			default: undefined,
 		},
 		compactibleEventTypes: {
-			from: "compactibleEventTypes",
+			from: 'compactibleEventTypes',
 			default: undefined,
 		},
 	},
@@ -50,19 +50,20 @@ export default {
 			let formattedEvents = this.events.map((event) => {
 				event.rows = [1, -1];
 				if (event.startsHere) {
-					event.rows[0] =
-						"t_" + event.start.diff(this.date).toMillis();
+					event.rows[0] = 't_' + event.start.diff(this.date).toMillis();
 				}
 				if (event.endsHere) {
-					event.rows[1] = "t_" + event.end.diff(this.date).toMillis();
+					event.rows[1] = 't_' + event.end.diff(this.date).toMillis();
 				}
 
 				return event;
 			});
 
 			if (this.shouldCompactEvents && this.compactibleEventTypes?.length) {
-				formattedEvents =
-					this.compactEvents(formattedEvents, this.compactibleEventTypes);
+				formattedEvents = this.compactEvents(
+					formattedEvents,
+					this.compactibleEventTypes,
+				);
 			}
 
 			return formattedEvents;
@@ -71,12 +72,9 @@ export default {
 	methods: {
 		compactEvents(events, compactibleEventTypes) {
 			let formattedEvents = events
-				.filter(
-					(event) =>
-						!compactibleEventTypes.includes(event.type),
-				)
+				.filter((event) => !compactibleEventTypes.includes(event.type))
 				.map((event) => {
-					event.display = "default";
+					event.display = 'default';
 					return event;
 				});
 			let eventsToBeCompacted = events.filter((event) =>
@@ -110,17 +108,17 @@ export default {
 			compactedEvents.forEach((compactedEvent) => {
 				if (compactedEvent.events.length < 4) {
 					formattedEvents.push({
-						display: "compacted",
+						display: 'compacted',
 						...compactedEvent,
 					});
 				} else {
 					formattedEvents.push({
-						display: "compacted",
+						display: 'compacted',
 						events: compactedEvent.events.slice(0, 3),
 						rows: compactedEvent.rows,
 					});
 					formattedEvents.push({
-						display: "compactedExtra",
+						display: 'compactedExtra',
 						events: compactedEvent.events.slice(3),
 						rows: compactedEvent.rows,
 					});

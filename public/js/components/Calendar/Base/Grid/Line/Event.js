@@ -3,72 +3,74 @@ import drop from '../../../../../directives/drop.js';
 import CalClick from '../../../../../directives/Calendar/Click.js';
 
 export default {
-	name: "GridLineEvent",
+	name: 'GridLineEvent',
 	directives: {
 		draggable,
 		drop,
-		CalClick
+		CalClick,
 	},
-	emits: [
-		'resize-start'
-	],
+	emits: ['resize-start'],
 	data() {
 		return {
 			contextMenu: {
 				show: false,
 				x: 0,
-				y: 0
-			}
+				y: 0,
+			},
 		};
 	},
 	inject: {
-		draggableEvents: "draggableEvents",
+		draggableEvents: 'draggableEvents',
 		resizableEvents: {
-			from: "resizableEvents",
-			default: () => () => false
+			from: 'resizableEvents',
+			default: () => () => false,
 		},
-		mode: "mode",
+		mode: 'mode',
 		contextMenuActions: {
-			from: "contextMenuActions",
-			default: () => ({})
+			from: 'contextMenuActions',
+			default: () => ({}),
 		},
 		onDrop: {
-			from: "onDrop",
-			default: () => null
+			from: 'onDrop',
+			default: () => null,
 		},
 		onDropEvent: {
-			from: "onDropEvent",
-			default: () => () => {}
-		}
+			from: 'onDropEvent',
+			default: () => () => {},
+		},
 	},
 	props: {
 		event: {
 			type: Object,
 			required: true,
 			validator(value) {
-				return (value.start && value.end && value.orig);
-			}
-		}
+				return value.start && value.end && value.orig;
+			},
+		},
 	},
 	computed: {
 		isHeaderOrFooter() {
 			return ['header', 'footer'].includes(this.event.orig);
 		},
 		draggable() {
-			return !this.isHeaderOrFooter && this.draggableEvents(this.event.orig, this.mode);
+			return (
+				!this.isHeaderOrFooter &&
+				this.draggableEvents(this.event.orig, this.mode)
+			);
 		},
 		resizable() {
-			return !this.isHeaderOrFooter && this.resizableEvents(this.event.orig, this.mode);
+			return (
+				!this.isHeaderOrFooter &&
+				this.resizableEvents(this.event.orig, this.mode)
+			);
 		},
 		classes() {
 			const classes = [];
 			if (this.isHeaderOrFooter) {
 				classes.push('event-' + this.event.orig);
 			} else {
-				if (this.event.startsHere)
-					classes.push('event-begin');
-				if (this.event.endsHere)
-					classes.push('event-end');
+				if (this.event.startsHere) classes.push('event-begin');
+				if (this.event.endsHere) classes.push('event-end');
 			}
 
 			classes.push(`calender_id-${this.event.orig.kalender_id}`);
@@ -85,9 +87,14 @@ export default {
 		activeContextActions() {
 			if (this.isHeaderOrFooter) return [];
 			const type = this.event.orig?.type ?? 'lehreinheit';
-			const actions = this.contextMenuActions[type] ?? this.contextMenuActions['default'] ?? [];
-			return actions.filter(action => !action.visible || action.visible(this.event.orig));
-		}
+			const actions =
+				this.contextMenuActions[type] ??
+				this.contextMenuActions['default'] ??
+				[];
+			return actions.filter(
+				(action) => !action.visible || action.visible(this.event.orig),
+			);
+		},
 	},
 	methods: {
 		onResizeStart(edge, evt) {
@@ -95,7 +102,7 @@ export default {
 				edge,
 				evt,
 				el: this.$refs.eventEl,
-				event: this.event
+				event: this.event,
 			});
 		},
 		onRightClick(evt) {
@@ -116,27 +123,24 @@ export default {
 			evt.dataTransfer.setData('fhc-grab-offset-x', evt.clientX - rect.left);
 		},
 		onDropOnCard(evt, items) {
-			if (this.isHeaderOrFooter || !this.onDrop)
-				return;
+			if (this.isHeaderOrFooter || !this.onDrop) return;
 
 			const list = Array.isArray(items) ? items : [items];
 			const obj = list[0];
-			if (!obj)
-				return;
+			if (!obj) return;
 
-			if ((evt.ctrlKey || evt.metaKey) && obj.type === 'lehreinheit')
-			{
+			if ((evt.ctrlKey || evt.metaKey) && obj.type === 'lehreinheit') {
 				return this.onDrop({
 					item: [obj],
 					ctrlKey: true,
-					targetKalenderId: this.event.orig?.kalender_id ?? null
+					targetKalenderId: this.event.orig?.kalender_id ?? null,
 				});
 			}
 
 			return this.onDropEvent(evt, items, this.event.start.startOf('day'));
 		},
 	},
-	template:`
+	template: `
 	<div
 		class="fhc-calendar-base-grid-line-event event"
 		:class="classes"
@@ -195,5 +199,5 @@ export default {
 			</ul>
 		</teleport>
 	</div>
-	`
-}
+	`,
+};
