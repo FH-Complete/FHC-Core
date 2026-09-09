@@ -362,7 +362,7 @@ class MigrateKalender extends CLI_Controller
 				FROM lehre.tbl_kalender
 			)");
 		
-		$db->db->query("DELETE FROM public.tbl_betriebsmittel_kalender
+		$db->db->query("DELETE FROM lehre.tbl_betriebsmittel_kalender
 			WHERE eindeutige_kalender_gruppen_id IN (
 				SELECT eindeutige_kalender_gruppen_id
 				FROM lehre.tbl_kalender
