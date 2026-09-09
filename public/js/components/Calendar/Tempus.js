@@ -183,8 +183,8 @@ export default {
 		onresize(payload) {
 			this.$emit('resize', payload);
 		},
-		resetEventLoader() {
-			this.reset();
+		resetEventLoader(arePreviousEventsCleared = true) {
+			this.reset(arePreviousEventsCleared);
 		},
 		navigatePrev() {
 			this.$refs.calendar.clickPrev();

@@ -165,7 +165,7 @@ export default {
 			if (!orig?.kalender_id) return;
 
 			await this.deleteEntryCall(orig);
-			this.$refs.calendar.resetEventLoader();
+			this.$refs.calendar.resetEventLoader(false);
 			this.$refs.sidebar.reloadCoursepicker();
 			this.rebuildRaumvorschlag();
 		},
@@ -176,7 +176,7 @@ export default {
 			await Promise.allSettled(
 				validList.map((orig) => this.deleteEntryCall(orig)),
 			);
-			this.$refs.calendar.resetEventLoader();
+			this.$refs.calendar.resetEventLoader(false);
 			this.$refs.sidebar.reloadCoursepicker();
 		},
 		async deleteEntryCall(orig) {
@@ -588,7 +588,7 @@ export default {
 				dates.start_time,
 				dates.end_time,
 				() => {
-					this.$refs.calendar.resetEventLoader();
+					this.$refs.calendar.resetEventLoader(false);
 					this.$refs.sidebar.reloadCoursepicker();
 					this.rebuildRaumvorschlag();
 				},
@@ -619,7 +619,7 @@ export default {
 						),
 					)
 					.then(() => {
-						this.$refs.calendar.resetEventLoader();
+						this.$refs.calendar.resetEventLoader(false);
 						this.$refs.sidebar.reloadCoursepicker();
 						this.rebuildRaumvorschlag();
 						this.bcc.postMessage('dropped');
@@ -690,7 +690,7 @@ export default {
 								return;
 							}
 
-							this.$refs.calendar.resetEventLoader();
+							this.$refs.calendar.resetEventLoader(false);
 							this.$refs.sidebar.reloadCoursepicker();
 							this.rebuildRaumvorschlag();
 							this.bcc.postMessage('dropped');
@@ -708,7 +708,7 @@ export default {
 							),
 						)
 						.then(() => {
-							this.$refs.calendar.resetEventLoader();
+							this.$refs.calendar.resetEventLoader(false);
 							this.$refs.sidebar.reloadCoursepicker();
 							this.bcc.postMessage('dropped');
 							this.rebuildRaumvorschlag();
@@ -733,7 +733,7 @@ export default {
 							type: obj.type,
 							id: obj.orig.kalender_id,
 						});
-						this.$refs.calendar.resetEventLoader();
+						this.$refs.calendar.resetEventLoader(false);
 						this.rebuildRaumvorschlag();
 						this.bcc.postMessage('dropped');
 					},
@@ -753,7 +753,7 @@ export default {
 			this.multiWeekModal.show = false;
 		},
 		onMultiWeekConfirmed() {
-			this.$refs.calendar.resetEventLoader();
+			this.$refs.calendar.resetEventLoader(false);
 			this.$refs.sidebar.reloadCoursepicker();
 			this.rebuildRaumvorschlag();
 			this.bcc.postMessage('dropped');
@@ -1238,7 +1238,6 @@ export default {
 			ref="verbandMenu"
 			@select-verband-and-close="onSelectVerbandAndClose"
 		/>
-		<raumauswahl-modal ref="raumModal" @saved="$refs.calendar.resetEventLoader()"/>
 		<raumauswahl-modal ref="raumModal" @saved="() => {$refs.calendar.resetEventLoader(); $refs.sidebar.reloadCoursepicker(); rebuildRaumvorschlag();}"/>
 		<lehreinheit-modal ref="lehreinheitModal" @saved="$refs.calendar.resetEventLoader(); $refs.sidebar.reloadCoursepicker();"/>
 		<resources-assignment-modal

@@ -3,6 +3,8 @@ export function useEventLoader(
   getPromiseFunc,
   cacheMultiplier = 1,
 ) {
+  let hasFirstLoadOccurred = false;
+
   let allEvents = Vue.ref([]);
   const lv = Vue.ref(null);
 
@@ -57,7 +59,7 @@ export function useEventLoader(
       isCacheEnabled
     );
 
-    ensureCacheRangeIsAllowedRange(
+    ensureCacheRangeIsInAllowedRange(
       allowedCacheStartTimestamp,
       allowedCacheEndTimestamp,
     );
@@ -70,16 +72,19 @@ export function useEventLoader(
       return;
     }
 
-    addVisualForEventsLoading();
+   addVisualForEventsLoading();
 
     Promise.allSettled(promises).then((results) => {
       let newlyLoadedEvents = [];
+      let hasSuccessfullyLoadedEvents = false;
 
       results.forEach((res) => {
         if (
           !(res.status === "fulfilled" && res.value.meta.status === "success")
         )
           return;
+
+        hasSuccessfullyLoadedEvents = true;
         if (res.value.meta.lv) lv.value = res.value.meta.lv;
         newlyLoadedEvents = res.value.data;
       });
@@ -93,6 +98,27 @@ export function useEventLoader(
         ).values(),
       );
 
+      if (!isCacheEnabled && hasSuccessfullyLoadedEvents) {
+        const newlyLoadedEventIds = new Set(
+          newlyLoadedEvents.map(
+            (event) => event.eindeutige_kalender_gruppen_id,
+          ),
+        );
+
+        tempAllEvents = tempAllEvents.filter((event) => {
+          const eventStart = getTimestampFromISODate(event.isostart);
+          const eventEnd = getTimestampFromISODate(event.isoend);
+          const overlapsDisplayedDateRange =
+            eventStart < currentlyDisplayedDateRange.end.ts &&
+            eventEnd > currentlyDisplayedDateRange.start.ts;
+
+          return (
+            !overlapsDisplayedDateRange ||
+            newlyLoadedEventIds.has(event.eindeutige_kalender_gruppen_id)
+          );
+        });
+      }
+
       allEvents.value = removeVisualForEventsLoading(
         ensureEventsAreInValidCacheRange(tempAllEvents),
       );
@@ -101,8 +127,10 @@ export function useEventLoader(
 
   Vue.watchEffect(reload);
 
-  const reset = () => {
-    allEvents.value = [];
+  const reset = (arePreviousEventsCleared = true) => {
+	if (arePreviousEventsCleared) {
+		allEvents.value = [];
+	}
     reload(false);
   };
 
@@ -167,6 +195,8 @@ export function useEventLoader(
   };
 
   const addVisualForEventsLoading = (startTimestamp, endTimestamp) => {
+	if (hasFirstLoadOccurred) return;
+
     allEvents.value.push({
       loading_id: 1,
       type: "loading",
@@ -191,7 +221,7 @@ export function useEventLoader(
     return events;
   };
 
-  const ensureCacheRangeIsAllowedRange = (
+  const ensureCacheRangeIsInAllowedRange = (
     allowedCacheStartTimestamp,
     allowedCacheEndTimestamp,
   ) => {
