@@ -64,7 +64,7 @@ export default {
 	methods: {
 		viewAttrs() {
 			const day = this.$props.currentDate.startOf("day");
-			const rangeLength = this.rangeLength;
+			const rangeLength = parseInt(this.rangeLength);
 			return { ...this.$attrs, day, rangeLength };
 		},
 		handleClickDefaults(evt) {
