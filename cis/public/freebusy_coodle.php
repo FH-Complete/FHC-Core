@@ -27,7 +27,7 @@
 require_once('../../config/cis.config.inc.php');
 
 $uid = mb_substr($_SERVER['PATH_INFO'], 1);
-$excludeSurveyQueryParam = isset($_GET['excludeSurvey']) ? '?excludeSurvey=' . $_GET['excludeSurvey'] : 'adis';
+$excludeSurveyQueryParam = isset($_GET['excludeSurvey']) ? '?excludeSurvey=' . $_GET['excludeSurvey'] : '';
 
 header('Location: ' . APP_ROOT . 'cis.php/CoodleFreeBusy/' . $uid . $excludeSurveyQueryParam);
 exit;
