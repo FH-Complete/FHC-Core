@@ -30,9 +30,6 @@ export function useEventLoader(
       currentlyDisplayedDateRange?.end?.ts === rangeInterval?.value?.end?.ts &&
       isCacheEnabled
     ) {
-      console.log(
-        "cached range is the same as requested range, skipping reload 2",
-      );
       return;
     }
 
@@ -51,9 +48,6 @@ export function useEventLoader(
       cachedEventsEndTimestamp === currentlyDisplayedDateRange.end.ts &&
       isCacheEnabled
     ) {
-      console.log(
-        "cached range is the same as requested range, skipping reload",
-      );
       return;
     }
 
@@ -123,9 +117,15 @@ export function useEventLoader(
 
     if (cachedEventsStartTimestamp && cachedEventsEndTimestamp && isCacheEnabled) {
       if (
-        startTimestamp < cachedEventsStartTimestamp &&
-        endTimestamp > cachedEventsEndTimestamp
-      ) {
+        (
+			(startTimestamp < cachedEventsStartTimestamp &&
+        	endTimestamp > cachedEventsEndTimestamp) ||
+			(startTimestamp < cachedEventsStartTimestamp &&
+        	endTimestamp < cachedEventsEndTimestamp && Math.abs(getLuxonDateFromMillis(endTimestamp).diff(getLuxonDateFromMillis(cachedEventsStartTimestamp), 'days')) > 1) ||
+			(startTimestamp > cachedEventsStartTimestamp &&
+        	endTimestamp > cachedEventsEndTimestamp && Math.abs(getLuxonDateFromMillis(startTimestamp).diff(getLuxonDateFromMillis(cachedEventsEndTimestamp), 'days')) > 1)
+		)
+      ) {		
         modifiedRequestStartTimestamp = startTimestamp;
         modifiedRequestEndTimestamp = endTimestamp;
         cachedEventsStartTimestamp = startTimestamp;
@@ -157,7 +157,7 @@ export function useEventLoader(
     allowedCacheStartTimestamp = startTimestamp - cachePadding;
     allowedCacheEndTimestamp = endTimestamp + cachePadding;
 
-    return mergePromiseElements(
+	return mergePromiseElements(
       getPromiseFunc(
         getLuxonDateFromMillis(modifiedRequestStartTimestamp),
         getLuxonDateFromMillis(modifiedRequestEndTimestamp),
