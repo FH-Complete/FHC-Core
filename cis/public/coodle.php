@@ -25,13 +25,31 @@ require_once('../../include/coodle.class.php');
 $coodleId = (isset($_GET['coodle_id']) ? $_GET['coodle_id'] : '');
 $accessKey = (isset($_GET['zugangscode']) ? $_GET['zugangscode'] : '');
 
-$coodle = new coodle();
-if (!$coodle->load($coodleId))
-	die($coodle->errormsg);
+if (!$coodleId)
+	die('Zu wenige Parameter angegeben');
 
-$coodle->getRessourceFromUser($coodleId, '', $accessKey);
-$redirectUrl = $coodle->uid ? APP_ROOT . 'cis.php/Cis/Coodle?id=' . $coodleId : APP_ROOT . 'cis.php/Cis/CoodleExternal/' . $coodleId . '/' . $accessKey;
+if (!$db = new basis_db())
+	die('Fehler beim Herstellen der Datenbankverbindung');
 
+$coodleSurveyQuery = "SELECT * FROM campus.tbl_coodle_surveys WHERE id = $coodleId LIMIT 1";
+if(!$coodleSurveyResult = $db->db_query($coodleSurveyQuery))
+	die('Fehler beim Lesen aus der Datenbank');
+
+if(!$coodleSurvey = $db->db_fetch_object($coodleSurveyResult))
+	die('Coodle Umfrage nicht gefunden');
+
+$externalParticipant = null;
+
+if ($accessKey) {
+	$externalParticipantQuery = "SELECT * FROM campus.tbl_coodle_survey_external_participants WHERE survey_id = $coodleId AND access_key = '$accessKey' LIMIT 1";
+	if (!$externalParticipantResult = $db->db_query($externalParticipantQuery))
+		die('Fehler beim Lesen aus der Datenbank');
+
+	$externalParticipant = $db->db_fetch_object($externalParticipantResult);
+}
+
+$redirectUrl = $externalParticipant ? APP_ROOT . 'cis.php/Cis/CoodleExternal/' . $coodleId . '/' . $accessKey : APP_ROOT . 'cis.php/Cis/Coodle?id=' . $coodleId;
 header('Location: ' . $redirectUrl);
 exit;
+
 ?>
