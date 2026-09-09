@@ -479,7 +479,7 @@ export default {
 				ctrlKey: !!(evt?.ctrlKey || evt?.metaKey)
 			});
 		},
-		handleResizeStart({ edge, evt, el, event })
+		handleResizeStart({ edge, evt, horizontal, el, event })
 		{
 			const gridEl = this.$refs.body;
 
@@ -490,6 +490,7 @@ export default {
 				el,
 				gridEl,
 				event,
+				horizontal,
 				timeGrid: this.timeGrid,
 				onEnd: ({ event, newStart, newEnd }) => {
 					const orig = event?.orig;

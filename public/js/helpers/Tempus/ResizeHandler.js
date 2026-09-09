@@ -41,20 +41,30 @@ function getSnapTimes(timeGrid, dayISO, zoneName)
 
 function calculateNewTimes(activeResize, ghostPosition)
 {
-	const { edge, event, timeGrid, startTop, startHeight } = activeResize;
+	const { edge, event, timeGrid, horizontal, startTop, startHeight, startLeft, startWidth } = activeResize;
 	const { start, end } = event;
 
 	const durationMinutes = end.diff(start, 'minutes').minutes;
 	if (!durationMinutes || durationMinutes <= 0)
 		return null;
 
-	const pxPerMinute = startHeight / durationMinutes;
+	const startSize = horizontal ? startWidth : startHeight;
+	if (!Number.isFinite(startSize) || startSize <= 0)
+		return null;
+
+	const pxPerMinute = startSize / durationMinutes;
 
 	let draggedPx = 0;
 	if (edge === 'end')
-		draggedPx = ghostPosition.height - startHeight;
+		draggedPx = horizontal
+			? ghostPosition.width - startWidth
+			: ghostPosition.height - startHeight;
 	if (edge === 'start')
-		draggedPx = ghostPosition.top - startTop;
+		draggedPx = horizontal
+			? ghostPosition.left - startLeft
+			: ghostPosition.top - startTop;
+	if (!Number.isFinite(draggedPx))
+		return null;
 
 	const draggedMinutes = snapToGrid(draggedPx / pxPerMinute, edge);
 
@@ -97,6 +107,12 @@ export function useResizeHandler() {
 		return (evt.clientY - gridRect.top) + activeResize.gridEl.scrollTop;
 	}
 
+	function getPointerXInGrid(evt)
+	{
+		const gridRect = activeResize.gridEl.getBoundingClientRect();
+		return (evt.clientX - gridRect.left) + activeResize.gridEl.scrollLeft;
+	}
+
 	function updateGhostLabel()
 	{
 		const result = calculateNewTimes(activeResize, ghost.getPosition());
@@ -111,36 +127,59 @@ export function useResizeHandler() {
 			return;
 		evt.preventDefault();
 
-		const maxBottom = activeResize.gridEl.scrollHeight;
-		const pointerY = getPointerYInGrid(evt);
-		const draggedPx = pointerY - activeResize.dragStartY;
+		const maxEnd = activeResize.horizontal
+			? activeResize.gridEl.scrollWidth
+			: activeResize.gridEl.scrollHeight;
+		const pointer = activeResize.horizontal
+			? getPointerXInGrid(evt)
+			: getPointerYInGrid(evt);
+		const draggedPx = pointer - (activeResize.horizontal
+			? activeResize.dragStartX
+			: activeResize.dragStartY);
 
 		if (activeResize.edge === 'end')
 		{
-			let newHeight = Math.max(MIN_HEIGHT_PX, activeResize.startHeight + draggedPx);
-			if (activeResize.startTop + newHeight > maxBottom)
-				newHeight = maxBottom - activeResize.startTop;
+			const minSize = MIN_HEIGHT_PX;
+			const newSize = Math.max(minSize, (activeResize.horizontal
+				? activeResize.startWidth
+				: activeResize.startHeight) + draggedPx);
+			const startPosition = activeResize.horizontal
+				? activeResize.startLeft
+				: activeResize.startTop;
+			const constrainedSize = Math.min(newSize, maxEnd - startPosition);
 
-			ghost.updatePosition(null, newHeight);
+			if (activeResize.horizontal)
+				ghost.updatePosition(null, null, constrainedSize);
+			else
+				ghost.updatePosition(null, constrainedSize);
 		}
 		else if (activeResize.edge === 'start')
 		{
-			let newTop = activeResize.startTop + draggedPx;
-			let newHeight = activeResize.startHeight - draggedPx;
+			const startPosition = activeResize.horizontal
+				? activeResize.startLeft
+				: activeResize.startTop;
+			const startSize = activeResize.horizontal
+				? activeResize.startWidth
+				: activeResize.startHeight;
+			let newPosition = startPosition + draggedPx;
+			let newSize = startSize - draggedPx;
 
-			if (newTop < 0)
+			if (newPosition < 0)
 			{
-				newHeight -= (0 - newTop);
-				newTop = 0;
+				newSize -= (0 - newPosition);
+				newPosition = 0;
 			}
 
-			if (newHeight < MIN_HEIGHT_PX)
+			if (newSize < MIN_HEIGHT_PX)
 			{
-				newTop = (activeResize.startTop + activeResize.startHeight) - MIN_HEIGHT_PX;
-				newHeight = MIN_HEIGHT_PX;
+				newPosition = (startPosition + startSize) - MIN_HEIGHT_PX;
+				newSize = MIN_HEIGHT_PX;
 			}
 
-			ghost.updatePosition(newTop, newHeight);
+			if (activeResize.horizontal)
+				ghost.updatePosition(null, null, newSize, newPosition);
+			else
+				ghost.updatePosition(newPosition, newSize);
 		}
 
 		updateGhostLabel();
@@ -176,9 +215,9 @@ export function useResizeHandler() {
 		activeResize = null;
 	}
 
-	function startResize(edge, evt, { el, gridEl, event, timeGrid, onEnd })
+	function startResize(edge, evt, { el, gridEl, event, horizontal = false, timeGrid, onEnd })
 	{
-		const { startTop, startHeight } = ghost.create(gridEl, el, edge);
+		const { startTop, startHeight, startLeft, startWidth } = ghost.create(gridEl, el, edge);
 
 		activeResize = {
 			edge,
@@ -186,11 +225,15 @@ export function useResizeHandler() {
 			eventEl: el,
 			gridEl,
 			event,
+			horizontal,
 			timeGrid,
 			onEnd,
 			dragStartY: (evt.clientY - gridEl.getBoundingClientRect().top) + gridEl.scrollTop,
+			dragStartX: (evt.clientX - gridEl.getBoundingClientRect().left) + gridEl.scrollLeft,
 			startTop,
 			startHeight,
+			startLeft,
+			startWidth,
 			originalOpacity: el.style.opacity,
 		};
 

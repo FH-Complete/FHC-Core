@@ -94,6 +94,7 @@ export default {
 			this.$emit('resize-start', {
 				edge,
 				evt,
+				horizontal: this.mode === 'range',
 				el: this.$refs.eventEl,
 				event: this.event
 			});
@@ -153,7 +154,7 @@ export default {
 		data-cy="calendar-event"
 	>
 		<div
-			v-if="resizable"
+			v-if="resizable && mode !== 'range'"
 			class="fhc-resize-bar fhc-resize-bar--top"
 			@pointerdown.prevent.stop="onResizeStart('start', $event)"
 			@click.stop
@@ -164,15 +165,30 @@ export default {
 			{{ event.orig }}
 		</slot>
 		<div
-			v-if="resizable"
+			v-if="resizable && mode !== 'range'"
 			class="fhc-resize-bar fhc-resize-bar--bottom"
 			@pointerdown.prevent.stop="onResizeStart('end', $event)"
 			@click.stop
 		>
 			<i class="fa-solid fa-grip-lines text-muted"></i>
 		</div>
+		<div
+			v-if="resizable && mode === 'range'"
+			class="fhc-resize-bar fhc-resize-bar--left"
+			@pointerdown.prevent.stop="onResizeStart('start', $event)"
+			@click.stop
+		>
+			<i class="fa-solid fa-grip-lines-vertical text-muted"></i>
+		</div>
+		<div
+			v-if="resizable && mode === 'range'"
+			class="fhc-resize-bar fhc-resize-bar--right"
+			@pointerdown.prevent.stop="onResizeStart('end', $event)"
+			@click.stop
+		>
+			<i class="fa-solid fa-grip-lines-vertical text-muted"></i>
+		</div>
 
-	
 		<teleport to="body">
 			<div
 				v-if="contextMenu.show"

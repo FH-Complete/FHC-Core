@@ -1,4 +1,10 @@
 export default {
+	inject: {
+		mode: {
+			from: 'mode',
+			default: null,
+		},
+	},
 	props: {
 		event: {
 			type: Object,
@@ -148,19 +154,6 @@ export default {
 		class="position-relative"
 		@wheel.stop
 	>
-		<div class="position-absolute top-0 start-0 m-1 d-flex gap-1" >
-			<i :class="statusIcon"></i>
-			<i
-				v-tooltip="resourcesTooltip"
-				v-if="event.has_assigned_resources"
-			  	class="fa-solid fa-table-list text-muted"
-			></i>
-			<i 
-				v-tooltip="tagsTooltip"
-				v-if="tags?.length"
-				class="fa-solid fa-tags"
-			></i>
-		</div>
 		<div class="position-absolute bottom-0 start-0 m-1">
 			{{event.verplante_stunden}}
 		</div>
@@ -172,7 +165,28 @@ export default {
 			<span>{{ end }}</span>
 		</div>
 		<div class="event-text" v-tooltip="tooltipString">
-			<span class="event-topic">{{ topicString }}</span>
+			<div
+				:class="{ 'd-flex align-items-center gap-1': mode === 'range' }"
+				:style="mode === 'range' ? null : { display: 'contents' }"
+			>
+				<span class="event-topic">{{ topicString }}</span>
+				<div
+					class="d-flex gap-1"
+					:class="{ 'position-absolute top-0 start-0 m-1': mode !== 'range' }"
+				>
+					<i :class="statusIcon"></i>
+					<i
+						v-if="event.has_assigned_resources"
+						v-tooltip="resourcesTooltip"
+						class="fa-solid fa-table-list text-muted"
+					></i>
+					<i
+						v-if="tags?.length"
+						v-tooltip="tagsTooltip"
+						class="fa-solid fa-tags"
+					></i>
+				</div>
+			</div>
 			<span
 				class="event-place"
 				data-cy="calendar-event-room"

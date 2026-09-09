@@ -109,3 +109,24 @@
 	z-index: 2;
 }
 
+.fhc-calendar-mode-range .fhc-calendar-base-grid-line-event {
+	position: relative;
+}
+
+.fhc-calendar-mode-range .fhc-resize-bar {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	height: auto;
+	width: 15px;
+	margin: 0;
+	cursor: ew-resize;
+}
+
+.fhc-calendar-mode-range .fhc-resize-bar--left {
+	left: 0;
+}
+
+.fhc-calendar-mode-range .fhc-resize-bar--right {
+	right: 0;
+}

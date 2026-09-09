@@ -5,14 +5,21 @@ import { useEventLoader } from '../../composables/EventLoader.js';
 import ModeWeek from './Mode/Week.js';
 import ModeMonth from './Mode/Month.js';
 import ModeTable from './Mode/Table.js';
+import ModeRange from './Mode/Range.js';
 import ApiKalender from '../../api/factory/tempus/kalender.js';
 import draggable from '../../directives/draggable.js';
-
+import ApiStudiensemester from '../../api/factory/studiensemester.js';
 
 export default {
 	name: "CalendarTempus",
 	components: {
 		FhcCalendar
+	},
+	provide() {
+		return {
+			rangeLength: Vue.computed(() => this.rangeLength),
+			rangeViewPresets: Vue.computed(() => this.semesterRangePresets)
+		};
 	},
 	inject: {
 		renderers: {from: 'renderers'},
@@ -25,7 +32,14 @@ export default {
 			default: {
 				visible_status: 'all'
 			}
-		}
+		},
+		rangeLength: {
+			default: 1,
+		},
+		shouldIncludeRangeMode: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	directives: {
 		draggable,
@@ -79,13 +93,13 @@ export default {
 		"event-unhover",
 		"open-reservierung"
 	],
-
 	data() {
 		return {
 			modes: {
 				week: Vue.markRaw(ModeWeek),
 				month: Vue.markRaw(ModeMonth),
 				tableList: Vue.markRaw(ModeTable),
+				range: Vue.markRaw(ModeRange),
 			},
 			modeOptions: {
 				day: {
@@ -100,6 +114,10 @@ export default {
 			teachingunits: null,
 			hoursplan: null,
 			showRaster: true,
+			semesterRangePresets: {
+				label: null,
+				presets: [],
+			},
 		};
 	},
 	computed: {
@@ -114,7 +132,9 @@ export default {
 					end: now.startOf('day')
 				}];
 			}
-			else
+			else if (this.mode == 'Range') {
+				return [];
+			} else
 			{
 				past = [{
 					class: 'background-past',
@@ -183,6 +203,24 @@ export default {
 		navigateNext() {
 			this.$refs.calendar.clickNext();
 		},
+		async fetchSemesters() {
+					const semestersResponse = await this.$api.call(ApiStudiensemester.getAll());
+					if (semestersResponse.meta.status === "success") {
+						this.semesterRangePresets = {
+							label: "View specific semester",
+							presets: semestersResponse.data.map((semester) => {
+								let startDate = luxon.DateTime.fromISO(semester.start);
+								let endDate = luxon.DateTime.fromISO(semester.ende);
+								return {
+									startDate,
+									endDate,
+									name: semester.studiensemester_kurzbz,
+									description: semester.bezeichnung,
+								};
+							})
+						};
+					}
+				},
 	},
 	setup(props, context) {
 		const rangeInterval = Vue.ref(null);
@@ -220,6 +258,8 @@ export default {
 					end: res.data.end
 				};
 			});
+
+		this.fetchSemesters();
 	},
 	template: /* html */`
 	<fhc-calendar
@@ -238,7 +278,7 @@ export default {
 		show-btns
 		:draggable-events="true"
 		:resizable-events="true"
-		:on-drop="currentMode === 'week' ? ondrop : null"
+		:on-drop="['week', 'range'].includes(currentMode) ? ondrop : null"
 		:on-resize="onresize"
 		@update:date="(newDate, newMode) => $emit('update:date', newDate, newMode)"
 		@update:mode="(newMode, newDate) => { currentMode = newMode; $emit('update:mode', newMode, newDate) }"

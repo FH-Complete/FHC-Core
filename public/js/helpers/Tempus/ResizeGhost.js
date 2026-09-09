@@ -59,7 +59,9 @@ export function useResizeGhost() {
 
 		return {
 			startTop: topInGrid,
-			startHeight: eventRect.height
+			startHeight: eventRect.height,
+			startLeft: leftInGrid,
+			startWidth: eventRect.width
 		};
 	}
 
@@ -69,7 +71,7 @@ export function useResizeGhost() {
 			labelEl.textContent = text;
 	}
 
-	function updatePosition(top, height)
+	function updatePosition(top, height, width, left)
 	{
 		if (!ghostEl)
 			return;
@@ -77,15 +79,21 @@ export function useResizeGhost() {
 			ghostEl.style.top = `${top}px`;
 		if (height !== null)
 			ghostEl.style.height = `${height}px`;
+		if (width !== null)
+			ghostEl.style.width = `${width}px`;
+		if (left !== null)
+			ghostEl.style.left = `${left}px`;
 	}
 
 	function getPosition()
 	{
 		if (!ghostEl)
-			return { top: 0, height: 0 };
+			return { top: 0, height: 0, left: 0, width: 0 };
 		return {
 			top: parseFloat(ghostEl.style.top),
-			height: parseFloat(ghostEl.style.height)
+			height: parseFloat(ghostEl.style.height),
+			left: parseFloat(ghostEl.style.left),
+			width: parseFloat(ghostEl.style.width)
 		};
 	}
 
