@@ -34,6 +34,12 @@ class MigrateKalender extends CLI_Controller
 	 */
 	public function refreshTablesAndFullMigrateOfStundenplanReservierung($von, $bis = null, $studiengang_kz = null, $ort_kurzbz = null)
 	{
+		if (defined('CI_ENVIRONMENT') && CI_ENVIRONMENT === 'production')
+		{
+			echo "This script is not allowed to run in production environment.\n";
+			return;
+		}
+
 		echo "Refreshing calendar related tables...\n";
 		$this->resetBeforeNewStundenplanReservierungImport();
 		echo "Calendar related tables refreshed successfully.\n\n";
@@ -308,77 +314,6 @@ class MigrateKalender extends CLI_Controller
 		}
 	}
 
-	public function resetBeforeNewStundenplanReservierungImport()
-	{
-		
-		$db = new DB_Model();
-
-		$db->db->trans_start();
-
-		$db->db->query('DELETE FROM sync.tbl_stundenplandev_kalender');
-		$db->db->query('DELETE FROM sync.tbl_reservierung_kalender');
-
-		$db->db->query("DELETE FROM lehre.tbl_kalender_event_teilnehmer
-			WHERE kalender_id IN (
-				SELECT kalender_id
-				FROM lehre.tbl_kalender
-				WHERE typ = 'reservierung'
-			)");
-
-		$db->db->query("DELETE FROM lehre.tbl_kalender_event
-			WHERE kalender_id IN (
-				SELECT kalender_id
-				FROM lehre.tbl_kalender
-				WHERE typ = 'reservierung'
-			)");
-
-		$db->db->query("DELETE FROM lehre.tbl_kalender_lehreinheit
-			WHERE kalender_id IN (
-				SELECT kalender_id
-				FROM lehre.tbl_kalender
-				WHERE typ = 'lehreinheit' OR typ = 'reservierung'
-			)");
-
-		$db->db->query("DELETE FROM lehre.tbl_kalender_ort
-			WHERE kalender_id IN (
-				SELECT kalender_id
-				FROM lehre.tbl_kalender
-				WHERE typ IN ('lehreinheit', 'reservierung')
-			)");
-
-		$db->db->query("DELETE FROM public.tbl_notiz
-			WHERE notiz_id IN (
-				SELECT notiz_id
-				FROM public.tbl_notizzuordnung
-				WHERE eindeutige_kalender_gruppen_id IN (
-					SELECT eindeutige_kalender_gruppen_id
-					FROM lehre.tbl_kalender
-				)
-			)");
-
-		$db->db->query("DELETE FROM public.tbl_notizzuordnung
-			WHERE eindeutige_kalender_gruppen_id IN (
-				SELECT eindeutige_kalender_gruppen_id
-				FROM lehre.tbl_kalender
-			)");
-		
-		$db->db->query("DELETE FROM lehre.tbl_betriebsmittel_kalender
-			WHERE eindeutige_kalender_gruppen_id IN (
-				SELECT eindeutige_kalender_gruppen_id
-				FROM lehre.tbl_kalender
-			)");
-
-		$db->db->query("DELETE FROM lehre.tbl_kalender
-			WHERE typ IN ('lehreinheit', 'reservierung')");
-
-		$db->db->trans_complete();
-
-		if ($db->db->trans_status() === false)
-			return error('Reset before new import failed');
-
-		return success('Migration data reset successfully');
-	}
-
 	public function migrateStundenplanBetriebsmittelEntries() {
 		$this->setKalendarEntriesGroupIDs();
 		$this->setKalendarEntriesGroupIDsForChildren();
@@ -471,6 +406,82 @@ class MigrateKalender extends CLI_Controller
 				$this->addTag($eindeutige_kalender_gruppen_id, $notizText, $block->updateamum);
 			}
 		}
+	}
+
+	private function resetBeforeNewStundenplanReservierungImport()
+	{
+		if (defined('CI_ENVIRONMENT') && CI_ENVIRONMENT === 'production')
+		{
+			echo "This script is not allowed to run in production environment.\n";
+			return;
+		}
+
+		$db = new DB_Model();
+
+		$db->db->trans_start();
+
+		$db->db->query('DELETE FROM sync.tbl_stundenplandev_kalender');
+		$db->db->query('DELETE FROM sync.tbl_reservierung_kalender');
+
+		$db->db->query("DELETE FROM lehre.tbl_kalender_event_teilnehmer
+			WHERE kalender_id IN (
+				SELECT kalender_id
+				FROM lehre.tbl_kalender
+				WHERE typ = 'reservierung'
+			)");
+
+		$db->db->query("DELETE FROM lehre.tbl_kalender_event
+			WHERE kalender_id IN (
+				SELECT kalender_id
+				FROM lehre.tbl_kalender
+				WHERE typ = 'reservierung'
+			)");
+
+		$db->db->query("DELETE FROM lehre.tbl_kalender_lehreinheit
+			WHERE kalender_id IN (
+				SELECT kalender_id
+				FROM lehre.tbl_kalender
+				WHERE typ = 'lehreinheit' OR typ = 'reservierung'
+			)");
+
+		$db->db->query("DELETE FROM lehre.tbl_kalender_ort
+			WHERE kalender_id IN (
+				SELECT kalender_id
+				FROM lehre.tbl_kalender
+				WHERE typ IN ('lehreinheit', 'reservierung')
+			)");
+
+		$db->db->query("DELETE FROM public.tbl_notiz
+			WHERE notiz_id IN (
+				SELECT notiz_id
+				FROM public.tbl_notizzuordnung
+				WHERE eindeutige_kalender_gruppen_id IN (
+					SELECT eindeutige_kalender_gruppen_id
+					FROM lehre.tbl_kalender
+				)
+			)");
+
+		$db->db->query("DELETE FROM public.tbl_notizzuordnung
+			WHERE eindeutige_kalender_gruppen_id IN (
+				SELECT eindeutige_kalender_gruppen_id
+				FROM lehre.tbl_kalender
+			)");
+		
+		$db->db->query("DELETE FROM lehre.tbl_betriebsmittel_kalender
+			WHERE eindeutige_kalender_gruppen_id IN (
+				SELECT eindeutige_kalender_gruppen_id
+				FROM lehre.tbl_kalender
+			)");
+
+		$db->db->query("DELETE FROM lehre.tbl_kalender
+			WHERE typ IN ('lehreinheit', 'reservierung')");
+
+		$db->db->trans_complete();
+
+		if ($db->db->trans_status() === false)
+			return error('Reset before new import failed');
+
+		return success('Migration data reset successfully');
 	}
 
 	private function setKalendarEntriesGroupIDs() {
