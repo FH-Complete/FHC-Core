@@ -15,6 +15,7 @@ class Gruppe extends FHCAPI_Controller
 			'getBenutzerSearch' => ['admin:r', 'assistenz:r'],
 			'getAllSearch' => ['admin:r', 'assistenz:r'],
 			'getByLehreinheit' => ['admin:r', 'assistenz:r'],
+			'getGruppe' => ['admin:r', 'assistenz:r'],
 		]);
 
 		$this->_ci = &get_instance();
@@ -67,12 +68,77 @@ class Gruppe extends FHCAPI_Controller
 
 		$this->checkPermission($lehreinheit_id);
 
-		$result = $this->_ci->LehreinheitgruppeModel->addGroup($lehreinheit_id, $gid, !($lehrverband === 'false'));
+		$result = $this->_ci->LehreinheitgruppeModel->addGroup($lehreinheit_id, $gid, $lehrverband === true || $lehrverband === 'true');
 
 		if (isError($result))
 			$this->terminateWithError(getError($result));
 
 		$this->terminateWithSuccess($result);
+	}
+
+	public function getGruppe()
+	{
+		$lehrverband = $this->input->post('lehrverband');
+
+		$gruppen_result = array();
+
+		if ($lehrverband === false)
+		{
+			$gruppen_result = $this->_ci->GruppeModel->loadWhere(array(
+				'studiengang_kz' => $this->input->post('stg_kz'),
+				'gruppe_kurzbz' => $this->input->post('gruppe_kurzbz'),
+				'aktiv' => true
+			));
+		}
+		else if ($lehrverband === true)
+		{
+
+			if (!isEmptyString($this->input->post('verband')))
+			{
+				$this->LehrverbandModel->db->where('verband', $this->input->post('verband'));
+			}
+			else
+			{
+				$this->LehrverbandModel->db->group_start();
+				$this->LehrverbandModel->db->where("trim(verband) = ''");
+				$this->LehrverbandModel->db->or_where("verband IS NULL");
+				$this->LehrverbandModel->db->group_end();
+			}
+
+			if (!isEmptyString($this->input->post('gruppe')))
+			{
+				$this->LehrverbandModel->db->where('gruppe', $this->input->post('gruppe'));
+			}
+			else
+			{
+				$this->LehrverbandModel->db->group_start();
+				$this->LehrverbandModel->db->where("trim(gruppe) = ''");
+				$this->LehrverbandModel->db->or_where("gruppe IS NULL");
+				$this->LehrverbandModel->db->group_end();
+			}
+
+			if (!isEmptyString((string)$this->input->post('semester')))
+			{
+				$this->LehrverbandModel->db->where('semester', $this->input->post('semester'));
+			}
+			else
+			{
+
+				$this->LehrverbandModel->db->group_start();
+				$this->LehrverbandModel->db->where("semester = ''");
+				$this->LehrverbandModel->db->or_where("semester IS NULL");
+				$this->LehrverbandModel->db->group_end();
+			}
+
+			$gruppen_result = $this->LehrverbandModel->loadWhere(array('studiengang_kz' => $this->input->post('stg_kz'), 'aktiv' => true));
+		}
+
+		if (!hasData($gruppen_result))
+			return $this->terminateWithError('No group found');
+
+		$gruppen_array = getData($gruppen_result)[0];
+
+		$this->terminateWithSuccess($gruppen_array->gid);
 	}
 
 	public function getByLehreinheit($lehreinheit_id = null)

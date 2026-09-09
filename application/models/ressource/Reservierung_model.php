@@ -135,4 +135,15 @@ class Reservierung_model extends DB_Model
 		return $this->execQuery($query, [$uid, $uid]);
 	}
 
+	public function lektorHasReservierung($uid, $datum, $stunde)
+	{
+		$qry = "SELECT reservierung_id, uid, stg_kurzbz, ort_kurzbz, semester, verband, gruppe, gruppe_kurzbz, datum, stunde
+				FROM lehre.vw_reservierung
+				WHERE uid = ?
+					AND datum = ?
+					AND stunde = ?";
+
+		return $this->execReadOnlyQuery($qry, [$uid, $datum, $stunde]);
+	}
+
 }
