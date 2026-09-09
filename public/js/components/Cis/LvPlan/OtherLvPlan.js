@@ -5,6 +5,7 @@ import FhcCalendar from "../../Calendar/LvPlan.js";
 import ApiLvPlan from "../.././../api/factory/lvPlan.js";
 import ApiOtherLvPlan from "../.././../api/factory/otherLvPlan.js";
 import ApiAuthinfo from "../../../api/factory/authinfo.js";
+import ApiStudienSemester from '../../../api/factory/studiensemester.js';
 
 export const DEFAULT_MODE_LVPLAN_DESKTOP = "Week";
 export const DEFAULT_MODE_LVPLAN_MOBILE = "List";
@@ -22,9 +23,6 @@ export default {
 	data() {
 		return {
 			localProps: {},
-			studiensemester_kurzbz: null,
-			studiensemester_start: null,
-			studiensemester_ende: null,
 			isOtherPersonMitarbeiter: false,
 			isOtherPersonStudent: false,
 			currentStgBezeichnung: null,
@@ -36,6 +34,8 @@ export default {
 				photo: "",
 			},
 			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone,
+			startSemester: null,
+			endSemester: null,
 		};
 	},
 	inject: ["isMobile"],
@@ -67,11 +67,10 @@ export default {
 			// do not show download links in otherLvPlan Mode
 			return false;
 
-			if (
-				!this.studiensemester_start ||
-				!this.studiensemester_ende ||
-				!this.propsViewData.otherUid
-			)
+			const startDate = this.startSemester?.start;
+			const endDate = this.endSemester ? this.endSemester.ende : this.startSemester?.ende;
+
+			if (!startDate || !endDate || !this.uid)
 				return false;
 
 			const type = this.isOtherPersonStudent
@@ -84,11 +83,11 @@ export default {
 
 			const opts = { zone: this.timezone };
 			const start = luxon.DateTime.fromISO(
-				this.studiensemester_start,
+				startDate,
 				opts,
 			).toUnixInteger();
 			const ende = luxon.DateTime.fromISO(
-				this.studiensemester_ende,
+				endDate,
 				opts,
 			).toUnixInteger();
 
@@ -166,19 +165,21 @@ export default {
 				},
 			});
 		},
-		updateRange(rangeInterval) {
-			this.$api
-				.call(
-					ApiLvPlan.studiensemesterDateInterval(
-						rangeInterval.end.startOf("week").toISODate(),
-					),
-				)
-				.then((res) => {
-					this.studiensemester_kurzbz =
-						res.data.studiensemester_kurzbz;
-					this.studiensemester_start = res.data.start;
-					this.studiensemester_ende = res.data.ende;
-				});
+		async updateRange(rangeInterval) {
+			const semesterResponse = await this.$api.call(
+				ApiStudienSemester.getContainingOrNearestByDateRange(
+					rangeInterval.s.toISO().slice(0, 10),
+					rangeInterval.e.toISO().slice(0, 10),
+				),
+			);
+			this.startSemester = 
+				semesterResponse.data.length
+					? semesterResponse.data[0]
+					: null;
+			this.endSemester =
+				semesterResponse.data.length > 1
+					? semesterResponse.data[1]
+					: null;
 		},
 		getPromiseFunc(start, end) {
 			return [
@@ -250,8 +251,14 @@ export default {
     <div class="d-flex flex-column h-100">
         <h2>
             <div class="d-flex flex-row justify-content-between align-items-center">
-			          <span>    
-                    {{ $p.t('lehre/stundenplan') + (studiensemester_kurzbz ? " " + studiensemester_kurzbz : "") }}
+			    <span>
+                    {{ $p.t('lehre/stundenplan') }}
+					<span v-if="startSemester?.studiensemester_kurzbz">
+						{{ startSemester.studiensemester_kurzbz }}
+						<span v-if="endSemester?.studiensemester_kurzbz">
+							{{ "- " + endSemester.studiensemester_kurzbz }}
+						</span>
+			</span>
                 </span>
                 <div @click="this.$router.push({name: 'ProfilView', params: {uid: propsViewData.otherUid}})" type="button" class="d-flex flex-row align-items-center gap-3">
                     <span v-if="otherPersonData.fullNameWithTitle?.length">
