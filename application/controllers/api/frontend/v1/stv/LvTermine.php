@@ -78,7 +78,7 @@ class LvTermine extends FHCAPI_Controller
 			'studiensemester_kurzbz' => $first_semester,
 		));
 		if (isError($result))
-			$semesterStud = 66;
+			$semesterStud = null;
 		if(hasData($result)){
 			$result = getData($result);
 			$data = current($result);
@@ -127,7 +127,10 @@ class LvTermine extends FHCAPI_Controller
 			$this->terminateWithSuccess($data);
 	}
 
-	// function used to sort an array of studiensemester strings
+	// TODO(Manu) following 5 private functions are copybased of StundenplanLib,
+	// just applyLoadUeberSemesterHaelfte is different
+	// after approval: change to public in StundenplanLib and use it here?
+
 	private function sortStudienSemester(&$semester_range){
 		usort(
 			$semester_range,
@@ -170,7 +173,6 @@ class LvTermine extends FHCAPI_Controller
 			}
 		);
 	}
-
 
 	private function fetchBenutzerGruppenFromStudiensemester($student_uid, $semester_range)
 	{
@@ -306,6 +308,7 @@ class LvTermine extends FHCAPI_Controller
 		return success($student_lehrverband);
 	}
 
+	//note: this is different to the version in StundenplanLib, changes apply just to LVTermine in StudVW
 	private function applyLoadUeberSemesterHaelfte(&$semester_range)
 	{
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
