@@ -44,7 +44,6 @@ class KalenderLib
 				FROM lehre.tbl_kalender
 				WHERE von >= timestamp %s
 					AND bis < timestamp %s
-					AND status_kurzbz <> \'deleted\'
 			)',
 			$this->_ci->KalenderModel->db->escape(date('Y-m-d H:i:s', strtotime($start_date))),
 			$this->_ci->KalenderModel->db->escape(date('Y-m-d H:i:s', strtotime($end_date)))
