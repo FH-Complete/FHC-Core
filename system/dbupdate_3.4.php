@@ -101,7 +101,6 @@ require_once('dbupdate_3.4/68530_Dashboard_Cleanup.php');
 require_once('dbupdate_3.4/77375_ressourcen.php');
 require_once('dbupdate_3.4/78052_tempus_tag_events.php');
 require_once('dbupdate_3.4/78318_rename_column_of_eindeutige_gruppen_id_to_eindeutige_kalender_gruppen_id_in_tbl_kalender.php');
-require_once('dbupdate_3.4/78318_rename_column_of_eindeutige_gruppen_id_to_eindeutige_kalender_gruppen_id_in_tbl_kalender.php');
 require_once('dbupdate_3.4/75959_StudVw_Automatische_Tags.php');
 require_once('dbupdate_3.4/76160_lvv_favorites.php');
 require_once('dbupdate_3.4/77080_tabulator_presets_table.php');

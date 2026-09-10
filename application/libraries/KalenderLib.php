@@ -34,12 +34,26 @@ class KalenderLib
 
 	}
 
-	private function _getBasePlan($start_date, $end_date)
+	private function _buildFilteredKalenderCte($start_date, $end_date)
+	{
+		$end_date = date('Y-m-d', strtotime($end_date . ' +1 day'));
+
+		return sprintf(
+			'WITH filtered_kalender AS MATERIALIZED (
+				SELECT *
+				FROM lehre.tbl_kalender
+				WHERE von >= timestamp %s
+					AND bis < timestamp %s
+			)',
+			$this->_ci->KalenderModel->db->escape(date('Y-m-d H:i:s', strtotime($start_date))),
+			$this->_ci->KalenderModel->db->escape(date('Y-m-d H:i:s', strtotime($end_date)))
+		);
+	}
+
+	private function _buildBasePlanQuery()
 	{
 		$language = $this->getLanguageIndex();
 		$index_bezeichnung_mehrsprachig = $language - 1;
-
-		$end_date = date('Y-m-d', strtotime($end_date . ' +1 day'));
 
 		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id,
 			tbl_kalender.eindeutige_kalender_gruppen_id,
@@ -139,6 +153,7 @@ class KalenderLib
 		$this->_ci->KalenderModel->addJoin('public.tbl_benutzer resevierung_benutzer', 'reservierung_ma.mitarbeiter_uid = resevierung_benutzer.uid', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('public.tbl_person reservierung_person', 'reservierung_person.person_id = resevierung_benutzer.person_id', 'LEFT');
 
+
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitgruppe', 'tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('public.tbl_gruppe le_gruppe', 'tbl_lehreinheitgruppe.gruppe_kurzbz = le_gruppe.gruppe_kurzbz', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('public.tbl_lehrverband le_lehrverband',
@@ -216,10 +231,15 @@ class KalenderLib
 		$this->_ci->KalenderModel->db->join('lehre.tbl_stunde vonstunde', 'tbl_kalender.von::time = vonstunde.beginn', 'LEFT', FALSE);
 		$this->_ci->KalenderModel->db->join('lehre.tbl_stunde bisstunde', 'tbl_kalender.bis::time = bisstunde.ende', 'LEFT', FALSE);
 
-		$this->_ci->KalenderModel->db->where('tbl_kalender.von >=', $start_date);
-		$this->_ci->KalenderModel->db->where('tbl_kalender.bis <', $end_date);
-
 		$this->_ci->KalenderModel->addOrder('tbl_kalender.eindeutige_kalender_gruppen_id', 'DESC');
+	}
+
+	private function _loadFilteredBasePlan($start_date, $end_date)
+	{
+		$query = $this->_buildFilteredKalenderCte($start_date, $end_date) . "\n" .
+			$this->_ci->KalenderModel->db->get_compiled_select('filtered_kalender AS tbl_kalender');
+
+		return $this->_ci->KalenderModel->execReadOnlyQuery($query);
 	}
 
 	private function _mapEvents($data, $collisionCheck = true, $maxDailyEventLimit = null)
@@ -384,10 +404,10 @@ class KalenderLib
 	}
 	public function getPlanByOrt($start_date, $end_date, $ort)
 	{
-		$this->_getBasePlan($start_date, $end_date);
+		$this->_buildBasePlanQuery();
 
 		$this->_ci->KalenderModel->db->where('tbl_kalender_ort.ort_kurzbz', $ort);
-		$data = $this->_ci->KalenderModel->load();
+		$data = $this->_loadFilteredBasePlan($start_date, $end_date);
 
 		return $this->_mapEvents($data);
 	}
@@ -397,7 +417,7 @@ class KalenderLib
 		$start_date = date('Y-m-d', strtotime($start_date));
 		$end_date = date('Y-m-d', strtotime($end_date . ' +1 day'));
 
-		$this->_getBasePlan($start_date, $end_date);
+		$this->_buildBasePlanQuery();
 
 		$this->_ci->KalenderModel->db->where('NOT EXISTS (
 											SELECT 1 FROM lehre.tbl_kalender nachfolger
@@ -429,7 +449,7 @@ class KalenderLib
 			$this->_ci->KalenderModel->db->group_end();
 		}
 
-		$data = $this->_ci->KalenderModel->load();
+		$data = $this->_loadFilteredBasePlan($start_date, $end_date);
 		return $this->_mapEvents($data, false);
 	}
 
@@ -445,14 +465,14 @@ class KalenderLib
 
 		$kalender_entry = getData($kalender_entry)[0];
 
-		$this->_getBasePlan($kalender_entry->von, $kalender_entry->bis);
+		$this->_buildBasePlanQuery();
 		$this->_ci->KalenderModel->db->where('tbl_kalender.kalender_id', $kalender_entry->kalender_id);
-		$data = $this->_ci->KalenderModel->load();
+		$data = $this->_loadFilteredBasePlan($kalender_entry->von, $kalender_entry->bis);
 		return $this->_mapEvents($data);
 	}
 	public function getPlanForPlanner($start_date, $end_date, $ort = null, $uids = null, $studiengaenge = null, $collisionCheck = true, $maxDailyEventLimit = null)
 	{
-		$this->_getBasePlan($start_date, $end_date);
+		$this->_buildBasePlanQuery();
 
 		if (!is_null($ort))
 		{
@@ -555,18 +575,18 @@ class KalenderLib
 			) AS has_assigned_resources"
 		]);
 		
-		$data = $this->_ci->KalenderModel->load();
+		$data = $this->_loadFilteredBasePlan($start_date, $end_date);
 
 		return $this->_mapEvents($data, $collisionCheck, $maxDailyEventLimit);
 	}
 
 	public function getPlanForStudent($start_date, $end_date)
 	{
-		$this->_getBasePlan($start_date, $end_date);
+		$this->_buildBasePlanQuery();
 
 		$this->_ci->KalenderModel->db->where_in('status_kurzbz', array('live', 'to_delete_live'));
 
-		$data = $this->_ci->KalenderModel->load();
+		$data = $this->_loadFilteredBasePlan($start_date, $end_date);
 
 		return $this->_mapEvents($data);
 	}
@@ -574,7 +594,7 @@ class KalenderLib
 
 	public function getPlanForLecturer($start_date, $end_date)
 	{
-		$this->_getBasePlan($start_date, $end_date);
+		$this->_buildBasePlanQuery();
 
 		$this->_ci->KalenderModel->addJoin(
 			'lehre.tbl_kalender neuerer',
@@ -586,7 +606,7 @@ class KalenderLib
 			OR (tbl_kalender.status_kurzbz = 'preview' AND neuerer.kalender_id IS NULL)
 			OR (tbl_kalender.status_kurzbz = 'live' AND neuerer.kalender_id IS NULL)
 		)", NULL, FALSE);
-		$data = $this->_ci->KalenderModel->load();
+		$data = $this->_loadFilteredBasePlan($start_date, $end_date);
 
 		return $this->_mapEvents($data);
 	}
@@ -1855,7 +1875,7 @@ class KalenderLib
 			else
 			{
 
-				if (!isEmptyArray($kalender_entry->ort_kurzbz))
+				if (!isEmptyArray($kalender_entry->ort_kurzbz) || !isEmptyString($kalender_entry->location))
 				{
 					$result = $this->_deleteOrtEntry($kalender_entry);
 					if (isError($result))
