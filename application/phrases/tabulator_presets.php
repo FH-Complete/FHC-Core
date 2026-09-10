@@ -1,286 +1,24 @@
 <?php
 
 $phrases = array(
-
 array (
   'app' => 'core',
-  'category' => 'LvPlan',
-  'phrase' => 'previousWeek',
+  'category' => 'tabulator_presets',
+  'phrase' => 'displayed_columns',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Vorherige Woche',
+      'text' => 'Angezeigte Spalten',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Previous week',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-
-array (
-  'app' => 'core',
-  'category' => 'LvPlan',
-  'phrase' => 'previousYear',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Vorheriges Jahr',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'Previous year',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-
-array (
-  'app' => 'core',
-  'category' => 'LvPlan',
-  'phrase' => 'previousMonth',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Vorheriges Monat',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'Previous month',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-
-array (
-  'app' => 'core',
-  'category' => 'LvPlan',
-  'phrase' => 'previousDay',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Vorheriger Tag',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'Previous day',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-
-array (
-  'app' => 'core',
-  'category' => 'LvPlan',
-  'phrase' => 'nextDay',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Nächster Tag',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'Next day',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-
-array (
-  'app' => 'core',
-  'category' => 'LvPlan',
-  'phrase' => 'nextWeek',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Nächste Woche',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'Next week',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-
-array (
-  'app' => 'core',
-  'category' => 'LvPlan',
-  'phrase' => 'nextMonth',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Nächster Monat',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'Next month',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-
-array (
-  'app' => 'core',
-  'category' => 'LvPlan',
-  'phrase' => 'nextYear',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Nächstes Jahr',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'Next year',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-
-array (
-  'app' => 'core',
-  'category' => 'LvPlan',
-  'phrase' => 'modeDay',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Tages Ansicht',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'Daily view',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-array (
-  'app' => 'core',
-  'category' => 'LvPlan',
-  'phrase' => 'modeWeek',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Wochen Ansicht',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'Week view',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-array (
-  'app' => 'core',
-  'category' => 'LvPlan',
-  'phrase' => 'modeMonth',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Monats Ansicht',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'Month view',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-array (
-  'app' => 'core',
-  'category' => 'LvPlan',
-  'phrase' => 'noStgProvided',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'kein Studiengang hinterlegt',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'no degree-program provided',
+      'text' => 'Displayed columns',
       'description' => '',
       'insertvon' => 'system',
     ),
@@ -289,22 +27,22 @@ array (
 ,
 array (
   'app' => 'core',
-  'category' => 'LvPlan',
-  'phrase' => 'headerLvPlanLvVerband',
+  'category' => 'tabulator_presets',
+  'phrase' => 'in_order',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Lv-Plan Lehrverband',
+      'text' => 'in Reihenfolge',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Course-Plan Teaching Association',
+      'text' => 'in order',
       'description' => '',
       'insertvon' => 'system',
     ),
@@ -313,22 +51,22 @@ array (
 ,
 array (
   'app' => 'core',
-  'category' => 'LvPlan',
-  'phrase' => 'chooseStg',
+  'category' => 'tabulator_presets',
+  'phrase' => 'column_header_filters',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Studiengang auswählen...',
+      'text' => 'Spalten Header Filter',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Select a degree-program...',
+      'text' => 'Column header filters',
       'description' => '',
       'insertvon' => 'system',
     ),
@@ -337,22 +75,22 @@ array (
 ,
 array (
   'app' => 'core',
-  'category' => 'LvPlan',
-  'phrase' => 'loadLvPlan',
+  'category' => 'tabulator_presets',
+  'phrase' => 'asc',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Lehrverband laden',
+      'text' => 'aufsteigend',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Load Course-Plan',
+      'text' => 'ascending',
       'description' => '',
       'insertvon' => 'system',
     ),
@@ -361,22 +99,22 @@ array (
 ,
 array (
   'app' => 'core',
-  'category' => 'LvPlan',
-  'phrase' => 'backToDropdown',
+  'category' => 'tabulator_presets',
+  'phrase' => 'sort',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Zurück zum Auswahl-Dropdown',
+      'text' => 'Sortierung',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Back to Dropdown',
+      'text' => 'Sort',
       'description' => '',
       'insertvon' => 'system',
     ),
@@ -385,22 +123,22 @@ array (
 ,
 array (
   'app' => 'core',
-  'category' => 'LvPlan',
-  'phrase' => 'error_SemMissing',
+  'category' => 'tabulator_presets',
+  'phrase' => 'preset_deletion_confirmation',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Semester wählen',
+      'text' => 'Sind Sie sicher, dass Sie die Voreinstellung (((presetName))) löschen möchten?',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Select a semester',
+      'text' => 'Are you sure you want to delete preset (((presetName)))?',
       'description' => '',
       'insertvon' => 'system',
     ),
@@ -409,22 +147,22 @@ array (
 ,
 array (
   'app' => 'core',
-  'category' => 'LvPlan',
-  'phrase' => 'error_VerbandMissing',
+  'category' => 'tabulator_presets',
+  'phrase' => 'table_presets',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Verband wählen',
+      'text' => 'Tabelle Voreinstellungen',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Select a verband',
+      'text' => 'Table presets',
       'description' => '',
       'insertvon' => 'system',
     ),
@@ -433,22 +171,286 @@ array (
 ,
 array (
   'app' => 'core',
-  'category' => 'LvPlan',
-  'phrase' => 'copy',
+  'category' => 'tabulator_presets',
+  'phrase' => 'save_current_config',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Kopieren',
+      'text' => 'Aktuelle Einstellung speichern',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Copy',
+      'text' => 'Save current configuration',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'tabulator_presets',
+  'phrase' => 'preset_name',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Voreinstellung Name',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Preset name',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'tabulator_presets',
+  'phrase' => 'max_presets_count_err_msg',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Maximale Anzahl an Voreinstellungen erreicht!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Maximum number of presets reached!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'tabulator_presets',
+  'phrase' => 'preset_name_duplicate_err_msg',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Doppelte Voreinstellunge Namen sind nicht zulässig!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Preset name duplicate not allowed!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'tabulator_presets',
+  'phrase' => 'preset_not_found_err_msg',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Voreinstellung nicht gefunden!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Preset not found!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'tabulator_presets',
+  'phrase' => 'preset_not_own_update_err_msg',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Sie dürfen diese Voreinstellung nicht ändern!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'You are not allowed to update this preset!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'tabulator_presets',
+  'phrase' => 'preset_not_own_delete_err_msg',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Sie dürfen diese Voreinstellung nicht löschen!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'You are not allowed to delete this preset!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'tabulator_presets',
+  'phrase' => 'preset_creation_generic_err_msg',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bei der Erstellung der Voreinstellung ist ein Fehler aufgetreten!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Something went wrong during preset creation!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'tabulator_presets',
+  'phrase' => 'preset_update_generic_err_msg',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bei der Voreinstellungsänderung ist ein Fehler aufgetreten!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Something went wrong during preset update!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'tabulator_presets',
+  'phrase' => 'preset_deletion_generic_err_msg',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Beim Löschen der Voreinstellung ist ein Fehler aufgetreten!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Something went wrong during preset deletion!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'tabulator_presets',
+  'phrase' => 'invalid_params_err_msg',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Ungültige Parameterübergabe!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Invalid parameters!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'tabulator_presets',
+  'phrase' => 'modified',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'modifiziert',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'modified',
       'description' => '',
       'insertvon' => 'system',
     ),

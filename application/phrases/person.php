@@ -3161,5 +3161,61 @@ array (
     ),
   ),
 )
+,
+array (
+  'app' => 'core',
+  'category' => 'person',
+  'phrase' => 'mailText_profilfoto',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Hallo,
+
+Ihr Profilbild wurde entfernt, da es nicht den aktuellen Bildrichtlinen entspricht. Bitte laden Sie unter CIS->Profil ein neues Profilbild hoch!
+
+Danke!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Hello,
+
+Your profile picture has been removed because it does not comply with the current image guidelines. Please upload a new profile picture under CIS->Profile!
+
+Thank you!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'person',
+  'phrase' => 'betreffProfilfoto',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Profilbild',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Profile picture',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );
 
