@@ -67,7 +67,7 @@ export default {
 			<component :is="generator" v-model="modelValue" :original="originalData" :key="modelValue.widget_id" />
 		</template>
 		<edit-setup v-else v-model="modelValue.setup" />
-		<div class="position-absolute bottom-0 end-0 z-1">
+		<div class="position-absolute bottom-0 end-0 z-3">
 			<button
 				type="submit"
 				:disabled="saving || !unsavedProgress"
