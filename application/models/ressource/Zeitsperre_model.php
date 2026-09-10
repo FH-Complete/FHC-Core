@@ -61,4 +61,40 @@ class Zeitsperre_model extends DB_Model
 
         return $this->execQuery($qry);
     }
+
+	public function checkIfZeitsperreExists($uid, $datum, $stunde)
+	{
+		$this->db->select("*");
+
+		$this->db->where('mitarbeiter_uid', $uid);
+		$this->db->where('zeitsperretyp_kurzbz !=', 'ZVerfueg');
+
+		$this->db->group_start();
+
+			$this->db->where('vondatum <', $datum);
+			$this->db->or_group_start();
+				$this->db->where('vondatum', $datum);
+				$this->db->group_start();
+					$this->db->where('vonstunde <=', $stunde);
+					$this->db->or_where('vonstunde IS NULL', null, false);
+				$this->db->group_end();
+			$this->db->group_end();
+		$this->db->group_end();
+
+
+		$this->db->group_start();
+			$this->db->where('bisdatum >', $datum);
+			$this->db->or_group_start();
+				$this->db->where('bisdatum', $datum);
+				$this->db->group_start();
+					$this->db->where('bisstunde >=', $stunde);
+					$this->db->or_where('bisstunde IS NULL', null, false);
+				$this->db->group_end();
+
+			$this->db->group_end();
+		$this->db->group_end();
+
+		return $this->load();
+
+	}
 }

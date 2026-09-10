@@ -1344,4 +1344,52 @@ array (
     ),
   ),
 )
+,
+array (
+  'app' => 'core',
+  'category' => 'profil',
+  'phrase' => 'name_title_clipboard_copy_confirmation',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Name mit Titel in die Zwischenablage kopiert.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Full name with title copied to clipboard.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'profil',
+  'phrase' => 'name_title_copy',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Name mit Titel kopieren',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Copy full name with title',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );

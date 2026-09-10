@@ -430,4 +430,28 @@ array (
     ),
   ),
 )
+,
+array (
+  'app' => 'core',
+  'category' => 'LvPlan',
+  'phrase' => 'copy',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Kopieren',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Copy',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );

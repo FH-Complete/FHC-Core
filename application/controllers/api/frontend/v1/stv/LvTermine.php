@@ -34,7 +34,7 @@ class LvTermine extends FHCAPI_Controller
 
 	//TODO Build own lib or combine with Controller Stundenplan.php
 	//here use of logic of Stundenplan.php, extended with parameters uid, grouping, and used dbTable
-	public function getStundenplan($uid, $start_date = null, $end_date = null, $groupConsecutiveHours = false, $dbStundenplanTable = "stundenplan")
+	public function getStundenplan($uid, $start_date = null, $end_date = null, $dbStundenplanTable = "stundenplan", $groupConsecutiveHours = false)
 	{
 		$student_uid = $uid;
 		$semester_range = $this->studienSemesterErmitteln($start_date, $end_date);
@@ -79,13 +79,6 @@ class LvTermine extends FHCAPI_Controller
 		}
 
 		$stundenplan_data = $this->getDataOrTerminateWithError($stundenplan_data) ?? [];
-		$this->terminateWithSuccess($stundenplan_data);
-
-		$this->expand_object_information($stundenplan_data);
-
-		$this->returnObj['$stundenplan_query'] = $stundenplan_query;
-		$this->returnObj['$student_lehrverband'] = $student_lehrverband;
-		$this->returnObj['$benutzer_gruppen'] = $benutzer_gruppen;
 		$this->terminateWithSuccess($stundenplan_data);
 	}
 
