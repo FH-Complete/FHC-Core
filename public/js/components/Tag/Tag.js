@@ -28,6 +28,10 @@ export default {
 		confirmLimit: {
 			type: Number,
 			default: 20
+		},
+		showHover: {
+			type: Boolean,
+			default: false
 		}
 	},
 	data() {
@@ -228,7 +232,8 @@ export default {
 			<span :title="values.length === 0 ? 'Bitte Zeilen markieren' : ''">
 			<button @mouseover="showList = true" 
 					:disabled="!values || values.length === 0"
-					class="btn btn-sm">
+					class="btn btn-sm"
+					:class="{'btn-hover': showHover}">
 				<i class="fa-solid fa-tag fa-xl"></i>
 			</button>
 			</span>

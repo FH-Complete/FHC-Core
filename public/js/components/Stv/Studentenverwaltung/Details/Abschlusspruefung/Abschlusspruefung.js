@@ -553,8 +553,12 @@ export default {
 			}
 
 			if (!this.formData.akadgrad_id && this.arrAkadGrad.length > 0) {
-				if(this.student.geschlecht == 'w')
-					this.formData.akadgrad_id = this.arrAkadGrad[1].akadgrad_id;
+				const akadGradByGeschlecht = this.arrAkadGrad.find((item) => {
+					return item.geschlecht === this.student.geschlecht;
+				});
+
+				if(akadGradByGeschlecht)
+					this.formData.akadgrad_id = akadGradByGeschlecht.akadgrad_id;
 				else
 					this.formData.akadgrad_id = this.arrAkadGrad[0].akadgrad_id;
 			}
