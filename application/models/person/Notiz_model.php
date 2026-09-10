@@ -296,4 +296,59 @@ class Notiz_model extends DB_Model
 		
 		return $this->loadWhere(array('anrechnung_id' => $anrechnung_id));
 	}
+
+	/**
+	 * check if a given Tag for a certain notizzuordnung id is valid
+	 *
+	 * @param $tag typ_kurzbz to check
+	 * @param $typeId typeId to check
+	 * @param $id id to check
+	 * @param $von start of time period or NULL
+	 * @param $bis end of time period or NULL
+ *
+	 * @return array
+	 */
+	public function checkIfExistingTag($tag, $typeId, $id, $von=null, $bis=null)
+	{
+		$query = "
+			SELECT *
+			FROM public.tbl_notiz
+			JOIN public.tbl_notizzuordnung nz USING (notiz_id)
+			WHERE typ = ?
+			AND {$typeId} = ?
+			AND (
+				start IS NULL
+				OR ende IS NULL
+				OR (start <= ? AND ende >= ?)
+			)
+		";
+
+		return $this->execQuery($query, [$tag, $id, $bis, $von]);
+	}
+
+	/**
+	 * returns all existing tags of a certain tag within a time period
+	 *
+	 * @param $tag typ_kurzbz of tag
+	 * @param $von start of time period or NULL
+	 * @param $bis end of time period or NULL
+	 *
+	 * @return array
+	 */
+	public function getAllTags($tag, $von=null, $bis=null)
+	{
+		$query = "
+			SELECT *
+			FROM public.tbl_notiz
+			JOIN public.tbl_notizzuordnung nz USING (notiz_id)
+			WHERE typ = ?
+			AND (
+				start IS NULL
+				OR ende IS NULL
+				OR (start <= ? AND ende >= ?)
+			);
+		";
+
+		return $this->execQuery($query, array($tag, $bis, $von));
+	}
 }

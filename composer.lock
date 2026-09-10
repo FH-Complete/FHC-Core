@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "70c42631fc8a94136bd2f8f033aefade",
+    "content-hash": "69f494c383b1ad1eebffaea0787dd325",
     "packages": [
         {
             "name": "afarkas/html5shiv",
@@ -960,10 +960,10 @@
         },
         {
             "name": "fortawesome/font-awesome6",
-            "version": "6.1.1",
+            "version": "6.7.2",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/6.1.1.zip"
+                "url": "https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/6.7.2.zip"
             },
             "type": "library"
         },
@@ -1388,16 +1388,16 @@
         },
         {
             "name": "netcarver/textile",
-            "version": "v4.1.4",
+            "version": "v4.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/textile/php-textile.git",
-                "reference": "53593a5a57b4c1db37d96237ab204b4d5548f19f"
+                "reference": "d0bf57dd3db293ecd27af8625d564bd255a5e32c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/textile/php-textile/zipball/53593a5a57b4c1db37d96237ab204b4d5548f19f",
-                "reference": "53593a5a57b4c1db37d96237ab204b4d5548f19f",
+                "url": "https://api.github.com/repos/textile/php-textile/zipball/d0bf57dd3db293ecd27af8625d564bd255a5e32c",
+                "reference": "d0bf57dd3db293ecd27af8625d564bd255a5e32c",
                 "shasum": ""
             },
             "require": {
@@ -1443,7 +1443,7 @@
                 "source": "https://github.com/textile/php-textile",
                 "wiki": "https://github.com/textile/php-textile/wiki"
             },
-            "time": "2025-12-20T18:52:55+00:00"
+            "time": "2026-08-21T18:25:39+00:00"
         },
         {
             "name": "nicolaskruchten/pivottable",
@@ -1456,10 +1456,10 @@
         },
         {
             "name": "npm-asset/primeicons",
-            "version": "5.0.0",
+            "version": "6.0.1",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/primeicons/-/primeicons-5.0.0.tgz"
+                "url": "https://registry.npmjs.org/primeicons/-/primeicons-6.0.1.tgz"
             },
             "type": "npm-asset",
             "license": [
