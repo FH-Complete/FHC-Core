@@ -198,7 +198,7 @@ class Grades extends FHCAPI_Controller
 		$now = date('c');
 
 		// NOTE(chris): Stg Permissions
-		if (!$this->hasPermissionUpdate($lehrveranstaltung_id, $student_uid))
+		if (!$this->hasPermissionGradeUID($lehrveranstaltung_id, $student_uid))
 			return $this->_outputAuthError([$this->router->method => ['admin', 'assistenz']]);
 
 		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
@@ -260,7 +260,7 @@ class Grades extends FHCAPI_Controller
 		$lehrveranstaltung_id = $this->input->post('lehrveranstaltung_id');
 
 		// NOTE(chris): Stg Permissions
-		if (!$this->hasPermissionDelete($lehrveranstaltung_id, $student_uid))
+		if (!$this->hasPermissionGradeUID($lehrveranstaltung_id, $student_uid))
 			return $this->_outputAuthError([$this->router->method => ['admin', 'assistenz']]);
 
 		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
@@ -298,7 +298,7 @@ class Grades extends FHCAPI_Controller
 		$authUID = getAuthUID();
 		
 		// NOTE(chris): Stg Permissions
-		if (!$this->hasPermissionCopy($lehrveranstaltung_id, $student_uid))
+		if (!$this->hasPermissionGradeUID($lehrveranstaltung_id, $student_uid))
 			return $this->_outputAuthError([$this->router->method => 'student/noten']);
 
 		$this->load->model('education/Lvgesamtnote_model', 'LvgesamtnoteModel');
@@ -410,7 +410,7 @@ class Grades extends FHCAPI_Controller
 		$repeaterGrade = current($repeaterGrade);
 
 		// NOTE(chris): Stg Permissions
-		if (!$this->hasPermissionCopy($repeaterGrade->lehrveranstaltung_id, $repeaterGrade->student_uid))
+		if (!$this->hasPermissionGradeUID($repeaterGrade->lehrveranstaltung_id, $repeaterGrade->student_uid))
 			return $this->_outputAuthError([$this->router->method => 'student/noten']);
 
 		$data = [
@@ -565,143 +565,6 @@ class Grades extends FHCAPI_Controller
 	}
 
 	/**
-	 * Helper function to check permissions for updateCertificate()
-	 *
-	 * @param integer				$lehrveranstaltung_id
-	 * @param string				$student_uid
-	 *
-	 * @return boolean
-	 */
-	protected function hasPermissionUpdate($lehrveranstaltung_id, $student_uid)
-	{
-		if ($lehrveranstaltung_id === null || $student_uid === null)
-			return true;
-
-		$this->load->model('crm/Student_model', 'StudentModel');
-		
-		$result = $this->StudentModel->load([$student_uid]);
-		if (isError($result) || !hasData($result))
-			return false;
-
-		$student = current(getData($result));
-
-		if ($this->permissionlib->isBerechtigt('admin', 'suid', $student->studiengang_kz))
-			return true;
-		if ($this->permissionlib->isBerechtigt('assistenz', 'suid', $student->studiengang_kz))
-			return true;
-
-		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
-
-		$result = $this->StudienplanModel->getAllOesForLv($lehrveranstaltung_id);
-		if (isError($result))
-			return false;
-
-		$oes = getData($result) ?: [];
-
-		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
-
-		$result = $this->LehrveranstaltungModel->getStg($lehrveranstaltung_id);
-		if (isError($result))
-			return false;
-
-		if (hasData($result))
-			$oes[] = current(getData($result));
-
-		foreach ($oes as $oe) {
-			if ($this->permissionlib->isBerechtigt('admin', 'suid', $oe->oe_kurzbz))
-				return true;
-			if ($this->permissionlib->isBerechtigt('assistenz', 'suid', $oe->oe_kurzbz))
-				return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Helper function to check permissions for deleteCertificate()
-	 *
-	 * @param integer				$lehrveranstaltung_id
-	 * @param string				$student_uid
-	 *
-	 * @return boolean
-	 */
-	protected function hasPermissionDelete($lehrveranstaltung_id, $student_uid)
-	{
-		if ($lehrveranstaltung_id === null || $student_uid === null)
-			return true;
-
-		$this->load->model('crm/Student_model', 'StudentModel');
-		
-		$result = $this->StudentModel->load([$student_uid]);
-		if (isError($result) || !hasData($result))
-			return false;
-
-		$student = current(getData($result));
-
-		if ($this->permissionlib->isBerechtigt('admin', 'suid', $student->studiengang_kz))
-			return true;
-		if ($this->permissionlib->isBerechtigt('assistenz', 'suid', $student->studiengang_kz))
-			return true;
-
-		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
-
-		$result = $this->LehrveranstaltungModel->load($lehrveranstaltung_id);
-		if (isError($result) || !hasData($result))
-			return false;
-
-		$oe = current(getData($result));
-
-		if ($this->permissionlib->isBerechtigt('admin', 'suid', $oe->oe_kurzbz))
-			return true;
-		if ($this->permissionlib->isBerechtigt('assistenz', 'suid', $oe->oe_kurzbz))
-			return true;
-
-		return false;
-	}
-
-	/**
-	 * Helper function to check permissions for
-	 * copyTeacherProposalToCertificate() and copyRepeaterGradeToCertificate()
-	 *
-	 * @param integer				$lehrveranstaltung_id
-	 * @param string				$student_uid
-	 *
-	 * @return boolean
-	 */
-	protected function hasPermissionCopy($lehrveranstaltung_id, $student_uid)
-	{
-		if ($lehrveranstaltung_id === null || $student_uid === null)
-			return true;
-
-		$this->load->model('crm/Student_model', 'StudentModel');
-		
-		$result = $this->StudentModel->load([$student_uid]);
-		if (isError($result) || !hasData($result))
-			return false;
-		
-		$student = current(getData($result));
-
-		if ($this->permissionlib->isBerechtigt('student/noten', 'suid', $student->studiengang_kz))
-			return true;
-
-		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
-		
-		$result = $this->LehrveranstaltungModel->load($lehrveranstaltung_id);
-		if (isError($result) || !hasData($result))
-			return false;
-		
-		$oe = current(getData($result));
-
-		if ($this->permissionlib->isBerechtigt('student/noten', 'suid', $oe->oe_kurzbz))
-			return true;
-
-		if ($this->permissionlib->isBerechtigt('student/noten', 'suid', $oe->studiengang_kz))
-			return true;
-
-		return false;
-	}
-
-	/**
 	 * Combined helper function to check permissions for
 	 * certificate-modifying functions
 	 *
@@ -735,31 +598,19 @@ class Grades extends FHCAPI_Controller
 
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 
-		$stgResult = $this->LehrveranstaltungModel->getStg($lehrveranstaltung_id);
-		if (isError($stgResult))
+		$lvResult = $this->LehrveranstaltungModel->load($lehrveranstaltung_id);
+		if (isError($lvResult))
 			return false;
 
-		if (hasData($stgResult))
-			$oes[] = current(getData($stgResult));
+		if (hasData($lvResult))
+			$oes[] = current(getData($lvResult));
 
 
-		if ($this->permissionlib->isBerechtigt('admin', 'suid', $student->studiengang_kz))
-			return true;
-		if ($this->permissionlib->isBerechtigt('assistenz', 'suid', $student->studiengang_kz))
-			return true;
 		if ($this->permissionlib->isBerechtigt('student/noten', 'suid', $student->studiengang_kz))
 			return true;
 
 		foreach ($oes as $oe) {
-			if ($this->permissionlib->isBerechtigt('admin', 'suid', $oe->oe_kurzbz))
-				return true;
-			if ($this->permissionlib->isBerechtigt('assistenz', 'suid', $oe->oe_kurzbz))
-				return true;
 			if ($this->permissionlib->isBerechtigt('student/noten', 'suid', $oe->oe_kurzbz))
-				return true;
-			if ($this->permissionlib->isBerechtigt('admin', 'suid', $oe->studiengang_kz))
-				return true;
-			if ($this->permissionlib->isBerechtigt('assistenz', 'suid', $oe->studiengang_kz))
 				return true;
 			if ($this->permissionlib->isBerechtigt('student/noten', 'suid', $oe->studiengang_kz))
 				return true;
