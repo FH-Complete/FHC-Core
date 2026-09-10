@@ -35,9 +35,6 @@ export default {
 	getMitarbeiter(searchString){
 		return this.$fhcApi.get('api/frontend/v1/stv/abschlusspruefung/getMitarbeiter/' + searchString);
 	},
-	getPruefer(searchString){
-		return this.$fhcApi.get('api/frontend/v1/stv/abschlusspruefung/getPruefer/' + searchString);
-	},
 	getNoten(){
 		return this.$fhcApi.get('api/frontend/v1/stv/abschlusspruefung/getNoten/');
 	},
