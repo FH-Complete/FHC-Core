@@ -1,0 +1,76 @@
+<?php
+/**
+ * Description of wh_auto
+ *
+ * @author bambi
+ */
+class CoreWiederholerTagLib
+{
+	protected $ci;
+
+	public function __construct()
+	{
+		$this->ci = get_instance();
+		$this->ci->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+	}
+
+	public function getZuordnungIds(array $params)
+	{
+		if(!isset($params['studiensemester_kurzbz']))
+		{
+			return (object) array(
+				'idArray' => []
+			);
+		}
+
+		$semester = $params['studiensemester_kurzbz'];
+
+		$this->ci->PrestudentstatusModel->addJoin('public.tbl_studiensemester', 'studiensemester_kurzbz');
+		$result = $this->ci->PrestudentstatusModel-> loadWhere(array(
+			'statusgrund_id' => 16,
+			'studiensemester_kurzbz' => $semester
+		));
+		$data = $result->retval;
+
+		$wiederholer_data = array_map(function($item) {
+			return [
+				'id' => $item->prestudent_id,
+				'von' => $item->start,
+				'bis' => $item->ende
+			];
+		}, $data);
+
+		return (object) array(
+			'typeId' => 'prestudent_id',
+			'data' => $wiederholer_data
+		);
+	}
+
+	public function isCriteriaSetFor(array $params)
+	{
+		if ( !isset($params['id'], $params['studiensemester_kurzbz'], $params['typeId']) ||	$params['typeId'] !== 'prestudent_id')
+			return false;
+
+		$semester = $params['studiensemester_kurzbz'];
+		$prestudent_id = $params['id'];
+
+		$this->ci->PrestudentstatusModel->addSelect('prestudent_id');
+		$this->ci->PrestudentstatusModel->addSelect('start as von');
+		$this->ci->PrestudentstatusModel->addSelect('ende as bis');
+
+		$this->ci->PrestudentstatusModel->addJoin('public.tbl_studiensemester', 'studiensemester_kurzbz');
+
+		$result = $this->ci->PrestudentstatusModel->loadWhere(array(
+			'statusgrund_id' => 16,
+			'studiensemester_kurzbz' => $semester,
+			'prestudent_id' => $prestudent_id,
+		));
+
+		if(hasData($result))
+		{
+			return $result;
+		}
+		else
+			return null;
+	}
+}
