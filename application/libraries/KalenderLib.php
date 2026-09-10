@@ -1860,7 +1860,7 @@ class KalenderLib
 			else
 			{
 
-				if (!isEmptyArray($kalender_entry->ort_kurzbz))
+				if (!isEmptyArray($kalender_entry->ort_kurzbz) || !isEmptyString($kalender_entry->location))
 				{
 					$result = $this->_deleteOrtEntry($kalender_entry);
 					if (isError($result))
