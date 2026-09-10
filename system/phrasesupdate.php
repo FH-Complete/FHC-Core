@@ -61464,6 +61464,106 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'benotungstool',
+		'phrase' => 'kommPruefNichtErlaubt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die kommissionelle Prüfung für {0} wird nicht in diesem Werkzeug angelegt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The oral examination for {0} is not created in this tool.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4benotungsdatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Benotungsdatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Assessment date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4benotungsdatumHinweis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Freigabe macht dieses Datum zum Datum des ersten Antritts.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The release turns this date into the date of the first attempt.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'benotungsdatumUngueltig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Benotungsdatum für {0} ist ungültig.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The assessment date for {0} is not valid.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'benotungsdatumInZukunft',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Benotungsdatum für {0} darf nicht in der Zukunft liegen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The assessment date for {0} must not be in the future.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
 		'phrase' => 'pruefungDatumBeforeExisting',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -62070,6 +62170,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'benotungstool',
+		'phrase' => 'c4importNotenkuerzel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Statt der Note können Sie das Kürzel aus der Notenliste eintragen. Beispiel: nb für die Note Nicht beurteilt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Instead of the grade you can enter the shorthand from the grade list. Example: nb for the grade Nicht beurteilt.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
 		'phrase' => 'c4importInvalidDateFoundForIdInRow',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -62170,18 +62290,18 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'benotungstool',
-		'phrase' => 'c4antrittNr',
+		'phrase' => 'c4terminNr',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '{0}. Antritt',
+				'text' => '{0}. Prüfungstermin',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Attempt {0}',
+				'text' => 'Exam session {0}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -62190,18 +62310,18 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'benotungstool',
-		'phrase' => 'c4spaltenAntritt',
+		'phrase' => 'c4spaltenTermin',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Antritte',
+				'text' => 'Termine',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Attempts',
+				'text' => 'Exam sessions',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -62210,18 +62330,98 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'benotungstool',
-		'phrase' => 'c4spaltenAntrittHint',
+		'phrase' => 'c4spaltenTerminHint',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Eine Spalte je Antritt, das Prüfungsdatum steht in der Zelle.',
+				'text' => 'Eine Spalte je Prüfungstermin. Das Prüfungsdatum steht in der Zelle.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'One column per attempt, the exam date is shown in the cell.',
+				'text' => 'One column per exam session. The cell shows the exam date.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4badgeAntritt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{0}. Antritt von {1}. Die Spalte zeigt den Prüfungstermin. Das Symbol zeigt den Antritt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attempt {0} of {1}. The column shows the exam date. The badge shows the attempt.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4badgeKommAntritt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kommissionelle Prüfung. {0}. Antritt von {1}.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Oral examination. Attempt {0} of {1}.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4badgeOhneAntritt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dieser Prüfungstermin zählt keinen Antritt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This exam date uses no attempt.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4badgeKommOhneAntritt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kommissionelle Prüfung. Dieser Prüfungstermin zählt keinen Antritt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Oral examination. This exam date uses no attempt.',
 				'description' => '',
 				'insertvon' => 'system'
 			)

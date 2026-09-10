@@ -46,6 +46,7 @@ class PruefungsverlaufLib
 	{
 		$this->_ci =& get_instance();
 		$this->_ci->load->model('education/LePruefung_model', 'LePruefungModel');
+		$this->_ci->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 		$this->_ci->load->model('education/Note_model', 'NoteModel');
 		$this->_ci->load->model('education/Pruefungstyp_model', 'PruefungstypModel');
 		$this->_ci->load->config('noten');
@@ -158,7 +159,106 @@ class PruefungsverlaufLib
 			$verlauf->naechsteRolle = self::ROLLE_PRUEFUNG;
 		}
 
+		// The next attempt is the kommissionelle one, but this tool may not create it.
+		$verlauf->kommPruefGesperrt = $verlauf->canAdd
+			&& $verlauf->naechsteRolle === self::ROLLE_KOMMISSIONELL
+			&& !$this->darfKommPruefAnlegen();
+
+		if ($verlauf->kommPruefGesperrt) $verlauf->canAdd = false;
+
 		return $verlauf;
+	}
+
+	/**
+	 * Trägt die Zeile eine Wiederholung, also einen Termin nach Antritt 1?
+	 *
+	 * Antritt 1 und die LV-Note sind dieselbe Leistung. Solange nur er existiert, darf der
+	 * Vorschlagsweg die Note schreiben, und upsertErstantritt hält genau diesen Termin nach. Ab der
+	 * ersten Wiederholung gehört die Note zum Antritt und folgt dessen Regeln.
+	 *
+	 * Die Antwort kommt aus dem Verlauf, nicht aus der Zahl der Zeilen: die Position sagt, der
+	 * wievielte Termin ein Datensatz ist.
+	 *
+	 * @param array $pruefungen die Termine der Zeile, ungeordnet
+	 * @return bool
+	 */
+	public function hatWiederholung($pruefungen)
+	{
+		foreach ($this->buildVerlauf($pruefungen)->pruefungen as $termin) {
+			if ($termin->position > 1) return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Materialises the first attempt as its own exam row. A course grade without any exam IS
+	 * attempt 1 (impliziterErstantritt). As long as that row is missing, the next exam becomes
+	 * attempt 2, and the legacy type of the whole chain moves one place. The caller therefore
+	 * writes the row as soon as the course grade exists, not only on the release.
+	 *
+	 * Idempotent. With more than one exam the chain has moved on and nothing is written. With
+	 * exactly one exam the grade follows the course grade.
+	 *
+	 * @param bool $mitDatum true also writes $datum into the existing attempt 1. Only the person
+	 *                       who enters the course grade picks that date; a release must not move
+	 *                       a date that somebody entered for the exam itself.
+	 * @param mixed $lehreinheit_id the caller resolved it already; null makes this method look it up
+	 * @return stdClass|null the exam row, or null if nothing was written
+	 */
+	public function upsertErstantritt($student_uid, $lv_id, $sem_kurzbz, $note, $punkte, $datum, $mitarbeiter_uid = null, $mitDatum = false, $lehreinheit_id = null)
+	{
+		$pruefungen = $this->getPruefungen($student_uid, $lv_id, $sem_kurzbz);
+		if ($this->hatWiederholung($pruefungen)) return null;
+
+		$jetzt = date('Y-m-d H:i:s');
+		$tag = substr((string) $datum, 0, 10);
+
+		if (count($pruefungen) === 1) {
+			$daten = [
+				'note' => $note,
+				'punkte' => $punkte,
+				'updateamum' => $jetzt,
+				'updatevon' => getAuthUID()
+			];
+			if ($mitDatum) $daten['datum'] = $tag;
+
+			$this->_ci->LePruefungModel->update($pruefungen[0]->pruefung_id, $daten);
+
+			return $this->ladePruefung($pruefungen[0]->pruefung_id);
+		}
+
+		// the server finds the Lehreinheit; it does not use a value from the client
+		if ($lehreinheit_id === null) {
+			$resLe = $this->_ci->LehrveranstaltungModel->getLeByStudent($student_uid, $sem_kurzbz, $lv_id);
+			if (isError($resLe) || !hasData($resLe)) return null;
+			$lehreinheit_id = current(getData($resLe))->lehreinheit_id;
+		}
+
+		$id = $this->_ci->LePruefungModel->insert([
+			'lehreinheit_id' => $lehreinheit_id,
+			'student_uid' => $student_uid,
+			'mitarbeiter_uid' => $mitarbeiter_uid,
+			'note' => $note,
+			'punkte' => $punkte,
+			'pruefungstyp_kurzbz' => $this->legacyTypFuerAntritt(1),
+			'datum' => $tag,
+			'anmerkung' => '',
+			'insertamum' => $jetzt,
+			'insertvon' => getAuthUID(),
+			'updateamum' => null,
+			'updatevon' => null,
+			'ext_id' => null
+		]);
+
+		return $id ? $this->ladePruefung($id->retval) : null;
+	}
+
+	/** @return stdClass|null */
+	private function ladePruefung($pruefung_id)
+	{
+		$result = $this->_ci->LePruefungModel->load($pruefung_id);
+		return (!isError($result) && hasData($result)) ? getData($result)[0] : null;
 	}
 
 	/** 'angerechnet' or 'intern angerechnet'. The TRANSCRIPT grade decides. @return bool */
@@ -185,6 +285,19 @@ class PruefungsverlaufLib
 		if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3) $max++;
 		if (defined('CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF') && CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF) $max++;
 		return $max;
+	}
+
+	/**
+	 * Tells you if this tool may create the kommissionelle Prüfung. An installation that enters it
+	 * in another tool sets CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF to false. The exam stays visible
+	 * in the tool either way.
+	 *
+	 * @return bool
+	 */
+	public function darfKommPruefAnlegen()
+	{
+		$erlaubt = $this->_ci->config->item('CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF');
+		return $erlaubt === null ? true : (bool) $erlaubt;
 	}
 
 	/**
@@ -261,43 +374,33 @@ class PruefungsverlaufLib
 		return $this->legacyTypFuerAntritt(max(2, $verlauf->antrittCount + 1));
 	}
 
-	/** @return array{entschuldigt: mixed, ohneAntritt: array, anrechnung: array, limitMap: array} */
+	/**
+	 * The grades with a special meaning. The configuration names them, this method resolves the
+	 * names in lehre.tbl_note. A primary key means something else in every installation, therefore
+	 * no configuration holds one. A name that no grade carries is left out.
+	 *
+	 * @return array{entschuldigt: mixed, ohneAntritt: array, anrechnung: array, limitMap: array}
+	 */
 	public function getSpecialNotes()
 	{
 		if ($this->_specialNotes !== null) return $this->_specialNotes;
 
-		$cfgEntschuldigt = $this->_ci->config->item('NOTE_ENTSCHULDIGT');
-		$cfgOhneAntritt = $this->_ci->config->item('NOTEN_OHNE_ANTRITT');
-		$cfgLimitMap = $this->_ci->config->item('NOTEN_OCCURANCE_LIMIT_MAP');
-		$bezeichnungen = $this->_ci->config->item('NOTEN_OHNE_ANTRITT_BEZEICHNUNGEN');
-		if (!is_array($cfgOhneAntritt)) $cfgOhneAntritt = [];
-		if (!is_array($cfgLimitMap)) $cfgLimitMap = [];
-		if (!is_array($bezeichnungen)) $bezeichnungen = [];
+		$entschuldigt = $this->getNoteByBezeichnung($this->_ci->config->item('NOTE_ENTSCHULDIGT_BEZEICHNUNG'));
 
-		$resEnt = $this->_ci->NoteModel->getEntschuldigtNote();
-		$entschuldigt = (!isError($resEnt) && hasData($resEnt)) ? getData($resEnt)[0]->note : $cfgEntschuldigt;
-
-		// The name wins against the configured key. Do NOT merge the two sets: the same key has a
-		// different meaning in each installation (17 is 'entschuldigt' here, but 'nicht zugelassen'
-		// in the standard data).
-		$ohneAntritt = [];
-		foreach ($bezeichnungen as $bezeichnung) {
-			$note = $this->getNoteByBezeichnung($bezeichnung);
-			if ($note !== null && !in_array($note, $ohneAntritt)) $ohneAntritt[] = $note;
-		}
-		if (count($ohneAntritt) === 0) $ohneAntritt = $cfgOhneAntritt;
+		$ohneAntritt = $this->resolveNoten('NOTEN_OHNE_ANTRITT_BEZEICHNUNGEN');
 		if ($entschuldigt !== null && !in_array($entschuldigt, $ohneAntritt)) $ohneAntritt[] = $entschuldigt;
 
-		// move the configured limit for 'entschuldigt' to the key that was found
+		// the limit names a grade, the rules work on its key
 		$limitMap = [];
-		foreach ($cfgLimitMap as $k => $v) {
-			$limitMap[($k == $cfgEntschuldigt) ? $entschuldigt : $k] = $v;
+		foreach ($this->configArray('NOTEN_OCCURANCE_LIMIT_MAP') as $bezeichnung => $limit) {
+			$note = $this->getNoteByBezeichnung($bezeichnung);
+			if ($note !== null) $limitMap[$note] = $limit;
 		}
 
 		$this->_specialNotes = [
 			'entschuldigt' => $entschuldigt,
 			'ohneAntritt' => array_values($ohneAntritt),
-			'anrechnung' => $this->resolveNoten('NOTEN_ANRECHNUNG_BEZEICHNUNGEN', 'NOTEN_ANRECHNUNG'),
+			'anrechnung' => $this->resolveNoten('NOTEN_ANRECHNUNG_BEZEICHNUNGEN'),
 			'limitMap' => $limitMap
 		];
 		return $this->_specialNotes;
@@ -367,24 +470,23 @@ class PruefungsverlaufLib
 		return $this->_typen;
 	}
 
-	/** Finds the grades by their name. The configured keys are the fallback only. @return array */
-	private function resolveNoten($bezeichnungKey, $pkKey)
+	/** The grades of one configuration key, found by their name. @return array */
+	private function resolveNoten($bezeichnungKey)
 	{
-		$bezeichnungen = $this->_ci->config->item($bezeichnungKey);
-		if (!is_array($bezeichnungen)) $bezeichnungen = [];
-
 		$noten = [];
-		foreach ($bezeichnungen as $bezeichnung) {
+		foreach ($this->configArray($bezeichnungKey) as $bezeichnung) {
 			$note = $this->getNoteByBezeichnung($bezeichnung);
 			if ($note !== null && !in_array($note, $noten)) $noten[] = $note;
 		}
 
-		if (count($noten) === 0) {
-			$fallback = $this->_ci->config->item($pkKey);
-			if (is_array($fallback)) $noten = $fallback;
-		}
-
 		return array_values($noten);
+	}
+
+	/** One configuration value that must be a list. @return array */
+	private function configArray($key)
+	{
+		$wert = $this->_ci->config->item($key);
+		return is_array($wert) ? $wert : [];
 	}
 
 	/**
@@ -400,10 +502,12 @@ class PruefungsverlaufLib
 	}
 
 	/**
-	 * @return mixed|null
+	 * @return mixed|null the key of the grade, or null if no grade carries the name
 	 */
 	private function getNoteByBezeichnung($bezeichnung)
 	{
+		if (!is_string($bezeichnung) || trim($bezeichnung) === '') return null;
+
 		$result = $this->_ci->NoteModel->loadWhere(['bezeichnung' => $bezeichnung]);
 		return (!isError($result) && hasData($result)) ? getData($result)[0]->note : null;
 	}

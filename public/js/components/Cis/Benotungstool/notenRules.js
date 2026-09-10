@@ -36,7 +36,8 @@ export const antrittCountStudent = (student, config, notenOptions) => {
 /** Tells you if the student can get one more attempt. */
 export const canAddPruefung = (student, config) => {
 	if (student.verlauf) return student.verlauf.canAdd;
-	return !student.kommPruef && antrittCountStudent(student, config) < maxAntrittCount(config);
+	const hatKommPruef = (student.pruefungen ?? []).some((p) => p.kommissionell);
+	return !hatKommPruef && antrittCountStudent(student, config) < maxAntrittCount(config);
 };
 
 /**

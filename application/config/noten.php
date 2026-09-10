@@ -2,26 +2,18 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-// Noten die keinen Prüfungsantritt verbrauchen. Fallback-PKs; massgeblich sind die per Bezeichnung
-// aufgelösten Noten (NOTEN_OHNE_ANTRITT_BEZEICHNUNGEN), da die PKs je Installation abweichen.
-$config['NOTEN_OHNE_ANTRITT'] = [9, 17]; // tbl_note pk
+// Noten, die keinen Prüfungsantritt verbrauchen.
+$config['NOTEN_OHNE_ANTRITT_BEZEICHNUNGEN'] = ['Noch nicht eingetragen', 'entschuldigt'];
 
-// 'Nicht beurteilt' ist eine Altlast: formal eine Note, inhaltlich keine Leistungsfeststellung.
-// Wird weiterhin häufig vergeben und darf daher keinen Antritt kosten.
-$config['NOTEN_OHNE_ANTRITT_BEZEICHNUNGEN'] = ['Noch nicht eingetragen', 'entschuldigt', 'Nicht beurteilt'];
-
-// Anrechnungsnoten: die Leistung wurde vorab anerkannt, der/die Studierende ist zwar Teil der
-// Lehrveranstaltung, tritt aber zu keiner Prüfung an. Solange die ZEUGNISNOTE eine davon ist, sind
-// für diese Lehrveranstaltung keine Prüfungen möglich. Auflösung wie oben über die Bezeichnung,
-// die PKs sind nur Fallback.
+// Anrechnungsnoten: die Leistung wurde vorab anerkannt.
 $config['NOTEN_ANRECHNUNG_BEZEICHNUNGEN'] = ['angerechnet', 'intern angerechnet'];
-$config['NOTEN_ANRECHNUNG'] = [6, 16]; // tbl_note pk
 
-$config['NOTEN_OCCURANCE_LIMIT_MAP'] = [17 => 1]; // über alle Antritte hinweg nur ein entschuldigt
+// Wie oft eine Note über alle Antritte hinweg vorkommen darf. Schlüssel ist die Bezeichnung.
+$config['NOTEN_OCCURANCE_LIMIT_MAP'] = ['entschuldigt' => 1];
 
-// tbl_note pk of the 'entschuldigt' note. An entschuldigt Termin is preserved as its own dated
-// entry when a new pruefung of the same type is created (instead of being overwritten).
-$config['NOTE_ENTSCHULDIGT'] = 17;
+// Die Note 'entschuldigt'. Ein entschuldigter Termin bleibt als eigene datierte Zeile erhalten,
+// wenn eine neue Prüfung desselben Typs entsteht.
+$config['NOTE_ENTSCHULDIGT_BEZEICHNUNG'] = 'entschuldigt';
 
 // The maximum number of attempts that count, the first attempt and the kommissionelle attempt
 // included. null derives the number from the old flags:
@@ -35,6 +27,12 @@ $config['PRUEFUNG_KOMMISSIONELL_TYPEN'] = ['kommPruef', 'zusKommPruef'];
 
 // The type that the tool writes for the last attempt. The last attempt is always kommissionell.
 $config['PRUEFUNG_TYP_KOMMISSIONELL'] = 'kommPruef';
+
+// The Benotungstool may create the kommissionelle Prüfung itself. Some installations enter it in
+// another tool. The tool SHOWS an existing kommissionelle Prüfung either way; false blocks the
+// creation only: the cell offers no button, and the dialog, the bulk entry and the import refuse
+// the row. The chain then stops one attempt earlier for this tool.
+$config['CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF'] = true;
 
 // Exam types that never use an attempt. A zusKommPruef repeats a kommissionelle Prüfung that had
 // a procedural fault. It stands outside the attempt chain, and the student administration enters
@@ -54,6 +52,11 @@ $config['CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME'] = true;
 // separate buttons/dialogs.
 $config['CIS_GESAMTNOTE_PRUEFUNGSIMPORT'] = true;  // dated import that creates a pruefung per row
 $config['CIS_GESAMTNOTE_NOTENIMPORT'] = false;     // classic note-only import (uid + note, no date)
+
+// The grade column of an imported row. false accepts the note itself (the primary key of
+// lehre.tbl_note) only. true also accepts the shorthand from lehre.tbl_note.anmerkung, which the
+// Excel grade list uses for the special grades ('nb', 'ea', 'en').
+$config['CIS_GESAMTNOTE_IMPORT_NOTENKUERZEL'] = false;
 
 // Noteneintragungsfrist (Prüfungsordnung §1): grade/pruefung entry is only permitted up to this
 // deadline. The month/day below is applied to the studiensemester's year:

@@ -93,7 +93,8 @@ class Noten extends FHCAPI_Controller
 	}
 
 	public function getCisConfig() {
-		// resolved from tbl_note (Bezeichnung) with config fallback -> single source of truth
+		// The configuration names the special grades, tbl_note gives their keys. The client compares
+		// keys, therefore the answer carries the resolved keys, never a Bezeichnung.
 		$special = $this->VerlaufLib->getSpecialNotes();
 		$NOTEN_OHNE_ANTRITT = $special['ohneAntritt'];
 		$NOTEN_OCCURANCE_LIMIT_MAP = $special['limitMap'];
@@ -117,8 +118,9 @@ class Noten extends FHCAPI_Controller
 				// the default column layout ('antritt' or 'datum'); the user can change it in the tool
 				'CIS_GESAMTNOTE_PRUEFUNGSSPALTEN' => $this->config->item('CIS_GESAMTNOTE_PRUEFUNGSSPALTEN'),
 
-				// used to toggle availability of kommPruef type pruefungen
-				'CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF' => CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF,
+				// may this tool CREATE the kommissionelle Prüfung (application/config/noten.php)?
+				// It always shows one that exists.
+				'CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF' => $this->VerlaufLib->darfKommPruefAnlegen(),
 				
 				//technically exists but is never used, could be LE pendant to next flag
 				// 'CIS_GESAMTNOTE_PRUEFUNG_MOODLE_NOTE' => CIS_GESAMTNOTE_PRUEFUNG_MOODLE_NOTE,
@@ -134,6 +136,9 @@ class Noten extends FHCAPI_Controller
 				// true they are shown separately
 				'CIS_GESAMTNOTE_PRUEFUNGSIMPORT' => $this->config->item('CIS_GESAMTNOTE_PRUEFUNGSIMPORT'),
 				'CIS_GESAMTNOTE_NOTENIMPORT' => $this->config->item('CIS_GESAMTNOTE_NOTENIMPORT'),
+
+				// does an imported row accept the shorthand from tbl_note.anmerkung as the grade?
+				'CIS_GESAMTNOTE_IMPORT_NOTENKUERZEL' => (bool) $this->config->item('CIS_GESAMTNOTE_IMPORT_NOTENKUERZEL'),
 				
 				// send a mail when approving grades
 				'CIS_GESAMTNOTE_FREIGABEMAIL_NOTE' => CIS_GESAMTNOTE_FREIGABEMAIL_NOTE,
@@ -975,6 +980,8 @@ class Noten extends FHCAPI_Controller
 			'terminal' => $verlauf->terminal,
 			'erstantrittMoeglich' => $verlauf->erstantrittMoeglich,
 			'naechsteRolle' => $verlauf->naechsteRolle,
+			// the next attempt is kommissionell and this tool may not create it
+			'kommPruefGesperrt' => $verlauf->kommPruefGesperrt,
 			// credited: the row is visible, but you cannot select it and it gets no exams
 			'angerechnet' => $verlauf->angerechnet,
 			'hatLvNote' => $hatLvNote // ungefiltert, also inklusive noch nicht freigegebener
@@ -1003,7 +1010,9 @@ class Noten extends FHCAPI_Controller
 		$pruefungen = $this->VerlaufLib->getPruefungen($student_uid, $lva_id, $stsem);
 		if(count($pruefungen) === 0) return null;
 
-		$verlauf = $this->VerlaufLib->buildVerlauf($pruefungen, null, $zeugnisNote);
+		// the same input as every other caller, so the same rows give the same history
+		$lvRow = $this->getLvGesamtnoteRow($lva_id, $student_uid, $stsem);
+		$verlauf = $this->VerlaufLib->buildVerlauf($pruefungen, $lvRow ? $lvRow->note : null, $zeugnisNote);
 
 		// the record being edited
 		$current = null;
@@ -1050,8 +1059,9 @@ class Noten extends FHCAPI_Controller
 	}
 
 	/**
-	 * Guards a NEW attempt. Rule A is the attempt limit, and nothing follows a final exam. Rule B
-	 * is the chronological order. Rule C is the occurrence limit of a grade.
+	 * Guards a NEW attempt. A blocked kommissionelle Prüfung is refused first. Rule A is the
+	 * attempt limit, and nothing follows a final exam. Rule B is the chronological order. Rule C is
+	 * the occurrence limit of a grade.
 	 *
 	 * @return string|null lokalisierte Fehlermeldung oder null
 	 */
@@ -1069,6 +1079,11 @@ class Noten extends FHCAPI_Controller
 		$lvNote = $lvRow ? $lvRow->note : null;
 
 		$verlauf = $this->VerlaufLib->buildVerlauf($pruefungen, $lvNote, $zeugnisNote);
+
+		// the next attempt is kommissionell, and this tool may not create it
+		if($verlauf->kommPruefGesperrt) {
+			return $this->p->t('benotungstool', 'kommPruefNichtErlaubt', [$student_uid]);
+		}
 
 		// A: the first attempt only materialises the course grade, therefore it adds no attempt
 		if($verlauf->naechsteRolle !== PruefungsverlaufLib::ROLLE_ERSTANTRITT && !$verlauf->canAdd) {
@@ -1129,8 +1144,9 @@ class Noten extends FHCAPI_Controller
 			return $this->p->t('benotungstool', 'c4noteNichtInLehre', [$student_uid]);
 		}
 
-		// as soon as an exam exists the grade belongs to the attempt history and follows its rules
-		if(count($this->VerlaufLib->getPruefungen($student_uid, $lva_id, $stsem)) > 0) {
+		// Antritt 1 und die LV-Note sind dieselbe Leistung, deshalb schreibt dieser Weg sie weiter.
+		// Ab der ersten Wiederholung gehört die Note zum Antritt: dann über den Prüfungsdialog.
+		if($this->VerlaufLib->hatWiederholung($this->VerlaufLib->getPruefungen($student_uid, $lva_id, $stsem))) {
 			return $this->p->t('benotungstool', 'c4notenvorschlagGesperrt', [$student_uid]);
 		}
 
@@ -1142,6 +1158,46 @@ class Noten extends FHCAPI_Controller
 		}
 
 		return null;
+	}
+
+	/**
+	 * Guards the date the user picked for the course grade. The release turns the benotungsdatum
+	 * into the date of the first attempt, therefore the date follows the same rules as an exam
+	 * date. No date at all is permitted: the current moment then applies.
+	 *
+	 * @return string|null a translated error message, or null if the date is permitted
+	 */
+	private function validateBenotungsdatum($datum, $student_uid, $sem_kurzbz)
+	{
+		if($datum === null || $datum === '') return null;
+
+		$tag = substr((string) $datum, 0, 10);
+		$geprueft = DateTime::createFromFormat('Y-m-d', $tag);
+
+		if($geprueft === false || $geprueft->format('Y-m-d') !== $tag) {
+			return $this->p->t('benotungstool', 'benotungsdatumUngueltig', [$student_uid]);
+		}
+
+		// an assessment that did not happen yet has no date
+		if($tag > date('Y-m-d')) {
+			return $this->p->t('benotungstool', 'benotungsdatumInZukunft', [$student_uid]);
+		}
+
+		return $this->pruefungsdatumNachFrist($sem_kurzbz, $tag, $student_uid);
+	}
+
+	/**
+	 * The Lehreinheit of one student in this course. Resolve it once and hand it to every consumer:
+	 * the grading person and the exam row both need it.
+	 *
+	 * @return mixed|null
+	 */
+	private function lehreinheitFuerStudent($lva_id, $student_uid, $stsem)
+	{
+		$resLe = $this->LehrveranstaltungModel->getLeByStudent($student_uid, $stsem, $lva_id);
+		if(isError($resLe) || !hasData($resLe)) return null;
+
+		return current(getData($resLe))->lehreinheit_id;
 	}
 
 	/**
@@ -1228,6 +1284,9 @@ class Noten extends FHCAPI_Controller
 		$note = $result->note;
 		$punkte = $result->punkte;
 
+		// the day the assessment took place. The dialog sends it, older callers do not.
+		$datum = property_exists($result, 'datum') ? $result->datum : null;
+
 		$this->assertLvAccess($lv_id, $sem_kurzbz);
 
 		// examination rules: no entry and no change after the grade entry deadline
@@ -1244,6 +1303,15 @@ class Noten extends FHCAPI_Controller
 
 		$fehler = $this->validateNotenvorschlag($lv_id, $student_uid, $sem_kurzbz, $note);
 		if($fehler !== null) $this->terminateWithError($fehler, 'general');
+
+		$fehler = $this->validateBenotungsdatum($datum, $student_uid, $sem_kurzbz);
+		if($fehler !== null) $this->terminateWithError($fehler, 'general');
+
+		// Der gewählte Tag ist das Datum von Antritt 1, nicht das benotungsdatum. Das benotungsdatum
+		// bleibt der Zeitpunkt der Eingabe, weil die Freigabe es mit dem freigabedatum vergleicht:
+		// ein Tag in der Vergangenheit liesse die geänderte Note als freigegeben erscheinen.
+		$erstantrittDatum = $datum === null || $datum === '' ? date("Y-m-d") : substr((string) $datum, 0, 10);
+		$lvgesamtnote = null;
 
 		$result = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lv_id, $student_uid, $sem_kurzbz);
 
@@ -1296,8 +1364,44 @@ class Noten extends FHCAPI_Controller
 
 			$this->logLib->logInfoDB(array('saveNotenvorschlag insert lv gesamtnote',$res, getAuthUID(), getAuthPersonId()));
 		}
-		
+
+		// Ohne geschriebene LV-Note entsteht kein Antritt: eine Prüfung ohne Note ist ein Zustand,
+		// den jeder andere Pfad ablehnt (c4keineLvNoteEingetragen).
+		if($lvgesamtnote === null) {
+			$this->terminateWithError($this->p->t('benotungstool', 'c4pruefungNichtGespeichert', [$student_uid]), 'general');
+		}
+
+		// The course grade IS the first attempt. Write it as its own exam now, or the next exam
+		// becomes attempt 2 and the legacy type of the whole chain moves one place.
+		$this->erstantrittBeiUebernahme($lv_id, $student_uid, $sem_kurzbz, $note, $punkte, $erstantrittDatum);
+
+		// the client shows the new attempt at once, without a reload
+		$lvgesamtnote->verlauf = $this->buildVerlaufSummary($student_uid, $lv_id, $sem_kurzbz);
+
 		$this->terminateWithSuccess(array($lvgesamtnote));
+	}
+
+	/**
+	 * Writes the first attempt when somebody takes the course grade over, the same way the
+	 * Studierendenverwaltung does it. CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME switches it off.
+	 * A credited transcript grade forbids every exam.
+	 */
+	private function erstantrittBeiUebernahme($lv_id, $student_uid, $sem_kurzbz, $note, $punkte, $datum)
+	{
+		if(!$this->config->item('CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME')) return;
+		if($this->VerlaufLib->istAnrechnungsnote($this->getZeugnisnote($lv_id, $student_uid, $sem_kurzbz))) return;
+
+		// the person who enters the grade picks this date, therefore it also updates attempt 1
+		$lehreinheit_id = $this->lehreinheitFuerStudent($lv_id, $student_uid, $sem_kurzbz);
+
+		$geschrieben = $this->VerlaufLib->upsertErstantritt(
+			$student_uid, $lv_id, $sem_kurzbz, $note, $punkte, $datum,
+			$this->benotenderMitarbeiter($lehreinheit_id), true, $lehreinheit_id
+		);
+
+		if($geschrieben !== null) {
+			$this->logLib->logInfoDB(array('erstantritt (uebernahme)', $student_uid, getAuthUID(), getAuthPersonId()));
+		}
 	}
 
 	/**
@@ -1327,6 +1431,9 @@ class Noten extends FHCAPI_Controller
 		
 		foreach($noten as $note)
 		{
+			// je Zeile neu: sonst trägt die Variable die Zeile davor, und eine gescheiterte Zeile
+			// meldet die Note der vorherigen Person zurück
+			$lvgesamtnote = null;
 
 			$result = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lv_id, $note->uid, $sem_kurzbz);
 //			$this->addMeta($note->uid.'$result', $result);
@@ -1389,6 +1496,17 @@ class Noten extends FHCAPI_Controller
 
 				$this->logLib->logInfoDB(array('saveNotenvorschlagBulk insert lv gesamtnote',$res, getAuthUID(), getAuthPersonId()));
 			}
+
+			// Ohne geschriebene LV-Note entsteht kein Antritt, und die Zeile meldet den Fehler
+			if($lvgesamtnote === null) {
+				$retLvNoten[$note->uid] = $this->p->t('benotungstool', 'c4pruefungNichtGespeichert', [$note->uid]);
+				continue;
+			}
+
+			// the same rule as the single dialog: the course grade is attempt 1
+			$this->erstantrittBeiUebernahme($lv_id, $note->uid, $sem_kurzbz, trim($note->note), $note->punkte, date("Y-m-d"));
+
+			$lvgesamtnote->verlauf = $this->buildVerlaufSummary($note->uid, $lv_id, $sem_kurzbz);
 
 			$retLvNoten[$note->uid] = $lvgesamtnote;
 		}
@@ -1534,51 +1652,19 @@ class Noten extends FHCAPI_Controller
 	{
 		if($this->VerlaufLib->istAnrechnungsnote($this->getZeugnisnote($lva_id, $student_uid, $stsem))) return;
 
-		$pruefungen = $this->VerlaufLib->getPruefungen($student_uid, $lva_id, $stsem);
-		if(count($pruefungen) > 1) return;
+		// The release makes the grade binding. It moves no date: an exam keeps the date it carries,
+		// and attempt 1 keeps the date that the person picked while entering the grade. Only a
+		// missing attempt 1 is created, and it is dated on the benotungsdatum.
+		$lehreinheit_id = $this->lehreinheitFuerStudent($lva_id, $student_uid, $stsem);
 
-		$jetzt = date("Y-m-d H:i:s");
-
-		if(count($pruefungen) === 1) {
-			$this->LePruefungModel->update(
-				$pruefungen[0]->pruefung_id,
-				array(
-					'note' => $note,
-					'punkte' => $punkte,
-					'datum' => $datum,
-					'updateamum' => $jetzt,
-					'updatevon' => getAuthUID()
-				)
-			);
-
-			$this->logLib->logInfoDB(array('erstantritt aktualisiert (freigabe)', $student_uid, getAuthUID(), getAuthPersonId()));
-			return;
-		}
-
-		// the server finds the lehreinheit_id; it does not use the value from the client
-		$resLe = $this->LehrveranstaltungModel->getLeByStudent($student_uid, $stsem, $lva_id);
-		if(isError($resLe) || !hasData($resLe)) return;
-		$le = current(getData($resLe));
-
-		$this->LePruefungModel->insert(
-			array(
-				'lehreinheit_id' => $le->lehreinheit_id,
-				'student_uid' => $student_uid,
-				'mitarbeiter_uid' => $this->benotenderMitarbeiter($le->lehreinheit_id),
-				'note' => $note,
-				'punkte' => $punkte,
-				'pruefungstyp_kurzbz' => $this->VerlaufLib->legacyTypFuerAntritt(1),
-				'datum' => $datum,
-				'anmerkung' => "",
-				'insertamum' => $jetzt,
-				'insertvon' => getAuthUID(),
-				'updateamum' => null,
-				'updatevon' => null,
-				'ext_id' => null
-			)
+		$geschrieben = $this->VerlaufLib->upsertErstantritt(
+			$student_uid, $lva_id, $stsem, $note, $punkte, $datum,
+			$this->benotenderMitarbeiter($lehreinheit_id), false, $lehreinheit_id
 		);
 
-		$this->logLib->logInfoDB(array('erstantritt angelegt (freigabe)', $student_uid, getAuthUID(), getAuthPersonId()));
+		if($geschrieben !== null) {
+			$this->logLib->logInfoDB(array('erstantritt (freigabe)', $student_uid, getAuthUID(), getAuthPersonId()));
+		}
 	}
 
 	/**

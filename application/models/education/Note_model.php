@@ -12,24 +12,19 @@ class Note_model extends DB_Model
 		$this->pk = 'note';
 	}
 	
+	// Sorted like the grade list of the Stv
+	// scale 1-5 by its value first, every other grade alphabetically after it.
 	public function getAllActive() {
 		$qry ="SELECT *
 			FROM lehre.tbl_note
-			WHERE aktiv = true";
+			WHERE aktiv = true
+			ORDER BY CASE WHEN note BETWEEN 1 AND 5 THEN 0 ELSE 1 END,
+				CASE WHEN note BETWEEN 1 AND 5 THEN note END,
+				bezeichnung";
 		
 		return $this->execReadOnlyQuery($qry);
 	}
 	
-	// used to determine the primary key of note "entschuldigt" to avoid hardcoded magic numbers
-	// that might differ in a different installation of fhcomplete
-	public function getEntschuldigtNote() {
-		$qry ="SELECT *
-			FROM lehre.tbl_note
-			WHERE bezeichnung = 'entschuldigt'";
-
-		return $this->execReadOnlyQuery($qry);
-	}
-
 	// used to determine the primary key of note "noch nicht eingetragen" to avoid hardcoded magic numbers
 	// that might differ in a different installation of fhcomplete
 	public function getNochNichtEingetragenNote() {

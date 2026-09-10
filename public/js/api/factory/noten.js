@@ -42,11 +42,13 @@ export default {
 			params: { password, noten, lv_id, sem_kurzbz }
 		};
 	},
-	saveNotenvorschlag(lv_id, sem_kurzbz, student_uid, note, punkte = null) {
+	// datum: das gewählte Benotungsdatum (YYYY-MM-DD). Ohne Wert nimmt der Server den aktuellen
+	// Zeitpunkt. Die Freigabe macht daraus das Datum des ersten Antritts.
+	saveNotenvorschlag(lv_id, sem_kurzbz, student_uid, note, punkte = null, datum = null) {
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/Noten/saveNotenvorschlag',
-			params: { lv_id, sem_kurzbz, student_uid, note, punkte }
+			params: { lv_id, sem_kurzbz, student_uid, note, punkte, datum }
 		};
 	},
 	// kein Termintyp mehr: welchen Antritt die Prüfung darstellt, leitet der Server aus dem
