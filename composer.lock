@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "146d2d3708e44cf5966be727e54c0a48",
+    "content-hash": "b4b62f4f36c3a83aef8f767375003082",
     "packages": [
         {
             "name": "afarkas/html5shiv",
@@ -951,10 +951,10 @@
         },
         {
             "name": "fortawesome/font-awesome6",
-            "version": "6.1.1",
+            "version": "6.7.2",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/6.1.1.zip"
+                "url": "https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/6.7.2.zip"
             },
             "type": "library"
         },
@@ -1447,10 +1447,10 @@
         },
         {
             "name": "npm-asset/primeicons",
-            "version": "5.0.0",
+            "version": "6.0.1",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/primeicons/-/primeicons-5.0.0.tgz"
+                "url": "https://registry.npmjs.org/primeicons/-/primeicons-6.0.1.tgz"
             },
             "type": "npm-asset",
             "license": [
@@ -2461,16 +2461,16 @@
         },
         {
             "name": "phpmetrics/phpmetrics",
-            "version": "v2.9.1",
+            "version": "v2.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpmetrics/PhpMetrics.git",
-                "reference": "e2e68ddd1543bc3f44402c383f7bccb62de1ece3"
+                "reference": "55c5e23b34afb8fa9b6c6ea95cbd59b710160235"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpmetrics/PhpMetrics/zipball/e2e68ddd1543bc3f44402c383f7bccb62de1ece3",
-                "reference": "e2e68ddd1543bc3f44402c383f7bccb62de1ece3",
+                "url": "https://api.github.com/repos/phpmetrics/PhpMetrics/zipball/55c5e23b34afb8fa9b6c6ea95cbd59b710160235",
+                "reference": "55c5e23b34afb8fa9b6c6ea95cbd59b710160235",
                 "shasum": ""
             },
             "require": {
@@ -2519,7 +2519,7 @@
             ],
             "support": {
                 "issues": "https://github.com/PhpMetrics/PhpMetrics/issues",
-                "source": "https://github.com/phpmetrics/PhpMetrics/tree/v2.9.1"
+                "source": "https://github.com/phpmetrics/PhpMetrics/tree/v2.11.0"
             },
             "funding": [
                 {
@@ -2527,7 +2527,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-09-25T05:21:02+00:00"
+            "time": "2026-08-09T06:58:42+00:00"
         },
         {
             "name": "phpspec/prophecy",
@@ -3699,16 +3699,16 @@
         },
         {
             "name": "sebastian/recursion-context",
-            "version": "3.0.3",
+            "version": "3.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/recursion-context.git",
-                "reference": "8fe7e75986a9d24b4cceae847314035df7703a5a"
+                "reference": "4d3432ab12baebb4da6b7ad65d92847287f593b8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/recursion-context/zipball/8fe7e75986a9d24b4cceae847314035df7703a5a",
-                "reference": "8fe7e75986a9d24b4cceae847314035df7703a5a",
+                "url": "https://api.github.com/repos/sebastianbergmann/recursion-context/zipball/4d3432ab12baebb4da6b7ad65d92847287f593b8",
+                "reference": "4d3432ab12baebb4da6b7ad65d92847287f593b8",
                 "shasum": ""
             },
             "require": {
@@ -3750,7 +3750,7 @@
             "homepage": "http://www.github.com/sebastianbergmann/recursion-context",
             "support": {
                 "issues": "https://github.com/sebastianbergmann/recursion-context/issues",
-                "source": "https://github.com/sebastianbergmann/recursion-context/tree/3.0.3"
+                "source": "https://github.com/sebastianbergmann/recursion-context/tree/3.0.4"
             },
             "funding": [
                 {
@@ -3770,7 +3770,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-08-10T05:25:53+00:00"
+            "time": "2026-08-11T05:21:46+00:00"
         },
         {
             "name": "sebastian/resource-operations",
