@@ -11,9 +11,6 @@ export default {
 	mixins: [
 		AbstractWidget
 	],
-	inject: [
-		"timezone"
-	],
 	methods: {
 		getPromiseFunc(start, end) {
 			return [
@@ -27,6 +24,6 @@ export default {
 	},
 	template: /*html*/`
 	<div class="dashboard-widget-lvplan d-flex flex-column h-100">
-		<fhc-calendar :timezone="timezone" :get-promise-func="getPromiseFunc" />
+		<fhc-calendar :get-promise-func="getPromiseFunc" />
 	</div>`
 }

@@ -41,5 +41,24 @@ export default {
 			method: 'get',
 			url: '/api/frontend/v1/phrasen/getAllLanguages'
 		};
-	}
+	},
+	getPhrases(phrasesGroupedByCategory, languages = []) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/phrasen/getPhrases',
+			params: {
+				phrasesGroupedByCategory,
+				languages,
+			},
+		};
+	},
+	getTabulatorPhrases(languages = []) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/phrasen/getTabulatorPhrases',
+			params: {
+				languages: JSON.stringify(languages),
+			},
+		};
+	},
 };

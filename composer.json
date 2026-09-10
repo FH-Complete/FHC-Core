@@ -73,6 +73,18 @@
 		{
 			"type": "package",
 			"package": {
+				"name": "drag-drop-touch-js/dragdroptouch",
+				"version": "2.0.3",
+				"source": {
+					"url": "https://github.com/drag-drop-touch-js/dragdroptouch.git",
+					"type": "git",
+					"reference": "master"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
 				"name": "fgelinas/timepicker",
 				"version": "0.3.3",
 				"source": {
@@ -97,9 +109,9 @@
 			"type": "package",
 			"package": {
 				"name": "fortawesome/font-awesome6",
-				"version": "6.1.1",
+				"version": "6.7.2",
 				"dist": {
-					"url": "https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/6.1.1.zip",
+					"url": "https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/6.7.2.zip",
 					"type": "zip"
 				}
 			}
@@ -452,9 +464,11 @@
 
 		"easyrdf/easyrdf": "0.9.*",
 
+		"drag-drop-touch-js/dragdroptouch": "*",
+
 		"fgelinas/timepicker": "0.3.3",
 		"fortawesome/font-awesome4": "4.7.*",
-		"fortawesome/font-awesome6": "6.1.*",
+		"fortawesome/font-awesome6": "6.7.*",
 		"fzaninotto/faker": "1.*",
 		"firebase/php-jwt": "^6.0",
 
@@ -482,7 +496,7 @@
 		"netcarver/textile": "3.7.*",
 		"nicolaskruchten/pivottable": "2.23.0",
 		"npm-asset/primevue": "3.29.1",
-		"npm-asset/primeicons": "5.0.0",
+		"npm-asset/primeicons": "6.0.1",
 
 		"olifolkerd/tabulator4": "4.9.*",
 		"olifolkerd/tabulator5": "5.5.*",
@@ -519,5 +533,9 @@
 		"phpmetrics/phpmetrics": "2.*",
 		"sebastian/phpcpd": "3.*",
 		"phpunit/phpunit": "^6"
+	},
+	"scripts": {
+		"post-install-cmd": "@symlink_vendor_to_public",
+		"symlink_vendor_to_public": "ln -sfn ../vendor ./public/"
 	}
 }

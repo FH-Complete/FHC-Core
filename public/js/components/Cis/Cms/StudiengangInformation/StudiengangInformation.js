@@ -29,51 +29,51 @@ components:{
 },
 template:/*html*/`
 		<div id="fhc-studiengang-informationen">
-		<template v-if="studiengang?.bezeichnung && semester">
-			<div class="card card-body mb-3 border-0">
-				<div class="mb-1">
-					<h2 class="h4 mb-1 pb-0">{{$p.t('lehre','studiengang')}}:</h2>
-					<span class="mb-1">{{studiengang?.bezeichnung}}</span>
-				</div>
-				<div class="mb-1">
-					<h2 class="h4 mb-1 pb-0">Moodle:</h2>
-					<a class="fhc-link-color mb-1" target="_blank" :href="moodleLink">{{studiengang?.kurzbzlang}}</a>
-				</div>
-				<div :class="{'mb-1':studiengang?.zusatzinfo_html}">
-					<h2 class="h4 mb-1 pb-0">{{$p.t('lehre','studiensemester')}}: </h2>
-					<span class="mb-1">{{semester}}</span>
-				</div>
-				<div class="zusatzinfo" v-if="studiengang?.zusatzinfo_html" v-html="studiengang?.zusatzinfo_html"></div>
-			</div>
-		</template>
-		<template v-for="{title, collection} in collection_array">
-			<template v-if="Array.isArray(collection)  && collection.length !==0">
-				<h2 class="h5 text-truncate">{{title}}</h2>
-				<template v-if="displayWidget">
-					<div class="d-flex flex-wrap flex-row mb-3 gap-2">
-						<template v-for="person in collection">
-							<studiengang-person displayWidget v-bind="person"></studiengang-person>
-						</template>
+			<template v-if="studiengang?.bezeichnung && semester">
+				<div class="card card-body mb-3 border-0">
+					<div class="mb-1">
+						<h2 class="h4 mb-1 pb-0">{{$p.t('lehre','studiengang')}}:</h2>
+						<span class="mb-1">{{studiengang?.bezeichnung}}</span>
 					</div>
-				</template>
-				<template v-else>
-					<template v-for="person in collection">
-						<div class="mb-3">
-							<studiengang-person v-bind="person"></studiengang-person>
+					<div class="mb-1">
+						<h2 class="h4 mb-1 pb-0">Moodle:</h2>
+						<a class="fhc-link-color mb-1" target="_blank" :href="moodleLink">{{studiengang?.kurzbzlang}}</a>
+					</div>
+					<div :class="{'mb-1':studiengang?.zusatzinfo_html}">
+						<h2 class="h4 mb-1 pb-0">{{$p.t('lehre','studiensemester')}}: </h2>
+						<span class="mb-1">{{semester}}</span>
+					</div>
+					<div class="zusatzinfo" v-if="studiengang?.zusatzinfo_html" v-html="studiengang?.zusatzinfo_html"></div>
+				</div>
+			</template>
+			<template v-for="{title, collection} in collection_array">
+				<template v-if="Array.isArray(collection)  && collection.length !==0">
+					<h2 class="h5 text-truncate">{{title}}</h2>
+					<template v-if="displayWidget">
+						<div class="d-flex flex-wrap flex-row mb-3 gap-2">
+							<template v-for="person in collection">
+								<studiengang-person displayWidget v-bind="person"></studiengang-person>
+							</template>
 						</div>
+					</template>
+					<template v-else>
+						<template v-for="person in collection">
+							<div class="mb-3">
+								<studiengang-person v-bind="person"></studiengang-person>
+							</div>
+						</template>
 					</template>
 				</template>
 			</template>
-		</template>
-		<template v-if="hochschulvertr && Array.isArray(hochschulvertr) && hochschulvertr.length >0">
-			<studiengang-vertretung showBezeichnung :title="$p.t('studiengangInformation', 'Hochschulvertretung')" :vertretungsList="hochschulvertr"></studiengang-vertretung>
-		</template>
-		<template v-if="stdv && Array.isArray(stdv) && stdv.length >0">
-			<studiengang-vertretung :title="$p.t('studiengangInformation', 'Studienvertretung').concat(studiengang.kurzbzlang??'')" :vertretungsList="stdv"></studiengang-vertretung>
-		</template>
-		<template v-if="jahrgangsvertr && Array.isArray(jahrgangsvertr) && jahrgangsvertr.length >0">
-			<studiengang-vertretung :title="$p.t('studiengangInformation', 'Jahrgangsvertretung')" :vertretungsList="jahrgangsvertr"></studiengang-vertretung>
-		</template>
+			<template v-if="hochschulvertr && Array.isArray(hochschulvertr) && hochschulvertr.length >0">
+				<studiengang-vertretung showBezeichnung :title="$p.t('studiengangInformation', 'Hochschulvertretung')" :vertretungsList="hochschulvertr"></studiengang-vertretung>
+			</template>
+			<template v-if="stdv && Array.isArray(stdv) && stdv.length >0">
+				<studiengang-vertretung :title="$p.t('studiengangInformation', 'Studienvertretung').concat(studiengang?.kurzbzlang??'')" :vertretungsList="stdv"></studiengang-vertretung>
+			</template>
+			<template v-if="jahrgangsvertr && Array.isArray(jahrgangsvertr) && jahrgangsvertr.length >0">
+				<studiengang-vertretung :title="$p.t('studiengangInformation', 'Jahrgangsvertretung')" :vertretungsList="jahrgangsvertr"></studiengang-vertretung>
+			</template>
 		</div>
 	
 `,

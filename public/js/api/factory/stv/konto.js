@@ -38,6 +38,10 @@ export default {
 		};
 	},
 	insert(params) {
+		if(params.betrag)
+		{
+			params.betrag = params.betrag.replace(',', '.');
+		}
 		return {
 			method: 'post',
 			url: 'api/frontend/v1/stv/konto/insert',
@@ -52,6 +56,10 @@ export default {
 		};
 	},
 	edit(params) {
+		if(params.betrag)
+		{
+			params.betrag = params.betrag.replace(',', '.');
+		}
 		return {
 			method: 'post',
 			url: 'api/frontend/v1/stv/konto/update',
@@ -65,10 +73,14 @@ export default {
 			params: { buchungsnr }
 		};
 	},
-	getBuchungstypen() {
+	getBuchungstypen(studiensemester_kurzbz) {
+		let url = 'api/frontend/v1/stv/konto/getBuchungstypen'
+		if (!!studiensemester_kurzbz)
+			url = url + '/' + encodeURIComponent(studiensemester_kurzbz);
+
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/stv/konto/getBuchungstypen'
+			url: url
 		};
-	}
+	},
 };

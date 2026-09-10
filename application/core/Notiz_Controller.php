@@ -417,6 +417,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		$notiz_id = $this->input->post('notiz_id');
 
 		$this->NotizModel->addSelect('campus.tbl_dms_version.*');
+		$this->NotizModel->addSelect($this->NotizModel->escape(base_url('content/notizdokdownload.php?id=')) . ' || public.tbl_notiz_dokument.dms_id AS preview');
 
 		$this->NotizModel->addJoin('public.tbl_notiz_dokument', 'ON (public.tbl_notiz_dokument.notiz_id = public.tbl_notiz.notiz_id)');
 		$this->NotizModel->addJoin('campus.tbl_dms_version', 'ON (public.tbl_notiz_dokument.dms_id = campus.tbl_dms_version.dms_id)');

@@ -22,8 +22,9 @@ unset($config['student']['searchfields']['email']);
 unset($config['student']['searchfields']['tel']);
 $config['student']['resultfields'] = [
 	"s.student_uid AS uid",
-	"s.matrikelnr",
+	"s.matrikelnr AS personenkennzeichen",
 	"p.person_id",
+	"p.matr_nr AS matrikelnummer",
 	"(p.vorname || ' ' || p.nachname) AS name",
 	"ARRAY[s.student_uid || '@' || '" . DOMAIN . "'] AS email",
 	"CASE

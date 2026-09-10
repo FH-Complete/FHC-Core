@@ -111,7 +111,7 @@ export function useEventLoader(rangeInterval, getPromiseFunc) {
 		return mergePromiseArr(getPromiseFunc(start, end), result);
 	};
 
-	Vue.watchEffect(() => {
+	const reload = () => {
 		const range = Vue.toValue(rangeInterval);
 		if (!(range instanceof luxon.Interval))
 			return;
@@ -132,7 +132,18 @@ export function useEventLoader(rangeInterval, getPromiseFunc) {
 					}
 				})
 			});
-	})
+	};
 
-	return { events: allEvents, lv }
+	Vue.watchEffect(reload);
+	
+	const reset = () => {
+		loading_id = 0;
+		events.value = [];
+		loadingEvents.value = [];
+		eventsLoaded.splice(0, eventsLoaded.length);
+
+		reload();
+	}
+
+	return { events: allEvents, lv, reset }
 }

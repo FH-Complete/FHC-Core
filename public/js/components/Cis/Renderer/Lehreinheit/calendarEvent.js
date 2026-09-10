@@ -3,6 +3,11 @@ export default {
 		event: {
 			type: Object,
 			required: true
+		},
+		timeSlotDisplayBehavior: {
+			type: String,
+			default: "default",
+			// options: default, always, never 
 		}
 	},
 	computed:{
@@ -31,7 +36,7 @@ export default {
 						this.event.lektor.slice(0, 3).map(lektor => lektor.kurzbz).join("\n")
 						+ "\n" + this.$p.t('lehre/weitereLektoren', [this.event.lektor.length - 3])
 					].join(": "));
-				} else {;
+				} else {
 					tooltipArray.push([
 						this.$p.t('lehre/lektor'),
 						this.event.lektor.map(lektor => lektor.kurzbz).join("\n")
@@ -50,7 +55,17 @@ export default {
 			return luxon.Duration
 				.fromISOTime(this.event.ende)
 				.toISOTime({ suppressSeconds: true });
-		}
+		},
+		timeSlotDisplayClasses() {
+			switch (this.$props.timeSlotDisplayBehavior) {
+				case "always":
+					return "d-grid";
+				case "never":
+					return "d-none";
+				default:
+					return "d-none d-xl-grid";
+			}
+		},
 	},
 	template: /*html*/`
 	<div
@@ -58,8 +73,9 @@ export default {
 		@wheel.stop
 	>
 		<div
-			v-if="!event.allDayEvent && event?.beginn && event?.ende"
-			class="event-time d-none d-xl-grid h-100"
+			v-if="!event?.allDayEvent && event?.beginn && event?.ende"
+			:class="timeSlotDisplayClasses"
+			class="event-time h-100"
 		>
 			<span>{{ start }}</span>
 			<span>{{ end }}</span>

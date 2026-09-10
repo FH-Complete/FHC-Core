@@ -30,10 +30,11 @@ export default {
 				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
-					{title: "Typ", field: "type", width: 100},
+					{title: "Typ", field: "type", width: 100, headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
 					{
 						title: "Betrag",
 						field: "betrag1",
+						headerFilter: true,
 						formatter: function(cell) {
 							let value = cell.getValue();
 							if (value == null) {
@@ -41,28 +42,29 @@ export default {
 							}
 							return parseFloat(value).toFixed(2);
 						}},
-					{title: "Bezeichnung", field: "bezeichnung", width: 150},
-					{title: "Studiensemester", field: "studiensemester_kurzbz",  width: 160},
-					{title: "mitarbeiter_uid", field: "mitarbeiter_uid", visible: false},
-					{title: "projektarbeit_id", field: "projektarbeit_id", visible: false},
-					{title: "lehreinheit_id", field: "lehreinheit_id", visible: true},
-					{title: "betreuerart_kurzbz", field: "betreuerart_kurzbz", visible: false},
-					{title: "Vertragsstunden", field: "vertragsstunden", visible: false},
-					{title: "vertrag_id", field: "vertrag_id", visible: false}, //just for testing
+					{title: "Bezeichnung", field: "bezeichnung", width: 150, headerFilter: true},
+					{title: "Studiensemester", field: "studiensemester_kurzbz",  width: 160, headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
+					{title: "mitarbeiter_uid", field: "mitarbeiter_uid", visible: false, headerFilter: true},
+					{title: "projektarbeit_id", field: "projektarbeit_id", visible: false, headerFilter: true},
+					{title: "lehreinheit_id", field: "lehreinheit_id", visible: true, headerFilter: true},
+					{title: "betreuerart_kurzbz", field: "betreuerart_kurzbz", visible: false, headerFilter: true},
+					{title: "Vertragsstunden", field: "vertragsstunden", visible: false, headerFilter: true},
+					{title: "vertrag_id", field: "vertrag_id", visible: false, headerFilter: true}, //just for testing
 					{
 						title: "VertragsstundenStudiensemester",
 						field: "vertragsstunden_studiensemester_kurzbz",
-						visible: false
+						visible: false,
+						headerFilter: true
 					},
 				],
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
-				height: 150,
+				height: 250,
 				selectableRowsRangeMode: 'click',
 				selectableRows: true,
 				selectableRowsRollingSelection: false, //only allow multiselect with STRG
 				index: "lehreinheit_id",
-				persistenceID: 'core-contracts-unassigned-2026021701'
+				persistenceID: 'core-contracts-unassigned-2026050501'
 			},
 			tabulatorEvents: [
 				{
@@ -100,7 +102,7 @@ export default {
 
 							setHeader('type', this.$p.t('global', 'typ'));
 							setHeader('bezeichnung', this.$p.t('ui', 'bezeichnung'));
-							setHeader('lehreinheit_id', this.$p.t('ui', 'lehreinheit_id'));
+							setHeader('lehreinheit_id', this.$p.t('lehre', 'lehreinheit_id'));
 							setHeader('betrag1', this.$p.t('ui', 'betrag'));
 							setHeader('studiensemester_kurzbz', this.$p.t('lehre', 'studiensemester'));
 							setHeader('mitarbeiter_uid', this.$p.t('ui', 'mitarbeiter_uid'));

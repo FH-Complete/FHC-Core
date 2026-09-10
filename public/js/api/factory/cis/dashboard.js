@@ -19,7 +19,7 @@ export default {
 	getViewData() {
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/Cis4FhcApi/getViewData'
+			url: '/api/frontend/v1/Cis4FhcApi/dashboardViewData'
 		};
 	}
 };

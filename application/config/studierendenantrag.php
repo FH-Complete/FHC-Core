@@ -168,3 +168,40 @@ $config['stgkz_blacklist_wiederholung'] = [];
  * @var array           An array of noten ids
  */
 $config['note_blacklist_wiederholung'] = [];
+
+/**
+ *  Enable/disable the Abmeldung StG process
+ *
+ * @var bool
+ */
+$config['abmeldung_stg_enabled'] = true;
+
+/**
+ *  Enable/disable the Abmeldung process
+ *
+ * @var bool
+ */
+$config['abmeldung_enabled'] = true;
+
+/**
+ *  Enable/disable the Unterbrecher process
+ *
+ * @var bool
+ */
+$config['unterbrechung_enabled'] = true;
+
+/**
+ *  Enable/disable the Wiederholer process
+ *
+ * @var bool
+ */
+$config['wiederholung_enabled'] = true;
+
+/**
+ * Modal with Infotext of TLC
+ * if true, there will be shown an info modal in the studentsView after the first button ABMELDUNG
+ *
+ * @var boolean
+ */
+$config['showInfoModalAbmeldung'] = true;
+

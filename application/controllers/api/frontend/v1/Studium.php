@@ -62,21 +62,36 @@ class Studium extends FHCAPI_Controller
 
 		if($this->getDataOrTerminateWithError($this->StudentModel->isStudent(getAuthUID()))){
 			$studentLehrverband =$this->StudentlehrverbandModel->loadWhere(["student_uid" => getAuthUID(), "studiensemester_kurzbz" => $aktuelles_studiensemester->studiensemester_kurzbz]);
-			$studentLehrverband = current($this->getDataOrTerminateWithError($studentLehrverband));
-			
-			$student_studiensemester = $studentLehrverband->studiensemester_kurzbz;
-			$student_studiengang = $studentLehrverband->studiengang_kz;
-			$student_semester = $studentLehrverband->semester;
+
+			//TODO(Manu) check if use Fallback or just comment out all paramschecks?
+			//add Fallback: if no LehrverbandData of actual semester, get Data of previous one
+			if(!hasData($studentLehrverband))
+			{
+				$result= $this->StudiensemesterModel->getPreviousFrom($aktuelles_studiensemester->studiensemester_kurzbz);
+
+				$data = $this->getDataOrTerminateWithError($result);
+				$vorheriges_studiensemester = current($data)->studiensemester_kurzbz;
+				$studentLehrverband =$this->StudentlehrverbandModel->loadWhere(["student_uid" => getAuthUID(), "studiensemester_kurzbz" => $vorheriges_studiensemester]);
+			}
+			$studentLehrverband = current(getData($studentLehrverband));
+
 			$student_studienplan = $this->getStudienPlanFromPrestudentStatus(getAuthPersonId())->studienplan_id;
 			
-			if(!isset($parameter_studiensemester))
-			$parameter_studiensemester = $student_studiensemester;
-			if(!isset($parameter_studiengang))
-			$parameter_studiengang = $student_studiengang;
-			if(!isset($parameter_semester))
-			$parameter_semester = $student_semester;
+			if(!isset($parameter_studiensemester)) {
+				$student_studiensemester = $studentLehrverband->studiensemester_kurzbz;
+				$parameter_studiensemester = $student_studiensemester;
+			}
+			if(!isset($parameter_studiengang)) {
+				$student_studiengang = $studentLehrverband->studiengang_kz;
+				$parameter_studiengang = $student_studiengang;
+			}
+			if(!isset($parameter_semester)) {
+				$student_semester = $studentLehrverband->semester;
+				$parameter_semester = $student_semester;
+			}
 			if(!isset($parameter_studienplan))
-			$parameter_studienplan = $student_studienplan;
+				$parameter_studienplan = $student_studienplan;
+
 		}  
 
 		if(isset($parameter_studiensemester)){
@@ -96,8 +111,7 @@ class Studium extends FHCAPI_Controller
 
 		// fetch studiensemester
 		$allStudienSemester = $this->getDataOrTerminateWithError($this->StudiensemesterModel->load());
-		
-		
+
 		if(isset($parameter_studiensemester) && !empty(array_filter($allStudienSemester, function($studiensemester) use($parameter_studiensemester){
 			return $studiensemester->studiensemester_kurzbz == $parameter_studiensemester->studiensemester_kurzbz;
 		}))){
@@ -153,7 +167,9 @@ class Studium extends FHCAPI_Controller
 		if($aktuelles_studienplan){
 			$lehrveranstaltungen = $this->computeStudienplanLehrveranstaltungen($aktuelles_studienplan->studienplan_id, $aktuelles_semester);
 			foreach($lehrveranstaltungen as $lehrv){
-				foreach($lehrv->lehrveranstaltungen as $lv){
+				// a lehrveranstaltung without a modul has no children and gets its lektoren directly
+				$lvs = isset($lehrv->lehrveranstaltungen) ? $lehrv->lehrveranstaltungen : [$lehrv];
+				foreach($lvs as $lv){
 					$lvLektoren =$this->computeLektorenFromLehrveranstaltung($lv->lehrveranstaltung_id,$aktuelles_semester, $aktuelles_studiengang->studiengang_kz, $aktuelles_studiensemester->studiensemester_kurzbz);
 					$lv->lektoren = $lvLektoren;
 				}
@@ -216,6 +232,8 @@ class Studium extends FHCAPI_Controller
 		$studienplaene = array_map(function($studienplan){
 			$orgform = current($this->getDataOrTerminateWithError($this->OrgformModel->loadWhere(["orgform_kurzbz" => $studienplan->orgform_kurzbz])));
 			$studienplan->orgform_bezeichnung = $orgform->bezeichnung;
+			// bezeichnung_mehrsprachig
+			$studienplan->orgform_bezeichnung_english = $orgform->bezeichnung_mehrsprachig[1];
 			return $studienplan;
 		},$studienplaene);
 		return $studienplaene;
@@ -270,6 +288,7 @@ SELECT tbl_lehrveranstaltung.*,
 		$lehrveranstaltungen = $this->LehrveranstaltungModel->execReadOnlyQuery($query,[$studienplan_id, $semester]);
 		
 		$lehrveranstaltungen = $this->getDataOrTerminateWithError($lehrveranstaltungen);
+		
 		usort($lehrveranstaltungen, function($a, $b){
 			if($a->lehrtyp_kurzbz == "modul"){
 				return -1;
@@ -286,11 +305,16 @@ SELECT tbl_lehrveranstaltung.*,
 			}
 			else{
 				$parent =array_filter($carry, function($item)use($lehrv){
-					return $item->studienplan_lehrveranstaltung_id == $lehrv->studienplan_lehrveranstaltung_id_parent;
+					return isset($item->lehrveranstaltungen)
+						&& $item->studienplan_lehrveranstaltung_id == $lehrv->studienplan_lehrveranstaltung_id_parent;
 				});
 				$parent = current($parent);
 				if($parent){
 					$parent->lehrveranstaltungen[] = $lehrv;
+				}
+				else{
+					// lehrveranstaltung without a modul: keep it on the top level
+					array_push($carry, $lehrv);
 				}
 			}
 			return $carry;

@@ -29,7 +29,7 @@ $config['ALLOWED_NOTEN_ABGABETOOL'] = [10, 14]; // tbl_note pk
 // benotete projektarbeiten sperren weitere terminanlage & bearbeitung, diese noten sind ausnahmen dieser Regel
 // wie zB "Nicht beurteilt" & "Noch nicht eingetragen"
 $config['NONFINAL_NOTEN_ABGABETOOL'] = [9];
-$config['beurteilung_link_fallback'] = 'addons/fhtw/content/projektbeurteilung/projektbeurteilungDocumentExport.php?projektarbeit_id=?&betreuerart_kurzbz=?&person_id=?';
+$config['beurteilung_link_fallback'] = 'cis/private/lehre/projektbeurteilungDocumentExport.php?projektarbeit_id=?&betreuerart_kurzbz=?&person_id=?';
 
 $config['PROJEKTARBEITSBEURTEILUNG_MAIL_BASELINK_ERSTBEGUTACHTER'] = 'index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/ProjektarbeitsbeurteilungErstbegutachter';
 $config['PROJEKTARBEITSBEURTEILUNG_MAIL_BASELINK_ZWEITBEGUTACHTER'] = 'index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/ProjektarbeitsbeurteilungErstbegutachter';
@@ -38,8 +38,19 @@ $config['SIGNATUR_CHECK_PAABGABETYPEN'] = ['end'];
 
 // to be used as "https://moodle.technikum-wien.at/course/view.php?idnumber=dl{$stg_kz}" for stg specific moodle routing
 $config['STG_MOODLE_LINK'] = 'https://moodle.technikum-wien.at/course/view.php?idnumber=dl';
+// TODO: check if these links change if the file changes and how to better retrieve the link?
+$config['SIGNATUR_INFO_LINK_GERMAN'] = 'https://cis.technikum-wien.at/cms/dms.php?id=214779'; 
+$config['SIGNATUR_INFO_LINK_ENGLISH'] = 'https://cis.technikum-wien.at/cms/dms.php?id=264256';
 
 $config['ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT'] = true;
 $config['ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER'] = true;
 
 $config['BETREUER_SAMMELMAIL_BUTTON_STUDENT'] = true;
+
+$config['MULTIEDIT_TABLE'] = true;
+
+$config['STUDENT_EDIT_PROJEKTARBEIT_TITLE'] = true;
+
+$config['CONFETTI_ON_ENDUPLOAD'] = true;
+
+
