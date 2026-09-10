@@ -204,7 +204,7 @@ class Student_model extends DB_Model
 
 		Events::trigger(
 			'generate_student_uid',
-			function ($value) use ($uid) {
+			function ($value) use (&$uid) {
 				$uid = $value;
 			},
 			$stgkzl,

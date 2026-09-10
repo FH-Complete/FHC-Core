@@ -121,7 +121,7 @@ class vertrag extends basis_db
 											JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 										WHERE
 											vertrag_id=tbl_vertrag.vertrag_id
-											AND studiensemester_kurzbz in (SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE start>=".$this->db_add_param($datum).")
+											AND studiensemester_kurzbz in (SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE start>".$this->db_add_param($datum).")
 								)
 						)";
 		}
