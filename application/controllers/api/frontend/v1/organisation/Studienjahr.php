@@ -24,7 +24,8 @@ class Studienjahr extends FHCAPI_Controller
 		parent::__construct(
 			array(
 				'getAll' => self::PERM_LOGGED,
-				'getNext' => self::PERM_LOGGED
+				'getNext' => self::PERM_LOGGED,
+				'getAktNext' => self::PERM_LOGGED
 			)
 		);
 		// Load model StudiensemesterModel
@@ -76,5 +77,33 @@ class Studienjahr extends FHCAPI_Controller
 		}
 
 		$this->terminateWithSuccess(current(getData($result)));
+	}
+
+	public function getAktNext()
+	{
+		$this->StudienjahrModel->addJoin('public.tbl_studiensemester', 'studienjahr_kurzbz');
+		$this->StudienjahrModel->addOrder('ende');
+		$this->StudienjahrModel->addLimit(1);
+
+		$result = $this->StudienjahrModel->loadWhere([
+			'start <=' => 'NOW()',
+			'ende >=' => 'NOW()'
+		]);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		if (!$data) {
+			$this->StudienjahrModel->addJoin('public.tbl_studiensemester', 'studienjahr_kurzbz');
+			$this->StudienjahrModel->addOrder('ende');
+			$this->StudienjahrModel->addLimit(1);
+
+			$result = $this->StudienjahrModel->loadWhere([
+				'ende >=' => 'NOW()'
+			]);
+
+			$data = $this->getDataOrTerminateWithError($result);
+		}
+
+		$this->terminateWithSuccess(current($data));
 	}
 }
