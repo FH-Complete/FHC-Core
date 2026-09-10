@@ -62,3 +62,16 @@
     top:13%;"
     z-index: 104; font-size: 1rem; width: 2.5rem; height: 2.5rem; opacity:0; transition: opacity 0.2s; top:13%;"
 }*/
+
+.tag-hover:hover {
+    background-color: #e9ecef;
+}
+
+.green {
+    background-color: #e9ecef;
+}
+
+.btn-hover {
+    --bs-btn-hover-bg: #e9ecef; /* Neue Hintergrundfarbe beim Hover */
+    --bs-btn-hover-border-color: #e9ecef; /* Neue Rahmenfarbe beim Hover */
+}
