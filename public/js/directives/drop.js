@@ -16,6 +16,11 @@ const EFFECTS = [
 
 export default {
 	mounted(el, binding) {
+		// A DOM node can be reused while Vue replaces directive bindings. Tear
+		// down a stale binding before installing the new one.
+		if (typeof el.fhcDropCleanup === 'function')
+			el.fhcDropCleanup();
+
 		if (!binding.arg) {
 			binding.arg = 'none';
 		} else if (typeof binding.arg === 'object' && !Array.isArray(binding.arg)) {
@@ -51,6 +56,11 @@ export default {
 
 		const bcc = new BroadcastChannel('fhc-dnd');
 		let allowed = false;
+		let cleanedUp = false;
+		const release = () => {
+			if (!cleanedUp)
+				bcc.postMessage('release');
+		};
 
 		function onEnter(evt) {
 			allowed = eventHasTypes(evt, allowedTypes, strict);
@@ -61,7 +71,7 @@ export default {
 		}
 		function onLeave(evt, wasDropped) {
 			if (allowed && !wasDropped) {
-				bcc.postMessage('release');
+				release();
 			}
 		}
 		function onOver(evt) {
@@ -80,11 +90,11 @@ export default {
 
 			if (res instanceof Promise) {
 				res.then(r => {
-					bcc.postMessage('release');
+					release();
 					return r;
 				});
 			} else {
-				bcc.postMessage('release');
+				release();
 			}
 		}
 
@@ -92,13 +102,23 @@ export default {
 		el.addEventListener('dragover', onOver);
 		el.addEventListener('drop', onDrop);
 		el.fhcDropCleanup = () => {
+			if (cleanedUp)
+				return;
+			if (allowed)
+				bcc.postMessage('release');
+			cleanedUp = true;
+			allowed = false;
+
 			cleanupEnterLeave();
 			el.removeEventListener('dragover', onOver);
 			el.removeEventListener('drop', onDrop);
+			bcc.onmessage = null;
+			bcc.close?.();
 		};
 	},
 	beforeUnmount(el) {
-		el.fhcDropCleanup();
+		if (typeof el.fhcDropCleanup === 'function')
+			el.fhcDropCleanup();
 		delete el.fhcDropCleanup;
 	}
 }

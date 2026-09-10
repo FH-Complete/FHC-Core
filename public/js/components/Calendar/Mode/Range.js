@@ -44,8 +44,10 @@ export default {
 			);
 		},
 		range() {
-			let first = this.$props.currentDate;
-			let last = first.plus({ days: this.rangeLength });
+			const first = this.$props.currentDate.startOf("day");
+			const last = first
+				.plus({ days: Math.max(Number(this.rangeLength) - 1, 0) })
+				.endOf("day");
 
 			return luxon.Interval.fromDateTimes(first, last);
 		},

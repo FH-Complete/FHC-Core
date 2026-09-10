@@ -298,8 +298,20 @@ function bindDragEnterLeave(el, onEnter, onLeave) {
 
 	let skipLeave = false;
 	let skipLeaveParent = true;
+	let active = false;
+	let disposed = false;
+
+	function removeGlobalListeners() {
+		window.removeEventListener('dragenter', globalDragenter, true);
+		window.removeEventListener('dragleave', globalDragleave, true);
+		window.removeEventListener('drop', globalDrop, true);
+	}
 
 	function init(evt) {
+		if (disposed || active)
+			return;
+
+		active = true;
 		skipLeave = false;
 		skipLeaveParent = true;
 		// add global listeners
@@ -313,14 +325,18 @@ function bindDragEnterLeave(el, onEnter, onLeave) {
 	}
 
 	function cleanup(evt, wasDropped) {
+		if (!active)
+			return;
+
+		active = false;
 		// remove global listeners
-		window.removeEventListener('dragenter', globalDragenter, true);
-		window.removeEventListener('dragleave', globalDragleave, true);
-		window.removeEventListener('drop', globalDrop, true);
+		removeGlobalListeners();
 		// call leave
-		onLeave(evt, wasDropped);
+		if (!disposed)
+			onLeave(evt, wasDropped);
 		// add init
-		el.addEventListener('dragenter', init);
+		if (!disposed)
+			el.addEventListener('dragenter', init);
 	}
 
 	function globalDragenter(evt) {
@@ -352,8 +368,10 @@ function bindDragEnterLeave(el, onEnter, onLeave) {
 	el.addEventListener('dragenter', init);
 
 	return () => {
-		// cleanup
+		disposed = true;
+		active = false;
 		el.removeEventListener('dragenter', init);
+		removeGlobalListeners();
 	}
 }
 

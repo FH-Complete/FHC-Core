@@ -21,6 +21,11 @@ const EFFECTS = [
 
 export default {
 	mounted(el, binding) {
+		// A DOM node can be reused while Vue replaces directive bindings. Tear
+		// down a stale binding before installing the new one.
+		if (typeof el.fhcDraggableCleanup === 'function')
+			el.fhcDraggableCleanup();
+
 		updateValue(el, binding.value);
 		updateEffectAllowed(el, binding.arg);
 
@@ -33,6 +38,7 @@ export default {
 
 		const bcc = new BroadcastChannel('fhc-dnd');
 		let blocked = false;
+		let cleanedUp = false;
 
 		function onStart(evt) {
 			const value = el.dataset.fhcDraggableValue;
@@ -77,8 +83,14 @@ export default {
 		el.addEventListener('dragend', onEnd, true);
 
 		el.fhcDraggableCleanup = () => {
+			if (cleanedUp)
+				return;
+			cleanedUp = true;
+
 			el.removeEventListener('dragstart', onStart, binding.modifiers.capture);
 			el.removeEventListener('dragend', onEnd, true);
+			bcc.onmessage = null;
+			bcc.close?.();
 			if (el.dataset.fhcDraggableValue) {
 				delete el.dataset.fhcDraggableValue;
 			}
@@ -96,7 +108,8 @@ export default {
 		}
 	},
 	beforeUnmount(el) {
-		el.fhcDraggableCleanup();
+		if (typeof el.fhcDraggableCleanup === 'function')
+			el.fhcDraggableCleanup();
 		delete el.fhcDraggableCleanup;
 	}
 }
