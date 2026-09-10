@@ -469,6 +469,7 @@ export default {
 						:tabulator-options="betriebsmittel_table_options"
 						tableOnly
 						:sideMenu="false"
+						:isUsingPresets="true"
                     />
                 </div>
             </div>

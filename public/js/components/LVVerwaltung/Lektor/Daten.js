@@ -140,7 +140,7 @@ export default{
 					{
 						this.$emit('changedLektor', this.changed.mitarbeiter_uid);
 					}
-					if (this.changed.semesterstunden || this.changed.stundensatz)
+					else if (this.changed.semesterstunden || this.changed.stundensatz)
 					{
 						this.$emit('changedCosts');
 					}
@@ -182,9 +182,6 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError)
 		},
 
-	},
-	created() {
-		this.getLektorData()
 	},
 	template: `
 		<core-form ref="form" @submit.prevent="updateDaten">
