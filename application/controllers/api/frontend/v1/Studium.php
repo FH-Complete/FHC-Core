@@ -167,7 +167,9 @@ class Studium extends FHCAPI_Controller
 		if($aktuelles_studienplan){
 			$lehrveranstaltungen = $this->computeStudienplanLehrveranstaltungen($aktuelles_studienplan->studienplan_id, $aktuelles_semester);
 			foreach($lehrveranstaltungen as $lehrv){
-				foreach($lehrv->lehrveranstaltungen as $lv){
+				// a lehrveranstaltung without a modul has no children and gets its lektoren directly
+				$lvs = isset($lehrv->lehrveranstaltungen) ? $lehrv->lehrveranstaltungen : [$lehrv];
+				foreach($lvs as $lv){
 					$lvLektoren =$this->computeLektorenFromLehrveranstaltung($lv->lehrveranstaltung_id,$aktuelles_semester, $aktuelles_studiengang->studiengang_kz, $aktuelles_studiensemester->studiensemester_kurzbz);
 					$lv->lektoren = $lvLektoren;
 				}
@@ -286,6 +288,7 @@ SELECT tbl_lehrveranstaltung.*,
 		$lehrveranstaltungen = $this->LehrveranstaltungModel->execReadOnlyQuery($query,[$studienplan_id, $semester]);
 		
 		$lehrveranstaltungen = $this->getDataOrTerminateWithError($lehrveranstaltungen);
+		
 		usort($lehrveranstaltungen, function($a, $b){
 			if($a->lehrtyp_kurzbz == "modul"){
 				return -1;
@@ -302,11 +305,16 @@ SELECT tbl_lehrveranstaltung.*,
 			}
 			else{
 				$parent =array_filter($carry, function($item)use($lehrv){
-					return $item->studienplan_lehrveranstaltung_id == $lehrv->studienplan_lehrveranstaltung_id_parent;
+					return isset($item->lehrveranstaltungen)
+						&& $item->studienplan_lehrveranstaltung_id == $lehrv->studienplan_lehrveranstaltung_id_parent;
 				});
 				$parent = current($parent);
 				if($parent){
 					$parent->lehrveranstaltungen[] = $lehrv;
+				}
+				else{
+					// lehrveranstaltung without a modul: keep it on the top level
+					array_push($carry, $lehrv);
 				}
 			}
 			return $carry;
