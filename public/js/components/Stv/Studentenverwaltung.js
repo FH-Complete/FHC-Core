@@ -18,6 +18,7 @@
 import CoreSearchbar from "../searchbar/searchbar.js";
 import NavLanguage from "../navigation/Language.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
+import HorizontalSplit from "../horizontalsplit/horizontalsplit.js";
 import AppMenu from "../AppMenu.js";
 import AppConfig from "../AppConfig.js";
 import StvVerband from "./Studentenverwaltung/Verband.js";
@@ -26,8 +27,8 @@ import StvDetails from "./Studentenverwaltung/Details.js";
 import StvStudiensemester from "./Studentenverwaltung/Studiensemester.js";
 
 import ApiSearchbar from "../../api/factory/searchbar.js";
+import ApiTreemenu from "../../api/factory/treemenu.js";
 import ApiStv from "../../api/factory/stv.js";
-import ApiStvVerband from '../../api/factory/stv/verband.js';
 import ApiStvConfig from '../../api/factory/stv/config.js';
 
 
@@ -37,6 +38,7 @@ export default {
 		CoreSearchbar,
 		NavLanguage,
 		VerticalSplit,
+		HorizontalSplit,
 		AppMenu,
 		AppConfig,
 		StvVerband,
@@ -53,11 +55,7 @@ export default {
 		avatarUrl: String,
 		logoutUrl: String,
 		activeAddons: String, // semicolon separated list of active addons
-		url_studiensemester_kurzbz: String,
-		url_mode: String,
-		url_prestudent_id: String,
-		url_tab: String,
-		url_studiengang: String
+		authUid: String
 	},
 	provide() {
 		return {
@@ -91,7 +89,9 @@ export default {
 			hasZGVMasterPermission: this.permissions['student/editMakkZgv'],
 			hasZGVDoctorPermission: this.permissions['student/editDokZgv'],
 			hasBismeldenPermission: this.permissions['student/editBismelden'],
-
+			authUid: this.authUid,
+			language: Vue.computed(() => this.$p.user_language),
+			isMobile: false,
 		}
 	},
 	data() {
@@ -140,7 +140,6 @@ export default {
 				mergeResults: 'person'
 			},
 			studiengangKz: undefined,
-			studiengangKuerzel: '',
 			studiensemesterKurzbz: this.defaultSemester,
 			selected_semester: undefined,
 			selected_orgform: undefined,
@@ -149,7 +148,6 @@ export default {
 				sprachen: [],
 				geschlechter: []
 			},
-			verbandEndpoint: ApiStvVerband,
 			filter: []
 		}
 	},
@@ -192,33 +190,110 @@ export default {
 			}
 
 			return extraItems;
+		},
+		appMenuLvPlanungItems() {
+			const extraItems = [];
+
+			if (this.studiengangKz !== undefined && this.selected_semester !== undefined) {
+				const studiengang_kz = String(this.studiengangKz);
+				const semester = String(this.selected_semester);
+				const orgform = this.selected_orgform || '';
+
+				extraItems.push({
+					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+						+ 'content/statistik/lvplanung.xls.php?'
+						+ '&studiengang_kz=' + studiengang_kz
+						+ '&semester=' + semester
+						+ '&studiensemester_kurzbz=' + this.studiensemesterKurzbz
+						+ '&orgform_kurzbz=' + orgform,
+					description: 'stv/lvplanung_xls'
+				});
+				extraItems.push({
+					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+						+ 'content/statistik/lvplanung.php?'
+						+ '&studiengang_kz=' + studiengang_kz
+						+ '&semester=' + semester,
+					description: 'stv/lvplanung_html'
+				});
+			}
+
+			return extraItems;
+		},
+		appMenuBisItems() {
+			const extraItems = [];
+
+			if (this.studiengangKz !== undefined) {
+				const studiengang_kz = String(this.studiengangKz);
+
+				extraItems.push({
+					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+						+ 'vilesci/bis/studentenmeldung.php?'
+						+ 'stg_kz=' + studiengang_kz,
+					description: 'stv/bis_stud_meldung'
+				});
+				extraItems.push({
+					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+						+ 'system/checkStudenten.php?'
+						+ 'stg_kz=' + studiengang_kz,
+					description: 'stv/bis_stud_plausicheck'
+				});
+			}
+
+			return extraItems;
+		},
+		linkRt(){
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root + '/vilesci/stammdaten/reihungstestverwaltung.php'
+		},
+		selected_uid(){
+			return this.selected?.[this.selected.length - 1]?.uid ?? null;
+		},
+		linkGradeList(){
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root + 'index.ci.php/person/gradelist/index/' + this.selected_uid
+		},
+		listEndpoint() {
+			if (['index', 'stdsem'].includes(this.$route.name))
+				return null;
+
+			if (this.$route.params.query) {
+				return ApiStv.students.search({
+					searchstr: this.$route.params.query,
+					types: this.$route.params.types?.split('+') || []
+				}, this.$route.params.stdsem);
+			}
+
+			let url = 'stdsem/' + this.$route.params.stdsem + '/';
+			
+			if (this.$route.params.treemenu) {
+				url += this.$route.params.treemenu.join('/');
+				return ApiTreemenu.data('stv', url);
+			}
+			
+			const paramName = Object.keys(this.$route.params).find(k => k != 'stdsem');
+			if (paramName) {
+				url += this.$route.name + '/' + this.$route.params[paramName];
+				return ApiTreemenu.data('stv', url);
+			}
+
+			return null;
+		},
+		studiengangKuerzel() {
+			if (!this.lists?.stgs)
+				return '';
+
+			const stg = this.lists.stgs
+				.find(stg => stg.studiengang_kz == this.studiengangKz);
+			
+			if (stg)
+				return (stg.typ + stg.kurzbz).toUpperCase();
+			
+			return '';
 		}
 	},
 	watch: {
-		'url_studiensemester_kurzbz': function (newVal, oldVal) {
-			if (newVal !== oldVal) {
-				this.studiensemesterKurzbz = newVal;
-				if(this.$route.name === 'search')
-				{
-					this.handleSearchUrl();
-				}
-				else
-				{
-					this.$refs.stvList.updateUrl();
-					this.$refs.details.reload();
-				}
+		listEndpoint(n, o) {
+			if (n != o) {
+				this.$refs.stvList.updateUrl(n || []);
 			}
-		},
-		'url_studiengang': function (newVal, oldVal) {
-			if (newVal !== oldVal) {
-				this.checkUrlStudiengang();
-			}
-		},
-		'url_mode': function () {
-			this.handlePersonUrl();
-		},
-		url_prestudent_id() {
-			this.handlePersonUrl();
 		},
 		'appconfig.font_size'() {
 			// add to html class
@@ -234,6 +309,15 @@ export default {
 						tabulators[0].searchRows().forEach(row => row.normalizeHeight());
 					}
 				}
+			}
+		},
+		sidebarCollapsed(newVal) {
+			if(newVal) this.$refs.hSplit.collapseLeft()
+			else this.$refs.hSplit.showBoth()
+		},
+		studiengangKz(newVal, oldVal) {
+			if (newVal !== oldVal) {
+				this.$refs.stvList.clearSelection();
 			}
 		}
 	},
@@ -272,48 +356,35 @@ export default {
 				);
 		},
 		onSelectVerband({ link, studiengang_kz, semester, orgform_kurzbz }) {
-			let urlpath = String(link);
-			if (!urlpath.match(/\/prestudent/))
-			{
-				urlpath = 'CURRENT_SEMESTER' + '/' + urlpath;
-			}
-			this.$refs.stvList.updateUrl(ApiStv.students.verband(urlpath));
-
 			this.studiengangKz = studiengang_kz;
 			this.selected_semester = semester;
 			this.selected_orgform = orgform_kurzbz;
-			const stg = this.lists.stgs.find((element) => {
-				return (element.studiengang_kz === this.studiengangKz);
-			});
-			if (stg)
-			{
-				this.studiengangKuerzel = (stg.typ + stg.kurzbz).toUpperCase()
-				this.$router.push({
-					name: 'studiengang',
-					params: {
-						studiensemester_kurzbz: this.studiensemesterKurzbz,
-						studiengang: this.studiengangKuerzel
-					}
-				});
-			} else
-			{
-				this.studiengangKuerzel = '';
-				this.$router.push({
-					name: 'studiensemester',
-					params: {
-						studiensemester_kurzbz: this.studiensemesterKurzbz
-					}
-				});
-		}
-		},
-		studiensemesterChanged(v) {
-			this.studiensemesterKurzbz = v;
 
 			this.$router.push({
+				name: 'treemenu',
 				params: {
-					studiensemester_kurzbz: v
+					treemenu: link.split('/')
 				}
 			});
+		},
+		studiensemesterChanged(stdsem) {
+			if (!stdsem) {
+				// no valid studiensemester in url
+				this.$router.replace({
+					params: {
+						stdsem: this.defaultSemester.toLowerCase()
+					}
+				});
+				return;
+			}
+			if (stdsem.toLowerCase() != this.studiensemesterKurzbz?.toLowerCase()) {
+				this.$router.push({
+					params: {
+						stdsem: stdsem.toLowerCase()
+					}
+				});
+			}
+			this.studiensemesterKurzbz = stdsem;
 		},
 		reloadList() {
 			this.$refs.stvList.reload();
@@ -321,128 +392,63 @@ export default {
 		searchfunction(params, config) {
 			return this.$api.call(ApiSearchbar.searchStv(params), config);
 		},
-		handlePersonUrl() {
-			if (this.$route.params.id) {
-				this.$refs.stvList.updateUrl(
-					ApiStv.students.uid(this.$route.params.id, 'CURRENT_SEMESTER'),
-					true
-					);
-			} else if (this.$route.params.prestudent_id) {
-				this.$refs.stvList.updateUrl(
-					ApiStv.students.prestudent(this.$route.params.prestudent_id, 'CURRENT_SEMESTER'),
-					true
-					);
-			} else if (this.$route.params.person_id) {
-				this.$refs.stvList.updateUrl(
-					ApiStv.students.person(this.$route.params.person_id, 'CURRENT_SEMESTER'),
-					true
-					);
-			} else if (this.$route.params.searchstr) {
-				this.handleSearchUrl();
-			}
-			else
-			{
-				this.clearTabulator();
-			}
-		},
-		handleSearchUrl() {
-			const searchsettings = {
-				searchstr: this.$route.params.searchstr,
-				types: this.$route.params.types?.split('+') || []
-			};
-
-			// init into student list
-			this.$refs.stvList.updateUrl(
-				ApiStv.students.search(searchsettings, this.studiensemesterKurzbz)
-			);
-
-			// init into searchbar
-			this.$refs.searchbar.searchsettings.searchstr = searchsettings.searchstr;
-			this.$refs.searchbar.searchsettings.types = searchsettings.types;
-			this.$nextTick(this.blurSearchbar);
-		},
-		clearTabulator() {
-			if(['index', 'studiensemester'].includes(this.$route.name))
-			{
-				if(this.$refs?.stvList?.$refs?.table?.tabulator)
-				{
-					this.$refs.stvList.$refs.table.tabulator.setData([]);
-				}
-			}
-		},
-		checkUrlStudiengang() {
-			if (this.url_studiengang) {
-				const stg = this.lists.stgs.find((element) => {
-					const kuerzel = (element.typ + element.kurzbz).toUpperCase();
-					return (this.url_studiengang === kuerzel);
-				});
-				if (stg) {
-					this.studiengangKz = stg.studiengang_kz;
-					this.studiengangKuerzel = (stg.typ + stg.kurzbz).toUpperCase();
-				} else {
-					this.$router.replace({
-						name: 'studiensemester',
-						params: {
-							studiensemester_kurzbz: this.studiensemesterKurzbz
-						}
-					});
-				}
-			}
-			else
-			{
-				this.studiengangKz = undefined;
-				this.studiengangKuerzel = '';
-				this.clearTabulator();
-			}
-		},
 		onSearch(e) {
-			this.deleteCustomFilter();
 			const searchsettings = { ...this.$refs.searchbar.searchsettings };
+
 			if (searchsettings.searchstr.length >= 2) {
-				this.blurSearchbar();
+				this.deleteCustomFilter();
 				
 				if (!searchsettings.types.length || searchsettings.types.length == this.$refs.searchbar.types.length) {
 					this.$router.push({
 						name: 'search',
 						params: {
-							studiensemester_kurzbz: this.studiensemesterKurzbz,
-							searchstr: searchsettings.searchstr
+							query: searchsettings.searchstr
 						}
 					});
 				} else {
 					this.$router.push({
-						name: 'search_w_types',
+						name: 'searchtypes',
 						params: {
-							studiensemester_kurzbz: this.studiensemesterKurzbz,
-							searchstr: searchsettings.searchstr,
+							query: searchsettings.searchstr,
 							types: searchsettings.types.join('+')
 						}
 					});
 				}
 			}
 		},
-		blurSearchbar() {
-			this.$refs.searchbar.$refs.input.blur();
-			this.$refs.searchbar.abort();
-			this.$refs.searchbar.hideresult();
-		},
 		handleCustomFilter(filter){
 			this.filter = filter;
 		},
 		deleteCustomFilter(){
 			this.$refs.stvList.resetFilter();
+		},
+		showAlertNoSelectedStudent(){
+			this.$fhcAlert.alertError(this.$p.t('ui', 'alert_chooseStudent'));
+		},
+		showAlertMultipleStudents() {
+			this.$fhcAlert.alertError(this.$p.t('ui', 'alert_chooseOnlyOneStudent'));
+		},
+		showAlertNoGroupChosen(){
+			this.$fhcAlert.alertError(this.$p.t('ui', 'alert_chooseGroupSem'));
+		},
+		showAlertNoDegreeProgramChosen(){
+			this.$fhcAlert.alertError(this.$p.t('ui', 'alert_chooseDegreeProgram'));
+		},
+		showMenu(refName) {
+			bootstrap.Dropdown.getOrCreateInstance(this.$refs[refName]).show();
+		},
+		hideMenu(refName) {
+			bootstrap.Dropdown.getOrCreateInstance(this.$refs[refName]).hide();
 		}
 	},
 	created() {
-		if (!this.url_studiensemester_kurzbz) {
+		if (!this.$route.params.stdsem) {
 			this.$router.replace({
-				name: 'studiensemester',
+				name: 'stdsem',
 				params: {
-					studiensemester_kurzbz: this.defaultSemester
+					stdsem: this.defaultSemester.toLowerCase()
 				}
 			});
-		} else {
-			this.studiensemesterKurzbz = this.url_studiensemester_kurzbz;
 		}
 
 		this.$api
@@ -478,7 +484,6 @@ export default {
 			.then(result => {
 				this.lists.stgs = result.data;
 				this.lists.active_stgs = this.lists.stgs.filter(stg => stg.aktiv);
-				this.checkUrlStudiengang();
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
@@ -505,7 +510,8 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	mounted() {
-		this.handlePersonUrl();
+		if (this.listEndpoint)
+			this.$refs.stvList.updateUrl(this.listEndpoint);
 	},
 	template: /* html */`
 		<div class="stv" :class="{ 'sidebar-collapsed': sidebarCollapsed }">
@@ -606,19 +612,30 @@ export default {
 					</div>
 					<div class="offcanvas-body">
 						<app-menu app-identifier="stv">
-							<li class="dropend">
+							<li :class="{ dropend: appMenuExtraItems.length }"
+								@mouseenter="appMenuExtraItems.length && showMenu('gradeReportToggle')"
+								@mouseleave="appMenuExtraItems.length && hideMenu('gradeReportToggle')"
+							>
 								<a
+									ref="gradeReportToggle"
+									v-if="appMenuExtraItems.length"
 									class="dropdown-toggle"
 									href="#"
 									role="button"
 									data-bs-toggle="dropdown"
 									aria-expanded="false"
-									:class="{ disabled: !appMenuExtraItems.length }"
 									data-bs-popper-config='{"strategy":"fixed"}'
 								>
 									{{ $p.t('stv/grade_report') }}
 								</a>
-								<ul class="dropdown-menu p-0">
+								<a
+									v-else
+									href="#"
+									@click.prevent="showAlertNoGroupChosen"
+									>
+										{{ $p.t('stv/grade_report') }}
+								</a>
+								<ul v-if="appMenuExtraItems.length" class="dropdown-menu p-0">
 									<li
 										v-for="(item, key) in appMenuExtraItems"
 										:key="key"
@@ -629,26 +646,120 @@ export default {
 									</li>
 								</ul>
 							</li>
+							<li :class="{ dropend: appMenuLvPlanungItems.length }"
+								@mouseenter="appMenuLvPlanungItems.length && showMenu('lvPlanungToggle')"
+								@mouseleave="appMenuLvPlanungItems.length && hideMenu('lvPlanungToggle')"
+							>
+								<a
+									ref="lvPlanungToggle"
+									v-if="appMenuLvPlanungItems.length"
+									class="dropdown-toggle"
+									href="#"
+									role="button"
+									data-bs-toggle="dropdown"
+									aria-expanded="false"
+									data-bs-popper-config='{"strategy":"fixed"}'
+									>
+										{{ $p.t('stv/lvplanung') }}
+								</a>
+								<a
+									v-else
+									href="#"
+									@click.prevent="showAlertNoGroupChosen"
+								>
+									{{ $p.t('stv/lvplanung') }}
+								</a>
+								<ul v-if="appMenuLvPlanungItems.length" class="dropdown-menu p-0">
+									<li
+										v-for="(item, key) in appMenuLvPlanungItems"
+										:key="key"
+									>
+										<a class="dropdown-item" :href="item.link" target="_blank">
+											{{ $p.t(item.description) }}
+										</a>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<a :href="linkRt" target="_blank">
+									{{ $p.t('stv/RTVerwaltung') }}
+								</a>
+							</li>
+							<li>
+								<a v-if="selected.length === 1" :href="linkGradeList" target="_blank">
+									{{ $p.t('stv/studienverlauf') }}
+								</a>
+								<a v-else-if="selected.length === 0" href="#" @click.prevent="showAlertNoSelectedStudent">
+									{{ $p.t('stv/studienverlauf') }}
+								</a>
+								<a v-else href="#" @click.prevent="showAlertMultipleStudents">
+									{{ $p.t('stv/studienverlauf') }}
+								</a>
+							</li>
+
+							<li :class="{ dropend: appMenuBisItems.length }"
+								@mouseenter="appMenuBisItems.length && showMenu('bisToggle')"
+								@mouseleave="appMenuBisItems.length && hideMenu('bisToggle')"
+							>
+								<a
+									ref="bisToggle"
+									v-if="appMenuBisItems.length"
+									class="dropdown-toggle"
+									href="#"
+									role="button"
+									data-bs-toggle="dropdown"
+									aria-expanded="false"
+									data-bs-popper-config='{"strategy":"fixed"}'
+									>
+										{{ $p.t('stv/bis_stud') }}
+								</a>
+								<a
+									v-else
+									href="#"
+									@click.prevent="showAlertNoDegreeProgramChosen"
+								>
+									{{ $p.t('stv/bis_stud') }}
+								</a>
+								<ul v-if="appMenuBisItems.length" class="dropdown-menu p-0">
+									<li
+										v-for="(item, key) in appMenuBisItems"
+										:key="key"
+									>
+										<a class="dropdown-item" :href="item.link" target="_blank">
+											{{ $p.t(item.description) }}
+										</a>
+									</li>
+								</ul>
+							</li>
+
 						</app-menu>
 					</div>
 				</aside>
-				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">
-					<div class="offcanvas-header justify-content-end px-1 d-md-none">
-						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
-					</div>
-					<stv-verband :preselectedKey="studiengangKz ? '' + studiengangKz : null" :endpoint="verbandEndpoint" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
-					<stv-studiensemester v-model:studiensemester-kurzbz="studiensemesterKurzbz" @update:studiensemester-kurzbz="studiensemesterChanged"></stv-studiensemester>
-				</nav>
-				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
-					<vertical-split>
-						<template #top>
-							<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz" @filterActive="handleCustomFilter"></stv-list>
-						</template>
-						<template #bottom>
-							<stv-details ref="details" :students="selected" @reload="reloadList"></stv-details>
-						</template>
-					</vertical-split>
-				</main>
+
+				<horizontal-split ref="hSplit" :defaultRatio="[15, 85]">
+					<template #left>
+						<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100  w-100">
+							<div class="offcanvas-header justify-content-end px-1 d-md-none">
+								<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
+							</div>
+							<stv-verband :preselected-key="$route.params.treemenu" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
+							<stv-studiensemester :studiensemester-kurzbz="$route.params.stdsem || defaultSemester" @update:studiensemester-kurzbz="studiensemesterChanged"></stv-studiensemester>
+						</nav>
+					</template>
+					<template #right>
+						<main>
+							<vertical-split :defaultRatio="[50, 50]">
+								<template #top>
+									<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz" @filter-active="handleCustomFilter"></stv-list>
+								</template>
+								<template #bottom>
+									<stv-details ref="details" :students="selected" @reload="reloadList"></stv-details>
+								</template>
+							</vertical-split>
+						</main>
+					</template>
+				</horizontal-split>
+
 			</div>
 		</div>
 		<app-config ref="config" v-model="appconfig" :endpoints="configEndpoints"></app-config>
