@@ -88,7 +88,7 @@ export default {
 			this.data = {
 				buchungstyp_kurzbz: '',
 				betrag: '-0.00',
-				buchungsdatum: new Date(),
+				buchungsdatum: luxon.DateTime.now().setZone(FHC_JS_DATA_STORAGE_OBJECT.timezone).toISODate(),
 				buchungstext: '',
 				mahnspanne: 30,
 				studiensemester_kurzbz: this.currentSemester,
@@ -154,6 +154,7 @@ export default {
 				<form-input
 					type="DatePicker"
 					v-model="data.buchungsdatum"
+					model-type="yyyy-MM-dd"
 					name="buchungsdatum"
 					:label="$p.t('konto/buchungsdatum')"
 					:enable-time-picker="false"
