@@ -259,7 +259,7 @@ class BetriebsmittelP extends FHCAPI_Controller
 		$kaution = $this->input->post('kaution');
 		if($kaution) $kaution = str_replace(',', '.', $kaution);
 		$ausgegebenam = $this->input->post('ausgegebenam');
-		$retouram = $this->input->post('retouram');
+		$retouram = $this->input->post('retouram') == "" ? null : $this->input->post('retouram');
 
 		// NOTE(chris): transform_kartennummer
 		if ($betriebsmitteltyp == 'Zutrittskarte' && $nummer)

@@ -148,7 +148,7 @@ class Zeugnisnote_model extends DB_Model
 	 *
 	 * @return object
 	 */
-	public function getZeugnisnoten($student_uid, $studiensemester_kurzbz)
+	public function getZeugnisnoten($student_uid, $studiensemester_kurzbz, $lehrveranstaltung_id = null)
 	{
 		$params = array();
 		$where='';
@@ -163,6 +163,11 @@ class Zeugnisnote_model extends DB_Model
 			$where.=" AND vw_student_lehrveranstaltung.studiensemester_kurzbz= ?";
 			$params[] = $studiensemester_kurzbz;
 		}
+		if($lehrveranstaltung_id != null)
+		{
+			$where .= " AND vw_student_lehrveranstaltung.lehrveranstaltung_id = ?";
+			$params[] = $lehrveranstaltung_id;
+		}
 
 		$where2='';
 
@@ -176,6 +181,11 @@ class Zeugnisnote_model extends DB_Model
 			$where2 .= " AND studiensemester_kurzbz= ?";
 			$params[] = $studiensemester_kurzbz;
 		}
+		if($lehrveranstaltung_id != null)
+		{
+			$where2 .=" AND lehrveranstaltung_id = ?";
+			$params[] = $lehrveranstaltung_id;
+		}
 
 		$qry = "SELECT
 			a.*,
@@ -188,7 +198,10 @@ class Zeugnisnote_model extends DB_Model
 			lv.semester AS semester_lv,
 			lv.ects AS ects_lv,
 			lv.zeugnis,
-			lv.bezeichnung_english AS lehrveranstaltung_bezeichnung_english
+			lv.bezeichnung_english AS lehrveranstaltung_bezeichnung_english,
+			s.verband,
+			person.vorname,
+			person.nachname
 		FROM (
 			SELECT vw_student_lehrveranstaltung.lehrveranstaltung_id, uid,
 				   vw_student_lehrveranstaltung.studiensemester_kurzbz, note, punkte, uebernahmedatum, benotungsdatum,
@@ -231,6 +244,8 @@ class Zeugnisnote_model extends DB_Model
 			ORDER BY sort
 		) a
 		LEFT JOIN public.tbl_student s ON (a.uid = s.student_uid)
+		LEFT JOIN public.tbl_benutzer benutzer ON benutzer.uid = s.student_uid
+		LEFT JOIN public.tbl_person person ON benutzer.person_id = person.person_id
 		LEFT JOIN public.tbl_studiengang stg1 ON (s.studiengang_kz = stg1.studiengang_kz)
 		LEFT JOIN lehre.tbl_lehrveranstaltung lv USING (lehrveranstaltung_id)
 		LEFT JOIN public.tbl_studiengang stg2 ON (lv.studiengang_kz = stg2.studiengang_kz)";

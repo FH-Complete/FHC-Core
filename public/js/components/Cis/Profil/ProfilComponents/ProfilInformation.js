@@ -67,6 +67,21 @@ export default {
 			return res;
 		},
 	},
+	methods: {
+		copyFullNameWithTitleToClipboard() {
+			let fragments = [
+				this.$props.data.Titel,
+				this.$props.data.Vorname,
+				this.$props.data.Nachname,
+				this.$props.data.Postnomen,
+			];
+			fragments = fragments.filter((fragment) => !!fragment);
+			navigator.clipboard.writeText(fragments.join(" "));
+			this.$fhcAlert.alertSuccess(
+				this.$p.t("profil/name_title_clipboard_copy_confirmation"),
+			);
+		},
+	},
 	template: /*html*/ `
 
 <div class="card h-100">
@@ -124,6 +139,16 @@ export default {
                     <span class="form-underline-content">{{wert?wert:'-'}} </span>
                 </div>
             </div>
+			<a
+				@click="copyFullNameWithTitleToClipboard()"
+				href="#"
+				class="col-12 fhc-link-color d-flex flex-row gap-2 align-items-center justify-content-center mt-3"
+			>
+				<span>
+					<i class="fa-regular fa-copy ms-2 text-decoration-none"></i>
+				</span>
+				<span>{{ $p.t("profil/name_title_copy") }}</span>
+			</a>
         </div>
     </div>
 </div>
