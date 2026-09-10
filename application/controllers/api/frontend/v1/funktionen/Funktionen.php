@@ -294,6 +294,10 @@ class Funktionen extends FHCAPI_Controller
 		{
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
+		if($datum_von == '')
+			$datum_von = null;
+		if($datum_bis == '')
+			$datum_bis = null;
 
 		$result = $this->BenutzerfunktionModel->update(
 			[

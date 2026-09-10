@@ -193,7 +193,7 @@ class Prestudent extends FHCAPI_Controller
 				}
 				elseif (
 					$val === ''
-					&& in_array($prop, ['zgvnation', 'zgvmanation', 'zgvdoktornation', 'berufstaetigkeit_code', 'ausbildungcode'])
+					&& in_array($prop, ['zgvnation', 'zgvmanation', 'zgvdoktornation', 'berufstaetigkeit_code', 'ausbildungcode', 'zgvdatum', 'zgvmadatum'])
 				)
 				{
 					$val = null;
