@@ -700,4 +700,71 @@ class Grades extends FHCAPI_Controller
 
 		return false;
 	}
+
+	/**
+	 * Combined helper function to check permissions for
+	 * certificate-modifying functions
+	 *
+	 * @param integer				$lehrveranstaltung_id
+	 * @param string				$student_uid
+	 *
+	 * @return boolean
+	 */
+	protected function hasPermissionGradeUID($lehrveranstaltung_id, $student_uid)
+	{
+		if ($lehrveranstaltung_id === null || $student_uid === null)
+			return true;
+
+
+		$this->load->model('crm/Student_model', 'StudentModel');
+		
+		$studentResult = $this->StudentModel->load([$student_uid]);
+		if (isError($studentResult) || !hasData($studentResult))
+			return false;
+
+		$student = current(getData($studentResult));
+
+
+		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
+
+		$oesResult = $this->StudienplanModel->getAllOesForLv($lehrveranstaltung_id);
+		if (isError($oesResult))
+			return false;
+
+		$oes = hasData($oesResult) ? getData($oesResult) : [];
+
+		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+
+		$stgResult = $this->LehrveranstaltungModel->getStg($lehrveranstaltung_id);
+		if (isError($stgResult))
+			return false;
+
+		if (hasData($stgResult))
+			$oes[] = current(getData($stgResult));
+
+
+		if ($this->permissionlib->isBerechtigt('admin', 'suid', $student->studiengang_kz))
+			return true;
+		if ($this->permissionlib->isBerechtigt('assistenz', 'suid', $student->studiengang_kz))
+			return true;
+		if ($this->permissionlib->isBerechtigt('student/noten', 'suid', $student->studiengang_kz))
+			return true;
+
+		foreach ($oes as $oe) {
+			if ($this->permissionlib->isBerechtigt('admin', 'suid', $oe->oe_kurzbz))
+				return true;
+			if ($this->permissionlib->isBerechtigt('assistenz', 'suid', $oe->oe_kurzbz))
+				return true;
+			if ($this->permissionlib->isBerechtigt('student/noten', 'suid', $oe->oe_kurzbz))
+				return true;
+			if ($this->permissionlib->isBerechtigt('admin', 'suid', $oe->studiengang_kz))
+				return true;
+			if ($this->permissionlib->isBerechtigt('assistenz', 'suid', $oe->studiengang_kz))
+				return true;
+			if ($this->permissionlib->isBerechtigt('student/noten', 'suid', $oe->studiengang_kz))
+				return true;
+		}
+
+		return false;
+	}
 }
