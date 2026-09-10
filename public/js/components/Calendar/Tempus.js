@@ -17,12 +17,20 @@ export default {
 	},
 	provide() {
 		return {
-			rangeLength: Vue.computed(() => this.rangeLength),
-			rangeViewPresets: Vue.computed(() => this.semesterRangePresets)
+			rangeLength: Vue.computed(() => this.currentRangeLength),
+			rangeViewPresets: Vue.computed(() => this.semesterRangePresets),
+			rangeViewSelectedPreset: Vue.computed({
+				get: () => this.selectedRangePreset,
+				set: value => this.selectedRangePreset = value,
+			}),
 		};
 	},
 	inject: {
 		renderers: {from: 'renderers'},
+		currentSemester: {
+			from: 'currentSemester',
+			default: null,
+		},
 		canToggleGrid: {
 			from: 'canToggleGrid',
 			default: false
@@ -114,6 +122,8 @@ export default {
 			teachingunits: null,
 			hoursplan: null,
 			showRaster: true,
+			currentRangeLength: this.rangeLength,
+			selectedRangePreset: this.currentSemester,
 			semesterRangePresets: {
 				label: null,
 				presets: [],
@@ -187,6 +197,12 @@ export default {
 			this.reset();
 			this.$emit('update:range', this.rangeInterval);
 			this.$emit('update:date-range', { start, end });
+		},
+		handleDateUpdate(newDate, newMode, newRangeLength) {
+			if (Number.isFinite(newRangeLength))
+				this.currentRangeLength = newRangeLength;
+
+			this.$emit('update:date', newDate, newMode);
 		},
 		ondrop(payload){
 			this.$emit('drop', payload);
@@ -280,7 +296,7 @@ export default {
 		:resizable-events="true"
 		:on-drop="['week', 'range'].includes(currentMode) ? ondrop : null"
 		:on-resize="onresize"
-		@update:date="(newDate, newMode) => $emit('update:date', newDate, newMode)"
+		@update:date="handleDateUpdate"
 		@update:mode="(newMode, newDate) => { currentMode = newMode; $emit('update:mode', newMode, newDate) }"
 		@update:range="updateRange"
 		@update:date-range="handleDateRange"

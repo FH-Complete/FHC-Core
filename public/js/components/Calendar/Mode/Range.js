@@ -23,13 +23,26 @@ export default {
 			required: true,
 		},
 	},
-	emits: ["update:currentDate", "update:range", "click", "requestModalOpen"],
+	emits: ["update:currentDate", "update:date", "update:range", "click", "requestModalOpen"],
+	setup() {
+		const selectedRangePreset = Vue.inject(
+			"rangeViewSelectedPreset",
+			Vue.ref(null),
+		);
+
+		return { selectedRangePreset };
+	},
 	data() {
 		return {
-			selectedRangePreset: null,
+			applyingRangePreset: false,
 		};
 	},
 	computed: {
+		activeRangePreset() {
+			return this.rangeViewPresets?.presets?.find(
+				(preset) => preset.name === this.selectedRangePreset,
+			);
+		},
 		range() {
 			let first = this.$props.currentDate;
 			let last = first.plus({ days: this.rangeLength });
@@ -39,29 +52,56 @@ export default {
 	},
 	watch: {
 		currentDate() {
+			this.syncSelectedRangePreset();
 			this.$emit("update:range", this.range);
 		},
 		rangeLength() {
+			this.syncSelectedRangePreset();
 			this.$emit("update:range", this.range);
 		},
-		selectedRangePreset() {
-			if (!this.selectedRangePreset) return;
+		activeRangePreset: {
+			handler(preset) {
+				if (!preset) {
+					this.applyingRangePreset = false;
+					return;
+				}
 
-			const preset = this.rangeViewPresets.presets.find(
-				(preset) => preset.name === this.selectedRangePreset,
-			);
-			if (!preset) return;
+				if (this.matchesRangePreset(preset)) {
+					this.applyingRangePreset = false;
+					return;
+				}
 
-			this.$emit("update:date", {
-				date: preset.startDate,
-				rangeLength:
-					preset.endDate.diff(preset.startDate, "days").days + 1,
-			});
-
-			this.selectedRangePreset = null;
+				this.applyingRangePreset = true;
+				this.$emit("update:date", {
+					date: preset.startDate,
+					rangeLength:
+						preset.endDate.diff(preset.startDate, "days").days + 1,
+				});
+			},
+			immediate: true,
 		},
 	},
 	methods: {
+		matchesRangePreset(preset) {
+			const rangeLength =
+				preset.endDate.diff(preset.startDate, "days").days + 1;
+
+			return (
+				this.currentDate.hasSame(preset.startDate, "day") &&
+				Number(this.rangeLength) === rangeLength
+			);
+		},
+		syncSelectedRangePreset() {
+			if (!this.activeRangePreset) return;
+
+			if (this.matchesRangePreset(this.activeRangePreset)) {
+				this.applyingRangePreset = false;
+				return;
+			}
+
+			if (!this.applyingRangePreset)
+				this.selectedRangePreset = null;
+		},
 		viewAttrs() {
 			const day = this.$props.currentDate.startOf("day");
 			const rangeLength = parseInt(this.rangeLength);
