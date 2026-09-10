@@ -103,6 +103,7 @@ export default {
 						<form-input
 							type="DatePicker"
 							v-model="formData.nachgereicht_am"
+							model-type="yyyy-MM-dd"
 							name="nachgereicht_am"
 							:label="$p.t('dokumente/nachreichungAm')"
 							auto-apply

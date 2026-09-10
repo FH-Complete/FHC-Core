@@ -122,6 +122,47 @@ class Studiensemester_model extends DB_Model
 		return $this->execQuery($query, array($studiensemester_kurzbz, $limit));
 	}
 
+
+	/**
+	 * Returns the current study semester and the previous semesters of the same type (SS/WS).
+	 *
+	 * Example:
+	 * - SS2026, limit 3:  SS2026, SS2025, SS2024
+	 * - WS2025, limit 2: WS2025, WS2024
+	 *
+	 * @param $studiensemester_kurzbz
+	 * @param $limit
+	 */
+	public function getPreviousSameSemesterFrom($studiensemester_kurzbz, $limit = 1)
+	{
+		$qry = '
+			SELECT 
+			    studiensemester_kurzbz,
+				start,
+				ende
+			FROM 
+			    public.tbl_studiensemester
+			WHERE 
+				SUBSTRING(studiensemester_kurzbz FROM 1 FOR 2) = SUBSTRING(? FROM 1 FOR 2)
+			AND start <= (
+				SELECT start
+				FROM public.tbl_studiensemester
+				WHERE studiensemester_kurzbz = ?
+			)
+			ORDER BY 
+				start DESC
+			LIMIT ?
+		';
+
+		return $this->execQuery($qry,
+			[
+				$studiensemester_kurzbz,
+				$studiensemester_kurzbz,
+				$limit
+			]
+		);
+	}
+
 	/**
 	 * getNearest
 	 */
@@ -186,6 +227,82 @@ class Studiensemester_model extends DB_Model
 			LIMIT 1";
 
 		return $this->execQuery($query, array($date,$date,$date,$date));
+	}
+
+	/**
+	 * Gets all Studiensemester where the range dates are contained
+	 * or the nearest if date is not contained
+	 * @param $from
+	 * @param $to
+	 * @return array|null
+	 */
+	public function getContainingOrNearestByDateRange($from, $to)
+	{
+		if (date_format(date_create($from), 'Y-m-d') > (date_format(date_create($to), 'Y-m-d')))
+			return success(array());
+
+		$query = <<<EOSQL
+			WITH semester_interval_startdate AS (
+				SELECT
+					s.*
+				FROM
+					public.tbl_studiensemester s
+				WHERE
+					{$this->db->escape($from)}::date BETWEEN s.start AND s.ende
+				ORDER BY
+					s.start DESC
+				LIMIT 1
+			),
+			semester_interval_enddate AS (
+				SELECT
+					s.*
+				FROM
+					public.tbl_studiensemester s
+				WHERE
+					{$this->db->escape($to)}::date BETWEEN s.start AND s.ende
+				ORDER BY
+					s.start DESC
+				LIMIT 1
+			),
+			nearest_semester_interval_startdate AS (
+				SELECT
+					LEAST(ABS(s.start - {$this->db->escape($from)}::date), ABS(s.ende - {$this->db->escape($from)}::date)) AS mindiff,
+					s.*
+				FROM
+					public.tbl_studiensemester s
+				WHERE
+					s.ende < {$this->db->escape($from)}::date
+				ORDER BY
+					1 ASC
+				LIMIT 1
+			),
+			nearest_semester_interval_enddate AS (
+				SELECT
+					LEAST(ABS(s.start - {$this->db->escape($to)}::date), ABS(s.ende - {$this->db->escape($to)}::date)) AS mindiff,
+					s.*
+				FROM
+					public.tbl_studiensemester s
+				WHERE
+					s.start > {$this->db->escape($to)}::date
+				ORDER BY
+					1 ASC
+				LIMIT 1
+			)
+			SELECT
+				COALESCE(
+					(SELECT studiensemester_kurzbz FROM semester_interval_startdate),
+					(SELECT studiensemester_kurzbz FROM nearest_semester_interval_startdate)
+				) AS studiensemester_kurzbz
+			UNION
+			SELECT
+				COALESCE(
+					(SELECT studiensemester_kurzbz FROM semester_interval_enddate),
+					(SELECT studiensemester_kurzbz FROM nearest_semester_interval_enddate)
+				) AS studiensemester_kurzbz
+
+EOSQL;
+
+		return $this->execReadonlyQuery($query);
 	}
 
 	/**

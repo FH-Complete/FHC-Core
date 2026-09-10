@@ -79,6 +79,7 @@ export default {
 				<form-input
 					type="DatePicker"
 					v-model="data.buchungsdatum"
+					model-type="yyyy-MM-dd"
 					name="buchungsdatum"
 					:label="$p.t('konto/buchungsdatum')"
 					:enable-time-picker="false"
