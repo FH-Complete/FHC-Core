@@ -1,7 +1,10 @@
 import AbstractWidget from '../Abstract.js';
 import ConfigKpi from './Config/Kpi.js';
 
+import { useCalculatedVars } from '../../../composables/DashboardWidget/Report/CalculatedVars.js';
+
 import ApiReport from '../../../api/factory/report.js';
+import ApiStudienjahr from '../../../api/factory/studienjahr.js';
 
 export default {
 	name: "WidgetsReportKpi",
@@ -18,6 +21,7 @@ export default {
 	data() {
 		return {
 			data: undefined,
+			hasErrors: false,
 		};
 	},
 	computed: {
@@ -55,24 +59,57 @@ export default {
 			return false;
 		}
 	},
+	watch: {
+		config: {
+			handler() { this.fetchData(); },
+			immediate: true,
+			deep: true,
+		}
+	},
 	methods: {
+		async fetchData() {
+			if (this.configMode)
+				return;
+
+			this.hasErrors = false;
+
+			let vars = {};
+			for (var key in this.config.vars) {
+				vars[key] = await this.getValueForVar(this.config.vars[key]);
+			}
+
+			try {
+				const result = await this.$api.call(
+					ApiReport.get(this.config.statistik_kurzbz, vars),
+					{ errorHandling: false }
+				);
+				this.data = result.data;
+			} catch(error) {
+				
+				if (this.activeAggregator === undefined)
+					return this.hasErrors = true;
+				if (Object.values(this.config.vars).some(v => v.type == 'user' && v.value === undefined))
+					return this.hasErrors = true;
+
+				if (error.response.data.errors)
+					return this.hasErrors = error.response.data.errors;
+
+				this.$fhcAlert.handleSystemError(error);
+			}
+		},
+	},
+	setup() {
+		const { getValueForVar } = useCalculatedVars();
+		return {
+			getValueForVar
+		};
 	},
 	mounted() {
 		if (!this.adminMode) {
 			if (Object.values(this.config.vars).some(v => v.type == 'user'))
-				this.$emit('setConfig', true);
+				this.$emit('setConfig', Vue.markRaw(ConfigKpi));
 			else if (this.config.aggregators.length > 1)
-				this.$emit('setConfig', true);
-
-			const vars = Object.fromEntries(Object.entries(this.config.vars).map(([key, { value }]) => [key, value]));
-			// TODO(chris): calculated stuff??
-			this.$api
-				.call(ApiReport.get(this.config.statistik_kurzbz, vars))
-				.then(result => {
-					this.data = result.data;
-				})
-				// TODO(chris): handle some errors inside
-				.catch(this.$fhcAlert.handleSystemErrors);
+				this.$emit('setConfig', Vue.markRaw(ConfigKpi));
 		}
 	},
 	template: /*html*/ `
@@ -85,10 +122,25 @@ export default {
 			'align-items-center': !configMode
 		}"
 	>
-		<template v-if="configMode">
-			<config-kpi :config="config" />
+		<div
+			v-if="hasErrors === true"
+			class="alert alert-danger m-0 h-100 w-100 border-0 rounded-0 d-flex justify-content-center align-items-center"
+		>
+			{{ $p.t('ui/errorConfigFehlt') }}
+		</div>
+		<template v-else-if="hasErrors">
+			<template v-for="error in hasErrors" :key="error">
+				<div v-if="error.message" class="alert alert-danger mx-1">
+					{{ error.message }}
+				</div>
+				<template v-else-if="error.messages">
+					<div v-for="msg in error.messages" :key="msg" class="alert alert-danger mx-1">
+						{{ msg }}
+					</div>
+				</template>
+			</template>
 		</template>
-		<template v-else-if="kpi">
+		<template v-else-if="kpi !== false">
 			<div class="h1 text-center">{{ kpi }}</div>
 			<small>{{ activeAggregator.label }}</small>
 		</template>

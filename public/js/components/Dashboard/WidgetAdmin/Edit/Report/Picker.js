@@ -14,14 +14,9 @@ export default {
 			type: String,
 			required: true
 		},
-		details: {
-			type: Object,
-			default: {}
-		},
 	},
 	emits: [
 		"update:modelValue",
-		"update:details",
 	],
 	data() {
 		return {
@@ -34,16 +29,14 @@ export default {
 		initSelectedValue() {
 			if (this.modelValue) {
 				const res = this.allItems.find(item => item.statistik_kurzbz == this.modelValue);
-				if (res) {
-					this.selectedValue = res;
-					this.loadDetails(this.modelValue);
-					return;
-				}
+
+				if (res)
+					return this.selectedValue = res;
+				
 				this.selectedValue = this.modelValue;
 			} else {
 				this.selectedValue = '';
 			}
-			this.$emit('update:details', null);
 		},
 		searchItems(event) {
 			if (this.allItems) {
@@ -58,16 +51,7 @@ export default {
 		updateSelectedItem(v) {
 			if (v?.statistik_kurzbz) {
 				this.$emit('update:modelValue', v.statistik_kurzbz);
-				this.loadDetails(v.statistik_kurzbz);
 			}
-		},
-		loadDetails(statistik_kurzbz) {
-			this.$api
-				.call(ApiReport.vars(statistik_kurzbz))
-				.then(result => {
-					this.$emit('update:details', result.data);
-				})
-				.catch(this.$fhcAlert.handleSystemErrors)
 		},
 	},
 	created() {
@@ -80,22 +64,26 @@ export default {
 			.catch(this.$fhcAlert.handleSystemErrors);
 	},
 	template: /*html*/ `
-	<form-input
-		type="autocomplete"
-		:label="$p.t('dashboard/widget_report_statistik')"
-		v-model="selectedValue"
-		class="widgets-report-config-picker"
-		:suggestions="filteredItems"
-		field="bezeichnung"
-		dropdown-mode="blank"
-		dropdown
-		force-selection
-		@complete="searchItems"
-		@update:modelValue="updateSelectedItem"
-	>
-		<template #option="{ option }">
-			<picker-option :option="option" />
-		</template>
-	</form-input>
+	<div class="widgets-report-config-picker">
+		<form-input
+			type="autocomplete"
+			:label="$p.t('dashboard/widget_report_statistik')"
+			v-model="selectedValue"
+			:suggestions="filteredItems"
+			field="statistik_kurzbz"
+			dropdown-mode="blank"
+			dropdown
+			force-selection
+			@complete="searchItems"
+			@update:modelValue="updateSelectedItem"
+		>
+			<template #option="{ option }">
+				<picker-option :option="option" />
+			</template>
+		</form-input>
+		<div v-if="selectedValue?.statistik_kurzbz" class="text-muted">
+			{{ selectedValue.bezeichnung || selectedValue.statistik_kurzbz }}
+		</div>
+	</div>
 	`,
 };

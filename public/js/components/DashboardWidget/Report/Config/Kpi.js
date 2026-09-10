@@ -1,54 +1,66 @@
+import AbstractWidget from '../../Abstract.js';
+import VarsVar from '../../../Dashboard/WidgetAdmin/Edit/Report/Vars/Var.js';
+import FormInput from '../../../Form/Input.js';
+
 export default {
 	name: "WidgetsReportKpiSetup",
 	components:{
+		VarsVar,
+		FormInput,
 	},
-	inject: {
-		adminMode: {
-			from: 'adminMode',
-			default: false
-		}
-	},
-	props: {
-		config: {
-			type: Object,
-			required: true
-		}
-	},
-	data() {
-		return {
-			report_details: null
-		};
-	},
+	mixins: [ AbstractWidget ],
 	computed: {
-		statistik_kurzbz: {
+		aggregator: {
 			get() {
-				return this.config.statistik_kurzbz || "";
+				if (this.config.aggregator !== undefined)
+					return this.config.aggregator;
+				
+				if (this.config.aggregators.length == 1)
+					return this.config.aggregators[0];
+
+				if (this.config.aggregators.length > 1) {
+					const def = this.config.aggregators.findIndex(agg => agg.default);
+					if (def > 0)
+						return def;
+				}
+				
+				return 0;
 			},
 			set(v) {
-				this.config.statistik_kurzbz = v;
+				this.config.aggregator = v;
 			}
 		},
-		variables() {
-			if (!this.report_details)
-				return '';
-			return Array.from(new Set(this.report_details.sql.match(/\$\w+/g) || [])).map(i => i.substr(1));
-		}
-	},
-	methods: {
-	},
-	mounted() {
+		hasCustomVars() {
+			return Object.values(this.config.vars).some(v => v.type == 'user');
+		},
 	},
 	template: /*html*/ `
 	<div class="widgets-report-kpi-config-kpi">
-		<div>
-			<report-picker v-model="statistik_kurzbz" v-model:details="report_details" />
-		</div>
-		<div>
-			Config KPI
-		</div>
-		<div>
-			{{ variables }}
-		</div>
+		<template v-if="hasCustomVars">
+			// TODO(chris): label: vars
+			<template
+				v-for="(variable, key) in config.vars"
+				:key="key"
+			>
+				<vars-var
+					v-if="variable.type == 'user'"
+					v-model="variable"
+					:detail="variable.detail"
+					no-type
+				/>
+				// TODO(chris): type == 'calc'?
+			</template>
+		</template>
+		<form-input
+			v-if="config.aggregators.length > 1"
+			type="select"
+			:label="$p.t('dashboard/widget_report_kpi_aggregator')"
+			v-model="aggregator"
+		>
+			<option v-for="(aggregator, i) in config.aggregators" :key="i" :value="i">
+				{{ aggregator.label }}
+			</option>
+		</form-input>
 	</div>
 	`,
 };
