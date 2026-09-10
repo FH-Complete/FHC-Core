@@ -29,10 +29,14 @@ class Lvgesamtnote_model extends DB_Model
 		$this->addSelect("lv.bezeichnung AS lehrveranstaltung_bezeichnung");
 		$this->addSelect("lv.studiengang_kz");
 		$this->addSelect("UPPER(stg.typ || stg.kurzbz) AS studiengang");
+		$this->addSelect("person.vorname");
+		$this->addSelect("person.nachname");
 
 		$this->addJoin("lehre.tbl_note n", "note");
 		$this->addJoin("lehre.tbl_lehrveranstaltung lv", "lehrveranstaltung_id");
 		$this->addJoin("public.tbl_studiengang stg", "studiengang_kz");
+		$this->addJoin("public.tbl_benutzer benutzer", "uid = student_uid", "LEFT");
+		$this->addJoin("public.tbl_person person", "person_id", "LEFT");
 
 		$this->db->where($this->dbTable . ".freigabedatum <", "NOW()", false);
 
