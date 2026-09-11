@@ -21,13 +21,10 @@ export default {
 	label: 'CurrentStudienjahr',
 	async calculate(instructions) {
 		try {
-			const $api = Vue.inject('$api');
-			const result = await $api.call(ApiStudienjahr.getAktNext());
+			const result = await this.$api.call(ApiStudienjahr.getAktNext());
 			return result.data.studienjahr_kurzbz;
 		} catch(error) {
-			const $fhcAlert = Vue.inject('$fhcAlert');
-
-			$fhcAlert.handleSystemError(error);
+			this.$fhcAlert.handleSystemError(error);
 		}
 		return null;
 	},

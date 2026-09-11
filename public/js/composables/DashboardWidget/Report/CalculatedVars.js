@@ -28,6 +28,8 @@ export function useCalculatedVars() {
 	const options = Vue.ref([]);
 
 	const $p = Vue.inject('$p');
+	const $api = Vue.inject('$api');
+	const $fhcAlert = Vue.inject('$fhcAlert');
 
 	for (var key in calculations) {
 		let label = calculations[key].label;
@@ -48,7 +50,11 @@ export function useCalculatedVars() {
 			const instructions = variable.type.split(':');
 
 			if (calculations[instructions[1]]?.calculate)
-				return calculations[instructions[1]].calculate(instructions);
+				return calculations[instructions[1]].calculate.bind({
+					$p,
+					$api,
+					$fhcAlert,
+				})(instructions);
 		}
 		return variable?.value;
 	}
