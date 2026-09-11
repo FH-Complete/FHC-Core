@@ -29,8 +29,9 @@ export default {
 				return this.modelValue.findIndex(agg => agg.default);
 			},
 			set(v) {
-				let curr = this.modelValue.find(agg => agg.default);
-				delete curr.default;
+				const curr = this.modelValue.find(agg => agg.default);
+				if (curr)
+					delete curr.default;
 				this.modelValue[v].default = true;
 			},
 		},
