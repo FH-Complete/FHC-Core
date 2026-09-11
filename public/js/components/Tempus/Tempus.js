@@ -551,6 +551,14 @@ export default {
 						this.$refs.calendar.$refs.calendar.$refs.mode.$refs.view.$refs.grid.disableAutoScroll();
 						this.currentlyUpdatedEvent = obj.orig;
 					}
+				})
+				.catch((error) => {
+					this.currentlyUpdatedEvent = null;
+					this.$refs.calendar.clearOutCalendarEventEmphasis();
+					this.$nextTick(() => {
+						this.$refs.calendar.reloadEvents();
+					});
+					throw error;
 				});
 		},
 

@@ -86,6 +86,8 @@ export default {
 
 	data() {
 		return {
+			eventReloadKey: 0,
+			refreshEventsAfterReload: false,
 			modes: {
 				week: Vue.markRaw(ModeWeek),
 				month: Vue.markRaw(ModeMonth),
@@ -108,6 +110,11 @@ export default {
 	},
 	watch: {
 		events() {
+			if (this.refreshEventsAfterReload) {
+				this.eventReloadKey += 1;
+				this.refreshEventsAfterReload = false;
+			}
+
 			this.$emit('events-reloaded');
 		}
 	},
@@ -186,6 +193,10 @@ export default {
 		resetEventLoader(arePreviousEventsCleared = true) {
 			this.reset(arePreviousEventsCleared);
 		},
+		reloadEvents() {
+			this.refreshEventsAfterReload = true;
+			this.resetEventLoader(false);
+		},
 		navigatePrev() {
 			this.$refs.calendar.clickPrev();
 		},
@@ -259,6 +270,7 @@ export default {
 		:timezone="timezone"
 		:locale="$p.user_locale.value"
 		:events="visibleEvents || []"
+		:event-reload-key="eventReloadKey"
 		:backgrounds="backgrounds"
 		:time-grid="showRaster ? teachingunits : null"
 		:hours-plan="hoursplan"

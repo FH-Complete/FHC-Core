@@ -122,6 +122,8 @@ export function useEventLoader(
       allEvents.value = removeVisualForEventsLoading(
         ensureEventsAreInValidCacheRange(tempAllEvents),
       );
+
+	  hasFirstLoadOccurred = true;
     });
   };
 
@@ -130,6 +132,7 @@ export function useEventLoader(
   const reset = (arePreviousEventsCleared = true) => {
 	if (arePreviousEventsCleared) {
 		allEvents.value = [];
+		hasFirstLoadOccurred = false;
 	}
     reload(false);
   };
