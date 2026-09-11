@@ -159,7 +159,7 @@ export default {
 		},
 		sendChangeConfig(config) {
 			for (var k in config) {
-				if (this.widgetTemplate.arguments[k] == config[k]) {
+				if (JSON.stringify(this.widgetTemplate.arguments[k]) == JSON.stringify(config[k])) {
 					delete config[k];
 				}
 			}
