@@ -30,26 +30,46 @@ export default {
 				this.config.aggregator = v;
 			}
 		},
+		customVars() {
+			const uservars = this.config.uservars || {};
+
+			return Object.entries(this.config.vars).reduce((res, [key, variable]) => {
+				if (variable.type == 'user') {
+					res[key] = {
+						modelValue: uservars[key] || {},
+						detail: variable.detail,
+					};
+				} else if (this.sharedData[key]) {
+					res[key] = {
+						modelValue: uservars[key] || {},
+						detail: this.sharedData[key],
+					};
+				}
+				return res;
+			}, {});
+		},
 		hasCustomVars() {
-			return Object.values(this.config.vars).some(v => v.type == 'user');
+			return Object.keys(this.customVars).length;
+		},
+	},
+	methods: {
+		updateUserVar(key, { value }) {
+			if (!this.config.uservars)
+				this.config.uservars = {};
+			this.config.uservars[key] = { value };
 		},
 	},
 	template: /*html*/ `
 	<div class="widgets-report-kpi-config-kpi">
 		<template v-if="hasCustomVars">
 			// TODO(chris): label: vars
-			<template
-				v-for="(variable, key) in config.vars"
+			<vars-var
+				v-for="(variable, key) in customVars"
 				:key="key"
-			>
-				<vars-var
-					v-if="variable.type == 'user'"
-					v-model="variable"
-					:detail="variable.detail"
-					no-type
-				/>
-				// TODO(chris): type == 'calc'?
-			</template>
+				v-bind="variable"
+				no-type
+				@update:model-value="updateUserVar(key, $event)"
+			/>
 		</template>
 		<form-input
 			v-if="config.aggregators.length > 1"

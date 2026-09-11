@@ -34,9 +34,6 @@ export default {
 				type: this.detail.type,
 			};
 
-			if (attrs.type == 'text')
-				attrs.type = 'input';
-
 			if (this.detail.placeholder)
 				attrs.placeholder = this.detail.placeholder;
 
@@ -80,9 +77,9 @@ export default {
 			return this.calcComponents[this.extendedType[1]];
 		},
 		options() {
-			if (this.extendedType.length < 1)
+			if (this.extendedType.length < 1 && !this.noType)
 				return [];
-			if (this.extendedType[0] == 'calc')
+			if (this.extendedType[0] == 'calc' && !this.noType)
 				return this.calcOptions;
 			if (this.detail.type == 'select')
 				return this.detail.options;
@@ -94,7 +91,7 @@ export default {
 			return 'Report' + capitalize(string);
 		},
 		setType(type) {
-			if (type == 'user') {
+			if (type == 'user' || type.substr(0, 5) == 'calc:') {
 				this.$emit('update:modelValue', { type, detail: this.detail });
 			} else {
 				this.$emit('update:modelValue', { type });
@@ -102,7 +99,7 @@ export default {
 		},
 		setSubType(subtype) {
 			let type = 'calc:' + subtype;
-			this.$emit('update:modelValue', { type });
+			this.$emit('update:modelValue', { type, detail: this.detail });
 		},
 		setValue(value) {
 			this.modelValue.value = value;
@@ -140,7 +137,7 @@ export default {
 		</form-input>
 		<form-input
 			v-if="modelValue.type == 'fix' || noType"
-			v-model="saveValue"
+			:modelValue="saveValue"
 			v-bind="fixedInputAttrs"
 			input-group
 			@update:modelValue="setValue"
