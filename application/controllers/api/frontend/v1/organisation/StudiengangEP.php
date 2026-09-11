@@ -23,7 +23,8 @@ class StudiengangEP extends FHCAPI_Controller
 	{
 		parent::__construct(
 			array(
-				'getStudiengangByKz' => self::PERM_LOGGED
+				'getStudiengangByKz' => self::PERM_LOGGED,
+				'getAllowed' => self::PERM_LOGGED,
 			)
 		);
 		// Load model StudiengangModel
@@ -53,5 +54,27 @@ class StudiengangEP extends FHCAPI_Controller
 			$stg = (getData($result))[0];
 		}
 		$this->terminateWithSuccess($stg);
+	}
+
+	/**
+	 * @return void
+	 */
+	public function getAllowed()
+	{
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('permissions[]', 'Permissions', 'required');
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$permissions = $this->input->post('permissions');
+
+		$permittedStgs = [];
+
+		foreach ($permissions as $permission)
+			$permittedStgs = array_merge($permittedStgs, $this->permissionlib->getSTG_isEntitledFor($permission) ?: []);
+
+		$this->terminateWithSuccess($permittedStgs);
 	}
 }

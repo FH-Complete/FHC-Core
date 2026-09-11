@@ -28,5 +28,15 @@ export default {
 			url: '/api/frontend/v1/organisation/StudiengangEP/getStudiengangByKz',
 			params: { studiengang_kz }
 		};
-	}
+	},
+	getAllowed(permissions) {
+		if (!Array.isArray(permissions))
+			permissions = permissions.split(',');
+		
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/organisation/StudiengangEP/getAllowed',
+			params: { permissions }
+		};
+	},
 };
