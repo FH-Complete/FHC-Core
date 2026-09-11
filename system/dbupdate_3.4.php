@@ -107,8 +107,8 @@ require_once('dbupdate_3.4/77080_tabulator_presets_table.php');
 require_once('dbupdate_3.4/78292_gehaltsanpassungtyp.php');
 require_once('dbupdate_3.4/77949_tempus_synchronisation.php');
 require_once('dbupdate_3.4/78287_tempus_raumzuordnung.php');
-
 require_once('dbupdate_3.4/78285_tempus_stundenraster.php');
+require_once('dbupdate_3.4/83437_kalender_notiz_tbl.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
