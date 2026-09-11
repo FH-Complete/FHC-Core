@@ -17,11 +17,13 @@
 
 import CurrentStudienjahr from './CalculatedVars/CurrentStudienjahr.js';
 import CalcDate from './CalculatedVars/CalcDate.js';
+import UserStgs from './CalculatedVars/UserStgs.js';
 
 export function useCalculatedVars() {
 	let calculations = {
 		CurrentStudienjahr,
 		CalcDate,
+		UserStgs,
 	};
 	
 	const components = Vue.ref({});
