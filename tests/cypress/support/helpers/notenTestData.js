@@ -55,6 +55,38 @@ export const fristHasPassed = (semKurzbz) => {
 	return new Date() > deadline;
 };
 
+/**
+ * A semester + course where the logged-in user actually teaches AND the grade deadline has passed.
+ *
+ * Both are needed: assertLvAccess runs BEFORE the deadline check, so a semester the user does not
+ * teach in fails there and never reaches the deadline.
+ *
+ * @param {string} type "SS" or "WS"
+ * @returns {Cypress.Chainable<{semKurzbz: string, lvId: number}|null>}
+ */
+export const lehrsemesterMitAbgelaufenerFrist = (type = "SS") => {
+	const jahr = new Date().getFullYear();
+	const kandidaten = [];
+	for (let y = jahr; y >= jahr - 6; y -= 1) {
+		const sem = `${type}${y}`;
+		if (fristHasPassed(sem)) kandidaten.push(sem);
+	}
+
+	const probiere = (i) => {
+		if (i >= kandidaten.length) return cy.wrap(null, { log: false });
+
+		return notenApi.getBenotungstoolContext(kandidaten[i]).then((response) => {
+			const lvs = (response.body && response.body.data && response.body.data.lehrveranstaltungen) || [];
+			if (lvs.length > 0) {
+				return { semKurzbz: kandidaten[i], lvId: lvs[0].lehrveranstaltung_id };
+			}
+			return probiere(i + 1);
+		});
+	};
+
+	return probiere(0);
+};
+
 export const semesterWithPastFrist = (type = "SS") => {
 	const year = new Date().getFullYear();
 	for (let y = year; y >= year - 6; y -= 1) {
@@ -164,7 +196,23 @@ export const loadNotenContext = () => {
 			const angerechnet = byBezeichnung("angerechnet");
 			const internAngerechnet = byBezeichnung("intern angerechnet");
 
+			// An attempt chain needs grades by meaning, not by index: a positive grade closes the
+			// chain, so a repeat after "Sehr Gut" is not a test case but an impossible flow.
+			const abschliessend = (context.cisConfig.NOTEN_ABSCHLIESSEND || []).map(String);
+			const inSkala = (n) => Number(n.note) >= 1 && Number(n.note) <= 5;
+			const negativNoten = usable.filter((n) => !n.positiv && inSkala(n)).map((n) => n.note);
+			const positivNoten = usable.filter((n) => n.positiv && inSkala(n)).map((n) => n.note);
+			const verbesserbar = positivNoten.filter((n) => !abschliessend.includes(String(n)));
+
+			expect(negativNoten.length, "need a negative grade to build an attempt chain").to.be.greaterThan(0);
+
 			context.notes = {
+				// the only grade a repeat may follow
+				negativ: negativNoten[0],
+				// positive but not final: allows a repeat when configured
+				positiv: verbesserbar.length ? verbesserbar[0] : null,
+				// always closes the chain (NOTEN_ABSCHLIESSEND)
+				bestnote: positivNoten.find((n) => abschliessend.includes(String(n))) || null,
 				entschuldigt: entschuldigt.note,
 				nochNichtEingetragen: nochNicht.note,
 				nichtLehre: nichtLehre ? nichtLehre.note : null,
@@ -206,7 +254,9 @@ export const resetNotenState = (context, studentUids) =>
  * `erstantritt: false` (bzw. `freigegeben: false`) seedet die Altdaten-Form ohne diese Zeile.
  */
 export const seedBaseline = (context, studentUid, options = {}) => {
-	const note = options.note !== undefined ? options.note : context.gradeNotes[0];
+	// Defaults to a NEGATIVE grade: only after one may another attempt follow. Pass
+	// context.notes.bestnote explicitly to close the chain.
+	const note = options.note !== undefined ? options.note : context.notes.negativ;
 	const freigegeben = options.freigegeben !== undefined ? options.freigegeben : true;
 
 	return performSeed(context, studentUid, {

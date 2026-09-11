@@ -5,7 +5,6 @@ import {
 	requireDbReset,
 	resetNotenState,
 	seedBaseline,
-	seedPruefung,
 } from "../../../../support/helpers/notenTestData";
 
 /**
@@ -13,8 +12,8 @@ import {
  * Sammelanlage aus der Toolbar. Beide laufen serverseitig durch denselben Kern
  * (siehe noten.pruefungstermin); geprüft wird, dass die Zelle danach ohne Reload stimmt.
  *
- * Die Specs laufen im Antrittsmodus, weil die Spaltennamen dort stabil sind: antritt_1, antritt_2,
- * ... Im Datumsmodus heisst die Spalte wie das Prüfungsdatum.
+ * Die Specs laufen im Terminmodus (Schaltfläche "Termine"), weil die Spaltennamen dort stabil sind:
+ * antritt_1, antritt_2, ... Im Datumsmodus heisst die Spalte wie das Prüfungsdatum.
  */
 context("Benotungstool UI - Prüfungen", () => {
 	let ctx;
@@ -33,28 +32,16 @@ context("Benotungstool UI - Prüfungen", () => {
 	beforeEach(function () {
 		if (ctx.cisConfig.CIS_GESAMTNOTE_PUNKTE) {
 			// im Punktemodus ist das Notenfeld gesperrt, die Note kommt aus dem Notenschlüssel
-			cy.log("Skipped: CIS_GESAMTNOTE_PUNKTE ist aktiv.");
+			Cypress.log({ name: "skip", message: "Skipped: CIS_GESAMTNOTE_PUNKTE ist aktiv." });
 			this.skip();
 		}
-	});
-
-	it("zeigt den von der Freigabe angelegten ersten Antritt", () => {
-		const student = ctx.students[0];
-
-		resetNotenState(ctx);
-		seedBaseline(ctx, student.uid, { note: ctx.gradeNotes[0], freigegeben: true });
-
-		page.visitAndWaitForTable(ctx);
-
-		page.expectPruefung(student.uid, "antritt_1", { note: ctx.gradeNotes[0], antritt: 1 });
-		page.expectAntrittCount(student.uid, 1);
 	});
 
 	it("legt aus der Zelle eine Wiederholung an und zählt sie als Antritt 2", () => {
 		const student = ctx.students[0];
 
 		resetNotenState(ctx);
-		seedBaseline(ctx, student.uid, { note: ctx.gradeNotes[0], freigegeben: true });
+		seedBaseline(ctx, student.uid, { note: ctx.notes.negativ, freigegeben: true });
 
 		page.visitAndWaitForTable(ctx);
 
@@ -94,7 +81,7 @@ context("Benotungstool UI - Prüfungen", () => {
 		const neuesDatum = attemptDate(ctx, 2);
 
 		resetNotenState(ctx);
-		seedBaseline(ctx, student.uid, { note: ctx.gradeNotes[0], freigegeben: true });
+		seedBaseline(ctx, student.uid, { note: ctx.notes.negativ, freigegeben: true });
 
 		page.visitAndWaitForTable(ctx);
 
@@ -112,7 +99,7 @@ context("Benotungstool UI - Prüfungen", () => {
 		const student = ctx.students[0];
 
 		resetNotenState(ctx);
-		seedBaseline(ctx, student.uid, { note: ctx.gradeNotes[0], freigegeben: true });
+		seedBaseline(ctx, student.uid, { note: ctx.notes.negativ, freigegeben: true });
 
 		page.visitAndWaitForTable(ctx);
 
@@ -137,8 +124,8 @@ context("Benotungstool UI - Prüfungen", () => {
 		const [a, b] = ctx.students;
 
 		resetNotenState(ctx);
-		seedBaseline(ctx, a.uid, { note: ctx.gradeNotes[0], freigegeben: true });
-		seedBaseline(ctx, b.uid, { note: ctx.gradeNotes[0], freigegeben: true });
+		seedBaseline(ctx, a.uid, { note: ctx.notes.negativ, freigegeben: true });
+		seedBaseline(ctx, b.uid, { note: ctx.notes.negativ, freigegeben: true });
 
 		page.visitAndWaitForTable(ctx);
 
@@ -155,52 +142,44 @@ context("Benotungstool UI - Prüfungen", () => {
 		});
 	});
 
-	it("legt den letzten Antritt als kommissionelle Prüfung an", () => {
+	it("legt den letzten Antritt als kommissionelle Prüfung an", function () {
+		if (ctx.cisConfig.CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF === false) {
+			Cypress.log({ name: "skip", message: "Skipped: das Tool darf keine kommissionelle Prüfung anlegen." });
+			this.skip();
+		}
+
 		const student = ctx.students[1];
 
 		resetNotenState(ctx);
-		seedBaseline(ctx, student.uid, { note: ctx.gradeNotes[0], freigegeben: true });
+		seedBaseline(ctx, student.uid, { note: ctx.notes.negativ, freigegeben: true });
 
 		page.visitAndWaitForTable(ctx);
 
 		// Baseline liefert Antritt 1. Bis zum vorletzten Antritt laufen die normalen Spalten.
 		for (let i = 1; i < ctx.maxAntritte - 1; i += 1) {
 			page.addPruefungInCell(student.uid, `antritt_${i + 1}`, {
-				note: bezeichnung(ctx.gradeNotes[0]),
+				note: bezeichnung(ctx.notes.negativ),
 				datum: page.toDDMMYYYY(attemptDate(ctx, i)),
 			});
 		}
 
-		// Der letzte Antritt ist laut Prüfungsordnung kommissionell und wird daher in der
-		// kommPruef-Spalte angelegt, nicht in einer weiteren Antrittsspalte.
-		page.getPruefungAddButton(student.uid, "kommPruef").should("exist");
-		page.expectKeineAntrittsspalte(ctx.maxAntritte);
+		// Der letzte Antritt ist laut Prüfungsordnung kommissionell. Er bekommt keine eigene Spalte,
+		// sondern den nächsten Prüfungstermin. Das K in der Zelle kennzeichnet ihn.
+		const letzterTermin = `antritt_${ctx.maxAntritte}`;
 
-		page.addPruefungInCell(student.uid, "kommPruef", {
-			note: bezeichnung(ctx.gradeNotes[0]),
+		page.getPruefungAddButton(student.uid, letzterTermin).should("exist");
+
+		page.addPruefungInCell(student.uid, letzterTermin, {
+			note: bezeichnung(ctx.notes.negativ),
 			datum: page.toDDMMYYYY(attemptDate(ctx, ctx.maxAntritte)),
 		});
 
 		page.expectAntrittCount(student.uid, ctx.maxAntritte);
-		page.expectPruefung(student.uid, "kommPruef", { note: ctx.gradeNotes[0], antritt: "K" });
-	});
-
-	it("bietet keinen weiteren Antritt an, sobald die Grenze erreicht ist", () => {
-		const student = ctx.students[2];
-
-		resetNotenState(ctx);
-		seedBaseline(ctx, student.uid, { note: ctx.gradeNotes[0], freigegeben: true });
-
-		// die kommissionelle Prüfung schliesst die Kette; sie kommt aus dem anderen Tool
-		seedPruefung(ctx, student, {
-			note: ctx.gradeNotes[0],
-			datum: attemptDate(ctx, 1),
-			typ: "kommPruef",
+		// das Badge trägt beides: die Antrittsnummer und das K der kommissionellen Prüfung
+		page.expectPruefung(student.uid, letzterTermin, {
+			note: ctx.notes.negativ,
+			antritt: `${ctx.maxAntritte}-K`,
 		});
-
-		page.visitAndWaitForTable(ctx);
-
-		page.getPruefungAddButton(student.uid, "kommPruef").should("not.exist");
-		page.expectKeineAntrittsspalte(2);
+		page.expectKeineAntrittsspalte(ctx.maxAntritte + 1);
 	});
 });

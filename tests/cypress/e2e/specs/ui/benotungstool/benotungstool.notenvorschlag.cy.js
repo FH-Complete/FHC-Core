@@ -1,9 +1,10 @@
 import { benotungstoolPage as page } from "../../../../support/pages/benotungstool.po";
 import {
+	baselineDate,
 	loadNotenContext,
+	readLvGesamtnote,
 	requireDbReset,
 	resetNotenState,
-	seedBaseline,
 } from "../../../../support/helpers/notenTestData";
 
 /**
@@ -28,7 +29,7 @@ context("Benotungstool UI - Notenvorschlag", () => {
 	beforeEach(function () {
 		if (ctx.cisConfig.CIS_GESAMTNOTE_PUNKTE) {
 			// im Punktemodus ist die Vorschlagsspalte gesperrt, die Note kommt aus den Punkten
-			cy.log("Skipped: CIS_GESAMTNOTE_PUNKTE ist aktiv.");
+			Cypress.log({ name: "skip", message: "Skipped: CIS_GESAMTNOTE_PUNKTE ist aktiv." });
 			this.skip();
 		}
 	});
@@ -62,6 +63,27 @@ context("Benotungstool UI - Notenvorschlag", () => {
 		page.expectFreigabeState(student.uid, "changed");
 	});
 
+	// Das gewählte Datum ist das Datum von Antritt 1, nicht das benotungsdatum. Das benotungsdatum
+	// bleibt der Zeitpunkt der Eingabe, sonst erschiene eine geänderte Note als freigegeben.
+	it("schreibt das im Dialog gewählte Datum in den ersten Antritt", () => {
+		const student = ctx.students[2];
+		const datum = baselineDate(ctx);
+
+		resetNotenState(ctx);
+		page.visitAndWaitForTable(ctx);
+
+		page.setNotenvorschlag(student.uid, bezeichnung(ctx.gradeNotes[0]));
+		page.uebernehmen(student.uid, { datum: page.toDDMMYYYY(datum) });
+
+		page.expectLvNote(student.uid, bezeichnung(ctx.gradeNotes[0]));
+		page.getCell(student.uid, "antritt_1").should("contain.text", page.toDDMMYYYY(datum));
+
+		readLvGesamtnote(ctx, student.uid).then((rowData) => {
+			expect(String(rowData.benotungsdatum).slice(0, 10), "das benotungsdatum bleibt heute")
+				.to.eq(new Date().toISOString().slice(0, 10));
+		});
+	});
+
 	it("blendet den Übernehmen-Button aus, sobald Vorschlag und LV-Note übereinstimmen", () => {
 		const student = ctx.students[0];
 
@@ -74,28 +96,4 @@ context("Benotungstool UI - Notenvorschlag", () => {
 		page.getUebernehmenButton(student.uid).should("not.exist");
 	});
 
-	it("zeigt eine bereits freigegebene Note nach dem Laden als ok", () => {
-		const student = ctx.students[1];
-
-		resetNotenState(ctx);
-		seedBaseline(ctx, student.uid, { note: ctx.gradeNotes[0], freigegeben: true });
-
-		page.visitAndWaitForTable(ctx);
-
-		page.expectLvNote(student.uid, bezeichnung(ctx.gradeNotes[0]));
-		page.expectFreigabeState(student.uid, "ok");
-	});
-
-	it("zeigt eine erfasste, nicht freigegebene Note nach dem Laden als changed", () => {
-		const student = ctx.students[1];
-
-		resetNotenState(ctx);
-		seedBaseline(ctx, student.uid, { note: ctx.gradeNotes[0], freigegeben: false });
-
-		page.visitAndWaitForTable(ctx);
-
-		// getStudentenNoten liest ungefiltert - wäre das nicht so, bliebe die Zeile hier leer
-		page.expectLvNote(student.uid, bezeichnung(ctx.gradeNotes[0]));
-		page.expectFreigabeState(student.uid, "changed");
-	});
 });

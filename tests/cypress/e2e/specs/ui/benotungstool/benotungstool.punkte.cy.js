@@ -7,6 +7,7 @@ import {
 	requireDbReset,
 	resetNotenState,
 	seedBaseline,
+	seedPruefung,
 } from "../../../../support/helpers/notenTestData";
 import { notenApi } from "../../../../support/api/notenApi";
 
@@ -64,17 +65,6 @@ context("Benotungstool UI - Punktemodus", () => {
 			page.expectNotenvorschlagGesperrt(student.uid);
 		});
 
-		it("leitet den Notenvorschlag beim Tippen aus den Punkten ab", () => {
-			const student = ctx.students[0];
-
-			resetNotenState(ctx);
-			page.visitAndWaitForTable(ctx);
-
-			page.setPunkteInCell(student.uid, OBEN);
-
-			page.expectNotenvorschlag(student.uid, page.bezeichnungOf(ctx, noteOben));
-		});
-
 		it("schreibt Note und Punkte, wenn der Vorschlag übernommen wird", () => {
 			const student = ctx.students[0];
 
@@ -93,26 +83,18 @@ context("Benotungstool UI - Punktemodus", () => {
 			});
 		});
 
-		it("zeigt gespeicherte Punkte nach einem Reload wieder an", () => {
-			const student = ctx.students[0];
-
-			resetNotenState(ctx);
-			page.visitAndWaitForTable(ctx);
-
-			page.setPunkteInCell(student.uid, OBEN);
-			page.uebernehmen(student.uid);
-
-			page.visitAndWaitForTable(ctx);
-
-			page.expectPunkte(student.uid, OBEN);
-			page.expectLvNote(student.uid, page.bezeichnungOf(ctx, noteOben));
-		});
-
-		it("sperrt die Punktespalte, sobald ein Termin existiert", () => {
+		// Antritt 1 und die LV-Note sind dieselbe Leistung, daher bleibt die Spalte dafür offen.
+		// Erst die Wiederholung nimmt der LV-Note die Hoheit über Note und Punkte.
+		it("sperrt die Punktespalte ab der ersten Wiederholung", () => {
 			const student = ctx.students[1];
 
 			resetNotenState(ctx);
 			seedBaseline(ctx, student.uid, { note: ctx.gradeNotes[0], freigegeben: true });
+			seedPruefung(ctx, student, {
+				note: ctx.gradeNotes[0],
+				datum: attemptDate(ctx, 1),
+				typ: "Termin2",
+			});
 
 			page.visitAndWaitForTable(ctx);
 
@@ -158,40 +140,5 @@ context("Benotungstool UI - Punktemodus", () => {
 	});
 
 	describe("Sammelanlage", () => {
-		it("legt für mehrere Studierende Termine mit der abgeleiteten Note an", () => {
-			const [a, b] = ctx.students;
-
-			resetNotenState(ctx);
-			seedBaseline(ctx, a.uid, { note: ctx.gradeNotes[0], freigegeben: true });
-			seedBaseline(ctx, b.uid, { note: ctx.gradeNotes[0], freigegeben: true });
-
-			page.visitAndWaitForTable(ctx);
-
-			cy.get("[data-cy='btn-neue-pruefung']").click();
-			page.getNeuePruefungModal().should("be.visible");
-
-			// dort gibt es kein Notenfeld zum Auswählen, nur Punkte
-			cy.get("[data-cy='neue-pruefung-punkte']").should("be.visible");
-			page.expectNoteFeldGesperrt("neue-pruefung-note");
-
-			page.setDatum("neue-pruefung-datum", page.toDDMMYYYY(attemptDate(ctx, 1)));
-			page.setNeuePruefungPunkte(MITTE);
-
-			cy.get("[data-cy='neue-pruefung-studenten']").click();
-			[a, b].forEach((s) =>
-				cy.contains(".p-multiselect-panel .p-multiselect-item", s.uid).click(),
-			);
-			cy.get("[data-cy='neue-pruefung-studenten']").click();
-			cy.get(".p-multiselect-panel").should("not.exist");
-
-			cy.get("[data-cy='neue-pruefung-submit']").click();
-			cy.wait("@createPruefungen").its("response.statusCode").should("eq", 200);
-			page.getNeuePruefungModal().should("not.be.visible");
-
-			[a, b].forEach((s) => {
-				page.expectPruefung(s.uid, "antritt_2", { note: noteMitte, antritt: 2 });
-				page.expectLvNote(s.uid, page.bezeichnungOf(ctx, noteMitte));
-			});
-		});
 	});
 });

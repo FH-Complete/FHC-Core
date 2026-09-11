@@ -62,6 +62,146 @@ $config['CIS_GESAMTNOTE_IMPORT_NOTENKUERZEL'] = false;
 // deadline. The month/day below is applied to the studiensemester's year:
 //   Sommersemester (SSyyyy) -> deadline in the SAME calendar year   (default 15th November)
 //   Wintersemester (WSyyyy) -> deadline in the FOLLOWING calendar year (default 15th May)
-$config['CIS_GESAMTNOTE_NOTENEINTRAGUNGSFRIST'] = false; // switch to use the window enforcement
+$config['CIS_GESAMTNOTE_NOTENEINTRAGUNGSFRIST'] = true; // switch to use the window enforcement
 $config['NOTENEINTRAGUNGSFRIST_SS'] = ['month' => 11, 'day' => 15]; // Sommersemester deadline (same year)
 $config['NOTENEINTRAGUNGSFRIST_WS'] = ['month' => 5,  'day' => 15];  // Wintersemester deadline (following year)
+
+// --- exam date guards --------------------------------------------------------------------------
+
+// allow a new exam on the same day as an existing one
+$config['CIS_GESAMTNOTE_TERMIN_GLEICHER_TAG'] = false;
+
+// a later exam locks the earlier grade; only its date stays editable
+$config['CIS_GESAMTNOTE_NOTE_SPERRE_BEI_SPAETEREM_TERMIN'] = true;
+
+// allow a benotungsdatum in the future
+$config['CIS_GESAMTNOTE_DATUM_ZUKUNFT'] = false;
+
+// waiting period between two ATTEMPTS in days; a Termin without an attempt does not start it.
+// null = off
+$config['CIS_GESAMTNOTE_ANTRITT_MIN_ABSTAND_TAGE'] = null;
+
+// deadline for the next attempt in days. null = off
+$config['CIS_GESAMTNOTE_ANTRITT_MAX_ABSTAND_TAGE'] = null;
+
+// --- when a grade closes the attempt chain -------------------------------------------------------
+
+// grades with no better one; they always close the chain. Named, not keyed: tbl_note resolves them
+$config['NOTEN_ABSCHLIESSEND_BEZEICHNUNGEN'] = ['Sehr Gut', 'Bestanden', 'Approbiert', 'Erfolgreich absolviert'];
+
+// allow another attempt after a positive grade (points mode: same grade, more points).
+// it uses up an attempt like any repeat
+$config['CIS_GESAMTNOTE_NOTENVERBESSERUNG'] = false;
+
+// a worse repeat keeps the better LV-Note; the exam row keeps its real grade
+$config['CIS_GESAMTNOTE_VERBESSERUNG_BESSERE_GEWINNT'] = false;
+
+// grade order, best first. tbl_note.notenwert is NULL everywhere, so it cannot be derived.
+// a grade outside this list is not comparable -> last grade wins
+$config['NOTEN_RANGFOLGE_BEZEICHNUNGEN'] = ['Sehr Gut', 'Gut', 'Befriedigend', 'Genügend', 'Nicht Genügend'];
+
+// --- deadlines ------------------------------------------------------------------------------------
+// Two separate questions. Omit a key to inherit CIS_GESAMTNOTE_NOTENEINTRAGUNGSFRIST.
+// Example: exam must happen by 15 Nov, but may be entered later -> PRUEFUNGSDATUM true, EINGABE false
+
+// blocks the time of ENTRY
+$config['CIS_GESAMTNOTE_FRIST_EINGABE'] = true;
+
+// blocks the DATE of the exam
+$config['CIS_GESAMTNOTE_FRIST_PRUEFUNGSDATUM'] = true;
+
+// permissions exempt from the ENTRY deadline. The date deadline has no exception: an exam does not
+// happen retroactively. Empty = no exception. Suggested: ['admin', 'lehre/benotungstool_assistenz']
+$config['CIS_GESAMTNOTE_FRIST_AUSNAHME'] = [];
+
+// --- attempt roles and legacy types ---------------------------------------------------------------
+
+// from which attempt the exam is held before a commission.
+//   'letzter'  the last attempt, whatever the count
+//   0          never
+//   3          from attempt 3 on
+// attempt count comes from CIS_GESAMTNOTE_MAX_ANTRITTE. A chain of one is never kommissionell
+$config['CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT'] = 'letzter';
+
+// legacy pruefungstyp per attempt; Stv still reads that column. A type missing from
+// tbl_pruefungstyp is skipped (Termin3 is absent by default).
+// The kommissionell role overrides this with PRUEFUNG_TYP_KOMMISSIONELL
+$config['PRUEFUNG_TYP_JE_ANTRITT'] = [1 => 'Termin1', 2 => 'Termin2', 3 => 'Termin3'];
+
+// --- roles and release ----------------------------------------------------------------------------
+
+// which permission may do which action. The keys are also the permissions that open the tool.
+//   vorschlag  write the LV-Note via the takeover path
+//   pruefung   create or edit an exam
+//   kommpruef  create the kommissionell attempt (on top of ALLOW_CREATE_KOMMPRUEF)
+//   freigabe   release grades
+//   import     the bulk paths
+// several roles -> union of their actions. Empty matrix = no restriction
+$config['CIS_GESAMTNOTE_ROLLENMATRIX'] = [
+	'lehre/benotungstool' => ['vorschlag', 'pruefung', 'kommpruef', 'freigabe', 'import'],
+	'lehre/benotungstool_assistenz' => ['vorschlag', 'pruefung', 'kommpruef', 'freigabe', 'import']
+];
+
+// a teacher sees only the courses they teach
+$config['CIS_GESAMTNOTE_LEKTOR_NUR_EIGENE_LV'] = true;
+
+// the release asks for the caller's password
+$config['CIS_GESAMTNOTE_FREIGABE_PASSWORT'] = true;
+
+// the release sends a mail
+$config['CIS_GESAMTNOTE_FREIGABEMAIL'] = true;
+
+// mail recipients. 'studiengang' = the degree programme addresses, 'aufrufer' = the releasing user.
+// an entry containing '@' is a fixed address
+$config['CIS_GESAMTNOTE_FREIGABEMAIL_EMPFAENGER'] = ['studiengang', 'aufrufer'];
+
+// Sancho template of the release mail; the body lives in the DB
+$config['CIS_GESAMTNOTE_FREIGABEMAIL_VORLAGE'] = 'Notenfreigabe';
+
+// a released grade is final and refuses any later change
+$config['CIS_GESAMTNOTE_FREIGABE_FINAL'] = false;
+
+// a new or edited exam revokes the release (it resets benotungsdatum, which the state compares)
+$config['CIS_GESAMTNOTE_PRUEFUNG_HEBT_FREIGABE_AUF'] = true;
+
+// --- proposal, import, display --------------------------------------------------------------------
+
+// rounding of the partial-grade average. The SMALLER number is the better grade, so the values are
+// named after the grade:
+//   'kaufmaennisch'  2.5 -> 3
+//   'besser'         2.5 -> 2
+//   'schlechter'     2.1 -> 3
+$config['CIS_GESAMTNOTE_VORSCHLAG_RUNDUNG'] = 'kaufmaennisch';
+
+// decimals of the points average before the grading scale applies
+$config['CIS_GESAMTNOTE_VORSCHLAG_PUNKTE_STELLEN'] = 2;
+
+// the takeover path accepts only grades valid in teaching (tbl_note.lehre)
+$config['CIS_GESAMTNOTE_VORSCHLAG_NUR_LEHRENOTEN'] = true;
+
+// the takeover path stays open once a repeat exists. false: from then on use the exam dialog
+$config['CIS_GESAMTNOTE_VORSCHLAG_NACH_WIEDERHOLUNG'] = false;
+
+// grade an empty entry falls back to
+$config['NOTE_NICHT_EINGETRAGEN_BEZEICHNUNG'] = 'Noch nicht eingetragen';
+
+// import column order. Allowed: 'kennung', 'datum', 'note'
+$config['CIS_GESAMTNOTE_IMPORT_SPALTEN_NOTEN'] = ['kennung', 'note'];
+$config['CIS_GESAMTNOTE_IMPORT_SPALTEN_PRUEFUNG'] = ['kennung', 'datum', 'note'];
+
+// 'dd.MM.yyyy' or 'yyyy-MM-dd'
+$config['CIS_GESAMTNOTE_IMPORT_DATUMSFORMAT'] = 'dd.MM.yyyy';
+
+// stop the bulk path at the first rejected row. false: report it and keep writing the rest
+$config['CIS_GESAMTNOTE_IMPORT_ABBRUCH'] = false;
+
+// badge in the exam cell; {n} is the attempt number
+$config['CIS_GESAMTNOTE_ANTRITT_ZEICHEN'] = [
+	'kommissionell' => '{n}-K',
+	'kommissionell_ohne_antritt' => 'K',
+	'antritt' => '{n}',
+	'ohne_antritt' => '–'
+];
+
+// grade list order: 'skala' = 1-5 first then alphabetical, 'bezeichnung' = alphabetical only
+$config['NOTEN_SORTIERUNG'] = 'skala';

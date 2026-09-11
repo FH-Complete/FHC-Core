@@ -1,3 +1,15 @@
+/**
+ * Makes a value safe for an HTML string. A Tabulator formatter string becomes innerHTML, therefore
+ * a value from the database or from an addon must not carry markup.
+ */
+export function escapeHtml(value) {
+	if (value === null || value === undefined) return '';
+
+	const ersatz = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'};
+
+	return String(value).replace(/[&<>"']/g, (zeichen) => ersatz[zeichen]);
+}
+
 export function capitalize(string) {
 	if (!string) return '';
 	

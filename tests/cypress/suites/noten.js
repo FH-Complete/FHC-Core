@@ -24,5 +24,9 @@ module.exports = {
 		NOTEN_TEACHER_USER: process.env.NOTEN_TEACHER_USER || null,
 		NOTEN_TEACHER_PASSWORD: process.env.NOTEN_TEACHER_PASSWORD || null,
 		NOTEN_FOREIGN_LV_ID: process.env.NOTEN_FOREIGN_LV_ID || null,
+
+		// assistant account for the role matrix: carries only lehre/benotungstool_assistenz
+		NOTEN_ASSISTENZ_USER: process.env.NOTEN_ASSISTENZ_USER || null,
+		NOTEN_ASSISTENZ_PASSWORD: process.env.NOTEN_ASSISTENZ_PASSWORD || null,
 	},
 };

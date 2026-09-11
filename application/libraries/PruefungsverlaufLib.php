@@ -34,8 +34,8 @@ class PruefungsverlaufLib
 	/** The last attempt. The examination rules require a commission for it. */
 	const ROLLE_KOMMISSIONELL = 'kommissionell';
 
-	/** Maps an attempt number to the old exam type. Kept for backward compatibility. */
-	private static $_legacyTypen = [1 => 'Termin1', 2 => 'Termin2', 3 => 'Termin3'];
+	/** Fallback for PRUEFUNG_TYP_JE_ANTRITT. */
+	private static $_typJeAntrittVorgabe = [1 => 'Termin1', 2 => 'Termin2', 3 => 'Termin3'];
 
 	private $_ci;
 	private $_noteCache = [];
@@ -52,57 +52,7 @@ class PruefungsverlaufLib
 		$this->_ci->load->config('noten');
 	}
 
-	/**
-	 * @param mixed $lvNote       counts as the implicit first attempt while no exam counts
-	 * @param mixed $zeugnisNote  a credited grade makes all exams impossible
-	 * @return stdClass
-	 */
-	public function getVerlauf($student_uid, $lv_id, $sem_kurzbz, $lvNote = null, $zeugnisNote = null)
-	{
-		return $this->buildVerlauf($this->getPruefungen($student_uid, $lv_id, $sem_kurzbz), $lvNote, $zeugnisNote);
-	}
-
-	/** All exams of one student in one course, in chronological order. @return array */
-	public function getPruefungen($student_uid, $lv_id, $sem_kurzbz)
-	{
-		$result = $this->_ci->LePruefungModel->getPruefungenByUidTypLvStudiensemester($student_uid, null, $lv_id, $sem_kurzbz);
-		if (isError($result) || !hasData($result)) return [];
-
-		return $this->sortPruefungen(getData($result));
-	}
-
-	/** Sort keys: datum, then tbl_pruefungstyp.sort (old rows without a date), then pruefung_id. */
-	public function sortPruefungen($pruefungen)
-	{
-		$pruefungen = array_values($pruefungen);
-		$typen = $this->getTypen();
-
-		usort($pruefungen, function ($a, $b) use ($typen) {
-			$da = substr((string) $a->datum, 0, 10);
-			$db = substr((string) $b->datum, 0, 10);
-
-			if ($da !== $db) {
-				if ($da === '') return -1;
-				if ($db === '') return 1;
-				return ($da < $db) ? -1 : 1;
-			}
-
-			$sa = isset($typen[$a->pruefungstyp_kurzbz]) ? (int) $typen[$a->pruefungstyp_kurzbz]->sort : 0;
-			$sb = isset($typen[$b->pruefungstyp_kurzbz]) ? (int) $typen[$b->pruefungstyp_kurzbz]->sort : 0;
-			if ($sa !== $sb) return ($sa < $sb) ? -1 : 1;
-
-			return ((int) $a->pruefung_id < (int) $b->pruefung_id) ? -1 : 1;
-		});
-
-		return $pruefungen;
-	}
-
-	/**
-	 * Builds the history from a list of exams. Each exam gets: position, zaehlt, antritt_nr (null
-	 * if the exam does not count) and terminal.
-	 *
-	 * @return stdClass
-	 */
+	/** Builds the history. Each exam gets position, zaehlt, antritt_nr and kommissionell. @return stdClass */
 	public function buildVerlauf($pruefungen, $lvNote = null, $zeugnisNote = null)
 	{
 		$pruefungen = $this->sortPruefungen($pruefungen);
@@ -132,6 +82,20 @@ class PruefungsverlaufLib
 		$implizit = ($antrittCount === 0 && $lvNote !== null && $this->zaehltAlsAntritt($lvNote));
 		if ($implizit) $antrittCount = 1;
 
+		// deciding grade: last counting attempt, else the course grade
+		$aktuelleNote = null;
+		foreach ($eintraege as $eintrag) {
+			if ($eintrag->zaehlt) $aktuelleNote = $eintrag->note;
+		}
+		if ($aktuelleNote === null && $implizit) $aktuelleNote = $lvNote;
+
+		// a pass closes the chain: a final grade always, any other positive one unless
+		// CIS_GESAMTNOTE_NOTENVERBESSERUNG is on
+		$bestanden = $this->istAbschliessendeNote($aktuelleNote)
+			|| (!$this->darfVerbessern() && $this->istPositiveNote($aktuelleNote));
+
+		if ($bestanden) $terminal = true;
+
 		$maxAntritte = $this->getMaxAntritte();
 
 		// credited: the row stays visible, but you cannot enter anything
@@ -142,6 +106,8 @@ class PruefungsverlaufLib
 		$verlauf->antrittCount = $antrittCount;
 		$verlauf->maxAntritte = $maxAntritte;
 		$verlauf->terminal = $terminal;
+		// closed by a pass, not by the attempt limit
+		$verlauf->bestanden = $bestanden;
 		$verlauf->angerechnet = $angerechnet;
 		$verlauf->impliziterErstantritt = $implizit;
 		$verlauf->canAdd = !$terminal && !$angerechnet && $antrittCount < $maxAntritte;
@@ -153,10 +119,9 @@ class PruefungsverlaufLib
 		// from the position, and the user interface offers no type to select.
 		if (count($eintraege) === 0 && !$implizit) {
 			$verlauf->naechsteRolle = self::ROLLE_ERSTANTRITT;
-		} elseif (($antrittCount + 1) >= $maxAntritte) {
-			$verlauf->naechsteRolle = self::ROLLE_KOMMISSIONELL;
 		} else {
-			$verlauf->naechsteRolle = self::ROLLE_PRUEFUNG;
+			// an exam exists -> the next is a repeat at least, even if none counted yet
+			$verlauf->naechsteRolle = $this->rolleFuerAntritt(max(2, $antrittCount + 1));
 		}
 
 		// The next attempt is the kommissionelle one, but this tool may not create it.
@@ -169,17 +134,138 @@ class PruefungsverlaufLib
 		return $verlauf;
 	}
 
+	/** May this tool CREATE the kommissionelle Prüfung? An existing one is always shown. @return bool */
+	public function darfKommPruefAnlegen()
+	{
+		$erlaubt = $this->_ci->config->item('CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF');
+		return $erlaubt === null ? true : (bool) $erlaubt;
+	}
+
+	/** May a student attempt again after a positive grade? @return bool */
+	public function darfVerbessern()
+	{
+		return $this->configBool('CIS_GESAMTNOTE_NOTENVERBESSERUNG', false);
+	}
+
 	/**
-	 * Trägt die Zeile eine Wiederholung, also einen Termin nach Antritt 1?
+	 * Attempt from which the exam is kommissionell, or null if none is.
+	 * Config takes a number, 0 for never, or 'letzter'.
 	 *
-	 * Antritt 1 und die LV-Note sind dieselbe Leistung. Solange nur er existiert, darf der
-	 * Vorschlagsweg die Note schreiben, und upsertErstantritt hält genau diesen Termin nach. Ab der
-	 * ersten Wiederholung gehört die Note zum Antritt und folgt dessen Regeln.
+	 * @return int|null
+	 */
+	public function getKommissionellAbAntritt()
+	{
+		$wert = $this->_ci->config->item('CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT');
+
+		if ($wert === null || $wert === 'letzter') {
+			$max = $this->getMaxAntritte();
+
+			// a chain of one has nothing to close
+			return $max > 1 ? $max : null;
+		}
+
+		return (is_numeric($wert) && (int) $wert >= 1) ? (int) $wert : null;
+	}
+
+	/** Attempts that count, kommissionell included. Config wins, else the old flags. @return int */
+	public function getMaxAntritte()
+	{
+		$max = $this->_ci->config->item('CIS_GESAMTNOTE_MAX_ANTRITTE');
+		if (is_numeric($max) && (int) $max > 0) return (int) $max;
+
+		return $this->maxAntritteAusAltFlags();
+	}
+
+	/** Grade an empty entry falls back to, named by config. @return mixed|null */
+	public function getNoteNichtEingetragen()
+	{
+		return $this->getSpecialNotes()['nichtEingetragen'];
+	}
+
+	/** All exams of one student in one course, in chronological order. @return array */
+	public function getPruefungen($student_uid, $lv_id, $sem_kurzbz)
+	{
+		$result = $this->_ci->LePruefungModel->getPruefungenByUidTypLvStudiensemester($student_uid, null, $lv_id, $sem_kurzbz);
+		if (isError($result) || !hasData($result)) return [];
+
+		return $this->sortPruefungen(getData($result));
+	}
+
+	/**
+	 * Special grades, resolved from config names to tbl_note keys. A PK means something else in
+	 * every installation, so no config holds one. An unknown name is dropped.
 	 *
-	 * Die Antwort kommt aus dem Verlauf, nicht aus der Zahl der Zeilen: die Position sagt, der
-	 * wievielte Termin ein Datensatz ist.
+	 * @return array{entschuldigt: mixed, ohneAntritt: array, anrechnung: array, limitMap: array}
+	 */
+	public function getSpecialNotes()
+	{
+		if ($this->_specialNotes !== null) return $this->_specialNotes;
+
+		$entschuldigt = $this->getNoteByBezeichnung($this->_ci->config->item('NOTE_ENTSCHULDIGT_BEZEICHNUNG'));
+
+		$ohneAntritt = $this->resolveNoten('NOTEN_OHNE_ANTRITT_BEZEICHNUNGEN');
+		if ($entschuldigt !== null && !in_array($entschuldigt, $ohneAntritt)) $ohneAntritt[] = $entschuldigt;
+
+		// the limit names a grade, the rules work on its key
+		$limitMap = [];
+		foreach ($this->configArray('NOTEN_OCCURANCE_LIMIT_MAP') as $bezeichnung => $limit) {
+			$note = $this->getNoteByBezeichnung($bezeichnung);
+			if ($note !== null) $limitMap[$note] = $limit;
+		}
+
+		$this->_specialNotes = [
+			'entschuldigt' => $entschuldigt,
+			'ohneAntritt' => array_values($ohneAntritt),
+			'anrechnung' => $this->resolveNoten('NOTEN_ANRECHNUNG_BEZEICHNUNGEN'),
+			'abschliessend' => $this->resolveNoten('NOTEN_ABSCHLIESSEND_BEZEICHNUNGEN'),
+			'nichtEingetragen' => $this->getNoteByBezeichnung($this->_ci->config->item('NOTE_NICHT_EINGETRAGEN_BEZEICHNUNG')),
+			// order matters here: best grade first
+			'rangfolge' => $this->resolveNoten('NOTEN_RANGFOLGE_BEZEICHNUNGEN'),
+			'limitMap' => $limitMap
+		];
+		return $this->_specialNotes;
+	}
+
+	/** The exam types that never use an attempt. @return array */
+	public function getTypenOhneAntritt()
+	{
+		$typen = $this->_ci->config->item('PRUEFUNG_TYPEN_OHNE_ANTRITT');
+		return is_array($typen) ? $typen : ['zusKommPruef'];
+	}
+
+	/**
+	 * @param mixed $lvNote       counts as the implicit first attempt while no exam counts
+	 * @param mixed $zeugnisNote  a credited grade makes all exams impossible
+	 * @return stdClass
+	 */
+	public function getVerlauf($student_uid, $lv_id, $sem_kurzbz, $lvNote = null, $zeugnisNote = null)
+	{
+		return $this->buildVerlauf($this->getPruefungen($student_uid, $lv_id, $sem_kurzbz), $lvNote, $zeugnisNote);
+	}
+
+	/** An exam with a later date locks the grade. You can still correct the date. @return bool */
+	public function hatSpaeterenTermin($verlauf, $pruefung_id)
+	{
+		$current = null;
+		foreach ($verlauf->pruefungen as $p) {
+			if ($p->pruefung_id == $pruefung_id) { $current = $p; break; }
+		}
+		if ($current === null) return false;
+
+		foreach ($verlauf->pruefungen as $p) {
+			if ($p->pruefung_id == $current->pruefung_id) continue;
+			if ($p->position > $current->position) return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Does a Termin after attempt 1 exist?
 	 *
-	 * @param array $pruefungen die Termine der Zeile, ungeordnet
+	 * Attempt 1 and the LV-Note are the same performance, so the takeover path may still write it.
+	 * From the first repeat on the grade belongs to the attempt. Decided by position, not by count.
+	 *
 	 * @return bool
 	 */
 	public function hatWiederholung($pruefungen)
@@ -191,19 +277,148 @@ class PruefungsverlaufLib
 		return false;
 	}
 
+	/** Grade with no better one: closes the chain for good. @return bool */
+	public function istAbschliessendeNote($note)
+	{
+		if ($note === null || $note === '') return false;
+
+		return in_array($note, $this->getSpecialNotes()['abschliessend']);
+	}
+
+	/** 'angerechnet' or 'intern angerechnet'. The TRANSCRIPT grade decides. @return bool */
+	public function istAnrechnungsnote($note)
+	{
+		if ($note === null || $note === '') return false;
+		return in_array($note, $this->getSpecialNotes()['anrechnung']);
+	}
+
+	/** Tells you if an exam takes place before a commission. @return bool */
+	public function istKommissionell($typ)
+	{
+		$typen = $this->_ci->config->item('PRUEFUNG_KOMMISSIONELL_TYPEN');
+		if (!is_array($typen)) $typen = ['kommPruef', 'zusKommPruef'];
+		return in_array($typ, $typen);
+	}
+
 	/**
-	 * Materialises the first attempt as its own exam row. A course grade without any exam IS
-	 * attempt 1 (impliziterErstantritt). As long as that row is missing, the next exam becomes
-	 * attempt 2, and the legacy type of the whole chain moves one place. The caller therefore
-	 * writes the row as soon as the course grade exists, not only on the release.
+	 * Is this grade a pass? tbl_note.positiv also sits on non-achievements ('entschuldigt',
+	 * 'Teilgenommen'), so ask this only about a grade that uses an attempt.
 	 *
-	 * Idempotent. With more than one exam the chain has moved on and nothing is written. With
-	 * exactly one exam the grade follows the course grade.
+	 * @return bool
+	 */
+	public function istPositiveNote($note)
+	{
+		if ($note === null || $note === '') return false;
+
+		$noteRow = $this->getNote($note);
+
+		return $noteRow ? (bool) $noteRow->positiv : false;
+	}
+
+	/** Is the new grade worse? An unknown grade is never worse. @return bool */
+	public function istSchlechter($neu, $alt)
+	{
+		$vergleich = $this->vergleicheNoten($neu, $alt);
+
+		return $vergleich !== null && $vergleich > 0;
+	}
+
+	/** Legacy pruefungstyp for an attempt number; Stv still reads that column. @return string */
+	public function legacyTypFuerAntritt($antrittNr)
+	{
+		$antrittNr = max(1, (int) $antrittNr);
+		$typen = $this->getTypen();
+		$jeAntritt = $this->getTypJeAntritt();
+
+		$kommissionell = $this->_ci->config->item('PRUEFUNG_TYP_KOMMISSIONELL');
+		if (!is_string($kommissionell) || $kommissionell === '') $kommissionell = 'kommPruef';
+
+		// the kommissionell role owns its type and beats the position
+		if ($this->rolleFuerAntritt($antrittNr) === self::ROLLE_KOMMISSIONELL && isset($typen[$kommissionell])) {
+			return $kommissionell;
+		}
+
+		// a type missing from tbl_pruefungstyp breaks the FK, so step down
+		for ($n = $antrittNr; $n >= 1; $n--) {
+			if (isset($jeAntritt[$n]) && isset($typen[$jeAntritt[$n]])) return $jeAntritt[$n];
+		}
+
+		return isset($jeAntritt[1]) ? $jeAntritt[1] : self::$_typJeAntrittVorgabe[1];
+	}
+
+	/** Legacy type for a new repeat; never below Termin2. @return string */
+	public function legacyTypFuerWiederholung($verlauf)
+	{
+		return $this->legacyTypFuerAntritt(max(2, $verlauf->antrittCount + 1));
+	}
+
+	/** Role of one attempt: 1 = erstantritt, later = pruefung, from the commission on = kommissionell. @return string */
+	public function rolleFuerAntritt($antrittNr)
+	{
+		$nr = max(1, (int) $antrittNr);
+		$abKommissionell = $this->getKommissionellAbAntritt();
+
+		if ($abKommissionell !== null && $nr >= $abKommissionell) return self::ROLLE_KOMMISSIONELL;
+
+		return $nr === 1 ? self::ROLLE_ERSTANTRITT : self::ROLLE_PRUEFUNG;
+	}
+
+	/** Sort keys: datum, then tbl_pruefungstyp.sort (old rows without a date), then pruefung_id. */
+	public function sortPruefungen($pruefungen)
+	{
+		$pruefungen = array_values($pruefungen);
+		$typen = $this->getTypen();
+
+		usort($pruefungen, function ($a, $b) use ($typen) {
+			$da = substr((string) $a->datum, 0, 10);
+			$db = substr((string) $b->datum, 0, 10);
+
+			if ($da !== $db) {
+				if ($da === '') return -1;
+				if ($db === '') return 1;
+				return ($da < $db) ? -1 : 1;
+			}
+
+			$sa = isset($typen[$a->pruefungstyp_kurzbz]) ? (int) $typen[$a->pruefungstyp_kurzbz]->sort : 0;
+			$sb = isset($typen[$b->pruefungstyp_kurzbz]) ? (int) $typen[$b->pruefungstyp_kurzbz]->sort : 0;
+			if ($sa !== $sb) return ($sa < $sb) ? -1 : 1;
+
+			return ((int) $a->pruefung_id < (int) $b->pruefung_id) ? -1 : 1;
+		});
+
+		return $pruefungen;
+	}
+
+	/** Occurrence limit per NOTEN_OCCURANCE_LIMIT_MAP; $excludePruefungId skips the edited row. @return bool */
+	public function ueberschreitetNotenLimit($pruefungen, $note, $excludePruefungId = null)
+	{
+		$limitMap = $this->getSpecialNotes()['limitMap'];
+
+		$limit = null;
+		foreach ($limitMap as $limitNote => $limitVal) {
+			if ($limitNote == $note) { $limit = $limitVal; break; }
+		}
+		if ($limit === null) return false;
+
+		$count = 0;
+		foreach ($pruefungen as $p) {
+			if ($excludePruefungId !== null && $p->pruefung_id == $excludePruefungId) continue;
+			if ($p->note == $note) $count++;
+		}
+
+		return ($count + 1) > $limit;
+	}
+
+	/**
+	 * Writes attempt 1 as its own exam row. A course grade without any exam IS attempt 1; while
+	 * that row is missing the next exam becomes attempt 2 and the whole legacy chain shifts.
 	 *
-	 * @param bool $mitDatum true also writes $datum into the existing attempt 1. Only the person
-	 *                       who enters the course grade picks that date; a release must not move
-	 *                       a date that somebody entered for the exam itself.
-	 * @param mixed $lehreinheit_id the caller resolved it already; null makes this method look it up
+	 * Idempotent: nothing is written once a repeat exists. Nothing is written either if the only
+	 * exam documents a result of its own (see darfErstantrittUeberschreiben).
+	 *
+	 * @param bool  $mitDatum        also write $datum into an existing attempt 1. Only the grader
+	 *                               picks that date - a release must not move it.
+	 * @param mixed $lehreinheit_id  null = look it up
 	 * @return stdClass|null the exam row, or null if nothing was written
 	 */
 	public function upsertErstantritt($student_uid, $lv_id, $sem_kurzbz, $note, $punkte, $datum, $mitarbeiter_uid = null, $mitDatum = false, $lehreinheit_id = null)
@@ -215,6 +430,9 @@ class PruefungsverlaufLib
 		$tag = substr((string) $datum, 0, 10);
 
 		if (count($pruefungen) === 1) {
+			// The course grade belongs to attempt 1 only. An excused Termin keeps its own grade.
+			if (!$this->darfErstantrittUeberschreiben($pruefungen[0])) return null;
+
 			$daten = [
 				'note' => $note,
 				'punkte' => $punkte,
@@ -254,55 +472,128 @@ class PruefungsverlaufLib
 		return $id ? $this->ladePruefung($id->retval) : null;
 	}
 
-	/** @return stdClass|null */
-	private function ladePruefung($pruefung_id)
-	{
-		$result = $this->_ci->LePruefungModel->load($pruefung_id);
-		return (!isError($result) && hasData($result)) ? getData($result)[0] : null;
-	}
-
-	/** 'angerechnet' or 'intern angerechnet'. The TRANSCRIPT grade decides. @return bool */
-	public function istAnrechnungsnote($note)
-	{
-		if ($note === null || $note === '') return false;
-		return in_array($note, $this->getSpecialNotes()['anrechnung']);
-	}
-
 	/**
-	 * All attempts that count, the kommissionelle attempt included. The explicit configuration
-	 * wins. Without it the number comes from the old flags: the original assessment, one attempt
-	 * for each active repeat, and the kommissionelle attempt.
+	 * Guards a NEW attempt: A limit, B chronology, C occurrence limit, D waiting period.
 	 *
-	 * @return int
+	 * @return array|null [phraseKey, extraParams] or null if permitted
 	 */
-	public function getMaxAntritte()
+	public function validateAdd($pruefungen, $note, $datum, $lvNote = null, $zeugnisNote = null)
 	{
-		$max = $this->_ci->config->item('CIS_GESAMTNOTE_MAX_ANTRITTE');
-		if (is_numeric($max) && (int) $max > 0) return (int) $max;
+		if ($this->istAnrechnungsnote($zeugnisNote)) return ['c4angerechnetKeinePruefung', []];
 
-		$max = 1;
-		if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2) $max++;
-		if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3) $max++;
-		if (defined('CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF') && CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF) $max++;
-		return $max;
+		$verlauf = $this->buildVerlauf($pruefungen, $lvNote, $zeugnisNote);
+
+		// the next attempt is kommissionell, and this tool may not create it
+		if ($verlauf->kommPruefGesperrt) return ['kommPruefNichtErlaubt', []];
+
+		// A: the first attempt only materialises the course grade, so it adds no attempt
+		if ($verlauf->naechsteRolle !== self::ROLLE_ERSTANTRITT && !$verlauf->canAdd) {
+			// a pass and a used-up limit are different answers
+			if ($verlauf->bestanden) return ['pruefungNachBestandenerNote', []];
+
+			return ['maxAntritteReached', [$verlauf->maxAntritte]];
+		}
+
+		// B: no attempt before an existing exam; same day counts as too early unless configured
+		$gleicherTag = $this->configBool('CIS_GESAMTNOTE_TERMIN_GLEICHER_TAG', false);
+		$newDate = substr((string) $datum, 0, 10);
+		foreach ($pruefungen as $p) {
+			$d = substr((string) $p->datum, 0, 10);
+			if ($d === '') continue;
+			if ($gleicherTag ? ($d > $newDate) : ($d >= $newDate)) {
+				return ['pruefungDatumBeforeExisting', []];
+			}
+		}
+
+		// C: occurrence limit, e.g. one 'entschuldigt' only
+		if ($this->ueberschreitetNotenLimit($pruefungen, $note, null)) {
+			return ['noteOccuranceLimitReached', []];
+		}
+
+		// D: the waiting period between two attempts
+		return $this->pruefeAntrittsabstand($verlauf, $newDate);
 	}
 
 	/**
-	 * Tells you if this tool may create the kommissionelle Prüfung. An installation that enters it
-	 * in another tool sets CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF to false. The exam stays visible
-	 * in the tool either way.
+	 * Guards an EDIT. Date must stay between the neighbouring exams; a later exam locks the grade.
 	 *
-	 * @return bool
+	 * Returns a phrase key, not a text - the controller adds student_uid and translates.
+	 *
+	 * @return array|null [phraseKey, extraParams] or null if permitted
 	 */
-	public function darfKommPruefAnlegen()
+	public function validateEdit($pruefungen, $pruefung_id, $newNote, $newDatum, $lvNote = null, $zeugnisNote = null)
 	{
-		$erlaubt = $this->_ci->config->item('CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF');
-		return $erlaubt === null ? true : (bool) $erlaubt;
+		if ($pruefung_id === null || $pruefung_id === '') return null; // add, not an edit
+
+		if ($this->istAnrechnungsnote($zeugnisNote)) return ['c4angerechnetKeinePruefung', []];
+
+		if (count($pruefungen) === 0) return null;
+
+		$verlauf = $this->buildVerlauf($pruefungen, $lvNote, $zeugnisNote);
+
+		// the record being edited
+		$current = null;
+		foreach ($verlauf->pruefungen as $p) {
+			if ($p->pruefung_id == $pruefung_id) { $current = $p; break; }
+		}
+		if ($current === null) return null;
+
+		// Stv owns exams that use no attempt (zusKommPruef); not validated here
+		if (in_array($current->pruefungstyp_kurzbz, $this->getTypenOhneAntritt())) return null;
+
+		$currentDate = substr((string) $current->datum, 0, 10);
+		$new         = substr((string) $newDatum, 0, 10);
+
+		// bounds: the exams directly before and after this one
+		$lower = null; $upper = null;
+		foreach ($verlauf->pruefungen as $p) {
+			if ($p->pruefung_id == $current->pruefung_id) continue;
+
+			$d = substr((string) $p->datum, 0, 10);
+			if ($d === '') continue;
+
+			if ($d < $currentDate) { if ($lower === null || $d > $lower) $lower = $d; }
+			elseif ($d > $currentDate) { if ($upper === null || $d < $upper) $upper = $d; }
+		}
+
+		// grade is locked once a later attempt exists
+		if ($this->configBool('CIS_GESAMTNOTE_NOTE_SPERRE_BEI_SPAETEREM_TERMIN', true)
+			&& $this->hatSpaeterenTermin($verlauf, $current->pruefung_id) && $newNote != $current->note) {
+			return ['pruefungNoteLocked', []];
+		}
+
+		// datum must stay strictly between the neighbouring exam dates
+		if (($lower !== null && $new <= $lower) || ($upper !== null && $new >= $upper)) {
+			return ['pruefungDatumOutOfRange', []];
+		}
+
+		// an edit may change the note too -> re-check the occurrence limit
+		if ($this->ueberschreitetNotenLimit($verlauf->pruefungen, $newNote, $current->pruefung_id)) {
+			return ['noteOccuranceLimitReached', []];
+		}
+
+		return null;
 	}
 
 	/**
-	 * The NOTE decides, therefore the same type can occur more than one time. The type decides in
-	 * one case only: a type in PRUEFUNG_TYPEN_OHNE_ANTRITT never uses an attempt.
+	 * Compares two grades via NOTEN_RANGFOLGE_BEZEICHNUNGEN (tbl_note.notenwert is NULL everywhere).
+	 *
+	 * @return int|null <0 if $a is better, 0 equal, null if one grade is not in the list
+	 */
+	public function vergleicheNoten($a, $b)
+	{
+		$rang = $this->getSpecialNotes()['rangfolge'];
+
+		$ia = array_search($a, $rang);
+		$ib = array_search($b, $rang);
+		if ($ia === false || $ib === false) return null;
+
+		return $ia - $ib;
+	}
+
+	/**
+	 * Does this Termin use an attempt? The NOTE decides; the type only via
+	 * PRUEFUNG_TYPEN_OHNE_ANTRITT, which never counts.
 	 *
 	 * @return bool
 	 */
@@ -319,174 +610,51 @@ class PruefungsverlaufLib
 		return $noteRow ? (bool) $noteRow->lehre : false;
 	}
 
-	/** Tells you if an exam takes place before a commission. @return bool */
-	public function istKommissionell($typ)
-	{
-		$typen = $this->_ci->config->item('PRUEFUNG_KOMMISSIONELL_TYPEN');
-		if (!is_array($typen)) $typen = ['kommPruef', 'zusKommPruef'];
-		return in_array($typ, $typen);
-	}
-
-	/** The exam types that never use an attempt. @return array */
-	public function getTypenOhneAntritt()
-	{
-		$typen = $this->_ci->config->item('PRUEFUNG_TYPEN_OHNE_ANTRITT');
-		return is_array($typen) ? $typen : ['zusKommPruef'];
-	}
-
-	/**
-	 * The type for an attempt number. The student administration still reads this column, so the
-	 * value must be correct. The last attempt gets the kommissionelle type, the attempts before it
-	 * get the old Termin types.
-	 *
-	 * @return string
-	 */
-	public function legacyTypFuerAntritt($antrittNr)
-	{
-		$antrittNr = max(1, (int) $antrittNr);
-		$typen = $this->getTypen();
-
-		$maxAntritte = $this->getMaxAntritte();
-		$kommissionell = $this->_ci->config->item('PRUEFUNG_TYP_KOMMISSIONELL');
-		if (!is_string($kommissionell) || $kommissionell === '') $kommissionell = 'kommPruef';
-
-		if ($maxAntritte > 1 && $antrittNr >= $maxAntritte && isset($typen[$kommissionell])) {
-			return $kommissionell;
-		}
-
-		for ($n = $antrittNr; $n >= 1; $n--) {
-			if (isset(self::$_legacyTypen[$n]) && isset($typen[self::$_legacyTypen[$n]])) {
-				return self::$_legacyTypen[$n];
-			}
-		}
-
-		return self::$_legacyTypen[1];
-	}
-
-	/**
-	 * The old type for a new repeat attempt. It is never lower than Termin2, also if the first
-	 * exam does not use an attempt.
-	 *
-	 * @return string
-	 */
-	public function legacyTypFuerWiederholung($verlauf)
-	{
-		return $this->legacyTypFuerAntritt(max(2, $verlauf->antrittCount + 1));
-	}
-
-	/**
-	 * The grades with a special meaning. The configuration names them, this method resolves the
-	 * names in lehre.tbl_note. A primary key means something else in every installation, therefore
-	 * no configuration holds one. A name that no grade carries is left out.
-	 *
-	 * @return array{entschuldigt: mixed, ohneAntritt: array, anrechnung: array, limitMap: array}
-	 */
-	public function getSpecialNotes()
-	{
-		if ($this->_specialNotes !== null) return $this->_specialNotes;
-
-		$entschuldigt = $this->getNoteByBezeichnung($this->_ci->config->item('NOTE_ENTSCHULDIGT_BEZEICHNUNG'));
-
-		$ohneAntritt = $this->resolveNoten('NOTEN_OHNE_ANTRITT_BEZEICHNUNGEN');
-		if ($entschuldigt !== null && !in_array($entschuldigt, $ohneAntritt)) $ohneAntritt[] = $entschuldigt;
-
-		// the limit names a grade, the rules work on its key
-		$limitMap = [];
-		foreach ($this->configArray('NOTEN_OCCURANCE_LIMIT_MAP') as $bezeichnung => $limit) {
-			$note = $this->getNoteByBezeichnung($bezeichnung);
-			if ($note !== null) $limitMap[$note] = $limit;
-		}
-
-		$this->_specialNotes = [
-			'entschuldigt' => $entschuldigt,
-			'ohneAntritt' => array_values($ohneAntritt),
-			'anrechnung' => $this->resolveNoten('NOTEN_ANRECHNUNG_BEZEICHNUNGEN'),
-			'limitMap' => $limitMap
-		];
-		return $this->_specialNotes;
-	}
-
-	/**
-	 * The occurrence limit from NOTEN_OCCURANCE_LIMIT_MAP. $excludePruefungId skips the record
-	 * that the user edits at this moment.
-	 *
-	 * @return bool
-	 */
-	public function ueberschreitetNotenLimit($pruefungen, $note, $excludePruefungId = null)
-	{
-		$limitMap = $this->getSpecialNotes()['limitMap'];
-
-		$limit = null;
-		foreach ($limitMap as $limitNote => $limitVal) {
-			if ($limitNote == $note) { $limit = $limitVal; break; }
-		}
-		if ($limit === null) return false;
-
-		$count = 0;
-		foreach ($pruefungen as $p) {
-			if ($excludePruefungId !== null && $p->pruefung_id == $excludePruefungId) continue;
-			if ($p->note == $note) $count++;
-		}
-
-		return ($count + 1) > $limit;
-	}
-
-	/** An exam with a later date locks the grade. You can still correct the date. @return bool */
-	public function hatSpaeterenTermin($verlauf, $pruefung_id)
-	{
-		$current = null;
-		foreach ($verlauf->pruefungen as $p) {
-			if ($p->pruefung_id == $pruefung_id) { $current = $p; break; }
-		}
-		if ($current === null) return false;
-
-		foreach ($verlauf->pruefungen as $p) {
-			if ($p->pruefung_id == $current->pruefung_id) continue;
-			if ($p->position > $current->position) return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * tbl_pruefungstyp as a map. It sorts old rows, and it limits the legacy type to the types
-	 * that exist. A type that does not exist breaks the foreign key. Termin3 is absent from the
-	 * standard data.
-	 *
-	 * @return array
-	 */
-	private function getTypen()
-	{
-		if ($this->_typen !== null) return $this->_typen;
-
-		$this->_typen = [];
-		$result = $this->_ci->PruefungstypModel->load();
-		if (!isError($result) && hasData($result)) {
-			foreach (getData($result) as $typ) {
-				$this->_typen[$typ->pruefungstyp_kurzbz] = $typ;
-			}
-		}
-
-		return $this->_typen;
-	}
-
-	/** The grades of one configuration key, found by their name. @return array */
-	private function resolveNoten($bezeichnungKey)
-	{
-		$noten = [];
-		foreach ($this->configArray($bezeichnungKey) as $bezeichnung) {
-			$note = $this->getNoteByBezeichnung($bezeichnung);
-			if ($note !== null && !in_array($note, $noten)) $noten[] = $note;
-		}
-
-		return array_values($noten);
-	}
-
 	/** One configuration value that must be a list. @return array */
 	private function configArray($key)
 	{
 		$wert = $this->_ci->config->item($key);
 		return is_array($wert) ? $wert : [];
+	}
+
+	/** One switch; an absent key keeps the default. @return bool */
+	private function configBool($key, $default)
+	{
+		$wert = $this->_ci->config->item($key);
+		return $wert === null ? (bool) $default : (bool) $wert;
+	}
+
+	/** Days, or null if the rule is off. @return int|null */
+	private function configTage($key)
+	{
+		$wert = $this->_ci->config->item($key);
+		if (!is_numeric($wert)) return null;
+
+		return ((int) $wert >= 0) ? (int) $wert : null;
+	}
+
+	/**
+	 * May the course grade go into this existing exam row? Attempt 1 and the course grade are the
+	 * same performance, therefore that row takes the grade. An empty row takes it too: it waits for
+	 * the result.
+	 *
+	 * A row with a result of its own does NOT take it. 'entschuldigt' and 'Nicht beurteilt' use no
+	 * attempt, but they document a dated event. The course grade then stays the implicit first
+	 * attempt, which buildVerlauf already counts.
+	 *
+	 * @return bool
+	 */
+	private function darfErstantrittUeberschreiben($pruefung)
+	{
+		// the student administration owns the types that never use an attempt (zusKommPruef)
+		if (in_array($pruefung->pruefungstyp_kurzbz, $this->getTypenOhneAntritt())) return false;
+
+		if ($this->zaehltAlsAntritt($pruefung->note, $pruefung->pruefungstyp_kurzbz)) return true;
+
+		// the row carries no result yet
+		$offen = $this->getSpecialNotes()['nichtEingetragen'];
+
+		return $offen !== null && $pruefung->note == $offen;
 	}
 
 	/**
@@ -510,5 +678,108 @@ class PruefungsverlaufLib
 
 		$result = $this->_ci->NoteModel->loadWhere(['bezeichnung' => $bezeichnung]);
 		return (!isError($result) && hasData($result)) ? getData($result)[0]->note : null;
+	}
+
+	/**
+	 * tbl_pruefungstyp as a map: sorts old rows and limits the legacy type to types that exist.
+	 * A missing type breaks the FK (Termin3 is absent by default).
+	 *
+	 * @return array
+	 */
+	private function getTypen()
+	{
+		if ($this->_typen !== null) return $this->_typen;
+
+		$this->_typen = [];
+		$result = $this->_ci->PruefungstypModel->load();
+		if (!isError($result) && hasData($result)) {
+			foreach (getData($result) as $typ) {
+				$this->_typen[$typ->pruefungstyp_kurzbz] = $typ;
+			}
+		}
+
+		return $this->_typen;
+	}
+
+	/** @return array attempt number => legacy type */
+	private function getTypJeAntritt()
+	{
+		$typen = $this->configArray('PRUEFUNG_TYP_JE_ANTRITT');
+
+		return count($typen) > 0 ? $typen : self::$_typJeAntrittVorgabe;
+	}
+
+	/** @return stdClass|null */
+	private function ladePruefung($pruefung_id)
+	{
+		$result = $this->_ci->LePruefungModel->load($pruefung_id);
+		return (!isError($result) && hasData($result)) ? getData($result)[0] : null;
+	}
+
+	/** 1 (the original assessment) + TERMIN2 + TERMIN3 + KOMMPRUEF. @return int */
+	private function maxAntritteAusAltFlags()
+	{
+		$max = 1;
+		if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2) $max++;
+		if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3) $max++;
+		if (defined('CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF') && CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF) $max++;
+
+		return $max;
+	}
+
+	/**
+	 * Waiting period between the last attempt and a new one.
+	 *
+	 * Runs between ATTEMPTS, not dates: an excused Termin must not push the next attempt away.
+	 *
+	 * @return array|null [phraseKey, extraParams] or null if permitted
+	 */
+	private function pruefeAntrittsabstand($verlauf, $newDate)
+	{
+		$min = $this->configTage('CIS_GESAMTNOTE_ANTRITT_MIN_ABSTAND_TAGE');
+		$max = $this->configTage('CIS_GESAMTNOTE_ANTRITT_MAX_ABSTAND_TAGE');
+		if (($min === null && $max === null) || $newDate === '') return null;
+
+		// last Termin that uses an attempt
+		$letzter = null;
+		foreach ($verlauf->pruefungen as $p) {
+			if (!$p->zaehlt) continue;
+
+			$d = substr((string) $p->datum, 0, 10);
+			if ($d !== '' && ($letzter === null || $d > $letzter)) $letzter = $d;
+		}
+		if ($letzter === null) return null;
+
+		$abstand = $this->tageZwischen($letzter, $newDate);
+		if ($abstand === null) return null;
+
+		if ($min !== null && $abstand < $min) return ['pruefungAbstandZuKurz', [$min]];
+		if ($max !== null && $abstand > $max) return ['pruefungAbstandZuLang', [$max]];
+
+		return null;
+	}
+
+	/** The grades of one configuration key, found by their name. @return array */
+	private function resolveNoten($bezeichnungKey)
+	{
+		$noten = [];
+		foreach ($this->configArray($bezeichnungKey) as $bezeichnung) {
+			$note = $this->getNoteByBezeichnung($bezeichnung);
+			if ($note !== null && !in_array($note, $noten)) $noten[] = $note;
+		}
+
+		return array_values($noten);
+	}
+
+	/** Whole days between two Y-m-d days. @return int|null */
+	private function tageZwischen($von, $bis)
+	{
+		$a = DateTime::createFromFormat('Y-m-d|', $von);
+		$b = DateTime::createFromFormat('Y-m-d|', $bis);
+		if ($a === false || $b === false) return null;
+
+		$diff = $a->diff($b);
+
+		return $diff->invert ? -((int) $diff->days) : (int) $diff->days;
 	}
 }

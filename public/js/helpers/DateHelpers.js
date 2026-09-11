@@ -59,3 +59,27 @@ export function formatDate(d) {
 		throw new TypeError("The parameter provided for this function is not a string or a Date object, please refere to the function formatDate in the DateHelpers.js file");
 	}
 }
+
+/**
+ * today in the time zone of the instance, as a Date at midnight
+ *
+ * The browser can stand in another time zone than the server. A date from the browser then names the
+ * next day, and the server refuses the entry as a date in the future.
+ *
+ * @returns {Date} today at 00:00 local time, with the day of the instance time zone.
+ */
+export function today() {
+	const zone = (typeof FHC_JS_DATA_STORAGE_OBJECT !== "undefined")
+		? FHC_JS_DATA_STORAGE_OBJECT.timezone
+		: null;
+
+	if (zone && typeof luxon !== "undefined")
+	{
+		const jetzt = luxon.DateTime.local().setZone(zone);
+		if (jetzt.isValid) return new Date(jetzt.year, jetzt.month - 1, jetzt.day);
+	}
+
+	// without the time zone of the instance the browser decides
+	const lokal = new Date();
+	return new Date(lokal.getFullYear(), lokal.getMonth(), lokal.getDate());
+}

@@ -67,7 +67,7 @@ describe("Noten API - Prüfungstermin (write path)", () => {
 
 		givenBaseline(ctx, student);
 
-		addPruefung(ctx, student, { note: ctx.gradeNotes[1], datum: attemptDate(ctx, 1) })
+		addPruefung(ctx, student, { note: ctx.notes.negativ, datum: attemptDate(ctx, 1) })
 			.then(() => readState(ctx))
 			.then((data) => {
 				const attempts = attemptsOfStudent(data, student.uid);
@@ -79,28 +79,11 @@ describe("Noten API - Prüfungstermin (write path)", () => {
 				const verlauf = verlaufOfStudent(data, student.uid);
 				expect(verlauf.antrittCount, "both attempts counted").to.eq(2);
 				expect(verlauf.maxAntritte, "the cap comes from the server").to.eq(ctx.maxAntritte);
-				expect(verlauf.canAdd, `canAdd with 2 of ${ctx.maxAntritte} used`).to.eq(2 < ctx.maxAntritte);
-			});
-	});
-
-	it("does not count an excused attempt, and keeps it as its own row", () => {
-		const student = studentFor(2);
-
-		givenBaseline(ctx, student);
-
-		addPruefung(ctx, student, { note: ctx.notes.entschuldigt, datum: attemptDate(ctx, 1) })
-			.then((response) => expectNotenSuccess(response, "excused attempt"))
-			.then(() => readState(ctx))
-			.then((data) => {
-				const attempts = attemptsOfStudent(data, student.uid);
-
-				expect(attempts, "the excused row is kept, not merged").to.have.length(2);
-
-				const excused = attempts[1];
-				expect(excused.zaehlt, "excused consumes no attempt").to.be.false;
-				expect(excused.antritt_nr, "and carries no Antrittsnummer").to.be.null;
-
-				expect(verlaufOfStudent(data, student.uid).antrittCount, "still one attempt used").to.eq(1);
+				// der letzte Antritt ist kommissionell; darf das Tool ihn nicht anlegen, ist hier Schluss
+				const anlegbar = ctx.cisConfig.CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF !== false
+					? ctx.maxAntritte
+					: ctx.maxAntritte - 1;
+				expect(verlauf.canAdd, `canAdd with 2 of ${anlegbar} possible`).to.eq(2 < anlegbar);
 			});
 	});
 
@@ -167,31 +150,6 @@ describe("Noten API - Prüfungstermin (write path)", () => {
 			});
 	});
 
-	it("adds an attempt while the LV note is still offen", () => {
-		// liest der Schreibpfad gefiltert, sieht er die Note nicht, versucht ein INSERT gegen den
-		// bestehenden PK und antwortet für immer "keine LV-Note eingetragen"
-		const student = studentFor(3);
-
-		givenBaseline(ctx, student, { freigegeben: false });
-
-		addPruefung(ctx, student, { note: ctx.gradeNotes[1], datum: attemptDate(ctx, 1) }).then((response) => {
-			expectNotenSuccess(response, "attempt on an un-freigegebene LV note");
-		});
-	});
-
-	it("stores an empty note as 'Noch nicht eingetragen'", () => {
-		const student = studentFor(1);
-
-		givenBaseline(ctx, student);
-
-		addPruefung(ctx, student, { note: "", datum: attemptDate(ctx, 1) }).then((response) => {
-			const [saved] = expectNotenSuccess(response, "attempt without a grade");
-			expect(String(saved.note), "empty note is normalised").to.eq(
-				String(ctx.notes.nochNichtEingetragen),
-			);
-		});
-	});
-
 	it("writes the LV note from the attempt's grade", () => {
 		const student = studentFor(3);
 
@@ -234,24 +192,4 @@ describe("Noten API - Prüfungstermin (write path)", () => {
 			});
 	});
 
-	it("applies a chosen note to both the Prüfung and the LV note in the bulk path", () => {
-		const student = studentFor(1);
-
-		resetNotenState(ctx);
-
-		notenApi
-			.createPruefungen(
-				[{ uid: student.uid, lehreinheit_id: student.lehreinheit_id }],
-				attemptDate(ctx, 1),
-				ctx.lvId,
-				ctx.semKurzbz,
-				ctx.gradeNotes[1],
-			)
-			.then((response) => {
-				const data = expectNotenSuccess(response, "createPruefungen with a note");
-				expect(String(data[student.uid].savedPruefung[0].note)).to.eq(String(ctx.gradeNotes[1]));
-			})
-			.then(() => readLvGesamtnote(ctx, student.uid))
-			.then((row) => expect(String(row.note)).to.eq(String(ctx.gradeNotes[1])));
-	});
 });

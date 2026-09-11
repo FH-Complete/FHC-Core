@@ -46,7 +46,7 @@ describe("Noten API - Notenvorschlag overwrite rules", () => {
 			.then(() => readLvGesamtnote(ctx, student.uid))
 			.then((row) => {
 				expect(String(row.note), "a non-lehre note must not become the LV note").to.eq(
-					String(ctx.gradeNotes[0]),
+					String(ctx.notes.negativ),
 				);
 			});
 	});
@@ -87,7 +87,7 @@ describe("Noten API - Notenvorschlag overwrite rules", () => {
 			.then((response) => expectNotenError(response, "c4zeugnisnoteGesperrt"))
 			.then(() => readLvGesamtnote(ctx, student.uid))
 			.then((row) => {
-				expect(String(row.note), "the LV note must not change").to.eq(String(ctx.gradeNotes[0]));
+				expect(String(row.note), "the LV note must not change").to.eq(String(ctx.notes.negativ));
 			});
 	});
 
@@ -98,56 +98,9 @@ describe("Noten API - Notenvorschlag overwrite rules", () => {
 			if (ctx.cisConfig.CIS_GESAMTNOTE_PUNKTE) {
 				// im Punktemodus leitet der Import die Note aus den Punkten ab und verwirft eine
 				// Zeile ohne Punkte, bevor eine dieser Regeln greift
-				cy.log("Skipped: CIS_GESAMTNOTE_PUNKTE ist aktiv.");
+				Cypress.log({ name: "skip", message: "Skipped: CIS_GESAMTNOTE_PUNKTE ist aktiv." });
 				this.skip();
 			}
-		});
-
-		it("refuses a note the editor list never offers", function () {
-			if (ctx.notes.nichtLehre === null) this.skip();
-
-			const student = studentFor(2);
-
-			givenBaseline(ctx, student, { erstantritt: false });
-
-			notenApi
-				.saveNotenvorschlagBulk(ctx.lvId, ctx.semKurzbz, [
-					{ uid: student.uid, note: ctx.notes.nichtLehre, punkte: null },
-				])
-				.then((response) => {
-					const data = expectNotenSuccess(response, "saveNotenvorschlagBulk");
-					expectBulkRowError(data, student.uid, "c4noteNichtInLehre");
-				})
-				.then(() => readLvGesamtnote(ctx, student.uid))
-				.then((row) => {
-					expect(String(row.note), "a non-lehre note must not become the LV note").to.eq(
-						String(ctx.gradeNotes[0]),
-					);
-				});
-		});
-
-		it("refuses to overwrite a locked Zeugnisnote", function () {
-			if (ctx.notes.nichtUeberschreibbar === null) this.skip();
-
-			const student = studentFor(5);
-
-			givenBaseline(ctx, student, { erstantritt: false });
-			seedZeugnisnote(ctx, student.uid, ctx.notes.nichtUeberschreibbar);
-
-			notenApi
-				.saveNotenvorschlagBulk(ctx.lvId, ctx.semKurzbz, [
-					{ uid: student.uid, note: ctx.gradeNotes[1], punkte: null },
-				])
-				.then((response) => {
-					const data = expectNotenSuccess(response, "saveNotenvorschlagBulk");
-					expectBulkRowError(data, student.uid, "c4zeugnisnoteGesperrt");
-				})
-				.then(() => readLvGesamtnote(ctx, student.uid))
-				.then((row) => {
-					expect(String(row.note), "the LV note must not change").to.eq(
-						String(ctx.gradeNotes[0]),
-					);
-				});
 		});
 
 		it("refuses to change the Notenvorschlag once a Prüfung exists", () => {

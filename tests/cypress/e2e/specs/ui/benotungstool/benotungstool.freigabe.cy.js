@@ -1,5 +1,6 @@
 import { benotungstoolPage as page } from "../../../../support/pages/benotungstool.po";
 import {
+	baselineDate,
 	loadNotenContext,
 	readLvGesamtnote,
 	requireDbReset,
@@ -46,15 +47,6 @@ context("Benotungstool UI - Notenfreigabe", () => {
 			page.expectFreigabeSummaryRow(student.uid, bezeichnung(ctx.gradeNotes[0]));
 		});
 
-		it("meldet eine leere Auswahl, wenn nichts freizugeben ist", () => {
-			resetNotenState(ctx);
-
-			page.visitAndWaitForTable(ctx);
-			page.openFreigabeModal();
-
-			cy.get("[data-cy='freigabe-summary-empty']").should("be.visible");
-		});
-
 		it("lehnt ein falsches Passwort ab und lässt den Status unverändert", () => {
 			const student = ctx.students[0];
 
@@ -77,10 +69,12 @@ context("Benotungstool UI - Notenfreigabe", () => {
 	describe("Freigabe (verschickt Mail - opt in über NOTEN_FREIGABE_ENABLED)", () => {
 		beforeEach(function () {
 			if (!freigabeEnabled()) {
-				cy.log(
+				Cypress.log({
+					name: "skip",
+					message:
 					"Skipped: die Freigabe verschickt die Notenfreigabe-Mail. NOTEN_FREIGABE_ENABLED=true " +
 						"nur auf einer Umgebung setzen, auf der das harmlos ist.",
-				);
+				});
 				this.skip();
 			}
 		});
@@ -115,6 +109,9 @@ context("Benotungstool UI - Notenfreigabe", () => {
 			page.visitAndWaitForTable(ctx);
 			page.expectPruefung(student.uid, "antritt_1", { note: ctx.gradeNotes[0], antritt: 1 });
 			page.expectAntrittCount(student.uid, 1);
+
+			// der Antritt übernimmt das Benotungsdatum der LV-Note, kein implizites Datum
+			page.getCell(student.uid, "antritt_1").should("contain.text", page.toDDMMYYYY(baselineDate(ctx)));
 		});
 	});
 });

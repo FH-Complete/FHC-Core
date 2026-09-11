@@ -61584,6 +61584,226 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'benotungstool',
+		'phrase' => 'pruefungAbstandZuKurz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zwischen zwei Prüfungsantritten für Studierenden {0} müssen mindestens {1} Tage liegen. Es wurde keine Prüfung angelegt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'At least {1} days must pass between two exam attempts for student {0}. No exam was created.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'pruefungAbstandZuLang',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der nächste Prüfungsantritt für Studierenden {0} muss innerhalb von {1} Tagen nach dem letzten Antritt stattfinden. Es wurde keine Prüfung angelegt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The next exam attempt for student {0} must take place within {1} days of the last attempt. No exam was created.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'pruefungNachBestandenerNote',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studierender {0} hat die Lehrveranstaltung bereits positiv abgeschlossen. Es wurde keine Prüfung angelegt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student {0} has already passed the course. No exam was created.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'aktionNichtErlaubt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ihre Rolle darf die Aktion "{0}" im Benotungstool nicht ausführen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Your role may not perform the action "{0}" in the grading tool.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'freigabeEndgueltig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Note für {0} ist freigegeben und damit endgültig. Sie kann nicht mehr geändert werden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The grade for {0} is released and therefore final. It can no longer be changed.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4antritteAufgebraucht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studierender {0} hat bereits {1} Prüfungsantritte abgelegt. {2}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student {0} has already used {1} exam attempts. {2}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4keinePruefungAngelegt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Werkzeug legt keine Prüfung an.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The tool creates no exam.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4zeileUebersprungen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Import überspringt die Zeile.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The import skips the row.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4pruefungBereitsAmDatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studierender {0} hat am {1} bereits eine Prüfung. {2}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student {0} already has an exam on {1}. {2}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4noteLimitUeberschritten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Note {0} ist für Studierenden {1} maximal {2} mal erlaubt. Das Werkzeug setzt die Auswahl zurück.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Grade {0} is permitted {2} times at most for student {1}. The tool resets the selection.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4notenGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Noten sind gespeichert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The grades are saved.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
 		'phrase' => 'noteOccuranceLimitReached',
 		'insertvon' => 'system',
 		'phrases' => array(

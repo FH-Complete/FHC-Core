@@ -10,6 +10,18 @@ const PHRASES = {
 		de: "Für Studierenden {0} sind bereits die maximal zulässigen Prüfungsantritte ({1}) vergeben. Es wurde keine Prüfung angelegt.",
 		en: "Student {0} has already used the maximum number of exam attempts ({1}). No exam was created.",
 	},
+	benotungsdatumUngueltig: {
+		de: "Das Benotungsdatum für {0} ist ungültig.",
+		en: "The assessment date for {0} is not valid.",
+	},
+	benotungsdatumInZukunft: {
+		de: "Das Benotungsdatum für {0} darf nicht in der Zukunft liegen.",
+		en: "The assessment date for {0} must not be in the future.",
+	},
+	kommPruefNichtErlaubt: {
+		de: "Die kommissionelle Prüfung für {0} wird nicht in diesem Werkzeug angelegt.",
+		en: "The oral examination for {0} is not created in this tool.",
+	},
 	pruefungDatumBeforeExisting: {
 		de: "Das Prüfungsdatum für Studierenden {0} darf nicht vor oder am selben Tag wie ein bereits bestehender Prüfungstermin liegen.",
 		en: "The exam date for student {0} must not be on or before an existing exam date.",
@@ -21,6 +33,26 @@ const PHRASES = {
 	pruefungNoteLocked: {
 		de: "Die Note für Studierenden {0} kann nicht mehr geändert werden, da bereits eine spätere Prüfung oder eine Prüfung mit höherem Antritt existiert. Das Prüfungsdatum kann weiterhin angepasst werden.",
 		en: "The grade for student {0} can no longer be changed because a later exam or an exam of a higher attempt already exists. The exam date can still be adjusted.",
+	},
+	aktionNichtErlaubt: {
+		de: 'Ihre Rolle darf die Aktion "{0}" im Benotungstool nicht ausführen.',
+		en: 'Your role may not perform the action "{0}" in the grading tool.',
+	},
+	freigabeEndgueltig: {
+		de: "Die Note für {0} ist freigegeben und damit endgültig. Sie kann nicht mehr geändert werden.",
+		en: "The grade for {0} is released and therefore final. It can no longer be changed.",
+	},
+	pruefungNachBestandenerNote: {
+		de: "Studierender {0} hat die Lehrveranstaltung bereits positiv abgeschlossen. Es wurde keine Prüfung angelegt.",
+		en: "Student {0} has already passed the course. No exam was created.",
+	},
+	pruefungAbstandZuKurz: {
+		de: "Zwischen zwei Prüfungsantritten für Studierenden {0} müssen mindestens {1} Tage liegen. Es wurde keine Prüfung angelegt.",
+		en: "At least {1} days must pass between two exam attempts for student {0}. No exam was created.",
+	},
+	pruefungAbstandZuLang: {
+		de: "Der nächste Prüfungsantritt für Studierenden {0} muss innerhalb von {1} Tagen nach dem letzten Antritt stattfinden. Es wurde keine Prüfung angelegt.",
+		en: "The next exam attempt for student {0} must take place within {1} days of the last attempt. No exam was created.",
 	},
 	pruefungDatumOutOfRange: {
 		de: "Das Prüfungsdatum für Studierenden {0} muss zwischen dem vorherigen und dem nachfolgenden Prüfungstermin liegen.",

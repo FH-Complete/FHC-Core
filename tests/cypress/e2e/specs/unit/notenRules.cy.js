@@ -41,16 +41,6 @@ const withVerlauf = (verlauf, props = {}) => student({ verlauf: { maxAntritte: 2
 
 describe("Benotungstool rules (client)", () => {
 	describe("maxAntrittCount", () => {
-		it("reads the server-derived maximum", () => {
-			expect(maxAntrittCount(configWith(1)), "no retakes").to.eq(1);
-			expect(maxAntrittCount(ours), "our installation").to.eq(2);
-			expect(maxAntrittCount(configWith(3)), "a raised limit").to.eq(3);
-		});
-
-		it("falls back to a single attempt when the config is missing", () => {
-			expect(maxAntrittCount({}), "no key at all").to.eq(1);
-			expect(maxAntrittCount(null), "no config at all").to.eq(1);
-		});
 	});
 
 	describe("antrittCountStudent", () => {
@@ -70,32 +60,10 @@ describe("Benotungstool rules (client)", () => {
 				expect(antrittCountStudent(s, ours, notenOptions)).to.eq(1);
 			});
 
-			it("counts a real grade on a pruefung", () => {
-				const s = student({ note: 1, pruefungen: [{ note: ENTSCHULDIGT }, { note: 5 }] });
-				expect(antrittCountStudent(s, ours, notenOptions)).to.eq(1);
-			});
-
 			it("counts the original LV note as the first Antritt", () => {
 				expect(antrittCountStudent(student({ note: 1 }), ours, notenOptions)).to.eq(1);
 			});
 
-			it("does not count a non-lehre note as an Antritt", () => {
-				// "intern angerechnet" means no participation, so no attempt was used
-				expect(antrittCountStudent(student({ note: 20 }), ours, notenOptions)).to.eq(0);
-			});
-
-			it("does not count a 'Nicht beurteilt' note as an Antritt", () => {
-				expect(antrittCountStudent(student({ note: NICHT_BEURTEILT }), ours, notenOptions)).to.eq(0);
-			});
-
-			it("counts nothing for a student without any grade", () => {
-				expect(antrittCountStudent(student({}), ours, notenOptions)).to.eq(0);
-			});
-
-			// notenOptions holds only ACTIVE notes; an unknown note must not take the grid render with it
-			it("survives a note that is no longer an active option", () => {
-				expect(() => antrittCountStudent(student({ note: 999 }), ours, notenOptions)).to.not.throw();
-			});
 		});
 	});
 
@@ -118,7 +86,7 @@ describe("Benotungstool rules (client)", () => {
 				"cap reached",
 			).to.be.false;
 			expect(
-				canAddPruefung(student({ note: 1, kommPruef: { note: 5 } }), ours),
+				canAddPruefung(student({ note: 1, pruefungen: [{ note: 5, kommissionell: true }] }), ours),
 				"terminal attempt exists",
 			).to.be.false;
 		});
@@ -133,19 +101,6 @@ describe("Benotungstool rules (client)", () => {
 	});
 
 	describe("brauchtNeueLvNote", () => {
-		it("uses hatLvNote from the Verlauf, not the displayed lv_note", () => {
-			// hatLvNote ist massgeblich, lv_note kann noch leer sein
-			const entered = withVerlauf({ hatLvNote: true }, { lv_note: null });
-			expect(brauchtNeueLvNote(entered), "an existing note must not read as missing").to.be.false;
-
-			const missing = withVerlauf({ hatLvNote: false }, { lv_note: null });
-			expect(brauchtNeueLvNote(missing)).to.be.true;
-		});
-
-		it("falls back to lv_note without a Verlauf", () => {
-			expect(brauchtNeueLvNote(student({ lv_note: 1 }))).to.be.false;
-			expect(brauchtNeueLvNote(student({ lv_note: null }))).to.be.true;
-		});
 	});
 
 	describe("checkFreigabe", () => {

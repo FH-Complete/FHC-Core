@@ -9,6 +9,7 @@
 import { notenApi } from "../../../../support/api/notenApi";
 import { expectNotenError, expectNotenSuccess } from "../../../../support/helpers/notenErrors";
 import {
+	attemptDate,
 	baselineBenotungsdatum,
 	loadNotenContext,
 	readLvGesamtnote,
@@ -16,7 +17,12 @@ import {
 	resetNotenState,
 	seedBaseline,
 } from "../../../../support/helpers/notenTestData";
-import { lvNoteOf, readState } from "../../../../support/helpers/notenScenario";
+import {
+	addPruefung,
+	attemptsOfStudent,
+	lvNoteOf,
+	readState,
+} from "../../../../support/helpers/notenScenario";
 
 const freigabeEnabled = () => String(Cypress.env("NOTEN_FREIGABE_ENABLED")).toLowerCase() === "true";
 const freigabePassword = () =>
@@ -76,10 +82,12 @@ describe("Noten API - Notenfreigabe", () => {
 	describe("happy path (sends mail - opt in via NOTEN_FREIGABE_ENABLED)", () => {
 		beforeEach(function () {
 			if (!freigabeEnabled()) {
-				cy.log(
+				Cypress.log({
+					name: "skip",
+					message:
 					"Skipped: saveStudentenNoten sends the Notenfreigabe email on success. " +
 						"Set NOTEN_FREIGABE_ENABLED=true only on an environment where that mail is harmless.",
-				);
+				});
 				this.skip();
 			}
 			requireDbReset();
@@ -123,6 +131,37 @@ describe("Noten API - Notenfreigabe", () => {
 			readState(ctx).then((data) => {
 				const grades = lvNoteOf(data, student.uid);
 				expect(grades.freigabedatum, "the note is now freigegeben").to.exist;
+			});
+		});
+
+		// Das Datum eines Termins gehört der Person, die ihn eingetragen hat. Die Freigabe macht die
+		// Note verbindlich und verschiebt kein Datum.
+		it("keeps the date of an exam that already exists", () => {
+			const student = ctx.students[2];
+			const pruefungsdatum = attemptDate(ctx, 2);
+
+			resetNotenState(ctx);
+			seedBaseline(ctx, student.uid, {
+				note: ctx.gradeNotes[0],
+				freigegeben: false,
+				erstantritt: false,
+				benotungsdatum: baselineBenotungsdatum(ctx),
+			});
+
+			addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: pruefungsdatum }).then(
+				(response) => expectNotenSuccess(response, "Termin von Hand"),
+			);
+
+			notenApi
+				.saveStudentenNoten(freigabePassword(), [notenPayload(student)], ctx.lvId, ctx.semKurzbz)
+				.then((response) => expectNotenSuccess(response, "saveStudentenNoten"));
+
+			readState(ctx).then((data) => {
+				const attempts = attemptsOfStudent(data, student.uid);
+				expect(attempts, "der Termin bleibt der einzige").to.have.length(1);
+				expect(String(attempts[0].datum).slice(0, 10), "mit seinem eigenen Datum").to.eq(
+					pruefungsdatum,
+				);
 			});
 		});
 

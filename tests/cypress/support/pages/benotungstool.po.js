@@ -80,6 +80,7 @@ class BenotungstoolPage {
 	getPruefungModal = () => cy.get("[data-cy='modal-pruefung']");
 	getNeuePruefungModal = () => cy.get("[data-cy='modal-neue-pruefung']");
 	getFreigabeModal = () => cy.get("[data-cy='modal-freigabe']");
+	getUebernahmeModal = () => cy.get("[data-cy='modal-uebernahme']");
 	getNotenImportModal = () => cy.get("[data-cy='modal-noten-import']");
 	getPruefungImportModal = () => cy.get("[data-cy='modal-pruefung-import']");
 	getFreigabeSummaryRow = (uid) => cy.get(`[data-cy='freigabe-row-${uid}']`);
@@ -124,9 +125,16 @@ class BenotungstoolPage {
 		cy.get(".tabulator-edit-list-item").contains(bezeichnung).click();
 	};
 
-	uebernehmen = (uid) => {
+	/** Übernehmen fragt zuerst das Benotungsdatum. Ohne `datum` bleibt der Vorschlag des Dialogs. */
+	uebernehmen = (uid, { datum } = {}) => {
 		this.getUebernehmenButton(uid).click();
+		this.getUebernahmeModal().should("be.visible");
+
+		if (datum) this.setDatum("uebernahme-datum", datum);
+
+		cy.get("[data-cy='uebernahme-submit']").click();
 		waitForOk("@saveNotenvorschlag");
+		this.getUebernahmeModal().should("not.be.visible");
 	};
 
 	// --- Prüfungen -------------------------------------------------------------------------------
@@ -301,6 +309,10 @@ class BenotungstoolPage {
 		const [y, m, d] = isoDate.split("-");
 		return `${d}.${m}.${y}`;
 	};
+
+	/** Date in the configured import format; kept apart from toDDMMYYYY, which the dialog uses. */
+	importDatum = (isoDate, format) =>
+		format === "yyyy-MM-dd" ? isoDate : this.toDDMMYYYY(isoDate);
 }
 
 export const benotungstoolPage = new BenotungstoolPage();

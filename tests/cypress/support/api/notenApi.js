@@ -35,8 +35,8 @@ export const notenApi = {
 		apiGet("getNotenvorschlagStudent", { lv_id, sem_kurzbz, uid }),
 
 	/** data -> [lvgesamtnote] */
-	saveNotenvorschlag: (lv_id, sem_kurzbz, student_uid, note, punkte = null) =>
-		apiPost("saveNotenvorschlag", { lv_id, sem_kurzbz, student_uid, note, punkte }),
+	saveNotenvorschlag: (lv_id, sem_kurzbz, student_uid, note, punkte = null, datum = null) =>
+		apiPost("saveNotenvorschlag", { lv_id, sem_kurzbz, student_uid, note, punkte, datum }),
 
 	/** data -> [savedPruefung, lvgesamtnote, verlauf]. Kein `typ` auf der Leitung. */
 	saveStudentPruefung: ({
