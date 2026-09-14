@@ -176,15 +176,15 @@ class Widget extends FHCAPI_Controller
 
 	public function create()
 	{
-		$this->loadPhrases(['mobility', 'dashboard']);
+		$this->loadPhrases([ 'ui', 'dashboard' ]);
 		$this->load->library('form_validation');
 
 		$this->form_validation->set_rules(
 			'widget_kurzbz',
-			$this->p->t('mobility', 'kurzbz'),
+			$this->p->t('dashboard', 'widget_kurzbz'),
 			'required|is_not_in_db[dashboard/Widget_model:widget_kurzbz]',
 			[
-				'is_not_in_db' => 'TODO(chris): error phrase'
+				'is_not_in_db' => $this->p->t('ui', 'error_entryExisting')
 			]
 		);
 		$this->form_validation->set_rules(
@@ -219,12 +219,12 @@ class Widget extends FHCAPI_Controller
 
 	public function update()
 	{
-		$this->loadPhrases(['zeitaufzeichnung']);
+		$this->loadPhrases([ 'dashboard' ]);
 		$this->load->library('form_validation');
 
 		$this->form_validation->set_rules(
 			'widget_id',
-			$this->p->t('zeitaufzeichnung', 'id'),
+			$this->p->t('dashboard', 'widget_id'),
 			'required'
 		);
 
