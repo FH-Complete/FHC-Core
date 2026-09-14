@@ -27,6 +27,24 @@ export default {
 			saving: false,
 		};
 	},
+	computed: {
+		value: {
+			get() {
+				return this.modelValue;
+			},
+			set(modelValue) {
+				this.$emit('update:modelValue', modelValue);
+			},
+		},
+		setup: {
+			get() {
+				return this.modelValue.setup;
+			},
+			set(setup) {
+				this.$emit('update:modelValue', { ...this.modelValue, setup });
+			},
+		},
+	},
 	watch: {
 		'originalData.setup.generator': {
 			async handler(gen) {
@@ -81,11 +99,11 @@ export default {
 		class="widgets-admin-edit mx-2"
 		@submit.prevent="save"
 	>
-		<edit-basics v-model="modelValue" :original="originalData" />
+		<edit-basics v-model="value" :original="originalData" />
 		<template v-if="generator">
-			<component :is="generator" v-model="modelValue" :original="originalData" :key="modelValue.widget_id" />
+			<component :is="generator" v-model="value" :original="originalData" :key="modelValue.widget_id" />
 		</template>
-		<edit-setup v-else v-model="modelValue.setup" />
+		<edit-setup v-else v-model="setup" />
 		<div class="position-absolute bottom-0 end-0 z-3">
 			<button
 				v-if="generator"

@@ -75,12 +75,25 @@ export default {
 	created() {
 		if (this.modelValue.arguments.statistik_kurzbz)
 			this.loadDetails(this.modelValue.arguments.statistik_kurzbz);
+		
 		if (!this.modelValue.arguments.vars) {
-			this.modelValue.arguments = {
-				statistik_kurzbz: '',
-				vars: {},
-				aggregators: [],
-			};
+			this.$emit('update:modelValue', {
+				...this.modelValue,
+				setup: {
+					...this.modelValue.setup,
+					icon: '',
+					name: '',
+					width: 1,
+					height: 1,
+					hideFooter: true,
+				},
+				arguments: {
+					statistik_kurzbz: '',
+					vars: {},
+					aggregators: [],
+				},
+				berechtigung_kurzbz: null,
+			});
 		}
 	},
 	template: /*html*/ `
@@ -93,7 +106,7 @@ export default {
 		/>
 		<report-picker
 			ref="picker"
-			:model-value="modelValue.arguments.statistik_kurzbz"
+			:model-value="modelValue.arguments.statistik_kurzbz || ''"
 			class="mb-3"
 			@update:model-value="attemptReportChange"
 		/>
