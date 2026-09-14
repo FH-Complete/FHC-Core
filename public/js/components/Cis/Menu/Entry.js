@@ -9,7 +9,7 @@ export default {
 		activeContent: [String, Number],
 		highestMatchingUrlCount: Number,
 		openMenuHierarchy: Array,
-		overarchingMenuHierarchy: {
+		precedingMenuHierarchy: {
 			type: Array,
 			default: [],
 		},
@@ -74,7 +74,7 @@ export default {
             return this.entry.childs && this.entry.childs.length !== 0;
         },
 		menuHierarchy() {
-			return [...this.$props.overarchingMenuHierarchy, this.$props.entry.content_id];
+			return [...this.$props.precedingMenuHierarchy, this.$props.entry.content_id];
 		},
 		menuNodeHref() {
 			if (this.hasChilds) {
@@ -113,7 +113,7 @@ export default {
 			
 			if (url_hash == this.entry.titel || url.href == this.entry.url) {
 					this.setActiveEntry(this.entry.content_id);
-					this.setOpenMenuHierarchy(this.overarchingMenuHierarchy);
+					this.setOpenMenuHierarchy(this.precedingMenuHierarchy);
 			}
 		},
 		searchRecursiveChild(entry,property,value){
@@ -136,7 +136,7 @@ export default {
 			if (!this.$props.entry.menu_open) {
 				this.setOpenMenuHierarchy(this.menuHierarchy);
 			} else {
-				this.setOpenMenuHierarchy(this.overarchingMenuHierarchy);
+				this.setOpenMenuHierarchy(this.precedingMenuHierarchy);
 			}
         },
 		handleClickOnMenuNode() {
@@ -197,7 +197,7 @@ export default {
 				:entry="child"
 				:level="level + 1"
 				:openMenuHierarchy="$props.openMenuHierarchy.slice(1)"
-				:overarchingMenuHierarchy="menuHierarchy"
+				:precedingMenuHierarchy="menuHierarchy"
 			/>
 		</ul>
     </template>`
