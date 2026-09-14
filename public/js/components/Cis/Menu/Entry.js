@@ -111,15 +111,11 @@ export default {
 			let url_hash = url.hash;
 			url_hash = url_hash.replace(url_hash_spaceSymbol_regex, " ").replace(url_hash_sharpSymbol_regex,"");
 			
-			// if the url hash contains the titel of the menu 
-			// or if the url equals the link of a menu 
-			// then set the menu active and open the menu up to this level 
 			if (url_hash == this.entry.titel || url.href == this.entry.url) {
 					this.setActiveEntry(this.entry.content_id);
 					this.setOpenMenuHierarchy(this.overarchingMenuHierarchy);
 			}
 		},
-		// searches the childs of an entry recursively based on the value of a property
 		searchRecursiveChild(entry,property,value){
 			if (typeof entry.childs == 'object' && !Array.isArray(entry.childs) && Object.entries(entry.childs).length > 0){
 				entry.childs = Object.values(entry.childs);
@@ -172,10 +168,9 @@ export default {
 			<a
 				@click="handleClickOnMenuNode($event)"
 				:href="menuNodeHref"
-				:target="target" 
+				:target="target"
 				class="btn btn-default rounded-0 text-start"
 				:class="{
-					'btn btn-default rounded-0 text-start': true,
 					['btn-level-' + level]: true,
 					'fw-bold': $props.activeContent === $props.entry.content_id
 				}"
