@@ -152,7 +152,14 @@ export default {
 			{
 				this.setActiveEntry(this.entry.content_id);
 			}
-        }
+        },
+		handleClickOnMenuNode(event) {
+			if (this.hasFullLink) {
+				this.setActiveEntry(this.$props.entry.content_id);
+			} else {
+				this.toggleCollapse(event);
+			}
+		},
     },
     mounted() {
         if (this.$refs.children) {
@@ -172,7 +179,7 @@ export default {
 			<div class="btn-group w-100">
  				<a :target="target" 
  					:href="(entry.menu_open && hasFullLink) ? entry.url : null"
-					@click="setActiveEntry(entry.content_id)"
+					@click="handleClickOnMenuNode($event)"
                     :class="{
                         'btn btn-default rounded-0 text-start': true,
                         ['btn-level-' + level]: true,
