@@ -178,14 +178,19 @@ class Report extends FHCAPI_Controller
 		if (count($vars)) {
 			$this->load->library('form_validation');
 			foreach ($vars as $var) {
-				// TODO(chris): select values check
 				$key = $var['kurzbz'];
 				$label = $var['title'];
 				$checks = 'required';
 				
-				// TODO(chris): select values check in multi?
 				if (isset($var['multiple']) && $var['multiple']) {
 					$key .= '[]';
+				}
+
+				if ($var['type'] == 'select') {
+					$options = array_map(function ($opt) {
+						return $opt['value'];
+					}, $var['options']);
+					$checks .= '|strval|in_list[' . implode(',', $options) . ']';
 				}
 
 				if ($var['type'] == 'datepicker')
