@@ -8,6 +8,11 @@ export default {
         },
 		activeContent: [String, Number],
 		highestMatchingUrlCount: Number,
+		openMenuHierarchy: Array,
+		overarchingMenuHierarchy: {
+			type: Array,
+			default: [],
+		},
     },
     data: () => {
 		return {
@@ -15,7 +20,7 @@ export default {
 			urlCount:0,
         }
     },
-	inject: ['makeParentContentActive', 'setActiveEntry','addUrlCount'],
+	inject: ['setActiveEntry', 'setOpenMenuHierarchy', 'addUrlCount'],
 	watch:{
 		highestMatchingUrlCount: function(newValue)
 		{
@@ -25,49 +30,36 @@ export default {
 				this.setActiveEntry(this.entry.content_id);
 			}
 		},
-		activeContent: function(newValue){
-			if(newValue == this.entry.content_id){
-				// wenn der Menupunkt nicht bereits offen ist
-				if (!this.entry.menu_open){
-					this.entry.menu_open = true;
-				}
-				
-			}else{
-				if (this.searchRecursiveChild(this.entry, 'content_id',newValue)) {
-					this.entry.menu_open = true;
-				} else {
-					this.entry.menu_open = false;
-				}
+		// activeContent: function(newValue){
+		// 	if (newValue === this.$props.entry.content_id) {
+		// 		this.setOpenMenuHierarchy(this.overarchingMenuHierarchy);
+		// 	}
+		// },
+		openMenuHierarchy() {
+			if (!this.hasChilds) return;
+
+			if (this.$props.openMenuHierarchy.length && this.$props.openMenuHierarchy[0] === this.$props.entry.content_id) {
+				this.$props.entry.menu_open = true;				
+			} else {
+				this.$props.entry.menu_open = false;				
 			}
 		},
 		'entry.menu_open': function (newValue,oldValue) {
 			if (newValue) 
 			{
-				// only invokes .show if this.collapse is not null
-				this.collapse && this.collapse.show();
+				if (this.collapse) {
+					this.collapse.show();
+				}
 			} 
 			else 
 			{
-				// only invokes .hide if this.collapse is not null
-				this.collapse && this.collapse.hide();
-				if (this.activeContent == this.entry.content_id)
-				{
-					this.makeParentContentActive(this.entry.content_id);
+				if (this.collapse) {
+					this.collapse.hide();
 				}
 			}
 		},
 	},
     computed: {
-		active: function () {
-			if (this.entry.menu_open){
-				return true;
-			}
-			else if (this.activeContent) {
-				return this.activeContent == this.entry.content_id;
-			} else {
-				return false;
-			}
-		},
 		hasFullLink() {
 			return this.entry.url.startsWith(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router)
 		},
@@ -89,7 +81,10 @@ export default {
         },
         hasChilds() {
             return this.entry.childs && this.entry.childs.length !== 0;
-        }
+        },
+		menuHierarchy() {
+			return [...this.$props.overarchingMenuHierarchy, this.$props.entry.content_id];
+		},
     },
     methods: {
 		getUrlMatchPoints(url,link){
@@ -121,9 +116,10 @@ export default {
 			
 			// if the url hash contains the titel of the menu 
 			// or if the url equals the link of a menu 
-			// then set the menu active 
+			// then set the menu active and open the menu up to this level 
 			if (url_hash == this.entry.titel || url.href == this.entry.url) {
 					this.setActiveEntry(this.entry.content_id);
+					this.setOpenMenuHierarchy(this.overarchingMenuHierarchy);
 			}
 		},
 		// searches the childs of an entry recursively based on the value of a property
@@ -143,21 +139,21 @@ export default {
 			}	
 			return false;
 		},
-        toggleCollapse(evt) {
-			if (this.active)
-			{
-				this.makeParentContentActive(this.entry.content_id); 
-			}
-			else
-			{
-				this.setActiveEntry(this.entry.content_id);
+        toggleCollapse() {
+			if (!this.$props.entry.menu_open) {
+				this.setOpenMenuHierarchy(this.menuHierarchy);
+			} else {
+				this.setOpenMenuHierarchy(this.overarchingMenuHierarchy);
 			}
         },
-		handleClickOnMenuNode(event) {
+		handleClickOnMenuNode() {
 			if (this.hasFullLink) {
 				this.setActiveEntry(this.$props.entry.content_id);
-			} else {
-				this.toggleCollapse(event);
+				if (this.hasChilds) {
+					this.setOpenMenuHierarchy(this.menuHierarchy);
+				}
+			} else if (this.hasChilds) {
+				this.toggleCollapse();
 			}
 		},
     },
@@ -183,12 +179,12 @@ export default {
                     :class="{
                         'btn btn-default rounded-0 text-start': true,
                         ['btn-level-' + level]: true,
-						'fw-bold':active
+						'fw-bold': $props.activeContent === $props.entry.content_id
                     }"
 					:style="'padding-left: calc(var(--bs-btn-padding-x) * ' + $props.level + ');'">
                     {{ entry.titel }}
                 </a>
-                <button @click.prevent="toggleCollapse" :aria-expanded="entry.menu_open"
+                <button @click.prevent="toggleCollapse()" :aria-expanded="entry.menu_open"
                     :class="{
                         'btn btn-default rounded-0 dropdown-toggle dropdown-toggle-split flex-grow-0': true,
                         collapsed: !entry.menu_open
@@ -198,7 +194,16 @@ export default {
             </div>
             <ul ref="children"
                 class="nav w-100 collapse">
-                <cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeContent" v-for="child in entry.childs" :key="child" :entry="child" :level="level + 1"/>
+                <cis-menu-entry
+					v-for="child in entry.childs"
+					:key="child"
+					:highestMatchingUrlCount="highestMatchingUrlCount"
+					:activeContent="activeContent"
+					:entry="child"
+					:level="level + 1"
+					:openMenuHierarchy="$props.openMenuHierarchy.slice(1)"
+					:overarchingMenuHierarchy="menuHierarchy"
+				/>
             </ul>
         </template>
 		<a v-else
@@ -207,9 +212,9 @@ export default {
             :class="{
                 'btn btn-default rounded-0 w-100 text-start': true,
                 ['btn-level-' + level]: true,
-				'fw-bold':active
+				'fw-bold': $props.activeContent === $props.entry.content_id
             }"
-            @mouseup="setActiveEntry(entry.content_id)"
+            @click="handleClickOnMenuNode(event)"
 			:style="'padding-left: calc(var(--bs-btn-padding-x) * ' + $props.level + ');'">
             {{ entry.titel }}
         </a>
