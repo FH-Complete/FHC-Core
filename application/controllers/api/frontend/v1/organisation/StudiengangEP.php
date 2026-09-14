@@ -57,6 +57,8 @@ class StudiengangEP extends FHCAPI_Controller
 	}
 
 	/**
+	 * Get all STGs they user has the given permissions for.
+	 *
 	 * @return void
 	 */
 	public function getAllowed()
