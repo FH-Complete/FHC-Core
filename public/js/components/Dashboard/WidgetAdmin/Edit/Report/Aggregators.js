@@ -66,9 +66,9 @@ export default {
 	},
 	template: /*html*/ `
 	<div class="widgets-report-config-aggregators">
-		<label>{{ $p.t('dashboard/widget_report_kpi_aggregators') }}</label>
+		<label class="form-label">{{ $p.t('dashboard/widget_report_kpi_aggregators') }}</label>
 		<div
-			class="accordion"
+			class="accordion mb-2"
 			@[\`show.bs.collapse\`]="preventOnCheckboxClick"
 			@[\`hide.bs.collapse\`]="preventOnCheckboxClick"
 		>

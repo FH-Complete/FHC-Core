@@ -20,7 +20,7 @@ export default {
 	],
 	template: /*html*/ `
 	<div class="widgets-report-config-vars">
-		<label v-if="details.length">{{ $p.t('dashboard/widget_report_vars') }}</label>
+		<label v-if="details.length" class="form-label">{{ $p.t('dashboard/widget_report_vars') }}</label>
 		<template v-for="detail in details" :key="detail.kurzbz">
 			<report-var
 				:model-value="modelValue[detail.kurzbz]"

@@ -25,7 +25,7 @@ export default {
 			:label="$p.t('global/name')"
 			:disabled="!editName"
 		/>
-		<label>{{ $p.t('dashboard/widget_setup_size') }}</label>
+		<label class="form-label">{{ $p.t('dashboard/widget_setup_size') }}</label>
 		<div class="d-flex gap-3 mb-3">
 			<edit-size v-model="modelValue.width" :disabled="!editSize">
 				{{ $p.t('dashboard/widget_setup_width') }}
