@@ -45,6 +45,13 @@ export default {
 				this.$refs.list.$refs.table.tabulator
 					.updateOrAddData([this.originalData])
 					.then(res => {
+						const widget_id = res[0].getData().widget_id;
+						let selected = this.$refs.list.$refs.table.tabulator.getSelectedRows();
+						selected.forEach(row => {
+							if (row.getData().widget_id != widget_id)
+								row.deselect();
+						});
+						
 						res[0].select();
 					})
 					.catch(this.$fhcAlert.handleSystemError);
