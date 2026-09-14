@@ -173,6 +173,7 @@ export default {
 				@click="handleClickOnMenuNode($event)"
 				:href="menuNodeHref"
 				:target="target" 
+				class="btn btn-default rounded-0 text-start"
 				:class="{
 					'btn btn-default rounded-0 text-start': true,
 					['btn-level-' + level]: true,
