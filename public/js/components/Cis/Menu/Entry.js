@@ -113,7 +113,7 @@ export default {
 			
 			if (url_hash == this.entry.titel || url.href == this.entry.url) {
 					this.setActiveEntry(this.entry.content_id);
-					this.setOpenMenuHierarchy(this.precedingMenuHierarchy);
+					this.setOpenMenuHierarchy(this.menuHierarchy);
 			}
 		},
 		searchRecursiveChild(entry,property,value){
