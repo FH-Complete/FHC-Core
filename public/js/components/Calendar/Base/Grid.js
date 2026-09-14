@@ -139,6 +139,10 @@ export default {
 			});
 			return displayedAxisMain;
 		},
+		displayedAxisMainIndexes() {
+			let axisMainIndex = 0;
+			return this.displayedAxisMain.map(date => date ? axisMainIndex++ : null);
+		},
 		start() {
 			return this.axisPartsWithBreaks[0].start;
 		},
@@ -165,9 +169,7 @@ export default {
 		eventsAllDay() {
 			if (!this.allDayEvents)
 				return [];
-
-			let eventsAllDay = this.mapIntoMainAxis(this.originalEvents.filter(event => event.orig.allDayEvent));
-			return eventsAllDay;
+			return this.mapIntoMainAxis(this.originalEvents.filter(event => event.orig.allDayEvent));
 		},
 		eventsNormal() {
 			if (!this.allDayEvents)
@@ -183,7 +185,17 @@ export default {
 		hasValidEvents() {
 			return this.events.find(e => e.length);
 		},
-		styleGridCols() {
+		styleGridCols()
+		{
+			if (this.dayVisibility)
+			{
+				let anyVisible = this.dayVisibility.some(day => day);
+				if (anyVisible)
+				{
+					return this.displayedAxisMain.map((day, i) => day && this.isDayCollapsed(i) ? 'var(--fhc-calendar-axis-collapsible-manual, 0.1fr)' : '1fr').join(' ');
+				}
+			}
+
 			let cols = 'repeat(' + this.displayedAxisMain.length + ', 1fr)';
 			if (this.axisMainCollapsible) {
 				if (this.hasValidEvents)
@@ -507,11 +519,15 @@ export default {
 		},
 		isDayCollapsed(index)
 		{
+			const axisMainIndex = this.displayedAxisMainIndexes[index];
+			if (axisMainIndex === null)
+				return false;
+
 			if (this.dayVisibility)
 			{
 				let anyVisible = this.dayVisibility.some(day => day);
 				if (anyVisible)
-					return !this.dayVisibility[index];
+					return !this.dayVisibility[axisMainIndex];
 			}
 			return this.axisMainCollapsible && this.hasValidEvents && !this.events[index].length;
 		}
@@ -528,23 +544,32 @@ export default {
 	<div
 		class="fhc-calendar-base-grid"
 		style="display:grid;width:100%;height:100%;overflow:auto"
-		:style="'grid-template-' + axisRow + 's:auto' + (allDayEvents ? ' auto ' : ' ') + '1fr;grid-template-' + axisCol + 's:auto ' + styleGridCols"
 		data-cy="calendar-base-grid"
+		:style="'--fhc-grid-displayed-axis-main-count: ' + displayedAxisMain.length + ';grid-template-' + axisRow + 's:auto' + (allDayEvents ? ' auto ' : ' ') + '1fr;grid-template-' + axisCol + 's:auto ' + styleGridCols"
 	>
 		<div
 			class="grid-header"
 			style="display:grid"
 			:style="'grid-template-' + axisCol + 's:subgrid;grid-' + axisCol + ':1/-1'"
 		>
-			<div
-				v-for="(date, index) in axisMain"
-				:key="index"
-				class="main-header"
-				:class="{'collapsed-header': isDayCollapsed(index)}"
-				:style="'grid-' + axisCol + ':' + (2+index)"
-			>
-				<slot name="main-header" v-bind="{ index, date }" />
-			</div>
+			<template v-for="(date, index) in displayedAxisMain" :key="index">
+				<div
+					v-if="date"
+					class="main-header"
+					:class="{
+						'collapsed-header': isDayCollapsed(index),
+						'main-header-sunday': date.weekday === 7,
+					}"
+					:style="'grid-' + axisCol + ':' + (2+index)"
+				>
+					<slot name="main-header" v-bind="{ index: displayedAxisMainIndexes[index], date }" />
+				</div>
+				<div
+					v-else
+					class="main-header main-header-empty"
+					:style="'grid-' + axisCol + ':' + (2+index)"
+				></div>
+			</template>
 		</div>
 		<div
 			v-if="allDayEvents"
@@ -552,26 +577,34 @@ export default {
 			style="display:grid"
 			:style="'grid-template-' + axisCol + 's:subgrid;grid-' + axisCol + ':1/-1'"
 		>
-			<div
-				v-for="(events, index) in eventsAllDay"
-				:key="index"
-				class="all-day-events"
-				:style="'grid-' + axisCol + ':' + (2+index)"
-			>
-				<grid-line-event
-					v-for="(event, i) in events"
-					:key="i"
-					:event="event"
+			<template v-for="(events, index) in eventsAllDay" :key="index">
+				<div
+					v-if="displayedAxisMain[index]"
+					class="all-day-events"
+					:class="{'all-day-events-sunday': displayedAxisMain[index].weekday === 7}"
+					:style="'grid-' + axisCol + ':' + (2+index)"
 				>
-					<template v-slot="slot">
-						<slot name="event" v-bind="slot" />
-					</template>
-				</grid-line-event>
-			</div>
+					<grid-line-event
+						v-for="(event, i) in events"
+						:key="i"
+						:event="event"
+					>
+						<template v-slot="slot">
+							<slot name="event" v-bind="slot" />
+						</template>
+					</grid-line-event>
+				</div>
+				<div
+					v-else
+					class="all-day-events"
+					:style="'grid-' + axisCol + ':' + (2+index)"
+				></div>
+			</template>
 		</div>
 		<div
 			ref="scroller"
 			@scrollend="userScroll ? disableAutoScroll() : userScroll = true"
+			id="grid-main-scrollable"
 			style="display:grid;overflow:auto"
 			:style="'grid-' + axisCol + ':1/-1;grid-template-' + axisCol + 's:subgrid'"
 		>
@@ -585,7 +618,7 @@ export default {
 					v-for="(part, index) in axisPartsSave"
 					:key="index"
 					class="part-header"
-					:style="'grid-' + axisCol + ':1;grid-' + axisRow + ': ps_' + index + '/pe_' + index"
+					:style="'grid-' + axisCol + ':1;grid-' + axisRow + ': ps_' + index + '/pe_' + index + ';min-width:50px;'"
 				>
 					<slot name="part-header" v-bind="{ index, part }" />
 				</div>
@@ -601,50 +634,65 @@ export default {
 					:style="'grid-' + axisCol + ':2/-1;grid-' + axisRow + ':1/-1'"
 				>
 					<template
-						v-for="(date, index) in axisMain"
+						v-for="(date, index) in displayedAxisMain"
 						:key="index"
 					>
-						<div
-							v-for="(part, i) in axisPartsSave"
-							:key="i"
-							class="part-body"
-							style="position:relative"
-							:style="'grid-' + axisCol + ':' + (1+index) + ';grid-' + axisRow + ':ps_' + i + '/pe_' + i"
-							:data-drop-index="index * axisPartsSave.length + i + 1"
-							data-cy="calendar-grid-part"
-						>
-							<slot name="part-body" v-bind="{ index, part }" />
+						<template v-if="date">
 							<div
-								v-if="snapToGrid"
-								style="position:absolute;inset:0"
-								:style="{ zIndex: isDragging ? 10 : 1 }"
-								:data-day="date.toFormat('yyyy-MM-dd')"
-								v-drop:move.lehreinheit.kalender.reservierung="(evt, item) => onDropSnap(evt, item, date, part)"
-							></div>
-						</div>
-						<grid-line
-							:start="date.plus(start)"
-							:end="date.plus(end)"
-							:date="date"
-							:events="eventsNormal[index]"
-							:backgrounds="backgrounds[index]"
-							:class="{ 'fhc-calendar-base-grid-line-collapsed': isDayCollapsed(index) }"
-							style="position:relative"
-							@resize-start="handleResizeStart"
-							:style="'grid-' + axisRow + ':1/-1;grid-' + axisCol + ':' + (1+index)"
-						>
-							<template #event="slot">
-								<slot name="event" v-bind="slot" />
-							</template>
-							<template #dropzone>
+								v-for="(part, i) in axisPartsSave"
+								:key="i"
+								class="part-body"
+								style="position:relative"
+								:style="'grid-' + axisCol + ':' + (1+index) + ';grid-' + axisRow + ':ps_' + i + '/pe_' + i"
+								:data-drop-index="displayedAxisMainIndexes[index] * axisPartsSave.length + i + 1"
+								data-cy="calendar-grid-part"
+							>
+								<slot name="part-body" v-bind="{ index: displayedAxisMainIndexes[index], part }" />
 								<div
-									v-if="!snapToGrid"
+									v-if="snapToGrid"
+									class="fhc-calendar-base-grid-dropzone"
 									style="position:absolute;inset:0"
 									:style="{ zIndex: isDragging ? 10 : 1 }"
-									v-drop:move.lehreinheit.kalender.reservierung="(evt, item) => onDropFree(evt, item, date)"
+									:data-day="date.toFormat('yyyy-MM-dd')"
+									v-drop:move.lehreinheit.kalender.reservierung="(evt, item) => onDropSnap(evt, item, date, part)"
 								></div>
-							</template>
-						</grid-line>
+							</div>
+							<grid-line
+								:start="date.plus(start)"
+								:end="date.plus(end)"
+								:date="date"
+								:events="eventsNormal[index]"
+								:backgrounds="backgrounds[index]"
+								:class="{ 'fhc-calendar-base-grid-line-collapsed': isDayCollapsed(index) }"
+								style="position:relative"
+								@resize-start="handleResizeStart"
+								:style="'grid-' + axisRow + ':1/-1;grid-' + axisCol + ':' + (1+index)"
+							>
+								<template #event="slot">
+									<slot name="event" v-bind="slot" />
+								</template>
+								<template #dropzone>
+									<div
+										v-if="!snapToGrid"
+										class="fhc-calendar-base-grid-dropzone"
+										style="position:absolute;inset:0"
+										:style="{ zIndex: isDragging ? 10 : 1 }"
+										v-drop:move.lehreinheit.kalender.reservierung="(evt, item) => onDropFree(evt, item, date)"
+									></div>
+								</template>
+							</grid-line>
+						</template>
+						<template v-else>
+							<div
+								v-for="(part, i) in axisPartsSave"
+								:key="i"
+								class="part-header-repeat part-body"
+								style="position:relative"
+								:style="'grid-' + axisCol + ':' + (1+index) + ';grid-' + axisRow + ':ps_' + i + '/pe_' + i"
+							>
+								<slot name="part-header-repeat" v-bind="{ index, part }" />
+							</div>
+						</template>
 					</template>
 				</div>
 			</div>

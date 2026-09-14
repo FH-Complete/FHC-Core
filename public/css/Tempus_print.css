@@ -9,6 +9,15 @@
 	overflow: visible !important;
 }
 
+html,
+body,
+#main,
+.tempus {
+	height: auto !important;
+	min-height: 0 !important;
+	max-height: none !important;
+}
+
 .fhc-calendar-base-slider > div {
 	position: relative !important;
 }
@@ -16,13 +25,35 @@
 header,
 #skiplink,
 #cis-lvplan-personal-heading,
+#sidebarMenu,
 .cis-lvplan-personal hr,
+.tempus .horizontalsplit-container > .horizontalsplitted:first-child,
+.tempus .horizontalsplitter,
 .fhc-calendar-base-header,
 .fhc-calendar-mode-range .grid-allday,
 .fhc-calendar-mode-range #rangePresetSelector,
 .fhc-calendar-base-grid-dropzone,
 .fhc-calendar-base-grid-line-background {
 	display: none !important;
+}
+
+.tempus .container-fluid,
+.tempus .container-fluid > .row,
+.tempus .horizontalsplit-container {
+	display: block !important;
+	width: 100% !important;
+	max-width: none !important;
+	height: auto !important;
+	max-height: none !important;
+}
+
+.tempus .horizontalsplit-container > .horizontalsplitted:last-child {
+	display: block !important;
+	width: 100% !important;
+	max-width: none !important;
+	height: auto !important;
+	max-height: none !important;
+	flex: 0 0 100% !important;
 }
 
 .fhc-calendar-mode-range .main-header-sunday,
