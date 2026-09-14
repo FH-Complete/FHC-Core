@@ -46,7 +46,7 @@ class Admin extends Auth_Controller
 
 	public function widgets()
 	{
-		$this->load->view('dashboard/widgets.php', [9]);
+		$this->load->view('dashboard/widgets.php');
 	}
 
 	public function preview($dashboard_kurzbz = 'CIS')
