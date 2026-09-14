@@ -1094,7 +1094,7 @@ export const CoreFilterCmpt = {
 		<div :id="'filterCollapsables' + idExtra">
 
 			<div class="d-flex flex-row justify-content-between flex-wrap">
-				<div v-if="newBtnShow || reload || $slots.search || $slots.actions" class="d-flex gap-2 align-items-baseline flex-wrap">
+				<div v-if="newBtnShow || reload || $slots.search || $slots.actions || $slots.tags" class="d-flex gap-2 align-items-baseline flex-wrap">
 					<button v-if="newBtnShow" class="btn btn-primary" :class="newBtnClass" :title="newBtnLabel ? undefined : 'New'" :aria-label="newBtnLabel ? undefined : 'New'" @click="$emit('click:new', $event)" :disabled="newBtnDisabled">
 						<span class="fa-solid fa-plus" aria-hidden="true"></span>
 						{{ newBtnLabel }}
@@ -1107,6 +1107,7 @@ export const CoreFilterCmpt = {
 						<span v-else id="selected-info-text"> Mit {{ selectedData.length }} ausgewählten:</span>
 					</span>
 					<slot name="actions" v-bind="{selected: tabulatorHasSelector ? selectedData : []}"></slot>
+					<slot name="tags"></slot>
 					<slot name="search"></slot>
 				</div>
 				<div class="d-flex gap-1 align-items-baseline flex-grow-1 justify-content-end">

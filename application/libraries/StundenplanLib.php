@@ -94,13 +94,13 @@ class StundenplanLib
 		if (isError($benutzer_gruppen))
 			return $benutzer_gruppen;
 		$benutzer_gruppen = getData($benutzer_gruppen);
-
+		$this->_ci->addMeta('spezialgruppen', $benutzer_gruppen);
 		// getting the student_lehrverbaende of the student in the different studiensemester
 		$student_lehrverband = $this->fetchStudentlehrverbandFromStudiensemester($student_uid, $semester_range);
 		if (isError($student_lehrverband))
 			return $student_lehrverband;
 		$student_lehrverband = getData($student_lehrverband);
-		
+		$this->_ci->addMeta('studentlehrvebaende', $student_lehrverband);
 		$stundenplan_query = $this->_ci->StundenplanModel->getStundenplanQuery(
 			$start,
 			$end,
@@ -632,6 +632,7 @@ class StundenplanLib
 						$result->semester = $item->semester;
 						$result->verband = $item->verband;
 						$result->gruppe = $item->gruppe;
+						$result->studiensemester_kurzbz = $item->studiensemester_kurzbz;
 						return $result;
 					},
 					$lehrverband_query_result);
