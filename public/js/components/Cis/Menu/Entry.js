@@ -39,18 +39,14 @@ export default {
 				this.$props.entry.menu_open = false;				
 			}
 		},
-		'entry.menu_open': function (newValue,oldValue) {
-			if (newValue) 
-			{
-				if (this.collapse) {
-					this.collapse.show();
-				}
-			} 
-			else 
-			{
-				if (this.collapse) {
-					this.collapse.hide();
-				}
+		'entry.menu_open': function (isMenuOpen) {
+			if (!this.collapse)
+				return;
+
+			if (isMenuOpen) {
+				this.collapse.show();
+			} else {
+				this.collapse.hide();
 			}
 		},
 	},
@@ -80,27 +76,30 @@ export default {
 		menuHierarchy() {
 			return [...this.$props.overarchingMenuHierarchy, this.$props.entry.content_id];
 		},
-		menuNodePadding() {
-			return "padding-left: calc(var(--bs-btn-padding-x) * " + this.$props.level + ");";
+		menuNodeHref() {
+			if (this.hasChilds) {
+				return this.$props.entry.menu_open && this.hasFullLink
+					? this.$props.entry.url
+					: null;
+			} else {
+				return this.$props.entry.url;
+			}
 		},
     },
     methods: {
 		getUrlMatchPoints(url,link){
 			let splitted_link = link.split('/');
 			let splitted_url = url.href.split('/');
-
 			let count = 0;
 
-			for(let part_url of splitted_url)
-			{
-				for (let part_link of splitted_link)
-				{
-					if(part_url == part_link)
-					{
+			for (let part_url of splitted_url) {
+				for (let part_link of splitted_link) {
+					if (part_url === part_link) {
 						count++;
 					}
 				}
 			}
+
 			this.urlCount = count;
 			this.addUrlCount(count);
 		},
@@ -169,52 +168,41 @@ export default {
         INCLUDE
     </div>
     <template v-else>
-        <template v-if="hasChilds">
-			<div class="btn-group w-100">
- 				<a :target="target" 
- 					:href="(entry.menu_open && hasFullLink) ? entry.url : null"
-					@click="handleClickOnMenuNode($event)"
-                    :class="{
-                        'btn btn-default rounded-0 text-start': true,
-                        ['btn-level-' + level]: true,
-						'fw-bold': $props.activeContent === $props.entry.content_id
-                    }"
-					:style="menuNodePadding">
-                    {{ entry.titel }}
-                </a>
-                <button @click.prevent="toggleCollapse()" :aria-expanded="entry.menu_open"
-                    :class="{
-                        'btn btn-default rounded-0 dropdown-toggle dropdown-toggle-split flex-grow-0': true,
-                        collapsed: !entry.menu_open
-                    }">
-                    <span class="visually-hidden">Toggle Dropdown</span>
-                </button>
-            </div>
-            <ul ref="children"
-                class="nav w-100 collapse">
-                <cis-menu-entry
-					v-for="child in entry.childs"
-					:key="child"
-					:highestMatchingUrlCount="highestMatchingUrlCount"
-					:activeContent="activeContent"
-					:entry="child"
-					:level="level + 1"
-					:openMenuHierarchy="$props.openMenuHierarchy.slice(1)"
-					:overarchingMenuHierarchy="menuHierarchy"
-				/>
-            </ul>
-        </template>
-		<a v-else
-            :href="entry.url"
-            :target="target"
-            :class="{
-                'btn btn-default rounded-0 w-100 text-start': true,
-                ['btn-level-' + level]: true,
-				'fw-bold': $props.activeContent === $props.entry.content_id
-            }"
-            @click="handleClickOnMenuNode(event)"
-			:style="menuNodePadding">
-            {{ entry.titel }}
-        </a>
+		<div class="btn-group w-100">
+			<a
+				@click="handleClickOnMenuNode($event)"
+				:href="menuNodeHref"
+				:target="target" 
+				:class="{
+					'btn btn-default rounded-0 text-start': true,
+					['btn-level-' + level]: true,
+					'fw-bold': $props.activeContent === $props.entry.content_id
+				}"
+				:style="'padding-left: calc(var(--bs-btn-padding-x) * ' + $props.level + ');'"
+			>
+				{{ entry.titel }}
+			</a>
+			<button
+				v-if="hasChilds"
+				@click.prevent="toggleCollapse()"
+				:aria-expanded="entry.menu_open"
+				class="btn btn-default rounded-0 dropdown-toggle dropdown-toggle-split flex-grow-0"
+				:class="{ collapsed: !entry.menu_open }"
+			>
+				<span class="visually-hidden">Toggle Dropdown</span>
+			</button>
+		</div>
+		<ul v-if="hasChilds" ref="children" class="nav w-100 collapse" >
+			<cis-menu-entry
+				v-for="child in entry.childs"
+				:key="child"
+				:highestMatchingUrlCount="highestMatchingUrlCount"
+				:activeContent="activeContent"
+				:entry="child"
+				:level="level + 1"
+				:openMenuHierarchy="$props.openMenuHierarchy.slice(1)"
+				:overarchingMenuHierarchy="menuHierarchy"
+			/>
+		</ul>
     </template>`
 };
