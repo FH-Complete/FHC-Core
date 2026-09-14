@@ -28,7 +28,7 @@ export default {
 		activeAggregator() {
 			if (this.config.aggregators.length == 1)
 				return this.config.aggregators[0];
-			// TODO(chris): by name not index??
+			
 			if (this.config.aggregator !== undefined)
 				return this.config.aggregators[this.config.aggregator];
 			return this.config.aggregators.find(agg => agg.default);
