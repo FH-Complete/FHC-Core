@@ -33,8 +33,10 @@ export default {
 				if (!gen)
 					return this.generator = null;
 
-				// TODO(chris): extensions
-				let file = '../../DashboardWidget/Generators/' + gen + '.js';
+				gen = gen.split(':').reverse();
+				let file = '../../DashboardWidget/Generators/' + gen[0] + '.js';
+				if (gen.length > 1)
+					file = '../../../../extensions/' + gen[1] + '/js/components' + file.substr(5);
 
 				this.generator = Vue.markRaw((await import(file)).default);
 			},
