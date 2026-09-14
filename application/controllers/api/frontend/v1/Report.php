@@ -49,7 +49,6 @@ class Report extends FHCAPI_Controller
 		$this->StatistikModel->addSelect('statistik_kurzbz');
 		$this->StatistikModel->addSelect('bezeichnung');
 		$this->StatistikModel->addSelect('gruppe');
-		$this->StatistikModel->addSelect('sql'); // TODO(chris): remove!
 		
 		$result = $this->StatistikModel->loadWhere([
 			'sql IS NOT NULL' => null
@@ -167,7 +166,6 @@ class Report extends FHCAPI_Controller
 	 */
 	public function get($statistik_kurzbz)
 	{
-		// TODO(chris): IMPLEMENT!
 		$result = $this->StatistikModel->load($statistik_kurzbz);
 		$statistik = $this->getDataOrTerminateWithError($result);
 		if (!$statistik)
@@ -180,7 +178,6 @@ class Report extends FHCAPI_Controller
 		if (count($vars)) {
 			$this->load->library('form_validation');
 			foreach ($vars as $var) {
-				// TODO(chris): calculated stuff
 				// TODO(chris): select values check
 				$key = $var['kurzbz'];
 				$label = $var['title'];
@@ -197,7 +194,7 @@ class Report extends FHCAPI_Controller
 				$this->form_validation->set_rules($key, $label, $checks);
 				
 				$vars_values[$var['kurzbz']] = $this->input->post($var['kurzbz']);
-				// TODO(chris): calculated stuff
+
 				if ($var['type'] == 'datepicker') {
 					try {
 						$dt = new DateTime($vars_values[$var['kurzbz']]);
