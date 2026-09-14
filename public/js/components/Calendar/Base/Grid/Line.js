@@ -46,6 +46,16 @@ export default {
 		},
 	},
 	computed: {
+		visibleStart() {
+			return this.date.startOf('day');
+		},
+		visibleEnd() {
+			const end = this.end.startOf('day');
+
+			return end > this.visibleStart
+				? end
+				: this.visibleStart.plus({ days: 1 });
+		},
 		formattedEvents() {
 			let formattedEvents = this.events.map((event) => {
 				event.rows = [1, -1];
@@ -133,6 +143,8 @@ export default {
 	template: /* html */ `
 	<div
 		class="fhc-calendar-base-grid-line"
+		:data-visible-start="visibleStart.toISO()"
+		:data-visible-end="visibleEnd.toISO()"
 		:class="{
 			'fhc-calendar-base-grid-line-sunday': $props.date.weekday === 7
 		}"

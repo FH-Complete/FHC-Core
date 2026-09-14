@@ -22,6 +22,7 @@ export default {
 	},
 	provide() {
 		return {
+			calendarVisibleDatesChanged: dates => this.$emit('update:visible-dates', dates),
 			events: Vue.computed(() => this.convertedEvents),
 			backgrounds: Vue.computed(() => this.convertedBackgrounds),
 			dropAllowed: Vue.computed(() => !!this.onDrop),
@@ -138,6 +139,7 @@ export default {
 		"update:date",
 		"update:mode",
 		"update:range",
+		"update:visible-dates",
 		"update:date-range",
 		"drop"
 	],

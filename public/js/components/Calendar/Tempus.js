@@ -103,6 +103,7 @@ export default {
 	],
 	data() {
 		return {
+			visibleDates: null,
 			modes: {
 				week: Vue.markRaw(ModeWeek),
 				month: Vue.markRaw(ModeMonth),
@@ -162,6 +163,34 @@ export default {
 		{
 			let list = this.events;
 
+			// Start with the first week and then keep events overlapping a grid line
+			// that is visible inside the slider viewport, including a one-day buffer
+			// before and after the visible dates.
+			console.log('visibleDates', this.visibleDates);
+			if (this.currentMode === 'range' && Array.isArray(this.visibleDates))
+			{
+				const visibleIntervals = this.visibleDates
+					.map(date => luxon.Interval.fromDateTimes(
+						luxon.DateTime.fromISO(date.start).setZone(this.timezone).minus({ days: 1 }),
+						luxon.DateTime.fromISO(date.end).setZone(this.timezone).plus({ days: 1 })
+					))
+					.filter(interval => interval.isValid);
+
+				list = list.filter(event => {
+					const eventStart = luxon.DateTime.fromISO(event.isostart).setZone(this.timezone);
+					const eventEnd = luxon.DateTime.fromISO(event.isoend).setZone(this.timezone);
+
+					// Do not hide an event with an invalid date; it is safer to keep it
+					// available for the renderer than to silently discard it.
+					if (!eventStart.isValid || !eventEnd.isValid)
+						return true;
+
+					return visibleIntervals.some(interval =>
+						eventStart < interval.end && eventEnd > interval.start
+					);
+				});
+			}
+
 			if (Array.isArray(this.visibleLecturers))
 			{
 				const visibleLectures = new Set(this.visibleLecturers);
@@ -190,6 +219,18 @@ export default {
 				return;
 
 			this.rangeInterval = rangeInterval;
+			if (
+				this.visibleDates === null
+				&& rangeInterval instanceof luxon.Interval
+				&& rangeInterval.isValid
+			)
+			{
+				const start = rangeInterval.start.startOf('day');
+				this.visibleDates = [{
+					start: start.toISO(),
+					end: start.plus({ days: 7 }).toISO()
+				}];
+			}
 			this.$emit('update:range', rangeInterval);
 		},
 		handleDateRange({ start, end }) {
@@ -299,6 +340,7 @@ export default {
 		@update:date="handleDateUpdate"
 		@update:mode="(newMode, newDate) => { currentMode = newMode; $emit('update:mode', newMode, newDate) }"
 		@update:range="updateRange"
+		@update:visible-dates="visibleDates = $event"
 		@update:date-range="handleDateRange"
 	>
 		<template v-slot="{ event, mode }">
