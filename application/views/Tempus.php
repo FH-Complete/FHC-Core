@@ -22,7 +22,7 @@
 			'public/css/components/calendar.css',
 			'public/css/Tempus.css',
 			'public/css/Studentenverwaltung.css',
-			'public/css/components/function.css'
+			'public/css/components/function.css',
 		],
 		'customJSs' => [
 			'vendor/moment/luxonjs/luxon.min.js',
@@ -30,7 +30,8 @@
 		],
 		'customJSModules' => [
 			'public/js/apps/Tempus.js'
-		]
+		],
+		'printCssPath' => 'public/css/Tempus_print.css'
 	);
 
 	$this->load->view('templates/FHC-Header', $includesArray);
