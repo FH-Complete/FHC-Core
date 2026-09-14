@@ -30,11 +30,6 @@ export default {
 				this.setActiveEntry(this.entry.content_id);
 			}
 		},
-		// activeContent: function(newValue){
-		// 	if (newValue === this.$props.entry.content_id) {
-		// 		this.setOpenMenuHierarchy(this.overarchingMenuHierarchy);
-		// 	}
-		// },
 		openMenuHierarchy() {
 			if (!this.hasChilds) return;
 
