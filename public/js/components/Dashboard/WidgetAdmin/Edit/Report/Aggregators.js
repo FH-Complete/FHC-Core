@@ -9,6 +9,19 @@ export default {
 		FormInput,
 		ReportAggregator,
 	},
+	provide() {
+		return {
+			defaultAggregatorIndex: Vue.computed({
+				get: () => this.defaultAggregatorIndex,
+				set: v => {
+					const curr = this.modelValue.find(agg => agg.default);
+					if (curr)
+						delete curr.default;
+					this.modelValue[v].default = true;
+				},
+			}),
+		};
+	},
 	props: {
 		modelValue: {
 			type: Object,
@@ -24,17 +37,9 @@ export default {
 		};
 	},
 	computed: {
-		aggregatorDefault: {
-			get() {
-				return this.modelValue.findIndex(agg => agg.default);
-			},
-			set(v) {
-				const curr = this.modelValue.find(agg => agg.default);
-				if (curr)
-					delete curr.default;
-				this.modelValue[v].default = true;
-			},
-		},
+		defaultAggregatorIndex() {
+			return this.modelValue.findIndex(agg => agg.default);
+		}
 	},
 	methods: {
 		addAggregator() {
@@ -44,6 +49,16 @@ export default {
 			if (evt.explicitOriginalTarget.classList.contains('form-check-label')) {
 				evt.preventDefault();
 			}
+		},
+		getHeaderStyle(isDefault) {
+			if (!isDefault)
+				return undefined;
+			return {
+				'--bs-accordion-btn-bg': 'var(--bs-success-bg-subtle)',
+				'--bs-accordion-btn-color': 'var(--bs-success-text-emphasis)',
+				'--bs-accordion-active-bg': 'var(--bs-success)',
+				'--bs-accordion-active-color': '#fff',
+			};
 		},
 	},
 	created() {
@@ -62,7 +77,10 @@ export default {
 				:key="i"
 				class="accordion-item"
 			>
-				<h3 class="accordion-header">
+				<h3
+					class="accordion-header"
+					:style="getHeaderStyle(defaultAggregatorIndex == i)"
+				>
 					<button
 						type="button"
 						class="accordion-button collapsed"
@@ -73,22 +91,10 @@ export default {
 					>
 						<span v-if="agg.label">{{ agg.label }}</span>
 						<i v-else>{{ $p.t('ui/neu') }}</i>
-						<div class="flex-grow-1">
-							<form-input
-								type="radio"
-								name="aggregatordefault"
-								v-model="aggregatorDefault"
-								class="btn-check"
-								:label="$p.t('ui/default')"
-								:value="i"
-								label-class="btn"
-								container-class="text-end pe-4"
-							/>
-						</div>
 					</button>
 				</h3>
 				<div :id="'aggregator_' + myId + '_' + i" class="accordion-collapse collapse">
-					<report-aggregator v-model="agg" class="accordion-body" />
+					<report-aggregator v-model="agg" class="accordion-body" :index="i" />
 				</div>
 			</div>
 		</div>
