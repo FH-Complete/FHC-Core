@@ -17,7 +17,7 @@ export default {
 	},
 	provide() {
 		return {
-			rangeLength: Vue.computed(() => this.currentRangeLength),
+			rangeLength: 30, //Vue.computed(() => this.currentRangeLength), TODO: This is a hack to make the range mode work, but it should be fixed in the future
 			rangeViewPresets: Vue.computed(() => this.semesterRangePresets),
 			rangeViewSelectedPreset: Vue.computed({
 				get: () => this.selectedRangePreset,
@@ -123,7 +123,7 @@ export default {
 			hoursplan: null,
 			showRaster: true,
 			currentRangeLength: this.rangeLength,
-			selectedRangePreset: this.currentSemester,
+			selectedRangePreset: null, //this.currentSemester, TODO: This is a hack to make the range mode work, but it should be fixed in the future
 			semesterRangePresets: {
 				label: null,
 				presets: [],
