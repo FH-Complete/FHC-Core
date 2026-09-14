@@ -34,6 +34,10 @@ export default {
 			this.currentData = JSON.parse(JSON.stringify(data));
 			this.save();
 		},
+		remove(widget) {
+			this.$refs.list.$refs.table.tabulator.deleteRow(widget.widget_id);
+			this.originalData = this.currentData = null;
+		},
 		save() {
 			this.select(this.currentData);
 			this.$nextTick(() => {
@@ -65,6 +69,7 @@ export default {
 					v-model="currentData"
 					:original-data="originalData"
 					:unsaved-progress="unsavedProgress"
+					@remove="remove"
 					@saved="save"
 				/>
 				<div v-else class="h-100 d-flex justify-content-center align-items-center">

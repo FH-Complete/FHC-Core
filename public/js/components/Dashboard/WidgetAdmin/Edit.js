@@ -18,6 +18,7 @@ export default {
 	},
 	emits: [
 		"saved",
+		"remove",
 		"update:modelValue",
 	],
 	data() {
@@ -54,6 +55,22 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => this.saving = false);
 		},
+		remove() {
+			this.$fhcAlert.confirmDelete()
+				.then(result => {
+					if (!result)
+						return Promise.reject({ handled: true });
+					
+					this.saving = true;
+					return this.$api
+						.call(ApiWidget.remove(this.modelValue.widget_id));
+				})
+				.then(() => {
+					this.$emit('remove', this.modelValue);
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => this.saving = false);
+		},
 	},
 	template: /* html */`
 	<core-form
@@ -68,6 +85,13 @@ export default {
 		</template>
 		<edit-setup v-else v-model="modelValue.setup" />
 		<div class="position-absolute bottom-0 end-0 z-3">
+			<button
+				v-if="generator"
+				type="button"
+				:disabled="saving"
+				class="btn btn-danger me-2"
+				@click="remove"
+			>{{ $p.t('ui/loeschen') }}</button>
 			<button
 				type="submit"
 				:disabled="saving || !unsavedProgress"

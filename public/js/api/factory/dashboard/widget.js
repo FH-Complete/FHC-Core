@@ -69,6 +69,13 @@ export default {
 			params
 		};
 	},
+	remove(widget_id) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/dashboard/widget/remove',
+			params: { widget_id }
+		};
+	},
 	generators() {
 		return {
 			method: 'get',

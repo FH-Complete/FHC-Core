@@ -408,7 +408,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE dashboard.tbl_dashboard_widget TO vil
 --
 
 GRANT SELECT ON TABLE dashboard.tbl_widget TO web;
-GRANT SELECT,INSERT,UPDATE ON TABLE dashboard.tbl_widget TO vilesci;
+GRANT SELECT,INSERT,UPDATE,DELETE ON TABLE dashboard.tbl_widget TO vilesci;
 
 
 --
@@ -466,3 +466,22 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
     }
 }
 
+// Add delete privilege for vilesci on tbl_widget
+if ($result = @$db->db_query("
+	SELECT 1 
+	FROM information_schema.role_table_grants 
+	WHERE grantee = 'vilesci' 
+		AND table_name = 'tbl_widget' 
+		AND table_schema = 'dashboard' 
+		AND privilege_type = 'DELETE' 
+	LIMIT 1")) {
+	if ($db->db_num_rows($result) == 0) {
+		$qry = "GRANT SELECT,INSERT,UPDATE,DELETE ON TABLE dashboard.tbl_widget TO vilesci;";
+
+		if(!$db->db_query($qry)) {
+			echo '<strong>dashboard.tbl_widget '.$db->db_last_error().'</strong><br>';
+		} else {
+			echo 'dashboard.tbl_widget: Added delete privilege for vilesci<br>';
+		}
+	}
+}

@@ -38,6 +38,7 @@ class Widget extends FHCAPI_Controller
 			'setAllowed'					=> 'dashboard/admin:rw',
 			'create'						=> 'dashboard/admin:rw',
 			'update'						=> 'dashboard/admin:rw',
+			'remove'						=> 'dashboard/admin:rw',
 			'generators'					=> 'dashboard/admin:rw',
 		]);
 
@@ -251,6 +252,40 @@ class Widget extends FHCAPI_Controller
 			$this->terminateWithSuccess();
 		
 		$result = $this->WidgetModel->update($widget_id, $data);
+
+		$this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess();
+	}
+
+	public function remove()
+	{
+		$this->loadPhrases([ 'dashboard' ]);
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules(
+			'widget_id',
+			$this->p->t('dashboard', 'widget_id'),
+			'required'
+		);
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$widget_id = $this->input->post('widget_id');
+
+		$result = $this->WidgetModel->load($widget_id);
+		$widget = $this->getDataOrTerminateWithError($result);
+		$widget = current($widget);
+		if (!$widget)
+			show_404();
+
+		$setup = json_decode($widget->setup);
+
+		if (!property_exists($setup, 'generator'))
+			$this->terminateWithError($this->p->t('dashboard', 'widget_error_delete_native'), null, REST_Controller::HTTP_METHOD_NOT_ALLOWED);
+
+		$result = $this->WidgetModel->delete($widget_id);
 
 		$this->getDataOrTerminateWithError($result);
 
