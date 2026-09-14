@@ -4,6 +4,8 @@ if (! defined("BASEPATH")) exit("No direct script access allowed");
 
 class KalenderLib
 {
+	const COLLISION_CHECK_BATCH_SIZE = 1000;
+
 	private $_ci;
 	public function __construct()
 	{
@@ -40,10 +42,27 @@ class KalenderLib
 
 		return sprintf(
 			'WITH filtered_kalender AS MATERIALIZED (
-				SELECT *
+				SELECT kalender_id
 				FROM lehre.tbl_kalender
 				WHERE von >= timestamp %s
 					AND bis < timestamp %s
+					AND status_kurzbz NOT IN (\'deleted\')
+			),
+			filtered_kalender_lehreinheit AS MATERIALIZED (
+				SELECT kalender_id, lehreinheit_id
+				FROM lehre.tbl_kalender_lehreinheit
+				WHERE kalender_id IN (
+					SELECT kalender_id
+					FROM filtered_kalender
+				)
+			),
+			filtered_lehreinheit AS MATERIALIZED (
+				SELECT lehreinheit_id, lehrveranstaltung_id, lehrfach_id, lehrform_kurzbz
+				FROM lehre.tbl_lehreinheit
+				WHERE lehreinheit_id IN (
+					SELECT lehreinheit_id
+					FROM filtered_kalender_lehreinheit
+				)
 			)',
 			$this->_ci->KalenderModel->db->escape(date('Y-m-d H:i:s', strtotime($start_date))),
 			$this->_ci->KalenderModel->db->escape(date('Y-m-d H:i:s', strtotime($end_date)))
@@ -118,9 +137,10 @@ class KalenderLib
 						,0)
 				,2
 			) END AS verplante_stunden
-			'); 
+		');
 
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit', 'tbl_kalender.kalender_id = tbl_kalender_lehreinheit.kalender_id', 'LEFT');
+		$this->_ci->KalenderModel->addJoin('filtered_kalender', 'tbl_kalender.kalender_id = filtered_kalender.kalender_id', 'INNER');
+		$this->_ci->KalenderModel->addJoin('filtered_kalender_lehreinheit AS tbl_kalender_lehreinheit', 'tbl_kalender.kalender_id = tbl_kalender_lehreinheit.kalender_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event', 'tbl_kalender.kalender_id = tbl_kalender_event.kalender_id', 'LEFT');
 
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event_teilnehmer orginasator', 'tbl_kalender_event.kalender_id = orginasator.kalender_id AND orginasator.rolle_kurzbz = \'organisator\'', 'LEFT');
@@ -139,7 +159,7 @@ class KalenderLib
 		$this->_ci->KalenderModel->addJoin('public.tbl_studiengang', 'verbandgruppe.studiengang_kz = public.tbl_studiengang.studiengang_kz', 'LEFT' );
 
 
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheit', 'tbl_kalender_lehreinheit.lehreinheit_id = tbl_lehreinheit.lehreinheit_id', 'LEFT');
+		$this->_ci->KalenderModel->addJoin('filtered_lehreinheit AS tbl_lehreinheit', 'tbl_kalender_lehreinheit.lehreinheit_id = tbl_lehreinheit.lehreinheit_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehrveranstaltung', 'tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehrveranstaltung lehrfach', 'tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_ort', 'tbl_kalender.kalender_id = tbl_kalender_ort.kalender_id', 'LEFT');
@@ -237,12 +257,431 @@ class KalenderLib
 	private function _loadFilteredBasePlan($start_date, $end_date)
 	{
 		$query = $this->_buildFilteredKalenderCte($start_date, $end_date) . "\n" .
-			$this->_ci->KalenderModel->db->get_compiled_select('filtered_kalender AS tbl_kalender');
+			$this->_ci->KalenderModel->db->get_compiled_select('lehre.tbl_kalender');
 
 		return $this->_ci->KalenderModel->execReadOnlyQuery($query);
 	}
 
-	private function _mapEvents($data, $collisionCheck = true, $maxDailyEventLimit = null)
+	private function _loadPlannerKalenderIds($start_date, $end_date, $ort = null, $uids = null, $studiengaenge = null)
+	{
+		$db = $this->_ci->KalenderModel->db;
+		$end_date = date('Y-m-d', strtotime($end_date . ' +1 day'));
+
+		$query = sprintf(
+			'SELECT tbl_kalender.kalender_id
+			FROM lehre.tbl_kalender
+			WHERE tbl_kalender.von >= timestamp %s
+				AND tbl_kalender.bis < timestamp %s
+				AND tbl_kalender.status_kurzbz NOT IN (\'deleted\')
+				AND NOT EXISTS (
+					SELECT 1
+					FROM lehre.tbl_kalender nachfolger
+					WHERE nachfolger.vorgaenger_kalender_id = tbl_kalender.kalender_id
+				)',
+			$db->escape(date('Y-m-d H:i:s', strtotime($start_date))),
+			$db->escape(date('Y-m-d H:i:s', strtotime($end_date)))
+		);
+
+		$orte = (array) $ort;
+		if (!is_null($ort) && !empty($orte))
+		{
+			$escaped_orte = array_map([$db, 'escape'], $orte);
+			$in_list = '(' . implode(',', $escaped_orte) . ')';
+
+			$query .= "
+				AND EXISTS (
+					SELECT 1
+					FROM lehre.tbl_kalender_ort filter_ort
+					WHERE filter_ort.kalender_id = tbl_kalender.kalender_id
+						AND filter_ort.ort_kurzbz IN $in_list
+				)";
+		}
+
+		$uid_array = (array) $uids;
+		if (!is_null($uids) && !empty($uid_array))
+		{
+			$escaped_uids = array_map([$db, 'escape'], $uid_array);
+			$in_list = '(' . implode(',', $escaped_uids) . ')';
+
+			$query .= "
+				AND (
+					EXISTS (
+						SELECT 1
+						FROM lehre.tbl_kalender_lehreinheit filter_kl
+						JOIN lehre.tbl_lehreinheitmitarbeiter filter_lem
+							ON filter_lem.lehreinheit_id = filter_kl.lehreinheit_id
+						WHERE filter_kl.kalender_id = tbl_kalender.kalender_id
+							AND filter_lem.mitarbeiter_uid IN $in_list
+					)
+					OR EXISTS (
+						SELECT 1
+						FROM lehre.tbl_kalender_event_teilnehmer filter_org
+						WHERE filter_org.kalender_id = tbl_kalender.kalender_id
+							AND filter_org.rolle_kurzbz = 'organisator'
+							AND filter_org.uid IN $in_list
+					)
+					OR EXISTS (
+						SELECT 1
+						FROM lehre.tbl_kalender_event_teilnehmer filter_teil
+						WHERE filter_teil.kalender_id = tbl_kalender.kalender_id
+							AND filter_teil.rolle_kurzbz = 'teilnehmer'
+							AND filter_teil.uid IN $in_list
+					)
+				)";
+		}
+
+		if (!is_null($studiengaenge) && !empty($studiengaenge))
+		{
+			$or_conditions = [];
+
+			foreach ($studiengaenge as $studiengang)
+			{
+				$conditions = [];
+				$conditions[] = 'filter_lv.studiengang_kz = ' . $db->escape($studiengang['stg_kz']);
+
+				if (isset($studiengang['semester']))
+					$conditions[] = 'filter_lv.semester = ' . $db->escape($studiengang['semester']);
+
+				if (isset($studiengang['orgform_kurzbz']))
+					$conditions[] = 'filter_lv.orgform_kurzbz = ' . $db->escape($studiengang['orgform_kurzbz']);
+
+				$or_conditions[] = '(' . implode(' AND ', $conditions) . ')';
+			}
+
+			$or_block = implode(' OR ', $or_conditions);
+			$query .= "
+				AND EXISTS (
+					SELECT 1
+					FROM lehre.tbl_kalender_lehreinheit filter_kl
+					JOIN lehre.tbl_lehreinheit filter_le
+						ON filter_le.lehreinheit_id = filter_kl.lehreinheit_id
+					JOIN lehre.tbl_lehrveranstaltung filter_lv
+						ON filter_lv.lehrveranstaltung_id = filter_le.lehrveranstaltung_id
+					WHERE filter_kl.kalender_id = tbl_kalender.kalender_id
+						AND ($or_block)
+				)";
+		}
+
+		return $this->_ci->KalenderModel->execReadOnlyQuery($query);
+	}
+
+	private function _loadPlannerDataForKalenderIds($query, $kalender_ids)
+	{
+		if (empty($kalender_ids))
+			return success([]);
+
+		$kalender_ids = array_values(array_unique(array_map('intval', $kalender_ids)));
+		$postgres_array = '{' . implode(',', $kalender_ids) . '}';
+
+		return $this->_ci->KalenderModel->execReadOnlyQuery($query, [$postgres_array]);
+	}
+
+	private function _loadPlannerKalenderData($kalender_ids)
+	{
+		$index_bezeichnung_mehrsprachig = $this->getLanguageIndex() - 1;
+		$this->_ci->load->config('tempus');
+		$tags = $this->_ci->config->item('tempus_tags');
+		$whereTags = '';
+
+		if (is_array($tags) && !isEmptyArray($tags))
+		{
+			$tags = array_keys($tags);
+
+			foreach ($tags as $key => $tag)
+				$tags[$key] = $this->_ci->KalenderModel->escape($tag);
+
+			$whereTags = ' AND nt.typ_kurzbz IN (' . implode(',', $tags) . ')';
+		}
+
+		$query = "
+			WITH planner_kalender AS MATERIALIZED (
+				SELECT kalender_id, eindeutige_kalender_gruppen_id, status_kurzbz, typ, von, bis
+				FROM lehre.tbl_kalender
+				WHERE kalender_id = ANY(?::bigint[])
+			)
+			SELECT
+				tbl_kalender.kalender_id,
+				tbl_kalender.eindeutige_kalender_gruppen_id,
+				tbl_kalender.status_kurzbz,
+				tbl_kalender.typ,
+				tbl_kalender.von,
+				tbl_kalender.bis,
+				tag_data_agg.tags,
+				resource_data_agg.resources,
+				CASE
+					WHEN vonstunde.stunde IS NOT NULL AND bisstunde.stunde IS NOT NULL
+						THEN bisstunde.stunde - vonstunde.stunde + 1
+					ELSE ROUND(
+						COALESCE(
+							(
+								SELECT SUM(EXTRACT(EPOCH FROM (LEAST(stunde.ende, tbl_kalender.bis::time) - GREATEST(stunde.beginn, tbl_kalender.von::time))) / 60) / 45
+								FROM lehre.tbl_stunde stunde
+								WHERE stunde.beginn < tbl_kalender.bis::time
+									AND stunde.ende > tbl_kalender.von::time
+							),
+							0
+						),
+						2
+					)
+				END AS verplante_stunden
+			FROM planner_kalender AS tbl_kalender
+			LEFT JOIN (
+				SELECT
+					tag.eindeutige_kalender_gruppen_id,
+					COALESCE(json_agg(tag ORDER BY tag.done, tag.prioritaet), '[]'::json) AS tags
+				FROM (
+					SELECT DISTINCT ON (n.notiz_id)
+						n.notiz_id AS id,
+						nt.typ_kurzbz,
+						array_to_json(nt.bezeichnung_mehrsprachig::varchar[])->>$index_bezeichnung_mehrsprachig AS beschreibung,
+						n.text AS notiz,
+						nt.style,
+						n.erledigt AS done,
+						nt.prioritaet,
+						nz.eindeutige_kalender_gruppen_id
+					FROM public.tbl_notizzuordnung nz
+					JOIN public.tbl_notiz n ON nz.notiz_id = n.notiz_id
+					JOIN public.tbl_notiz_typ nt ON n.typ = nt.typ_kurzbz$whereTags
+					WHERE nz.eindeutige_kalender_gruppen_id IN (
+						SELECT eindeutige_kalender_gruppen_id
+						FROM planner_kalender
+					)
+				) tag
+				GROUP BY tag.eindeutige_kalender_gruppen_id
+			) tag_data_agg
+				ON tag_data_agg.eindeutige_kalender_gruppen_id = tbl_kalender.eindeutige_kalender_gruppen_id
+			LEFT JOIN (
+				SELECT
+					resource.eindeutige_kalender_gruppen_id,
+					COALESCE(json_agg(resource ORDER BY resource.beschreibung), '[]'::json) AS resources
+				FROM (
+					SELECT
+						betriebsmittel_kalender.*,
+						betriebsmittel.beschreibung,
+						betriebsmittel.verplanen
+					FROM lehre.tbl_betriebsmittel_kalender betriebsmittel_kalender
+					JOIN wawi.tbl_betriebsmittel betriebsmittel
+						ON betriebsmittel.betriebsmittel_id = betriebsmittel_kalender.betriebsmittel_id
+					WHERE betriebsmittel.verplanen = TRUE
+						AND betriebsmittel_kalender.eindeutige_kalender_gruppen_id IN (
+							SELECT eindeutige_kalender_gruppen_id
+							FROM planner_kalender
+						)
+				) resource
+				GROUP BY resource.eindeutige_kalender_gruppen_id
+			) resource_data_agg
+				ON resource_data_agg.eindeutige_kalender_gruppen_id = tbl_kalender.eindeutige_kalender_gruppen_id
+			LEFT JOIN lehre.tbl_stunde vonstunde ON tbl_kalender.von::time = vonstunde.beginn
+			LEFT JOIN lehre.tbl_stunde bisstunde ON tbl_kalender.bis::time = bisstunde.ende
+			ORDER BY tbl_kalender.eindeutige_kalender_gruppen_id DESC";
+
+		return $this->_loadPlannerDataForKalenderIds($query, $kalender_ids);
+	}
+
+	private function _loadPlannerKalenderOrte($kalender_ids)
+	{
+		$query = '
+			SELECT kalender_id, location, ort_kurzbz
+			FROM lehre.tbl_kalender_ort
+			WHERE kalender_id = ANY(?::bigint[])';
+
+		return $this->_loadPlannerDataForKalenderIds($query, $kalender_ids);
+	}
+
+	private function _loadPlannerLehreinheiten($kalender_ids)
+	{
+		$query = '
+			SELECT
+				tbl_kalender_lehreinheit.kalender_id,
+				tbl_lehreinheit.lehreinheit_id,
+				tbl_lehreinheit.lehrveranstaltung_id,
+				tbl_lehreinheit.lehrform_kurzbz,
+				lehrfach.kurzbz AS lehrfach_kurzbz,
+				lehrfach.bezeichnung AS lehrfach_bezeichnung,
+				lehrfach.farbe,
+				tbl_lehrveranstaltung.oe_kurzbz
+			FROM lehre.tbl_kalender_lehreinheit
+			JOIN lehre.tbl_lehreinheit
+				ON tbl_kalender_lehreinheit.lehreinheit_id = tbl_lehreinheit.lehreinheit_id
+			LEFT JOIN lehre.tbl_lehrveranstaltung
+				ON tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
+			LEFT JOIN lehre.tbl_lehrveranstaltung lehrfach
+				ON tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id
+			WHERE tbl_kalender_lehreinheit.kalender_id = ANY(?::bigint[])';
+
+		return $this->_loadPlannerDataForKalenderIds($query, $kalender_ids);
+	}
+
+	private function _loadPlannerLehreinheitMitarbeiter($kalender_ids)
+	{
+		$query = '
+			SELECT
+				tbl_kalender_lehreinheit.kalender_id,
+				tbl_lehreinheitmitarbeiter.mitarbeiter_uid,
+				tbl_person.vorname,
+				tbl_person.nachname,
+				tbl_mitarbeiter.kurzbz AS ma_kurzbz
+			FROM lehre.tbl_kalender_lehreinheit
+			JOIN lehre.tbl_lehreinheitmitarbeiter
+				ON tbl_kalender_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id
+			LEFT JOIN public.tbl_mitarbeiter
+				ON tbl_mitarbeiter.mitarbeiter_uid = tbl_lehreinheitmitarbeiter.mitarbeiter_uid
+			LEFT JOIN public.tbl_benutzer
+				ON tbl_mitarbeiter.mitarbeiter_uid = tbl_benutzer.uid
+			LEFT JOIN public.tbl_person
+				ON tbl_person.person_id = tbl_benutzer.person_id
+			WHERE tbl_kalender_lehreinheit.kalender_id = ANY(?::bigint[])';
+
+		return $this->_loadPlannerDataForKalenderIds($query, $kalender_ids);
+	}
+
+	private function _loadPlannerLehreinheitGruppen($kalender_ids)
+	{
+		$query = "
+			SELECT
+				tbl_kalender_lehreinheit.kalender_id,
+				CASE
+					WHEN tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL THEN
+						COALESCE(
+							UPPER(le_studiengang.typ || le_studiengang.kurzbz) ||
+							COALESCE(tbl_lehreinheitgruppe.semester::varchar, '') ||
+							COALESCE(tbl_lehreinheitgruppe.verband::varchar, '') ||
+							COALESCE(tbl_lehreinheitgruppe.gruppe, ''),
+							''
+						)
+					ELSE tbl_lehreinheitgruppe.gruppe_kurzbz
+				END AS lehreinheit_gruppe_bezeichnung,
+				tbl_lehreinheitgruppe.gruppe_kurzbz AS le_gruppe_kurzbz,
+				tbl_lehreinheitgruppe.studiengang_kz AS le_studiengang_kz,
+				tbl_lehreinheitgruppe.semester AS le_semester,
+				tbl_lehreinheitgruppe.verband AS le_verband,
+				tbl_lehreinheitgruppe.gruppe AS le_gruppe,
+				le_gruppe.direktinskription AS le_direktinskription
+			FROM lehre.tbl_kalender_lehreinheit
+			JOIN lehre.tbl_lehreinheitgruppe
+				ON tbl_kalender_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id
+			LEFT JOIN public.tbl_gruppe le_gruppe
+				ON tbl_lehreinheitgruppe.gruppe_kurzbz = le_gruppe.gruppe_kurzbz
+			LEFT JOIN public.tbl_lehrverband le_lehrverband
+				ON tbl_lehreinheitgruppe.studiengang_kz = le_lehrverband.studiengang_kz
+				AND tbl_lehreinheitgruppe.semester = le_lehrverband.semester
+				AND TRIM(COALESCE(tbl_lehreinheitgruppe.verband::text, '')) = TRIM(le_lehrverband.verband::text)
+				AND TRIM(COALESCE(tbl_lehreinheitgruppe.gruppe::text, '')) = TRIM(le_lehrverband.gruppe::text)
+			LEFT JOIN public.tbl_studiengang le_studiengang
+				ON le_lehrverband.studiengang_kz = le_studiengang.studiengang_kz
+			WHERE tbl_kalender_lehreinheit.kalender_id = ANY(?::bigint[])";
+
+		return $this->_loadPlannerDataForKalenderIds($query, $kalender_ids);
+	}
+
+	private function _loadPlannerKalenderEvents($kalender_ids)
+	{
+		$query = '
+			SELECT kalender_id, beschreibung, titel
+			FROM lehre.tbl_kalender_event
+			WHERE kalender_id = ANY(?::bigint[])';
+
+		return $this->_loadPlannerDataForKalenderIds($query, $kalender_ids);
+	}
+
+	private function _loadPlannerOrganisatoren($kalender_ids)
+	{
+		$query = "
+			SELECT
+				organisator.kalender_id,
+				organisator.uid AS mitarbeiter_uid,
+				reservierung_person.vorname,
+				reservierung_person.nachname,
+				reservierung_ma.kurzbz AS ma_kurzbz
+			FROM lehre.tbl_kalender_event_teilnehmer organisator
+			LEFT JOIN public.tbl_mitarbeiter reservierung_ma
+				ON reservierung_ma.mitarbeiter_uid = organisator.uid
+			LEFT JOIN public.tbl_benutzer reservierung_benutzer
+				ON reservierung_ma.mitarbeiter_uid = reservierung_benutzer.uid
+			LEFT JOIN public.tbl_person reservierung_person
+				ON reservierung_person.person_id = reservierung_benutzer.person_id
+			WHERE organisator.rolle_kurzbz = 'organisator'
+				AND organisator.kalender_id = ANY(?::bigint[])";
+
+		return $this->_loadPlannerDataForKalenderIds($query, $kalender_ids);
+	}
+
+	private function _loadPlannerTeilnehmer($kalender_ids)
+	{
+		$query = "
+			SELECT
+				teilnehmer.kalender_id,
+				teilnehmergruppe.gruppe_kurzbz AS teilnehmerg_grp,
+				COALESCE(
+					UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) ||
+					COALESCE(verbandgruppe.semester::varchar, '') ||
+					COALESCE(verbandgruppe.verband::varchar, '') ||
+					COALESCE(verbandgruppe.gruppe, ''),
+					''
+				) AS verband_grp,
+				teilmitarbeiter.kurzbz AS teilnehmer_kurzbz,
+				teilperson.vorname AS teilnehmer_vorname,
+				teilperson.nachname AS teilnehmer_nachname,
+				teilbenutzer.uid AS teilnehmer_uid
+			FROM lehre.tbl_kalender_event_teilnehmer teilnehmer
+			LEFT JOIN public.tbl_benutzer teilbenutzer ON teilnehmer.uid = teilbenutzer.uid
+			LEFT JOIN public.tbl_mitarbeiter teilmitarbeiter
+				ON teilmitarbeiter.mitarbeiter_uid = teilbenutzer.uid
+			LEFT JOIN public.tbl_person teilperson ON teilperson.person_id = teilbenutzer.person_id
+			LEFT JOIN public.tbl_gruppe teilnehmergruppe
+				ON teilnehmer.gruppe_kurzbz = teilnehmergruppe.gruppe_kurzbz
+			LEFT JOIN public.tbl_lehrverband verbandgruppe
+				ON teilnehmer.studiengang_kz = verbandgruppe.studiengang_kz
+				AND teilnehmer.semester = verbandgruppe.semester
+				AND TRIM(COALESCE(teilnehmer.verband::text, '')) = TRIM(verbandgruppe.verband::text)
+				AND TRIM(COALESCE(teilnehmer.gruppe::text, '')) = TRIM(verbandgruppe.gruppe::text)
+			LEFT JOIN public.tbl_studiengang
+				ON verbandgruppe.studiengang_kz = public.tbl_studiengang.studiengang_kz
+			WHERE teilnehmer.rolle_kurzbz = 'teilnehmer'
+				AND teilnehmer.kalender_id = ANY(?::bigint[])";
+
+		return $this->_loadPlannerDataForKalenderIds($query, $kalender_ids);
+	}
+
+	private function _combinePlannerData($results)
+	{
+		$defaults = [
+			'lehreinheit_id' => null,
+			'lehrveranstaltung_id' => null,
+			'ort_kurzbz' => null,
+			'location' => null,
+			'mitarbeiter_uid' => null,
+			'verband_grp' => null,
+			'teilnehmerg_grp' => null,
+			'lehreinheit_gruppe_bezeichnung' => null,
+			'teilnehmer_uid' => null
+		];
+		$rows = [];
+
+		foreach ($results as $result)
+		{
+			if (!isSuccess($result))
+				return $result;
+
+			if (!hasData($result))
+				continue;
+
+			foreach (getData($result) as $row)
+			{
+				foreach ($defaults as $property => $value)
+				{
+					if (!property_exists($row, $property))
+						$row->{$property} = $value;
+				}
+
+				$rows[] = $row;
+			}
+		}
+
+		return success($rows);
+	}
+
+	private function _mapEvents($data, $collisionCheck = true, $maxDailyEventLimit = null, $mergeScalarData = false)
 	{
 		$stundenplan_data = [];
 
@@ -295,6 +734,33 @@ class KalenderLib
 					'resources' => is_array($parsedResources) ? $parsedResources : [],
 					'tags' => isset($row->tags) ? $row->tags : [],
 				];
+			}
+
+			if ($mergeScalarData)
+			{
+				if ($events[$id]->lehrform === '' && isset($row->lehrform_kurzbz) && $row->lehrform_kurzbz !== '')
+					$events[$id]->lehrform = $row->lehrform_kurzbz;
+
+				if ($events[$id]->lehrfach === '' && isset($row->lehrfach_kurzbz) && $row->lehrfach_kurzbz !== '')
+					$events[$id]->lehrfach = $row->lehrfach_kurzbz;
+
+				if ($events[$id]->lehrfach_bez === '' && isset($row->lehrfach_bezeichnung) && $row->lehrfach_bezeichnung !== '')
+					$events[$id]->lehrfach_bez = $row->lehrfach_bezeichnung;
+
+				if ($events[$id]->farbe === '' && isset($row->farbe) && $row->farbe !== '')
+					$events[$id]->farbe = $row->farbe;
+
+				if (is_null($events[$id]->lehrveranstaltung_id) && isset($row->lehrveranstaltung_id) && !is_null($row->lehrveranstaltung_id))
+					$events[$id]->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+
+				if ($events[$id]->organisationseinheit === '' && isset($row->oe_kurzbz) && $row->oe_kurzbz !== '')
+					$events[$id]->organisationseinheit = $row->oe_kurzbz;
+
+				if ($events[$id]->titel === '' && isset($row->titel) && $row->titel !== '')
+					$events[$id]->titel = $row->titel;
+
+				if ($events[$id]->beschreibung === '' && isset($row->beschreibung) && $row->beschreibung !== '')
+					$events[$id]->beschreibung = $row->beschreibung;
 			}
 
 			if ($row->lehreinheit_id && !in_array($row->lehreinheit_id, $events[$id]->lehreinheit_id))
@@ -375,13 +841,17 @@ class KalenderLib
 
 		if ($collisionCheck)
 		{
-			$kalender_ids = array_keys($events);
-			$collisions = $this->_ci->collisionchecker->runAll($kalender_ids);
+			$kalender_id_batches = array_chunk(array_keys($events), self::COLLISION_CHECK_BATCH_SIZE);
 
-			foreach ($collisions as $kalender_id => $errors)
+			foreach ($kalender_id_batches as $kalender_ids)
 			{
-				if (isset($events[$kalender_id]))
-					$events[$kalender_id]->collisions = !empty($errors);
+				$collision_ids = $this->_ci->collisionchecker->runAny($kalender_ids);
+
+				foreach ($collision_ids as $kalender_id => $has_collision)
+				{
+					if ($has_collision && isset($events[$kalender_id]))
+						$events[$kalender_id]->collisions = true;
+				}
 			}
 		}
 
@@ -472,112 +942,27 @@ class KalenderLib
 	}
 	public function getPlanForPlanner($start_date, $end_date, $ort = null, $uids = null, $studiengaenge = null, $collisionCheck = true, $maxDailyEventLimit = null)
 	{
-		$this->_buildBasePlanQuery();
+		$kalender_ids_result = $this->_loadPlannerKalenderIds($start_date, $end_date, $ort, $uids, $studiengaenge);
 
-		if (!is_null($ort))
-		{
-			$ort_array = (array) $ort;
-			$escaped_orte = array();
+		if (!isSuccess($kalender_ids_result) || !hasData($kalender_ids_result))
+			return [];
 
-			foreach ($ort_array as $ort)
-			{
-				$escaped_orte[] = $this->_ci->KalenderModel->db->escape($ort);
-			}
-			$in_list = '(' . implode(',', $escaped_orte) . ')';
+		$kalender_ids = [];
+		foreach (getData($kalender_ids_result) as $kalender)
+			$kalender_ids[] = $kalender->kalender_id;
 
-			$this->_ci->KalenderModel->db->where(
-				"(EXISTS (
-					SELECT 1 
-					FROM lehre.tbl_kalender_ort filter_ort
-					WHERE filter_ort.kalender_id = tbl_kalender.kalender_id
-						AND filter_ort.ort_kurzbz IN $in_list
-				))"
-			);
-		}
-
-		if (!is_null($uids))
-		{
-			$uid_array = (array) $uids;
-			$db = $this->_ci->KalenderModel->db;
-
-			$escaped_uids = array();
-			foreach ($uid_array as $uid)
-				$escaped_uids[] = $db->escape($uid);
-			$in_list = '(' . implode(',', $escaped_uids) . ')';
-
-			$this->_ci->KalenderModel->db->where(
-				"(EXISTS (
-					SELECT 1 
-					FROM lehre.tbl_lehreinheitmitarbeiter filter_lem
-					WHERE filter_lem.lehreinheit_id = tbl_lehreinheit.lehreinheit_id
-					  AND filter_lem.mitarbeiter_uid IN $in_list
-				)
-				OR EXISTS (
-					SELECT 1 
-					FROM lehre.tbl_kalender_event_teilnehmer filter_org
-					WHERE filter_org.kalender_id = tbl_kalender.kalender_id
-					  AND filter_org.rolle_kurzbz = 'organisator'
-					  AND filter_org.uid IN $in_list
-				)
-				OR EXISTS (
-					SELECT 1 
-					FROM lehre.tbl_kalender_event_teilnehmer filter_teil
-					WHERE filter_teil.kalender_id = tbl_kalender.kalender_id
-					  AND filter_teil.rolle_kurzbz = 'teilnehmer'
-					  AND filter_teil.uid IN $in_list
-				))"
-			);
-		}
-
-		if (!is_null($studiengaenge))
-		{
-			$db = $this->_ci->KalenderModel->db;
-			$or_conditions = array();
-
-			foreach ($studiengaenge as $studiengang)
-			{
-				$conditions = array();
-				$conditions[] = 'filter_lv.studiengang_kz = ' . $db->escape($studiengang['stg_kz']);
-
-				if (isset($studiengang['semester']))
-					$conditions[] = 'filter_lv.semester = ' . $db->escape($studiengang['semester']);
-
-				if (isset($studiengang['orgform_kurzbz']))
-					$conditions[] = 'filter_lv.orgform_kurzbz = ' . $db->escape($studiengang['orgform_kurzbz']);
-
-				$or_conditions[] = '(' . implode(' AND ', $conditions) . ')';
-			}
-
-			$or_block = implode(' OR ', $or_conditions);
-
-			$this->_ci->KalenderModel->db->where(
-				"(EXISTS (
-					SELECT 1
-					FROM lehre.tbl_kalender_lehreinheit filter_kl
-					JOIN lehre.tbl_lehreinheit filter_le ON filter_le.lehreinheit_id = filter_kl.lehreinheit_id
-					JOIN lehre.tbl_lehrveranstaltung filter_lv ON filter_lv.lehrveranstaltung_id = filter_le.lehrveranstaltung_id
-					WHERE filter_kl.kalender_id = tbl_kalender.kalender_id
-						AND ($or_block)
-				))"
-			);
-		}
-
-		$this->_ci->KalenderModel->db->where('NOT EXISTS (
-				SELECT 1 FROM lehre.tbl_kalender nachfolger
-				WHERE nachfolger.vorgaenger_kalender_id = tbl_kalender.kalender_id)', null, false);
-
-		$this->_ci->KalenderModel->db->where_not_in('status_kurzbz', array('deleted'));
-
-		$this->_ci->KalenderModel->addSelect([ 
-			"(
-				SELECT COUNT(*) FROM lehre.tbl_betriebsmittel_kalender 
-				WHERE tbl_betriebsmittel_kalender.eindeutige_kalender_gruppen_id = tbl_kalender.eindeutige_kalender_gruppen_id
-			) AS has_assigned_resources"
+		$data = $this->_combinePlannerData([
+			$this->_loadPlannerKalenderData($kalender_ids),
+			$this->_loadPlannerKalenderOrte($kalender_ids),
+			$this->_loadPlannerLehreinheiten($kalender_ids),
+			$this->_loadPlannerLehreinheitMitarbeiter($kalender_ids),
+			$this->_loadPlannerLehreinheitGruppen($kalender_ids),
+			$this->_loadPlannerKalenderEvents($kalender_ids),
+			$this->_loadPlannerOrganisatoren($kalender_ids),
+			$this->_loadPlannerTeilnehmer($kalender_ids)
 		]);
-		
-		$data = $this->_loadFilteredBasePlan($start_date, $end_date);
 
-		return $this->_mapEvents($data, $collisionCheck, $maxDailyEventLimit);
+		return $this->_mapEvents($data, $collisionCheck, $maxDailyEventLimit, true);
 	}
 
 	public function getPlanForStudent($start_date, $end_date)

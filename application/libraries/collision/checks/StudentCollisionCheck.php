@@ -190,97 +190,134 @@ class StudentCollisionCheck implements ICollisionCheck
 
 	public function checkAll($kalender_ids)
 	{
-
 		if (empty($kalender_ids)) return [];
 
 		if ($this->_ci->variablelib->getVar('kollision_student') !== 'true') return [];
 
+		$kalender_ids = array_values(array_unique(array_map('intval', $kalender_ids)));
+		$postgres_array = '{' . implode(',', $kalender_ids) . '}';
 		$dbModel = new DB_Model();
-		$placeholders = implode(',', array_fill(0, count($kalender_ids), '?'));
-
 		$sql = "
-			SELECT DISTINCT current_kalender.kalender_id, current_benutzergruppe.uid
-			FROM lehre.tbl_kalender current_kalender
-			JOIN lehre.tbl_kalender_lehreinheit current_kalender_le ON current_kalender_le.kalender_id = current_kalender.kalender_id
-			JOIN lehre.tbl_lehreinheit current_lehreinheit ON current_lehreinheit.lehreinheit_id = current_kalender_le.lehreinheit_id
-			JOIN lehre.tbl_lehreinheitgruppe current_lehreinheitgruppe ON current_lehreinheitgruppe.lehreinheit_id = current_lehreinheit.lehreinheit_id
-			JOIN public.tbl_gruppe current_gruppe
-				ON current_gruppe.studiengang_kz = current_lehreinheitgruppe.studiengang_kz
-				AND current_gruppe.semester = current_lehreinheitgruppe.semester
-				AND current_gruppe.gruppe_kurzbz = current_lehreinheitgruppe.gruppe_kurzbz
-			JOIN public.tbl_benutzergruppe current_benutzergruppe ON current_benutzergruppe.gruppe_kurzbz = current_gruppe.gruppe_kurzbz
+			WITH current_kalender AS MATERIALIZED (
+				SELECT kalender_id, von, bis
+				FROM lehre.tbl_kalender
+				WHERE kalender_id = ANY(?::bigint[])
+			)
+			SELECT current_kalender.kalender_id
+			FROM current_kalender
+			WHERE EXISTS (
+				SELECT 1
+				FROM lehre.tbl_kalender_lehreinheit current_kalender_le
+				JOIN lehre.tbl_lehreinheit current_lehreinheit
+					ON current_lehreinheit.lehreinheit_id = current_kalender_le.lehreinheit_id
+				JOIN lehre.tbl_lehreinheitgruppe current_lehreinheitgruppe
+					ON current_lehreinheitgruppe.lehreinheit_id = current_lehreinheit.lehreinheit_id
+				JOIN public.tbl_gruppe current_gruppe
+					ON current_gruppe.studiengang_kz = current_lehreinheitgruppe.studiengang_kz
+					AND current_gruppe.semester = current_lehreinheitgruppe.semester
+					AND current_gruppe.gruppe_kurzbz = current_lehreinheitgruppe.gruppe_kurzbz
+				JOIN public.tbl_benutzergruppe current_benutzergruppe
+					ON current_benutzergruppe.gruppe_kurzbz = current_gruppe.gruppe_kurzbz
 					AND current_benutzergruppe.studiensemester_kurzbz = current_lehreinheit.studiensemester_kurzbz
-			JOIN lehre.tbl_kalender other_kalender
-				ON other_kalender.kalender_id != current_kalender.kalender_id
-				AND other_kalender.von < current_kalender.bis
-				AND other_kalender.bis > current_kalender.von
-				AND other_kalender.status_kurzbz NOT IN ('archived', 'deleted', 'to_delete', 'to_delete_live', 'to_delete_preview')
-				AND NOT EXISTS (
-					SELECT 1 FROM lehre.tbl_kalender vorgaenger
-					WHERE vorgaenger.vorgaenger_kalender_id = other_kalender.kalender_id
-				)
-			JOIN lehre.tbl_kalender_lehreinheit other_kalender_le ON other_kalender_le.kalender_id = other_kalender.kalender_id
-			JOIN lehre.tbl_lehreinheit other_lehreinheit ON other_lehreinheit.lehreinheit_id = other_kalender_le.lehreinheit_id
-			JOIN lehre.tbl_lehreinheitgruppe other_lehreinheitgruppe ON other_lehreinheitgruppe.lehreinheit_id = other_lehreinheit.lehreinheit_id
-			JOIN public.tbl_gruppe other_gruppe
-				ON other_gruppe.studiengang_kz = other_lehreinheitgruppe.studiengang_kz
-				AND other_gruppe.semester = other_lehreinheitgruppe.semester
-				AND other_gruppe.gruppe_kurzbz = other_lehreinheitgruppe.gruppe_kurzbz
-			JOIN public.tbl_benutzergruppe other_benutzergruppe
-				ON other_benutzergruppe.gruppe_kurzbz = other_gruppe.gruppe_kurzbz
-				AND other_benutzergruppe.uid = current_benutzergruppe.uid
-				AND other_benutzergruppe.studiensemester_kurzbz = other_lehreinheit.studiensemester_kurzbz
+				WHERE current_kalender_le.kalender_id = current_kalender.kalender_id
+					AND EXISTS (
+						SELECT 1
+						FROM lehre.tbl_kalender other_kalender
+						JOIN lehre.tbl_kalender_lehreinheit other_kalender_le
+							ON other_kalender_le.kalender_id = other_kalender.kalender_id
+						JOIN lehre.tbl_lehreinheit other_lehreinheit
+							ON other_lehreinheit.lehreinheit_id = other_kalender_le.lehreinheit_id
+						JOIN lehre.tbl_lehreinheitgruppe other_lehreinheitgruppe
+							ON other_lehreinheitgruppe.lehreinheit_id = other_lehreinheit.lehreinheit_id
+						JOIN public.tbl_gruppe other_gruppe
+							ON other_gruppe.studiengang_kz = other_lehreinheitgruppe.studiengang_kz
+							AND other_gruppe.semester = other_lehreinheitgruppe.semester
+							AND other_gruppe.gruppe_kurzbz = other_lehreinheitgruppe.gruppe_kurzbz
+						JOIN public.tbl_benutzergruppe other_benutzergruppe
+							ON other_benutzergruppe.gruppe_kurzbz = other_gruppe.gruppe_kurzbz
+							AND other_benutzergruppe.studiensemester_kurzbz = other_lehreinheit.studiensemester_kurzbz
+							AND other_benutzergruppe.uid = current_benutzergruppe.uid
+						WHERE other_kalender.kalender_id != current_kalender.kalender_id
+							AND other_kalender.von < current_kalender.bis
+							AND other_kalender.bis > current_kalender.von
+							AND other_kalender.status_kurzbz NOT IN ('archived', 'deleted', 'to_delete', 'to_delete_live', 'to_delete_preview')
+							AND NOT EXISTS (
+								SELECT 1
+								FROM lehre.tbl_kalender nachfolger
+								WHERE nachfolger.vorgaenger_kalender_id = other_kalender.kalender_id
+							)
+					)
+			)
+			OR EXISTS (
+				SELECT 1
+				FROM lehre.tbl_kalender_lehreinheit current_kalender_le
+				JOIN lehre.tbl_lehreinheit current_lehreinheit
+					ON current_lehreinheit.lehreinheit_id = current_kalender_le.lehreinheit_id
+				JOIN lehre.tbl_lehreinheitgruppe current_lehreinheitgruppe
+					ON current_lehreinheitgruppe.lehreinheit_id = current_lehreinheit.lehreinheit_id
+				JOIN public.tbl_studentlehrverband current_studentlehrverband
+					ON current_studentlehrverband.studiengang_kz = current_lehreinheitgruppe.studiengang_kz
+					AND current_studentlehrverband.semester = current_lehreinheitgruppe.semester
+					AND current_studentlehrverband.studiensemester_kurzbz = current_lehreinheit.studiensemester_kurzbz
+					AND (
+						current_lehreinheitgruppe.verband = current_studentlehrverband.verband
+						OR current_lehreinheitgruppe.verband IS NULL
+						OR btrim(current_lehreinheitgruppe.verband::text) = ''
+						OR current_studentlehrverband.verband IS NULL
+					)
+					AND (
+						current_lehreinheitgruppe.gruppe = current_studentlehrverband.gruppe
+						OR current_lehreinheitgruppe.gruppe IS NULL
+						OR btrim(current_lehreinheitgruppe.gruppe::text) = ''
+						OR current_studentlehrverband.gruppe IS NULL
+					)
+				WHERE current_kalender_le.kalender_id = current_kalender.kalender_id
+					AND EXISTS (
+						SELECT 1
+						FROM lehre.tbl_kalender other_kalender
+						JOIN lehre.tbl_kalender_lehreinheit other_kalender_le
+							ON other_kalender_le.kalender_id = other_kalender.kalender_id
+						JOIN lehre.tbl_lehreinheit other_lehreinheit
+							ON other_lehreinheit.lehreinheit_id = other_kalender_le.lehreinheit_id
+						JOIN lehre.tbl_lehreinheitgruppe other_lehreinheitgruppe
+							ON other_lehreinheitgruppe.lehreinheit_id = other_lehreinheit.lehreinheit_id
+						JOIN public.tbl_studentlehrverband other_studentlehrverband
+							ON other_studentlehrverband.studiengang_kz = other_lehreinheitgruppe.studiengang_kz
+							AND other_studentlehrverband.semester = other_lehreinheitgruppe.semester
+							AND other_studentlehrverband.studiensemester_kurzbz = other_lehreinheit.studiensemester_kurzbz
+							AND other_studentlehrverband.student_uid = current_studentlehrverband.student_uid
+							AND (
+								other_lehreinheitgruppe.verband = other_studentlehrverband.verband
+								OR other_lehreinheitgruppe.verband IS NULL
+								OR btrim(other_lehreinheitgruppe.verband::text) = ''
+								OR other_studentlehrverband.verband IS NULL
+							)
+							AND (
+								other_lehreinheitgruppe.gruppe = other_studentlehrverband.gruppe
+								OR other_lehreinheitgruppe.gruppe IS NULL
+								OR btrim(other_lehreinheitgruppe.gruppe::text) = ''
+								OR other_studentlehrverband.gruppe IS NULL
+							)
+						WHERE other_kalender.kalender_id != current_kalender.kalender_id
+							AND other_kalender.von < current_kalender.bis
+							AND other_kalender.bis > current_kalender.von
+							AND other_kalender.status_kurzbz NOT IN ('archived', 'deleted', 'to_delete', 'to_delete_live', 'to_delete_preview')
+							AND NOT EXISTS (
+								SELECT 1
+								FROM lehre.tbl_kalender nachfolger
+								WHERE nachfolger.vorgaenger_kalender_id = other_kalender.kalender_id
+							)
+					)
+			)";
 
-
-			WHERE current_kalender.kalender_id IN ($placeholders)
-
-			UNION ALL
-
-			SELECT DISTINCT current_kalender.kalender_id, current_studentlehrverband.student_uid AS uid
-			FROM lehre.tbl_kalender current_kalender
-			JOIN lehre.tbl_kalender_lehreinheit current_kalender_le ON current_kalender_le.kalender_id = current_kalender.kalender_id
-			JOIN lehre.tbl_lehreinheit current_lehreinheit ON current_lehreinheit.lehreinheit_id = current_kalender_le.lehreinheit_id
-			JOIN lehre.tbl_lehreinheitgruppe current_lehreinheitgruppe ON current_lehreinheitgruppe.lehreinheit_id = current_lehreinheit.lehreinheit_id
-			JOIN public.tbl_studentlehrverband current_studentlehrverband
-				ON current_studentlehrverband.studiengang_kz = current_lehreinheitgruppe.studiengang_kz
-				AND current_studentlehrverband.semester = current_lehreinheitgruppe.semester
-				AND current_studentlehrverband.studiensemester_kurzbz = current_lehreinheit.studiensemester_kurzbz
-				AND (current_lehreinheitgruppe.verband = current_studentlehrverband.verband OR current_lehreinheitgruppe.verband IS NULL OR btrim(current_lehreinheitgruppe.verband::text) = '' OR current_studentlehrverband.verband IS NULL)
-				AND (current_lehreinheitgruppe.gruppe = current_studentlehrverband.gruppe OR current_lehreinheitgruppe.gruppe IS NULL OR btrim(current_lehreinheitgruppe.gruppe::text) = '' OR current_studentlehrverband.gruppe IS NULL)
-
-			JOIN lehre.tbl_kalender other_kalender
-				ON other_kalender.kalender_id != current_kalender.kalender_id
-				AND other_kalender.von < current_kalender.bis
-				AND other_kalender.bis > current_kalender.von
-				AND other_kalender.status_kurzbz NOT IN ('archived', 'deleted', 'to_delete', 'to_delete_live', 'to_delete_preview')
-				AND NOT EXISTS (
-					SELECT 1 FROM lehre.tbl_kalender vorgaenger
-					WHERE vorgaenger.vorgaenger_kalender_id = other_kalender.kalender_id
-				)
-			JOIN lehre.tbl_kalender_lehreinheit other_kalender_le ON other_kalender_le.kalender_id = other_kalender.kalender_id
-			JOIN lehre.tbl_lehreinheit other_lehreinheit ON other_lehreinheit.lehreinheit_id = other_kalender_le.lehreinheit_id
-			JOIN lehre.tbl_lehreinheitgruppe other_lehreinheitgruppe ON other_lehreinheitgruppe.lehreinheit_id = other_lehreinheit.lehreinheit_id
-			JOIN public.tbl_studentlehrverband other_slv
-				ON other_slv.studiengang_kz = other_lehreinheitgruppe.studiengang_kz
-				AND other_slv.semester = other_lehreinheitgruppe.semester
-				AND other_slv.studiensemester_kurzbz = other_lehreinheit.studiensemester_kurzbz
-				AND other_slv.student_uid = current_studentlehrverband.student_uid
-				AND (other_lehreinheitgruppe.verband = other_slv.verband OR other_lehreinheitgruppe.verband IS NULL OR btrim(other_lehreinheitgruppe.verband::text) = '' OR other_slv.verband IS NULL)
-				AND (other_lehreinheitgruppe.gruppe = other_slv.gruppe OR other_lehreinheitgruppe.gruppe IS NULL OR btrim(other_lehreinheitgruppe.gruppe::text) = '' OR other_slv.gruppe IS NULL)
-
-			WHERE current_kalender.kalender_id IN ($placeholders)
-		";
-
-		$result = $dbModel->execReadOnlyQuery($sql, array_merge($kalender_ids, $kalender_ids));
-
+		$result = $dbModel->execReadOnlyQuery($sql, [$postgres_array]);
 		if (isError($result) || !hasData($result)) return [];
 
 		$grouped = [];
 		foreach (getData($result) as $row)
-		{
-			$grouped[$row->kalender_id][] = true;
-		}
+			$grouped[$row->kalender_id] = [true];
 
+		log_message('error', 'StudentCollisionCheck::checkAll() 1');
 		return $grouped;
 	}
 }

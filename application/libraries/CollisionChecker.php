@@ -18,12 +18,12 @@ class CollisionChecker
 		$this->_ci->load->library('collision/checks/LectureCollisionCheck');
 		$this->_ci->load->library('collision/checks/VerbandCollisionCheck');
 		$this->_ci->load->library('collision/checks/StudentCollisionCheck');
-		$this->_ci->load->library('collision/checks/ResourcesCollisionCheck');
+		// $this->_ci->load->library('collision/checks/ResourcesCollisionCheck');
 		$this->register($this->_ci->roomcollisioncheck);
 		$this->register($this->_ci->lecturecollisioncheck);
 		$this->register($this->_ci->verbandcollisioncheck);
 		$this->register($this->_ci->studentcollisioncheck);
-		$this->register($this->_ci->resourcescollisioncheck);
+		// $this->register($this->_ci->resourcescollisioncheck);
 		Events::trigger('collision_register', $this);
 	}
 
@@ -63,5 +63,28 @@ class CollisionChecker
 		}
 
 		return $results;
+	}
+
+	public function runAny($kalender_ids)
+	{
+		$remaining_ids = array_values(array_unique($kalender_ids));
+		$collision_ids = [];
+
+		foreach ($this->_checks as $check)
+		{
+			if (empty($remaining_ids)) break;
+
+			$batch_result = $check->checkAll($remaining_ids);
+			foreach ($batch_result as $kalender_id => $errors)
+			{
+				if (!empty($errors))
+					$collision_ids[$kalender_id] = true;
+			}
+
+			if (!empty($collision_ids))
+				$remaining_ids = array_values(array_diff($remaining_ids, array_keys($collision_ids)));
+		}
+
+		return $collision_ids;
 	}
 }

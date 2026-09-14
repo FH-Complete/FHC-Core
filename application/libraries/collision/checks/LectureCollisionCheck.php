@@ -50,111 +50,111 @@ class LectureCollisionCheck implements ICollisionCheck
 	{
 		if (empty($kalender_ids)) return [];
 
-		$kollisionsfreie_user = unserialize(KOLLISIONSFREIE_USER);
+		$kalender_ids = array_values(array_unique(array_map('intval', $kalender_ids)));
+		$postgres_array = '{' . implode(',', $kalender_ids) . '}';
+		$kollisionsfreie_user = array_values(array_filter((array) unserialize(KOLLISIONSFREIE_USER)));
+		$excluded_user_condition = '';
+		$params = [$postgres_array];
+
+		if (!empty($kollisionsfreie_user))
+		{
+			$placeholders = implode(',', array_fill(0, count($kollisionsfreie_user), '?'));
+			$excluded_user_condition = "AND current_lecturer.mitarbeiter_uid NOT IN ($placeholders)";
+			$params = array_merge($params, $kollisionsfreie_user);
+		}
+
+		$sql = "
+			WITH current_kalender AS MATERIALIZED (
+				SELECT kalender_id, von, bis
+				FROM lehre.tbl_kalender
+				WHERE kalender_id = ANY(?::bigint[])
+			),
+			current_lecturer AS MATERIALIZED (
+				SELECT
+					current_kalender.kalender_id,
+					current_kalender.von,
+					current_kalender.bis,
+					current_lehreinheit_ma.mitarbeiter_uid
+				FROM current_kalender
+				JOIN lehre.tbl_kalender_lehreinheit current_kalender_le
+					ON current_kalender_le.kalender_id = current_kalender.kalender_id
+				JOIN lehre.tbl_lehreinheit current_lehreinheit
+					ON current_lehreinheit.lehreinheit_id = current_kalender_le.lehreinheit_id
+				JOIN lehre.tbl_lehreinheitmitarbeiter current_lehreinheit_ma
+					ON current_lehreinheit_ma.lehreinheit_id = current_lehreinheit.lehreinheit_id
+			)
+			SELECT current_kalender.kalender_id
+			FROM current_kalender
+			WHERE EXISTS (
+				SELECT 1
+				FROM current_lecturer
+				WHERE current_lecturer.kalender_id = current_kalender.kalender_id
+					$excluded_user_condition
+					AND (
+						EXISTS (
+							SELECT 1
+							FROM lehre.tbl_lehreinheitmitarbeiter other_lehreinheit_ma
+							JOIN lehre.tbl_lehreinheit other_lehreinheit
+								ON other_lehreinheit.lehreinheit_id = other_lehreinheit_ma.lehreinheit_id
+							JOIN lehre.tbl_kalender_lehreinheit other_kalender_le
+								ON other_kalender_le.lehreinheit_id = other_lehreinheit.lehreinheit_id
+							JOIN lehre.tbl_kalender other_kalender
+								ON other_kalender.kalender_id = other_kalender_le.kalender_id
+							WHERE other_lehreinheit_ma.mitarbeiter_uid = current_lecturer.mitarbeiter_uid
+								AND other_kalender.kalender_id != current_lecturer.kalender_id
+								AND other_kalender.von < current_lecturer.bis
+								AND other_kalender.bis > current_lecturer.von
+								AND other_kalender.status_kurzbz NOT IN ('archived', 'deleted', 'to_delete', 'to_delete_live', 'to_delete_preview')
+								AND NOT EXISTS (
+									SELECT 1
+									FROM lehre.tbl_kalender nachfolger
+									WHERE nachfolger.vorgaenger_kalender_id = other_kalender.kalender_id
+								)
+						)
+						OR EXISTS (
+							SELECT 1
+							FROM lehre.tbl_kalender_event_teilnehmer other_teilnehmer
+							JOIN lehre.tbl_kalender_event other_event
+								ON other_event.kalender_id = other_teilnehmer.kalender_id
+							JOIN lehre.tbl_kalender other_kalender
+								ON other_kalender.kalender_id = other_event.kalender_id
+							WHERE other_teilnehmer.uid = current_lecturer.mitarbeiter_uid
+								AND other_kalender.kalender_id != current_lecturer.kalender_id
+								AND other_kalender.von < current_lecturer.bis
+								AND other_kalender.bis > current_lecturer.von
+								AND other_kalender.status_kurzbz NOT IN ('archived', 'deleted', 'to_delete', 'to_delete_live', 'to_delete_preview')
+								AND NOT EXISTS (
+									SELECT 1
+									FROM lehre.tbl_kalender nachfolger
+									WHERE nachfolger.vorgaenger_kalender_id = other_kalender.kalender_id
+								)
+						)
+						OR EXISTS (
+							SELECT 1
+							FROM campus.tbl_zeitsperre zeitsperre
+							LEFT JOIN lehre.tbl_stunde vonstunde_z
+								ON vonstunde_z.stunde = zeitsperre.vonstunde
+							LEFT JOIN lehre.tbl_stunde bisstunde_z
+								ON bisstunde_z.stunde = zeitsperre.bisstunde
+							WHERE zeitsperre.mitarbeiter_uid = current_lecturer.mitarbeiter_uid
+								AND zeitsperre.zeitsperretyp_kurzbz != 'ZVerfueg'
+								AND (zeitsperre.vondatum + COALESCE(vonstunde_z.beginn, '00:00'))::timestamp < current_lecturer.bis
+								AND (zeitsperre.bisdatum + COALESCE(bisstunde_z.ende, '23:59'))::timestamp > current_lecturer.von
+						)
+					)
+			)";
+
+		$dbModel = new DB_Model();
+		$result = $dbModel->execReadOnlyQuery($sql, $params);
 		$grouped = [];
 
-		$this->_ci->KalenderModel->addSelect('DISTINCT ON (tbl_kalender.kalender_id) tbl_kalender.kalender_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit current_kalender_le', 'current_kalender_le.kalender_id = tbl_kalender.kalender_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheit current_lehreinheit', 'current_lehreinheit.lehreinheit_id = current_kalender_le.lehreinheit_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter current_lehreinheit_ma', 'current_lehreinheit_ma.lehreinheit_id = current_lehreinheit.lehreinheit_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter other_lehreinheithreinheit_ma', 'other_lehreinheithreinheit_ma.mitarbeiter_uid = current_lehreinheit_ma.mitarbeiter_uid');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheit other_lehreinheit', 'other_lehreinheit.lehreinheit_id = other_lehreinheithreinheit_ma.lehreinheit_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit other_kalender_le', 'other_kalender_le.lehreinheit_id = other_lehreinheit.lehreinheit_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender other_kalender', 'other_kalender.kalender_id = other_kalender_le.kalender_id');
-
-		$this->_ci->KalenderModel->db->where('other_kalender.kalender_id != tbl_kalender.kalender_id', null, false);
-		$this->_ci->KalenderModel->db->where('other_kalender.von < tbl_kalender.bis', null, false);
-		$this->_ci->KalenderModel->db->where('other_kalender.bis > tbl_kalender.von', null, false);
-		$this->_ci->KalenderModel->db->where_not_in('other_kalender.status_kurzbz', array('archived', 'deleted', 'to_delete', 'to_delete_live', 'to_delete_preview'));
-		$this->_ci->KalenderModel->db->where_not_in('current_lehreinheit_ma.mitarbeiter_uid', $kollisionsfreie_user);
-
-		$this->_ci->KalenderModel->db->group_start();
-		$where_ids_chunks = array_chunk($kalender_ids,25);
-		foreach($where_ids_chunks as $where_ids)
-		{
-			$this->_ci->KalenderModel->db->or_where_in('tbl_kalender.kalender_id', $where_ids);
-		}
-		$this->_ci->KalenderModel->db->group_end();
-
-		$this->_ci->KalenderModel->db->where(
-			'other_kalender.kalender_id NOT IN (SELECT vorgaenger_kalender_id FROM lehre.tbl_kalender WHERE vorgaenger_kalender_id IS NOT NULL)',
-			null, false
-		);
-		$result = $this->_ci->KalenderModel->load();
 		if (!isError($result) && hasData($result))
 		{
 			foreach (getData($result) as $row)
-			{
-				$grouped[$row->kalender_id][] = true;
-			}
+				$grouped[$row->kalender_id] = [true];
 		}
 
-		$this->_ci->KalenderModel->addSelect('DISTINCT ON (tbl_kalender.kalender_id) tbl_kalender.kalender_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit current_kalender_le', 'current_kalender_le.kalender_id = tbl_kalender.kalender_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheit current_lehreinheit', 'current_lehreinheit.lehreinheit_id = current_kalender_le.lehreinheit_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter current_lehreinheit_ma', 'current_lehreinheit_ma.lehreinheit_id = current_lehreinheit.lehreinheit_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event_teilnehmer other_t', 'other_t.uid = current_lehreinheit_ma.mitarbeiter_uid');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event other_e', 'other_e.kalender_id = other_t.kalender_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender other_kalender', 'other_kalender.kalender_id = other_e.kalender_id');
-
-		$this->_ci->KalenderModel->db->where('other_kalender.kalender_id != tbl_kalender.kalender_id', null, false);
-		$this->_ci->KalenderModel->db->where('other_kalender.von < tbl_kalender.bis', null, false);
-		$this->_ci->KalenderModel->db->where('other_kalender.bis > tbl_kalender.von', null, false);
-		$this->_ci->KalenderModel->db->where_not_in('other_kalender.status_kurzbz', ['archived', 'deleted', 'to_delete', 'to_delete_live', 'to_delete_preview']);
-		$this->_ci->KalenderModel->db->where_not_in('current_lehreinheit_ma.mitarbeiter_uid', $kollisionsfreie_user);
-
-		$this->_ci->KalenderModel->db->group_start();
-		$where_ids_chunks = array_chunk($kalender_ids,25);
-		foreach($where_ids_chunks as $where_ids)
-		{
-			$this->_ci->KalenderModel->db->or_where_in('tbl_kalender.kalender_id', $where_ids);
-		}
-		$this->_ci->KalenderModel->db->group_end();
-
-		$this->_ci->KalenderModel->db->where(
-			'other_kalender.kalender_id NOT IN (SELECT vorgaenger_kalender_id FROM lehre.tbl_kalender WHERE vorgaenger_kalender_id IS NOT NULL)',
-			null, false
-		);
-		$result = $this->_ci->KalenderModel->load();
-		if (!isError($result) && hasData($result))
-		{
-			foreach (getData($result) as $row)
-			{
-				$grouped[$row->kalender_id][] = true;
-			}
-		}
-
-		$this->_ci->KalenderModel->addSelect('DISTINCT ON (tbl_kalender.kalender_id) tbl_kalender.kalender_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit current_kalender_le', 'current_kalender_le.kalender_id = tbl_kalender.kalender_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheit current_lehreinheit', 'current_lehreinheit.lehreinheit_id = current_kalender_le.lehreinheit_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter current_lehreinheit_ma', 'current_lehreinheit_ma.lehreinheit_id = current_lehreinheit.lehreinheit_id');
-		$this->_ci->KalenderModel->addJoin('campus.tbl_zeitsperre z',
-			"z.mitarbeiter_uid = current_lehreinheit_ma.mitarbeiter_uid 
-			AND z.zeitsperretyp_kurzbz != 'ZVerfueg'");
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_stunde vonstunde_z', 'vonstunde_z.stunde = z.vonstunde', 'LEFT');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_stunde bisstunde_z', 'bisstunde_z.stunde = z.bisstunde', 'LEFT');
-
-		$this->_ci->KalenderModel->db->where('(z.vondatum + COALESCE(vonstunde_z.beginn, \'00:00\'))::timestamp < tbl_kalender.bis', null, false);
-		$this->_ci->KalenderModel->db->where('(z.bisdatum + COALESCE(bisstunde_z.ende, \'23:59\'))::timestamp > tbl_kalender.von', null, false);
-		$this->_ci->KalenderModel->db->where_not_in('current_lehreinheit_ma.mitarbeiter_uid', $kollisionsfreie_user);
-		$this->_ci->KalenderModel->db->group_start();
-		$where_ids_chunks = array_chunk($kalender_ids,25);
-		foreach($where_ids_chunks as $where_ids)
-		{
-			$this->_ci->KalenderModel->db->or_where_in('tbl_kalender.kalender_id', $where_ids);
-		}
-		$this->_ci->KalenderModel->db->group_end();
-		$result = $this->_ci->KalenderModel->load();
-
-
-		if (!isError($result) && hasData($result))
-		{
-			foreach (getData($result) as $row)
-			{
-				$grouped[$row->kalender_id][] = true;
-			}
-		}
-
+		log_message('error', 'LectureCollisionCheck::checkAll() 1');
 		return $grouped;
 	}
 
