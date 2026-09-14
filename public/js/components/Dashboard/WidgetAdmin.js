@@ -31,6 +31,7 @@ export default {
 			this.currentData = JSON.parse(JSON.stringify(data));
 		},
 		create(data) {
+			data.arguments = {};
 			this.currentData = JSON.parse(JSON.stringify(data));
 			this.save();
 		},
