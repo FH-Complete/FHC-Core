@@ -1,11 +1,17 @@
 
 export default {
-	getPlan(filter, start_date, end_date)
+	getPlan(filter, start_date, end_date, collisionCheck = true, maxDailyEventLimit = null)
 	{
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/tempus/Kalender/getPlan',
-			params: { ...filter, start_date, end_date }
+			params: {
+				...filter,
+				start_date,
+				end_date,
+				collisionCheck,
+				...(maxDailyEventLimit == null ? {} : { maxDailyEventLimit })
+			}
 		};
 	},
 	getRaumvorschlagSlots(lehreinheit_id, start_date, end_date)
@@ -21,15 +27,25 @@ export default {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/tempus/Kalender/getPlanLecturer',
-			params: { start_date, end_date }
+			params: {
+				start_date,
+				end_date,
+				collisionCheck,
+				...(maxDailyEventLimit == null ? {} : { maxDailyEventLimit })
+			}
 		};
 	},
-	getPlanStudent(start_date, end_date)
+	getPlanStudent(start_date, end_date, collisionCheck = true, maxDailyEventLimit = null)
 	{
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/tempus/Kalender/getPlanStudent',
-			params: { start_date, end_date }
+			params: {
+				start_date,
+				end_date,
+				collisionCheck,
+				...(maxDailyEventLimit == null ? {} : { maxDailyEventLimit })
+			}
 		};
 	},
 

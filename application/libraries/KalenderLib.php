@@ -243,7 +243,7 @@ class KalenderLib
 		return $this->_ci->KalenderModel->execReadOnlyQuery($query);
 	}
 
-	private function _mapEvents($data, $collisionCheck = true)
+	private function _mapEvents($data, $collisionCheck = true, $maxDailyEventLimit = null)
 	{
 		$stundenplan_data = [];
 
@@ -264,6 +264,7 @@ class KalenderLib
 				$parsedResources = is_string($resources) ? json_decode($resources, true) : $resources;
 
 				$events[$id] = (object) [
+					'kalender_id' => $id,					
 					'eindeutige_kalender_gruppen_id' => $row->eindeutige_kalender_gruppen_id,
 					'type' => $row->typ,
 					'beginn' => $von->format('H:i:s'),
@@ -282,7 +283,6 @@ class KalenderLib
 					'lehrveranstaltung_id' => $row->lehrveranstaltung_id,
 					'verplante_stunden' => $row->verplante_stunden,
 					'organisationseinheit' => isset($row->oe_kurzbz) ? $row->oe_kurzbz : '',
-					'kalender_id' => $id,
 					'lehreinheit_id' => [],
 					'lektor' => [],
 					'teilnehmer_gruppe' => [],
@@ -386,6 +386,21 @@ class KalenderLib
 			}
 		}
 
+		if (!is_null($maxDailyEventLimit) && is_numeric($maxDailyEventLimit) && $maxDailyEventLimit > 0)
+		{
+			$eventsPerDay = [];
+			$events = array_filter($events, function ($event) use (&$eventsPerDay, $maxDailyEventLimit) {
+				$date = $event->datum;
+				$eventsPerDay[$date] = $eventsPerDay[$date] ?? 0;
+	
+				if ($eventsPerDay[$date] >= $maxDailyEventLimit)
+					return false;
+	
+				$eventsPerDay[$date]++;
+				return true;
+			});
+		}
+
 		return array_values($events);
 	}
 	public function getPlanByOrt($start_date, $end_date, $ort)
@@ -456,7 +471,7 @@ class KalenderLib
 		$data = $this->_loadFilteredBasePlan($kalender_entry->von, $kalender_entry->bis);
 		return $this->_mapEvents($data);
 	}
-	public function getPlanForPlanner($start_date, $end_date, $ort = null, $uids = null, $studiengaenge = null)
+	public function getPlanForPlanner($start_date, $end_date, $ort = null, $uids = null, $studiengaenge = null, $collisionCheck = true, $maxDailyEventLimit = null)
 	{
 		$this->_buildBasePlanQuery();
 
@@ -563,7 +578,7 @@ class KalenderLib
 		
 		$data = $this->_loadFilteredBasePlan($start_date, $end_date);
 
-		return $this->_mapEvents($data);
+		return $this->_mapEvents($data, $collisionCheck, $maxDailyEventLimit);
 	}
 
 	public function getPlanForStudent($start_date, $end_date)

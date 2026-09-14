@@ -69,6 +69,7 @@ export default {
 		if (binding.arg == 'container')
 			removeContainerListener(el);
 		else
+		if (binding.arg != 'container')
 			removeClickListener(el);
 	}
 }

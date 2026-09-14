@@ -131,11 +131,13 @@ export default {
 				endTime: null,
 			},
 			studiengaenge_all: [],
+			maxDailyEventLimitForMonthView: 10,
 			raumvorschlagPreview: null,
 			raumvorschlagLoading: false,
 			showEvents: true,
 			reservierungPending: false,
 			bcc: null,
+			currentlyUpdatedEvent: null,
 		};
 	},
 	computed: {
@@ -163,7 +165,7 @@ export default {
 			if (!orig?.kalender_id) return;
 
 			await this.deleteEntryCall(orig);
-			this.$refs.calendar.resetEventLoader();
+			this.$refs.calendar.resetEventLoader(false);
 			this.$refs.sidebar.reloadCoursepicker();
 			this.rebuildRaumvorschlag();
 		},
@@ -174,7 +176,7 @@ export default {
 			await Promise.allSettled(
 				validList.map((orig) => this.deleteEntryCall(orig)),
 			);
-			this.$refs.calendar.resetEventLoader();
+			this.$refs.calendar.resetEventLoader(false);
 			this.$refs.sidebar.reloadCoursepicker();
 		},
 		async deleteEntryCall(orig) {
@@ -437,6 +439,9 @@ export default {
 			return this.$api.call(ApiSearchbar.search(params));
 		},
 		getPromiseFunc(start, end) {
+			const isMonth = this.currentMode?.toLowerCase() === "month";
+			const collisionCheck = !isMonth;
+			const maxDailyEventLimit = isMonth ? this.maxDailyEventLimitForMonthView : null;
 			const hasRooms = this.rooms.length > 0;
 			const hasLektoren = this.lecturers.length > 0;
 			const hasStg = this.studiengaenge.length > 0;
@@ -456,25 +461,50 @@ export default {
 			if (hasLektoren)
 				filter.uid = this.lecturers.map((lecture) => lecture.uid);
 
+			let response = null;
 			if (this.previewRole === 'lektor')
-				return [
+				response = [
 					this.$api.call(
-						ApiKalender.getPlanLecturer(start.toISODate(), end.toISODate()),
+						ApiKalender.getPlanLecturer(
+							start.toISODate(),
+							end.toISODate(),
+							collisionCheck,
+							maxDailyEventLimit,
+						),
 					),
 				];
 
 			if (this.previewRole === 'student')
-				return [
+				response = [
 					this.$api.call(
-						ApiKalender.getPlanStudent(start.toISODate(), end.toISODate()),
+						ApiKalender.getPlanStudent(
+							start.toISODate(),
+							end.toISODate(),
+							collisionCheck,
+							maxDailyEventLimit,
+						),
 					),
 				];
 
-			return [
+			response = [
 				this.$api.call(
-					ApiKalender.getPlan(filter, start.toISODate(), end.toISODate()),
+					ApiKalender.getPlan(
+						filter,
+						start.toISODate(),
+						end.toISODate(),
+						collisionCheck,
+						maxDailyEventLimit,
+					),
 				),
 			];
+
+			if (response) {
+				response[0].then((result) => {
+					this.scrollToAndEmphasizeUpdatedEvent();
+				});
+			}
+
+			return response;
 		},
 		_parseDates(start, end) {
 			const startDT = luxon.DateTime.fromISO(start);
@@ -516,7 +546,19 @@ export default {
 					ApiKalender.updateKalenderEvent(obj.orig.kalender_id, updatedInfos),
 				)
 				.then(() => {
-					if (onSuccess) onSuccess();
+					if (onSuccess) {
+						onSuccess();
+						this.$refs.calendar.$refs.calendar.$refs.mode.$refs.view.$refs.grid.disableAutoScroll();
+						this.currentlyUpdatedEvent = obj.orig;
+					}
+				})
+				.catch((error) => {
+					this.currentlyUpdatedEvent = null;
+					this.$refs.calendar.clearOutCalendarEventEmphasis();
+					this.$nextTick(() => {
+						this.$refs.calendar.reloadEvents();
+					});
+					throw error;
 				});
 		},
 
@@ -527,11 +569,25 @@ export default {
 			const { item, start, end } = payload;
 			const obj = item[0];
 			if (!obj?.orig?.kalender_id)
-				return alert('Kein gültiges Kalender-Event zum Resizen');
+				return;
 
 			const dates = this._parseDates(start, end);
 
 			if (!dates) return;
+
+			if (
+				luxon.DateTime.fromISO(obj.orig.isostart).toMillis() ===
+					dates.startDT.toMillis() &&
+				luxon.DateTime.fromISO(obj.orig.isoend).toMillis() ===
+					dates.endDT.toMillis()
+			)
+				return;
+
+			this.updateKalenderEventElementDisplay(
+				obj.orig.eindeutige_kalender_gruppen_id,
+				dates.startDT,
+				dates.endDT,
+			);
 
 			return this._updateKalenderEvent(
 				obj,
@@ -540,7 +596,7 @@ export default {
 				dates.start_time,
 				dates.end_time,
 				() => {
-					this.$refs.calendar.resetEventLoader();
+					this.$refs.calendar.resetEventLoader(false);
 					this.$refs.sidebar.reloadCoursepicker();
 					this.rebuildRaumvorschlag();
 				},
@@ -571,7 +627,7 @@ export default {
 						),
 					)
 					.then(() => {
-						this.$refs.calendar.resetEventLoader();
+						this.$refs.calendar.resetEventLoader(false);
 						this.$refs.sidebar.reloadCoursepicker();
 						this.rebuildRaumvorschlag();
 						this.bcc.postMessage('dropped');
@@ -581,7 +637,21 @@ export default {
 			const dates = this._parseDates(start, end);
 			if (!dates) return;
 
+			if (
+				luxon.DateTime.fromISO(obj.orig.isostart).toMillis() ===
+					dates.startDT.toMillis() &&
+				luxon.DateTime.fromISO(obj.orig.isoend).toMillis() ===
+					dates.endDT.toMillis()
+			)
+				return;
+
 			const { startDT, endDT, start_time, end_time } = dates;
+
+			this.updateKalenderEventElementDisplay(
+				obj.orig.eindeutige_kalender_gruppen_id,
+				startDT,
+				endDT,
+			);
 
 			if (obj.type === 'reservierung') {
 				this.reservierungPending = true;
@@ -628,7 +698,7 @@ export default {
 								return;
 							}
 
-							this.$refs.calendar.resetEventLoader();
+							this.$refs.calendar.resetEventLoader(false);
 							this.$refs.sidebar.reloadCoursepicker();
 							this.rebuildRaumvorschlag();
 							this.bcc.postMessage('dropped');
@@ -646,7 +716,7 @@ export default {
 							),
 						)
 						.then(() => {
-							this.$refs.calendar.resetEventLoader();
+							this.$refs.calendar.resetEventLoader(false);
 							this.$refs.sidebar.reloadCoursepicker();
 							this.bcc.postMessage('dropped');
 							this.rebuildRaumvorschlag();
@@ -671,7 +741,7 @@ export default {
 							type: obj.type,
 							id: obj.orig.kalender_id,
 						});
-						this.$refs.calendar.resetEventLoader();
+						this.$refs.calendar.resetEventLoader(false);
 						this.rebuildRaumvorschlag();
 						this.bcc.postMessage('dropped');
 					},
@@ -691,7 +761,7 @@ export default {
 			this.multiWeekModal.show = false;
 		},
 		onMultiWeekConfirmed() {
-			this.$refs.calendar.resetEventLoader();
+			this.$refs.calendar.resetEventLoader(false);
 			this.$refs.sidebar.reloadCoursepicker();
 			this.rebuildRaumvorschlag();
 			this.bcc.postMessage('dropped');
@@ -872,6 +942,148 @@ export default {
 		focusSearchbar() {
 			this.$refs.header?.focusSearchbar();
 		},
+		scrollToAndEmphasizeUpdatedEvent() {
+			if (!this.currentlyUpdatedEvent) return;
+
+			document
+				.querySelectorAll(
+					'.fhc-calendar-base-grid .fhc-calendar-base-grid-line-event',
+				)
+				.forEach((el) => {
+					const spinner = el.querySelector('.spinner-overlay');
+					if (spinner) {
+						spinner.remove();
+					}
+
+					el.classList.remove(
+						'updating-event',
+						'updated-event',
+						'updated-event-long',
+					);
+				});
+
+			setTimeout(() => {
+				const eventEl = document.querySelector(
+					`[data-group-id="event-group-${this.currentlyUpdatedEvent.eindeutige_kalender_gruppen_id}"]`,
+				);
+				if (!eventEl) return;
+
+				const calendar = document.querySelector('.fhc-calendar-base-grid');
+				const eventRect = eventEl.getBoundingClientRect();
+
+				const offset = 300;
+
+				const isInsideScrolledView =
+					eventEl.offsetLeft < calendar.scrollLeft + calendar.clientWidth &&
+					eventEl.offsetLeft + eventEl.offsetWidth > calendar.scrollLeft &&
+					eventEl.offsetTop < calendar.scrollTop + calendar.clientHeight &&
+					eventEl.offsetTop + eventEl.offsetHeight > calendar.scrollTop;
+
+				const rect = eventEl.getBoundingClientRect();
+				if (!isInsideScrolledView) {
+					eventEl.scrollIntoView({
+						behavior: 'smooth',
+						inline: 'center',
+						block: 'nearest',
+					});
+				}
+
+				let timeout = 0;
+				let emphasizeUpdateClassName = isInsideScrolledView
+					? 'updated-event'
+					: 'updated-event-long';
+
+				if (!isInsideScrolledView) timeout = 300;
+
+				setTimeout(() => {
+					eventEl.classList.add(emphasizeUpdateClassName);
+				}, timeout);
+
+				this.currentlyUpdatedEvent = null;
+			}, 100);
+		},
+		updateKalenderEventElementDisplay(calendarGruppenId, startDT, endDT) {
+			if (!calendarGruppenId)
+				return;
+
+			let startOfDay = startDT.startOf('day');
+			let newPotentialStart = startDT.diff(startOfDay).toMillis() ?? 1;
+			let newPotentialEnd = endDT.diff(startOfDay).toMillis();
+
+			const calendar = this.$refs.calendar?.$el;
+			let element = calendar?.querySelector(
+				`[data-group-id="event-group-${calendarGruppenId}"]`,
+			);
+			if (!element) return;
+
+			const targetGridLine = [...calendar.querySelectorAll(
+				'.fhc-calendar-base-grid-line',
+			)].find((gridLine) => {
+				const [rowStart, columnStart, rowEnd] = getComputedStyle(
+					gridLine,
+				).gridArea.split(' / ');
+
+				return (
+					rowStart === '1' &&
+					columnStart === String(startDT.weekday) &&
+					rowEnd === '-1'
+				);
+			});
+			const changedDay =
+				targetGridLine && element.parentElement !== targetGridLine;
+
+			setTimeout(() => {
+				if (!calendar.contains(element)) return;
+
+
+				if (changedDay) {
+					targetGridLine.insertBefore(element, null);
+					element.classList.add('tempus-temporary-calendar-event');
+				}
+				element.style.gridRowEnd = 't_' + newPotentialEnd;
+				element.style.gridRowStart = 't_' + newPotentialStart;
+			}, 100);
+
+			const outerDiv = document.createElement('div');
+			outerDiv.className = 'spinner-overlay';
+
+			const innerDiv = document.createElement('div');
+			innerDiv.className = 'spinner';
+
+			outerDiv.appendChild(innerDiv);
+
+			element.appendChild(outerDiv);
+
+			const eventRect = element.getBoundingClientRect();
+
+			const offset = 300;
+
+			const isInsideScrolledView =
+				element.offsetLeft < calendar.scrollLeft + calendar.clientWidth &&
+				element.offsetLeft + element.offsetWidth > calendar.scrollLeft &&
+				element.offsetTop < calendar.scrollTop + calendar.clientHeight &&
+				element.offsetTop + element.offsetHeight > calendar.scrollTop;
+
+			const rect = element.getBoundingClientRect();
+			if (!isInsideScrolledView) {
+				element.scrollIntoView({
+					behavior: 'smooth',
+					inline: 'center',
+					block: 'nearest',
+				});
+			}
+		},
+		clearTemporaryEvents() {
+			const calendar = this.$refs.calendar?.$el;
+			if (!calendar) return;
+			
+			const tempEvents = calendar.querySelectorAll(
+				'.tempus-temporary-calendar-event',
+			);
+			tempEvents.forEach((event) => {
+				event.remove();
+			});
+		}
 	},
 	watch: {
 		lecturers: {
@@ -1021,7 +1233,9 @@ export default {
 							@open-reservierung="openReservierung"
 							:extra-backgrounds="extraBackgrounds"
 							@update:range="handleRange"
+							@events-reloaded="clearTemporaryEvents"
 							class="responsive-calendar"
+							:cache-multiplier="currentMode === 'week' ? 1 : 0"
 						/>
 					</template>
 				</horizontal-split>
@@ -1032,7 +1246,6 @@ export default {
 			ref="verbandMenu"
 			@select-verband-and-close="onSelectVerbandAndClose"
 		/>
-		<raumauswahl-modal ref="raumModal" @saved="$refs.calendar.resetEventLoader()"/>
 		<raumauswahl-modal ref="raumModal" @saved="() => {$refs.calendar.resetEventLoader(); $refs.sidebar.reloadCoursepicker(); rebuildRaumvorschlag();}"/>
 		<lehreinheit-modal ref="lehreinheitModal" @saved="$refs.calendar.resetEventLoader(); $refs.sidebar.reloadCoursepicker();"/>
 		<resources-assignment-modal

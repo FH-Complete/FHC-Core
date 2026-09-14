@@ -104,6 +104,9 @@ class Kalender extends FHCAPI_Controller
 		$start_date = $this->_ci->input->post('start_date', TRUE);
 		$end_date = $this->_ci->input->post('end_date', TRUE);
 
+		$isCollisionCheckEnabled = $this->_ci->input->post('collisionCheck', TRUE) ?? false;
+		$maxDailyEventLimit = $this->_ci->input->post('maxDailyEventLimit', TRUE) ?? false;
+
 		$filter = $this->_checkFilter(self::ALLOWED_PLAN_FILTER);
 
 		$stundenplan_data = $this->_ci->kalenderlib->getPlanForPlanner(
@@ -111,7 +114,9 @@ class Kalender extends FHCAPI_Controller
 			$end_date,
 			isset($filter->ort) ? $filter->ort : null,
 			isset($filter->uid) ? $filter->uid : null,
-			isset($filter->stg) ? $filter->stg : null
+			isset($filter->stg) ? $filter->stg : null,
+			$isCollisionCheckEnabled,
+			$maxDailyEventLimit
 		);
 
 		$this->terminateWithSuccess($stundenplan_data);

@@ -125,6 +125,10 @@ export default {
 		draggableEvents: [Boolean, Array, Function],
 		dropableEvents: [Boolean, Array, Function],
 		resizableEvents: [Boolean, Array, Function],
+		eventReloadKey: {
+			type: Number,
+			default: 0,
+		},
 		onDragover: Function,
 		onDrop: Function,
 		onResize: Function
@@ -333,6 +337,7 @@ export default {
 			</base-header>
 			<component
 				:is="modes ? modes[cMode] : null || 'div'"
+				:key="eventReloadKey"
 				ref="mode"
 				v-model:current-date="cDate"
 				:range-end="pickedRangeEnd"

@@ -76,15 +76,15 @@ export default {
 			if (!this.onVisibleDatesChanged || typeof IntersectionObserver === 'undefined')
 				return;
 
-			if (
-				this.$el.closest('.fhc-calendar-mode-range')
-				&& typeof ResizeObserver !== 'undefined'
-			)
-			{
-				this.gridLineResizeObserver = Vue.markRaw(new ResizeObserver(entries => {
-					entries.forEach(entry => this.preserveGridLineHeight(entry.target));
-				}));
-			}
+			// if (
+			// 	this.$el.closest('.fhc-calendar-mode-range')
+			// 	&& typeof ResizeObserver !== 'undefined'
+			// )
+			// {
+			// 	this.gridLineResizeObserver = Vue.markRaw(new ResizeObserver(entries => {
+			// 		entries.forEach(entry => this.preserveGridLineHeight(entry.target));
+			// 	}));
+			// }
 
 			this.intersectionObserver = Vue.markRaw(new IntersectionObserver(entries => {
 				let changed = false;
@@ -112,8 +112,8 @@ export default {
 
 				mutations.forEach(mutation => {
 					if (mutation.type === 'attributes') {
-						this.applyPreservedGridLineHeight(mutation.target);
-						this.gridLineResizeObserver?.observe(mutation.target);
+						// this.applyPreservedGridLineHeight(mutation.target);
+						// this.gridLineResizeObserver?.observe(mutation.target);
 						if (this.visibleGridLines.has(mutation.target))
 							changed = true;
 						return;
@@ -123,7 +123,7 @@ export default {
 					mutation.removedNodes.forEach(node => {
 						this.getGridLines(node).forEach(line => {
 							this.intersectionObserver.unobserve(line);
-							this.gridLineResizeObserver?.unobserve(line);
+							// this.gridLineResizeObserver?.unobserve(line);
 							if (this.visibleGridLines.delete(line))
 								changed = true;
 						});
@@ -157,12 +157,14 @@ export default {
 			});
 		},
 		getGridLineKey(line) {
+			return;
 			const start = line.dataset.visibleStart;
 			const end = line.dataset.visibleEnd;
 
 			return start && end ? start + '/' + end : null;
 		},
 		applyPreservedGridLineHeight(line) {
+			return;
 			if (!this.gridLineResizeObserver)
 				return;
 
@@ -171,6 +173,7 @@ export default {
 			line.style.minHeight = height ? height + 'px' : '';
 		},
 		preserveGridLineHeight(line) {
+			return;
 			const key = this.getGridLineKey(line);
 			if (!key)
 				return;
