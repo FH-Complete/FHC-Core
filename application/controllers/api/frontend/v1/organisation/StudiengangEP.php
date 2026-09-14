@@ -63,9 +63,10 @@ class StudiengangEP extends FHCAPI_Controller
 	 */
 	public function getAllowed()
 	{
+		$this->loadPhrases([ 'global' ]);
 		$this->load->library('form_validation');
 
-		$this->form_validation->set_rules('permissions[]', 'Permissions', 'required');
+		$this->form_validation->set_rules('permissions[]', $this->p->t('global', 'permissions'), 'required');
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
