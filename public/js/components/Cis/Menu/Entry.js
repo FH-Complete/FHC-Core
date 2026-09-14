@@ -184,7 +184,8 @@ export default {
                         'btn btn-default rounded-0 text-start': true,
                         ['btn-level-' + level]: true,
 						'fw-bold':active
-                    }">
+                    }"
+					:style="'padding-left: calc(var(--bs-btn-padding-x) * ' + $props.level + ');'">
                     {{ entry.titel }}
                 </a>
                 <button @click.prevent="toggleCollapse" :aria-expanded="entry.menu_open"
@@ -208,7 +209,8 @@ export default {
                 ['btn-level-' + level]: true,
 				'fw-bold':active
             }"
-            @mouseup="setActiveEntry(entry.content_id)">
+            @mouseup="setActiveEntry(entry.content_id)"
+			:style="'padding-left: calc(var(--bs-btn-padding-x) * ' + $props.level + ');'">
             {{ entry.titel }}
         </a>
     </template>`
