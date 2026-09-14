@@ -20,7 +20,18 @@ export default {
 	},
 	emits: [
 		"update:modelValue",
+		"remove",
 	],
+	methods: {
+		remove() {
+			this.$fhcAlert.confirmDelete()
+				.then(result => {
+					if (result)
+						this.$emit('remove', this.index);
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+	},
 	template: /*html*/ `
 	<div class="widgets-report-config-aggregators-aggregator">
 		<form-input
@@ -46,14 +57,20 @@ export default {
 			:placeholder="$p.t('dashboard/widget_report_kpi_aggregator_fields_placeholder')"
 			class="mb-3"
 		/>
-		<form-input
-			v-model="defaultAggregatorIndex"
-			type="radio"
-			name="aggregatordefault"
-			container-class="form-switch"
-			:label="$p.t('ui/default')"
-			:value="index"
-		/>
+		<div class="d-flex justify-content-between align-items-baseline">
+			<form-input
+				v-model="defaultAggregatorIndex"
+				type="radio"
+				name="aggregatordefault"
+				container-class="form-switch"
+				:label="$p.t('ui/default')"
+				:value="index"
+			/>
+			<button type="button" class="btn btn-danger" @click="remove">
+				<i class="fa-solid fa-trash"></i>
+				{{ $p.t('ui/loeschen') }}
+			</button>
+		</div>
 	</div>
 	`,
 };

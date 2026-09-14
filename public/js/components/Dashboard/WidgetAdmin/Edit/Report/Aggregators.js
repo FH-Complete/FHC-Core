@@ -45,6 +45,9 @@ export default {
 		addAggregator() {
 			this.modelValue.push({});
 		},
+		removeAggregator(index) {
+			this.$emit('update:modelValue', this.modelValue.toSpliced(index, 1));
+		},
 		preventOnCheckboxClick(evt) {
 			if (evt.explicitOriginalTarget.classList.contains('form-check-label')) {
 				evt.preventDefault();
@@ -94,7 +97,7 @@ export default {
 					</button>
 				</h3>
 				<div :id="'aggregator_' + myId + '_' + i" class="accordion-collapse collapse">
-					<report-aggregator v-model="agg" class="accordion-body" :index="i" />
+					<report-aggregator v-model="agg" class="accordion-body" :index="i" @remove="removeAggregator" />
 				</div>
 			</div>
 		</div>
