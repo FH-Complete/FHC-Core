@@ -61,8 +61,8 @@ export default {
 	},
 	template: /*html*/ `
 	<div class="widgets-report-kpi-config-kpi">
-		<template v-if="hasCustomVars">
-			// TODO(chris): label: vars
+		<div v-if="hasCustomVars" :class="config.aggregators.length > 1 ? 'mb-3' : ''">
+			<label class="form-label">{{ $p.t('dashboard/widget_report_vars') }}</label>
 			<vars-var
 				v-for="(variable, key) in customVars"
 				:key="key"
@@ -70,7 +70,7 @@ export default {
 				no-type
 				@update:model-value="updateUserVar(key, $event)"
 			/>
-		</template>
+		</div>
 		<form-input
 			v-if="config.aggregators.length > 1"
 			type="select"

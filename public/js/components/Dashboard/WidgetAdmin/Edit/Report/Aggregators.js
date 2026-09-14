@@ -72,14 +72,14 @@ export default {
 						:aria-controls="'aggregator_' + myId + '_' + i"
 					>
 						<span v-if="agg.label">{{ agg.label }}</span>
-						<i v-else>new</i>
+						<i v-else>{{ $p.t('ui/neu') }}</i>
 						<div class="flex-grow-1">
 							<form-input
 								type="radio"
 								name="aggregatordefault"
 								v-model="aggregatorDefault"
 								class="btn-check"
-								:label="$p.t('ui/defaultoption')"
+								:label="$p.t('ui/default')"
 								:value="i"
 								label-class="btn"
 								container-class="text-end pe-4"

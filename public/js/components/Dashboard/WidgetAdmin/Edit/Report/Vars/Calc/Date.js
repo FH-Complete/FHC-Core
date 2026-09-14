@@ -24,14 +24,13 @@ export default {
 			},
 		},
 	},
-	// TODO(chris): phrases: placeholder
 	template: /*html*/ `
 	<form-input
 		v-model="modelValueCmp"
 		class="widgets-report-config-vars-var-calc-date"
 		type="text"
 		input-group
-		placeholder="Duration (add '-' at the beginning to substract) from current date"
+		:placeholder="$p.t('dashboard/widget_report_vars_calc_date_placeholder')"
 	>
 	</form-input>
 	`,

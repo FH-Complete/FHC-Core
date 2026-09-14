@@ -32,11 +32,11 @@ export default {
 			<div class="col">
 				<div class="d-flex gap-3 mb-2">
 					<div class="col">
-						<b>{{ $p.t('mobility/kurzbz') }}: </b>
+						<b>{{ $p.t('dashboard/widget_kurzbz') }}: </b>
 						{{ modelValue.widget_kurzbz }}
 					</div>
 					<div v-if="modelValue.widget_id !== undefined" class="col-auto">
-						<b>{{ $p.t('zeitaufzeichnung/id') }}: </b>
+						<b>{{ $p.t('dashboard/widget_id') }}: </b>
 						{{ modelValue.widget_id }}
 					</div>
 				</div>

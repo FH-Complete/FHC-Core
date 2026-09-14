@@ -22,16 +22,16 @@ export default {
 			v-model="modelValue.name"
 			type="text"
 			container-class="mb-3"
-			:label="$p.t('ui/name')"
+			:label="$p.t('global/name')"
 			:disabled="!editName"
 		/>
-		<label>{{ $p.t('ui/size') }}</label>
+		<label>{{ $p.t('dashboard/widget_setup_size') }}</label>
 		<div class="d-flex gap-3 mb-3">
 			<edit-size v-model="modelValue.width" :disabled="!editSize">
-				{{ $p.t('ui/width') }}
+				{{ $p.t('dashboard/widget_setup_width') }}
 			</edit-size>
 			<edit-size v-model="modelValue.height" :disabled="!editSize">
-				{{ $p.t('ui/height') }}
+				{{ $p.t('dashboard/widget_setup_height') }}
 			</edit-size>
 		</div>
 		<form-input

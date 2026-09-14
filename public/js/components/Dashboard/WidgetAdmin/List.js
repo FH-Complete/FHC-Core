@@ -25,6 +25,7 @@ export default {
 					{
 						field: 'setup.icon',
 						title: 'Icon',
+						titlePhrase: 'dashboard/widget_icon',
 						mutator: value => {
 							if (!value)
 								return FHC_JS_DATA_STORAGE_OBJECT.app_root + 'skin/images/fh_technikum_wien_illustration_klein.png';
@@ -41,14 +42,17 @@ export default {
 					{
 						field: 'setup.name',
 						title: 'Name',
+						titlePhrase: 'global/name',
 					},
 					{
 						field: 'widget_kurzbz',
 						title: 'Kurzbz',
+						titlePhrase: 'dashboard/widget_kurzbz',
 					},
 					{
 						field: 'berechtigung_kurzbz',
 						title: 'Berechtigung',
+						titlePhrase: 'global/permission',
 					},
 				],
 				locale: true,
@@ -74,7 +78,7 @@ export default {
 				return true;
 
 			BsConfirm
-				.popup('selectablecheck' + row.getData().widget_id)
+				.popup(this.$p.t('dashboard/confirm_unsaved_progress'))
 				.then(() => {
 					const currentRows = row.getTable().getSelectedRows();
 					if (currentRows.length)
@@ -88,7 +92,7 @@ export default {
 		newWidget() {
 			if (this.unsavedProgress) {
 				BsConfirm
-					.popup('newcheck')
+					.popup(this.$p.t('dashboard/confirm_unsaved_progress'))
 					.then(() => this.$emit('new'))
 					.catch(() => {});
 			} else {
@@ -109,7 +113,7 @@ export default {
 			table-only
 			reload
 			new-btn-show
-			new-btn-label="Widget"
+			:new-btn-label="$p.t('dashboard/widget')"
 			@click:new="newWidget"
 		>
 		</core-filter-cmpt>

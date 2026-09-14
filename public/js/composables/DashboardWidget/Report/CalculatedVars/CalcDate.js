@@ -18,7 +18,7 @@
 import CalcDate from '../../../../components/Dashboard/WidgetAdmin/Edit/Report/Vars/Calc/Date.js';
 
 export default {
-	label: 'CalcDate',
+	label: [ 'dashboard', 'widget_report_vars_calc_date' ],
 	component: CalcDate,
 	async calculate(instructions) {
 		let duration = instructions[2] || 'P';

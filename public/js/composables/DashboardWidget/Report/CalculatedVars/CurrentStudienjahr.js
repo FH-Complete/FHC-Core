@@ -18,7 +18,7 @@
 import ApiStudienjahr from '../../../../api/factory/studienjahr.js';
 
 export default {
-	label: 'CurrentStudienjahr',
+	label: [ 'dashboard', 'widget_report_vars_calc_currentstudienjahr' ],
 	async calculate(instructions) {
 		try {
 			const result = await this.$api.call(ApiStudienjahr.getAktNext());

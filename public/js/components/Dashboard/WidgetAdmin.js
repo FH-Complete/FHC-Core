@@ -31,7 +31,6 @@ export default {
 			this.currentData = JSON.parse(JSON.stringify(data));
 		},
 		create(data) {
-			// TODO(chris): modify data with base info
 			this.currentData = JSON.parse(JSON.stringify(data));
 			this.save();
 		},
@@ -69,7 +68,7 @@ export default {
 					@saved="save"
 				/>
 				<div v-else class="h-100 d-flex justify-content-center align-items-center">
-					Please select a widget
+					{{ $p.t('dashboard/no_widget_selected') }}
 				</div>
 			</template>
 		</vertical-split>

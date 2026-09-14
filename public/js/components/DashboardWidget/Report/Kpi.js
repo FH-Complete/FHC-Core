@@ -172,15 +172,7 @@ export default {
 		}
 	},
 	template: /*html*/ `
-	<div
-		class="widgets-report-kpi w-100 h-100"
-		:class="{
-			'd-flex': !configMode,
-			'flex-column': !configMode,
-			'justify-content-center': !configMode,
-			'align-items-center': !configMode
-		}"
-	>
+	<div class="widgets-report-kpi w-100 h-100 d-flex flex-column justify-content-center align-items-center">
 		<div
 			v-if="hasErrors === true"
 			class="alert alert-danger m-0 h-100 w-100 border-0 rounded-0 d-flex justify-content-center align-items-center"

@@ -25,8 +25,6 @@ export default {
 			details: null,
 		};
 	},
-	computed: {
-	},
 	methods: {
 		attemptReportChange(value) {
 			if (this.modelValue.arguments.statistik_kurzbz == value)
@@ -37,7 +35,7 @@ export default {
 
 			if (hasVars || hasAggregators) {
 				BsConfirm
-					.popup('change') // TODO(chris): phrase
+					.popup($p.t('dashboard/widget_report_statistik_change'))
 					.then(() => {
 						this.modelValue.arguments.statistik_kurzbz = value;
 						this.modelValue.arguments.aggregators = [];
@@ -69,7 +67,6 @@ export default {
 							this.modelValue.arguments.vars[detail.kurzbz] = { type: 'fix' };
 					});
 
-					// TODO(chris): emit update:modelValue
 					this.details = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemErrors)

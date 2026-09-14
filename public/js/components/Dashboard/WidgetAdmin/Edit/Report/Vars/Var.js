@@ -131,9 +131,9 @@ export default {
 			input-group
 			@update:modelValue="setType"
 		>
-			<option value="fix">Fixed</option>
-			<option value="calc">Calculated</option>
-			<option value="user">User Defined</option>
+			<option value="fix">{{ $p.t('dashboard/widget_report_vars_var_type_fix') }}</option>
+			<option value="calc">{{ $p.t('dashboard/widget_report_vars_var_type_calc') }}</option>
+			<option value="user">{{ $p.t('dashboard/widget_report_vars_var_type_user') }}</option>
 		</form-input>
 		<form-input
 			v-if="modelValue.type == 'fix' || noType"

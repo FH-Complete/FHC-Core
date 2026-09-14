@@ -24,14 +24,13 @@ export default {
 			},
 		},
 	},
-	// TODO(chris): phrases: placeholder
 	template: /*html*/ `
 	<form-input
 		v-model="modelValueCmp"
 		class="widgets-report-config-vars-var-calc-right"
 		type="text"
 		input-group
-		placeholder="Access Right (comma separated)"
+		:placeholder="$p.t('dashboard/widget_report_vars_calc_right_placeholder')"
 	>
 	</form-input>
 	`,

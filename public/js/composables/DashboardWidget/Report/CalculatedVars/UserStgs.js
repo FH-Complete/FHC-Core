@@ -20,7 +20,7 @@ import CalcRight from '../../../../components/Dashboard/WidgetAdmin/Edit/Report/
 import ApiStudiengang from '../../../../api/factory/studiengang.js';
 
 export default {
-	label: 'UserStgs',
+	label: [ 'dashboard', 'widget_report_vars_calc_stgs' ],
 	component: CalcRight,
 	async calculate(instructions) {
 		try {

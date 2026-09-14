@@ -58,24 +58,33 @@ export default {
 		<bs-modal ref="modal">
 			<template #default>
 				<form-input
-					type="select"
-					:label="'Generator:'"
 					v-model="result.setup.generator"
+					type="select"
+					:label="$p.t('dashboard/generator')"
+					class="mb-3"
 				>
 					<option v-for="(generator, name) in generators" :key="name" :value="generator">
 						{{ generator }}
 					</option>
 				</form-input>
 				<form-input
+					v-model="result.widget_kurzbz"
 					type="text"
 					name="widget_kurzbz"
-					:label="$p.t('mobility/kurzbz') + ':'"
-					v-model="result.widget_kurzbz"
+					:label="$p.t('dashboard/widget_kurzbz') + ':'"
 				/>
 			</template>
 			<template #footer>
-				<button type="submit" class="btn btn-primary">OK</button>
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+				<button type="submit" class="btn btn-primary">
+					{{ $p.t('ui/ok') }}
+				</button>
+				<button
+					type="button"
+					class="btn btn-secondary"
+					data-bs-dismiss="modal"
+				>
+					{{ $p.t('ui/cancel') }}
+				</button>
 			</template>
 		</bs-modal>
 	</core-form>

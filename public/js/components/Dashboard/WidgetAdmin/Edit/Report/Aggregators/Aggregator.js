@@ -1,7 +1,5 @@
 import FormInput from '../../../../../Form/Input.js';
 
-// TODO(chris): phrases
-
 export default {
 	name: "WidgetsGenteratorReportAggregatorsAggregator",
 	components: {
@@ -16,31 +14,27 @@ export default {
 	emits: [
 		"update:modelValue",
 	],
-	methods: {
-	},
-	created() {
-	},
 	template: /*html*/ `
 	<div class="widgets-report-config-aggregators-aggregator">
 		<form-input
 			type="text"
 			v-model="modelValue.label"
-			label="label"
+			:label="$p.t('global/label')"
 		/>
 		<form-input
 			type="select"
 			v-model="modelValue.type"
-			label="type"
+			:label="$p.t('global/typ')"
 		>
-			<option value="sum">Sum</option>
-			<option value="count">Count</option>
+			<option value="sum">{{ $p.t('dashboard/widget_report_kpi_aggregator_type_sum') }}</option>
+			<option value="count">{{ $p.t('dashboard/widget_report_kpi_aggregator_type_count') }}</option>
 		</form-input>
 		<form-input
 			v-if="modelValue.type == 'sum'"
 			type="text"
 			v-model="modelValue.fields"
-			label="fields"
-			placeholder="fields (comma separated)"
+			:label="$p.t('dashboard/widget_report_kpi_aggregator_fields')"
+			:placeholder="$p.t('dashboard/widget_report_kpi_aggregator_fields_placeholder')"
 		/>
 	</div>
 	`,
