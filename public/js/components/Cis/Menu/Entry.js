@@ -80,6 +80,9 @@ export default {
 		menuHierarchy() {
 			return [...this.$props.overarchingMenuHierarchy, this.$props.entry.content_id];
 		},
+		menuNodePadding() {
+			return "padding-left: calc(var(--bs-btn-padding-x) * " + this.$props.level + ");";
+		},
     },
     methods: {
 		getUrlMatchPoints(url,link){
@@ -176,7 +179,7 @@ export default {
                         ['btn-level-' + level]: true,
 						'fw-bold': $props.activeContent === $props.entry.content_id
                     }"
-					:style="'padding-left: calc(var(--bs-btn-padding-x) * ' + $props.level + ');'">
+					:style="menuNodePadding">
                     {{ entry.titel }}
                 </a>
                 <button @click.prevent="toggleCollapse()" :aria-expanded="entry.menu_open"
@@ -210,7 +213,7 @@ export default {
 				'fw-bold': $props.activeContent === $props.entry.content_id
             }"
             @click="handleClickOnMenuNode(event)"
-			:style="'padding-left: calc(var(--bs-btn-padding-x) * ' + $props.level + ');'">
+			:style="menuNodePadding">
             {{ entry.titel }}
         </a>
     </template>`
