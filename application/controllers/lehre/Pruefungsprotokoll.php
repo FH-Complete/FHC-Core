@@ -215,8 +215,11 @@ class Pruefungsprotokoll extends Auth_Controller
 			if (hasData($abschlusspruefung))
 			{
 				$abschlusspruefung_data = getData($abschlusspruefung);
-				if ($this->permissionlib->isBerechtigt('admin') ||
-					(isset($abschlusspruefung_data->studiengang_kz) && $this->permissionlib->isBerechtigt('assistenz', 'suid', $abschlusspruefung_data->studiengang_kz))
+				if ($this->permissionlib->isBerechtigt('admin')
+					|| (
+						isset($abschlusspruefung_data->studiengang_kz)
+						&& $this->permissionlib->isBerechtigt('assistenz', 'suid', $abschlusspruefung_data->studiengang_kz)
+					)
 					|| $this->_uid === $abschlusspruefung_data->uid_vorsitz)
 					$result = $abschlusspruefung;
 				else

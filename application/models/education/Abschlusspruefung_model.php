@@ -100,12 +100,14 @@ class Abschlusspruefung_model extends DB_Model
 
 					if (isError($abschlussarbeit))
 						return $abschlussarbeit;
+
 					if (hasData($abschlussarbeit))
 					{
 						$abschlussarbeit = getData($abschlussarbeit)[0];
 						$abschlusspruefungdata->projektarbeit_studiengangstyp_name = $abschlussarbeit->projekttyp_kurzbz;
 						$abschlusspruefungdata->abschlussarbeit_titel = $abschlussarbeit->titel;
 						$abschlusspruefungdata->abschlussarbeit_note = $abschlussarbeit->note;
+						$abschlusspruefungdata->abschlussarbeit_sprache = $abschlussarbeit->sprache_bezeichnung;
 					}
 				}
 			}

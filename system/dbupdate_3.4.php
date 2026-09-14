@@ -101,6 +101,7 @@ require_once('dbupdate_3.4/75959_StudVw_Automatische_Tags.php');
 require_once('dbupdate_3.4/76160_lvv_favorites.php');
 require_once('dbupdate_3.4/77080_tabulator_presets_table.php');
 require_once('dbupdate_3.4/78292_gehaltsanpassungtyp.php');
+require_once('dbupdate_3.4/77048_cis4_mitarbeiter_studstatus_widget.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';

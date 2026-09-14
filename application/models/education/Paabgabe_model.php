@@ -61,6 +61,174 @@ class Paabgabe_model extends DB_Model
 		return $this->execReadOnlyQuery($qry, array($person_id));
 	}
 
+	/**
+	 * Gets project submissions for search criteria.
+	 * @param array $projekttyp_kurzbz_arr contains all relevant project types (e.g. Bachelor)
+	 * @param int $studiengang_kz study program
+	 * @param string $abgabetyp_kurzbz project submission type (e.g. end upload, intermediate submission)
+	 * @param string $abgabedatum due date for hand-in
+	 * @param string $personSearchString for searching by person, i.e. name, uid, person/prestudent id
+	 * @param int $limit limiting max number of results if search criteria is not precise enough
+	 * @return object
+	 */
+	public function getPaAbgaben(
+		$projekttyp_kurzbz_arr,
+		$studiengang_kz = null,
+		$abgabetyp_kurzbz = null,
+		$abgabedatum = null,
+		$personSearchString = null,
+		$limit = 1000
+	) {
+		$params = [];
+
+		$qry = "
+			SELECT
+				stg.bezeichnung AS stgbez, paabg.datum AS termin,
+				paabg.paabgabe_id, paabg.projektarbeit_id, paabg.paabgabetyp_kurzbz, paabg.abgabedatum,
+				abgabetyp.bezeichnung AS paabgabetyp_bezeichnung, ben.uid, pers.vorname, pers.nachname, pa.projekttyp_kurzbz, pa.titel,
+				UPPER(stg.typ || stg.kurzbz) AS studiengang_kuerzel,
+				(
+					 /* show all relevant Studiengänge of person and wether it is an employee*/
+					SELECT
+						STRING_AGG(studiengang || ' ' || last_status, ' | ')
+						|| (CASE WHEN EXISTS (
+							SELECT 1 FROM public.tbl_mitarbeiter ma
+							JOIN public.tbl_benutzer ben ON ma.mitarbeiter_uid = ben.uid
+							WHERE person_id = prestudents.person_id
+							AND ben.aktiv
+							) THEN ' | Mitarbeiter' ELSE '' END)
+					FROM (
+						SELECT
+							DISTINCT person_id, prestudent_id, UPPER(stg.typ || stg.kurzbz) AS studiengang,
+							get_rolle_prestudent(ps.prestudent_id, null) AS last_status
+						FROM
+							public.tbl_prestudent ps
+						JOIN public.tbl_studiengang stg USING (studiengang_kz)
+						WHERE
+							person_id = pers.person_id
+						ORDER BY
+							prestudent_id DESC
+					) prestudents
+					WHERE
+						last_status IN ('Abgewiesener','Aufgenommener', 'Student', 'Incoming', 'Diplomand', 'Abbrecher', 'Unterbrecher', 'Absolvent')
+					GROUP BY
+						person_id
+					LIMIT 1;
+				) AS status
+			FROM
+				lehre.tbl_projektarbeit pa
+				JOIN campus.tbl_paabgabe paabg USING(projektarbeit_id)
+				JOIN campus.tbl_paabgabetyp abgabetyp USING(paabgabetyp_kurzbz)
+				LEFT JOIN public.tbl_benutzer ben ON(uid=student_uid)
+				LEFT JOIN public.tbl_person pers ON(ben.person_id=pers.person_id)
+				LEFT JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+				LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+				LEFT JOIN public.tbl_studiengang stg USING(studiengang_kz)
+			WHERE
+				TRUE";
+
+		if (isset($projekttyp_kurzbz_arr) && !isEmptyArray($projekttyp_kurzbz_arr))
+		{
+			$qry .= " AND projekttyp_kurzbz IN ?";
+			$params[] = $projekttyp_kurzbz_arr;
+		}
+
+		if (isset($studiengang_kz) && is_numeric($studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz=?";
+			$params[] = $studiengang_kz;
+		}
+
+		if (isset($abgabetyp_kurzbz))
+		{
+			$qry .= " AND paabg.paabgabetyp_kurzbz=?";
+			$params[] = $abgabetyp_kurzbz;
+		}
+
+		if (isset($abgabedatum))
+		{
+			$qry .= " AND paabg.datum=?";
+			$params[] = $abgabedatum;
+		}
+
+		if (is_numeric($personSearchString))
+		{
+			$personSearchString = (int) $personSearchString;
+			$params = array_merge($params, [$personSearchString, $personSearchString]);
+			$qry .= " AND (
+				pers.person_id = ?
+				OR EXISTS (SELECT 1 FROM public.tbl_prestudent WHERE person_id = pers.person_id AND prestudent_id = ?)
+			)";
+		}
+		elseif (is_string($personSearchString))
+		{
+			// remove empty spaces and lowercase
+			$personSearchString = strtolower(str_replace(' ', '', $personSearchString));
+			$qry .= " AND (
+				LOWER(REPLACE(pers.nachname || pers.vorname || pers.nachname, ' ', '')) LIKE ".$this->db->escape('%'.$personSearchString.'%')."
+				OR ben.uid LIKE ".$this->db->escape('%'.$personSearchString.'%')."
+			)";
+		}
+
+		$qry .= " ORDER BY nachname";
+
+		if (isset($limit) && is_numeric($limit) && (!isset($studiengang_kz) || !is_numeric($studiengang_kz)) && !isset($abgabedatum))
+		{
+			$qry .= " LIMIT ?";
+			$params[] = $limit;
+		}
+
+		return $this->execReadOnlyQuery($qry, $params);
+	}
+
+	/**
+	 * Gets due dates for projekt submission search criteria.
+	 * @param array $projekttyp_kurzbz_arr contains all relevant project types (e.g. Bachelor)
+	 * @param int $studiengang_kz study program
+	 * @param string $abgabetyp_kurzbz project submission type (e.g. end upload, intermediate submission)
+	 * @return object
+	 */
+	public function getTermine($projekttyp_kurzbz_arr, $studiengang_kz, $abgabetyp_kurzbz)
+	{
+		$params = [];
+
+		$qry = "
+			SELECT
+				DISTINCT tbl_paabgabe.datum as termin, to_char(tbl_paabgabe.datum, 'DD.MM.YYYY') as termin_anzeige
+			FROM
+				lehre.tbl_projektarbeit
+				JOIN campus.tbl_paabgabe USING(projektarbeit_id)
+				LEFT JOIN public.tbl_benutzer ON(uid=student_uid)
+				LEFT JOIN public.tbl_person ON(tbl_benutzer.person_id=tbl_person.person_id)
+				LEFT JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+				LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+				LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
+			WHERE
+				TRUE";
+
+		if (isset($projekttyp_kurzbz_arr) && !isEmptyArray($projekttyp_kurzbz_arr))
+		{
+			$qry .= " AND projekttyp_kurzbz IN ?";
+			$params[] = $projekttyp_kurzbz_arr;
+		}
+
+		if (isset($studiengang_kz) && is_numeric($studiengang_kz))
+		{
+			$qry .= " AND public.tbl_studiengang.studiengang_kz=?";
+			$params[] = $studiengang_kz;
+		}
+
+		if (isset($abgabetyp_kurzbz))
+		{
+			$qry .= " AND campus.tbl_paabgabe.paabgabetyp_kurzbz=?";
+			$params[] = $abgabetyp_kurzbz;
+		}
+
+		$qry .= " ORDER BY termin DESC";
+
+		return $this->execReadOnlyQuery($qry, $params);
+	}
+
 	public function findAbgabenNewOrUpdatedSince($interval, $relevantTypes)
 	{
 

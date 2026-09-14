@@ -7,6 +7,14 @@ export default {
 		BaseSlider,
 		WeekView
 	},
+	inject: {
+		reservierbar: "isReservierbar",
+		reservierbarMap: "reservierbarMap",
+		createContext: {
+			from: 'createContext',
+			default: () => {}
+		},
+	},
 	props: {
 		currentDate: {
 			type: luxon.DateTime,
@@ -83,14 +91,33 @@ export default {
 		},
 		handleClickDefaults(evt) {
 			switch (evt.detail.source) {
-			case 'day':
-				// default: Set current-date
-				this.$emit('update:currentDate', evt.detail.value);
-				break;
-			case 'event':
-				// default: Request Modal
-				this.$emit('requestModalOpen', { event: evt.detail.value });
-				break;
+				case 'day':
+					// default: Set current-date
+					this.$emit('update:currentDate', evt.detail.value);
+					break;
+				case 'event':
+					// default: Request Modal
+					this.$emit('requestModalOpen', { event: evt.detail.value });
+					break;
+				case 'slot':
+				{
+					const { date, part } = evt.detail.value || {};
+					if (!date)
+						return;
+					let reservierbar = this.reservierbarMap?.[date.toISODate()] === true;
+					if (!reservierbar)
+						return;
+
+					this.$emit('requestModalOpen', {
+						event: {
+							type: this.createContext?.scope ?? 'slot',
+							start: date.plus(part.start || part),
+							end: date.plus(part.end || part.plus({ hours: 1 })),
+							createContext: this.createContext
+						}
+					});
+					break;
+				}
 			}
 		}
 	},

@@ -5,7 +5,7 @@ import contrast from '../../directives/contrast.js';
 import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers.js";
 import LvPlan from "../../components/Cis/LvPlan/Lehrveranstaltung.js";
 import MyLvPlan from "../../components/Cis/LvPlan/MyLvPlan.js";
-import MylvStudent from "../../components/Cis/Mylv/Student.js";
+import Mylv from "../../components/Cis/Mylv/MyLv.js";
 import Profil from "../../components/Cis/Profil/Profil.js";
 import Raumsuche from "../../components/Cis/Raumsuche/Raumsuche.js";
 import CmsNews from "../../components/Cis/Cms/News.js";
@@ -19,9 +19,15 @@ import DeadlineOverview from "../../components/Cis/Abgabetool/DeadlineOverview.j
 import Studium from "../../components/Cis/Studium/Studium.js";
 import StgOrgLvPlan from "../../components/Cis/LvPlan/StgOrg.js";
 import OtherLvPlan from "../../components/Cis/LvPlan/OtherLvPlan.js";
+import PaabgabeUebersicht from "../../components/Cis/ProjektabgabeUebersicht/ProjektabgabeUebersicht.js";
+import Benotungstool from "../../components/Cis/Benotungstool/Benotungstool.js";
+import Zeitsperren from "../../components/Cis/Zeitsperren/Zeitsperren.js";
+import Compat from "../../components/Cis/Compat.js";
+import ZeitsperrenMa from "../../components/Cis/ZeitsperrenMitarbeiter/ZeitsperrenMa.js";
 
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
 import {capitalize} from "../../helpers/StringHelpers.js";
+import ApiAuthinfo from "../../api/factory/authinfo.js";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 const isMobile = window.matchMedia("(max-width: 767px)").matches;
@@ -29,6 +35,18 @@ const isMobile = window.matchMedia("(max-width: 767px)").matches;
 const router = VueRouter.createRouter({
 	history: VueRouter.createWebHistory(`/${ciPath}`),
 	routes: [
+		{
+			path: `/Cis/Compat/:mode(ci|legacy)/:path(.*)`,
+			name: 'Compat',
+			component: Compat,
+			props: (route) => {
+				return {
+					mode: route.params.mode,
+					path: route.params.path,
+					query_string: VueRouter.stringifyQuery(route.query)
+				};
+			}
+		},
 		{
 			path: `/Cis/Studium`,
 			name: 'Studium',
@@ -75,6 +93,18 @@ const router = VueRouter.createRouter({
 			path: `/Cis/Raumsuche`,
 			name: 'Raumsuche',
 			component: Raumsuche,
+			props: true
+		},
+		{
+			path: `/Cis/ProjektabgabeUebersicht`,
+			name: 'PaabgabeUebersicht',
+			component: PaabgabeUebersicht,
+			props: true
+		},
+		{
+			path: `/Cis/Benotungstool/:lv_id?/:sem_kurzbz?`,
+			name: 'Benotungstool',
+			component: Benotungstool,
 			props: true
 		},
 		// Redirect old links to new format
@@ -151,7 +181,7 @@ const router = VueRouter.createRouter({
 		{
 			path: `/Cis/MyLv/:studiensemester?`,
 			name: 'MyLv',
-			component: MylvStudent,
+			component: Mylv,
 			props: true,
 		},
 		{
@@ -163,7 +193,7 @@ const router = VueRouter.createRouter({
 		// Redirect old links to new format
 		{
 			// only trigger on first param being numeric to avoid paths like "LvPlan/Month" entering here
-			path: "/Cis/LvPlan/:lv_id(\\d+)", 
+			path: "/Cis/LvPlan/:lv_id(\\d+)",
 			name: "LvPlanOld",
 			component: LvPlan,
 			redirect(to) {
@@ -232,6 +262,23 @@ const router = VueRouter.createRouter({
 			props: {dashboard: 'CIS'},
 		},
 		{
+			path: '/Cis/Zeitsperrenma/:type(all|fix|lector|ma|oe|stg|ass)?/:id?/:days?',
+			name: 'ZeitsperrenMa',
+			component: ZeitsperrenMa,
+			props: route => {
+				//console.log('ROUTE PARAMS', route.params);
+				return {
+					propsViewData: route.params
+				};
+			}
+		},
+		{
+			path: `/Cis/Zeitsperren`,
+			name: 'Zeitsperren',
+			component: Zeitsperren,
+			props: true
+		},
+		{
 			path: '/:pathMatch(.*)*',
 			name: 'Fallback',
 			component: FhcDashboard,
@@ -253,11 +300,15 @@ const app = Vue.createApp({
 	data: () => ({
 		appSideMenuEntries: {},
 		windowWidth: 0,
+		isStudent: null,
+		isMitarbeiter: null,
 	}),
 	provide() {
 		return { // provide injectable & watchable language property
 			language: Vue.computed(() => this.$p.user_language),
 			isMobile: Vue.computed(() => this.isMobile),
+			isStudent: Vue.computed(() => this.isStudent),
+			isMitarbeiter: Vue.computed(() => this.isMitarbeiter)
 		}	
 	},
 	computed: {
@@ -276,7 +327,7 @@ const app = Vue.createApp({
 			if(target?.id == 'skiplink') return
 			if (target && this.isInternalRoute(target.href)) {
 				const url = new URL(target.href)
-				
+
 				const path = url.pathname
 				const base = this.$router.options.history.base
 				const route = path.replace(base, '') || '/'
@@ -284,27 +335,31 @@ const app = Vue.createApp({
 				// let click event propagate normally if we dont route internally
 				const res = this.$router.resolve(route)
 				if(!res?.matched?.length || res.name === 'Fallback') return
-				
+
 				event.preventDefault(); // Prevent browser navigation
-				
+
 				if(this.isMobile) { // toggle the menu
 					const navMain = document.getElementById('nav-main');
 					// fix unwanted toggle from off to on for some links on mobile
 					if(navMain.classList.contains('show')){
 						document.getElementById('nav-main-btn').click();
-					} 
+					}
 				}
-				
+
 				this.$router.push(route);
-				
+
 			}
 		},
 		handleWindowResize() {
 			this.windowWidth = window.innerWidth;
 		},
 	},
-	created() {
+	async created() {
 		this.windowWidth = window.innerWidth;
+		await this.$api.call(ApiAuthinfo.getAuthInfo()).then((res) => {
+			this.isMitarbeiter = res.data.isMitarbeiter;
+			this.isStudent = res.data.isStudent;
+		});
 	},
 	async mounted() {
 		document.addEventListener('click', this.handleClick);

@@ -1,6 +1,7 @@
 import MylvSemesterStudiengang from "./Semester/Studiengang.js";
 
 export default {
+	name: 'Semester',
 	components: {
 		MylvSemesterStudiengang
 	},
