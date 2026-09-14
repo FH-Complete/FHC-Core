@@ -17,12 +17,12 @@ export default {
 	},
 	provide() {
 		return {
-			rangeLength: 30, //Vue.computed(() => this.currentRangeLength), TODO: This is a hack to make the range mode work, but it should be fixed in the future
+			rangeLength: Vue.computed(() => this.currentRangeLength),
 			rangeViewPresets: Vue.computed(() => this.semesterRangePresets),
-			rangeViewSelectedPreset: Vue.computed({
-				get: () => this.selectedRangePreset,
-				set: value => this.selectedRangePreset = value,
-			}),
+			// rangeViewSelectedPreset: Vue.computed({
+			// 	get: () => this.selectedRangePreset,
+			// 	set: value => this.selectedRangePreset = value,
+			// }),
 		};
 	},
 	inject: {
@@ -42,7 +42,7 @@ export default {
 			}
 		},
 		rangeLength: {
-			default: 1,
+			default: 30,
 		},
 		shouldIncludeRangeMode: {
 			type: Boolean,
@@ -352,6 +352,8 @@ export default {
 				end: res.data.end,
 			};
 		});
+
+		this.fetchSemesters();
 	},
 	template: /* html */ `
 	<fhc-calendar
