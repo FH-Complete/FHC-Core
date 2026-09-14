@@ -28,11 +28,10 @@ class Report extends FHCAPI_Controller
 	 */
 	public function __construct()
 	{
-		// TODO(chris): permissions
 		parent::__construct([
-			'list' => self::PERM_LOGGED,
-			'vars' => self::PERM_LOGGED,
-			'get' => self::PERM_LOGGED,
+			'list' => [ 'dashboard/admin:rw', 'basis/statistik:rw' ],
+			'vars' => self::PERM_LOGGED, // additional permission check inside
+			'get' => self::PERM_LOGGED, // additional permission check inside
 		]);
 
 		$this->load->model('organisation/Statistik_model', 'StatistikModel');
@@ -69,6 +68,13 @@ class Report extends FHCAPI_Controller
 		if (!$statistik)
 			show_404();
 		$statistik = current($statistik);
+
+		// NOTE(chris): Permission check
+		$permissions = [ 'vars' => $statistik->berechtigung_kurzbz . ':r' ];
+		if (!$this->permissionlib->isEntitled($permissions, 'vars')) {
+			$this->_outputAuthError($permissions);
+			exit; // immediately terminate the execution
+		}
 
 		$vars = $this->loadVars($statistik->sql);
 		
@@ -171,6 +177,13 @@ class Report extends FHCAPI_Controller
 		if (!$statistik)
 			show_404();
 		$statistik = current($statistik);
+
+		// NOTE(chris): Permission check
+		$permissions = [ 'get' => $statistik->berechtigung_kurzbz . ':r' ];
+		if (!$this->permissionlib->isEntitled($permissions, 'get')) {
+			$this->_outputAuthError($permissions);
+			exit; // immediately terminate the execution
+		}
 
 		$vars = $this->loadVars($statistik->sql);
 		$vars_values = [];
