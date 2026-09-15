@@ -68,22 +68,47 @@ export default {
 					handler: this.selectWidget,
 				},
 			],
+			adding: false,
 		};
 	},
 	methods: {
+		selectRow(row) {
+			const id = row.getData().widget_id;
+			const selected = row.getTable().getSelectedRows();
+			// deselect
+			selected.forEach(r => {
+				if (r.getData().widget_id != id) {
+					r.deselect();
+				}
+			});
+			// select
+			row.select();
+		},
+		updateOrAddDataAndSelect(data) {
+			this.adding = true;
+			this.$refs.table.tabulator
+				.updateOrAddData([ data ])
+				.then(res => {
+					this.selectRow(res[0]);
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					this.adding = false;
+				});
+
+		},
 		selectableCheck(row) {
+			if (this.adding)
+				return true;
 			if (row.isSelected())
-				return false;
+				return true;
 			if (!this.unsavedProgress)
 				return true;
 
 			BsConfirm
 				.popup(this.$p.t('dashboard/confirm_unsaved_progress'))
 				.then(() => {
-					const currentRows = row.getTable().getSelectedRows();
-					if (currentRows.length)
-						currentRows[0].deselect();
-					row.select();
+					this.selectRow(row);
 				})
 				.catch(() => {});
 

@@ -41,21 +41,7 @@ export default {
 		},
 		save() {
 			this.select(this.currentData);
-			this.$nextTick(() => {
-				this.$refs.list.$refs.table.tabulator
-					.updateOrAddData([this.originalData])
-					.then(res => {
-						const widget_id = res[0].getData().widget_id;
-						let selected = this.$refs.list.$refs.table.tabulator.getSelectedRows();
-						selected.forEach(row => {
-							if (row.getData().widget_id != widget_id)
-								row.deselect();
-						});
-						
-						res[0].select();
-					})
-					.catch(this.$fhcAlert.handleSystemError);
-			});
+			this.$nextTick(() => this.$refs.list.updateOrAddDataAndSelect(this.originalData));
 		},
 	},
 	template: /* html */`
@@ -72,6 +58,7 @@ export default {
 			</template>
 			<template #bottom>
 				<widget-edit
+					:key="currentData.widget_id"
 					v-if="currentData"
 					ref="edit"
 					v-model="currentData"
