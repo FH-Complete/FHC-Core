@@ -28,6 +28,8 @@ class Lehrveranstaltung extends FHCAPI_Controller
 	{
 		parent::__construct([
 			'getByEmp' => ['admin:r', 'assistenz:r'],
+			'getByLe' => ['admin:r', 'assistenz:r'],
+			'getByLv' => ['admin:r', 'assistenz:r'],
 			'getByStg' => ['admin:r', 'assistenz:r'],
 			'loadByLV' => ['admin:r', 'assistenz:r'],
 		]);
@@ -66,6 +68,47 @@ class Lehrveranstaltung extends FHCAPI_Controller
 		foreach ($lehrveranstaltungen_data as $lehrveranstaltung)
 		{
 			$lehreinheiten = $this->_ci->LehreinheitModel->getByLvidStudiensemester($lehrveranstaltung->lehrveranstaltung_id, $studiensemester_kurzbz, $mitarbeiter_uid);
+			$lehreinheiten_data = $this->getDataOrTerminateWithError($lehreinheiten);
+
+			if (!isset($lehrveranstaltung->_children))
+			{
+				$lehrveranstaltung->_children = $lehreinheiten_data;
+			}
+			$tree[] = $lehrveranstaltung;
+		}
+
+		$this->terminateWithSuccess($tree);
+	}
+
+	public function getByLe($studiensemester_kurzbz = null, $lehreinheit_id = null)
+	{
+		if (is_null($lehreinheit_id))
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+		$studiensemester_kurzbz = $this->getStudiensemesterKurzbz($studiensemester_kurzbz);
+
+
+		$lehreinheiten = $this->_ci->LehreinheitModel->getByLeStudiensemester($lehreinheit_id, $studiensemester_kurzbz);
+		$lehreinheiten_data = $this->getDataOrTerminateWithError($lehreinheiten);
+
+		$this->terminateWithSuccess($lehreinheiten_data);
+	}
+
+	public function getByLv($studiensemester_kurzbz = null, $lehrveranstaltung_id = null)
+	{
+		if (is_null($lehrveranstaltung_id))
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+		$studiensemester_kurzbz = $this->getStudiensemesterKurzbz($studiensemester_kurzbz);
+
+		$tree = [];
+
+		$lehrveranstaltungen = $this->_ci->LehreinheitModel->getLvsById($lehrveranstaltung_id, $studiensemester_kurzbz);
+		$lehrveranstaltungen_data = $this->getDataOrTerminateWithError($lehrveranstaltungen);
+
+		foreach ($lehrveranstaltungen_data as $lehrveranstaltung)
+		{
+			$lehreinheiten = $this->_ci->LehreinheitModel->getByLvidStudiensemester($lehrveranstaltung->lehrveranstaltung_id, $studiensemester_kurzbz);
 			$lehreinheiten_data = $this->getDataOrTerminateWithError($lehreinheiten);
 
 			if (!isset($lehrveranstaltung->_children))

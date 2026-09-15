@@ -61,6 +61,7 @@ export default {
 			selected: [],
 			studiengang_kz: null,
 			selectedStudiensemester: this.defaultSemester,
+			preselected: null,
 			dropdowns: {
 				studiensemester_array: [],
 				sprachen_array: [],
@@ -73,7 +74,9 @@ export default {
 				calcheightonly: true,
 				types: [
 					"mitarbeiter",
-					"mitarbeiter_ohne_zuordnung"
+					"mitarbeiter_ohne_zuordnung",
+					"lehreinheit",
+					"lehrveranstaltung",
 				],
 				actions: {
 					employee: {
@@ -86,6 +89,26 @@ export default {
 						childactions: [
 						]
 					},
+					lehreinheit: {
+						defaultaction: {
+							type: "function",
+							action: (data) => {
+								this.onSelectLehreinheit(data);
+							}
+						},
+						childactions: [
+						]
+					},
+					lehrveranstaltung: {
+						defaultaction: {
+							type: "function",
+							action: (data) => {
+								this.onSelectLehrveranstaltung(data);
+							}
+						},
+						childactions: [
+						]
+					}
 				}
 			},
 		}
@@ -94,6 +117,8 @@ export default {
 		filter() {
 			let filter = {
 				emp: this.$route.params.emp,
+				le: this.$route.params.le,
+				lv: this.$route.params.lv,
 				studiensemester_kurzbz: this.selectedStudiensemester
 			};
 			let index;
@@ -105,7 +130,7 @@ export default {
 				if (index > -1)
 					filter.semester = this.$route.params.treemenu[index+1];
 			}
-			filter.activeFilter = filter.emp ? 'employee' : filter.stg ? 'verband' : null;
+			filter.activeFilter = filter.emp ? 'employee' : filter.stg ? 'verband' : filter.le ? 'lehreinheit' : filter.lv ? 'lehrveranstaltung' : null;
 			return filter;
 		},
 		emp() {
@@ -203,20 +228,50 @@ export default {
 		},
 		onSelectEmployee(emp)
 		{
+			let params = { ...this.$route.params }
+			delete params.le;
+			delete params.lv;
+
 			this.$router.push({
 				name: 'emp',
 				params: {
-					...this.$route.params,
+					...params,
 					emp
+				}
+			});
+		},
+		onSelectLehreinheit(lehreinheit)
+		{
+			this.$router.push({
+				name: 'le',
+				params: {
+					le: lehreinheit.id,
+					stdsem: lehreinheit.studiensemester_kurzbz.toLowerCase()
+				}
+			});
+		},
+
+		onSelectLehrveranstaltung(lehrveranstaltung)
+		{
+			this.$router.push({
+				name: 'lv',
+				params: {
+					lv: lehrveranstaltung.id,
+					stdsem: lehrveranstaltung?.studiensemester_kurzbz?.toLowerCase() ?? this.selectedStudiensemester.toLowerCase()
 				}
 			});
 		},
 		onSelectVerband({ path: link, stg_kz })
 		{
+
+			let params = { ...this.$route.params }
+			delete params.le;
+			delete params.lv;
+
 			this.$router.push({
 				name: this.$route.name == 'emp' ? 'emp' : 'treemenu',
 				params: {
-					...this.$route.params,
+					...params,
 					treemenu: link.split('/')
 				}
 			});
@@ -295,7 +350,7 @@ export default {
 		}
 	},
 	created() {
-		if (!this.$route.params.stdsem) {
+		if (this.$route.name !== 'le' && this.$route.name !== 'lv' && !this.$route.params.stdsem) {
 			this.$router.replace({
 				name: 'stdsem',
 				params: {
@@ -477,7 +532,8 @@ export default {
 								<template #top>
 									<lv-table ref="lvTable"
 										v-model:selected="selected"
-										 @row-clicked="handleRowClicked"
+										@row-clicked="handleRowClicked"
+										@select-LV="onSelectLehrveranstaltung"
 										:filter="filter"
 									>
 										<template #filterzuruecksetzen v-if="filter.activeFilter === 'employee'">

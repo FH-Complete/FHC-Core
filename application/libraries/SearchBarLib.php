@@ -33,7 +33,7 @@ class SearchBarLib
 	const ERROR_NOT_AUTH = 'ERR005';
 
 	// List of allowed types of search
-	const ALLOWED_TYPES = ['mitarbeiter', 'mitarbeiter_ohne_zuordnung', 'organisationunit', 'raum', 'person', 'student','studentStv', 'prestudent', 'document', 'cms'];
+	const ALLOWED_TYPES = ['mitarbeiter', 'mitarbeiter_ohne_zuordnung', 'organisationunit', 'raum', 'person', 'student','studentStv', 'prestudent', 'document', 'cms', 'lehreinheit', 'lehrveranstaltung'];
 
 	const PHOTO_IMG_URL = '/cis/public/bild.php?src=person&person_id=';
 
@@ -596,5 +596,61 @@ EOSC;
 		// Otherwise return an empty array
 		return array();
 	}
+
+
+	private function _lehreinheit($searchstr, $type)
+	{
+		$dbModel = new DB_Model();
+
+		$lehreinheit = $dbModel->execReadOnlyQuery('
+			SELECT
+				\'teachingunit\' AS renderer,
+				\''.$type.'\' AS type,
+				lehreinheit_id as id,
+				studiensemester_kurzbz,
+				lv_bezeichnung as bezeichnung,
+				\'lv_table_icon icon-\' as foto,
+				UPPER(CONCAT(vw_lehreinheit.stg_typ, vw_lehreinheit.stg_kurzbz)) as studiengang
+			FROM campus.vw_lehreinheit
+				JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+			WHERE cast(lehreinheit_id as text) ILIKE \'%'.$dbModel->escapeLIKE($searchstr).'%\'
+				OR lv_bezeichnung ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+			ORDER BY start DESC, lv_bezeichnung
+		');
+
+		// If something has been found then return it
+		if (hasData($lehreinheit)) return getData($lehreinheit);
+
+		// Otherwise return an empty array
+		return array();
+	}
+
+	private function _lehrveranstaltung($searchstr, $type)
+	{
+		$dbModel = new DB_Model();
+
+		$lehreinheit = $dbModel->execReadOnlyQuery('
+			
+			SELECT
+				\'teachingunit\' AS renderer,
+				\''.$type.'\' AS type,
+				lehrveranstaltung_id as id,
+				tbl_lehrveranstaltung.bezeichnung,
+				\'lv_table_icon icon-lv\' as foto,
+				UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as studiengang
+			FROM lehre.tbl_lehrveranstaltung
+				JOIN public.tbl_studiengang USING(studiengang_kz)
+			WHERE cast(lehrveranstaltung_id as text) ILIKE \'%'.$dbModel->escapeLIKE($searchstr).'%\'
+				OR tbl_lehrveranstaltung.bezeichnung ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+			ORDER BY lehrveranstaltung_id DESC
+		');
+
+		// If something has been found then return it
+		if (hasData($lehreinheit)) return getData($lehreinheit);
+
+		// Otherwise return an empty array
+		return array();
+	}
+
 }
 
