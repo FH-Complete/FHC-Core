@@ -76,6 +76,8 @@ class Report extends FHCAPI_Controller
 			exit; // immediately terminate the execution
 		}
 
+		$this->addMeta('berechtigung_kurzbz', $statistik->berechtigung_kurzbz);
+
 		$vars = $this->loadVars($statistik->sql);
 		
 		$this->terminateWithSuccess($vars);

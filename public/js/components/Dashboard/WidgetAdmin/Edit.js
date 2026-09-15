@@ -1,6 +1,7 @@
 import CoreForm from "../../Form/Form.js";
 import EditBasics from "./Edit/Basics.js";
 import EditSetup from "./Edit/Setup.js";
+import EditPermission from "./Edit/Permission.js";
 
 import ApiWidget from "../../../api/factory/dashboard/widget.js";
 
@@ -10,6 +11,7 @@ export default {
 		CoreForm,
 		EditBasics,
 		EditSetup,
+		EditPermission,
 	},
 	props: {
 		originalData: Object,
@@ -42,6 +44,14 @@ export default {
 			},
 			set(setup) {
 				this.$emit('update:modelValue', { ...this.modelValue, setup });
+			},
+		},
+		permission: {
+			get() {
+				return this.modelValue.berechtigung_kurzbz;
+			},
+			set(berechtigung_kurzbz) {
+				this.$emit('update:modelValue', { ...this.modelValue, berechtigung_kurzbz });
 			},
 		},
 	},
@@ -109,7 +119,8 @@ export default {
 			/>
 		</template>
 		<template v-else>
-			<edit-setup v-model="setup" />
+			<edit-setup v-model="setup" class="border-bottom mb-3" />
+			<edit-permission v-model="permission" />
 		</template>
 		<div class="position-absolute mx-2 my-1 bottom-0 end-0 z-3">
 			<button

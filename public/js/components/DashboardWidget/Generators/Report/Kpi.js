@@ -1,4 +1,5 @@
 import EditSetup from '../../../Dashboard/WidgetAdmin/Edit/Setup.js';
+import EditPermission from '../../../Dashboard/WidgetAdmin/Edit/Permission.js';
 import ReportPicker from '../../../Dashboard/WidgetAdmin/Edit/Report/Picker.js';
 import ReportVars from '../../../Dashboard/WidgetAdmin/Edit/Report/Vars.js';
 import ReportAggregators from '../../../Dashboard/WidgetAdmin/Edit/Report/Aggregators.js';
@@ -10,6 +11,7 @@ export default {
 	name: "WidgetsGeneratorReportKpi",
 	components: {
 		EditSetup,
+		EditPermission,
 		ReportPicker,
 		ReportVars,
 		ReportAggregators,
@@ -67,6 +69,9 @@ export default {
 							this.modelValue.arguments.vars[detail.kurzbz] = { type: 'fix' };
 					});
 
+					if (result.meta?.berechtigung_kurzbz)
+						this.modelValue.berechtigung_kurzbz = result.meta.berechtigung_kurzbz;
+
 					this.details = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemErrors)
@@ -100,6 +105,7 @@ export default {
 	<div class="widgets-generator-report-kpi">
 		<edit-setup
 			v-model="modelValue.setup"
+			class="border-bottom mb-3"
 			edit-name
 			edit-size
 			edit-hide-footer
@@ -125,6 +131,7 @@ export default {
 		<div v-else class="placeholder-glow mb-3">
 			<span class="placeholder col-6"></span>
 		</div>
+		<edit-permission v-model="modelValue.berechtigung_kurzbz" disabled />
 	</div>
 	`,
 };
