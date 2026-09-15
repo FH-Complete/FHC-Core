@@ -16,6 +16,9 @@ export default {
 		rangeViewPresets: {
 			default: {},
 		},
+		rangeViewPreviewLink: {
+			default: null,
+		},
 	},
 	props: {
 		currentDate: {
@@ -133,12 +136,13 @@ export default {
 		@cal-click-default.capture="handleClickDefaults"
 	>
 		<div
-			v-if="rangeViewPresets?.presets?.length"
+			v-if="rangeViewPresets?.presets?.length || rangeViewPreviewLink"
 			id="rangePresetSelector"
 			class="w-100 d-flex flex-row gap-2 justify-content-center align-items-center py-2"
 		>
-			<span>{{ rangeViewPresets.label }}</span>
+			<span v-if="rangeViewPresets?.presets?.length">{{ rangeViewPresets.label }}</span>
 			<form-input
+				v-if="rangeViewPresets?.presets?.length"
 				name="rangePresetSelector"
 				type="select"
 				v-model="selectedRangePreset"
@@ -151,6 +155,17 @@ export default {
 					{{ preset.name }}
 				</option>
 			</form-input>
+			<a
+				v-if="rangeViewPreviewLink"
+				:href="rangeViewPreviewLink"
+				target="_blank"
+				rel="noopener"
+				class="btn btn-outline-secondary"
+				aria-label="Vorschau öffnen"
+				title="Vorschau öffnen"
+			>
+				<i class="fa-solid fa-eye"></i>
+			</a>
 		</div>
 		<div class="flex-grow-1">
 			<base-slider ref="slider" v-slot="slot">

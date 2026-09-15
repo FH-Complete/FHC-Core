@@ -845,7 +845,7 @@ class KalenderLib
 
 			foreach ($kalender_id_batches as $kalender_ids)
 			{
-				$collision_ids = $this->_ci->collisionchecker->runAny($kalender_ids);
+				$collision_ids = $this->_ci->collisionchecker->runAll($kalender_ids);
 
 				foreach ($collision_ids as $kalender_id => $has_collision)
 				{

@@ -1,7 +1,10 @@
+const PLAN_REQUEST_INTERVAL_DAYS = 60;
+
 export function useEventLoader(
   rangeInterval,
   getPromiseFunc,
   cacheMultiplier = 1,
+  requestIntervalDays = PLAN_REQUEST_INTERVAL_DAYS,
 ) {
   let hasFirstLoadOccurred = false;
 
@@ -22,6 +25,14 @@ export function useEventLoader(
     const cacheSize = Math.max(Vue.toValue(cacheMultiplier), 0);
 
     return Math.round(currentlyDisplayedDateRange.length() * cacheSize) + 1;
+  };
+
+  const getRequestIntervalDays = () => {
+    const intervalDays = Number(Vue.toValue(requestIntervalDays));
+
+    return Number.isFinite(intervalDays) && intervalDays > 0
+      ? Math.max(1, Math.floor(intervalDays))
+      : PLAN_REQUEST_INTERVAL_DAYS;
   };
 
   const reload = (isCacheEnabled = true) => {
@@ -74,56 +85,66 @@ export function useEventLoader(
 
    addVisualForEventsLoading();
 
-    Promise.allSettled(promises).then((results) => {
-      let newlyLoadedEvents = [];
-      let hasSuccessfullyLoadedEvents = false;
+    let newlyLoadedEvents = [];
+    let pendingPromiseCount = promises.length;
+    let hasSuccessfullyLoadedEvents = false;
 
-      results.forEach((res) => {
-        if (
-          !(res.status === "fulfilled" && res.value.meta.status === "success")
-        )
-          return;
+    promises.forEach((promise) => {
+      Promise.resolve(promise)
+        .then((res) => {
+          if (res.meta.status !== "success") return;
 
-        hasSuccessfullyLoadedEvents = true;
-        if (res.value.meta.lv) lv.value = res.value.meta.lv;
-        newlyLoadedEvents = res.value.data;
-      });
+          hasSuccessfullyLoadedEvents = true;
+          if (res.meta.lv) lv.value = res.meta.lv;
+          newlyLoadedEvents = newlyLoadedEvents.concat(res.data);
 
-      let tempAllEvents = Array.from(
-        new Map(
-          [...allEvents.value, ...newlyLoadedEvents].map((event) => [
-            event.eindeutige_kalender_gruppen_id,
-            event,
-          ]),
-        ).values(),
-      );
-
-      if (!isCacheEnabled && hasSuccessfullyLoadedEvents) {
-        const newlyLoadedEventIds = new Set(
-          newlyLoadedEvents.map(
-            (event) => event.eindeutige_kalender_gruppen_id,
-          ),
-        );
-
-        tempAllEvents = tempAllEvents.filter((event) => {
-          const eventStart = getTimestampFromISODate(event.isostart);
-          const eventEnd = getTimestampFromISODate(event.isoend);
-          const overlapsDisplayedDateRange =
-            eventStart < currentlyDisplayedDateRange.end.ts &&
-            eventEnd > currentlyDisplayedDateRange.start.ts;
-
-          return (
-            !overlapsDisplayedDateRange ||
-            newlyLoadedEventIds.has(event.eindeutige_kalender_gruppen_id)
+          let tempAllEvents = Array.from(
+            new Map(
+              [...allEvents.value, ...newlyLoadedEvents].map((event) => [
+                event.eindeutige_kalender_gruppen_id,
+                event,
+              ]),
+            ).values(),
           );
+
+          if (!isCacheEnabled) {
+            const newlyLoadedEventIds = new Set(
+              newlyLoadedEvents.map(
+                (event) => event.eindeutige_kalender_gruppen_id,
+              ),
+            );
+
+            tempAllEvents = tempAllEvents.filter((event) => {
+              const eventStart = getTimestampFromISODate(event.isostart);
+              const eventEnd = getTimestampFromISODate(event.isoend);
+              const overlapsDisplayedDateRange =
+                eventStart < currentlyDisplayedDateRange.end.ts &&
+                eventEnd > currentlyDisplayedDateRange.start.ts;
+
+              return (
+                !overlapsDisplayedDateRange ||
+                newlyLoadedEventIds.has(event.eindeutige_kalender_gruppen_id)
+              );
+            });
+          }
+
+          allEvents.value = removeVisualForEventsLoading(
+            ensureEventsAreInValidCacheRange(tempAllEvents),
+          );
+        })
+        .catch(() => {})
+        .finally(() => {
+          pendingPromiseCount -= 1;
+
+          if (pendingPromiseCount === 0) {
+            if (!hasSuccessfullyLoadedEvents) {
+              allEvents.value = removeVisualForEventsLoading(
+                ensureEventsAreInValidCacheRange(allEvents.value),
+              );
+            }
+            hasFirstLoadOccurred = true;
+          }
         });
-      }
-
-      allEvents.value = removeVisualForEventsLoading(
-        ensureEventsAreInValidCacheRange(tempAllEvents),
-      );
-
-	  hasFirstLoadOccurred = true;
     });
   };
 
@@ -187,6 +208,32 @@ export function useEventLoader(
 
     allowedCacheStartTimestamp = startTimestamp - cachePadding;
     allowedCacheEndTimestamp = endTimestamp + cachePadding;
+
+    const requestEnd = getLuxonDateFromMillis(modifiedRequestEndTimestamp);
+    let requestStart = getLuxonDateFromMillis(modifiedRequestStartTimestamp);
+    const intervalDays = getRequestIntervalDays();
+    const intervalEnd = requestStart
+      .plus({ days: intervalDays - 1 })
+      .endOf("day");
+
+    if (requestEnd > intervalEnd) {
+      while (requestStart < requestEnd) {
+		console.log("requestStart", requestStart.toISO() + " requestEnd", requestEnd.toISO() + " intervalDays", intervalDays);
+        let intervalRequestEnd = requestStart
+          .plus({ days: intervalDays - 1 })
+          .endOf("day");
+        if (intervalRequestEnd > requestEnd) intervalRequestEnd = requestEnd;
+
+        result = mergePromiseElements(
+          getPromiseFunc(requestStart, intervalRequestEnd),
+          result,
+        );
+
+        requestStart = intervalRequestEnd.plus({ milliseconds: 1 });
+      }
+
+      return result;
+    }
 
 	return mergePromiseElements(
       getPromiseFunc(

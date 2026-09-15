@@ -16,6 +16,7 @@
  */
 
 import FhcTempus from "../components/Tempus/Tempus.js";
+import FhcTempusCalendarPreview from "../components/Tempus/TempusCalendarPreview.js";
 import FhcTempusSync from "../components/Tempus/TempusSync.js";
 
 import Phrasen from "../plugins/Phrasen.js";
@@ -28,6 +29,7 @@ const router = VueRouter.createRouter({
 	history: VueRouter.createWebHistory(),
 	routes: [
 		{ path: `/${ciPath}/Tempus`, component: FhcTempus },
+		{ path: `/${ciPath}/Tempus/preview`, component: FhcTempusCalendarPreview },
 		{ path: `/${ciPath}/Tempus/sync`, component: FhcTempusSync },
 	]
 });

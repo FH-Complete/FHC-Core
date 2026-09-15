@@ -55,6 +55,11 @@ class Tempus extends Auth_Controller
 		$this->_loadView(array('organisationen' => $organisationen, 'studiensemestern' => $studiensemestern));
 	}
 
+	public function preview()
+	{
+		$this->_loadView();
+	}
+
 	private function _loadView($extraVariables = [])
 	{
 		$this->load->view('Tempus', [

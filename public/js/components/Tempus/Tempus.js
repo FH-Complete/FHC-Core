@@ -153,6 +153,18 @@ export default {
 				.filter((lecture) => lecture.showEvents)
 				.map((lecture) => lecture.uid);
 		},
+		rangeViewPreviewLink() {
+			const previewUrl = `${this.tempusRoot.replace(/\/$/, '')}/preview`;
+			if (!this.lastRange?.start || !this.lastRange?.end)
+				return previewUrl;
+
+			const params = new URLSearchParams({
+				startDate: this.lastRange.start.toISODate(),
+				endDate: this.lastRange.end.toISODate(),
+			});
+
+			return `${previewUrl}?${params}`;
+		},
 		keyboardShortcuts() {
 			return getTempusShortcuts(this);
 		},
@@ -1221,6 +1233,7 @@ export default {
 							:visible-status="visibleStatus"
 							:date="calendarDate"
 							:mode="currentMode"
+							:range-view-preview-link="rangeViewPreviewLink"
 							:parkedEvents="parkedKeys"
 							:visible-lecturers="visibleLecturerUids"
 							:show-events="showEvents"

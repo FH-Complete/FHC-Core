@@ -10,6 +10,17 @@ import ApiKalender from '../../api/factory/tempus/kalender.js';
 import draggable from '../../directives/draggable.js';
 import ApiStudiensemester from '../../api/factory/studiensemester.js';
 
+function getRangeLength(range) {
+	if (!(range instanceof luxon.Interval) || !range.isValid)
+		return null;
+
+	const start = range.start.startOf('day');
+	const end = range.end.startOf('day');
+	if (end < start) return null;
+
+	return Math.floor(end.diff(start, 'days').days) + 1;
+}
+
 export default {
 	name: 'CalendarTempus',
 	components: {
@@ -19,6 +30,7 @@ export default {
 		return {
 			rangeLength: Vue.computed(() => this.currentRangeLength),
 			rangeViewPresets: Vue.computed(() => this.semesterRangePresets),
+			rangeViewPreviewLink: Vue.computed(() => this.rangeViewPreviewLink),
 			// rangeViewSelectedPreset: Vue.computed({
 			// 	get: () => this.selectedRangePreset,
 			// 	set: value => this.selectedRangePreset = value,
@@ -61,9 +73,17 @@ export default {
 			type: [Date, String, Number, luxon.DateTime],
 			default: luxon.DateTime.local(),
 		},
+		range: {
+			type: luxon.Interval,
+			default: null,
+		},
 		mode: {
 			type: String,
 			default: 'Week',
+		},
+		modes: {
+			type: Array,
+			default: () => ['week', 'month', 'tableList', 'range'],
 		},
 		getPromiseFunc: {
 			type: Function,
@@ -92,6 +112,22 @@ export default {
 		showEvents: {
 			type: Boolean,
 			default: true
+		},
+		isEventDraggingEnabled: {
+			type: Boolean,
+			default: true,
+		},
+		isEventResizingEnabled: {
+			type: Boolean,
+			default: true,
+		},
+		isRangeVirtualScrollEnabled: {
+			type: Boolean,
+			default: true,
+		},
+		rangeViewPreviewLink: {
+			type: String,
+			default: null,
 		}
 	},
 	emits: [
@@ -111,7 +147,7 @@ export default {
 			visibleDates: null,
 			eventReloadKey: 0,
 			refreshEventsAfterReload: false,
-			modes: {
+			calendarModes: {
 				week: Vue.markRaw(ModeWeek),
 				month: Vue.markRaw(ModeMonth),
 				tableList: Vue.markRaw(ModeTable),
@@ -130,7 +166,7 @@ export default {
 			teachingunits: null,
 			hoursplan: null,
 			showRaster: true,
-			currentRangeLength: this.rangeLength,
+			currentRangeLength: getRangeLength(this.range) ?? this.rangeLength,
 			selectedRangePreset: null, //this.currentSemester, TODO: This is a hack to make the range mode work, but it should be fixed in the future
 			semesterRangePresets: {
 				label: null,
@@ -139,6 +175,10 @@ export default {
 		};
 	},
 	watch: {
+		range(range) {
+			const rangeLength = getRangeLength(range);
+			this.currentRangeLength = rangeLength ?? this.rangeLength;
+		},
 		events() {
 			if (this.refreshEventsAfterReload) {
 				this.eventReloadKey += 1;
@@ -149,6 +189,14 @@ export default {
 		}
 	},
 	computed: {
+		availableModes() {
+			return this.modes.reduce((availableModes, mode) => {
+				if (this.calendarModes[mode])
+					availableModes[mode] = this.calendarModes[mode];
+
+				return availableModes;
+			}, {});
+		},
 		backgrounds() {
 			let now = luxon.DateTime.now().setZone(this.timezone);
 
@@ -180,7 +228,11 @@ export default {
 			// that is visible inside the slider viewport, including a one-day buffer
 			// before and after the visible dates.
 			console.log('visibleDates', this.visibleDates);
-			if (this.currentMode === 'range' && Array.isArray(this.visibleDates))
+			if (
+				this.isRangeVirtualScrollEnabled
+				&& this.currentMode === 'range'
+				&& Array.isArray(this.visibleDates)
+			)
 			{
 				const visibleIntervals = this.visibleDates
 					.map(date => luxon.Interval.fromDateTimes(
@@ -360,7 +412,7 @@ export default {
 		ref="calendar"
 		class="fhc-calendar-lvplan"
 		:date="date"
-		:modes="modes"
+		:modes="availableModes"
 		:mode-options="modeOptions"
 		:mode="mode"
 		:timezone="timezone"
@@ -371,10 +423,10 @@ export default {
 		:time-grid="showRaster ? teachingunits : null"
 		:hours-plan="hoursplan"
 		show-btns
-		:draggable-events="true"
-		:resizable-events="true"
-		:on-drop="['week', 'range'].includes(currentMode) ? ondrop : null"
-		:on-resize="onresize"
+		:draggable-events="isEventDraggingEnabled"
+		:resizable-events="isEventResizingEnabled"
+		:on-drop="isEventDraggingEnabled && ['week', 'range'].includes(currentMode) ? ondrop : null"
+		:on-resize="isEventResizingEnabled ? onresize : null"
 		@update:date="handleDateUpdate"
 		@update:mode="(newMode, newDate) => { currentMode = newMode; $emit('update:mode', newMode, newDate) }"
 		@update:range="updateRange"
@@ -418,6 +470,7 @@ export default {
 					<span class="form-check-label">Stundenraster</span>
 				</div>
 				<div
+					v-if="isEventDraggingEnabled"
 					class="d-flex align-items-center gap-2 "
 					v-draggable:move.noimage="{ type: 'reservierung', id: null, orig: {} }"
 					data-cy="reservationDragHandle"
