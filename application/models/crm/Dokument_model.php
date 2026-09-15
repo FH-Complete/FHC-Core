@@ -57,7 +57,7 @@ class Dokument_model extends DB_Model
 
 		$qry = " SELECT
 				  a.akte_id,
-				  a.bezeichnung,
+				  dok.bezeichnung,
 				  a.dokument_kurzbz,
 				  a.titel_intern,
 				  a.anmerkung_intern,
@@ -83,6 +83,7 @@ class Dokument_model extends DB_Model
 				  inhalt
 				FROM
 				  public.tbl_akte a
+				  JOIN public.tbl_dokument dok ON (dok.dokument_kurzbz = a.dokument_kurzbz)
 				WHERE
 				  a.person_id = ?
 				  AND a.dokument_kurzbz NOT IN (

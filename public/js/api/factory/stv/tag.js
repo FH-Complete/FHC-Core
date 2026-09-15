@@ -51,4 +51,20 @@ export default {
 			params: data
 		};
 	},
+
+	getAllTagsPrestudent(prestudent_id){
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/stv/Tags/getAllTags',
+			params: prestudent_id
+		};
+	},
+
+	rebuildTagsforTypeId(data){
+		return {
+			method: 'post',
+			url: 'api/frontend/v1/stv/Tags/rebuildTagsForTypeId/',
+			params: data
+		};
+	}
 };

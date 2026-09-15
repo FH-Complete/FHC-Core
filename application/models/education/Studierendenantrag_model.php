@@ -188,6 +188,7 @@ class Studierendenantrag_model extends DB_Model
 	 * Get the studiengang and ausbildungssemester the student was in
 	 * for the studiensemester the antrag was committed for
 	 *
+	 *
 	 * @param integer		$antrag_id
 	 *
 	 * @return stdClass
@@ -234,6 +235,28 @@ class Studierendenantrag_model extends DB_Model
 	{
 		$this->addSelect('p.studiengang_kz');
 		$this->addJoin('public.tbl_prestudent p', 'prestudent_id');
+
+		$this->addLimit(1);
+
+		return $this->load(
+			$antrag_id
+		);
+	}
+
+	/**
+	 * Get the studiengang and the studienplan the student is in
+	 *
+	 * @param integer		$antrag_id
+	 *
+	 * @return stdClass
+	 */
+	public function getStgAndDetails($antrag_id)
+	{
+		$this->addSelect('p.studiengang_kz');
+		$this->addSelect('stg.orgform_kurzbz');
+		$this->addSelect('stg.bezeichnung');
+		$this->addJoin('public.tbl_prestudent p', 'prestudent_id');
+		$this->addJoin('public.tbl_studiengang stg', 'studiengang_kz');
 
 		$this->addLimit(1);
 

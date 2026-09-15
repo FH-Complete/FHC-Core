@@ -2,12 +2,18 @@ import FhcTabs from "../../Tabs.js";
 import FhcHeader from "../../DetailHeader/DetailHeader.js";
 
 import ApiStvApp from '../../../api/factory/stv/app.js';
+import ApiStudent from '../../../api/factory/stv/students.js';
 
 // TODO(chris): alt & title
 // TODO(chris): phrasen
 
 export default {
 	name: "DetailsPrestudent",
+	inject: {
+		currentSemester: {
+			from: 'currentSemester',
+		},
+	},
 	components: {
 		FhcTabs,
 		FhcHeader
@@ -16,7 +22,8 @@ export default {
 		return {
 			configStudent: {},
 			configStudents: {},
-			activeTab: null
+			activeTab: null,
+			localStudent: null
 		};
 	},
 	props: {
@@ -41,6 +48,9 @@ export default {
 			}
 			return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithUid && !value.showOnlyWithUid));
 		},
+		isLoading() {
+			return this.students === null; //null-> loading, [] -> empty, [...] -> data, necessary for skeleton in child
+		},
 		tile_PersId(){
 			let tile = this.students[0].person_id != null ? this.students[0].person_id : '-';
 			return tile;
@@ -53,11 +63,34 @@ export default {
 			let tile = this.students[0].matrikelnr != null ? this.students[0].matrikelnr : '-';
 			return tile;
 		},
+		tile_PrestdId(){
+			let tile = this.students[0].prestudent_id != null ? this.students[0].prestudent_id : '-';
+			return tile;
+		},
+		tile_UID(){
+			let tile = this.students[0].uid != null ? this.students[0].uid : '-';
+			return tile;
+		},
 	},
 	watch: {
 		'$p.user_language.value'(n, o) {
 			if (n !== o && o !== undefined)
 				this.loadConfig();
+		},
+		currentSemester(newVal) {
+			if (
+				Array.isArray(this.students) &&
+				this.students.length === 1 &&
+				newVal !== this.students[0].query_studiensemester_kurzbz
+			) {
+				this.reloadDataStudent();
+			}
+			else {
+				this.localStudent = null;
+			}
+		},
+		students() {
+			this.localStudent = null;
 		}
 	},
 	methods: {
@@ -83,6 +116,20 @@ export default {
 			if (this.$refs.tabs?.$refs?.current?.reload)
 				this.$refs.tabs.$refs.current.reload();
 		},
+		reloadDataStudent(){
+			this.localStudent = null;
+			const studentArr = this.students;
+
+			if (!studentArr || !studentArr.length) {
+				return;
+			}
+
+			this.$api
+				.call(ApiStudent.uid(studentArr[0].uid, this.currentSemester))
+				.then(result => {
+					this.localStudent = result.data;
+				});
+		},
 		reloadList() {
 			this.$emit('reload');
 		},
@@ -97,24 +144,28 @@ export default {
 		</div>
 		<div v-else-if="configStudent && configStudents" class="d-flex flex-column h-100">
 			<fhc-header
-				:headerData="students"
+				:headerData="localStudent || students"
+				:currentSemester="currentSemester"
 				typeHeader="student"
 				@reload="reloadList"
 				fotoEditable
+				:isLoading="isLoading"
 			>
-				<template #uid>{{students[0].uid}}</template>
-				<template #titleAlphaTile>PersID</template>
-				<template #valueAlphaTile>{{tile_PersId}}</template>
-				<template #titleBetaTile>MatrNr</template>
-				<template #valueBetaTile>{{tile_MatrNr}}</template>
-				<template #titleGammaTile>PersKz</template>
-				<template #valueGammaTile>{{tile_PersKz}}</template>
+				<template #uid>{{tile_UID}}</template>
+				<template #titleAlphaTile>PrestdID</template>
+				<template #valueAlphaTile>{{tile_PrestdId}}</template>
+				<template #titleBetaTile>PersID</template>
+				<template #valueBetaTile>{{tile_PersId}}</template>
+				<template #titleGammaTile>MatrNr</template>
+				<template #valueGammaTile>{{tile_MatrNr}}</template>
+				<template #titleDeltaTile>PersKz</template>
+				<template #valueDeltaTile>{{tile_PersKz}}</template>
 			</fhc-header>
 			<fhc-tabs
 				v-if="students.length == 1"
-				ref="tabs" 
+				ref="tabs"
 				:useprimevue="true"
-				:modelValue="students[0]"
+				:modelValue="(Array.isArray(localStudent) && localStudent[0]) || students[0]"
 				:config="config"
 				:default="activeTab ?? $route.params.tab"
 				style="flex: 1 1 0%; height: 0%"

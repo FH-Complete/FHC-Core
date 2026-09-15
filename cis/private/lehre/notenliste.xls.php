@@ -387,13 +387,13 @@ if (!$berechtigung->isBerechtigt('admin')
 						$worksheet->write($lines,3,$elem->vorname);
 					}
 					$worksheet->write($lines,4,$elem->semester.$elem->verband.$elem->gruppe);
-					$worksheet->write($lines,5,trim($elem->matrikelnr),$fmtNoteImportPkz);
-					$worksheet->write($lines,6, $note, $fmtNoteImportNote);
+					$worksheet->write($lines,5,trim($elem->matrikelnr),$format_highlight);
+					$worksheet->write($lines,6, $note, $format_highlightright);
 
 					// Nachprüfung
 					if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2)
 					{
-						$worksheet->write($lines,8, trim($elem->matrikelnr), $fmtPruefImportPkz);
+						$worksheet->write($lines,8, trim($elem->matrikelnr), $format_highlight);
 						$pr = new Pruefung();
 						$pr->getPruefungen($elem->uid, "Termin2", $lvid, $stsem);
 						$output2 = $pr->result;
@@ -401,23 +401,23 @@ if (!$berechtigung->isBerechtigt('admin')
 						if ($output2)
 						{
 							$resultPr = $output2[0];
-							$worksheet->write($lines,9, date('d.m.Y', strtotime($resultPr->datum)), $fmtPruefImportDate);
+							$worksheet->write($lines,9, date('d.m.Y', strtotime($resultPr->datum)), $format_highlightright_date);
 							if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE==true)
-								$worksheet->write($lines,10, $resultPr->punkte, $fmtPruefImportNote);
+								$worksheet->write($lines,10, $resultPr->punkte, $format_highlightright);
 							else
-								$worksheet->write($lines,10, $resultPr->note, $fmtPruefImportNote);
+								$worksheet->write($lines,10, $resultPr->note, $format_highlightright);
 						}
 						else
 						{
-								$worksheet->write($lines,9, '', $fmtPruefImportDate);
-								$worksheet->write($lines,10, '', $fmtPruefImportNote);
+								$worksheet->write($lines,9, '', $format_highlightright_date);
+								$worksheet->write($lines,10, '', $format_highlightright);
 						}
 					}
 
 					// Nachprüfung
 					if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
 					{
-						$worksheet->write($lines,12, trim($elem->matrikelnr), $fmtPruefImportPkz);
+						$worksheet->write($lines,12, trim($elem->matrikelnr), $format_highlight);
 						$pr = new Pruefung();
 						$pr->getPruefungen($elem->uid, "Termin3", $lvid, $stsem);
 						$output3 = $pr->result;
@@ -425,16 +425,16 @@ if (!$berechtigung->isBerechtigt('admin')
 						if ($output3)
 						{
 							$resultPr = $output3[0];
-							$worksheet->write($lines,13, date('d.m.Y', strtotime($resultPr->datum)), $fmtPruefImportDate);
+							$worksheet->write($lines,13, date('d.m.Y', strtotime($resultPr->datum)), $format_highlightright_date);
 							if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE==true)
-								$worksheet->write($lines,14, $resultPr->punkte, $fmtPruefImportNote);
+								$worksheet->write($lines,14, $resultPr->punkte, $format_highlightright);
 							else
-								$worksheet->write($lines,14, $resultPr->note, $fmtPruefImportNote);
+								$worksheet->write($lines,14, $resultPr->note, $format_highlightright);
 						}
 						else
 						{
-								$worksheet->write($lines,13, '', $fmtPruefImportDate);
-								$worksheet->write($lines,14, '', $fmtPruefImportNote);
+								$worksheet->write($lines,13, '', $format_highlightright_date);
+								$worksheet->write($lines,14, '', $format_highlightright);
 						}
 					}
 

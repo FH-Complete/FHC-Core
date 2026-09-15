@@ -1,5 +1,11 @@
 export default {
     name: 'VerticalSplit',
+    props: {
+        defaultRatio: {
+            type: Array,
+            default: () => [50, 50]
+        }
+    },
     data: function() {
       return {          
           availHeight: 0,
@@ -50,17 +56,22 @@ export default {
     updated: function() {
         this.trackVerticalSplitterOffsetTop();
     },
+    beforeDestroy: function () {
+        window.removeEventListener('resize', this.calcHeights);
+    },
     methods: {
         calcHeights: function() {
             var windowheight = window.innerHeight;
             var oldavailHeight = this.availHeight;
             this.selfOffsetTop = this.$refs.verticalsplit.offsetTop;
             this.availHeight = windowheight - this.selfOffsetTop - this.$refs.vsplitter.offsetHeight;
+           
             if( (this.topheight === 0 && this.bottomheight === 0) || oldavailHeight === 0 ) {
-                this.topheight = Math.floor(this.availHeight/2);
+                this.topheight = Math.floor(this.availHeight * (this.defaultRatio[0] / 100));
             } else {
                 this.topheight = Math.floor( ((((this.topheight * 100) / oldavailHeight) / 100) * this.availHeight) );
             }
+            
             this.bottomheight = this.availHeight - this.topheight;
         },
         collapseTop: function() {
@@ -74,8 +85,8 @@ export default {
             this.bottomheight = 0;
         },
         showBoth: function() {
-            this.topheight = Math.floor(this.availHeight/2);
-            this.bottomheight = Math.floor(this.availHeight/2);
+            this.topheight = Math.floor(this.availHeight * (this.defaultRatio[0] / 100));
+            this.bottomheight = this.availHeight - this.topheight
         },
         isCollapsed: function() {
             if( this.topheight === 0 ) {
