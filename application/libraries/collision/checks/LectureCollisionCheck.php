@@ -57,8 +57,7 @@ class LectureCollisionCheck implements ICollisionCheck
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit current_kalender_le', 'current_kalender_le.kalender_id = tbl_kalender.kalender_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter current_lehreinheit_ma', 'current_lehreinheit_ma.lehreinheit_id = current_kalender_le.lehreinheit_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter other_lehreinheithreinheit_ma', 'other_lehreinheithreinheit_ma.mitarbeiter_uid = current_lehreinheit_ma.mitarbeiter_uid');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheit other_lehreinheit', 'other_lehreinheit.lehreinheit_id = other_lehreinheithreinheit_ma.lehreinheit_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit other_kalender_le', 'other_kalender_le.lehreinheit_id = other_lehreinheit.lehreinheit_id');
+		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit other_kalender_le', 'other_kalender_le.lehreinheit_id = other_lehreinheithreinheit_ma.lehreinheit_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender other_kalender', 'other_kalender.kalender_id = other_kalender_le.kalender_id');
 
 		$this->_ci->KalenderModel->db->where('other_kalender.kalender_id != tbl_kalender.kalender_id', null, false);
@@ -90,8 +89,7 @@ class LectureCollisionCheck implements ICollisionCheck
 
 		$this->_ci->KalenderModel->addSelect('DISTINCT ON (tbl_kalender.kalender_id) tbl_kalender.kalender_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit current_kalender_le', 'current_kalender_le.kalender_id = tbl_kalender.kalender_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheit current_lehreinheit', 'current_lehreinheit.lehreinheit_id = current_kalender_le.lehreinheit_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter current_lehreinheit_ma', 'current_lehreinheit_ma.lehreinheit_id = current_lehreinheit.lehreinheit_id');
+		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter current_lehreinheit_ma', 'current_lehreinheit_ma.lehreinheit_id = current_kalender_le.lehreinheit_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event_teilnehmer other_t', 'other_t.uid = current_lehreinheit_ma.mitarbeiter_uid');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event other_e', 'other_e.kalender_id = other_t.kalender_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender other_kalender', 'other_kalender.kalender_id = other_e.kalender_id');
@@ -125,8 +123,7 @@ class LectureCollisionCheck implements ICollisionCheck
 
 		$this->_ci->KalenderModel->addSelect('DISTINCT ON (tbl_kalender.kalender_id) tbl_kalender.kalender_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit current_kalender_le', 'current_kalender_le.kalender_id = tbl_kalender.kalender_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheit current_lehreinheit', 'current_lehreinheit.lehreinheit_id = current_kalender_le.lehreinheit_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter current_lehreinheit_ma', 'current_lehreinheit_ma.lehreinheit_id = current_lehreinheit.lehreinheit_id');
+		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter current_lehreinheit_ma', 'current_lehreinheit_ma.lehreinheit_id = current_kalender_le.lehreinheit_id');
 		$this->_ci->KalenderModel->addJoin('campus.tbl_zeitsperre z',
 			"z.mitarbeiter_uid = current_lehreinheit_ma.mitarbeiter_uid 
 			AND z.zeitsperretyp_kurzbz != 'ZVerfueg'");
@@ -164,7 +161,6 @@ class LectureCollisionCheck implements ICollisionCheck
 		$this->_ci->KalenderModel->addDistinct('mitarbeiter_uid, tbl_kalender_event_teilnehmer.uid');
 		$this->_ci->KalenderModel->addSelect('mitarbeiter_uid, tbl_kalender_event_teilnehmer.uid');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit', 'kalender_id', 'LEFT');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheit', 'lehreinheit_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter', 'lehreinheit_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event', 'kalender_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event_teilnehmer', 'tbl_kalender_event.kalender_id = tbl_kalender_event_teilnehmer.kalender_id', 'LEFT');
@@ -208,7 +204,6 @@ class LectureCollisionCheck implements ICollisionCheck
 		$this->_ci->KalenderModel->addDistinct('mitarbeiter_uid, tbl_kalender.von, tbl_kalender.bis');
 		$this->_ci->KalenderModel->addSelect('mitarbeiter_uid, tbl_kalender.von, tbl_kalender.bis');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit', 'kalender_id', 'LEFT');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheit', 'lehreinheit_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter', 'lehreinheit_id', 'LEFT');
 
 		$this->_ci->KalenderModel->db->where_in('mitarbeiter_uid', $uids);

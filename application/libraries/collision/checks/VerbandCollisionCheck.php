@@ -91,8 +91,7 @@ class VerbandCollisionCheck implements ICollisionCheck
 				SELECT tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester, tbl_lehreinheitgruppe.verband, tbl_lehreinheitgruppe.gruppe,
 					tbl_lehreinheitgruppe.gruppe_kurzbz, tbl_kalender_lehreinheit.kalender_id
 				FROM lehre.tbl_kalender_lehreinheit
-				JOIN lehre.tbl_lehreinheit ON tbl_lehreinheit.lehreinheit_id = tbl_kalender_lehreinheit.lehreinheit_id
-				JOIN lehre.tbl_lehreinheitgruppe ON tbl_lehreinheitgruppe.lehreinheit_id = tbl_lehreinheit.lehreinheit_id
+				JOIN lehre.tbl_lehreinheitgruppe ON tbl_lehreinheitgruppe.lehreinheit_id = tbl_kalender_lehreinheit.lehreinheit_id
             ". $union_event ."
         ";
 
