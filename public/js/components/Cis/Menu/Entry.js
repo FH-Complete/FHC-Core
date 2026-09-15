@@ -78,9 +78,7 @@ export default {
 		},
 		menuNodeHref() {
 			if (this.hasChilds) {
-				return this.$props.entry.menu_open && this.hasFullLink
-					? this.$props.entry.url
-					: null;
+				return this.hasFullLink ? this.$props.entry.url : null;
 			} else {
 				return this.$props.entry.url;
 			}
