@@ -96,15 +96,22 @@ export default {
 	<core-form
 		v-if="modelValue"
 		ref="form"
-		class="widgets-admin-edit mx-2"
+		class="widgets-admin-edit mx-2 pb-5"
 		@submit.prevent="save"
 	>
-		<edit-basics v-model="value" :original="originalData" />
+		<edit-basics v-model="value" :original="originalData" class="border-bottom mb-3" />
 		<template v-if="generator">
-			<component :is="generator" v-model="value" :original="originalData" :key="modelValue.widget_id" />
+			<component
+				:is="generator"
+				v-model="value"
+				:original="originalData"
+				:key="modelValue.widget_id"
+			/>
 		</template>
-		<edit-setup v-else v-model="setup" />
-		<div class="position-absolute bottom-0 end-0 z-3">
+		<template v-else>
+			<edit-setup v-model="setup" />
+		</template>
+		<div class="position-absolute mx-2 my-1 bottom-0 end-0 z-3">
 			<button
 				v-if="generator"
 				type="button"

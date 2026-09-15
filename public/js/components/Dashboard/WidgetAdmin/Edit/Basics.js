@@ -20,7 +20,7 @@ export default {
 		}
 	},
 	template: /* html */`
-	<div class="widgets-admin-edit-basics border-bottom mb-3">
+	<div class="widgets-admin-edit-basics">
 		<div class="d-flex gap-3 my-2">
 			<div class="col-auto">
 				<img

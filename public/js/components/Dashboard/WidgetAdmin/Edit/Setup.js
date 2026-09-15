@@ -17,7 +17,7 @@ export default {
 		"update:modelValue"
 	],
 	template: /* html */`
-	<div class="widgets-admin-edit-setup border-bottom mb-3">
+	<div class="widgets-admin-edit-setup">
 		<form-input
 			v-model="modelValue.name"
 			type="text"

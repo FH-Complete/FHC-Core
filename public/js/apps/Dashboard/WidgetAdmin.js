@@ -24,7 +24,7 @@ const app = Vue.createApp({
 		<div class="content d-flex flex-column gap-3 w-100 h-100 overflow-hidden">
 			<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3">
 				<h1 class="h2 pb-3 border-bottom mb-0 w-100">
-					{{ $p.t('dashboard/widgets') }}
+					{{ $p.t('dashboard/widgets') || '&nbsp;' }}
 				</h1>
 			</div>
 			<widget-admin class="h-100 overflow-hidden" />
