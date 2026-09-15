@@ -88,7 +88,7 @@ class ResourcesCollisionCheck implements ICollisionCheck
 		{
 			$grouped[$row->kalender_id][] = true;
 		}
-		log_message('error', 'ResourcesCollisionCheck::checkAll() 1');
+
 		return $grouped;
 	}
 }

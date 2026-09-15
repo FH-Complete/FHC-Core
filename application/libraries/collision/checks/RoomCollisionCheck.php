@@ -54,39 +54,29 @@ class RoomCollisionCheck implements ICollisionCheck
 	{
 		if (empty($kalender_ids)) return [];
 
-		$kalender_ids = array_values(array_unique(array_map('intval', $kalender_ids)));
-		$postgres_array = '{' . implode(',', $kalender_ids) . '}';
-		$dbModel = new DB_Model();
-		$sql = "
-			WITH current_kalender AS MATERIALIZED (
-				SELECT kalender_id, von, bis
-				FROM lehre.tbl_kalender
-				WHERE kalender_id = ANY(?::bigint[])
-			)
-			SELECT current_kalender.kalender_id
-			FROM current_kalender
-			WHERE EXISTS (
-				SELECT 1
-				FROM lehre.tbl_kalender_ort current_ort
-				JOIN lehre.tbl_kalender_ort other_ort
-					ON other_ort.ort_kurzbz = current_ort.ort_kurzbz
-				JOIN lehre.tbl_kalender other_kalender
-					ON other_kalender.kalender_id = other_ort.kalender_id
-				WHERE current_ort.kalender_id = current_kalender.kalender_id
-					AND other_kalender.kalender_id != current_kalender.kalender_id
-					AND other_kalender.von < current_kalender.bis
-					AND other_kalender.bis > current_kalender.von
-					AND other_kalender.status_kurzbz NOT IN ('archived', 'deleted', 'to_delete', 'to_delete_live', 'to_delete_preview')
-					AND NOT EXISTS (
-						SELECT 1
-						FROM lehre.tbl_kalender nachfolger
-						WHERE nachfolger.vorgaenger_kalender_id = other_kalender.kalender_id
-					)
-			)";
+		$this->_ci->KalenderModel->addSelect('DISTINCT ON (tbl_kalender.kalender_id) tbl_kalender.kalender_id');
+		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_ort current_ort', 'current_ort.kalender_id = tbl_kalender.kalender_id');
+		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_ort other_ort', 'other_ort.ort_kurzbz = current_ort.ort_kurzbz');
+		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender other_kalender', 'other_kalender.kalender_id = other_ort.kalender_id');
 
-		$result = $dbModel->execReadOnlyQuery($sql, [$postgres_array]);
+		$this->_ci->KalenderModel->db->where('other_kalender.kalender_id != tbl_kalender.kalender_id', null, false);
+		$this->_ci->KalenderModel->db->where('other_kalender.von < tbl_kalender.bis', null, false);
+		$this->_ci->KalenderModel->db->where('other_kalender.bis > tbl_kalender.von', null, false);
+		$this->_ci->KalenderModel->db->where_not_in('other_kalender.status_kurzbz', array('archived', 'deleted', 'to_delete', 'to_delete_live', 'to_delete_preview'));
 
-		log_message('error', 'RoomCollisionCheck::checkAll() 1');
+		$this->_ci->KalenderModel->db->group_start();
+		$where_ids_chunks = array_chunk($kalender_ids,25);
+		foreach($where_ids_chunks as $where_ids)
+		{
+			$this->_ci->KalenderModel->db->or_where_in('tbl_kalender.kalender_id', $where_ids);
+		}
+		$this->_ci->KalenderModel->db->group_end();
+
+		$this->_ci->KalenderModel->db->where('other_kalender.kalender_id NOT IN (SELECT vorgaenger_kalender_id FROM lehre.tbl_kalender WHERE vorgaenger_kalender_id IS NOT NULL)', null, false);
+
+		$result = $this->_ci->KalenderModel->load();
+
+
 		if (isError($result) || !hasData($result)) return [];
 
 		$grouped = [];

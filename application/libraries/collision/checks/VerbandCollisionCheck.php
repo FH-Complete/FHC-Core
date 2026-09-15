@@ -308,155 +308,104 @@ class VerbandCollisionCheck implements ICollisionCheck
 	{
 		if (empty($kalender_ids)) return [];
 
-		$kalender_ids = array_values(array_unique(array_map('intval', $kalender_ids)));
-		$postgres_array = '{' . implode(',', $kalender_ids) . '}';
 		$dbModel = new DB_Model();
-		$lehreinheit_group_match = $this->_buildGroupMatchCondition(
-			'current_group_assignment',
-			'other_lehreinheitgruppe',
-			'current_group_assignment.direktinskription',
-			'other_gruppe.direktinskription'
-		);
-		$event_group_match = $this->_buildGroupMatchCondition(
-			'current_group_assignment',
-			'other_event_teilnehmer',
-			'current_group_assignment.direktinskription',
-			'other_gruppe.direktinskription'
-		);
+
+		$placeholders = implode(',', array_fill(0, count($kalender_ids), '?'));
 
 		$sql = "
-			WITH current_kalender AS MATERIALIZED (
-				SELECT kalender_id, von, bis
-				FROM lehre.tbl_kalender
-				WHERE kalender_id = ANY(?::bigint[])
-			),
-			current_group_assignment AS MATERIALIZED (
-				SELECT
-					current_kalender.kalender_id,
-					current_lehreinheitgruppe.studiengang_kz,
-					current_lehreinheitgruppe.semester,
-					current_lehreinheitgruppe.verband,
-					current_lehreinheitgruppe.gruppe,
-					current_lehreinheitgruppe.gruppe_kurzbz,
-					current_gruppe.direktinskription
-				FROM current_kalender
-				JOIN lehre.tbl_kalender_lehreinheit current_kalender_le
-					ON current_kalender_le.kalender_id = current_kalender.kalender_id
-				JOIN lehre.tbl_lehreinheit current_lehreinheit
-					ON current_lehreinheit.lehreinheit_id = current_kalender_le.lehreinheit_id
-				JOIN lehre.tbl_lehreinheitgruppe current_lehreinheitgruppe
-					ON current_lehreinheitgruppe.lehreinheit_id = current_lehreinheit.lehreinheit_id
-				LEFT JOIN public.tbl_gruppe current_gruppe
-					ON current_gruppe.gruppe_kurzbz = current_lehreinheitgruppe.gruppe_kurzbz
-
-				UNION ALL
-
-				SELECT
-					current_kalender.kalender_id,
-					current_event_teilnehmer.studiengang_kz,
-					current_event_teilnehmer.semester,
-					current_event_teilnehmer.verband,
-					current_event_teilnehmer.gruppe,
-					current_event_teilnehmer.gruppe_kurzbz,
-					current_gruppe.direktinskription
-				FROM current_kalender
-				JOIN lehre.tbl_kalender_event_teilnehmer current_event_teilnehmer
-					ON current_event_teilnehmer.kalender_id = current_kalender.kalender_id
-				LEFT JOIN public.tbl_gruppe current_gruppe
-					ON current_gruppe.gruppe_kurzbz = current_event_teilnehmer.gruppe_kurzbz
-			)
-			SELECT current_kalender.kalender_id
-			FROM current_kalender
-			WHERE EXISTS (
-				SELECT 1
-				FROM current_group_assignment
-				WHERE current_group_assignment.kalender_id = current_kalender.kalender_id
-					AND EXISTS (
-						SELECT 1
-						FROM lehre.tbl_kalender other_kalender
-						WHERE other_kalender.kalender_id != current_kalender.kalender_id
-							AND other_kalender.von < current_kalender.bis
-							AND other_kalender.bis > current_kalender.von
-							AND other_kalender.status_kurzbz NOT IN ('archived', 'deleted', 'to_delete', 'to_delete_live', 'to_delete_preview')
-							AND NOT EXISTS (
-								SELECT 1
-								FROM lehre.tbl_kalender nachfolger
-								WHERE nachfolger.vorgaenger_kalender_id = other_kalender.kalender_id
-							)
-							AND (
-								EXISTS (
-									SELECT 1
-									FROM lehre.tbl_kalender_lehreinheit other_kalender_le
-									JOIN lehre.tbl_lehreinheit other_lehreinheit
-										ON other_lehreinheit.lehreinheit_id = other_kalender_le.lehreinheit_id
-									JOIN lehre.tbl_lehreinheitgruppe other_lehreinheitgruppe
-										ON other_lehreinheitgruppe.lehreinheit_id = other_lehreinheit.lehreinheit_id
-									LEFT JOIN public.tbl_gruppe other_gruppe
-										ON other_gruppe.gruppe_kurzbz = other_lehreinheitgruppe.gruppe_kurzbz
-									WHERE other_kalender_le.kalender_id = other_kalender.kalender_id
-										AND $lehreinheit_group_match
-								)
-								OR EXISTS (
-									SELECT 1
-									FROM lehre.tbl_kalender_event_teilnehmer other_event_teilnehmer
-									LEFT JOIN public.tbl_gruppe other_gruppe
-										ON other_gruppe.gruppe_kurzbz = other_event_teilnehmer.gruppe_kurzbz
-									WHERE other_event_teilnehmer.kalender_id = other_kalender.kalender_id
-										AND $event_group_match
-								)
-							)
+			SELECT DISTINCT ON (current_kalender.kalender_id) current_kalender.kalender_id
+			FROM lehre.tbl_kalender current_kalender
+	
+			JOIN (
+				SELECT tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester, tbl_lehreinheitgruppe.verband, tbl_lehreinheitgruppe.gruppe,
+					tbl_lehreinheitgruppe.gruppe_kurzbz, tbl_kalender_lehreinheit.kalender_id
+				FROM lehre.tbl_kalender_lehreinheit
+				JOIN lehre.tbl_lehreinheitgruppe ON tbl_lehreinheitgruppe.lehreinheit_id = tbl_kalender_lehreinheit.lehreinheit_id
+				UNION
+				SELECT tbl_kalender_event_teilnehmer.studiengang_kz, tbl_kalender_event_teilnehmer.semester, tbl_kalender_event_teilnehmer.verband, tbl_kalender_event_teilnehmer.gruppe,
+					tbl_kalender_event_teilnehmer.gruppe_kurzbz, tbl_kalender_event_teilnehmer.kalender_id
+				FROM lehre.tbl_kalender_event_teilnehmer
+			) current_lehreinheitguppe ON current_lehreinheitguppe.kalender_id = current_kalender.kalender_id
+	
+			LEFT JOIN public.tbl_gruppe current_gruppe
+				ON current_gruppe.gruppe_kurzbz = current_lehreinheitguppe.gruppe_kurzbz
+	
+			JOIN lehre.tbl_kalender other_kalender
+				ON other_kalender.kalender_id != current_kalender.kalender_id
+				AND other_kalender.von < current_kalender.bis
+				AND other_kalender.bis > current_kalender.von
+	
+			JOIN (
+				SELECT tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester, tbl_lehreinheitgruppe.verband, tbl_lehreinheitgruppe.gruppe,
+					tbl_lehreinheitgruppe.gruppe_kurzbz, tbl_kalender_lehreinheit.kalender_id
+				FROM lehre.tbl_kalender_lehreinheit
+				JOIN lehre.tbl_lehreinheitgruppe ON tbl_lehreinheitgruppe.lehreinheit_id = tbl_kalender_lehreinheit.lehreinheit_id
+				UNION
+				SELECT tbl_kalender_event_teilnehmer.studiengang_kz, tbl_kalender_event_teilnehmer.semester, tbl_kalender_event_teilnehmer.verband, tbl_kalender_event_teilnehmer.gruppe,
+					tbl_kalender_event_teilnehmer.gruppe_kurzbz, tbl_kalender_event_teilnehmer.kalender_id
+				FROM lehre.tbl_kalender_event_teilnehmer
+			) other_lehreinheitguppe ON other_lehreinheitguppe.kalender_id = other_kalender.kalender_id
+	
+			LEFT JOIN public.tbl_gruppe other_gruppe
+				ON other_gruppe.gruppe_kurzbz = other_lehreinheitguppe.gruppe_kurzbz
+	
+			WHERE current_kalender.kalender_id IN ({$placeholders})
+			AND other_kalender.status_kurzbz NOT IN ('archived', 'deleted', 'to_delete', 'to_delete_live', 'to_delete_preview')
+			AND current_lehreinheitguppe.studiengang_kz = other_lehreinheitguppe.studiengang_kz
+			AND current_lehreinheitguppe.semester = other_lehreinheitguppe.semester
+			AND (
+				(
+					current_lehreinheitguppe.gruppe_kurzbz IS NULL
+					AND other_lehreinheitguppe.gruppe_kurzbz IS NULL
+					AND (
+						current_lehreinheitguppe.verband IS NULL
+						OR (
+							current_lehreinheitguppe.verband = other_lehreinheitguppe.verband
+							AND (current_lehreinheitguppe.gruppe IS NULL OR other_lehreinheitguppe.gruppe IS NULL OR current_lehreinheitguppe.gruppe = other_lehreinheitguppe.gruppe)
+						)
 					)
-			)";
+				)
+				OR
+				(
+					current_lehreinheitguppe.gruppe_kurzbz IS NOT NULL
+					AND other_lehreinheitguppe.gruppe_kurzbz IS NOT NULL
+					AND current_gruppe.direktinskription IS NOT TRUE
+					AND other_gruppe.direktinskription IS NOT TRUE
+				)
+				OR
+				(
+					(
+						current_lehreinheitguppe.gruppe_kurzbz IS NULL
+						AND other_lehreinheitguppe.gruppe_kurzbz IS NOT NULL
+						AND other_gruppe.direktinskription IS NOT TRUE
+					)
+					OR
+					(
+						current_lehreinheitguppe.gruppe_kurzbz IS NOT NULL
+						AND other_lehreinheitguppe.gruppe_kurzbz IS NULL
+						AND current_gruppe.direktinskription IS NOT TRUE
+					)
+				)
+			)
+			AND other_kalender.kalender_id NOT IN (
+				SELECT vorgaenger_kalender_id
+				FROM lehre.tbl_kalender
+				WHERE vorgaenger_kalender_id IS NOT NULL
+			)
+			
+		";
 
-		$result = $dbModel->execReadOnlyQuery($sql, [$postgres_array]);
+		$result = $dbModel->execReadOnlyQuery($sql, $kalender_ids);
+
 		if (isError($result) || !hasData($result)) return [];
 
 		$grouped = [];
 		foreach (getData($result) as $row)
-			$grouped[$row->kalender_id] = [true];
+		{
+			$grouped[$row->kalender_id][] = true;
+		}
 
-		log_message('error', 'VerbandCollisionCheck::checkAll() 1');
 		return $grouped;
-	}
-
-	private function _buildGroupMatchCondition($current_alias, $other_alias, $current_direct, $other_direct)
-	{
-		return "
-			$current_alias.studiengang_kz = $other_alias.studiengang_kz
-			AND $current_alias.semester = $other_alias.semester
-			AND (
-				(
-					$current_alias.gruppe_kurzbz IS NULL
-					AND $other_alias.gruppe_kurzbz IS NULL
-					AND (
-						$current_alias.verband IS NULL
-						OR (
-							$current_alias.verband = $other_alias.verband
-							AND (
-								$current_alias.gruppe IS NULL
-								OR $other_alias.gruppe IS NULL
-								OR $current_alias.gruppe = $other_alias.gruppe
-							)
-						)
-					)
-				)
-				OR (
-					$current_alias.gruppe_kurzbz IS NOT NULL
-					AND $other_alias.gruppe_kurzbz IS NOT NULL
-					AND $current_direct IS NOT TRUE
-					AND $other_direct IS NOT TRUE
-				)
-				OR (
-					$current_alias.gruppe_kurzbz IS NULL
-					AND $other_alias.gruppe_kurzbz IS NOT NULL
-					AND $other_direct IS NOT TRUE
-				)
-				OR (
-					$current_alias.gruppe_kurzbz IS NOT NULL
-					AND $other_alias.gruppe_kurzbz IS NULL
-					AND $current_direct IS NOT TRUE
-				)
-			)";
 	}
 
 }
