@@ -1,7 +1,16 @@
 import { benotungstoolPage as page } from "../../../../support/pages/benotungstool.po";
+import { waitForOk } from "../../../../support/helpers/network";
+import {
+	requireKommissionellerAntritt,
+	requireKonfiguration,
+	requireWiederholung,
+} from "../../../../support/helpers/notenConfig";
+import { expectNotenSuccess } from "../../../../support/helpers/notenErrors";
+import { addPruefung } from "../../../../support/helpers/notenScenario";
 import {
 	attemptDate,
 	loadNotenContext,
+	readLvGesamtnote,
 	requireDbReset,
 	resetNotenState,
 	seedBaseline,
@@ -37,11 +46,13 @@ context("Benotungstool UI - Prüfungen", () => {
 		}
 	});
 
-	it("legt aus der Zelle eine Wiederholung an und zählt sie als Antritt 2", () => {
+	it("legt aus der Zelle eine Wiederholung an und zählt sie als Antritt 2", function () {
+		requireWiederholung(this, ctx);
+
 		const student = ctx.students[0];
 
 		resetNotenState(ctx);
-		seedBaseline(ctx, student.uid, { note: ctx.notes.negativ, freigegeben: true });
+		seedBaseline(ctx, student.uid, { note: ctx.notes.negativ });
 
 		page.visitAndWaitForTable(ctx);
 
@@ -53,9 +64,14 @@ context("Benotungstool UI - Prüfungen", () => {
 		page.expectPruefung(student.uid, "antritt_2", { note: ctx.gradeNotes[1], antritt: 2 });
 		page.expectAntrittCount(student.uid, 2);
 
-		// die LV-Note folgt dem neuesten Antritt und ist damit wieder unfreigegeben
+		// die LV-Note folgt dem neuesten Antritt
 		page.expectLvNote(student.uid, bezeichnung(ctx.gradeNotes[1]));
-		page.expectFreigabeState(student.uid, "changed");
+
+		// die Zelle zeigt den Freigabestatus, den der Server geschrieben hat; die Regel prüft noten.pruefungstermin
+		readLvGesamtnote(ctx, student.uid).then((row) => {
+			const geaendert = new Date(row.benotungsdatum) > new Date(row.freigabedatum);
+			page.expectFreigabeState(student.uid, geaendert ? "changed" : "ok");
+		});
 	});
 
 	it("legt einen Antritt für einen Studenten ohne LV-Note an und weist darauf hin", () => {
@@ -76,12 +92,14 @@ context("Benotungstool UI - Prüfungen", () => {
 		page.expectAntrittCount(student.uid, 0);
 	});
 
-	it("korrigiert nur das Datum eines bestehenden Antritts", () => {
+	it("korrigiert nur das Datum eines bestehenden Antritts", function () {
+		requireWiederholung(this, ctx);
+
 		const student = ctx.students[0];
 		const neuesDatum = attemptDate(ctx, 2);
 
 		resetNotenState(ctx);
-		seedBaseline(ctx, student.uid, { note: ctx.notes.negativ, freigegeben: true });
+		seedBaseline(ctx, student.uid, { note: ctx.notes.negativ });
 
 		page.visitAndWaitForTable(ctx);
 
@@ -95,11 +113,14 @@ context("Benotungstool UI - Prüfungen", () => {
 		page.getCell(student.uid, "antritt_2").should("contain.text", page.toDDMMYYYY(neuesDatum));
 	});
 
-	it("sperrt die Note, sobald ein späterer Antritt existiert", () => {
+	it("sperrt die Note, sobald ein späterer Antritt existiert", function () {
+		requireWiederholung(this, ctx);
+		requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_NOTE_SPERRE_BEI_SPAETEREM_TERMIN", true);
+
 		const student = ctx.students[0];
 
 		resetNotenState(ctx);
-		seedBaseline(ctx, student.uid, { note: ctx.notes.negativ, freigegeben: true });
+		seedBaseline(ctx, student.uid, { note: ctx.notes.negativ });
 
 		page.visitAndWaitForTable(ctx);
 
@@ -120,12 +141,14 @@ context("Benotungstool UI - Prüfungen", () => {
 		cy.get("[data-cy='pruefung-note']").should("have.class", "p-disabled");
 	});
 
-	it("legt über die Sammelanlage für mehrere Studierende denselben Termin an", () => {
+	it("legt über die Sammelanlage für mehrere Studierende denselben Termin an", function () {
+		requireWiederholung(this, ctx);
+
 		const [a, b] = ctx.students;
 
 		resetNotenState(ctx);
-		seedBaseline(ctx, a.uid, { note: ctx.notes.negativ, freigegeben: true });
-		seedBaseline(ctx, b.uid, { note: ctx.notes.negativ, freigegeben: true });
+		seedBaseline(ctx, a.uid, { note: ctx.notes.negativ });
+		seedBaseline(ctx, b.uid, { note: ctx.notes.negativ });
 
 		page.visitAndWaitForTable(ctx);
 
@@ -142,16 +165,65 @@ context("Benotungstool UI - Prüfungen", () => {
 		});
 	});
 
+	// W12: Der Sammeldialog prüft einen Termin am selben Tag wie der Server nach
+	// CIS_GESAMTNOTE_TERMIN_GLEICHER_TAG.
+	describe("Termin am selben Tag im Sammeldialog", () => {
+		beforeEach(function () {
+			requireWiederholung(this, ctx);
+		});
+
+		// 'entschuldigt' verbraucht keinen Antritt, deshalb bleibt ein weiterer Termin möglich
+		const mitTerminAm = (student, datum) => {
+			resetNotenState(ctx);
+			seedBaseline(ctx, student.uid, { note: ctx.notes.negativ });
+			addPruefung(ctx, student, { note: ctx.notes.entschuldigt, datum }).then((response) =>
+				expectNotenSuccess(response, "bestehender Termin"),
+			);
+			page.visitAndWaitForTable(ctx);
+		};
+
+		const sammelterminAbschicken = (student, datum) =>
+			page.submitPruefungBulk({ uids: [student.uid], datum: page.toDDMMYYYY(datum) });
+
+		it("schickt einen Termin am selben Tag ab, wenn der Schalter an ist", function () {
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_TERMIN_GLEICHER_TAG", true);
+
+			const student = ctx.students[0];
+			const datum = attemptDate(ctx, 1);
+
+			mitTerminAm(student, datum);
+			sammelterminAbschicken(student, datum);
+
+			waitForOk("@createPruefungen");
+			cy.get(".p-toast-message-warn").should("not.exist");
+		});
+
+		it("warnt bei einem Termin am selben Tag und schickt nichts ab", function () {
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_TERMIN_GLEICHER_TAG", false);
+
+			const student = ctx.students[0];
+			const datum = attemptDate(ctx, 1);
+
+			mitTerminAm(student, datum);
+			sammelterminAbschicken(student, datum);
+
+			cy.get(".p-toast-message-warn").should("contain.text", student.uid);
+			page.getNeuePruefungModal().should("not.be.visible");
+			cy.get("@createPruefungen.all").should("have.length", 0);
+		});
+	});
+
 	it("legt den letzten Antritt als kommissionelle Prüfung an", function () {
-		if (ctx.cisConfig.CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF === false) {
-			Cypress.log({ name: "skip", message: "Skipped: das Tool darf keine kommissionelle Prüfung anlegen." });
+		requireKommissionellerAntritt(this, ctx);
+		if (ctx.cisConfig.CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT !== ctx.maxAntritte) {
+			Cypress.log({ name: "skip", message: "Übersprungen: der letzte Antritt ist nicht kommissionell." });
 			this.skip();
 		}
 
 		const student = ctx.students[1];
 
 		resetNotenState(ctx);
-		seedBaseline(ctx, student.uid, { note: ctx.notes.negativ, freigegeben: true });
+		seedBaseline(ctx, student.uid, { note: ctx.notes.negativ });
 
 		page.visitAndWaitForTable(ctx);
 

@@ -46,12 +46,13 @@ export const expectedFristString = (
 	return `${pad2(cfg.day)}.${pad2(cfg.month)}.${type === "SS" ? year : year + 1}`;
 };
 
-export const fristHasPassed = (semKurzbz) => {
+/** ssConfig/wsConfig: NOTENEINTRAGUNGSFRIST_SS/WS from getCisConfig. */
+export const fristHasPassed = (semKurzbz, ssConfig = { month: 11, day: 15 }, wsConfig = { month: 5, day: 15 }) => {
 	const type = semKurzbz.slice(0, 2).toUpperCase();
 	const year = Number(semKurzbz.slice(2, 6));
 	if (!["SS", "WS"].includes(type) || !year) return false;
-	const deadline =
-		type === "SS" ? new Date(year, 10, 15, 23, 59, 59) : new Date(year + 1, 4, 15, 23, 59, 59);
+	const cfg = type === "SS" ? ssConfig : wsConfig;
+	const deadline = new Date(type === "SS" ? year : year + 1, cfg.month - 1, cfg.day, 23, 59, 59);
 	return new Date() > deadline;
 };
 
@@ -59,17 +60,17 @@ export const fristHasPassed = (semKurzbz) => {
  * A semester + course where the logged-in user actually teaches AND the grade deadline has passed.
  *
  * Both are needed: assertLvAccess runs BEFORE the deadline check, so a semester the user does not
- * teach in fails there and never reaches the deadline.
+ * teach in fails there and never reaches the deadline. Seeder 019 provides the Sommersemester.
  *
  * @param {string} type "SS" or "WS"
  * @returns {Cypress.Chainable<{semKurzbz: string, lvId: number}|null>}
  */
-export const lehrsemesterMitAbgelaufenerFrist = (type = "SS") => {
+export const lehrsemesterMitAbgelaufenerFrist = (type = "SS", ssConfig, wsConfig) => {
 	const jahr = new Date().getFullYear();
 	const kandidaten = [];
 	for (let y = jahr; y >= jahr - 6; y -= 1) {
 		const sem = `${type}${y}`;
-		if (fristHasPassed(sem)) kandidaten.push(sem);
+		if (fristHasPassed(sem, ssConfig, wsConfig)) kandidaten.push(sem);
 	}
 
 	const probiere = (i) => {
@@ -257,7 +258,12 @@ export const seedBaseline = (context, studentUid, options = {}) => {
 	// Defaults to a NEGATIVE grade: only after one may another attempt follow. Pass
 	// context.notes.bestnote explicitly to close the chain.
 	const note = options.note !== undefined ? options.note : context.notes.negativ;
-	const freigegeben = options.freigegeben !== undefined ? options.freigegeben : true;
+	// Mit CIS_GESAMTNOTE_FREIGABE_FINAL ist eine freigegebene Note endgültig. Ohne ausdrückliches
+	// freigegeben sät die Baseline dann eine offene Note, damit ein Test weitere Termine anlegen kann.
+	const freigegeben =
+		options.freigegeben !== undefined ? options.freigegeben : context.cisConfig.CIS_GESAMTNOTE_FREIGABE_FINAL !== true;
+	// Antritt 1 fehlt nur bei ausdrücklichem erstantritt: false oder freigegeben: false
+	const erstantritt = options.erstantritt !== undefined ? options.erstantritt : options.freigegeben !== false;
 
 	return performSeed(context, studentUid, {
 		note,
@@ -266,7 +272,7 @@ export const seedBaseline = (context, studentUid, options = {}) => {
 		freigegeben,
 		freigabedatum: options.freigabedatum || null,
 	}).then((seeded) => {
-		if (options.erstantritt === false || !freigegeben) return cy.wrap(seeded, { log: false });
+		if (!erstantritt) return cy.wrap(seeded, { log: false });
 
 		const student = context.students.find((s) => s.uid === studentUid);
 		expect(student, `student ${studentUid} in the loaded LV`).to.exist;

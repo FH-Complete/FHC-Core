@@ -15,14 +15,16 @@ const {
 
 const REQUIRED_SCOPE = ["lvId", "semKurzbz", "studentUids"];
 
-const assertScope = (scope) => {
+const assertScope = (scope, keys = REQUIRED_SCOPE) => {
 	if (!scope || typeof scope !== "object") throw new Error("noten:db scope object is required");
 
-	REQUIRED_SCOPE.forEach((key) => {
+	keys.forEach((key) => {
 		if (scope[key] === undefined || scope[key] === null || scope[key] === "") {
 			throw new Error(`noten:db refused - missing scope key "${key}"`);
 		}
 	});
+
+	if (!keys.includes("studentUids")) return;
 
 	if (!Array.isArray(scope.studentUids) || scope.studentUids.length === 0) {
 		throw new Error("noten:db refused - studentUids must be a non-empty array");
@@ -200,6 +202,149 @@ const readLvGesamtnote = async ({ lvId, semKurzbz, studentUid }) => {
 	});
 };
 
+const LV_SCOPE = ["lvId", "semKurzbz"];
+
+const assertReadable = () => {
+	if (!dbConfigured()) throw new Error("noten:db refused - database is not configured");
+};
+
+const readRows = async (sql, params) => withClient(async (client) => (await client.query(sql, params)).rows);
+
+/** Same query as Lehrveranstaltung_model::getLeIdsByStudent. Empty = no participant. */
+const lehreinheitenDesStudenten = async (scope) => {
+	assertReadable();
+	assertScope({ ...scope, studentUids: [scope.studentUid] });
+
+	const rows = await readRows(
+		`SELECT DISTINCT lehreinheit_id FROM campus.vw_student_lehrveranstaltung
+		  WHERE uid = $1 AND lehrveranstaltung_id = $2 AND studiensemester_kurzbz = $3
+		  ORDER BY lehreinheit_id`,
+		[scope.studentUid, scope.lvId, scope.semKurzbz],
+	);
+	return rows.map((r) => r.lehreinheit_id);
+};
+
+/** Same joins as Lehreinheit_model::getLehreinheitenForLv. */
+const lehreinheitenDerLv = async (scope) => {
+	assertReadable();
+	assertScope(scope, LV_SCOPE);
+
+	const rows = await readRows(
+		`SELECT DISTINCT le.lehreinheit_id FROM lehre.tbl_lehreinheit le
+		   JOIN lehre.tbl_lehreinheitgruppe leg USING (lehreinheit_id)
+		   JOIN public.tbl_studiengang stg ON stg.studiengang_kz = leg.studiengang_kz
+		  WHERE le.lehrveranstaltung_id = $1 AND le.studiensemester_kurzbz = $2
+		  ORDER BY 1`,
+		[scope.lvId, scope.semKurzbz],
+	);
+	return rows.map((r) => r.lehreinheit_id);
+};
+
+/** A Lehreinheit of another LV in the same semester, or null. */
+const fremdeLehreinheit = async (scope) => {
+	assertReadable();
+	assertScope(scope, LV_SCOPE);
+
+	const rows = await readRows(
+		`SELECT lehreinheit_id, lehrveranstaltung_id FROM lehre.tbl_lehreinheit
+		  WHERE studiensemester_kurzbz = $1 AND lehrveranstaltung_id <> $2
+		  ORDER BY lehreinheit_id LIMIT 1`,
+		[scope.semKurzbz, scope.lvId],
+	);
+	return rows[0] || null;
+};
+
+/** An active student without any Lehreinheit in the LV, or null. */
+const nichtTeilnehmer = async (scope) => {
+	assertReadable();
+	assertScope(scope, LV_SCOPE);
+
+	const rows = await readRows(
+		`SELECT s.student_uid FROM public.tbl_student s
+		   JOIN public.tbl_benutzer b ON b.uid = s.student_uid
+		  WHERE b.aktiv AND NOT EXISTS (
+		        SELECT 1 FROM campus.vw_student_lehrveranstaltung v
+		         WHERE v.uid = s.student_uid AND v.lehrveranstaltung_id = $1 AND v.studiensemester_kurzbz = $2)
+		  ORDER BY s.student_uid LIMIT 1`,
+		[scope.lvId, scope.semKurzbz],
+	);
+	return rows[0] ? rows[0].student_uid : null;
+};
+
+/** LV notes of the student in OTHER LVs of the semester; resetStudents never reaches them. */
+const andereLvNoten = async (scope) => {
+	assertReadable();
+	assertScope({ ...scope, studentUids: [scope.studentUid] });
+
+	const rows = await readRows(
+		`SELECT count(*)::int AS anzahl FROM campus.tbl_lvgesamtnote
+		  WHERE student_uid = $1 AND studiensemester_kurzbz = $2 AND lehrveranstaltung_id <> $3`,
+		[scope.studentUid, scope.semKurzbz, scope.lvId],
+	);
+	return rows[0].anzahl;
+};
+
+const pruefungstypVorhanden = async ({ typ } = {}) => {
+	assertReadable();
+	if (!typ) throw new Error("noten:db pruefungstypVorhanden - typ is required");
+
+	const rows = await readRows("SELECT 1 FROM lehre.tbl_pruefungstyp WHERE pruefungstyp_kurzbz = $1", [typ]);
+	return rows.length > 0;
+};
+
+/** Removes one exam outside the LV scope, e.g. one the old code wrote into a foreign Lehreinheit. */
+const deletePruefung = async ({ pruefungId, studentUids } = {}) => {
+	assertWritable();
+	if (!pruefungId) throw new Error("noten:db deletePruefung - pruefungId is required");
+	assertScope({ studentUids }, ["studentUids"]);
+
+	return withClient(async (client) => {
+		const res = await client.query(
+			"DELETE FROM lehre.tbl_pruefung WHERE pruefung_id = $1 AND student_uid = ANY($2::varchar[])",
+			[pruefungId, studentUids],
+		);
+		return res.rowCount;
+	});
+};
+
+/** Active text of each Vorlage, newest version. The suite cannot read the mail itself. */
+const vorlagen = async ({ kurzbz } = {}) => {
+	assertReadable();
+	if (!Array.isArray(kurzbz) || !kurzbz.length) throw new Error("noten:db vorlagen - kurzbz list is required");
+
+	return readRows(
+		`SELECT DISTINCT ON (vorlage_kurzbz) vorlage_kurzbz, text FROM public.tbl_vorlagestudiengang
+		  WHERE vorlage_kurzbz = ANY($1::varchar[]) AND aktiv
+		  ORDER BY vorlage_kurzbz, version DESC`,
+		[kurzbz],
+	);
+};
+
+/** Lektoren of a Lehreinheit, sorted by uid like Noten::lehrendeDerLehreinheit (strcmp). */
+const lehrendeDerLehreinheit = async ({ lehreinheitId } = {}) => {
+	assertReadable();
+	if (!lehreinheitId) throw new Error("noten:db lehrendeDerLehreinheit - lehreinheitId is required");
+
+	const rows = await readRows(
+		`SELECT mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter
+		  WHERE lehreinheit_id = $1 ORDER BY mitarbeiter_uid COLLATE "C"`,
+		[lehreinheitId],
+	);
+	return rows.map((r) => r.mitarbeiter_uid);
+};
+
+/** The grading person of one exam row, or null. */
+const pruefungMitarbeiter = async ({ pruefungId, studentUid } = {}) => {
+	assertReadable();
+	if (!pruefungId || !studentUid) throw new Error("noten:db pruefungMitarbeiter - pruefungId and studentUid are required");
+
+	const rows = await readRows(
+		"SELECT mitarbeiter_uid FROM lehre.tbl_pruefung WHERE pruefung_id = $1 AND student_uid = $2",
+		[pruefungId, studentUid],
+	);
+	return rows[0] ? rows[0].mitarbeiter_uid : null;
+};
+
 const registerNotenDbTasks = (on) => {
 	on("task", {
 		"noten:db:available": () => checkAvailability(),
@@ -208,6 +353,16 @@ const registerNotenDbTasks = (on) => {
 		"noten:db:seedPruefung": (scope) => seedPruefung(scope),
 		"noten:db:seedZeugnisnote": (scope) => seedZeugnisnote(scope),
 		"noten:db:readLvGesamtnote": (scope) => readLvGesamtnote(scope),
+		"noten:db:lehreinheitenDesStudenten": (scope) => lehreinheitenDesStudenten(scope),
+		"noten:db:lehreinheitenDerLv": (scope) => lehreinheitenDerLv(scope),
+		"noten:db:fremdeLehreinheit": (scope) => fremdeLehreinheit(scope),
+		"noten:db:nichtTeilnehmer": (scope) => nichtTeilnehmer(scope),
+		"noten:db:andereLvNoten": (scope) => andereLvNoten(scope),
+		"noten:db:pruefungstypVorhanden": (scope) => pruefungstypVorhanden(scope),
+		"noten:db:deletePruefung": (scope) => deletePruefung(scope),
+		"noten:db:vorlagen": (scope) => vorlagen(scope),
+		"noten:db:lehrendeDerLehreinheit": (scope) => lehrendeDerLehreinheit(scope),
+		"noten:db:pruefungMitarbeiter": (scope) => pruefungMitarbeiter(scope),
 		"noten:db:close": () => closeDb(),
 	});
 };

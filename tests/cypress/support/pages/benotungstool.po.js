@@ -8,7 +8,8 @@ import { waitForOk } from "../helpers/network";
  * Freigabestatus steckt als data-state am Zellinhalt statt am Icon.
  *
  * Nach jeder schreibenden Aktion wird auf den zugehörigen Request gewartet (waitForOk), nicht auf
- * eine DOM-Änderung - sonst prüfen die Specs gegen den Stand vor der Antwort.
+ * eine DOM-Änderung - sonst prüfen die Specs gegen den Stand vor der Antwort. Die submit-Methoden
+ * warten nicht; mit ihnen prüft ein Test die Ablehnung durch den Server.
  */
 
 const TABLE_TIMEOUT = 60_000;
@@ -45,7 +46,7 @@ class BenotungstoolPage {
 	 * Initialisieren, und vor dem ersten visit gehört er noch about:blank.
 	 */
 	visit = (ctx, { spalten = "antritt" } = {}) =>
-		cy.visit(`/cis.php/Cis/Benotungstool/${ctx.lvId}/${ctx.semKurzbz}`, {
+		cy.visit(`/cis.php/Cis/Benotungstool/${ctx.semKurzbz}/${ctx.lvId}`, {
 			onBeforeLoad(win) {
 				win.localStorage.setItem("notenToolPruefungsspalten", spalten);
 				win.localStorage.removeItem("notenToolStickyCols");
@@ -117,6 +118,39 @@ class BenotungstoolPage {
 
 	expectKeineAntrittsspalte = (nr) => cy.get(`[tabulator-field='antritt_${nr}']`).should("not.exist");
 
+	/**
+	 * Der Server lehnt eine Speicherung ab, und ein Toast zeigt seine Meldung. Die Meldung kommt aus
+	 * der Antwort, deshalb schreibt der Test keine Phrase fest.
+	 */
+	expectAbgelehnt = (alias) =>
+		cy.wait(alias).then(({ response }) => {
+			expect(response.statusCode, `${alias} lehnt ab`).to.not.eq(200);
+			const meldung = (response.body?.errors ?? [])[0]?.message;
+			expect(meldung, `Meldung von ${alias}`).to.be.a("string").and.not.be.empty;
+			cy.get(".p-toast-message", { timeout: TABLE_TIMEOUT }).should("contain.text", meldung);
+		});
+
+	/** Ein Sammelpfad lehnt eine Zeile ab: HTTP 200, die Meldung steht in data[uid] und im Toast. */
+	expectZeileAbgelehnt = (alias, uid) =>
+		cy.wait(alias).then(({ response }) => {
+			expect(response.statusCode, `${alias} antwortet`).to.eq(200);
+			const meldung = response.body?.data?.[uid];
+			expect(meldung, `Ablehnung der Zeile ${uid}`).to.be.a("string").and.not.be.empty;
+			cy.get(".p-toast-message", { timeout: TABLE_TIMEOUT }).should("contain.text", meldung);
+		});
+
+	/** Nach einer ganz abgelehnten Aktion meldet die Oberfläche keinen Erfolg. */
+	expectKeinErfolg = () => cy.get(".p-toast-message-success").should("not.exist");
+
+	/** Eine Warnung des Clients. Warnungen haben keine Ablaufzeit. */
+	expectWarnung = (text) => cy.get(".p-toast-message-warn", { timeout: TABLE_TIMEOUT }).should("contain.text", text);
+
+	expectWarnungen = (anzahl) =>
+		cy.get(".p-toast-message-warn", { timeout: TABLE_TIMEOUT }).should("have.length.at.least", anzahl);
+
+	/** Die uids des letzten Requests eines Sammelpfads. feld: "noten" oder "pruefungen" */
+	gesendeteUids = (alias, feld) => cy.get(alias).its(`request.body.${feld}`).then((zeilen) => zeilen.map((z) => z.uid));
+
 	// --- Notenvorschlag --------------------------------------------------------------------------
 
 	/** Öffnet den Tabulator-Listeneditor der Vorschlagsspalte und wählt die Bezeichnung. */
@@ -126,13 +160,18 @@ class BenotungstoolPage {
 	};
 
 	/** Übernehmen fragt zuerst das Benotungsdatum. Ohne `datum` bleibt der Vorschlag des Dialogs. */
-	uebernehmen = (uid, { datum } = {}) => {
+	submitUebernahme = (uid, { datum } = {}) => {
+		this.schliesseToasts();
 		this.getUebernehmenButton(uid).click();
 		this.getUebernahmeModal().should("be.visible");
 
 		if (datum) this.setDatum("uebernahme-datum", datum);
 
 		cy.get("[data-cy='uebernahme-submit']").click();
+	};
+
+	uebernehmen = (uid, optionen) => {
+		this.submitUebernahme(uid, optionen);
 		waitForOk("@saveNotenvorschlag");
 		this.getUebernahmeModal().should("not.be.visible");
 	};
@@ -148,8 +187,22 @@ class BenotungstoolPage {
 	setDatum = (dataCy, ddmmyyyy) =>
 		cy.get(`[data-cy='${dataCy}'] input`).first().clear().type(`${ddmmyyyy}{enter}`);
 
+	/**
+	 * Nach jeder Speicherung zeigt das Tool einen Erfolgs-Toast ohne Ablaufzeit. Er liegt über dem Modal
+	 * (z-index 100001) und verdeckt dessen Knöpfe, deshalb schliesst ihn der Test über seinen Knopf.
+	 */
+	schliesseToasts = () =>
+		cy
+			.get("body")
+			.then(($body) => {
+				const knoepfe = $body.find(".p-toast-message .p-toast-icon-close");
+				if (knoepfe.length) cy.wrap(knoepfe).click({ multiple: true });
+			})
+			.then(() => cy.get(".p-toast-message").should("not.exist"));
+
 	/** Dialog aus der Tabellenzelle: neuer Antritt für EINEN Studenten. */
-	addPruefungInCell = (uid, spalte, { note, datum } = {}) => {
+	submitPruefungInCell = (uid, spalte, { note, datum } = {}) => {
+		this.schliesseToasts();
 		this.getPruefungAddButton(uid, spalte).click();
 		this.getPruefungModal().should("be.visible");
 
@@ -157,12 +210,17 @@ class BenotungstoolPage {
 		if (note) this.selectDropdownOption("pruefung-note", note);
 
 		cy.get("[data-cy='pruefung-submit']").click();
+	};
+
+	addPruefungInCell = (uid, spalte, optionen) => {
+		this.submitPruefungInCell(uid, spalte, optionen);
 		waitForOk("@saveStudentPruefung");
 		this.getPruefungModal().should("not.be.visible");
 	};
 
 	/** Bestehenden Antritt bearbeiten. Ohne `note` bleibt sie unverändert (Datumskorrektur). */
 	editPruefungInCell = (uid, spalte, { note, datum } = {}) => {
+		this.schliesseToasts();
 		this.getPruefungEditButton(uid, spalte).click();
 		this.getPruefungModal().should("be.visible");
 
@@ -175,27 +233,36 @@ class BenotungstoolPage {
 	};
 
 	openPruefungModalForEdit = (uid, spalte) => {
+		this.schliesseToasts();
 		this.getPruefungEditButton(uid, spalte).click();
 		this.getPruefungModal().should("be.visible");
 	};
 
-	/** Sammelanlage über die Toolbar, für mehrere Studierende auf einmal. */
-	addPruefungBulk = ({ uids, note, datum }) => {
+	/** Sammelanlage über die Toolbar abschicken, ohne auf die Antwort zu warten. */
+	submitPruefungBulk = ({ uids, note, punkte, datum }) => {
+		this.schliesseToasts();
 		cy.get("[data-cy='btn-neue-pruefung']").click();
 		this.getNeuePruefungModal().should("be.visible");
 
 		if (datum) this.setDatum("neue-pruefung-datum", datum);
 		if (note) this.selectDropdownOption("neue-pruefung-note", note);
+		if (punkte !== undefined) this.setNeuePruefungPunkte(punkte);
 
 		cy.get("[data-cy='neue-pruefung-studenten']").click();
 		// das Label ist "uid – Nachname Vorname – Antritte: n", daher hier bewusst per Teilstring
 		uids.forEach((uid) => cy.contains(".p-multiselect-panel .p-multiselect-item", uid).click());
 
-		// Panel über den Trigger schliessen, NICHT mit Escape: das schliesst das Bootstrap-Modal mit
-		cy.get("[data-cy='neue-pruefung-studenten']").click();
+		// NICHT mit Escape: das schliesst das Bootstrap-Modal mit. Das offene Panel kann den Trigger
+		// verdecken, deshalb über den Schliessknopf des Panels.
+		cy.get(".p-multiselect-panel .p-multiselect-close").click();
 		cy.get(".p-multiselect-panel").should("not.exist");
 
 		cy.get("[data-cy='neue-pruefung-submit']").click();
+	};
+
+	/** Sammelanlage über die Toolbar, für mehrere Studierende auf einmal. */
+	addPruefungBulk = (optionen) => {
+		this.submitPruefungBulk(optionen);
 		waitForOk("@createPruefungen");
 		this.getNeuePruefungModal().should("not.be.visible");
 	};
@@ -227,23 +294,33 @@ class BenotungstoolPage {
 	// --- Import ----------------------------------------------------------------------------------
 
 	/** rows: [[uid, note], ...] -> "uid<TAB>note" je Zeile */
-	importNoten = (rows) => {
+	submitNotenImport = (rows) => {
+		this.schliesseToasts();
 		cy.get("[data-cy='btn-noten-import']").click();
 		this.getNotenImportModal().should("be.visible");
 
 		cy.get("[data-cy='noten-import-text']").type(rows.map((r) => r.join("\t")).join("\n"));
 		cy.get("[data-cy='noten-import-submit']").click();
+	};
+
+	importNoten = (rows) => {
+		this.submitNotenImport(rows);
 		waitForOk("@saveNotenvorschlagBulk");
 		this.getNotenImportModal().should("not.be.visible");
 	};
 
 	/** rows: [[uid, "dd.MM.yyyy", note], ...] */
-	importPruefungen = (rows) => {
+	submitPruefungImport = (rows) => {
+		this.schliesseToasts();
 		cy.get("[data-cy='btn-pruefung-import']").click();
 		this.getPruefungImportModal().should("be.visible");
 
 		cy.get("[data-cy='pruefung-import-text']").type(rows.map((r) => r.join("\t")).join("\n"));
 		cy.get("[data-cy='pruefung-import-submit']").click();
+	};
+
+	importPruefungen = (rows) => {
+		this.submitPruefungImport(rows);
 		waitForOk("@savePruefungenBulk");
 		this.getPruefungImportModal().should("not.be.visible");
 	};

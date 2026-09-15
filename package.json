@@ -9,10 +9,12 @@
     "cy:noten:punkte-on": "cypress run --browser chrome --env NOTEN_PUNKTE_MODUS=on --spec \"tests/cypress/e2e/specs/**/*.cy.js\"",
     "cy:noten:punkte-off": "cypress run --browser chrome --env NOTEN_PUNKTE_MODUS=off --spec \"tests/cypress/e2e/specs/**/*.cy.js\"",
     "cy:noten:p0": "cypress run --spec \"tests/cypress/e2e/specs/unit/notenRules.cy.js,tests/cypress/e2e/specs/api/noten/noten.pruefungsantritte.cy.js,tests/cypress/e2e/specs/api/noten/noten.pruefungstermin.cy.js,tests/cypress/e2e/specs/api/noten/noten.ueberschreiben.cy.js\"",
+    "cy:noten:profile": "node tests/cypress/tools/notenProfile.js lauf",
+    "noten:profil": "node tests/cypress/tools/notenProfile.js",
     "noten:check": "node tests/cypress/tools/dbCheck.js noten"
   },
   "dependencies": {
-    "cypress": "^15.11.0",
+    "cypress": "^15.21.1",
     "dotenv": "^17.4.2",
     "pg": "^8.13.1",
     "ssh2": "^1.17.0"

@@ -1,4 +1,5 @@
 import { benotungstoolPage as page } from "../../../../support/pages/benotungstool.po";
+import { requireKonfiguration } from "../../../../support/helpers/notenConfig";
 import {
 	baselineDate,
 	loadNotenContext,
@@ -14,11 +15,9 @@ import {
  * Der Dialog listet genau die Zeilen, die freigegeben werden (changedNoten), und verlangt das
  * LDAP-Passwort. Danach muss die Statusspalte ohne Reload von changed auf ok springen.
  *
- * Ein erfolgreiches Speichern verschickt IMMER die Freigabemail - dieselbe Sperre wie in
- * noten.freigabe: opt-in über NOTEN_FREIGABE_ENABLED. Dialogansicht und Passwortablehnung
- * schreiben nichts und laufen daher immer.
+ * Eine erfolgreiche Freigabe verschickt die Freigabemail. Die Entwicklungsinstanzen stellen sie in ein
+ * Debug-Postfach zu.
  */
-const freigabeEnabled = () => String(Cypress.env("NOTEN_FREIGABE_ENABLED")).toLowerCase() === "true";
 const freigabePassword = () => Cypress.env("NOTEN_FREIGABE_PASSWORD") || Cypress.env("adminpassword");
 
 context("Benotungstool UI - Notenfreigabe", () => {
@@ -47,7 +46,10 @@ context("Benotungstool UI - Notenfreigabe", () => {
 			page.expectFreigabeSummaryRow(student.uid, bezeichnung(ctx.gradeNotes[0]));
 		});
 
-		it("lehnt ein falsches Passwort ab und lässt den Status unverändert", () => {
+		it("lehnt ein falsches Passwort ab und lässt den Status unverändert", function () {
+			// ohne Passwortpflicht gibt der Dialog frei
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_FREIGABE_PASSWORT", true);
+
 			const student = ctx.students[0];
 
 			resetNotenState(ctx);
@@ -58,7 +60,10 @@ context("Benotungstool UI - Notenfreigabe", () => {
 
 			page.typeFreigabePasswort("definitely-not-the-password");
 			page.submitFreigabe();
-			cy.wait("@saveStudentenNoten");
+
+			// die Oberfläche zeigt die Ablehnung, der Status bleibt
+			page.expectAbgelehnt("@saveStudentenNoten");
+			page.expectFreigabeState(student.uid, "changed");
 
 			readLvGesamtnote(ctx, student.uid).then((rowData) => {
 				expect(rowData.freigabedatum, "eine abgelehnte Freigabe stempelt nichts").to.be.null;
@@ -66,19 +71,7 @@ context("Benotungstool UI - Notenfreigabe", () => {
 		});
 	});
 
-	describe("Freigabe (verschickt Mail - opt in über NOTEN_FREIGABE_ENABLED)", () => {
-		beforeEach(function () {
-			if (!freigabeEnabled()) {
-				Cypress.log({
-					name: "skip",
-					message:
-					"Skipped: die Freigabe verschickt die Notenfreigabe-Mail. NOTEN_FREIGABE_ENABLED=true " +
-						"nur auf einer Umgebung setzen, auf der das harmlos ist.",
-				});
-				this.skip();
-			}
-		});
-
+	describe("Freigabe", () => {
 		it("gibt frei und schaltet die Statusspalte auf ok", () => {
 			const student = ctx.students[0];
 
@@ -95,7 +88,9 @@ context("Benotungstool UI - Notenfreigabe", () => {
 			page.expectLvNote(student.uid, bezeichnung(ctx.gradeNotes[0]));
 		});
 
-		it("legt mit der Freigabe den ersten Antritt an", () => {
+		it("legt mit der Freigabe den ersten Antritt an", function () {
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", true);
+
 			const student = ctx.students[1];
 
 			resetNotenState(ctx);

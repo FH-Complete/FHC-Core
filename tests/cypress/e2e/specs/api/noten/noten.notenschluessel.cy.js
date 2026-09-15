@@ -6,8 +6,16 @@
  */
 
 import { notenApi } from "../../../../support/api/notenApi";
-import { expectNotenSuccess } from "../../../../support/helpers/notenErrors";
-import { loadNotenContext } from "../../../../support/helpers/notenTestData";
+import { expectNotenError, expectNotenSuccess } from "../../../../support/helpers/notenErrors";
+import { requirePunkteModus } from "../../../../support/helpers/notenConfig";
+import {
+	attemptDate,
+	loadNotenContext,
+	requireDbReset,
+	resetNotenState,
+	seedBaseline,
+} from "../../../../support/helpers/notenTestData";
+import { attemptsOfStudent, givenBaseline, readState } from "../../../../support/helpers/notenScenario";
 
 const MAX_PUNKTE = 100;
 
@@ -107,11 +115,72 @@ describe("Noten API - Notenschlüssel (getNoteByPunkte)", () => {
 		});
 	});
 
-	it("reports no grade for an LV without a Notenschlüssel", () => {
-		// eine nicht existierende LV hat garantiert keinen Schlüssel - fixturefrei prüfbar
-		notenApi.getNoteByPunkte(50, 0, ctx.semKurzbz).then((response) => {
-			const note = expectNotenSuccess(response, "getNoteByPunkte for an LV without a schluessel");
-			expect(note, "no Notenschlüssel -> no grade").to.be.oneOf([null, undefined]);
+	// W3: Punkte ohne ableitbare Note lehnen alle Pfade gleich ab.
+	describe("Punkte ohne ableitbare Note", () => {
+		let schwelleUnterNull = false;
+
+		before(() => {
+			notenApi.getNoteByPunkte(-1, lvId, ctx.semKurzbz).then((response) => {
+				const note = expectNotenSuccess(response, "getNoteByPunkte(-1)");
+				schwelleUnterNull = note !== null && note !== undefined;
+			});
+		});
+
+		beforeEach(function () {
+			requirePunkteModus(this, ctx);
+			if (schwelleUnterNull) {
+				Cypress.log({ name: "skip", message: "Übersprungen: der Notenschlüssel hat eine Schwelle unter 0 Punkten." });
+				this.skip();
+			}
+			requireDbReset();
+		});
+
+		const expectNurAntritt1 = (students) =>
+			readState(ctx).then((data) => {
+				students.forEach((s) => {
+					expect(attemptsOfStudent(data, s.uid), `Prüfungen von ${s.uid}`).to.have.length(1);
+				});
+			});
+
+		it("saveStudentPruefung lehnt negative Punkte ab", () => {
+			const student = ctx.students[0];
+
+			givenBaseline(ctx, student);
+
+			notenApi
+				.saveStudentPruefung({
+					student_uid: student.uid,
+					note: ctx.gradeNotes[0],
+					punkte: -1,
+					datum: attemptDate(ctx, 1),
+					lva_id: lvId,
+					lehreinheit_id: student.lehreinheit_id,
+					sem_kurzbz: ctx.semKurzbz,
+					pruefung_id: null,
+				})
+				.then((response) => expectNotenError(response, "c4punkteKeineNoteErmittelt"));
+
+			expectNurAntritt1([student]);
+		});
+
+		it("createPruefungen lehnt negative Punkte für alle gewählten Studierenden ab", () => {
+			const students = ctx.students.slice(0, 2);
+
+			resetNotenState(ctx);
+			students.forEach((s) => seedBaseline(ctx, s.uid));
+
+			notenApi
+				.createPruefungen(
+					students.map((s) => ({ uid: s.uid, lehreinheit_id: s.lehreinheit_id })),
+					attemptDate(ctx, 1),
+					lvId,
+					ctx.semKurzbz,
+					null,
+					-1,
+				)
+				.then((response) => expectNotenError(response, "c4punkteKeineNoteErmittelt"));
+
+			expectNurAntritt1(students);
 		});
 	});
 

@@ -62,6 +62,23 @@ Zwei weitere Skripte prüfen den Punktemodus:
 
 Passt die Instanz nicht zur Erwartung, bricht der Lauf sofort ab.
 
+Die Konfiguration der Instanz wechselt über Profile (tests/cypress/profiles/noten.js). Ein Profil
+schreibt application/config/noten.php und die define()-Schalter in config/global.config.inc.php auf
+der Instanz um. Nach dem Lauf stellt die Suite beide Dateien wieder her. Dafür braucht .env
+zusätzlich NOTEN_REMOTE_ROOT.
+
+  npm run cy:noten:profile                   jedes Profil, Unit und API, danach der Bericht
+  npm run cy:noten:profile -- ui final       nur die Oberfläche, nur das Profil final
+  npm run cy:noten:profile -- alle a,b       alles, nur die Profile a und b
+  npm run noten:profil -- status             das aktive Profil und die Liste der Profile
+  npm run noten:profil -- anwenden final     ein Profil einschalten, zum Beispiel vor cy:open
+  npm run noten:profil -- wiederherstellen   die Originale zurück
+
+Jedes Profil schaltet die Freigabemail aus. Nur dann laufen die Freigabetests.
+
+Ein Lauf ohne Profil stellt zuerst die Originale her. So bleibt die Instanz nach einem abgebrochenen
+Lauf nicht auf einem Profil stehen.
+
 
 4. DAS ERGEBNIS
 ---------------------
@@ -76,6 +93,9 @@ Skipped   Ein Test lief nicht, weil vorher etwas abgebrochen ist.
 Pending ist normal. Ein Test überspringt sich, wenn seine Voraussetzung fehlt. Beispiele: der
 Punktemodus ist aus, die Frist ist nicht aktiv, die Freigabemail ist nicht erlaubt. Den Grund
 schreibt der Test ins Protokoll.
+
+Ein Test, der in keinem Profil läuft, ist dagegen eine Lücke. Der Bericht von cy:noten:profile
+listet diese Tests am Ende. Ergänze für jeden davon ein Profil.
 
 Der aktuelle Sollzustand: API und Unit 84 Tests, 69 grün, 15 pending. UI 30 Tests, 18 grün,
 12 pending. Kein roter Test.
@@ -93,6 +113,9 @@ Der aktuelle Sollzustand: API und Unit 84 Tests, 69 grün, 15 pending. UI 30 Tes
 
 Ein Test erwartet eine Fehlermeldung und bekommt eine andere
   Die Phrase fehlt in der Datenbank. Lass system/phrasesupdate.php auf dem Server laufen.
+
+Die Instanz steht nach einem Absturz noch auf einem Profil
+  npm run noten:profil -- wiederherstellen
 
 Der nächste Lauf startet nicht
   Ein Cypress-Prozess hängt noch. Beende ihn:  Stop-Process -Name Cypress -Force

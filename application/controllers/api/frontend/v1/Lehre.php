@@ -31,7 +31,6 @@ class Lehre extends FHCAPI_Controller
 			'LV' => self::PERM_LOGGED,
 			'Pruefungen' => self::PERM_LOGGED,
 			'getZugewieseneLv' => self::PERM_LOGGED,
-			'getLeForLv' => self::PERM_LOGGED,
 			'semesterAverageGrade' => self::PERM_LOGGED,
 		]);
 
@@ -184,16 +183,6 @@ class Lehre extends FHCAPI_Controller
 		$result = $this->LehrveranstaltungModel->getLvForLektorInSemester($sem_kurzbz, $uid);
 		$data = $this->getDataOrTerminateWithError($result);
 		$this->terminateWithSuccess($data);
-	}
-
-	public function getLeForLv() {
-		$lv_id = $this->input->get("lv_id",TRUE);
-		$sem_kurzbz = $this->input->get("sem_kurzbz",TRUE);
-
-		$this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
-
-//		$this->terminateWithSuccess($this->LehreinheitModel->getLesForLv($lv_id, $sem_kurzbz));
-		$this->terminateWithSuccess($this->LehreinheitModel->getAllLehreinheitenForLvaAndMaUid($lv_id, getAuthUID(), $sem_kurzbz));
 	}
 
 }

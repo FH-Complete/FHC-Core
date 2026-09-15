@@ -43,13 +43,6 @@ export default {
 			params: { uid, sem_kurzbz}
 		};
 	},
-	getLeForLv(lv_id, sem_kurzbz) {
-		return {
-			method: 'get',
-			url: '/api/frontend/v1/Lehre/getLeForLv',
-			params: { lv_id, sem_kurzbz }
-		};
-	},
 	getSemesterAverageGrade(semester) {
 		return {
 			method: 'get',

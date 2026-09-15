@@ -175,8 +175,11 @@ const main = async () => {
 			client.on("notice", (n) => console.log(`  NOTICE: ${n.message}`));
 
 			if (mode !== "check") {
-				const code = await applySqlFile(client, suite.sqlFiles[mode]);
-				if (code !== 0) return code;
+				// a suite can name several files; they run in this order
+				for (const file of [].concat(suite.sqlFiles[mode])) {
+					const code = await applySqlFile(client, file);
+					if (code !== 0) return code;
+				}
 			}
 			return runChecks(client, suite);
 		});

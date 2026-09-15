@@ -4,12 +4,17 @@
 
 const NOTEN_API = "/index.ci.php/api/frontend/v1/Noten";
 
+// One session for the whole run. Without a session cookie the server checks each Basic-auth request
+// against LDAP, and many LDAP binds can block all PHP-FPM workers of the instance. cy.login creates the
+// session once (cy.session, cacheAcrossSpecs) and restores it before each test of every importing spec.
+beforeEach(() => cy.login());
+
 const authOptions = () => ({
 	username: Cypress.env("adminusername"),
 	password: Cypress.env("adminpassword"),
 });
 
-// Basic auth on every call rather than relying on the session cookie, so requests stay independent.
+// Basic auth stays on every call as the fallback; with a session cookie the server uses the cookie.
 const apiGet = (path, qs) =>
 	cy.request({ method: "GET", url: `${NOTEN_API}/${path}`, qs, auth: authOptions(), failOnStatusCode: false });
 
@@ -27,6 +32,11 @@ export const notenApi = {
 	getLvForStudiengang: (studiengang_kz, sem_kurzbz) =>
 		apiGet("getLvForStudiengang", { studiengang_kz, sem_kurzbz }),
 
+	getLehrendeFuerLehreinheit: (lehreinheit_id, lv_id, sem_kurzbz) =>
+		apiGet("getLehrendeFuerLehreinheit", { lehreinheit_id, lv_id, sem_kurzbz }),
+
+	getLehreinheitenFuerLv: (lv_id, sem_kurzbz) => apiGet("getLehreinheitenFuerLv", { lv_id, sem_kurzbz }),
+
 	/** data ist POSITIONAL: [studenten, pruefungen, DOMAIN, grades-by-uid, anwesenheiten] */
 	getStudentenNoten: (lv_id, sem_kurzbz) => apiGet("getStudentenNoten", { lv_id, sem_kurzbz }),
 
@@ -38,17 +48,23 @@ export const notenApi = {
 	saveNotenvorschlag: (lv_id, sem_kurzbz, student_uid, note, punkte = null, datum = null) =>
 		apiPost("saveNotenvorschlag", { lv_id, sem_kurzbz, student_uid, note, punkte, datum }),
 
-	/** data -> [savedPruefung, lvgesamtnote, verlauf]. Kein `typ` auf der Leitung. */
+	/** data -> [savedPruefung, lvgesamtnote, verlauf]. Kein `typ` auf der Leitung. Ohne mitarbeiter_uid fehlt das Feld. */
 	saveStudentPruefung: ({
-		student_uid, note, punkte = null, datum, lva_id, lehreinheit_id, sem_kurzbz, pruefung_id = null,
+		student_uid, note, punkte = null, datum, lva_id, lehreinheit_id, sem_kurzbz, pruefung_id = null, mitarbeiter_uid,
 	}) =>
 		apiPost("saveStudentPruefung", {
-			student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, pruefung_id,
+			student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, pruefung_id, mitarbeiter_uid,
 		}),
 
-	/** LDAP-password gated. data -> [{uid, freigabedatum, benotungsdatum}] */
+	/**
+	 * LDAP-password gated. data -> [{uid, freigabedatum, benotungsdatum}]
+	 *
+	 * Zuerst eine Sitzung: AuthLDAPLib lädt ldap.php mit require_once. Prüft die Basic-Anmeldung desselben
+	 * Requests schon LDAP, sieht die Passwortprüfung der Freigabe keine Konfiguration und meldet
+	 * "Falsches Passwort". Mit dem Sitzungscookie prüft die Anmeldung kein LDAP.
+	 */
 	saveStudentenNoten: (password, noten, lv_id, sem_kurzbz) =>
-		apiPost("saveStudentenNoten", { password, noten, lv_id, sem_kurzbz }),
+		apiGet("getCisConfig").then(() => apiPost("saveStudentenNoten", { password, noten, lv_id, sem_kurzbz })),
 
 	getNoteByPunkte: (punkte, lv_id, sem_kurzbz) =>
 		apiPost("getNoteByPunkte", { punkte, lv_id, sem_kurzbz }),

@@ -99,6 +99,17 @@ const PHRASES = {
 		en: 'No permission to enter grades for the course "{0}" in semester {1}.',
 	},
 	wrongPassword: { de: "Falsches Passwort", en: "Wrong password" },
+	wrongParameters: { de: "Falsche Parameterübergabe", en: "Wrong parameters transferred" },
+	// nicht in phrasesupdate.php, der Text liegt nur in der Datenbank
+	missingParameters: { de: "Unvollständige Parameterübergabe", en: "Parameters are missing" },
+	pruefungOhneErgebnis: {
+		de: "Für Studierenden {0} gibt es bereits einen Prüfungstermin ohne Note. Es darf nur einen solchen Termin geben.",
+		en: "Student {0} already has an exam without a grade. Only one such exam is allowed.",
+	},
+	pruefungsdatumUngueltig: {
+		de: "Das Prüfungsdatum für {0} ist ungültig.",
+		en: "The exam date for {0} is not valid.",
+	},
 };
 
 const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

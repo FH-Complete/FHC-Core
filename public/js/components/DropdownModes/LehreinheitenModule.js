@@ -1,4 +1,4 @@
-import ApiLehre from "../../api/factory/lehre.js";
+import ApiNoten from "../../api/factory/noten.js";
 import {capitalize} from "../../helpers/StringHelpers.js";
 
 const options = Vue.ref([]);
@@ -27,11 +27,12 @@ async function fetchLehreinheiten(lv_id, sem_kurzbz) {
 		return
 	}
 	
-	appContext.$api.call(ApiLehre.getLeForLv(lv_id, sem_kurzbz)).then(res => {
+	// every Lehreinheit of the course, not only the own ones: an Assistenz teaches none
+	appContext.$api.call(ApiNoten.getLehreinheitenFuerLv(lv_id, sem_kurzbz)).then(res => {
 
 		const data =  []
 		// TODO: could be done on server in some shared function, copied from anw extension for now
-		res.data?.retval?.forEach(entry => {
+		res.data?.forEach(entry => {
 
 			const existing = data.find(e => e.lehreinheit_id === entry.lehreinheit_id)
 			if (existing) {

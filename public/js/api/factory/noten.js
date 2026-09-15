@@ -70,6 +70,13 @@ export default {
 			params: { uids, datum, lva_id, sem_kurzbz, note, punkte, mitarbeiter_uid }
 		};
 	},
+	getLehreinheitenFuerLv(lv_id, sem_kurzbz) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Noten/getLehreinheitenFuerLv',
+			params: { lv_id, sem_kurzbz }
+		};
+	},
 	getLehrendeFuerLehreinheit(lehreinheit_id, lv_id, sem_kurzbz) {
 		return {
 			method: 'get',

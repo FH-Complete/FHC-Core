@@ -41,6 +41,49 @@ export const requirePunkteModus = (testContext, ctx) => {
 	testContext.skip();
 };
 
+/**
+ * Skip, wenn der Schlüssel aus getCisConfig nicht den Zweig trägt, den der Test prüft. Ein Profil aus
+ * tests/cypress/profiles/noten.js schaltet den anderen Zweig ein.
+ */
+export const requireKonfiguration = (testContext, ctx, key, wert) => {
+	if (ctx.cisConfig[key] === wert) return;
+	Cypress.log({
+		name: "skip",
+		message: `Übersprungen: ${key} ist ${JSON.stringify(ctx.cisConfig[key])}, der Test braucht ${JSON.stringify(wert)}.`,
+	});
+	testContext.skip();
+};
+
+/**
+ * Skip, wenn das Werkzeug keinen zweiten Antritt anlegt. Ohne CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF
+ * endet die Kette für das Werkzeug vor dem kommissionellen Antritt.
+ */
+export const requireWiederholung = (testContext, ctx) => {
+	const ab = ctx.cisConfig.CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT ?? null;
+	const anlegbar =
+		ctx.cisConfig.CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF === false && ab !== null
+			? Math.min(ctx.maxAntritte, ab - 1)
+			: ctx.maxAntritte;
+	if (anlegbar >= 2) return;
+	Cypress.log({ name: "skip", message: `Übersprungen: das Werkzeug legt nur ${anlegbar} Antritt an.` });
+	testContext.skip();
+};
+
+/**
+ * Skip, wenn das Werkzeug keinen kommissionellen Antritt anlegt: die Kette endet ohne Kommission, oder
+ * CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF verbietet die Anlage.
+ */
+export const requireKommissionellerAntritt = (testContext, ctx) => {
+	const ab = ctx.cisConfig.CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT ?? null;
+	const anlegbar = ctx.cisConfig.CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF !== false;
+	if (anlegbar && ab !== null && ab >= 2 && ab <= ctx.maxAntritte) return;
+	Cypress.log({
+		name: "skip",
+		message: `Übersprungen: kein anlegbarer kommissioneller Antritt (ab ${JSON.stringify(ab)}, anlegen ${anlegbar}).`,
+	});
+	testContext.skip();
+};
+
 /** Skip, wenn der Punktemodus an ist. */
 export const requireNotenModus = (testContext, ctx) => {
 	if (!punkteModus(ctx)) return;

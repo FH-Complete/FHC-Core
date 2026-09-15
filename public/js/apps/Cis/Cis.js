@@ -79,7 +79,8 @@ const router = VueRouter.createRouter({
 			props: true
 		},
 		{
-			path: `/Cis/Benotungstool/:lv_id?/:sem_kurzbz?`,
+			// semester first: a URL without a course must not read the semester as lv_id
+			path: `/Cis/Benotungstool/:sem_kurzbz?/:lv_id?`,
 			name: 'Benotungstool',
 			component: Benotungstool,
 			props: true

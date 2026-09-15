@@ -54,11 +54,21 @@ class Lvgesamtnote_model extends DB_Model
 				  AND campus.tbl_lvgesamtnote.studiensemester_kurzbz = ?";
 		$params = [$student_uid, $studiensemester_kurzbz];
 		
-		if ($lehrveranstaltung_id) {
-			$qry .= " AND campus.tbl_lvgesamtnote.lehrveranstaltung_id = ?";
-			$params[] = $lehrveranstaltung_id;
-		}
+		// ohne LV liefert die Abfrage die Noten anderer LVs
+		$qry .= " AND campus.tbl_lvgesamtnote.lehrveranstaltung_id = ?";
+		$params[] = $lehrveranstaltung_id;
 
 		return $this->execReadOnlyQuery($qry, $params);
+	}
+
+	/**
+	 * Alle LV-Noten einer LV in einem Semester, ohne Freigabefilter.
+	 */
+	public function getByLvStudiensemester($lehrveranstaltung_id, $studiensemester_kurzbz)
+	{
+		return $this->loadWhere(array(
+			'lehrveranstaltung_id' => $lehrveranstaltung_id,
+			'studiensemester_kurzbz' => $studiensemester_kurzbz
+		));
 	}
 }

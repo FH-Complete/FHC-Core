@@ -11,11 +11,17 @@
 import { notenApi } from "../../../../support/api/notenApi";
 import { expectNotenError, expectNotenSuccess } from "../../../../support/helpers/notenErrors";
 import {
+	requireKommissionellerAntritt,
+	requireKonfiguration,
+	requireWiederholung,
+} from "../../../../support/helpers/notenConfig";
+import {
 	attemptDate,
 	baselineDate,
 	loadNotenContext,
 	requireDbReset,
 	seedPruefung,
+	seedZeugnisnote,
 	shiftDate,
 } from "../../../../support/helpers/notenTestData";
 import {
@@ -51,30 +57,24 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 	// one student per test, so a leaked row cannot reach the next scenario
 	const studentFor = (index) => ctx.students[index % ctx.students.length];
 
-	/**
-	 * Der letzte Antritt ist kommissionell. Darf das Tool ihn nicht anlegen, endet die Kette einen
-	 * Antritt früher, und die Grenze meldet eine andere Phrase. Beides kommt aus der Konfiguration.
-	 */
-	const kommPruefAnlegbar = () => ctx.cisConfig.CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF !== false;
-	const anlegbareAntritte = () => (kommPruefAnlegbar() ? ctx.maxAntritte : ctx.maxAntritte - 1);
-	const grenzPhrase = () => (kommPruefAnlegbar() ? "maxAntritteReached" : "kommPruefNichtErlaubt");
-	// Ob der letzte Antritt kommissionell ist, steht in der Konfiguration, nicht im Test.
-	const letzteRolle = () => {
-		const ab = ctx.cisConfig.CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT ?? null;
-		return ab !== null && ctx.maxAntritte >= ab ? "kommissionell" : "pruefung";
+	/** Skip, wenn der letzte Antritt der Kette nicht der kommissionelle ist. */
+	const skipOhneKommissionLetzt = (test) => {
+		if (ctx.cisConfig.CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT === ctx.maxAntritte) return;
+		Cypress.log({ name: "skip", message: "Übersprungen: der letzte Antritt ist nicht kommissionell." });
+		test.skip();
 	};
 
 	/** Adds counting attempts until the cap is reached. Baseline already provides Antritt 1. */
 	const fillToCap = (student, firstIndex = 1) => {
-		for (let i = 0; i < anlegbareAntritte() - 1; i += 1) {
+		for (let i = 0; i < ctx.maxAntritte - 1; i += 1) {
 			addPruefung(ctx, student, {
 				note: ctx.notes.negativ,
 				datum: attemptDate(ctx, firstIndex + i),
 			}).then((response) => {
-				expectNotenSuccess(response, `attempt ${i + 2} of ${anlegbareAntritte()}`);
+				expectNotenSuccess(response, `attempt ${i + 2} of ${ctx.maxAntritte}`);
 			});
 		}
-		return attemptDate(ctx, firstIndex + anlegbareAntritte() - 1);
+		return attemptDate(ctx, firstIndex + ctx.maxAntritte - 1);
 	};
 
 	// Die Konfiguration nennt die Sondernoten nur mit ihrer Bezeichnung. Die API antwortet mit dem
@@ -97,7 +97,10 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 	});
 
 	describe("Rule A - maximum number of Prüfungsantritte", () => {
-		it("rejects an attempt once the configured maximum is reached", () => {
+		it("rejects an attempt once the configured maximum is reached", function () {
+			// ohne Anlage der kommissionellen Prüfung endet die Kette früher, siehe den Test zu kommPruefNichtErlaubt
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF", true);
+
 			const student = studentFor(0);
 
 			givenBaseline(ctx, student);
@@ -105,7 +108,7 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 			const nextDate = fillToCap(student);
 
 			addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: nextDate }).then((response) => {
-				expectNotenError(response, grenzPhrase());
+				expectNotenError(response, "maxAntritteReached");
 			});
 
 			// and nothing was written for the rejected attempt
@@ -114,12 +117,16 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 				expect(dates, "no row may carry the rejected date").to.not.include(nextDate);
 
 				expect(countingAttemptsOfStudent(data, student.uid), "exactly the possible counting rows")
-					.to.have.length(anlegbareAntritte());
+					.to.have.length(ctx.maxAntritte);
 			});
 		});
 	});
 
 	describe("Rule B - attempts are taken in chronological order", () => {
+		beforeEach(function () {
+			requireWiederholung(this, ctx);
+		});
+
 		// "Noch nicht eingetragen" belegt ein Datum ohne zu zählen, damit Regel A nicht maskiert
 		const givenOpenAttemptOn = (student, datum) => {
 			givenBaseline(ctx, student);
@@ -154,6 +161,10 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 	});
 
 	describe("Rule C - 'entschuldigt' may be assigned only once", () => {
+		beforeEach(function () {
+			requireWiederholung(this, ctx);
+		});
+
 		it("rejects a second entschuldigt attempt", () => {
 			const student = studentFor(2);
 
@@ -177,6 +188,10 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 	});
 
 	describe("entschuldigt does not consume an attempt", () => {
+		beforeEach(function () {
+			requireWiederholung(this, ctx);
+		});
+
 		it("still accepts a real grade after an excused attempt", () => {
 			const student = studentFor(0);
 
@@ -208,15 +223,9 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 		// §17 Abs 1: die zweite Wiederholung ist kommissionell. Der Server leitet den Typ aus der
 		// Position ab und schreibt ihn in pruefungstyp_kurzbz, weil die Studierendenverwaltung
 		// diese Spalte weiterhin liest.
-		it("schreibt den letzten Antritt nach seiner konfigurierten Rolle", function () {
-			if (!kommPruefAnlegbar()) {
-				Cypress.log({ name: "skip", message: "Skipped: das Tool darf keine kommissionelle Prüfung anlegen." });
-				this.skip();
-			}
-			if (letzteRolle() !== "kommissionell") {
-				Cypress.log({ name: "skip", message: `Übersprungen: die Kette endet mit "${letzteRolle()}".` });
-				this.skip();
-			}
+		it("schreibt den letzten Antritt als kommissionelle Prüfung", function () {
+			requireKommissionellerAntritt(this, ctx);
+			skipOhneKommissionLetzt(this);
 
 			const student = studentFor(3);
 
@@ -234,17 +243,9 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 				datum: attemptDate(ctx, ctx.maxAntritte),
 			}).then((response) => {
 				const [saved] = expectNotenSuccess(response, "letzter Antritt");
-				const kommTyp = ctx.cisConfig.PRUEFUNG_TYP_KOMMISSIONELL;
-
-				if (letzteRolle() === "kommissionell") {
-					expect(saved.pruefungstyp_kurzbz, "der letzte Antritt ist kommissionell").to.eq(kommTyp);
-					return;
-				}
-
-				expect(
-					saved.pruefungstyp_kurzbz,
-					`die Kette endet mit der Rolle "${letzteRolle()}", nicht kommissionell`,
-				).to.not.eq(kommTyp);
+				expect(saved.pruefungstyp_kurzbz, "der letzte Antritt ist kommissionell").to.eq(
+					ctx.cisConfig.PRUEFUNG_TYP_KOMMISSIONELL,
+				);
 			});
 
 			readState(ctx).then((data) => {
@@ -257,10 +258,8 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 		// Die Anlage kann abgeschaltet sein, wenn eine Installation die kommissionelle Prüfung in
 		// einem anderen Werkzeug einträgt. Angezeigt wird sie trotzdem, nur angelegt nicht.
 		it("verweigert den letzten Antritt, wenn das Tool ihn nicht anlegen darf", function () {
-			if (kommPruefAnlegbar()) {
-				Cypress.log({ name: "skip", message: "Skipped: das Tool darf die kommissionelle Prüfung anlegen." });
-				this.skip();
-			}
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF", false);
+			skipOhneKommissionLetzt(this);
 
 			const student = studentFor(4);
 
@@ -308,40 +307,65 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 				(response) => expectNotenError(response, "maxAntritteReached"),
 			);
 		});
-
 	});
 
 	describe("'Noch nicht eingetragen' does not consume an attempt", () => {
-	});
+		beforeEach(function () {
+			requireWiederholung(this, ctx);
+		});
 
-	describe("Anrechnung - no Prüfungen at all", () => {
-		it("refuses an attempt while the Zeugnisnote is angerechnet", () => {
-			const angerechnet = ctx.notes.angerechnet ?? ctx.notes.internAngerechnet;
-			if (!angerechnet) {
-				cy.log("no Anrechnungsnote in tbl_note - skipped");
-				return;
-			}
+		it("zählt einen offenen Termin nicht als Antritt", () => {
+			const student = studentFor(3);
 
-			// braucht einen Studenten, dessen Fixture-Zeugnisnote eine Anrechnung ist
+			givenBaseline(ctx, student);
+			addPruefung(ctx, student, { note: ctx.notes.nochNichtEingetragen, datum: attemptDate(ctx, 1) }).then(
+				(response) => expectNotenSuccess(response, "offener Termin"),
+			);
+
 			readState(ctx).then((data) => {
-				const target = (data[0] || []).find((s) => String(s.note) === String(angerechnet));
-				if (!target) {
-					cy.log(`no student with Zeugnisnote ${angerechnet} in LV ${ctx.lvId} - skipped`);
-					return;
-				}
-
-				const verlauf = verlaufOfStudent(data, target.uid);
-				expect(verlauf.angerechnet, "the Verlauf marks the Anrechnung").to.be.true;
-				expect(verlauf.canAdd, "and blocks further attempts").to.be.false;
-
-				addPruefung(ctx, target, { note: ctx.gradeNotes[0], datum: attemptDate(ctx, 1) }).then(
-					(response) => expectNotenError(response, "c4angerechnetKeinePruefung"),
+				const offen = attemptsOfStudent(data, student.uid).find(
+					(p) => String(p.note) === String(ctx.notes.nochNichtEingetragen),
 				);
+				expect(offen, "der offene Termin").to.exist;
+				expect(offen.zaehlt, "der offene Termin verbraucht keinen Antritt").to.be.false;
+
+				const verlauf = verlaufOfStudent(data, student.uid);
+				expect(verlauf.antrittCount, "nur Antritt 1").to.eq(1);
+				expect(verlauf.canAdd, "ein weiterer Antritt bleibt möglich").to.be.true;
 			});
 		});
 	});
 
+	describe("Anrechnung - no Prüfungen at all", () => {
+		it("refuses an attempt while the Zeugnisnote is angerechnet", function () {
+			const angerechnet = (ctx.cisConfig.NOTEN_ANRECHNUNG || [])[0];
+			if (angerechnet === undefined) {
+				Cypress.log({ name: "skip", message: "Übersprungen: NOTEN_ANRECHNUNG löst keine Note auf." });
+				this.skip();
+			}
+
+			const student = studentFor(4);
+
+			givenBaseline(ctx, student);
+			seedZeugnisnote(ctx, student.uid, angerechnet);
+
+			readState(ctx).then((data) => {
+				const verlauf = verlaufOfStudent(data, student.uid);
+				expect(verlauf.angerechnet, "the Verlauf marks the Anrechnung").to.be.true;
+				expect(verlauf.canAdd, "and blocks further attempts").to.be.false;
+			});
+
+			addPruefung(ctx, student, { note: ctx.notes.negativ, datum: attemptDate(ctx, 1) }).then((response) =>
+				expectNotenError(response, "c4angerechnetKeinePruefung"),
+			);
+		});
+	});
+
 	describe("edit guards", () => {
+		beforeEach(function () {
+			requireWiederholung(this, ctx);
+		});
+
 		/** Antritt 1 < entschuldigt < echte Note; liefert die entschuldigte Zeile (Nachbarn beidseits). */
 		const givenThreeAttempts = (student) => {
 			givenBaseline(ctx, student);
@@ -358,7 +382,9 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 			});
 		};
 
-		it("rejects changing the grade once a later attempt exists", () => {
+		it("rejects changing the grade once a later attempt exists", function () {
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_NOTE_SPERRE_BEI_SPAETEREM_TERMIN", true);
+
 			const student = studentFor(1);
 
 			givenThreeAttempts(student).then((excused) => {
@@ -405,6 +431,5 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 				}).then((response) => expectNotenError(response, "pruefungDatumOutOfRange"));
 			});
 		});
-
 	});
 });

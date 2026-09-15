@@ -27,17 +27,18 @@ Cypress.Commands.add("checkPageResources", (url) => {
 /**
  * Session-Login für die UI-Specs.
  * cy.session hält es über Specs hinweg, damit nicht jeder Test neu anmeldet.
+ * Ohne Argumente meldet sich der Suite-Benutzer an.
  */
-Cypress.Commands.add("login", () => {
+Cypress.Commands.add("login", (username, password) => {
   const { adminusername, adminpassword } = Cypress.env();
-  const auth = { username: adminusername, password: adminpassword };
+  const auth = { username: username || adminusername, password: password || adminpassword };
   const probe = () =>
     cy
       .request({ url: "/index.ci.php/api/frontend/v1/AuthInfo/getAuthUID", auth })
       .its("status")
       .should("eq", 200);
 
-  cy.session(["benotungstool-login", adminusername], probe, {
+  cy.session(["benotungstool-login", auth.username], probe, {
     cacheAcrossSpecs: true,
     validate: probe,
   });

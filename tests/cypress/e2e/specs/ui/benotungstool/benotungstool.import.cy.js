@@ -1,4 +1,5 @@
 import { benotungstoolPage as page } from "../../../../support/pages/benotungstool.po";
+import { requireKonfiguration, requireWiederholung } from "../../../../support/helpers/notenConfig";
 import {
 	attemptDate,
 	loadNotenContext,
@@ -84,7 +85,9 @@ context("Benotungstool UI - Import", () => {
 			page.expectFreigabeState(b.uid, "changed");
 		});
 
-		it("legt dabei den ersten Antritt an", () => {
+		it("legt dabei den ersten Antritt an", function () {
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", true);
+
 			const student = ctx.students[0];
 
 			resetNotenState(ctx);
@@ -123,14 +126,16 @@ context("Benotungstool UI - Import", () => {
 			}
 		});
 
-		it("legt je Zeile einen datierten Antritt an", () => {
+		it("legt je Zeile einen datierten Antritt an", function () {
+			requireWiederholung(this, ctx);
+
 			const [a, b] = ctx.students;
 			// das Format nennt die Konfiguration, nicht der Test
 			const datum = page.importDatum(attemptDate(ctx, 1), ctx.cisConfig.CIS_GESAMTNOTE_IMPORT_DATUMSFORMAT);
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, a.uid, { note: ctx.notes.negativ, freigegeben: true });
-			seedBaseline(ctx, b.uid, { note: ctx.notes.negativ, freigegeben: true });
+			seedBaseline(ctx, a.uid, { note: ctx.notes.negativ });
+			seedBaseline(ctx, b.uid, { note: ctx.notes.negativ });
 
 			page.visitAndWaitForTable(ctx);
 
@@ -160,6 +165,72 @@ context("Benotungstool UI - Import", () => {
 
 			page.expectPruefung(student.uid, "antritt_1", { note: ctx.gradeNotes[0], antritt: 1 });
 			page.expectLvNote(student.uid, bezeichnung(ctx.gradeNotes[0]));
+		});
+	});
+
+	// Der Client prüft jede Zeile, bevor er sie schickt. Eine fehlerhafte Zeile meldet er als Warnung und
+	// schickt nur die übrigen. Doppelte Zeilen erkennt er bewusst nicht.
+	describe("fehlerhafte Zeilen", () => {
+		it("warnt im Prüfungsimport je fehlerhafter Zeile und schickt nur die gültigen", function () {
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_PRUEFUNGSIMPORT", true);
+			requireWiederholung(this, ctx);
+
+			const [perUid, perMatrikelnr, falschesDatum, falscheNote, falscheSpalten] = ctx.students;
+			const format = ctx.cisConfig.CIS_GESAMTNOTE_IMPORT_DATUMSFORMAT;
+			const datum = page.importDatum(attemptDate(ctx, 1), format);
+			const jahr = attemptDate(ctx, 1).slice(0, 4);
+			const unmoeglich = format === "yyyy-MM-dd" ? `${jahr}-02-31` : `31.02.${jahr}`;
+			const note = ctx.notes.negativ;
+
+			expect(perMatrikelnr.matrikelnr, "Matrikelnummer des Studierenden").to.be.a("string").and.not.be.empty;
+
+			resetNotenState(ctx);
+			seedBaseline(ctx, perUid.uid, { note: ctx.notes.negativ });
+			seedBaseline(ctx, perMatrikelnr.uid, { note: ctx.notes.negativ });
+			page.visitAndWaitForTable(ctx);
+
+			page.importPruefungen([
+				[perUid.uid, datum, note],
+				[perMatrikelnr.matrikelnr, datum, note],
+				["zz_unbekannt", datum, note],
+				[falschesDatum.uid, unmoeglich, note],
+				[falscheNote.uid, datum, "keine-note"],
+				[falscheSpalten.uid, datum],
+			]);
+
+			page.expectWarnung("zz_unbekannt");
+			page.expectWarnung(falschesDatum.uid);
+			page.expectWarnung(falscheNote.uid);
+			// die Zeile mit falscher Spaltenzahl nennt nur ihre Zeilennummer
+			page.expectWarnungen(4);
+
+			page.gesendeteUids("@savePruefungenBulk", "pruefungen").then((uids) => {
+				expect(uids, "nur die gültigen Zeilen, die Matrikelnummer aufgelöst").to.deep.eq([perUid.uid, perMatrikelnr.uid]);
+			});
+		});
+
+		it("warnt im Notenimport je fehlerhafter Zeile und schickt nur die gültigen", function () {
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_NOTENIMPORT", true);
+
+			const [gueltig, falscheNote, falscheSpalten] = ctx.students;
+
+			resetNotenState(ctx);
+			page.visitAndWaitForTable(ctx);
+
+			page.importNoten([
+				[gueltig.uid, ctx.gradeNotes[0]],
+				["zz_unbekannt", ctx.gradeNotes[0]],
+				[falscheNote.uid, "keine-note"],
+				[falscheSpalten.uid, ctx.gradeNotes[0], "zu viel"],
+			]);
+
+			page.expectWarnung("zz_unbekannt");
+			page.expectWarnung(falscheNote.uid);
+			page.expectWarnungen(3);
+
+			page.gesendeteUids("@saveNotenvorschlagBulk", "noten").then((uids) => {
+				expect(uids, "nur die gültige Zeile").to.deep.eq([gueltig.uid]);
+			});
 		});
 	});
 });

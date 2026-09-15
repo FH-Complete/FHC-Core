@@ -244,9 +244,11 @@ export const Benotungstool = {
 					return
 				}
 
-				// get student for pruefung and check if proposed datum does not conflict (no new pruefungen before existing ones)
+				// no new exam before an existing one; the same day only if configured, as the server checks
+				const gleicherTag = this.config?.CIS_GESAMTNOTE_TERMIN_GLEICHER_TAG === true
 				const youngerPruefung = student.pruefungen.find(pr => {
-					return pr.dateObj >= this.selectedPruefungDate
+					const d = String(pr.datum ?? '').slice(0, 10)
+					return gleicherTag ? d > dateStrDb : d >= dateStrDb
 				})
 				if(youngerPruefung) {
 					this.$fhcAlert.alertWarning(this.$capitalize(this.$p.t('benotungstool/c4pruefungBereitsAmDatum', [
@@ -721,11 +723,14 @@ export const Benotungstool = {
 					const rowData = cell.getRow().getData();
 					rowData._originalNoteVorschlag = cell.getValue();
 
+					// the course grade is never 'entschuldigt'
 					return {
-						values: this.notenOptionsLehre.map(opt => ({
-							label: opt.bezeichnung,
-							value: opt.note
-						}))
+						values: this.notenOptionsLehre
+							.filter(opt => opt.note != this.config?.NOTE_ENTSCHULDIGT)
+							.map(opt => ({
+								label: opt.bezeichnung,
+								value: opt.note
+							}))
 					};
 				},
 				editable: (cell) => {
@@ -961,7 +966,8 @@ export const Benotungstool = {
 		 * the exam. The server applies the same rule (validateNotenvorschlag).
 		 */
 		hatWiederholung(student) {
-			return (student?.pruefungen?.length ?? 0) > 1
+			// the server decides: one exam can already be a repeat next to an implicit attempt 1
+			return student?.verlauf ? !!student.verlauf.hatWiederholung : (student?.pruefungen?.length ?? 0) > 1
 		},
 
 		identifyUid(str) {
@@ -983,13 +989,20 @@ export const Benotungstool = {
 			const eingabe = String(wert ?? '').trim()
 
 			if(format === 'yyyy-MM-dd') {
-				return /^\d{4}-\d{2}-\d{2}$/.test(eingabe) ? eingabe : null
+				// the pattern alone accepts 2026-02-31, so check the calendar day too
+				const [jahr, monat, tag] = eingabe.split('-')
+				return /^\d{4}-\d{2}-\d{2}$/.test(eingabe) && this.isValidDate_ddmmyyyy(`${tag}.${monat}.${jahr}`) ? eingabe : null
 			}
 
 			if(!this.isValidDate_ddmmyyyy(eingabe)) return null
 
 			const teile = eingabe.split('.')
 			return `${teile[2].padStart(4, '0')}-${teile[1].padStart(2, '0')}-${teile[0].padStart(2, '0')}`
+		},
+
+		/** Import points -> number. A decimal comma counts as a decimal point. */
+		importPunkte(wert) {
+			return Number.parseFloat(String(wert ?? '').trim().replace(',', '.'))
 		},
 
 		importNoten() {
@@ -1420,7 +1433,7 @@ export const Benotungstool = {
 			let punkte = null
 			let note = null
 			if(this.config?.CIS_GESAMTNOTE_PUNKTE) {
-				punkte = Number.parseFloat(rowParts[iNote])
+				punkte = this.importPunkte(rowParts[iNote])
 			} else {
 				// find notenoption and check if its allowed to use in lehre
 				const notenOption = this.noteAusImportWert(rowParts[iNote])
@@ -1467,7 +1480,7 @@ export const Benotungstool = {
 			let punkte = null
 			let note = null
 			if(this.config?.CIS_GESAMTNOTE_PUNKTE) {
-				punkte = Number.parseFloat(rowParts[iNote]) 
+				punkte = this.importPunkte(rowParts[iNote]) 
 			} else {
 				// find notenoption and check if its allowed to use in lehre
 				const notenOption = this.noteAusImportWert(rowParts[iNote])
@@ -1752,13 +1765,17 @@ export const Benotungstool = {
 				if(res.meta.status === 'success') {
 					// the answer uses the uid as the key: a course grade or an error message for each row
 					let errorList = ''
+					let gespeichert = 0
 
 					Object.keys(res.data ?? {}).forEach(uid => {
 						const lvn = res.data[uid]
+
+						// a rejected row reports its message, also for a uid that is not in the table
+						if(typeof lvn === 'string') { errorList += lvn + '\n'; return }
+						gespeichert++
+
 						const s = this.studenten.find(s => s.uid === uid)
 						if(!s) return
-
-						if(typeof lvn === 'string') { errorList += lvn + '\n'; return }
 
 						s.note_vorschlag = lvn.note
 						this.applyLvGesamtnote(s, lvn)
@@ -1767,12 +1784,15 @@ export const Benotungstool = {
 
 					if(errorList !== '') this.$fhcAlert.alertError(errorList)
 
-					this.$fhcAlert.alertDefault(
-						'success',
-						'Info',
-						this.$capitalize(this.$p.t('benotungstool/notenImportSuccessAlert')),
-						true
-					)
+					// only a saved row is a success
+					if(gespeichert > 0) {
+						this.$fhcAlert.alertDefault(
+							'success',
+							'Info',
+							this.$capitalize(this.$p.t('benotungstool/notenImportSuccessAlert')),
+							true
+						)
+					}
 				}
 
 				// the import writes attempt 1 for each row, therefore the exam columns can change
@@ -1877,12 +1897,15 @@ export const Benotungstool = {
 							this.$fhcAlert.alertError(errorList)
 						}
 
-						this.$fhcAlert.alertDefault(
-							'success',
-							'Info',
-							this.$capitalize(this.$p.t('benotungstool/pruefungImportSuccessAlert')),
-							true
-						)
+						// only a saved row is a success
+						if(Object.values(res.data ?? {}).some(entry => entry?.savedPruefung)) {
+							this.$fhcAlert.alertDefault(
+								'success',
+								'Info',
+								this.$capitalize(this.$p.t('benotungstool/pruefungImportSuccessAlert')),
+								true
+							)
+						}
 						this.handleAddNewPruefungenResponse(res, pruefungenbulk)
 					}
 				}).finally(()=>{this.loading = false})
@@ -2376,9 +2399,11 @@ export const Benotungstool = {
 					return
 				}
 
-				// get student for pruefung and check if proposed datum does not conflict (no new pruefungen before existing ones)
+				// no new exam before an existing one; the same day only if configured, as the server checks
+				const gleicherTag = this.config?.CIS_GESAMTNOTE_TERMIN_GLEICHER_TAG === true
 				const youngerPruefung = student.pruefungen.find(pr => {
-					return pr.dateObj >= p.dateObj
+					const d = String(pr.datum ?? '').slice(0, 10)
+					return gleicherTag ? d > p.datum : d >= p.datum
 				})
 				if(youngerPruefung) {
 					this.$fhcAlert.alertWarning(this.$capitalize(this.$p.t('benotungstool/c4pruefungBereitsAmDatum', [
@@ -2933,7 +2958,7 @@ export const Benotungstool = {
 
 					<div class="d-flex align-items-center" style="flex: 1 1 12rem; min-width: 9rem; gap: 0.35rem;" v-if="isAssistenz">
 						<label class="col-form-label py-0 text-nowrap flex-shrink-0 d-none d-xxl-inline">{{$capitalize($p.t('lehre/studiengang'))}}:</label>
-						<Dropdown @change="stgChanged" class="flex-grow-1" :style="{'minWidth': '0'}" :optionLabel="getOptionLabelStg"
+						<Dropdown data-cy="dropdown-studiengang" @change="stgChanged" class="flex-grow-1" :style="{'minWidth': '0'}" :optionLabel="getOptionLabelStg"
 							:placeholder="$capitalize($p.t('lehre/studiengang'))"
 							v-model="selectedStudiengang" :options="assistenzStudiengaenge" appendTo="self">
 							<template #optionsgroup="slotProps">
@@ -2944,7 +2969,7 @@ export const Benotungstool = {
 
 					<div class="d-flex align-items-center" style="flex: 1 1 12rem; min-width: 9rem; gap: 0.35rem;">
 						<label class="col-form-label py-0 text-nowrap flex-shrink-0 d-none d-xxl-inline">{{$capitalize($p.t('lehre/lehrveranstaltung'))}}:</label>
-						<Dropdown @change="lvChanged" class="flex-grow-1" :style="{'minWidth': '0'}" :optionLabel="getOptionLabelLv"
+						<Dropdown data-cy="dropdown-lehrveranstaltung" @change="lvChanged" class="flex-grow-1" :style="{'minWidth': '0'}" :optionLabel="getOptionLabelLv"
 							:placeholder="$capitalize($p.t('lehre/lehrveranstaltung'))"
 							v-model="selectedLehrveranstaltung" :options="lehrveranstaltungen" appendTo="self">
 							<template #optionsgroup="slotProps">
@@ -2955,7 +2980,7 @@ export const Benotungstool = {
 
 					<div class="d-flex align-items-center" style="flex: 1 1 12rem; min-width: 9rem; gap: 0.35rem;">
 						<label class="col-form-label py-0 text-nowrap flex-shrink-0 d-none d-xxl-inline">{{$capitalize($p.t('lehre/lehreinheit'))}}:</label>
-						<Dropdown class="flex-grow-1" :style="{'minWidth': '0'}" v-bind="LehreinheitenModule"
+						<Dropdown data-cy="dropdown-lehreinheit" class="flex-grow-1" :style="{'minWidth': '0'}" v-bind="LehreinheitenModule"
 							v-model="selectedLehreinheit" showClear appendTo="self">
 							<template #option="slotProps">
 								<div>
@@ -2971,7 +2996,7 @@ export const Benotungstool = {
 
 					<div class="d-flex align-items-center" style="flex: 1 1 8rem; min-width: 7rem; gap: 0.35rem;">
 						<label class="col-form-label py-0 text-nowrap flex-shrink-0 d-none d-xxl-inline">{{$capitalize($p.t('lehre/studiensemester'))}}:</label>
-						<Dropdown @change="ssChanged" class="flex-grow-1" :style="{'minWidth': '0'}" :optionLabel="getOptionLabel"
+						<Dropdown data-cy="dropdown-semester" @change="ssChanged" class="flex-grow-1" :style="{'minWidth': '0'}" :optionLabel="getOptionLabel"
 							v-model="selectedSemester" :options="studiensemester" appendTo="self">
 							<template #optionsgroup="slotProps">
 								<div> {{ option.studiensemester_kurzbz }} </div>

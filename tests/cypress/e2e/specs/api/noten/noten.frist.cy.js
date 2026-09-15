@@ -1,13 +1,20 @@
 /**
- * Prüfungsordnung §1 - Noteneintragungsfrist (P0, cases 8-9).
+ * Prüfungsordnung §1 - Noteneintragungsfrist.
  *
- * Die Prüfung läuft vor jedem Schreibzugriff, ein abgelaufenes Semester wird also abgelehnt ohne
- * eine Zeile anzufassen. Die Fehlermeldung nennt die Frist und prüft damit zugleich deren
- * Ableitung (SS -> 15.11.yyyy, WS -> 15.05.yyyy+1).
+ * Zwei Fristen beantworten zwei Fragen: CIS_GESAMTNOTE_FRIST_EINGABE sperrt den Zeitpunkt der Eingabe,
+ * CIS_GESAMTNOTE_FRIST_PRUEFUNGSDATUM das Datum der Prüfung. Die Eingabefrist greift in jedem Schreibpfad
+ * direkt nach der Zugriffsprüfung, ein abgelehnter Request schreibt also nichts. Die Meldung nennt die Frist
+ * und prüft damit ihre Ableitung aus NOTENEINTRAGUNGSFRIST_SS/WS.
+ *
+ * Seeder 019 legt das Sommersemester an, in dem der Testbenutzer nach der Frist unterrichtet.
  */
 
 import { notenApi } from "../../../../support/api/notenApi";
-import { expectNotenError, expectNotenSuccess } from "../../../../support/helpers/notenErrors";
+import {
+	expectNotenError,
+	expectNotenSuccess,
+	messageMatchesPhrase,
+} from "../../../../support/helpers/notenErrors";
 import {
 	attemptDate,
 	expectedFristString,
@@ -17,176 +24,167 @@ import {
 	lehrsemesterMitAbgelaufenerFrist,
 } from "../../../../support/helpers/notenTestData";
 import { addPruefung, givenBaseline } from "../../../../support/helpers/notenScenario";
-
-// Deadlines computeNoteneintragungsfrist derives: SS -> 15.11.yyyy, WS -> 15.05.yyyy+1.
-const fristConfig = () => ({ ss: { month: 11, day: 15 }, ws: { month: 5, day: 15 } });
+import { requireKonfiguration, requireWiederholung } from "../../../../support/helpers/notenConfig";
 
 describe("Noten API - Noteneintragungsfrist (Prüfungsordnung §1)", () => {
 	let ctx;
-	let fristDatum; // sperrt das DATUM der Prüfung
-	let fristEingabe; // sperrt den ZEITPUNKT der Eingabe
 	// Semester samt Lehrveranstaltung, in dem der Benutzer unterrichtet und die Frist abgelaufen ist
 	const abgelaufen = { SS: null, WS: null };
+
+	const fristSS = () => ctx.cisConfig.NOTENEINTRAGUNGSFRIST_SS;
+	const fristWS = () => ctx.cisConfig.NOTENEINTRAGUNGSFRIST_WS;
 
 	before(() => {
 		loadNotenContext().then((context) => {
 			ctx = context;
-			// Die zwei Fristen beantworten zwei Fragen. Der Server liefert die Werte, die er
-			// wirklich anwendet; der alte Schlüssel ist darin schon aufgelöst.
-			fristDatum = Boolean(ctx.cisConfig.CIS_GESAMTNOTE_FRIST_PRUEFUNGSDATUM);
-			// eine Ausnahmerolle hebt die Eingabefrist für diesen Benutzer auf
-			fristEingabe =
-				Boolean(ctx.cisConfig.CIS_GESAMTNOTE_FRIST_EINGABE) &&
-				ctx.cisConfig.CIS_GESAMTNOTE_FRIST_AUSNAHME_GILT !== true;
-			cy.log(`FRIST_PRUEFUNGSDATUM=${fristDatum} FRIST_EINGABE=${fristEingabe} AUSNAHME=${ctx.cisConfig.CIS_GESAMTNOTE_FRIST_AUSNAHME_GILT}`);
-		});
+			cy.log(
+				`FRIST_EINGABE=${ctx.cisConfig.CIS_GESAMTNOTE_FRIST_EINGABE} ` +
+					`FRIST_PRUEFUNGSDATUM=${ctx.cisConfig.CIS_GESAMTNOTE_FRIST_PRUEFUNGSDATUM} ` +
+					`AUSNAHME_GILT=${ctx.cisConfig.CIS_GESAMTNOTE_FRIST_AUSNAHME_GILT}`,
+			);
 
-		lehrsemesterMitAbgelaufenerFrist("SS").then((paar) => {
-			abgelaufen.SS = paar;
-			cy.log(`SS mit abgelaufener Frist: ${JSON.stringify(paar)}`);
-		});
-
-		lehrsemesterMitAbgelaufenerFrist("WS").then((paar) => {
-			abgelaufen.WS = paar;
-			cy.log(`WS mit abgelaufener Frist: ${JSON.stringify(paar)}`);
-		});
-	});
-
-	// §7 und §11: nicht nur der Zeitpunkt der Eingabe zählt, sondern auch das Prüfungsdatum selbst.
-	// Die kommissionelle Prüfung muss bis zur Frist STATTFINDEN, sonst verliert der Student ein
-	// Semester. Das ist eine andere Frage als "darf jetzt noch eingetragen werden".
-	describe("Prüfungsdatum nach der Frist", () => {
-		beforeEach(function () {
-			if (!fristDatum) {
-				Cypress.log({ name: "skip", message: "Übersprungen: CIS_GESAMTNOTE_FRIST_PRUEFUNGSDATUM ist aus." });
-				this.skip();
-			}
-			requireDbReset();
-		});
-
-		it("lehnt einen Termin ab, der nach der Frist liegt", () => {
-			const student = ctx.students[0];
-			const jahr = Number(ctx.semKurzbz.slice(2, 6));
-			// die Frist des laufenden Semesters liegt in der Zukunft, ein Datum dahinter ist ungültig
-			const nachDerFrist = `${jahr + 1}-12-31`;
-
-			givenBaseline(ctx, student);
-
-			addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: nachDerFrist }).then((response) => {
-				expectNotenError(response, "pruefungsdatumNachFrist");
-			});
-		});
-
-		it("nimmt einen Termin vor der Frist an", () => {
-			const student = ctx.students[1];
-
-			givenBaseline(ctx, student);
-
-			addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: attemptDate(ctx, 1) }).then(
-				(response) => expectNotenSuccess(response, "Termin innerhalb der Frist"),
+			["SS", "WS"].forEach((typ) =>
+				lehrsemesterMitAbgelaufenerFrist(typ, fristSS(), fristWS()).then((paar) => {
+					abgelaufen[typ] = paar;
+					cy.log(`${typ} mit abgelaufener Frist: ${JSON.stringify(paar)}`);
+				}),
 			);
 		});
 	});
 
-	describe("deadline has passed", () => {
-		// A rejected request writes nothing, so these need no DB reset.
-		[
-			{ type: "SS", label: "Sommersemester (deadline in the same year)" },
-			{ type: "WS", label: "Wintersemester (deadline in the following year)" },
-		].forEach(({ type, label }) => {
-			it(`rejects grade entry for a ${label}`, function () {
-				// no flag, no deadline - skip rather than pretend it passed
-				if (!fristEingabe) this.skip();
+	// ein fehlendes Semester ist ein Fixturefehler und kein übersprungener Test
+	const paarFuer = (typ) => {
+		expect(abgelaufen[typ], `ein ${typ} mit abgelaufener Frist, in dem der Testbenutzer unterrichtet`).to.not.be.null;
+		return abgelaufen[typ];
+	};
 
-				// assertLvAccess laeuft vor der Frist: das Semester muss eines sein, in dem der
-				// Benutzer wirklich unterrichtet, sonst antwortet der Server mit fehlender Berechtigung
-				const paar = abgelaufen[type];
-				if (!paar) {
-					Cypress.log({ name: "skip", message: `Übersprungen: kein ${type} mit abgelaufener Frist, in dem der Benutzer unterrichtet.` });
-					this.skip();
-				}
+	// §7 und §11: Die kommissionelle Prüfung muss bis zur Frist STATTFINDEN. Das ist eine andere Frage als
+	// "darf jetzt noch eingetragen werden".
+	describe("Prüfungsdatum nach der Frist", () => {
+		beforeEach(() => requireDbReset());
 
-				const sem = paar.semKurzbz;
-				const cfg = fristConfig();
-				const expectedDeadline = expectedFristString(sem, cfg.ss, cfg.ws);
+		// die Frist des laufenden Semesters liegt vor diesem Datum
+		const nachDerFrist = () => `${Number(ctx.semKurzbz.slice(2, 6)) + 1}-12-31`;
 
-				expect(fristHasPassed(sem), `${sem} deadline is in the past`).to.be.true;
+		it("lehnt einen Termin ab, der nach der Frist liegt", function () {
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_FRIST_PRUEFUNGSDATUM", true);
 
-				notenApi
-					.saveStudentPruefung({
-						student_uid: ctx.students[0].uid,
-						note: ctx.gradeNotes[0],
-						punkte: null,
-						datum: attemptDate(ctx, 1),
-						lva_id: paar.lvId,
-						lehreinheit_id: ctx.students[0].lehreinheit_id,
-						sem_kurzbz: sem,
-						pruefung_id: null,
-					})
-					.then((response) => {
-						expectNotenError(response, "noteneintragungsfristVorbei");
+			const student = ctx.students[0];
 
-						const message = response.body.errors.map((e) => e.message).join(" | ");
-						expect(
-							message,
-							`the ${type} deadline the server derived for ${sem}`,
-						).to.include(expectedDeadline);
-					});
-			});
+			givenBaseline(ctx, student);
+			addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: nachDerFrist() }).then((response) =>
+				expectNotenError(response, "pruefungsdatumNachFrist"),
+			);
 		});
 
-		// Die Ausnahme deckt die EINGABE ab, nicht das Prüfungsdatum. Ohne Ausnahmeweg wird eine Frist
-		// beim ersten Sonderfall abgeschaltet, deshalb nennt CIS_GESAMTNOTE_FRIST_AUSNAHME Rollen.
-		// Der Test prüft beide Seiten: mit Ausnahme geht die Eingabe durch, ohne wird sie abgelehnt.
-		it("lässt eine Ausnahmerolle nach der Frist eintragen", function () {
-			if (!ctx.cisConfig.CIS_GESAMTNOTE_FRIST_EINGABE) {
-				Cypress.log({ name: "skip", message: "Übersprungen: CIS_GESAMTNOTE_FRIST_EINGABE ist aus." });
-				this.skip();
-			}
+		it("nimmt einen Termin nach der Frist an, wenn das Prüfungsdatum an keine Frist gebunden ist", function () {
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_FRIST_PRUEFUNGSDATUM", false);
+			requireWiederholung(this, ctx);
 
-			const ausnahme = ctx.cisConfig.CIS_GESAMTNOTE_FRIST_AUSNAHME_GILT === true;
-			const paar = abgelaufen.SS || abgelaufen.WS;
-			if (!paar) {
-				Cypress.log({ name: "skip", message: "Übersprungen: kein Semester mit abgelaufener Frist, in dem der Benutzer unterrichtet." });
-				this.skip();
-			}
-			const sem = paar.semKurzbz;
+			const student = ctx.students[0];
 
-			requireDbReset();
+			givenBaseline(ctx, student);
+			addPruefung(ctx, student, { note: ctx.notes.negativ, datum: nachDerFrist() }).then((response) =>
+				expectNotenSuccess(response, "Termin nach der Frist"),
+			);
+		});
 
-			notenApi
-				.saveStudentPruefung({
-					student_uid: ctx.students[0].uid,
+		it("nimmt einen Termin vor der Frist an", function () {
+			requireWiederholung(this, ctx);
+
+			const student = ctx.students[1];
+
+			givenBaseline(ctx, student);
+			addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: attemptDate(ctx, 1) }).then((response) =>
+				expectNotenSuccess(response, "Termin innerhalb der Frist"),
+			);
+		});
+	});
+
+	describe("Eingabe nach der Frist", () => {
+		const s0 = () => ctx.students[0];
+
+		// Der Studierende gehört nicht zur Lehrveranstaltung des abgelaufenen Semesters. Greift die Eingabefrist
+		// nicht, lehnt die Teilnehmerprüfung ab, und der Request schreibt trotzdem nichts.
+		const schreibpfade = {
+			saveStudentPruefung: (paar) =>
+				notenApi.saveStudentPruefung({
+					student_uid: s0().uid,
 					note: ctx.gradeNotes[0],
 					punkte: null,
 					datum: attemptDate(ctx, 1),
 					lva_id: paar.lvId,
-					lehreinheit_id: ctx.students[0].lehreinheit_id,
-					sem_kurzbz: sem,
+					lehreinheit_id: s0().lehreinheit_id,
+					sem_kurzbz: paar.semKurzbz,
 					pruefung_id: null,
-				})
-				.then((response) => {
-					if (ausnahme) {
-						// die Eingabefrist gilt nicht; eine andere Regel darf trotzdem greifen
-						const meldungen = (response.body.errors || []).map((e) => e.message).join(" | ");
-						expect(meldungen, "die Eingabefrist darf nicht mehr greifen").to.not.include(
-							"Noteneintragungsfrist",
+				}),
+			saveNotenvorschlag: (paar) => notenApi.saveNotenvorschlag(paar.lvId, paar.semKurzbz, s0().uid, ctx.gradeNotes[0]),
+			saveNotenvorschlagBulk: (paar) =>
+				notenApi.saveNotenvorschlagBulk(paar.lvId, paar.semKurzbz, [
+					{ uid: s0().uid, note: ctx.gradeNotes[0], punkte: null },
+				]),
+			createPruefungen: (paar) =>
+				notenApi.createPruefungen(
+					[{ uid: s0().uid, lehreinheit_id: s0().lehreinheit_id }],
+					attemptDate(ctx, 1),
+					paar.lvId,
+					paar.semKurzbz,
+				),
+			savePruefungenBulk: (paar) =>
+				notenApi.savePruefungenBulk(paar.lvId, paar.semKurzbz, [
+					{
+						uid: s0().uid,
+						note: ctx.gradeNotes[0],
+						punkte: null,
+						datum: attemptDate(ctx, 1),
+						lehreinheit_id: s0().lehreinheit_id,
+					},
+				]),
+		};
+
+		const meldetFrist = (response) =>
+			((response.body && response.body.errors) || []).some((e) =>
+				messageMatchesPhrase(e.message, "noteneintragungsfristVorbei"),
+			);
+
+		Object.entries(schreibpfade).forEach(([pfad, aufruf]) => {
+			["SS", "WS"].forEach((typ) => {
+				it(`${pfad} lehnt eine Eingabe im ${typ} nach der Frist ab`, function () {
+					requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_FRIST_EINGABE", true);
+					requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_FRIST_AUSNAHME_GILT", false);
+
+					const paar = paarFuer(typ);
+					expect(fristHasPassed(paar.semKurzbz, fristSS(), fristWS()), `die Frist von ${paar.semKurzbz} ist vorbei`)
+						.to.be.true;
+
+					aufruf(paar).then((response) => {
+						expectNotenError(response, "noteneintragungsfristVorbei");
+
+						const meldung = response.body.errors.map((e) => e.message).join(" | ");
+						expect(meldung, `die Frist, die der Server für ${paar.semKurzbz} ableitet`).to.include(
+							expectedFristString(paar.semKurzbz, fristSS(), fristWS()),
 						);
-						return;
-					}
-
-					expectNotenError(response, "noteneintragungsfristVorbei");
+					});
 				});
+			});
+
+			// Die Ausnahme deckt die EINGABE ab, nicht das Prüfungsdatum.
+			it(`${pfad} lässt eine Ausnahmerolle nach der Frist eintragen`, function () {
+				requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_FRIST_EINGABE", true);
+				requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_FRIST_AUSNAHME_GILT", true);
+
+				aufruf(paarFuer("SS")).then((response) => {
+					expect(meldetFrist(response), "die Eingabefrist greift nicht").to.be.false;
+				});
+			});
+
+			it(`${pfad} nimmt ohne Eingabefrist eine späte Eingabe an`, function () {
+				requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_FRIST_EINGABE", false);
+
+				aufruf(paarFuer("SS")).then((response) => {
+					expect(meldetFrist(response), "die Eingabefrist greift nicht").to.be.false;
+				});
+			});
 		});
 	});
-
-	describe("deadline is still ahead", () => {
-		before(() => {
-			requireDbReset();
-		});
-
-	});
-
-	// Die SS/WS-Ableitung wird gegen den SERVER geprüft (die Frist in der Fehlermeldung oben) -
-	// ein lokaler Vergleich von expectedFristString() gegen Konstanten testet nur den Helfer.
 });

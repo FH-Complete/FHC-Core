@@ -1,5 +1,10 @@
 import { benotungstoolPage as page } from "../../../../support/pages/benotungstool.po";
-import { requirePunkteModus } from "../../../../support/helpers/notenConfig";
+import {
+	requireKonfiguration,
+	requirePunkteModus,
+	requireWiederholung,
+} from "../../../../support/helpers/notenConfig";
+import { attemptsOfStudent, readState } from "../../../../support/helpers/notenScenario";
 import {
 	attemptDate,
 	loadNotenContext,
@@ -103,11 +108,12 @@ context("Benotungstool UI - Punktemodus", () => {
 	});
 
 	describe("Prüfungsdialog", () => {
+		// Beide Tests brauchen einen freien Antritt: eine positive Basisnote schliesst die Kette.
 		it("bietet ein Punktefeld statt der Notenauswahl", () => {
 			const student = ctx.students[1];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, { note: ctx.gradeNotes[0], freigegeben: true });
+			seedBaseline(ctx, student.uid, { note: ctx.notes.negativ, freigegeben: true });
 
 			page.visitAndWaitForTable(ctx);
 			page.getPruefungAddButton(student.uid, "antritt_2").click();
@@ -121,7 +127,7 @@ context("Benotungstool UI - Punktemodus", () => {
 			const student = ctx.students[1];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, { note: ctx.gradeNotes[0], freigegeben: true });
+			seedBaseline(ctx, student.uid, { note: ctx.notes.negativ, freigegeben: true });
 
 			page.visitAndWaitForTable(ctx);
 			page.getPruefungAddButton(student.uid, "antritt_2").click();
@@ -140,5 +146,70 @@ context("Benotungstool UI - Punktemodus", () => {
 	});
 
 	describe("Sammelanlage", () => {
+		// die Sammelanlage schickt nur Punkte; erst der Server leitet die Note ab
+		it("legt den Termin mit der aus den Punkten abgeleiteten Note an", function () {
+			requireWiederholung(this, ctx);
+
+			const [a, b] = [ctx.students[2], ctx.students[3]];
+
+			resetNotenState(ctx);
+			seedBaseline(ctx, a.uid, { note: ctx.notes.negativ, freigegeben: true });
+			seedBaseline(ctx, b.uid, { note: ctx.notes.negativ, freigegeben: true });
+
+			page.visitAndWaitForTable(ctx);
+			page.addPruefungBulk({ uids: [a.uid, b.uid], punkte: MITTE, datum: page.toDDMMYYYY(attemptDate(ctx, 1)) });
+
+			[a, b].forEach((student) => page.expectPruefung(student.uid, "antritt_2", { note: noteMitte, antritt: 2 }));
+		});
+	});
+
+	// Die Excel-Liste schreibt Dezimalstellen mit Komma oder mit Punkt. Beide Schreibweisen ergeben dieselbe Zahl.
+	describe("Import mit Punkten", () => {
+		const PUNKTE = 89.5;
+
+		[
+			["Dezimalkomma", "89,5"],
+			["Dezimalpunkt", "89.5"],
+		].forEach(([schreibweise, eingabe]) => {
+			it(`liest Punkte mit ${schreibweise} im Prüfungsimport`, function () {
+				requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_PRUEFUNGSIMPORT", true);
+				requireWiederholung(this, ctx);
+
+				const student = ctx.students[4];
+				const datum = page.importDatum(attemptDate(ctx, 1), ctx.cisConfig.CIS_GESAMTNOTE_IMPORT_DATUMSFORMAT);
+
+				resetNotenState(ctx);
+				seedBaseline(ctx, student.uid, { note: ctx.notes.negativ, freigegeben: true });
+				page.visitAndWaitForTable(ctx);
+
+				page.importPruefungen([[student.uid, datum, eingabe]]);
+
+				cy.get("@savePruefungenBulk").its("request.body.pruefungen.0.punkte").should("eq", PUNKTE);
+
+				readState(ctx).then((data) => {
+					const neu = attemptsOfStudent(data, student.uid)[1];
+					expect(neu, "der importierte Termin").to.exist;
+					expect(Number(neu.punkte), "die Punkte des Termins").to.eq(PUNKTE);
+				});
+			});
+
+			it(`liest Punkte mit ${schreibweise} im Notenimport`, function () {
+				requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_NOTENIMPORT", true);
+
+				const student = ctx.students[5];
+
+				resetNotenState(ctx);
+				page.visitAndWaitForTable(ctx);
+
+				page.importNoten([[student.uid, eingabe]]);
+
+				cy.get("@saveNotenvorschlagBulk").its("request.body.noten.0.punkte").should("eq", PUNKTE);
+
+				readLvGesamtnote(ctx, student.uid).then((row) => {
+					expect(row, "die importierte LV-Note").to.not.be.null;
+					expect(Number(row.punkte), "die Punkte der LV-Note").to.eq(PUNKTE);
+				});
+			});
+		});
 	});
 });

@@ -28,8 +28,11 @@ class Noten extends FHCAPI_Controller
 	/** The teachers of one Lehreinheit. They do not change during one request. */
 	private $lehrendeCache = array();
 
-	/** The Lehreinheit of one student in one course. A bulk path asks for it several times. */
+	/** The Lehreinheiten of one student in one course. A bulk path asks for them several times. */
 	private $lehreinheitCache = array();
+
+	/** Transcript grades of one student in one course. This tool never writes them. */
+	private $zeugnisnoteCache = array();
 
 	public function __construct()
 	{
@@ -47,6 +50,7 @@ class Noten extends FHCAPI_Controller
 			'getCisConfig' => $permissions,
 			'getNoteByPunkte' => $permissions,
 			'getBenotungstoolContext' => $permissions,
+			'getLehreinheitenFuerLv' => $permissions,
 			'getLehrendeFuerLehreinheit' => $permissions,
 			'getLvForStudiengang' => $permissions
 		]);
@@ -89,6 +93,7 @@ class Noten extends FHCAPI_Controller
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('codex/Mobilitaet_model', 'MobilitaetModel');
 		$this->load->model('organisation/Erhalter_model', 'ErhalterModel');
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 
 		$this->load->config('noten');
 		$this->load->helper('hlp_sancho_helper');
@@ -137,10 +142,10 @@ class Noten extends FHCAPI_Controller
 		$note = property_exists($payload, 'note') ? $payload->note : null;
 		$punkte = property_exists($payload, 'punkte') ? $payload->punkte : null;
 
-		// the points win: the grade then comes from the grading scale
-		if(CIS_GESAMTNOTE_PUNKTE && $punkte !== null && $punkte !== '' && $punkte >= 0) {
-			$resNote = $this->NotenschluesselaufteilungModel->getNote($punkte, $lva_id, $stsem);
-			$note = $this->getDataOrTerminateWithError($resNote);
+		// the points win: the grade comes from the grading scale; points without a grade refuse the entry
+		if(CIS_GESAMTNOTE_PUNKTE && $punkte !== null && $punkte !== '') {
+			$note = $this->noteAusPunkten($punkte, $lva_id, $stsem, implode(', ', array_column($uids, 'uid')));
+			if(is_string($note)) $this->terminateWithError($note, 'general');
 		}
 
 		// without a selection the exam has no grade
@@ -191,13 +196,13 @@ class Noten extends FHCAPI_Controller
 
 		if (isset($sem_kurzbz) && !isEmptyString($sem_kurzbz)) {
 			if ($isAssistenz) {
-				$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 				$result = $this->StudiengangModel->getByStgs($entitledStgs, $sem_kurzbz);
 				if (!isError($result)) $studiengaenge = getData($result) ?? array();
 
 				// deep-link: resolve the Studiengang of the requested LV so the frontend can preselect
 				// the Studiengang dropdown (and then its LV) - only if the Assistenz is entitled for it
-				if (isset($lv_id) && !isEmptyString($lv_id)) {
+				// only digits are a course id
+				if (isset($lv_id) && ctype_digit((string) $lv_id)) {
 					$res = $this->LehrveranstaltungModel->load($lv_id);
 					if (!isError($res) && hasData($res)) {
 						$stg = getData($res)[0]->studiengang_kz;
@@ -290,7 +295,13 @@ class Noten extends FHCAPI_Controller
 				// release: password required, and final?
 				'CIS_GESAMTNOTE_FREIGABE_PASSWORT' => $this->config->item('CIS_GESAMTNOTE_FREIGABE_PASSWORT') !== false,
 				'CIS_GESAMTNOTE_FREIGABE_FINAL' => (bool) $this->config->item('CIS_GESAMTNOTE_FREIGABE_FINAL'),
-				
+
+				// release mail on or off; the test suite releases only without it
+				'CIS_GESAMTNOTE_FREIGABEMAIL' => $this->config->item('CIS_GESAMTNOTE_FREIGABEMAIL') !== false,
+
+				// takeover and release write attempt 1 as an exam row
+				'CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME' => (bool) $this->config->item('CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME'),
+
 				'NOTEN_OHNE_ANTRITT' => $NOTEN_OHNE_ANTRITT,
 
 				'NOTEN_OCCURANCE_LIMIT_MAP' => $NOTEN_OCCURANCE_LIMIT_MAP,
@@ -322,9 +333,43 @@ class Noten extends FHCAPI_Controller
 				'NOTEN_ABSCHLIESSEND' => $special['abschliessend'],
 				'CIS_GESAMTNOTE_NOTENVERBESSERUNG' => $this->VerlaufLib->darfVerbessern(),
 				'CIS_GESAMTNOTE_VERBESSERUNG_BESSERE_GEWINNT' =>
-					(bool) $this->config->item('CIS_GESAMTNOTE_VERBESSERUNG_BESSERE_GEWINNT')
+					(bool) $this->config->item('CIS_GESAMTNOTE_VERBESSERUNG_BESSERE_GEWINNT'),
+
+				// the remaining rule keys, as the server applies them; the test suite reads a rule only from here
+				'NOTEN_ANRECHNUNG' => $special['anrechnung'],
+				'NOTEN_RANGFOLGE' => $special['rangfolge'],
+				'NOTE_NICHT_EINGETRAGEN' => $special['nichtEingetragen'],
+				'PRUEFUNG_KOMMISSIONELL_TYPEN' => $this->VerlaufLib->getKommissionellTypen(),
+				'PRUEFUNG_TYPEN_OHNE_ANTRITT' => $this->VerlaufLib->getTypenOhneAntritt(),
+				'PRUEFUNG_TYP_JE_ANTRITT' => $this->VerlaufLib->getTypJeAntritt(),
+				'NOTENEINTRAGUNGSFRIST_SS' => $this->fristMonatTag('SS'),
+				'NOTENEINTRAGUNGSFRIST_WS' => $this->fristMonatTag('WS'),
+				'CIS_GESAMTNOTE_FRIST_AUSNAHME' => (array) $this->config->item('CIS_GESAMTNOTE_FRIST_AUSNAHME'),
+				'CIS_GESAMTNOTE_ROLLENMATRIX' => (array) $this->config->item('CIS_GESAMTNOTE_ROLLENMATRIX'),
+				'CIS_GESAMTNOTE_LEKTOR_NUR_EIGENE_LV' => $this->config->item('CIS_GESAMTNOTE_LEKTOR_NUR_EIGENE_LV') !== false,
+				'CIS_GESAMTNOTE_FREIGABEMAIL_EMPFAENGER' => $this->freigabeEmpfaengerEintraege(),
+				'CIS_GESAMTNOTE_FREIGABEMAIL_VORLAGE' => $this->freigabeVorlage(),
+				'CIS_GESAMTNOTE_PRUEFUNG_HEBT_FREIGABE_AUF' => $this->config->item('CIS_GESAMTNOTE_PRUEFUNG_HEBT_FREIGABE_AUF') !== false,
+				'CIS_GESAMTNOTE_VORSCHLAG_RUNDUNG' => $this->rundungsModus(),
+				'CIS_GESAMTNOTE_VORSCHLAG_PUNKTE_STELLEN' => $this->punkteNachkommastellen(),
+				'CIS_GESAMTNOTE_VORSCHLAG_NUR_LEHRENOTEN' => $this->config->item('CIS_GESAMTNOTE_VORSCHLAG_NUR_LEHRENOTEN') !== false,
+				'CIS_GESAMTNOTE_VORSCHLAG_NACH_WIEDERHOLUNG' => $this->config->item('CIS_GESAMTNOTE_VORSCHLAG_NACH_WIEDERHOLUNG') === true,
+				'CIS_GESAMTNOTE_IMPORT_ABBRUCH' => $this->importBrichtAb(),
+				'NOTEN_SORTIERUNG' => $this->config->item('NOTEN_SORTIERUNG') === 'bezeichnung' ? 'bezeichnung' : 'skala'
 			)
 		);
+	}
+
+	/** GET 'lv_id', 'sem_kurzbz'. All Lehreinheiten of the course, for the filter and the grade lists. */
+	public function getLehreinheitenFuerLv() {
+		$lv_id = $this->input->get('lv_id');
+		$sem_kurzbz = $this->input->get('sem_kurzbz');
+
+		$this->assertLvAccess($lv_id, $sem_kurzbz);
+
+		$this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
+		$result = $this->LehreinheitModel->getLehreinheitenForLv($lv_id, $sem_kurzbz);
+		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result));
 	}
 
 	/**
@@ -336,11 +381,20 @@ class Noten extends FHCAPI_Controller
 		$lv_id = $this->input->get('lv_id');
 		$sem_kurzbz = $this->input->get('sem_kurzbz');
 
-		if(!$lehreinheit_id || !$lv_id || !$sem_kurzbz) {
+		if(!ctype_digit((string) $lehreinheit_id) || !$lv_id || !$sem_kurzbz) {
 			$this->terminateWithError($this->p->t('global', 'missingParameters'), 'general');
 		}
 
 		$this->assertLvAccess($lv_id, $sem_kurzbz);
+
+		// the Lehreinheit must belong to this course
+		$this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
+		$le = $this->LehreinheitModel->loadWhere(array(
+			'lehreinheit_id' => $lehreinheit_id,
+			'lehrveranstaltung_id' => $lv_id,
+			'studiensemester_kurzbz' => $sem_kurzbz
+		));
+		if(!hasData($le)) $this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 
 		$lehrende = array();
 		foreach($this->lehrendeDerLehreinheit($lehreinheit_id) as $l) {
@@ -502,16 +556,16 @@ class Noten extends FHCAPI_Controller
 			}
 		}
 		
-		// the course grade of each student, read once. The history below needs the same rows.
+		// All course grades of the course in one query, without the release filter: getLvGesamtNoten()
+		// gives released grades only. The history below needs the same rows.
 		$lvNotenRows = array();
+		$resLvNoten = $this->LvgesamtnoteModel->getByLvStudiensemester($lv_id, $sem_kurzbz);
+		foreach((hasData($resLvNoten) ? getData($resLvNoten) : array()) as $row) $lvNotenRows[$row->student_uid] = $row;
 
 		foreach($student_uids as $uid) {
 			$grades[$uid]['grades'] = [];
 
-			// Read without the filter. getLvGesamtNoten() gives released grades only. With that getter
-			// the course grade and the release state are empty after a reload.
-			$lvgesamtnote = $this->getLvGesamtnoteRow($lv_id, $uid, $sem_kurzbz);
-			$lvNotenRows[$uid] = $lvgesamtnote;
+			$lvgesamtnote = $lvNotenRows[$uid] ?? null;
 
 			if($lvgesamtnote !== null) {
 				$grades[$uid]['note_lv'] = $lvgesamtnote->note;
@@ -548,6 +602,7 @@ class Noten extends FHCAPI_Controller
 		$anwresult = $this->getAnwesenheiten($prestudent_ids, $lv_id, $sem_kurzbz);
 		
 		// calculate the grade proposals from the partial grades
+		$notenJePunkte = array();
 		foreach($studentenData as $student) {
 			
 			// null when the Anwesenheiten addon is absent - the column stays empty in the UI
@@ -604,8 +659,13 @@ class Noten extends FHCAPI_Controller
 					if (CIS_GESAMTNOTE_PUNKTE) {
 						$punkte_vorschlag = round(($gewichtet ? $punktesumme_gewichtet : $punktesumme) / $divisor,
 							$this->punkteNachkommastellen());
-						$note_vorschlag_result = $this->NotenschluesselaufteilungModel->getNote($punkte_vorschlag, $lv_id, $sem_kurzbz);
-						$note_vorschlag = $this->getDataOrTerminateWithError($note_vorschlag_result);
+						// equal points give an equal grade, so ask the grading scale once for each value
+						if(!array_key_exists((string) $punkte_vorschlag, $notenJePunkte)) {
+							$notenJePunkte[(string) $punkte_vorschlag] = $this->getDataOrTerminateWithError(
+								$this->NotenschluesselaufteilungModel->getNote($punkte_vorschlag, $lv_id, $sem_kurzbz)
+							);
+						}
+						$note_vorschlag = $notenJePunkte[(string) $punkte_vorschlag];
 					} else {
 						$note_vorschlag = $this->rundeNote(($gewichtet ? $notensumme_gewichtet : $notensumme) / $divisor);
 					}
@@ -676,6 +736,11 @@ class Noten extends FHCAPI_Controller
 		// examination rules: no entry and no change after the grade entry deadline
 		$this->enforceNoteneintragungsfrist($sem_kurzbz);
 
+		// only a participant of the course gets a grade
+		if(!$this->lehreinheitenFuerStudent($lv_id, $student_uid, $sem_kurzbz)) {
+			$this->terminateWithError($this->p->t('benotungstool', 'c4pruefungNichtGespeichert', [$student_uid]), 'general');
+		}
+
 		// In the points mode the grading scale decides, not the grade from the client. If not, you
 		// get a course grade that contradicts its own points. Without points there is nothing to
 		// derive (for example a proposal from Moodle partial grades), then the given grade applies.
@@ -696,6 +761,9 @@ class Noten extends FHCAPI_Controller
 		// ein Tag in der Vergangenheit liesse die geänderte Note als freigegeben erscheinen.
 		$erstantrittDatum = $datum === null || $datum === '' ? date("Y-m-d") : substr((string) $datum, 0, 10);
 		$lvgesamtnote = null;
+
+		// the course grade and attempt 1 are one change
+		$this->sperreStudent($student_uid, $lv_id, $sem_kurzbz);
 
 		$result = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lv_id, $student_uid, $sem_kurzbz);
 
@@ -754,12 +822,17 @@ class Noten extends FHCAPI_Controller
 		// Ohne geschriebene LV-Note entsteht kein Antritt: eine Prüfung ohne Note ist ein Zustand,
 		// den jeder andere Pfad ablehnt (c4keineLvNoteEingetragen).
 		if($lvgesamtnote === null) {
+			$this->db->trans_rollback();
 			$this->terminateWithError($this->p->t('benotungstool', 'c4pruefungNichtGespeichert', [$student_uid]), 'general');
 		}
 
 		// The course grade IS the first attempt. Write it as its own exam now, or the next exam
 		// becomes attempt 2 and the legacy type of the whole chain moves one place.
 		$this->erstantrittBeiUebernahme($lv_id, $student_uid, $sem_kurzbz, $note, $punkte, $erstantrittDatum);
+
+		if(!$this->entsperreStudent()) {
+			$this->terminateWithError($this->p->t('benotungstool', 'c4pruefungNichtGespeichert', [$student_uid]), 'general');
+		}
 
 		// the client shows the new attempt at once, without a reload. The row is the one just written.
 		$lvgesamtnote->verlauf = $this->buildVerlaufSummary($student_uid, $lv_id, $sem_kurzbz, $lvgesamtnote);
@@ -799,8 +872,13 @@ class Noten extends FHCAPI_Controller
 			// meldet die Note der vorherigen Person zurück
 			$lvgesamtnote = null;
 
-			$result = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lv_id, $note->uid, $sem_kurzbz);
-//			$this->addMeta($note->uid.'$result', $result);
+			// only a participant of the course gets a grade
+			if(!$this->lehreinheitenFuerStudent($lv_id, $note->uid, $sem_kurzbz)) {
+				$retLvNoten[$note->uid] = $this->p->t('benotungstool', 'c4pruefungNichtGespeichert', [$note->uid]);
+				if($this->importBrichtAb()) break;
+				continue;
+			}
+
 			
 			if(CIS_GESAMTNOTE_PUNKTE) {
 				$abgeleitet = $this->noteAusPunkten($note->punkte, $lv_id, $sem_kurzbz, $note->uid);
@@ -821,6 +899,10 @@ class Noten extends FHCAPI_Controller
 				if($this->importBrichtAb()) break;
 				continue;
 			}
+
+			// the course grade and attempt 1 are one change
+			$this->sperreStudent($note->uid, $lv_id, $sem_kurzbz);
+			$result = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lv_id, $note->uid, $sem_kurzbz);
 
 			if(!isError($result) && hasData($result)) {
 				$lvgesamtnote = getData($result)[0];
@@ -874,12 +956,18 @@ class Noten extends FHCAPI_Controller
 
 			// Ohne geschriebene LV-Note entsteht kein Antritt, und die Zeile meldet den Fehler
 			if($lvgesamtnote === null) {
+				$this->db->trans_rollback();
 				$retLvNoten[$note->uid] = $this->p->t('benotungstool', 'c4pruefungNichtGespeichert', [$note->uid]);
 				continue;
 			}
 
 			// the same rule as the single dialog: the course grade is attempt 1
 			$this->erstantrittBeiUebernahme($lv_id, $note->uid, $sem_kurzbz, trim($note->note), $note->punkte, date("Y-m-d"));
+
+			if(!$this->entsperreStudent()) {
+				$retLvNoten[$note->uid] = $this->p->t('benotungstool', 'c4pruefungNichtGespeichert', [$note->uid]);
+				continue;
+			}
 
 			$lvgesamtnote->verlauf = $this->buildVerlaufSummary($note->uid, $lv_id, $sem_kurzbz, $lvgesamtnote);
 
@@ -1032,6 +1120,9 @@ class Noten extends FHCAPI_Controller
 		
 		foreach($result->noten as $note) {
 
+			// read, release and attempt 1 are one change
+			$this->sperreStudent($note->uid, $lv_id, $sem_kurzbz);
+
 			$resultLVGes = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lv_id, $note->uid, $sem_kurzbz);
 			if (!isError($resultLVGes) && hasData($resultLVGes))
 			{
@@ -1104,6 +1195,8 @@ class Noten extends FHCAPI_Controller
 					}
 				}
 			}
+
+			$this->entsperreStudent();
 		}
 		$studlist .= "</table>";
 
@@ -1153,18 +1246,10 @@ class Noten extends FHCAPI_Controller
 
 		$jetzt = date("Y-m-d H:i:s");
 
-		if(CIS_GESAMTNOTE_PUNKTE && isset($punkte) && $punkte >= 0) {
-			// with a points entry the server checks the grade again and corrects it
-			$resultNote = $this->NotenschluesselaufteilungModel->getNote($punkte, $lva_id, $stsem);
-			if(isError($resultNote)) {
-				$this->terminateWithError(getError($resultNote));
-			} else {
-				$data = getData($resultNote);
-				if($data != $note)
-				{
-					$note = $data;
-				}
-			}
+		if(CIS_GESAMTNOTE_PUNKTE && $punkte !== null && $punkte !== '') {
+			// the grading scale decides; points without a grade refuse the entry, as in the bulk paths
+			$note = $this->noteAusPunkten($punkte, $lva_id, $stsem, $student_uid);
+			if(is_string($note)) $this->terminateWithError($note, 'general');
 			
 		}
 
@@ -1221,6 +1306,11 @@ class Noten extends FHCAPI_Controller
 	 */
 	private function assertLvAccess($lv_id, $sem_kurzbz)
 	{
+		// an empty id widens load() and the model filters to all courses
+		if(!ctype_digit((string) $lv_id) || (int) $lv_id < 1 || !is_string($sem_kurzbz) || trim($sem_kurzbz) === '') {
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
+
 		$this->load->library('PermissionLib');
 
 		// admins keep full access
@@ -1352,20 +1442,17 @@ class Noten extends FHCAPI_Controller
 		if($year <= 0) return null;
 
 		if($type === 'SS') {
-			$cfg = $this->config->item('NOTENEINTRAGUNGSFRIST_SS');
 			$deadlineYear = $year;
 		} elseif($type === 'WS') {
-			$cfg = $this->config->item('NOTENEINTRAGUNGSFRIST_WS');
 			$deadlineYear = $year + 1;
 		} else {
 			return null;
 		}
 
-		$month = (is_array($cfg) && isset($cfg['month'])) ? (int)$cfg['month'] : ($type === 'SS' ? 11 : 5);
-		$day   = (is_array($cfg) && isset($cfg['day']))   ? (int)$cfg['day']   : 15;
+		$tag = $this->fristMonatTag($type);
 
 		$deadline = new DateTime();
-		$deadline->setDate($deadlineYear, $month, $day);
+		$deadline->setDate($deadlineYear, $tag['month'], $tag['day']);
 		$deadline->setTime(23, 59, 59);
 		return $deadline;
 	}
@@ -1458,6 +1545,17 @@ class Noten extends FHCAPI_Controller
 		}
 	}
 
+	/** Commits the write of one student, or rolls it back after a failed statement. @return bool */
+	private function entsperreStudent()
+	{
+		if($this->db->trans_status() === false) {
+			$this->db->trans_rollback();
+			return false;
+		}
+
+		return $this->db->trans_commit();
+	}
+
 	/** All actions of the caller, for the client. @return array */
 	private function erlaubteAktionen()
 	{
@@ -1505,11 +1603,8 @@ class Noten extends FHCAPI_Controller
 	 */
 	private function freigabeEmpfaenger($studiengangAdressen)
 	{
-		$konfiguriert = $this->config->item('CIS_GESAMTNOTE_FREIGABEMAIL_EMPFAENGER');
-		if(!is_array($konfiguriert)) $konfiguriert = array('studiengang', 'aufrufer');
-
 		$adressen = array();
-		foreach($konfiguriert as $eintrag) {
+		foreach($this->freigabeEmpfaengerEintraege() as $eintrag) {
 			if($eintrag === 'studiengang') {
 				foreach($studiengangAdressen as $adresse) {
 					if(trim($adresse) !== '') $adressen[] = trim($adresse);
@@ -1525,17 +1620,40 @@ class Noten extends FHCAPI_Controller
 		return array_values(array_unique($adressen));
 	}
 
+	/** The configured recipient entries of the release mail. @return array */
+	private function freigabeEmpfaengerEintraege()
+	{
+		$eintraege = $this->config->item('CIS_GESAMTNOTE_FREIGABEMAIL_EMPFAENGER');
+		return is_array($eintraege) ? $eintraege : array('studiengang', 'aufrufer');
+	}
+
+	/** Sancho template of the release mail. @return string */
+	private function freigabeVorlage()
+	{
+		$vorlage = $this->config->item('CIS_GESAMTNOTE_FREIGABEMAIL_VORLAGE');
+		return (is_string($vorlage) && $vorlage !== '') ? $vorlage : 'Notenfreigabe';
+	}
+
+	/** Month and day of the grade entry deadline for 'SS' or 'WS'. @return array */
+	private function fristMonatTag($type)
+	{
+		$cfg = $this->config->item($type === 'SS' ? 'NOTENEINTRAGUNGSFRIST_SS' : 'NOTENEINTRAGUNGSFRIST_WS');
+
+		return array(
+			'month' => (is_array($cfg) && isset($cfg['month'])) ? (int) $cfg['month'] : ($type === 'SS' ? 11 : 5),
+			'day' => (is_array($cfg) && isset($cfg['day'])) ? (int) $cfg['day'] : 15
+		);
+	}
+
 	/**
-	 * The grade of an excused date, or null. An addon knows the excuses, therefore the answer comes
-	 * from an event. A failure of that addon must not stop the grade entry.
+	 * The grade 'entschuldigt' if an addon reports the date as excused, else null. A failure of that
+	 * addon must not stop the grade entry.
 	 *
-	 * Runs BEFORE the writes: the course grade and the exam must tell the same story.
+	 * Runs BEFORE the transaction: a failed addon query would abort it.
 	 *
-	 * @param array $pruefungen   the exams of the student, read before the write
-	 * @param mixed $pruefung_id  the edited row; it does not count against the occurrence limit
 	 * @return mixed|null
 	 */
-	private function entschuldigungsNote($student_uid, $datum, $pruefungen, $pruefung_id)
+	private function entschuldigungsNote($student_uid, $datum)
 	{
 		$status = [];
 
@@ -1558,15 +1676,7 @@ class Noten extends FHCAPI_Controller
 
 		if(count($status) === 0 || $status[0] != true) return null;
 
-		$entschuldigtNote = $this->VerlaufLib->getSpecialNotes()['entschuldigt'];
-		if($entschuldigtNote === null) return null;
-
-		// the rules were checked on the grade BEFORE the override, therefore check the limit again
-		if($this->VerlaufLib->ueberschreitetNotenLimit($pruefungen, $entschuldigtNote, $pruefung_id)) {
-			return null;
-		}
-
-		return $entschuldigtNote;
+		return $this->VerlaufLib->getSpecialNotes()['entschuldigt'];
 	}
 
 	/** Does one of the two deadline checks apply? Falls back to the old combined key. @return bool */
@@ -1617,6 +1727,9 @@ class Noten extends FHCAPI_Controller
 	/** The transcript grade or null. Credited grades are there, not in the course grade. @return mixed|null */
 	private function getZeugnisnote($lva_id, $student_uid, $stsem)
 	{
+		$key = $lva_id . '|' . $student_uid . '|' . $stsem;
+		if(array_key_exists($key, $this->zeugnisnoteCache)) return $this->zeugnisnoteCache[$key];
+
 		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
 
 		$res = $this->ZeugnisnoteModel->load([
@@ -1625,7 +1738,7 @@ class Noten extends FHCAPI_Controller
 			'lehrveranstaltung_id' => $lva_id
 		]);
 
-		return (!isError($res) && hasData($res)) ? getData($res)[0]->note : null;
+		return $this->zeugnisnoteCache[$key] = (!isError($res) && hasData($res)) ? getData($res)[0]->note : null;
 	}
 
 	/** Does a bulk path stop at the first rejected row? @return bool */
@@ -1640,20 +1753,24 @@ class Noten extends FHCAPI_Controller
 		return $lvRow !== null && $lvRow->freigabedatum !== null && $lvRow->freigabedatum !== '';
 	}
 
+	/** Lehreinheiten of one student in the course, lowest id first. Empty = no participant. @return array */
+	private function lehreinheitenFuerStudent($lva_id, $student_uid, $stsem)
+	{
+		$key = $lva_id . '|' . $student_uid . '|' . $stsem;
+		if(!array_key_exists($key, $this->lehreinheitCache)) {
+			$res = $this->LehrveranstaltungModel->getLeIdsByStudent($student_uid, $stsem, $lva_id);
+			$this->lehreinheitCache[$key] = hasData($res) ? array_column(getData($res), 'lehreinheit_id') : array();
+		}
+
+		return $this->lehreinheitCache[$key];
+	}
+
 	/** Lehreinheit of one student; the grading person and the exam row both need it. @return mixed|null */
 	private function lehreinheitFuerStudent($lva_id, $student_uid, $stsem)
 	{
-		$key = $lva_id . '|' . $student_uid . '|' . $stsem;
-		if(array_key_exists($key, $this->lehreinheitCache)) return $this->lehreinheitCache[$key];
+		$lehreinheiten = $this->lehreinheitenFuerStudent($lva_id, $student_uid, $stsem);
 
-		$this->lehreinheitCache[$key] = null;
-
-		$resLe = $this->LehrveranstaltungModel->getLeByStudent($student_uid, $stsem, $lva_id);
-		if(isError($resLe) || !hasData($resLe)) return null;
-
-		$this->lehreinheitCache[$key] = current(getData($resLe))->lehreinheit_id;
-
-		return $this->lehreinheitCache[$key];
+		return $lehreinheiten ? $lehreinheiten[0] : null;
 	}
 
 	/**
@@ -1751,12 +1868,19 @@ class Noten extends FHCAPI_Controller
 	 */
 	private function rundeNote($wert)
 	{
-		$modus = $this->config->item('CIS_GESAMTNOTE_VORSCHLAG_RUNDUNG');
+		$modus = $this->rundungsModus();
 
 		if($modus === 'besser') return (int) floor($wert);
 		if($modus === 'schlechter') return (int) ceil($wert);
 
 		return (int) round($wert);
+	}
+
+	/** Rounding of the proposal: 'besser', 'schlechter' or 'kaufmaennisch'. @return string */
+	private function rundungsModus()
+	{
+		$modus = $this->config->item('CIS_GESAMTNOTE_VORSCHLAG_RUNDUNG');
+		return in_array($modus, array('besser', 'schlechter'), true) ? $modus : 'kaufmaennisch';
 	}
 
 	/**
@@ -1770,13 +1894,30 @@ class Noten extends FHCAPI_Controller
 	 */
 	private function savePruefungFuerStudent($pruefung_id, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum, $mitarbeiter_uid = null)
 	{
+		// the rules compare Y-m-d strings; another format breaks the order of the attempts
+		$tag = substr((string) $datum, 0, 10);
+		$geprueft = DateTime::createFromFormat('Y-m-d', $tag);
+		if(!$geprueft || $geprueft->format('Y-m-d') !== $tag) return $this->p->t('benotungstool', 'pruefungsdatumUngueltig', [$student_uid]);
+		$datum = $tag;
+
 		// §7 and §11: every exam must take place before the grade entry deadline. The kommissionelle
 		// Prüfung is the important case, because it decides if the student loses a semester.
 		$fristError = $this->pruefungsdatumNachFrist($stsem, $datum, $student_uid);
 		if($fristError !== null) return $fristError;
 
-		// The context of the rules, read once. It travels with the call, so no method below reads the
-		// same row again.
+		// the Lehreinheit decides the course of the exam; accept only one of this student in this course
+		$lehreinheiten = $this->lehreinheitenFuerStudent($lva_id, $student_uid, $stsem);
+		if(!$lehreinheiten) return $this->p->t('benotungstool', 'c4pruefungNichtGespeichert', [$student_uid]);
+		$index = array_search($lehreinheit_id, $lehreinheiten);
+		$lehreinheit_id = $lehreinheiten[$index === false ? 0 : $index];
+
+		// the addon runs before the transaction: a failed addon query would abort it
+		$entschuldigt = $this->entschuldigungsNote($student_uid, $datum);
+
+		$this->sperreStudent($student_uid, $lva_id, $stsem);
+
+		// The context of the rules, read once inside the lock. It travels with the call, so no method
+		// below reads the same row again.
 		// The course grade comes without the filter: a grade that is not released still exists. You
 		// must update it, because a new insert breaks the primary key.
 		$zeugnisNote = $this->getZeugnisnote($lva_id, $student_uid, $stsem);
@@ -1785,15 +1926,31 @@ class Noten extends FHCAPI_Controller
 
 		// validate before any write
 		$regelError = $this->validatePruefung($student_uid, $note, $datum, $pruefung_id, $pruefungen, $bestehendeLvNote, $zeugnisNote);
-		if($regelError !== null) return $regelError;
+		if($regelError !== null) {
+			$this->db->trans_rollback();
+			return $regelError;
+		}
 
-		// An excused date decides the grade before anything is written. If it decided later, the
-		// course grade would carry the grade of the dialog and the exam would carry 'entschuldigt'.
-		$entschuldigt = $this->entschuldigungsNote($student_uid, $datum, $pruefungen, $pruefung_id);
-		if($entschuldigt !== null) $note = $entschuldigt;
+		// A course grade without an exam row is attempt 1: the takeover ran without
+		// CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME, or the grade is older than this tool. The first new exam writes it now.
+		if(($pruefung_id === null || $pruefung_id === '')
+			&& count($pruefungen) === 0 && $bestehendeLvNote !== null
+			&& $this->VerlaufLib->buildVerlauf($pruefungen, $bestehendeLvNote->note, $zeugnisNote)->impliziterErstantritt) {
+			// attempt 1 must stay before the new exam; an exam entered late can be older than the benotungsdatum
+			$tagLvNote = substr((string) $bestehendeLvNote->benotungsdatum, 0, 10);
+			$tagErstantritt = ($tagLvNote !== '' && $tagLvNote < $datum) ? $tagLvNote : date('Y-m-d', strtotime($datum . ' -1 day'));
 
-		// the client does not always send it; without it the insert fails on the NOT NULL column
-		if(!$lehreinheit_id) $lehreinheit_id = $this->lehreinheitFuerStudent($lva_id, $student_uid, $stsem);
+			$this->VerlaufLib->upsertErstantritt(
+				$student_uid, $lva_id, $stsem, $bestehendeLvNote->note, $bestehendeLvNote->punkte, $tagErstantritt,
+				$this->benotenderMitarbeiter($lehreinheit_id), false, $lehreinheit_id
+			);
+			$pruefungen = $this->VerlaufLib->getPruefungen($student_uid, $lva_id, $stsem);
+		}
+
+		// an excused date replaces the grade of the dialog, within the occurrence limit
+		if($entschuldigt !== null && !$this->VerlaufLib->ueberschreitetNotenLimit($pruefungen, $entschuldigt, $pruefung_id)) {
+			$note = $entschuldigt;
+		}
 
 		$jetzt = date("Y-m-d H:i:s");
 
@@ -1801,21 +1958,19 @@ class Noten extends FHCAPI_Controller
 		$origLvNote = $bestehendeLvNote ? $bestehendeLvNote->note : null;
 		$lvgesamtnote = $bestehendeLvNote;
 
-		$this->db->trans_begin();
+		// the rules decide the course grade: the last exam that uses an attempt, never 'entschuldigt'
+		list($lvNoteNeu, $lvPunkteNeu) = $this->VerlaufLib->lvNoteNachTermin(
+			$pruefungen, $pruefung_id, $note, $punkte, $origLvNote, $bestehendeLvNote ? $bestehendeLvNote->punkte : null
+		);
 
 		if($bestehendeLvNote === null) {
-			$lvgesamtnote = $this->createLvGesamtnote($lva_id, $student_uid, $stsem, $note, $punkte, $lehreinheit_id, $mitarbeiter_uid);
+			$lvgesamtnote = $this->createLvGesamtnote($lva_id, $student_uid, $stsem, $lvNoteNeu, $lvPunkteNeu, $lehreinheit_id, $mitarbeiter_uid);
 
 			$this->logLib->logInfoDB(array('pruefung: lvnote angelegt', $student_uid, $lva_id, $stsem,
 				$note, $punkte, getAuthUID(), getAuthPersonId()));
 		} else {
-			// An excused date is no performance. It documents the date and keeps the course grade, so
-			// an earlier result survives.
-			$lvNoteNeu = $entschuldigt !== null ? $origLvNote : $note;
-			$lvPunkteNeu = $entschuldigt !== null ? $bestehendeLvNote->punkte : $punkte;
-
 			// a repeat must not worsen the LV-Note; the exam row keeps the real grade
-			if($entschuldigt === null
+			if($lvNoteNeu == $note
 				&& $this->config->item('CIS_GESAMTNOTE_VERBESSERUNG_BESSERE_GEWINNT')
 				&& $this->VerlaufLib->istSchlechter($note, $origLvNote)) {
 				$lvNoteNeu = $origLvNote;
@@ -1856,7 +2011,7 @@ class Noten extends FHCAPI_Controller
 			return $pruefungenChanged;
 		}
 
-		$this->db->trans_commit();
+		if(!$this->entsperreStudent()) return $this->p->t('benotungstool', 'c4pruefungNichtGespeichert', [$student_uid]);
 
 		$pruefungenChanged['lvgesamtnote'] = $lvgesamtnote;
 
@@ -1973,17 +2128,21 @@ class Noten extends FHCAPI_Controller
 			);
 
 			// Send mail
-			$vorlage = $this->config->item('CIS_GESAMTNOTE_FREIGABEMAIL_VORLAGE');
-			if(!is_string($vorlage) || $vorlage === '') $vorlage = 'Notenfreigabe';
-
 			sendSanchoMail(
-				$vorlage,
+				$this->freigabeVorlage(),
 				$body_fields,
 				$email,
 				$betreff
 			);
 		}
 
+	}
+
+	/** Opens a transaction; a second request for the same student in the same course waits for it. */
+	private function sperreStudent($student_uid, $lva_id, $stsem)
+	{
+		$this->db->trans_begin();
+		$this->db->query('SELECT pg_advisory_xact_lock(hashtext(?))', array($student_uid . '|' . $lva_id . '|' . $stsem));
 	}
 
 	/**
@@ -2050,6 +2209,11 @@ class Noten extends FHCAPI_Controller
 		$noten = $this->aktiveNoten();
 		$wert  = trim((string)$note);
 
+		// the course grade is never 'entschuldigt': an excused date uses no attempt
+		if($wert !== '' && $wert == $this->VerlaufLib->getSpecialNotes()['entschuldigt']) {
+			return $this->p->t('benotungstool', 'c4noteNichtInLehre', [$student_uid]);
+		}
+
 		// the editor offers the lehre grades only; an administrative grade belongs to the transcript
 		if($this->config->item('CIS_GESAMTNOTE_VORSCHLAG_NUR_LEHRENOTEN') !== false
 			&& (!isset($noten[$wert]) || !$noten[$wert]->lehre)) {
@@ -2107,6 +2271,21 @@ class Noten extends FHCAPI_Controller
 			return $this->p->t('benotungstool', 'freigabeEndgueltig', [$student_uid]);
 		}
 
+		// the exam also writes the course grade: only a lehre grade, or one that uses no attempt
+		$noten = $this->aktiveNoten();
+		$wert = trim((string) $note);
+		if($this->config->item('CIS_GESAMTNOTE_VORSCHLAG_NUR_LEHRENOTEN') !== false
+			&& !in_array($wert, $this->VerlaufLib->getSpecialNotes()['ohneAntritt'])
+			&& (!isset($noten[$wert]) || !$noten[$wert]->lehre)) {
+			return $this->p->t('benotungstool', 'c4noteNichtInLehre', [$student_uid]);
+		}
+
+		// a locked transcript grade forbids every change, as in validateNotenvorschlag
+		$zeugnis = trim((string) $zeugnisNote);
+		if(isset($noten[$zeugnis]) && !$noten[$zeugnis]->lkt_ueberschreibbar) {
+			return $this->p->t('benotungstool', 'c4zeugnisnoteGesperrt', [$student_uid]);
+		}
+
 		// the matrix can reserve the kommPruef for one role, on top of the global switch
 		if($neu && !$this->darfAktion('kommpruef')) {
 			$verlauf = $this->VerlaufLib->buildVerlauf($pruefungen, $lvNote, $zeugnisNote);
@@ -2131,6 +2310,8 @@ class Noten extends FHCAPI_Controller
 			'terminal' => $verlauf->terminal,
 			// closed by a pass, not by the attempt limit
 			'bestanden' => $verlauf->bestanden,
+			// the takeover path is locked from the first repeat on
+			'hatWiederholung' => $verlauf->hatWiederholung,
 			'erstantrittMoeglich' => $verlauf->erstantrittMoeglich,
 			'naechsteRolle' => $verlauf->naechsteRolle,
 			// the next attempt is kommissionell and this tool may not create it

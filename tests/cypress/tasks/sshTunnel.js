@@ -134,4 +134,4 @@ const ensureTunnel = async (cfg) => {
 	}
 };
 
-module.exports = { ensureTunnel, closeTunnel, tunnelPort };
+module.exports = { ensureTunnel, closeTunnel, tunnelPort, resolveAuth };

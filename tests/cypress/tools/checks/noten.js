@@ -19,7 +19,7 @@ module.exports = {
 	title: "Gesamtnoteneingabe",
 
 	sqlFiles: {
-		seed: seeder("016_benotungstool_noten.sql"),
+		seed: [seeder("016_benotungstool_noten.sql"), seeder("019_benotungstool_fixture_erweitert.sql")],
 	},
 
 	checks: [
@@ -112,6 +112,39 @@ module.exports = {
 			hint:
 				"The Notenschluessel tables are empty in the base dump, so getNoteByPunkte always returns " +
 				"null. Apply 016_benotungstool_noten.sql.",
+		},
+		{
+			label: "Students in the second Lehreinheit of LV 5221",
+			sql: `SELECT COUNT(*)::int AS value FROM campus.vw_student_lehrveranstaltung
+			       WHERE lehreinheit_id = 51103 AND studiensemester_kurzbz = ${SEM}`,
+			ok: (r) => r.value > 0,
+			hint: "The Lehreinheit check of the write paths needs it. Apply 019_benotungstool_fixture_erweitert.sql.",
+		},
+		{
+			label: "Lektoren of Lehreinheit 51103",
+			sql: "SELECT COUNT(*)::int AS value FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id = 51103",
+			ok: (r) => r.value >= 2,
+			hint: "The grader rules need two Lektoren. Apply 019_benotungstool_fixture_erweitert.sql.",
+		},
+		{
+			label: "Sommersemester after its deadline, taught by demolektor1",
+			sql: `SELECT COALESCE((SELECT le.studiensemester_kurzbz
+			                         FROM lehre.tbl_lehreinheit le
+			                         JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id)
+			                        WHERE mitarbeiter_uid = 'demolektor1'
+			                          AND le.studiensemester_kurzbz ~ '^SS[0-9]{4}$'
+			                          AND make_date(substring(le.studiensemester_kurzbz FROM 3 FOR 4)::int, 11, 15) < current_date
+			                        ORDER BY le.studiensemester_kurzbz DESC LIMIT 1), '') AS value`,
+			ok: (r) => r.value !== "",
+			hint: "The deadline tests need it. Apply 019_benotungstool_fixture_erweitert.sql.",
+		},
+		{
+			label: "Texts of the Vorlagen Notenfreigabe and Sancho_Mail_Template",
+			sql: `SELECT COUNT(DISTINCT vorlage_kurzbz)::int AS value FROM public.tbl_vorlagestudiengang
+			       WHERE vorlage_kurzbz IN ('Notenfreigabe', 'Sancho_Mail_Template') AND aktiv
+			         AND COALESCE(text, '') <> ''`,
+			ok: (r) => r.value === 2,
+			hint: "Without both texts every release mail has an empty body. Apply 019_benotungstool_fixture_erweitert.sql.",
 		},
 	],
 };

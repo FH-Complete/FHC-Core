@@ -740,10 +740,11 @@ EOSQL;
 	}
 
 
-	public function getAllLehreinheitenForLvaAndMaUid($lva_id, $ma_uid, $sem_kurzbz)
+	public function getLehreinheitenForLv($lva_id, $sem_kurzbz)
 	{
-		$query = "SELECT DISTINCT tbl_lehreinheitmitarbeiter.lehreinheit_id, tbl_lehreinheit.lehrveranstaltung_id, tbl_lehreinheit.lehrform_kurzbz,
-						tbl_lehreinheitmitarbeiter.mitarbeiter_uid,
+		// every Lehreinheit of the course; the caller checks the access
+		$query = "SELECT DISTINCT tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrveranstaltung_id, tbl_lehreinheit.lehrform_kurzbz,
+						tbl_gruppe.direktinskription,
 						tbl_lehreinheitgruppe.semester,
 						tbl_lehreinheitgruppe.verband,
 						tbl_lehreinheitgruppe.gruppe,
@@ -752,13 +753,14 @@ EOSQL;
 			 			tbl_studiengang.kurzbzlang,
 			 			(SELECT COUNT(DISTINCT datum) FROM campus.vw_stundenplan WHERE lehreinheit_id = lehre.tbl_lehreinheit.lehreinheit_id) as termincount,
 						(SELECT COUNT(*) FROM campus.vw_student_lehrveranstaltung WHERE lehreinheit_id = lehre.tbl_lehreinheit.lehreinheit_id) as studentcount
-		FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+		FROM lehre.tbl_lehreinheit
 			JOIN lehre.tbl_lehreinheitgruppe USING(lehreinheit_id)
 			JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 			JOIN public.tbl_studiengang ON (tbl_lehreinheitgruppe.studiengang_kz = tbl_studiengang.studiengang_kz)
-		WHERE lehrveranstaltung_id = ? AND studiensemester_kurzbz = ? AND mitarbeiter_uid = ?
+		LEFT JOIN public.tbl_gruppe ON (tbl_gruppe.gruppe_kurzbz = tbl_lehreinheitgruppe.gruppe_kurzbz)
+		WHERE lehrveranstaltung_id = ? AND tbl_lehreinheit.studiensemester_kurzbz = ?
 		ORDER BY tbl_lehreinheitgruppe.gruppe_kurzbz";
 
-		return $this->execQuery($query, [$lva_id, $sem_kurzbz, $ma_uid]);
+		return $this->execReadOnlyQuery($query, [$lva_id, $sem_kurzbz]);
 	}
 }

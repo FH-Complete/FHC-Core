@@ -7,7 +7,8 @@
  */
 
 import { notenApi } from "../../../../support/api/notenApi";
-import { expectNotenSuccess } from "../../../../support/helpers/notenErrors";
+import { expectNotenError, expectNotenSuccess } from "../../../../support/helpers/notenErrors";
+import { requireKonfiguration, requireWiederholung } from "../../../../support/helpers/notenConfig";
 import {
 	attemptDate,
 	baselineBenotungsdatum,
@@ -17,6 +18,7 @@ import {
 	requireDbReset,
 	resetNotenState,
 	seedBaseline,
+	seedPruefung,
 } from "../../../../support/helpers/notenTestData";
 import {
 	addPruefung,
@@ -91,7 +93,9 @@ describe("Noten API - Notenvorschlag", () => {
 	describe("das gewählte Benotungsdatum", () => {
 		// Die LV-Note IST Antritt 1. Ohne diese Zeile bekäme die nächste Prüfung Termin2, und der
 		// Legacy-Typ der ganzen Kette verschiebt sich um eine Stelle.
-		it("writes attempt 1 with the chosen day", () => {
+		it("writes attempt 1 with the chosen day", function () {
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", true);
+
 			const student = ctx.students[1];
 			const datum = baselineDate(ctx);
 
@@ -103,6 +107,7 @@ describe("Noten API - Notenvorschlag", () => {
 					const row = expectNotenSuccess(response, "saveNotenvorschlag")[0];
 					expect(row.verlauf, "die Antwort trägt den Verlauf").to.exist;
 					expect(row.verlauf.antrittCount, "die LV-Note ist Antritt 1").to.eq(1);
+					expect(row.verlauf.hatWiederholung, "Antritt 1 ist keine Wiederholung").to.be.false;
 				})
 				.then(() => readState(ctx))
 				.then((data) => {
@@ -113,7 +118,9 @@ describe("Noten API - Notenvorschlag", () => {
 				});
 		});
 
-		it("makes the next exam attempt 2, not attempt 1 again", () => {
+		it("makes the next exam attempt 2, not attempt 1 again", function () {
+			requireWiederholung(this, ctx);
+
 			const student = ctx.students[2];
 
 			resetNotenState(ctx);
@@ -138,9 +145,122 @@ describe("Noten API - Notenvorschlag", () => {
 				});
 		});
 
+		it("schreibt ohne CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME nur die LV-Note", function () {
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", false);
+
+			const student = ctx.students[1];
+
+			resetNotenState(ctx);
+
+			notenApi
+				.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, ctx.notes.negativ, null, baselineDate(ctx))
+				.then((response) => {
+					const row = expectNotenSuccess(response, "saveNotenvorschlag")[0];
+					expect(String(row.note), "die LV-Note").to.eq(String(ctx.notes.negativ));
+					expect(row.verlauf.antrittCount, "die LV-Note zählt als Antritt 1").to.eq(1);
+				});
+
+			readState(ctx).then((data) => {
+				expect(attemptsOfStudent(data, student.uid), "kein Termin").to.have.length(0);
+			});
+		});
+
+		// Ohne Erstantritt bei der Übernahme bleibt die LV-Note Antritt 1. Der erste Termin schreibt ihn nach
+		// und wird selbst Antritt 2.
+		it("legt ohne CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME Antritt 1 mit dem ersten Termin an", function () {
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", false);
+			requireWiederholung(this, ctx);
+
+			const student = ctx.students[2];
+
+			resetNotenState(ctx);
+			notenApi
+				.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, ctx.notes.negativ)
+				.then((response) => expectNotenSuccess(response, "übernehmen ohne Erstantritt"));
+
+			addPruefung(ctx, student, { note: ctx.gradeNotes[1], datum: attemptDate(ctx, 1) }).then((response) =>
+				expectNotenSuccess(response, "erster Termin"),
+			);
+
+			readState(ctx).then((data) => {
+				const attempts = attemptsOfStudent(data, student.uid);
+				expect(attempts, "Antritt 1 und der neue Termin").to.have.length(2);
+				expect(String(attempts[0].note), "Antritt 1 trägt die LV-Note").to.eq(String(ctx.notes.negativ));
+				expect(attempts.map((p) => p.antritt_nr), "Antrittsnummern").to.deep.eq([1, 2]);
+				expect(verlaufOfStudent(data, student.uid).antrittCount, "zwei Antritte").to.eq(2);
+			});
+		});
+
+	});
+
+	// W5: Eine Abfrage liest alle LV-Noten der LV. Das Ergebnis je Studierendem bleibt gleich.
+	describe("Lesedaten", () => {
+		it("liefert LV-Note und Zeitstempel je Studierendem", () => {
+			const [freigegeben, offen, ohneNote] = ctx.students;
+
+			resetNotenState(ctx);
+			seedBaseline(ctx, freigegeben.uid, { freigegeben: true });
+			seedBaseline(ctx, offen.uid, { freigegeben: false });
+
+			readState(ctx).then((data) => {
+				const f = lvNoteOf(data, freigegeben.uid);
+				expect(f.note_lv, "LV-Note der freigegebenen Zeile").to.exist;
+				expect(f.freigabedatum, "freigabedatum der freigegebenen Zeile").to.exist;
+				expect(f.benotungsdatum, "benotungsdatum der freigegebenen Zeile").to.exist;
+
+				const o = lvNoteOf(data, offen.uid);
+				expect(o.note_lv, "LV-Note der offenen Zeile").to.exist;
+				expect(o.benotungsdatum, "benotungsdatum der offenen Zeile").to.exist;
+				expect(o.freigabedatum, "die offene Zeile ist nicht freigegeben").to.be.oneOf([null, undefined, ""]);
+
+				expect((lvNoteOf(data, ohneNote.uid) || {}).note_lv, "keine LV-Note").to.be.oneOf([null, undefined]);
+			});
+		});
+	});
+
+	// W7: Eine einzelne Wiederholung ohne Antritt 1, wie sie die Studierendenverwaltung hinterlassen kann. Dieses
+	// Werkzeug erzeugt den Zustand nicht mehr: sein erster Termin schreibt Antritt 1 nach.
+	describe("eine einzelne Wiederholung", () => {
+		it("sperrt die Übernahme", () => {
+			const student = ctx.students[3];
+			const g2 =
+				ctx.notes.positiv ?? ctx.notes.bestnote ?? ctx.gradeNotes.find((n) => String(n) !== String(ctx.notes.negativ));
+			const g3 = ctx.gradeNotes.find((n) => String(n) !== String(g2));
+
+			resetNotenState(ctx);
+			seedBaseline(ctx, student.uid, { erstantritt: false });
+
+			let wiederholungId;
+			seedPruefung(ctx, student, { note: g2, datum: attemptDate(ctx, 1), typ: "Termin2" }).then((seeded) => {
+				wiederholungId = seeded.pruefungId;
+			});
+
+			readState(ctx).then((data) => {
+				expect(verlaufOfStudent(data, student.uid).hatWiederholung, "hatWiederholung").to.be.true;
+			});
+
+			notenApi
+				.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, g3, null, baselineDate(ctx))
+				.then((response) => expectNotenError(response, "c4notenvorschlagGesperrt"));
+
+			readState(ctx).then((data) => {
+				const pruefung = attemptsOfStudent(data, student.uid).find(
+					(p) => String(p.pruefung_id) === String(wiederholungId),
+				);
+				expect(String(pruefung.note), "die Wiederholung behält ihre Note").to.eq(String(g2));
+				expect(String(pruefung.datum).slice(0, 10), "die Wiederholung behält ihr Datum").to.eq(
+					attemptDate(ctx, 1),
+				);
+			});
+		});
 	});
 
 	describe("re-grading an already freigegebene note", () => {
+		// eine endgültige Freigabe verbietet genau das, siehe noten.freigabe
+		beforeEach(function () {
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_FREIGABE_FINAL", false);
+		});
+
 		it("moves the state from freigegeben to changed", () => {
 			const student = ctx.students[1];
 

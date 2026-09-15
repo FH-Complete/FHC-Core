@@ -115,6 +115,10 @@ class PruefungsverlaufLib
 		// after the first exam each new entry is a repeat attempt
 		$verlauf->erstantrittMoeglich = !$angerechnet && (count($eintraege) === 0);
 
+		// a repeat exists: a second exam, or one exam that is no attempt 1 (next to an implicit attempt 1)
+		$verlauf->hatWiederholung = count($eintraege) > 1
+			|| (count($eintraege) === 1 && $eintraege[0]->pruefungstyp_kurzbz !== $this->legacyTypFuerAntritt(1));
+
 		// The last attempt of the chain is kommissionell (§17 Abs 1). The role therefore follows
 		// from the position, and the user interface offers no type to select.
 		if (count($eintraege) === 0 && !$implizit) {
@@ -165,6 +169,13 @@ class PruefungsverlaufLib
 		}
 
 		return (is_numeric($wert) && (int) $wert >= 1) ? (int) $wert : null;
+	}
+
+	/** The exam types held before a commission. @return array */
+	public function getKommissionellTypen()
+	{
+		$typen = $this->_ci->config->item('PRUEFUNG_KOMMISSIONELL_TYPEN');
+		return is_array($typen) ? $typen : ['kommPruef', 'zusKommPruef'];
 	}
 
 	/** Attempts that count, kommissionell included. Config wins, else the old flags. @return int */
@@ -261,20 +272,16 @@ class PruefungsverlaufLib
 	}
 
 	/**
-	 * Does a Termin after attempt 1 exist?
+	 * Does a repeat exist? See buildVerlauf.
 	 *
 	 * Attempt 1 and the LV-Note are the same performance, so the takeover path may still write it.
-	 * From the first repeat on the grade belongs to the attempt. Decided by position, not by count.
+	 * From the first repeat on the grade belongs to the attempt.
 	 *
 	 * @return bool
 	 */
 	public function hatWiederholung($pruefungen)
 	{
-		foreach ($this->buildVerlauf($pruefungen)->pruefungen as $termin) {
-			if ($termin->position > 1) return true;
-		}
-
-		return false;
+		return $this->buildVerlauf($pruefungen)->hatWiederholung;
 	}
 
 	/** Grade with no better one: closes the chain for good. @return bool */
@@ -295,9 +302,7 @@ class PruefungsverlaufLib
 	/** Tells you if an exam takes place before a commission. @return bool */
 	public function istKommissionell($typ)
 	{
-		$typen = $this->_ci->config->item('PRUEFUNG_KOMMISSIONELL_TYPEN');
-		if (!is_array($typen)) $typen = ['kommPruef', 'zusKommPruef'];
-		return in_array($typ, $typen);
+		return in_array($typ, $this->getKommissionellTypen());
 	}
 
 	/**
@@ -350,6 +355,32 @@ class PruefungsverlaufLib
 	public function legacyTypFuerWiederholung($verlauf)
 	{
 		return $this->legacyTypFuerAntritt(max(2, $verlauf->antrittCount + 1));
+	}
+
+	/**
+	 * The course grade after one exam write: the grade of the last exam that uses an attempt.
+	 * Without one, an implicit attempt 1 stays, else nothing is entered. The course grade is never
+	 * 'entschuldigt': an excused date uses no attempt.
+	 *
+	 * @param mixed $pruefung_id set = edit of that row, empty = new exam after all others
+	 * @return array [note, punkte]
+	 */
+	public function lvNoteNachTermin($pruefungen, $pruefung_id, $note, $punkte, $lvNote, $lvPunkte)
+	{
+		$neu = $pruefung_id === null || $pruefung_id === '';
+
+		$ergebnis = null;
+		foreach ($this->sortPruefungen($pruefungen) as $p) {
+			$zeile = (!$neu && $p->pruefung_id == $pruefung_id) ? [$note, $punkte] : [$p->note, $p->punkte];
+			if ($this->zaehltAlsAntritt($zeile[0], $p->pruefungstyp_kurzbz)) $ergebnis = $zeile;
+		}
+		if ($neu && $this->zaehltAlsAntritt($note)) $ergebnis = [$note, $punkte];
+
+		if ($ergebnis !== null) return $ergebnis;
+
+		if ($this->buildVerlauf($pruefungen, $lvNote)->impliziterErstantritt) return [$lvNote, $lvPunkte];
+
+		return [$this->getNoteNichtEingetragen(), null];
 	}
 
 	/** Role of one attempt: 1 = erstantritt, later = pruefung, from the commission on = kommissionell. @return string */
@@ -494,6 +525,9 @@ class PruefungsverlaufLib
 			return ['maxAntritteReached', [$verlauf->maxAntritte]];
 		}
 
+		// only one exam without a result per history; more of them break the order of the attempts
+		if ($this->istOffen($note) && $this->hatOffenenTermin($pruefungen)) return ['pruefungOhneErgebnis', []];
+
 		// B: no attempt before an existing exam; same day counts as too early unless configured
 		$gleicherTag = $this->configBool('CIS_GESAMTNOTE_TERMIN_GLEICHER_TAG', false);
 		$newDate = substr((string) $datum, 0, 10);
@@ -527,19 +561,19 @@ class PruefungsverlaufLib
 
 		if ($this->istAnrechnungsnote($zeugnisNote)) return ['c4angerechnetKeinePruefung', []];
 
-		if (count($pruefungen) === 0) return null;
-
 		$verlauf = $this->buildVerlauf($pruefungen, $lvNote, $zeugnisNote);
 
-		// the record being edited
+		// only an exam of this student in this course; Stv owns zusKommPruef
 		$current = null;
 		foreach ($verlauf->pruefungen as $p) {
 			if ($p->pruefung_id == $pruefung_id) { $current = $p; break; }
 		}
-		if ($current === null) return null;
+		if ($current === null || in_array($current->pruefungstyp_kurzbz, $this->getTypenOhneAntritt())) {
+			return ['c4pruefungNichtGespeichert', []];
+		}
 
-		// Stv owns exams that use no attempt (zusKommPruef); not validated here
-		if (in_array($current->pruefungstyp_kurzbz, $this->getTypenOhneAntritt())) return null;
+		// only one exam without a result per history
+		if ($this->istOffen($newNote) && $this->hatOffenenTermin($pruefungen, $pruefung_id)) return ['pruefungOhneErgebnis', []];
 
 		$currentDate = substr((string) $current->datum, 0, 10);
 		$new         = substr((string) $newDatum, 0, 10);
@@ -702,11 +736,29 @@ class PruefungsverlaufLib
 	}
 
 	/** @return array attempt number => legacy type */
-	private function getTypJeAntritt()
+	public function getTypJeAntritt()
 	{
 		$typen = $this->configArray('PRUEFUNG_TYP_JE_ANTRITT');
 
 		return count($typen) > 0 ? $typen : self::$_typJeAntrittVorgabe;
+	}
+
+	/** Does an exam other than $ausser still wait for its result? @return bool */
+	private function hatOffenenTermin($pruefungen, $ausser = null)
+	{
+		foreach ($pruefungen as $p) {
+			if ($p->pruefung_id != $ausser && $this->istOffen($p->note)) return true;
+		}
+
+		return false;
+	}
+
+	/** "Noch nicht eingetragen": the exam waits for its result. @return bool */
+	private function istOffen($note)
+	{
+		$offen = $this->getNoteNichtEingetragen();
+
+		return $offen !== null && $note !== null && $note !== '' && $note == $offen;
 	}
 
 	/** @return stdClass|null */

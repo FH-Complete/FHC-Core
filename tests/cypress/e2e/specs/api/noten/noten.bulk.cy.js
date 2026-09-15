@@ -10,6 +10,11 @@ import {
 	expectNotenSuccess,
 } from "../../../../support/helpers/notenErrors";
 import {
+	requireKonfiguration,
+	requirePunkteModus,
+	requireWiederholung,
+} from "../../../../support/helpers/notenConfig";
+import {
 	attemptDate,
 	loadNotenContext,
 	readLvGesamtnote,
@@ -33,26 +38,35 @@ describe("Noten API - bulk paths", () => {
 		});
 	});
 
+	/** Führt den Studierenden bis an die Grenze. Die Baseline liefert Antritt 1. */
+	const bisZurGrenze = (student) => {
+		for (let i = 0; i < ctx.maxAntritte - 1; i += 1) {
+			addPruefung(ctx, student, {
+				note: ctx.notes.negativ,
+				datum: attemptDate(ctx, i + 1),
+			}).then((response) => {
+				expectNotenSuccess(response, `bring ${student.uid} to the cap (attempt ${i + 2})`);
+			});
+		}
+		return attemptDate(ctx, ctx.maxAntritte + 1);
+	};
+
 	describe("createPruefungen", () => {
+		beforeEach(function () {
+			requireWiederholung(this, ctx);
+			// ohne Anlage der kommissionellen Prüfung meldet die Grenze kommPruefNichtErlaubt
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF", true);
+		});
+
 		it("rejects only the row that breaks a §1 rule and accepts the rest", () => {
 			const atCap = ctx.students[0];
 			const fresh = ctx.students[1];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, atCap.uid, { freigegeben: true });
-			seedBaseline(ctx, fresh.uid, { freigegeben: true });
+			seedBaseline(ctx, atCap.uid);
+			seedBaseline(ctx, fresh.uid);
 
-			// drive the first student up to the cap - the baseline already provides Antritt 1
-			for (let i = 0; i < ctx.maxAntritte - 1; i += 1) {
-				addPruefung(ctx, atCap, {
-					note: ctx.notes.negativ,
-					datum: attemptDate(ctx, i + 1),
-				}).then((response) => {
-					expectNotenSuccess(response, `bring ${atCap.uid} to the cap (attempt ${i + 2})`);
-				});
-			}
-
-			const datum = attemptDate(ctx, ctx.maxAntritte + 1);
+			const datum = bisZurGrenze(atCap);
 
 			notenApi
 				.createPruefungen(
@@ -84,8 +98,10 @@ describe("Noten API - bulk paths", () => {
 	});
 
 	describe("savePruefungenBulk", () => {
-		beforeEach(() => {
+		beforeEach(function () {
 			requireDbReset();
+			requireWiederholung(this, ctx);
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF", true);
 		});
 
 		it("applies the §1 rules per row", function () {
@@ -100,14 +116,10 @@ describe("Noten API - bulk paths", () => {
 			const fresh = ctx.students[1];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, atCap.uid, { freigegeben: true });
-			seedBaseline(ctx, fresh.uid, { freigegeben: true });
+			seedBaseline(ctx, atCap.uid);
+			seedBaseline(ctx, fresh.uid);
 
-			for (let i = 0; i < ctx.maxAntritte - 1; i += 1) {
-				addPruefung(ctx, atCap, { note: ctx.notes.negativ, datum: attemptDate(ctx, i + 1) });
-			}
-
-			const datum = attemptDate(ctx, ctx.maxAntritte + 1);
+			const datum = bisZurGrenze(atCap);
 
 			notenApi
 				.savePruefungenBulk(ctx.lvId, ctx.semKurzbz, [
@@ -136,12 +148,43 @@ describe("Noten API - bulk paths", () => {
 		// Punktemodus: die Note kommt aus dem Notenschlüssel, die Zeile liefert nur Punkte.
 		describe("Punktemodus", () => {
 			beforeEach(function () {
-				if (!ctx.cisConfig.CIS_GESAMTNOTE_PUNKTE) {
-					Cypress.log({ name: "skip", message: "Skipped: CIS_GESAMTNOTE_PUNKTE ist aus." });
-					this.skip();
-				}
+				requirePunkteModus(this, ctx);
 			});
 
+			it("wendet die Regeln je Zeile auf die abgeleitete Note an", () => {
+				const atCap = ctx.students[0];
+				const fresh = ctx.students[1];
+				const punkte = 70;
+
+				resetNotenState(ctx);
+				seedBaseline(ctx, atCap.uid);
+				seedBaseline(ctx, fresh.uid);
+
+				const datum = bisZurGrenze(atCap);
+				const zeile = (student) => ({
+					uid: student.uid,
+					note: null,
+					punkte,
+					datum,
+					lehreinheit_id: student.lehreinheit_id,
+				});
+
+				notenApi.savePruefungenBulk(ctx.lvId, ctx.semKurzbz, [zeile(atCap), zeile(fresh)]).then((response) => {
+					const data = expectNotenSuccess(response, "savePruefungenBulk mit Punkten");
+					expectBulkRowError(data, atCap.uid, "maxAntritteReached");
+					expectBulkRowAccepted(data, fresh.uid);
+				});
+
+				notenApi.getNoteByPunkte(punkte, ctx.lvId, ctx.semKurzbz).then((antwort) => {
+					const erwartet = antwort.body.data;
+
+					readState(ctx).then((data) => {
+						const neu = attemptsOfStudent(data, fresh.uid).find((p) => String(p.datum).slice(0, 10) === datum);
+						expect(neu, "der neue Termin").to.exist;
+						expect(String(neu.note), "die aus den Punkten abgeleitete Note").to.eq(String(erwartet));
+					});
+				});
+			});
 		});
 	});
 
@@ -182,10 +225,7 @@ describe("Noten API - bulk paths", () => {
 
 		describe("Punktemodus", () => {
 			beforeEach(function () {
-				if (!ctx.cisConfig.CIS_GESAMTNOTE_PUNKTE) {
-					Cypress.log({ name: "skip", message: "Skipped: CIS_GESAMTNOTE_PUNKTE ist aus." });
-					this.skip();
-				}
+				requirePunkteModus(this, ctx);
 			});
 
 			it("überspringt eine Zeile ohne Punkte und schreibt die übrigen", () => {

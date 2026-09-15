@@ -685,8 +685,20 @@ class Lehrveranstaltung_model extends DB_Model
 		]);
 		
 		$this->dbTable = $tmp;
-		
+
 		return $result;
+	}
+
+	/**
+	 * All Lehreinheiten of a student in a Lehrveranstaltung, lowest id first.
+	 */
+	public function getLeIdsByStudent($student_uid, $studiensemester_kurzbz, $lehrveranstaltung_id)
+	{
+		$qry = "SELECT DISTINCT lehreinheit_id FROM campus.vw_student_lehrveranstaltung
+			WHERE uid = ? AND lehrveranstaltung_id = ? AND studiensemester_kurzbz = ?
+			ORDER BY lehreinheit_id";
+
+		return $this->execReadOnlyQuery($qry, array($student_uid, $lehrveranstaltung_id, $studiensemester_kurzbz));
 	}
 
 	/**

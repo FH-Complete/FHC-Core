@@ -2,12 +2,15 @@
  * Der Schreibpfad (savePruefungFuerStudent), den saveStudentPruefung, createPruefungen und
  * savePruefungenBulk teilen. Die Validatoren decken die anderen Specs ab.
  *
- * Invariante: eine Aktion schreibt genau eine Prüfung; Antritt 1 entsteht bei der Freigabe.
+ * Invariante: eine Aktion schreibt genau eine Prüfung. Ausnahme: neben einer LV-Note ohne Prüfungszeile
+ * schreibt der erste neue Termin zuerst Antritt 1.
  */
 
-import { expectNotenSuccess } from "../../../../support/helpers/notenErrors";
+import { expectNotenError, expectNotenSuccess } from "../../../../support/helpers/notenErrors";
+import { requireKonfiguration, requireWiederholung } from "../../../../support/helpers/notenConfig";
 import {
 	attemptDate,
+	baselineDate,
 	loadNotenContext,
 	readLvGesamtnote,
 	requireDbReset,
@@ -40,7 +43,9 @@ describe("Noten API - Prüfungstermin (write path)", () => {
 
 	const studentFor = (index) => ctx.students[index % ctx.students.length];
 
-	it("writes exactly one Prüfung per add - no snapshot alongside it", () => {
+	it("writes exactly one Prüfung per add - no snapshot alongside it", function () {
+		requireWiederholung(this, ctx);
+
 		const student = studentFor(0);
 
 		givenBaseline(ctx, student);
@@ -62,7 +67,9 @@ describe("Noten API - Prüfungstermin (write path)", () => {
 			});
 	});
 
-	it("derives position and Antrittsnummer server-side", () => {
+	it("derives position and Antrittsnummer server-side", function () {
+		requireWiederholung(this, ctx);
+
 		const student = studentFor(1);
 
 		givenBaseline(ctx, student);
@@ -87,7 +94,9 @@ describe("Noten API - Prüfungstermin (write path)", () => {
 			});
 	});
 
-	it("appends a new row per add instead of overwriting the previous one", () => {
+	it("appends a new row per add instead of overwriting the previous one", function () {
+		requireWiederholung(this, ctx);
+
 		// nur eine explizite pruefung_id aktualisiert, ein Add fügt immer ein
 		const student = studentFor(0);
 
@@ -150,7 +159,9 @@ describe("Noten API - Prüfungstermin (write path)", () => {
 			});
 	});
 
-	it("writes the LV note from the attempt's grade", () => {
+	it("writes the LV note from the attempt's grade", function () {
+		requireWiederholung(this, ctx);
+
 		const student = studentFor(3);
 
 		givenBaseline(ctx, student);
@@ -163,6 +174,237 @@ describe("Noten API - Prüfungstermin (write path)", () => {
 					String(ctx.gradeNotes[1]),
 				);
 			});
+	});
+
+	// Eine LV-Note ohne Prüfungszeile ist Antritt 1: aus einer Übernahme ohne Erstantritt oder aus der Zeit
+	// vor dem Werkzeug. Ohne die Zeile fiele sie aus der Zählung, und der Studierende bekäme einen Antritt zu viel.
+	it("schreibt Antritt 1 aus einer LV-Note ohne Prüfungszeile nach", function () {
+		requireWiederholung(this, ctx);
+
+		const student = studentFor(4);
+
+		givenBaseline(ctx, student, { erstantritt: false });
+		addPruefung(ctx, student, { note: ctx.notes.negativ, datum: attemptDate(ctx, 1) }).then((response) =>
+			expectNotenSuccess(response, "erster Termin neben der LV-Note"),
+		);
+
+		readState(ctx).then((data) => {
+			const attempts = attemptsOfStudent(data, student.uid);
+			expect(attempts, "Antritt 1 und der neue Termin").to.have.length(2);
+			expect(String(attempts[0].note), "Antritt 1 trägt die LV-Note").to.eq(String(ctx.notes.negativ));
+			expect(dayOf(attempts[0].datum) < attemptDate(ctx, 1), "Antritt 1 liegt vor dem neuen Termin").to.be.true;
+			expect(attempts.map((p) => p.antritt_nr), "Antrittsnummern").to.deep.eq([1, 2]);
+			expect(verlaufOfStudent(data, student.uid).antrittCount, "zwei Antritte").to.eq(2);
+		});
+	});
+
+	// Regel: Die LV-Note ist die Note des letzten Termins, der einen Antritt verbraucht. Ohne einen
+	// solchen Termin bleibt ein impliziter Erstantritt, sonst gilt "Noch nicht eingetragen".
+	// Die LV-Note ist nie 'entschuldigt'.
+	describe("LV-Note nach einem Termin", () => {
+		const g2 = () =>
+			ctx.notes.positiv ?? ctx.notes.bestnote ?? ctx.gradeNotes.find((n) => String(n) !== String(ctx.notes.negativ));
+
+		const expectLvNote = (student, note, message) =>
+			readLvGesamtnote(ctx, student.uid).then((row) => {
+				expect(String(row.note), message).to.eq(String(note));
+				return row;
+			});
+
+		const expectAntritte = (student, anzahl) =>
+			readState(ctx).then((data) => {
+				expect(verlaufOfStudent(data, student.uid).antrittCount, "antrittCount").to.eq(anzahl);
+			});
+
+		it("behält die LV-Note bei einer Datumskorrektur an Termin 1", function () {
+			requireWiederholung(this, ctx);
+
+			const student = studentFor(0);
+
+			givenBaseline(ctx, student);
+			addPruefung(ctx, student, { note: g2(), datum: attemptDate(ctx, 1) }).then((response) =>
+				expectNotenSuccess(response, "Termin 2"),
+			);
+
+			readState(ctx)
+				.then((data) => {
+					const t1 = attemptsOfStudent(data, student.uid)[0];
+					// die Note bleibt gleich, sonst meldet validateEdit pruefungNoteLocked
+					return editPruefung(ctx, student, {
+						pruefungId: t1.pruefung_id,
+						note: t1.note,
+						datum: shiftDate(baselineDate(ctx), 1),
+					});
+				})
+				.then((response) => expectNotenSuccess(response, "Datumskorrektur an Termin 1"));
+
+			expectLvNote(student, g2(), "die LV-Note bleibt beim Ergebnis von Termin 2");
+		});
+
+		it("behält die LV-Note bei einem neuen entschuldigten Termin", function () {
+			requireWiederholung(this, ctx);
+
+			const student = studentFor(1);
+
+			givenBaseline(ctx, student);
+			addPruefung(ctx, student, { note: ctx.notes.entschuldigt, datum: attemptDate(ctx, 1) }).then((response) =>
+				expectNotenSuccess(response, "entschuldigter Termin"),
+			);
+
+			expectLvNote(student, ctx.notes.negativ, "die LV-Note bleibt beim Ergebnis von Termin 1");
+			expectAntritte(student, 1);
+		});
+
+		// Kein requireWiederholung: der Test braucht nur Antritt 1. Mit zwei Antritten ohne
+		// kommissionelle Anlage scheitert er, siehe docs/benotungstool-status.md, Abschnitt 9.
+		it("setzt 'Noch nicht eingetragen', wenn der erste Termin entschuldigt ist", () => {
+			const student = studentFor(2);
+
+			resetNotenState(ctx);
+			addPruefung(ctx, student, { note: ctx.notes.entschuldigt, datum: attemptDate(ctx, 1) }).then((response) =>
+				expectNotenSuccess(response, "entschuldigter erster Termin"),
+			);
+
+			expectLvNote(student, ctx.notes.nochNichtEingetragen, "die LV-Note ist nie entschuldigt").then((row) => {
+				expect(row.punkte, "ohne Punkte").to.be.null;
+			});
+
+			readState(ctx).then((data) => {
+				const verlauf = verlaufOfStudent(data, student.uid);
+				expect(verlauf.antrittCount, "der entschuldigte Termin verbraucht keinen Antritt").to.eq(0);
+				expect(verlauf.canAdd, "ein weiterer Termin ist möglich").to.be.true;
+			});
+
+			addPruefung(ctx, student, { note: ctx.notes.negativ, datum: attemptDate(ctx, 2) }).then((response) =>
+				expectNotenSuccess(response, "erster zählender Termin"),
+			);
+
+			readState(ctx).then((data) => {
+				const zaehlend = attemptsOfStudent(data, student.uid).find(
+					(p) => String(p.note) === String(ctx.notes.negativ),
+				);
+				expect(zaehlend.antritt_nr, "der Studierende hat keinen Antritt verloren").to.eq(1);
+			});
+		});
+
+		it("setzt 'Noch nicht eingetragen', wenn der einzige Termin nachträglich entschuldigt wird", () => {
+			const student = studentFor(3);
+
+			givenBaseline(ctx, student);
+
+			readState(ctx)
+				.then((data) => {
+					const t1 = attemptsOfStudent(data, student.uid)[0];
+					return editPruefung(ctx, student, {
+						pruefungId: t1.pruefung_id,
+						note: ctx.notes.entschuldigt,
+						datum: dayOf(t1.datum),
+					});
+				})
+				.then((response) => expectNotenSuccess(response, "Termin 1 wird entschuldigt"));
+
+			expectLvNote(student, ctx.notes.nochNichtEingetragen, "die LV-Note ist nie entschuldigt");
+			// die alte LV-Note zählt nicht als impliziter Erstantritt
+			expectAntritte(student, 0);
+		});
+
+		it("fällt auf Termin 1 zurück, wenn die Wiederholung nachträglich entschuldigt wird", function () {
+			requireWiederholung(this, ctx);
+
+			const student = studentFor(0);
+
+			givenBaseline(ctx, student);
+			addPruefung(ctx, student, { note: g2(), datum: attemptDate(ctx, 1) }).then((response) =>
+				expectNotenSuccess(response, "Termin 2"),
+			);
+
+			readState(ctx)
+				.then((data) => {
+					const t2 = attemptsOfStudent(data, student.uid)[1];
+					return editPruefung(ctx, student, {
+						pruefungId: t2.pruefung_id,
+						note: ctx.notes.entschuldigt,
+						datum: dayOf(t2.datum),
+					});
+				})
+				.then((response) => expectNotenSuccess(response, "Termin 2 wird entschuldigt"));
+
+			expectLvNote(student, ctx.notes.negativ, "die LV-Note ist wieder das Ergebnis von Termin 1");
+			expectAntritte(student, 1);
+		});
+
+		it("behält eine LV-Note aus Altdaten als Ergebnis von Antritt 1", function () {
+			requireWiederholung(this, ctx);
+
+			const student = studentFor(1);
+
+			givenBaseline(ctx, student, { erstantritt: false });
+			addPruefung(ctx, student, { note: ctx.notes.entschuldigt, datum: attemptDate(ctx, 1) }).then((response) =>
+				expectNotenSuccess(response, "entschuldigter Termin neben der Altdaten-LV-Note"),
+			);
+
+			expectLvNote(student, ctx.notes.negativ, "die Altdaten-LV-Note bleibt");
+			expectAntritte(student, 1);
+		});
+
+		it("behält das letzte Ergebnis bei einem offenen Termin", function () {
+			requireWiederholung(this, ctx);
+
+			const student = studentFor(2);
+
+			givenBaseline(ctx, student);
+			addPruefung(ctx, student, { note: ctx.notes.nochNichtEingetragen, datum: attemptDate(ctx, 1) }).then(
+				(response) => expectNotenSuccess(response, "offener Termin"),
+			);
+
+			expectLvNote(student, ctx.notes.negativ, "die LV-Note bleibt beim Ergebnis von Termin 1");
+		});
+
+		it("lehnt 'entschuldigt' als übernommene LV-Note ab", () => {
+			const student = studentFor(3);
+
+			givenBaseline(ctx, student, { erstantritt: false });
+			notenApi
+				.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, ctx.notes.entschuldigt)
+				.then((response) => expectNotenError(response, "c4noteNichtInLehre"));
+
+			expectLvNote(student, ctx.notes.negativ, "die LV-Note bleibt");
+		});
+	});
+
+	// CIS_GESAMTNOTE_PRUEFUNG_HEBT_FREIGABE_AUF: Der Freigabestatus hängt an benotungsdatum > freigabedatum.
+	describe("Freigabe nach einem neuen Termin", () => {
+		beforeEach(function () {
+			// eine endgültige Freigabe verbietet den neuen Termin
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_FREIGABE_FINAL", false);
+			requireWiederholung(this, ctx);
+		});
+
+		const neuerTerminNachFreigabe = (student) => {
+			givenBaseline(ctx, student, { freigegeben: true });
+			addPruefung(ctx, student, { note: ctx.notes.negativ, datum: attemptDate(ctx, 1) }).then((response) =>
+				expectNotenSuccess(response, "Termin nach der Freigabe"),
+			);
+			return readLvGesamtnote(ctx, student.uid);
+		};
+
+		it("hebt die Freigabe mit einem neuen Termin auf", function () {
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_PRUEFUNG_HEBT_FREIGABE_AUF", true);
+
+			neuerTerminNachFreigabe(studentFor(5)).then((row) => {
+				expect(new Date(row.benotungsdatum) > new Date(row.freigabedatum), "benotungsdatum nach freigabedatum")
+					.to.be.true;
+			});
+		});
+
+		it("behält die Freigabe bei einem neuen Termin", function () {
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_PRUEFUNG_HEBT_FREIGABE_AUF", false);
+
+			neuerTerminNachFreigabe(studentFor(5)).then((row) => {
+				expect(new Date(row.benotungsdatum) > new Date(row.freigabedatum), "benotungsdatum nach freigabedatum")
+					.to.be.false;
+			});
+		});
 	});
 
 	it("creates the LV note when a student has none yet", () => {
