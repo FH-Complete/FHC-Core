@@ -12,6 +12,12 @@ class Ort_model extends DB_Model
 		$this->pk = "ort_kurzbz";
 	}
 	
+	public function getRoomInfo($ortKurzbz)
+	{
+		$this->addSelect("ort_kurzbz, ausstattung");
+		return $this->OrtModel->loadWhere(array("ort_kurzbz" => $ortKurzbz));
+	}
+
 	public function getAll($raumtyp_kurzbz)
 	{
 		$this->addOrder("ort_kurzbz");

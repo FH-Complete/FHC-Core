@@ -5,6 +5,8 @@ import Theme from "../../plugins/Theme.js";
 import ApiSearchbar from '../../api/factory/searchbar.js';
 import ApiLvPlan from "../../api/factory/lvPlan.js";
 
+import {router} from "../../routers/Cis/CisRouter.js";
+
 const app = Vue.createApp({
     name: 'CisMenuApp',
     components: {
@@ -34,7 +36,22 @@ const app = Vue.createApp({
 										"/Cis/Profil/View/"+data.uid;
 							}
 						},
-                        childactions: []
+                        childactions: [
+							{
+								label: Vue.computed(() => this.$p.t("profil/zeitsperren")),
+								icon: "fas fa-calendar-days",
+								type: "link",
+								action: function (data) {
+									const uid = JSON.parse(data.data).uid;
+									const link =
+										FHC_JS_DATA_STORAGE_OBJECT.app_root +
+										FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+										"/Cis/Zeitsperrenma/ma/" +
+										uid;
+									return link;
+								}
+							}
+						]
 					},
 					student: {
 						defaultaction: {
@@ -193,6 +210,7 @@ const app = Vue.createApp({
 
 FhcApps.makeExtendable(app);
 
+app.use(router);
 app.use(primevue.config.default, {
 	zIndex: {
 		overlay: 9000,

@@ -477,7 +477,7 @@ export default {
         <!-- START OF SIDE PANEL -->
         <div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
             <!-- Bearbeiten Button -->
-            <div class="row d-none d-md-block ">
+            <div v-if="isEditable" class="row d-none d-md-block ">
                 <div class="col mb-3">
                     <button @click="()=>showEditProfilModal()" type="button" class="text-start card w-100 btn btn-outline-secondary" >
                         <div class="row">

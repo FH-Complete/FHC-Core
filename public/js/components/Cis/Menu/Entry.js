@@ -1,5 +1,10 @@
+import CisMenuLink from "./Link.js";
+
 export default {
     name: 'CisMenuEntry',
+	components: {
+		CisMenuLink
+	},
     props: {
         entry: Object,
         level: {
@@ -163,7 +168,7 @@ export default {
     </div>
     <template v-else>
 		<div class="btn-group w-100">
-			<a
+			<cis-menu-link
 				@click="handleClickOnMenuNode($event)"
 				:href="menuNodeHref"
 				:target="target"
@@ -175,7 +180,7 @@ export default {
 				:style="'padding-left: calc(var(--bs-btn-padding-x) * ' + $props.level + ');'"
 			>
 				{{ entry.titel }}
-			</a>
+			</cis-menu-link>
 			<button
 				v-if="hasChilds"
 				@click.prevent="toggleCollapse()"

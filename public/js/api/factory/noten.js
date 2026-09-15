@@ -1,0 +1,113 @@
+/**
+ * Copyright (C) 2025 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+export default {
+	getCisConfig(){
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Noten/getCisConfig'
+		};
+	},
+	getStudentenNoten(lv_id, sem_kurzbz) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Noten/getStudentenNoten',
+			params: { lv_id, sem_kurzbz }
+		};
+	},
+	getNoten(){
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Noten/getNoten'
+		};
+	},
+	saveStudentenNoten(password, noten, lv_id, sem_kurzbz) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Noten/saveStudentenNoten',
+			params: { password, noten, lv_id, sem_kurzbz }
+		};
+	},
+	saveNotenvorschlag(lv_id, sem_kurzbz, student_uid, note, punkte = null) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Noten/saveNotenvorschlag',
+			params: { lv_id, sem_kurzbz, student_uid, note, punkte }
+		};
+	},
+	// kein Termintyp mehr: welchen Antritt die Prüfung darstellt, leitet der Server aus dem
+	// bestehenden Prüfungsverlauf des Studenten in dieser LV und diesem Semester ab
+	// mitarbeiter_uid: der benotende Lektor. Nur nötig, wenn die Lehreinheit mehrere hat - sonst
+	// löst der Server ihn selbst auf.
+	saveStudentPruefung(student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, pruefung_id = null, mitarbeiter_uid = null){
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Noten/saveStudentPruefung',
+			params: { student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, pruefung_id, mitarbeiter_uid }
+		};
+	},
+	// note/punkte optional: ohne Auswahl wird der Termin als "noch nicht eingetragen" angelegt
+	createPruefungen(uids, datum, lva_id, sem_kurzbz, note = null, punkte = null, mitarbeiter_uid = null){
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Noten/createPruefungen',
+			params: { uids, datum, lva_id, sem_kurzbz, note, punkte, mitarbeiter_uid }
+		};
+	},
+	getLehrendeFuerLehreinheit(lehreinheit_id, lv_id, sem_kurzbz) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Noten/getLehrendeFuerLehreinheit',
+			params: { lehreinheit_id, lv_id, sem_kurzbz }
+		};
+	},
+	saveNotenvorschlagBulk(lv_id, sem_kurzbz, noten) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Noten/saveNotenvorschlagBulk',
+			params: { lv_id, sem_kurzbz, noten }
+		};
+	},
+	saveStudentPruefungBulk(lv_id, sem_kurzbz, pruefungen) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Noten/savePruefungenBulk',
+			params: { lv_id, sem_kurzbz, pruefungen }
+		};
+	},
+	getNoteByPunkte(punkte, lv_id, sem_kurzbz) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Noten/getNoteByPunkte',
+			params: { punkte, lv_id, sem_kurzbz }
+		};
+	},
+	getBenotungstoolContext(sem_kurzbz, lv_id = null) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Noten/getBenotungstoolContext',
+			params: { sem_kurzbz, lv_id }
+		};
+	},
+	getLvForStudiengang(studiengang_kz, sem_kurzbz) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Noten/getLvForStudiengang',
+			params: { studiengang_kz, sem_kurzbz }
+		};
+	}
+}
