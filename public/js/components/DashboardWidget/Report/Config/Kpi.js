@@ -39,7 +39,7 @@ export default {
 						modelValue: uservars[key] || {},
 						detail: variable.detail,
 					};
-				} else if (this.sharedData[key]) {
+				} else if (this.sharedData && this.sharedData[key]) {
 					res[key] = {
 						modelValue: uservars[key] || {},
 						detail: this.sharedData[key],
