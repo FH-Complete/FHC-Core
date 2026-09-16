@@ -19,7 +19,6 @@ $includesArray = array(
 		'public/css/components/primevue.css',
 		'public/css/Vertragsverwaltung.css',
 		'public/css/components/Detailheader.css',
-		'public/css/components/Zeitsperren.css'
 	],
 	'customJSs' => [
 		#'vendor/npm-asset/primevue/tree/tree.min.js',

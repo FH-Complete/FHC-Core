@@ -64,32 +64,30 @@ export default {
 		},
 	},
 	template: `
-		<div class="base-zeitsperrenma w-100 h-100">
-
-				<div class="row g-1">
-					<div
-						class="col"
-						v-for="button in buttons"
-						:key="button.key"
+		<div class="base-zeitsperrenma">
+			<div class="row g-1 flex-shrink-0">
+				<div
+					class="col"
+					v-for="button in buttons"
+					:key="button.key"
+				>
+					<button
+						class="btn w-100"
+						:class="button.class"
+						@click="route(button.key)"
 					>
-						<button
-							class="btn w-100"
-							:class="button.class"
-							@click="route(button.key)"
-						>
-							{{ $p.t(button.title) }}
-						</button>
-					</div>
+						{{ $p.t(button.title) }}
+					</button>
 				</div>
+			</div>
 
-
-					<lists-zeitsperren
-						:type="propsViewData.type"
-						:id="propsViewData.id"
-						:tage="propsViewData.days"
-					/>
-
+			<div class="zeitsperren-list-container">
+				<lists-zeitsperren
+					:type="propsViewData.type"
+					:id="propsViewData.id"
+					:tage="propsViewData.days"
+				/>
+			</div>
 	</div>
-
 	`,
 }

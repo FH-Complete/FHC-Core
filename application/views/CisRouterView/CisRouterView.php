@@ -25,8 +25,7 @@ $includesArray = array(
 		'public/css/Cis4/Cms.css',
 		'public/css/Cis4/Studium.css',
 		'public/css/Cis4/Benotungstool.css',
-		'public/css/Cis4/Zeitsperren.css',
-		'public/css/components/Zeitsperren.css', //70747
+		'public/css/components/Zeitsperrenma.css', //70747
 		'public/css/Cis4/Zeitsperren.css', //77941
 	),
 	'customJSs' => array(
