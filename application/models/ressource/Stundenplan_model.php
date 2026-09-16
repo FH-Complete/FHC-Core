@@ -604,11 +604,17 @@ class Stundenplan_model extends DB_Model
 		{
 			foreach($semester_date_range as $sem_date => $sem_date_range)
 			{
-				if(!array_key_exists($sem_date,$studentlehrverbaende) || count($studentlehrverbaende[$sem_date]) == 0)
+				if(!array_key_exists($sem,$studentlehrverbaende) || count($studentlehrverbaende[$sem]) == 0)
 				{
 					continue;
 				}
-				foreach($studentlehrverbaende[$sem_date] as $key=>$lehrverband)
+				$studlvbds = array_filter(
+					$studentlehrverbaende[$sem],
+					function($value) use ($sem_date) {
+						return $value->studiensemester_kurzbz === $sem_date;
+					}
+				);
+				foreach($studlvbds as $key=>$lehrverband)
 				{
 					$query .= "(((sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND sp.verband = ".$this->escape($lehrverband->verband)." AND sp.gruppe = ".$this->escape($lehrverband->gruppe)." AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)." AND ".$this->escape($sem_date_range->ende).")";
 					// Eintraege fuer den ganzen Verband

@@ -160,6 +160,7 @@ export default {
 					}
 				}
 			},
+			openMenuHierarchy: [],
         };
     },
 	inject: ["isNarrow", "isMobile"],
@@ -167,7 +168,7 @@ export default {
 		return{
 			setActiveEntry: this.setActiveEntry,
 			addUrlCount: this.addUrlCount,
-			makeParentContentActive: this.makeParentContentActive,
+			setOpenMenuHierarchy: this.setOpenMenuHierarchy,
 		}
 	},
 	computed:{
@@ -214,19 +215,6 @@ export default {
 		handleHideNavUser(){
 			document.removeEventListener("click", this.checkSettingsVisibility);
 		},
-		makeParentContentActive(content_id, collection=this.entries, parent=null){
-			if(!collection) return;
-			if (typeof collection == 'object' && !Array.isArray(collection) && Object.entries(collection).length > 0) {
-				collection = Object.values(collection);
-			}
-			for(let entry of collection){
-				if(entry.content_id == content_id){
-					this.activeEntry = parent;
-				}
-				this.makeParentContentActive(content_id, entry.childs, entry.content_id);
-			}
-			
-		},
 		addUrlCount(count){
 			this.urlMatchRankings.push(count);
 		},
@@ -236,6 +224,9 @@ export default {
 		},
 		searchfunction(searchsettings) {
 			return this.$api.call(ApiSearchbar.searchCis(searchsettings));
+		},
+		setOpenMenuHierarchy(openMenuHierarchy) {
+			this.openMenuHierarchy = openMenuHierarchy;
 		},
 	},
 	created(){
@@ -344,7 +335,14 @@ export default {
 				<div class="offcanvas-body p-0">
 					<div id="nav-main-menu" class="nav-menu-collapse collapse collapse-horizontal show">
 						<div class="flex-grow-1">
-							<cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeEntry" v-for="entry in entries" :key="entry.content_id" :entry="entry" />
+							<cis-menu-entry
+								v-for="entry in entries"
+								:key="entry.content_id"
+								:highestMatchingUrlCount="highestMatchingUrlCount"
+								:activeContent="activeEntry"
+								:entry="entry"
+								:openMenuHierarchy="openMenuHierarchy"
+							/>
 						</div>
 					</div>
 				</div>

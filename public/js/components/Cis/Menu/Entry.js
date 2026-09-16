@@ -13,6 +13,11 @@ export default {
         },
 		activeContent: [String, Number],
 		highestMatchingUrlCount: Number,
+		openMenuHierarchy: Array,
+		precedingMenuHierarchy: {
+			type: Array,
+			default: [],
+		},
     },
     data: () => {
 		return {
@@ -20,7 +25,7 @@ export default {
 			urlCount:0,
         }
     },
-	inject: ['makeParentContentActive', 'setActiveEntry','addUrlCount'],
+	inject: ['setActiveEntry', 'setOpenMenuHierarchy', 'addUrlCount'],
 	watch:{
 		highestMatchingUrlCount: function(newValue)
 		{
@@ -28,51 +33,30 @@ export default {
 			if (this.activeContent == null && newValue == this.urlCount)
 			{
 				this.setActiveEntry(this.entry.content_id);
+				this.setOpenMenuHierarchy(this.menuHierarchy);
 			}
 		},
-		activeContent: function(newValue){
-			if(newValue == this.entry.content_id){
-				// only open if not already open
-				if (!this.entry.menu_open){
-					this.entry.menu_open = true;
-				}
-				
-			}else{
-				if (this.searchRecursiveChild(this.entry, 'content_id',newValue)) {
-					this.entry.menu_open = true;
-				} else {
-					this.entry.menu_open = false;
-				}
+		openMenuHierarchy() {
+			if (!this.hasChilds) return;
+
+			if (this.$props.openMenuHierarchy.length && this.$props.openMenuHierarchy[0] === this.$props.entry.content_id) {
+				this.$props.entry.menu_open = true;				
+			} else {
+				this.$props.entry.menu_open = false;				
 			}
 		},
-		'entry.menu_open': function (newValue,oldValue) {
-			if (newValue) 
-			{
-				// only invokes .show if this.collapse is not null
-				this.collapse && this.collapse.show();
-			} 
-			else 
-			{
-				// only invokes .hide if this.collapse is not null
-				this.collapse && this.collapse.hide();
-				if (this.activeContent == this.entry.content_id)
-				{
-					this.makeParentContentActive(this.entry.content_id);
-				}
+		'entry.menu_open': function (isMenuOpen) {
+			if (!this.collapse)
+				return;
+
+			if (isMenuOpen) {
+				this.collapse.show();
+			} else {
+				this.collapse.hide();
 			}
 		},
 	},
     computed: {
-		active: function () {
-			if (this.entry.menu_open){
-				return true;
-			}
-			else if (this.activeContent) {
-				return this.activeContent == this.entry.content_id;
-			} else {
-				return false;
-			}
-		},
 		hasFullLink() {
 			return this.entry.url.startsWith(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router)
 		},
@@ -94,25 +78,32 @@ export default {
         },
         hasChilds() {
             return this.entry.childs && this.entry.childs.length !== 0;
-        }
+        },
+		menuHierarchy() {
+			return [...this.$props.precedingMenuHierarchy, this.$props.entry.content_id];
+		},
+		menuNodeHref() {
+			if (this.hasChilds) {
+				return this.hasFullLink ? this.$props.entry.url : null;
+			} else {
+				return this.$props.entry.url;
+			}
+		},
     },
     methods: {
 		getUrlMatchPoints(url,link){
 			let splitted_link = link.split('/');
 			let splitted_url = url.href.split('/');
-
 			let count = 0;
 
-			for(let part_url of splitted_url)
-			{
-				for (let part_link of splitted_link)
-				{
-					if(part_url == part_link)
-					{
+			for (let part_url of splitted_url) {
+				for (let part_link of splitted_link) {
+					if (part_url === part_link) {
 						count++;
 					}
 				}
 			}
+
 			this.urlCount = count;
 			this.addUrlCount(count);
 		},
@@ -124,14 +115,11 @@ export default {
 			let url_hash = url.hash;
 			url_hash = url_hash.replace(url_hash_spaceSymbol_regex, " ").replace(url_hash_sharpSymbol_regex,"");
 			
-			// if the url hash contains the titel of the menu 
-			// or if the url equals the link of a menu 
-			// then set the menu active 
 			if (url_hash == this.entry.titel || url.href == this.entry.url) {
 					this.setActiveEntry(this.entry.content_id);
+					this.setOpenMenuHierarchy(this.menuHierarchy);
 			}
 		},
-		// searches the childs of an entry recursively based on the value of a property
 		searchRecursiveChild(entry,property,value){
 			if (typeof entry.childs == 'object' && !Array.isArray(entry.childs) && Object.entries(entry.childs).length > 0){
 				entry.childs = Object.values(entry.childs);
@@ -148,16 +136,23 @@ export default {
 			}	
 			return false;
 		},
-        toggleCollapse(evt) {
-			if (this.active)
-			{
-				this.makeParentContentActive(this.entry.content_id);
+        toggleCollapse() {
+			if (!this.$props.entry.menu_open) {
+				this.setOpenMenuHierarchy(this.menuHierarchy);
+			} else {
+				this.setOpenMenuHierarchy(this.precedingMenuHierarchy);
 			}
-			else
-			{
-				this.setActiveEntry(this.entry.content_id);
+        },
+		handleClickOnMenuNode() {
+			if (this.hasFullLink) {
+				this.setActiveEntry(this.$props.entry.content_id);
+				if (this.hasChilds) {
+					this.setOpenMenuHierarchy(this.menuHierarchy);
+				}
+			} else if (this.hasChilds) {
+				this.toggleCollapse();
 			}
-        }
+		},
     },
     mounted() {
         if (this.$refs.children) {
@@ -173,41 +168,41 @@ export default {
         INCLUDE
     </div>
     <template v-else>
-        <template v-if="hasChilds">
-			<div class="btn-group w-100">
- 				<cis-menu-link :target="target"
- 					:href="hasFullLink ? entry.url : null"
-					@click="toggleCollapse"
-                    :class="{
-                        'btn btn-default rounded-0 text-start': true,
-                        ['btn-level-' + level]: true,
-						'fw-bold':active
-                    }">
-                    {{ entry.titel }}
-                </cis-menu-link>
-                <button @click.prevent="toggleCollapse" :aria-expanded="entry.menu_open"
-                    :class="{
-                        'btn btn-default rounded-0 dropdown-toggle dropdown-toggle-split flex-grow-0': true,
-                        collapsed: !entry.menu_open
-                    }">
-                    <span class="visually-hidden">Toggle Dropdown</span>
-                </button>
-            </div>
-            <ul ref="children"
-                class="nav w-100 collapse">
-                <cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeContent" v-for="child in entry.childs" :key="child" :entry="child" :level="level + 1"/>
-            </ul>
-        </template>
-		<cis-menu-link v-else
-            :href="entry.url"
-            :target="target"
-            :class="{
-                'btn btn-default rounded-0 w-100 text-start': true,
-                ['btn-level-' + level]: true,
-				'fw-bold':active
-            }"
-            @mouseup="setActiveEntry(entry.content_id)">
-            {{ entry.titel }}
-        </cis-menu-link>
+		<div class="btn-group w-100">
+			<cis-menu-link
+				@click="handleClickOnMenuNode($event)"
+				:href="menuNodeHref"
+				:target="target"
+				class="btn btn-default rounded-0 text-start"
+				:class="{
+					['btn-level-' + level]: true,
+					'fw-bold': $props.activeContent === $props.entry.content_id
+				}"
+				:style="'padding-left: calc(var(--bs-btn-padding-x) * ' + $props.level + ');'"
+			>
+				{{ entry.titel }}
+			</cis-menu-link>
+			<button
+				v-if="hasChilds"
+				@click.prevent="toggleCollapse()"
+				:aria-expanded="entry.menu_open"
+				class="btn btn-default rounded-0 dropdown-toggle dropdown-toggle-split flex-grow-0"
+				:class="{ collapsed: !entry.menu_open }"
+			>
+				<span class="visually-hidden">Toggle Dropdown</span>
+			</button>
+		</div>
+		<ul v-if="hasChilds" ref="children" class="nav w-100 collapse" >
+			<cis-menu-entry
+				v-for="child in entry.childs"
+				:key="child"
+				:highestMatchingUrlCount="highestMatchingUrlCount"
+				:activeContent="activeContent"
+				:entry="child"
+				:level="level + 1"
+				:openMenuHierarchy="$props.openMenuHierarchy.slice(1)"
+				:precedingMenuHierarchy="menuHierarchy"
+			/>
+		</ul>
     </template>`
 };
