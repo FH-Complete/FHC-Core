@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Overview on cronjob logs
+ * Ferien management
  */
 class Ferienverwaltung extends Auth_Controller
 {
