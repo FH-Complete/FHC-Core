@@ -28,6 +28,7 @@ export default {
 			if (this.activeContent == null && newValue == this.urlCount)
 			{
 				this.setActiveEntry(this.entry.content_id);
+				this.setOpenMenuHierarchy(this.menuHierarchy);
 			}
 		},
 		openMenuHierarchy() {
