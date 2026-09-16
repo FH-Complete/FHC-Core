@@ -31,18 +31,20 @@ class Vertrag_model extends DB_Model
      */
 	public function save($person_id, $mitarbeiter_uid, $lehrveranstaltung_id, $lehreinheit_id, $projektarbeit_id = null, $vertragsstunden, $betrag, $studiensemester_kurzbz)
     {
-        $person_id = (isset($person_id) && is_numeric($person_id))
+		$vertragstyp_kurzbz = (is_null($projektarbeit_id)) ? 'Lehrauftrag' : 'Betreuung';
+        
+		$person_id = (isset($person_id) && is_numeric($person_id))
             ? $person_id
             : show_error('peron_id must be set and numeric.');
-        $lehreinheit_id = (isset($lehreinheit_id) && is_numeric($lehreinheit_id))
-            ? $lehreinheit_id
-            : show_error('lehreinheit_id must be set and numeric.');
         $lehrveranstaltung_id = (isset($lehrveranstaltung_id) && is_numeric($lehrveranstaltung_id))
             ? $lehrveranstaltung_id
             : show_error('lehrveranstaltung_id must be set and numeric.');
         $projektarbeit_id = (isset($projektarbeit_id) && is_numeric($projektarbeit_id))
             ? $projektarbeit_id
             : null;
+		$lehreinheit_id = (isset($lehreinheit_id) && is_numeric($lehreinheit_id))
+			? $lehreinheit_id
+			: $vertragstyp_kurzbz == 'Betreuung' ? null : show_error('lehreinheit_id must be set and numeric.');
         $vertragsstunden = (isset($vertragsstunden) && is_numeric($vertragsstunden))
             ? $vertragsstunden
             : 0;
@@ -53,7 +55,7 @@ class Vertrag_model extends DB_Model
             ? $mitarbeiter_uid
             : show_error('mitarbeiter_uid must be set and a string value.');;
 
-        $vertragstyp_kurzbz = (is_null($projektarbeit_id)) ? 'Lehrauftrag' : 'Betreuung';
+        
 
         // First check if Vertrag already exists for that Lehrauftrag or for that Projektbetreuerauftrag
         if ($vertragstyp_kurzbz == 'Lehrauftrag')
@@ -257,7 +259,7 @@ class Vertrag_model extends DB_Model
         }
         elseif ($vertragstyp_kurzbz == 'Betreuung')
         {
-            $this->addSelect('lehreinheit_id');
+            $this->addSelect('lehreinheit_id, lehre.tbl_projektarbeit.lehrveranstaltung_id, lehre.tbl_projektarbeit.studiensemester_kurzbz');
             $this->addJoin('lehre.tbl_projektbetreuer', 'vertrag_id');
             $this->addJoin('lehre.tbl_projektarbeit', 'projektarbeit_id');
             if ($result = $this->loadWhere(array('vertrag_id' => $vertrag_id)))
@@ -281,17 +283,22 @@ class Vertrag_model extends DB_Model
     {
         if ($result = getData($this->getLehreinheitID($vertrag_id)))
         {
-            $this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
-            $this->LehreinheitModel->addSelect($select);
+            if (!empty($result[0]->lehreinheit_id))
+            {
+                $this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
+                $this->LehreinheitModel->addSelect($select);
 
-            if($result = $this->LehreinheitModel->load($result[0]->lehreinheit_id))
-            {
-                return success($result->retval);
+                if ($result = $this->LehreinheitModel->load($result[0]->lehreinheit_id))
+                {
+                    return success($result->retval);
+                }
+                else
+                {
+                    return error('Fehler beim Laden der Lehreinheit');
+                }
             }
-            else
-            {
-                return error('Fehler beim Laden der Lehreinheit');
-            }
+
+            return success($result);
         }
         else
         {
@@ -563,14 +570,13 @@ SELECT
 			null::integer as pruefung_id,
 			projektarbeit_id,
 			(tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag1,
-			tbl_lehreinheit.studiensemester_kurzbz,
+			tbl_projektarbeit.studiensemester_kurzbz,
 			tbl_projektbetreuer.betreuerart_kurzbz,
 			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=tbl_projektarbeit.student_uid)
 			as bezeichnung
 		FROM
 			lehre.tbl_projektbetreuer
 			JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
-			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 		WHERE
 			tbl_projektbetreuer.person_id=?
 			AND vertrag_id IS NULL
@@ -619,14 +625,13 @@ SELECT
 			null::integer as pruefung_id,
 			projektarbeit_id,
 			(tbl_projektbetreuer.stunden * tbl_projektbetreuer.stundensatz) as betrag,
-			tbl_lehreinheit.studiensemester_kurzbz,
+			tbl_projektarbeit.studiensemester_kurzbz,
 			tbl_projektbetreuer.betreuerart_kurzbz,
 			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=tbl_projektarbeit.student_uid)
 			as bezeichnung, vertrag_id
 		FROM
 			lehre.tbl_projektbetreuer
 			JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
-			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 		WHERE
 			tbl_projektbetreuer.person_id=?
 			AND vertrag_id = ?

@@ -490,15 +490,13 @@ if($result = $db->db_query($qry))
 				tbl_projektbetreuer.person_id,
 				tbl_lehrveranstaltung.orgform_kurzbz
 			FROM lehre.tbl_projektarbeit,
-				lehre.tbl_lehreinheit,
 				lehre.tbl_lehrveranstaltung,
 				lehre.tbl_projektbetreuer,
 				PUBLIC.tbl_person
-			WHERE tbl_projektarbeit.lehreinheit_id = tbl_lehreinheit.lehreinheit_id
-				AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
+			WHERE tbl_projektarbeit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
 				AND tbl_projektarbeit.projektarbeit_id = tbl_projektbetreuer.projektarbeit_id
 				AND tbl_person.person_id = tbl_projektbetreuer.person_id
-				AND tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz);
+				AND tbl_projektarbeit.studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz);
 
 	if($uid!=='')
 	{
