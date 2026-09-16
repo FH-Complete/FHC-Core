@@ -653,31 +653,42 @@ class Studiengang_model extends DB_Model
 	}
 
 	/**
+	 * Gets the Studiengang information. Without parameters it uses the Studiengang
+	 * of the logged in Student.
+	 *
+	 * @param int|null $studiengang_kz
+	 * @param int|null $semester used for the Jahrgangsvertretung
 	 * @return stdClass
 	 */
-	public function getStudiengangInfoForNews()
+	public function getStudiengangInfoForNews($studiengang_kz = null, $semester = null)
 	{
 
 		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
-		
-		$student = $this->StudentModel->loadWhere(['student_uid' => getAuthUID()]);
-		if (isError($student))
-			return error($student);
-		if (getData($student)) {
-			$student = current(getData($student));
-			$studiengang_kz = $student->studiengang_kz;
-			$semester = $student->semester;
+
+		if (is_null($studiengang_kz))
+		{
+			$student = $this->StudentModel->loadWhere(['student_uid' => getAuthUID()]);
+			if (isError($student))
+				return error($student);
+			if (getData($student)) {
+				$student = current(getData($student));
+				$studiengang_kz = $student->studiengang_kz;
+				$semester = $student->semester;
+			}
 		}
-		
+
+		// users without a Student record get no information instead of an error
+		if (is_null($studiengang_kz))
+			return success(null);
+
 		$stg_obj = $this->load($studiengang_kz);
 		if(isError($stg_obj))
 			return error($stg_obj);
-		if(getData($stg_obj))
-		{
-			$stg_obj = current(getData($stg_obj));
-		}		
+		if(!hasData($stg_obj))
+			return error('Studiengang nicht gefunden');
+		$stg_obj = current(getData($stg_obj));
 
 		$stg_ltg = $this->getLeitungDetailed($stg_obj->studiengang_kz);
 		if (isError($stg_ltg))

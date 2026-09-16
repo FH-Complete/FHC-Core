@@ -1,4 +1,5 @@
 import LvUebersicht from "../Mylv/LvUebersicht.js";
+import StudiengangInformation from "../Cms/StudiengangInformation/StudiengangInformation.js";
 
 import ApiCisStudium from '../../../api/factory/cis/studium.js';
 
@@ -17,6 +18,7 @@ export default {
 			lehrveranstaltungen: [],
 			selectedLehrveranstaltung: null,
 			menu:null,
+			showStudiengangInfo: false,
 		}
 	},
 	provide(){
@@ -29,8 +31,10 @@ export default {
 		}
 	},
 	name: "OverviewStudiengaenge",
+	inject: ["isMobile"],
 	components: {
 		LvUebersicht,
+		StudiengangInformation,
 	},
 	watch:{
 		selectedStudiensemester: function(newVal, oldVal){
@@ -119,6 +123,10 @@ export default {
 		getDataFromLocalStorage(key){
 			const value = localStorage.getItem(key);
 			return value;
+		},
+		toggleStudiengangInfo(){
+			this.showStudiengangInfo = !this.showStudiengangInfo;
+			this.storeDataToLocalStorage("studiengangInfo", this.showStudiengangInfo);
 		},
 		changeSelectedStudienSemester(studiensemester_kurzbz) {
 			return this.$api
@@ -248,6 +256,11 @@ export default {
 	},
 
 	computed:{
+		studiengangInfoToggleTitel(){
+			return this.showStudiengangInfo
+				? this.$p.t('studiengangInformation', 'studiengangsinformationen_ausblenden')
+				: this.$p.t('studiengangInformation', 'studiengangsinformationen_anzeigen');
+		},
 		isGermanLanguage(){
 			return this.$p.user_language.value == "German"
 		},
@@ -288,6 +301,10 @@ export default {
 	
 	created(){
 
+		// the last toggle wins, otherwise the desktop view shows the information and the mobile view hides it
+		const studiengangInfo = this.getDataFromLocalStorage("studiengangInfo");
+		this.showStudiengangInfo = studiengangInfo === null ? !this.isMobile : studiengangInfo === "true";
+
 		const studiensemester = this.getDataFromLocalStorage("sudiensemester") ?? undefined;
 		const studiengang = JSON.parse(this.getDataFromLocalStorage("studiengang")) ?? undefined;
 		const semester = this.getDataFromLocalStorage("semester") ?? undefined;
@@ -305,112 +322,129 @@ export default {
 	},
 	template: /*html*/`
 	<div>
-	<h2>{{$p.t('studium','studium')}}</h2>
-	<hr>
-	<lv-uebersicht ref="lvUebersicht" :titel="selectedLehrveranstaltungTitel" :event="selectedLehrveranstaltung" :studiensemester="selectedStudiensemester" v-if="selectedLehrveranstaltung">
-		<template #content>
-			<div v-if="Array.isArray(selectedLehrveranstaltung.lektoren) && selectedLehrveranstaltung.lektoren.length>0" class="mb-4">
-				<h4>{{$p.t('studium','lektoren')}}:</h4>
-				<a :href="'mailto:'+lektor?.email" class="fhc-link-color mx-2" v-for="lektor in selectedLehrveranstaltung.lektoren">{{lektor.name}}</a>
+		<h2>{{$p.t('studium','studium')}}</h2>
+		<hr>
+		<lv-uebersicht ref="lvUebersicht" :titel="selectedLehrveranstaltungTitel" :event="selectedLehrveranstaltung" :studiensemester="selectedStudiensemester" v-if="selectedLehrveranstaltung">
+			<template #content>
+				<div v-if="Array.isArray(selectedLehrveranstaltung.lektoren) && selectedLehrveranstaltung.lektoren.length>0" class="mb-4">
+					<h4>{{$p.t('studium','lektoren')}}:</h4>
+					<a :href="'mailto:'+lektor?.email" class="fhc-link-color mx-2" v-for="lektor in selectedLehrveranstaltung.lektoren">{{lektor.name}}</a>
+				</div>
+				<h4>Menu:</h4>
+			</template>
+		</lv-uebersicht>
+		<div class="lvOptions">
+			<div>
+				<h6>{{$p.t('studium','studiensemester')}}:</h6>
+				<div class="input-group">
+					<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiensemester(1)" :aria-label="$p.t('global','previous')" :title="$p.t('global','previous')">
+						<i class="fa fa-caret-left" aria-hidden="true"></i>
+					</button>
+					<select ref="studiensemester" v-model="selectedStudiensemester"  @change="onStudiensemesterChange" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')">
+						<option v-for="semester in studienSemester"  :key="semester" :value="semester.studiensemester_kurzbz">{{studiensemesterTitel(semester.studiensemester_kurzbz)	}}</option>
+					</select>
+					<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiensemester(-1)" :aria-label="$p.t('global','next')" :title="$p.t('global','next')">
+						<i class="fa fa-caret-right" aria-hidden="true"></i>
+					</button>
+				</div>
 			</div>
-			<h4>Menu:</h4>
-		</template>
-	</lv-uebersicht>
-	<div class="lvOptions">
-		<div>
-		<h6>{{$p.t('studium','studiensemester')}}:</h6>
-		<div class="input-group">
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiensemester(1)" :aria-label="$p.t('global','previous')" :title="$p.t('global','previous')">
-				<i class="fa fa-caret-left" aria-hidden="true"></i>
-			</button>
-			<select ref="studiensemester" v-model="selectedStudiensemester"  @change="onStudiensemesterChange" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')">
-				<option v-for="semester in studienSemester"  :key="semester" :value="semester.studiensemester_kurzbz">{{studiensemesterTitel(semester.studiensemester_kurzbz)	}}</option>
-			</select>
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiensemester(-1)" :aria-label="$p.t('global','next')" :title="$p.t('global','next')">
-				<i class="fa fa-caret-right" aria-hidden="true"></i>
-			</button>
-		</div>
+
+			<div>
+				<h6>{{$p.t('lehre','studiengang')}}:</h6>
+				<div class="input-group">
+					<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiengang(-1)" :aria-label="$p.t('global','previous')" :title="$p.t('global','previous')">
+						<i class="fa fa-caret-left" aria-hidden="true"></i>
+					</button>
+					<select ref="studiengaenge" v-model="selectedStudiengang" class="form-select" @change="onStudiengangChange" :aria-label="$p.t('global/studiensemester_auswaehlen')">
+						<option v-for="studiengang in studiengaenge"  :key="studiengang.studiengang_kz" :value="studiengang.studiengang_kz" >{{studiengangTitel(studiengang)}}</option>
+					</select>
+					<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiengang(1)" :aria-label="$p.t('global','next')" :title="$p.t('global','next')">
+						<i class="fa fa-caret-right" aria-hidden="true"></i>
+					</button>
+				</div>
+			</div>
+
+			<div>
+				<h6>{{$p.t('lehre','semester')}}:</h6>
+				<div class="input-group">
+					<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeSemester(-1)" :aria-label="$p.t('global','previous')" :title="$p.t('global','previous')">
+						<i class="fa fa-caret-left" aria-hidden="true"></i>
+					</button>
+					<select ref="semester" v-model="selectedSemester" class="form-select"  @change="onSemesterChange" :aria-label="$p.t('global/studiensemester_auswaehlen')">
+						<option v-for="sem in semester" :key="sem" :value="sem">{{sem}}. Semester</option>
+					</select>
+					<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeSemester(1)" :aria-label="$p.t('global','next')" :title="$p.t('global','next')">
+						<i class="fa fa-caret-right" aria-hidden="true"></i>
+					</button>
+				</div>
+			</div>
+
+			<div>
+				<h6>{{$p.t('studium','studienordnung')}}:</h6>
+				<div class="input-group">
+					<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudienordnung(-1)" :aria-label="$p.t('global','previous')" :title="$p.t('global','previous')">
+						<i class="fa fa-caret-left" aria-hidden="true"></i>
+					</button>
+					<select ref="studienordnung" v-model="selectedStudienordnung" class="form-select"  @change="onStudienordnungChange" :aria-label="$p.t('global/studiensemester_auswaehlen')">
+						<option v-for="ordnung in computedStudienOrdnungSelectValues" :disabled="ordnung.disabled" :key="ordnung?.studienplan?.studienplan_id" :value="ordnung?.studienplan?.studienplan_id">{{ordnung.bezeichnung}}</option>
+					</select>
+					<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudienordnung(1)" :aria-label="$p.t('global','next')" :title="$p.t('global','next')">
+						<i class="fa fa-caret-right" aria-hidden="true"></i>
+					</button>
+				</div>
+			</div>
 		</div>
 
-		<div>
-		<h6>{{$p.t('lehre','studiengang')}}:</h6>
-		<div class="input-group">
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiengang(-1)" :aria-label="$p.t('global','previous')" :title="$p.t('global','previous')">
-				<i class="fa fa-caret-left" aria-hidden="true"></i>
-			</button>
-			<select ref="studiengaenge" v-model="selectedStudiengang" class="form-select" @change="onStudiengangChange" :aria-label="$p.t('global/studiensemester_auswaehlen')">
-				<option v-for="studiengang in studiengaenge"  :key="studiengang.studiengang_kz" :value="studiengang.studiengang_kz" >{{studiengangTitel(studiengang)}}</option>
-			</select>
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiengang(1)" :aria-label="$p.t('global','next')" :title="$p.t('global','next')">
-				<i class="fa fa-caret-right" aria-hidden="true"></i>
-			</button>
-		</div>
-		</div>
+		<hr>
 
-		<div>
-		<h6>{{$p.t('lehre','semester')}}:</h6>
-		<div class="input-group">
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeSemester(-1)" :aria-label="$p.t('global','previous')" :title="$p.t('global','previous')">
-				<i class="fa fa-caret-left" aria-hidden="true"></i>
-			</button>
-			<select ref="semester" v-model="selectedSemester" class="form-select"  @change="onSemesterChange" :aria-label="$p.t('global/studiensemester_auswaehlen')">
-				<option v-for="sem in semester" :key="sem" :value="sem">{{sem}}. Semester</option>
-			</select>
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeSemester(1)" :aria-label="$p.t('global','next')" :title="$p.t('global','next')">
-				<i class="fa fa-caret-right" aria-hidden="true"></i>
-			</button>
-		</div>
-		</div>
-
-		<div>
-		<h6>{{$p.t('studium','studienordnung')}}:</h6>
-		<div class="input-group">
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudienordnung(-1)" :aria-label="$p.t('global','previous')" :title="$p.t('global','previous')">
-				<i class="fa fa-caret-left" aria-hidden="true"></i>
-			</button>
-			<select ref="studienordnung" v-model="selectedStudienordnung" class="form-select"  @change="onStudienordnungChange" :aria-label="$p.t('global/studiensemester_auswaehlen')">
-				<option v-for="ordnung in computedStudienOrdnungSelectValues" :disabled="ordnung.disabled" :key="ordnung?.studienplan?.studienplan_id" :value="ordnung?.studienplan?.studienplan_id">{{ordnung.bezeichnung}}</option>
-			</select>
-			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudienordnung(1)" :aria-label="$p.t('global','next')" :title="$p.t('global','next')">
-				<i class="fa fa-caret-right" aria-hidden="true"></i>
-			</button>
-		</div>
+		<div class="row g-3">
+			<div class="col-12 order-last studiengang-info-col" :class="{collapsed: !showStudiengangInfo}" v-if="selectedStudiengang">
+				<h2 class="studiengang-info-title"><span>{{$p.t('global','ansprechpartner')}}</span> <span>{{$p.t('lehre','studiengang')}}</span></h2>
+				<div class="d-flex flex-column flex-md-row">
+					<button id="studiengang-info-toggle" type="button" class="d-flex justify-content-center p-2 flex-shrink-0"
+						@click="toggleStudiengangInfo"
+						:aria-label="studiengangInfoToggleTitel" :title="studiengangInfoToggleTitel"
+						:aria-expanded="showStudiengangInfo" aria-controls="fhc-studiengang-info-column">
+						<i aria-hidden="true" class="fa-solid fa-chevron-right fhc-text"></i>
+					</button>
+					<div id="fhc-studiengang-info-column" class="flex-grow-1">
+						<div class="studiengang-info-body">
+							<studiengang-information compact :studiengang_kz="selectedStudiengang" :semester="selectedSemester"></studiengang-information>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-12 col-md">
+				<div class="lvUebersicht " >
+					<template v-for="lehrveranstaltung in lehrveranstaltungen" :key="lehrveranstaltung.lehrveranstaltung_id">
+						<div  class="card" v-if="Array.isArray(lehrveranstaltung.lehrveranstaltungen) && lehrveranstaltung.lehrveranstaltungen.length >0" >
+							<div class="card-header">
+								<h5 class=" card-title">{{isGermanLanguage ? lehrveranstaltung.bezeichnung : lehrveranstaltung.bezeichnung_english }}</h5>
+								<h6 class=" card-subtitle">{{lehrveranstaltung.lehrform_kurzbz}}</h6>
+							</div>
+							<div class="card-body">
+								<ul class="list-group list-group-flush">
+									<li class="d-flex list-group-item" v-for="lv in lehrveranstaltung.lehrveranstaltungen">
+										<a class="fhc-link-color d-block me-auto" href="#" @click="openLvUebersicht(lv)">{{isGermanLanguage ? lv.bezeichnung : lv.bezeichnung_english}}</a>
+										<p>{{lv.lehrform_kurzbz}}</p>
+									</li>	
+								</ul>
+							</div>
+						</div>
+						<div class="card" v-else-if="!Array.isArray(lehrveranstaltung.lehrveranstaltungen)">
+							<div class="card-body">
+								<ul class="list-group list-group-flush">
+									<li class="d-flex list-group-item">
+										<a class="fhc-link-color d-block me-auto" href="#" @click="openLvUebersicht(lehrveranstaltung)">{{isGermanLanguage ? lehrveranstaltung.bezeichnung : lehrveranstaltung.bezeichnung_english}}</a>
+										<p>{{lehrveranstaltung.lehrform_kurzbz}}</p>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</template>
+				</div>
+			</div>
 		</div>
 	</div>
-
-	<hr>
-
-	<div class="lvUebersicht " >
-	<template v-for="lehrveranstaltung in lehrveranstaltungen" :key="lehrveranstaltung.lehrveranstaltung_id">
-		<div  class="card" v-if="Array.isArray(lehrveranstaltung.lehrveranstaltungen) && lehrveranstaltung.lehrveranstaltungen.length >0" >
-			<div class="card-header">
-				<h5 class=" card-title">{{isGermanLanguage ? lehrveranstaltung.bezeichnung : lehrveranstaltung.bezeichnung_english }}</h5>
-				<h6 class=" card-subtitle">{{lehrveranstaltung.lehrform_kurzbz}}</h6>
-			</div>
-			<div class="card-body">
-				<ul class="list-group list-group-flush">
-					<li class="d-flex list-group-item" v-for="lv in lehrveranstaltung.lehrveranstaltungen">
-						<a class="fhc-link-color d-block me-auto" href="#" @click="openLvUebersicht(lv)">{{isGermanLanguage ? lv.bezeichnung : lv.bezeichnung_english}}</a>
-						<p>{{lv.lehrform_kurzbz}}</p>
-					</li>	
-				</ul>
-			</div>
-		</div>
-		<div class="card" v-else-if="!Array.isArray(lehrveranstaltung.lehrveranstaltungen)">
-			<div class="card-body">
-				<ul class="list-group list-group-flush">
-					<li class="d-flex list-group-item">
-						<a class="fhc-link-color d-block me-auto" href="#" @click="openLvUebersicht(lehrveranstaltung)">{{isGermanLanguage ? lehrveranstaltung.bezeichnung : lehrveranstaltung.bezeichnung_english}}</a>
-						<p>{{lehrveranstaltung.lehrform_kurzbz}}</p>
-					</li>
-				</ul>
-			</div>
-		</div>
-	</template>
-	</div>
-
-
-	</div>
-	
 	`
 };
