@@ -60,7 +60,22 @@ export default {
 									"/Cis/Profil/View/" + data.uid;
 							}
 						},
-						childactions: []
+						childactions: [
+							{
+								label: Vue.computed(() => this.$p.t("profil/zeitsperren")),
+								icon: "fas fa-calendar-days",
+								type: "link",
+								action: function (data) {
+									const uid = JSON.parse(data.data).uid;
+									const link =
+										FHC_JS_DATA_STORAGE_OBJECT.app_root +
+										FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+										"/Cis/Zeitsperrenma/ma/" +
+										uid;
+									return link;
+								}
+							}
+						]
 					},
 					student: {
 						defaultaction: {
