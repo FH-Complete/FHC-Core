@@ -28,6 +28,7 @@ export default {
 			if (this.activeContent == null && newValue == this.urlCount)
 			{
 				this.setActiveEntry(this.entry.content_id);
+				this.setOpenMenuHierarchy(this.menuHierarchy);
 			}
 		},
 		openMenuHierarchy() {
@@ -78,9 +79,7 @@ export default {
 		},
 		menuNodeHref() {
 			if (this.hasChilds) {
-				return this.$props.entry.menu_open && this.hasFullLink
-					? this.$props.entry.url
-					: null;
+				return this.hasFullLink ? this.$props.entry.url : null;
 			} else {
 				return this.$props.entry.url;
 			}
