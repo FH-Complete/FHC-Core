@@ -7,7 +7,8 @@
  *   node tests/cypress/tools/dbCheck.js noten env        print the .env block to use
  *
  * A suite contributes tools/checks/<suite>.js exporting { title, checks, sqlFiles }. Connection,
- * tunnel and output are shared and live here.
+ * tunnel and output are shared and live here. A sqlFiles entry is a path or { file, group }; a
+ * "-- ==== <group> ====" line starts a group.
  *
  * `check` is read-only; `seed` needs <PREFIX>_DB_ALLOW_WRITES=true and an owner role.
  */
@@ -32,12 +33,14 @@ const loadSuite = (name) => {
 	const file = path.join(CHECKS_DIR, `${name}.js`);
 	if (!fs.existsSync(file)) {
 		const available = fs.existsSync(CHECKS_DIR)
-			? fs.readdirSync(CHECKS_DIR).map((f) => f.replace(/\.js$/, "")).join(", ")
+			? fs
+					.readdirSync(CHECKS_DIR)
+					.map((f) => f.replace(/\.js$/, ""))
+					.join(", ")
 			: "(none)";
 		console.error(`\nUnknown suite "${name}". Available: ${available}\n`);
 		process.exit(2);
 	}
-	// eslint-disable-next-line global-require, import/no-dynamic-require
 	return require(file);
 };
 
@@ -74,7 +77,18 @@ const runChecks = async (client, suite) => {
 	return 1;
 };
 
-const applySqlFile = async (client, file) => {
+/** The SQL of a file, or of one group in it. A group ends at the next group header. */
+const readSql = (file, group) => {
+	const sql = fs.readFileSync(file, "utf8");
+	if (!group) return sql;
+	const parts = sql.split(/^-- ==== (.+?) ====[ \t]*\r?$/m);
+	for (let i = 1; i < parts.length; i += 2) if (parts[i] === group) return parts[i + 1];
+	return null;
+};
+
+const applySqlFile = async (client, entry) => {
+	const { file, group } = typeof entry === "string" ? { file: entry } : entry;
+	const label = path.relative(process.cwd(), file) + (group ? ` [${group}]` : "");
 	if (!db.writesAllowed()) {
 		console.error(`\nRefusing to write: set ${db.PREFIX}_DB_ALLOW_WRITES=true first.\n`);
 		return 2;
@@ -84,13 +98,19 @@ const applySqlFile = async (client, file) => {
 		return 2;
 	}
 
-	console.log(`\nApplying ${path.relative(process.cwd(), file)} ...\n`);
+	const sql = readSql(file, group);
+	if (sql === null) {
+		console.error(`\nGroup "${group}" not found in ${file}\n`);
+		return 2;
+	}
+
+	console.log(`\nApplying ${label} ...\n`);
 
 	// One connection, one call: the seeders rely on running as a unit (temp tables, DO blocks and a
 	// closing verification query).
 	let result;
 	try {
-		result = await client.query(fs.readFileSync(file, "utf8"));
+		result = await client.query(sql);
 	} catch (error) {
 		// `check` gets by as the application role; seeding creates and grants objects.
 		if (/permission denied/i.test(error.message)) {
@@ -107,11 +127,10 @@ const applySqlFile = async (client, file) => {
 	const last = results.filter((r) => r && r.rows && r.rows.length).pop();
 	if (last) {
 		console.log("Verification\n" + "-".repeat(50));
-		last.rows.forEach((row) =>
-			Object.entries(row).forEach(([k, v]) => console.log(`  ${k.padEnd(24)} ${v}`)));
+		last.rows.forEach((row) => Object.entries(row).forEach(([k, v]) => console.log(`  ${k.padEnd(24)} ${v}`)));
 	}
 
-	console.log(`\nDone: ${path.basename(file)}\n`);
+	console.log(`\nDone: ${label}\n`);
 	return 0;
 };
 
@@ -175,7 +194,7 @@ const main = async () => {
 			client.on("notice", (n) => console.log(`  NOTICE: ${n.message}`));
 
 			if (mode !== "check") {
-				// a suite can name several files; they run in this order
+				// a suite can name several files or groups; they run in this order
 				for (const file of [].concat(suite.sqlFiles[mode])) {
 					const code = await applySqlFile(client, file);
 					if (code !== 0) return code;

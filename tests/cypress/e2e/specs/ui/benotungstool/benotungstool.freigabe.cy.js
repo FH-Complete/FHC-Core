@@ -3,7 +3,7 @@ import { requireKonfiguration } from "../../../../support/helpers/notenConfig";
 import {
 	baselineDate,
 	loadNotenContext,
-	readLvGesamtnote,
+	readLvGesamtnoteViaDb,
 	requireDbReset,
 	resetNotenState,
 	seedBaseline,
@@ -37,7 +37,7 @@ context("Benotungstool UI - Notenfreigabe", () => {
 			const student = ctx.students[0];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, { note: ctx.gradeNotes[0], freigegeben: false });
+			seedBaseline(ctx, student, { note: ctx.gradeNotes[0], freigegeben: false });
 
 			page.visitAndWaitForTable(ctx);
 			page.expectFreigabeState(student.uid, "changed");
@@ -53,7 +53,7 @@ context("Benotungstool UI - Notenfreigabe", () => {
 			const student = ctx.students[0];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, { note: ctx.gradeNotes[0], freigegeben: false });
+			seedBaseline(ctx, student, { note: ctx.gradeNotes[0], freigegeben: false });
 
 			page.visitAndWaitForTable(ctx);
 			page.openFreigabeModal();
@@ -65,7 +65,7 @@ context("Benotungstool UI - Notenfreigabe", () => {
 			page.expectAbgelehnt("@saveStudentenNoten");
 			page.expectFreigabeState(student.uid, "changed");
 
-			readLvGesamtnote(ctx, student.uid).then((rowData) => {
+			readLvGesamtnoteViaDb(ctx, student.uid).then((rowData) => {
 				expect(rowData.freigabedatum, "eine abgelehnte Freigabe stempelt nichts").to.be.null;
 			});
 		});
@@ -76,7 +76,7 @@ context("Benotungstool UI - Notenfreigabe", () => {
 			const student = ctx.students[0];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, { note: ctx.gradeNotes[0], freigegeben: false });
+			seedBaseline(ctx, student, { note: ctx.gradeNotes[0], freigegeben: false });
 
 			page.visitAndWaitForTable(ctx);
 			page.expectFreigabeState(student.uid, "changed");
@@ -94,7 +94,7 @@ context("Benotungstool UI - Notenfreigabe", () => {
 			const student = ctx.students[1];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, { note: ctx.gradeNotes[0], freigegeben: false });
+			seedBaseline(ctx, student, { note: ctx.gradeNotes[0], freigegeben: false });
 
 			page.visitAndWaitForTable(ctx);
 			page.openFreigabeModal();

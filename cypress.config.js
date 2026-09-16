@@ -33,10 +33,13 @@ module.exports = defineConfig({
       // the suite can switch the instance to a configuration profile for the run
       on("before:run", () => suite.beforeRun(config));
 
-      // the profile goes back first; otherwise the SSH forward outlives Cypress
+      // the profile goes back first; the pool and the SSH forward close even if that fails
       on("after:run", async () => {
-        await suite.afterRun(config);
-        await require("./tests/cypress/tasks/sshTunnel").closeTunnel();
+        try {
+          await suite.afterRun(config);
+        } finally {
+          await require("./tests/cypress/tasks/db").closeDb();
+        }
       });
 
       return config;

@@ -19,8 +19,7 @@ const API = "**/api/frontend/v1/Noten";
  * Exakter Textvergleich für Optionslisten. Nötig, weil die Notenbezeichnungen einander enthalten:
  * contains("Gut") trifft zuerst "Sehr Gut", contains("Genügend") zuerst "Nicht Genügend".
  */
-const exactText = (text) =>
-	new RegExp(`^\\s*${String(text).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`);
+const exactText = (text) => new RegExp(`^\\s*${String(text).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`);
 
 class BenotungstoolPage {
 	selectors = {
@@ -73,10 +72,8 @@ class BenotungstoolPage {
 	getFreigabeState = (uid) => this.getCell(uid, "freigegeben").find("[data-cy='freigabe-state']");
 	getPruefungCell = (uid, spalte) => this.getCell(uid, spalte).find("[data-cy='pruefung-cell']");
 	getUebernehmenButton = (uid) => this.getCell(uid, "übernehmen").find("[data-cy='btn-uebernehmen']");
-	getPruefungAddButton = (uid, spalte) =>
-		this.getCell(uid, spalte).find("[data-cy='btn-pruefung-add']");
-	getPruefungEditButton = (uid, spalte) =>
-		this.getCell(uid, spalte).find("[data-cy='btn-pruefung-edit']");
+	getPruefungAddButton = (uid, spalte) => this.getCell(uid, spalte).find("[data-cy='btn-pruefung-add']");
+	getPruefungEditButton = (uid, spalte) => this.getCell(uid, spalte).find("[data-cy='btn-pruefung-edit']");
 
 	getPruefungModal = () => cy.get("[data-cy='modal-pruefung']");
 	getNeuePruefungModal = () => cy.get("[data-cy='modal-neue-pruefung']");
@@ -89,8 +86,7 @@ class BenotungstoolPage {
 	// --- Zustand prüfen --------------------------------------------------------------------------
 
 	/** offen | changed | ok */
-	expectFreigabeState = (uid, state) =>
-		this.getFreigabeState(uid).should("have.attr", "data-state", state);
+	expectFreigabeState = (uid, state) => this.getFreigabeState(uid).should("have.attr", "data-state", state);
 
 	expectLvNote = (uid, bezeichnung) => this.getCell(uid, "lv_note").should("contain.text", bezeichnung);
 
@@ -149,7 +145,11 @@ class BenotungstoolPage {
 		cy.get(".p-toast-message-warn", { timeout: TABLE_TIMEOUT }).should("have.length.at.least", anzahl);
 
 	/** Die uids des letzten Requests eines Sammelpfads. feld: "noten" oder "pruefungen" */
-	gesendeteUids = (alias, feld) => cy.get(alias).its(`request.body.${feld}`).then((zeilen) => zeilen.map((z) => z.uid));
+	gesendeteUids = (alias, feld) =>
+		cy
+			.get(alias)
+			.its(`request.body.${feld}`)
+			.then((zeilen) => zeilen.map((z) => z.uid));
 
 	// --- Notenvorschlag --------------------------------------------------------------------------
 
@@ -184,8 +184,7 @@ class BenotungstoolPage {
 		cy.contains(".p-dropdown-panel .p-dropdown-item", exactText(label)).click();
 	};
 
-	setDatum = (dataCy, ddmmyyyy) =>
-		cy.get(`[data-cy='${dataCy}'] input`).first().clear().type(`${ddmmyyyy}{enter}`);
+	setDatum = (dataCy, ddmmyyyy) => cy.get(`[data-cy='${dataCy}'] input`).first().clear().type(`${ddmmyyyy}{enter}`);
 
 	/**
 	 * Nach jeder Speicherung zeigt das Tool einen Erfolgs-Toast ohne Ablaufzeit. Er liegt über dem Modal
@@ -279,8 +278,7 @@ class BenotungstoolPage {
 			.find("[data-cy='freigabe-row-released']")
 			.should("contain.text", releasedBezeichnung);
 
-	typeFreigabePasswort = (password) =>
-		cy.get("[data-cy='freigabe-passwort'] input").type(password, { log: false });
+	typeFreigabePasswort = (password) => cy.get("[data-cy='freigabe-passwort'] input").type(password, { log: false });
 
 	submitFreigabe = () => cy.get("[data-cy='freigabe-submit']").click();
 
@@ -349,8 +347,7 @@ class BenotungstoolPage {
 		waitForOk("@getNoteByPunkte");
 	};
 
-	expectPunkte = (uid, punkte) =>
-		this.getPunkteCell(uid).should("contain.text", String(punkte));
+	expectPunkte = (uid, punkte) => this.getPunkteCell(uid).should("contain.text", String(punkte));
 
 	/** Sobald ein Termin existiert, ist die Punktespalte gesperrt (editable-Guard der Spalte). */
 	expectPunkteZelleGesperrt = (uid) => {
@@ -373,14 +370,12 @@ class BenotungstoolPage {
 	};
 
 	/** Punktefeld der Sammelanlage; dort leitet erst der Server beim Speichern ab. */
-	setNeuePruefungPunkte = (punkte) =>
-		cy.get("[data-cy='neue-pruefung-punkte'] input").clear().type(String(punkte));
+	setNeuePruefungPunkte = (punkte) => cy.get("[data-cy='neue-pruefung-punkte'] input").clear().type(String(punkte));
 
 	// --- Hilfen ----------------------------------------------------------------------------------
 
 	/** Die Bezeichnung zu einer Noten-PK, wie sie in Dropdowns und Zellen steht. */
-	bezeichnungOf = (ctx, note) =>
-		(ctx.notenOptions ?? []).find((n) => String(n.note) === String(note))?.bezeichnung;
+	bezeichnungOf = (ctx, note) => (ctx.notenOptions ?? []).find((n) => String(n.note) === String(note))?.bezeichnung;
 
 	toDDMMYYYY = (isoDate) => {
 		const [y, m, d] = isoDate.split("-");
@@ -388,8 +383,7 @@ class BenotungstoolPage {
 	};
 
 	/** Date in the configured import format; kept apart from toDDMMYYYY, which the dialog uses. */
-	importDatum = (isoDate, format) =>
-		format === "yyyy-MM-dd" ? isoDate : this.toDDMMYYYY(isoDate);
+	importDatum = (isoDate, format) => (format === "yyyy-MM-dd" ? isoDate : this.toDDMMYYYY(isoDate));
 }
 
 export const benotungstoolPage = new BenotungstoolPage();

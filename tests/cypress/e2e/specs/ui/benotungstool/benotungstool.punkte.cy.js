@@ -1,14 +1,10 @@
 import { benotungstoolPage as page } from "../../../../support/pages/benotungstool.po";
-import {
-	requireKonfiguration,
-	requirePunkteModus,
-	requireWiederholung,
-} from "../../../../support/helpers/notenConfig";
-import { attemptsOfStudent, readState } from "../../../../support/helpers/notenScenario";
+import { requireKonfiguration, requirePunkteModus, requireWiederholung } from "../../../../support/helpers/notenConfig";
+import { attemptsOfStudent, readStateViaApi } from "../../../../support/helpers/notenScenario";
 import {
 	attemptDate,
 	loadNotenContext,
-	readLvGesamtnote,
+	readLvGesamtnoteViaDb,
 	requireDbReset,
 	resetNotenState,
 	seedBaseline,
@@ -82,7 +78,7 @@ context("Benotungstool UI - Punktemodus", () => {
 			page.expectLvNote(student.uid, page.bezeichnungOf(ctx, noteMitte));
 			page.expectFreigabeState(student.uid, "changed");
 
-			readLvGesamtnote(ctx, student.uid).then((row) => {
+			readLvGesamtnoteViaDb(ctx, student.uid).then((row) => {
 				expect(String(row.note), "abgeleitete Note").to.eq(String(noteMitte));
 				expect(Number(row.punkte), "die Punkte werden mitgeschrieben").to.eq(MITTE);
 			});
@@ -94,7 +90,7 @@ context("Benotungstool UI - Punktemodus", () => {
 			const student = ctx.students[1];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, { note: ctx.gradeNotes[0], freigegeben: true });
+			seedBaseline(ctx, student, { note: ctx.gradeNotes[0], freigegeben: true });
 			seedPruefung(ctx, student, {
 				note: ctx.gradeNotes[0],
 				datum: attemptDate(ctx, 1),
@@ -113,7 +109,7 @@ context("Benotungstool UI - Punktemodus", () => {
 			const student = ctx.students[1];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, { note: ctx.notes.negativ, freigegeben: true });
+			seedBaseline(ctx, student, { note: ctx.notes.negativ, freigegeben: true });
 
 			page.visitAndWaitForTable(ctx);
 			page.getPruefungAddButton(student.uid, "antritt_2").click();
@@ -127,7 +123,7 @@ context("Benotungstool UI - Punktemodus", () => {
 			const student = ctx.students[1];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, { note: ctx.notes.negativ, freigegeben: true });
+			seedBaseline(ctx, student, { note: ctx.notes.negativ, freigegeben: true });
 
 			page.visitAndWaitForTable(ctx);
 			page.getPruefungAddButton(student.uid, "antritt_2").click();
@@ -153,8 +149,8 @@ context("Benotungstool UI - Punktemodus", () => {
 			const [a, b] = [ctx.students[2], ctx.students[3]];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, a.uid, { note: ctx.notes.negativ, freigegeben: true });
-			seedBaseline(ctx, b.uid, { note: ctx.notes.negativ, freigegeben: true });
+			seedBaseline(ctx, a, { note: ctx.notes.negativ, freigegeben: true });
+			seedBaseline(ctx, b, { note: ctx.notes.negativ, freigegeben: true });
 
 			page.visitAndWaitForTable(ctx);
 			page.addPruefungBulk({ uids: [a.uid, b.uid], punkte: MITTE, datum: page.toDDMMYYYY(attemptDate(ctx, 1)) });
@@ -179,14 +175,14 @@ context("Benotungstool UI - Punktemodus", () => {
 				const datum = page.importDatum(attemptDate(ctx, 1), ctx.cisConfig.CIS_GESAMTNOTE_IMPORT_DATUMSFORMAT);
 
 				resetNotenState(ctx);
-				seedBaseline(ctx, student.uid, { note: ctx.notes.negativ, freigegeben: true });
+				seedBaseline(ctx, student, { note: ctx.notes.negativ, freigegeben: true });
 				page.visitAndWaitForTable(ctx);
 
 				page.importPruefungen([[student.uid, datum, eingabe]]);
 
 				cy.get("@savePruefungenBulk").its("request.body.pruefungen.0.punkte").should("eq", PUNKTE);
 
-				readState(ctx).then((data) => {
+				readStateViaApi(ctx).then((data) => {
 					const neu = attemptsOfStudent(data, student.uid)[1];
 					expect(neu, "der importierte Termin").to.exist;
 					expect(Number(neu.punkte), "die Punkte des Termins").to.eq(PUNKTE);
@@ -205,7 +201,7 @@ context("Benotungstool UI - Punktemodus", () => {
 
 				cy.get("@saveNotenvorschlagBulk").its("request.body.noten.0.punkte").should("eq", PUNKTE);
 
-				readLvGesamtnote(ctx, student.uid).then((row) => {
+				readLvGesamtnoteViaDb(ctx, student.uid).then((row) => {
 					expect(row, "die importierte LV-Note").to.not.be.null;
 					expect(Number(row.punkte), "die Punkte der LV-Note").to.eq(PUNKTE);
 				});

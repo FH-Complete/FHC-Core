@@ -1,5 +1,9 @@
 {
   "scripts": {
+    "lint": "eslint tests/cypress cypress.config.js eslint.config.js",
+    "lint:fix": "eslint tests/cypress cypress.config.js eslint.config.js --fix",
+    "format": "prettier --write \"tests/cypress/**/*.{js,md}\"",
+    "format:check": "prettier --check \"tests/cypress/**/*.{js,md}\"",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
     "cy:noten": "cypress run --spec \"tests/cypress/e2e/specs/**/*.cy.js\"",
@@ -18,5 +22,13 @@
     "dotenv": "^17.4.2",
     "pg": "^8.13.1",
     "ssh2": "^1.17.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.10.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-cypress": "^7.0.2",
+    "globals": "^17.12.0",
+    "prettier": "^3.9.7"
   }
 }

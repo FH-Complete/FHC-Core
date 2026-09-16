@@ -24,7 +24,6 @@ const getPool = () => {
 	if (pool) return pool;
 
 	// lazy require so the suite loads without pg when no DB task is used
-	// eslint-disable-next-line global-require
 	const { Pool } = require("pg");
 
 	// with a tunnel up, bind to its local end - that is what gets us past pg_hba
@@ -37,8 +36,16 @@ const getPool = () => {
 		user: env("USER"),
 		password: env("PASSWORD"),
 		max: 4,
+		// tells these connections apart from the web application in pg_stat_activity
+		application_name: "cypress",
+		connectionTimeoutMillis: 15000,
+		// the server ends a stuck statement or transaction before the 60 s task timeout, so no lock wait holds a connection
+		statement_timeout: 30000,
+		idle_in_transaction_session_timeout: 30000,
 		ssl: String(env("SSL")).toLowerCase() === "true" ? { rejectUnauthorized: false } : undefined,
 	});
+	// an idle client that loses its connection emits here; without a listener the config process crashes
+	pool.on("error", (error) => console.warn(`[db] idle connection lost: ${error.message}`));
 	return pool;
 };
 
@@ -115,19 +122,27 @@ const checkAvailability = async ({ requireWrites = true } = {}) => {
 	} catch (error) {
 		// a failed pool is poisoned - drop it so a retry reconnects cleanly
 		if (pool) {
-			try { await pool.end(); } catch (e) { /* ignore */ }
+			const failed = pool;
 			pool = null;
+			try {
+				await failed.end();
+			} catch (e) {
+				/* ignore */
+			}
 		}
 		return { available: false, reason: explainFailure(error) };
 	}
 };
 
 const closeDb = async () => {
-	if (pool) {
-		await pool.end();
-		pool = null;
+	// drop the reference first: a later task must not get a pool that is ending
+	const open = pool;
+	pool = null;
+	try {
+		if (open) await open.end();
+	} finally {
+		await closeTunnel();
 	}
-	await closeTunnel();
 	return null;
 };
 

@@ -1,5 +1,10 @@
 import { benotungstoolPage as page } from "../../../../support/pages/benotungstool.po";
-import { requireKonfiguration, requireWiederholung } from "../../../../support/helpers/notenConfig";
+import {
+	requireKonfiguration,
+	requireNotenModus,
+	requireWiederholung,
+	skipWenn,
+} from "../../../../support/helpers/notenConfig";
 import {
 	attemptDate,
 	loadNotenContext,
@@ -30,11 +35,8 @@ context("Benotungstool UI - Import", () => {
 	});
 
 	beforeEach(function () {
-		if (ctx.cisConfig.CIS_GESAMTNOTE_PUNKTE) {
-			// im Punktemodus erwarten beide Importe Punkte statt einer Note
-			Cypress.log({ name: "skip", message: "Skipped: CIS_GESAMTNOTE_PUNKTE ist aktiv." });
-			this.skip();
-		}
+		// im Punktemodus erwarten beide Importe Punkte statt einer Note
+		requireNotenModus(this, ctx);
 	});
 
 	/**
@@ -45,7 +47,10 @@ context("Benotungstool UI - Import", () => {
 	const kuerzelNote = () => {
 		if (!ctx.cisConfig.CIS_GESAMTNOTE_IMPORT_NOTENKUERZEL) return null;
 
-		const kuerzelVon = (n) => String(n.anmerkung ?? "").trim().toLowerCase();
+		const kuerzelVon = (n) =>
+			String(n.anmerkung ?? "")
+				.trim()
+				.toLowerCase();
 
 		return (ctx.notenOptions ?? []).find((n) => {
 			const k = kuerzelVon(n);
@@ -60,10 +65,7 @@ context("Benotungstool UI - Import", () => {
 
 	describe("Notenimport", () => {
 		beforeEach(function () {
-			if (!ctx.cisConfig.CIS_GESAMTNOTE_NOTENIMPORT) {
-				Cypress.log({ name: "skip", message: "Skipped: CIS_GESAMTNOTE_NOTENIMPORT ist aus, der Button existiert nicht." });
-				this.skip();
-			}
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_NOTENIMPORT", true);
 		});
 
 		it("schreibt die LV-Note für jede Zeile", () => {
@@ -102,10 +104,7 @@ context("Benotungstool UI - Import", () => {
 
 		it("nimmt das Kürzel aus der Notenliste, sobald die Option das erlaubt", function () {
 			const kuerzel = kuerzelNote();
-			if (!kuerzel) {
-				Cypress.log({ name: "skip", message: "Skipped: keine Note mit brauchbarem Kürzel in tbl_note.anmerkung." });
-				this.skip();
-			}
+			skipWenn(this, !kuerzel, "Übersprungen: keine Note mit brauchbarem Kürzel in tbl_note.anmerkung.");
 
 			const student = ctx.students[1];
 
@@ -120,10 +119,7 @@ context("Benotungstool UI - Import", () => {
 
 	describe("Prüfungsimport", () => {
 		beforeEach(function () {
-			if (!ctx.cisConfig.CIS_GESAMTNOTE_PRUEFUNGSIMPORT) {
-				Cypress.log({ name: "skip", message: "Skipped: CIS_GESAMTNOTE_PRUEFUNGSIMPORT ist aus, der Button existiert nicht." });
-				this.skip();
-			}
+			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_PRUEFUNGSIMPORT", true);
 		});
 
 		it("legt je Zeile einen datierten Antritt an", function () {
@@ -134,8 +130,8 @@ context("Benotungstool UI - Import", () => {
 			const datum = page.importDatum(attemptDate(ctx, 1), ctx.cisConfig.CIS_GESAMTNOTE_IMPORT_DATUMSFORMAT);
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, a.uid, { note: ctx.notes.negativ });
-			seedBaseline(ctx, b.uid, { note: ctx.notes.negativ });
+			seedBaseline(ctx, a, { note: ctx.notes.negativ });
+			seedBaseline(ctx, b, { note: ctx.notes.negativ });
 
 			page.visitAndWaitForTable(ctx);
 
@@ -157,11 +153,13 @@ context("Benotungstool UI - Import", () => {
 			resetNotenState(ctx);
 			page.visitAndWaitForTable(ctx);
 
-			page.importPruefungen([[
-				student.uid,
-				page.importDatum(attemptDate(ctx, 1), ctx.cisConfig.CIS_GESAMTNOTE_IMPORT_DATUMSFORMAT),
-				ctx.gradeNotes[0],
-			]]);
+			page.importPruefungen([
+				[
+					student.uid,
+					page.importDatum(attemptDate(ctx, 1), ctx.cisConfig.CIS_GESAMTNOTE_IMPORT_DATUMSFORMAT),
+					ctx.gradeNotes[0],
+				],
+			]);
 
 			page.expectPruefung(student.uid, "antritt_1", { note: ctx.gradeNotes[0], antritt: 1 });
 			page.expectLvNote(student.uid, bezeichnung(ctx.gradeNotes[0]));
@@ -185,8 +183,8 @@ context("Benotungstool UI - Import", () => {
 			expect(perMatrikelnr.matrikelnr, "Matrikelnummer des Studierenden").to.be.a("string").and.not.be.empty;
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, perUid.uid, { note: ctx.notes.negativ });
-			seedBaseline(ctx, perMatrikelnr.uid, { note: ctx.notes.negativ });
+			seedBaseline(ctx, perUid, { note: ctx.notes.negativ });
+			seedBaseline(ctx, perMatrikelnr, { note: ctx.notes.negativ });
 			page.visitAndWaitForTable(ctx);
 
 			page.importPruefungen([
@@ -205,7 +203,10 @@ context("Benotungstool UI - Import", () => {
 			page.expectWarnungen(4);
 
 			page.gesendeteUids("@savePruefungenBulk", "pruefungen").then((uids) => {
-				expect(uids, "nur die gültigen Zeilen, die Matrikelnummer aufgelöst").to.deep.eq([perUid.uid, perMatrikelnr.uid]);
+				expect(uids, "nur die gültigen Zeilen, die Matrikelnummer aufgelöst").to.deep.eq([
+					perUid.uid,
+					perMatrikelnr.uid,
+				]);
 			});
 		});
 

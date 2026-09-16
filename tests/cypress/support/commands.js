@@ -2,26 +2,26 @@
 
 /** Visits a page and fails if any request returned >= 400. */
 Cypress.Commands.add("checkPageResources", (url) => {
-  const failedRequests = [];
+	const failedRequests = [];
 
-  cy.intercept("**", (req) => {
-    req.on("response", (res) => {
-      if (res.statusCode >= 400) {
-        failedRequests.push({ url: req.url, status: res.statusCode });
-      }
-    });
-  });
+	cy.intercept("**", (req) => {
+		req.on("response", (res) => {
+			if (res.statusCode >= 400) {
+				failedRequests.push({ url: req.url, status: res.statusCode });
+			}
+		});
+	});
 
-  cy.env(["adminusername", "adminpassword"]).then(({ adminusername, adminpassword }) => {
-    cy.visit(url, { auth: { username: adminusername, password: adminpassword } });
-  });
+	cy.env(["adminusername", "adminpassword"]).then(({ adminusername, adminpassword }) => {
+		cy.visit(url, { auth: { username: adminusername, password: adminpassword } });
+	});
 
-  cy.then(() => {
-    if (failedRequests.length > 0) {
-      const message = failedRequests.map((r) => `${r.status} - ${r.url}`).join("\n");
-      throw new Error(`Broken resources detected:\n${message}`);
-    }
-  });
+	cy.then(() => {
+		if (failedRequests.length > 0) {
+			const message = failedRequests.map((r) => `${r.status} - ${r.url}`).join("\n");
+			throw new Error(`Broken resources detected:\n${message}`);
+		}
+	});
 });
 
 /**
@@ -30,22 +30,19 @@ Cypress.Commands.add("checkPageResources", (url) => {
  * Ohne Argumente meldet sich der Suite-Benutzer an.
  */
 Cypress.Commands.add("login", (username, password) => {
-  const { adminusername, adminpassword } = Cypress.env();
-  const auth = { username: username || adminusername, password: password || adminpassword };
-  const probe = () =>
-    cy
-      .request({ url: "/index.ci.php/api/frontend/v1/AuthInfo/getAuthUID", auth })
-      .its("status")
-      .should("eq", 200);
+	const { adminusername, adminpassword } = Cypress.env();
+	const auth = { username: username || adminusername, password: password || adminpassword };
+	const probe = () =>
+		cy.request({ url: "/index.ci.php/api/frontend/v1/AuthInfo/getAuthUID", auth }).its("status").should("eq", 200);
 
-  cy.session(["benotungstool-login", auth.username], probe, {
-    cacheAcrossSpecs: true,
-    validate: probe,
-  });
+	cy.session(["benotungstool-login", auth.username], probe, {
+		cacheAcrossSpecs: true,
+		validate: probe,
+	});
 });
 
 // Anwendungsfehler sollen den Test nicht abbrechen, aber sichtbar sein.
 Cypress.on("uncaught:exception", (err) => {
-  Cypress.log({ name: "app error", message: err.message, consoleProps: () => ({ error: err }) });
-  return false;
+	Cypress.log({ name: "app error", message: err.message, consoleProps: () => ({ error: err }) });
+	return false;
 });

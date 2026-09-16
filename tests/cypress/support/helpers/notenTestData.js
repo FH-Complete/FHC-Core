@@ -10,8 +10,13 @@ import { expectNotenSuccess } from "./notenErrors";
 // the client rule; it now only reads back what the server derived, so a mismatch is a config bug
 import { maxAntrittCount as computeMaxAntritte } from "../../../../public/js/components/Cis/Benotungstool/notenRules.js";
 import {
-	describeFailure, performRead, performReset, performSeed, performSeedPruefung,
-	performSeedZeugnisnote, resolveResetStrategy,
+	describeFailure,
+	performRead,
+	performReset,
+	performSeed,
+	performSeedPruefung,
+	performSeedZeugnisnote,
+	resolveResetStrategy,
 } from "./notenReset";
 import { assertPunkteModus } from "./notenConfig";
 
@@ -24,8 +29,7 @@ let cachedContext = null;
 
 export const pad2 = (n) => String(n).padStart(2, "0");
 
-export const toDateString = (date) =>
-	`${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+export const toDateString = (date) => `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
 
 export const shiftDate = (dateString, days) => {
 	const [y, m, d] = dateString.split("-").map(Number);
@@ -35,11 +39,7 @@ export const shiftDate = (dateString, days) => {
 };
 
 /** Deadline the server derives (computeNoteneintragungsfrist): SS -> 15.11.yyyy, WS -> 15.05.yyyy+1. */
-export const expectedFristString = (
-	semKurzbz,
-	ssConfig = { month: 11, day: 15 },
-	wsConfig = { month: 5, day: 15 },
-) => {
+export const expectedFristString = (semKurzbz, ssConfig = { month: 11, day: 15 }, wsConfig = { month: 5, day: 15 }) => {
 	const type = semKurzbz.slice(0, 2).toUpperCase();
 	const year = Number(semKurzbz.slice(2, 6));
 	const cfg = type === "SS" ? ssConfig : wsConfig;
@@ -60,7 +60,7 @@ export const fristHasPassed = (semKurzbz, ssConfig = { month: 11, day: 15 }, wsC
  * A semester + course where the logged-in user actually teaches AND the grade deadline has passed.
  *
  * Both are needed: assertLvAccess runs BEFORE the deadline check, so a semester the user does not
- * teach in fails there and never reaches the deadline. Seeder 019 provides the Sommersemester.
+ * teach in fails there and never reaches the deadline. Seeder group benotungstool_fixture_erweitert provides the Sommersemester.
  *
  * @param {string} type "SS" or "WS"
  * @returns {Cypress.Chainable<{semKurzbz: string, lvId: number}|null>}
@@ -137,7 +137,6 @@ const resolveLehrveranstaltung = (semKurzbz) => {
 	});
 };
 
-
 /** -> { semKurzbz, lvId, cisConfig, maxAntritte, notes, gradeNotes, students, studentUids } */
 export const loadNotenContext = () => {
 	if (cachedContext) return cy.wrap(cachedContext, { log: false });
@@ -183,7 +182,10 @@ export const loadNotenContext = () => {
 			context.gradeNotes =
 				ordinary.length > 1
 					? ordinary
-					: usable.map((n) => n.note).filter((n) => Number(n) !== 0).sort((a, b) => Number(a) - Number(b));
+					: usable
+							.map((n) => n.note)
+							.filter((n) => Number(n) !== 0)
+							.sort((a, b) => Number(a) - Number(b));
 
 			expect(context.gradeNotes.length, "need two ordinary grades to vary one on edit").to.be.greaterThan(1);
 
@@ -244,8 +246,7 @@ export const loadNotenContext = () => {
 
 // --- fixture state ---
 
-export const resetNotenState = (context, studentUids) =>
-	performReset(context, studentUids || context.studentUids);
+export const resetNotenState = (context, studentUids) => performReset(context, studentUids || context.studentUids);
 
 /**
  * Baseline für Antritt 1: freigegebene LV-Note PLUS die Prüfungszeile dazu - das ist, was die
@@ -254,18 +255,24 @@ export const resetNotenState = (context, studentUids) =>
  *
  * `erstantritt: false` (bzw. `freigegeben: false`) seedet die Altdaten-Form ohne diese Zeile.
  */
-export const seedBaseline = (context, studentUid, options = {}) => {
+export const seedBaseline = (context, student, options = {}) => {
+	expect(student, "seedBaseline braucht das Studierenden-Objekt aus context.students, nicht die uid").to.be.an(
+		"object",
+	);
+
 	// Defaults to a NEGATIVE grade: only after one may another attempt follow. Pass
 	// context.notes.bestnote explicitly to close the chain.
 	const note = options.note !== undefined ? options.note : context.notes.negativ;
 	// Mit CIS_GESAMTNOTE_FREIGABE_FINAL ist eine freigegebene Note endgültig. Ohne ausdrückliches
 	// freigegeben sät die Baseline dann eine offene Note, damit ein Test weitere Termine anlegen kann.
 	const freigegeben =
-		options.freigegeben !== undefined ? options.freigegeben : context.cisConfig.CIS_GESAMTNOTE_FREIGABE_FINAL !== true;
+		options.freigegeben !== undefined
+			? options.freigegeben
+			: context.cisConfig.CIS_GESAMTNOTE_FREIGABE_FINAL !== true;
 	// Antritt 1 fehlt nur bei ausdrücklichem erstantritt: false oder freigegeben: false
 	const erstantritt = options.erstantritt !== undefined ? options.erstantritt : options.freigegeben !== false;
 
-	return performSeed(context, studentUid, {
+	return performSeed(context, student.uid, {
 		note,
 		punkte: options.punkte !== undefined ? options.punkte : null,
 		benotungsdatum: options.benotungsdatum || baselineBenotungsdatum(context),
@@ -274,10 +281,7 @@ export const seedBaseline = (context, studentUid, options = {}) => {
 	}).then((seeded) => {
 		if (!erstantritt) return cy.wrap(seeded, { log: false });
 
-		const student = context.students.find((s) => s.uid === studentUid);
-		expect(student, `student ${studentUid} in the loaded LV`).to.exist;
-
-		return performSeedPruefung(context, studentUid, {
+		return performSeedPruefung(context, student.uid, {
 			lehreinheitId: student.lehreinheit_id,
 			note,
 			datum: baselineDate(context),
@@ -296,11 +300,13 @@ export const seedPruefung = (context, student, { note, datum, typ }) =>
 	});
 
 /** Zeugnisnote setzen. Nur die Studierendenverwaltung schreibt sie, kein Endpunkt dieses Tools. */
-export const seedZeugnisnote = (context, studentUid, note) =>
-	performSeedZeugnisnote(context, studentUid, { note });
+export const seedZeugnisnote = (context, studentUid, note) => performSeedZeugnisnote(context, studentUid, { note });
 
-/** Raw row, bypassing the freigabedatum filter of getLvGesamtNoten. */
-export const readLvGesamtnote = (context, studentUid) => performRead(context, studentUid);
+/**
+ * Liest die LV-Note direkt aus der DATENBANK: was wirklich gespeichert ist, ohne den
+ * freigabedatum-Filter von getLvGesamtNoten. Das Gegenstück ist readStateViaApi.
+ */
+export const readLvGesamtnoteViaDb = (context, studentUid) => performRead(context, studentUid);
 
 /** Anchor date; attempt dates derive from it so ordering is known. */
 export const baselineBenotungsdatum = (context) => `${Number(context.semKurzbz.slice(2, 6))}-01-10 08:00:00`;

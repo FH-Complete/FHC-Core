@@ -46,12 +46,15 @@ const sshKonfiguriert = () => Boolean(envWert("SSH_HOST") && envWert("SSH_USER")
 
 const verbinde = () =>
 	new Promise((resolve, reject) => {
-		// eslint-disable-next-line global-require
 		const { Client } = require("ssh2");
 
 		let auth;
 		try {
-			auth = resolveAuth({ keyPath: envWert("SSH_KEY"), passphrase: envWert("SSH_PASSPHRASE"), agent: envWert("SSH_AGENT") });
+			auth = resolveAuth({
+				keyPath: envWert("SSH_KEY"),
+				passphrase: envWert("SSH_PASSPHRASE"),
+				agent: envWert("SSH_AGENT"),
+			});
 		} catch (error) {
 			reject(error);
 			return;
@@ -60,7 +63,9 @@ const verbinde = () =>
 		const client = new Client();
 		client
 			.on("ready", () => client.sftp((err, sftp) => (err ? reject(err) : resolve({ client, sftp }))))
-			.on("error", (err) => reject(new Error(`SSH zu ${envWert("SSH_USER")}@${envWert("SSH_HOST")} gescheitert: ${err.message}`)))
+			.on("error", (err) =>
+				reject(new Error(`SSH zu ${envWert("SSH_USER")}@${envWert("SSH_HOST")} gescheitert: ${err.message}`)),
+			)
 			.connect({
 				host: envWert("SSH_HOST"),
 				port: Number(envWert("SSH_PORT") || 22),
@@ -133,7 +138,9 @@ const mitFlags = (original, flags) => {
 	Object.entries(flags).forEach(([flag, wert]) => {
 		const muster = new RegExp(`^([ \\t]*)define\\(\\s*['"]${flag}['"]\\s*,[^;]*;`, "m");
 		if (!muster.test(text)) {
-			throw new Error(`${DATEIEN.flags} definiert ${flag} nicht. Ein Profil ändert nur einen bestehenden Schalter.`);
+			throw new Error(
+				`${DATEIEN.flags} definiert ${flag} nicht. Ein Profil ändert nur einen bestehenden Schalter.`,
+			);
 		}
 		text = text.replace(muster, (treffer, einzug) => `${einzug}define('${flag}', ${phpWert(wert)});`);
 	});
@@ -198,7 +205,8 @@ const setze = async (sftp, zustand, schluessel, umbau) => {
 		}
 		original = await lies(sftp, sicherung);
 	} else {
-		if (eintrag) console.warn(`[profil] ${entfernt} ist seit dem letzten Profil neu ausgerollt und gilt als Original.`);
+		if (eintrag)
+			console.warn(`[profil] ${entfernt} ist seit dem letzten Profil neu ausgerollt und gilt als Original.`);
 		await schreibeRoh(sftp, sicherung, aktuell, 0o600);
 	}
 
@@ -232,7 +240,9 @@ const leseCisConfig = async (url, auth) => {
 
 	// unter 500 steht eine PHP-Meldung vor dem JSON: die Datei ist kaputt, Warten hilft nicht
 	if (antwort.status < 500) {
-		throw new Error(`getCisConfig antwortet nach dem Profilwechsel mit HTTP ${antwort.status}: ${text.slice(0, 300)}`);
+		throw new Error(
+			`getCisConfig antwortet nach dem Profilwechsel mit HTTP ${antwort.status}: ${text.slice(0, 300)}`,
+		);
 	}
 	return { ist: null, grund: `getCisConfig antwortet mit HTTP ${antwort.status}` };
 };
@@ -259,7 +269,9 @@ const pruefeInstanz = async (daten) => {
 			const abweichend = pruefbar.filter((key) => !gleich(ist[key], erwartet[key]));
 			if (!abweichend.length) return;
 
-			const liste = abweichend.map((k) => `  ${k}: ${JSON.stringify(ist[k])} statt ${JSON.stringify(erwartet[k])}`);
+			const liste = abweichend.map(
+				(k) => `  ${k}: ${JSON.stringify(ist[k])} statt ${JSON.stringify(erwartet[k])}`,
+			);
 			offen = `die Instanz zeigt das Profil nicht:\n${liste.join("\n")}`;
 		}
 
@@ -295,7 +307,9 @@ const anwenden = async (name) => {
 	const daten = profilDaten(name);
 	const root = envWert("REMOTE_ROOT");
 	if (!sshKonfiguriert() || !root) {
-		throw new Error(`Profil "${name}" braucht ${PREFIX}_SSH_HOST, ${PREFIX}_SSH_USER und ${PREFIX}_REMOTE_ROOT in tests/cypress/.env.`);
+		throw new Error(
+			`Profil "${name}" braucht ${PREFIX}_SSH_HOST, ${PREFIX}_SSH_USER und ${PREFIX}_REMOTE_ROOT in tests/cypress/.env.`,
+		);
 	}
 
 	await mitSftp(async (sftp) => {
@@ -303,12 +317,15 @@ const anwenden = async (name) => {
 
 		const zustand = (await leseZustand(sftp)) || { dateien: {} };
 		if (zustand.root && zustand.root !== root && Object.keys(zustand.dateien).length) {
-			throw new Error(`Auf ${zustand.root} ist noch "${zustand.profil}" aktiv. Zuerst: npm run noten:profil -- wiederherstellen`);
+			throw new Error(
+				`Auf ${zustand.root} ist noch "${zustand.profil}" aktiv. Zuerst: npm run noten:profil -- wiederherstellen`,
+			);
 		}
 		zustand.root = root;
 		zustand.profil = name;
 
-		if (Object.keys(daten.config).length) await setze(sftp, zustand, "config", (o) => mitConfig(o, name, daten.config));
+		if (Object.keys(daten.config).length)
+			await setze(sftp, zustand, "config", (o) => mitConfig(o, name, daten.config));
 		else await stelleHer(sftp, zustand, "config");
 
 		if (Object.keys(daten.flags).length) await setze(sftp, zustand, "flags", (o) => mitFlags(o, daten.flags));

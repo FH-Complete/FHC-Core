@@ -6,15 +6,11 @@
  * direkt nach der Zugriffsprüfung, ein abgelehnter Request schreibt also nichts. Die Meldung nennt die Frist
  * und prüft damit ihre Ableitung aus NOTENEINTRAGUNGSFRIST_SS/WS.
  *
- * Seeder 019 legt das Sommersemester an, in dem der Testbenutzer nach der Frist unterrichtet.
+ * Die Seeder-Gruppe benotungstool_fixture_erweitert legt das Sommersemester an, in dem der Testbenutzer nach der Frist unterrichtet.
  */
 
 import { notenApi } from "../../../../support/api/notenApi";
-import {
-	expectNotenError,
-	expectNotenSuccess,
-	messageMatchesPhrase,
-} from "../../../../support/helpers/notenErrors";
+import { expectNotenError, expectNotenSuccess, messageMatchesPhrase } from "../../../../support/helpers/notenErrors";
 import {
 	attemptDate,
 	expectedFristString,
@@ -54,7 +50,8 @@ describe("Noten API - Noteneintragungsfrist (Prüfungsordnung §1)", () => {
 
 	// ein fehlendes Semester ist ein Fixturefehler und kein übersprungener Test
 	const paarFuer = (typ) => {
-		expect(abgelaufen[typ], `ein ${typ} mit abgelaufener Frist, in dem der Testbenutzer unterrichtet`).to.not.be.null;
+		expect(abgelaufen[typ], `ein ${typ} mit abgelaufener Frist, in dem der Testbenutzer unterrichtet`).to.not.be
+			.null;
 		return abgelaufen[typ];
 	};
 
@@ -118,7 +115,8 @@ describe("Noten API - Noteneintragungsfrist (Prüfungsordnung §1)", () => {
 					sem_kurzbz: paar.semKurzbz,
 					pruefung_id: null,
 				}),
-			saveNotenvorschlag: (paar) => notenApi.saveNotenvorschlag(paar.lvId, paar.semKurzbz, s0().uid, ctx.gradeNotes[0]),
+			saveNotenvorschlag: (paar) =>
+				notenApi.saveNotenvorschlag(paar.lvId, paar.semKurzbz, s0().uid, ctx.gradeNotes[0]),
 			saveNotenvorschlagBulk: (paar) =>
 				notenApi.saveNotenvorschlagBulk(paar.lvId, paar.semKurzbz, [
 					{ uid: s0().uid, note: ctx.gradeNotes[0], punkte: null },
@@ -154,8 +152,10 @@ describe("Noten API - Noteneintragungsfrist (Prüfungsordnung §1)", () => {
 					requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_FRIST_AUSNAHME_GILT", false);
 
 					const paar = paarFuer(typ);
-					expect(fristHasPassed(paar.semKurzbz, fristSS(), fristWS()), `die Frist von ${paar.semKurzbz} ist vorbei`)
-						.to.be.true;
+					expect(
+						fristHasPassed(paar.semKurzbz, fristSS(), fristWS()),
+						`die Frist von ${paar.semKurzbz} ist vorbei`,
+					).to.be.true;
 
 					aufruf(paar).then((response) => {
 						expectNotenError(response, "noteneintragungsfristVorbei");

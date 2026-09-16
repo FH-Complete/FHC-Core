@@ -8,8 +8,26 @@
  * The local fallback applies only while the client has no `verlauf` for a row.
  */
 
-/** The maximum number of attempts that count in this tool. The server derives this value. */
-export const maxAntrittCount = (config) => config?.CIS_GESAMTNOTE_MAX_ANTRITTE ?? 1;
+/**
+ * Is the value set? Never test a grade or a count for truthy: the grade key 0 ("Teilnote") is a
+ * grade and a configured 0 is a number, but both are falsy. The server rewrites an empty grade
+ * with `if($note=='')`, which catches a 0 under PHP 7 but not under PHP 8, so a 0 does reach us.
+ */
+const isSet = (value) => value !== null && value !== undefined && value !== "";
+
+/**
+ * The maximum number of attempts that count in this tool. The server derives the value and sends
+ * an integer. The conversion keeps it a number if it ever arrives as a string, because the callers
+ * compare it (`<`) and the tests compare it strictly. A configured 0 stays 0 and blocks every
+ * attempt; only a missing or unusable value falls back to 1.
+ */
+export const maxAntrittCount = (config) => {
+	const configured = config?.CIS_GESAMTNOTE_MAX_ANTRITTE;
+	if (!isSet(configured)) return 1;
+
+	const count = Number(configured);
+	return Number.isFinite(count) ? count : 1;
+};
 
 /**
  * The attempts that count. The NOTE decides, not the exam type: the grades in NOTEN_OHNE_ANTRITT
@@ -25,7 +43,7 @@ export const antrittCountStudent = (student, config, notenOptions) => {
 		if (!ohneAntritt.find((pk) => pk == p.note)) count++;
 	}
 
-	if (count === 0 && student.note && !ohneAntritt.find((pk) => pk == student.note)) {
+	if (count === 0 && isSet(student.note) && !ohneAntritt.find((pk) => pk == student.note)) {
 		const noteOption = notenOptions?.find((n) => n.note == student.note);
 		return noteOption?.lehre ? 1 : 0;
 	}
@@ -45,7 +63,8 @@ export const canAddPruefung = (student, config) => {
  * not from `lv_note`, because `lv_note` contains RELEASED grades only. An entered grade that is
  * not released still exists. The user interface uses this for a hint only.
  */
-export const brauchtNeueLvNote = (student) => student.verlauf ? !student.verlauf.hatLvNote : !student.lv_note;
+export const brauchtNeueLvNote = (student) =>
+	student.verlauf ? !student.verlauf.hatLvNote : !isSet(student.lv_note);
 
 /**
  * The grade state from the two timestamps: offen = no grade entered (an empty row), changed = a

@@ -53,7 +53,6 @@ const openTunnel = (cfg) =>
 		if (localPort) return resolve(localPort);
 		if (!cfg.sshHost || !cfg.sshUser) return reject(new Error("Tunnel needs an SSH host and user."));
 
-		// eslint-disable-next-line global-require
 		const { Client } = require("ssh2");
 
 		let auth;
@@ -68,6 +67,8 @@ const openTunnel = (cfg) =>
 		sshClient
 			.on("ready", () => {
 				server = net.createServer((socket) => {
+					// an error before the channel is up must not crash the process
+					socket.on("error", () => socket.destroy());
 					sshClient.forwardOut(
 						socket.remoteAddress || "127.0.0.1",
 						socket.remotePort || 0,
@@ -75,6 +76,10 @@ const openTunnel = (cfg) =>
 						cfg.dbPort,
 						(err, stream) => {
 							if (err) return socket.destroy();
+							if (socket.destroyed) return stream.destroy();
+							// pipe forwards only a clean end; an aborted side must close the other, or the channel keeps its Postgres connection
+							socket.on("close", () => stream.destroy());
+							stream.on("error", () => socket.destroy()).on("close", () => socket.destroy());
 							socket.pipe(stream).pipe(socket);
 						},
 					);
@@ -85,7 +90,6 @@ const openTunnel = (cfg) =>
 				// port 0: let the OS pick, so a leftover process cannot collide
 				server.listen(0, "127.0.0.1", () => {
 					localPort = server.address().port;
-					// eslint-disable-next-line no-console
 					console.log(
 						`[db] SSH tunnel up: 127.0.0.1:${localPort} -> ${cfg.dbHost}:${cfg.dbPort} ` +
 							`via ${cfg.sshUser}@${cfg.sshHost} (${auth.description})`,
@@ -114,13 +118,14 @@ const openTunnel = (cfg) =>
 	});
 
 const closeTunnel = async () => {
-	if (server) {
-		await new Promise((resolve) => server.close(resolve));
-		server = null;
-	}
+	// the SSH connection first: its closing channels close the local sockets, which server.close waits for
 	if (sshClient) {
 		sshClient.end();
 		sshClient = null;
+	}
+	if (server) {
+		await new Promise((resolve) => server.close(resolve));
+		server = null;
 	}
 	localPort = null;
 	return null;

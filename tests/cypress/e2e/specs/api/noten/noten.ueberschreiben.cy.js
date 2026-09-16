@@ -8,19 +8,29 @@
  */
 
 import { expectBulkRowError, expectNotenError, expectNotenSuccess } from "../../../../support/helpers/notenErrors";
-import { requireKonfiguration, requireWiederholung } from "../../../../support/helpers/notenConfig";
+import {
+	requireKonfiguration,
+	requireNotenModus,
+	requireWiederholung,
+	skipWenn,
+} from "../../../../support/helpers/notenConfig";
 import {
 	attemptDate,
 	loadNotenContext,
-	readLvGesamtnote,
+	readLvGesamtnoteViaDb,
 	requireDbReset,
 	resetNotenState,
 	seedZeugnisnote,
 } from "../../../../support/helpers/notenTestData";
-import { addPruefung, attemptsOfStudent, givenBaseline, readState } from "../../../../support/helpers/notenScenario";
+import {
+	addPruefung,
+	attemptsOfStudent,
+	givenBaseline,
+	readStateViaApi,
+} from "../../../../support/helpers/notenScenario";
 import { notenApi } from "../../../../support/api/notenApi";
 
-describe("Noten API - Notenvorschlag overwrite rules", () => {
+describe("Noten API - Regeln zum Überschreiben des Notenvorschlags", () => {
 	let ctx;
 
 	before(() => {
@@ -32,11 +42,10 @@ describe("Noten API - Notenvorschlag overwrite rules", () => {
 
 	const studentFor = (index) => ctx.students[index % ctx.students.length];
 
-	it("refuses a note the editor list never offers", function () {
+	it("lehnt eine Note ab, die die Auswahlliste nicht anbietet", function () {
 		requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_VORSCHLAG_NUR_LEHRENOTEN", true);
-		if (ctx.notes.nichtLehre === null) {
-			this.skip(); // every active note is a lehre note on this instance
-		}
+		// auf dieser Instanz kann jede aktive Note eine Lehrenote sein
+		skipWenn(this, ctx.notes.nichtLehre === null, "Übersprungen: keine Verwaltungsnote in tbl_note.");
 
 		const student = studentFor(0);
 
@@ -46,7 +55,7 @@ describe("Noten API - Notenvorschlag overwrite rules", () => {
 		notenApi
 			.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, ctx.notes.nichtLehre)
 			.then((response) => expectNotenError(response, "c4noteNichtInLehre"))
-			.then(() => readLvGesamtnote(ctx, student.uid))
+			.then(() => readLvGesamtnoteViaDb(ctx, student.uid))
 			.then((row) => {
 				expect(String(row.note), "a non-lehre note must not become the LV note").to.eq(
 					String(ctx.notes.negativ),
@@ -54,7 +63,7 @@ describe("Noten API - Notenvorschlag overwrite rules", () => {
 			});
 	});
 
-	it("refuses to change the Notenvorschlag once a Prüfung exists", function () {
+	it("lehnt eine Änderung des Notenvorschlags nach einer Prüfung ab", function () {
 		requireWiederholung(this, ctx);
 
 		const student = studentFor(1);
@@ -69,18 +78,15 @@ describe("Noten API - Notenvorschlag overwrite rules", () => {
 		notenApi
 			.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, ctx.gradeNotes[0])
 			.then((response) => expectNotenError(response, "c4notenvorschlagGesperrt"))
-			.then(() => readLvGesamtnote(ctx, student.uid))
+			.then(() => readLvGesamtnoteViaDb(ctx, student.uid))
 			.then((row) => {
-				expect(String(row.note), "the attempt's grade must survive the call").to.eq(
-					String(ctx.gradeNotes[1]),
-				);
+				expect(String(row.note), "the attempt's grade must survive the call").to.eq(String(ctx.gradeNotes[1]));
 			});
 	});
 
-	it("refuses to overwrite a locked Zeugnisnote", function () {
-		if (ctx.notes.nichtUeberschreibbar === null) {
-			this.skip(); // every active note allows the teacher to overwrite it on this instance
-		}
+	it("lehnt das Überschreiben einer gesperrten Zeugnisnote ab", function () {
+		// auf dieser Instanz darf die Lehrperson jede aktive Note überschreiben
+		skipWenn(this, ctx.notes.nichtUeberschreibbar === null, "Übersprungen: keine gesperrte Note in tbl_note.");
 
 		const student = studentFor(4);
 
@@ -90,7 +96,7 @@ describe("Noten API - Notenvorschlag overwrite rules", () => {
 		notenApi
 			.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, ctx.gradeNotes[1])
 			.then((response) => expectNotenError(response, "c4zeugnisnoteGesperrt"))
-			.then(() => readLvGesamtnote(ctx, student.uid))
+			.then(() => readLvGesamtnoteViaDb(ctx, student.uid))
 			.then((row) => {
 				expect(String(row.note), "the LV note must not change").to.eq(String(ctx.notes.negativ));
 			});
@@ -103,14 +109,13 @@ describe("Noten API - Notenvorschlag overwrite rules", () => {
 			requireKonfiguration(test, ctx, "CIS_GESAMTNOTE_VORSCHLAG_NUR_LEHRENOTEN", true);
 
 			const ohneAntritt = (ctx.cisConfig.NOTEN_OHNE_ANTRITT || []).map(String);
-			if (ctx.notes.nichtLehre !== null && !ohneAntritt.includes(String(ctx.notes.nichtLehre))) return;
+			const brauchbar = ctx.notes.nichtLehre !== null && !ohneAntritt.includes(String(ctx.notes.nichtLehre));
 
-			Cypress.log({ name: "skip", message: "Übersprungen: keine Verwaltungsnote, die einen Antritt verbraucht." });
-			test.skip();
+			skipWenn(test, !brauchbar, "Übersprungen: keine Verwaltungsnote, die einen Antritt verbraucht.");
 		};
 
 		const expectNurAntritt1 = (student) =>
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				expect(attemptsOfStudent(data, student.uid), "nur Antritt 1").to.have.length(1);
 			});
 
@@ -126,7 +131,7 @@ describe("Noten API - Notenvorschlag overwrite rules", () => {
 			);
 
 			expectNurAntritt1(student);
-			readLvGesamtnote(ctx, student.uid).then((row) => {
+			readLvGesamtnoteViaDb(ctx, student.uid).then((row) => {
 				expect(String(row.note), "die LV-Note bleibt").to.eq(String(ctx.notes.negativ));
 			});
 		});
@@ -139,10 +144,7 @@ describe("Noten API - Notenvorschlag overwrite rules", () => {
 			const gesperrt = ctx.notenOptions.find(
 				(n) => n.lkt_ueberschreibbar === false && !anrechnung.includes(String(n.note)),
 			);
-			if (!gesperrt) {
-				Cypress.log({ name: "skip", message: "Übersprungen: keine gesperrte Note ausser den Anrechnungsnoten." });
-				this.skip();
-			}
+			skipWenn(this, !gesperrt, "Übersprungen: keine gesperrte Note ausser den Anrechnungsnoten.");
 
 			const student = studentFor(1);
 
@@ -177,7 +179,7 @@ describe("Noten API - Notenvorschlag overwrite rules", () => {
 				});
 
 			students.forEach((s) =>
-				readLvGesamtnote(ctx, s.uid).then((row) => {
+				readLvGesamtnoteViaDb(ctx, s.uid).then((row) => {
 					expect(row, `keine LV-Note für ${s.uid}`).to.be.null;
 				}),
 			);
@@ -188,25 +190,20 @@ describe("Noten API - Notenvorschlag overwrite rules", () => {
 	// antwortet 200 und meldet die abgelehnte Zeile in data[uid].
 	describe("saveNotenvorschlagBulk", () => {
 		beforeEach(function () {
-			if (ctx.cisConfig.CIS_GESAMTNOTE_PUNKTE) {
-				// im Punktemodus leitet der Import die Note aus den Punkten ab und verwirft eine
-				// Zeile ohne Punkte, bevor eine dieser Regeln greift
-				Cypress.log({ name: "skip", message: "Skipped: CIS_GESAMTNOTE_PUNKTE ist aktiv." });
-				this.skip();
-			}
+			// im Punktemodus leitet der Import die Note aus den Punkten ab und verwirft eine
+			// Zeile ohne Punkte, bevor eine dieser Regeln greift
+			requireNotenModus(this, ctx);
 			requireWiederholung(this, ctx);
 		});
 
-		it("refuses to change the Notenvorschlag once a Prüfung exists", () => {
+		it("lehnt je Zeile eine Änderung des Notenvorschlags nach einer Prüfung ab", () => {
 			const student = studentFor(3);
 
 			givenBaseline(ctx, student);
 
-			addPruefung(ctx, student, { note: ctx.gradeNotes[1], datum: attemptDate(ctx, 1) }).then(
-				(response) => {
-					expectNotenSuccess(response, "seed a Prüfung");
-				},
-			);
+			addPruefung(ctx, student, { note: ctx.gradeNotes[1], datum: attemptDate(ctx, 1) }).then((response) => {
+				expectNotenSuccess(response, "seed a Prüfung");
+			});
 
 			notenApi
 				.saveNotenvorschlagBulk(ctx.lvId, ctx.semKurzbz, [
@@ -216,7 +213,7 @@ describe("Noten API - Notenvorschlag overwrite rules", () => {
 					const data = expectNotenSuccess(response, "saveNotenvorschlagBulk");
 					expectBulkRowError(data, student.uid, "c4notenvorschlagGesperrt");
 				})
-				.then(() => readLvGesamtnote(ctx, student.uid))
+				.then(() => readLvGesamtnoteViaDb(ctx, student.uid))
 				.then((row) => {
 					expect(String(row.note), "the attempt's grade must survive the import").to.eq(
 						String(ctx.gradeNotes[1]),

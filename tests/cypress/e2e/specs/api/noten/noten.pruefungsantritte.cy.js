@@ -14,6 +14,7 @@ import {
 	requireKommissionellerAntritt,
 	requireKonfiguration,
 	requireWiederholung,
+	skipWenn,
 } from "../../../../support/helpers/notenConfig";
 import {
 	attemptDate,
@@ -30,7 +31,7 @@ import {
 	countingAttemptsOfStudent,
 	editPruefung,
 	givenBaseline,
-	readState,
+	readStateViaApi,
 	verlaufOfStudent,
 } from "../../../../support/helpers/notenScenario";
 
@@ -47,10 +48,7 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 					`entschuldigt=${ctx.notes.entschuldigt}`,
 			);
 
-			expect(
-				ctx.maxAntritte,
-				"needs room for at least one retake beyond the first Antritt",
-			).to.be.greaterThan(1);
+			expect(ctx.maxAntritte, "needs room for at least one retake beyond the first Antritt").to.be.greaterThan(1);
 		});
 	});
 
@@ -58,11 +56,12 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 	const studentFor = (index) => ctx.students[index % ctx.students.length];
 
 	/** Skip, wenn der letzte Antritt der Kette nicht der kommissionelle ist. */
-	const skipOhneKommissionLetzt = (test) => {
-		if (ctx.cisConfig.CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT === ctx.maxAntritte) return;
-		Cypress.log({ name: "skip", message: "Übersprungen: der letzte Antritt ist nicht kommissionell." });
-		test.skip();
-	};
+	const skipOhneKommissionLetzt = (test) =>
+		skipWenn(
+			test,
+			ctx.cisConfig.CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT !== ctx.maxAntritte,
+			"Übersprungen: der letzte Antritt ist nicht kommissionell.",
+		);
 
 	/** Adds counting attempts until the cap is reached. Baseline already provides Antritt 1. */
 	const fillToCap = (student, firstIndex = 1) => {
@@ -80,7 +79,7 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 	// Die Konfiguration nennt die Sondernoten nur mit ihrer Bezeichnung. Die API antwortet mit dem
 	// aufgelösten Primärschlüssel, auf Demodaten ist entschuldigt die 14. Scheitert die Auflösung,
 	// greifen alle Regeln stillschweigend auf der falschen Note.
-	it("resolves the special notes from tbl_note by their Bezeichnung", () => {
+	it("löst die Sondernoten über ihre Bezeichnung aus tbl_note auf", () => {
 		notenApi.getCisConfig().then((response) => {
 			const config = expectNotenSuccess(response, "getCisConfig");
 
@@ -96,8 +95,8 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 		});
 	});
 
-	describe("Rule A - maximum number of Prüfungsantritte", () => {
-		it("rejects an attempt once the configured maximum is reached", function () {
+	describe("Regel A - die Höchstzahl der Prüfungsantritte", () => {
+		it("lehnt einen Antritt ab, sobald das konfigurierte Maximum erreicht ist", function () {
 			// ohne Anlage der kommissionellen Prüfung endet die Kette früher, siehe den Test zu kommPruefNichtErlaubt
 			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF", true);
 
@@ -112,17 +111,19 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 			});
 
 			// and nothing was written for the rejected attempt
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				const dates = attemptsOfStudent(data, student.uid).map((p) => String(p.datum).slice(0, 10));
 				expect(dates, "no row may carry the rejected date").to.not.include(nextDate);
 
-				expect(countingAttemptsOfStudent(data, student.uid), "exactly the possible counting rows")
-					.to.have.length(ctx.maxAntritte);
+				expect(
+					countingAttemptsOfStudent(data, student.uid),
+					"exactly the possible counting rows",
+				).to.have.length(ctx.maxAntritte);
 			});
 		});
 	});
 
-	describe("Rule B - attempts are taken in chronological order", () => {
+	describe("Regel B - die Antritte folgen der Zeitordnung", () => {
 		beforeEach(function () {
 			requireWiederholung(this, ctx);
 		});
@@ -135,50 +136,46 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 			});
 		};
 
-		it("rejects a new attempt dated before an existing one", () => {
+		it("lehnt einen neuen Antritt vor einem bestehenden ab", () => {
 			const student = studentFor(1);
 
 			givenOpenAttemptOn(student, attemptDate(ctx, 2));
 
-			addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: attemptDate(ctx, 1) }).then(
-				(response) => {
-					expectNotenError(response, "pruefungDatumBeforeExisting");
-				},
-			);
+			addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: attemptDate(ctx, 1) }).then((response) => {
+				expectNotenError(response, "pruefungDatumBeforeExisting");
+			});
 		});
 
-		it("accepts a new attempt dated after every existing one", () => {
+		it("nimmt einen neuen Antritt nach allen bestehenden an", () => {
 			const student = studentFor(1);
 
 			givenOpenAttemptOn(student, attemptDate(ctx, 2));
 
-			addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: attemptDate(ctx, 3) }).then(
-				(response) => {
-					expectNotenSuccess(response, "attempt strictly after the existing one");
-				},
-			);
+			addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: attemptDate(ctx, 3) }).then((response) => {
+				expectNotenSuccess(response, "attempt strictly after the existing one");
+			});
 		});
 	});
 
-	describe("Rule C - 'entschuldigt' may be assigned only once", () => {
+	describe("Regel C - 'entschuldigt' gilt nur einmal", () => {
 		beforeEach(function () {
 			requireWiederholung(this, ctx);
 		});
 
-		it("rejects a second entschuldigt attempt", () => {
+		it("lehnt einen zweiten entschuldigten Antritt ab", () => {
 			const student = studentFor(2);
 
 			givenBaseline(ctx, student);
 
-			addPruefung(ctx, student, { note: ctx.notes.entschuldigt, datum: attemptDate(ctx, 1) }).then(
-				(response) => expectNotenSuccess(response, "first entschuldigt attempt"),
+			addPruefung(ctx, student, { note: ctx.notes.entschuldigt, datum: attemptDate(ctx, 1) }).then((response) =>
+				expectNotenSuccess(response, "first entschuldigt attempt"),
 			);
 
-			addPruefung(ctx, student, { note: ctx.notes.entschuldigt, datum: attemptDate(ctx, 2) }).then(
-				(response) => expectNotenError(response, "noteOccuranceLimitReached"),
+			addPruefung(ctx, student, { note: ctx.notes.entschuldigt, datum: attemptDate(ctx, 2) }).then((response) =>
+				expectNotenError(response, "noteOccuranceLimitReached"),
 			);
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				const excused = attemptsOfStudent(data, student.uid).filter(
 					(p) => String(p.note) === String(ctx.notes.entschuldigt),
 				);
@@ -187,30 +184,29 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 		});
 	});
 
-	describe("entschuldigt does not consume an attempt", () => {
+	describe("'entschuldigt' verbraucht keinen Antritt", () => {
 		beforeEach(function () {
 			requireWiederholung(this, ctx);
 		});
 
-		it("still accepts a real grade after an excused attempt", () => {
+		it("nimmt nach einem entschuldigten Antritt weiter eine echte Note an", () => {
 			const student = studentFor(0);
 
 			givenBaseline(ctx, student);
 
-			addPruefung(ctx, student, { note: ctx.notes.entschuldigt, datum: attemptDate(ctx, 1) }).then(
-				(response) => expectNotenSuccess(response, "excused attempt"),
+			addPruefung(ctx, student, { note: ctx.notes.entschuldigt, datum: attemptDate(ctx, 1) }).then((response) =>
+				expectNotenSuccess(response, "excused attempt"),
 			);
 
 			// excused must not count, so this real grade is still within the cap
-			addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: attemptDate(ctx, 2) }).then(
-				(response) =>
-					expectNotenSuccess(
-						response,
-						"a real grade after an excused attempt (excused must not count towards the cap)",
-					),
+			addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: attemptDate(ctx, 2) }).then((response) =>
+				expectNotenSuccess(
+					response,
+					"a real grade after an excused attempt (excused must not count towards the cap)",
+				),
 			);
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				expect(
 					verlaufOfStudent(data, student.uid).antrittCount,
 					"baseline + the real grade, the excused one not counted",
@@ -233,8 +229,8 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 
 			// bis zum vorletzten Antritt auffüllen
 			for (let i = 1; i < ctx.maxAntritte - 1; i += 1) {
-				addPruefung(ctx, student, { note: ctx.notes.negativ, datum: attemptDate(ctx, i) }).then(
-					(response) => expectNotenSuccess(response, `Antritt ${i + 1}`),
+				addPruefung(ctx, student, { note: ctx.notes.negativ, datum: attemptDate(ctx, i) }).then((response) =>
+					expectNotenSuccess(response, `Antritt ${i + 1}`),
 				);
 			}
 
@@ -248,7 +244,7 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 				);
 			});
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				const verlauf = verlaufOfStudent(data, student.uid);
 				expect(verlauf.antrittCount, "die kommissionelle zählt als Antritt").to.eq(ctx.maxAntritte);
 				expect(verlauf.canAdd, "danach ist kein Antritt mehr möglich").to.be.false;
@@ -267,12 +263,12 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 
 			// bis zum vorletzten Antritt auffüllen; danach wäre der kommissionelle fällig
 			for (let i = 1; i < ctx.maxAntritte - 1; i += 1) {
-				addPruefung(ctx, student, { note: ctx.notes.negativ, datum: attemptDate(ctx, i) }).then(
-					(response) => expectNotenSuccess(response, `Antritt ${i + 1}`),
+				addPruefung(ctx, student, { note: ctx.notes.negativ, datum: attemptDate(ctx, i) }).then((response) =>
+					expectNotenSuccess(response, `Antritt ${i + 1}`),
 				);
 			}
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				const verlauf = verlaufOfStudent(data, student.uid);
 				expect(verlauf.kommPruefGesperrt, "der Verlauf nennt den Grund").to.be.true;
 				expect(verlauf.canAdd, "und lässt keinen Antritt mehr zu").to.be.false;
@@ -297,19 +293,19 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 				typ: "kommPruef",
 			});
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				const verlauf = verlaufOfStudent(data, student.uid);
 				expect(verlauf.terminal, "die Kette ist geschlossen").to.be.true;
 				expect(verlauf.canAdd, "kein weiterer Antritt möglich").to.be.false;
 			});
 
-			addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: attemptDate(ctx, 2) }).then(
-				(response) => expectNotenError(response, "maxAntritteReached"),
+			addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: attemptDate(ctx, 2) }).then((response) =>
+				expectNotenError(response, "maxAntritteReached"),
 			);
 		});
 	});
 
-	describe("'Noch nicht eingetragen' does not consume an attempt", () => {
+	describe("'Noch nicht eingetragen' verbraucht keinen Antritt", () => {
 		beforeEach(function () {
 			requireWiederholung(this, ctx);
 		});
@@ -322,7 +318,7 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 				(response) => expectNotenSuccess(response, "offener Termin"),
 			);
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				const offen = attemptsOfStudent(data, student.uid).find(
 					(p) => String(p.note) === String(ctx.notes.nochNichtEingetragen),
 				);
@@ -336,20 +332,17 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 		});
 	});
 
-	describe("Anrechnung - no Prüfungen at all", () => {
-		it("refuses an attempt while the Zeugnisnote is angerechnet", function () {
+	describe("Anrechnung - gar keine Prüfungen", () => {
+		it("lehnt einen Antritt bei angerechneter Zeugnisnote ab", function () {
 			const angerechnet = (ctx.cisConfig.NOTEN_ANRECHNUNG || [])[0];
-			if (angerechnet === undefined) {
-				Cypress.log({ name: "skip", message: "Übersprungen: NOTEN_ANRECHNUNG löst keine Note auf." });
-				this.skip();
-			}
+			skipWenn(this, angerechnet === undefined, "Übersprungen: NOTEN_ANRECHNUNG löst keine Note auf.");
 
 			const student = studentFor(4);
 
 			givenBaseline(ctx, student);
 			seedZeugnisnote(ctx, student.uid, angerechnet);
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				const verlauf = verlaufOfStudent(data, student.uid);
 				expect(verlauf.angerechnet, "the Verlauf marks the Anrechnung").to.be.true;
 				expect(verlauf.canAdd, "and blocks further attempts").to.be.false;
@@ -361,7 +354,7 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 		});
 	});
 
-	describe("edit guards", () => {
+	describe("Schutz beim Bearbeiten", () => {
 		beforeEach(function () {
 			requireWiederholung(this, ctx);
 		});
@@ -373,7 +366,7 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 			addPruefung(ctx, student, { note: ctx.notes.entschuldigt, datum: attemptDate(ctx, 1) });
 			addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: attemptDate(ctx, 2) });
 
-			return readState(ctx).then((data) => {
+			return readStateViaApi(ctx).then((data) => {
 				const excused = attemptsOfStudent(data, student.uid).find(
 					(p) => String(p.note) === String(ctx.notes.entschuldigt),
 				);
@@ -382,7 +375,7 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 			});
 		};
 
-		it("rejects changing the grade once a later attempt exists", function () {
+		it("lehnt eine Notenänderung nach einem späteren Antritt ab", function () {
 			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_NOTE_SPERRE_BEI_SPAETEREM_TERMIN", true);
 
 			const student = studentFor(1);
@@ -396,7 +389,7 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 			});
 		});
 
-		it("still allows a date-only correction between the neighbouring attempts", () => {
+		it("erlaubt weiter eine reine Datumskorrektur zwischen den Nachbarantritten", () => {
 			const student = studentFor(1);
 
 			givenThreeAttempts(student).then((excused) => {
@@ -407,7 +400,7 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 					datum: shiftDate(attemptDate(ctx, 1), 3),
 				})
 					.then((response) => expectNotenSuccess(response, "date-only correction inside the bounds"))
-					.then(() => readState(ctx))
+					.then(() => readStateViaApi(ctx))
 					.then((data) => {
 						const moved = attemptsOfStudent(data, student.uid).find(
 							(p) => p.pruefung_id === excused.pruefung_id,
@@ -420,7 +413,7 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 			});
 		});
 
-		it("rejects a date on or before the previous attempt", () => {
+		it("lehnt ein Datum am oder vor dem vorherigen Antritt ab", () => {
 			const student = studentFor(2);
 
 			givenThreeAttempts(student).then((excused) => {

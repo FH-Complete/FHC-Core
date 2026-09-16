@@ -26,11 +26,9 @@ export const notenApi = {
 
 	getNoten: () => apiGet("getNoten"),
 
-	getBenotungstoolContext: (sem_kurzbz, lv_id = null) =>
-		apiGet("getBenotungstoolContext", { sem_kurzbz, lv_id }),
+	getBenotungstoolContext: (sem_kurzbz, lv_id = null) => apiGet("getBenotungstoolContext", { sem_kurzbz, lv_id }),
 
-	getLvForStudiengang: (studiengang_kz, sem_kurzbz) =>
-		apiGet("getLvForStudiengang", { studiengang_kz, sem_kurzbz }),
+	getLvForStudiengang: (studiengang_kz, sem_kurzbz) => apiGet("getLvForStudiengang", { studiengang_kz, sem_kurzbz }),
 
 	getLehrendeFuerLehreinheit: (lehreinheit_id, lv_id, sem_kurzbz) =>
 		apiGet("getLehrendeFuerLehreinheit", { lehreinheit_id, lv_id, sem_kurzbz }),
@@ -50,10 +48,26 @@ export const notenApi = {
 
 	/** data -> [savedPruefung, lvgesamtnote, verlauf]. Kein `typ` auf der Leitung. Ohne mitarbeiter_uid fehlt das Feld. */
 	saveStudentPruefung: ({
-		student_uid, note, punkte = null, datum, lva_id, lehreinheit_id, sem_kurzbz, pruefung_id = null, mitarbeiter_uid,
+		student_uid,
+		note,
+		punkte = null,
+		datum,
+		lva_id,
+		lehreinheit_id,
+		sem_kurzbz,
+		pruefung_id = null,
+		mitarbeiter_uid,
 	}) =>
 		apiPost("saveStudentPruefung", {
-			student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, pruefung_id, mitarbeiter_uid,
+			student_uid,
+			note,
+			punkte,
+			datum,
+			lva_id,
+			lehreinheit_id,
+			sem_kurzbz,
+			pruefung_id,
+			mitarbeiter_uid,
 		}),
 
 	/**
@@ -66,8 +80,7 @@ export const notenApi = {
 	saveStudentenNoten: (password, noten, lv_id, sem_kurzbz) =>
 		apiGet("getCisConfig").then(() => apiPost("saveStudentenNoten", { password, noten, lv_id, sem_kurzbz })),
 
-	getNoteByPunkte: (punkte, lv_id, sem_kurzbz) =>
-		apiPost("getNoteByPunkte", { punkte, lv_id, sem_kurzbz }),
+	getNoteByPunkte: (punkte, lv_id, sem_kurzbz) => apiPost("getNoteByPunkte", { punkte, lv_id, sem_kurzbz }),
 
 	// Bulk-Pfade antworten 200 und melden Fehler je Zeile in data[uid]
 	saveNotenvorschlagBulk: (lv_id, sem_kurzbz, noten) =>
@@ -83,8 +96,7 @@ export const notenApi = {
 
 // --- selectors over the getStudentenNoten payload ---
 
-export const pruefungenOf = (data, uid) =>
-	(data[1] || []).filter((p) => p.student_uid === uid);
+export const pruefungenOf = (data, uid) => (data[1] || []).filter((p) => p.student_uid === uid);
 
 /** Antritte in Verlaufsreihenfolge. Specs prüfen position/zaehlt/antritt_nr/terminal, nie den Typ. */
 export const attemptsOf = (data, uid) =>
@@ -94,8 +106,7 @@ export const attemptsOf = (data, uid) =>
 export const countingAttemptsOf = (data, uid) => attemptsOf(data, uid).filter((p) => p.zaehlt);
 
 /** Legacy projection written for old reports. Asserted in exactly one spec, never used as a rule. */
-export const pruefungenOfTyp = (data, uid, typ) =>
-	pruefungenOf(data, uid).filter((p) => p.pruefungstyp_kurzbz === typ);
+export const pruefungenOfTyp = (data, uid, typ) => pruefungenOf(data, uid).filter((p) => p.pruefungstyp_kurzbz === typ);
 
 export const gradesOf = (data, uid) => (data[3] || {})[uid];
 

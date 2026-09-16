@@ -10,6 +10,19 @@
  * vor - passt die Instanz nicht dazu, scheitert der Lauf sofort und laut.
  */
 
+/**
+ * Der einzige Weg, einen Test zu überspringen. `bedingung` wahr -> überspringen, `grund` sagt warum.
+ * In it(function(){...}) / beforeEach(function(){...}) aufrufen, nie in einer Pfeilfunktion: eine
+ * Pfeilfunktion bindet kein `this` und erreicht test.skip() nicht.
+ *
+ * Die require*-Helfer unten nennen je eine fachliche Voraussetzung und rufen ihrerseits skipWenn.
+ */
+export const skipWenn = (testContext, bedingung, grund) => {
+	if (!bedingung) return;
+	Cypress.log({ name: "skip", message: grund });
+	testContext.skip();
+};
+
 /** Ist der Punktemodus auf dieser Instanz aktiv? */
 export const punkteModus = (ctx) => Boolean(ctx.cisConfig.CIS_GESAMTNOTE_PUNKTE);
 
@@ -35,24 +48,19 @@ export const assertPunkteModus = (ctx) => {
 };
 
 /** Skip, wenn der Punktemodus aus ist. Als erste Zeile in beforeEach(function(){...}) aufrufen. */
-export const requirePunkteModus = (testContext, ctx) => {
-	if (punkteModus(ctx)) return;
-	cy.log("Übersprungen: CIS_GESAMTNOTE_PUNKTE ist aus.");
-	testContext.skip();
-};
+export const requirePunkteModus = (testContext, ctx) =>
+	skipWenn(testContext, !punkteModus(ctx), "Übersprungen: CIS_GESAMTNOTE_PUNKTE ist aus.");
 
 /**
  * Skip, wenn der Schlüssel aus getCisConfig nicht den Zweig trägt, den der Test prüft. Ein Profil aus
  * tests/cypress/profiles/noten.js schaltet den anderen Zweig ein.
  */
-export const requireKonfiguration = (testContext, ctx, key, wert) => {
-	if (ctx.cisConfig[key] === wert) return;
-	Cypress.log({
-		name: "skip",
-		message: `Übersprungen: ${key} ist ${JSON.stringify(ctx.cisConfig[key])}, der Test braucht ${JSON.stringify(wert)}.`,
-	});
-	testContext.skip();
-};
+export const requireKonfiguration = (testContext, ctx, key, wert) =>
+	skipWenn(
+		testContext,
+		ctx.cisConfig[key] !== wert,
+		`Übersprungen: ${key} ist ${JSON.stringify(ctx.cisConfig[key])}, der Test braucht ${JSON.stringify(wert)}.`,
+	);
 
 /**
  * Skip, wenn das Werkzeug keinen zweiten Antritt anlegt. Ohne CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF
@@ -64,9 +72,7 @@ export const requireWiederholung = (testContext, ctx) => {
 		ctx.cisConfig.CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF === false && ab !== null
 			? Math.min(ctx.maxAntritte, ab - 1)
 			: ctx.maxAntritte;
-	if (anlegbar >= 2) return;
-	Cypress.log({ name: "skip", message: `Übersprungen: das Werkzeug legt nur ${anlegbar} Antritt an.` });
-	testContext.skip();
+	skipWenn(testContext, anlegbar < 2, `Übersprungen: das Werkzeug legt nur ${anlegbar} Antritt an.`);
 };
 
 /**
@@ -76,17 +82,14 @@ export const requireWiederholung = (testContext, ctx) => {
 export const requireKommissionellerAntritt = (testContext, ctx) => {
 	const ab = ctx.cisConfig.CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT ?? null;
 	const anlegbar = ctx.cisConfig.CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF !== false;
-	if (anlegbar && ab !== null && ab >= 2 && ab <= ctx.maxAntritte) return;
-	Cypress.log({
-		name: "skip",
-		message: `Übersprungen: kein anlegbarer kommissioneller Antritt (ab ${JSON.stringify(ab)}, anlegen ${anlegbar}).`,
-	});
-	testContext.skip();
+	const moeglich = anlegbar && ab !== null && ab >= 2 && ab <= ctx.maxAntritte;
+	skipWenn(
+		testContext,
+		!moeglich,
+		`Übersprungen: kein anlegbarer kommissioneller Antritt (ab ${JSON.stringify(ab)}, anlegen ${anlegbar}).`,
+	);
 };
 
 /** Skip, wenn der Punktemodus an ist. */
-export const requireNotenModus = (testContext, ctx) => {
-	if (!punkteModus(ctx)) return;
-	cy.log("Übersprungen: CIS_GESAMTNOTE_PUNKTE ist aktiv.");
-	testContext.skip();
-};
+export const requireNotenModus = (testContext, ctx) =>
+	skipWenn(testContext, punkteModus(ctx), "Übersprungen: CIS_GESAMTNOTE_PUNKTE ist aktiv.");

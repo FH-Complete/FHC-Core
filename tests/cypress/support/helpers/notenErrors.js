@@ -116,7 +116,12 @@ const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 // Split on the {n} placeholders first, then escape - the other order breaks on the braces.
 const toPattern = (text) =>
-	new RegExp(text.split(/\{\d+\}/).map(escapeRegExp).join("[\\s\\S]*?"));
+	new RegExp(
+		text
+			.split(/\{\d+\}/)
+			.map(escapeRegExp)
+			.join("[\\s\\S]*?"),
+	);
 
 const patternsFor = (key) => {
 	const phrase = PHRASES[key];
@@ -141,7 +146,7 @@ export const expectNotenError = (response, key) => {
 
 export const expectNotenSuccess = (response, context = "request") => {
 	// carry the server's message into the assertion, or a 500 says only "expected 200"
-	const errors = (response.body && response.body.errors || []).map((e) => e.message).join(" | ");
+	const errors = ((response.body && response.body.errors) || []).map((e) => e.message).join(" | ");
 	expect(response.status, `HTTP status for ${context}${errors ? ` -- ${errors}` : ""}`).to.eq(200);
 	expect(response.body, context).to.have.nested.property("meta.status", "success");
 	return response.body.data;
@@ -164,7 +169,6 @@ export const expectBulkRowError = (data, uid, key) => {
 export const expectBulkRowAccepted = (data, uid) => {
 	expect(data).to.have.property(uid);
 	const value = data[uid];
-	const isError =
-		typeof value === "string" && Object.keys(PHRASES).some((k) => messageMatchesPhrase(value, k));
+	const isError = typeof value === "string" && Object.keys(PHRASES).some((k) => messageMatchesPhrase(value, k));
 	expect(isError, `expected row "${uid}" accepted, got: ${JSON.stringify(value)}`).to.be.false;
 };

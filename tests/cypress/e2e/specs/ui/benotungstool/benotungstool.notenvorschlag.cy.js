@@ -1,10 +1,10 @@
 import { benotungstoolPage as page } from "../../../../support/pages/benotungstool.po";
-import { requireKonfiguration } from "../../../../support/helpers/notenConfig";
+import { requireKonfiguration, requireNotenModus } from "../../../../support/helpers/notenConfig";
 import {
 	attemptDate,
 	baselineDate,
 	loadNotenContext,
-	readLvGesamtnote,
+	readLvGesamtnoteViaDb,
 	requireDbReset,
 	resetNotenState,
 	seedBaseline,
@@ -31,11 +31,8 @@ context("Benotungstool UI - Notenvorschlag", () => {
 	});
 
 	beforeEach(function () {
-		if (ctx.cisConfig.CIS_GESAMTNOTE_PUNKTE) {
-			// im Punktemodus ist die Vorschlagsspalte gesperrt, die Note kommt aus den Punkten
-			Cypress.log({ name: "skip", message: "Skipped: CIS_GESAMTNOTE_PUNKTE ist aktiv." });
-			this.skip();
-		}
+		// im Punktemodus ist die Vorschlagsspalte gesperrt, die Note kommt aus den Punkten
+		requireNotenModus(this, ctx);
 	});
 
 	it("trägt einen Vorschlag über den Zelleneditor ein", () => {
@@ -84,9 +81,10 @@ context("Benotungstool UI - Notenvorschlag", () => {
 		page.expectLvNote(student.uid, bezeichnung(ctx.gradeNotes[0]));
 		page.getCell(student.uid, "antritt_1").should("contain.text", page.toDDMMYYYY(datum));
 
-		readLvGesamtnote(ctx, student.uid).then((rowData) => {
-			expect(String(rowData.benotungsdatum).slice(0, 10), "das benotungsdatum bleibt heute")
-				.to.eq(new Date().toISOString().slice(0, 10));
+		readLvGesamtnoteViaDb(ctx, student.uid).then((rowData) => {
+			expect(String(rowData.benotungsdatum).slice(0, 10), "das benotungsdatum bleibt heute").to.eq(
+				new Date().toISOString().slice(0, 10),
+			);
 		});
 	});
 
@@ -97,11 +95,13 @@ context("Benotungstool UI - Notenvorschlag", () => {
 		const kontrolle = ctx.students[4];
 		// Sehr Gut zuerst: setNotenvorschlag vergleicht mit contains, "Gut" träfe "Sehr Gut"
 		const vorschlag = ctx.gradeNotes[0];
-		const pruefungsnote = ctx.gradeNotes.find((n) => ![vorschlag, ctx.notes.negativ].map(String).includes(String(n)));
+		const pruefungsnote = ctx.gradeNotes.find(
+			(n) => ![vorschlag, ctx.notes.negativ].map(String).includes(String(n)),
+		);
 
 		resetNotenState(ctx);
-		seedBaseline(ctx, wiederholung.uid, { erstantritt: false });
-		seedBaseline(ctx, kontrolle.uid);
+		seedBaseline(ctx, wiederholung, { erstantritt: false });
+		seedBaseline(ctx, kontrolle);
 		seedPruefung(ctx, wiederholung, { note: pruefungsnote, datum: attemptDate(ctx, 1), typ: "Termin2" });
 
 		page.visitAndWaitForTable(ctx);
@@ -123,11 +123,13 @@ context("Benotungstool UI - Notenvorschlag", () => {
 		page.getCell(student.uid, "note_vorschlag").click();
 
 		// exakter Vergleich: "unentschuldigt" enthält "entschuldigt"
-		cy.get(".tabulator-edit-list-item").should("have.length.greaterThan", 0).then((items) => {
-			const labels = [...items].map((item) => item.innerText.trim());
-			expect(labels, "Optionen des Editors").to.include(bezeichnung(ctx.gradeNotes[0]));
-			expect(labels, "Optionen des Editors").to.not.include(bezeichnung(ctx.notes.entschuldigt));
-		});
+		cy.get(".tabulator-edit-list-item")
+			.should("have.length.greaterThan", 0)
+			.then((items) => {
+				const labels = [...items].map((item) => item.innerText.trim());
+				expect(labels, "Optionen des Editors").to.include(bezeichnung(ctx.gradeNotes[0]));
+				expect(labels, "Optionen des Editors").to.not.include(bezeichnung(ctx.notes.entschuldigt));
+			});
 	});
 
 	it("blendet den Übernehmen-Button aus, sobald Vorschlag und LV-Note übereinstimmen", () => {
@@ -141,5 +143,4 @@ context("Benotungstool UI - Notenvorschlag", () => {
 
 		page.getUebernehmenButton(student.uid).should("not.exist");
 	});
-
 });

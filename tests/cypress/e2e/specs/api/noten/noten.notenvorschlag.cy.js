@@ -14,7 +14,7 @@ import {
 	baselineBenotungsdatum,
 	baselineDate,
 	loadNotenContext,
-	readLvGesamtnote,
+	readLvGesamtnoteViaDb,
 	requireDbReset,
 	resetNotenState,
 	seedBaseline,
@@ -24,7 +24,7 @@ import {
 	addPruefung,
 	attemptsOfStudent,
 	lvNoteOf,
-	readState,
+	readStateViaApi,
 	verlaufOfStudent,
 } from "../../../../support/helpers/notenScenario";
 
@@ -38,41 +38,38 @@ describe("Noten API - Notenvorschlag", () => {
 		});
 	});
 
-	const readRow = (uid) => readLvGesamtnote(ctx, uid);
+	const readRow = (uid) => readLvGesamtnoteViaDb(ctx, uid);
 
-	describe("saving a Notenvorschlag on a student without a grade", () => {
-		it("returns the stored note with a benotungsdatum and no freigabedatum", () => {
+	describe("ein Notenvorschlag für einen Studierenden ohne Note", () => {
+		it("gibt die gespeicherte Note mit benotungsdatum und ohne freigabedatum zurück", () => {
 			const student = ctx.students[0];
 
 			resetNotenState(ctx);
 
-			notenApi
-				.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, ctx.gradeNotes[0])
-				.then((response) => {
-					const data = expectNotenSuccess(response, "saveNotenvorschlag");
-					expect(data, "saveNotenvorschlag returns [ lvgesamtnote ]").to.be.an("array").and.not
-						.be.empty;
+			notenApi.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, ctx.gradeNotes[0]).then((response) => {
+				const data = expectNotenSuccess(response, "saveNotenvorschlag");
+				expect(data, "saveNotenvorschlag returns [ lvgesamtnote ]").to.be.an("array").and.not.be.empty;
 
-					const row = data[0];
-					expect(String(row.note), "stored note").to.eq(String(ctx.gradeNotes[0]));
-					expect(row.benotungsdatum, "benotungsdatum is stamped on save").to.exist;
-					expect(row.freigabedatum, "a fresh Notenvorschlag is not freigegeben").to.be.oneOf([
-						null,
-						undefined,
-						"",
-					]);
-				});
+				const row = data[0];
+				expect(String(row.note), "stored note").to.eq(String(ctx.gradeNotes[0]));
+				expect(row.benotungsdatum, "benotungsdatum is stamped on save").to.exist;
+				expect(row.freigabedatum, "a fresh Notenvorschlag is not freigegeben").to.be.oneOf([
+					null,
+					undefined,
+					"",
+				]);
+			});
 		});
 
 		// getStudentenNoten liest seit dem Wechsel auf den ungefilterten Getter auch noch nicht
 		// freigegebene Noten - sonst sind LV-Note und Freigabestatus nach einem Reload leer.
-		it("reports the offen note back through getStudentenNoten", () => {
+		it("meldet die offene Note über getStudentenNoten zurück", () => {
 			const student = ctx.students[0];
 
 			resetNotenState(ctx);
 			notenApi.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, ctx.gradeNotes[0]);
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				const grades = lvNoteOf(data, student.uid);
 				expect(grades, `grades entry for ${student.uid}`).to.exist;
 				expect(
@@ -93,7 +90,7 @@ describe("Noten API - Notenvorschlag", () => {
 	describe("das gewählte Benotungsdatum", () => {
 		// Die LV-Note IST Antritt 1. Ohne diese Zeile bekäme die nächste Prüfung Termin2, und der
 		// Legacy-Typ der ganzen Kette verschiebt sich um eine Stelle.
-		it("writes attempt 1 with the chosen day", function () {
+		it("schreibt Antritt 1 mit dem gewählten Tag", function () {
 			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", true);
 
 			const student = ctx.students[1];
@@ -109,7 +106,7 @@ describe("Noten API - Notenvorschlag", () => {
 					expect(row.verlauf.antrittCount, "die LV-Note ist Antritt 1").to.eq(1);
 					expect(row.verlauf.hatWiederholung, "Antritt 1 ist keine Wiederholung").to.be.false;
 				})
-				.then(() => readState(ctx))
+				.then(() => readStateViaApi(ctx))
 				.then((data) => {
 					const attempts = attemptsOfStudent(data, student.uid);
 					expect(attempts, "genau ein Antritt").to.have.length(1);
@@ -118,7 +115,7 @@ describe("Noten API - Notenvorschlag", () => {
 				});
 		});
 
-		it("makes the next exam attempt 2, not attempt 1 again", function () {
+		it("macht die nächste Prüfung zu Antritt 2 statt wieder zu Antritt 1", function () {
 			requireWiederholung(this, ctx);
 
 			const student = ctx.students[2];
@@ -126,19 +123,15 @@ describe("Noten API - Notenvorschlag", () => {
 			resetNotenState(ctx);
 
 			notenApi
-				.saveNotenvorschlag(
-					ctx.lvId, ctx.semKurzbz, student.uid, ctx.notes.negativ, null, baselineDate(ctx),
-				)
+				.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, ctx.notes.negativ, null, baselineDate(ctx))
 				.then((response) => expectNotenSuccess(response, "übernehmen"));
 
 			addPruefung(ctx, student, { note: ctx.gradeNotes[1], datum: attemptDate(ctx, 1) })
 				.then((response) => {
 					const [saved] = expectNotenSuccess(response, "Wiederholung");
-					expect(saved.pruefungstyp_kurzbz, "die Wiederholung ist nicht Antritt 1").to.not.eq(
-						"Termin1",
-					);
+					expect(saved.pruefungstyp_kurzbz, "die Wiederholung ist nicht Antritt 1").to.not.eq("Termin1");
 				})
-				.then(() => readState(ctx))
+				.then(() => readStateViaApi(ctx))
 				.then((data) => {
 					const verlauf = verlaufOfStudent(data, student.uid);
 					expect(verlauf.antrittCount, "die Übernahme und die Prüfung sind zwei Antritte").to.eq(2);
@@ -160,7 +153,7 @@ describe("Noten API - Notenvorschlag", () => {
 					expect(row.verlauf.antrittCount, "die LV-Note zählt als Antritt 1").to.eq(1);
 				});
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				expect(attemptsOfStudent(data, student.uid), "kein Termin").to.have.length(0);
 			});
 		});
@@ -182,15 +175,17 @@ describe("Noten API - Notenvorschlag", () => {
 				expectNotenSuccess(response, "erster Termin"),
 			);
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				const attempts = attemptsOfStudent(data, student.uid);
 				expect(attempts, "Antritt 1 und der neue Termin").to.have.length(2);
 				expect(String(attempts[0].note), "Antritt 1 trägt die LV-Note").to.eq(String(ctx.notes.negativ));
-				expect(attempts.map((p) => p.antritt_nr), "Antrittsnummern").to.deep.eq([1, 2]);
+				expect(
+					attempts.map((p) => p.antritt_nr),
+					"Antrittsnummern",
+				).to.deep.eq([1, 2]);
 				expect(verlaufOfStudent(data, student.uid).antrittCount, "zwei Antritte").to.eq(2);
 			});
 		});
-
 	});
 
 	// W5: Eine Abfrage liest alle LV-Noten der LV. Das Ergebnis je Studierendem bleibt gleich.
@@ -199,10 +194,10 @@ describe("Noten API - Notenvorschlag", () => {
 			const [freigegeben, offen, ohneNote] = ctx.students;
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, freigegeben.uid, { freigegeben: true });
-			seedBaseline(ctx, offen.uid, { freigegeben: false });
+			seedBaseline(ctx, freigegeben, { freigegeben: true });
+			seedBaseline(ctx, offen, { freigegeben: false });
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				const f = lvNoteOf(data, freigegeben.uid);
 				expect(f.note_lv, "LV-Note der freigegebenen Zeile").to.exist;
 				expect(f.freigabedatum, "freigabedatum der freigegebenen Zeile").to.exist;
@@ -224,18 +219,20 @@ describe("Noten API - Notenvorschlag", () => {
 		it("sperrt die Übernahme", () => {
 			const student = ctx.students[3];
 			const g2 =
-				ctx.notes.positiv ?? ctx.notes.bestnote ?? ctx.gradeNotes.find((n) => String(n) !== String(ctx.notes.negativ));
+				ctx.notes.positiv ??
+				ctx.notes.bestnote ??
+				ctx.gradeNotes.find((n) => String(n) !== String(ctx.notes.negativ));
 			const g3 = ctx.gradeNotes.find((n) => String(n) !== String(g2));
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, { erstantritt: false });
+			seedBaseline(ctx, student, { erstantritt: false });
 
 			let wiederholungId;
 			seedPruefung(ctx, student, { note: g2, datum: attemptDate(ctx, 1), typ: "Termin2" }).then((seeded) => {
 				wiederholungId = seeded.pruefungId;
 			});
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				expect(verlaufOfStudent(data, student.uid).hatWiederholung, "hatWiederholung").to.be.true;
 			});
 
@@ -243,7 +240,7 @@ describe("Noten API - Notenvorschlag", () => {
 				.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, g3, null, baselineDate(ctx))
 				.then((response) => expectNotenError(response, "c4notenvorschlagGesperrt"));
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				const pruefung = attemptsOfStudent(data, student.uid).find(
 					(p) => String(p.pruefung_id) === String(wiederholungId),
 				);
@@ -255,17 +252,17 @@ describe("Noten API - Notenvorschlag", () => {
 		});
 	});
 
-	describe("re-grading an already freigegebene note", () => {
+	describe("eine bereits freigegebene Note neu benoten", () => {
 		// eine endgültige Freigabe verbietet genau das, siehe noten.freigabe
 		beforeEach(function () {
 			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_FREIGABE_FINAL", false);
 		});
 
-		it("moves the state from freigegeben to changed", () => {
+		it("wechselt den Status von freigegeben auf geändert", () => {
 			const student = ctx.students[1];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, {
+			seedBaseline(ctx, student, {
 				note: ctx.gradeNotes[0],
 				freigegeben: true,
 				erstantritt: false,
@@ -273,7 +270,7 @@ describe("Noten API - Notenvorschlag", () => {
 			});
 
 			// baseline: benotungsdatum == freigabedatum -> freigegeben, not changed
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				const grades = lvNoteOf(data, student.uid);
 				expect(grades.note_lv, "seeded freigegebene note is visible").to.exist;
 				expect(
@@ -282,18 +279,14 @@ describe("Noten API - Notenvorschlag", () => {
 				).to.be.false;
 			});
 
-			notenApi
-				.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, ctx.gradeNotes[1])
-				.then((response) => {
-					expectNotenSuccess(response, "re-grade after Freigabe");
-				});
+			notenApi.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, ctx.gradeNotes[1]).then((response) => {
+				expectNotenSuccess(response, "re-grade after Freigabe");
+			});
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				const grades = lvNoteOf(data, student.uid);
 
-				expect(String(grades.note_lv), "the new grade is stored").to.eq(
-					String(ctx.gradeNotes[1]),
-				);
+				expect(String(grades.note_lv), "the new grade is stored").to.eq(String(ctx.gradeNotes[1]));
 				expect(grades.freigabedatum, "the old Freigabe timestamp is kept").to.exist;
 				expect(
 					new Date(grades.benotungsdatum) > new Date(grades.freigabedatum),
@@ -302,11 +295,11 @@ describe("Noten API - Notenvorschlag", () => {
 			});
 		});
 
-		it("overwrites the grade rather than adding a second row", () => {
+		it("überschreibt die Note, statt eine zweite Zeile anzulegen", () => {
 			const student = ctx.students[1];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, {
+			seedBaseline(ctx, student, {
 				note: ctx.gradeNotes[0],
 				freigegeben: true,
 				erstantritt: false,
@@ -320,5 +313,4 @@ describe("Noten API - Notenvorschlag", () => {
 			});
 		});
 	});
-
 });

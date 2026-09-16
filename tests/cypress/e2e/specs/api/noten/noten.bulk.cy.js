@@ -4,31 +4,24 @@
  */
 
 import { notenApi } from "../../../../support/api/notenApi";
-import {
-	expectBulkRowAccepted,
-	expectBulkRowError,
-	expectNotenSuccess,
-} from "../../../../support/helpers/notenErrors";
+import { expectBulkRowAccepted, expectBulkRowError, expectNotenSuccess } from "../../../../support/helpers/notenErrors";
 import {
 	requireKonfiguration,
+	requireNotenModus,
 	requirePunkteModus,
 	requireWiederholung,
 } from "../../../../support/helpers/notenConfig";
 import {
 	attemptDate,
 	loadNotenContext,
-	readLvGesamtnote,
+	readLvGesamtnoteViaDb,
 	requireDbReset,
 	resetNotenState,
 	seedBaseline,
 } from "../../../../support/helpers/notenTestData";
-import {
-	addPruefung,
-	attemptsOfStudent,
-	readState,
-} from "../../../../support/helpers/notenScenario";
+import { addPruefung, attemptsOfStudent, readStateViaApi } from "../../../../support/helpers/notenScenario";
 
-describe("Noten API - bulk paths", () => {
+describe("Noten API - Sammelpfade", () => {
 	let ctx;
 
 	before(() => {
@@ -58,13 +51,13 @@ describe("Noten API - bulk paths", () => {
 			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF", true);
 		});
 
-		it("rejects only the row that breaks a §1 rule and accepts the rest", () => {
+		it("lehnt nur die Zeile gegen eine §1-Regel ab und nimmt die übrigen an", () => {
 			const atCap = ctx.students[0];
 			const fresh = ctx.students[1];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, atCap.uid);
-			seedBaseline(ctx, fresh.uid);
+			seedBaseline(ctx, atCap);
+			seedBaseline(ctx, fresh);
 
 			const datum = bisZurGrenze(atCap);
 
@@ -86,7 +79,7 @@ describe("Noten API - bulk paths", () => {
 					expectBulkRowAccepted(data, fresh.uid);
 				});
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				const created = attemptsOfStudent(data, fresh.uid);
 				expect(
 					created.map((p) => String(p.datum).slice(0, 10)),
@@ -94,7 +87,6 @@ describe("Noten API - bulk paths", () => {
 				).to.include(datum);
 			});
 		});
-
 	});
 
 	describe("savePruefungenBulk", () => {
@@ -104,20 +96,17 @@ describe("Noten API - bulk paths", () => {
 			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF", true);
 		});
 
-		it("applies the §1 rules per row", function () {
-			if (ctx.cisConfig.CIS_GESAMTNOTE_PUNKTE) {
-				// im Punktemodus leitet der Endpunkt die Note aus den Punkten ab; die Regelprüfung
-				// deckt der punktebasierte Test unten ab
-				Cypress.log({ name: "skip", message: "Skipped: CIS_GESAMTNOTE_PUNKTE ist aktiv, siehe den punktebasierten Test." });
-				this.skip();
-			}
+		it("wendet die §1-Regeln je Zeile an", function () {
+			// im Punktemodus leitet der Endpunkt die Note aus den Punkten ab; die Regelprüfung
+			// deckt der punktebasierte Test unten ab
+			requireNotenModus(this, ctx);
 
 			const atCap = ctx.students[0];
 			const fresh = ctx.students[1];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, atCap.uid);
-			seedBaseline(ctx, fresh.uid);
+			seedBaseline(ctx, atCap);
+			seedBaseline(ctx, fresh);
 
 			const datum = bisZurGrenze(atCap);
 
@@ -157,8 +146,8 @@ describe("Noten API - bulk paths", () => {
 				const punkte = 70;
 
 				resetNotenState(ctx);
-				seedBaseline(ctx, atCap.uid);
-				seedBaseline(ctx, fresh.uid);
+				seedBaseline(ctx, atCap);
+				seedBaseline(ctx, fresh);
 
 				const datum = bisZurGrenze(atCap);
 				const zeile = (student) => ({
@@ -178,8 +167,10 @@ describe("Noten API - bulk paths", () => {
 				notenApi.getNoteByPunkte(punkte, ctx.lvId, ctx.semKurzbz).then((antwort) => {
 					const erwartet = antwort.body.data;
 
-					readState(ctx).then((data) => {
-						const neu = attemptsOfStudent(data, fresh.uid).find((p) => String(p.datum).slice(0, 10) === datum);
+					readStateViaApi(ctx).then((data) => {
+						const neu = attemptsOfStudent(data, fresh.uid).find(
+							(p) => String(p.datum).slice(0, 10) === datum,
+						);
 						expect(neu, "der neue Termin").to.exist;
 						expect(String(neu.note), "die aus den Punkten abgeleitete Note").to.eq(String(erwartet));
 					});
@@ -189,12 +180,9 @@ describe("Noten API - bulk paths", () => {
 	});
 
 	describe("saveNotenvorschlagBulk", () => {
-		it("writes an LV note for every row", function () {
-			if (ctx.cisConfig.CIS_GESAMTNOTE_PUNKTE) {
-				// im Punktemodus kommt die Note aus dem Notenschlüssel, siehe den Punktemodus-Block
-				Cypress.log({ name: "skip", message: "Skipped: CIS_GESAMTNOTE_PUNKTE ist aktiv." });
-				this.skip();
-			}
+		it("schreibt für jede Zeile eine LV-Note", function () {
+			// im Punktemodus kommt die Note aus dem Notenschlüssel, siehe den Punktemodus-Block
+			requireNotenModus(this, ctx);
 
 			const [a, b] = ctx.students;
 
@@ -212,12 +200,12 @@ describe("Noten API - bulk paths", () => {
 					expectBulkRowAccepted(data, b.uid);
 				});
 
-			readLvGesamtnote(ctx, a.uid).then((row) => {
+			readLvGesamtnoteViaDb(ctx, a.uid).then((row) => {
 				expect(row, `row for ${a.uid}`).to.not.be.null;
 				expect(String(row.note)).to.eq(String(ctx.gradeNotes[0]));
 			});
 
-			readLvGesamtnote(ctx, b.uid).then((row) => {
+			readLvGesamtnoteViaDb(ctx, b.uid).then((row) => {
 				expect(row, `row for ${b.uid}`).to.not.be.null;
 				expect(String(row.note)).to.eq(String(ctx.gradeNotes[1]));
 			});
@@ -246,7 +234,7 @@ describe("Noten API - bulk paths", () => {
 						expectBulkRowAccepted(data, mitPunkten.uid);
 					});
 
-				readLvGesamtnote(ctx, ohnePunkte.uid).then((row) => {
+				readLvGesamtnoteViaDb(ctx, ohnePunkte.uid).then((row) => {
 					expect(row, "die übersprungene Zeile bleibt ungeschrieben").to.be.null;
 				});
 			});

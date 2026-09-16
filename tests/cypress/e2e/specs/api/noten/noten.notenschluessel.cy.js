@@ -7,7 +7,7 @@
 
 import { notenApi } from "../../../../support/api/notenApi";
 import { expectNotenError, expectNotenSuccess } from "../../../../support/helpers/notenErrors";
-import { requirePunkteModus } from "../../../../support/helpers/notenConfig";
+import { requirePunkteModus, skipWenn } from "../../../../support/helpers/notenConfig";
 import {
 	attemptDate,
 	loadNotenContext,
@@ -15,7 +15,7 @@ import {
 	resetNotenState,
 	seedBaseline,
 } from "../../../../support/helpers/notenTestData";
-import { attemptsOfStudent, givenBaseline, readState } from "../../../../support/helpers/notenScenario";
+import { attemptsOfStudent, givenBaseline, readStateViaApi } from "../../../../support/helpers/notenScenario";
 
 const MAX_PUNKTE = 100;
 
@@ -44,7 +44,7 @@ describe("Noten API - Notenschlüssel (getNoteByPunkte)", () => {
 		return cy.then(() => observed);
 	};
 
-	it("maps every point value through a monotonic, exact grade scale", () => {
+	it("bildet jeden Punktewert auf eine monotone und exakte Notenskala ab", () => {
 		sweepScale().then((observed) => {
 			const graded = observed.filter((entry) => entry.note !== null && entry.note !== undefined);
 
@@ -84,11 +84,7 @@ describe("Noten API - Notenschlüssel (getNoteByPunkte)", () => {
 				}
 			}
 
-			cy.log(
-				`Notenschlüssel of LV ${lvId}: ${boundaries
-					.map((b) => `>=${b.punkte} -> ${b.note}`)
-					.join(", ")}`,
-			);
+			cy.log(`Notenschlüssel of LV ${lvId}: ${boundaries.map((b) => `>=${b.punkte} -> ${b.note}`).join(", ")}`);
 
 			expect(
 				boundaries.length,
@@ -128,15 +124,12 @@ describe("Noten API - Notenschlüssel (getNoteByPunkte)", () => {
 
 		beforeEach(function () {
 			requirePunkteModus(this, ctx);
-			if (schwelleUnterNull) {
-				Cypress.log({ name: "skip", message: "Übersprungen: der Notenschlüssel hat eine Schwelle unter 0 Punkten." });
-				this.skip();
-			}
+			skipWenn(this, schwelleUnterNull, "Übersprungen: der Notenschlüssel hat eine Schwelle unter 0 Punkten.");
 			requireDbReset();
 		});
 
 		const expectNurAntritt1 = (students) =>
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				students.forEach((s) => {
 					expect(attemptsOfStudent(data, s.uid), `Prüfungen von ${s.uid}`).to.have.length(1);
 				});
@@ -167,7 +160,7 @@ describe("Noten API - Notenschlüssel (getNoteByPunkte)", () => {
 			const students = ctx.students.slice(0, 2);
 
 			resetNotenState(ctx);
-			students.forEach((s) => seedBaseline(ctx, s.uid));
+			students.forEach((s) => seedBaseline(ctx, s));
 
 			notenApi
 				.createPruefungen(
@@ -183,5 +176,4 @@ describe("Noten API - Notenschlüssel (getNoteByPunkte)", () => {
 			expectNurAntritt1(students);
 		});
 	});
-
 });

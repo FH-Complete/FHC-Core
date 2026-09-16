@@ -3,14 +3,16 @@ import { waitForOk } from "../../../../support/helpers/network";
 import {
 	requireKommissionellerAntritt,
 	requireKonfiguration,
+	requireNotenModus,
 	requireWiederholung,
+	skipWenn,
 } from "../../../../support/helpers/notenConfig";
 import { expectNotenSuccess } from "../../../../support/helpers/notenErrors";
 import { addPruefung } from "../../../../support/helpers/notenScenario";
 import {
 	attemptDate,
 	loadNotenContext,
-	readLvGesamtnote,
+	readLvGesamtnoteViaDb,
 	requireDbReset,
 	resetNotenState,
 	seedBaseline,
@@ -39,11 +41,8 @@ context("Benotungstool UI - Prüfungen", () => {
 	});
 
 	beforeEach(function () {
-		if (ctx.cisConfig.CIS_GESAMTNOTE_PUNKTE) {
-			// im Punktemodus ist das Notenfeld gesperrt, die Note kommt aus dem Notenschlüssel
-			Cypress.log({ name: "skip", message: "Skipped: CIS_GESAMTNOTE_PUNKTE ist aktiv." });
-			this.skip();
-		}
+		// im Punktemodus ist das Notenfeld gesperrt, die Note kommt aus dem Notenschlüssel
+		requireNotenModus(this, ctx);
 	});
 
 	it("legt aus der Zelle eine Wiederholung an und zählt sie als Antritt 2", function () {
@@ -52,7 +51,7 @@ context("Benotungstool UI - Prüfungen", () => {
 		const student = ctx.students[0];
 
 		resetNotenState(ctx);
-		seedBaseline(ctx, student.uid, { note: ctx.notes.negativ });
+		seedBaseline(ctx, student, { note: ctx.notes.negativ });
 
 		page.visitAndWaitForTable(ctx);
 
@@ -68,7 +67,7 @@ context("Benotungstool UI - Prüfungen", () => {
 		page.expectLvNote(student.uid, bezeichnung(ctx.gradeNotes[1]));
 
 		// die Zelle zeigt den Freigabestatus, den der Server geschrieben hat; die Regel prüft noten.pruefungstermin
-		readLvGesamtnote(ctx, student.uid).then((row) => {
+		readLvGesamtnoteViaDb(ctx, student.uid).then((row) => {
 			const geaendert = new Date(row.benotungsdatum) > new Date(row.freigabedatum);
 			page.expectFreigabeState(student.uid, geaendert ? "changed" : "ok");
 		});
@@ -99,7 +98,7 @@ context("Benotungstool UI - Prüfungen", () => {
 		const neuesDatum = attemptDate(ctx, 2);
 
 		resetNotenState(ctx);
-		seedBaseline(ctx, student.uid, { note: ctx.notes.negativ });
+		seedBaseline(ctx, student, { note: ctx.notes.negativ });
 
 		page.visitAndWaitForTable(ctx);
 
@@ -120,7 +119,7 @@ context("Benotungstool UI - Prüfungen", () => {
 		const student = ctx.students[0];
 
 		resetNotenState(ctx);
-		seedBaseline(ctx, student.uid, { note: ctx.notes.negativ });
+		seedBaseline(ctx, student, { note: ctx.notes.negativ });
 
 		page.visitAndWaitForTable(ctx);
 
@@ -147,8 +146,8 @@ context("Benotungstool UI - Prüfungen", () => {
 		const [a, b] = ctx.students;
 
 		resetNotenState(ctx);
-		seedBaseline(ctx, a.uid, { note: ctx.notes.negativ });
-		seedBaseline(ctx, b.uid, { note: ctx.notes.negativ });
+		seedBaseline(ctx, a, { note: ctx.notes.negativ });
+		seedBaseline(ctx, b, { note: ctx.notes.negativ });
 
 		page.visitAndWaitForTable(ctx);
 
@@ -175,7 +174,7 @@ context("Benotungstool UI - Prüfungen", () => {
 		// 'entschuldigt' verbraucht keinen Antritt, deshalb bleibt ein weiterer Termin möglich
 		const mitTerminAm = (student, datum) => {
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, { note: ctx.notes.negativ });
+			seedBaseline(ctx, student, { note: ctx.notes.negativ });
 			addPruefung(ctx, student, { note: ctx.notes.entschuldigt, datum }).then((response) =>
 				expectNotenSuccess(response, "bestehender Termin"),
 			);
@@ -215,15 +214,16 @@ context("Benotungstool UI - Prüfungen", () => {
 
 	it("legt den letzten Antritt als kommissionelle Prüfung an", function () {
 		requireKommissionellerAntritt(this, ctx);
-		if (ctx.cisConfig.CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT !== ctx.maxAntritte) {
-			Cypress.log({ name: "skip", message: "Übersprungen: der letzte Antritt ist nicht kommissionell." });
-			this.skip();
-		}
+		skipWenn(
+			this,
+			ctx.cisConfig.CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT !== ctx.maxAntritte,
+			"Übersprungen: der letzte Antritt ist nicht kommissionell.",
+		);
 
 		const student = ctx.students[1];
 
 		resetNotenState(ctx);
-		seedBaseline(ctx, student.uid, { note: ctx.notes.negativ });
+		seedBaseline(ctx, student, { note: ctx.notes.negativ });
 
 		page.visitAndWaitForTable(ctx);
 

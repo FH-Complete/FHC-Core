@@ -35,7 +35,11 @@ export const editPruefung = (context, student, { pruefungId, note, datum }) =>
 		pruefung_id: pruefungId,
 	});
 
-export const readState = (context) =>
+/**
+ * Liest den Zustand über die API (getStudentenNoten): was der Server MELDET.
+ * Das Gegenstück ist readLvGesamtnoteViaDb - es liest, was wirklich gespeichert ist.
+ */
+export const readStateViaApi = (context) =>
 	notenApi
 		.getStudentenNoten(context.lvId, context.semKurzbz)
 		.then((response) => expectNotenSuccess(response, "getStudentenNoten"));
@@ -53,4 +57,4 @@ export const lvNoteOf = (data, uid) => gradesOf(data, uid);
 
 /** Clears the suite's rows and re-seeds the Antritt-1 baseline for one student. */
 export const givenBaseline = (context, student, options = {}) =>
-	resetNotenState(context).then(() => seedBaseline(context, student.uid, options));
+	resetNotenState(context).then(() => seedBaseline(context, student, options));

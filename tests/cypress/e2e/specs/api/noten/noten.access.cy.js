@@ -6,39 +6,29 @@
  */
 
 import { notenApi } from "../../../../support/api/notenApi";
-import {
-	expectAuthError,
-	expectNotenError,
-	expectNotenSuccess,
-} from "../../../../support/helpers/notenErrors";
+import { expectAuthError, expectNotenError, expectNotenSuccess } from "../../../../support/helpers/notenErrors";
 import {
 	attemptDate,
 	loadNotenContext,
-	readLvGesamtnote,
+	readLvGesamtnoteViaDb,
 	requireDbReset,
 	resetNotenState,
 	seedBaseline,
 } from "../../../../support/helpers/notenTestData";
+import { skipWenn } from "../../../../support/helpers/notenConfig";
 import {
 	assistenzAuth,
-	assistenzConfigured,
 	assistenzKontext,
 	assistenzLvMitLehreinheiten,
+	requireAssistenz,
 } from "../../../../support/helpers/notenAssistenz";
 
 const NOTEN_API = "/index.ci.php/api/frontend/v1/Noten";
 
-const teacherConfigured = () =>
-	Boolean(Cypress.env("NOTEN_TEACHER_USER") && Cypress.env("NOTEN_FOREIGN_LV_ID"));
+const teacherConfigured = () => Boolean(Cypress.env("NOTEN_TEACHER_USER") && Cypress.env("NOTEN_FOREIGN_LV_ID"));
 
 const getAs = (auth, path, qs) =>
 	cy.request({ method: "GET", url: `${NOTEN_API}/${path}`, qs, auth, failOnStatusCode: false });
-
-const skipOhneAssistenz = (test) => {
-	if (assistenzConfigured()) return;
-	Cypress.log({ name: "skip", message: "Übersprungen: NOTEN_ASSISTENZ_USER / NOTEN_ASSISTENZ_PASSWORD fehlen." });
-	test.skip();
-};
 
 /** A getStudentenNoten call as an explicitly chosen user (or with no credentials at all). */
 const getStudentenNotenAs = (auth, lvId, semKurzbz) =>
@@ -50,7 +40,7 @@ const getStudentenNotenAs = (auth, lvId, semKurzbz) =>
 		failOnStatusCode: false,
 	});
 
-describe("Noten API - access control", () => {
+describe("Noten API - Zugriffsschutz", () => {
 	let ctx;
 
 	before(() => {
@@ -59,11 +49,11 @@ describe("Noten API - access control", () => {
 		});
 	});
 
-	it("rejects requests that are not authenticated", () => {
+	it("lehnt eine Anfrage ohne Anmeldung ab", () => {
 		cy.clearAllCookies(); // otherwise the previous login is still active
 
-		cy.request({ method: "GET", url: `${NOTEN_API}/getCisConfig`, failOnStatusCode: false }).then(
-			(response) => expectAuthError(response),
+		cy.request({ method: "GET", url: `${NOTEN_API}/getCisConfig`, failOnStatusCode: false }).then((response) =>
+			expectAuthError(response),
 		);
 
 		cy.request({
@@ -74,8 +64,8 @@ describe("Noten API - access control", () => {
 		}).then((response) => expectAuthError(response));
 	});
 
-	describe("the configured API user", () => {
-		it("can read the students of the test LV", () => {
+	describe("der konfigurierte API-Benutzer", () => {
+		it("liest die Studierenden der Test-LV", () => {
 			notenApi.getStudentenNoten(ctx.lvId, ctx.semKurzbz).then((response) => {
 				const data = expectNotenSuccess(response, "getStudentenNoten on the own/admin LV");
 				expect(data[0], "student list").to.be.an("array").and.not.be.empty;
@@ -83,18 +73,15 @@ describe("Noten API - access control", () => {
 		});
 	});
 
-	describe("teacher scoping", () => {
+	describe("Scope der Lehrperson", () => {
 		beforeEach(function () {
-			if (!teacherConfigured()) {
-				Cypress.log({
-					name: "skip",
-					message:
-					"Skipped: needs NOTEN_TEACHER_USER / NOTEN_TEACHER_PASSWORD and NOTEN_FOREIGN_LV_ID " +
-						"(an LV that teacher does NOT teach). This API has no impersonation, so a second " +
-						"real login is required.",
-				});
-				this.skip();
-			}
+			skipWenn(
+				this,
+				!teacherConfigured(),
+				"Übersprungen: braucht NOTEN_TEACHER_USER / NOTEN_TEACHER_PASSWORD und NOTEN_FOREIGN_LV_ID " +
+					"(eine LV, die diese Lehrperson NICHT unterrichtet). Die API kennt keine Identitätsübernahme, " +
+					"deshalb braucht der Test ein zweites echtes Konto.",
+			);
 			// cy.request reuses the session cookie of the previous (admin) call and the server prefers
 			// it over the Basic header - without this every test here silently runs as the admin user.
 			cy.clearAllCookies();
@@ -106,17 +93,13 @@ describe("Noten API - access control", () => {
 		});
 
 		// assertLvAccess denies through terminateWithError -> 500 + phrase, not a 401.
-		it("denies a teacher access to an LV they do not teach", () => {
-			getStudentenNotenAs(
-				teacherAuth(),
-				Cypress.env("NOTEN_FOREIGN_LV_ID"),
-				ctx.semKurzbz,
-			).then((response) => {
+		it("verweigert einer Lehrperson eine fremde LV", () => {
+			getStudentenNotenAs(teacherAuth(), Cypress.env("NOTEN_FOREIGN_LV_ID"), ctx.semKurzbz).then((response) => {
 				expectNotenError(response, "keineBerechtigungNoten");
 			});
 		});
 
-		it("denies a teacher writing a grade in an LV they do not teach", () => {
+		it("verweigert einer Lehrperson die Note in einer fremden LV", () => {
 			cy.request({
 				method: "POST",
 				url: `${NOTEN_API}/saveNotenvorschlag`,
@@ -134,7 +117,7 @@ describe("Noten API - access control", () => {
 			});
 		});
 
-		it("denies a teacher the Lehreinheiten of an LV they do not teach", () => {
+		it("verweigert einer Lehrperson die Lehreinheiten einer fremden LV", () => {
 			getAs(teacherAuth(), "getLehreinheitenFuerLv", {
 				lv_id: Cypress.env("NOTEN_FOREIGN_LV_ID"),
 				sem_kurzbz: ctx.semKurzbz,
@@ -147,7 +130,7 @@ describe("Noten API - access control", () => {
 
 	describe("getBenotungstoolContext als Assistenz", () => {
 		beforeEach(function () {
-			skipOhneAssistenz(this);
+			requireAssistenz(this);
 			cy.clearAllCookies();
 		});
 
@@ -223,12 +206,12 @@ describe("Noten API - access control", () => {
 					i >= ctx.students.length
 						? cy.wrap(null, { log: false })
 						: cy
-							.task("noten:db:andereLvNoten", {
-								lvId: ctx.lvId,
-								semKurzbz: ctx.semKurzbz,
-								studentUid: ctx.students[i].uid,
-							})
-							.then((anzahl) => (anzahl === 0 ? ctx.students[i] : suche(i + 1)));
+								.task("noten:db:andereLvNoten", {
+									lvId: ctx.lvId,
+									semKurzbz: ctx.semKurzbz,
+									studentUid: ctx.students[i].uid,
+								})
+								.then((anzahl) => (anzahl === 0 ? ctx.students[i] : suche(i + 1)));
 
 				suche(0).then((found) => {
 					student = found;
@@ -236,21 +219,18 @@ describe("Noten API - access control", () => {
 			});
 
 			it("ändert bei lv_id=null keine LV-Note", function () {
-				if (!student) {
-					Cypress.log({ name: "skip", message: "Übersprungen: jeder Studierende hat LV-Noten in anderen LVs." });
-					this.skip();
-				}
+				skipWenn(this, !student, "Übersprungen: jeder Studierende hat LV-Noten in anderen LVs.");
 
 				const g2 = ctx.gradeNotes.find((n) => String(n) !== String(ctx.notes.negativ));
 
 				resetNotenState(ctx);
-				seedBaseline(ctx, student.uid);
+				seedBaseline(ctx, student);
 
 				notenApi
 					.saveNotenvorschlag(null, ctx.semKurzbz, student.uid, g2)
 					.then((response) => expectNotenError(response, "wrongParameters"));
 
-				readLvGesamtnote(ctx, student.uid).then((row) => {
+				readLvGesamtnoteViaDb(ctx, student.uid).then((row) => {
 					expect(String(row.note), "die LV-Note bleibt").to.eq(String(ctx.notes.negativ));
 				});
 			});
@@ -260,7 +240,9 @@ describe("Noten API - access control", () => {
 	// W10: Der Endpunkt liefert alle Lehreinheiten der LV, für jede Rolle mit Zugriff auf die LV.
 	describe("getLehreinheitenFuerLv", () => {
 		const lehreinheitenDerLv = (lvId) =>
-			cy.task("noten:db:lehreinheitenDerLv", { lvId, semKurzbz: ctx.semKurzbz }).then((ids) => ids.map(String).sort());
+			cy
+				.task("noten:db:lehreinheitenDerLv", { lvId, semKurzbz: ctx.semKurzbz })
+				.then((ids) => ids.map(String).sort());
 
 		// die Abfrage liefert eine Zeile je Gruppe, eine Lehreinheit kann also mehrfach vorkommen
 		const idsOf = (rows) => [...new Set(rows.map((r) => String(r.lehreinheit_id)))].sort();
@@ -272,8 +254,18 @@ describe("Noten API - access control", () => {
 				const rows = expectNotenSuccess(response, "getLehreinheitenFuerLv");
 				expect(rows, "Lehreinheiten").to.be.an("array").and.not.be.empty;
 				expect(rows[0], "Felder einer Lehreinheit").to.include.all.keys(
-					"lehreinheit_id", "lehrveranstaltung_id", "lehrform_kurzbz", "direktinskription", "semester",
-					"verband", "gruppe", "gruppe_kurzbz", "kurzbz", "kurzbzlang", "termincount", "studentcount",
+					"lehreinheit_id",
+					"lehrveranstaltung_id",
+					"lehrform_kurzbz",
+					"direktinskription",
+					"semester",
+					"verband",
+					"gruppe",
+					"gruppe_kurzbz",
+					"kurzbz",
+					"kurzbzlang",
+					"termincount",
+					"studentcount",
 				);
 
 				lehreinheitenDerLv(ctx.lvId).then((ids) => {
@@ -283,7 +275,7 @@ describe("Noten API - access control", () => {
 		});
 
 		it("liefert einer Assistenz die Lehreinheiten einer LV ihres Studiengangs", function () {
-			skipOhneAssistenz(this);
+			requireAssistenz(this);
 			cy.clearAllCookies();
 
 			assistenzLvMitLehreinheiten(ctx.semKurzbz).then((ziel) => {

@@ -106,7 +106,8 @@ module.exports = {
 		},
 
 		offen: {
-			beschreibung: "frühere Noten änderbar, künftiges Benotungsdatum, keine Datumsfrist, ein Termin hebt die Freigabe nicht auf",
+			beschreibung:
+				"frühere Noten änderbar, künftiges Benotungsdatum, keine Datumsfrist, ein Termin hebt die Freigabe nicht auf",
 			config: {
 				CIS_GESAMTNOTE_NOTE_SPERRE_BEI_SPAETEREM_TERMIN: false,
 				CIS_GESAMTNOTE_DATUM_ZUKUNFT: true,

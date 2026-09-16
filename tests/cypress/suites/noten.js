@@ -16,20 +16,22 @@ const parallelPost = ({ path, bodies }) => {
 	const base = String(process.env.BASE_URL).replace(/\/+$/, "");
 	const auth = "Basic " + Buffer.from(`${process.env.USER_NAME}:${process.env.USER_PASSWORD}`).toString("base64");
 
-	return Promise.all(bodies.map((body) =>
-		fetch(`${base}/index.ci.php/api/frontend/v1/Noten/${path}`, {
-			method: "POST",
-			headers: { Authorization: auth, "Content-Type": "application/json" },
-			body: JSON.stringify(body),
-		}).then(async (r) => {
-			const text = await r.text();
-			try {
-				return { status: r.status, body: JSON.parse(text) };
-			} catch (e) {
-				return { status: r.status, body: null, text: text.slice(0, 500) };
-			}
-		}),
-	));
+	return Promise.all(
+		bodies.map((body) =>
+			fetch(`${base}/index.ci.php/api/frontend/v1/Noten/${path}`, {
+				method: "POST",
+				headers: { Authorization: auth, "Content-Type": "application/json" },
+				body: JSON.stringify(body),
+			}).then(async (r) => {
+				const text = await r.text();
+				try {
+					return { status: r.status, body: JSON.parse(text) };
+				} catch (e) {
+					return { status: r.status, body: null, text: text.slice(0, 500) };
+				}
+			}),
+		),
+	);
 };
 
 module.exports = {

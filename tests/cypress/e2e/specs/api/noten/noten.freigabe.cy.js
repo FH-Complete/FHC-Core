@@ -18,7 +18,7 @@ import {
 	attemptDate,
 	baselineBenotungsdatum,
 	loadNotenContext,
-	readLvGesamtnote,
+	readLvGesamtnoteViaDb,
 	requireDbReset,
 	resetNotenState,
 	seedBaseline,
@@ -29,12 +29,11 @@ import {
 	attemptsOfStudent,
 	givenBaseline,
 	lvNoteOf,
-	readState,
+	readStateViaApi,
 	verlaufOfStudent,
 } from "../../../../support/helpers/notenScenario";
 
-const freigabePassword = () =>
-	Cypress.env("NOTEN_FREIGABE_PASSWORD") || Cypress.env("adminpassword");
+const freigabePassword = () => Cypress.env("NOTEN_FREIGABE_PASSWORD") || Cypress.env("adminpassword");
 
 /** The payload shape saveStudentenNoten expects per student (see the studlist builder). */
 const notenPayload = (student, noteBezeichnung) => ({
@@ -55,8 +54,8 @@ describe("Noten API - Notenfreigabe", () => {
 		});
 	});
 
-	describe("password gate", () => {
-		it("rejects a Freigabe with a wrong password and changes nothing", function () {
+	describe("Passwortschutz", () => {
+		it("lehnt eine Freigabe mit falschem Passwort ab und ändert nichts", function () {
 			// ohne Passwortpflicht gibt der Aufruf frei
 			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_FREIGABE_PASSWORT", true);
 			requireDbReset();
@@ -64,53 +63,42 @@ describe("Noten API - Notenfreigabe", () => {
 			const student = ctx.students[0];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, {
+			seedBaseline(ctx, student, {
 				note: ctx.gradeNotes[0],
 				freigegeben: false,
 				benotungsdatum: baselineBenotungsdatum(ctx),
 			});
 
 			notenApi
-				.saveStudentenNoten(
-					"definitely-not-the-password",
-					[notenPayload(student)],
-					ctx.lvId,
-					ctx.semKurzbz,
-				)
+				.saveStudentenNoten("definitely-not-the-password", [notenPayload(student)], ctx.lvId, ctx.semKurzbz)
 				.then((response) => {
 					expectNotenError(response, "wrongPassword");
 				});
 
-			readLvGesamtnote(ctx, student.uid).then((row) => {
+			readLvGesamtnoteViaDb(ctx, student.uid).then((row) => {
 				expect(row, "the row still exists").to.not.be.null;
 				expect(row.freigabedatum, "a rejected Freigabe must not stamp freigabedatum").to.be.null;
 			});
 		});
-
 	});
 
-	describe("happy path", () => {
+	describe("der normale Ablauf", () => {
 		beforeEach(() => {
 			requireDbReset();
 		});
 
-		it("stamps freigabedatum on a changed note", () => {
+		it("setzt das freigabedatum auf einer geänderten Note", () => {
 			const student = ctx.students[0];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, {
+			seedBaseline(ctx, student, {
 				note: ctx.gradeNotes[0],
 				freigegeben: false,
 				benotungsdatum: baselineBenotungsdatum(ctx),
 			});
 
 			notenApi
-				.saveStudentenNoten(
-					freigabePassword(),
-					[notenPayload(student)],
-					ctx.lvId,
-					ctx.semKurzbz,
-				)
+				.saveStudentenNoten(freigabePassword(), [notenPayload(student)], ctx.lvId, ctx.semKurzbz)
 				.then((response) => {
 					const data = expectNotenSuccess(response, "saveStudentenNoten");
 					expect(data, "freigegebene rows are reported back").to.be.an("array");
@@ -122,13 +110,13 @@ describe("Noten API - Notenfreigabe", () => {
 					expect(entry.verlauf.pruefungen, "inklusive der Termine").to.be.an("array");
 				});
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				const grades = lvNoteOf(data, student.uid);
 				expect(grades.freigabedatum, "the note is now freigegeben").to.exist;
 			});
 
 			// C1: Die Freigabe brach früher vor dem Schreiben ab.
-			readLvGesamtnote(ctx, student.uid).then((row) => {
+			readLvGesamtnoteViaDb(ctx, student.uid).then((row) => {
 				expect(row.freigabedatum, "C1: die Freigabe schreibt freigabedatum").to.not.be.null;
 			});
 		});
@@ -139,17 +127,19 @@ describe("Noten API - Notenfreigabe", () => {
 			const student = ctx.students[0];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, { note: ctx.notes.negativ, freigegeben: false });
+			seedBaseline(ctx, student, { note: ctx.notes.negativ, freigegeben: false });
 
 			notenApi
 				.saveStudentenNoten(freigabePassword(), [notenPayload(student)], ctx.lvId, ctx.semKurzbz)
 				.then((response) => {
 					const entry = expectNotenSuccess(response, "saveStudentenNoten").find((r) => r.uid === student.uid);
 					// ohne den Verlauf in der Antwort zeigt die Tabelle den neuen Termin erst nach einem Reload
-					expect(entry.verlauf.pruefungen, "der erste Antritt kommt mit der Antwort zurück").to.have.length(1);
+					expect(entry.verlauf.pruefungen, "der erste Antritt kommt mit der Antwort zurück").to.have.length(
+						1,
+					);
 				});
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				const attempts = attemptsOfStudent(data, student.uid);
 				expect(attempts, "genau ein Termin").to.have.length(1);
 				expect(attempts[0].antritt_nr, "als Antritt 1").to.eq(1);
@@ -162,7 +152,7 @@ describe("Noten API - Notenfreigabe", () => {
 			const student = ctx.students[0];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, { note: ctx.notes.negativ, freigegeben: false });
+			seedBaseline(ctx, student, { note: ctx.notes.negativ, freigegeben: false });
 
 			notenApi
 				.saveStudentenNoten(freigabePassword(), [notenPayload(student)], ctx.lvId, ctx.semKurzbz)
@@ -171,7 +161,7 @@ describe("Noten API - Notenfreigabe", () => {
 					expect(entry.freigabedatum, "die Freigabe gilt trotzdem").to.exist;
 				});
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				expect(attemptsOfStudent(data, student.uid), "kein Termin").to.have.length(0);
 				expect(verlaufOfStudent(data, student.uid).antrittCount, "die LV-Note zählt als Antritt 1").to.eq(1);
 			});
@@ -183,32 +173,35 @@ describe("Noten API - Notenfreigabe", () => {
 			const student = ctx.students[1];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, { note: ctx.notes.negativ, freigegeben: false });
+			seedBaseline(ctx, student, { note: ctx.notes.negativ, freigegeben: false });
 
 			notenApi.saveStudentenNoten("", [notenPayload(student)], ctx.lvId, ctx.semKurzbz).then((response) => {
 				const data = expectNotenSuccess(response, "Freigabe ohne Passwort");
-				expect(data.map((r) => r.uid), "freigegebene Zeilen").to.include(student.uid);
+				expect(
+					data.map((r) => r.uid),
+					"freigegebene Zeilen",
+				).to.include(student.uid);
 			});
 
-			readLvGesamtnote(ctx, student.uid).then((row) => {
+			readLvGesamtnoteViaDb(ctx, student.uid).then((row) => {
 				expect(row.freigabedatum, "freigabedatum").to.not.be.null;
 			});
 		});
 
 		// W7: Eine einzelne Wiederholung ist nicht Antritt 1. Die Freigabe überschreibt ihre Note nicht.
-		it("keeps the grade of a single repeat", () => {
+		it("behält die Note einer einzelnen Wiederholung", () => {
 			const student = ctx.students[1];
 			const g2 = ctx.gradeNotes.find((n) => String(n) !== String(ctx.notes.negativ));
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, { note: ctx.notes.negativ, freigegeben: false, erstantritt: false });
+			seedBaseline(ctx, student, { note: ctx.notes.negativ, freigegeben: false, erstantritt: false });
 			seedPruefung(ctx, student, { note: g2, datum: attemptDate(ctx, 1), typ: "Termin2" });
 
 			notenApi
 				.saveStudentenNoten(freigabePassword(), [notenPayload(student)], ctx.lvId, ctx.semKurzbz)
 				.then((response) => expectNotenSuccess(response, "saveStudentenNoten"));
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				const attempts = attemptsOfStudent(data, student.uid);
 				expect(attempts, "the Freigabe adds no exam").to.have.length(1);
 				expect(String(attempts[0].note), "the repeat keeps its grade").to.eq(String(g2));
@@ -217,12 +210,12 @@ describe("Noten API - Notenfreigabe", () => {
 
 		// Das Datum eines Termins gehört der Person, die ihn eingetragen hat. Die Freigabe macht die
 		// Note verbindlich und verschiebt kein Datum.
-		it("keeps the date of an exam that already exists", () => {
+		it("behält das Datum einer bestehenden Prüfung", () => {
 			const student = ctx.students[2];
 			const pruefungsdatum = attemptDate(ctx, 2);
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, {
+			seedBaseline(ctx, student, {
 				note: ctx.notes.negativ,
 				freigegeben: false,
 				erstantritt: false,
@@ -235,23 +228,21 @@ describe("Noten API - Notenfreigabe", () => {
 				.saveStudentenNoten(freigabePassword(), [notenPayload(student)], ctx.lvId, ctx.semKurzbz)
 				.then((response) => expectNotenSuccess(response, "saveStudentenNoten"));
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				const attempts = attemptsOfStudent(data, student.uid);
 				expect(attempts, "der Termin bleibt der einzige").to.have.length(1);
-				expect(String(attempts[0].datum).slice(0, 10), "mit seinem eigenen Datum").to.eq(
-					pruefungsdatum,
-				);
+				expect(String(attempts[0].datum).slice(0, 10), "mit seinem eigenen Datum").to.eq(pruefungsdatum);
 			});
 		});
 
-		it("only touches rows whose benotungsdatum is newer than their freigabedatum", () => {
+		it("ändert nur Zeilen mit einem benotungsdatum nach dem freigabedatum", () => {
 			const changed = ctx.students[0];
 			const alreadyReleased = ctx.students[1];
 
 			resetNotenState(ctx);
 
 			// changed: benotungsdatum after freigabedatum -> must be re-freigegeben
-			seedBaseline(ctx, changed.uid, {
+			seedBaseline(ctx, changed, {
 				note: ctx.gradeNotes[0],
 				freigegeben: true,
 				freigabedatum: `${ctx.semKurzbz.slice(2, 6)}-01-05 08:00:00`,
@@ -259,7 +250,7 @@ describe("Noten API - Notenfreigabe", () => {
 			});
 
 			// already freigegeben and untouched since -> must be left alone
-			seedBaseline(ctx, alreadyReleased.uid, {
+			seedBaseline(ctx, alreadyReleased, {
 				note: ctx.gradeNotes[0],
 				freigegeben: true,
 				freigabedatum: `${ctx.semKurzbz.slice(2, 6)}-01-10 08:00:00`,
@@ -284,7 +275,7 @@ describe("Noten API - Notenfreigabe", () => {
 					).to.not.include(alreadyReleased.uid);
 				});
 
-			readLvGesamtnote(ctx, alreadyReleased.uid).then((row) => {
+			readLvGesamtnoteViaDb(ctx, alreadyReleased.uid).then((row) => {
 				expect(
 					new Date(row.freigabedatum).toISOString().slice(0, 10),
 					"the untouched row keeps its original freigabedatum",
@@ -318,7 +309,7 @@ describe("Noten API - Notenfreigabe", () => {
 			const student = ctx.students[3];
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, student.uid, { note: ctx.notes.negativ, freigegeben: false });
+			seedBaseline(ctx, student, { note: ctx.notes.negativ, freigegeben: false });
 
 			notenApi
 				.saveStudentenNoten(freigabePassword(), [notenPayload(student)], ctx.lvId, ctx.semKurzbz)
@@ -327,7 +318,7 @@ describe("Noten API - Notenfreigabe", () => {
 					expect(entry, `${student.uid} ist freigegeben`).to.exist;
 				});
 
-			readLvGesamtnote(ctx, student.uid).then((row) => {
+			readLvGesamtnoteViaDb(ctx, student.uid).then((row) => {
 				expect(row.freigabedatum, "freigabedatum").to.not.be.null;
 			});
 		});
@@ -353,7 +344,7 @@ describe("Noten API - Notenfreigabe", () => {
 				.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, andereNote())
 				.then((response) => expectNotenError(response, "freigabeEndgueltig"));
 
-			readLvGesamtnote(ctx, student.uid).then((row) => {
+			readLvGesamtnoteViaDb(ctx, student.uid).then((row) => {
 				expect(String(row.note), "die LV-Note bleibt").to.eq(String(ctx.notes.negativ));
 			});
 		});
@@ -367,7 +358,7 @@ describe("Noten API - Notenfreigabe", () => {
 				expectNotenError(response, "freigabeEndgueltig"),
 			);
 
-			readState(ctx).then((data) => {
+			readStateViaApi(ctx).then((data) => {
 				expect(attemptsOfStudent(data, student.uid), "nur Antritt 1").to.have.length(1);
 			});
 		});
@@ -379,8 +370,8 @@ describe("Noten API - Notenfreigabe", () => {
 			const [freigegeben, offen] = ctx.students;
 
 			resetNotenState(ctx);
-			seedBaseline(ctx, freigegeben.uid, { freigegeben: true });
-			seedBaseline(ctx, offen.uid, { freigegeben: false });
+			seedBaseline(ctx, freigegeben, { freigegeben: true });
+			seedBaseline(ctx, offen, { freigegeben: false });
 
 			notenApi
 				.saveNotenvorschlagBulk(ctx.lvId, ctx.semKurzbz, [

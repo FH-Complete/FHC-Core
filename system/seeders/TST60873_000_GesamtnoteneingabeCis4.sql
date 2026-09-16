@@ -1,3 +1,25 @@
+-- Seeder of feature-60873/GesamtnoteneingabeCis4. A "-- ==== <group> ====" line starts a group; tests/cypress/tools/dbCheck.js applies single groups.
+
+-- ==== helper_functions ====
+-- Semester helpers for group studiengang_5. BS001_helper_functions.sql does not define them.
+
+CREATE OR REPLACE FUNCTION CurrentSemester() RETURNS varchar(32) AS $$
+DECLARE res varchar(32);
+	BEGIN
+		SELECT studiensemester_kurzbz into res FROM public.tbl_studiensemester WHERE start<=now() AND ende>=now() ORDER BY start DESC LIMIT 1;
+		return res;
+	END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION LastActiveSemester() RETURNS varchar(32) AS $$
+DECLARE res varchar(32);
+	BEGIN
+		SELECT studiensemester_kurzbz into res FROM public.tbl_studiensemester WHERE start<=now() ORDER BY start DESC LIMIT 1;
+		return res;
+	END;
+$$ LANGUAGE plpgsql;
+
+-- ==== studiengang_5 ====
 -- Demodaten fuer Studiengang 5: Organisationseinheit, Studienordnung, Studiengang, Lehrveranstaltungen
 
 INSERT INTO public.tbl_organisationseinheit (oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz, aktiv, mailverteiler, freigabegrenze, kurzzeichen, lehre, standort, warn_semesterstunden_frei, warn_semesterstunden_fix, standort_id)
@@ -229,3 +251,470 @@ INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, updateamum, updatevon
 ('s125b101', 'GRP_51003', now(), 'demoadmin', now(), 'demoadmin', NULL, NULL),
 ('s125b101', 'GRP_51004', now(), 'demoadmin', now(), 'demoadmin', NULL, NULL)
 ;
+
+-- ==== benotungstool_noten ====
+-- Demo data for the Benotungstool / Gesamtnoteneingabe test suite.
+--
+-- campus.vw_student_lehrveranstaltung, the source of getStudentsByLv(), links students to
+-- Lehreinheiten through tbl_lehreinheitgruppe.gruppe_kurzbz = tbl_benutzergruppe.gruppe_kurzbz AND
+-- a matching Studiensemester.
+--
+-- RESULT: demolektor1 -> LV 5221 (12 students), demolektor2 -> LV 5121 (6, the foreign LV for the
+-- access tests).
+
+BEGIN;
+
+-- Test semester: the running one, else the last started. Same rule as the suite.
+CREATE TEMP TABLE sem AS
+SELECT studiensemester_kurzbz AS kurzbz
+  FROM public.tbl_studiensemester
+ WHERE start <= now()
+ ORDER BY (ende >= now()) DESC, start DESC
+ LIMIT 1;
+
+-- The two LV fixtures. Own Lehreinheiten (511xx) so the tempus fixtures 51001-51006 stay untouched.
+-- members_up_to = highest person_id that joins this group.
+CREATE TEMP TABLE lv AS
+SELECT v.*, l.semester
+  FROM (VALUES
+          (true,  5221, 51101, 'GRP_CYNOTEN_H', 'Cypress Noten Haupt', 'demolektor1', 512),
+          (false, 5121, 51102, 'GRP_CYNOTEN_F', 'Cypress Noten Fremd', 'demolektor2', 506)
+       ) AS v(main, lv_id, le_id, grp, grp_text, lektor, members_up_to)
+  JOIN lehre.tbl_lehrveranstaltung l ON l.lehrveranstaltung_id = v.lv_id;
+
+-- The 12 students. person_id is the anchor for every derived key.
+CREATE TEMP TABLE stud AS
+SELECT id AS person_id, 5000 + id AS prestudent_id, 's525b' || id AS uid
+  FROM generate_series(501, 512) AS g(id);
+
+DO $$
+BEGIN
+	IF NOT EXISTS (SELECT 1 FROM sem) THEN
+		RAISE EXCEPTION 'No Studiensemester found, the base dump is missing.';
+	END IF;
+	IF (SELECT count(*) FROM lv) <> 2 THEN
+		RAISE EXCEPTION 'LV 5221/5121 missing, apply group studiengang_5.';
+	END IF;
+END $$;
+
+-- Termin3 is absent from the base dump; without it every Termin3 insert hits a foreign key error.
+INSERT INTO lehre.tbl_pruefungstyp (pruefungstyp_kurzbz, beschreibung)
+VALUES ('Termin3', '3. Termin')
+    ON CONFLICT DO NOTHING;
+
+-- ------------------------------------------------------------------------------------- students
+INSERT INTO public.tbl_person (person_id, vorname, nachname, gebdatum, geschlecht, aktiv)
+SELECT person_id, 'Noten', 'Student ' || (person_id - 500), '2000-01-15', 'm', true
+  FROM stud
+    ON CONFLICT DO NOTHING;
+
+INSERT INTO public.tbl_prestudent (prestudent_id, person_id, studiengang_kz)
+SELECT prestudent_id, person_id, 5
+  FROM stud
+    ON CONFLICT DO NOTHING;
+
+INSERT INTO public.tbl_prestudentstatus
+       (prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester)
+SELECT s.prestudent_id, 'Student', sem.kurzbz, lv.semester
+  FROM stud s, sem, lv
+ WHERE lv.main
+    ON CONFLICT DO NOTHING;
+
+INSERT INTO public.tbl_benutzer (uid, person_id, aktiv)
+SELECT uid, person_id, true
+  FROM stud
+    ON CONFLICT DO NOTHING;
+
+-- matrikelnr is UNIQUE; scheme of the existing seeders is '251000' + studiengang_kz + person_id
+INSERT INTO public.tbl_student
+       (student_uid, matrikelnr, prestudent_id, studiengang_kz, semester, verband, gruppe)
+SELECT s.uid, '2510005' || s.person_id, s.prestudent_id, 5, lv.semester, '', ''
+  FROM stud s, lv
+ WHERE lv.main
+    ON CONFLICT DO NOTHING;
+
+-- Lehrverband assignment; (5, <semester>, '', '') is created by group studiengang_5.
+INSERT INTO public.tbl_studentlehrverband
+       (student_uid, studiensemester_kurzbz, studiengang_kz, semester, verband, gruppe)
+SELECT s.uid, sem.kurzbz, 5, lv.semester, '', ''
+  FROM stud s, sem, lv
+ WHERE lv.main
+    ON CONFLICT DO NOTHING;
+
+-- ------------------------------------------------------------------- Lehreinheiten and Lektoren
+INSERT INTO lehre.tbl_lehreinheit
+       (lehreinheit_id, lehrveranstaltung_id, studiensemester_kurzbz, lehrform_kurzbz,
+        wochenrythmus, raumtyp, raumtypalternativ, sprache, lehrfach_id)
+SELECT lv.le_id, lv.lv_id, sem.kurzbz, 'VO', 1, 'Dummy', 'Dummy', 'German', lv.lv_id
+  FROM lv, sem
+    ON CONFLICT DO NOTHING;
+
+-- Fix the semester if the Lehreinheit is left over from a run in a different one.
+UPDATE lehre.tbl_lehreinheit le
+   SET studiensemester_kurzbz = sem.kurzbz
+  FROM lv, sem
+ WHERE le.lehreinheit_id = lv.le_id
+   AND le.studiensemester_kurzbz IS DISTINCT FROM sem.kurzbz;
+
+INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, mitarbeiter_uid, lehrfunktion_kurzbz)
+SELECT le_id, lektor, 'Lektor'
+  FROM lv
+    ON CONFLICT DO NOTHING;
+
+-- --------------------------------------------------------------------------------------- groups
+INSERT INTO public.tbl_gruppe (gruppe_kurzbz, studiengang_kz, semester, bezeichnung, aktiv)
+SELECT grp, 5, semester, grp_text, true
+  FROM lv
+    ON CONFLICT DO NOTHING;
+
+-- The row the existing seeders lack: attach the group to the Lehreinheit with gruppe_kurzbz set.
+-- The primary key is a serial, so NOT EXISTS instead of ON CONFLICT.
+INSERT INTO lehre.tbl_lehreinheitgruppe (lehreinheit_id, studiengang_kz, semester, gruppe_kurzbz)
+SELECT lv.le_id, 5, lv.semester, lv.grp
+  FROM lv
+ WHERE NOT EXISTS (SELECT 1 FROM lehre.tbl_lehreinheitgruppe g
+                    WHERE g.lehreinheit_id = lv.le_id AND g.gruppe_kurzbz = lv.grp);
+
+-- Membership WITH a semester. The primary key is (uid, gruppe_kurzbz) and excludes the semester,
+-- so DO UPDATE repairs a row from an earlier run instead of duplicating it.
+INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, studiensemester_kurzbz)
+SELECT s.uid, lv.grp, sem.kurzbz
+  FROM stud s, lv, sem
+ WHERE s.person_id <= lv.members_up_to
+    ON CONFLICT (uid, gruppe_kurzbz) DO UPDATE
+       SET studiensemester_kurzbz = EXCLUDED.studiensemester_kurzbz;
+
+-- -------------------------------------------------------------------------------- Notenschluessel
+INSERT INTO lehre.tbl_notenschluessel (notenschluessel_kurzbz, bezeichnung)
+VALUES ('CYNOTEN', 'Cypress Testnotenschluessel')
+    ON CONFLICT DO NOTHING;
+
+-- getNote() takes the row with the largest punkte value <= the points given. The 0 threshold makes
+-- sure every value maps to a grade. Serial primary key, so NOT EXISTS.
+INSERT INTO lehre.tbl_notenschluesselaufteilung (notenschluessel_kurzbz, note, punkte)
+SELECT 'CYNOTEN', a.note, a.punkte
+  FROM (VALUES (5, 0.0), (4, 51.0), (3, 64.0), (2, 77.0), (1, 90.0)) AS a(note, punkte)
+ WHERE NOT EXISTS (SELECT 1 FROM lehre.tbl_notenschluesselaufteilung x
+                    WHERE x.notenschluessel_kurzbz = 'CYNOTEN' AND x.punkte = a.punkte);
+
+-- Set the semester explicitly: getKurzbzForLv() builds "... AND studiensemester_kurzbz = ? OR
+-- studiensemester_kurzbz IS NULL" without parentheses, so a NULL-semester assignment would apply
+-- to every Lehrveranstaltung through AND/OR precedence.
+INSERT INTO lehre.tbl_notenschluesselzuordnung
+       (notenschluessel_kurzbz, lehrveranstaltung_id, studiensemester_kurzbz)
+SELECT 'CYNOTEN', lv.lv_id, sem.kurzbz
+  FROM lv, sem
+ WHERE lv.main
+   AND NOT EXISTS (SELECT 1 FROM lehre.tbl_notenschluesselzuordnung z
+                    WHERE z.notenschluessel_kurzbz = 'CYNOTEN'
+                      AND z.lehrveranstaltung_id = lv.lv_id
+                      AND z.studiensemester_kurzbz = sem.kurzbz);
+
+COMMIT;
+
+-- Fires if the view stays empty anyway, which is the bug this seeder exists to fix.
+DO $$
+DECLARE v_count integer;
+BEGIN
+	SELECT count(*) INTO v_count
+	  FROM campus.vw_student_lehrveranstaltung v, sem
+	 WHERE v.lehrveranstaltung_id = 5221 AND v.studiensemester_kurzbz = sem.kurzbz;
+
+	IF v_count = 0 THEN
+		RAISE EXCEPTION 'No students in LV 5221 (%), fixture unusable.', (SELECT kurzbz FROM sem);
+	END IF;
+
+	RAISE NOTICE 'OK: % students in LV 5221 (%)', v_count, (SELECT kurzbz FROM sem);
+END $$;
+
+SELECT (SELECT kurzbz FROM sem)                                              AS semester,
+       (SELECT count(*) FROM campus.vw_student_lehrveranstaltung v, sem
+         WHERE v.lehrveranstaltung_id = 5221 AND v.studiensemester_kurzbz = sem.kurzbz) AS lv5221,
+       (SELECT count(*) FROM campus.vw_student_lehrveranstaltung v, sem
+         WHERE v.lehrveranstaltung_id = 5121 AND v.studiensemester_kurzbz = sem.kurzbz) AS lv5121,
+       (SELECT note FROM lehre.tbl_note WHERE bezeichnung = 'entschuldigt')  AS entschuldigt,
+       (SELECT note FROM lehre.tbl_note WHERE bezeichnung = 'Noch nicht eingetragen') AS noch_nicht,
+       (SELECT count(*) FROM lehre.tbl_notenschluesselaufteilung
+         WHERE notenschluessel_kurzbz = 'CYNOTEN')                           AS notenschluessel;
+
+-- ==== schema_grants ====
+-- Vollzugriff auf ALLE Anwendungsschemata für alle DB-Rollen.
+
+DO $$
+DECLARE
+	v_grantee  text;
+	v_target   text;
+	v_schema   text;
+	v_grantees text[] := ARRAY['web', 'vilesci', 'wawi', 'admin', 'PUBLIC'];
+	v_done     integer := 0;
+BEGIN
+	FOREACH v_grantee IN ARRAY v_grantees
+	LOOP
+		IF v_grantee = 'PUBLIC' THEN
+			v_target := 'PUBLIC';
+		ELSE
+			CONTINUE WHEN NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = v_grantee);
+			v_target := quote_ident(v_grantee);
+		END IF;
+
+		FOR v_schema IN
+			SELECT nspname
+			FROM pg_namespace
+			WHERE nspname NOT LIKE 'pg\_%' AND nspname <> 'information_schema'
+			ORDER BY nspname
+		LOOP
+			EXECUTE format('GRANT ALL ON SCHEMA %I TO %s', v_schema, v_target);
+			EXECUTE format('GRANT ALL ON ALL TABLES IN SCHEMA %I TO %s', v_schema, v_target);
+			EXECUTE format('GRANT ALL ON ALL SEQUENCES IN SCHEMA %I TO %s', v_schema, v_target);
+			EXECUTE format('GRANT ALL ON ALL FUNCTIONS IN SCHEMA %I TO %s', v_schema, v_target);
+
+			EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT ALL ON TABLES TO %s', v_schema, v_target);
+			EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT ALL ON SEQUENCES TO %s', v_schema, v_target);
+			EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT ALL ON FUNCTIONS TO %s', v_schema, v_target);
+
+			v_done := v_done + 1;
+		END LOOP;
+	END LOOP;
+
+	RAISE NOTICE 'Grants auf % Schema/Rollen-Kombinationen vergeben.', v_done;
+END $$;
+
+-- ==== benotungstool_berechtigungen ====
+-- Benotungstool permissions for the demo accounts. Without them every endpoint answers 403.
+--
+--   demolektor1    teacher; no oe_kurzbz - assertLvAccess scopes him by the Lehreinheiten he teaches
+--   demoassistenz  programme assistant for stg3 and stg5 (test courses 5221 and 5121 live in stg5)
+--
+-- Idempotent.
+
+BEGIN;
+
+DO $$
+BEGIN
+	IF NOT EXISTS (SELECT 1 FROM public.tbl_benutzer WHERE uid = 'demolektor1') THEN
+		RAISE EXCEPTION 'Benutzer demolektor1 fehlt, die Basisdaten sind unvollstaendig.';
+	END IF;
+	IF NOT EXISTS (SELECT 1 FROM public.tbl_benutzer WHERE uid = 'demoassistenz') THEN
+		RAISE EXCEPTION 'Benutzer demoassistenz fehlt, die Basisdaten sind unvollstaendig.';
+	END IF;
+END $$;
+
+-- Der Lektor: darf das Werkzeug öffnen, sieht aber nur seine eigenen Lehrveranstaltungen.
+INSERT INTO system.tbl_benutzerrolle (uid, berechtigung_kurzbz, art, oe_kurzbz, insertvon, insertamum)
+SELECT 'demolektor1', 'lehre/benotungstool', 'suid', NULL, 'seeder', now()
+ WHERE NOT EXISTS (
+	SELECT 1 FROM system.tbl_benutzerrolle
+	 WHERE uid = 'demolektor1'
+	   AND berechtigung_kurzbz = 'lehre/benotungstool'
+	   AND oe_kurzbz IS NULL
+ );
+
+-- Die Assistenz: darf die Lehrveranstaltungen ihrer Studiengänge benoten.
+INSERT INTO system.tbl_benutzerrolle (uid, berechtigung_kurzbz, art, oe_kurzbz, insertvon, insertamum)
+SELECT 'demoassistenz', 'lehre/benotungstool_assistenz', 'suid', oe.oe_kurzbz, 'seeder', now()
+  FROM (VALUES ('stg3'), ('stg5')) AS oe(oe_kurzbz)
+ WHERE NOT EXISTS (
+	SELECT 1 FROM system.tbl_benutzerrolle b
+	 WHERE b.uid = 'demoassistenz'
+	   AND b.berechtigung_kurzbz = 'lehre/benotungstool_assistenz'
+	   AND b.oe_kurzbz = oe.oe_kurzbz
+ );
+
+COMMIT;
+
+-- Zurücknehmen:
+--   DELETE FROM system.tbl_benutzerrolle
+--    WHERE insertvon = 'seeder' AND berechtigung_kurzbz LIKE 'lehre/benotungstool%';
+
+-- ==== benotungstool_fixture_erweitert ====
+-- Extensions of the Benotungstool fixture. Apply after group benotungstool_noten.
+--
+--   LE 51103   a second Lehreinheit of LV 5221 with two Lektoren and two students of its own. The write
+--              paths replace a foreign Lehreinheit, and the grader rules need a Lehreinheit with more
+--              than one Lektor. demoadmin sorts before demolektor1, so "the caller" and "the first
+--              Lektor" give different results.
+--   LE 51104   demolektor1 in LV 5221 in the last Sommersemester with a passed grade entry deadline.
+--              The deadline tests need a semester in which the user teaches.
+--   Vorlagen   demo texts for 'Notenfreigabe' and 'Sancho_Mail_Template'. Without them every release
+--              mail has an empty body. The dbupdate script creates only the tbl_vorlage row.
+--
+-- The new students sort after 'Student 1'..'Student 12', so the first twelve students of the suite
+-- stay the same. Idempotent.
+
+BEGIN;
+
+-- group benotungstool_noten creates temp tables with the same names when both groups run in one session
+DROP TABLE IF EXISTS pg_temp.sem, pg_temp.sem_frist, pg_temp.lv, pg_temp.stud;
+
+-- Test semester: the running one, else the last started. Same rule as the suite and group benotungstool_noten.
+CREATE TEMP TABLE sem AS
+SELECT studiensemester_kurzbz AS kurzbz
+  FROM public.tbl_studiensemester
+ WHERE start <= now()
+ ORDER BY (ende >= now()) DESC, start DESC
+ LIMIT 1;
+
+-- The last Sommersemester after its deadline. NOTENEINTRAGUNGSFRIST_SS defaults to 15 November.
+CREATE TEMP TABLE sem_frist AS
+SELECT studiensemester_kurzbz AS kurzbz
+  FROM public.tbl_studiensemester
+ WHERE studiensemester_kurzbz ~ '^SS[0-9]{4}$'
+   AND make_date(substring(studiensemester_kurzbz FROM 3 FOR 4)::int, 11, 15) < current_date
+ ORDER BY start DESC
+ LIMIT 1;
+
+CREATE TEMP TABLE lv AS
+SELECT lehrveranstaltung_id AS lv_id, semester
+  FROM lehre.tbl_lehrveranstaltung
+ WHERE lehrveranstaltung_id = 5221;
+
+CREATE TEMP TABLE stud AS
+SELECT id AS person_id, 5000 + id AS prestudent_id, 's525b' || id AS uid, vorname
+  FROM (VALUES (513, 'Eins'), (514, 'Zwei')) AS g(id, vorname);
+
+DO $$
+BEGIN
+	IF NOT EXISTS (SELECT 1 FROM sem) THEN
+		RAISE EXCEPTION 'No Studiensemester found, the base dump is missing.';
+	END IF;
+	IF NOT EXISTS (SELECT 1 FROM sem_frist) THEN
+		RAISE EXCEPTION 'No Sommersemester with a passed grade entry deadline.';
+	END IF;
+	IF NOT EXISTS (SELECT 1 FROM lv) THEN
+		RAISE EXCEPTION 'LV 5221 missing, apply group studiengang_5.';
+	END IF;
+	IF NOT EXISTS (SELECT 1 FROM lehre.tbl_lehreinheit WHERE lehreinheit_id = 51101) THEN
+		RAISE EXCEPTION 'Lehreinheit 51101 missing, apply group benotungstool_noten first.';
+	END IF;
+	IF (SELECT count(*) FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid IN ('demoadmin', 'demolektor1')) <> 2 THEN
+		RAISE EXCEPTION 'demoadmin or demolektor1 missing, apply BS002_mitarbeiter.sql.';
+	END IF;
+END $$;
+
+-- ------------------------------------------------------------------------------------- students
+INSERT INTO public.tbl_person (person_id, vorname, nachname, gebdatum, geschlecht, aktiv)
+SELECT person_id, vorname, 'Zweitgruppe', '2000-01-15', 'm', true
+  FROM stud
+    ON CONFLICT DO NOTHING;
+
+INSERT INTO public.tbl_prestudent (prestudent_id, person_id, studiengang_kz)
+SELECT prestudent_id, person_id, 5
+  FROM stud
+    ON CONFLICT DO NOTHING;
+
+INSERT INTO public.tbl_prestudentstatus
+       (prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester)
+SELECT s.prestudent_id, 'Student', sem.kurzbz, lv.semester
+  FROM stud s, sem, lv
+    ON CONFLICT DO NOTHING;
+
+INSERT INTO public.tbl_benutzer (uid, person_id, aktiv)
+SELECT uid, person_id, true
+  FROM stud
+    ON CONFLICT DO NOTHING;
+
+INSERT INTO public.tbl_student
+       (student_uid, matrikelnr, prestudent_id, studiengang_kz, semester, verband, gruppe)
+SELECT s.uid, '2510005' || s.person_id, s.prestudent_id, 5, lv.semester, '', ''
+  FROM stud s, lv
+    ON CONFLICT DO NOTHING;
+
+INSERT INTO public.tbl_studentlehrverband
+       (student_uid, studiensemester_kurzbz, studiengang_kz, semester, verband, gruppe)
+SELECT s.uid, sem.kurzbz, 5, lv.semester, '', ''
+  FROM stud s, sem, lv
+    ON CONFLICT DO NOTHING;
+
+-- ------------------------------------------------------------------------------ Lehreinheit 51103
+INSERT INTO lehre.tbl_lehreinheit
+       (lehreinheit_id, lehrveranstaltung_id, studiensemester_kurzbz, lehrform_kurzbz,
+        wochenrythmus, raumtyp, raumtypalternativ, sprache, lehrfach_id)
+SELECT 51103, lv.lv_id, sem.kurzbz, 'VO', 1, 'Dummy', 'Dummy', 'German', lv.lv_id
+  FROM lv, sem
+    ON CONFLICT DO NOTHING;
+
+UPDATE lehre.tbl_lehreinheit le
+   SET studiensemester_kurzbz = sem.kurzbz
+  FROM sem
+ WHERE le.lehreinheit_id = 51103
+   AND le.studiensemester_kurzbz IS DISTINCT FROM sem.kurzbz;
+
+INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, mitarbeiter_uid, lehrfunktion_kurzbz)
+SELECT 51103, l.uid, 'Lektor'
+  FROM (VALUES ('demoadmin'), ('demolektor1')) AS l(uid)
+    ON CONFLICT DO NOTHING;
+
+INSERT INTO public.tbl_gruppe (gruppe_kurzbz, studiengang_kz, semester, bezeichnung, aktiv)
+SELECT 'GRP_CYNOTEN_Z', 5, semester, 'Cypress Noten Zweitgruppe', true
+  FROM lv
+    ON CONFLICT DO NOTHING;
+
+INSERT INTO lehre.tbl_lehreinheitgruppe (lehreinheit_id, studiengang_kz, semester, gruppe_kurzbz)
+SELECT 51103, 5, lv.semester, 'GRP_CYNOTEN_Z'
+  FROM lv
+ WHERE NOT EXISTS (SELECT 1 FROM lehre.tbl_lehreinheitgruppe g
+                    WHERE g.lehreinheit_id = 51103 AND g.gruppe_kurzbz = 'GRP_CYNOTEN_Z');
+
+-- the students of 51103 are members of this group only, so each has exactly one Lehreinheit
+INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, studiensemester_kurzbz)
+SELECT s.uid, 'GRP_CYNOTEN_Z', sem.kurzbz
+  FROM stud s, sem
+    ON CONFLICT (uid, gruppe_kurzbz) DO UPDATE
+       SET studiensemester_kurzbz = EXCLUDED.studiensemester_kurzbz;
+
+-- ------------------------------------------------------------------------------ Lehreinheit 51104
+-- getLvForLektorInSemester needs no group, only the Lehreinheit and its Lektor
+INSERT INTO lehre.tbl_lehreinheit
+       (lehreinheit_id, lehrveranstaltung_id, studiensemester_kurzbz, lehrform_kurzbz,
+        wochenrythmus, raumtyp, raumtypalternativ, sprache, lehrfach_id)
+SELECT 51104, lv.lv_id, sf.kurzbz, 'VO', 1, 'Dummy', 'Dummy', 'German', lv.lv_id
+  FROM lv, sem_frist sf
+    ON CONFLICT DO NOTHING;
+
+UPDATE lehre.tbl_lehreinheit le
+   SET studiensemester_kurzbz = sf.kurzbz
+  FROM sem_frist sf
+ WHERE le.lehreinheit_id = 51104
+   AND le.studiensemester_kurzbz IS DISTINCT FROM sf.kurzbz;
+
+INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, mitarbeiter_uid, lehrfunktion_kurzbz)
+VALUES (51104, 'demolektor1', 'Lektor')
+    ON CONFLICT DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------- Vorlagen
+INSERT INTO public.tbl_vorlage (vorlage_kurzbz, bezeichnung, anmerkung, mimetype)
+VALUES ('Notenfreigabe', 'Notenfreigabe', NULL, 'text/html'),
+       ('Sancho_Mail_Template', 'Sancho Mail Template', 'Demo layout of the test instance', 'text/html')
+    ON CONFLICT (vorlage_kurzbz) DO NOTHING;
+
+-- Placeholders of Noten::sendFreigabeEmail: lektor, lvaname, neuenotencount, studlist, adressen.
+-- An existing active text stays. Studiengang 0 and oe 'etw' are the root, as for the other Vorlagen.
+INSERT INTO public.tbl_vorlagestudiengang
+       (vorlage_kurzbz, studiengang_kz, version, text, oe_kurzbz, aktiv, insertamum, insertvon)
+SELECT v.kurzbz, 0, 1, v.text, 'etw', true, now(), 'seeder'
+  FROM (VALUES
+          ('Notenfreigabe',
+           '<p>{lektor} hat {neuenotencount} Note(n) freigegeben: {lvaname}</p>{studlist}<p>Empf&auml;nger: {adressen}</p>'),
+          ('Sancho_Mail_Template', '<html><body>{content}</body></html>')
+       ) AS v(kurzbz, text)
+ WHERE NOT EXISTS (SELECT 1 FROM public.tbl_vorlagestudiengang x
+                    WHERE x.vorlage_kurzbz = v.kurzbz AND x.aktiv);
+
+COMMIT;
+
+DO $$
+BEGIN
+	IF (SELECT count(*) FROM campus.vw_student_lehrveranstaltung v, sem
+	     WHERE v.lehreinheit_id = 51103 AND v.studiensemester_kurzbz = sem.kurzbz) = 0 THEN
+		RAISE EXCEPTION 'No students in Lehreinheit 51103 (%), fixture unusable.', (SELECT kurzbz FROM sem);
+	END IF;
+END $$;
+
+SELECT (SELECT kurzbz FROM sem)                                               AS semester,
+       (SELECT kurzbz FROM sem_frist)                                         AS semester_frist,
+       (SELECT count(*) FROM campus.vw_student_lehrveranstaltung v, sem
+         WHERE v.lehreinheit_id = 51103 AND v.studiensemester_kurzbz = sem.kurzbz) AS le51103_studenten,
+       (SELECT count(*) FROM lehre.tbl_lehreinheitmitarbeiter
+         WHERE lehreinheit_id = 51103)                                        AS le51103_lektoren,
+       (SELECT count(*) FROM public.tbl_vorlagestudiengang
+         WHERE vorlage_kurzbz IN ('Notenfreigabe', 'Sancho_Mail_Template') AND aktiv) AS vorlagen;

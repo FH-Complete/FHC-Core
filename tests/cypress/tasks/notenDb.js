@@ -9,9 +9,7 @@
  * No unscoped DELETE in this file.
  */
 
-const {
-	assertWritable, dbConfigured, withClient, inTransaction, checkAvailability, closeDb,
-} = require("./db");
+const { assertWritable, dbConfigured, withClient, inTransaction, checkAvailability, closeDb } = require("./db");
 
 const REQUIRED_SCOPE = ["lvId", "semKurzbz", "studentUids"];
 
@@ -83,8 +81,15 @@ const seedLvGesamtnote = async (scope) => {
 	assertScope({ ...scope, studentUids: [scope.studentUid] });
 
 	const {
-		lvId, semKurzbz, studentUid, note, punkte = null, mitarbeiterUid,
-		benotungsdatum, freigegeben = false, freigabedatum = null,
+		lvId,
+		semKurzbz,
+		studentUid,
+		note,
+		punkte = null,
+		mitarbeiterUid,
+		benotungsdatum,
+		freigegeben = false,
+		freigabedatum = null,
 	} = scope;
 
 	if (note === undefined || note === null) throw new Error("noten:db seed - note is required");
@@ -107,8 +112,15 @@ const seedLvGesamtnote = async (scope) => {
 			      mitarbeiter_uid, benotungsdatum, freigabedatum, freigabevon_uid, insertamum, insertvon)
 			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), $6)`,
 			[
-				studentUid, lvId, semKurzbz, note, punkte, mitarbeiterUid,
-				benotungsdatum, resolvedFreigabe, resolvedFreigabe ? mitarbeiterUid : null,
+				studentUid,
+				lvId,
+				semKurzbz,
+				note,
+				punkte,
+				mitarbeiterUid,
+				benotungsdatum,
+				resolvedFreigabe,
+				resolvedFreigabe ? mitarbeiterUid : null,
 			],
 		);
 
@@ -140,7 +152,9 @@ const seedPruefung = async (scope) => {
 			[lehreinheitId, lvId, semKurzbz],
 		);
 		if (!owned.rowCount) {
-			throw new Error(`noten:db seedPruefung refused - lehreinheit ${lehreinheitId} is outside ${lvId}/${semKurzbz}`);
+			throw new Error(
+				`noten:db seedPruefung refused - lehreinheit ${lehreinheitId} is outside ${lvId}/${semKurzbz}`,
+			);
 		}
 
 		const res = await client.query(
@@ -336,7 +350,8 @@ const lehrendeDerLehreinheit = async ({ lehreinheitId } = {}) => {
 /** The grading person of one exam row, or null. */
 const pruefungMitarbeiter = async ({ pruefungId, studentUid } = {}) => {
 	assertReadable();
-	if (!pruefungId || !studentUid) throw new Error("noten:db pruefungMitarbeiter - pruefungId and studentUid are required");
+	if (!pruefungId || !studentUid)
+		throw new Error("noten:db pruefungMitarbeiter - pruefungId and studentUid are required");
 
 	const rows = await readRows(
 		"SELECT mitarbeiter_uid FROM lehre.tbl_pruefung WHERE pruefung_id = $1 AND student_uid = $2",
