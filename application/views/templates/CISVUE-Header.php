@@ -8,6 +8,7 @@ $includesArray = array(
 	'axios027' => true,
 	'primevue3' => true,
 	'vuedatepicker11' => true,
+	'printCssPath' => 'public/css/Cis4/print.css',
 	'customJSs' => array_merge([
 		'vendor/moment/luxonjs/luxon.min.js'
 	], $customJSs ?? []),

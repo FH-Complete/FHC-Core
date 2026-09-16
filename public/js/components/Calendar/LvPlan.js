@@ -9,13 +9,21 @@ import ModeDay from './Mode/Day.js';
 import ModeWeek from './Mode/Week.js';
 import ModeMonth from './Mode/Month.js';
 import ModeList from './Mode/List.js';
+import ModeRange from './Mode/Range.js';
 
 export default {
 	name: "CalendarLvPlan",
 	components: {
 		FhcCalendar
 	},
-	inject: ["isMobile"],
+	inject: {
+		isMobile: {
+			default: false,
+		},
+		rangeLength: {
+			default: 30,
+		}
+	},
 	props: {
 		date: {
 			type: [Date, String, Number, luxon.DateTime],
@@ -36,6 +44,10 @@ export default {
 		createContext: {
 			type: Object,
 			default: () => ({})
+		},
+		shouldIncludeRangeMode: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	provide() {
@@ -91,31 +103,37 @@ export default {
 		backgrounds() {
 			let now = luxon.DateTime.now().setZone(this.timezone);
 
-			if (this.mode == 'Month')
+			if (this.mode == 'Month') {
 				return [
 					{
 						class: 'background-past',
 						end: now.startOf('day')
 					}
 				];
-
-			return [
-				{
-					class: 'background-past',
-					end: now,
-					label: now.startOf('minute').toISOTime({ suppressSeconds: true, includeOffset: false })
-				}
-			];
+			} else if (this.mode == 'Range') {
+				return [];
+			} else {
+				return [
+					{
+						class: 'background-past',
+						end: now,
+						label: now.startOf('minute').toISOTime({ suppressSeconds: true, includeOffset: false })
+					}
+				];
+			}
 		},
 		modes() {
 			let modes = {
 				day: Vue.markRaw(ModeDay),
 				month: Vue.markRaw(ModeMonth),
 			};
-			if (this.isMobile) {
-				modes.list = Vue.markRaw(ModeList);
-			} else {
+			if (!this.isMobile) {
 				modes.week = Vue.markRaw(ModeWeek);
+				if (this.$props.shouldIncludeRangeMode) {
+					modes.range = Vue.markRaw(ModeRange);
+				}
+			} else {
+				modes.list = Vue.markRaw(ModeList);
 			}
 
 			return modes;
@@ -197,7 +215,7 @@ export default {
 		:isReservierbar="isReservierbar"
 		:create-context="createContext"
 		show-btns
-		@update:date="(newDate, newMode) => $emit('update:date', newDate, newMode)"
+		@update:date="(newDate, newMode, newRangeLength) => $emit('update:date', newDate, newMode, newRangeLength)"
 		@update:mode="(newMode, newDate) => $emit('update:mode', newMode, newDate)"
 		@update:range="updateRange"
 	>

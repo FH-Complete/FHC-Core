@@ -3,6 +3,7 @@ import FhcCalendar from "../../Calendar/LvPlan.js";
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
 import ApiRoomPlan from '../../../api/factory/calendar/roomPlan.js';
+import ApiStudiensemester from '../../../api/factory/studiensemester.js';
 
 export const DEFAULT_MODE_LVPLAN_DESKTOP = "Week";
 export const DEFAULT_MODE_LVPLAN_MOBILE = "List";
@@ -24,9 +25,23 @@ export default {
 			isMitarbeiter: false,
 			isStudent: false,
 			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone,
+			semesterRangePresets: {
+				label: null,
+				presets: [],
+			},
 		};
 	},
 	inject: ["isMobile"],
+	provide() {
+		return { 
+			rangeLength: Vue.computed(() => {
+				if (!this.$route.params.range_length) return 30;
+				else if (this.$route.params.range_length > 365) return 365;
+				else return this.$route.params.range_length;
+			}),
+			rangeViewPresets: Vue.computed(() => this.semesterRangePresets)
+		};
+	},
 	computed:{
 		currentDay() {
 			if (!this.propsViewData?.focus_date || isNaN(new Date(this.propsViewData?.focus_date)))
@@ -35,7 +50,11 @@ export default {
 		},
 		currentMode() {
 			let validModes = ["day", "month"];
-			validModes.push(this.isMobile ? "list" : "week");
+			if (!this.isMobile) {
+				validModes.push("week", "range");
+			} else {
+				validModes.push("list");
+			}
 
 			const defaultMode = this.isMobile
 				? DEFAULT_MODE_LVPLAN_MOBILE
@@ -95,10 +114,10 @@ export default {
 		},
 	},
 	methods: {
-		handleChangeDate(day, newMode) {
-			return this.handleChangeMode(newMode, day);
+		handleChangeDate(day, newMode, rangeLength) {
+			return this.handleChangeMode(newMode, day, rangeLength);
 		},
-		handleChangeMode(newMode, day) {
+		handleChangeMode(newMode, day, range_length = null) {
 			const mode = newMode[0].toUpperCase() + newMode.slice(1)
 			const focus_date = day.toISODate();
 			
@@ -106,7 +125,8 @@ export default {
 				name: "MyLvPlan",
 				params: {
 					mode,
-					focus_date
+					focus_date,
+					range_length,
 				}
 			});
 		},
@@ -153,13 +173,32 @@ export default {
 
 			this.$refs.calendar.reset();
 		},
+		async fetchSemesters() {
+			const semestersResponse = await this.$api.call(ApiStudiensemester.getAll());
+			if (semestersResponse.meta.status === "success") {
+				this.semesterRangePresets = {
+					label: "View specific semester",
+					presets: semestersResponse.data.map((semester) => {
+						let startDate = luxon.DateTime.fromISO(semester.start);
+						let endDate = luxon.DateTime.fromISO(semester.ende);
+						return {
+							startDate,
+							endDate,
+							name: semester.studiensemester_kurzbz,
+							description: semester.bezeichnung,
+						};
+					})
+				};
+			}
+		},
 	},
 	async created() {
 		await this.fetchAuthInfo();
+		await this.fetchSemesters();
 	},
 	template: /*html*/`
 	<div class="cis-lvplan-personal d-flex flex-column h-100">
-		<h2>
+		<h2 id="cis-lvplan-personal-heading">
 			{{ $p.t('lehre/stundenplan') }}
 			<span v-if="studiensemester_kurzbz" class="ps-3">
 				{{ studiensemester_kurzbz }}
@@ -173,6 +212,7 @@ export default {
 			:get-promise-func="getPromiseFunc"
 			:date="currentDay"
 			:mode="currentMode"
+			:shouldIncludeRangeMode="true"
 			@update:date="handleChangeDate"
 			@update:mode="handleChangeMode"
 			@update:range="updateRange"
