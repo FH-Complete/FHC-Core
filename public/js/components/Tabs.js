@@ -14,7 +14,8 @@ export default {
 	emits: [
 		'update:modelValue',
 		'change',
-		'changed'
+		'changed',
+		'tab-action'
 	],
 	props: {
 		config: {
@@ -234,6 +235,7 @@ export default {
 						v-model="value"
 						:config="tab.config"
 						@update:suffix="updateSuffix($event)"
+						@tab-action="$emit('tab-action', { key: tab.key, payload: $event })"
 						></component>
 				</keep-alive>
 			</tabpanel>
@@ -265,6 +267,7 @@ export default {
 					v-model="value"
 					:config="currentTab.config"
 					@update:suffix="updateSuffix($event)"
+					@tab-action="$emit('tab-action', { key: currentTab.key, payload: $event })"
 					></component>
 			</keep-alive>
 		</div>
@@ -272,4 +275,3 @@ export default {
 
 	</template>`
 };
-

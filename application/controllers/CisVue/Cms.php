@@ -17,14 +17,15 @@ class Cms extends Auth_Controller
 		    array(
 			'content' => 'basis/cis:r',
 			'getNews' => 'basis/cis:r',
-			'getNewsRowCount' => 'basis/cis:r',
 			'getRoomInformation' => 'basis/cis:r',
-			'news' => 'basis/cis:r'
+			'news' => 'basis/cis:r',
+			'newsAdministration' => ['basis/news:r'],
 		    )
 		);
 
 		// Loads Libraries
 		$this->load->library('CmsLib');
+		$this->load->library('PermissionLib');
 
 		// Loads phrases system
 		$this->loadPhrases([
@@ -84,9 +85,29 @@ class Cms extends Auth_Controller
 	public function news($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true)
 	{	
 		$viewData = array();
-		$this->load->view('CisRouterView/CisRouterView.php', ['viewData'=>$viewData, 'route' => 'News']);
+		$this->load->view('CisRouterView/CisRouterView.php', [
+			'viewData'=>$viewData,
+			'route' => 'News',
+			'permissions' => [
+				'basis/news_r' => $this->permissionlib->isBerechtigt('basis/news', 's'),
+				'basis/news_w' => $this->permissionlib->isBerechtigt('basis/news', 'suid'),
+			],
+		]);
 	}
 	
+	public function newsAdministration()
+	{
+		$viewData = array();
+		$this->load->view('CisRouterView/CisRouterView.php', [
+			'viewData'=>$viewData,
+			'route' => 'NewsAdministration',
+			'permissions' => [
+				'basis/news_r' => $this->permissionlib->isBerechtigt('basis/news', 's'),
+				'basis/news_w' => $this->permissionlib->isBerechtigt('basis/news', 'suid'),
+			],
+		]);
+	}
+
 	public function getRoomInformation($ort_kurzbz)
 	{
 		// Load Config

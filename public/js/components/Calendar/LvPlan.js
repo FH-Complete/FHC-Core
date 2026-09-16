@@ -1,4 +1,4 @@
-import FhcCalendar from "./Base.js";
+import FhcCalendar from './Base.js';
 
 import ApiLvPlan from '../../api/factory/lvPlan.js';
 
@@ -12,9 +12,9 @@ import ModeList from './Mode/List.js';
 import ModeRange from './Mode/Range.js';
 
 export default {
-	name: "CalendarLvPlan",
+	name: 'CalendarLvPlan',
 	components: {
-		FhcCalendar
+		FhcCalendar,
 	},
 	inject: {
 		isMobile: {
@@ -27,11 +27,11 @@ export default {
 	props: {
 		date: {
 			type: [Date, String, Number, luxon.DateTime],
-			default: luxon.DateTime.local()
+			default: luxon.DateTime.local(),
 		},
 		mode: {
 			type: String,
-			default: 'Week'
+			default: 'Week',
 		},
 		getPromiseFunc: {
 			type: Function,
@@ -53,11 +53,9 @@ export default {
 	provide() {
 		return {
 			shouldCompactEvents: Vue.computed(
-				() => this.$props.mode === "Month" && this.isMobile,
+				() => this.$props.mode === 'Month' && this.isMobile,
 			),
-			compactibleEventTypes: Vue.computed(
-				() => this.compactibleEventTypes,
-			),
+			compactibleEventTypes: Vue.computed(() => this.compactibleEventTypes),
 		};
 	},
 	emits: [
@@ -86,10 +84,10 @@ export default {
 			modeOptions: {
 				day: {
 					emptyMessage: Vue.computed(() => this.$p.t('lehre/noLvFound')),
-					emptyMessageDetails: Vue.computed(() => this.$p.t('lehre/noLvFound'))
+					emptyMessageDetails: Vue.computed(() => this.$p.t('lehre/noLvFound')),
 				},
 				week: {
-					collapseEmptyDays: false
+					collapseEmptyDays: false,
 				},
 				list: {
 					length: 7,
@@ -107,8 +105,8 @@ export default {
 				return [
 					{
 						class: 'background-past',
-						end: now.startOf('day')
-					}
+						end: now.startOf('day'),
+					},
 				];
 			} else if (this.mode == 'Range') {
 				return [];
@@ -117,8 +115,10 @@ export default {
 					{
 						class: 'background-past',
 						end: now,
-						label: now.startOf('minute').toISOTime({ suppressSeconds: true, includeOffset: false })
-					}
+						label: now
+						.startOf('minute')
+						.toISOTime({ suppressSeconds: true, includeOffset: false }),
+					},
 				];
 			}
 		},
@@ -141,8 +141,7 @@ export default {
 	},
 	methods: {
 		eventStyle(event) {
-			if (!event.farbe)
-				return undefined;
+			if (!event.farbe) return undefined;
 			return '--event-bg:#' + event.farbe;
 		},
 		updateRange(rangeInterval) {
@@ -172,10 +171,13 @@ export default {
 	},
 	setup(props, context) {
 		const rangeInterval = Vue.ref(null);
-		
-		const { events, lv, reservierbarMap, reset  } = useEventLoader(rangeInterval, props.getPromiseFunc);
 
-		Vue.watch(lv, newValue => {
+		const { events, lv, reservierbarMap, reset  } = useEventLoader(
+			rangeInterval,
+			props.getPromiseFunc,
+		);
+
+		Vue.watch(lv, (newValue) => {
 			context.emit('update:lv', newValue);
 		});
 
@@ -191,14 +193,14 @@ export default {
 			lv,
 			reservierbarMap,
 			reset,
-			renderers
+			renderers,
 		};
 	},
 	async created() {
 		await this.getStunden();
 		await this.getCompactibleEventTypes();
 	},
-	template: /* html */`
+	template: /* html */ `
 	<fhc-calendar
 		ref="calendar"
 		class="fhc-calendar-lvplan"
@@ -260,5 +262,5 @@ export default {
 		<template #actions>
 			<slot />
 		</template>
-	</fhc-calendar>`
-}
+	</fhc-calendar>`,
+};

@@ -16,18 +16,24 @@
  */
 
 export default {
+	getDegreePrograms() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Studgang/getDegreePrograms',
+		};
+	},
 	studiengangInformation(studiengang_kz, semester) {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/Studgang/getStudiengangInfo',
-			params: { studiengang_kz, semester }
+			params: { studiengang_kz, semester },
 		};
 	},
 	getStudiengangByKz(studiengang_kz) {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/organisation/StudiengangEP/getStudiengangByKz',
-			params: { studiengang_kz }
+			params: { studiengang_kz },
 		};
-	}
+	},
 };

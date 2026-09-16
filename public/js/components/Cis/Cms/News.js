@@ -1,30 +1,36 @@
-import Pagination from "../../Pagination/Pagination.js";
-import StudiengangInformation from "./StudiengangInformation/StudiengangInformation.js";
-import BsConfirm from "../../Bootstrap/Confirm.js";
+import Pagination from '../../Pagination/Pagination.js';
+import StudiengangInformation from './StudiengangInformation/StudiengangInformation.js';
+import BsConfirm from '../../Bootstrap/Confirm.js';
 
-import ApiCms from "../../../api/factory/cms.js";
+import ApiCms from '../../../api/factory/cms.js';
 
 export default {
-	name: "NewsComponent",
+	name: 'NewsComponent',
 	components: {
 		Pagination,
 		StudiengangInformation,
 	},
-	inject: ["isMobile"],
+	inject: ['isMobile'],
+	props: {
+		permissions: Object,
+	},
 	data() {
 		return {
 			content: null,
 			maxPageCount: 0,
-			page_size: 10,
+			page_size: 100,
 			page: 1,
 		};
 	},
 	watch: {
-		"$p.user_language.value": function (sprache) {
+		'$p.user_language.value': function (sprache) {
 			this.fetchNews();
 		},
 	},
 	computed: {
+		hasBasisNewsTypRPermission() {
+			return this.permissions['basis/news_r'] || false;
+		},
 		sprache: function () {
 			return this.$p.user_language.value;
 		},
@@ -35,9 +41,10 @@ export default {
 				ApiCms.getNews(this.page, this.page_size, this.sprache),
 			);
 			this.content = newsResponse.data;
+			this.maxPageCount = newsResponse.meta.row_count;
 
-			document.querySelectorAll("#cms [data-confirm]").forEach((el) => {
-				el.addEventListener("click", (evt) => {
+			document.querySelectorAll('#cms [data-confirm]').forEach((el) => {
+				el.addEventListener('click', (evt) => {
 					evt.preventDefault();
 					BsConfirm.popup(el.dataset.confirm)
 						.then(() => {
@@ -46,12 +53,12 @@ export default {
 									// TODO(chris): check for success then show message and/or reload
 									location = location;
 								})
-								.catch((err) => console.error("ERROR:", err));
+								.catch((err) => console.error('ERROR:', err));
 						})
 						.catch(() => {});
 				});
 			});
-			document.querySelectorAll("#cms [data-href]").forEach((el) => {
+			document.querySelectorAll('#cms [data-href]').forEach((el) => {
 				el.href = el.dataset.href.replace(
 					/^ROOT\//,
 					FHC_JS_DATA_STORAGE_OBJECT.app_root,
@@ -73,48 +80,41 @@ export default {
 		},
 		formatExternalHtml() {
 			document
-				.querySelectorAll(".news-list-item .card-header")
+				.querySelectorAll('.news-list-item .card-header')
 				.forEach((el) => {
-					el.classList.add("fhc-primary");
+					el.classList.add('fhc-primary');
 				});
-			document.querySelectorAll(".news-list-item .row").forEach((el) => {
-				el.classList.add("w-100");
-				el.classList.add("align-items-center");
+			document.querySelectorAll('.news-list-item .row').forEach((el) => {
+				el.classList.add('w-100');
+				el.classList.add('align-items-center');
 			});
-			document
-				.querySelectorAll(".news-list-item .row h2")
-				.forEach((el) => {
-					el.classList.add("mb-0");
-				});
+			document.querySelectorAll('.news-list-item .row h2').forEach((el) => {
+				el.classList.add('mb-0');
+			});
 		},
 		afterPageUpdated(event) {
 			this.page = event.page;
 			this.page_size = event.rows;
-			this.$refs.newsPageHeading.scrollIntoView({block: 'end'});
+			this.$refs.newsPageHeading.scrollIntoView({ block: 'end' });
 			this.loadNewPageContent(event);
 		},
 	},
 	created() {
 		this.fetchNews();
-
-		this.$api
-			.call(ApiCms.getNewsRowCount())
-			.then((res) => res.data)
-			.then((result) => {
-				this.maxPageCount = result;
-			});
 	},
 	template: /*html*/ `
 	<div :class="{'pb-3': isMobile}" class="overflow-x-hidden">
-  		<h2 ref="newsPageHeading" class="fhc-primary-color">News</h2>
+  		<div class="d-flex justify-content-between align-items-center">
+			<h2 ref="newsPageHeading" class="fhc-primary-color">News</h2>
+			<router-link
+				v-if="hasBasisNewsTypRPermission"
+				class="btn btn-primary mb-3"
+				:to="{ name: 'NewsAdministration' }"
+			>
+				{{ $p.t('ui', 'newsAdministration') }} <i class="fas fa-cog m-0"></i>
+			</router-link>
+		</div>
 		<hr/>
-		<pagination
-			v-if="content?true:false"
-			:page="page"
-			:page_size="page_size"
-			@pageUpdated="afterPageUpdated($event)"
-			:maxPageCount="maxPageCount"
-		></pagination>
 		<div class="container-fluid mt-4">
 			<div class="row">
 				<div class="col" v-html="content">

@@ -37,19 +37,19 @@ const app = Vue.createApp({
 		}
 	},
 	computed: {
-		isMobile: function() {
-			return (this.windowWidth < 767);
-		}
+		isMobile: function () {
+			return this.windowWidth < 767;
+		},
 	},
 	methods: {
 		isInternalRoute(href) {
-			const internalBase = window.location.origin
+			const internalBase = window.location.origin;
 			return href.startsWith(internalBase);
 		},
 		handleClick(event) {
 			const target = event.target.closest('a');
 
-			if(target?.id == 'skiplink') return
+			if (target?.id == 'skiplink') return;
 			if (target && this.isInternalRoute(target.href)) {
 				const url = new URL(target.href)
 
@@ -66,10 +66,11 @@ const app = Vue.createApp({
 				if(this.isMobile) { // toggle the menu
 					const navMain = document.getElementById('nav-main');
 					// fix unwanted toggle from off to on for some links on mobile
-					if(navMain.classList.contains('show')){
+					if (navMain.classList.contains('show')) {
 						document.getElementById('nav-main-btn').click();
 					}
 				}
+
 
 				this.$router.push(route);
 
@@ -88,11 +89,11 @@ const app = Vue.createApp({
 	},
 	async mounted() {
 		document.addEventListener('click', this.handleClick);
-		window.addEventListener("resize", this.handleWindowResize);
+		window.addEventListener('resize', this.handleWindowResize);
 	},
 	beforeUnmount() {
 		document.removeEventListener('click', this.handleClick);
-		window.removeEventListener("resize", this.handleWindowResize);
+		window.removeEventListener('resize', this.handleWindowResize);
 	},
 });
 
@@ -107,9 +108,9 @@ app.use(router);
 app.use(primevue.config.default, {
 	zIndex: {
 		overlay: 9000,
-		tooltip: 8000
-	}
-})
+		tooltip: 8000,
+	},
+});
 app.directive('tooltip', primevue.tooltip);
 app.use(PluginsPhrasen);
 app.use(Theme);

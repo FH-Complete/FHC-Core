@@ -4,6 +4,7 @@ if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
 use \DateTime as DateTime;
+use \DateInterval as DateInterval;
 use \DOMDocument as DOMDocument;
 use \XSLTProcessor as XSLTProcessor;
 
@@ -142,63 +143,6 @@ class CmsLib
 	}
 
 	/**
-	 * @param stdClass		$stg_obj
-	 * 
-	 * @return stdClass
-	 */
-	protected function getNewsExtras($stg_obj, $semester)
-	{
-		$this->ci->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
-
-		$stg_ltg = $this->ci->StudiengangModel->getLeitungDetailed($stg_obj->studiengang_kz);
-		if (isError($stg_ltg))
-			return $stg_ltg;
-		$stg_ltg = getData($stg_ltg) ?: [];
-
-		$gf_ltg = $this->ci->BenutzerfunktionModel->getBenutzerFunktionenDetailed('gLtg', $stg_obj->oe_kurzbz);
-		if (isError($gf_ltg))
-			return $gf_ltg;
-		$gf_ltg = getData($gf_ltg) ?: [];
-
-		$stv_ltg = $this->ci->BenutzerfunktionModel->getBenutzerFunktionenDetailed('stvLtg', $stg_obj->oe_kurzbz);
-		if (isError($stv_ltg))
-			return $stv_ltg;
-		$stv_ltg = getData($stv_ltg) ?: [];
-
-		$ass = $this->ci->BenutzerfunktionModel->getBenutzerFunktionenDetailed('ass', $stg_obj->oe_kurzbz);
-		if (isError($ass))
-			return $ass;
-		$ass = getData($ass) ?: [];
-
-		$hochschulvertr = $this->ci->BenutzerfunktionModel->getBenutzerFunktionenDetailed('hsv');
-		if (isError($hochschulvertr))
-			return $hochschulvertr;
-		$hochschulvertr = getData($hochschulvertr) ?: [];
-
-		$stdv = $this->ci->BenutzerfunktionModel->getBenutzerFunktionenDetailed('stdv', $stg_obj->oe_kurzbz);
-		if (isError($stdv))
-			return $stdv;
-		$stdv = getData($stdv) ?: [];
-
-		$jahrgangsvertr = $this->ci->BenutzerfunktionModel->getBenutzerFunktionenDetailed('jgv', $stg_obj->oe_kurzbz, $semester);
-		if (isError($jahrgangsvertr))
-			return $jahrgangsvertr;
-		$jahrgangsvertr = getData($jahrgangsvertr) ?: [];
-
-		return success($this->ci->load->view('Cis/Cms/News/Xml/NewsExtras', [
-			'studiengang' => $stg_obj,
-			'semester' => $semester,
-			'stg_ltg' => $stg_ltg,
-			'gf_ltg' => $gf_ltg,
-			'stv_ltg' => $stv_ltg,
-			'ass' => $ass,
-			'hochschulvertr' => $hochschulvertr,
-			'stdv' => $stdv,
-			'jahrgangsvertr' => $jahrgangsvertr
-		], true));
-	}
-
-	/**
 	 * @param string			$studiengang_kz
 	 * @param string			$semester
 	 * 
@@ -233,63 +177,101 @@ class CmsLib
 	 * 
 	 * @return void
 	 */
-	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true, $page = 1, $page_size = 10, $sprache)
+	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true, $page = 1, $page_size = 10, $sprache, $filterForDegreePrograms = false, $allowedDegreePrograms = [], $active = true)
+
 	{
 		$this->ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		list($studiengang_kz, $semester) = $this->getStgAndSem($studiengang_kz, $semester);
-		$all = $edit;
-
-		$xml = '<?xml version="1.0" encoding="UTF-8"?><content>';
 
 		$this->ci->load->model('content/News_model', 'NewsModel');
-		$news = $this->ci->NewsModel->getNewsWithContent($sprache, $studiengang_kz, $semester, null, $sichtbar, 0, $page, $page_size, $all, $mischen);
-
-		if (isError($news))
-			return $news;
-
-		$news = getData($news);
+	
 		
+		$news = $this->ci->NewsModel->getNewsWithContent($sprache, $studiengang_kz, $semester, null, $sichtbar, $page, $page_size, $active, $mischen, $filterForDegreePrograms, $allowedDegreePrograms);
+		$news = getData($news) ?? [];
+		$newsWrappers = [];
+
 		foreach ($news as $newsobj) {
 			if ($studiengang_kz && $edit && !$newsobj->studiengang_kz)
 				continue;
-			$date = new DateTime($newsobj->datum);
-			$datum = '<datum><![CDATA[' . $date->format('d.m.Y') . ']]></datum>';
-			$datum .= '<datumdetail><![CDATA[' . $date->format('Y-m-d H:i') . ']]></datumdetail>';
-			$id = $edit ? '<news_id><![CDATA[' . $newsobj->news_id . ']]></news_id>' : '';
-			$xml .= "<newswrapper>" . $newsobj->content . $datum . $id . "</newswrapper>";
+
+			$newsWrappers[] = $this->createNewsWrapper($newsobj, $edit);
 		}
 
-		/* if ($studiengang_kz != 0) {
-			$stg_obj = $this->ci->StudiengangModel->load($studiengang_kz);
-			if (isError($stg_obj))
-				return $stg_obj;
-			$stg_obj = current(getData($stg_obj) ?: []);
+		$content = $this->createNewsContent($newsWrappers, $infoscreen, $titel);
+		if (isError($content))
+			return $content;
 
-			if ($stg_obj) {
-				if (!$edit && !$infoscreen) {
-					$extras = $this->getNewsExtras($stg_obj, $semester);
-					if (isError($extras))
-						return $extras;
-					$xml .= getData($extras);
-				}
-				$xml .= '<studiengang_bezeichnung><![CDATA[' . $stg_obj->bezeichnung . ']]></studiengang_bezeichnung>';
-			}
-		} */
+		return success([
+			"content" => getData($content),
+			"row_count" => $news[0]->row_count ?? 0
+		]);
+	}
+
+	/**
+	 * Creates a newswrapper XML element from a news item.
+	 *
+	 * @param stdClass	$newsobj
+	 * @param boolean	$edit
+	 *
+	 * @return DOMElement
+	 */
+	public function createNewsWrapper($newsobj, $edit)
+	{
+		$id = $edit ? '<news_id><![CDATA[' . $newsobj->news_id . ']]></news_id>' : '';
+		$isPublished = $edit ? '<is_published><![CDATA[' . ($newsobj->sichtbar ? 'true' : 'false') . ']]></is_published>' : '';
+
+		$date = new DateTime($newsobj->datum);
+		$datum = '<datum><![CDATA[' . $date->format('d.m.Y') . ']]></datum>';
+		$datum .= '<datumdetail><![CDATA[' . $date->format('Y-m-d H:i') . ']]></datumdetail>';
+
+		$hasVisibleToDate = isset($newsobj->datum_bis) && $newsobj->datum_bis !== '';
+		$datumTo = $hasVisibleToDate
+			? new DateTime($newsobj->datum_bis)
+			: (clone $date)->add(new DateInterval('P' . MAXNEWSALTER . 'D'));
+		if ($hasVisibleToDate)
+			$datumTo->setTime(23, 59, 59);
+
+		$now = new DateTime();
+		$isActive = '<is_active><![CDATA[' . ($datumTo >= $now ? 'true' : 'false') . ']]></is_active>';
+
+		$newsWrapper = new DOMDocument(); 
+		$newsWrapper->loadXML('<newswrapper>' . $newsobj->content . $datum . $id . $isPublished . $isActive . '</newswrapper>');
+
+		return $newsWrapper->documentElement;
+	}
+
+	/**
+	 * Creates rendered news content from one or more newswrapper XML elements.
+	 *
+	 * @param DOMElement|array	$newsWrappers
+	 * @param boolean				$infoscreen
+	 * @param string				$titel
+	 *
+	 * @return stdClass
+	 */
+	public function createNewsContent($newsWrappers, $infoscreen, $titel)
+	{
+		if (!is_array($newsWrappers))
+			$newsWrappers = [$newsWrappers];
+
+		$XML = new DOMDocument('1.0', 'UTF-8');
+		$contentElement = $XML->createElement('content');
+		$XML->appendChild($contentElement);
+
+		foreach ($newsWrappers as $newsWrapper)
+			$contentElement->appendChild($XML->importNode($newsWrapper, true));
 
 		if ($titel != '') {
-			$xml .= '<news_titel>' . $titel . '</news_titel>';
+			$titleElement = $XML->createElement('news_titel');
+			$titleElement->appendChild($XML->createTextNode($titel));
+			$contentElement->appendChild($titleElement);
 		}
-
-		$xml .= '</content>';
 
 		//XSLT Vorlage laden
 		$template = $this->ci->TemplateModel->load($infoscreen ? 'news_infoscreen' : 'news');
 		if (isError($template))
 			return $template;
 		$template = current(getData($template));
-
-		$XML = new DOMDocument();
-		$XML->loadXML($xml);
 
 		$xsltemplate = new DOMDocument();
 		$xsltemplate->loadXML($template->xslt_xhtml_c4);

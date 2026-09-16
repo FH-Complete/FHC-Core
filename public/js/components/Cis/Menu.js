@@ -1,15 +1,15 @@
-import CisMenuEntry from "./Menu/Entry.js";
-import FhcSearchbar from "../searchbar/searchbar.js";
-import CisSprachen from "./Sprachen.js"
-import ThemeSwitch from "./ThemeSwitch.js";
+import CisMenuEntry from './Menu/Entry.js';
+import FhcSearchbar from '../searchbar/searchbar.js';
+import CisSprachen from './Sprachen.js';
+import ThemeSwitch from './ThemeSwitch.js';
 import ApiCisMenu from '../../api/factory/cis/menu.js';
 import ApiSearchbar from '../../api/factory/searchbar.js';
 import ApiLvPlan from "../../api/factory/lvPlan.js";
 
 export default {
-    components: {
-        CisMenuEntry,
-        FhcSearchbar,
+	components: {
+		CisMenuEntry,
+		FhcSearchbar,
 		CisSprachen,
 		ThemeSwitch,
     },
@@ -171,35 +171,41 @@ export default {
 			setOpenMenuHierarchy: this.setOpenMenuHierarchy,
 		}
 	},
-	computed:{
-		menuCollapseAriaLabel(){
-			if(this.menuOpen){
+	computed: {
+		menuCollapseAriaLabel() {
+			if (this.menuOpen) {
 				return this.$p.t('global', 'collapseMenu');
-			}else{
+			} else {
 				return this.$p.t('global', 'extendMenu');
 			}
 		},
-		highestMatchingUrlCount(){
+		highestMatchingUrlCount() {
 			// gets the hightest ranking inside the array
 			let highestMatch = Math.max(...this.urlMatchRankings);
 
-			if(this.urlMatchRankings.length > 0){
+			if (this.urlMatchRankings.length > 0) {
 				// if more than one entry has the same ranking, none should be active
-				return this.urlMatchRankings.filter((value)=>value == highestMatch).length > 1 ? null : highestMatch;
+				return this.urlMatchRankings.filter((value) => value == highestMatch)
+					.length > 1
+					? null
+					: highestMatch;
 			}
 
 			return null;
 		},
-		site_url(){
-			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+		site_url() {
+			return (
+				FHC_JS_DATA_STORAGE_OBJECT.app_root +
+				FHC_JS_DATA_STORAGE_OBJECT.ci_router
+			);
 		},
 	},
 	methods: {
 		fetchMenu() {
 			return this.$api
 				.call(ApiCisMenu.getMenu())
-				.then(res => res.data)
-				.then(menu => {
+				.then((res) => res.data)
+				.then((menu) => {
 					this.entries = menu;
 				});
 		},
@@ -209,8 +215,8 @@ export default {
 				this.navUserDropdown.hide();
 			}
 		},
-		handleShowNavUser(){
-			document.addEventListener("click", this.checkSettingsVisibility);
+		handleShowNavUser() {
+			document.addEventListener('click', this.checkSettingsVisibility);
 		},
 		handleHideNavUser(){
 			document.removeEventListener("click", this.checkSettingsVisibility);
@@ -219,7 +225,7 @@ export default {
 			this.urlMatchRankings.push(count);
 		},
 
-		setActiveEntry(content_id){
+		setActiveEntry(content_id) {
 			this.activeEntry = content_id;
 		},
 		searchfunction(searchsettings) {
@@ -229,33 +235,16 @@ export default {
 			this.openMenuHierarchy = openMenuHierarchy;
 		},
 	},
-	created(){
+	created() {
 		this.fetchMenu();
 	},
-	async mounted(){
+	async mounted() {
 		this.$p.loadCategory(['ui', 'global', 'profilUpdate'])
 		this.navUserDropdown = new bootstrap.Collapse(this.$refs.navUserDropdown,{
 			toggle: false
 		});
-
-		const openOtherLvPlanAction = {
-			label: Vue.computed(() => this.$p.t("lehre/stundenplan")),
-			icon: "fas fa-calendar-days",
-			type: "link",
-			action: function(data) {
-				const uid = JSON.parse(data.data).uid;
-				return FHC_JS_DATA_STORAGE_OBJECT.app_root +
-					FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-					"/Cis/OtherLvPlan/" + uid;
-			},
-		};
-		let result = await this.$api.call(ApiLvPlan.checkPermissionOtherLvPlan());
-		if (result.meta.status === "success" && result.data) {
-			this.searchbaroptions.actions.employee.childactions.push(openOtherLvPlanAction);
-			this.searchbaroptions.actions.student.childactions.push(openOtherLvPlanAction);
-		}
 	},
-    template: /*html*/`
+	template: /*html*/ `
 	<div id="cis-header-bar" class="d-flex flex-row flex-grow-1">
 		<div id="nav-logo" class="d-none d-lg-block">
 			<div class="d-flex h-100 justify-content-between">
@@ -362,5 +351,5 @@ export default {
 				</div>
 			</div>
 		</div>
-    </nav>`
+    </nav>`,
 };
