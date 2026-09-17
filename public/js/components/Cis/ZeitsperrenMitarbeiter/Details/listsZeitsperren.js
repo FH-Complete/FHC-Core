@@ -453,7 +453,7 @@ export default {
 			this.studiengang_kz = this.id;
 		}
 	},
-	template: `
+	template: /*html*/ `
 	<div class="zeitsperrenma-container">
 
 		<!-- header-->

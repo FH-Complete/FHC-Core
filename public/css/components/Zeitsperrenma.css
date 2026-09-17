@@ -10,6 +10,6 @@
 .zeitsperrenma-content thead th {
     position: sticky;
     top: 0;
-    background: white;
+    background: var(--bs-table-bg);
     z-index: 2;
 }
