@@ -262,7 +262,7 @@ export const Raumsuche =  {
 				<span class="input-group-text">{{ $p.t('rauminfo/minCapacity') }}:</span>
 				<FormInput
 					v-model="anzahlInput"
-					type="text"
+					type="number"
 					input-group
 					inputmode="numeric"
 					pattern="[0-9,]*"
