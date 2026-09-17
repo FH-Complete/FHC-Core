@@ -72,7 +72,9 @@ export function useEventLoader(
       return;
     }
 
-   addVisualForEventsLoading();
+	hasFirstLoadOccurred = false;
+	
+    addVisualForEventsLoading();
 
     Promise.allSettled(promises).then((results) => {
       let newlyLoadedEvents = [];
