@@ -32,7 +32,16 @@ if (!$result = @$db->db_query('SELECT 0 FROM lehre.tbl_kalender_notiz WHERE 0 = 
 		echo '<br>Granted privileges to <strong>vilesci</strong> on lehre.tbl_kalender_notiz';
 
 	// Delete the related note when its calendar-note assignment no longer exists.
-	$qry = 'CREATE OR REPLACE FUNCTION lehre.cleanup_notiz_on_kalender_notiz_delete()
+	$result = $db->db_query("SELECT 1
+		FROM pg_catalog.pg_proc AS p
+		JOIN pg_catalog.pg_namespace AS n ON n.oid = p.pronamespace
+		WHERE n.nspname = 'lehre'
+			AND p.proname = 'cleanup_notiz_on_kalender_notiz_delete'
+			AND p.proargtypes = ''::oidvector");
+
+	if ($db->db_num_rows($result) === 0)
+	{
+		$qry = 'CREATE FUNCTION lehre.cleanup_notiz_on_kalender_notiz_delete()
 		RETURNS trigger
 		LANGUAGE plpgsql
 		SECURITY DEFINER
@@ -50,9 +59,15 @@ if (!$result = @$db->db_query('SELECT 0 FROM lehre.tbl_kalender_notiz WHERE 0 = 
 
 			RETURN OLD;
 		END;
-		$function$;
+		$function$;';
 
-		CREATE TRIGGER cleanup_notiz_on_kalender_notiz_delete
+		if (!$db->db_query($qry))
+			echo '<strong>lehre.tbl_notiz cleanup function: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>lehre.tbl_notiz cleanup function created';
+	}
+
+	$qry = 'CREATE TRIGGER cleanup_notiz_on_kalender_notiz_delete
 		AFTER DELETE ON lehre.tbl_kalender_notiz
 		FOR EACH ROW
 		EXECUTE PROCEDURE lehre.cleanup_notiz_on_kalender_notiz_delete();';
@@ -65,7 +80,16 @@ if (!$result = @$db->db_query('SELECT 0 FROM lehre.tbl_kalender_notiz WHERE 0 = 
 
 // Delete note assignments after a physical delete or when every row in the
 // calendar group has an inactive status.
-$qry = 'CREATE OR REPLACE FUNCTION lehre.cleanup_kalender_notiz()
+$result = $db->db_query("SELECT 1
+	FROM pg_catalog.pg_proc AS p
+	JOIN pg_catalog.pg_namespace AS n ON n.oid = p.pronamespace
+	WHERE n.nspname = 'lehre'
+		AND p.proname = 'cleanup_kalender_notiz'
+		AND p.proargtypes = ''::oidvector");
+
+if ($db->db_num_rows($result) === 0)
+{
+	$qry = 'CREATE FUNCTION lehre.cleanup_kalender_notiz()
 		RETURNS trigger
 		LANGUAGE plpgsql
 		SECURITY DEFINER
@@ -113,6 +137,7 @@ $qry = 'CREATE OR REPLACE FUNCTION lehre.cleanup_kalender_notiz()
 		echo '<strong>lehre.tbl_kalender_notiz cleanup function: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>lehre.tbl_kalender_notiz cleanup function created';
+}
 
 $result = $db->db_query("SELECT 1
 	FROM pg_catalog.pg_trigger AS t
@@ -138,7 +163,16 @@ if ($db->db_num_rows($result) === 0)
 
 // Delete resource assignments after a physical delete or when every row in the
 // calendar group has an inactive status.
-$qry = 'CREATE OR REPLACE FUNCTION lehre.cleanup_betriebsmittel_kalender()
+$result = $db->db_query("SELECT 1
+	FROM pg_catalog.pg_proc AS p
+	JOIN pg_catalog.pg_namespace AS n ON n.oid = p.pronamespace
+	WHERE n.nspname = 'lehre'
+		AND p.proname = 'cleanup_betriebsmittel_kalender'
+		AND p.proargtypes = ''::oidvector");
+
+if ($db->db_num_rows($result) === 0)
+{
+	$qry = 'CREATE FUNCTION lehre.cleanup_betriebsmittel_kalender()
 		RETURNS trigger
 		LANGUAGE plpgsql
 		SECURITY DEFINER
@@ -186,6 +220,7 @@ $qry = 'CREATE OR REPLACE FUNCTION lehre.cleanup_betriebsmittel_kalender()
 		echo '<strong>lehre.tbl_betriebsmittel_kalender cleanup function: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>lehre.tbl_betriebsmittel_kalender cleanup function created';
+}
 
 $result = $db->db_query("SELECT 1
 	FROM pg_catalog.pg_trigger AS t
@@ -224,4 +259,21 @@ if ($db->db_num_rows($result) === 1)
 		echo '<strong>public.tbl_notizzuordnung: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>public.tbl_notizzuordnung: eindeutige_kalender_gruppen_id column removed';
+}
+
+$result = $db->db_query("SELECT 1
+	FROM information_schema.columns
+	WHERE table_schema = 'public'
+		AND table_name = 'tbl_notizzuordnung'
+		AND column_name = 'eindeutige_gruppen_id'");
+
+if ($db->db_num_rows($result) === 1)
+{
+	$qry = "ALTER TABLE public.tbl_notizzuordnung
+		DROP COLUMN eindeutige_gruppen_id";
+
+	if (!$db->db_query($qry))
+		echo '<strong>public.tbl_notizzuordnung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_notizzuordnung: eindeutige_gruppen_id column removed';
 }
