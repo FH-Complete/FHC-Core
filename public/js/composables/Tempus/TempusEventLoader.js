@@ -83,8 +83,9 @@ export function useEventLoader(
 
       return;
     }
-
-   addVisualForEventsLoading();
+	hasFirstLoadOccurred = false;
+    
+	addVisualForEventsLoading();
 
     if (waitForAllPromises) {
       Promise.allSettled(promises).then((results) => {
@@ -275,7 +276,6 @@ export function useEventLoader(
 
     if (requestEnd > intervalEnd) {
       while (requestStart < requestEnd) {
-		console.log("requestStart", requestStart.toISO() + " requestEnd", requestEnd.toISO() + " intervalDays", intervalDays);
         let intervalRequestEnd = requestStart
           .plus({ days: intervalDays - 1 })
           .endOf("day");
