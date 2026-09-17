@@ -78,6 +78,8 @@ $route['Cis/OtherLvPlan/.*'] = 'Cis/OtherLvPlan/index/$1';
 $route['Cis/StgOrgLvPlan/.*'] = 'Cis/StgOrgLvPlan/index/$1';
 $route['Cis/Benotungstool/.*'] = 'Cis/Benotungstool/index/$1';
 
+$route['Cis/MyReservation'] = 'Cis/MyReservation/index/$1';
+
 //Route for Zeitsperrenma
 $route['Cis/Zeitsperrenma/.*'] = 'Cis/Zeitsperrenma/index/$1';
 //Route für Zeitsperren
