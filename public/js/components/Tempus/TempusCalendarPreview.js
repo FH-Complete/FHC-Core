@@ -39,6 +39,22 @@ function getRangeFromQuery(query, timezone) {
 	return luxon.Interval.fromDateTimes(start, end);
 }
 
+function getPlanFilterFromQuery(query) {
+	const filter = {};
+	for (const key of ['ort', 'stg', 'uid']) {
+		const value = Array.isArray(query?.[key]) ? query[key][0] : query?.[key];
+		if (typeof value !== 'string') continue;
+
+		try {
+			filter[key] = JSON.parse(value);
+		} catch {
+			// Ignore malformed filter parameters.
+		}
+	}
+
+	return filter;
+}
+
 export default {
 	name: 'TempusCalendarPreview',
 	components: {
@@ -85,6 +101,7 @@ export default {
 			visibleStatus: ['all'],
 			selectedStudiensemester: this.defaultSemester,
 			urlRange: null,
+			planFilter: {},
 			calendarDatesByMode: {
 				week: today,
 				month: today,
@@ -147,28 +164,11 @@ export default {
 			this.currentMode = newMode;
 		},
 		getPromiseFunc(start, end) {
-			const collisionCheck = false;
-			const hasRooms = this.rooms.length > 0;
-			const hasLektoren = this.lecturers.length > 0;
-			const hasStg = this.studiengaenge.length > 0;
-
-			const filter = {};
-
-			if (hasRooms) filter.ort = this.rooms.map((room) => room.ort_kurzbz);
-			if (hasStg) {
-				filter.stg = this.studiengaenge.map(
-					({ stg_kz, semester, orgform_kurzbz }) => ({
-						stg_kz,
-						semester,
-						orgform_kurzbz,
-					}),
-				);
-			}
-			if (hasLektoren)
-				filter.uid = this.lecturers.map((lecture) => lecture.uid);
+			const collisionCheck = true;
+			const filter = this.planFilter;
 
 			let response = null;
-			if (this.previewRole === 'lektor')
+			if (this.previewRole === 'lektor') {
 				response = [
 					this.$api.call(
 						ApiKalender.getPlanLecturer(
@@ -179,8 +179,7 @@ export default {
 						),
 					),
 				];
-
-			if (this.previewRole === 'student')
+			} else if (this.previewRole === 'student') {
 				response = [
 					this.$api.call(
 						ApiKalender.getPlanStudent(
@@ -191,8 +190,8 @@ export default {
 						),
 					),
 				];
-
-			response = [
+			} else {
+				response = [
 				this.$api.call(
 					ApiKalender.getPlan(
 						filter,
@@ -203,6 +202,7 @@ export default {
 					),
 				),
 			];
+			}
 
 			if (response) {
 				response[0].then((result) => {
@@ -397,25 +397,27 @@ export default {
 				this.hoveredEvent = null;
 			}
 		},
-		scrollToAndEmphasizeUpdatedEvent() {
+		scrollToAndEmphasizeUpdatedEvent(shouldEmphasize = true) {
 			if (!this.currentlyUpdatedEvent) return;
 
-			document
-				.querySelectorAll(
-					'.fhc-calendar-base-grid .fhc-calendar-base-grid-line-event',
-				)
-				.forEach((el) => {
-					const spinner = el.querySelector('.spinner-overlay');
-					if (spinner) {
-						spinner.remove();
-					}
+			if (shouldEmphasize) {
+				document
+					.querySelectorAll(
+						'.fhc-calendar-base-grid .fhc-calendar-base-grid-line-event',
+					)
+					.forEach((el) => {
+						const spinner = el.querySelector('.spinner-overlay');
+						if (spinner) {
+							spinner.remove();
+						}
 
-					el.classList.remove(
-						'updating-event',
-						'updated-event',
-						'updated-event-long',
-					);
-				});
+						el.classList.remove(
+							'updating-event',
+							'updated-event',
+							'updated-event-long',
+						);
+					});
+			}
 
 			setTimeout(() => {
 				const eventEl = document.querySelector(
@@ -443,18 +445,20 @@ export default {
 					});
 				}
 
-				let timeout = 0;
-				let emphasizeUpdateClassName = isInsideScrolledView
-					? 'updated-event'
-					: 'updated-event-long';
+				if (shouldEmphasize) {
+					let timeout = 0;
+					let emphasizeUpdateClassName = isInsideScrolledView
+						? 'updated-event'
+						: 'updated-event-long';
 
-				if (!isInsideScrolledView) timeout = 300;
+					if (!isInsideScrolledView) timeout = 300;
 
-				setTimeout(() => {
-					eventEl.classList.add(emphasizeUpdateClassName);
-				}, timeout);
+					setTimeout(() => {
+						eventEl.classList.add(emphasizeUpdateClassName);
+					}, timeout);
 
-				this.currentlyUpdatedEvent = null;
+					this.currentlyUpdatedEvent = null;
+				}
 			}, 100);
 		},
 		updateKalenderEventElementDisplay(calendarGruppenId, startDT, endDT) {
@@ -495,8 +499,19 @@ export default {
 					targetGridLine.insertBefore(element, null);
 					element.classList.add('tempus-temporary-calendar-event');
 				}
-				element.style.gridRowEnd = 't_' + newPotentialEnd;
-				element.style.gridRowStart = 't_' + newPotentialStart;
+				if (this.currentMode === 'range') {
+					element.style.gridColumnStart = 't_' + newPotentialStart;
+					element.style.gridColumnEnd = 't_' + newPotentialEnd;
+				} else {
+					element.style.gridRowStart = 't_' + newPotentialStart;
+					element.style.gridRowEnd = 't_' + newPotentialEnd;
+				}
+
+				element.scrollIntoView({
+					behavior: 'smooth',
+					inline: 'center',
+					block: 'nearest',
+				});
 			}, 100);
 
 			const outerDiv = document.createElement('div');
@@ -509,24 +524,6 @@ export default {
 
 			element.appendChild(outerDiv);
 
-			const eventRect = element.getBoundingClientRect();
-
-			const offset = 300;
-
-			const isInsideScrolledView =
-				element.offsetLeft < calendar.scrollLeft + calendar.clientWidth &&
-				element.offsetLeft + element.offsetWidth > calendar.scrollLeft &&
-				element.offsetTop < calendar.scrollTop + calendar.clientHeight &&
-				element.offsetTop + element.offsetHeight > calendar.scrollTop;
-
-			const rect = element.getBoundingClientRect();
-			if (!isInsideScrolledView) {
-				element.scrollIntoView({
-					behavior: 'smooth',
-					inline: 'center',
-					block: 'nearest',
-				});
-			}
 		},
 		clearTemporaryEvents() {
 			const calendar = this.$refs.calendar?.$el;
@@ -544,6 +541,10 @@ export default {
 		'$route.query': {
 			immediate: true,
 			handler(query) {
+				this.planFilter = getPlanFilterFromQuery(query);
+				this.previewRole = Array.isArray(query?.previewRole)
+					? query.previewRole[0]
+					: query?.previewRole ?? 'planer';
 				this.urlRange = getRangeFromQuery(query, this.config.timezone);
 				const rangeStart = this.urlRange?.start.toISODate()
 					?? luxon.DateTime.now().setZone(this.config.timezone).toISODate();
@@ -580,7 +581,6 @@ export default {
 			.call(ApiRenderers.loadTempusRenderers())
 			.then((res) => res.data)
 			.then((data) => {
-				console.log(Object.keys(data))
 				for (let rendertype of Object.keys(data)) {
 					let modalTitle = null;
 					let modalContent = null;
@@ -648,6 +648,7 @@ export default {
 			:is-event-dragging-enabled="false"
 			:is-event-resizing-enabled="false"
 			:isRangeVirtualScrollEnabled="false"
+			:can-toggle-collision-check="false"
 			@update:date="handleChangeDate"
 			@update:mode="handleChangeMode"
 			@event-hover="onEventHover"

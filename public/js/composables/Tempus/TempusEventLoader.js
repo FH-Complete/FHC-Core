@@ -5,6 +5,7 @@ export function useEventLoader(
   getPromiseFunc,
   cacheMultiplier = 1,
   requestIntervalDays = PLAN_REQUEST_INTERVAL_DAYS,
+  waitForAllPromises = true,
 ) {
   let hasFirstLoadOccurred = false;
 
@@ -84,6 +85,62 @@ export function useEventLoader(
     }
 
    addVisualForEventsLoading();
+
+    if (waitForAllPromises) {
+      Promise.allSettled(promises).then((results) => {
+        let newlyLoadedEvents = [];
+        let hasSuccessfullyLoadedEvents = false;
+
+        results.forEach((res) => {
+          if (
+            !(res.status === "fulfilled" && res.value.meta.status === "success")
+          )
+            return;
+
+          hasSuccessfullyLoadedEvents = true;
+          if (res.value.meta.lv) lv.value = res.value.meta.lv;
+          newlyLoadedEvents = newlyLoadedEvents.concat(res.value.data);
+        });
+
+        let tempAllEvents = Array.from(
+          new Map(
+            [...allEvents.value, ...newlyLoadedEvents].map((event) => [
+              event.eindeutige_kalender_gruppen_id,
+              event,
+            ]),
+          ).values(),
+        );
+
+        if (!isCacheEnabled && hasSuccessfullyLoadedEvents) {
+          const newlyLoadedEventIds = new Set(
+            newlyLoadedEvents.map(
+              (event) => event.eindeutige_kalender_gruppen_id,
+            ),
+          );
+
+          tempAllEvents = tempAllEvents.filter((event) => {
+            const eventStart = getTimestampFromISODate(event.isostart);
+            const eventEnd = getTimestampFromISODate(event.isoend);
+            const overlapsDisplayedDateRange =
+              eventStart < currentlyDisplayedDateRange.end.ts &&
+              eventEnd > currentlyDisplayedDateRange.start.ts;
+
+            return (
+              !overlapsDisplayedDateRange ||
+              newlyLoadedEventIds.has(event.eindeutige_kalender_gruppen_id)
+            );
+          });
+        }
+
+        allEvents.value = removeVisualForEventsLoading(
+          ensureEventsAreInValidCacheRange(tempAllEvents),
+        );
+
+        hasFirstLoadOccurred = true;
+      });
+
+      return;
+    }
 
     let newlyLoadedEvents = [];
     let pendingPromiseCount = promises.length;

@@ -77,7 +77,31 @@ header,
 
 .fhc-calendar-mode-range .main-header:not(.main-header-empty),
 .fhc-calendar-mode-range .fhc-calendar-base-grid-line {
-	border-top: solid !important;
-	border-top-color: black !important;
-	border-top-width: 1px !important;
+	border-top: solid 1px black !important;
+}
+
+.fhc-calendar-mode-range .main-header:not(.main-header-empty) {
+	padding-top: .25rem !important;
+}
+
+.fhc-calendar-mode-range .fhc-calendar-base-grid-line {
+	grid-auto-rows: max-content !important;
+	overflow: hidden !important;
+}
+
+.fhc-calendar-mode-range .fhc-calendar-base-grid-line-event {
+	break-inside: avoid !important;
+	margin: 1px !important;
+	page-break-inside: avoid !important;
+	z-index: auto !important;
+}
+
+.fhc-calendar-mode-range .fhc-calendar-base-grid-line-event > .rangePageContainer {
+	background-color: var(--event-bg, var(--event-default-bg)) !important;
+	break-inside: avoid !important;
+	page-break-inside: avoid !important;
+}
+
+.fhc-calendar-mode-range .fhc-calendar-base-grid-line-event > .rangePageContainer * {
+	background-color: transparent !important;
 }

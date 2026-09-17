@@ -154,7 +154,11 @@ export default {
 		class="position-relative"
 		@wheel.stop
 	>
-		<div class="position-absolute bottom-0 start-0 m-1">
+		<div
+			:class="mode === 'range'
+				? 'position-absolute top-0 end-0 m-1'
+				: 'position-absolute bottom-0 start-0 m-1'"
+		>
 			{{event.verplante_stunden}}
 		</div>
 		<div
@@ -166,7 +170,7 @@ export default {
 		</div>
 		<div class="event-text" v-tooltip="tooltipString">
 			<div
-				:class="{ 'd-flex align-items-center gap-1': mode === 'range' }"
+				:class="{ 'd-flex align-items-center gap-2': mode === 'range' }"
 				:style="mode === 'range' ? null : { display: 'contents' }"
 			>
 				<span class="event-topic">{{ topicString }}</span>

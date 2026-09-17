@@ -93,6 +93,10 @@ export default {
 			type: Number,
 			default: 1
 		},
+		waitForAllPromises: {
+			type: Boolean,
+			default: true,
+		},
 		parkedEvents: {
 			type: Object,
 			default: () => new Set(),
@@ -122,6 +126,10 @@ export default {
 			default: true,
 		},
 		isRangeVirtualScrollEnabled: {
+			type: Boolean,
+			default: true,
+		},
+		canToggleCollisionCheck: {
 			type: Boolean,
 			default: true,
 		},
@@ -224,10 +232,6 @@ export default {
 		visibleEvents() {
 			let list = this.events;
 
-			// Start with the first week and then keep events overlapping a grid line
-			// that is visible inside the slider viewport, including a one-day buffer
-			// before and after the visible dates.
-			console.log('visibleDates', this.visibleDates);
 			if (
 				this.isRangeVirtualScrollEnabled
 				&& this.currentMode === 'range'
@@ -374,7 +378,9 @@ export default {
 		const { events, lv, reset } = useEventLoader(
 			rangeInterval,
 			props.getPromiseFunc,
-			() => props.cacheMultiplier
+			() => props.cacheMultiplier,
+			undefined,
+			props.waitForAllPromises,
 		);
 
 		Vue.watch(lv, (newValue) => {
@@ -482,7 +488,10 @@ export default {
 					></i>
 					<span>Reservierung</span>
 				</div>
-				<div class="d-flex align-items-center gap-2">
+				<div
+					v-if="canToggleCollisionCheck"
+					class="d-flex align-items-center gap-2"
+				>
 					<i :class="appConfig.ignore_kollision ? 'fa-solid fa-triangle-exclamation text-danger' : 'fa-solid fa-circle-check text-success'"></i>
 					<span class="form-check-label">
 						{{ appConfig.ignore_kollision ? 'Kollisionscheck aus' : 'Kollisionscheck an' }}
