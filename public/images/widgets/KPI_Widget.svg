@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+	<defs>
+		<clipPath id="c">
+			<path d="M92,320A1,1,0,0,1,420,192l41,-16A1,1,0,1,0,51,336z"/>
+		</clipPath>
+	</defs>
+	<text x="256" style="fill: rgb(0, 100, 156); font-family: &quot;Arial&quot;, sans-serif; font-size: 150px; font-weight: 700;text-anchor: middle;" y="300">KPI</text>
+	<foreignObject width="512" height="512" clip-path="url(#c)">
+		<div xmlns="http://www.w3.org/1999/xhtml" style="width: 100%;height: 100%;background: conic-gradient(from -112deg, rgba(114,120,122,0),rgba(139,179,29,1));"></div>
+	</foreignObject>
+	<path fill="transparent" d="M92,320A1,1,0,0,1,420,192l41,-16A1,1,0,1,0,51,336" stroke="#72777A" stroke-width="3"/>
+</svg>

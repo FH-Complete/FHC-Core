@@ -86,7 +86,7 @@ export default {
 				...this.modelValue,
 				setup: {
 					...this.modelValue.setup,
-					icon: '',
+					icon: '/public/images/widgets/KPI_Widget.svg',
 					name: '',
 					width: 1,
 					height: 1,
