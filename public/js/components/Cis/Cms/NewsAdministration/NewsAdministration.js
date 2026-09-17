@@ -1,7 +1,9 @@
 import NewsItemForm from './NewsItemForm.js';
 import NewsItemPreview from './NewsItemPreview.js';
 import NewsList from './NewsList.js';
+
 import ApiNewsAdministration from '../../../../api/factory/newsAdministration.js';
+import ApiPermission from '../../../../api/factory/permission.js';
 
 export default {
 	name: 'NewsAdministration',
@@ -10,9 +12,6 @@ export default {
 		NewsItemPreview,
 		NewsList,
 	},
-	props: {
-		permissions: Object,
-	},
 	data() {
 		return {
 			isNewsFormShown: false,
@@ -20,6 +19,8 @@ export default {
 			editableNewsItem: null,
 			newsPreview: null,
 			newsFormCollapse: null,
+			hasBasisNewsTypRPermission: false,
+			hasBasisNewsTypWPermission: false,
 		};
 	},
 	watch: {
@@ -40,14 +41,6 @@ export default {
 
 				this.editNewsItem({ newsId: this.$route.query.newsId });
 			},
-		},
-	},
-	computed: {
-		hasBasisNewsTypRPermission() {
-			return this.permissions['basis/news_r'] || false;
-		},
-		hasBasisNewsTypWPermission() {
-			return this.permissions['basis/news_w'] || false;
 		},
 	},
 	methods: {
@@ -138,11 +131,28 @@ export default {
 		handlePreviewChange(preview) {
 			this.newsPreview = preview;
 		},
+		async getPermissions() {
+			const permissionsResponse = await this.$api.call(
+				ApiPermission.getPermissions(
+					[
+						"basis/news:r",
+						"basis/news:w",
+					]
+				)
+			);
+
+			if (permissionsResponse.meta.status === "success") {
+				this.hasBasisNewsTypRPermission = permissionsResponse.data["basis/news:r"];
+				this.hasBasisNewsTypWPermission = permissionsResponse.data["basis/news:w"];
+			}
+		},
 	},
-	created() {
+	async created() {
 		this.$p.loadCategory('ui').then(() => {
 			this.phrasesLoaded = true;
 		});
+
+		await this.getPermissions();
 	},
 	mounted() {
 		this.newsFormCollapse = new bootstrap.Collapse(

@@ -101,10 +101,6 @@ class Cms extends Auth_Controller
 		$this->load->view('CisRouterView/CisRouterView.php', [
 			'viewData'=>$viewData,
 			'route' => 'NewsAdministration',
-			'permissions' => [
-				'basis/news_r' => $this->permissionlib->isBerechtigt('basis/news', 's'),
-				'basis/news_w' => $this->permissionlib->isBerechtigt('basis/news', 'suid'),
-			],
 		]);
 	}
 
