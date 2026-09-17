@@ -8,6 +8,9 @@ export default {
 	components: {
 		CoreFilterCmpt,
 	},
+	inject: {
+		imageSrc: "imageSrc",
+	},
 	props: {
 		unsavedProgress: Boolean,
 	},
@@ -26,14 +29,15 @@ export default {
 						field: 'setup.icon',
 						title: 'Icon',
 						titlePhrase: 'dashboard/widget_icon',
-						mutator: value => {
-							if (!value)
-								return FHC_JS_DATA_STORAGE_OBJECT.app_root + 'skin/images/fh_technikum_wien_illustration_klein.png';
-							if (value[0] == '/')
-								return FHC_JS_DATA_STORAGE_OBJECT.app_root + value.substr(1);
-							return value;
+						formatter: (cell, formatterParams) => {
+							const img = document.createElement('img');
+							img.src = this.imageSrc(cell.getData().setup?.icon);
+
+							if (formatterParams?.height)
+								img.style.height = formatterParams.height;
+
+							return img;
 						},
-						formatter: 'image',
 						formatterParams: {
 							height: '1.5em',
 						},

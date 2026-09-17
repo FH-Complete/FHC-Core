@@ -11,6 +11,17 @@ export default {
 		WidgetList,
 		WidgetEdit,
 	},
+	provide() {
+		return {
+			imageSrc(src) {
+				if (!src)
+					return FHC_JS_DATA_STORAGE_OBJECT.app_root + 'skin/images/fh_technikum_wien_illustration_klein.png';
+				else if (src[0] == '/')
+					return FHC_JS_DATA_STORAGE_OBJECT.app_root + src.substr(1);
+				return src;
+			},
+		};
+	},
 	data() {
 		return {
 			originalData: null,
