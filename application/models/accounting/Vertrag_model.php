@@ -44,7 +44,7 @@ class Vertrag_model extends DB_Model
             : null;
 		$lehreinheit_id = (isset($lehreinheit_id) && is_numeric($lehreinheit_id))
 			? $lehreinheit_id
-			: $vertragstyp_kurzbz == 'Betreuung' ? null : show_error('lehreinheit_id must be set and numeric.');
+			: (($vertragstyp_kurzbz == 'Betreuung') ? null : show_error('lehreinheit_id must be set and numeric.'));
         $vertragsstunden = (isset($vertragsstunden) && is_numeric($vertragsstunden))
             ? $vertragsstunden
             : 0;
