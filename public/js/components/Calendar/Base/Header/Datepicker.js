@@ -83,8 +83,8 @@ export default {
 		},
 		rangeConfig() {
 			if (this.$props.mode === "list") {
-				return { autoRange: listLength - 1 };
-			} else if (this.$props.mode === "range") {
+				return { autoRange: this.listLength - 1 };
+			} else if (["range", "tableList"].includes(this.$props.mode)) {
 				return true;
 			} else {
 				return false;
