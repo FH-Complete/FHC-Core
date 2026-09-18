@@ -3,6 +3,7 @@ import StudiengangInformation from './StudiengangInformation/StudiengangInformat
 import BsConfirm from '../../Bootstrap/Confirm.js';
 
 import ApiCms from '../../../api/factory/cms.js';
+import ApiPermission from '../../../api/factory/permission.js';
 
 export default {
 	name: 'NewsComponent',
@@ -11,15 +12,13 @@ export default {
 		StudiengangInformation,
 	},
 	inject: ['isMobile'],
-	props: {
-		permissions: Object,
-	},
 	data() {
 		return {
 			content: null,
 			maxPageCount: 0,
 			page_size: 100,
 			page: 1,
+			hasBasisNewsTypRPermission: false,
 		};
 	},
 	watch: {
@@ -28,9 +27,6 @@ export default {
 		},
 	},
 	computed: {
-		hasBasisNewsTypRPermission() {
-			return this.permissions['basis/news_r'] || false;
-		},
 		sprache: function () {
 			return this.$p.user_language.value;
 		},
@@ -98,9 +94,23 @@ export default {
 			this.$refs.newsPageHeading.scrollIntoView({ block: 'end' });
 			this.loadNewPageContent(event);
 		},
+		async getPermissions() {
+			const permissionsResponse = await this.$api.call(
+				ApiPermission.getPermissions(
+					[
+						"basis/news:r",
+					]
+				)
+			);
+
+			if (permissionsResponse.meta.status === "success") {
+				this.hasBasisNewsTypRPermission = permissionsResponse.data["basis/news:r"];
+			}
+		},
 	},
-	created() {
+	async created() {
 		this.fetchNews();
+		await this.getPermissions();
 	},
 	template: /*html*/ `
 	<div :class="{'pb-3': isMobile}" class="overflow-x-hidden">
