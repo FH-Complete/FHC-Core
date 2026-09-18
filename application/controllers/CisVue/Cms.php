@@ -84,18 +84,14 @@ class Cms extends Auth_Controller
 	 */
 	public function news($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true)
 	{	
-		$viewData = array();
 		$this->load->view('CisRouterView/CisRouterView.php', [
-			'viewData'=>$viewData,
 			'route' => 'News',
 		]);
 	}
 	
 	public function newsAdministration()
 	{
-		$viewData = array();
 		$this->load->view('CisRouterView/CisRouterView.php', [
-			'viewData'=>$viewData,
 			'route' => 'NewsAdministration',
 		]);
 	}
