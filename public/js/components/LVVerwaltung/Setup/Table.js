@@ -242,31 +242,31 @@ export default {
 						return [];
 					return [
 						{
-							label: "LV-Teil kopieren",
+							label: this.$p.t('lehre', 'lvteilkopieren'),
 							menu: [
 								{
-									label: "Alles",
+									label: this.$p.t('lehre', 'alles'),
 									action: (e, row) =>
 									{
 										this.copyLehreinheit(row, "alle");
 									},
 								},
 								{
-									label: "Nur LV-Teil",
+									label: this.$p.t('lehre', 'nurlvteil'),
 									action: (e, row) =>
 									{
 										this.copyLehreinheit(row, "lvteil");
 									},
 								},
 								{
-									label: "Nur mit Gruppen",
+									label: this.$p.t('lehre', 'nurmitgruppen'),
 									action: (e, row) =>
 									{
 										this.copyLehreinheit(row, "gruppen");
 									},
 								},
 								{
-									label: "Nur mit Lehrenden",
+									label: this.$p.t('lehre', 'nurmitlehrende'),
 									action: (e, row) =>
 									{
 										this.copyLehreinheit(row, "lektoren");
@@ -275,13 +275,13 @@ export default {
 							],
 						},
 						{
-							label: "Zur LV Springen",
+							label: this.$p.t('lehre', 'zurlvspringen'),
 							action: (e, row)  => {
 								this.openLV(row)
 							},
 						},
 						{
-							label: "Link kopieren",
+							label: this.$p.t('lehre', 'lvteillinkkopieren'),
 							action: (e, row)  => {
 								let rowData = row.getData();
 								let link = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/LVVerwaltung/stdsem/' + rowData.studiensemester_kurzbz.toLowerCase() + '/le/' + rowData.lehreinheit_id;
@@ -289,7 +289,7 @@ export default {
 							},
 						},
 						{
-							label: "Entfernen",
+							label: this.$p.t('ui', 'entfernen'),
 							action: (e, row)  => {
 								this.deleteLehreinheit(row)
 							},

@@ -106,6 +106,31 @@ class Lehrveranstaltung extends FHCAPI_Controller
 		$lehrveranstaltungen = $this->_ci->LehreinheitModel->getLvsById($lehrveranstaltung_id, $studiensemester_kurzbz);
 		$lehrveranstaltungen_data = $this->getDataOrTerminateWithError($lehrveranstaltungen);
 
+		if (!hasData($lehrveranstaltungen_data))
+		{
+
+			$this->_ci->LehrveranstaltungModel->addSelect('
+				kurzbz as lv_kurzbz,
+				lehrveranstaltung_id,
+				lehrtyp_kurzbz,
+				studiengang_kz as lv_studiengang_kz,
+				semester as lv_semester,
+				bezeichnung as lv_bezeichnung,
+				ects as lv_ects,
+				lehreverzeichnis as lv_lehreverzeichnis,
+				planfaktor as lv_planfaktor,
+				planlektoren as lv_planlektoren,
+				planpersonalkosten as lv_planpersonalkosten,
+				plankostenprolektor as lv_plankostenprolektor,
+				orgform_kurzbz as lv_orgform_kurzbz,
+				lehrform_kurzbz as lv_lehrform_kurzbz,
+				bezeichnung_english as lv_bezeichnung_english,
+				semesterstunden as lv_semesterstunden,
+			');
+			$lehrveranstaltungen = $this->_ci->LehrveranstaltungModel->load($lehrveranstaltung_id);
+			$lehrveranstaltungen_data = $this->getDataOrTerminateWithError($lehrveranstaltungen);
+		}
+
 		foreach ($lehrveranstaltungen_data as $lehrveranstaltung)
 		{
 			$lehreinheiten = $this->_ci->LehreinheitModel->getByLvidStudiensemester($lehrveranstaltung->lehrveranstaltung_id, $studiensemester_kurzbz);
