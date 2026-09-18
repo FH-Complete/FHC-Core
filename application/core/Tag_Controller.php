@@ -34,7 +34,7 @@ class Tag_Controller extends FHCAPI_Controller
 		$this->load->model('person/Notiz_model', 'NotizModel');
 		$this->load->model('system/Notiztyp_model', 'NotiztypModel');
 		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
-
+		
 		$this->loadPhrases([
 			'ui'
 		]);
@@ -122,36 +122,7 @@ class Tag_Controller extends FHCAPI_Controller
 		$notiztypen = $this->NotiztypModel->loadWhere(array('aktiv' => true));
 		$this->terminateWithSuccess(hasData($notiztypen) ? getData($notiztypen) : array());
 	}
-	public function getTagsByAssignmentTypeValue($zuordnung_typ, $zuordnung_id, $tags = null)
-	{
-		$language = $this->_getLanguageIndex();
-		$index_bezeichnung_mehrsprachig = $language - 1;
 
-		$this->NotizzuordnungModel->addSelect(
-			'tbl_notizzuordnung.notiz_id as notiz_id,
-			typ_kurzbz as tag_typ_kurzbz,
-			array_to_json(bezeichnung_mehrsprachig::varchar[])->>'. $index_bezeichnung_mehrsprachig. ' as bezeichnung,
-			style,
-			beschreibung,
-			tag,
-			tbl_notiz.erledigt as done
-			'
-		);
-		
-		if (is_array($tags) && !isEmptyArray($tags))
-		{
-			$tags = $this->_filterTag($tags, false);
-			$this->NotizzuordnungModel->db->where_in('tbl_notiz_typ.typ_kurzbz', $tags);
-		}
-
-		$this->NotizzuordnungModel->addJoin('public.tbl_notiz', 'public.tbl_notizzuordnung.notiz_id = public.tbl_notiz.notiz_id');
-		$this->NotizzuordnungModel->addJoin('public.tbl_notiz_typ', 'public.tbl_notiz.typ = public.tbl_notiz_typ.typ_kurzbz');
-
-		$this->NotizzuordnungModel->addOrder('prioritaet');
-
-		$notiztypen = $this->NotizzuordnungModel->loadWhere(array('aktiv' => true, $zuordnung_typ => $zuordnung_id));
-		$this->terminateWithSuccess(hasData($notiztypen) ? getData($notiztypen) : array());
-	}
 	public function addTag($withZuordnung = true, $updatable_tags = null)
 	{
 		$postData = $this->getPostJson();

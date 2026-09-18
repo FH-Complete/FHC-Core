@@ -20,6 +20,7 @@ class Tags extends Tag_Controller
 		]);
 
 	$this->config->load('tempus');
+	$this->load->model('ressource/KalenderNotiz_model', 'KalenderNotizModel');
 	}
 
 	public function getTag($readonly_tags = null)
@@ -30,14 +31,53 @@ class Tags extends Tag_Controller
 	{
 		parent::getTags($this->config->item('tempus_tags'));
 	}
-	public function getTagsByCalendar($eindeutige_kalender_gruppen_id = null)
+
+	public function getTagsByCalendar($eindeutige_kalender_gruppen_id)
 	{
-		parent::getTagsByAssignmentTypeValue('eindeutige_kalender_gruppen_id', $eindeutige_kalender_gruppen_id, $this->config->item('tempus_tags'));
+		$language = $this->_getLanguageIndex();
+		$index_bezeichnung_mehrsprachig = $language - 1;
+
+		$this->KalenderNotizModel->addSelect(
+			'tbl_kalender_notiz.notiz_id as notiz_id,
+			typ_kurzbz as tag_typ_kurzbz,
+			array_to_json(bezeichnung_mehrsprachig::varchar[])->>'. $index_bezeichnung_mehrsprachig. ' as bezeichnung,
+			style,
+			beschreibung,
+			tag,
+			tbl_notiz.erledigt as done
+			'
+		);
+
+		$this->KalenderNotizModel->addJoin('public.tbl_notiz', 'tbl_kalender_notiz.notiz_id = public.tbl_notiz.notiz_id');
+		$this->KalenderNotizModel->addJoin('public.tbl_notiz_typ', 'public.tbl_notiz.typ = public.tbl_notiz_typ.typ_kurzbz');
+
+		$this->KalenderNotizModel->addOrder('prioritaet');
+
+		$notiztypen = $this->KalenderNotizModel->loadWhere(array('aktiv' => true, 'eindeutige_kalender_gruppen_id' => $eindeutige_kalender_gruppen_id));
+		$this->terminateWithSuccess(hasData($notiztypen) ? getData($notiztypen) : array());
 	}
+
 	public function addTag($withZuordnung = true, $updatable_tags = null)
 	{
-		parent::addTag(true, $this->config->item('tempus_tags'));
+		$postData = $this->getPostJson();
+
+		$return = array();
+		foreach ($postData->values as $value)
+		{
+			$insertResult = parent::addTag(false, $this->config->item('tempus_tags'));
+
+			$insertZuordnung = $this->KalenderNotizModel->insert(array(
+				'eindeutige_kalender_gruppen_id' => $value,
+				'notiz_id' => $insertResult,
+			));
+
+			if (isError($insertZuordnung))
+				$this->terminateWithError('Error occurred', self::ERROR_TYPE_GENERAL);
+			$return[] = ['eindeutige_kalender_gruppen_id' => $value, 'id' => $insertResult];
+		}
+		$this->terminateWithSuccess($return);
 	}
+
 	public function updateTag($updatable_tags = null)
 	{
 		parent::updateTag($this->config->item('tempus_tags'));
@@ -49,5 +89,14 @@ class Tags extends Tag_Controller
 	public function doneTag($updatable_tags = null)
 	{
 		parent::doneTag($this->config->item('tempus_tags'));
+	}
+
+	public function _getLanguageIndex()
+	{
+		$this->load->model('system/Sprache_model', 'SpracheModel');
+		$this->SpracheModel->addSelect('index');
+		$result = $this->SpracheModel->loadWhere(array('sprache' => getUserLanguage()));
+
+		return hasData($result) ? getData($result)[0]->index : 1;
 	}
 }
