@@ -439,7 +439,7 @@ class KalenderLib
 						n.erledigt AS done,
 						nt.prioritaet,
 						nz.eindeutige_kalender_gruppen_id
-					FROM public.tbl_notizzuordnung nz
+					FROM lehre.tbl_kalender_notiz nz
 					JOIN public.tbl_notiz n ON nz.notiz_id = n.notiz_id
 					JOIN public.tbl_notiz_typ nt ON n.typ = nt.typ_kurzbz$whereTags
 					WHERE nz.eindeutige_kalender_gruppen_id IN (
