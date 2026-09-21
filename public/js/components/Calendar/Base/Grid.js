@@ -321,7 +321,19 @@ export default {
 			} else {
 				this.$refs.scroller.scrollTo(0, 0);
 			}
-		}
+		},
+		isFollowedByBreak(index) {
+			if (index === this.axisPartsSave.length - 1) return false;
+
+			const targetPartEnd = this.axisPartsSave[index].end;
+			const nextPartStart = this.axisPartsSave[index + 1].start;
+			if (!targetPartEnd || !nextPartStart) return false;
+
+			return !(
+				targetPartEnd.hours === nextPartStart.hours &&
+				targetPartEnd.minutes === nextPartStart.minutes
+			);
+		},
 	},
 	beforeUnmount() {
 		this.disableAutoScroll();
@@ -398,6 +410,7 @@ export default {
 					v-for="(part, index) in axisPartsSave"
 					:key="index"
 					class="part-header"
+					:class="{'part-header-followed-by-break': isFollowedByBreak(index)}"
 					:style="'grid-' + axisCol + ':1;grid-' + axisRow + ': ps_' + index + '/pe_' + index + ';min-width:50px;'"
 				>
 					<slot name="part-header" v-bind="{ index, part }" />
@@ -421,6 +434,7 @@ export default {
 							v-for="(part, i) in axisPartsSave"
 							:key="i"
 							class="part-body"
+							:class="{'part-body-followed-by-break': isFollowedByBreak(i)}"
 							style="position:relative"
 							:style="'grid-' + axisCol + ':' + (1+index) + ';grid-' + axisRow + ':ps_' + i + '/pe_' + i"
 						>
