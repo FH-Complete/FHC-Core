@@ -1,5 +1,5 @@
 @page {
-  size: landscape;
+  size: portrait;
 }
 
 * {
@@ -7,6 +7,12 @@
 	color: black !important;
 	font-size: x-small !important;
 	overflow: visible !important;
+	scrollbar-color: rgba(0,0,0,0) rgba(0,0,0,0) !important;
+}
+
+body
+{
+  padding-top: 0 !important;
 }
 
 .fhc-calendar-base-slider > div {
@@ -24,18 +30,13 @@ header,
 	display: none !important;
 }
 
-.fhc-calendar-mode-range .main-header-sunday,
-.fhc-calendar-mode-range .fhc-calendar-base-grid-line-sunday {
-	border-bottom-width: 0 !important;
-}
-
-.fhc-calendar-base-grid-line-sunday,
-.fhc-calendar-mode-range .main-header-sunday {
+.fhc-calendar-mode-range .fhc-calendar-base-grid {
 	break-after: page !important;
+	border-bottom-style: none !important;
 }
 
 .fhc-calendar-mode-range .fhc-calendar-base-grid {
-	grid-template-rows: auto repeat(var(--fhc-grid-displayed-axis-main-count), auto) !important;
+	grid-template-rows: auto repeat(var(--fhc-grid-axis-main-count), auto) !important;
 	gap: 0px !important;
 }
 
@@ -43,8 +44,8 @@ header,
 	gap: 0px !important;
 }
 
-.fhc-calendar-mode-range .main-header:not(.main-header-empty),
-.fhc-calendar-mode-range .fhc-calendar-base-grid-line {
+.fhc-calendar-mode-range .part-body,
+.fhc-calendar-mode-range .part-header {
 	border-top: solid !important;
 	border-top-color: black !important;
 	border-top-width: 1px !important;
