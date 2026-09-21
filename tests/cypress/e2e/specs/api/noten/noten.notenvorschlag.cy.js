@@ -1,14 +1,14 @@
 /**
- * Notenvorschlag - LV-Note schreiben und der resultierende Status (P1, case 11).
+ * Grade proposal - Entering a course grade and the resulting status.
  *
- * Status aus zwei Zeitstempeln (notenRules.js::checkFreigabe). Der "changed nach Freigabe"-Fall
- * wird über eine bereits freigegebene Baseline erzeugt, damit dieser Spec ohne LDAP-Passwort und
- * ohne Freigabemail auskommt.
+ * Status determined by two timestamps (notenRules.js::checkFreigabe). The “changed after approval” case
+ * is generated using a baseline that has already been approved, so that this spec does not require an LDAP password or
+ * an approval email.
  */
 
 import { notenApi } from "../../../../support/api/notenApi";
 import { expectNotenError, expectNotenSuccess } from "../../../../support/helpers/notenErrors";
-import { requireKonfiguration, requireWiederholung } from "../../../../support/helpers/notenConfig";
+import { requireConfig, requireWiederholung } from "../../../../support/helpers/notenConfig";
 import {
 	attemptDate,
 	baselineBenotungsdatum,
@@ -82,16 +82,16 @@ describe("Noten API - Notenvorschlag", () => {
 		});
 	});
 
-	// `erstantritt: false` ist die Altdatenform: freigegebene LV-Note ohne Prüfungszeile. Nur dort
-	// ist ein direktes Umbenoten erlaubt - existiert eine Prüfung, lehnt der Server ab
-	// (validateNotenvorschlag, siehe noten.ueberschreiben).
-	// Das Datum kommt aus dem Übernehmen-Dialog. Die Freigabe macht daraus das Datum von Antritt 1,
-	// daher gelten dieselben Grenzen wie für einen Prüfungstermin.
+	// `erstantritt: false` is the legacy data format: approved course grade without an exam entry. Only in this case
+	// is direct grade adjustment permitted—if an exam exists, the server rejects the request
+	// (validateGradeSuggestion, see overwriteGrades).
+	// The date comes from the “Apply” dialog. The approval process uses this as the date of the first attempt,
+	// so the same restrictions apply as for an exam date.
 	describe("das gewählte Benotungsdatum", () => {
-		// Die LV-Note IST Antritt 1. Ohne diese Zeile bekäme die nächste Prüfung Termin2, und der
-		// Legacy-Typ der ganzen Kette verschiebt sich um eine Stelle.
+		// The lv-note IS “Antritt 1.” Without this line, the next exam would be assigned “Termin2,” and the
+		// legacy type of the entire chain would shift by one position.
 		it("schreibt Antritt 1 mit dem gewählten Tag", function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", true);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", true);
 
 			const student = ctx.students[1];
 			const datum = baselineDate(ctx);
@@ -139,7 +139,7 @@ describe("Noten API - Notenvorschlag", () => {
 		});
 
 		it("schreibt ohne CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME nur die LV-Note", function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", false);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", false);
 
 			const student = ctx.students[1];
 
@@ -157,11 +157,11 @@ describe("Noten API - Notenvorschlag", () => {
 				expect(attemptsOfStudent(data, student.uid), "kein Termin").to.have.length(0);
 			});
 		});
-
+		
 		// Ohne Erstantritt bei der Übernahme bleibt die LV-Note Antritt 1. Der erste Termin schreibt ihn nach
 		// und wird selbst Antritt 2.
 		it("legt ohne CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME Antritt 1 mit dem ersten Termin an", function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", false);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", false);
 			requireWiederholung(this, ctx);
 
 			const student = ctx.students[2];
@@ -188,14 +188,14 @@ describe("Noten API - Notenvorschlag", () => {
 		});
 	});
 
-	// W5: Eine Abfrage liest alle LV-Noten der LV. Das Ergebnis je Studierendem bleibt gleich.
+	// Eine Abfrage liest alle LV-Noten der LV. Das Ergebnis je Studierendem bleibt gleich.
 	describe("Lesedaten", () => {
 		it("liefert LV-Note und Zeitstempel je Studierendem", () => {
-			const [freigegeben, offen, ohneNote] = ctx.students;
+			const [freigegeben, open, withoutNote] = ctx.students;
 
 			resetNotenState(ctx);
 			seedBaseline(ctx, freigegeben, { freigegeben: true });
-			seedBaseline(ctx, offen, { freigegeben: false });
+			seedBaseline(ctx, open, { freigegeben: false });
 
 			readStateViaApi(ctx).then((data) => {
 				const f = lvNoteOf(data, freigegeben.uid);
@@ -203,17 +203,17 @@ describe("Noten API - Notenvorschlag", () => {
 				expect(f.freigabedatum, "freigabedatum der freigegebenen Zeile").to.exist;
 				expect(f.benotungsdatum, "benotungsdatum der freigegebenen Zeile").to.exist;
 
-				const o = lvNoteOf(data, offen.uid);
+				const o = lvNoteOf(data, open.uid);
 				expect(o.note_lv, "LV-Note der offenen Zeile").to.exist;
 				expect(o.benotungsdatum, "benotungsdatum der offenen Zeile").to.exist;
 				expect(o.freigabedatum, "die offene Zeile ist nicht freigegeben").to.be.oneOf([null, undefined, ""]);
 
-				expect((lvNoteOf(data, ohneNote.uid) || {}).note_lv, "keine LV-Note").to.be.oneOf([null, undefined]);
+				expect((lvNoteOf(data, withoutNote.uid) || {}).note_lv, "keine LV-Note").to.be.oneOf([null, undefined]);
 			});
 		});
 	});
 
-	// W7: Eine einzelne Wiederholung ohne Antritt 1, wie sie die Studierendenverwaltung hinterlassen kann. Dieses
+	// Eine einzelne Wiederholung ohne Antritt 1, wie sie die Studierendenverwaltung hinterlassen kann. Dieses
 	// Werkzeug erzeugt den Zustand nicht mehr: sein erster Termin schreibt Antritt 1 nach.
 	describe("eine einzelne Wiederholung", () => {
 		it("sperrt die Übernahme", () => {
@@ -228,7 +228,7 @@ describe("Noten API - Notenvorschlag", () => {
 			seedBaseline(ctx, student, { erstantritt: false });
 
 			let wiederholungId;
-			seedPruefung(ctx, student, { note: g2, datum: attemptDate(ctx, 1), typ: "Termin2" }).then((seeded) => {
+			seedPruefung(ctx, student, { note: g2, datum: attemptDate(ctx, 1), type: "Termin2" }).then((seeded) => {
 				wiederholungId = seeded.pruefungId;
 			});
 
@@ -255,7 +255,7 @@ describe("Noten API - Notenvorschlag", () => {
 	describe("eine bereits freigegebene Note neu benoten", () => {
 		// eine endgültige Freigabe verbietet genau das, siehe noten.freigabe
 		beforeEach(function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_FREIGABE_FINAL", false);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_FREIGABE_FINAL", false);
 		});
 
 		it("wechselt den Status von freigegeben auf geändert", () => {

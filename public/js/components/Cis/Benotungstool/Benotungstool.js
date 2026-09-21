@@ -493,8 +493,9 @@ export const Benotungstool = {
 				let count = 0
 				this.studenten?.forEach(s => {
 					// Add one more column while this row can get one more Termin. The kommissionelle
-					// Prüfung is the last Termin, therefore it uses such a column too.
-					const frei = this.canAddPruefung(s) ? 1 : 0
+					// Prüfung is the last Termin, therefore it uses such a column too. A row closed by
+					// a pass also gets the column: the cell names the reason.
+					const frei = (this.canAddPruefung(s) || this.showBestandenHint(s)) ? 1 : 0
 					const needed = (s.pruefungen?.length ?? 0) + frei
 					if(needed > count) count = needed
 				})
@@ -522,6 +523,11 @@ export const Benotungstool = {
 		/** Tells you if this row can get one more attempt. The value comes from the server. */
 		canAddPruefung(student) {
 			return NotenRules.canAddPruefung(student, this.config)
+		},
+
+		/** A pass closed the chain: the next exam cell names the reason. A credited row stays empty. */
+		showBestandenHint(student) {
+			return !this.canAddPruefung(student) && NotenRules.isBestanden(student) && !student.verlauf?.angerechnet
 		},
 
 		checkFreigabe(freigabedatum, benotungsdatum) {
@@ -1650,7 +1656,9 @@ export const Benotungstool = {
 			// An empty cell gets an add button only if one more Termin is possible and if the column
 			// is after all exams that exist. The kommissionelle Prüfung needs no own column: the
 			// server decides the role of the new exam, the cell then shows the K badge.
-			if(!this.canAddPruefung(data)) return ''
+			// A pass closes the chain. That cell shows the reason instead of the button.
+			const bestanden = this.showBestandenHint(data)
+			if(!this.canAddPruefung(data) && !bestanden) return ''
 
 			if(antrittModus) {
 				// only the next free Termin column shows an add button
@@ -1659,6 +1667,14 @@ export const Benotungstool = {
 				// no new exam before an existing one; same day counts as too early unless configured
 				const gleicherTag = this.config?.CIS_GESAMTNOTE_TERMIN_GLEICHER_TAG === true
 				if((data.pruefungen ?? []).some(p => gleicherTag ? p.datum > field : p.datum >= field)) return ''
+			}
+
+			if(bestanden) {
+				rowDiv.classList.add('ohne-aktion')
+				const hint = addSlot('pruefung-hint', this.$capitalize(this.$p.t('benotungstool/c4bestandenHint')))
+				hint.title = this.$capitalize(this.$p.t('benotungstool/c4bestandenTooltip'))
+				hint.dataset.cy = 'pruefung-bestanden'
+				return rowDiv
 			}
 
 			addButton(
@@ -2422,11 +2438,16 @@ export const Benotungstool = {
 
 		/**
 		 * Meldet, warum diese Zeile keinen Antritt mehr bekommt. Die gesperrte kommissionelle
-		 * Prüfung nennt einen anderen Grund als die erreichte Grenze.
+		 * Prüfung und eine bestandene Note nennen einen anderen Grund als die erreichte Grenze.
 		 */
 		warnKeinAntritt(student, nachsatz) {
 			if(student.verlauf?.kommPruefGesperrt) {
 				this.$fhcAlert.alertWarning(this.$capitalize(this.$p.t('benotungstool/kommPruefNichtErlaubt', [student.uid])))
+				return
+			}
+
+			if(NotenRules.isBestanden(student)) {
+				this.$fhcAlert.alertWarning(this.$capitalize(this.$p.t('benotungstool/pruefungNachBestandenerNote', [student.uid])))
 				return
 			}
 

@@ -1,14 +1,14 @@
 /**
- * Bulk- und Importpfade (P2). Dieselben Guards wie beim einzelnen Speichern, aber je Zeile
- * gemeldet: HTTP 200 mit der Fehlermeldung in data[uid].
+ * Bulk and import paths. Same guards as for individual saves, but reported per row
+ * : HTTP 200 with the error message in data[uid].
  */
 
 import { notenApi } from "../../../../support/api/notenApi";
 import { expectBulkRowAccepted, expectBulkRowError, expectNotenSuccess } from "../../../../support/helpers/notenErrors";
 import {
-	requireKonfiguration,
-	requireNotenModus,
-	requirePunkteModus,
+	requireConfig,
+	requireNotenMode,
+	requirePunkteMode,
 	requireWiederholung,
 } from "../../../../support/helpers/notenConfig";
 import {
@@ -31,8 +31,8 @@ describe("Noten API - Sammelpfade", () => {
 		});
 	});
 
-	/** Führt den Studierenden bis an die Grenze. Die Baseline liefert Antritt 1. */
-	const bisZurGrenze = (student) => {
+	/** Takes students to the limit. The baseline provides the starting point. */
+	const bringToCap = (student) => {
 		for (let i = 0; i < ctx.maxAntritte - 1; i += 1) {
 			addPruefung(ctx, student, {
 				note: ctx.notes.negativ,
@@ -47,8 +47,8 @@ describe("Noten API - Sammelpfade", () => {
 	describe("createPruefungen", () => {
 		beforeEach(function () {
 			requireWiederholung(this, ctx);
-			// ohne Anlage der kommissionellen Prüfung meldet die Grenze kommPruefNichtErlaubt
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF", true);
+			// If the commission audit is not attached, the boundary returns “commAuditNotAllowed”
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF", true);
 		});
 
 		it("lehnt nur die Zeile gegen eine §1-Regel ab und nimmt die übrigen an", () => {
@@ -59,7 +59,7 @@ describe("Noten API - Sammelpfade", () => {
 			seedBaseline(ctx, atCap);
 			seedBaseline(ctx, fresh);
 
-			const datum = bisZurGrenze(atCap);
+			const datum = bringToCap(atCap);
 
 			notenApi
 				.createPruefungen(
@@ -93,13 +93,13 @@ describe("Noten API - Sammelpfade", () => {
 		beforeEach(function () {
 			requireDbReset();
 			requireWiederholung(this, ctx);
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF", true);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF", true);
 		});
 
 		it("wendet die §1-Regeln je Zeile an", function () {
-			// im Punktemodus leitet der Endpunkt die Note aus den Punkten ab; die Regelprüfung
-			// deckt der punktebasierte Test unten ab
-			requireNotenModus(this, ctx);
+			// In Punkte mode, the endpoint derives the grade from the points; the rule check
+			// is covered by the points-based test below
+			requireNotenMode(this, ctx);
 
 			const atCap = ctx.students[0];
 			const fresh = ctx.students[1];
@@ -108,7 +108,7 @@ describe("Noten API - Sammelpfade", () => {
 			seedBaseline(ctx, atCap);
 			seedBaseline(ctx, fresh);
 
-			const datum = bisZurGrenze(atCap);
+			const datum = bringToCap(atCap);
 
 			notenApi
 				.savePruefungenBulk(ctx.lvId, ctx.semKurzbz, [
@@ -134,10 +134,10 @@ describe("Noten API - Sammelpfade", () => {
 				});
 		});
 
-		// Punktemodus: die Note kommt aus dem Notenschlüssel, die Zeile liefert nur Punkte.
+		// Point mode: The grade comes from the grading key; the row only provides points.
 		describe("Punktemodus", () => {
 			beforeEach(function () {
-				requirePunkteModus(this, ctx);
+				requirePunkteMode(this, ctx);
 			});
 
 			it("wendet die Regeln je Zeile auf die abgeleitete Note an", () => {
@@ -149,8 +149,8 @@ describe("Noten API - Sammelpfade", () => {
 				seedBaseline(ctx, atCap);
 				seedBaseline(ctx, fresh);
 
-				const datum = bisZurGrenze(atCap);
-				const zeile = (student) => ({
+				const datum = bringToCap(atCap);
+				const bulkRow = (student) => ({
 					uid: student.uid,
 					note: null,
 					punkte,
@@ -158,21 +158,25 @@ describe("Noten API - Sammelpfade", () => {
 					lehreinheit_id: student.lehreinheit_id,
 				});
 
-				notenApi.savePruefungenBulk(ctx.lvId, ctx.semKurzbz, [zeile(atCap), zeile(fresh)]).then((response) => {
-					const data = expectNotenSuccess(response, "savePruefungenBulk mit Punkten");
-					expectBulkRowError(data, atCap.uid, "maxAntritteReached");
-					expectBulkRowAccepted(data, fresh.uid);
-				});
+				notenApi
+					.savePruefungenBulk(ctx.lvId, ctx.semKurzbz, [bulkRow(atCap), bulkRow(fresh)])
+					.then((response) => {
+						const data = expectNotenSuccess(response, "savePruefungenBulk mit Punkten");
+						expectBulkRowError(data, atCap.uid, "maxAntritteReached");
+						expectBulkRowAccepted(data, fresh.uid);
+					});
 
-				notenApi.getNoteByPunkte(punkte, ctx.lvId, ctx.semKurzbz).then((antwort) => {
-					const erwartet = antwort.body.data;
+				notenApi.getNoteByPunkte(punkte, ctx.lvId, ctx.semKurzbz).then((punkteResponse) => {
+					const expectedNote = punkteResponse.body.data;
 
 					readStateViaApi(ctx).then((data) => {
-						const neu = attemptsOfStudent(data, fresh.uid).find(
+						const newTermin = attemptsOfStudent(data, fresh.uid).find(
 							(p) => String(p.datum).slice(0, 10) === datum,
 						);
-						expect(neu, "der neue Termin").to.exist;
-						expect(String(neu.note), "die aus den Punkten abgeleitete Note").to.eq(String(erwartet));
+						expect(newTermin, "der neue Termin").to.exist;
+						expect(String(newTermin.note), "die aus den Punkten abgeleitete Note").to.eq(
+							String(expectedNote),
+						);
 					});
 				});
 			});
@@ -181,8 +185,8 @@ describe("Noten API - Sammelpfade", () => {
 
 	describe("saveNotenvorschlagBulk", () => {
 		it("schreibt für jede Zeile eine LV-Note", function () {
-			// im Punktemodus kommt die Note aus dem Notenschlüssel, siehe den Punktemodus-Block
-			requireNotenModus(this, ctx);
+			// In points mode, the grade comes from the grading key, see the score mode block
+			requireNotenMode(this, ctx);
 
 			const [a, b] = ctx.students;
 
@@ -194,7 +198,7 @@ describe("Noten API - Sammelpfade", () => {
 					{ uid: b.uid, note: ctx.gradeNotes[1], punkte: null },
 				])
 				.then((response) => {
-					// nach uid geschlüsselt: je Zeile die LV-Note oder eine Fehlermeldung
+					// Sorted by uid: each line contains either the course grade or an error message
 					const data = expectNotenSuccess(response, "saveNotenvorschlagBulk");
 					expectBulkRowAccepted(data, a.uid);
 					expectBulkRowAccepted(data, b.uid);
@@ -213,28 +217,28 @@ describe("Noten API - Sammelpfade", () => {
 
 		describe("Punktemodus", () => {
 			beforeEach(function () {
-				requirePunkteModus(this, ctx);
+				requirePunkteMode(this, ctx);
 			});
 
 			it("überspringt eine Zeile ohne Punkte und schreibt die übrigen", () => {
-				const ohnePunkte = ctx.students[0];
-				const mitPunkten = ctx.students[1];
+				const withoutPunkte = ctx.students[0];
+				const withPunkte = ctx.students[1];
 
 				resetNotenState(ctx);
 
 				notenApi
 					.saveNotenvorschlagBulk(ctx.lvId, ctx.semKurzbz, [
-						{ uid: ohnePunkte.uid, note: null, punkte: null },
-						{ uid: mitPunkten.uid, note: null, punkte: 100 },
+						{ uid: withoutPunkte.uid, note: null, punkte: null },
+						{ uid: withPunkte.uid, note: null, punkte: 100 },
 					])
 					.then((response) => {
-						// eine kaputte Zeile darf den ganzen Import nicht abbrechen
+						// A broken line should not cause the entire import to fail
 						const data = expectNotenSuccess(response, "Notenimport mit Luecke");
-						expectBulkRowError(data, ohnePunkte.uid, "c4punkteKeineNoteErmittelt");
-						expectBulkRowAccepted(data, mitPunkten.uid);
+						expectBulkRowError(data, withoutPunkte.uid, "c4punkteKeineNoteErmittelt");
+						expectBulkRowAccepted(data, withPunkte.uid);
 					});
 
-				readLvGesamtnoteViaDb(ctx, ohnePunkte.uid).then((row) => {
+				readLvGesamtnoteViaDb(ctx, withoutPunkte.uid).then((row) => {
 					expect(row, "die übersprungene Zeile bleibt ungeschrieben").to.be.null;
 				});
 			});

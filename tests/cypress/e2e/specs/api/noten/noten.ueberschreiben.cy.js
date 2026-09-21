@@ -1,19 +1,14 @@
 /**
- * Overwrite-Regeln der Notenvorschlag-Spalte.
+ * Overwrite rules for the grade suggestion column.
  *
- * Drei Regeln: die Editorliste bietet nur lehre-Noten an, die Spalte ist gesperrt, sobald eine
- * Prüfung existiert, und eine Zeugnisnote mit lkt_ueberschreibbar = false sperrt sie ebenfalls.
- * Alle drei stehen in Benotungstool.js UND in Noten::validateNotenvorschlag - der direkte
- * API-Aufruf und der CSV-Import erreichen den Client nie.
+ * Three rules: the editor list only offers “lehre” noten, the column is locked as soon as an
+ * exam exists; and a report card grade with lkt_ueberschreibbar = false also locks it.
+ * All three are defined in Benotungstool.js AND in Noten::validateNotenvorschlag the direct
+ * API call and the CSV import never reach the client.
  */
 
 import { expectBulkRowError, expectNotenError, expectNotenSuccess } from "../../../../support/helpers/notenErrors";
-import {
-	requireKonfiguration,
-	requireNotenModus,
-	requireWiederholung,
-	skipWenn,
-} from "../../../../support/helpers/notenConfig";
+import { requireConfig, requireNotenMode, requireWiederholung, skipIf } from "../../../../support/helpers/notenConfig";
 import {
 	attemptDate,
 	loadNotenContext,
@@ -43,17 +38,17 @@ describe("Noten API - Regeln zum Überschreiben des Notenvorschlags", () => {
 	const studentFor = (index) => ctx.students[index % ctx.students.length];
 
 	it("lehnt eine Note ab, die die Auswahlliste nicht anbietet", function () {
-		requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_VORSCHLAG_NUR_LEHRENOTEN", true);
-		// auf dieser Instanz kann jede aktive Note eine Lehrenote sein
-		skipWenn(this, ctx.notes.nichtLehre === null, "Übersprungen: keine Verwaltungsnote in tbl_note.");
+		requireConfig(this, ctx, "CIS_GESAMTNOTE_VORSCHLAG_NUR_LEHRENOTEN", true);
+		// On this instance, any active note can be a lehre note
+		skipIf(this, ctx.notes.notLehre === null, "Übersprungen: keine Verwaltungsnote in tbl_note.");
 
 		const student = studentFor(0);
 
-		// ohne Erstantritt: sonst greift die Prüfungsregel und die Notenregel bliebe ungeprüft
+		// without a first attempt: otherwise, the review rule applies and the grading rule would remain unreviewed
 		givenBaseline(ctx, student, { erstantritt: false });
 
 		notenApi
-			.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, ctx.notes.nichtLehre)
+			.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, ctx.notes.notLehre)
 			.then((response) => expectNotenError(response, "c4noteNichtInLehre"))
 			.then(() => readLvGesamtnoteViaDb(ctx, student.uid))
 			.then((row) => {
@@ -86,12 +81,12 @@ describe("Noten API - Regeln zum Überschreiben des Notenvorschlags", () => {
 
 	it("lehnt das Überschreiben einer gesperrten Zeugnisnote ab", function () {
 		// auf dieser Instanz darf die Lehrperson jede aktive Note überschreiben
-		skipWenn(this, ctx.notes.nichtUeberschreibbar === null, "Übersprungen: keine gesperrte Note in tbl_note.");
+		skipIf(this, ctx.notes.notUeberschreibbar === null, "Übersprungen: keine gesperrte Note in tbl_note.");
 
 		const student = studentFor(4);
 
 		givenBaseline(ctx, student, { erstantritt: false });
-		seedZeugnisnote(ctx, student.uid, ctx.notes.nichtUeberschreibbar);
+		seedZeugnisnote(ctx, student.uid, ctx.notes.notUeberschreibbar);
 
 		notenApi
 			.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, ctx.gradeNotes[1])
@@ -102,35 +97,35 @@ describe("Noten API - Regeln zum Überschreiben des Notenvorschlags", () => {
 			});
 	});
 
-	// W1: Ein Termin schreibt dieselbe LV-Note wie die Übernahme und prüft dieselben Notenregeln.
+	// Ein Termin schreibt dieselbe LV-Note wie die Übernahme und prüft dieselben Notenregeln.
 	describe("Prüfungspfade", () => {
 		/** Eine Verwaltungsnote, die einen Antritt verbraucht. Noten ohne Antritt bleiben erlaubt. */
-		const skipOhneVerwaltungsnote = (test) => {
-			requireKonfiguration(test, ctx, "CIS_GESAMTNOTE_VORSCHLAG_NUR_LEHRENOTEN", true);
+		const skipWithoutVerwaltungsnote = (test) => {
+			requireConfig(test, ctx, "CIS_GESAMTNOTE_VORSCHLAG_NUR_LEHRENOTEN", true);
 
-			const ohneAntritt = (ctx.cisConfig.NOTEN_OHNE_ANTRITT || []).map(String);
-			const brauchbar = ctx.notes.nichtLehre !== null && !ohneAntritt.includes(String(ctx.notes.nichtLehre));
+			const withoutAntritt = (ctx.cisConfig.NOTEN_OHNE_ANTRITT || []).map(String);
+			const usable = ctx.notes.notLehre !== null && !withoutAntritt.includes(String(ctx.notes.notLehre));
 
-			skipWenn(test, !brauchbar, "Übersprungen: keine Verwaltungsnote, die einen Antritt verbraucht.");
+			skipIf(test, !usable, "Übersprungen: keine Verwaltungsnote, die einen Antritt verbraucht.");
 		};
 
-		const expectNurAntritt1 = (student) =>
+		const expectOnlyAntritt1 = (student) =>
 			readStateViaApi(ctx).then((data) => {
 				expect(attemptsOfStudent(data, student.uid), "nur Antritt 1").to.have.length(1);
 			});
 
 		it("lehnt einen Termin mit einer Verwaltungsnote ab", function () {
-			skipOhneVerwaltungsnote(this);
+			skipWithoutVerwaltungsnote(this);
 			requireWiederholung(this, ctx);
 
 			const student = studentFor(0);
 
 			givenBaseline(ctx, student);
-			addPruefung(ctx, student, { note: ctx.notes.nichtLehre, datum: attemptDate(ctx, 1) }).then((response) =>
+			addPruefung(ctx, student, { note: ctx.notes.notLehre, datum: attemptDate(ctx, 1) }).then((response) =>
 				expectNotenError(response, "c4noteNichtInLehre"),
 			);
 
-			expectNurAntritt1(student);
+			expectOnlyAntritt1(student);
 			readLvGesamtnoteViaDb(ctx, student.uid).then((row) => {
 				expect(String(row.note), "die LV-Note bleibt").to.eq(String(ctx.notes.negativ));
 			});
@@ -139,27 +134,27 @@ describe("Noten API - Regeln zum Überschreiben des Notenvorschlags", () => {
 		it("lehnt einen Termin bei gesperrter Zeugnisnote ab", function () {
 			requireWiederholung(this, ctx);
 
-			// eine Anrechnungsnote meldet c4angerechnetKeinePruefung, deshalb schliesst der Test sie aus
+			// A anrechnungs grade reports “c4angerechnetKeinePruefung,” so the test excludes it
 			const anrechnung = (ctx.cisConfig.NOTEN_ANRECHNUNG || []).map(String);
-			const gesperrt = ctx.notenOptions.find(
+			const locked = ctx.notenOptions.find(
 				(n) => n.lkt_ueberschreibbar === false && !anrechnung.includes(String(n.note)),
 			);
-			skipWenn(this, !gesperrt, "Übersprungen: keine gesperrte Note ausser den Anrechnungsnoten.");
+			skipIf(this, !locked, "Übersprungen: keine gesperrte Note ausser den Anrechnungsnoten.");
 
 			const student = studentFor(1);
 
 			givenBaseline(ctx, student);
-			seedZeugnisnote(ctx, student.uid, gesperrt.note);
+			seedZeugnisnote(ctx, student.uid, locked.note);
 
 			addPruefung(ctx, student, { note: ctx.notes.negativ, datum: attemptDate(ctx, 1) }).then((response) =>
 				expectNotenError(response, "c4zeugnisnoteGesperrt"),
 			);
 
-			expectNurAntritt1(student);
+			expectOnlyAntritt1(student);
 		});
 
 		it("lehnt im Sammeldialog jede Zeile mit einer Verwaltungsnote ab", function () {
-			skipOhneVerwaltungsnote(this);
+			skipWithoutVerwaltungsnote(this);
 
 			const students = [studentFor(0), studentFor(1)];
 
@@ -171,7 +166,7 @@ describe("Noten API - Regeln zum Überschreiben des Notenvorschlags", () => {
 					attemptDate(ctx, 1),
 					ctx.lvId,
 					ctx.semKurzbz,
-					ctx.notes.nichtLehre,
+					ctx.notes.notLehre,
 				)
 				.then((response) => {
 					const data = expectNotenSuccess(response, "createPruefungen mit einer Verwaltungsnote");
@@ -186,13 +181,13 @@ describe("Noten API - Regeln zum Überschreiben des Notenvorschlags", () => {
 		});
 	});
 
-	// Derselbe Weg über den CSV-Import, den eine Assistenz tatsächlich fährt. Der Bulk-Endpunkt
-	// antwortet 200 und meldet die abgelehnte Zeile in data[uid].
+	// The same process via CSV import that an assistant actually follows. The bulk endpoint
+	// returns a 200 status code and reports the rejected row in data[uid].
 	describe("saveNotenvorschlagBulk", () => {
 		beforeEach(function () {
-			// im Punktemodus leitet der Import die Note aus den Punkten ab und verwirft eine
-			// Zeile ohne Punkte, bevor eine dieser Regeln greift
-			requireNotenModus(this, ctx);
+			// In point mode, the import calculates the grade based on the points and discards a
+			// row with no points before any of these rules take effect
+			requireNotenMode(this, ctx);
 			requireWiederholung(this, ctx);
 		});
 

@@ -1,0 +1,25 @@
+{
+  "private": true,
+  "description": "Eigener Arbeitsplatz: SSH-Tunnel, Profile, Lint und Format.",
+  "scripts": {
+    "lint": "cd ../../.. && eslint -c tests/cypress/local/eslint.config.js tests/cypress cypress.config.js",
+    "format": "cd ../../.. && prettier --config tests/cypress/local/package.json --write \"tests/cypress/**/*.js\" \"!tests/cypress/e2e/fhcomplete/**\" \"!tests/cypress/e2e/*.cy.js\""
+  },
+  "prettier": {
+    "useTabs": true,
+    "tabWidth": 4,
+    "printWidth": 120,
+    "endOfLine": "auto"
+  },
+  "dependencies": {
+    "ssh2": "^1.17.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.10.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-cypress": "^7.0.2",
+    "globals": "^17.12.0",
+    "prettier": "^3.9.7"
+  }
+}

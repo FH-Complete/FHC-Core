@@ -1,11 +1,11 @@
 /**
- * Runtime discovery + Fixture-Helfer.
+ * Runtime discovery + fixture helpers.
  *
- * Keine fixen Ids: maxAntritte und die Sondernoten-PKs stehen in Server-Config, die nicht im Repo
- * liegt, und werden daher zur Laufzeit über die API gelesen. Override: NOTEN_SEM / NOTEN_LV_ID.
+ * No fixed IDs: maxAntritte and the special grade PKs are stored in the server configuration, which is not in the repo
+ * and are therefore read at runtime via the API. Override: NOTEN_SEM / NOTEN_LV_ID.
  */
 
-import { notenApi } from "../api/notenApi";
+import { notenApi, notenAuth } from "../api/notenApi";
 import { expectNotenSuccess } from "./notenErrors";
 // the client rule; it now only reads back what the server derived, so a mismatch is a config bug
 import { maxAntrittCount as computeMaxAntritte } from "../../../../public/js/components/Cis/Benotungstool/notenRules.js";
@@ -18,7 +18,7 @@ import {
 	performSeedZeugnisnote,
 	resolveResetStrategy,
 } from "./notenReset";
-import { assertPunkteModus } from "./notenConfig";
+import { assertPunkteMode } from "./notenConfig";
 
 const BEZ_ENTSCHULDIGT = "entschuldigt";
 const BEZ_NOCH_NICHT = "Noch nicht eingetragen";
@@ -65,35 +65,27 @@ export const fristHasPassed = (semKurzbz, ssConfig = { month: 11, day: 15 }, wsC
  * @param {string} type "SS" or "WS"
  * @returns {Cypress.Chainable<{semKurzbz: string, lvId: number}|null>}
  */
-export const lehrsemesterMitAbgelaufenerFrist = (type = "SS", ssConfig, wsConfig) => {
-	const jahr = new Date().getFullYear();
-	const kandidaten = [];
-	for (let y = jahr; y >= jahr - 6; y -= 1) {
+export const teachingSemesterWithExpiredFrist = (type = "SS", ssConfig, wsConfig) => {
+	const year = new Date().getFullYear();
+	const candidates = [];
+	for (let y = year; y >= year - 6; y -= 1) {
 		const sem = `${type}${y}`;
-		if (fristHasPassed(sem, ssConfig, wsConfig)) kandidaten.push(sem);
+		if (fristHasPassed(sem, ssConfig, wsConfig)) candidates.push(sem);
 	}
 
-	const probiere = (i) => {
-		if (i >= kandidaten.length) return cy.wrap(null, { log: false });
+	const trySemester = (i) => {
+		if (i >= candidates.length) return cy.wrap(null, { log: false });
 
-		return notenApi.getBenotungstoolContext(kandidaten[i]).then((response) => {
+		return notenApi.getBenotungstoolContext(candidates[i]).then((response) => {
 			const lvs = (response.body && response.body.data && response.body.data.lehrveranstaltungen) || [];
 			if (lvs.length > 0) {
-				return { semKurzbz: kandidaten[i], lvId: lvs[0].lehrveranstaltung_id };
+				return { semKurzbz: candidates[i], lvId: lvs[0].lehrveranstaltung_id };
 			}
-			return probiere(i + 1);
+			return trySemester(i + 1);
 		});
 	};
 
-	return probiere(0);
-};
-
-export const semesterWithPastFrist = (type = "SS") => {
-	const year = new Date().getFullYear();
-	for (let y = year; y >= year - 6; y -= 1) {
-		if (fristHasPassed(`${type}${y}`)) return `${type}${y}`;
-	}
-	return `${type}${year - 6}`;
+	return trySemester(0);
 };
 
 // --- discovery ---
@@ -107,7 +99,7 @@ const resolveSemester = () => {
 			method: "GET",
 			url: "/index.ci.php/api/frontend/v1/organisation/Studiensemester/getAll",
 			qs: { order: "DESC" },
-			auth: { username: Cypress.env("adminusername"), password: Cypress.env("adminpassword") },
+			auth: notenAuth(),
 			failOnStatusCode: false,
 		})
 		.then((response) => {
@@ -157,7 +149,7 @@ export const loadNotenContext = () => {
 			context.maxAntritte = computeMaxAntritte(context.cisConfig);
 			// ein Lauf, der den falschen Konfigurationsmodus erwartet, soll hier scheitern und nicht
 			// alles stillschweigend überspringen
-			assertPunkteModus(context);
+			assertPunkteMode(context);
 			return notenApi.getNoten();
 		})
 		.then((response) => {
@@ -190,10 +182,10 @@ export const loadNotenContext = () => {
 			expect(context.gradeNotes.length, "need two ordinary grades to vary one on edit").to.be.greaterThan(1);
 
 			// administrative note the editor list excludes ("intern angerechnet" / "nicht zugelassen")
-			const nichtLehre = noten.find((n) => n.lehre === false);
+			const notLehre = noten.find((n) => n.lehre === false);
 
 			// as a ZEUGNISnote this one locks the LV note, in the client and in the server
-			const nichtUeberschreibbar = noten.find((n) => n.lkt_ueberschreibbar === false);
+			const notUeberschreibbar = noten.find((n) => n.lkt_ueberschreibbar === false);
 
 			// Anrechnungen block every Prüfung for the LV - keyed on the ZEUGNISnote
 			const angerechnet = byBezeichnung("angerechnet");
@@ -202,9 +194,9 @@ export const loadNotenContext = () => {
 			// An attempt chain needs grades by meaning, not by index: a positive grade closes the
 			// chain, so a repeat after "Sehr Gut" is not a test case but an impossible flow.
 			const abschliessend = (context.cisConfig.NOTEN_ABSCHLIESSEND || []).map(String);
-			const inSkala = (n) => Number(n.note) >= 1 && Number(n.note) <= 5;
-			const negativNoten = usable.filter((n) => !n.positiv && inSkala(n)).map((n) => n.note);
-			const positivNoten = usable.filter((n) => n.positiv && inSkala(n)).map((n) => n.note);
+			const inScale = (n) => Number(n.note) >= 1 && Number(n.note) <= 5;
+			const negativNoten = usable.filter((n) => !n.positiv && inScale(n)).map((n) => n.note);
+			const positivNoten = usable.filter((n) => n.positiv && inScale(n)).map((n) => n.note);
 			const verbesserbar = positivNoten.filter((n) => !abschliessend.includes(String(n)));
 
 			expect(negativNoten.length, "need a negative grade to build an attempt chain").to.be.greaterThan(0);
@@ -218,8 +210,8 @@ export const loadNotenContext = () => {
 				bestnote: positivNoten.find((n) => abschliessend.includes(String(n))) || null,
 				entschuldigt: entschuldigt.note,
 				nochNichtEingetragen: nochNicht.note,
-				nichtLehre: nichtLehre ? nichtLehre.note : null,
-				nichtUeberschreibbar: nichtUeberschreibbar ? nichtUeberschreibbar.note : null,
+				notLehre: notLehre ? notLehre.note : null,
+				notUeberschreibbar: notUeberschreibbar ? notUeberschreibbar.note : null,
 				angerechnet: angerechnet ? angerechnet.note : null,
 				internAngerechnet: internAngerechnet ? internAngerechnet.note : null,
 			};
@@ -249,11 +241,11 @@ export const loadNotenContext = () => {
 export const resetNotenState = (context, studentUids) => performReset(context, studentUids || context.studentUids);
 
 /**
- * Baseline für Antritt 1: freigegebene LV-Note PLUS die Prüfungszeile dazu - das ist, was die
- * Freigabe produziert. Ohne die Zeile zählt die LV-Note nur solange gar kein Termin existiert, und
- * der erste hinzugefügte Antritt würde Antritt 1 ersetzen statt Antritt 2 zu werden.
+ * Baseline for Antritt 1: approved course grade PLUS the corresponding exam row—that is what the
+ * approval generates. Without that row, the course grade only counts as long as no date exists, and
+ * the first attempt added would replace Attempt 1 instead of becoming Attempt 2.
  *
- * `erstantritt: false` (bzw. `freigegeben: false`) seedet die Altdaten-Form ohne diese Zeile.
+ * `first_attempt: false` (or `approved: false`) seeds the legacy data form without this line.
  */
 export const seedBaseline = (context, student, options = {}) => {
 	expect(student, "seedBaseline braucht das Studierenden-Objekt aus context.students, nicht die uid").to.be.an(
@@ -263,13 +255,13 @@ export const seedBaseline = (context, student, options = {}) => {
 	// Defaults to a NEGATIVE grade: only after one may another attempt follow. Pass
 	// context.notes.bestnote explicitly to close the chain.
 	const note = options.note !== undefined ? options.note : context.notes.negativ;
-	// Mit CIS_GESAMTNOTE_FREIGABE_FINAL ist eine freigegebene Note endgültig. Ohne ausdrückliches
-	// freigegeben sät die Baseline dann eine offene Note, damit ein Test weitere Termine anlegen kann.
+	// With CIS_GESAMTNOTE_FREIGABE_FINAL, a released grade is final. Without an explicit
+	// release, the baseline sets the grade to “open” so that a test can create additional dates.
 	const freigegeben =
 		options.freigegeben !== undefined
 			? options.freigegeben
 			: context.cisConfig.CIS_GESAMTNOTE_FREIGABE_FINAL !== true;
-	// Antritt 1 fehlt nur bei ausdrücklichem erstantritt: false oder freigegeben: false
+	// Start 1 is missing only if the initial start is explicitly set to false or enabled: false
 	const erstantritt = options.erstantritt !== undefined ? options.erstantritt : options.freigegeben !== false;
 
 	return performSeed(context, student.uid, {
@@ -285,26 +277,27 @@ export const seedBaseline = (context, student, options = {}) => {
 			lehreinheitId: student.lehreinheit_id,
 			note,
 			datum: baselineDate(context),
-			typ: "Termin1", // legacy projection of Antritt 1; the rules never read it back
+			type: "Termin1", // legacy projection of Antritt 1; the rules never read it back
 		}).then(() => seeded);
 	});
 };
 
 /** -> { pruefungId, note, datum, typ }. For attempt states the API cannot build. */
-export const seedPruefung = (context, student, { note, datum, typ }) =>
+export const seedPruefung = (context, student, { note, datum, type }) =>
 	performSeedPruefung(context, student.uid, {
 		lehreinheitId: student.lehreinheit_id,
 		note,
 		datum,
-		typ,
+		type,
 	});
 
-/** Zeugnisnote setzen. Nur die Studierendenverwaltung schreibt sie, kein Endpunkt dieses Tools. */
+/** Set the grade on the transcript. Only the student administration system (stv) enters it,
+ *  this tool does not handle that. */
 export const seedZeugnisnote = (context, studentUid, note) => performSeedZeugnisnote(context, studentUid, { note });
 
 /**
- * Liest die LV-Note direkt aus der DATENBANK: was wirklich gespeichert ist, ohne den
- * freigabedatum-Filter von getLvGesamtNoten. Das Gegenstück ist readStateViaApi.
+ * Reads the course grade directly from the DB: what is actually stored, without the
+ * “release date” filter from getLvGesamtNoten. The counterpart is readStateViaApi.
  */
 export const readLvGesamtnoteViaDb = (context, studentUid) => performRead(context, studentUid);
 

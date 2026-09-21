@@ -1,11 +1,11 @@
 /**
- * Access control (P2) - das Scoping von assertLvAccess.
+ * Access control - the scope of `assertLvAccess`.
  *
- * Diese API kennt keine Impersonation, der Lektoren-Scope braucht daher echte Zugangsdaten:
+ * This API does not support impersonation. therefore the lecturer scope requires valid credentials:
  * NOTEN_TEACHER_USER / NOTEN_TEACHER_PASSWORD / NOTEN_FOREIGN_LV_ID.
  */
 
-import { notenApi } from "../../../../support/api/notenApi";
+import { notenApi, notenAuth } from "../../../../support/api/notenApi";
 import { expectAuthError, expectNotenError, expectNotenSuccess } from "../../../../support/helpers/notenErrors";
 import {
 	attemptDate,
@@ -15,11 +15,11 @@ import {
 	resetNotenState,
 	seedBaseline,
 } from "../../../../support/helpers/notenTestData";
-import { skipWenn } from "../../../../support/helpers/notenConfig";
+import { skipIf } from "../../../../support/helpers/notenConfig";
 import {
 	assistenzAuth,
-	assistenzKontext,
-	assistenzLvMitLehreinheiten,
+	assistenzContext,
+	assistenzLvWithLehreinheiten,
 	requireAssistenz,
 } from "../../../../support/helpers/notenAssistenz";
 
@@ -75,7 +75,7 @@ describe("Noten API - Zugriffsschutz", () => {
 
 	describe("Scope der Lehrperson", () => {
 		beforeEach(function () {
-			skipWenn(
+			skipIf(
 				this,
 				!teacherConfigured(),
 				"Übersprungen: braucht NOTEN_TEACHER_USER / NOTEN_TEACHER_PASSWORD und NOTEN_FOREIGN_LV_ID " +
@@ -125,25 +125,22 @@ describe("Noten API - Zugriffsschutz", () => {
 		});
 	});
 
-	// getLvForStudiengang ist NICHT abgedeckt: als Admin greift isBerechtigt('admin') und jeder
-	// Aufruf gelingt. Braucht denselben Nicht-Admin-Login wie die Lektorentests oben.
-
+	// getLvForStudiengang is NOT covered: as an admin, isBerechtigt(‘admin’) applies and every
+	// call succeeds. Requires the same non-admin login as the reviewer tests above.
 	describe("getBenotungstoolContext als Assistenz", () => {
 		beforeEach(function () {
 			requireAssistenz(this);
 			cy.clearAllCookies();
 		});
-
-		// C1: Der Assistenz-Zweig lud früher als einziger das StudiengangModel. Der Test schützt ihn.
+		
 		it("liefert die berechtigten Studiengänge", () => {
-			assistenzKontext(ctx.semKurzbz).then((kontext) => {
-				expect(kontext, "ein Semester mit Studiengängen der Assistenz").to.not.be.null;
-				expect(kontext.data.isAssistenz, "isAssistenz").to.be.true;
-				expect(kontext.data.studiengaenge, "studiengaenge").to.be.an("array").and.not.be.empty;
+			assistenzContext(ctx.semKurzbz).then((result) => {
+				expect(result, "ein Semester mit Studiengängen der Assistenz").to.not.be.null;
+				expect(result.data.isAssistenz, "isAssistenz").to.be.true;
+				expect(result.data.studiengaenge, "studiengaenge").to.be.an("array").and.not.be.empty;
 			});
 		});
-
-		// W9: Die alte Route las das Semester als lv_id.
+		
 		it("ignoriert eine lv_id, die nicht nur aus Ziffern besteht", () => {
 			getAs(assistenzAuth(), "getBenotungstoolContext", {
 				sem_kurzbz: ctx.semKurzbz,
@@ -155,12 +152,12 @@ describe("Noten API - Zugriffsschutz", () => {
 		});
 	});
 
-	// C5: Eine leere oder nicht numerische lv_id weitete die Zugriffsprüfung auf alle LVs aus.
+	// An empty or non-numeric lv_id would extend the access check to all LVs.
 	describe("Parameter der Zugriffsprüfung", () => {
 		const s0 = () => ctx.students[0];
 
 		// saveStudentenNoten fehlt: Der Endpunkt prüft zuerst das Passwort und verschickt eine Mail.
-		const endpunkte = {
+		const endpoints = {
 			getStudentenNoten: (lv, sem) => notenApi.getStudentenNoten(lv, sem),
 			getLehreinheitenFuerLv: (lv, sem) => notenApi.getLehreinheitenFuerLv(lv, sem),
 			getNoteByPunkte: (lv, sem) => notenApi.getNoteByPunkte(50, lv, sem),
@@ -176,21 +173,21 @@ describe("Noten API - Zugriffsschutz", () => {
 					lehreinheit_id: s0().lehreinheit_id,
 					sem_kurzbz: sem,
 				}),
-			// createPruefungen prüft uids vor der Zugriffsprüfung
+			// createPruefungen checks UIDs before performing the access check
 			createPruefungen: (lv, sem) => notenApi.createPruefungen([{ uid: s0().uid }], attemptDate(ctx, 1), lv, sem),
 			savePruefungenBulk: (lv, sem) => notenApi.savePruefungenBulk(lv, sem, []),
 		};
 
-		Object.entries(endpunkte).forEach(([name, aufruf]) => {
+		Object.entries(endpoints).forEach(([name, call]) => {
 			[null, 0, "", "abc", "1abc", -1].forEach((lv) => {
 				it(`${name} lehnt lv_id=${JSON.stringify(lv)} ab`, () => {
-					aufruf(lv, ctx.semKurzbz).then((response) => expectNotenError(response, "wrongParameters"));
+					call(lv, ctx.semKurzbz).then((response) => expectNotenError(response, "wrongParameters"));
 				});
 			});
 
 			[null, "", "   "].forEach((sem) => {
 				it(`${name} lehnt sem_kurzbz=${JSON.stringify(sem)} ab`, () => {
-					aufruf(ctx.lvId, sem).then((response) => expectNotenError(response, "wrongParameters"));
+					call(ctx.lvId, sem).then((response) => expectNotenError(response, "wrongParameters"));
 				});
 			});
 		});
@@ -201,25 +198,24 @@ describe("Noten API - Zugriffsschutz", () => {
 			before(() => {
 				requireDbReset();
 
-				// Der alte Code überschrieb eine LV-Note einer anderen LV. Diese Zeile setzt kein Reset zurück.
-				const suche = (i) =>
+				const search = (i) =>
 					i >= ctx.students.length
 						? cy.wrap(null, { log: false })
 						: cy
-								.task("noten:db:andereLvNoten", {
+								.task("noten:db:otherLvNoten", {
 									lvId: ctx.lvId,
 									semKurzbz: ctx.semKurzbz,
 									studentUid: ctx.students[i].uid,
 								})
-								.then((anzahl) => (anzahl === 0 ? ctx.students[i] : suche(i + 1)));
+								.then((count) => (count === 0 ? ctx.students[i] : search(i + 1)));
 
-				suche(0).then((found) => {
+				search(0).then((found) => {
 					student = found;
 				});
 			});
 
 			it("ändert bei lv_id=null keine LV-Note", function () {
-				skipWenn(this, !student, "Übersprungen: jeder Studierende hat LV-Noten in anderen LVs.");
+				skipIf(this, !student, "Übersprungen: jeder Studierende hat LV-Noten in anderen LVs.");
 
 				const g2 = ctx.gradeNotes.find((n) => String(n) !== String(ctx.notes.negativ));
 
@@ -237,14 +233,14 @@ describe("Noten API - Zugriffsschutz", () => {
 		});
 	});
 
-	// W10: Der Endpunkt liefert alle Lehreinheiten der LV, für jede Rolle mit Zugriff auf die LV.
+	// The endpoint returns all course units for the course, for each role with access to the course.
 	describe("getLehreinheitenFuerLv", () => {
-		const lehreinheitenDerLv = (lvId) =>
+		const lehreinheitenOfLv = (lvId) =>
 			cy
-				.task("noten:db:lehreinheitenDerLv", { lvId, semKurzbz: ctx.semKurzbz })
+				.task("noten:db:lehreinheitenOfLv", { lvId, semKurzbz: ctx.semKurzbz })
 				.then((ids) => ids.map(String).sort());
 
-		// die Abfrage liefert eine Zeile je Gruppe, eine Lehreinheit kann also mehrfach vorkommen
+		// The query returns one row per group, so a course may appear multiple times
 		const idsOf = (rows) => [...new Set(rows.map((r) => String(r.lehreinheit_id)))].sort();
 
 		before(() => requireDbReset());
@@ -268,7 +264,7 @@ describe("Noten API - Zugriffsschutz", () => {
 					"studentcount",
 				);
 
-				lehreinheitenDerLv(ctx.lvId).then((ids) => {
+				lehreinheitenOfLv(ctx.lvId).then((ids) => {
 					expect(idsOf(rows), "lehreinheit_id").to.deep.eq(ids);
 				});
 			});
@@ -278,13 +274,13 @@ describe("Noten API - Zugriffsschutz", () => {
 			requireAssistenz(this);
 			cy.clearAllCookies();
 
-			assistenzLvMitLehreinheiten(ctx.semKurzbz).then((ziel) => {
-				expect(ziel, "eine LV der Assistenz mit Lehreinheiten").to.not.be.null;
+			assistenzLvWithLehreinheiten(ctx.semKurzbz).then((target) => {
+				expect(target, "eine LV der Assistenz mit Lehreinheiten").to.not.be.null;
 
-				getAs(assistenzAuth(), "getLehreinheitenFuerLv", { lv_id: ziel.lvId, sem_kurzbz: ziel.sem }).then(
+				getAs(assistenzAuth(), "getLehreinheitenFuerLv", { lv_id: target.lvId, sem_kurzbz: target.sem }).then(
 					(response) => {
 						const rows = expectNotenSuccess(response, "getLehreinheitenFuerLv als Assistenz");
-						expect(idsOf(rows), "lehreinheit_id").to.deep.eq(ziel.lehreinheiten);
+						expect(idsOf(rows), "lehreinheit_id").to.deep.eq(target.lehreinheiten);
 					},
 				);
 			});
@@ -294,7 +290,7 @@ describe("Noten API - Zugriffsschutz", () => {
 			cy.request({
 				method: "GET",
 				url: "/index.ci.php/api/frontend/v1/Lehre/getLeForLv",
-				auth: { username: Cypress.env("adminusername"), password: Cypress.env("adminpassword") },
+				auth: notenAuth(),
 				failOnStatusCode: false,
 			}).then((response) => {
 				expect(response.status, "Status von Lehre/getLeForLv").to.not.eq(200);

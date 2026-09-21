@@ -1,8 +1,9 @@
 /**
- * Fixture-Reset ausschliesslich über eine direkte DB-Verbindung - ein HTTP-Endpunkt, der
- * Notendaten löscht, ist durch keine Absicherung so sicher wie sein Nichtvorhandensein.
- * Von der Workstation aus braucht das den SSH-Tunnel (cypress/tasks/sshTunnel.js).
+ * Reset fixtures exclusively via a direct database connection, an HTTP endpoint that
+ * deletes grade data is never as secure as its absence, no matter what safeguards are in place.
  */
+
+import { notenAuth } from "../api/notenApi";
 
 let available = null;
 
@@ -18,13 +19,11 @@ export const resolveResetStrategy = () => {
 };
 
 export const describeFailure = (state) =>
-	`      ${state.reason}\n\n` +
-	"      Needs a database connection. From a workstation: NOTEN_SSH_TUNNEL=true plus\n" +
-	"      NOTEN_SSH_HOST / NOTEN_SSH_USER (and NOTEN_SSH_KEY, unless an agent holds the key).";
+	`      ${state.reason}\n\n` + "      Needs a database connection: NOTEN_DB_* in tests/cypress/suites/.env.";
 
 /**
  * uid to stamp as mitarbeiter_uid / freigabevon_uid.
- * Not Cypress.env("adminusername"): LDAP accepts "Demolektor1" but tbl_benutzer.uid is
+ * Not Cypress.env("NOTEN_USER"): LDAP accepts "Demolektor1" but tbl_benutzer.uid is
  * "demolektor1" and the FKs are case sensitive.
  */
 let cachedAuthUid = null;
@@ -36,7 +35,7 @@ const authUid = () => {
 		.request({
 			method: "GET",
 			url: "/index.ci.php/api/frontend/v1/AuthInfo/getAuthUID",
-			auth: { username: Cypress.env("adminusername"), password: Cypress.env("adminpassword") },
+			auth: notenAuth(),
 			failOnStatusCode: false,
 		})
 		.then((response) => {

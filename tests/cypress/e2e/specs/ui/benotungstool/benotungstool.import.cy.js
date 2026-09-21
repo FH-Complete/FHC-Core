@@ -1,10 +1,5 @@
 import { benotungstoolPage as page } from "../../../../support/pages/benotungstool.po";
-import {
-	requireKonfiguration,
-	requireNotenModus,
-	requireWiederholung,
-	skipWenn,
-} from "../../../../support/helpers/notenConfig";
+import { requireConfig, requireNotenMode, requireWiederholung, skipIf } from "../../../../support/helpers/notenConfig";
 import {
 	attemptDate,
 	loadNotenContext,
@@ -14,13 +9,13 @@ import {
 } from "../../../../support/helpers/notenTestData";
 
 /**
- * Die beiden Importe aus der Toolbar.
+ * The two import options.
  *
- * Notenimport: "UID<TAB>Note" je Zeile, schreibt nur die LV-Note.
- * Prüfungsimport: "UID<TAB>dd.MM.yyyy<TAB>Note" je Zeile, legt zusätzlich den Termin an.
+ * Grade import: “UID<TAB>Grade” per line; writes only the course grade.
+ * Exam import: “UID<TAB>dd.MM.yyyy<TAB>Grade” per line; also creates the exam date.
  *
- * Beide sind über CIS_GESAMTNOTE_NOTENIMPORT / CIS_GESAMTNOTE_PRUEFUNGSIMPORT konfigurierbar - ist
- * der Import aus, existiert der Button nicht und der Block wird übersprungen.
+ * Both can be configured via CIS_GESAMTNOTE_NOTENIMPORT / CIS_GESAMTNOTE_PRUEFUNGSIMPORT
+ * if the import is disabled, the button does not appear and the block is skipped.
  */
 context("Benotungstool UI - Import", () => {
 	let ctx;
@@ -36,36 +31,36 @@ context("Benotungstool UI - Import", () => {
 
 	beforeEach(function () {
 		// im Punktemodus erwarten beide Importe Punkte statt einer Note
-		requireNotenModus(this, ctx);
+		requireNotenMode(this, ctx);
 	});
 
 	/**
-	 * Eine Note, deren Kürzel aus tbl_note.anmerkung im Import brauchbar ist: eindeutig, nicht leer
-	 * und nicht die Note selbst. Passt die Konfiguration nicht zum Parameter, kommt null zurück und
-	 * der Test überspringt sich. Nichts davon steht fest im Test, die Spalte ist Freitext.
+	 * A grade whose abbreviation from tbl_note.anmerkung can be used in the import: unique, not empty,
+	 * and not the grade itself. If the configuration does not match the parameter, null is returned and
+	 * the test skips this line.
 	 */
 	const kuerzelNote = () => {
 		if (!ctx.cisConfig.CIS_GESAMTNOTE_IMPORT_NOTENKUERZEL) return null;
 
-		const kuerzelVon = (n) =>
+		const kuerzelOf = (n) =>
 			String(n.anmerkung ?? "")
 				.trim()
 				.toLowerCase();
 
 		return (ctx.notenOptions ?? []).find((n) => {
-			const k = kuerzelVon(n);
+			const k = kuerzelOf(n);
 			if (!n.lehre || k === "" || k === String(n.note).trim()) return false;
 
-			const doppelt = ctx.notenOptions.filter((o) => kuerzelVon(o) === k).length > 1;
-			const alsNote = ctx.notenOptions.some((o) => String(o.note).trim() === k);
+			const duplicate = ctx.notenOptions.filter((o) => kuerzelOf(o) === k).length > 1;
+			const isNoteValue = ctx.notenOptions.some((o) => String(o.note).trim() === k);
 
-			return !doppelt && !alsNote;
+			return !duplicate && !isNoteValue;
 		});
 	};
 
 	describe("Notenimport", () => {
 		beforeEach(function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_NOTENIMPORT", true);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_NOTENIMPORT", true);
 		});
 
 		it("schreibt die LV-Note für jede Zeile", () => {
@@ -88,7 +83,7 @@ context("Benotungstool UI - Import", () => {
 		});
 
 		it("legt dabei den ersten Antritt an", function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", true);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", true);
 
 			const student = ctx.students[0];
 
@@ -97,14 +92,14 @@ context("Benotungstool UI - Import", () => {
 
 			page.importNoten([[student.uid, ctx.gradeNotes[0]]]);
 
-			// die LV-Note IST Antritt 1, der Import schreibt ihn als eigene Zeile
+			// The course grade IS “Attendance 1”; the import writes it as a separate row
 			page.expectAntrittCount(student.uid, 1);
 			page.expectPruefung(student.uid, "antritt_1", { note: ctx.gradeNotes[0], antritt: 1 });
 		});
 
 		it("nimmt das Kürzel aus der Notenliste, sobald die Option das erlaubt", function () {
 			const kuerzel = kuerzelNote();
-			skipWenn(this, !kuerzel, "Übersprungen: keine Note mit brauchbarem Kürzel in tbl_note.anmerkung.");
+			skipIf(this, !kuerzel, "Übersprungen: keine Note mit brauchbarem Kürzel in tbl_note.anmerkung.");
 
 			const student = ctx.students[1];
 
@@ -119,7 +114,7 @@ context("Benotungstool UI - Import", () => {
 
 	describe("Prüfungsimport", () => {
 		beforeEach(function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_PRUEFUNGSIMPORT", true);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_PRUEFUNGSIMPORT", true);
 		});
 
 		it("legt je Zeile einen datierten Antritt an", function () {
@@ -127,7 +122,7 @@ context("Benotungstool UI - Import", () => {
 
 			const [a, b] = ctx.students;
 			// das Format nennt die Konfiguration, nicht der Test
-			const datum = page.importDatum(attemptDate(ctx, 1), ctx.cisConfig.CIS_GESAMTNOTE_IMPORT_DATUMSFORMAT);
+			const datum = page.importDate(attemptDate(ctx, 1), ctx.cisConfig.CIS_GESAMTNOTE_IMPORT_DATUMSFORMAT);
 
 			resetNotenState(ctx);
 			seedBaseline(ctx, a, { note: ctx.notes.negativ });
@@ -156,7 +151,7 @@ context("Benotungstool UI - Import", () => {
 			page.importPruefungen([
 				[
 					student.uid,
-					page.importDatum(attemptDate(ctx, 1), ctx.cisConfig.CIS_GESAMTNOTE_IMPORT_DATUMSFORMAT),
+					page.importDate(attemptDate(ctx, 1), ctx.cisConfig.CIS_GESAMTNOTE_IMPORT_DATUMSFORMAT),
 					ctx.gradeNotes[0],
 				],
 			]);
@@ -166,18 +161,18 @@ context("Benotungstool UI - Import", () => {
 		});
 	});
 
-	// Der Client prüft jede Zeile, bevor er sie schickt. Eine fehlerhafte Zeile meldet er als Warnung und
-	// schickt nur die übrigen. Doppelte Zeilen erkennt er bewusst nicht.
+	// The client checks each line before sending it. It reports any invalid lines as a warning and
+	// sends only the remaining ones. It deliberately does not detect duplicate lines.
 	describe("fehlerhafte Zeilen", () => {
 		it("warnt im Prüfungsimport je fehlerhafter Zeile und schickt nur die gültigen", function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_PRUEFUNGSIMPORT", true);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_PRUEFUNGSIMPORT", true);
 			requireWiederholung(this, ctx);
 
-			const [perUid, perMatrikelnr, falschesDatum, falscheNote, falscheSpalten] = ctx.students;
+			const [perUid, perMatrikelnr, wrongDate, wrongNote, wrongColumns] = ctx.students;
 			const format = ctx.cisConfig.CIS_GESAMTNOTE_IMPORT_DATUMSFORMAT;
-			const datum = page.importDatum(attemptDate(ctx, 1), format);
-			const jahr = attemptDate(ctx, 1).slice(0, 4);
-			const unmoeglich = format === "yyyy-MM-dd" ? `${jahr}-02-31` : `31.02.${jahr}`;
+			const datum = page.importDate(attemptDate(ctx, 1), format);
+			const year = attemptDate(ctx, 1).slice(0, 4);
+			const impossible = format === "yyyy-MM-dd" ? `${year}-02-31` : `31.02.${year}`;
 			const note = ctx.notes.negativ;
 
 			expect(perMatrikelnr.matrikelnr, "Matrikelnummer des Studierenden").to.be.a("string").and.not.be.empty;
@@ -191,18 +186,18 @@ context("Benotungstool UI - Import", () => {
 				[perUid.uid, datum, note],
 				[perMatrikelnr.matrikelnr, datum, note],
 				["zz_unbekannt", datum, note],
-				[falschesDatum.uid, unmoeglich, note],
-				[falscheNote.uid, datum, "keine-note"],
-				[falscheSpalten.uid, datum],
+				[wrongDate.uid, impossible, note],
+				[wrongNote.uid, datum, "keine-note"],
+				[wrongColumns.uid, datum],
 			]);
 
-			page.expectWarnung("zz_unbekannt");
-			page.expectWarnung(falschesDatum.uid);
-			page.expectWarnung(falscheNote.uid);
+			page.expectWarning("zz_unbekannt");
+			page.expectWarning(wrongDate.uid);
+			page.expectWarning(wrongNote.uid);
 			// die Zeile mit falscher Spaltenzahl nennt nur ihre Zeilennummer
-			page.expectWarnungen(4);
+			page.expectWarnings(4);
 
-			page.gesendeteUids("@savePruefungenBulk", "pruefungen").then((uids) => {
+			page.sentUids("@savePruefungenBulk", "pruefungen").then((uids) => {
 				expect(uids, "nur die gültigen Zeilen, die Matrikelnummer aufgelöst").to.deep.eq([
 					perUid.uid,
 					perMatrikelnr.uid,
@@ -211,26 +206,26 @@ context("Benotungstool UI - Import", () => {
 		});
 
 		it("warnt im Notenimport je fehlerhafter Zeile und schickt nur die gültigen", function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_NOTENIMPORT", true);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_NOTENIMPORT", true);
 
-			const [gueltig, falscheNote, falscheSpalten] = ctx.students;
+			const [valid, wrongNote, wrongColumns] = ctx.students;
 
 			resetNotenState(ctx);
 			page.visitAndWaitForTable(ctx);
 
 			page.importNoten([
-				[gueltig.uid, ctx.gradeNotes[0]],
+				[valid.uid, ctx.gradeNotes[0]],
 				["zz_unbekannt", ctx.gradeNotes[0]],
-				[falscheNote.uid, "keine-note"],
-				[falscheSpalten.uid, ctx.gradeNotes[0], "zu viel"],
+				[wrongNote.uid, "keine-note"],
+				[wrongColumns.uid, ctx.gradeNotes[0], "zu viel"],
 			]);
 
-			page.expectWarnung("zz_unbekannt");
-			page.expectWarnung(falscheNote.uid);
-			page.expectWarnungen(3);
+			page.expectWarning("zz_unbekannt");
+			page.expectWarning(wrongNote.uid);
+			page.expectWarnings(3);
 
-			page.gesendeteUids("@saveNotenvorschlagBulk", "noten").then((uids) => {
-				expect(uids, "nur die gültige Zeile").to.deep.eq([gueltig.uid]);
+			page.sentUids("@saveNotenvorschlagBulk", "noten").then((uids) => {
+				expect(uids, "nur die gültige Zeile").to.deep.eq([valid.uid]);
 			});
 		});
 	});

@@ -58,6 +58,9 @@ export const canAddPruefung = (student, config) => {
 	return !hatKommPruef && antrittCountStudent(student, config) < maxAntrittCount(config);
 };
 
+/** Tells you if a pass closed the chain. Only the server knows it; without a `verlauf` the answer is false. */
+export const isBestanden = (student) => Boolean(student?.verlauf?.bestanden);
+
 /**
  * Tells you if the new exam also creates the course grade. The value comes from the `verlauf` and
  * not from `lv_note`, because `lv_note` contains RELEASED grades only. An entered grade that is

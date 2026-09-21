@@ -2,13 +2,13 @@ import { benotungstoolPage as page } from "../../../../support/pages/benotungsto
 import { waitForOk } from "../../../../support/helpers/network";
 import {
 	requireKommissionellerAntritt,
-	requireKonfiguration,
-	requireNotenModus,
+	requireConfig,
+	requireNotenMode,
 	requireWiederholung,
-	skipWenn,
+	skipIf,
 } from "../../../../support/helpers/notenConfig";
 import { expectNotenSuccess } from "../../../../support/helpers/notenErrors";
-import { addPruefung } from "../../../../support/helpers/notenScenario";
+import { addPruefung, givenBaseline } from "../../../../support/helpers/notenScenario";
 import {
 	attemptDate,
 	loadNotenContext,
@@ -19,12 +19,12 @@ import {
 } from "../../../../support/helpers/notenTestData";
 
 /**
- * Prüfungen anlegen und bearbeiten, über beide Wege: den Dialog aus der Tabellenzelle und die
- * Sammelanlage aus der Toolbar. Beide laufen serverseitig durch denselben Kern
- * (siehe noten.pruefungstermin); geprüft wird, dass die Zelle danach ohne Reload stimmt.
+ * Create and edit exams using both methods: the dialog from the table cell and the
+ * batch creation from import. Both run on the server side using the same core
+ * (see noten.pruefungstermin); the system verifies that the cell is correct afterward without reloading.
  *
- * Die Specs laufen im Terminmodus (Schaltfläche "Termine"), weil die Spaltennamen dort stabil sind:
- * antritt_1, antritt_2, ... Im Datumsmodus heisst die Spalte wie das Prüfungsdatum.
+ * The specs run in schedule mode (the “Schedules” button) because the column names are consistent there:
+ * antritt_1, antritt_2, ... In date mode, the column is named after the exam date.
  */
 context("Benotungstool UI - Prüfungen", () => {
 	let ctx;
@@ -42,7 +42,7 @@ context("Benotungstool UI - Prüfungen", () => {
 
 	beforeEach(function () {
 		// im Punktemodus ist das Notenfeld gesperrt, die Note kommt aus dem Notenschlüssel
-		requireNotenModus(this, ctx);
+		requireNotenMode(this, ctx);
 	});
 
 	it("legt aus der Zelle eine Wiederholung an und zählt sie als Antritt 2", function () {
@@ -68,9 +68,27 @@ context("Benotungstool UI - Prüfungen", () => {
 
 		// die Zelle zeigt den Freigabestatus, den der Server geschrieben hat; die Regel prüft noten.pruefungstermin
 		readLvGesamtnoteViaDb(ctx, student.uid).then((row) => {
-			const geaendert = new Date(row.benotungsdatum) > new Date(row.freigabedatum);
-			page.expectFreigabeState(student.uid, geaendert ? "changed" : "ok");
+			const changed = new Date(row.benotungsdatum) > new Date(row.freigabedatum);
+			page.expectFreigabeState(student.uid, changed ? "changed" : "ok");
 		});
+	});
+
+	it("nennt nach einer positiven Note den Grund statt der Schaltfläche", function () {
+		requireConfig(this, ctx, "CIS_GESAMTNOTE_NOTENVERBESSERUNG", false);
+		skipIf(
+			this,
+			!ctx.notes.positiv,
+			"Übersprungen: keine positive Note, die die Kette nur ohne Notenverbesserung schliesst.",
+		);
+
+		const student = ctx.students[0];
+
+		givenBaseline(ctx, student, { note: ctx.notes.positiv });
+
+		page.visitAndWaitForTable(ctx);
+
+		page.getBestandenHint(student.uid, "antritt_2").should("exist").and("have.attr", "title").and("not.be.empty");
+		page.getPruefungAddButton(student.uid, "antritt_2").should("not.exist");
 	});
 
 	it("legt einen Antritt für einen Studenten ohne LV-Note an und weist darauf hin", () => {
@@ -95,7 +113,7 @@ context("Benotungstool UI - Prüfungen", () => {
 		requireWiederholung(this, ctx);
 
 		const student = ctx.students[0];
-		const neuesDatum = attemptDate(ctx, 2);
+		const newDate = attemptDate(ctx, 2);
 
 		resetNotenState(ctx);
 		seedBaseline(ctx, student, { note: ctx.notes.negativ });
@@ -106,15 +124,15 @@ context("Benotungstool UI - Prüfungen", () => {
 			note: bezeichnung(ctx.gradeNotes[1]),
 			datum: page.toDDMMYYYY(attemptDate(ctx, 1)),
 		});
-		page.editPruefungInCell(student.uid, "antritt_2", { datum: page.toDDMMYYYY(neuesDatum) });
+		page.editPruefungInCell(student.uid, "antritt_2", { datum: page.toDDMMYYYY(newDate) });
 
 		page.expectPruefung(student.uid, "antritt_2", { note: ctx.gradeNotes[1], antritt: 2 });
-		page.getCell(student.uid, "antritt_2").should("contain.text", page.toDDMMYYYY(neuesDatum));
+		page.getCell(student.uid, "antritt_2").should("contain.text", page.toDDMMYYYY(newDate));
 	});
 
 	it("sperrt die Note, sobald ein späterer Antritt existiert", function () {
 		requireWiederholung(this, ctx);
-		requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_NOTE_SPERRE_BEI_SPAETEREM_TERMIN", true);
+		requireConfig(this, ctx, "CIS_GESAMTNOTE_NOTE_SPERRE_BEI_SPAETEREM_TERMIN", true);
 
 		const student = ctx.students[0];
 
@@ -164,7 +182,7 @@ context("Benotungstool UI - Prüfungen", () => {
 		});
 	});
 
-	// W12: Der Sammeldialog prüft einen Termin am selben Tag wie der Server nach
+	// Der Sammeldialog prüft einen Termin am selben Tag wie der Server nach
 	// CIS_GESAMTNOTE_TERMIN_GLEICHER_TAG.
 	describe("Termin am selben Tag im Sammeldialog", () => {
 		beforeEach(function () {
@@ -172,7 +190,7 @@ context("Benotungstool UI - Prüfungen", () => {
 		});
 
 		// 'entschuldigt' verbraucht keinen Antritt, deshalb bleibt ein weiterer Termin möglich
-		const mitTerminAm = (student, datum) => {
+		const withTerminOn = (student, datum) => {
 			resetNotenState(ctx);
 			seedBaseline(ctx, student, { note: ctx.notes.negativ });
 			addPruefung(ctx, student, { note: ctx.notes.entschuldigt, datum }).then((response) =>
@@ -181,40 +199,40 @@ context("Benotungstool UI - Prüfungen", () => {
 			page.visitAndWaitForTable(ctx);
 		};
 
-		const sammelterminAbschicken = (student, datum) =>
+		const submitBulkTermin = (student, datum) =>
 			page.submitPruefungBulk({ uids: [student.uid], datum: page.toDDMMYYYY(datum) });
 
 		it("schickt einen Termin am selben Tag ab, wenn der Schalter an ist", function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_TERMIN_GLEICHER_TAG", true);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_TERMIN_GLEICHER_TAG", true);
 
 			const student = ctx.students[0];
 			const datum = attemptDate(ctx, 1);
 
-			mitTerminAm(student, datum);
-			sammelterminAbschicken(student, datum);
+			withTerminOn(student, datum);
+			submitBulkTermin(student, datum);
 
 			waitForOk("@createPruefungen");
 			cy.get(".p-toast-message-warn").should("not.exist");
 		});
 
 		it("warnt bei einem Termin am selben Tag und schickt nichts ab", function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_TERMIN_GLEICHER_TAG", false);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_TERMIN_GLEICHER_TAG", false);
 
 			const student = ctx.students[0];
 			const datum = attemptDate(ctx, 1);
 
-			mitTerminAm(student, datum);
-			sammelterminAbschicken(student, datum);
+			withTerminOn(student, datum);
+			submitBulkTermin(student, datum);
 
 			cy.get(".p-toast-message-warn").should("contain.text", student.uid);
-			page.getNeuePruefungModal().should("not.be.visible");
+			page.getNewPruefungModal().should("not.be.visible");
 			cy.get("@createPruefungen.all").should("have.length", 0);
 		});
 	});
 
 	it("legt den letzten Antritt als kommissionelle Prüfung an", function () {
 		requireKommissionellerAntritt(this, ctx);
-		skipWenn(
+		skipIf(
 			this,
 			ctx.cisConfig.CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT !== ctx.maxAntritte,
 			"Übersprungen: der letzte Antritt ist nicht kommissionell.",
@@ -237,21 +255,21 @@ context("Benotungstool UI - Prüfungen", () => {
 
 		// Der letzte Antritt ist laut Prüfungsordnung kommissionell. Er bekommt keine eigene Spalte,
 		// sondern den nächsten Prüfungstermin. Das K in der Zelle kennzeichnet ihn.
-		const letzterTermin = `antritt_${ctx.maxAntritte}`;
+		const lastTermin = `antritt_${ctx.maxAntritte}`;
 
-		page.getPruefungAddButton(student.uid, letzterTermin).should("exist");
+		page.getPruefungAddButton(student.uid, lastTermin).should("exist");
 
-		page.addPruefungInCell(student.uid, letzterTermin, {
+		page.addPruefungInCell(student.uid, lastTermin, {
 			note: bezeichnung(ctx.notes.negativ),
 			datum: page.toDDMMYYYY(attemptDate(ctx, ctx.maxAntritte)),
 		});
 
 		page.expectAntrittCount(student.uid, ctx.maxAntritte);
-		// das Badge trägt beides: die Antrittsnummer und das K der kommissionellen Prüfung
-		page.expectPruefung(student.uid, letzterTermin, {
+		// The badge displays both the antritt number and the “K” for the commission exam
+		page.expectPruefung(student.uid, lastTermin, {
 			note: ctx.notes.negativ,
 			antritt: `${ctx.maxAntritte}-K`,
 		});
-		page.expectKeineAntrittsspalte(ctx.maxAntritte + 1);
+		page.expectNoAntrittColumn(ctx.maxAntritte + 1);
 	});
 });

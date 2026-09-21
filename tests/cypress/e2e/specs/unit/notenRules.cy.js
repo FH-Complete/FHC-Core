@@ -1,8 +1,8 @@
 /**
- * Die §1-Regeln auf Clientseite. Pure functions - kein Server, keine Fixture.
+ * The §1 rules on the client side as pure functions.
  *
- * Die Regeln liegen im Server und erreichen den Client als `student.verlauf`; hier wird nur das
- * Auswerten und der lokale Fallback (Verlauf noch nicht geladen) festgenagelt.
+ * The rules are stored on the server and are sent to the client as `student.history`; here, only the
+ * evaluation and the local fallback (history not yet loaded) are hard-coded.
  */
 
 import {
@@ -10,6 +10,7 @@ import {
 	brauchtNeueLvNote,
 	canAddPruefung,
 	checkFreigabe,
+	isBestanden,
 	maxAntrittCount,
 } from "../../../../../public/js/components/Cis/Benotungstool/notenRules.js";
 
@@ -47,21 +48,21 @@ describe("Benotungstool-Regeln (Client)", () => {
 		});
 
 		it("nimmt 1, solange die Konfiguration keine Zahl liefert", () => {
-			// getCisConfig liefert den Schlüssel erst nach dem Laden; bis dahin gilt ein Antritt
+			// getCisConfig returns the key only after loading; until then, a default value applies
 			expect(maxAntrittCount({}), "Schlüssel fehlt").to.eq(1);
 			expect(maxAntrittCount({ CIS_GESAMTNOTE_MAX_ANTRITTE: null }), "Schlüssel ist null").to.eq(1);
 			expect(maxAntrittCount(undefined), "keine Konfiguration").to.eq(1);
 			expect(maxAntrittCount(null), "Konfiguration ist null").to.eq(1);
 		});
 
-		// Der Rückfall nutzt ??, nicht ||. Mit || würde eine konfigurierte 0 zu 1 werden und das
-		// Werkzeug liesse einen Antritt zu, den die Konfiguration verbietet.
+		// The fallback uses ??, not ||. If || were used, a configured 0 would become 1, and the
+		// tool would allow a start that the configuration prohibits.
 		it("behält eine konfigurierte 0", () => {
 			expect(maxAntrittCount(configWith(0))).to.eq(0);
 		});
 
-		// getMaxAntritte auf dem Server liefert ein int. Die Umwandlung hält den Wert auch dann eine
-		// Zahl, wenn er je als Text ankommt: die Aufrufer vergleichen ihn, die Tests streng.
+		// getMaxAntritte on the server returns an int. The conversion ensures that the value remains a
+		// number even if it is received as text: the callers compare it, and the tests are strict.
 		it("gibt immer eine Zahl zurück", () => {
 			expect(maxAntrittCount(configWith("4")), "Text mit Zahl").to.eq(4);
 			expect(maxAntrittCount(configWith(3)), "bleibt eine Zahl").to.eq(3);
@@ -94,10 +95,10 @@ describe("Benotungstool-Regeln (Client)", () => {
 				expect(antrittCountStudent(student({ note: 1 }), ours, notenOptions)).to.eq(1);
 			});
 
-			// dieselbe Falle wie in brauchtNeueLvNote: die Note 0 ist eine Note, kein fehlender Wert
+			// Same pitfall as in “needsNewLvNote”: a score of 0 is a score, not a missing value
 			it("zählt auch die Note 0 als ersten Antritt", () => {
-				const mitNullNote = [...notenOptions, { note: 0, lehre: true }];
-				expect(antrittCountStudent(student({ note: 0 }), ours, mitNullNote)).to.eq(1);
+				const withZeroNote = [...notenOptions, { note: 0, lehre: true }];
+				expect(antrittCountStudent(student({ note: 0 }), ours, withZeroNote)).to.eq(1);
 			});
 		});
 	});
@@ -109,7 +110,7 @@ describe("Benotungstool-Regeln (Client)", () => {
 		});
 
 		it("sperrt eine angerechnete Zeile trotz freier Antritte", () => {
-			// the server sets canAdd:false for an Anrechnung; the client must not second-guess it
+			// the server sets canAdd: false for an Anrechnung, the client must not second-guess it
 			const s = withVerlauf({ canAdd: false, antrittCount: 0, angerechnet: true });
 			expect(canAddPruefung(s, ours)).to.be.false;
 		});
@@ -124,8 +125,8 @@ describe("Benotungstool-Regeln (Client)", () => {
 			).to.be.false;
 		});
 
-		// Bekannte Lücke, hier festgenagelt: die LV-Note zählt nur solange gar keine Prüfung
-		// existiert. Deshalb schreibt die Freigabe Antritt 1 als echte Zeile.
+		// Known issue, addressed here: the course grade only counts if there is no exam
+		// at all. That is why the approval writes “Attempt 1” as a separate row.
 		it("zählt die LV-Note nicht mehr mit, sobald eine Prüfung existiert", () => {
 			const s = student({ note: 1, pruefungen: [{ note: 5 }] });
 			expect(antrittCountStudent(s, ours, notenOptions), "the LV note is no longer added").to.eq(1);
@@ -133,12 +134,21 @@ describe("Benotungstool-Regeln (Client)", () => {
 		});
 	});
 
+	describe("isBestanden", () => {
+		it("folgt dem Verlauf und bleibt ohne Verlauf false", () => {
+			expect(isBestanden(withVerlauf({ canAdd: false, bestanden: true }))).to.be.true;
+			expect(isBestanden(withVerlauf({ canAdd: false, bestanden: false }))).to.be.false;
+			// the client cannot tell a pass without the server rules
+			expect(isBestanden(student({ note: 1 }))).to.be.false;
+		});
+	});
+
 	describe("brauchtNeueLvNote", () => {
 		/**
-		 * Der Verlauf schlägt lv_note, und zwar genau deshalb: lv_note trägt nur FREIGEGEBENE Noten
-		 * (Benotungstool.js setzt es aus getLvGesamtNoten), hatLvNote dagegen zählt auch die
-		 * eingetragene, noch nicht freigegebene Note mit. Noten.php nennt das Feld
-		 * "ungefiltert, also inklusive noch nicht freigegebener".
+		 * The history uses `lv_note`: `lv_note` only contains APPROVED grades
+		 * (`Benotungstool.js` calculates it from `getLvGesamtNoten`), whereas `hatLvNote` also counts the
+		 * entered grades that have not yet been approved. Noten.php refers to this field as
+		 * “unfiltered, i.e., including those not yet approved.”
 		 */
 		it("meldet keinen Bedarf, wenn die LV-Note nur noch nicht freigegeben ist", () => {
 			const s = { verlauf: { hatLvNote: true }, lv_note: null };
@@ -146,13 +156,13 @@ describe("Benotungstool-Regeln (Client)", () => {
 		});
 
 		it("meldet Bedarf, wenn der Verlauf keine LV-Note kennt", () => {
-			// auch wenn lv_note gesetzt ist: der Verlauf entscheidet
+			// even if lv_note is set, the history takes precedence
 			expect(brauchtNeueLvNote({ verlauf: { hatLvNote: false }, lv_note: 1 })).to.be.true;
 			expect(brauchtNeueLvNote({ verlauf: { hatLvNote: false }, lv_note: null })).to.be.true;
 		});
 
-		// verlaufSummary hat für hatLvNote den Vorgabewert null. Ein Aufrufer, der ihn nicht
-		// übergibt, erzeugt damit den Hinweis "noch keine LV-Note".
+		// verlaufSummary has a default value of zero for hatLvNote. A caller who does not
+		// pass it will thus trigger the message “No LV note yet.”
 		it("meldet Bedarf, wenn der Verlauf das Feld nicht trägt", () => {
 			expect(brauchtNeueLvNote({ verlauf: {} })).to.be.true;
 		});
@@ -164,8 +174,8 @@ describe("Benotungstool-Regeln (Client)", () => {
 				expect(brauchtNeueLvNote({}), "Feld fehlt").to.be.true;
 			});
 
-			// Die Note 0 ("Teilnote") ist eine Note. Ein truthy-Test hielte sie für "keine Note" und
-			// das Werkzeug verspräche eine neue LV-Note, obwohl eine existiert.
+			// A grade of 0 (“partial grade”) is a grade. A truthy test would treat it as “no grade,” and
+			// the tool would promise a new course grade even though one already exists.
 			it("erkennt die Note 0 als Note", () => {
 				expect(brauchtNeueLvNote({ lv_note: 0 })).to.be.false;
 			});

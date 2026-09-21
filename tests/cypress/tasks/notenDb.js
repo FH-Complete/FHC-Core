@@ -1,8 +1,8 @@
 /**
  * cy.task implementations for the Gesamtnoteneingabe fixture. Connection and guards come from
- * db.js; this file only knows which rows the §1 specs write and how to undo them.
+ * db.js; this file only knows which rows the specs write and how to undo them.
  *
- * Needed because the Noten API has no delete endpoint, while every §1 test writes
+ * Needed because the Noten API has no delete endpoint, while every test writes
  * campus.tbl_lvgesamtnote and lehre.tbl_pruefung. Without a reset the suite is single-shot.
  *
  * Every statement is scoped by an explicit student_uid list plus the test LV and semester.
@@ -136,11 +136,11 @@ const seedPruefung = async (scope) => {
 	assertWritable();
 	assertScope({ ...scope, studentUids: [scope.studentUid] });
 
-	const { lvId, semKurzbz, studentUid, lehreinheitId, note, datum, typ, mitarbeiterUid } = scope;
+	const { lvId, semKurzbz, studentUid, lehreinheitId, note, datum, type, mitarbeiterUid } = scope;
 
 	if (note === undefined || note === null) throw new Error("noten:db seedPruefung - note is required");
 	if (!datum) throw new Error("noten:db seedPruefung - datum is required");
-	if (!typ) throw new Error("noten:db seedPruefung - typ is required");
+	if (!type) throw new Error("noten:db seedPruefung - type is required");
 	if (!lehreinheitId) throw new Error("noten:db seedPruefung - lehreinheitId is required");
 	if (!mitarbeiterUid) throw new Error("noten:db seedPruefung - mitarbeiterUid is required");
 
@@ -163,10 +163,10 @@ const seedPruefung = async (scope) => {
 			      anmerkung, insertamum, insertvon)
 			 VALUES ($1, $2, $3, $4, $5, $6, '', NOW(), $3)
 			 RETURNING pruefung_id`,
-			[lehreinheitId, studentUid, mitarbeiterUid, note, typ, datum],
+			[lehreinheitId, studentUid, mitarbeiterUid, note, type, datum],
 		);
 
-		return { pruefungId: res.rows[0].pruefung_id, note, datum, typ };
+		return { pruefungId: res.rows[0].pruefung_id, note, datum, type };
 	});
 };
 
@@ -225,7 +225,7 @@ const assertReadable = () => {
 const readRows = async (sql, params) => withClient(async (client) => (await client.query(sql, params)).rows);
 
 /** Same query as Lehrveranstaltung_model::getLeIdsByStudent. Empty = no participant. */
-const lehreinheitenDesStudenten = async (scope) => {
+const lehreinheitenOfStudent = async (scope) => {
 	assertReadable();
 	assertScope({ ...scope, studentUids: [scope.studentUid] });
 
@@ -239,7 +239,7 @@ const lehreinheitenDesStudenten = async (scope) => {
 };
 
 /** Same joins as Lehreinheit_model::getLehreinheitenForLv. */
-const lehreinheitenDerLv = async (scope) => {
+const lehreinheitenOfLv = async (scope) => {
 	assertReadable();
 	assertScope(scope, LV_SCOPE);
 
@@ -255,7 +255,7 @@ const lehreinheitenDerLv = async (scope) => {
 };
 
 /** A Lehreinheit of another LV in the same semester, or null. */
-const fremdeLehreinheit = async (scope) => {
+const foreignLehreinheit = async (scope) => {
 	assertReadable();
 	assertScope(scope, LV_SCOPE);
 
@@ -269,7 +269,7 @@ const fremdeLehreinheit = async (scope) => {
 };
 
 /** An active student without any Lehreinheit in the LV, or null. */
-const nichtTeilnehmer = async (scope) => {
+const nonParticipant = async (scope) => {
 	assertReadable();
 	assertScope(scope, LV_SCOPE);
 
@@ -286,23 +286,23 @@ const nichtTeilnehmer = async (scope) => {
 };
 
 /** LV notes of the student in OTHER LVs of the semester; resetStudents never reaches them. */
-const andereLvNoten = async (scope) => {
+const otherLvNoten = async (scope) => {
 	assertReadable();
 	assertScope({ ...scope, studentUids: [scope.studentUid] });
 
 	const rows = await readRows(
-		`SELECT count(*)::int AS anzahl FROM campus.tbl_lvgesamtnote
+		`SELECT count(*)::int AS total FROM campus.tbl_lvgesamtnote
 		  WHERE student_uid = $1 AND studiensemester_kurzbz = $2 AND lehrveranstaltung_id <> $3`,
 		[scope.studentUid, scope.semKurzbz, scope.lvId],
 	);
-	return rows[0].anzahl;
+	return rows[0].total;
 };
 
-const pruefungstypVorhanden = async ({ typ } = {}) => {
+const pruefungstypExists = async ({ type } = {}) => {
 	assertReadable();
-	if (!typ) throw new Error("noten:db pruefungstypVorhanden - typ is required");
+	if (!type) throw new Error("noten:db pruefungstypExists - type is required");
 
-	const rows = await readRows("SELECT 1 FROM lehre.tbl_pruefungstyp WHERE pruefungstyp_kurzbz = $1", [typ]);
+	const rows = await readRows("SELECT 1 FROM lehre.tbl_pruefungstyp WHERE pruefungstyp_kurzbz = $1", [type]);
 	return rows.length > 0;
 };
 
@@ -335,9 +335,9 @@ const vorlagen = async ({ kurzbz } = {}) => {
 };
 
 /** Lektoren of a Lehreinheit, sorted by uid like Noten::lehrendeDerLehreinheit (strcmp). */
-const lehrendeDerLehreinheit = async ({ lehreinheitId } = {}) => {
+const lehrendeOfLehreinheit = async ({ lehreinheitId } = {}) => {
 	assertReadable();
-	if (!lehreinheitId) throw new Error("noten:db lehrendeDerLehreinheit - lehreinheitId is required");
+	if (!lehreinheitId) throw new Error("noten:db lehrendeOfLehreinheit - lehreinheitId is required");
 
 	const rows = await readRows(
 		`SELECT mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter
@@ -368,15 +368,15 @@ const registerNotenDbTasks = (on) => {
 		"noten:db:seedPruefung": (scope) => seedPruefung(scope),
 		"noten:db:seedZeugnisnote": (scope) => seedZeugnisnote(scope),
 		"noten:db:readLvGesamtnote": (scope) => readLvGesamtnote(scope),
-		"noten:db:lehreinheitenDesStudenten": (scope) => lehreinheitenDesStudenten(scope),
-		"noten:db:lehreinheitenDerLv": (scope) => lehreinheitenDerLv(scope),
-		"noten:db:fremdeLehreinheit": (scope) => fremdeLehreinheit(scope),
-		"noten:db:nichtTeilnehmer": (scope) => nichtTeilnehmer(scope),
-		"noten:db:andereLvNoten": (scope) => andereLvNoten(scope),
-		"noten:db:pruefungstypVorhanden": (scope) => pruefungstypVorhanden(scope),
+		"noten:db:lehreinheitenOfStudent": (scope) => lehreinheitenOfStudent(scope),
+		"noten:db:lehreinheitenOfLv": (scope) => lehreinheitenOfLv(scope),
+		"noten:db:foreignLehreinheit": (scope) => foreignLehreinheit(scope),
+		"noten:db:nonParticipant": (scope) => nonParticipant(scope),
+		"noten:db:otherLvNoten": (scope) => otherLvNoten(scope),
+		"noten:db:pruefungstypExists": (scope) => pruefungstypExists(scope),
 		"noten:db:deletePruefung": (scope) => deletePruefung(scope),
 		"noten:db:vorlagen": (scope) => vorlagen(scope),
-		"noten:db:lehrendeDerLehreinheit": (scope) => lehrendeDerLehreinheit(scope),
+		"noten:db:lehrendeOfLehreinheit": (scope) => lehrendeOfLehreinheit(scope),
 		"noten:db:pruefungMitarbeiter": (scope) => pruefungMitarbeiter(scope),
 		"noten:db:close": () => closeDb(),
 	});

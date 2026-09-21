@@ -2,9 +2,6 @@ const { defineConfig } = require("cypress");
 
 require("dotenv").config({ path: "tests/cypress/.env" });
 
-// The suite being run: its cy.task handlers and its Cypress.env() values.
-const suite = require("./tests/cypress/suites/noten");
-
 module.exports = defineConfig({
   // Cypress 15 deprecates Cypress.env() inside cy.request options, which the API helpers use.
   allowCypressEnv: true,
@@ -28,29 +25,13 @@ module.exports = defineConfig({
       const missing = ["BASE_URL", "USER_NAME", "USER_PASSWORD"].filter((key) => !process.env[key]);
       if (missing.length) throw new Error(`Missing in tests/cypress/.env: ${missing.join(", ")}`);
 
-      suite.registerTasks(on);
-
-      // the suite can switch the instance to a configuration profile for the run
-      on("before:run", () => suite.beforeRun(config));
-
-      // the profile goes back first; the pool and the SSH forward close even if that fails
-      on("after:run", async () => {
-        try {
-          await suite.afterRun(config);
-        } finally {
-          await require("./tests/cypress/tasks/db").closeDb();
-        }
-      });
-
-      return config;
+      // each suite registers its own tasks and Cypress.env() values
+      return require("./tests/cypress/suites/noten").setupNodeEvents(on, config);
     },
   },
 
   env: {
-    // HTTP Basic + LDAP user the API calls authenticate as.
     adminusername: process.env.USER_NAME,
     adminpassword: process.env.USER_PASSWORD,
-
-    ...suite.env,
   },
 });

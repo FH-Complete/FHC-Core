@@ -1,19 +1,17 @@
 /**
- * Notenfreigabe (P1, cases 12-14).
- *
- * Eine erfolgreiche Freigabe verschickt die Freigabemail, solange CIS_GESAMTNOTE_FREIGABEMAIL nicht false
- * ist. Die Entwicklungsinstanzen stellen jede Mail in ein Debug-Postfach zu (MAIL_DEBUG), deshalb laufen
- * die Tests mit der Mail. Die Suite sieht die Mail selbst nicht: sie prüft die Vorlagen und die Antwort.
+ * A successful release sends the release email, provided that CIS_GESAMTNOTE_FREIGABEMAIL is not false
+ *. The development instances deliver every email to a debug mailbox (MAIL_DEBUG), which is why
+ * the tests run with the email. The suite does not see the email itself; it checks the templates and the response.
  */
 
-import { notenApi } from "../../../../support/api/notenApi";
+import { notenApi, notenAuth } from "../../../../support/api/notenApi";
 import {
 	expectBulkRowAccepted,
 	expectBulkRowError,
 	expectNotenError,
 	expectNotenSuccess,
 } from "../../../../support/helpers/notenErrors";
-import { requireKonfiguration, requireNotenModus } from "../../../../support/helpers/notenConfig";
+import { requireConfig, requireNotenMode } from "../../../../support/helpers/notenConfig";
 import {
 	attemptDate,
 	baselineBenotungsdatum,
@@ -33,7 +31,7 @@ import {
 	verlaufOfStudent,
 } from "../../../../support/helpers/notenScenario";
 
-const freigabePassword = () => Cypress.env("NOTEN_FREIGABE_PASSWORD") || Cypress.env("adminpassword");
+const freigabePassword = () => Cypress.env("NOTEN_FREIGABE_PASSWORD") || notenAuth().password;
 
 /** The payload shape saveStudentenNoten expects per student (see the studlist builder). */
 const notenPayload = (student, noteBezeichnung) => ({
@@ -56,8 +54,8 @@ describe("Noten API - Notenfreigabe", () => {
 
 	describe("Passwortschutz", () => {
 		it("lehnt eine Freigabe mit falschem Passwort ab und ändert nichts", function () {
-			// ohne Passwortpflicht gibt der Aufruf frei
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_FREIGABE_PASSWORT", true);
+			// Without a password requirement, the call grants access
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_FREIGABE_PASSWORT", true);
 			requireDbReset();
 
 			const student = ctx.students[0];
@@ -115,14 +113,14 @@ describe("Noten API - Notenfreigabe", () => {
 				expect(grades.freigabedatum, "the note is now freigegeben").to.exist;
 			});
 
-			// C1: Die Freigabe brach früher vor dem Schreiben ab.
+			// The release used to abort before writing.
 			readLvGesamtnoteViaDb(ctx, student.uid).then((row) => {
 				expect(row.freigabedatum, "C1: die Freigabe schreibt freigabedatum").to.not.be.null;
 			});
 		});
 
 		it("legt mit der Freigabe den ersten Antritt an", function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", true);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", true);
 
 			const student = ctx.students[0];
 
@@ -133,7 +131,7 @@ describe("Noten API - Notenfreigabe", () => {
 				.saveStudentenNoten(freigabePassword(), [notenPayload(student)], ctx.lvId, ctx.semKurzbz)
 				.then((response) => {
 					const entry = expectNotenSuccess(response, "saveStudentenNoten").find((r) => r.uid === student.uid);
-					// ohne den Verlauf in der Antwort zeigt die Tabelle den neuen Termin erst nach einem Reload
+					// Without the history in the response, the table won't display the new date until it is reloaded
 					expect(entry.verlauf.pruefungen, "der erste Antritt kommt mit der Antwort zurück").to.have.length(
 						1,
 					);
@@ -147,7 +145,7 @@ describe("Noten API - Notenfreigabe", () => {
 		});
 
 		it("legt ohne CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME keinen Termin an", function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", false);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", false);
 
 			const student = ctx.students[0];
 
@@ -168,7 +166,7 @@ describe("Noten API - Notenfreigabe", () => {
 		});
 
 		it("gibt ohne Passwort frei, wenn die Konfiguration keines verlangt", function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_FREIGABE_PASSWORT", false);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_FREIGABE_PASSWORT", false);
 
 			const student = ctx.students[1];
 
@@ -188,14 +186,14 @@ describe("Noten API - Notenfreigabe", () => {
 			});
 		});
 
-		// W7: Eine einzelne Wiederholung ist nicht Antritt 1. Die Freigabe überschreibt ihre Note nicht.
+		// A single repeat is not Antritt 1. The approval does not overwrite your grade.
 		it("behält die Note einer einzelnen Wiederholung", () => {
 			const student = ctx.students[1];
 			const g2 = ctx.gradeNotes.find((n) => String(n) !== String(ctx.notes.negativ));
 
 			resetNotenState(ctx);
 			seedBaseline(ctx, student, { note: ctx.notes.negativ, freigegeben: false, erstantritt: false });
-			seedPruefung(ctx, student, { note: g2, datum: attemptDate(ctx, 1), typ: "Termin2" });
+			seedPruefung(ctx, student, { note: g2, datum: attemptDate(ctx, 1), type: "Termin2" });
 
 			notenApi
 				.saveStudentenNoten(freigabePassword(), [notenPayload(student)], ctx.lvId, ctx.semKurzbz)
@@ -208,8 +206,8 @@ describe("Noten API - Notenfreigabe", () => {
 			});
 		});
 
-		// Das Datum eines Termins gehört der Person, die ihn eingetragen hat. Die Freigabe macht die
-		// Note verbindlich und verschiebt kein Datum.
+		// The date of an appointment belongs to the person who entered it. Approving it makes the
+		// grade binding and does not change the date.
 		it("behält das Datum einer bestehenden Prüfung", () => {
 			const student = ctx.students[2];
 			const pruefungsdatum = attemptDate(ctx, 2);
@@ -221,8 +219,8 @@ describe("Noten API - Notenfreigabe", () => {
 				erstantritt: false,
 				benotungsdatum: baselineBenotungsdatum(ctx),
 			});
-			// Antritt 1 mit einem eigenen Datum; ohne Termin datiert die Freigabe auf das Benotungsdatum
-			seedPruefung(ctx, student, { note: ctx.notes.negativ, datum: pruefungsdatum, typ: "Termin1" });
+			// Antritt 1 with a custom date. if no date is specified, the release date is set to the grading date
+			seedPruefung(ctx, student, { note: ctx.notes.negativ, datum: pruefungsdatum, type: "Termin1" });
 
 			notenApi
 				.saveStudentenNoten(freigabePassword(), [notenPayload(student)], ctx.lvId, ctx.semKurzbz)
@@ -284,11 +282,11 @@ describe("Noten API - Notenfreigabe", () => {
 		});
 	});
 
-	// Die Mail geht an ein Debug-Postfach, die Suite liest sie nicht. Sie prüft deshalb, was die Mail braucht:
-	// beide Vorlagen mit Text und eine Freigabe, die mit eingeschalteter Mail vollständig antwortet.
+	// The email is sent to a debug mailbox; the suite does not read it. It therefore checks what the email requires:
+	// both templates with text and an approval that responds in full when email is enabled.
 	describe("Freigabemail", () => {
 		beforeEach(function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_FREIGABEMAIL", true);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_FREIGABEMAIL", true);
 			requireDbReset();
 		});
 
@@ -324,24 +322,24 @@ describe("Noten API - Notenfreigabe", () => {
 		});
 	});
 
-	// CIS_GESAMTNOTE_FREIGABE_FINAL: Kein Pfad ändert eine freigegebene Note. Die Tests säen die
-	// Freigabe, deshalb brauchen sie kein Passwort.
+	// CIS_GESAMTNOTE_FREIGABE_FINAL: No path changes a released grade. The tests trigger the
+	// release, so they do not need a password.
 	describe("endgültige Freigabe", () => {
 		beforeEach(function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_FREIGABE_FINAL", true);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_FREIGABE_FINAL", true);
 			requireDbReset();
 		});
 
-		const andereNote = () => ctx.gradeNotes.find((n) => String(n) !== String(ctx.notes.negativ));
+		const otherNote = () => ctx.gradeNotes.find((n) => String(n) !== String(ctx.notes.negativ));
 
 		it("lehnt eine Übernahme nach der Freigabe ab", () => {
 			const student = ctx.students[0];
 
-			// ausdrücklich freigegeben: unter FINAL sät die Baseline sonst eine offene Note
+			// Explicitly released: otherwise, the baseline seeds an open note under “FINAL”
 			givenBaseline(ctx, student, { freigegeben: true });
 
 			notenApi
-				.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, andereNote())
+				.saveNotenvorschlag(ctx.lvId, ctx.semKurzbz, student.uid, otherNote())
 				.then((response) => expectNotenError(response, "freigabeEndgueltig"));
 
 			readLvGesamtnoteViaDb(ctx, student.uid).then((row) => {
@@ -364,24 +362,24 @@ describe("Noten API - Notenfreigabe", () => {
 		});
 
 		it("lehnt im Import nur die freigegebene Zeile ab", function () {
-			// im Punktemodus leitet der Import die Note aus den Punkten ab
-			requireNotenModus(this, ctx);
+			// Point mode: The grade comes from the grading key; the row only provides points.
+			requireNotenMode(this, ctx);
 
-			const [freigegeben, offen] = ctx.students;
+			const [freigegeben, open] = ctx.students;
 
 			resetNotenState(ctx);
 			seedBaseline(ctx, freigegeben, { freigegeben: true });
-			seedBaseline(ctx, offen, { freigegeben: false });
+			seedBaseline(ctx, open, { freigegeben: false });
 
 			notenApi
 				.saveNotenvorschlagBulk(ctx.lvId, ctx.semKurzbz, [
-					{ uid: freigegeben.uid, note: andereNote(), punkte: null },
-					{ uid: offen.uid, note: andereNote(), punkte: null },
+					{ uid: freigegeben.uid, note: otherNote(), punkte: null },
+					{ uid: open.uid, note: otherNote(), punkte: null },
 				])
 				.then((response) => {
 					const data = expectNotenSuccess(response, "saveNotenvorschlagBulk");
 					expectBulkRowError(data, freigegeben.uid, "freigabeEndgueltig");
-					expectBulkRowAccepted(data, offen.uid);
+					expectBulkRowAccepted(data, open.uid);
 				});
 		});
 	});

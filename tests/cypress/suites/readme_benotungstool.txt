@@ -1,135 +1,87 @@
 BENOTUNGSTOOL - TESTSUITE
 =========================
+The suite deletes and writes notes to the database. Run only on a test instance.
 
-WARNUNG: Die Suite löscht und schreibt Noten in der Datenbank. Starte sie nur gegen eine
-Testinstanz.
-
-
-1. WAS HIER LIEGT
+1. Files
 -----------------
 
-e2e/specs/unit/      Regeln als reine Funktion. Kein Server, keine Datenbank.
-e2e/specs/api/noten/ Die API. Ein Test ruft einen Endpunkt auf und prüft die Antwort.
-e2e/specs/ui/        Die Oberfläche im Browser.
+e2e/specs/unit/      Rules as pure functions.
+e2e/specs/api/noten/ The API, called by tests to query an endpoint and verify the response.
+e2e/specs/ui/        The user interface in the browser.
 
-support/api/         Die API-Aufrufe an einer Stelle. Spiegelt public/js/api/factory/noten.js.
-support/pages/       Die Oberfläche an einer Stelle. Selektoren und Klickwege.
-support/helpers/     Testdaten, Fehlermeldungen, Fixture-Reset.
-tasks/               Datenbankverbindung und SSH-Tunnel. Läuft in Node, nicht im Browser.
-suites/noten.js      Verbindet die Suite mit cypress.config.js.
-tools/dbCheck.js     Prüft die Fixture ohne HTTP. Gutes erstes Kommando bei Problemen.
+support/api/         API calls, which mirror public/js/api/factory/noten.js.
+support/pages/       The user interface with selectors and click paths.
+support/helpers/     Test data, error messages, fixture reset.
+tasks/               Database connection in Node, not in the browser.
+suites/noten.js      Links the suite to cypress.config.js.
+suites/.env          The suite’s environment variables.
+tools/dbCheck.js     Checks the fixture without HTTP. A good first command to run if problems arise.
 
-Die Konfiguration steht in cypress.config.js. Die Zugangsdaten stehen in
-tests/cypress/.env.
+The configuration is located in cypress.config.js. The credentials are stored in two files:
+tests/cypress/.env applies to all suites, while tests/cypress/suites/.env applies only to this suite.
 
 
-2. VORBEREITUNG
+2. Preparation
 ---------------
 
-Einmalig:
+Create login credentials in actual .env files:
 
-  npm install
+tests/cypress/.env.example -> tests/cypress/.env
+tests/cypress/suites/.env.example -> tests/cypress/suites/.env
 
-Dann die Zugangsdaten anlegen:
+Fill out both files. The comments within them explain each value.
 
-  cp tests/cypress/.env.example tests/cypress/.env
+- NOTEN_USER is the INSTRUCTOR, not an administrator. An administrator usually does not teach any courses,
+  so the suite will not find any courses.
+- The suite requires a direct connection to the database (NOTEN_DB_*).
 
-Fülle die Datei aus. Die Kommentare darin erklären jeden Wert. Drei Punkte sind wichtig:
-
-- .env darf nie in Git landen.
-- USER_NAME ist der LEKTOR, nicht ein Administrator. Ein Administrator unterrichtet meist nichts,
-  dann findet die Suite keine Lehrveranstaltung.
-- Von einer Arbeitsstation aus brauchst du den SSH-Tunnel. Die Datenbank nimmt nur den
-  Applikationsserver an. Setze NOTEN_SSH_TUNNEL=true und die drei NOTEN_SSH_*-Werte.
-
-Beide Seiten müssen auf dieselbe Datenbank zeigen: die Webinstanz (config/system.config.inc.php,
-DB_NAME) und die Suite (NOTEN_DB_NAME in .env). Sonst seedet die Suite die eine Datenbank und prüft
-gegen die andere.
+Both sides must point to the same database: the web instance (config/system.config.inc.php,
+DB_NAME) and the suite (NOTEN_DB_NAME in suites/.env). Otherwise, the suite will seed one database and
+check against the other.
 
 
-3. STARTEN
+3. Start
 ----------
 
-  npm run noten:check          Fixture prüfen.
-  npm run cy:noten:api         Unit- und API-Tests.
-  npm run cy:noten:ui          Oberfläche in Chrome.
-  npm run cy:open              Cypress interaktiv.
+  npm run noten:check          Check fixture.
+  npm run noten:api            Unit and API tests.
+  npm run noten:ui             User interface in Chrome.
+  npx cypress open             Cypress interactive.
 
-Zwei weitere Skripte prüfen den Punktemodus:
+Put more Cypress options after "--". A second --spec replaces the default:
 
-  npm run cy:noten:punkte-on   erwartet CIS_GESAMTNOTE_PUNKTE = true
-  npm run cy:noten:punkte-off  erwartet CIS_GESAMTNOTE_PUNKTE = false
+  npm run noten:api -- --spec tests/cypress/e2e/specs/api/noten/noten.frist.cy.js
+  npm run noten:ui -- --headed --no-exit
+  npm run noten:api -- --env NOTEN_PUNKTE_MODE=on
 
-Passt die Instanz nicht zur Erwartung, bricht der Lauf sofort ab.
-
-Die Konfiguration der Instanz wechselt über Profile (tests/cypress/profiles/noten.js). Ein Profil
-schreibt application/config/noten.php und die define()-Schalter in config/global.config.inc.php auf
-der Instanz um. Nach dem Lauf stellt die Suite beide Dateien wieder her. Dafür braucht .env
-zusätzlich NOTEN_REMOTE_ROOT.
-
-  npm run cy:noten:profile                   jedes Profil, Unit und API, danach der Bericht
-  npm run cy:noten:profile -- ui final       nur die Oberfläche, nur das Profil final
-  npm run cy:noten:profile -- alle a,b       alles, nur die Profile a und b
-  npm run noten:profil -- status             das aktive Profil und die Liste der Profile
-  npm run noten:profil -- anwenden final     ein Profil einschalten, zum Beispiel vor cy:open
-  npm run noten:profil -- wiederherstellen   die Originale zurück
-
-Jedes Profil schaltet die Freigabemail aus. Nur dann laufen die Freigabetests.
-
-Ein Lauf ohne Profil stellt zuerst die Originale her. So bleibt die Instanz nach einem abgebrochenen
-Lauf nicht auf einem Profil stehen.
+tests/cypress/profiles/noten.js describes the configurations in which the suite should run. A
+profile specifies the values for application/config/noten.php and the define() switches in
+config/global.config.inc.php. The suite tests the configuration it finds. Switching
+the instance is not part of the suite.
 
 
-4. DAS ERGEBNIS
----------------------
-
-Am Ende steht eine Tabelle mit vier Spalten.
-
-Passing   Der Test lief und war erfolgreich.
-Failing   Der Test lief und fand einen Fehler. Nur das ist ein Problem.
-Pending   Der Test hat sich selbst übersprungen. Das ist kein Fehler.
-Skipped   Ein Test lief nicht, weil vorher etwas abgebrochen ist.
-
-Pending ist normal. Ein Test überspringt sich, wenn seine Voraussetzung fehlt. Beispiele: der
-Punktemodus ist aus, die Frist ist nicht aktiv, die Freigabemail ist nicht erlaubt. Den Grund
-schreibt der Test ins Protokoll.
-
-Ein Test, der in keinem Profil läuft, ist dagegen eine Lücke. Der Bericht von cy:noten:profile
-listet diese Tests am Ende. Ergänze für jeden davon ein Profil.
-
-Der aktuelle Sollzustand: API und Unit 84 Tests, 69 grün, 15 pending. UI 30 Tests, 18 grün,
-12 pending. Kein roter Test.
-
-
-5. WENN ETWAS SCHIEFGEHT
+4. Debugging
 ------------------------
 
-401 bei allen Tests
-  Die Webinstanz und .env zeigen auf verschiedene Datenbanken. Siehe Abschnitt 2.
+401 in all tests
+  The web instance and suites/.env likely point to different databases.
 
-"Fixture reset unavailable"
-  Die Datenbankverbindung fehlt. Prüfe den SSH-Tunnel. Einen Schlüssel mit einem Namen ausserhalb
-  der OpenSSH-Standardnamen probiert SSH nie automatisch. Trage ihn in NOTEN_SSH_KEY ein.
+“Fixture reset unavailable”
+  The database connection is missing. Check NOTEN_DB_* in tests/cypress/suites/.env. The pg_hba.conf file for the
+  database must allow access from the machine running Cypress.
 
-Ein Test erwartet eine Fehlermeldung und bekommt eine andere
-  Die Phrase fehlt in der Datenbank. Lass system/phrasesupdate.php auf dem Server laufen.
+A test expects one error message but receives a different one
+  The phrase is missing from the database -> run system/phrasesupdate.php on the server.
 
-Die Instanz steht nach einem Absturz noch auf einem Profil
-  npm run noten:profil -- wiederherstellen
+The next run won’t start
+  A Cypress process is still hanging. Terminate it:  Stop-Process -Name Cypress -Force
 
-Der nächste Lauf startet nicht
-  Ein Cypress-Prozess hängt noch. Beende ihn:  Stop-Process -Name Cypress -Force
-
-Ein Screenshot zeigt eine leere Seite
-  Bei API-Tests ist das normal. Diese Tests öffnen keine Seite.
-
-
-6. KONVENTIONEN
+5. Conventions
 ---------------
 
-- Keine festen Ids im Test. Die Noten kommen aus getNoten, die Regelwerte aus getCisConfig. Eine
-  andere Installation hat andere Zahlen.
-- Warte nach jeder schreibenden Aktion auf den Request, nicht auf die Oberfläche.
-- Sprich die Oberfläche über data-cy an, nie über eine CSS-Klasse.
-- Setze den Zustand vor dem Test über givenBaseline oder resetNotenState. Verlass dich nie auf den
-  Zustand, den ein Test davor hinterlassen hat.
+- No fixed IDs in the test. The grades come from `getNoten`, the rule values from `getCisConfig`. A
+  different installation will have different primary keys.
+- After every write operation, wait for the request, not for the UI.
+- Access the UI via `data-cy`, not via a CSS class.
+- Set the state before the test using `givenBaseline` or `resetNotenState`. Never rely on the
+  state left behind by a previous test.

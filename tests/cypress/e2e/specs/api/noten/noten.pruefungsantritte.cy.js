@@ -1,20 +1,20 @@
 /**
- * Prüfungsordnung §1 - Prüfungsantritte.
+ * Examination Regulations §1 - Taking Exams.
  *
- * Die Regeln greifen in der Reihenfolge A (Maximum) -> B (Chronologie) -> C (Vorkommenslimit).
- * Jeder Test baut einen Zustand, in dem genau eine davon feuern kann, sonst maskiert die frühere.
+ * The rules apply in the following order: A (Maximum) -> B (Chronological) -> C (Occurrence Limit).
+ * Each test establishes a state in which exactly one of these can trigger; otherwise, the earlier one takes precedence.
  *
- * Gezählt wird über die NOTE: entschuldigt, "Noch nicht eingetragen" und "Nicht beurteilt" zählen
- * nie mit. Antritt 1 ist eine echte Prüfung (von givenBaseline geseedet).
+ * The count is based on the GRADE: entschuldigt, “Noch nicht eingetragen” are
+ * never counted. Attempt 1 is a real exam (seeded by givenBaseline).
  */
 
 import { notenApi } from "../../../../support/api/notenApi";
 import { expectNotenError, expectNotenSuccess } from "../../../../support/helpers/notenErrors";
 import {
 	requireKommissionellerAntritt,
-	requireKonfiguration,
+	requireConfig,
 	requireWiederholung,
-	skipWenn,
+	skipIf,
 } from "../../../../support/helpers/notenConfig";
 import {
 	attemptDate,
@@ -55,9 +55,9 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 	// one student per test, so a leaked row cannot reach the next scenario
 	const studentFor = (index) => ctx.students[index % ctx.students.length];
 
-	/** Skip, wenn der letzte Antritt der Kette nicht der kommissionelle ist. */
-	const skipOhneKommissionLetzt = (test) =>
-		skipWenn(
+	/** Skip if the last Antritt in the chain is not the commission link. */
+	const skipUnlessLastKommissionell = (test) =>
+		skipIf(
 			test,
 			ctx.cisConfig.CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT !== ctx.maxAntritte,
 			"Übersprungen: der letzte Antritt ist nicht kommissionell.",
@@ -76,9 +76,9 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 		return attemptDate(ctx, firstIndex + ctx.maxAntritte - 1);
 	};
 
-	// Die Konfiguration nennt die Sondernoten nur mit ihrer Bezeichnung. Die API antwortet mit dem
-	// aufgelösten Primärschlüssel, auf Demodaten ist entschuldigt die 14. Scheitert die Auflösung,
-	// greifen alle Regeln stillschweigend auf der falschen Note.
+	// The configuration refers to the special notes only by their labels. The API responds with the
+	// resolved primary key; on demo data, this is set to 14 by default. If the resolution fails,
+	// all rules implicitly apply to the incorrect note.
 	it("löst die Sondernoten über ihre Bezeichnung aus tbl_note auf", () => {
 		notenApi.getCisConfig().then((response) => {
 			const config = expectNotenSuccess(response, "getCisConfig");
@@ -98,7 +98,7 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 	describe("Regel A - die Höchstzahl der Prüfungsantritte", () => {
 		it("lehnt einen Antritt ab, sobald das konfigurierte Maximum erreicht ist", function () {
 			// ohne Anlage der kommissionellen Prüfung endet die Kette früher, siehe den Test zu kommPruefNichtErlaubt
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF", true);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF", true);
 
 			const student = studentFor(0);
 
@@ -157,7 +157,7 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 		});
 	});
 
-	describe("Regel C - 'entschuldigt' gilt nur einmal", () => {
+	describe("'entschuldigt' gilt nur einmal", () => {
 		beforeEach(function () {
 			requireWiederholung(this, ctx);
 		});
@@ -216,18 +216,18 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 	});
 
 	describe("die kommissionelle Prüfung ist der letzte Antritt", () => {
-		// §17 Abs 1: die zweite Wiederholung ist kommissionell. Der Server leitet den Typ aus der
-		// Position ab und schreibt ihn in pruefungstyp_kurzbz, weil die Studierendenverwaltung
-		// diese Spalte weiterhin liest.
+		// §17, Abs 1: The second retake is kommissionell. The server derives the type from the
+		// position and writes it to `pruefungstyp_kurzbz` because the student administration
+		// system still reads this column.
 		it("schreibt den letzten Antritt als kommissionelle Prüfung", function () {
 			requireKommissionellerAntritt(this, ctx);
-			skipOhneKommissionLetzt(this);
+			skipUnlessLastKommissionell(this);
 
 			const student = studentFor(3);
 
 			givenBaseline(ctx, student);
 
-			// bis zum vorletzten Antritt auffüllen
+			// Fill up to the second-to-last step
 			for (let i = 1; i < ctx.maxAntritte - 1; i += 1) {
 				addPruefung(ctx, student, { note: ctx.notes.negativ, datum: attemptDate(ctx, i) }).then((response) =>
 					expectNotenSuccess(response, `Antritt ${i + 1}`),
@@ -250,18 +250,16 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 				expect(verlauf.canAdd, "danach ist kein Antritt mehr möglich").to.be.false;
 			});
 		});
-
-		// Die Anlage kann abgeschaltet sein, wenn eine Installation die kommissionelle Prüfung in
-		// einem anderen Werkzeug einträgt. Angezeigt wird sie trotzdem, nur angelegt nicht.
+		
 		it("verweigert den letzten Antritt, wenn das Tool ihn nicht anlegen darf", function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF", false);
-			skipOhneKommissionLetzt(this);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF", false);
+			skipUnlessLastKommissionell(this);
 
 			const student = studentFor(4);
 
 			givenBaseline(ctx, student);
 
-			// bis zum vorletzten Antritt auffüllen; danach wäre der kommissionelle fällig
+			// Fill up to the second-to-last step
 			for (let i = 1; i < ctx.maxAntritte - 1; i += 1) {
 				addPruefung(ctx, student, { note: ctx.notes.negativ, datum: attemptDate(ctx, i) }).then((response) =>
 					expectNotenSuccess(response, `Antritt ${i + 1}`),
@@ -280,8 +278,8 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 			}).then((response) => expectNotenError(response, "kommPruefNichtErlaubt"));
 		});
 
-		// Auch eine kommissionelle Prüfung ohne zählende Note schliesst die Kette. Sonst liesse sich
-		// nach einer noch unbenoteten kommissionellen ein weiterer Antritt anlegen.
+		// Even a kommissionelle pruefung without a graded score completes the chain. Otherwise,
+		// it would be possible to schedule another attempt after a committee exam that has not yet been graded.
 		it("sperrt weitere Antritte auch bei einer kommPruef ohne zählende Note", () => {
 			const student = studentFor(1);
 
@@ -290,7 +288,7 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 			seedPruefung(ctx, student, {
 				note: ctx.notes.nochNichtEingetragen,
 				datum: attemptDate(ctx, 1),
-				typ: "kommPruef",
+				type: "kommPruef",
 			});
 
 			readStateViaApi(ctx).then((data) => {
@@ -319,11 +317,11 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 			);
 
 			readStateViaApi(ctx).then((data) => {
-				const offen = attemptsOfStudent(data, student.uid).find(
+				const open = attemptsOfStudent(data, student.uid).find(
 					(p) => String(p.note) === String(ctx.notes.nochNichtEingetragen),
 				);
-				expect(offen, "der offene Termin").to.exist;
-				expect(offen.zaehlt, "der offene Termin verbraucht keinen Antritt").to.be.false;
+				expect(open, "der offene Termin").to.exist;
+				expect(open.zaehlt, "der offene Termin verbraucht keinen Antritt").to.be.false;
 
 				const verlauf = verlaufOfStudent(data, student.uid);
 				expect(verlauf.antrittCount, "nur Antritt 1").to.eq(1);
@@ -335,7 +333,7 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 	describe("Anrechnung - gar keine Prüfungen", () => {
 		it("lehnt einen Antritt bei angerechneter Zeugnisnote ab", function () {
 			const angerechnet = (ctx.cisConfig.NOTEN_ANRECHNUNG || [])[0];
-			skipWenn(this, angerechnet === undefined, "Übersprungen: NOTEN_ANRECHNUNG löst keine Note auf.");
+			skipIf(this, angerechnet === undefined, "Übersprungen: NOTEN_ANRECHNUNG löst keine Note auf.");
 
 			const student = studentFor(4);
 
@@ -359,7 +357,7 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 			requireWiederholung(this, ctx);
 		});
 
-		/** Antritt 1 < entschuldigt < echte Note; liefert die entschuldigte Zeile (Nachbarn beidseits). */
+		/** Antritt 1 < entschuldigt < actual grade, returns the excused row (neighbors on both sides). */
 		const givenThreeAttempts = (student) => {
 			givenBaseline(ctx, student);
 
@@ -376,7 +374,7 @@ describe("Noten API - Prüfungsantritte (Prüfungsordnung §1)", () => {
 		};
 
 		it("lehnt eine Notenänderung nach einem späteren Antritt ab", function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_NOTE_SPERRE_BEI_SPAETEREM_TERMIN", true);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_NOTE_SPERRE_BEI_SPAETEREM_TERMIN", true);
 
 			const student = studentFor(1);
 

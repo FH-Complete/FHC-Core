@@ -1,5 +1,6 @@
+import { notenAuth } from "../../../../support/api/notenApi";
 import { benotungstoolPage as page } from "../../../../support/pages/benotungstool.po";
-import { requireKonfiguration } from "../../../../support/helpers/notenConfig";
+import { requireConfig } from "../../../../support/helpers/notenConfig";
 import {
 	baselineDate,
 	loadNotenContext,
@@ -10,15 +11,15 @@ import {
 } from "../../../../support/helpers/notenTestData";
 
 /**
- * Notenfreigabe über den Modal-Dialog mit Passwort.
+ * Approve grades via the modal dialog using a password.
  *
- * Der Dialog listet genau die Zeilen, die freigegeben werden (changedNoten), und verlangt das
- * LDAP-Passwort. Danach muss die Statusspalte ohne Reload von changed auf ok springen.
+ * The dialog lists exactly which rows are being released (changedNoten) and prompts for the
+ * LDAP password. Afterward, the status column must change from “changed” to “ok” without a reload.
  *
- * Eine erfolgreiche Freigabe verschickt die Freigabemail. Die Entwicklungsinstanzen stellen sie in ein
- * Debug-Postfach zu.
+ * A successful release triggers the release email. The development instances deliver it to a
+ * debug mailbox.
  */
-const freigabePassword = () => Cypress.env("NOTEN_FREIGABE_PASSWORD") || Cypress.env("adminpassword");
+const freigabePassword = () => Cypress.env("NOTEN_FREIGABE_PASSWORD") || notenAuth().password;
 
 context("Benotungstool UI - Notenfreigabe", () => {
 	let ctx;
@@ -47,8 +48,8 @@ context("Benotungstool UI - Notenfreigabe", () => {
 		});
 
 		it("lehnt ein falsches Passwort ab und lässt den Status unverändert", function () {
-			// ohne Passwortpflicht gibt der Dialog frei
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_FREIGABE_PASSWORT", true);
+			// If no password is required, the dialog box allows access
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_FREIGABE_PASSWORT", true);
 
 			const student = ctx.students[0];
 
@@ -58,11 +59,11 @@ context("Benotungstool UI - Notenfreigabe", () => {
 			page.visitAndWaitForTable(ctx);
 			page.openFreigabeModal();
 
-			page.typeFreigabePasswort("definitely-not-the-password");
+			page.typeFreigabePassword("definitely-not-the-password");
 			page.submitFreigabe();
 
-			// die Oberfläche zeigt die Ablehnung, der Status bleibt
-			page.expectAbgelehnt("@saveStudentenNoten");
+			// The interface displays the rejection, but the status remains the same
+			page.expectRejected("@saveStudentenNoten");
 			page.expectFreigabeState(student.uid, "changed");
 
 			readLvGesamtnoteViaDb(ctx, student.uid).then((rowData) => {
@@ -89,7 +90,7 @@ context("Benotungstool UI - Notenfreigabe", () => {
 		});
 
 		it("legt mit der Freigabe den ersten Antritt an", function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", true);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", true);
 
 			const student = ctx.students[1];
 
@@ -100,12 +101,12 @@ context("Benotungstool UI - Notenfreigabe", () => {
 			page.openFreigabeModal();
 			page.freigeben(freigabePassword());
 
-			// upsertErstantritt schreibt die Prüfungszeile; sichtbar wird sie beim nächsten Laden
+			// upsertErstantritt writes the audit entry; it becomes visible the next time the page is loaded
 			page.visitAndWaitForTable(ctx);
 			page.expectPruefung(student.uid, "antritt_1", { note: ctx.gradeNotes[0], antritt: 1 });
 			page.expectAntrittCount(student.uid, 1);
 
-			// der Antritt übernimmt das Benotungsdatum der LV-Note, kein implizites Datum
+			// The start date uses the grading date of the course grade; no implicit date is used
 			page.getCell(student.uid, "antritt_1").should("contain.text", page.toDDMMYYYY(baselineDate(ctx)));
 		});
 	});

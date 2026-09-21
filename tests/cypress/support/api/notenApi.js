@@ -7,19 +7,25 @@ const NOTEN_API = "/index.ci.php/api/frontend/v1/Noten";
 // One session for the whole run. Without a session cookie the server checks each Basic-auth request
 // against LDAP, and many LDAP binds can block all PHP-FPM workers of the instance. cy.login creates the
 // session once (cy.session, cacheAcrossSpecs) and restores it before each test of every importing spec.
-beforeEach(() => cy.login());
-
-const authOptions = () => ({
-	username: Cypress.env("adminusername"),
-	password: Cypress.env("adminpassword"),
+beforeEach(() => {
+	const { username, password } = notenAuth();
+	cy.login(username, password);
 });
+
+/** The lecturer the suite works as. No fallback to USER_NAME: that user belongs to every suite. */
+export const notenAuth = () => {
+	const username = Cypress.env("NOTEN_USER");
+	const password = Cypress.env("NOTEN_PASSWORD");
+	if (!username || !password) throw new Error("NOTEN_USER / NOTEN_PASSWORD missing in tests/cypress/suites/.env");
+	return { username, password };
+};
 
 // Basic auth stays on every call as the fallback; with a session cookie the server uses the cookie.
 const apiGet = (path, qs) =>
-	cy.request({ method: "GET", url: `${NOTEN_API}/${path}`, qs, auth: authOptions(), failOnStatusCode: false });
+	cy.request({ method: "GET", url: `${NOTEN_API}/${path}`, qs, auth: notenAuth(), failOnStatusCode: false });
 
 const apiPost = (path, body) =>
-	cy.request({ method: "POST", url: `${NOTEN_API}/${path}`, body, auth: authOptions(), failOnStatusCode: false });
+	cy.request({ method: "POST", url: `${NOTEN_API}/${path}`, body, auth: notenAuth(), failOnStatusCode: false });
 
 export const notenApi = {
 	getCisConfig: () => apiGet("getCisConfig"),
@@ -71,18 +77,18 @@ export const notenApi = {
 		}),
 
 	/**
-	 * LDAP-password gated. data -> [{uid, freigabedatum, benotungsdatum}]
+	 * LDAP password-protected data -> [{uid, approval_date, grading_date}]
 	 *
-	 * Zuerst eine Sitzung: AuthLDAPLib lädt ldap.php mit require_once. Prüft die Basic-Anmeldung desselben
-	 * Requests schon LDAP, sieht die Passwortprüfung der Freigabe keine Konfiguration und meldet
-	 * "Falsches Passwort". Mit dem Sitzungscookie prüft die Anmeldung kein LDAP.
+	 * First, a session: AuthLDAPLib loads ldap.php using require_once. It checks the Basic authentication for the same
+	 * request against LDAP; if the password check for the release finds no configuration, it reports
+	 * “Incorrect password.” With the session cookie, the login does not check against LDAP.
 	 */
 	saveStudentenNoten: (password, noten, lv_id, sem_kurzbz) =>
 		apiGet("getCisConfig").then(() => apiPost("saveStudentenNoten", { password, noten, lv_id, sem_kurzbz })),
 
 	getNoteByPunkte: (punkte, lv_id, sem_kurzbz) => apiPost("getNoteByPunkte", { punkte, lv_id, sem_kurzbz }),
 
-	// Bulk-Pfade antworten 200 und melden Fehler je Zeile in data[uid]
+	// Bulk paths return a 200 response and report errors on a per-row basis in data[uid]
 	saveNotenvorschlagBulk: (lv_id, sem_kurzbz, noten) =>
 		apiPost("saveNotenvorschlagBulk", { lv_id, sem_kurzbz, noten }),
 
@@ -98,15 +104,16 @@ export const notenApi = {
 
 export const pruefungenOf = (data, uid) => (data[1] || []).filter((p) => p.student_uid === uid);
 
-/** Antritte in Verlaufsreihenfolge. Specs prüfen position/zaehlt/antritt_nr/terminal, nie den Typ. */
+/** Antritte in chronological order. Check the specs for position/count/start_no/terminal, never the type. */
 export const attemptsOf = (data, uid) =>
 	[...pruefungenOf(data, uid)].sort((a, b) => Number(a.position) - Number(b.position));
 
-/** Only the attempts that consume one - excused / "noch nicht eingetragen" / nicht beurteilt do not. */
+/** Only the attempts that consume one - excused / "noch nicht eingetragen" do not. */
 export const countingAttemptsOf = (data, uid) => attemptsOf(data, uid).filter((p) => p.zaehlt);
 
 /** Legacy projection written for old reports. Asserted in exactly one spec, never used as a rule. */
-export const pruefungenOfTyp = (data, uid, typ) => pruefungenOf(data, uid).filter((p) => p.pruefungstyp_kurzbz === typ);
+export const pruefungenOfType = (data, uid, type) =>
+	pruefungenOf(data, uid).filter((p) => p.pruefungstyp_kurzbz === type);
 
 export const gradesOf = (data, uid) => (data[3] || {})[uid];
 

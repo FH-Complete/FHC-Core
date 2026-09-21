@@ -1,5 +1,5 @@
 import { benotungstoolPage as page } from "../../../../support/pages/benotungstool.po";
-import { requireKonfiguration, requireNotenModus } from "../../../../support/helpers/notenConfig";
+import { requireConfig, requireNotenMode } from "../../../../support/helpers/notenConfig";
 import {
 	attemptDate,
 	baselineDate,
@@ -12,11 +12,11 @@ import {
 } from "../../../../support/helpers/notenTestData";
 
 /**
- * Notenvorschlag eintragen und übernehmen.
+ * Enter and apply the grade suggestion.
  *
- * Die Regeln dahinter prüft noten.notenvorschlag; hier geht es darum, dass die Tabelle den
- * Serverzustand ohne Reload korrekt nachführt: LV-Note, Freigabestatus und das Verschwinden des
- * Übernehmen-Buttons.
+ * The rules behind this are checked by noten.notenvorschlag; the goal here is to ensure that the table
+ * correctly updates the server state without a reload: course grade, approval status, and the disappearance of the
+ * “Übernehmen” button.
  */
 context("Benotungstool UI - Notenvorschlag", () => {
 	let ctx;
@@ -32,7 +32,7 @@ context("Benotungstool UI - Notenvorschlag", () => {
 
 	beforeEach(function () {
 		// im Punktemodus ist die Vorschlagsspalte gesperrt, die Note kommt aus den Punkten
-		requireNotenModus(this, ctx);
+		requireNotenMode(this, ctx);
 	});
 
 	it("trägt einen Vorschlag über den Zelleneditor ein", () => {
@@ -67,7 +67,7 @@ context("Benotungstool UI - Notenvorschlag", () => {
 	// Das gewählte Datum ist das Datum von Antritt 1, nicht das benotungsdatum. Das benotungsdatum
 	// bleibt der Zeitpunkt der Eingabe, sonst erschiene eine geänderte Note als freigegeben.
 	it("schreibt das im Dialog gewählte Datum in den ersten Antritt", function () {
-		requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", true);
+		requireConfig(this, ctx, "CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME", true);
 
 		const student = ctx.students[2];
 		const datum = baselineDate(ctx);
@@ -88,11 +88,11 @@ context("Benotungstool UI - Notenvorschlag", () => {
 		});
 	});
 
-	// W7: Eine einzelne Wiederholung ohne Antritt 1, wie sie die Studierendenverwaltung hinterlassen kann. Der
+	// Eine einzelne Wiederholung ohne Antritt 1, wie sie die Studierendenverwaltung hinterlassen kann. Der
 	// Button fehlt auch ohne Vorschlag, deshalb setzt der Test einen Vorschlag und prüft eine Kontrollzeile mit.
 	it("zeigt bei einer einzelnen Wiederholung keinen Übernehmen-Button", () => {
 		const wiederholung = ctx.students[3];
-		const kontrolle = ctx.students[4];
+		const control = ctx.students[4];
 		// Sehr Gut zuerst: setNotenvorschlag vergleicht mit contains, "Gut" träfe "Sehr Gut"
 		const vorschlag = ctx.gradeNotes[0];
 		const pruefungsnote = ctx.gradeNotes.find(
@@ -101,19 +101,19 @@ context("Benotungstool UI - Notenvorschlag", () => {
 
 		resetNotenState(ctx);
 		seedBaseline(ctx, wiederholung, { erstantritt: false });
-		seedBaseline(ctx, kontrolle);
-		seedPruefung(ctx, wiederholung, { note: pruefungsnote, datum: attemptDate(ctx, 1), typ: "Termin2" });
+		seedBaseline(ctx, control);
+		seedPruefung(ctx, wiederholung, { note: pruefungsnote, datum: attemptDate(ctx, 1), type: "Termin2" });
 
 		page.visitAndWaitForTable(ctx);
 
-		page.setNotenvorschlag(kontrolle.uid, bezeichnung(vorschlag));
-		page.getUebernehmenButton(kontrolle.uid).should("exist");
+		page.setNotenvorschlag(control.uid, bezeichnung(vorschlag));
+		page.getUebernehmenButton(control.uid).should("exist");
 
 		page.setNotenvorschlag(wiederholung.uid, bezeichnung(vorschlag));
 		page.getUebernehmenButton(wiederholung.uid).should("not.exist");
 	});
 
-	// C4: Die LV-Note ist nie 'entschuldigt', der Editor bietet die Note deshalb nicht an.
+	// Die LV-Note ist nie 'entschuldigt', der Editor bietet die Note deshalb nicht an.
 	it("bietet 'entschuldigt' nicht als Notenvorschlag an", () => {
 		const student = ctx.students[1];
 

@@ -6,8 +6,8 @@
  *   node tests/cypress/tools/dbCheck.js noten seed       apply the suite's seeder, then re-check
  *   node tests/cypress/tools/dbCheck.js noten env        print the .env block to use
  *
- * A suite contributes tools/checks/<suite>.js exporting { title, checks, sqlFiles }. Connection,
- * tunnel and output are shared and live here. A sqlFiles entry is a path or { file, group }; a
+ * A suite contributes tools/checks/<suite>.js exporting { title, checks, sqlFiles }. Connection
+ * and output are shared and live here. A sqlFiles entry is a path or { file, group }; a
  * "-- ==== <group> ====" line starts a group.
  *
  * `check` is read-only; `seed` needs <PREFIX>_DB_ALLOW_WRITES=true and an owner role.
@@ -17,7 +17,7 @@ const fs = require("fs");
 const path = require("path");
 
 try {
-	require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
+	require("dotenv").config({ path: path.join(__dirname, "..", "suites", ".env") });
 } catch (e) {
 	// dotenv missing -> fall back to the ambient environment
 }
@@ -116,7 +116,7 @@ const applySqlFile = async (client, entry) => {
 		if (/permission denied/i.test(error.message)) {
 			console.error(`${error.message}\n`);
 			console.error(`Seeding needs the database owner, but ${db.PREFIX}_DB_USER is "${db.env("USER")}".`);
-			console.error("Point it at the owner role, or seed via system/setup_testinstance.php.\n");
+			console.error("Point it at the owner role, or rebuild the database with db_setup.sh.\n");
 			return 2;
 		}
 		throw error;
@@ -137,7 +137,7 @@ const applySqlFile = async (client, entry) => {
 const printEnv = () => {
 	const p = db.PREFIX;
 	console.log(`
-Add to tests/cypress/.env (gitignored):
+Add to tests/cypress/suites/.env (gitignored):
 
   TEST_ENV_PREFIX=${p}
   ${p}_DB_HOST=<postgres host>
@@ -146,13 +146,6 @@ Add to tests/cypress/.env (gitignored):
   ${p}_DB_USER=<user>
   ${p}_DB_PASSWORD=<password>
   ${p}_DB_ALLOW_WRITES=true
-
-If pg_hba.conf does not admit this machine, add the tunnel:
-
-  ${p}_SSH_TUNNEL=true
-  ${p}_SSH_HOST=<ssh host, often NOT the web hostname>
-  ${p}_SSH_USER=<user>
-  ${p}_SSH_KEY=<path, or empty to use the ssh agent>
 `);
 };
 
@@ -181,7 +174,6 @@ const main = async () => {
 		return 2;
 	}
 
-	// Opens the SSH tunnel when configured, so a workstation run needs no manual forward.
 	const status = await db.checkAvailability({ requireWrites: mode !== "check" });
 	if (!status.available) {
 		console.error(`\nCould not connect: ${status.reason}\n`);

@@ -11,9 +11,6 @@ let server = null;
 let sshClient = null;
 let localPort = null;
 
-/** Local end of the forward, or null. Lets the pool bind without going through the environment. */
-const tunnelPort = () => localPort;
-
 const resolveAgent = (agent) => {
 	if (agent && agent !== "true") return agent;
 	if (process.env.SSH_AUTH_SOCK) return process.env.SSH_AUTH_SOCK;
@@ -139,4 +136,4 @@ const ensureTunnel = async (cfg) => {
 	}
 };
 
-module.exports = { ensureTunnel, closeTunnel, tunnelPort, resolveAuth };
+module.exports = { ensureTunnel, closeTunnel, resolveAuth };

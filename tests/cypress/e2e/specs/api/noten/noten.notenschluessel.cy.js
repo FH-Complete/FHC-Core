@@ -1,13 +1,13 @@
 /**
- * Notenschlüssel - Punkte zu Note (P0, case 10). Read-only.
+ * Grade key - Points per grade. Read-only.
  *
- * Statt die Zuordnung nachzubauen, wird der Bereich abgetastet und auf die Eigenschaften einer
- * korrekten Skala geprüft: lückenlos, monoton, exakt an jeder Grenze.
+ * Instead of recreating the mapping, the range is scanned and checked for the properties of a
+ * valid scale: continuous, monotonic, and exact at every boundary.
  */
 
 import { notenApi } from "../../../../support/api/notenApi";
 import { expectNotenError, expectNotenSuccess } from "../../../../support/helpers/notenErrors";
-import { requirePunkteModus, skipWenn } from "../../../../support/helpers/notenConfig";
+import { requirePunkteMode, skipIf } from "../../../../support/helpers/notenConfig";
 import {
 	attemptDate,
 	loadNotenContext,
@@ -54,8 +54,8 @@ describe("Noten API - Notenschlüssel (getNoteByPunkte)", () => {
 					`for every value in 0..${MAX_PUNKTE}. Pin NOTEN_LV_ID to an LV that has one.`,
 			).to.be.greaterThan(0);
 
-			// unter der niedrigsten Schwelle antwortet das Modell null; das muss ein zusammenhängender
-			// Anfang sein, ein null NACH einer Note wäre eine Lücke in der Skala
+			// Below the lowest threshold, the model returns zero, this must be a continuous
+			// start. a zero AFTER a note would create a gap in the scale
 			const firstGradedIndex = observed.findIndex((e) => e.note !== null && e.note !== undefined);
 			observed.slice(firstGradedIndex).forEach((entry) => {
 				expect(
@@ -64,7 +64,7 @@ describe("Noten API - Notenschlüssel (getNoteByPunkte)", () => {
 				).to.not.be.oneOf([null, undefined]);
 			});
 
-			// monoton: die PKs laufen 1 (beste) .. 5, die Zahl darf also nie steigen
+			// Monotonic: The PKs range from 1 (best) to 5, so the number must never increase
 			for (let i = 1; i < graded.length; i += 1) {
 				expect(
 					Number(graded[i].note),
@@ -72,7 +72,7 @@ describe("Noten API - Notenschlüssel (getNoteByPunkte)", () => {
 				).to.be.at.most(Number(graded[i - 1].note));
 			}
 
-			// jede Stufe einzeln melden, damit eine verschobene Schwelle in der Ausgabe sichtbar wird
+			// Report each level individually so that a shifted threshold is visible in the output
 			const boundaries = [];
 			for (let i = 1; i < graded.length; i += 1) {
 				if (Number(graded[i].note) !== Number(graded[i - 1].note)) {
@@ -111,24 +111,24 @@ describe("Noten API - Notenschlüssel (getNoteByPunkte)", () => {
 		});
 	});
 
-	// W3: Punkte ohne ableitbare Note lehnen alle Pfade gleich ab.
+	// Nodes without a derivable grade reject all paths equally.
 	describe("Punkte ohne ableitbare Note", () => {
-		let schwelleUnterNull = false;
+		let thresholdBelowZero = false;
 
 		before(() => {
 			notenApi.getNoteByPunkte(-1, lvId, ctx.semKurzbz).then((response) => {
 				const note = expectNotenSuccess(response, "getNoteByPunkte(-1)");
-				schwelleUnterNull = note !== null && note !== undefined;
+				thresholdBelowZero = note !== null && note !== undefined;
 			});
 		});
 
 		beforeEach(function () {
-			requirePunkteModus(this, ctx);
-			skipWenn(this, schwelleUnterNull, "Übersprungen: der Notenschlüssel hat eine Schwelle unter 0 Punkten.");
+			requirePunkteMode(this, ctx);
+			skipIf(this, thresholdBelowZero, "Übersprungen: der Notenschlüssel hat eine Schwelle unter 0 Punkten.");
 			requireDbReset();
 		});
 
-		const expectNurAntritt1 = (students) =>
+		const expectOnlyAntritt1 = (students) =>
 			readStateViaApi(ctx).then((data) => {
 				students.forEach((s) => {
 					expect(attemptsOfStudent(data, s.uid), `Prüfungen von ${s.uid}`).to.have.length(1);
@@ -153,7 +153,7 @@ describe("Noten API - Notenschlüssel (getNoteByPunkte)", () => {
 				})
 				.then((response) => expectNotenError(response, "c4punkteKeineNoteErmittelt"));
 
-			expectNurAntritt1([student]);
+			expectOnlyAntritt1([student]);
 		});
 
 		it("createPruefungen lehnt negative Punkte für alle gewählten Studierenden ab", () => {
@@ -173,7 +173,7 @@ describe("Noten API - Notenschlüssel (getNoteByPunkte)", () => {
 				)
 				.then((response) => expectNotenError(response, "c4punkteKeineNoteErmittelt"));
 
-			expectNurAntritt1(students);
+			expectOnlyAntritt1(students);
 		});
 	});
 });

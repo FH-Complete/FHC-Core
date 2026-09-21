@@ -102,7 +102,7 @@ module.exports = {
 			sql: `SELECT COALESCE((SELECT note::text FROM lehre.tbl_note
 			                        WHERE bezeichnung = 'Noch nicht eingetragen'), '') AS value`,
 			ok: (r) => r.value !== "",
-			hint: "Missing from the base dump. Rebuild with system/setup_testinstance.php --setup.",
+			hint: "Missing from the base dump. Rebuild the database with db_setup.sh.",
 		},
 		{
 			label: "Pruefungstypen Termin1/Termin2/Termin3/kommPruef",

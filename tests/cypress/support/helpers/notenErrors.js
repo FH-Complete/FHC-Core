@@ -1,8 +1,8 @@
 /**
- * Assertions für die Noten-Fehlerhülle.
+ * Assertions for the grade error message.
  *
- * Die Fehler tragen keinen errorCode, nur eine lokalisierte Meldung - daher der Abgleich gegen die
- * de/en-Templates aus system/phrasesupdate.php. Ein errorCode serverseitig würde das erübrigen.
+ * The errors do not have an errorCode, only a localized message—hence the comparison against the
+ * de/en templates from system/phrasesupdate.php. An errorCode on the server side would make this unnecessary.
  */
 
 const PHRASES = {

@@ -95,6 +95,18 @@
 	white-space: nowrap;
 }
 
+/* Reason instead of a button, for example, after passing a test */
+.pruefung-cell .pruefung-hint {
+	grid-column: 1 / -1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: 0.8rem;
+	font-style: italic;
+	opacity: 0.7;
+	cursor: help;
+}
+
 .pruefung-cell .pruefung-datum {
 	font-size: 0.75rem;
 	white-space: nowrap;

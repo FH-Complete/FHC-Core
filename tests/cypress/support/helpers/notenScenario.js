@@ -5,10 +5,10 @@ import { expectNotenSuccess } from "./notenErrors";
 import { resetNotenState, seedBaseline } from "./notenTestData";
 
 /**
- * Neuer Antritt (ohne pruefung_id -> validatePruefungAdd). Kein typ auf der Leitung.
+ * New entry (without prüfung_id -> validatePruefungAdd). No type on the line.
  *
- * punkte bleibt null: mit CIS_GESAMTNOTE_PUNKTE würde ein punkte >= 0 die Note aus dem
- * Notenschlüssel neu ableiten und die zu testende Note überschreiben.
+ * Points remain zero: with CIS_GESAMTNOTE_PUNKTE, a points value >= 0 would derive the grade anew from the
+ * grading scale and overwrite the grade being tested.
  */
 export const addPruefung = (context, student, { note, datum }) =>
 	notenApi.saveStudentPruefung({
@@ -36,8 +36,8 @@ export const editPruefung = (context, student, { pruefungId, note, datum }) =>
 	});
 
 /**
- * Liest den Zustand über die API (getStudentenNoten): was der Server MELDET.
- * Das Gegenstück ist readLvGesamtnoteViaDb - es liest, was wirklich gespeichert ist.
+ * Reads the status via the API (getStudentenNoten): what the server REPORTS.
+ * The counterpart is readLvGesamtnoteViaDb, it reads what is actually stored.
  */
 export const readStateViaApi = (context) =>
 	notenApi

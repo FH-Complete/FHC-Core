@@ -1,34 +1,16 @@
 {
   "scripts": {
-    "lint": "eslint tests/cypress cypress.config.js eslint.config.js",
-    "lint:fix": "eslint tests/cypress cypress.config.js eslint.config.js --fix",
-    "format": "prettier --write \"tests/cypress/**/*.{js,md}\"",
-    "format:check": "prettier --check \"tests/cypress/**/*.{js,md}\"",
-    "cy:open": "cypress open",
-    "cy:run": "cypress run",
-    "cy:noten": "cypress run --spec \"tests/cypress/e2e/specs/**/*.cy.js\"",
-    "cy:noten:api": "cypress run --spec \"tests/cypress/e2e/specs/{unit,api}/**/*.cy.js\"",
-    "cy:noten:ui": "cypress run --browser chrome --spec \"tests/cypress/e2e/specs/ui/**/*.cy.js\"",
-    "cy:noten:ui:watch": "cypress run --browser chrome --headed --no-exit --spec \"tests/cypress/e2e/specs/ui/**/*.cy.js\"",
-    "cy:noten:punkte-on": "cypress run --browser chrome --env NOTEN_PUNKTE_MODUS=on --spec \"tests/cypress/e2e/specs/**/*.cy.js\"",
-    "cy:noten:punkte-off": "cypress run --browser chrome --env NOTEN_PUNKTE_MODUS=off --spec \"tests/cypress/e2e/specs/**/*.cy.js\"",
-    "cy:noten:p0": "cypress run --spec \"tests/cypress/e2e/specs/unit/notenRules.cy.js,tests/cypress/e2e/specs/api/noten/noten.pruefungsantritte.cy.js,tests/cypress/e2e/specs/api/noten/noten.pruefungstermin.cy.js,tests/cypress/e2e/specs/api/noten/noten.ueberschreiben.cy.js\"",
-    "cy:noten:profile": "node tests/cypress/tools/notenProfile.js lauf",
-    "noten:profil": "node tests/cypress/tools/notenProfile.js",
-    "noten:check": "node tests/cypress/tools/dbCheck.js noten"
+    "noten:check": "node tests/cypress/tools/dbCheck.js noten",
+    "noten:api": "cypress run --spec \"tests/cypress/e2e/specs/{unit,api}/**/*.cy.js\"",
+    "noten:ui": "cypress run --browser chrome --spec \"tests/cypress/e2e/specs/ui/**/*.cy.js\""
   },
+  "//": [
+    "pg: the suite resets and seeds the test database directly (tasks/db.js, tools/dbCheck.js)",
+    "dotenv: cypress.config.js and the suite read URL, accounts and DB access from the .env files"
+  ],
   "dependencies": {
     "cypress": "^15.21.1",
     "dotenv": "^17.4.2",
-    "pg": "^8.13.1",
-    "ssh2": "^1.17.0"
-  },
-  "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "eslint": "^10.10.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-cypress": "^7.0.2",
-    "globals": "^17.12.0",
-    "prettier": "^3.9.7"
+    "pg": "^8.13.1"
   }
 }

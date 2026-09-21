@@ -64978,6 +64978,46 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4bestandenHint',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Positiv abgeschlossen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Passed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4bestandenTooltip',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Note des letzten Antritts ist positiv. Eine weitere Prüfung ist nicht möglich.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The grade of the last attempt is a pass. No further exam is possible.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// CIS4 GESAMTNOTENEINGABE ENDE ------------------------------------------------------------------------------------
 );
 

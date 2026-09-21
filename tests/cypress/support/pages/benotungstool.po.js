@@ -1,23 +1,24 @@
+import { notenAuth } from "../api/notenApi";
 import { waitForOk } from "../helpers/network";
 
 /**
- * Page object für das Benotungstool.
+ * Page object for the grading tool.
  *
- * Selektoren sind data-cy-Attribute aus Benotungstool.js. Die Tabelle ist Tabulator: Zeilen tragen
- * data-cy="student-row-<uid>", Zellen das von Tabulator gesetzte tabulator-field, und der
- * Freigabestatus steckt als data-state am Zellinhalt statt am Icon.
+ * Selectors are data-cy attributes from Benotungstool.js. The table is a tabulator: rows contain
+ * data-cy=“student-row-<uid>”, cells contain the tabulator-field set by the tabulator, and the
+ * approval status is stored as data-state in the cell content rather than in the icon.
  *
- * Nach jeder schreibenden Aktion wird auf den zugehörigen Request gewartet (waitForOk), nicht auf
- * eine DOM-Änderung - sonst prüfen die Specs gegen den Stand vor der Antwort. Die submit-Methoden
- * warten nicht; mit ihnen prüft ein Test die Ablehnung durch den Server.
+ * After every write operation, the system waits for the corresponding request (waitForOk), not for
+ * a DOM change. Otherwise, the specs would check against the state prior to the response. The submit methods
+ * do not wait; a test uses them to check for rejection by the server.
  */
 
 const TABLE_TIMEOUT = 60_000;
 const API = "**/api/frontend/v1/Noten";
 
 /**
- * Exakter Textvergleich für Optionslisten. Nötig, weil die Notenbezeichnungen einander enthalten:
- * contains("Gut") trifft zuerst "Sehr Gut", contains("Genügend") zuerst "Nicht Genügend".
+ * Exact text comparison for option lists. This is necessary because the grade labels are subsets of one another:
+ * contains(“Gut”) matches “Sehr Gut” first, and contains(‘Genügend’) matches “Nicht Genügend” first.
  */
 const exactText = (text) => new RegExp(`^\\s*${String(text).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`);
 
@@ -40,20 +41,21 @@ class BenotungstoolPage {
 	};
 
 	/**
-	 * Deep-Link auf LV + Semester - die vier Dropdowns müssen dafür nicht bedient werden.
-	 * Die Spaltenaufteilung wird vor dem Laden gesetzt: die Komponente liest den localStorage beim
-	 * Initialisieren, und vor dem ersten visit gehört er noch about:blank.
+	 * Deep link to LV + Semester. The four dropdown menus do not need to be used for this.
+	 * The column layout is set before loading: the component reads localStorage during
+	 * initialization, and before the first visit, it still belongs to about:blank.
 	 */
-	visit = (ctx, { spalten = "antritt" } = {}) =>
+	visit = (ctx, { columns = "antritt" } = {}) =>
 		cy.visit(`/cis.php/Cis/Benotungstool/${ctx.semKurzbz}/${ctx.lvId}`, {
 			onBeforeLoad(win) {
-				win.localStorage.setItem("notenToolPruefungsspalten", spalten);
+				win.localStorage.setItem("notenToolPruefungsspalten", columns);
 				win.localStorage.removeItem("notenToolStickyCols");
 			},
 		});
 
 	visitAndWaitForTable = (ctx, options) => {
-		cy.login();
+		const { username, password } = notenAuth();
+		cy.login(username, password);
 		this.setupIntercepts();
 		this.visit(ctx, options);
 
@@ -70,13 +72,14 @@ class BenotungstoolPage {
 	getCell = (uid, field) => this.getRow(uid).find(`[tabulator-field='${field}']`);
 
 	getFreigabeState = (uid) => this.getCell(uid, "freigegeben").find("[data-cy='freigabe-state']");
-	getPruefungCell = (uid, spalte) => this.getCell(uid, spalte).find("[data-cy='pruefung-cell']");
+	getPruefungCell = (uid, column) => this.getCell(uid, column).find("[data-cy='pruefung-cell']");
 	getUebernehmenButton = (uid) => this.getCell(uid, "übernehmen").find("[data-cy='btn-uebernehmen']");
-	getPruefungAddButton = (uid, spalte) => this.getCell(uid, spalte).find("[data-cy='btn-pruefung-add']");
-	getPruefungEditButton = (uid, spalte) => this.getCell(uid, spalte).find("[data-cy='btn-pruefung-edit']");
+	getPruefungAddButton = (uid, column) => this.getCell(uid, column).find("[data-cy='btn-pruefung-add']");
+	getPruefungEditButton = (uid, column) => this.getCell(uid, column).find("[data-cy='btn-pruefung-edit']");
+	getBestandenHint = (uid, column) => this.getCell(uid, column).find("[data-cy='pruefung-bestanden']");
 
 	getPruefungModal = () => cy.get("[data-cy='modal-pruefung']");
-	getNeuePruefungModal = () => cy.get("[data-cy='modal-neue-pruefung']");
+	getNewPruefungModal = () => cy.get("[data-cy='modal-neue-pruefung']");
 	getFreigabeModal = () => cy.get("[data-cy='modal-freigabe']");
 	getUebernahmeModal = () => cy.get("[data-cy='modal-uebernahme']");
 	getNotenImportModal = () => cy.get("[data-cy='modal-noten-import']");
@@ -99,131 +102,130 @@ class BenotungstoolPage {
 			? this.getCell(uid, "hoechsterAntritt").invoke("text").invoke("trim").should("eq", "")
 			: this.getCell(uid, "hoechsterAntritt").should("contain.text", String(count));
 
-	expectPruefung = (uid, spalte, { note, antritt } = {}) => {
+	expectPruefung = (uid, column, { note, antritt } = {}) => {
 		// je Assertion neu abfragen, damit Cypress ein Re-Render der Zelle erneut versucht
 		if (note !== undefined) {
-			this.getPruefungCell(uid, spalte).should("have.attr", "data-note", String(note));
+			this.getPruefungCell(uid, column).should("have.attr", "data-note", String(note));
 		}
 		if (antritt !== undefined) {
-			this.getPruefungCell(uid, spalte).should("have.attr", "data-attempt", String(antritt));
+			this.getPruefungCell(uid, column).should("have.attr", "data-attempt", String(antritt));
 		}
 	};
 
-	expectKeinePruefung = (uid, spalte) =>
-		this.getCell(uid, spalte).find("[data-cy='pruefung-cell']").should("not.exist");
+	expectNoPruefung = (uid, column) => this.getCell(uid, column).find("[data-cy='pruefung-cell']").should("not.exist");
 
-	expectKeineAntrittsspalte = (nr) => cy.get(`[tabulator-field='antritt_${nr}']`).should("not.exist");
+	expectNoAntrittColumn = (nr) => cy.get(`[tabulator-field='antritt_${nr}']`).should("not.exist");
 
 	/**
-	 * Der Server lehnt eine Speicherung ab, und ein Toast zeigt seine Meldung. Die Meldung kommt aus
-	 * der Antwort, deshalb schreibt der Test keine Phrase fest.
+	 * The server refuses to save the data, and a toast message displays its message. The message comes from
+	 * the response, so the test does not set a phrase.
 	 */
-	expectAbgelehnt = (alias) =>
+	expectRejected = (alias) =>
 		cy.wait(alias).then(({ response }) => {
 			expect(response.statusCode, `${alias} lehnt ab`).to.not.eq(200);
-			const meldung = (response.body?.errors ?? [])[0]?.message;
-			expect(meldung, `Meldung von ${alias}`).to.be.a("string").and.not.be.empty;
-			cy.get(".p-toast-message", { timeout: TABLE_TIMEOUT }).should("contain.text", meldung);
+			const errorMessage = (response.body?.errors ?? [])[0]?.message;
+			expect(errorMessage, `Meldung von ${alias}`).to.be.a("string").and.not.be.empty;
+			cy.get(".p-toast-message", { timeout: TABLE_TIMEOUT }).should("contain.text", errorMessage);
 		});
 
-	/** Ein Sammelpfad lehnt eine Zeile ab: HTTP 200, die Meldung steht in data[uid] und im Toast. */
-	expectZeileAbgelehnt = (alias, uid) =>
+	/** A collection path rejects a row: HTTP 200; the message is stored in data[uid] and in the toast. */
+	expectRowRejected = (alias, uid) =>
 		cy.wait(alias).then(({ response }) => {
 			expect(response.statusCode, `${alias} antwortet`).to.eq(200);
-			const meldung = response.body?.data?.[uid];
-			expect(meldung, `Ablehnung der Zeile ${uid}`).to.be.a("string").and.not.be.empty;
-			cy.get(".p-toast-message", { timeout: TABLE_TIMEOUT }).should("contain.text", meldung);
+			const errorMessage = response.body?.data?.[uid];
+			expect(errorMessage, `Ablehnung der Zeile ${uid}`).to.be.a("string").and.not.be.empty;
+			cy.get(".p-toast-message", { timeout: TABLE_TIMEOUT }).should("contain.text", errorMessage);
 		});
 
-	/** Nach einer ganz abgelehnten Aktion meldet die Oberfläche keinen Erfolg. */
-	expectKeinErfolg = () => cy.get(".p-toast-message-success").should("not.exist");
+	/** After an action is completely rejected, the interface reports that it was unsuccessful. */
+	expectNoSuccess = () => cy.get(".p-toast-message-success").should("not.exist");
 
-	/** Eine Warnung des Clients. Warnungen haben keine Ablaufzeit. */
-	expectWarnung = (text) => cy.get(".p-toast-message-warn", { timeout: TABLE_TIMEOUT }).should("contain.text", text);
+	/** A client warning. Warnings do not have an expiration time. */
+	expectWarning = (text) => cy.get(".p-toast-message-warn", { timeout: TABLE_TIMEOUT }).should("contain.text", text);
 
-	expectWarnungen = (anzahl) =>
-		cy.get(".p-toast-message-warn", { timeout: TABLE_TIMEOUT }).should("have.length.at.least", anzahl);
+	expectWarnings = (minCount) =>
+		cy.get(".p-toast-message-warn", { timeout: TABLE_TIMEOUT }).should("have.length.at.least", minCount);
 
-	/** Die uids des letzten Requests eines Sammelpfads. feld: "noten" oder "pruefungen" */
-	gesendeteUids = (alias, feld) =>
+	/** The UIDs of the last request in a collection path. Field: “noten” or “pruefungen” */
+	sentUids = (alias, bodyField) =>
 		cy
 			.get(alias)
-			.its(`request.body.${feld}`)
-			.then((zeilen) => zeilen.map((z) => z.uid));
+			.its(`request.body.${bodyField}`)
+			.then((sentRows) => sentRows.map((z) => z.uid));
 
 	// --- Notenvorschlag --------------------------------------------------------------------------
 
-	/** Öffnet den Tabulator-Listeneditor der Vorschlagsspalte und wählt die Bezeichnung. */
+	/** Opens the tab-separated list editor for the suggestion column and selects the label. */
 	setNotenvorschlag = (uid, bezeichnung) => {
 		this.getCell(uid, "note_vorschlag").click();
 		cy.get(".tabulator-edit-list-item").contains(bezeichnung).click();
 	};
 
-	/** Übernehmen fragt zuerst das Benotungsdatum. Ohne `datum` bleibt der Vorschlag des Dialogs. */
+	/** “Übernehmen” first asks for the grading date. If `datum` is omitted, the dialog's default value is used. */
 	submitUebernahme = (uid, { datum } = {}) => {
-		this.schliesseToasts();
+		this.closeToasts();
 		this.getUebernehmenButton(uid).click();
 		this.getUebernahmeModal().should("be.visible");
 
-		if (datum) this.setDatum("uebernahme-datum", datum);
+		if (datum) this.setDate("uebernahme-datum", datum);
 
 		cy.get("[data-cy='uebernahme-submit']").click();
 	};
 
-	uebernehmen = (uid, optionen) => {
-		this.submitUebernahme(uid, optionen);
+	uebernehmen = (uid, options) => {
+		this.submitUebernahme(uid, options);
 		waitForOk("@saveNotenvorschlag");
 		this.getUebernahmeModal().should("not.be.visible");
 	};
 
 	// --- Prüfungen -------------------------------------------------------------------------------
 
-	/** PrimeVue hängt seine Panels an den body, daher nicht innerhalb des Modals suchen. */
+	/** PrimeVue attaches its panels to the `body`, so don't search inside the modal. */
 	selectDropdownOption = (dataCy, label) => {
 		cy.get(`[data-cy='${dataCy}']`).click();
 		cy.contains(".p-dropdown-panel .p-dropdown-item", exactText(label)).click();
 	};
 
-	setDatum = (dataCy, ddmmyyyy) => cy.get(`[data-cy='${dataCy}'] input`).first().clear().type(`${ddmmyyyy}{enter}`);
+	setDate = (dataCy, ddmmyyyy) => cy.get(`[data-cy='${dataCy}'] input`).first().clear().type(`${ddmmyyyy}{enter}`);
 
 	/**
-	 * Nach jeder Speicherung zeigt das Tool einen Erfolgs-Toast ohne Ablaufzeit. Er liegt über dem Modal
-	 * (z-index 100001) und verdeckt dessen Knöpfe, deshalb schliesst ihn der Test über seinen Knopf.
+	 * After each save, the tool displays a success toast with no timeout. It is positioned above the modal
+	 * (z-index 100001) and covers its buttons, which is why the test closes it using its button.
 	 */
-	schliesseToasts = () =>
+	closeToasts = () =>
 		cy
 			.get("body")
 			.then(($body) => {
-				const knoepfe = $body.find(".p-toast-message .p-toast-icon-close");
-				if (knoepfe.length) cy.wrap(knoepfe).click({ multiple: true });
+				const buttons = $body.find(".p-toast-message .p-toast-icon-close");
+				if (buttons.length) cy.wrap(buttons).click({ multiple: true });
 			})
 			.then(() => cy.get(".p-toast-message").should("not.exist"));
 
-	/** Dialog aus der Tabellenzelle: neuer Antritt für EINEN Studenten. */
-	submitPruefungInCell = (uid, spalte, { note, datum } = {}) => {
-		this.schliesseToasts();
-		this.getPruefungAddButton(uid, spalte).click();
+	/** Dialog from the table cell: new enrollment for ONE student. */
+	submitPruefungInCell = (uid, column, { note, datum } = {}) => {
+		this.closeToasts();
+		this.getPruefungAddButton(uid, column).click();
 		this.getPruefungModal().should("be.visible");
 
-		if (datum) this.setDatum("pruefung-datum", datum);
+		if (datum) this.setDate("pruefung-datum", datum);
 		if (note) this.selectDropdownOption("pruefung-note", note);
 
 		cy.get("[data-cy='pruefung-submit']").click();
 	};
 
-	addPruefungInCell = (uid, spalte, optionen) => {
-		this.submitPruefungInCell(uid, spalte, optionen);
+	addPruefungInCell = (uid, column, options) => {
+		this.submitPruefungInCell(uid, column, options);
 		waitForOk("@saveStudentPruefung");
 		this.getPruefungModal().should("not.be.visible");
 	};
 
-	/** Bestehenden Antritt bearbeiten. Ohne `note` bleibt sie unverändert (Datumskorrektur). */
-	editPruefungInCell = (uid, spalte, { note, datum } = {}) => {
-		this.schliesseToasts();
-		this.getPruefungEditButton(uid, spalte).click();
+	/** Edit an existing Antrittsdatum. If `note` is omitted, the start date remains unchanged (date correction). */
+	editPruefungInCell = (uid, column, { note, datum } = {}) => {
+		this.closeToasts();
+		this.getPruefungEditButton(uid, column).click();
 		this.getPruefungModal().should("be.visible");
 
-		if (datum) this.setDatum("pruefung-datum", datum);
+		if (datum) this.setDate("pruefung-datum", datum);
 		if (note) this.selectDropdownOption("pruefung-note", note);
 
 		cy.get("[data-cy='pruefung-submit']").click();
@@ -231,39 +233,39 @@ class BenotungstoolPage {
 		this.getPruefungModal().should("not.be.visible");
 	};
 
-	openPruefungModalForEdit = (uid, spalte) => {
-		this.schliesseToasts();
-		this.getPruefungEditButton(uid, spalte).click();
+	openPruefungModalForEdit = (uid, column) => {
+		this.closeToasts();
+		this.getPruefungEditButton(uid, column).click();
 		this.getPruefungModal().should("be.visible");
 	};
 
-	/** Sammelanlage über die Toolbar abschicken, ohne auf die Antwort zu warten. */
+	/** Submit the batch request via import modal without waiting for a response. */
 	submitPruefungBulk = ({ uids, note, punkte, datum }) => {
-		this.schliesseToasts();
+		this.closeToasts();
 		cy.get("[data-cy='btn-neue-pruefung']").click();
-		this.getNeuePruefungModal().should("be.visible");
+		this.getNewPruefungModal().should("be.visible");
 
-		if (datum) this.setDatum("neue-pruefung-datum", datum);
+		if (datum) this.setDate("neue-pruefung-datum", datum);
 		if (note) this.selectDropdownOption("neue-pruefung-note", note);
-		if (punkte !== undefined) this.setNeuePruefungPunkte(punkte);
+		if (punkte !== undefined) this.setNewPruefungPunkte(punkte);
 
 		cy.get("[data-cy='neue-pruefung-studenten']").click();
-		// das Label ist "uid – Nachname Vorname – Antritte: n", daher hier bewusst per Teilstring
+		// The label is “uid – Last Name First Name – Appearances: n”
 		uids.forEach((uid) => cy.contains(".p-multiselect-panel .p-multiselect-item", uid).click());
 
-		// NICHT mit Escape: das schliesst das Bootstrap-Modal mit. Das offene Panel kann den Trigger
-		// verdecken, deshalb über den Schliessknopf des Panels.
+		// DO NOT use the Escape key: that closes the Bootstrap modal as well. The open panel may cover the trigger,
+		// so use the panel's close button instead.
 		cy.get(".p-multiselect-panel .p-multiselect-close").click();
 		cy.get(".p-multiselect-panel").should("not.exist");
 
 		cy.get("[data-cy='neue-pruefung-submit']").click();
 	};
 
-	/** Sammelanlage über die Toolbar, für mehrere Studierende auf einmal. */
-	addPruefungBulk = (optionen) => {
-		this.submitPruefungBulk(optionen);
+	/** Bulk insert for multiple students. */
+	addPruefungBulk = (options) => {
+		this.submitPruefungBulk(options);
 		waitForOk("@createPruefungen");
-		this.getNeuePruefungModal().should("not.be.visible");
+		this.getNewPruefungModal().should("not.be.visible");
 	};
 
 	// --- Freigabe --------------------------------------------------------------------------------
@@ -278,12 +280,12 @@ class BenotungstoolPage {
 			.find("[data-cy='freigabe-row-released']")
 			.should("contain.text", releasedBezeichnung);
 
-	typeFreigabePasswort = (password) => cy.get("[data-cy='freigabe-passwort'] input").type(password, { log: false });
+	typeFreigabePassword = (password) => cy.get("[data-cy='freigabe-passwort'] input").type(password, { log: false });
 
 	submitFreigabe = () => cy.get("[data-cy='freigabe-submit']").click();
 
 	freigeben = (password) => {
-		this.typeFreigabePasswort(password);
+		this.typeFreigabePassword(password);
 		this.submitFreigabe();
 		waitForOk("@saveStudentenNoten");
 		this.getFreigabeModal().should("not.be.visible");
@@ -291,9 +293,9 @@ class BenotungstoolPage {
 
 	// --- Import ----------------------------------------------------------------------------------
 
-	/** rows: [[uid, note], ...] -> "uid<TAB>note" je Zeile */
+	/** rows: [[uid, note], ...] -> "uid<TAB>note" per row */
 	submitNotenImport = (rows) => {
-		this.schliesseToasts();
+		this.closeToasts();
 		cy.get("[data-cy='btn-noten-import']").click();
 		this.getNotenImportModal().should("be.visible");
 
@@ -309,7 +311,7 @@ class BenotungstoolPage {
 
 	/** rows: [[uid, "dd.MM.yyyy", note], ...] */
 	submitPruefungImport = (rows) => {
-		this.schliesseToasts();
+		this.closeToasts();
 		cy.get("[data-cy='btn-pruefung-import']").click();
 		this.getPruefungImportModal().should("be.visible");
 
@@ -350,18 +352,18 @@ class BenotungstoolPage {
 	expectPunkte = (uid, punkte) => this.getPunkteCell(uid).should("contain.text", String(punkte));
 
 	/** Sobald ein Termin existiert, ist die Punktespalte gesperrt (editable-Guard der Spalte). */
-	expectPunkteZelleGesperrt = (uid) => {
+	expectPunkteCellLocked = (uid) => {
 		this.getPunkteCell(uid).click();
 		this.getPunkteCell(uid).find("input").should("not.exist");
 	};
 
 	/** Im Punktemodus ist die Vorschlagsspalte nicht editierbar - die Note kommt aus den Punkten. */
-	expectNotenvorschlagGesperrt = (uid) => {
+	expectNotenvorschlagLocked = (uid) => {
 		this.getCell(uid, "note_vorschlag").click();
 		cy.get(".tabulator-edit-list").should("not.exist");
 	};
 
-	expectNoteFeldGesperrt = (dataCy) => cy.get(`[data-cy='${dataCy}']`).should("have.class", "p-disabled");
+	expectNoteFieldLocked = (dataCy) => cy.get(`[data-cy='${dataCy}']`).should("have.class", "p-disabled");
 
 	/** Punktefeld im Einzeldialog; löst die Ableitung der Note aus. */
 	setPruefungPunkte = (punkte) => {
@@ -370,7 +372,7 @@ class BenotungstoolPage {
 	};
 
 	/** Punktefeld der Sammelanlage; dort leitet erst der Server beim Speichern ab. */
-	setNeuePruefungPunkte = (punkte) => cy.get("[data-cy='neue-pruefung-punkte'] input").clear().type(String(punkte));
+	setNewPruefungPunkte = (punkte) => cy.get("[data-cy='neue-pruefung-punkte'] input").clear().type(String(punkte));
 
 	// --- Hilfen ----------------------------------------------------------------------------------
 
@@ -383,7 +385,7 @@ class BenotungstoolPage {
 	};
 
 	/** Date in the configured import format; kept apart from toDDMMYYYY, which the dialog uses. */
-	importDatum = (isoDate, format) => (format === "yyyy-MM-dd" ? isoDate : this.toDDMMYYYY(isoDate));
+	importDate = (isoDate, format) => (format === "yyyy-MM-dd" ? isoDate : this.toDDMMYYYY(isoDate));
 }
 
 export const benotungstoolPage = new BenotungstoolPage();

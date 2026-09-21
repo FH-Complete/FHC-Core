@@ -1,13 +1,13 @@
 /**
- * Der Schreibpfad (savePruefungFuerStudent), den saveStudentPruefung, createPruefungen und
- * savePruefungenBulk teilen. Die Validatoren decken die anderen Specs ab.
+ * The write path (savePruefungFuerStudent) shared by saveStudentPruefung, createPruefungen, and
+ * savePruefungenBulk. The validators cover the other specs.
  *
- * Invariante: eine Aktion schreibt genau eine Prüfung. Ausnahme: neben einer LV-Note ohne Prüfungszeile
- * schreibt der erste neue Termin zuerst Antritt 1.
+ * Invariant: An action saves exactly one exam. Exception: In addition to a course grade without an exam row,
+ * the first new date first saves “Attendance 1.”
  */
 
 import { expectNotenError, expectNotenSuccess } from "../../../../support/helpers/notenErrors";
-import { requireKonfiguration, requireWiederholung } from "../../../../support/helpers/notenConfig";
+import { requireConfig, requireWiederholung } from "../../../../support/helpers/notenConfig";
 import {
 	attemptDate,
 	baselineDate,
@@ -92,19 +92,19 @@ describe("Noten API - Prüfungstermin (Schreibpfad)", () => {
 				const verlauf = verlaufOfStudent(data, student.uid);
 				expect(verlauf.antrittCount, "both attempts counted").to.eq(2);
 				expect(verlauf.maxAntritte, "the cap comes from the server").to.eq(ctx.maxAntritte);
-				// der letzte Antritt ist kommissionell; darf das Tool ihn nicht anlegen, ist hier Schluss
-				const anlegbar =
+				// The last entry is kommissionell. if the tool cannot create it, the process ends here
+				const creatable =
 					ctx.cisConfig.CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF !== false
 						? ctx.maxAntritte
 						: ctx.maxAntritte - 1;
-				expect(verlauf.canAdd, `canAdd with 2 of ${anlegbar} possible`).to.eq(2 < anlegbar);
+				expect(verlauf.canAdd, `canAdd with 2 of ${creatable} possible`).to.eq(2 < creatable);
 			});
 	});
 
 	it("hängt je Anlage eine neue Zeile an, statt die vorherige zu überschreiben", function () {
 		requireWiederholung(this, ctx);
 
-		// nur eine explizite pruefung_id aktualisiert, ein Add fügt immer ein
+		// Only an explicit “pruefung_id” is updating, an “Add” always inserts one
 		const student = studentFor(0);
 
 		givenBaseline(ctx, student);
@@ -138,10 +138,10 @@ describe("Noten API - Prüfungstermin (Schreibpfad)", () => {
 		givenBaseline(ctx, student);
 
 		let excusedId;
-		seedPruefung(ctx, student, { note: ctx.notes.entschuldigt, datum: excusedDate, typ: "Termin2" })
+		seedPruefung(ctx, student, { note: ctx.notes.entschuldigt, datum: excusedDate, type: "Termin2" })
 			.then((seeded) => {
 				excusedId = seeded.pruefungId;
-				return seedPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: gradedDate, typ: "Termin2" });
+				return seedPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: gradedDate, type: "Termin2" });
 			})
 			// note stays entschuldigt: a later pruefung exists, so only the datum may move
 			.then(() =>
@@ -182,8 +182,8 @@ describe("Noten API - Prüfungstermin (Schreibpfad)", () => {
 			});
 	});
 
-	// Eine LV-Note ohne Prüfungszeile ist Antritt 1: aus einer Übernahme ohne Erstantritt oder aus der Zeit
-	// vor dem Werkzeug. Ohne die Zeile fiele sie aus der Zählung, und der Studierende bekäme einen Antritt zu viel.
+	// A course grade without an exam line is considered “Antritt 1”: either from a Übernahme without an initial attendance or from the period
+	// before the tool was implemented. Without that line, it would be omitted from the count, and the student would be credited with one too many attendances.
 	it("schreibt Antritt 1 aus einer LV-Note ohne Prüfungszeile nach", function () {
 		requireWiederholung(this, ctx);
 
@@ -207,9 +207,9 @@ describe("Noten API - Prüfungstermin (Schreibpfad)", () => {
 		});
 	});
 
-	// Regel: Die LV-Note ist die Note des letzten Termins, der einen Antritt verbraucht. Ohne einen
-	// solchen Termin bleibt ein impliziter Erstantritt, sonst gilt "Noch nicht eingetragen".
-	// Die LV-Note ist nie 'entschuldigt'.
+	// Rule: The course grade is the grade from the last session that counts as an attendance. Without such
+	// a session, an implicit first attendance is assumed; otherwise, the status is “Noch nicht eingetragen”
+	// The course grade is never marked as “entschuldigt”
 	describe("LV-Note nach einem Termin", () => {
 		const g2 = () =>
 			ctx.notes.positiv ??
@@ -222,9 +222,9 @@ describe("Noten API - Prüfungstermin (Schreibpfad)", () => {
 				return row;
 			});
 
-		const expectAntritte = (student, anzahl) =>
+		const expectAntritte = (student, count) =>
 			readStateViaApi(ctx).then((data) => {
-				expect(verlaufOfStudent(data, student.uid).antrittCount, "antrittCount").to.eq(anzahl);
+				expect(verlaufOfStudent(data, student.uid).antrittCount, "antrittCount").to.eq(count);
 			});
 
 		it("behält die LV-Note bei einer Datumskorrektur an Termin 1", function () {
@@ -267,7 +267,7 @@ describe("Noten API - Prüfungstermin (Schreibpfad)", () => {
 		});
 
 		// Kein requireWiederholung: der Test braucht nur Antritt 1. Mit zwei Antritten ohne
-		// kommissionelle Anlage scheitert er, siehe docs/benotungstool-status.md, Abschnitt 9.
+		// kommissionelle Anlage scheitert er
 		it("setzt 'Noch nicht eingetragen', wenn der erste Termin entschuldigt ist", () => {
 			const student = studentFor(2);
 
@@ -291,10 +291,10 @@ describe("Noten API - Prüfungstermin (Schreibpfad)", () => {
 			);
 
 			readStateViaApi(ctx).then((data) => {
-				const zaehlend = attemptsOfStudent(data, student.uid).find(
+				const counting = attemptsOfStudent(data, student.uid).find(
 					(p) => String(p.note) === String(ctx.notes.negativ),
 				);
-				expect(zaehlend.antritt_nr, "der Studierende hat keinen Antritt verloren").to.eq(1);
+				expect(counting.antritt_nr, "der Studierende hat keinen Antritt verloren").to.eq(1);
 			});
 		});
 
@@ -315,7 +315,7 @@ describe("Noten API - Prüfungstermin (Schreibpfad)", () => {
 				.then((response) => expectNotenSuccess(response, "Termin 1 wird entschuldigt"));
 
 			expectLvNote(student, ctx.notes.nochNichtEingetragen, "die LV-Note ist nie entschuldigt");
-			// die alte LV-Note zählt nicht als impliziter Erstantritt
+			// The old course grade does not count as an implicit first enrollment
 			expectAntritte(student, 0);
 		});
 
@@ -387,11 +387,11 @@ describe("Noten API - Prüfungstermin (Schreibpfad)", () => {
 	describe("Freigabe nach einem neuen Termin", () => {
 		beforeEach(function () {
 			// eine endgültige Freigabe verbietet den neuen Termin
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_FREIGABE_FINAL", false);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_FREIGABE_FINAL", false);
 			requireWiederholung(this, ctx);
 		});
 
-		const neuerTerminNachFreigabe = (student) => {
+		const newTerminAfterFreigabe = (student) => {
 			givenBaseline(ctx, student, { freigegeben: true });
 			addPruefung(ctx, student, { note: ctx.notes.negativ, datum: attemptDate(ctx, 1) }).then((response) =>
 				expectNotenSuccess(response, "Termin nach der Freigabe"),
@@ -400,18 +400,18 @@ describe("Noten API - Prüfungstermin (Schreibpfad)", () => {
 		};
 
 		it("hebt die Freigabe mit einem neuen Termin auf", function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_PRUEFUNG_HEBT_FREIGABE_AUF", true);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_PRUEFUNG_HEBT_FREIGABE_AUF", true);
 
-			neuerTerminNachFreigabe(studentFor(5)).then((row) => {
+			newTerminAfterFreigabe(studentFor(5)).then((row) => {
 				expect(new Date(row.benotungsdatum) > new Date(row.freigabedatum), "benotungsdatum nach freigabedatum")
 					.to.be.true;
 			});
 		});
 
 		it("behält die Freigabe bei einem neuen Termin", function () {
-			requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_PRUEFUNG_HEBT_FREIGABE_AUF", false);
+			requireConfig(this, ctx, "CIS_GESAMTNOTE_PRUEFUNG_HEBT_FREIGABE_AUF", false);
 
-			neuerTerminNachFreigabe(studentFor(5)).then((row) => {
+			newTerminAfterFreigabe(studentFor(5)).then((row) => {
 				expect(new Date(row.benotungsdatum) > new Date(row.freigabedatum), "benotungsdatum nach freigabedatum")
 					.to.be.false;
 			});

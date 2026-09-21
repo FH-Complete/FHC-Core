@@ -1,5 +1,5 @@
 import { benotungstoolPage as page } from "../../../../support/pages/benotungstool.po";
-import { requireKonfiguration, requirePunkteModus, requireWiederholung } from "../../../../support/helpers/notenConfig";
+import { requireConfig, requirePunkteMode, requireWiederholung } from "../../../../support/helpers/notenConfig";
 import { attemptsOfStudent, readStateViaApi } from "../../../../support/helpers/notenScenario";
 import {
 	attemptDate,
@@ -13,22 +13,22 @@ import {
 import { notenApi } from "../../../../support/api/notenApi";
 
 /**
- * Punktemodus (CIS_GESAMTNOTE_PUNKTE) in der Oberfläche.
+ * Point Mode (CIS_GESAMTNOTE_PUNKTE) in the user interface.
  *
- * Die Punktespalte und die Punktefelder der beiden Dialoge existieren nur mit diesem Flag, die Note
- * wird dann aus dem Notenschlüssel abgeleitet statt gewählt. Genau diese Felder deckt sonst nichts
- * ab, deshalb steht der ganze Modus hier in einer eigenen Datei.
+ * The points column and the points fields in both dialogs exist only when this flag is set; the grade
+ * is then derived from the grading key instead of being selected. Nothing else covers these specific fields,
+ * which is why this entire mode is contained in its own file here.
  *
- * Der Notenschlüssel wird nie hartcodiert: die erwartete Note kommt zur Laufzeit aus
- * getNoteByPunkte, damit die Specs an jeder Instanz mit eigenem Schlüssel laufen.
+ * The grading key is never hard-coded: the expected grade is retrieved at runtime from
+ * getNoteByPunkte, so that the specs run with their own key for each instance.
  */
 context("Benotungstool UI - Punktemodus", () => {
 	let ctx;
 	// Punktewerte, deren Noten zur Laufzeit ermittelt werden
-	const OBEN = 100;
-	const MITTE = 70;
-	let noteOben;
-	let noteMitte;
+	const TOP = 100;
+	const MIDDLE = 70;
+	let noteTop;
+	let noteMiddle;
 
 	before(() => {
 		requireDbReset();
@@ -36,22 +36,22 @@ context("Benotungstool UI - Punktemodus", () => {
 			ctx = context;
 			if (!ctx.cisConfig.CIS_GESAMTNOTE_PUNKTE) return;
 
-			notenApi.getNoteByPunkte(OBEN, ctx.lvId, ctx.semKurzbz).then((r) => {
-				noteOben = r.body.data;
-				expect(noteOben, `${OBEN} Punkte müssen eine Note ergeben`).to.not.be.null;
+			notenApi.getNoteByPunkte(TOP, ctx.lvId, ctx.semKurzbz).then((r) => {
+				noteTop = r.body.data;
+				expect(noteTop, `${TOP} Punkte müssen eine Note ergeben`).to.not.be.null;
 			});
-			notenApi.getNoteByPunkte(MITTE, ctx.lvId, ctx.semKurzbz).then((r) => {
-				noteMitte = r.body.data;
-				expect(noteMitte, `${MITTE} Punkte müssen eine Note ergeben`).to.not.be.null;
-				expect(String(noteMitte), "die beiden Punktewerte müssen verschiedene Noten liefern").to.not.eq(
-					String(noteOben),
+			notenApi.getNoteByPunkte(MIDDLE, ctx.lvId, ctx.semKurzbz).then((r) => {
+				noteMiddle = r.body.data;
+				expect(noteMiddle, `${MIDDLE} Punkte müssen eine Note ergeben`).to.not.be.null;
+				expect(String(noteMiddle), "die beiden Punktewerte müssen verschiedene Noten liefern").to.not.eq(
+					String(noteTop),
 				);
 			});
 		});
 	});
 
 	beforeEach(function () {
-		requirePunkteModus(this, ctx);
+		requirePunkteMode(this, ctx);
 	});
 
 	describe("Punktespalte in der Tabelle", () => {
@@ -63,7 +63,7 @@ context("Benotungstool UI - Punktemodus", () => {
 
 			page.getPunkteCell(student.uid).should("exist");
 			// die Note kommt aus den Punkten, sie darf nicht direkt gewählt werden
-			page.expectNotenvorschlagGesperrt(student.uid);
+			page.expectNotenvorschlagLocked(student.uid);
 		});
 
 		it("schreibt Note und Punkte, wenn der Vorschlag übernommen wird", () => {
@@ -72,15 +72,15 @@ context("Benotungstool UI - Punktemodus", () => {
 			resetNotenState(ctx);
 			page.visitAndWaitForTable(ctx);
 
-			page.setPunkteInCell(student.uid, MITTE);
+			page.setPunkteInCell(student.uid, MIDDLE);
 			page.uebernehmen(student.uid);
 
-			page.expectLvNote(student.uid, page.bezeichnungOf(ctx, noteMitte));
+			page.expectLvNote(student.uid, page.bezeichnungOf(ctx, noteMiddle));
 			page.expectFreigabeState(student.uid, "changed");
 
 			readLvGesamtnoteViaDb(ctx, student.uid).then((row) => {
-				expect(String(row.note), "abgeleitete Note").to.eq(String(noteMitte));
-				expect(Number(row.punkte), "die Punkte werden mitgeschrieben").to.eq(MITTE);
+				expect(String(row.note), "abgeleitete Note").to.eq(String(noteMiddle));
+				expect(Number(row.punkte), "die Punkte werden mitgeschrieben").to.eq(MIDDLE);
 			});
 		});
 
@@ -94,17 +94,16 @@ context("Benotungstool UI - Punktemodus", () => {
 			seedPruefung(ctx, student, {
 				note: ctx.gradeNotes[0],
 				datum: attemptDate(ctx, 1),
-				typ: "Termin2",
+				type: "Termin2",
 			});
 
 			page.visitAndWaitForTable(ctx);
 
-			page.expectPunkteZelleGesperrt(student.uid);
+			page.expectPunkteCellLocked(student.uid);
 		});
 	});
 
 	describe("Prüfungsdialog", () => {
-		// Beide Tests brauchen einen freien Antritt: eine positive Basisnote schliesst die Kette.
 		it("bietet ein Punktefeld statt der Notenauswahl", () => {
 			const student = ctx.students[1];
 
@@ -116,7 +115,7 @@ context("Benotungstool UI - Punktemodus", () => {
 			page.getPruefungModal().should("be.visible");
 
 			cy.get("[data-cy='pruefung-punkte']").should("be.visible");
-			page.expectNoteFeldGesperrt("pruefung-note");
+			page.expectNoteFieldLocked("pruefung-note");
 		});
 
 		it("legt den Termin mit der aus den Punkten abgeleiteten Note an", () => {
@@ -129,15 +128,15 @@ context("Benotungstool UI - Punktemodus", () => {
 			page.getPruefungAddButton(student.uid, "antritt_2").click();
 			page.getPruefungModal().should("be.visible");
 
-			page.setDatum("pruefung-datum", page.toDDMMYYYY(attemptDate(ctx, 1)));
-			page.setPruefungPunkte(OBEN);
+			page.setDate("pruefung-datum", page.toDDMMYYYY(attemptDate(ctx, 1)));
+			page.setPruefungPunkte(TOP);
 
 			cy.get("[data-cy='pruefung-submit']").click();
 			cy.wait("@saveStudentPruefung").its("response.statusCode").should("eq", 200);
 			page.getPruefungModal().should("not.be.visible");
 
-			page.expectPruefung(student.uid, "antritt_2", { note: noteOben, antritt: 2 });
-			page.expectLvNote(student.uid, page.bezeichnungOf(ctx, noteOben));
+			page.expectPruefung(student.uid, "antritt_2", { note: noteTop, antritt: 2 });
+			page.expectLvNote(student.uid, page.bezeichnungOf(ctx, noteTop));
 		});
 	});
 
@@ -153,9 +152,11 @@ context("Benotungstool UI - Punktemodus", () => {
 			seedBaseline(ctx, b, { note: ctx.notes.negativ, freigegeben: true });
 
 			page.visitAndWaitForTable(ctx);
-			page.addPruefungBulk({ uids: [a.uid, b.uid], punkte: MITTE, datum: page.toDDMMYYYY(attemptDate(ctx, 1)) });
+			page.addPruefungBulk({ uids: [a.uid, b.uid], punkte: MIDDLE, datum: page.toDDMMYYYY(attemptDate(ctx, 1)) });
 
-			[a, b].forEach((student) => page.expectPruefung(student.uid, "antritt_2", { note: noteMitte, antritt: 2 }));
+			[a, b].forEach((student) =>
+				page.expectPruefung(student.uid, "antritt_2", { note: noteMiddle, antritt: 2 }),
+			);
 		});
 	});
 
@@ -166,38 +167,38 @@ context("Benotungstool UI - Punktemodus", () => {
 		[
 			["Dezimalkomma", "89,5"],
 			["Dezimalpunkt", "89.5"],
-		].forEach(([schreibweise, eingabe]) => {
-			it(`liest Punkte mit ${schreibweise} im Prüfungsimport`, function () {
-				requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_PRUEFUNGSIMPORT", true);
+		].forEach(([notation, input]) => {
+			it(`liest Punkte mit ${notation} im Prüfungsimport`, function () {
+				requireConfig(this, ctx, "CIS_GESAMTNOTE_PRUEFUNGSIMPORT", true);
 				requireWiederholung(this, ctx);
 
 				const student = ctx.students[4];
-				const datum = page.importDatum(attemptDate(ctx, 1), ctx.cisConfig.CIS_GESAMTNOTE_IMPORT_DATUMSFORMAT);
+				const datum = page.importDate(attemptDate(ctx, 1), ctx.cisConfig.CIS_GESAMTNOTE_IMPORT_DATUMSFORMAT);
 
 				resetNotenState(ctx);
 				seedBaseline(ctx, student, { note: ctx.notes.negativ, freigegeben: true });
 				page.visitAndWaitForTable(ctx);
 
-				page.importPruefungen([[student.uid, datum, eingabe]]);
+				page.importPruefungen([[student.uid, datum, input]]);
 
 				cy.get("@savePruefungenBulk").its("request.body.pruefungen.0.punkte").should("eq", PUNKTE);
 
 				readStateViaApi(ctx).then((data) => {
-					const neu = attemptsOfStudent(data, student.uid)[1];
-					expect(neu, "der importierte Termin").to.exist;
-					expect(Number(neu.punkte), "die Punkte des Termins").to.eq(PUNKTE);
+					const newTermin = attemptsOfStudent(data, student.uid)[1];
+					expect(newTermin, "der importierte Termin").to.exist;
+					expect(Number(newTermin.punkte), "die Punkte des Termins").to.eq(PUNKTE);
 				});
 			});
 
-			it(`liest Punkte mit ${schreibweise} im Notenimport`, function () {
-				requireKonfiguration(this, ctx, "CIS_GESAMTNOTE_NOTENIMPORT", true);
+			it(`liest Punkte mit ${notation} im Notenimport`, function () {
+				requireConfig(this, ctx, "CIS_GESAMTNOTE_NOTENIMPORT", true);
 
 				const student = ctx.students[5];
 
 				resetNotenState(ctx);
 				page.visitAndWaitForTable(ctx);
 
-				page.importNoten([[student.uid, eingabe]]);
+				page.importNoten([[student.uid, input]]);
 
 				cy.get("@saveNotenvorschlagBulk").its("request.body.noten.0.punkte").should("eq", PUNKTE);
 
