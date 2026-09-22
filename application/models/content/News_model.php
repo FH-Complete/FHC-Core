@@ -29,7 +29,7 @@ class News_model extends DB_Model
 			--text IS NOT NULL AND 	
 			datum <= NOW() AND (datum_bis >= NOW()::date OR datum_bis IS NULL) AND
 			(NOW()-datum) < interval \'' . MAXNEWSALTER . ' days\'
-			ORDER BY datum DESC ORDER BY campus.tbl_news.updateamum DESC
+			ORDER BY datum DESC, campus.tbl_news.updateamum DESC
 			LIMIT ' . $this->escape($limit)
 		, ['DD/MM/YYYY']);
 	}
