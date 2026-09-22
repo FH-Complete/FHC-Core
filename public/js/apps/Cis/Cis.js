@@ -19,6 +19,7 @@ import DeadlineOverview from "../../components/Cis/Abgabetool/DeadlineOverview.j
 import Studium from "../../components/Cis/Studium/Studium.js";
 import StgOrgLvPlan from "../../components/Cis/LvPlan/StgOrg.js";
 import OtherLvPlan from "../../components/Cis/LvPlan/OtherLvPlan.js";
+import Compat from "../../components/Cis/Compat.js";
 
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
 import {capitalize} from "../../helpers/StringHelpers.js";
@@ -29,6 +30,18 @@ const isMobile = window.matchMedia("(max-width: 767px)").matches;
 const router = VueRouter.createRouter({
 	history: VueRouter.createWebHistory(`/${ciPath}`),
 	routes: [
+		{
+			path: `/Cis/Compat/:mode(ci|legacy)/:path(.*)`,
+			name: 'Compat',
+			component: Compat,
+			props: (route) => {
+				return {
+					mode: route.params.mode,
+					path: route.params.path,
+					query_string: VueRouter.stringifyQuery(route.query)
+				};
+			}
+		},
 		{
 			path: `/Cis/Studium`,
 			name: 'Studium',
@@ -277,7 +290,7 @@ const app = Vue.createApp({
 			if (target && this.isInternalRoute(target.href)) {
 				const url = new URL(target.href)
 				
-				const path = url.pathname
+				const path = url.pathname + url.search;
 				const base = this.$router.options.history.base
 				const route = path.replace(base, '') || '/'
 
