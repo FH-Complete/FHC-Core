@@ -152,7 +152,7 @@ if(isset($_POST["start"]) && $_POST["start"] == "start")
 				if(in_array($row->status_kurzbz,array('Abbrecher','Unterbrecher','Diplomand','Absolvent')))
 				{
 					// Schauen ob fuer das vorherige Studiensemester ein eindeutiger Eintrag vorhanden ist
-					// Da bei diesen Statuseintraegen Studiensemster und Ausbildungssemester meist versetzt sind
+					// Da bei diesen Statuseintraegen Studiensemester und Ausbildungssemester meist versetzt sind
 					// (zB Wintersemester 2. Semester)
 
 					$stsem_obj = new studiensemester();

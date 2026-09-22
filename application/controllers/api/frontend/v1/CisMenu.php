@@ -91,6 +91,8 @@ class CisMenu extends FHCAPI_Controller
 		$doc->loadXML($menuItem->content);
 		$urlElem = $doc->getElementsByTagName('url')->item(0);
 
+		$this->menuItemUrlTargetHelper($menuItem, $doc);
+
 		if (!$urlElem) {
 			return '';
 		}
@@ -122,5 +124,18 @@ class CisMenu extends FHCAPI_Controller
 		return $url;
 	}
 
+	private function menuItemUrlTargetHelper($menuItem, $xmldoc)
+	{
+		if($menuItem->template_kurzbz === 'redirect')
+		{
+			$targetElem = $xmldoc->getElementsByTagName('target')->item(0);
+			$target = ($targetElem) ? $targetElem->textContent : '';
+			if(!in_array($target, array('_self', '_top', '_blank')))
+			{
+				$target = '_self';
+			}
+			$menuItem->target = $target;
+		}
+	}
 }
 

@@ -104,6 +104,10 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#projektarbeit_id" />
 				<splitter class="tree-splitter"/>
+				<treecol id="student-projektarbeit-tree-lehrveranstaltung_id" label="LehrveranstaltungID" flex="2" hidden="true"
+						 class="sortDirectionIndicator"
+						 sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#lehrveranstaltung_id" />
+				<splitter class="tree-splitter"/>
 				<treecol id="student-projektarbeit-tree-lehreinheit_id" label="LehreinheitID" flex="2" hidden="true"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#lehreinheit_id" />
@@ -131,7 +135,7 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 						<treeitem uri="rdf:*">
 						<treerow>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#bezeichnung"/>
-							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#lehreinheit_stsem"/>
+							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#projektarbeit_stsem"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#titel"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#note"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#beginn"/>
@@ -141,6 +145,7 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#themenbereich"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#anmerkung"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#projektarbeit_id"/>
+							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#lehrveranstaltung_id"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#lehreinheit_id"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#student_uid"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#firma_id"/>
@@ -245,6 +250,20 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 										<menuitem value="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#lehrveranstaltung_id"
 							        		      label="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#bezeichnung rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#orgform_kurzbz (rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#semester Sem) ID: rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#lehrveranstaltung_id"
 										  		  uri="rdf:*"/>
+									</menupopup>
+								</template>
+							</menulist>
+						</row>
+						<row>
+							<label value="Studiensemester" control="student-projektarbeit-menulist-studiensemester"/>
+							<menulist id="student-projektarbeit-menulist-studiensemester" disabled="true"
+									  datasources="<?php echo APP_ROOT ?>rdf/studiensemester.rdf.php?order=desc" flex="1"
+									  ref="http://www.technikum-wien.at/studiensemester/liste">
+								<template>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
+												  label="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
+												  uri="rdf:*"/>
 									</menupopup>
 								</template>
 							</menulist>
