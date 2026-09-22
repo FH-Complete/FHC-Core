@@ -2,6 +2,10 @@
   size: portrait;
 }
 
+:root {
+	--range-view-print-border-color: rgb(150,150,150);
+}
+
 * {
 	background-color: white !important;
 	color: black !important;
@@ -14,10 +18,6 @@
 body
 {
   padding-top: 0 !important;
-}
-
-.fhc-calendar-base-slider > div {
-	position: relative !important;
 }
 
 header,
@@ -40,7 +40,7 @@ header,
 	grid-template-rows: auto repeat(var(--fhc-grid-axis-main-count), auto) !important;
 	gap: 0px !important;
 	border: solid !important;
-	border-color: black !important;
+	border-color: var(--range-view-print-border-color) !important;
 	border-width: 1px !important;
 }
 
@@ -48,29 +48,24 @@ header,
 	gap: 0px !important;
 }
 
-.fhc-calendar-mode-range .part-header,
-.fhc-calendar-mode-range .part-body,
-.fhc-calendar-mode-range .fhc-calendar-base-grid-line-event {
-	break-inside: avoid;
-}
 .fhc-calendar-mode-range .main-header {
 	border-left: solid !important;
-	border-left-color: black !important;
+	border-left-color: var(--range-view-print-border-color) !important;
 	border-left-width: 1px !important;
 }
 
 .fhc-calendar-mode-range .part-header {
 	border-top: solid !important;
-	border-top-color: black !important;
+	border-top-color: var(--range-view-print-border-color) !important;
 	border-top-width: 1px !important;
 }
 
 .fhc-calendar-mode-range .part-body {
 	border-top: solid !important;
-	border-top-color: black !important;
+	border-top-color: var(--range-view-print-border-color) !important;
 	border-top-width: 1px !important;
 	border-left: solid !important;
-	border-left-color: black !important;
+	border-left-color: var(--range-view-print-border-color) !important;
 	border-left-width: 1px !important;
 	z-index: 9998;
 }
@@ -78,12 +73,22 @@ header,
 .fhc-calendar-mode-range .part-header-followed-by-break,
 .fhc-calendar-mode-range .part-body-followed-by-break {
 	border-bottom: solid !important;
-	border-bottom-color: black !important;
+	border-bottom-color: var(--range-view-print-border-color) !important;
 	border-bottom-width: 1px !important;
+}
+
+.fhc-calendar-mode-range .part-header,
+.fhc-calendar-mode-range .part-body,
+.fhc-calendar-mode-range .fhc-calendar-base-grid-line-event {
+	break-inside: avoid;
 }
 
 .fhc-calendar-mode-range .main-header {
 	text-align: center !important;
+}
+
+.fhc-calendar-mode-range .event-text {
+	align-items: center !important;
 }
 
 .fhc-calendar-mode-range .fhc-calendar-base-grid-line * {
