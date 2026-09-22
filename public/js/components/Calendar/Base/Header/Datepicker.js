@@ -72,7 +72,7 @@ export default {
 		},
 		rangeConfig() {
 			if (this.$props.mode === "list") {
-				return { autoRange: listLength - 1 };
+				return { autoRange: this.listLength - 1 };
 			} else if (this.$props.mode === "range") {
 				return true;
 			} else {
