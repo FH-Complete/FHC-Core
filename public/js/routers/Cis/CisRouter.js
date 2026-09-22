@@ -226,7 +226,7 @@ const router = VueRouter.createRouter({
 			}
 		},
 		{
-			path: `/Cis/MyLvPlan/:mode?/:focus_date?`,
+			path: `/Cis/MyLvPlan/:mode?/:focus_date?/:range_length?`,
 			name: 'MyLvPlan',
 			component: MyLvPlan,
 			props(route) {
