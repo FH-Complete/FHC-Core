@@ -29,7 +29,8 @@ export default {
 		label: String,
 		// NOTE(chris): remove these from $attrs array to prevent doubled event listeners
 		onInput: [Array, Function],
-		'onUpdate:modelValue': [Array, Function]
+		'onUpdate:modelValue': [Array, Function],
+		titleActionButton: String
 	},
 	data() {
 		return {
@@ -317,6 +318,7 @@ export default {
 			:id="idCmp"
 			:name="name"
 			:class="validationClass"
+			:titleActionButton="titleActionButton"
 			@update:model-value="clearValidationForThisName"
 			>
 			<slot></slot>

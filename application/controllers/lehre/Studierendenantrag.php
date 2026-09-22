@@ -25,7 +25,8 @@ class Studierendenantrag extends FHC_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
-			'studierendenantrag'
+			'studierendenantrag',
+			'ui'
 		]);
 
 		$this->load->config('studierendenantrag');

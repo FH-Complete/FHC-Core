@@ -8,7 +8,11 @@ export default {
 		CoreNotiz
 	},
 	props: {
-		modelValue: Object
+		modelValue: Object,
+		config: {
+			type: Object,
+			default: {}
+		}
 	},
 	data() {
 		return {
@@ -23,7 +27,7 @@ export default {
 		class="overflow-hidden"
 		:endpoint="endpoint"
 		ref="formc"
-		notiz-layout="popupModal"
+		:notiz-layout="config.notizLayout"
 		type-id="person_id"
 		:id="modelValue.person_id"
 		show-document
@@ -31,6 +35,7 @@ export default {
 		:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
 		@reload="$emit('update:suffix')"
 		tabulator-persistence-id="stv-notiz-20260217"
+		:show-erweitert="config.showErweitert"
 		>
 </core-notiz>
 
@@ -49,16 +54,16 @@ ref="formc"
 type-id: id to which table the notizdata should be connected... eg. person_id, prestudent_id, uid (for mitarbeiter_uid), projekt_kurzbz, projektphase_id, projekttask_id,
 	bestellung_id, lehreinheit_id, anrechnung_id
 
-notizLayout: "classicFas", "twoColumnsFormLeft", twoColumnsFormRight, popupModal"
+notizLayout: "classicFas", "twoColumnsFormLeft", twoColumnsFormRight, popupModal"; is now configurable in config/stv.php
 
 showErweitert: if true: section with following fields will be displayed:
-	'verfasser', 'bearbeiter', 'von', 'bis'
+	'verfasser', 'bearbeiter', 'von', 'bis' and 'erledigt'; is now configurable in config/stv.php
 
 showDocument: if true: section with documentHandling will be displayed
 
 showTinyMCE: if true: section with WYSIWYG Editor for Text will be displayed
 
-visibleColumns: list, which fields shoult be showed as default in filter component
+visibleColumns: list, which fields should be showed as default in filter component
 		fullVersion: :visibleColumns="['titel','text','bearbeiter','verfasser','von','bis','dokumente','erledigt','notiz_id','notizzuordnung_id','id','lastupdate']"
 		
 

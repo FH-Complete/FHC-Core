@@ -1,5 +1,6 @@
 documents/
 vendor/
+public/vendor
 
 /nbproject/
 .vscode

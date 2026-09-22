@@ -1,4 +1,3 @@
-import verband from './stv/verband.js';
 import students from './stv/students.js';
 import filter from './stv/filter.js';
 import konto from './stv/konto.js';
@@ -18,7 +17,6 @@ import jointstudies from "./stv/jointstudies.js";
 import courselist from './stv/courselist.js';
 
 export default {
-	verband,
 	students,
 	filter,
 	konto,

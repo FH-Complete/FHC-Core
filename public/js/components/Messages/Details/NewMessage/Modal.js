@@ -56,6 +56,7 @@ export default {
 			previewText: null,
 			previewBody: "",
 			replyData: null,
+			isSending: false
 		}
 	},
 	methods: {
@@ -113,6 +114,9 @@ export default {
 			data.append('data', JSON.stringify(this.formData));
 			data.append('ids', JSON.stringify(this.id));
 
+			//for disabling sendButton and show Spinner
+			this.isSending = true;
+
 			return this.$refs.formMessage
 				.call(ApiMessages.sendMessage(this.typeId, data))
 				.then(response => {
@@ -121,6 +125,7 @@ export default {
 					this.resetForm();
 				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
+					this.isSending = false;
 
 					//just emit if no multitasking
 					if(this.id.length == 1){
@@ -288,6 +293,9 @@ export default {
 			dialog-class=" modal-dialog-scrollable modal-xl modal-msg"
 			header-class="flex-wrap pb-0"
 			body-class="px-3 py-2"
+			:backdrop="isSending ? 'static' : true"
+			:keyboard="!isSending"
+			:noCloseBtn="isSending"
 			@hidden.bs.modal="resetForm"
 			>
 
@@ -476,7 +484,12 @@ export default {
 
 					<button class="btn btn-secondary" @click="resetForm">{{$p.t('ui', 'reset')}}</button>
 
-					<button v-if="statusNew" type="button" class="btn btn-primary" @click="sendMessage()">{{$p.t('ui', 'nachrichtSenden')}}</button>
+					<button v-if="statusNew" type="button" class="btn btn-primary" :disabled="isSending" @click="sendMessage()">
+						<span
+							v-if="isSending"
+							class="spinner-border spinner-border-sm me-2"
+						></span>
+						{{$p.t('ui', 'nachrichtSenden')}}</button>
 					<button v-else type="button" class="btn btn-primary" @click="replyMessage(formData.message_id)">{{$p.t('global', 'reply')}}</button>
 				</div>
 			</template>

@@ -1,4 +1,4 @@
-import {CoreRESTClient} from '../../../RESTClient.js';
+import ApiStudiensemester from '../../../api/factory/studiensemester.js';
 
 export default {
 	emits: [
@@ -17,6 +17,11 @@ export default {
 			list: [],
 			today: -1
 		};
+	},
+	computed: {
+		lowerCaseList() {
+			return this.list.map(i => i.toLowerCase());
+		}
 	},
 	methods: {
 		set(n) {
@@ -47,25 +52,18 @@ export default {
 			}
 
 			this.loading = true;
-			CoreRESTClient
-				.get('components/stv/studiensemester/now')
-				.then(result => CoreRESTClient.getData(result.data))
+			this.$api
+				.call(ApiStudiensemester.current())
 				.then(result => {
-					this.today = this.list.indexOf(result);
-					if (this.today >= 0) {
-						if (this.today != this.current)
-							this.set(this.today);
-					} else {
-						// TODO(chris): handle error (list might not be loaded yet)
-					}
+					this.today = this.list.indexOf(result.data);
+					if (this.today >= 0 && this.today != this.current)
+						this.set(this.today);
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		save(fallback) {
-			CoreRESTClient
-				.post('components/stv/studiensemester/set', {
-					studiensemester: this.list[this.current]
-				})
+			this.$api
+				.call(ApiStudiensemester.set(this.list[this.current]))
 				.then(() => {
 					this.loading = false;
 					this.$emit('update:studiensemesterKurzbz', this.list[this.current]);
@@ -73,27 +71,42 @@ export default {
 				.catch(error => {
 					this.current = fallback;
 					this.loading = false;
-					this.$fhcAlert.handleFormValidation(error);
+					this.$fhcAlert.handleSystemError(error);
 				});
+		},
+		index() {
+			let index = this.list.indexOf(this.studiensemesterKurzbz);
+			if (index >= 0)
+				return index;
+			
+			// check if input is lower cases (because it came from an url)
+			index = this.lowerCaseList.indexOf(this.studiensemesterKurzbz);
+			if (index >= 0) {
+				this.$emit('update:studiensemesterKurzbz', this.list[index]);
+				return index;
+			}
+			
+			this.$emit('update:studiensemesterKurzbz', null);
+			return -1;
 		}
 	},
 	watch: {
-		'studiensemesterKurzbz': function () {
-			this.current = this.list.indexOf(this.studiensemesterKurzbz);
+		studiensemesterKurzbz() {
+			if (!this.loading)
+				this.current = this.index(this.studiensemesterKurzbz);
 		}
 	},
 	created() {
-		CoreRESTClient
-			.get('components/stv/studiensemester')
-			.then(result => CoreRESTClient.getData(result.data) || [])
+		this.$api
+			.call(ApiStudiensemester.getAll())
 			.then(result => {
-				this.list = result.map(el => el.studiensemester_kurzbz);
+				this.list = result.data.map(el => el.studiensemester_kurzbz);
 				this.loading = false;
-				this.current = this.list.indexOf(this.studiensemesterKurzbz);
+				this.current = this.index(this.studiensemesterKurzbz);
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
-	template: `
+	template: /* html */`
 	<div class="stv-studiensemester">
 		<div class="btn-toolbar w-100 dropup" role="toolbar" aria-label="Studiensemester">
 			<div class="btn-group flex-grow-1 position-static" role="group" aria-label="Studiensemester einstellen">

@@ -219,7 +219,7 @@ export default {
 			:scrollable="true"
 			:lazy="true"
 			:activeIndex="calcActiveIndex"
-			:pt="{navContainer:{style: 'flex: 0 0 auto;'}, panelContainer:{class: 'overflow-y-scroll p-2', style: 'flex: 1 1 auto;'}}"
+			:pt="{navContainer:{style: 'flex: 0 0 auto;'}, panelContainer:{class: 'overflow-y-scroll p-2 pe-3', style: 'flex: 1 1 auto;'}}"
 			@tab-click="handleTabClick"
 		>
 			<tabpanel

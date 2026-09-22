@@ -170,6 +170,8 @@ class Dokumente extends FHCAPI_Controller
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
+		$nachgereicht_am =  $this->input->post('nachgereicht_am') == '' ? null : $this->input->post('nachgereicht_am');
+
 		$uid = getAuthUID();
 
 		$result = $this->AkteModel->update(
@@ -180,7 +182,7 @@ class Dokumente extends FHCAPI_Controller
 				'dokument_kurzbz' => $this->input->post('dokument_kurzbz'),
 				'anmerkung_intern' => $this->input->post('anmerkung_intern'),
 				'titel_intern' => $this->input->post('titel_intern'),
-				'nachgereicht_am' => $this->input->post('nachgereicht_am'),
+				'nachgereicht_am' => $nachgereicht_am,
 				'updateamum' => date('c'),
 				'updatevon' => $uid,
 			]

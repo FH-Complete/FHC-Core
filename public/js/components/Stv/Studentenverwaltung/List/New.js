@@ -285,6 +285,7 @@ export default {
 								uid="stv-list-new-gebdatum"
 								name="gebdatum"
 								v-model="formDataPerson['gebdatum']"
+								model-type="yyyy-MM-dd"
 								:disabled="!!person"
 								@update:model-value="loadSuggestions"
 								text-input
