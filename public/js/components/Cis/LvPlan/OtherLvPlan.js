@@ -6,6 +6,7 @@ import ApiLvPlan from "../.././../api/factory/lvPlan.js";
 import ApiOtherLvPlan from "../.././../api/factory/otherLvPlan.js";
 import ApiAuthinfo from "../../../api/factory/authinfo.js";
 import ApiStudiensemester from "../../../api/factory/studiensemester.js";
+import ApiBenutzer from "../../../api/factory/benutzer.js";
 
 export const DEFAULT_MODE_LVPLAN_DESKTOP = "Week";
 export const DEFAULT_MODE_LVPLAN_MOBILE = "List";
@@ -263,6 +264,19 @@ export default {
 			);
 		},
 		async fetchSemesters() {
+			let userCreatedAt = null;
+			const userResponse = await this.$api.call(
+				ApiBenutzer.getUserData(this.propsViewData.otherUid),
+			);
+			if (
+				userResponse.meta.status === "success" &&
+				userResponse.data[0].insertamum
+			) {
+				userCreatedAt = luxon.DateTime.fromFormat(
+					userResponse.data[0].insertamum.split(" ")[0],
+					"yy-MM-dd",
+				);
+			}
 			const semestersResponse = await this.$api.call(
 				ApiStudiensemester.getAll(),
 			);
@@ -277,6 +291,11 @@ export default {
 							name: semester.studiensemester_kurzbz,
 							description: semester.bezeichnung,
 						};
+					})
+					.filter((semester) => {
+						if (!userCreatedAt) return true;
+
+						return userCreatedAt.ts < semester.endDate.ts;
 					})
 					.sort((semesterA, semesterB) =>
 						semesterA.startDate.ts > semesterB.startDate.ts
