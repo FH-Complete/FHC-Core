@@ -19832,6 +19832,26 @@ array(
 	array(
 		'app' => 'international',
 		'category' => 'international',
+		'phrase' => 'massnahmeneinmalig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Diese Maßnahme ist nur einmalig planbar.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This measure may only be planned once.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
 		'phrase' => 'alleStudierendeJetzt',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -20684,6 +20704,46 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Add measure',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'einmalig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur einmal planbar',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'One-time only',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'erroreinmalig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Diese Maßnahme kann nur einmal geplant werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This measure can only be planned once.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
