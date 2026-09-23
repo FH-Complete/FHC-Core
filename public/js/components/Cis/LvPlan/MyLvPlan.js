@@ -253,6 +253,9 @@ export default {
 					);
 			}
 		},
+		openPrintPreview() {
+			window.print();
+		}
 	},
 	async created() {
 		await this.fetchAuthInfo();
@@ -281,22 +284,34 @@ export default {
 			@delete-event="(event) => deleteEvent(event)"
 			class="responsive-calendar"
 		>
-			<div
-				v-if="downloadLinks"
-				class="d-flex gap-1 justify-items-start"
-			>
-				<div v-for="{ title, icon, link } in downloadLinks">
-					<a
+			<div class="d-flex gap-1 justify-items-start">
+				<template v-if="downloadLinks">
+					<div v-for="{ title, icon, link } in downloadLinks">
+						<a
 						:href="link"
 						:aria-label="title"
 						class="py-1 btn btn-outline-secondary"
+						>
+							<div class="d-flex flex-column">
+								<i aria-hidden="true" :class="icon"></i>
+								<span style="font-size:.5rem">{{ title }}</span>
+							</div>
+						</a>
+					</div>
+				</template>
+				<template v-if="currentMode.toLowerCase() === 'range'">
+					<a
+						@click="openPrintPreview()"
+						href="#"
+						:aria-label="Print"
+						class="py-1 btn btn-outline-secondary"
 					>
 						<div class="d-flex flex-column">
-							<i aria-hidden="true" :class="icon"></i>
-							<span style="font-size:.5rem">{{ title }}</span>
+							<i aria-hidden="true" class="fa-solid fa-print"></i>
+							<span style="font-size:.5rem">{{ $p.t('global/print') }}</span>
 						</div>
 					</a>
-				</div>
+				</template>
 			</div>
 		</fhc-calendar>
 	</div>`,
