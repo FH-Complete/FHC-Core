@@ -30053,7 +30053,7 @@ array(
 			'phrases' => array(
 				array(
 					'sprache' => 'German',
-					'text' => 'Tages Ansicht',
+					'text' => 'Tagesansicht',
 					'description' => '',
 					'insertvon' => 'system'
 				),
@@ -30073,7 +30073,7 @@ array(
 			'phrases' => array(
 				array(
 					'sprache' => 'German',
-					'text' => 'Wochen Ansicht',
+					'text' => 'Wochenansicht',
 					'description' => '',
 					'insertvon' => 'system'
 				),
@@ -30093,13 +30093,53 @@ array(
 			'phrases' => array(
 				array(
 					'sprache' => 'German',
-					'text' => 'Monats Ansicht',
+					'text' => 'Monatsansicht',
 					'description' => '',
 					'insertvon' => 'system'
 				),
 				array(
 					'sprache' => 'English',
 					'text' => 'Month view',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'LvPlan',
+			'phrase' => 'modeList',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Listenansicht',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'List View',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'LvPlan',
+			'phrase' => 'modeRange',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Mehrwochenansicht',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Multi-Week View',
 					'description' => '',
 					'insertvon' => 'system'
 				)
@@ -30120,106 +30160,6 @@ array(
 				array(
 					'sprache' => 'English',
 					'text' => 'Add reservation',
-					'description' => '',
-					'insertvon' => 'system'
-				)
-			)
-		),
-		array(
-			'app' => 'core',
-			'category' => 'LvPlan',
-			'phrase' => 'day',
-			'insertvon' => 'system',
-			'phrases' => array(
-				array(
-					'sprache' => 'German',
-					'text' => 'Tagesansicht',
-					'description' => '',
-					'insertvon' => 'system'
-				),
-				array(
-					'sprache' => 'English',
-					'text' => 'Day View',
-					'description' => '',
-					'insertvon' => 'system'
-				)
-			)
-		),
-		array(
-			'app' => 'core',
-			'category' => 'LvPlan',
-			'phrase' => 'week',
-			'insertvon' => 'system',
-			'phrases' => array(
-				array(
-					'sprache' => 'German',
-					'text' => 'Wochenansicht',
-					'description' => '',
-					'insertvon' => 'system'
-				),
-				array(
-					'sprache' => 'English',
-					'text' => 'Week View',
-					'description' => '',
-					'insertvon' => 'system'
-				)
-			)
-		),
-		array(
-			'app' => 'core',
-			'category' => 'LvPlan',
-			'phrase' => 'month',
-			'insertvon' => 'system',
-			'phrases' => array(
-				array(
-					'sprache' => 'German',
-					'text' => 'Monatsansicht',
-					'description' => '',
-					'insertvon' => 'system'
-				),
-				array(
-					'sprache' => 'English',
-					'text' => 'Month View',
-					'description' => '',
-					'insertvon' => 'system'
-				)
-			)
-		),
-		array(
-			'app' => 'core',
-			'category' => 'LvPlan',
-			'phrase' => 'list',
-			'insertvon' => 'system',
-			'phrases' => array(
-				array(
-					'sprache' => 'German',
-					'text' => 'Listenansicht',
-					'description' => '',
-					'insertvon' => 'system'
-				),
-				array(
-					'sprache' => 'English',
-					'text' => 'List View',
-					'description' => '',
-					'insertvon' => 'system'
-				)
-			)
-		),
-		array(
-			'app' => 'core',
-			'category' => 'LvPlan',
-			'phrase' => 'range',
-			'insertvon' => 'system',
-			'phrases' => array(
-				array(
-					'sprache' => 'German',
-					'text' => 'Mehrwochenansicht',
-					'description' => '',
-					'insertvon' => 'system'
-				),
-				array(
-					'sprache' => 'English',
-					'text' => 'Multi-Week View',
 					'description' => '',
 					'insertvon' => 'system'
 				)

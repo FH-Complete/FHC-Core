@@ -58,7 +58,7 @@ export default {
 					<button
 						v-if="btnRange"
 						type="button"
-						:title="$p.t('LvPlan/range')"
+						:title="$p.t('LvPlan/modeRange')"
 						class="btn btn-outline-secondary"
 						:class="{active: mode === 'range'}"
 						@click="clickMode($event, 'range')"
@@ -68,7 +68,7 @@ export default {
 					<button
 						v-if="btnMonth"
 						type="button"
-						:title="$p.t('LvPlan/month')"
+						:title="$p.t('LvPlan/modeMonth')"
 						class="btn btn-outline-secondary"
 						:class="{active: mode === 'month'}"
 						@click="clickMode($event, 'month')"
@@ -78,7 +78,7 @@ export default {
 					<button
 						v-if="btnWeek"
 						type="button"
-						:title="$p.t('LvPlan/week')"
+						:title="$p.t('LvPlan/modeWeek')"
 						class="btn btn-outline-secondary"
 						:class="{active: mode === 'week'}"
 						@click="clickMode($event, 'week')"
@@ -88,7 +88,7 @@ export default {
 					<button
 						v-if="btnDay"
 						type="button"
-						:title="$p.t('LvPlan/day')"
+						:title="$p.t('LvPlan/modeDay')"
 						class="btn btn-outline-secondary"
 						:class="{active: mode === 'day'}"
 						@click="clickMode($event, 'day')"
@@ -98,7 +98,7 @@ export default {
 					<button
 						v-if="btnList"
 						type="button"
-						:title="$p.t('LvPlan/list')"
+						:title="$p.t('LvPlan/modeList')"
 						class="btn btn-outline-secondary"
 						:class="{active: mode === 'list'}"
 						@click="clickMode($event, 'list')"
