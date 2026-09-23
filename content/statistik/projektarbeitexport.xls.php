@@ -84,15 +84,14 @@ $qry = "SELECT
 			ende, CASE WHEN freigegeben THEN 'Ja' ELSE 'Nein' END, gesperrtbis, themenbereich,
 			tbl_projektarbeit.anmerkung, projektarbeit_id
 		FROM
-			lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung,
+			lehre.tbl_projektarbeit, lehre.tbl_lehrveranstaltung,
 			public.tbl_benutzer, public.tbl_person, lehre.tbl_projekttyp
 		WHERE
-			tbl_projektarbeit.lehreinheit_id = tbl_lehreinheit.lehreinheit_id AND
-			tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND
+			tbl_projektarbeit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
 			tbl_projektarbeit.student_uid = tbl_benutzer.uid AND
 			tbl_benutzer.person_id = tbl_person.person_id AND
 			tbl_projektarbeit.projekttyp_kurzbz = tbl_projekttyp.projekttyp_kurzbz AND
-			tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz)." AND
+			tbl_projektarbeit.studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz)." AND
 			tbl_lehrveranstaltung.studiengang_kz = ".$db->db_add_param($studiengang_kz)." AND
 			tbl_projektarbeit.projekttyp_kurzbz IN ('Bachelor','Diplom','Projekt')";
 

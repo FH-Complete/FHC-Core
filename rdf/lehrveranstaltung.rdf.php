@@ -92,6 +92,12 @@ elseif($lehrveranstaltung_kompatibel_id!='')
 else
 	$lehrveranstaltung->load_lva($stg_kz,$sem);
 
+// try to filter projektarbeit lva selection by those lva that are also assigned to students current studienplan
+// so it is more likely that the thesis name gets found by the diplomasupplement script
+if(isset($_GET['projektarbeit']) && isset($_GET['uid'])) {
+	$lehrveranstaltung->checkLvaAgainstStudentCurrentStudienplan($student_uid);
+}
+
 $rdf_url='http://www.technikum-wien.at/lehrveranstaltung/';
 
 echo '

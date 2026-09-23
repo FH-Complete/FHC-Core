@@ -48498,6 +48498,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
+		'phrase' => 'c4termineTimeLine',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zeitstrahl Termine',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Timeline Deadlines',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
 		'phrase' => 'c4noZuordnungBetreuerStudent',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -64839,6 +64859,48 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 	// CIS4 GESAMTNOTENEINGABE ENDE ------------------------------------------------------------------------------------
+	// ### Infocenter Onboarding START
+	array(
+		'app' => 'core',
+		'category' => 'infocenter',
+		'phrase' => 'onboardingRegistriert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Über ElectronicOnboarding registriert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Registered with Electronic Onboarding',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'infocenter',
+		'phrase' => 'ersterOnboardingLogin',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erster Electronic Onboarding Login',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'First Electronic Onboarding Login',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	)
+	// ### Infocenter Onboarding END
 );
 
 
