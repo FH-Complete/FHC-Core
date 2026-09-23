@@ -70,9 +70,9 @@ class Mobilitaet_model extends DB_Model
 			$ddtype = $entry->ddtype ?? null;
 
 			if ($ddtype == 'Intern') {
-				$zusatz .= 'i.)';
+				$zusatz .= 'int.)';
 			} elseif ($ddtype == 'Extern') {
-				$zusatz .= 'o.)';
+				$zusatz .= 'ext.)';
 			} else {
 				$zusatz .= ')';
 			}
