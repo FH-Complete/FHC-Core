@@ -1,16 +1,9 @@
 /**
- * Postgres plumbing for cy.task fixture resets. Suite-agnostic.
- *
- * Connection, write guard, pooling and teardown live here. What to delete or seed belongs in a
- * suite-specific task file -- see notenDb.js.
- *
- * Settings come from <PREFIX>_DB_*, where PREFIX is TEST_ENV_PREFIX. That indirection is the point:
- * another suite sets its own prefix and reuses this file untouched.
+ * The Postgres connection for the cy.task functions: pool, write guard, teardown.
+ * What the suite deletes or seeds is in notenDb.js. Settings: NOTEN_DB_* in tests/cypress/suites/.env.
  */
 
-const PREFIX = process.env.TEST_ENV_PREFIX || "TEST";
-
-const env = (key) => process.env[`${PREFIX}_DB_${key}`];
+const env = (key) => process.env[`NOTEN_DB_${key}`];
 
 const dbConfigured = () => Boolean(env("HOST") && env("NAME") && env("USER"));
 const writesAllowed = () => String(env("ALLOW_WRITES")).toLowerCase() === "true";
@@ -45,10 +38,10 @@ const getPool = () => {
 
 const assertWritable = () => {
 	if (!dbConfigured()) {
-		throw new Error(`db refused - set ${PREFIX}_DB_HOST / ${PREFIX}_DB_NAME / ${PREFIX}_DB_USER.`);
+		throw new Error("db refused - set NOTEN_DB_HOST / NOTEN_DB_NAME / NOTEN_DB_USER.");
 	}
 	if (!writesAllowed()) {
-		throw new Error(`db refused - set ${PREFIX}_DB_ALLOW_WRITES=true (test databases only).`);
+		throw new Error("db refused - set NOTEN_DB_ALLOW_WRITES=true (test databases only).");
 	}
 };
 
@@ -85,14 +78,14 @@ const explainFailure = (error) => {
 		);
 	}
 	if (/authentication failed/i.test(msg)) return `credentials rejected. Details: ${msg}`;
-	if (/database .* does not exist/i.test(msg)) return `${PREFIX}_DB_NAME does not exist. Details: ${msg}`;
-	if (/ECONNREFUSED/i.test(msg)) return `nothing listening on ${PREFIX}_DB_HOST:${PREFIX}_DB_PORT. Details: ${msg}`;
+	if (/database .* does not exist/i.test(msg)) return `NOTEN_DB_NAME does not exist. Details: ${msg}`;
+	if (/ECONNREFUSED/i.test(msg)) return `nothing listening on NOTEN_DB_HOST:NOTEN_DB_PORT. Details: ${msg}`;
 	if (/ETIMEDOUT|EHOSTUNREACH|ENETUNREACH/i.test(msg)) return `host unreachable (firewall/VPN?). Details: ${msg}`;
 	return msg;
 };
 
 /** Proves the connection works. */
-const checkAvailability = async ({ requireWrites = true } = {}) => {
+const checkConnection = async ({ requireWrites = true } = {}) => {
 	if (!dbConfigured()) return { available: false, reason: "not-configured" };
 	if (requireWrites && !writesAllowed()) return { available: false, reason: "writes-disabled" };
 
@@ -123,13 +116,12 @@ const closeDb = async () => {
 };
 
 module.exports = {
-	PREFIX,
 	env,
 	dbConfigured,
 	writesAllowed,
 	assertWritable,
 	withClient,
 	inTransaction,
-	checkAvailability,
+	checkConnection,
 	closeDb,
 };

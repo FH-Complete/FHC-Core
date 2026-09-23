@@ -742,9 +742,9 @@ EOSQL;
 	}
 
 
-	public function getLehreinheitenForLv($lva_id, $sem_kurzbz)
+	public function getLehreinheitenForLv($lv_id, $sem_kurzbz)
 	{
-		// every Lehreinheit of the course; the caller checks the access
+		// every Lehreinheit of the LV; the caller checks the access
 		$query = "SELECT DISTINCT tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrveranstaltung_id, tbl_lehreinheit.lehrform_kurzbz,
 						tbl_gruppe.direktinskription,
 						tbl_lehreinheitgruppe.semester,
@@ -763,6 +763,6 @@ EOSQL;
 		WHERE lehrveranstaltung_id = ? AND tbl_lehreinheit.studiensemester_kurzbz = ?
 		ORDER BY tbl_lehreinheitgruppe.gruppe_kurzbz";
 
-		return $this->execReadOnlyQuery($query, [$lva_id, $sem_kurzbz]);
+		return $this->execReadOnlyQuery($query, [$lv_id, $sem_kurzbz]);
 	}
 }

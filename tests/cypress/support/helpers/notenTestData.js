@@ -1,29 +1,21 @@
 /**
- * Runtime discovery + fixture helpers.
+ * Finds the test data at runtime (ctx), and resets and seeds it in the database.
  *
- * No fixed IDs: maxAntritte and the special grade PKs are stored in the server configuration, which is not in the repo
- * and are therefore read at runtime via the API. Override: NOTEN_SEM / NOTEN_LV_ID.
+ * No fixed ids: the semester, the LV, the Noten and the rule values differ per installation, so the
+ * suite reads them through the API. NOTEN_SEM_KURZBZ / NOTEN_LV_ID pin the semester and the LV.
+ * The Noten API has no delete endpoint on purpose, so reset and seed use cy.task (tasks/notenDb.js).
  */
 
-import { notenApi, notenAuth } from "../api/notenApi";
+import { notenApi, lektorAuth } from "../api/notenApi";
 import { expectNotenSuccess } from "./notenErrors";
-// the client rule; it now only reads back what the server derived, so a mismatch is a config bug
-import { maxAntrittCount as computeMaxAntritte } from "../../../../public/js/components/Cis/Benotungstool/notenRules.js";
-import {
-	describeFailure,
-	performRead,
-	performReset,
-	performSeed,
-	performSeedPruefung,
-	performSeedZeugnisnote,
-	resolveResetStrategy,
-} from "./notenReset";
-import { assertPunkteMode } from "./notenConfig";
 
 const BEZ_ENTSCHULDIGT = "entschuldigt";
 const BEZ_NOCH_NICHT = "Noch nicht eingetragen";
 
-let cachedContext = null;
+// the highest index a spec uses is ctx.students[6]
+const MIN_STUDENTS = 7;
+
+let cachedCtx = null;
 
 // --- dates ---
 
@@ -38,8 +30,8 @@ export const shiftDate = (dateString, days) => {
 	return `${date.getUTCFullYear()}-${pad2(date.getUTCMonth() + 1)}-${pad2(date.getUTCDate())}`;
 };
 
-/** Deadline the server derives (computeNoteneintragungsfrist): SS -> 15.11.yyyy, WS -> 15.05.yyyy+1. */
-export const expectedFristString = (semKurzbz, ssConfig = { month: 11, day: 15 }, wsConfig = { month: 5, day: 15 }) => {
+/** The Frist the server derives (Noten::computeFrist). ssConfig/wsConfig: NOTENEINTRAGUNGSFRIST_SS/WS. */
+export const expectedFristString = (semKurzbz, ssConfig, wsConfig) => {
 	const type = semKurzbz.slice(0, 2).toUpperCase();
 	const year = Number(semKurzbz.slice(2, 6));
 	const cfg = type === "SS" ? ssConfig : wsConfig;
@@ -47,20 +39,21 @@ export const expectedFristString = (semKurzbz, ssConfig = { month: 11, day: 15 }
 };
 
 /** ssConfig/wsConfig: NOTENEINTRAGUNGSFRIST_SS/WS from getCisConfig. */
-export const fristHasPassed = (semKurzbz, ssConfig = { month: 11, day: 15 }, wsConfig = { month: 5, day: 15 }) => {
+export const fristHasPassed = (semKurzbz, ssConfig, wsConfig) => {
 	const type = semKurzbz.slice(0, 2).toUpperCase();
 	const year = Number(semKurzbz.slice(2, 6));
 	if (!["SS", "WS"].includes(type) || !year) return false;
 	const cfg = type === "SS" ? ssConfig : wsConfig;
-	const deadline = new Date(type === "SS" ? year : year + 1, cfg.month - 1, cfg.day, 23, 59, 59);
-	return new Date() > deadline;
+	const frist = new Date(type === "SS" ? year : year + 1, cfg.month - 1, cfg.day, 23, 59, 59);
+	return new Date() > frist;
 };
 
 /**
- * A semester + course where the logged-in user actually teaches AND the grade deadline has passed.
+ * A semester and LV where the Lektor teaches AND the Frist has passed.
  *
- * Both are needed: assertLvAccess runs BEFORE the deadline check, so a semester the user does not
- * teach in fails there and never reaches the deadline. Seeder group benotungstool_fixture_erweitert provides the Sommersemester.
+ * Both are necessary: assertLvAccess runs BEFORE the Frist check, so in a semester without teaching
+ * the request fails there and never reaches the Frist. Seeder group benotungstool_fixture_erweitert
+ * provides the Sommersemester.
  *
  * @param {string} type "SS" or "WS"
  * @returns {Cypress.Chainable<{semKurzbz: string, lvId: number}|null>}
@@ -69,8 +62,8 @@ export const teachingSemesterWithExpiredFrist = (type = "SS", ssConfig, wsConfig
 	const year = new Date().getFullYear();
 	const candidates = [];
 	for (let y = year; y >= year - 6; y -= 1) {
-		const sem = `${type}${y}`;
-		if (fristHasPassed(sem, ssConfig, wsConfig)) candidates.push(sem);
+		const semKurzbz = `${type}${y}`;
+		if (fristHasPassed(semKurzbz, ssConfig, wsConfig)) candidates.push(semKurzbz);
 	}
 
 	const trySemester = (i) => {
@@ -91,7 +84,7 @@ export const teachingSemesterWithExpiredFrist = (type = "SS", ssConfig, wsConfig
 // --- discovery ---
 
 const resolveSemester = () => {
-	const configured = Cypress.env("NOTEN_SEM");
+	const configured = Cypress.env("NOTEN_SEM_KURZBZ");
 	if (configured) return cy.wrap(configured, { log: false });
 
 	return cy
@@ -99,7 +92,7 @@ const resolveSemester = () => {
 			method: "GET",
 			url: "/index.ci.php/api/frontend/v1/organisation/Studiensemester/getAll",
 			qs: { order: "DESC" },
-			auth: notenAuth(),
+			auth: lektorAuth(),
 			failOnStatusCode: false,
 		})
 		.then((response) => {
@@ -109,7 +102,7 @@ const resolveSemester = () => {
 				.filter((s) => (s.start || "").slice(0, 10) && (s.start || "").slice(0, 10) <= today)
 				.sort((a, b) => (b.start || "").localeCompare(a.start || ""))[0];
 
-			expect(active, `an active studiensemester starting on or before ${today}`).to.exist;
+			expect(active, `ein Studiensemester, das am ${today} oder davor beginnt`).to.exist;
 			return active.studiensemester_kurzbz;
 		});
 };
@@ -122,34 +115,31 @@ const resolveLehrveranstaltung = (semKurzbz) => {
 		const lvs = expectNotenSuccess(response, "getBenotungstoolContext").lehrveranstaltungen || [];
 		expect(
 			lvs.length,
-			`No Lehrveranstaltungen for ${semKurzbz}: the logged-in user teaches nothing here ` +
-				"(admins usually don't). Set NOTEN_LV_ID.",
+			`Keine Lehrveranstaltung in ${semKurzbz}: der angemeldete Benutzer unterrichtet hier nichts ` +
+				"(ein Admin meistens nirgends). Setze NOTEN_LV_ID.",
 		).to.be.greaterThan(0);
 		return lvs[0].lehrveranstaltung_id;
 	});
 };
 
-/** -> { semKurzbz, lvId, cisConfig, maxAntritte, notes, gradeNotes, students, studentUids } */
+/** -> { semKurzbz, lvId, cisConfig, maxAntritte, noten, notenScale, notenOptions, students, studentUids } */
 export const loadNotenContext = () => {
-	if (cachedContext) return cy.wrap(cachedContext, { log: false });
+	if (cachedCtx) return cy.wrap(cachedCtx, { log: false });
 
-	const context = {};
+	const ctx = {};
 
 	return resolveSemester()
-		.then((sem) => {
-			context.semKurzbz = sem;
-			return resolveLehrveranstaltung(sem);
+		.then((semKurzbz) => {
+			ctx.semKurzbz = semKurzbz;
+			return resolveLehrveranstaltung(semKurzbz);
 		})
 		.then((lvId) => {
-			context.lvId = lvId;
+			ctx.lvId = lvId;
 			return notenApi.getCisConfig();
 		})
 		.then((response) => {
-			context.cisConfig = expectNotenSuccess(response, "getCisConfig");
-			context.maxAntritte = computeMaxAntritte(context.cisConfig);
-			// ein Lauf, der den falschen Konfigurationsmodus erwartet, soll hier scheitern und nicht
-			// alles stillschweigend überspringen
-			assertPunkteMode(context);
+			ctx.cisConfig = expectNotenSuccess(response, "getCisConfig");
+			ctx.maxAntritte = ctx.cisConfig.CIS_GESAMTNOTE_MAX_ANTRITTE;
 			return notenApi.getNoten();
 		})
 		.then((response) => {
@@ -159,11 +149,10 @@ export const loadNotenContext = () => {
 			const entschuldigt = byBezeichnung(BEZ_ENTSCHULDIGT);
 			const nochNicht = byBezeichnung(BEZ_NOCH_NICHT);
 
-			expect(entschuldigt, `tbl_note needs bezeichnung "${BEZ_ENTSCHULDIGT}"`).to.exist;
-			expect(nochNicht, `tbl_note needs bezeichnung "${BEZ_NOCH_NICHT}"`).to.exist;
+			expect(entschuldigt, `tbl_note braucht die Bezeichnung "${BEZ_ENTSCHULDIGT}"`).to.exist;
+			expect(nochNicht, `tbl_note braucht die Bezeichnung "${BEZ_NOCH_NICHT}"`).to.exist;
 
-			// Restricted to the 1..5 scale: the wider lehre-Noten set contains note 0 ("Teilnote"),
-			// and saveStudentPruefung's `if($note=='')` guard rewrites a 0 to "Noch nicht eingetragen".
+			// Only the 1..5 scale: the Lehre Noten also contain 0 ("Teilnote"), which is no result of an assessment.
 			const specialPks = [entschuldigt.note, nochNicht.note];
 			const usable = noten.filter((n) => n.lehre && !specialPks.includes(n.note));
 			const ordinary = usable
@@ -171,7 +160,7 @@ export const loadNotenContext = () => {
 				.filter((note) => Number(note) >= 1 && Number(note) <= 5)
 				.sort((a, b) => Number(a) - Number(b));
 
-			context.gradeNotes =
+			ctx.notenScale =
 				ordinary.length > 1
 					? ordinary
 					: usable
@@ -179,32 +168,35 @@ export const loadNotenContext = () => {
 							.filter((n) => Number(n) !== 0)
 							.sort((a, b) => Number(a) - Number(b));
 
-			expect(context.gradeNotes.length, "need two ordinary grades to vary one on edit").to.be.greaterThan(1);
+			expect(
+				ctx.notenScale.length,
+				"die Skala braucht zwei Noten, sonst ist keine Änderung prüfbar",
+			).to.be.greaterThan(1);
 
-			// administrative note the editor list excludes ("intern angerechnet" / "nicht zugelassen")
+			// an administrative Note that the editor list leaves out ("intern angerechnet" / "nicht zugelassen")
 			const notLehre = noten.find((n) => n.lehre === false);
 
-			// as a ZEUGNISnote this one locks the LV note, in the client and in the server
+			// as a Zeugnisnote, this Note locks the LV-Note, in the client and in the server
 			const notUeberschreibbar = noten.find((n) => n.lkt_ueberschreibbar === false);
 
-			// Anrechnungen block every Prüfung for the LV - keyed on the ZEUGNISnote
+			// an Anrechnung blocks every Pruefung of the LV; the Zeugnisnote decides
 			const angerechnet = byBezeichnung("angerechnet");
 			const internAngerechnet = byBezeichnung("intern angerechnet");
 
-			// An attempt chain needs grades by meaning, not by index: a positive grade closes the
-			// chain, so a repeat after "Sehr Gut" is not a test case but an impossible flow.
-			const abschliessend = (context.cisConfig.NOTEN_ABSCHLIESSEND || []).map(String);
+			// A test picks a Note by meaning, not by index: a positive Note closes the Antritt chain,
+			// so a repeat after "Sehr Gut" is not a test case but an impossible flow.
+			const abschliessend = (ctx.cisConfig.NOTEN_ABSCHLIESSEND || []).map(String);
 			const inScale = (n) => Number(n.note) >= 1 && Number(n.note) <= 5;
 			const negativNoten = usable.filter((n) => !n.positiv && inScale(n)).map((n) => n.note);
 			const positivNoten = usable.filter((n) => n.positiv && inScale(n)).map((n) => n.note);
 			const verbesserbar = positivNoten.filter((n) => !abschliessend.includes(String(n)));
 
-			expect(negativNoten.length, "need a negative grade to build an attempt chain").to.be.greaterThan(0);
+			expect(negativNoten.length, "ohne negative Note ist keine Antrittskette möglich").to.be.greaterThan(0);
 
-			context.notes = {
-				// the only grade a repeat may follow
+			ctx.noten = {
+				// the only Note that allows a repeat
 				negativ: negativNoten[0],
-				// positive but not final: allows a repeat when configured
+				// positive but not final: allows a repeat only with CIS_GESAMTNOTE_NOTENVERBESSERUNG
 				positiv: verbesserbar.length ? verbesserbar[0] : null,
 				// always closes the chain (NOTEN_ABSCHLIESSEND)
 				bestnote: positivNoten.find((n) => abschliessend.includes(String(n))) || null,
@@ -216,103 +208,149 @@ export const loadNotenContext = () => {
 				internAngerechnet: internAngerechnet ? internAngerechnet.note : null,
 			};
 
-			// die GUI-Specs wählen und lesen über die Bezeichnung, nicht über die PK
-			context.notenOptions = noten;
+			// the UI specs select and read a Note by its Bezeichnung, not by its id
+			ctx.notenOptions = noten;
 
-			return notenApi.getStudentenNoten(context.lvId, context.semKurzbz);
+			return notenApi.getStudentenNoten(ctx.lvId, ctx.semKurzbz);
 		})
 		.then((response) => {
-			const data = expectNotenSuccess(response, `getStudentenNoten(${context.lvId})`);
-			const students = data[0] || [];
+			const data = expectNotenSuccess(response, `getStudentenNoten(${ctx.lvId})`);
+			const students = data.students;
 
-			expect(students.length, `LV ${context.lvId} needs >=3 enrolled students`).to.be.greaterThan(2);
-			students.forEach((s) => expect(s.lehreinheit_id, `lehreinheit_id of ${s.uid}`).to.exist);
+			expect(
+				students.length,
+				`LV ${ctx.lvId} hat ${students.length} Studierende, die Suite braucht ${MIN_STUDENTS}. Starte: npm run noten:check`,
+			).to.be.at.least(MIN_STUDENTS);
+			students.forEach((s) => expect(s.lehreinheit_id, `lehreinheit_id von ${s.uid}`).to.exist);
 
-			context.students = students;
-			context.studentUids = students.map((s) => s.uid);
+			ctx.students = students;
+			ctx.studentUids = students.map((s) => s.uid);
 
-			cachedContext = context;
-			return context;
+			cachedCtx = ctx;
+			return ctx;
 		});
 };
 
-// --- fixture state ---
+// --- database ---
 
-export const resetNotenState = (context, studentUids) => performReset(context, studentUids || context.studentUids);
+let dbConnection = null;
+
+/** Fails the test with the reason if the suite cannot reach the database. Call it in before or beforeEach. */
+export const requireDbReset = () => {
+	const status = dbConnection
+		? cy.wrap(dbConnection, { log: false })
+		: cy.task("noten:db:checkConnection", null, { log: false }).then((result) => (dbConnection = result));
+
+	return status.then((result) => {
+		expect(
+			result.available,
+			`Fixture-Reset nicht verfügbar: ${result.reason}\n\n` +
+				"Die Suite braucht eine Datenbankverbindung: NOTEN_DB_* in tests/cypress/suites/.env.",
+		).to.be.true;
+	});
+};
+
+let cachedAuthUid = null;
 
 /**
- * Baseline for Antritt 1: approved course grade PLUS the corresponding exam row—that is what the
- * approval generates. Without that row, the course grade only counts as long as no date exists, and
- * the first attempt added would replace Attempt 1 instead of becoming Attempt 2.
- *
- * `first_attempt: false` (or `approved: false`) seeds the legacy data form without this line.
+ * The uid of NOTEN_LEKTOR_USER as the database stores it, for mitarbeiter_uid / freigabevon_uid.
+ * Not Cypress.env("NOTEN_LEKTOR_USER"): LDAP accepts "Demolektor1", but tbl_benutzer.uid is
+ * "demolektor1", and the foreign keys are case sensitive.
  */
-export const seedBaseline = (context, student, options = {}) => {
-	expect(student, "seedBaseline braucht das Studierenden-Objekt aus context.students, nicht die uid").to.be.an(
-		"object",
+export const readAuthUid = () => {
+	if (cachedAuthUid) return cy.wrap(cachedAuthUid, { log: false });
+
+	return cy
+		.request({
+			method: "GET",
+			url: "/index.ci.php/api/frontend/v1/AuthInfo/getAuthUID",
+			auth: lektorAuth(),
+			failOnStatusCode: false,
+		})
+		.then((response) => {
+			const uid = response.body?.data?.uid;
+			expect(uid, "uid von AuthInfo/getAuthUID").to.be.a("string").and.not.be.empty;
+			cachedAuthUid = uid;
+			return uid;
+		});
+};
+
+/** Runs a seed task in the test LV, with NOTEN_LEKTOR_USER as mitarbeiter_uid. */
+const seedTask = (task, ctx, studentUid, payload) =>
+	readAuthUid().then((uid) =>
+		cy.task(task, { lvId: ctx.lvId, semKurzbz: ctx.semKurzbz, studentUid, mitarbeiterUid: uid, ...payload }),
 	);
 
-	// Defaults to a NEGATIVE grade: only after one may another attempt follow. Pass
-	// context.notes.bestnote explicitly to close the chain.
-	const note = options.note !== undefined ? options.note : context.notes.negativ;
-	// With CIS_GESAMTNOTE_FREIGABE_FINAL, a released grade is final. Without an explicit
-	// release, the baseline sets the grade to “open” so that a test can create additional dates.
-	const freigegeben =
-		options.freigegeben !== undefined
-			? options.freigegeben
-			: context.cisConfig.CIS_GESAMTNOTE_FREIGABE_FINAL !== true;
-	// Start 1 is missing only if the initial start is explicitly set to false or enabled: false
-	const erstantritt = options.erstantritt !== undefined ? options.erstantritt : options.freigegeben !== false;
+/** Deletes the LV-Noten, Pruefungen and Zeugnisnoten of the students in the test LV. */
+export const resetNotenState = (ctx, studentUids) =>
+	cy.task("noten:db:reset", {
+		lvId: ctx.lvId,
+		semKurzbz: ctx.semKurzbz,
+		studentUids: studentUids || ctx.studentUids,
+	});
 
-	return performSeed(context, student.uid, {
+/**
+ * The baseline for Antritt 1: an LV-Note PLUS its Pruefung row, the same as a Freigabe creates.
+ * Without that row the LV-Note counts only while no Pruefung exists, and the next added Pruefung
+ * would replace Antritt 1 instead of becoming Antritt 2.
+ *
+ * Options: note, punkte, benotungsdatum, freigegeben, freigabedatum, erstantritt.
+ * `erstantritt: false` leaves out the Pruefung row: the LV-Note then has no Antritt 1 of its own,
+ * which is the state of an old Note and of a Note before its Freigabe.
+ */
+export const seedBaseline = (ctx, student, options = {}) => {
+	expect(student, "seedBaseline braucht das Studierenden-Objekt aus ctx.students, nicht die uid").to.be.an("object");
+
+	// A NEGATIVE Note by default: only a negative Note allows another Antritt.
+	// Pass ctx.noten.bestnote to close the chain.
+	const note = options.note !== undefined ? options.note : ctx.noten.negativ;
+	// With CIS_GESAMTNOTE_FREIGABE_FINAL a freigegeben Note is final. So the baseline leaves the Note
+	// open by default, and a test can still add Pruefungen.
+	const freigegeben =
+		options.freigegeben !== undefined ? options.freigegeben : ctx.cisConfig.CIS_GESAMTNOTE_FREIGABE_FINAL !== true;
+	const erstantritt = options.erstantritt !== undefined ? options.erstantritt : true;
+
+	return seedTask("noten:db:seedLvGesamtnote", ctx, student.uid, {
 		note,
 		punkte: options.punkte !== undefined ? options.punkte : null,
-		benotungsdatum: options.benotungsdatum || baselineBenotungsdatum(context),
+		benotungsdatum: options.benotungsdatum || baselineBenotungsdatum(ctx),
 		freigegeben,
 		freigabedatum: options.freigabedatum || null,
 	}).then((seeded) => {
 		if (!erstantritt) return cy.wrap(seeded, { log: false });
 
-		return performSeedPruefung(context, student.uid, {
+		return seedTask("noten:db:seedPruefung", ctx, student.uid, {
 			lehreinheitId: student.lehreinheit_id,
 			note,
-			datum: baselineDate(context),
-			type: "Termin1", // legacy projection of Antritt 1; the rules never read it back
+			datum: baselineDate(ctx),
+			type: "Termin1", // legacy Pruefungstyp of Antritt 1; no rule reads it
 		}).then(() => seeded);
 	});
 };
 
-/** -> { pruefungId, note, datum, typ }. For attempt states the API cannot build. */
-export const seedPruefung = (context, student, { note, datum, type }) =>
-	performSeedPruefung(context, student.uid, {
+/** -> { pruefungId, note, datum, type }. For Pruefung states that the API cannot build. */
+export const seedPruefung = (ctx, student, { note, datum, type }) =>
+	seedTask("noten:db:seedPruefung", ctx, student.uid, {
 		lehreinheitId: student.lehreinheit_id,
 		note,
 		datum,
 		type,
 	});
 
-/** Set the grade on the transcript. Only the student administration system (stv) enters it,
- *  this tool does not handle that. */
-export const seedZeugnisnote = (context, studentUid, note) => performSeedZeugnisnote(context, studentUid, { note });
+/** Sets the Zeugnisnote. Only the StV enters it; the Benotungstool never writes it. */
+export const seedZeugnisnote = (ctx, student, note) => seedTask("noten:db:seedZeugnisnote", ctx, student.uid, { note });
 
 /**
- * Reads the course grade directly from the DB: what is actually stored, without the
- * “release date” filter from getLvGesamtNoten. The counterpart is readStateViaApi.
+ * Reads the LV-Note from the database: what is STORED, without the freigabedatum filter
+ * of getLvGesamtNoten. The counterpart is readStateViaApi.
  */
-export const readLvGesamtnoteViaDb = (context, studentUid) => performRead(context, studentUid);
+export const readLvGesamtnoteViaDb = (ctx, student) =>
+	cy.task("noten:db:readLvGesamtnote", { lvId: ctx.lvId, semKurzbz: ctx.semKurzbz, studentUid: student.uid });
 
-/** Anchor date; attempt dates derive from it so ordering is known. */
-export const baselineBenotungsdatum = (context) => `${Number(context.semKurzbz.slice(2, 6))}-01-10 08:00:00`;
+/** The anchor date. Every Antritt date comes after it, so the order is known. */
+export const baselineBenotungsdatum = (ctx) => `${Number(ctx.semKurzbz.slice(2, 6))}-01-10 08:00:00`;
 
-export const baselineDate = (context) => baselineBenotungsdatum(context).slice(0, 10);
+export const baselineDate = (ctx) => baselineBenotungsdatum(ctx).slice(0, 10);
 
-/** attemptDate(ctx,1) < attemptDate(ctx,2) < ... , all after the baseline. */
-export const attemptDate = (context, index) => shiftDate(baselineDate(context), 30 * index);
-
-export const requireDbReset = () =>
-	resolveResetStrategy().then((state) => {
-		expect(
-			state.strategy,
-			`Fixture reset unavailable.\n\n${describeFailure(state)}\n\n      See tests/cypress/.env.example.\n`,
-		).to.not.be.null;
-	});
+/** antrittDate(ctx, 1) < antrittDate(ctx, 2) < ..., all after the baseline, 30 days apart. */
+export const antrittDate = (ctx, index) => shiftDate(baselineDate(ctx), 30 * index);

@@ -1,18 +1,18 @@
 /**
- * Examination Regulations §1 - Grade Entry Deadline.
+ * Pruefungsordnung §1: the Noteneintragungsfrist.
  *
- * Two deadlines address two issues: CIS_GESAMTNOTE_FRIST_EINGABE restricts the time of entry,
- * CIS_GESAMTNOTE_FRIST_PRUEFUNGSDATUM restricts the exam date. The entry deadline applies in every write path
- * immediately after the access check; a rejected request therefore does not write anything. The message specifies the deadline
- * and uses it to verify its derivation from NOTENEINTRAGUNGSFRIST_SS/WS.
+ * Two Fristen answer two questions: CIS_GESAMTNOTE_FRIST_EINGABE limits the day of the entry,
+ * CIS_GESAMTNOTE_FRIST_PRUEFUNGSDATUM limits the date of the Pruefung. Every write endpoint checks the
+ * entry Frist right after the access check, so a rejected request writes nothing. The message names
+ * the Frist, so the test also checks how the server derives it from NOTENEINTRAGUNGSFRIST_SS/WS.
  *
- * The seeder group benotungstool_fixture_erweitert creates the summer semester in which the test user is notified after the deadline.
+ * Seeder group benotungstool_fixture_erweitert creates a Sommersemester after its Frist in which the Lektor teaches.
  */
 
-import { notenApi } from "../../../../support/api/notenApi";
-import { expectNotenError, expectNotenSuccess, messageMatchesPhrase } from "../../../../support/helpers/notenErrors";
+import { freigabePassword, notenApi, loginAsLektor } from "../../../../support/api/notenApi";
+import { expectNotenError, expectNotenSuccess } from "../../../../support/helpers/notenErrors";
 import {
-	attemptDate,
+	antrittDate,
 	expectedFristString,
 	fristHasPassed,
 	loadNotenContext,
@@ -20,19 +20,19 @@ import {
 	teachingSemesterWithExpiredFrist,
 } from "../../../../support/helpers/notenTestData";
 import { addPruefung, givenBaseline } from "../../../../support/helpers/notenScenario";
-import { requireConfig, requireWiederholung } from "../../../../support/helpers/notenConfig";
+import { requireConfig, requireRepeat } from "../../../../support/helpers/notenConfig";
 
 describe("Noten API - Noteneintragungsfrist (Prüfungsordnung §1)", () => {
 	let ctx;
-	// Semester, including the course, in which the user teaches and the deadline has passed
+	// a semester and LV in which the Lektor teaches and the Frist has passed
 	const expired = { SS: null, WS: null };
 
 	const fristSS = () => ctx.cisConfig.NOTENEINTRAGUNGSFRIST_SS;
 	const fristWS = () => ctx.cisConfig.NOTENEINTRAGUNGSFRIST_WS;
 
 	before(() => {
-		loadNotenContext().then((context) => {
-			ctx = context;
+		loadNotenContext().then((loaded) => {
+			ctx = loaded;
 			cy.log(
 				`FRIST_EINGABE=${ctx.cisConfig.CIS_GESAMTNOTE_FRIST_EINGABE} ` +
 					`FRIST_PRUEFUNGSDATUM=${ctx.cisConfig.CIS_GESAMTNOTE_FRIST_PRUEFUNGSDATUM} ` +
@@ -48,6 +48,8 @@ describe("Noten API - Noteneintragungsfrist (Prüfungsordnung §1)", () => {
 		});
 	});
 
+	beforeEach(() => loginAsLektor());
+
 	// A missing semester is a fixture error, not a skipped test
 	const pairFor = (type) => {
 		expect(expired[type], `ein ${type} mit abgelaufener Frist, in dem der Testbenutzer unterrichtet`).to.not.be
@@ -55,12 +57,12 @@ describe("Noten API - Noteneintragungsfrist (Prüfungsordnung §1)", () => {
 		return expired[type];
 	};
 
-	// §7 and §11: The commission review must TAKE PLACE by the deadline. That is a different question from
-	// “Can it still be registered now?”
+	// §7 and §11: the Pruefung must TAKE PLACE before the Frist. That is a different question from
+	// "may the Lektor still enter it now?"
 	describe("Prüfungsdatum nach der Frist", () => {
 		beforeEach(() => requireDbReset());
 
-		// The deadline for the current semester is before this date
+		// the Frist of the current semester is before this date
 		const afterFrist = () => `${Number(ctx.semKurzbz.slice(2, 6)) + 1}-12-31`;
 
 		it("lehnt einen Termin ab, der nach der Frist liegt", function () {
@@ -69,30 +71,30 @@ describe("Noten API - Noteneintragungsfrist (Prüfungsordnung §1)", () => {
 			const student = ctx.students[0];
 
 			givenBaseline(ctx, student);
-			addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: afterFrist() }).then((response) =>
+			addPruefung(ctx, student, { note: ctx.notenScale[0], datum: afterFrist() }).then((response) =>
 				expectNotenError(response, "pruefungsdatumNachFrist"),
 			);
 		});
 
 		it("nimmt einen Termin nach der Frist an, wenn das Prüfungsdatum an keine Frist gebunden ist", function () {
 			requireConfig(this, ctx, "CIS_GESAMTNOTE_FRIST_PRUEFUNGSDATUM", false);
-			requireWiederholung(this, ctx);
+			requireRepeat(this, ctx);
 
 			const student = ctx.students[0];
 
 			givenBaseline(ctx, student);
-			addPruefung(ctx, student, { note: ctx.notes.negativ, datum: afterFrist() }).then((response) =>
+			addPruefung(ctx, student, { note: ctx.noten.negativ, datum: afterFrist() }).then((response) =>
 				expectNotenSuccess(response, "Termin nach der Frist"),
 			);
 		});
 
 		it("nimmt einen Termin vor der Frist an", function () {
-			requireWiederholung(this, ctx);
+			requireRepeat(this, ctx);
 
 			const student = ctx.students[1];
 
 			givenBaseline(ctx, student);
-			addPruefung(ctx, student, { note: ctx.gradeNotes[0], datum: attemptDate(ctx, 1) }).then((response) =>
+			addPruefung(ctx, student, { note: ctx.notenScale[0], datum: antrittDate(ctx, 1) }).then((response) =>
 				expectNotenSuccess(response, "Termin innerhalb der Frist"),
 			);
 		});
@@ -101,49 +103,46 @@ describe("Noten API - Noteneintragungsfrist (Prüfungsordnung §1)", () => {
 	describe("Eingabe nach der Frist", () => {
 		const s0 = () => ctx.students[0];
 
-		// The student is not enrolled in the course from the previous semester. If the submission deadline
-		// does not apply, the system rejects the student's attempt, and the request still does not write anything.
+		// The student is not in the LV of that earlier semester. Without the Frist check the server would
+		// reject the student instead. Either way the request writes nothing.
 		const writePaths = {
-			saveStudentPruefung: (pair) =>
-				notenApi.saveStudentPruefung({
-					student_uid: s0().uid,
-					note: ctx.gradeNotes[0],
-					punkte: null,
-					datum: attemptDate(ctx, 1),
-					lva_id: pair.lvId,
-					lehreinheit_id: s0().lehreinheit_id,
-					sem_kurzbz: pair.semKurzbz,
+			savePruefung: (pair) =>
+				notenApi.savePruefung(pair.lvId, pair.semKurzbz, s0().uid, {
 					pruefung_id: null,
+					lehreinheit_id: s0().lehreinheit_id,
+					datum: antrittDate(ctx, 1),
+					note: ctx.notenScale[0],
+					punkte: null,
 				}),
-			saveNotenvorschlag: (pair) =>
-				notenApi.saveNotenvorschlag(pair.lvId, pair.semKurzbz, s0().uid, ctx.gradeNotes[0]),
-			saveNotenvorschlagBulk: (pair) =>
-				notenApi.saveNotenvorschlagBulk(pair.lvId, pair.semKurzbz, [
-					{ uid: s0().uid, note: ctx.gradeNotes[0], punkte: null },
+			saveLvNote: (pair) => notenApi.saveLvNote(pair.lvId, pair.semKurzbz, s0().uid, ctx.notenScale[0]),
+			importLvNoten: (pair) =>
+				notenApi.importLvNoten(pair.lvId, pair.semKurzbz, [
+					{ uid: s0().uid, note: ctx.notenScale[0], punkte: null },
 				]),
 			createPruefungen: (pair) =>
 				notenApi.createPruefungen(
-					[{ uid: s0().uid, lehreinheit_id: s0().lehreinheit_id }],
-					attemptDate(ctx, 1),
 					pair.lvId,
 					pair.semKurzbz,
+					[{ uid: s0().uid, lehreinheit_id: s0().lehreinheit_id }],
+					{
+						datum: antrittDate(ctx, 1),
+					},
 				),
-			savePruefungenBulk: (pair) =>
-				notenApi.savePruefungenBulk(pair.lvId, pair.semKurzbz, [
+			importPruefungen: (pair) =>
+				notenApi.importPruefungen(pair.lvId, pair.semKurzbz, [
 					{
 						uid: s0().uid,
-						note: ctx.gradeNotes[0],
+						note: ctx.notenScale[0],
 						punkte: null,
-						datum: attemptDate(ctx, 1),
+						datum: antrittDate(ctx, 1),
 						lehreinheit_id: s0().lehreinheit_id,
 					},
 				]),
+			saveFreigabe: (pair) => notenApi.saveFreigabe(pair.lvId, pair.semKurzbz, freigabePassword(), [s0().uid]),
 		};
 
 		const reportsFrist = (response) =>
-			((response.body && response.body.errors) || []).some((e) =>
-				messageMatchesPhrase(e.message, "noteneintragungsfristVorbei"),
-			);
+			(response.body?.errors ?? []).some((e) => e.code === "noteneintragungsfristVorbei");
 
 		Object.entries(writePaths).forEach(([writePath, call]) => {
 			["SS", "WS"].forEach((type) => {
@@ -168,7 +167,7 @@ describe("Noten API - Noteneintragungsfrist (Prüfungsordnung §1)", () => {
 				});
 			});
 
-			// The exception covers the INPUT DATE, not the exam date.
+			// the exception covers the day of the ENTRY, not the date of the Pruefung
 			it(`${writePath} lässt eine Ausnahmerolle nach der Frist eintragen`, function () {
 				requireConfig(this, ctx, "CIS_GESAMTNOTE_FRIST_EINGABE", true);
 				requireConfig(this, ctx, "CIS_GESAMTNOTE_FRIST_AUSNAHME_GILT", true);

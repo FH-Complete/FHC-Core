@@ -54,10 +54,12 @@ class LePruefung_model extends DB_Model
 	}
 
 	/**
-	 * Alle Prüfungen einer Lehrveranstaltung in einem Studiensemester.
+	 * All Pruefungen of one LV in one Studiensemester.
 	 *
-	 * Note und Prüfungstyp hängen als LEFT JOIN: eine Zeile mit einem Typ, den tbl_pruefungstyp nicht
-	 * mehr kennt, muss im Verlauf bleiben. Sonst zählt die Regelprüfung einen Antritt zu wenig.
+	 * Note and Pruefungstyp are LEFT JOINs: a Pruefung with a type that tbl_pruefungstyp does not know
+	 * stays in the Verlauf. Else the rules count one Antritt too few.
+	 *
+	 * No ORDER BY: PruefungsverlaufLib sorts the rows into the order of the Verlauf.
 	 */
 	public function getPruefungenByLvStudiensemester($lv_id, $sem_kurzbz) {
 		$qry = "SELECT tbl_pruefung.*, tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
@@ -68,20 +70,18 @@ class LePruefung_model extends DB_Model
 				LEFT JOIN lehre.tbl_note ON (tbl_pruefung.note = tbl_note.note)
 				LEFT JOIN lehre.tbl_pruefungstyp ON (tbl_pruefung.pruefungstyp_kurzbz = tbl_pruefungstyp.pruefungstyp_kurzbz)
 			WHERE tbl_lehrveranstaltung.lehrveranstaltung_id = ?
-			  AND tbl_lehreinheit.studiensemester_kurzbz = ?
-			ORDER BY tbl_pruefung.datum DESC;";
+			  AND tbl_lehreinheit.studiensemester_kurzbz = ?";
 
 		return $this->execReadOnlyQuery($qry, array($lv_id, $sem_kurzbz));
 	}
 
 	/**
-	 * Die Prüfungen eines Studenten, optional je Typ, Lehrveranstaltung und Studiensemester.
+	 * All Pruefungen of one student in one LV.
 	 *
-	 * Note und Prüfungstyp hängen als LEFT JOIN. PruefungsverlaufLib leitet die Antrittsnummern aus
-	 * dieser Liste ab. Eine fehlende Zeile verschiebt die ganze Kette.
+	 * Note and Pruefungstyp are LEFT JOINs. PruefungsverlaufLib derives the Antritt numbers from this
+	 * list, and a missing row shifts the whole chain.
 	 */
-	public function getPruefungenByUidTypLvStudiensemester($uid, $typ = null, $lv_id = null, $sem_kurzbz = null) {
-		$params = [$uid];
+	public function getPruefungenByStudent($student_uid, $lv_id, $sem_kurzbz) {
 		$qry = "SELECT tbl_pruefung.*, tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
 			    tbl_note.bezeichnung as note_bezeichnung, tbl_pruefungstyp.beschreibung as typ_beschreibung, tbl_lehreinheit.studiensemester_kurzbz as studiensemester_kurzbz
 			    FROM lehre.tbl_pruefung
@@ -89,28 +89,10 @@ class LePruefung_model extends DB_Model
 					JOIN lehre.tbl_lehrveranstaltung ON (tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id)
 					LEFT JOIN lehre.tbl_note ON (tbl_pruefung.note = tbl_note.note)
 					LEFT JOIN lehre.tbl_pruefungstyp ON (tbl_pruefung.pruefungstyp_kurzbz = tbl_pruefungstyp.pruefungstyp_kurzbz)
-			    WHERE student_uid= ?";
-		if ($typ != null)
-		{
-			$qry .= " AND tbl_pruefung.pruefungstyp_kurzbz = ?";
-			$params[] = $typ;
-		}
+			    WHERE tbl_pruefung.student_uid = ?
+				  AND tbl_lehrveranstaltung.lehrveranstaltung_id = ?
+				  AND tbl_lehreinheit.studiensemester_kurzbz = ?";
 
-		if ($lv_id != null)
-		{
-			$qry .= " AND tbl_lehrveranstaltung.lehrveranstaltung_id = ?";
-			$params[] = $lv_id;
-		}
-
-		if ($sem_kurzbz != null)
-		{
-			$qry .= " AND tbl_lehreinheit.studiensemester_kurzbz = ?";
-			$params[] = $sem_kurzbz;
-		}
-
-
-		$qry .= " ORDER BY tbl_pruefung.datum DESC";
-
-		return $this->execReadOnlyQuery($qry, $params);
+		return $this->execReadOnlyQuery($qry, array($student_uid, $lv_id, $sem_kurzbz));
 	}
 }

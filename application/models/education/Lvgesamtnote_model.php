@@ -14,7 +14,7 @@ class Lvgesamtnote_model extends DB_Model
 	}
 
 	/**
-	 * Laedt die Noten - lvgesamtnote (Vorschlag) JOIN tbl.note (zeugnisnote)
+	 * Laedt die Noten
 	 *
 	 * @param integer				$lehrveranstaltung_id
 	 * @param string				$student_uid
@@ -51,22 +51,20 @@ class Lvgesamtnote_model extends DB_Model
 		return $this->loadWhere($where);
 	}
 
-	public function getLvGesamtNoteVorschlag($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
+	/**
+	 * The LV-Note of one student, without the Freigabe filter of getLvGesamtNoten().
+	 */
+	public function getByStudent($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
 	{
-		$qry = "SELECT * FROM campus.tbl_lvgesamtnote
-				WHERE campus.tbl_lvgesamtnote.student_uid = ? 
-				  AND campus.tbl_lvgesamtnote.studiensemester_kurzbz = ?";
-		$params = [$student_uid, $studiensemester_kurzbz];
-		
-		// ohne LV liefert die Abfrage die Noten anderer LVs
-		$qry .= " AND campus.tbl_lvgesamtnote.lehrveranstaltung_id = ?";
-		$params[] = $lehrveranstaltung_id;
-
-		return $this->execReadOnlyQuery($qry, $params);
+		return $this->loadWhere(array(
+			'student_uid' => $student_uid,
+			'lehrveranstaltung_id' => $lehrveranstaltung_id,
+			'studiensemester_kurzbz' => $studiensemester_kurzbz
+		));
 	}
 
 	/**
-	 * Alle LV-Noten einer LV in einem Semester, ohne Freigabefilter.
+	 * All LV-Noten of one LV in one Studiensemester, without the Freigabe filter.
 	 */
 	public function getByLvStudiensemester($lehrveranstaltung_id, $studiensemester_kurzbz)
 	{

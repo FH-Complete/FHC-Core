@@ -1,12 +1,12 @@
 /**
- * Configuration profiles for the grading tool suite on the test instance.
+ * Switches the test instance to a configuration profile of the noten suite.
  *
- * A profile modifies application/config/noten.php and the define() switches in
- * config/global.config.inc.php. The originals are located in the SSH user's home directory, i.e.,
- * outside the web root: global.config.inc.php contains login credentials.
+ * A profile changes application/config/noten.php and the define() flags in config/global.config.inc.php.
+ * The originals go to the home directory of the SSH user, outside the web root, because
+ * global.config.inc.php contains credentials.
  *
- * state.json stores the MD5 hash of every file that has been written. If a file differs from this hash, it has been
- * redeployed since then. It is then considered the original, and the old backup is invalidated.
+ * state.json keeps the MD5 hash of each written file. If a file has a different hash, someone deployed
+ * it again. Then that file is the new original, and the old backup is void.
  */
 
 const crypto = require("crypto");
@@ -14,14 +14,11 @@ const path = require("path");
 const { resolveAuth } = require("./sshTunnel");
 const { base, profiles } = require("../profiles/noten");
 
-const PREFIX = process.env.TEST_ENV_PREFIX || "TEST";
-
-// The instance may be located on a different host than the SSH tunnel to the database. If
-// <PREFIX>_PROFILE_SSH_HOST is set, all SSH values come from <PREFIX>_PROFILE_SSH_*; without a key,
-// the SSH agent is used.
+// The instance can run on a different host than the database tunnel. If NOTEN_PROFILE_SSH_HOST is set,
+// all SSH values come from NOTEN_PROFILE_SSH_*; without a key, the SSH agent is used.
 const envValue = (key) => {
-	const ownHost = key.startsWith("SSH_") && Boolean(process.env[`${PREFIX}_PROFILE_SSH_HOST`]);
-	return process.env[`${PREFIX}_${ownHost ? "PROFILE_" : ""}${key}`];
+	const ownHost = key.startsWith("SSH_") && Boolean(process.env.NOTEN_PROFILE_SSH_HOST);
+	return process.env[`NOTEN_${ownHost ? "PROFILE_" : ""}${key}`];
 };
 
 const FILES = {
@@ -90,9 +87,9 @@ const exists = (sftp, file) => new Promise((resolve) => sftp.stat(file, (err) =>
 const read = (sftp, file) => sftpCall((cb) => sftp.readFile(file, cb));
 const writeRaw = (sftp, file, content, mode) => sftpCall((cb) => sftp.writeFile(file, content, { mode }, cb));
 
-/** Writes to a temporary file to ensure that no request reads an incomplete configuration. */
+/** Writes to a temporary file first, so no request reads a half-written configuration. */
 const write = async (sftp, file, content) => {
-	// .php: ein Webserver führt die Datei aus, statt ihre Zugangsdaten auszuliefern
+	// .php: a web server runs the file instead of sending its credentials
 	const temp = `${file}.cypress-temp.php`;
 	await writeRaw(sftp, temp, content, 0o644);
 	await sftpCall((cb) => sftp.ext_openssh_rename(temp, file, cb));
@@ -105,7 +102,7 @@ const readState = async (sftp) =>
 
 const writeState = (sftp, state) => writeRaw(sftp, STATE_FILE, JSON.stringify(state, null, 2), 0o600);
 
-// --- Modifying the files ---
+// --- Changing the files ---
 
 const phpString = (text) => `'${String(text).replace(/\\/g, "\\\\").replace(/'/g, "\\'")}'`;
 
@@ -120,7 +117,7 @@ const phpValue = (value) => {
 const asciiJson = (value) =>
 	JSON.stringify(value).replace(/[-￿]/g, (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`);
 
-/** Appends the profile keys to noten.php. The later assignment takes precedence. */
+/** Appends the profile keys to noten.php. The later assignment wins. */
 const withConfig = (original, name, config) => {
 	const text = original.toString("latin1");
 	const block =
@@ -131,7 +128,7 @@ const withConfig = (original, name, config) => {
 	return Buffer.from(end === -1 ? text + block : text.slice(0, end) + block + text.slice(end), "latin1");
 };
 
-/** Replaces the `define()` line for each switch. A second `define()` outputs a notice to the page. */
+/** Replaces the `define()` line of each flag. A second `define()` would print a notice on the page. */
 const withFlags = (original, flags) => {
 	let text = original.toString("latin1");
 
@@ -150,7 +147,7 @@ const withFlags = (original, flags) => {
 
 // --- Profile ---
 
-/** Profile, including the base. expect lists values from getCisConfig that a flag changes only indirectly. */
+/** The profile plus the base. `expect` lists getCisConfig values that a flag changes only indirectly. */
 const profileData = (name) => {
 	if (!NAME_PATTERN.test(String(name)) || !Object.prototype.hasOwnProperty.call(profiles, name)) {
 		throw new Error(`Unbekanntes Profil "${name}". Vorhanden: ${Object.keys(profiles).join(", ")}`);
@@ -169,7 +166,7 @@ const profileData = (name) => {
 	return data;
 };
 
-/** Stellt eine Datei her, die ein Profil geschrieben hat. Eine neu ausgerollte Datei bleibt stehen. */
+/** Restores a file that a profile wrote. A file deployed again since then stays. */
 const restoreFile = async (sftp, state, fileKey) => {
 	const entry = state.files[fileKey];
 	if (!entry) return;
@@ -190,7 +187,7 @@ const restoreFile = async (sftp, state, fileKey) => {
 	await writeState(sftp, state);
 };
 
-/** Creates a file generated by a profile. A newly rolled-out file remains in place. */
+/** Writes the profile version of a file and keeps the original as a backup. */
 const applyFile = async (sftp, state, fileKey, transform) => {
 	const remotePath = `${state.root}/${FILES[fileKey]}`;
 	const backup = backupOf(remotePath);
@@ -212,7 +209,7 @@ const applyFile = async (sftp, state, fileKey, transform) => {
 
 	const updated = transform(original);
 
-	// zuerst der Zustand: bricht das Schreiben ab, gilt die Datei beim nächsten Lauf als Original
+	// the state first: if the write fails, the next run takes the file as the original
 	state.files[fileKey] = { md5: md5(updated) };
 	await writeState(sftp, state);
 	await write(sftp, remotePath, updated);
@@ -221,7 +218,7 @@ const applyFile = async (sftp, state, fileKey, transform) => {
 const matches = (actual, expected) =>
 	typeof expected === "boolean" ? Boolean(actual) === expected : JSON.stringify(actual) === JSON.stringify(expected);
 
-/** The data returned by getCisConfig, or null with a reason in the event of a temporary error (network, HTTP 5xx). */
+/** The getCisConfig data, or null with a reason for a temporary error (network, HTTP 5xx). */
 const readCisConfig = async (url, auth) => {
 	let response;
 	try {
@@ -235,10 +232,10 @@ const readCisConfig = async (url, auth) => {
 		const actual = JSON.parse(text).data;
 		if (actual) return { actual };
 	} catch (e) {
-		// keine JSON-Antwort
+		// no JSON response
 	}
 
-	// unter 500 steht eine PHP-Meldung vor dem JSON: die Datei ist kaputt, Warten hilft nicht
+	// below 500 a PHP message comes before the JSON: the file is broken, and waiting does not help
 	if (response.status < 500) {
 		throw new Error(
 			`getCisConfig antwortet nach dem Profilwechsel mit HTTP ${response.status}: ${text.slice(0, 300)}`,
@@ -247,12 +244,12 @@ const readCisConfig = async (url, auth) => {
 	return { actual: null, reason: `getCisConfig antwortet mit HTTP ${response.status}` };
 };
 
-/** Waits until getCisConfig returns the profile. PHP-FPM does not read a modified file until opcache.revalidate_freq has elapsed. */
+/** Waits until getCisConfig returns the profile. PHP-FPM reads a changed file only after opcache.revalidate_freq. */
 const verifyInstance = async (data) => {
 	const expected = { ...data.config, ...data.flags, ...data.expect };
 	const baseUrl = String(process.env.BASE_URL).replace(/\/+$/, "");
 	const url = `${baseUrl}/index.ci.php/api/frontend/v1/Noten/getCisConfig`;
-	const auth = `Basic ${Buffer.from(`${process.env.NOTEN_USER}:${process.env.NOTEN_PASSWORD}`).toString("base64")}`;
+	const auth = `Basic ${Buffer.from(`${process.env.NOTEN_LEKTOR_USER}:${process.env.NOTEN_LEKTOR_PASSWORD}`).toString("base64")}`;
 	const deadline = Date.now() + 60000;
 
 	for (;;) {
@@ -280,9 +277,9 @@ const verifyInstance = async (data) => {
 	}
 };
 
-// --- öffentlich ---
+// --- public ---
 
-/** Retrieves the active profile. Returns its name or null. */
+/** Puts the original files back. Returns the name of the profile that was active, or null. */
 const restore = async () => {
 	if (!sshConfigured()) return null;
 
@@ -300,7 +297,7 @@ const restore = async () => {
 	});
 };
 
-/** Sets the instance to a profile. If no name is specified, it uses the defaults. */
+/** Switches the instance to a profile. Without a name it restores the originals. */
 const apply = async (name) => {
 	if (!name) return restore();
 
@@ -308,7 +305,7 @@ const apply = async (name) => {
 	const root = envValue("REMOTE_ROOT");
 	if (!sshConfigured() || !root) {
 		throw new Error(
-			`Profil "${name}" braucht ${PREFIX}_SSH_HOST, ${PREFIX}_SSH_USER und ${PREFIX}_REMOTE_ROOT in tests/cypress/local/.env.`,
+			`Profil "${name}" braucht NOTEN_SSH_HOST, NOTEN_SSH_USER und NOTEN_REMOTE_ROOT in tests/cypress/local/.env.`,
 		);
 	}
 

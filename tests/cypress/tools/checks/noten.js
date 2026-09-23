@@ -1,8 +1,11 @@
 /**
- * Fixture preconditions for the Gesamtnoteneingabe suite. Data only -- dbCheck.js runs it.
+ * The test data that the noten suite needs. Data only: dbCheck.js runs the checks.
+ *
+ * The seeder builds the fixture: demolektor1 teaches LV 5221 (12 students), demoassistenz is Assistenz
+ * for stg5. suites/.env.example uses the same values.
  *
  * Every precondition of the chain
- *   getBenotungstoolContext -> getStudentenNoten -> saveStudentPruefung
+ *   getBenotungstoolContext -> getStudentenNoten -> savePruefung
  * is its own query, so a failure names the exact missing link instead of "no students".
  */
 
@@ -87,8 +90,8 @@ module.exports = {
 			label: "Students visible in LV 5221 (the test LV)",
 			sql: `SELECT COUNT(*)::int AS value FROM campus.vw_student_lehrveranstaltung
 			       WHERE lehrveranstaltung_id = 5221 AND studiensemester_kurzbz = ${SEM}`,
-			ok: (r) => r.value >= 3,
-			hint: "The suite needs at least 3 enrolled students. Apply seeder group benotungstool_noten.",
+			ok: (r) => r.value >= 7,
+			hint: "The suite needs 7 students (MIN_STUDENTS in notenTestData.js). Apply seeder group benotungstool_noten.",
 		},
 		{
 			label: "tbl_note 'entschuldigt' (resolved by Bezeichnung)",
@@ -139,7 +142,7 @@ module.exports = {
 			hint: "The grader rules need two Lektoren. Apply seeder group benotungstool_fixture_erweitert.",
 		},
 		{
-			label: "Sommersemester after its deadline, taught by demolektor1",
+			label: "Sommersemester after its Frist, taught by demolektor1",
 			sql: `SELECT COALESCE((SELECT le.studiensemester_kurzbz
 			                         FROM lehre.tbl_lehreinheit le
 			                         JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id)
@@ -148,7 +151,7 @@ module.exports = {
 			                          AND make_date(substring(le.studiensemester_kurzbz FROM 3 FOR 4)::int, 11, 15) < current_date
 			                        ORDER BY le.studiensemester_kurzbz DESC LIMIT 1), '') AS value`,
 			ok: (r) => r.value !== "",
-			hint: "The deadline tests need it. Apply seeder group benotungstool_fixture_erweitert.",
+			hint: "The Frist tests need it. Apply seeder group benotungstool_fixture_erweitert.",
 		},
 		{
 			label: "Texts of the Vorlagen Notenfreigabe and Sancho_Mail_Template",
@@ -156,7 +159,7 @@ module.exports = {
 			       WHERE vorlage_kurzbz IN ('Notenfreigabe', 'Sancho_Mail_Template') AND aktiv
 			         AND COALESCE(text, '') <> ''`,
 			ok: (r) => r.value === 2,
-			hint: "Without both texts every release mail has an empty body. Apply seeder group benotungstool_fixture_erweitert.",
+			hint: "Without both texts every Freigabe mail has an empty body. Apply seeder group benotungstool_fixture_erweitert.",
 		},
 	],
 };

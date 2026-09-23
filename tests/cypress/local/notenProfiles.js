@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Configuration profiles for the grading tool suite, via SFTP on a c3p0 instance.
+ * Switches a c3p0 instance to a profile of the noten suite, over SFTP.
  *
  *   node tests/cypress/local/notenProfiles.js status                  Profiles and the active profile
- *   node tests/cypress/local/notenProfiles.js apply <profile>         For example, before running `cypress open`
+ *   node tests/cypress/local/notenProfiles.js apply <profile>         switch, for example before `cypress open`
  *   node tests/cypress/local/notenProfiles.js restore                 restore the originals
  *   node tests/cypress/local/notenProfiles.js run [api|ui|all] [a,b]  one run per profile, followed by the report
  *
@@ -20,18 +20,21 @@ const { profiles } = require("../profiles/noten");
 
 const SCOPES = {
 	api: { spec: "tests/cypress/e2e/specs/{unit,api}/**/*.cy.js" },
-	// Electron crashes on the grading tool page
+	// Electron crashes on the Benotungstool page
 	ui: { spec: "tests/cypress/e2e/specs/ui/**/*.cy.js", browser: "chrome" },
 	all: { spec: "tests/cypress/e2e/specs/**/*.cy.js", browser: "chrome" },
 };
 
 const NOT_RUN = ["pending", "skipped"];
 
-const testTitle = (run, test) => `${path.basename(run.spec.relative)} › ${test.title.join(" › ")}`;
+// api/noten/freigabe.cy.js and ui/noten/freigabe.cy.js share a file name, so the key keeps the folder
+const specName = (run) => path.relative("tests/cypress/e2e/specs", run.spec.relative).split(path.sep).join("/");
+
+const testTitle = (run, test) => `${specName(run)} › ${test.title.join(" › ")}`;
 
 const column = (value, width) => String(value).padStart(width);
 
-/** Numbers per profile, the red tests per profile, and the tests that aren't running in any profile. */
+/** The numbers and the red tests of each profile, and the tests that run in no profile. */
 const report = (names, results) => {
 	const tests = new Map();
 	const completed = [];
@@ -113,7 +116,7 @@ const runProfiles = async (scope = "api", selection = null) => {
 				await profileSwitch.apply(name);
 				results[name] = await cypress.run(options);
 			} catch (error) {
-				// ein gescheiterter Profilwechsel beendet nur diesen Lauf; der Bericht nennt den Grund
+				// a failed profile switch ends only this run; the report names the reason
 				results[name] = { message: error.message };
 			}
 		}

@@ -1,27 +1,24 @@
-/* Sticky identity columns. The four freezable columns (selection/uid/Vorname/Nachname) always carry
-   the .sticky-col class for the opaque background; whether a column is actually pinned is toggled
-   per column via a `sticky-on-<field>` class on #notentable (set in JS from the user's selection).
-   The cumulative left offsets (--sl-<field>) are computed in JS (recomputeStickyOffsets) so that
-   multiple sticky columns stack next to each other instead of overlapping at left:0. */
+/* Pinned columns (tableLayout.js). The four columns that can be pinned always have .sticky-col.
+   A `sticky-on-<field>` class on #notentable pins one of them, and --sl-<field> is its left offset,
+   so that the pinned columns stand next to each other. */
 #notentable .tabulator-header .tabulator-col.sticky-col,
 #notentable .tabulator-tableholder .tabulator-row .tabulator-cell.sticky-col {
-	background-color: #fff;       /* opaque so scrolled cells don't show through */
+	background-color: #fff;       /* the cells below do not show through */
 }
 
-/* keep sticky cells opaque on row hover */
+/* also on row hover */
 #notentable .tabulator-row:hover .tabulator-cell.sticky-col {
 	background-color: #ccc;
 }
 
-/* enable pinning per column only when the container opts the field in.
-   left offset comes from the matching --sl-<field> CSS variable (set on #notentable from JS). */
+/* the container pins a column */
 #notentable.sticky-on-selectCol .sticky-col[tabulator-field="selectCol"],
 #notentable.sticky-on-uid .sticky-col[tabulator-field="uid"],
 #notentable.sticky-on-vorname .sticky-col[tabulator-field="vorname"],
 #notentable.sticky-on-nachname .sticky-col[tabulator-field="nachname"] {
 	position: sticky;
-	z-index: 10;                  /* float above the scrolling pruefungs columns */
-	border-right: 1px solid #ddd; /* separator on the sticky block */
+	z-index: 10;                  /* above the Pruefung columns */
+	border-right: 1px solid #ddd;
 }
 
 #notentable.sticky-on-selectCol .sticky-col[tabulator-field="selectCol"] { left: var(--sl-selectCol, 0); }
@@ -30,20 +27,52 @@
 #notentable.sticky-on-nachname  .sticky-col[tabulator-field="nachname"]  { left: var(--sl-nachname, 0); }
 
 
-/* styling for points input column for notenvorschläge in benotungstool*/
-#notentable .tabulator-tableholder .tabulator-editable[tabulator-field="punkte"] {
+/* the content of a cell, from the formatters in Benotungstool.js */
+#notentable .cell-start,
+#notentable .cell-center {
+	display: flex;
+	align-items: center;
+	height: 100%;
+}
+
+#notentable .cell-start  { justify-content: start; }
+#notentable .cell-center { justify-content: center; }
+
+/* a Zeugnisnote that differs from the LV-Note */
+#notentable .zeugnisnote-differs {
+	color: red;
+	border: 1px solid red;
+}
+
+/* a proposal that the user cannot change */
+#notentable .proposal-locked {
+	color: gray;
+	font-style: italic;
+	background-color: #f0f0f0;
+	pointer-events: none;
+	opacity: 0.6;
+	user-select: none;
+	cursor: not-allowed;
+}
+
+#notentable .teilnote-negativ   { color: red; }
+#notentable .freigegeben-icon   { color: green; }
+#notentable .mail-icon          { color: #00649C; }
+
+
+/* the editable proposal columns */
+#notentable .tabulator-tableholder .tabulator-editable[tabulator-field="proposed_punkte"] {
 	position: relative;
 	background-color: rgba(255, 255, 157, 0.73);
 }
 
-/* styling for editable dropdown column of notenvorschläge in benotungstool*/
-#notentable .tabulator-tableholder .tabulator-editable[tabulator-field="note_vorschlag"] {
+#notentable .tabulator-tableholder .tabulator-editable[tabulator-field="proposed_note"] {
 	position: relative;
 	background-color: rgba(255, 255, 157, 0.73);
 	cursor: pointer;
 }
 
-#notentable .tabulator-tableholder .tabulator-editable[tabulator-field="note_vorschlag"]::after {
+#notentable .tabulator-tableholder .tabulator-editable[tabulator-field="proposed_note"]::after {
 	content: "▾";
 	position: absolute;
 	right: 8px;
@@ -57,18 +86,16 @@
 	transition: transform 0.15s ease;
 }
 
-/* rotate the indicator up while the dropdown editor is open */
-#notentable .tabulator-tableholder .tabulator-cell.tabulator-editing[tabulator-field="note_vorschlag"]::after {
+/* the arrow points up while the list is open */
+#notentable .tabulator-tableholder .tabulator-cell.tabulator-editing[tabulator-field="proposed_note"]::after {
 	transform: translateY(-50%) rotate(180deg);
 }
 
-/*
- * Prueufungszelle: feste cols für Note | Datum | Aktion.
- */
+/* A Pruefung cell: fixed tracks for Note | date | action, so that they align in all rows. */
 .pruefung-cell {
 	position: relative;
 	display: grid;
-	grid-template-columns: minmax(0, 1fr) 6.5rem; /* Note | Aktion */
+	grid-template-columns: minmax(0, 1fr) 6.5rem; /* Note | action */
 	align-items: center;
 	column-gap: 0.5rem;
 	height: 100%;
@@ -77,16 +104,16 @@
 	text-align: left;
 }
 
-.pruefung-cell.mit-datum {
-	grid-template-columns: minmax(0, 1fr) 4.75rem 6.5rem; /* Note | Datum | Aktion */
+.pruefung-cell.with-datum {
+	grid-template-columns: minmax(0, 1fr) 4.75rem 6.5rem; /* Note | datum | action */
 }
 
-.pruefung-cell.ohne-aktion {
+.pruefung-cell.without-action {
 	grid-template-columns: minmax(0, 1fr); /* Note */
 }
 
-.pruefung-cell.ohne-aktion.mit-datum {
-	grid-template-columns: minmax(0, 1fr) 4.75rem; /* Note | Datum */
+.pruefung-cell.without-action.with-datum {
+	grid-template-columns: minmax(0, 1fr) 4.75rem; /* Note | datum */
 }
 
 .pruefung-cell .pruefung-note {
@@ -95,7 +122,7 @@
 	white-space: nowrap;
 }
 
-/* Reason instead of a button, for example, after passing a test */
+/* the reason instead of a button, for example after a pass */
 .pruefung-cell .pruefung-hint {
 	grid-column: 1 / -1;
 	overflow: hidden;
@@ -114,7 +141,7 @@
 	opacity: 0.7;
 }
 
-/* immer in der letzten Spur, auch wenn Note und Datum fehlen (leere Zelle mit "Hinzufuegen") */
+/* always the last track, also in an empty cell with only the add button */
 .pruefung-cell .pruefung-action {
 	grid-column: -2 / -1;
 	display: flex;
@@ -126,7 +153,7 @@
 }
 
 .pruefung-badge::before {
-	content: attr(data-attempt);
+	content: attr(data-antritt);
 	position: absolute;
 	left: 6px;
 	top: 50%;
@@ -144,8 +171,8 @@
 	white-space: nowrap;
 }
 
-.pruefung-badge.attempt-t1::before { background: #0072B2; }
-.pruefung-badge.attempt-t2::before { background: #E69F00; }
-.pruefung-badge.attempt-t3::before { background: #CC79A7; }
-.pruefung-badge.attempt-k::before  { background: #D55E00; }
-.pruefung-badge.attempt-none::before { background: #767676; }
+.pruefung-badge.antritt-1::before    { background: #0072B2; }
+.pruefung-badge.antritt-2::before    { background: #E69F00; }
+.pruefung-badge.antritt-3::before    { background: #CC79A7; }
+.pruefung-badge.antritt-k::before    { background: #D55E00; }
+.pruefung-badge.antritt-none::before { background: #767676; }

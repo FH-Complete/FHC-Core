@@ -2,206 +2,215 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-// Noten, die keinen Prüfungsantritt verbrauchen.
+// The configuration of the Benotungstool. The tool reads two sources:
+//   this file             $this->config->item('KEY')
+//   global.config.inc.php define() flags of the old tool: CIS_GESAMTNOTE_PUNKTE, CIS_GESAMTNOTE_GEWICHTUNG,
+//                         CIS_GESAMTNOTE_FREIGABEMAIL_NOTE, CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE and
+//                         CIS_GESAMTNOTE_PRUEFUNG_TERMIN2/TERMIN3/KOMMPRUEF (see CIS_GESAMTNOTE_MAX_ANTRITTE)
+//
+// The prefixes in this file:
+//   NOTEN_, NOTE_     name a Note by its Bezeichnung. The server finds its key in lehre.tbl_note.
+//   PRUEFUNG_         name a Pruefungstyp from lehre.tbl_pruefungstyp.
+//   CIS_GESAMTNOTE_   the switches and values of the tool.
+//
+// Every key must be present. The code has no default values.
+
+// --- Noten ---------------------------------------------------------------------------------------
+
+// Noten that use no Antritt.
 $config['NOTEN_OHNE_ANTRITT_BEZEICHNUNGEN'] = ['Noch nicht eingetragen', 'entschuldigt'];
 
-// Anrechnungsnoten: die Leistung wurde vorab anerkannt.
+// Anrechnung Noten: an earlier result counts for this LV. As a Zeugnisnote they block every Pruefung.
 $config['NOTEN_ANRECHNUNG_BEZEICHNUNGEN'] = ['angerechnet', 'intern angerechnet'];
 
-// Wie oft eine Note über alle Antritte hinweg vorkommen darf. Schlüssel ist die Bezeichnung.
-$config['NOTEN_OCCURANCE_LIMIT_MAP'] = ['entschuldigt' => 1];
+// How often a Note may occur in the Pruefungen of one student.
+$config['NOTEN_OCCURRENCE_LIMIT_MAP'] = ['entschuldigt' => 1];
 
-// Die Note 'entschuldigt'. Ein entschuldigter Termin bleibt als eigene datierte Zeile erhalten,
-// wenn eine neue Prüfung desselben Typs entsteht.
+// The Note 'entschuldigt'. An addon can report a Pruefung date as entschuldigt.
 $config['NOTE_ENTSCHULDIGT_BEZEICHNUNG'] = 'entschuldigt';
 
-// The maximum number of attempts that count, the first attempt and the kommissionelle attempt
-// included. null derives the number from the old flags:
-//   1 (the original assessment) + TERMIN2 + TERMIN3 + KOMMPRUEF
-// The examination rules permit three attempts. With TERMIN2 and KOMMPRUEF the formula gives 3.
-// An installation with TERMIN3 gets 4, which is one more attempt in the same chain.
+// The Note of a Pruefung without a result.
+$config['NOTE_NICHT_EINGETRAGEN_BEZEICHNUNG'] = 'Noch nicht eingetragen';
+
+// Noten with no better one. They always close the Antritt chain.
+$config['NOTEN_ABSCHLIESSEND_BEZEICHNUNGEN'] = ['Sehr Gut', 'Bestanden', 'Approbiert', 'Erfolgreich absolviert'];
+
+// The order of the Noten, best first. tbl_note.notenwert is NULL everywhere, so the order cannot come
+// from the database. A Note outside this list is not comparable.
+$config['NOTEN_RANGFOLGE_BEZEICHNUNGEN'] = ['Sehr Gut', 'Gut', 'Befriedigend', 'Genügend', 'Nicht Genügend'];
+
+// The order of the Noten in the lists: 'skala' = 1-5 first, then alphabetical; 'bezeichnung' = alphabetical.
+$config['NOTEN_SORTIERUNG'] = 'skala';
+
+// --- Antritte -------------------------------------------------------------------------------------
+
+// The maximum number of Antritte, Antritt 1 and the kommissionelle Pruefung included.
+// null = 1 + CIS_GESAMTNOTE_PRUEFUNG_TERMIN2 + CIS_GESAMTNOTE_PRUEFUNG_TERMIN3 + CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF.
+// The Pruefungsordnung permits three Antritte: TERMIN2 and KOMMPRUEF give 3, TERMIN3 adds one more.
 $config['CIS_GESAMTNOTE_MAX_ANTRITTE'] = null;
 
-// The exam types that take place before a commission.
-$config['PRUEFUNG_KOMMISSIONELL_TYPEN'] = ['kommPruef', 'zusKommPruef'];
+// The Antritt from which the Pruefung is kommissionell:
+//   'letzter'  the last Antritt (CIS_GESAMTNOTE_MAX_ANTRITTE)
+//   0          never
+//   3          from Antritt 3 on
+// A chain of one Antritt is never kommissionell.
+$config['CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT'] = 'letzter';
 
-// The type that the tool writes for the last attempt. The last attempt is always kommissionell.
-$config['PRUEFUNG_TYP_KOMMISSIONELL'] = 'kommPruef';
-
-// The Benotungstool may create the kommissionelle Prüfung itself. Some installations enter it in
-// another tool. The tool SHOWS an existing kommissionelle Prüfung either way; false blocks the
-// creation only: the cell offers no button, and the dialog, the bulk entry and the import refuse
-// the row. The chain then stops one attempt earlier for this tool.
+// The Benotungstool may create the kommissionelle Pruefung. Some installations enter it in the StV.
+// false: the tool shows an existing kommissionelle Pruefung, but it creates none. The chain then ends
+// one Antritt earlier for this tool.
 $config['CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF'] = true;
 
-// Exam types that never use an attempt. A zusKommPruef repeats a kommissionelle Prüfung that had
-// a procedural fault. It stands outside the attempt chain, and the student administration enters
-// it. The examination rules do not describe it.
-$config['PRUEFUNG_TYPEN_OHNE_ANTRITT'] = ['zusKommPruef'];
+// Allow another Antritt after a positive Note. It uses an Antritt like any repeat.
+$config['CIS_GESAMTNOTE_NOTENVERBESSERUNG'] = false;
 
-// Spaltenaufteilung der Prüfungen in der Notentabelle:
-//   'antritt' - eine Spalte je Antrittsnummer, Datum steht in der Zelle (robust bei Einzelterminen)
-//   'datum'   - eine Spalte je Prüfungsdatum (kompakt, wenn ganze Jahrgänge am selben Tag antreten)
-// Nur die Vorgabe; im Tool umschaltbar und pro Benutzer gespeichert.
-$config['CIS_GESAMTNOTE_PRUEFUNGSSPALTEN'] = 'antritt';
+// A worse repeat keeps the better LV-Note. The Pruefung keeps its own Note.
+$config['CIS_GESAMTNOTE_VERBESSERUNG_BESSERE_GEWINNT'] = false;
 
-// Bei der Notenübernahme durch die Assistenz den ersten Antritt als eigene Prüfung anlegen.
+// Create Antritt 1 as its own Pruefung when a Note becomes the LV-Note: the proposal, the import, the
+// Freigabe, and the Notenuebernahme in the StV.
 $config['CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME'] = true;
 
-// availability of the two Benotungstool import flows. When both are true they are shown as
-// separate buttons/dialogs.
-$config['CIS_GESAMTNOTE_PRUEFUNGSIMPORT'] = true;  // dated import that creates a pruefung per row
-$config['CIS_GESAMTNOTE_NOTENIMPORT'] = false;     // classic note-only import (uid + note, no date)
+// --- Pruefungstypen ---------------------------------------------------------------------------------
+// The tool derives the position of a Pruefung from its date. The type marks a kommissionelle Pruefung,
+// sorts old Pruefungen without a date, separates Antritt 1 from a repeat (verlauf.hasRepeat), and feeds
+// the old reports of the StV.
 
-// The grade column of an imported row. false accepts the note itself (the primary key of
-// lehre.tbl_note) only. true also accepts the shorthand from lehre.tbl_note.anmerkung, which the
-// Excel grade list uses for the special grades ('nb', 'ea', 'en').
-$config['CIS_GESAMTNOTE_IMPORT_NOTENKUERZEL'] = false;
+// The Pruefungstypen of a kommissionelle Pruefung.
+$config['PRUEFUNG_KOMMISSIONELL_TYPEN'] = ['kommPruef', 'zusKommPruef'];
 
-// Noteneintragungsfrist (Prüfungsordnung §1): grade/pruefung entry is only permitted up to this
-// deadline. The month/day below is applied to the studiensemester's year:
-//   Sommersemester (SSyyyy) -> deadline in the SAME calendar year   (default 15th November)
-//   Wintersemester (WSyyyy) -> deadline in the FOLLOWING calendar year (default 15th May)
-$config['CIS_GESAMTNOTE_NOTENEINTRAGUNGSFRIST'] = true; // switch to use the window enforcement
-$config['NOTENEINTRAGUNGSFRIST_SS'] = ['month' => 11, 'day' => 15]; // Sommersemester deadline (same year)
-$config['NOTENEINTRAGUNGSFRIST_WS'] = ['month' => 5,  'day' => 15];  // Wintersemester deadline (following year)
+// The Pruefungstyp that the tool writes for a kommissionelle Pruefung.
+$config['PRUEFUNG_TYP_KOMMISSIONELL'] = 'kommPruef';
 
-// --- exam date guards --------------------------------------------------------------------------
+// Pruefungstypen that never use an Antritt. A zusKommPruef repeats a kommissionelle Pruefung with a
+// procedural fault. The StV enters it.
+$config['PRUEFUNG_TYPEN_OHNE_ANTRITT'] = ['zusKommPruef'];
 
-// allow a new exam on the same day as an existing one
-$config['CIS_GESAMTNOTE_TERMIN_GLEICHER_TAG'] = false;
+// The Pruefungstyp that the tool writes for each Antritt. A type that tbl_pruefungstyp does not have
+// is skipped (Termin3 is absent by default).
+$config['PRUEFUNG_TYP_JE_ANTRITT'] = [1 => 'Termin1', 2 => 'Termin2', 3 => 'Termin3'];
 
-// a later exam locks the earlier grade; only its date stays editable
-$config['CIS_GESAMTNOTE_NOTE_SPERRE_BEI_SPAETEREM_TERMIN'] = true;
+// --- Pruefung dates -------------------------------------------------------------------------------
 
-// allow a benotungsdatum in the future
+// Allow a new Pruefung on the day of an existing one.
+$config['CIS_GESAMTNOTE_PRUEFUNG_GLEICHER_TAG'] = false;
+
+// A later Pruefung locks the Note of an earlier one. Its date stays editable.
+$config['CIS_GESAMTNOTE_NOTE_SPERRE_BEI_SPAETERER_PRUEFUNG'] = true;
+
+// Allow a Benotungsdatum in the future: the day of Antritt 1 when the LV-Note is written. A Pruefung
+// may always lie in the future: without a Note it waits for its result.
 $config['CIS_GESAMTNOTE_DATUM_ZUKUNFT'] = false;
 
-// waiting period between two ATTEMPTS in days; a Termin without an attempt does not start it.
+// The minimum number of days between two Antritte. A Pruefung without an Antritt does not count.
 // null = off
 $config['CIS_GESAMTNOTE_ANTRITT_MIN_ABSTAND_TAGE'] = null;
 
-// deadline for the next attempt in days. null = off
+// The maximum number of days between two Antritte. null = off
 $config['CIS_GESAMTNOTE_ANTRITT_MAX_ABSTAND_TAGE'] = null;
 
-// --- when a grade closes the attempt chain -------------------------------------------------------
+// --- Frist ----------------------------------------------------------------------------------------
+// The Frist (Pruefungsordnung §1) is a day in the year of the Studiensemester:
+//   Sommersemester SSyyyy -> the same year
+//   Wintersemester WSyyyy -> the next year
 
-// grades with no better one; they always close the chain. Named, not keyed: tbl_note resolves them
-$config['NOTEN_ABSCHLIESSEND_BEZEICHNUNGEN'] = ['Sehr Gut', 'Bestanden', 'Approbiert', 'Erfolgreich absolviert'];
+$config['NOTENEINTRAGUNGSFRIST_SS'] = ['month' => 11, 'day' => 15];
+$config['NOTENEINTRAGUNGSFRIST_WS'] = ['month' => 5, 'day' => 15];
 
-// allow another attempt after a positive grade (points mode: same grade, more points).
-// it uses up an attempt like any repeat
-$config['CIS_GESAMTNOTE_NOTENVERBESSERUNG'] = false;
-
-// a worse repeat keeps the better LV-Note; the exam row keeps its real grade
-$config['CIS_GESAMTNOTE_VERBESSERUNG_BESSERE_GEWINNT'] = false;
-
-// grade order, best first. tbl_note.notenwert is NULL everywhere, so it cannot be derived.
-// a grade outside this list is not comparable -> last grade wins
-$config['NOTEN_RANGFOLGE_BEZEICHNUNGEN'] = ['Sehr Gut', 'Gut', 'Befriedigend', 'Genügend', 'Nicht Genügend'];
-
-// --- deadlines ------------------------------------------------------------------------------------
-// Two separate questions. Omit a key to inherit CIS_GESAMTNOTE_NOTENEINTRAGUNGSFRIST.
-// Example: exam must happen by 15 Nov, but may be entered later -> PRUEFUNGSDATUM true, EINGABE false
-
-// blocks the time of ENTRY
+// No entry after the Frist.
 $config['CIS_GESAMTNOTE_FRIST_EINGABE'] = true;
 
-// blocks the DATE of the exam
+// No Pruefung date after the Frist.
+// Example: a Pruefung must take place before the Frist, but the Note may come later -> EINGABE false.
 $config['CIS_GESAMTNOTE_FRIST_PRUEFUNGSDATUM'] = true;
 
-// permissions exempt from the ENTRY deadline. The date deadline has no exception: an exam does not
-// happen retroactively. Empty = no exception. Suggested: ['admin', 'lehre/benotungstool_assistenz']
+// Permissions that may enter after the Frist. The Pruefung date has no exception.
+// Example: ['admin', 'lehre/benotungstool_assistenz']
 $config['CIS_GESAMTNOTE_FRIST_AUSNAHME'] = [];
 
-// --- attempt roles and legacy types ---------------------------------------------------------------
+// --- Roles and Freigabe ---------------------------------------------------------------------------
 
-// from which attempt the exam is held before a commission.
-//   'letzter'  the last attempt, whatever the count
-//   0          never
-//   3          from attempt 3 on
-// attempt count comes from CIS_GESAMTNOTE_MAX_ANTRITTE. A chain of one is never kommissionell
-$config['CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT'] = 'letzter';
-
-// legacy pruefungstyp per attempt; Stv still reads that column. A type missing from
-// tbl_pruefungstyp is skipped (Termin3 is absent by default).
-// The kommissionell role overrides this with PRUEFUNG_TYP_KOMMISSIONELL
-$config['PRUEFUNG_TYP_JE_ANTRITT'] = [1 => 'Termin1', 2 => 'Termin2', 3 => 'Termin3'];
-
-// --- roles and release ----------------------------------------------------------------------------
-
-// which permission may do which action. The keys are also the permissions that open the tool.
-//   vorschlag  write the LV-Note via the takeover path
-//   pruefung   create or edit an exam
-//   kommpruef  create the kommissionell attempt (on top of ALLOW_CREATE_KOMMPRUEF)
-//   freigabe   release grades
-//   import     the bulk paths
-// several roles -> union of their actions. Empty matrix = no restriction
+// The actions of each permission. The keys are also the permissions that open the tool.
+//   lvnote     write the LV-Note (the proposal)
+//   pruefung   create or edit a Pruefung
+//   kommpruef  create the kommissionelle Pruefung (also needs CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF)
+//   freigabe   the Freigabe
+//   import     the two imports
+// A user with several permissions gets all their actions.
 $config['CIS_GESAMTNOTE_ROLLENMATRIX'] = [
-	'lehre/benotungstool' => ['vorschlag', 'pruefung', 'kommpruef', 'freigabe', 'import'],
-	'lehre/benotungstool_assistenz' => ['vorschlag', 'pruefung', 'kommpruef', 'freigabe', 'import']
+	'lehre/benotungstool' => ['lvnote', 'pruefung', 'kommpruef', 'freigabe', 'import'],
+	'lehre/benotungstool_assistenz' => ['lvnote', 'pruefung', 'kommpruef', 'freigabe', 'import']
 ];
 
-// a teacher sees only the courses they teach
+// A Lektor sees only the LVs that the Lektor teaches.
 $config['CIS_GESAMTNOTE_LEKTOR_NUR_EIGENE_LV'] = true;
 
-// the release asks for the caller's password
+// The Freigabe asks for the password of the user.
 $config['CIS_GESAMTNOTE_FREIGABE_PASSWORT'] = true;
 
-// the release sends a mail
+// The Freigabe sends a mail.
 $config['CIS_GESAMTNOTE_FREIGABEMAIL'] = true;
 
-// mail recipients. 'studiengang' = the degree programme addresses, 'aufrufer' = the releasing user.
-// an entry containing '@' is a fixed address
+// The recipients of the mail: 'studiengang' = the addresses of the Studiengang, 'aufrufer' = the user.
+// An entry with an '@' is a fixed address.
 $config['CIS_GESAMTNOTE_FREIGABEMAIL_EMPFAENGER'] = ['studiengang', 'aufrufer'];
 
-// Sancho template of the release mail; the body lives in the DB
+// The Sancho template of the mail. The text is in the database.
 $config['CIS_GESAMTNOTE_FREIGABEMAIL_VORLAGE'] = 'Notenfreigabe';
 
-// a released grade is final and refuses any later change
+// A freigegeben LV-Note is final. No path can change it.
 $config['CIS_GESAMTNOTE_FREIGABE_FINAL'] = false;
 
-// a new or edited exam revokes the release (it resets benotungsdatum, which the state compares)
+// A new or changed Pruefung cancels the Freigabe of the LV-Note: it sets the benotungsdatum.
 $config['CIS_GESAMTNOTE_PRUEFUNG_HEBT_FREIGABE_AUF'] = true;
 
-// --- proposal, import, display --------------------------------------------------------------------
+// --- LV-Note and proposal -------------------------------------------------------------------------
 
-// rounding of the partial-grade average. The SMALLER number is the better grade, so the values are
-// named after the grade:
+// An LV-Note must be a Note of the Lehre (tbl_note.lehre).
+$config['CIS_GESAMTNOTE_LVNOTE_NUR_LEHRENOTEN'] = true;
+
+// The proposal stays open after a repeat. false: after a repeat the Lektor changes the LV-Note
+// through the Pruefung.
+$config['CIS_GESAMTNOTE_VORSCHLAG_NACH_WIEDERHOLUNG'] = false;
+
+// The rounding of the Teilnoten average. The smaller number is the better Note:
 //   'kaufmaennisch'  2.5 -> 3
 //   'besser'         2.5 -> 2
 //   'schlechter'     2.1 -> 3
 $config['CIS_GESAMTNOTE_VORSCHLAG_RUNDUNG'] = 'kaufmaennisch';
 
-// decimals of the points average before the grading scale applies
+// The decimals of the Punkte average before the Notenschluessel applies.
 $config['CIS_GESAMTNOTE_VORSCHLAG_PUNKTE_STELLEN'] = 2;
 
-// the takeover path accepts only grades valid in teaching (tbl_note.lehre)
-$config['CIS_GESAMTNOTE_VORSCHLAG_NUR_LEHRENOTEN'] = true;
+// --- Import and display ---------------------------------------------------------------------------
 
-// the takeover path stays open once a repeat exists. false: from then on use the exam dialog
-$config['CIS_GESAMTNOTE_VORSCHLAG_NACH_WIEDERHOLUNG'] = false;
+// The two imports. With both on, the tool shows two buttons.
+$config['CIS_GESAMTNOTE_PRUEFUNGSIMPORT'] = true;   // one Pruefung per row: Kennung, Datum, Note
+$config['CIS_GESAMTNOTE_NOTENIMPORT'] = false;      // one LV-Note per row: Kennung, Note
 
-// grade an empty entry falls back to
-$config['NOTE_NICHT_EINGETRAGEN_BEZEICHNUNG'] = 'Noch nicht eingetragen';
+// The Note column of an import accepts the key of lehre.tbl_note. true also accepts the short form
+// from lehre.tbl_note.anmerkung ('nb', 'ea', 'en') of the Excel Notenliste.
+$config['CIS_GESAMTNOTE_IMPORT_NOTENKUERZEL'] = false;
 
-// import column order. Allowed: 'kennung', 'datum', 'note'
+// The column order of an import. Allowed: 'kennung', 'datum', 'note'.
 $config['CIS_GESAMTNOTE_IMPORT_SPALTEN_NOTEN'] = ['kennung', 'note'];
 $config['CIS_GESAMTNOTE_IMPORT_SPALTEN_PRUEFUNG'] = ['kennung', 'datum', 'note'];
 
-// 'dd.MM.yyyy' or 'yyyy-MM-dd'
+// The date format of an import: 'dd.MM.yyyy' or 'yyyy-MM-dd'.
 $config['CIS_GESAMTNOTE_IMPORT_DATUMSFORMAT'] = 'dd.MM.yyyy';
 
-// stop the bulk path at the first rejected row. false: report it and keep writing the rest
+// An import stops at the first rejected row. false: it reports the row and writes the others.
 $config['CIS_GESAMTNOTE_IMPORT_ABBRUCH'] = false;
 
-// badge in the exam cell; {n} is the attempt number
+// The Pruefung columns of the table. The user can switch the layout; the browser keeps the choice.
+//   'antritt'  one column per Antritt, the date is in the cell
+//   'datum'    one column per Pruefung date
+$config['CIS_GESAMTNOTE_PRUEFUNGSSPALTEN'] = 'antritt';
+
+// The badge in a Pruefung cell; {n} is the Antritt number.
 $config['CIS_GESAMTNOTE_ANTRITT_ZEICHEN'] = [
 	'kommissionell' => '{n}-K',
 	'kommissionell_ohne_antritt' => 'K',
 	'antritt' => '{n}',
 	'ohne_antritt' => '–'
 ];
-
-// grade list order: 'skala' = 1-5 first then alphabetical, 'bezeichnung' = alphabetical only
-$config['NOTEN_SORTIERUNG'] = 'skala';

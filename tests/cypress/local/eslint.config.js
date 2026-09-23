@@ -4,18 +4,15 @@ const pluginCypress = require("eslint-plugin-cypress");
 const prettier = require("eslint-config-prettier");
 
 /**
- * Nur die Cypress-Suite. Der übrige Code des Repos ist älter als dieses Setup; ihn mitzulinten
- * würde hunderte Funde erzeugen, die niemand in dieser Story abarbeitet.
+ * Lint for the Cypress suite only. The rest of the repo is older than this setup.
  *
- * Die no-restricted-syntax-Regeln setzen die Konventionen aus .claude/rules/benotungstool-tests.md durch.
- * Sie sind der Grund für diese Datei: eine Konvention, die kein Werkzeug prüft, zerfällt.
- *
- * Pfade gelten ab dem Repo-Root: `npm run lint` in local/ wechselt dorthin.
+ * The no-restricted-syntax rules check two conventions from tests/cypress/suites/readme_noten.txt.
+ * Paths start at the repo root: `npm run lint` in local/ changes to it first.
  */
 module.exports = [
 	{ ignores: ["tests/cypress/e2e/fhcomplete/**", "tests/cypress/e2e/*.cy.js"] },
 
-	// --- Node-Seite: Tasks, Werkzeuge, Profile, eigener Arbeitsplatz, Konfiguration (CommonJS) ---
+	// --- Node side: tasks, tools, profiles, local tools, configuration (CommonJS) ---
 	{
 		files: ["tests/cypress/{tasks,tools,profiles,suites,local}/**/*.js", "cypress.config.js"],
 		languageOptions: {
@@ -29,7 +26,7 @@ module.exports = [
 		},
 	},
 
-	// --- Browser-Seite: Specs und Support (ES-Module, im Cypress-Runner) ---
+	// --- browser side: specs and support (ES modules in the Cypress runner) ---
 	{
 		files: ["tests/cypress/e2e/**/*.js", "tests/cypress/support/**/*.js"],
 		languageOptions: {
@@ -43,45 +40,41 @@ module.exports = [
 			...pluginCypress.configs.recommended.rules,
 			"no-unused-vars": ["warn", { argsIgnorePattern: "^_", caughtErrors: "none" }],
 
-			/*
-			 * Warnung statt Fehler. Das Muster .clear().type() steckt an vier Stellen im Page
-			 * Object und läuft dort. Drei davon gehören zum Punktemodus, den nur das Profil
-			 * "punkte" ausführt - eine Umstellung wäre hier nicht prüfbar. Für neuen Code
-			 * bleibt der Hinweis sichtbar.
-			 */
+			// warn, not error: four .clear().type() calls in the page object work, and three of them
+			// run only in the Punkte profile, so a change there cannot be tested here
 			"cypress/unsafe-to-chain-command": "warn",
 		},
 	},
 
-	// --- die Konventionen der Suite ---
+	// --- the conventions of the suite ---
 	{
 		files: ["tests/cypress/e2e/specs/**/*.cy.js"],
 		rules: {
 			"no-restricted-syntax": [
 				"error",
 				{
-					// skipIf / require* aus notenConfig.js sind der einzige Weg.
+					// skipIf and the require* helpers are the only way to skip
 					selector: "CallExpression[callee.property.name='skip'][callee.object.type='ThisExpression']",
 					message:
 						"Kein this.skip() im Spec. Nimm skipIf(this, condition, reason) oder einen require*-Helfer aus support/helpers/notenConfig.js.",
 				},
 				{
-					// Die Noten-API zu stubben hebt genau die Serverregeln auf, die die Suite prüft.
+					// a stub of the Noten API removes exactly the server rules that the suite checks
 					selector:
 						"CallExpression[callee.object.name='cy'][callee.property.name='intercept'] > ObjectExpression:has(Property[key.name='body'])",
 					message:
-						"Kein Stub der Noten-API. cy.intercept nur zum Aliasen und Warten, siehe .claude/rules/benotungstool-tests.md.",
+						"Kein Stub der Noten-API. cy.intercept nur zum Aliasen und Warten, siehe tests/cypress/suites/readme_noten.txt.",
 				},
 			],
 		},
 	},
 
-	// notenConfig.js hält die einzige Umsetzung von skip.
+	// notenConfig.js has the only this.skip() call
 	{
 		files: ["tests/cypress/support/helpers/notenConfig.js"],
 		rules: { "no-restricted-syntax": "off" },
 	},
 
-	// muss zuletzt stehen: schaltet alle Stilregeln ab, die Prettier ohnehin setzt
+	// must be last: turns off all style rules that Prettier sets
 	prettier,
 ];

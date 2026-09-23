@@ -7,7 +7,7 @@
  *   node tests/cypress/local/withTunnel.js npm run noten:check
  *   node tests/cypress/local/withTunnel.js npx cypress open
  *
- * The tunnel sets the command’s <PREFIX>_DB_HOST and <PREFIX>_DB_PORT to its local endpoint.
+ * The tunnel sets NOTEN_DB_HOST and NOTEN_DB_PORT of the command to its local end.
  */
 
 const path = require("path");
@@ -16,8 +16,7 @@ const { ensureTunnel, closeTunnel } = require("./sshTunnel");
 
 ["local", "suites"].forEach((dir) => require("dotenv").config({ path: path.join(__dirname, "..", dir, ".env") }));
 
-const PREFIX = process.env.TEST_ENV_PREFIX || "TEST";
-const env = (key) => process.env[`${PREFIX}_${key}`];
+const env = (key) => process.env[`NOTEN_${key}`];
 
 /** Opens the tunnel and redirects the DB values in process.env to it. Provides the function to close it. */
 const openDbTunnel = async () => {
@@ -33,8 +32,8 @@ const openDbTunnel = async () => {
 	});
 	if (!tunnel.tunnelled) throw new Error(`SSH tunnel failed: ${tunnel.reason}`);
 
-	process.env[`${PREFIX}_DB_HOST`] = "127.0.0.1";
-	process.env[`${PREFIX}_DB_PORT`] = String(tunnel.localPort);
+	process.env.NOTEN_DB_HOST = "127.0.0.1";
+	process.env.NOTEN_DB_PORT = String(tunnel.localPort);
 	return closeTunnel;
 };
 
@@ -50,7 +49,7 @@ const main = async () => {
 
 	const close = await openDbTunnel();
 
-	// Strg+C erreicht auch den Befehl; der Tunnel bleibt offen, bis der Befehl endet
+	// Ctrl+C also reaches the command; the tunnel stays open until the command ends
 	process.on("SIGINT", () => {});
 
 	return new Promise((resolve) => {

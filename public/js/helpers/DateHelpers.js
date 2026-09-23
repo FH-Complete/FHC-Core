@@ -75,11 +75,96 @@ export function today() {
 
 	if (zone && typeof luxon !== "undefined")
 	{
-		const jetzt = luxon.DateTime.local().setZone(zone);
-		if (jetzt.isValid) return new Date(jetzt.year, jetzt.month - 1, jetzt.day);
+		const now = luxon.DateTime.local().setZone(zone);
+		if (now.isValid) return new Date(now.year, now.month - 1, now.day);
 	}
 
 	// without the time zone of the instance the browser decides
-	const lokal = new Date();
-	return new Date(lokal.getFullYear(), lokal.getMonth(), lokal.getDate());
+	const local = new Date();
+	return new Date(local.getFullYear(), local.getMonth(), local.getDate());
+}
+
+/**
+ * Date -> 'YYYY-MM-DD' in local time. An API takes the day, never a timestamp.
+ *
+ * @param {Date} date
+ * @returns {string}
+ */
+export function toIsoDate(date) {
+	return `${date.getFullYear()}-${numberPadding(date.getMonth() + 1)}-${numberPadding(date.getDate())}`;
+}
+
+/**
+ * 'YYYY-MM-DD' (a longer string is cut) -> Date at 00:00 local time.
+ *
+ * @param {string} iso
+ * @returns {Date|null}
+ */
+export function parseIsoDate(iso) {
+	const parts = String(iso ?? '').slice(0, 10).split('-');
+	if (parts.length !== 3) return null;
+
+	return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+}
+
+/**
+ * 'YYYY-MM-DD HH:MM:SS' or 'YYYY-MM-DD' -> Date in local time.
+ *
+ * @param {string} timestamp
+ * @returns {Date|null}
+ */
+export function parseTimestamp(timestamp) {
+	if (!timestamp) return null;
+
+	const [datePart, timePart] = String(timestamp).trim().split(' ');
+	const [year, month, day] = (datePart ?? '').split('-').map(Number);
+	if (!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day)) return null;
+
+	const [hour, minute, second] = (timePart ?? '').split(':').map(Number);
+
+	return new Date(year, month - 1, day,
+		Number.isFinite(hour) ? hour : 0,
+		Number.isFinite(minute) ? minute : 0,
+		Number.isFinite(second) ? second : 0);
+}
+
+/**
+ * 'YYYY-MM-DD' (a longer string is cut) -> 'DD.MM.YYYY'. A string operation: no time zone applies.
+ *
+ * @param {string} iso
+ * @returns {string} an empty string for an invalid value
+ */
+export function isoToDmy(iso) {
+	const parts = String(iso ?? '').slice(0, 10).split('-');
+	if (parts.length !== 3) return '';
+
+	return `${parts[2]}.${parts[1]}.${parts[0]}`;
+}
+
+/**
+ * 'DD.MM.YYYY' -> 'YYYY-MM-DD'.
+ *
+ * @param {string} dmy
+ * @returns {string|null} null if the value has another format or the day does not exist (31.02.)
+ */
+export function dmyToIso(dmy) {
+	const match = String(dmy ?? '').trim().match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+	if (!match) return null;
+
+	const [, day, month, year] = match.map(Number);
+	const date = new Date(year, month - 1, day);
+	if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return null;
+
+	return `${match[3]}-${match[2]}-${match[1]}`;
+}
+
+/**
+ * @param {Date} date
+ * @param {number} days
+ * @returns {Date} a new Date, $days later
+ */
+export function addDays(date, days) {
+	const result = new Date(date);
+	result.setDate(result.getDate() + days);
+	return result;
 }

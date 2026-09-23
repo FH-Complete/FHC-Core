@@ -1,21 +1,17 @@
 /**
- * Configuration-dependent specs.
+ * Skip helpers for tests that depend on the configuration.
  *
- * CIS_GESAMTNOTE_PUNKTE is a PHP define() in config/global.config.inc.php and is therefore a
- * property of the INSTANCE, not of the request. A test run cannot switch modes.
- * The suite therefore covers both modes and skips the irrelevant part in each case.
- *
- * For the pipeline, this means: two jobs, each against a single instance. To prevent a job from reporting a pass
- * when in reality everything was skipped, NOTEN_PUNKTE_MODE (‘on’|'off') specifies the expectation.
- * If the instance does not match this, the run fails immediately and with a clear error message.
+ * The configuration of the instance decides which rule branch is active, and a test run cannot switch
+ * it. So a test checks the active branch and skips the other one. A profile in profiles/noten.js
+ * switches the instance to the other branch (readme_noten.txt, section 1).
  */
 
 /**
- * The only way to skip a test. `condition` true -> skip; `reason` explains why.
- * Call within it(function(){...}) / beforeEach(function(){...}), never in an arrow function: an
- * arrow function does not bind `this` and cannot access test.skip().
+ * The only way to skip a test. `condition` true -> skip; `reason` says why.
+ * Call it in it(function () {...}) or beforeEach(function () {...}), never in an arrow function:
+ * an arrow function has no Mocha `this`, so `this.skip()` is not available.
  *
- * The `require*` helpers below each specify a business requirement and, in turn, call `skipIf`.
+ * Each `require*` helper below names one domain precondition and calls `skipIf`.
  */
 export const skipIf = (testContext, condition, reason) => {
 	if (!condition) return;
@@ -23,38 +19,17 @@ export const skipIf = (testContext, condition, reason) => {
 	testContext.skip();
 };
 
-/** Ist der Punktemodus auf dieser Instanz aktiv? */
-export const punkteMode = (ctx) => Boolean(ctx.cisConfig.CIS_GESAMTNOTE_PUNKTE);
+const punkteMode = (ctx) => Boolean(ctx.cisConfig.CIS_GESAMTNOTE_PUNKTE);
 
-/**
- * In before() aufrufen: prüft die Instanz gegen NOTEN_PUNKTE_MODE. Ohne gesetzte Variable
- * (lokaler Lauf) wird nur geloggt.
- */
-export const assertPunkteMode = (ctx) => {
-	const expectedMode = String(Cypress.env("NOTEN_PUNKTE_MODE") || "").toLowerCase();
-	const actualMode = punkteMode(ctx);
-
-	if (expectedMode !== "on" && expectedMode !== "off") {
-		cy.log(`CIS_GESAMTNOTE_PUNKTE = ${actualMode} (NOTEN_PUNKTE_MODE nicht gesetzt)`);
-		return;
-	}
-
-	expect(
-		actualMode,
-		`NOTEN_PUNKTE_MODE=${expectedMode}, die Instanz steht aber auf CIS_GESAMTNOTE_PUNKTE=${actualMode}. ` +
-			"Der Lauf würde sonst grün melden, obwohl der halbe Umfang übersprungen wurde. " +
-			"Flag sitzt in config/global.config.inc.php - cis.config.inc.php wird zu spät geladen.",
-	).to.eq(expectedMode === "on");
-};
-
-/** Skip, wenn der Punktemodus aus ist. Als erste Zeile in beforeEach(function(){...}) aufrufen. */
+/** Skips if the Punkte mode is off. Call it as the first line in beforeEach(function () {...}). */
 export const requirePunkteMode = (testContext, ctx) =>
 	skipIf(testContext, !punkteMode(ctx), "Übersprungen: CIS_GESAMTNOTE_PUNKTE ist aus.");
 
-/**
- * Skip, wenn der Schlüssel aus getCisConfig nicht den Zweig trägt, den der Test prüft. Ein Profil aus
- * tests/cypress/profiles/noten.js schaltet den anderen Zweig ein.
- */
+/** Skips if the Punkte mode is on. */
+export const requireNotenMode = (testContext, ctx) =>
+	skipIf(testContext, punkteMode(ctx), "Übersprungen: CIS_GESAMTNOTE_PUNKTE ist aktiv.");
+
+/** Skips if the getCisConfig key does not have the value that the test needs. */
 export const requireConfig = (testContext, ctx, key, value) =>
 	skipIf(
 		testContext,
@@ -63,11 +38,11 @@ export const requireConfig = (testContext, ctx, key, value) =>
 	);
 
 /**
- * Skip, wenn das Werkzeug keinen zweiten Antritt anlegt. Ohne CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF
- * endet die Kette für das Werkzeug vor dem kommissionellen Antritt.
+ * Skips if the Benotungstool cannot create a repeat (Antritt 2). Without CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF
+ * the chain ends for the Benotungstool before the kommissionelle Pruefung.
  */
-export const requireWiederholung = (testContext, ctx) => {
-	const fromAntritt = ctx.cisConfig.CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT ?? null;
+export const requireRepeat = (testContext, ctx) => {
+	const fromAntritt = ctx.cisConfig.CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT;
 	const creatable =
 		ctx.cisConfig.CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF === false && fromAntritt !== null
 			? Math.min(ctx.maxAntritte, fromAntritt - 1)
@@ -76,12 +51,12 @@ export const requireWiederholung = (testContext, ctx) => {
 };
 
 /**
- * Skip, wenn das Werkzeug keinen kommissionellen Antritt anlegt: die Kette endet ohne Kommission, oder
- * CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF verbietet die Anlage.
+ * Skips if the Benotungstool cannot create the kommissionelle Pruefung: the chain has none, or
+ * CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF forbids it.
  */
 export const requireKommissionellerAntritt = (testContext, ctx) => {
-	const fromAntritt = ctx.cisConfig.CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT ?? null;
-	const creatable = ctx.cisConfig.CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF !== false;
+	const fromAntritt = ctx.cisConfig.CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT;
+	const creatable = ctx.cisConfig.CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF;
 	const possible = creatable && fromAntritt !== null && fromAntritt >= 2 && fromAntritt <= ctx.maxAntritte;
 	skipIf(
 		testContext,
@@ -89,7 +64,3 @@ export const requireKommissionellerAntritt = (testContext, ctx) => {
 		`Übersprungen: kein anlegbarer kommissioneller Antritt (ab ${JSON.stringify(fromAntritt)}, anlegen ${creatable}).`,
 	);
 };
-
-/** Skip, wenn der Punktemodus an ist. */
-export const requireNotenMode = (testContext, ctx) =>
-	skipIf(testContext, punkteMode(ctx), "Übersprungen: CIS_GESAMTNOTE_PUNKTE ist aktiv.");

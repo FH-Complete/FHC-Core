@@ -1,25 +1,18 @@
-// components/Lehre/Benotungstool/NotenlisteLinks.js
-import LehreinheitenModule from '../../DropdownModes/LehreinheitenModule.js';
-
+// The links to the Excel Notenliste of the LV and of each Lehreinheit.
 export const NotenlisteLinks = {
 	name: "NotenlisteLinks",
 	props: {
 		lehrveranstaltung:   { type: Object, default: null },
 		sem_kurzbz:          { type: String, default: null },
+		lehreinheiten:       { type: Array, default: () => [] },
 		selectedLehreinheit: { type: Object, default: null }
 	},
 	computed: {
-		LehreinheitenModule() {
-			return LehreinheitenModule;
-		},
-		lehreinheiten() {
-			// use the teaching unit options that the shared module loaded before
-			const all = LehreinheitenModule.options ?? [];
-			// if the user selected one teaching unit, show only that one
-			if (this.selectedLehreinheit?.lehreinheit_id != null) {
-				return all.filter(le => le.lehreinheit_id === this.selectedLehreinheit.lehreinheit_id);
-			}
-			return all;
+		/** A selected Lehreinheit shows only its own link. */
+		shownLehreinheiten() {
+			if (this.selectedLehreinheit?.lehreinheit_id == null) return this.lehreinheiten;
+
+			return this.lehreinheiten.filter(le => le.lehreinheit_id === this.selectedLehreinheit.lehreinheit_id);
 		},
 		baseUrl() {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root
@@ -30,7 +23,7 @@ export const NotenlisteLinks = {
 			return !!(lv && lv.studiengang_kz != null && lv.lv_semester != null
 				&& lv.lehrveranstaltung_id != null && this.sem_kurzbz);
 		},
-		gesamtUrl() {
+		fullListUrl() {
 			if (!this.ready) return null;
 			return this.buildUrl();
 		}
@@ -53,12 +46,12 @@ export const NotenlisteLinks = {
             <div class="fw-bold mb-2">{{ $capitalize($p.t('benotungstool/c4notenlisten')) }}</div>
 
             <div class="mb-1">
-                <a class="Item" :href="gesamtUrl" target="_blank" rel="noopener">
+                <a class="Item" :href="fullListUrl" target="_blank" rel="noopener">
                     {{ $capitalize($p.t('benotungstool/c4gesamtliste')) }} {{ lehrveranstaltung.lv_bezeichnung }}
                 </a>
             </div>
 
-            <div v-for="le in lehreinheiten" :key="le.lehreinheit_id" class="mb-1" style="padding-left: 1.5rem;">
+            <div v-for="le in shownLehreinheiten" :key="le.lehreinheit_id" class="mb-1" style="padding-left: 1.5rem;">
                 <a class="Item" :href="buildUrl(le.lehreinheit_id)" target="_blank" rel="noopener">
                     {{ le.infoString }}
                 </a>

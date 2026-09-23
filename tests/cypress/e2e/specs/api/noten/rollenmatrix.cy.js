@@ -2,22 +2,21 @@
  * The role matrix: which permission may do which action.
  *
  * Each account asks getCisConfig for its actions. Each action has two tests: one runs when the matrix
- * allows the action, the other when the matrix withholds it. The profile "rollen" withholds the release
- * and the kommissionelle Prüfung from the Assistenz, otherwise the second test never runs.
+ * allows the action, the other when the matrix withholds it. The profile "rollen" withholds the Freigabe
+ * and the kommissionelle Pruefung from the Assistenz, otherwise the second test never runs.
  */
 
-import { expectNotenError, expectNotenSuccess, messageMatchesPhrase } from "../../../../support/helpers/notenErrors";
+import { apiGet, apiPost, loginAsLektor } from "../../../../support/api/notenApi";
+import { expectNotenError, expectNotenSuccess } from "../../../../support/helpers/notenErrors";
 import { requireKommissionellerAntritt, skipIf } from "../../../../support/helpers/notenConfig";
-import { attemptDate, loadNotenContext, requireDbReset } from "../../../../support/helpers/notenTestData";
+import { antrittDate, loadNotenContext, requireDbReset } from "../../../../support/helpers/notenTestData";
 import { addPruefung, givenBaseline } from "../../../../support/helpers/notenScenario";
-
-const NOTEN_API = "/index.ci.php/api/frontend/v1/Noten";
 
 const accounts = () => [
 	{
 		label: "Lektor",
-		user: Cypress.env("NOTEN_TEACHER_USER"),
-		pass: Cypress.env("NOTEN_TEACHER_PASSWORD"),
+		user: Cypress.env("NOTEN_LEKTOR_USER"),
+		pass: Cypress.env("NOTEN_LEKTOR_PASSWORD"),
 	},
 	{
 		label: "Assistenz",
@@ -26,34 +25,30 @@ const accounts = () => [
 	},
 ];
 
-// the first statement of each endpoint checks its action; kommpruef is checked at the kommissionell attempt
+// the first statement of each endpoint checks its action; kommpruef is checked at the kommissionell Antritt
 const ENDPOINT = {
-	vorschlag: "saveNotenvorschlag",
-	pruefung: "saveStudentPruefung",
-	freigabe: "saveStudentenNoten",
-	import: "saveNotenvorschlagBulk",
+	lvnote: "saveLvNote",
+	pruefung: "savePruefung",
+	freigabe: "saveFreigabe",
+	import: "importLvNoten",
 };
 
 /** A call that only reaches the action check. The empty body ends in missingParameters otherwise. */
 const callAction = (auth, action, ctx) =>
-	cy.request({
-		method: "POST",
-		url: `${NOTEN_API}/${ENDPOINT[action]}`,
-		body: { lv_id: ctx.lvId, sem_kurzbz: ctx.semKurzbz },
-		auth,
-		failOnStatusCode: false,
-	});
+	apiPost(ENDPOINT[action], { lv_id: ctx.lvId, sem_kurzbz: ctx.semKurzbz }, auth);
 
-const errorMessages = (response) => ((response.body && response.body.errors) || []).map((e) => e.message);
+const errorCodes = (response) => (response.body?.errors ?? []).map((e) => e.code);
 
 describe("Noten API - die Rollenmatrix", () => {
 	let ctx;
 
 	before(() => {
-		loadNotenContext().then((context) => {
-			ctx = context;
+		loadNotenContext().then((loaded) => {
+			ctx = loaded;
 		});
 	});
+
+	beforeEach(() => loginAsLektor());
 
 	accounts().forEach(({ label, user, pass }) => {
 		describe(label, () => {
@@ -61,20 +56,18 @@ describe("Noten API - die Rollenmatrix", () => {
 			let allowed = [];
 
 			before(function () {
-				skipIf(this, !user || !pass, `Übersprungen: kein Konto für "${label}" in tests/cypress/.env.`);
+				skipIf(this, !user || !pass, `Übersprungen: kein Konto für "${label}" in tests/cypress/suites/.env.`);
 
 				cy.clearAllCookies();
-				cy.request({ method: "GET", url: `${NOTEN_API}/getCisConfig`, auth, failOnStatusCode: false }).then(
-					(response) => {
-						// every account of the suite holds a permission of the matrix; seeder group benotungstool_berechtigungen creates it
-						expect(response.status, `getCisConfig als ${label}`).to.eq(200);
-						allowed = response.body.data.CIS_GESAMTNOTE_AKTIONEN || [];
-						cy.log(`${label} darf: ${JSON.stringify(allowed)}`);
-					},
-				);
+				apiGet("getCisConfig", undefined, auth).then((response) => {
+					// every account of the suite holds a permission of the matrix; seeder group benotungstool_berechtigungen creates it
+					expect(response.status, `getCisConfig als ${label}`).to.eq(200);
+					allowed = response.body.data.CIS_GESAMTNOTE_AKTIONEN || [];
+					cy.log(`${label} darf: ${JSON.stringify(allowed)}`);
+				});
 			});
 
-			// cy.request sends the cookie of the suite user otherwise, and the server prefers the cookie
+			// otherwise the request sends the session cookie of loginAsLektor, and the server prefers the cookie
 			beforeEach(() => cy.clearAllCookies());
 
 			Object.keys(ENDPOINT).forEach((action) => {
@@ -82,10 +75,7 @@ describe("Noten API - die Rollenmatrix", () => {
 					skipIf(this, !allowed.includes(action), `Übersprungen: die Matrix entzieht ${label} "${action}".`);
 
 					callAction(auth, action, ctx).then((res) => {
-						expect(
-							errorMessages(res).some((m) => messageMatchesPhrase(m, "aktionNichtErlaubt")),
-							`${label} darf "${action}": ${JSON.stringify(errorMessages(res))}`,
-						).to.be.false;
+						expect(errorCodes(res), `${label} darf "${action}"`).to.not.include("aktionNichtErlaubt");
 					});
 				});
 
@@ -104,39 +94,37 @@ describe("Noten API - die Rollenmatrix", () => {
 					requireDbReset();
 				});
 
-				/** The suite user builds the chain up to the kommissionell attempt. Returns its date. */
+				/** NOTEN_LEKTOR_USER builds the chain up to the kommissionell Antritt. Returns its date. */
 				const bringToBeforeKommission = () => {
 					const fromAntritt = ctx.cisConfig.CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT;
 
 					givenBaseline(ctx, student());
 					for (let nr = 2; nr < fromAntritt; nr += 1) {
-						addPruefung(ctx, student(), { note: ctx.notes.negativ, datum: attemptDate(ctx, nr - 1) }).then(
+						addPruefung(ctx, student(), { note: ctx.noten.negativ, datum: antrittDate(ctx, nr - 1) }).then(
 							(response) => expectNotenSuccess(response, `Antritt ${nr}`),
 						);
 					}
-					return attemptDate(ctx, fromAntritt - 1);
+					return antrittDate(ctx, fromAntritt - 1);
 				};
 
 				const createKommissionell = (datum) => {
 					const s = student();
-					// the chain requests can leave a session cookie of the suite user
+					// the chain requests can leave a session cookie of NOTEN_LEKTOR_USER
 					cy.clearAllCookies();
-					return cy.request({
-						method: "POST",
-						url: `${NOTEN_API}/saveStudentPruefung`,
-						body: {
-							student_uid: s.uid,
-							note: ctx.notes.negativ,
-							punkte: null,
-							datum,
-							lva_id: ctx.lvId,
-							lehreinheit_id: s.lehreinheit_id,
+					return apiPost(
+						"savePruefung",
+						{
+							lv_id: ctx.lvId,
 							sem_kurzbz: ctx.semKurzbz,
+							student_uid: s.uid,
 							pruefung_id: null,
+							lehreinheit_id: s.lehreinheit_id,
+							datum,
+							note: ctx.noten.negativ,
+							punkte: null,
 						},
 						auth,
-						failOnStatusCode: false,
-					});
+					);
 				};
 
 				it("legt ihn an, wenn die Matrix es erlaubt", function () {
@@ -147,8 +135,10 @@ describe("Noten API - die Rollenmatrix", () => {
 					);
 
 					createKommissionell(bringToBeforeKommission()).then((response) => {
-						const [saved] = expectNotenSuccess(response, `kommissioneller Antritt als ${label}`);
-						expect(saved.pruefungstyp_kurzbz, "der Antritt ist kommissionell").to.eq(
+						const { pruefung } = expectNotenSuccess(response, `kommissioneller Antritt als ${label}`)[
+							student().uid
+						];
+						expect(pruefung.pruefungstyp_kurzbz, "der Antritt ist kommissionell").to.eq(
 							ctx.cisConfig.PRUEFUNG_TYP_KOMMISSIONELL,
 						);
 					});

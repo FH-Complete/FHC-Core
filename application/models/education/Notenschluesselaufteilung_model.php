@@ -13,7 +13,7 @@ class Notenschluesselaufteilung_model extends DB_Model
 	}
 
 	/**
-	 * Gives the grade for the points of a course.
+	 * Gives the Note for the Punkte of an LV.
 	 *
 	 * @param number					$points
 	 * @param integer					$lehrveranstaltung_id
@@ -23,9 +23,9 @@ class Notenschluesselaufteilung_model extends DB_Model
 	 */
 	public function getNote($points, $lehrveranstaltung_id, $studiensemester_kurzbz)
 	{
-		// Without a valid points value you cannot derive a grade. Without this guard the query
-		// builder makes a bad statement from "punkte <=" => null ('punkte' < 'IS' 'NULL'). The
-		// request then fails with HTTP 500 instead of an answer that says "no grade".
+		// Without valid Punkte no Note follows. Without this guard the query builder makes a bad
+		// statement from "punkte <=" => null ('punkte' < 'IS' 'NULL'), and the request fails with
+		// HTTP 500 instead of an answer that says "no Note".
 		if (!is_numeric($points))
 			return success(null);
 

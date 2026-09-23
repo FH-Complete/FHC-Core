@@ -18,49 +18,65 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+// the constructor needs the permissions before CodeIgniter can load a helper
+require_once APPPATH . 'helpers/hlp_benotungstool_helper.php';
+
 use CI3_Events as Events;
 
+/**
+ * The Noten API of the Benotungstool.
+ *
+ * Read:  getCisConfig, getNoten, getBenotungstoolContext, getLvForStudiengang, getLehreinheitenForLv,
+ *        getLektorenForLehreinheit, getStudentenNoten, getNoteByPunkte
+ * Write: saveLvNote, importLvNoten, savePruefung, createPruefungen, importPruefungen, saveFreigabe
+ *
+ * Each write answers { <uid>: row }. A row is { lvgesamtnote, verlauf } plus 'pruefung' for a Pruefung.
+ * A rejected row of a bulk write is { error: { code, message } }. An error that stops the request has
+ * the same code. The code is the phrase key of the message.
+ *
+ * PruefungsverlaufLib holds the rules of the Antritt chain. This class holds access, Frist and Freigabe.
+ * The domain model is in tests/cypress/suites/readme_noten.txt, section 2.
+ */
 class Noten extends FHCAPI_Controller
 {
-	/** tbl_note by PK, read once per request. @see aktiveNoten() */
-	private $aktiveNotenCache = null;
+	/** lehre.tbl_note by key, read once per request. */
+	private $activeNotenCache = null;
 
-	/** The teachers of one Lehreinheit. They do not change during one request. */
-	private $lehrendeCache = array();
+	/** The Lektoren of one Lehreinheit. */
+	private $lektorenCache = array();
 
-	/** The Lehreinheiten of one student in one course. A bulk path asks for them several times. */
-	private $lehreinheitCache = array();
+	/** The Lehreinheiten of one student in one LV. An import asks for them several times. */
+	private $lehreinheitenCache = array();
 
-	/** Transcript grades of one student in one course. This tool never writes them. */
+	/** The Zeugnisnote of one student in one LV. This tool never writes it. */
 	private $zeugnisnoteCache = array();
 
 	public function __construct()
 	{
-		$permissions = self::berechtigungenAusMatrix();
+		$permissions = benotungstoolPermissions();
 		parent::__construct([
-			'getStudentenNoten' => $permissions,
-			'getNoten' => $permissions,
-			'saveStudentenNoten' => $permissions,
-			'getNotenvorschlagStudent' => $permissions,
-			'saveNotenvorschlag' => $permissions,
-			'saveStudentPruefung' => $permissions,
-			'createPruefungen' => $permissions,
-			'saveNotenvorschlagBulk' => $permissions,
-			'savePruefungenBulk' => $permissions,
 			'getCisConfig' => $permissions,
-			'getNoteByPunkte' => $permissions,
+			'getNoten' => $permissions,
 			'getBenotungstoolContext' => $permissions,
-			'getLehreinheitenFuerLv' => $permissions,
-			'getLehrendeFuerLehreinheit' => $permissions,
-			'getLvForStudiengang' => $permissions
+			'getLvForStudiengang' => $permissions,
+			'getLehreinheitenForLv' => $permissions,
+			'getLektorenForLehreinheit' => $permissions,
+			'getStudentenNoten' => $permissions,
+			'getNoteByPunkte' => $permissions,
+			'saveLvNote' => $permissions,
+			'importLvNoten' => $permissions,
+			'savePruefung' => $permissions,
+			'createPruefungen' => $permissions,
+			'importPruefungen' => $permissions,
+			'saveFreigabe' => $permissions
 		]);
 
 		$this->load->library('AuthLib', null, 'AuthLib');
+		$this->load->library('PermissionLib');
 		$this->load->library('PhrasesLib');
 		$this->load->library('PruefungsverlaufLib', null, 'VerlaufLib');
 
-		// Loads LogLib with different debug trace levels to get data of the job that extends this class
-		// It also specify parameters to set database fields
+		// the log entries name this class, its function and its line
 		$this->load->library('LogLib', array(
 			'classIndex' => 5,
 			'functionIndex' => 5,
@@ -72,8 +88,7 @@ class Noten extends FHCAPI_Controller
 				return json_encode($data);
 			}
 		), 'logLib');
-		
-		// Loads phrases system
+
 		$this->loadPhrases([
 			'global',
 			'person',
@@ -82,1473 +97,1030 @@ class Noten extends FHCAPI_Controller
 			'ui',
 			'password'
 		]);
-		
+
 		$this->load->model('education/LePruefung_model', 'LePruefungModel');
+		$this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
 		$this->load->model('education/Lvgesamtnote_model', 'LvgesamtnoteModel');
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 		$this->load->model('education/Notenschluesselaufteilung_model', 'NotenschluesselaufteilungModel');
 		$this->load->model('education/Note_model', 'NoteModel');
+		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
-		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('codex/Mobilitaet_model', 'MobilitaetModel');
 		$this->load->model('organisation/Erhalter_model', 'ErhalterModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 
 		$this->load->config('noten');
 		$this->load->helper('hlp_sancho_helper');
-
 	}
 
-	/**
-	 * POST 'uids', 'datum', optional 'note'/'punkte'. One exam for several students; without a
-	 * grade it writes "Noch nicht eingetragen".
-	 */
-	public function createPruefungen() {
-		// role first: a caller without the action fails on the right, not on missing parameters
-		$this->assertAktion('pruefung');
+	// === Read ===================================================================================
 
-		$payload = $this->getPostJSON();
-
-		if(!property_exists($payload, 'uids') || !property_exists($payload, 'datum')
-			|| !property_exists($payload, 'lva_id') || !property_exists($payload, 'sem_kurzbz')) {
-			$this->terminateWithError($this->p->t('global', 'missingParameters'), 'general');
-		}
-
-		$uids = $payload->uids;
-		$datum = $payload->datum;
-		$lva_id = $payload->lva_id;
-
-		$stsem = $payload->sem_kurzbz;
-
-		// every entry must name a student; the Lehreinheit is optional, the server looks it up
-		if(!is_array($uids) || count($uids) === 0) {
-			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
-		}
-
-		foreach($uids as $student) {
-			if(!is_object($student) || !property_exists($student, 'uid') || isEmptyString($student->uid)) {
-				$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
-			}
-		}
-
-		$this->assertLvAccess($lva_id, $stsem);
-
-		// examination rules: no entry after the grade entry deadline
-		$this->enforceNoteneintragungsfrist($stsem);
-
-		$ret = [];
-
-		$note = property_exists($payload, 'note') ? $payload->note : null;
-		$punkte = property_exists($payload, 'punkte') ? $payload->punkte : null;
-
-		// the points win: the grade comes from the grading scale; points without a grade refuse the entry
-		if(CIS_GESAMTNOTE_PUNKTE && $punkte !== null && $punkte !== '') {
-			$note = $this->noteAusPunkten($punkte, $lva_id, $stsem, implode(', ', array_column($uids, 'uid')));
-			if(is_string($note)) $this->terminateWithError($note, 'general');
-		}
-
-		// without a selection the exam has no grade
-		if($note === null || $note === '') {
-			// config names the grade, the lib resolves it in tbl_note
-			$note = $this->VerlaufLib->getNoteNichtEingetragen();
-			$punkte = null;
-		}
-
-		// the dialog sends the teacher when all selected students share one Lehreinheit
-		$mitarbeiter_uid = property_exists($payload, 'mitarbeiter_uid') ? $payload->mitarbeiter_uid : null;
-
-		// the same core as the dialog; each row gets its own error message
-		foreach ($uids as $student) {
-			$lehreinheit_id = property_exists($student, 'lehreinheit_id') ? $student->lehreinheit_id : null;
-
-			$ret[$student->uid] = $this->savePruefungFuerStudent(
-				null, $student->uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum,
-				$mitarbeiter_uid
-			);
-		}
-
-		$this->logLib->logInfoDB(array('createPruefungen',$ret, getAuthUID(), getAuthPersonId()));
-
-		$this->terminateWithSuccess($ret);
-	}
-
-	/**
-	 * GET, optional 'sem_kurzbz'. Role-determining entry point: a teacher gets their own courses,
-	 * an Assistenz gets the degree programmes they may pick from.
-	 */
-	public function getBenotungstoolContext() {
-		$sem_kurzbz = $this->input->get("sem_kurzbz", TRUE);
-		$lv_id = $this->input->get("lv_id", TRUE); // optional: deep-link target, used to preselect
-
-		$this->load->library('PermissionLib');
-
-		// teachers keep the classic assigned-LV flow; the Studiengang flow is only for Assistenz.
-		// Role determination mirrors assertLvAccess, which scopes each role's actual data
-		// access. A teacher sees the own courses, an assistant sees the entitled degree programmes.
-		$isLektor = $this->permissionlib->isBerechtigt('lehre/benotungstool');
-		$entitledStgs = $this->permissionlib->getSTG_isEntitledFor('lehre/benotungstool_assistenz');
-		$isAssistenz = !$isLektor && is_array($entitledStgs) && count($entitledStgs) > 0;
-
-		$studiengaenge = array();
-		$lehrveranstaltungen = array();
-		$preselectStudiengang_kz = null;
-
-		if (isset($sem_kurzbz) && !isEmptyString($sem_kurzbz)) {
-			if ($isAssistenz) {
-				$result = $this->StudiengangModel->getByStgs($entitledStgs, $sem_kurzbz);
-				if (!isError($result)) $studiengaenge = getData($result) ?? array();
-
-				// deep-link: resolve the Studiengang of the requested LV so the frontend can preselect
-				// the Studiengang dropdown (and then its LV) - only if the Assistenz is entitled for it
-				// only digits are a course id
-				if (isset($lv_id) && ctype_digit((string) $lv_id)) {
-					$res = $this->LehrveranstaltungModel->load($lv_id);
-					if (!isError($res) && hasData($res)) {
-						$stg = getData($res)[0]->studiengang_kz;
-						if (in_array($stg, $entitledStgs)) $preselectStudiengang_kz = $stg;
-					}
-				}
-			} else {
-				$result = $this->LehrveranstaltungModel->getLvForLektorInSemester($sem_kurzbz, getAuthUID());
-				if (!isError($result)) $lehrveranstaltungen = getData($result) ?? array();
-			}
-		}
-
-		$this->terminateWithSuccess(array(
-			'isAssistenz' => $isAssistenz,
-			'studiengaenge' => $studiengaenge,
-			'lehrveranstaltungen' => $lehrveranstaltungen,
-			'preselectStudiengang_kz' => $preselectStudiengang_kz
-		));
-	}
-
-	public function getCisConfig() {
-		// The configuration names the special grades, tbl_note gives their keys. The client compares
-		// keys, therefore the answer carries the resolved keys, never a Bezeichnung.
+	/** GET. The configuration that the client and the tests read. A Note is a key, never a Bezeichnung. */
+	public function getCisConfig()
+	{
 		$special = $this->VerlaufLib->getSpecialNotes();
-		$NOTEN_OHNE_ANTRITT = $special['ohneAntritt'];
-		$NOTEN_OCCURANCE_LIMIT_MAP = $special['limitMap'];
-		$NOTE_ENTSCHULDIGT = $special['entschuldigt'];
-		
-		$this->terminateWithSuccess(
-			array(
-				// show the points during the grade entry
-				'CIS_GESAMTNOTE_PUNKTE' => CIS_GESAMTNOTE_PUNKTE,
-				
-				// basically on/of toggle for the points/grade col and the arrow button
-				'CIS_GESAMTNOTE_UEBERSCHREIBEN' => CIS_GESAMTNOTE_UEBERSCHREIBEN,
-				
-				// only relevant in punkte calculation in backend
-				// 'CIS_GESAMTNOTE_GEWICHTUNG' => CIS_GESAMTNOTE_GEWICHTUNG,
-				
-				// The maximum number of attempts that count in this tool. The server derives it from the
-				// configuration or from the old TERMIN2/TERMIN3 flags. The client does not calculate it.
-				'CIS_GESAMTNOTE_MAX_ANTRITTE' => $this->VerlaufLib->getMaxAntritte(),
 
-				// attempt from which the exam is kommissionell, or null; 'letzter' already resolved
-				'CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT' => $this->VerlaufLib->getKommissionellAbAntritt(),
+		$config = array(
+			// define() flags of the old tool
+			'CIS_GESAMTNOTE_PUNKTE' => CIS_GESAMTNOTE_PUNKTE,
+			'CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE' => CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE,
 
-				// legacy type the kommissionell role writes; Stv reads that column
-				'PRUEFUNG_TYP_KOMMISSIONELL' => $this->config->item('PRUEFUNG_TYP_KOMMISSIONELL'),
+			// values that the server derives
+			'CIS_GESAMTNOTE_MAX_ANTRITTE' => $this->VerlaufLib->getMaxAntritte(),
+			'CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT' => $this->VerlaufLib->getKommissionellFromAntritt(),
+			'CIS_GESAMTNOTE_AKTIONEN' => $this->allowedActions(),
+			'CIS_GESAMTNOTE_FRIST_AUSNAHME_GILT' => $this->hasFristException(),
 
-				// the default column layout ('antritt' or 'datum'); the user can change it in the tool
-				'CIS_GESAMTNOTE_PRUEFUNGSSPALTEN' => $this->config->item('CIS_GESAMTNOTE_PRUEFUNGSSPALTEN'),
-
-				// may this tool CREATE the kommissionelle Prüfung (application/config/noten.php)?
-				// It always shows one that exists.
-				'CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF' => $this->VerlaufLib->darfKommPruefAnlegen(),
-				
-				//technically exists but is never used, could be LE pendant to next flag
-				// 'CIS_GESAMTNOTE_PRUEFUNG_MOODLE_NOTE' => CIS_GESAMTNOTE_PRUEFUNG_MOODLE_NOTE,
-			
-				// basically a toggle for "use teilnoten" and the source is always moodle
-				// setting this to false breaks legacy tool and if that was fixed it wouldnt render any table at all
-				// anyway so not sure why this even is a config at all. placebo at best
-				
-				// toggles availability of the teilnoten column... existas but do we really need this?
-				'CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE' => CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE,
-
-				// availability of the two import flows (application/config/noten.php); when both are
-				// true they are shown separately
-				'CIS_GESAMTNOTE_PRUEFUNGSIMPORT' => $this->config->item('CIS_GESAMTNOTE_PRUEFUNGSIMPORT'),
-				'CIS_GESAMTNOTE_NOTENIMPORT' => $this->config->item('CIS_GESAMTNOTE_NOTENIMPORT'),
-
-				// does an imported row accept the shorthand from tbl_note.anmerkung as the grade?
-				'CIS_GESAMTNOTE_IMPORT_NOTENKUERZEL' => (bool) $this->config->item('CIS_GESAMTNOTE_IMPORT_NOTENKUERZEL'),
-
-				// shape of an imported row and the badge in the exam cell
-				'CIS_GESAMTNOTE_IMPORT_SPALTEN_NOTEN' => $this->config->item('CIS_GESAMTNOTE_IMPORT_SPALTEN_NOTEN'),
-				'CIS_GESAMTNOTE_IMPORT_SPALTEN_PRUEFUNG' => $this->config->item('CIS_GESAMTNOTE_IMPORT_SPALTEN_PRUEFUNG'),
-				'CIS_GESAMTNOTE_IMPORT_DATUMSFORMAT' => $this->config->item('CIS_GESAMTNOTE_IMPORT_DATUMSFORMAT'),
-				'CIS_GESAMTNOTE_ANTRITT_ZEICHEN' => $this->config->item('CIS_GESAMTNOTE_ANTRITT_ZEICHEN'),
-
-				// weighting of the partial grades; server applies, client only shows
-				'CIS_GESAMTNOTE_GEWICHTUNG' => defined('CIS_GESAMTNOTE_GEWICHTUNG') && CIS_GESAMTNOTE_GEWICHTUNG,
-				
-				// send a mail when approving grades
-				'CIS_GESAMTNOTE_FREIGABEMAIL_NOTE' => CIS_GESAMTNOTE_FREIGABEMAIL_NOTE,
-
-				// actions this caller may perform; the client only hides buttons, the server decides
-				'CIS_GESAMTNOTE_AKTIONEN' => $this->erlaubteAktionen(),
-
-				// release: password required, and final?
-				'CIS_GESAMTNOTE_FREIGABE_PASSWORT' => $this->config->item('CIS_GESAMTNOTE_FREIGABE_PASSWORT') !== false,
-				'CIS_GESAMTNOTE_FREIGABE_FINAL' => (bool) $this->config->item('CIS_GESAMTNOTE_FREIGABE_FINAL'),
-
-				// release mail on or off; the test suite releases only without it
-				'CIS_GESAMTNOTE_FREIGABEMAIL' => $this->config->item('CIS_GESAMTNOTE_FREIGABEMAIL') !== false,
-
-				// takeover and release write attempt 1 as an exam row
-				'CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME' => (bool) $this->config->item('CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME'),
-
-				'NOTEN_OHNE_ANTRITT' => $NOTEN_OHNE_ANTRITT,
-
-				'NOTEN_OCCURANCE_LIMIT_MAP' => $NOTEN_OCCURANCE_LIMIT_MAP,
-
-				// pk of the 'entschuldigt' note; used to preserve excused Termine on new pruefung creation
-				'NOTE_ENTSCHULDIGT' => $NOTE_ENTSCHULDIGT,
-
-				// Noteneintragungsfrist window (enforced server-side; also surfaced so the UI can hint at it)
-				'CIS_GESAMTNOTE_NOTENEINTRAGUNGSFRIST' => $this->config->item('CIS_GESAMTNOTE_NOTENEINTRAGUNGSFRIST'),
-
-				// the two deadlines, fallback already resolved
-				'CIS_GESAMTNOTE_FRIST_EINGABE' => $this->fristAktiv('CIS_GESAMTNOTE_FRIST_EINGABE'),
-				'CIS_GESAMTNOTE_FRIST_PRUEFUNGSDATUM' => $this->fristAktiv('CIS_GESAMTNOTE_FRIST_PRUEFUNGSDATUM'),
-
-				// does THIS user carry an entry-deadline exception?
-				'CIS_GESAMTNOTE_FRIST_AUSNAHME_GILT' => $this->darfFristUeberschreiten(),
-
-				// exam date guards; server enforces, client only hides buttons
-				'CIS_GESAMTNOTE_TERMIN_GLEICHER_TAG' => (bool) $this->config->item('CIS_GESAMTNOTE_TERMIN_GLEICHER_TAG'),
-				'CIS_GESAMTNOTE_NOTE_SPERRE_BEI_SPAETEREM_TERMIN' =>
-					$this->config->item('CIS_GESAMTNOTE_NOTE_SPERRE_BEI_SPAETEREM_TERMIN') === null
-						? true
-						: (bool) $this->config->item('CIS_GESAMTNOTE_NOTE_SPERRE_BEI_SPAETEREM_TERMIN'),
-				'CIS_GESAMTNOTE_DATUM_ZUKUNFT' => (bool) $this->config->item('CIS_GESAMTNOTE_DATUM_ZUKUNFT'),
-				'CIS_GESAMTNOTE_ANTRITT_MIN_ABSTAND_TAGE' => $this->config->item('CIS_GESAMTNOTE_ANTRITT_MIN_ABSTAND_TAGE'),
-				'CIS_GESAMTNOTE_ANTRITT_MAX_ABSTAND_TAGE' => $this->config->item('CIS_GESAMTNOTE_ANTRITT_MAX_ABSTAND_TAGE'),
-
-				// when a grade closes the chain; resolved keys, never a Bezeichnung
-				'NOTEN_ABSCHLIESSEND' => $special['abschliessend'],
-				'CIS_GESAMTNOTE_NOTENVERBESSERUNG' => $this->VerlaufLib->darfVerbessern(),
-				'CIS_GESAMTNOTE_VERBESSERUNG_BESSERE_GEWINNT' =>
-					(bool) $this->config->item('CIS_GESAMTNOTE_VERBESSERUNG_BESSERE_GEWINNT'),
-
-				// the remaining rule keys, as the server applies them; the test suite reads a rule only from here
-				'NOTEN_ANRECHNUNG' => $special['anrechnung'],
-				'NOTEN_RANGFOLGE' => $special['rangfolge'],
-				'NOTE_NICHT_EINGETRAGEN' => $special['nichtEingetragen'],
-				'PRUEFUNG_KOMMISSIONELL_TYPEN' => $this->VerlaufLib->getKommissionellTypen(),
-				'PRUEFUNG_TYPEN_OHNE_ANTRITT' => $this->VerlaufLib->getTypenOhneAntritt(),
-				'PRUEFUNG_TYP_JE_ANTRITT' => $this->VerlaufLib->getTypJeAntritt(),
-				'NOTENEINTRAGUNGSFRIST_SS' => $this->fristMonatTag('SS'),
-				'NOTENEINTRAGUNGSFRIST_WS' => $this->fristMonatTag('WS'),
-				'CIS_GESAMTNOTE_FRIST_AUSNAHME' => (array) $this->config->item('CIS_GESAMTNOTE_FRIST_AUSNAHME'),
-				'CIS_GESAMTNOTE_ROLLENMATRIX' => (array) $this->config->item('CIS_GESAMTNOTE_ROLLENMATRIX'),
-				'CIS_GESAMTNOTE_LEKTOR_NUR_EIGENE_LV' => $this->config->item('CIS_GESAMTNOTE_LEKTOR_NUR_EIGENE_LV') !== false,
-				'CIS_GESAMTNOTE_FREIGABEMAIL_EMPFAENGER' => $this->freigabeEmpfaengerEintraege(),
-				'CIS_GESAMTNOTE_FREIGABEMAIL_VORLAGE' => $this->freigabeVorlage(),
-				'CIS_GESAMTNOTE_PRUEFUNG_HEBT_FREIGABE_AUF' => $this->config->item('CIS_GESAMTNOTE_PRUEFUNG_HEBT_FREIGABE_AUF') !== false,
-				'CIS_GESAMTNOTE_VORSCHLAG_RUNDUNG' => $this->rundungsModus(),
-				'CIS_GESAMTNOTE_VORSCHLAG_PUNKTE_STELLEN' => $this->punkteNachkommastellen(),
-				'CIS_GESAMTNOTE_VORSCHLAG_NUR_LEHRENOTEN' => $this->config->item('CIS_GESAMTNOTE_VORSCHLAG_NUR_LEHRENOTEN') !== false,
-				'CIS_GESAMTNOTE_VORSCHLAG_NACH_WIEDERHOLUNG' => $this->config->item('CIS_GESAMTNOTE_VORSCHLAG_NACH_WIEDERHOLUNG') === true,
-				'CIS_GESAMTNOTE_IMPORT_ABBRUCH' => $this->importBrichtAb(),
-				'NOTEN_SORTIERUNG' => $this->config->item('NOTEN_SORTIERUNG') === 'bezeichnung' ? 'bezeichnung' : 'skala'
-			)
+			// the special Noten as keys of lehre.tbl_note
+			'NOTE_ENTSCHULDIGT' => $special['entschuldigt'],
+			'NOTE_NICHT_EINGETRAGEN' => $special['nichtEingetragen'],
+			'NOTEN_OHNE_ANTRITT' => $special['ohneAntritt'],
+			'NOTEN_ANRECHNUNG' => $special['anrechnung'],
+			'NOTEN_ABSCHLIESSEND' => $special['abschliessend'],
+			'NOTEN_OCCURRENCE_LIMIT_MAP' => $special['limitMap']
 		);
+
+		// the values of config/noten.php as they are
+		$keys = array(
+			'CIS_GESAMTNOTE_ALLOW_CREATE_KOMMPRUEF',
+			'CIS_GESAMTNOTE_ANTRITT_MAX_ABSTAND_TAGE',
+			'CIS_GESAMTNOTE_ANTRITT_MIN_ABSTAND_TAGE',
+			'CIS_GESAMTNOTE_ANTRITT_ZEICHEN',
+			'CIS_GESAMTNOTE_DATUM_ZUKUNFT',
+			'CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME',
+			'CIS_GESAMTNOTE_FREIGABE_FINAL',
+			'CIS_GESAMTNOTE_FREIGABE_PASSWORT',
+			'CIS_GESAMTNOTE_FREIGABEMAIL',
+			'CIS_GESAMTNOTE_FREIGABEMAIL_VORLAGE',
+			'CIS_GESAMTNOTE_FRIST_AUSNAHME',
+			'CIS_GESAMTNOTE_FRIST_EINGABE',
+			'CIS_GESAMTNOTE_FRIST_PRUEFUNGSDATUM',
+			'CIS_GESAMTNOTE_IMPORT_DATUMSFORMAT',
+			'CIS_GESAMTNOTE_IMPORT_NOTENKUERZEL',
+			'CIS_GESAMTNOTE_IMPORT_SPALTEN_NOTEN',
+			'CIS_GESAMTNOTE_IMPORT_SPALTEN_PRUEFUNG',
+			'CIS_GESAMTNOTE_LEKTOR_NUR_EIGENE_LV',
+			'CIS_GESAMTNOTE_LVNOTE_NUR_LEHRENOTEN',
+			'CIS_GESAMTNOTE_NOTE_SPERRE_BEI_SPAETERER_PRUEFUNG',
+			'CIS_GESAMTNOTE_NOTENIMPORT',
+			'CIS_GESAMTNOTE_NOTENVERBESSERUNG',
+			'CIS_GESAMTNOTE_PRUEFUNG_GLEICHER_TAG',
+			'CIS_GESAMTNOTE_PRUEFUNG_HEBT_FREIGABE_AUF',
+			'CIS_GESAMTNOTE_PRUEFUNGSIMPORT',
+			'CIS_GESAMTNOTE_PRUEFUNGSSPALTEN',
+			'CIS_GESAMTNOTE_ROLLENMATRIX',
+			'CIS_GESAMTNOTE_VERBESSERUNG_BESSERE_GEWINNT',
+			'CIS_GESAMTNOTE_VORSCHLAG_NACH_WIEDERHOLUNG',
+			'NOTENEINTRAGUNGSFRIST_SS',
+			'NOTENEINTRAGUNGSFRIST_WS',
+			'PRUEFUNG_TYP_KOMMISSIONELL',
+			'PRUEFUNG_TYPEN_OHNE_ANTRITT'
+		);
+		foreach ($keys as $key) $config[$key] = $this->config->item($key);
+
+		$this->terminateWithSuccess($config);
 	}
 
-	/** GET 'lv_id', 'sem_kurzbz'. All Lehreinheiten of the course, for the filter and the grade lists. */
-	public function getLehreinheitenFuerLv() {
-		$lv_id = $this->input->get('lv_id');
-		$sem_kurzbz = $this->input->get('sem_kurzbz');
-
-		$this->assertLvAccess($lv_id, $sem_kurzbz);
-
-		$this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
-		$result = $this->LehreinheitModel->getLehreinheitenForLv($lv_id, $sem_kurzbz);
+	/** GET. All active Noten, in the order of NOTEN_SORTIERUNG. */
+	public function getNoten()
+	{
+		$result = $this->NoteModel->getAllActive($this->config->item('NOTEN_SORTIERUNG'));
 		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result));
 	}
 
 	/**
-	 * GET 'lehreinheit_id', 'lv_id', 'sem_kurzbz'. Teachers of one Lehreinheit; the dialog offers a
-	 * choice when there is more than one.
+	 * GET 'sem_kurzbz', optional 'lv_id' (a deep link). A Lektor gets the own LVs. An Assistenz gets
+	 * the Studiengaenge of the permission, and the Studiengang of the deep link.
 	 */
-	public function getLehrendeFuerLehreinheit() {
-		$lehreinheit_id = $this->input->get('lehreinheit_id');
-		$lv_id = $this->input->get('lv_id');
-		$sem_kurzbz = $this->input->get('sem_kurzbz');
+	public function getBenotungstoolContext()
+	{
+		$sem_kurzbz = $this->input->get('sem_kurzbz', TRUE);
+		$lv_id = $this->input->get('lv_id', TRUE);
 
-		if(!ctype_digit((string) $lehreinheit_id) || !$lv_id || !$sem_kurzbz) {
-			$this->terminateWithError($this->p->t('global', 'missingParameters'), 'general');
+		// the same roles as assertLvAccess
+		$isLektor = $this->permissionlib->isBerechtigt('lehre/benotungstool');
+		$studiengaenge = $this->permissionlib->getSTG_isEntitledFor('lehre/benotungstool_assistenz');
+		$isAssistenz = !$isLektor && is_array($studiengaenge) && count($studiengaenge) > 0;
+
+		$context = array(
+			'isAssistenz' => $isAssistenz,
+			'studiengaenge' => array(),
+			'lehrveranstaltungen' => array(),
+			'preselectStudiengang_kz' => null
+		);
+
+		if (isEmptyString((string) $sem_kurzbz)) $this->terminateWithSuccess($context);
+
+		if (!$isAssistenz) {
+			$result = $this->LehrveranstaltungModel->getLvForLektorInSemester($sem_kurzbz, getAuthUID());
+			if (!isError($result)) $context['lehrveranstaltungen'] = getData($result) ?: array();
+
+			$this->terminateWithSuccess($context);
 		}
+
+		$result = $this->StudiengangModel->getByStgs($studiengaenge, $sem_kurzbz);
+		if (!isError($result)) $context['studiengaenge'] = getData($result) ?: array();
+
+		// the Studiengang of the deep link, if the Assistenz may see it
+		if (ctype_digit((string) $lv_id)) {
+			$result = $this->LehrveranstaltungModel->load($lv_id);
+			if (hasData($result) && in_array(getData($result)[0]->studiengang_kz, $studiengaenge)) {
+				$context['preselectStudiengang_kz'] = getData($result)[0]->studiengang_kz;
+			}
+		}
+
+		$this->terminateWithSuccess($context);
+	}
+
+	/** GET 'studiengang_kz', 'sem_kurzbz'. The LVs of one Studiengang, for the Assistenz. */
+	public function getLvForStudiengang()
+	{
+		$studiengang_kz = $this->input->get('studiengang_kz', TRUE);
+		$sem_kurzbz = $this->input->get('sem_kurzbz', TRUE);
+
+		if (isEmptyString((string) $studiengang_kz) || isEmptyString((string) $sem_kurzbz)) {
+			$this->terminateWithPhrase('global', 'wrongParameters');
+		}
+
+		$studiengaenge = $this->permissionlib->getSTG_isEntitledFor('lehre/benotungstool_assistenz');
+		if (!$this->permissionlib->isBerechtigt('admin')
+			&& (!is_array($studiengaenge) || !in_array($studiengang_kz, $studiengaenge))) {
+			$this->terminateWithPhrase('ui', 'keineBerechtigung');
+		}
+
+		$result = $this->LehrveranstaltungModel->getLvForStudiengangInSemester($sem_kurzbz, $studiengang_kz);
+		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result));
+	}
+
+	/** GET 'lv_id', 'sem_kurzbz'. All Lehreinheiten of the LV, for the filter and the Notenlisten. */
+	public function getLehreinheitenForLv()
+	{
+		$lv_id = $this->input->get('lv_id', TRUE);
+		$sem_kurzbz = $this->input->get('sem_kurzbz', TRUE);
 
 		$this->assertLvAccess($lv_id, $sem_kurzbz);
 
-		// the Lehreinheit must belong to this course
-		$this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
-		$le = $this->LehreinheitModel->loadWhere(array(
+		$result = $this->LehreinheitModel->getLehreinheitenForLv($lv_id, $sem_kurzbz);
+		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result));
+	}
+
+	/** GET 'lehreinheit_id', 'lv_id', 'sem_kurzbz'. The Lektoren of one Lehreinheit; with several, the dialog offers a choice. */
+	public function getLektorenForLehreinheit()
+	{
+		$lehreinheit_id = $this->input->get('lehreinheit_id', TRUE);
+		$lv_id = $this->input->get('lv_id', TRUE);
+		$sem_kurzbz = $this->input->get('sem_kurzbz', TRUE);
+
+		if (!ctype_digit((string) $lehreinheit_id)) $this->terminateWithPhrase('global', 'missingParameters');
+
+		$this->assertLvAccess($lv_id, $sem_kurzbz);
+
+		// the Lehreinheit must belong to this LV
+		$result = $this->LehreinheitModel->loadWhere(array(
 			'lehreinheit_id' => $lehreinheit_id,
 			'lehrveranstaltung_id' => $lv_id,
 			'studiensemester_kurzbz' => $sem_kurzbz
 		));
-		if(!hasData($le)) $this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		if (!hasData($result)) $this->terminateWithPhrase('global', 'wrongParameters');
 
-		$lehrende = array();
-		foreach($this->lehrendeDerLehreinheit($lehreinheit_id) as $l) {
-			$lehrende[] = array(
-				'mitarbeiter_uid' => $l->mitarbeiter_uid,
-				'vorname' => $l->vorname,
-				'nachname' => $l->nachname
+		$lektoren = array();
+		foreach ($this->lektorenOfLehreinheit($lehreinheit_id) as $lektor) {
+			$lektoren[] = array(
+				'mitarbeiter_uid' => $lektor->mitarbeiter_uid,
+				'vorname' => $lektor->vorname,
+				'nachname' => $lektor->nachname
 			);
 		}
 
-		$this->terminateWithSuccess($lehrende);
+		$this->terminateWithSuccess($lektoren);
 	}
 
 	/**
-	 * GET 'studiengang_kz', 'sem_kurzbz'. Courses of one Studiengang for the Assistenz flow; only
-	 * programmes the caller is entitled for.
+	 * GET 'lv_id', 'sem_kurzbz'. One row per student: the Zeugnisnote, the LV-Note, the Teilnoten, the
+	 * proposal and the Verlauf with all Pruefungen. -> { students, domain }
 	 */
-	public function getLvForStudiengang() {
-		$studiengang_kz = $this->input->get("studiengang_kz", TRUE);
-		$sem_kurzbz = $this->input->get("sem_kurzbz", TRUE);
-
-		if (!isset($studiengang_kz) || isEmptyString($studiengang_kz)
-			|| !isset($sem_kurzbz) || isEmptyString($sem_kurzbz)) {
-			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
-		}
-
-		$this->load->library('PermissionLib');
-		$entitledStgs = $this->permissionlib->getSTG_isEntitledFor('lehre/benotungstool_assistenz');
-		$isAdmin = $this->permissionlib->isBerechtigt('admin');
-
-		if (!$isAdmin && (!is_array($entitledStgs) || !in_array($studiengang_kz, $entitledStgs))) {
-			$this->terminateWithError($this->p->t('ui', 'keineBerechtigung'), 'general');
-		}
-
-		$result = $this->LehrveranstaltungModel->getLvForStudiengangInSemester($sem_kurzbz, $studiengang_kz);
-		$data = $this->getDataOrTerminateWithError($result);
-		$this->terminateWithSuccess($data);
-	}
-
-	public function getNoteByPunkte() {
-		$result = $this->getPostJSON();
-		
-		if(!property_exists($result, 'punkte') 
-			|| !property_exists($result, 'lv_id')
-			|| !property_exists($result, 'sem_kurzbz')) {
-			$this->terminateWithError($this->p->t('global', 'missingParameters'), 'general');
-		}
-
-		$punkte = $result->punkte;
-		$lv_id = $result->lv_id;
-		$sem_kurzbz = $result->sem_kurzbz;
-
-		// the grading scale belongs to the course, therefore the same scope as every other endpoint
-		$this->assertLvAccess($lv_id, $sem_kurzbz);
-
-		$result = $this->NotenschluesselaufteilungModel->getNote($punkte, $lv_id, $sem_kurzbz);
-		$data = $this->getDataOrTerminateWithError($result);
-		
-		$this->terminateWithSuccess($data);
-		
-	}
-
-	/**
-	 * GET METHOD
-	 * returns List of all available & active NotenOptions 
-	 */
-	public function getNoten() {
-		$this->load->model('education/Note_model', 'NoteModel');
-
-		// the controller holds the configuration; the model only builds the order
-		$result = $this->NoteModel->getAllActive($this->config->item('NOTEN_SORTIERUNG'));
-		$noten = $this->getDataOrTerminateWithError($result);
-		$this->terminateWithSuccess($noten);
-	}
-
-	/**
-	 * GET METHOD
-	 * should return Notenvorschlag for single Students, not used anywhere but required as per
-	 * https://openproject.technikum-wien.at/projects/fh-complete/work_packages/60873/activity
-	 */
-	public function getNotenvorschlagStudent() {
-		$uid = $this->input->get("uid",TRUE);
-
-		// if uid is missing or empty, fall back to getAuthUID()
-		if ($uid === NULL || trim((string)$uid) === '') {
-			$uid = getAuthUID();
-		}
-
-		$sem_kurzbz = $this->input->get("sem_kurzbz",TRUE);
-		$lv_id = $this->input->get("lv_id",TRUE);
-
-		if ($uid === NULL || trim((string)$uid) === ''
-			|| $sem_kurzbz === NULL || trim((string)$sem_kurzbz) === ''
-			|| $lv_id === NULL || trim((string)$lv_id) === '') {
-			$this->terminateWithError($this->p->t('global', 'missingParameters'), 'general');
-		}
-
-		$this->assertLvAccess($lv_id, $sem_kurzbz);
-		
-
-		$result = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lv_id, $uid, $sem_kurzbz);
-		$data = $this->getDataOrTerminateWithError($result);
-		
-		// TODO: moodle teilnote but it seems they only work for a whole course?
-		
-		// get anw% of student by prestudent_id
-//		$anwresult = $this->getAnwesenheiten($prestudent_ids, $lv_id, $sem_kurzbz);
-
-
-
-		$this->terminateWithSuccess($data);
-	}
-
-	/**
-	 * GET 'lv_id', 'sem_kurzbz'. Students of the course with their grades, the Teilnoten from
-	 * getExternalGrades, the averaged Notenvorschlag and every exam of the semester.
-	 */
-	public function getStudentenNoten() {
-		$lv_id = $this->input->get("lv_id",TRUE);
-		$sem_kurzbz = $this->input->get("sem_kurzbz",TRUE);
-
-		if (!isset($lv_id) || isEmptyString($lv_id)
-			|| !isset($sem_kurzbz) || isEmptyString($sem_kurzbz))
-			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+	public function getStudentenNoten()
+	{
+		$lv_id = $this->input->get('lv_id', TRUE);
+		$sem_kurzbz = $this->input->get('sem_kurzbz', TRUE);
 
 		$this->assertLvAccess($lv_id, $sem_kurzbz);
 
-		// get studenten for lva & sem with zeugnisnote if available
-		$studenten = $this->LehrveranstaltungModel->getStudentsByLv($sem_kurzbz, $lv_id);
-		$studentenData = $this->getDataOrTerminateWithError($studenten);
-		
-		if(count($studentenData) == 0) {
-			$this->terminateWithError($this->p->t('benotungstool', 'c4keineStudentenGefunden'));
-		}
-		
-		$func = function ($value) {
-			return $value->uid;
-		};
-		
-		$grades = array();
-		$student_uids = array_map($func, $studentenData);
+		$students = $this->getDataOrTerminateWithError($this->LehrveranstaltungModel->getStudentsByLv($sem_kurzbz, $lv_id));
 
-		$funcpre = function ($value) {
-			return $value->prestudent_id;
-		};
-		
-		$prestudent_ids = array_map($funcpre, $studentenData);
-		
-		if(count($student_uids) > 0) {
-			$mobres = $this->MobilitaetModel->getMobilityZusatzForUids($student_uids);
-			$mobData = $this->getDataOrTerminateWithError($mobres);
+		// an LV without students is no error; the addons get no empty list
+		if (empty($students)) $this->terminateWithSuccess(array('students' => array(), 'domain' => DOMAIN));
 
-			$result = $this->ErhalterModel->load();
-			$erhalter = getData($result)[0];
-			
-			$erhalter_kz = '9' . sprintf("%03s", $erhalter->erhalter_kz);
-			foreach($mobData as $mob) {
-				$grades[$mob->uid]['mobility_zusatz'] = $this->MobilitaetModel->formatZusatz($mob, $erhalter_kz);
-			}
-		}
-		
-		// All course grades of the course in one query, without the release filter: getLvGesamtNoten()
-		// gives released grades only. The history below needs the same rows.
-		$lvNotenRows = array();
-		$resLvNoten = $this->LvgesamtnoteModel->getByLvStudiensemester($lv_id, $sem_kurzbz);
-		foreach((hasData($resLvNoten) ? getData($resLvNoten) : array()) as $row) $lvNotenRows[$row->student_uid] = $row;
+		$uids = array_column($students, 'uid');
 
-		foreach($student_uids as $uid) {
-			$grades[$uid]['grades'] = [];
+		$lvNoten = $this->lvGesamtnotenByUid($lv_id, $sem_kurzbz);
+		$pruefungen = $this->pruefungenByUid($lv_id, $sem_kurzbz);
+		$teilnoten = $this->teilnotenByUid($uids, $lv_id, $sem_kurzbz);
+		$mobility = $this->mobilityByUid($uids);
+		$anwesenheiten = $this->getAnwesenheiten(array_column($students, 'prestudent_id'), $lv_id, $sem_kurzbz);
+		$notenForPunkte = array();
 
-			$lvgesamtnote = $lvNotenRows[$uid] ?? null;
+		foreach ($students as $student) {
+			$uid = $student->uid;
+			$lvgesamtnote = isset($lvNoten[$uid]) ? $lvNoten[$uid] : null;
 
-			if($lvgesamtnote !== null) {
-				$grades[$uid]['note_lv'] = $lvgesamtnote->note;
-				$grades[$uid]['freigabedatum'] = $lvgesamtnote->freigabedatum;
-				$grades[$uid]['benotungsdatum'] = $lvgesamtnote->benotungsdatum;
-				$grades[$uid]['punkte_lv'] = $lvgesamtnote->punkte;
-			} else {
-				$grades[$uid]['note_lv'] = null;
-				$grades[$uid]['freigabedatum'] = null;
-				$grades[$uid]['benotungsdatum'] = null;
-				$grades[$uid]['punkte_lv'] = null;
-			}
-		}
+			// getStudentsByLv names the Zeugnisnote 'note'
+			$student->zeugnisnote = $student->note;
+			unset($student->note);
 
-		// send $grades reference to moodle addon
-		try {
-			Events::trigger(
-				'getExternalGrades',
-				function & () use (&$grades)
-				{
-					return $grades;
-				},
-				[
-					'lvid' => $lv_id,
-					'stsem' => $sem_kurzbz
-				]
+			$student->lv_note = $lvgesamtnote ? $lvgesamtnote->note : null;
+			$student->lv_punkte = $lvgesamtnote ? $lvgesamtnote->punkte : null;
+			$student->freigabedatum = $lvgesamtnote ? $lvgesamtnote->freigabedatum : null;
+			$student->benotungsdatum = $lvgesamtnote ? $lvgesamtnote->benotungsdatum : null;
+			$student->teilnoten = $teilnoten[$uid];
+			$student->mobility_zusatz = isset($mobility[$uid]) ? $mobility[$uid] : null;
+			// null without the Anwesenheiten addon
+			$student->anwquote = isset($anwesenheiten[$student->prestudent_id]) ? $anwesenheiten[$student->prestudent_id] : null;
+
+			// an LV-Note replaces the proposal
+			$student->proposed_note = $student->lv_note !== null
+				? $student->lv_note
+				: $this->proposeNote($student->teilnoten, $lv_id, $sem_kurzbz, $notenForPunkte);
+
+			$verlauf = $this->VerlaufLib->buildVerlauf(
+				isset($pruefungen[$uid]) ? $pruefungen[$uid] : array(),
+				$student->lv_note,
+				$student->zeugnisnote
 			);
-		} catch (Throwable $t) {
-//			$this->addMeta('throwable', $t->getTrace());
-			$this->addMeta('getExternalGradesError', $t->getMessage());
-		}
-		
-		// assign the anw% to the students in the studentData loop
-		$anwresult = $this->getAnwesenheiten($prestudent_ids, $lv_id, $sem_kurzbz);
-		
-		// calculate the grade proposals from the partial grades
-		$notenJePunkte = array();
-		foreach($studentenData as $student) {
-			
-			// null when the Anwesenheiten addon is absent - the column stays empty in the UI
-			$student->anwquote = $anwresult[$student->prestudent_id] ?? null;
-			
-			$g = $grades[$student->uid]['grades'];
-			$note_lv = $grades[$student->uid]['note_lv'];
-			
-			// overwrite any calculation with lv note once available
-			if(!is_null($note_lv)) {
-				$student->note_vorschlag = $note_lv;
-			} else if(count($g) > 0) {
-				
-				$notensumme = 0;
-				$notensumme_gewichtet = 0;
-				$gewichtsumme = 0;
-				$punktesumme = 0;
-				$punktesumme_gewichtet = 0;
-				$anzahlnoten = 0;
-				foreach($g as $teilnote) {
-					$note = $teilnote['grade'] ?? null;
-					$punkte = $teilnote['points'] ?? null;
-					$gewicht = is_numeric($teilnote['weight'] ?? null) ? $teilnote['weight'] : 0;
-
-					$hatNote = is_numeric($note);
-					$hatPunkte = is_numeric($punkte);
-
-					// A partial entry counts only for the value that the mode uses. A row without a
-					// grade adds zero in the grade mode and still raises the divisor, which makes the
-					// average better than the performance.
-					if(!(CIS_GESAMTNOTE_PUNKTE ? $hatPunkte : $hatNote)) continue;
-
-					if($hatNote) {
-						$notensumme += $note;
-						$notensumme_gewichtet += $note * $gewicht;
-					}
-
-					if($hatPunkte) {
-						$punktesumme += $punkte;
-						$punktesumme_gewichtet += $punkte * $gewicht;
-					}
-
-					$gewichtsumme += $gewicht;
-					$anzahlnoten += 1;
-				}
-				
-				// Without a partial grade that counts there is no average. Without this guard the
-				// division uses zero. PHP 7 gives INF, and INF gives the best grade. PHP 8 stops with
-				// a fatal error and the full grade table stays empty.
-				$gewichtet = defined('CIS_GESAMTNOTE_GEWICHTUNG') && CIS_GESAMTNOTE_GEWICHTUNG;
-				$divisor = $gewichtet ? $gewichtsumme : $anzahlnoten;
-
-				if ($divisor > 0) {
-					if (CIS_GESAMTNOTE_PUNKTE) {
-						$punkte_vorschlag = round(($gewichtet ? $punktesumme_gewichtet : $punktesumme) / $divisor,
-							$this->punkteNachkommastellen());
-						// equal points give an equal grade, so ask the grading scale once for each value
-						if(!array_key_exists((string) $punkte_vorschlag, $notenJePunkte)) {
-							$notenJePunkte[(string) $punkte_vorschlag] = $this->getDataOrTerminateWithError(
-								$this->NotenschluesselaufteilungModel->getNote($punkte_vorschlag, $lv_id, $sem_kurzbz)
-							);
-						}
-						$note_vorschlag = $notenJePunkte[(string) $punkte_vorschlag];
-					} else {
-						$note_vorschlag = $this->rundeNote(($gewichtet ? $notensumme_gewichtet : $notensumme) / $divisor);
-					}
-
-					$student->note_vorschlag = $note_vorschlag;
-				}
-			}
-		}
-		
-		// get all exams with grades of that semester and that course
-		$pruefungen = $this->LePruefungModel->getPruefungenByLvStudiensemester($lv_id, $sem_kurzbz);
-		$pruefungenData = getData($pruefungen);
-
-		// the server derives the history for each student; the client only reads it
-		$proStudent = [];
-		foreach($pruefungenData ?: [] as $p) {
-			$proStudent[$p->student_uid][] = $p;
+			$student->verlauf = $this->verlaufSummary($verlauf, $lvgesamtnote, $student->zeugnisnote);
 		}
 
-		// the transcript grades come with the student list (tbl_zeugnisnote.note)
-		$zeugnisnoten = [];
-		foreach($studentenData as $s) $zeugnisnoten[$s->uid] = $s->note;
+		$this->terminateWithSuccess(array('students' => $students, 'domain' => DOMAIN));
+	}
 
-		$pruefungenAbgeleitet = [];
-		foreach(array_unique(array_merge($student_uids, array_keys($proStudent))) as $uid) {
-			$lvNote = isset($grades[$uid]) ? ($grades[$uid]['note_lv'] ?? null) : null;
-			$verlauf = $this->VerlaufLib->buildVerlauf($proStudent[$uid] ?? [], $lvNote, $zeugnisnoten[$uid] ?? null);
+	/** POST 'punkte', 'lv_id', 'sem_kurzbz'. The Note for the Punkte, from the Notenschluessel of the LV. */
+	public function getNoteByPunkte()
+	{
+		$payload = $this->getPostWith(array('punkte', 'lv_id', 'sem_kurzbz'));
 
-			foreach($verlauf->pruefungen as $p) $pruefungenAbgeleitet[] = $p;
+		$this->assertLvAccess($payload->lv_id, $payload->sem_kurzbz);
 
-			if(isset($grades[$uid])) {
-				// the row comes from the loop above; a second read gives the same answer
-				$grades[$uid]['verlauf'] = $this->verlaufSummary(
-					$verlauf, false, isset($lvNotenRows[$uid]) && $lvNotenRows[$uid] !== null
+		$result = $this->NotenschluesselaufteilungModel->getNote($payload->punkte, $payload->lv_id, $payload->sem_kurzbz);
+		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result));
+	}
+
+	// === Write ==================================================================================
+
+	/**
+	 * POST 'lv_id', 'sem_kurzbz', 'student_uid', 'note', optional 'punkte' and 'datum'. Writes the
+	 * LV-Note, and Antritt 1 on 'datum'. -> { uid: { lvgesamtnote, verlauf } }
+	 */
+	public function saveLvNote()
+	{
+		// the role first: a user without the action gets that answer, not a parameter error
+		$this->assertAction('lvnote');
+
+		$payload = $this->getPostWith(array('lv_id', 'sem_kurzbz', 'student_uid', 'note'));
+
+		$this->assertLvAccess($payload->lv_id, $payload->sem_kurzbz);
+		$this->assertFrist($payload->sem_kurzbz);
+
+		$row = $this->saveLvNoteForStudent(
+			$payload->lv_id, $payload->sem_kurzbz, $payload->student_uid,
+			$payload->note, $this->field($payload, 'punkte'), $this->field($payload, 'datum')
+		);
+		if (isset($row['error'])) $this->terminateWithError($row['error'], 'general');
+
+		$this->terminateWithSuccess(array($payload->student_uid => $row));
+	}
+
+	/**
+	 * POST 'lv_id', 'sem_kurzbz', 'lv_noten' [{ uid, note, punkte }]. The Noten import.
+	 * -> { uid: { lvgesamtnote, verlauf } or { error } }
+	 */
+	public function importLvNoten()
+	{
+		$this->assertAction('import');
+
+		$payload = $this->getPostWith(array('lv_id', 'sem_kurzbz', 'lv_noten'));
+		$this->assertRows($payload->lv_noten);
+
+		$this->assertLvAccess($payload->lv_id, $payload->sem_kurzbz);
+		$this->assertFrist($payload->sem_kurzbz);
+
+		// the switch also hides the button; a direct call must not pass it
+		if (!$this->config->item('CIS_GESAMTNOTE_NOTENIMPORT')) $this->terminateWithPhrase('benotungstool', 'importAusgeschaltet');
+
+		$rows = array();
+		foreach ($payload->lv_noten as $lvNote) {
+			$row = $this->missingPunkteError($lvNote);
+			if ($row === null) {
+				$row = $this->saveLvNoteForStudent(
+					$payload->lv_id, $payload->sem_kurzbz, $lvNote->uid,
+					$this->field($lvNote, 'note'), $this->field($lvNote, 'punkte'), null
 				);
 			}
+
+			$rows[$lvNote->uid] = $row;
+			if (isset($row['error']) && $this->config->item('CIS_GESAMTNOTE_IMPORT_ABBRUCH')) break;
 		}
 
-		$this->terminateWithSuccess(array($studentenData, $pruefungenAbgeleitet, DOMAIN, $grades, $anwresult));
+		$this->terminateWithSuccess($rows);
 	}
 
 	/**
-	 * POST 'sem_kurzbz', 'lv_id', 'student_uid', 'note'. Writes the LV-Note and the benotungsdatum,
-	 * which drives the offen/changed/freigegeben state.
+	 * POST 'lv_id', 'sem_kurzbz', 'student_uid', 'datum' (Y-m-d), 'note', optional 'punkte',
+	 * 'pruefung_id' (set = change this Pruefung), 'lehreinheit_id', 'mitarbeiter_uid'.
+	 * -> { uid: { pruefung, lvgesamtnote, verlauf } }
 	 */
-	public function saveNotenvorschlag() {
-		// role first: a caller without the action fails on the right, not on missing parameters
-		$this->assertAktion('vorschlag');
+	public function savePruefung()
+	{
+		$this->assertAction('pruefung');
 
-		$result = $this->getPostJSON();
+		$payload = $this->getPostWith(array('lv_id', 'sem_kurzbz', 'student_uid', 'datum', 'note'));
 
-		if(!property_exists($result, 'lv_id') || !property_exists($result, 'sem_kurzbz') ||
-			!property_exists($result, 'student_uid') || !property_exists($result, 'note')) {
-			$this->terminateWithError($this->p->t('global', 'missingParameters'), 'general');
-		}
+		$this->assertLvAccess($payload->lv_id, $payload->sem_kurzbz);
+		$this->assertFrist($payload->sem_kurzbz);
 
-		$lv_id = $result->lv_id;
-		$student_uid = $result->student_uid;
-		$sem_kurzbz = $result->sem_kurzbz;
-		$note = $result->note;
-		$punkte = $result->punkte;
+		$row = $this->savePruefungForStudent(
+			$payload->lv_id, $payload->sem_kurzbz, $payload->student_uid, $this->field($payload, 'pruefung_id'), $payload
+		);
+		if (isset($row['error'])) $this->terminateWithError($row['error'], 'general');
 
-		// the day the assessment took place. The dialog sends it, older callers do not.
-		$datum = property_exists($result, 'datum') ? $result->datum : null;
+		$this->terminateWithSuccess(array($payload->student_uid => $row));
+	}
 
-		$this->assertLvAccess($lv_id, $sem_kurzbz);
+	/**
+	 * POST 'lv_id', 'sem_kurzbz', 'students' [{ uid, lehreinheit_id }], 'datum', optional 'note',
+	 * 'punkte', 'mitarbeiter_uid'. One new Pruefung for each student; without a Note it waits for its
+	 * result. -> { uid: { pruefung, lvgesamtnote, verlauf } or { error } }
+	 */
+	public function createPruefungen()
+	{
+		$this->assertAction('pruefung');
 
-		// examination rules: no entry and no change after the grade entry deadline
-		$this->enforceNoteneintragungsfrist($sem_kurzbz);
+		$payload = $this->getPostWith(array('lv_id', 'sem_kurzbz', 'students', 'datum'));
 
-		// only a participant of the course gets a grade
-		if(!$this->lehreinheitenFuerStudent($lv_id, $student_uid, $sem_kurzbz)) {
-			$this->terminateWithError($this->p->t('benotungstool', 'c4pruefungNichtGespeichert', [$student_uid]), 'general');
-		}
+		// each entry names a student; the server finds a missing Lehreinheit
+		$this->assertRows($payload->students);
+		if (count($payload->students) === 0) $this->terminateWithPhrase('global', 'wrongParameters');
 
-		// In the points mode the grading scale decides, not the grade from the client. If not, you
-		// get a course grade that contradicts its own points. Without points there is nothing to
-		// derive (for example a proposal from Moodle partial grades), then the given grade applies.
-		if(CIS_GESAMTNOTE_PUNKTE && $punkte !== null && $punkte !== '') {
-			$abgeleitet = $this->noteAusPunkten($punkte, $lv_id, $sem_kurzbz, $student_uid);
-			if(is_string($abgeleitet)) $this->terminateWithError($abgeleitet, 'general');
-			$note = $abgeleitet;
-		}
+		$this->assertLvAccess($payload->lv_id, $payload->sem_kurzbz);
+		$this->assertFrist($payload->sem_kurzbz);
 
-		$fehler = $this->validateNotenvorschlag($lv_id, $student_uid, $sem_kurzbz, $note);
-		if($fehler !== null) $this->terminateWithError($fehler, 'general');
-
-		$fehler = $this->validateBenotungsdatum($datum, $student_uid, $sem_kurzbz);
-		if($fehler !== null) $this->terminateWithError($fehler, 'general');
-
-		// Der gewählte Tag ist das Datum von Antritt 1, nicht das benotungsdatum. Das benotungsdatum
-		// bleibt der Zeitpunkt der Eingabe, weil die Freigabe es mit dem freigabedatum vergleicht:
-		// ein Tag in der Vergangenheit liesse die geänderte Note als freigegeben erscheinen.
-		$erstantrittDatum = $datum === null || $datum === '' ? date("Y-m-d") : substr((string) $datum, 0, 10);
-		$lvgesamtnote = null;
-
-		// the course grade and attempt 1 are one change
-		$this->sperreStudent($student_uid, $lv_id, $sem_kurzbz);
-
-		$result = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lv_id, $student_uid, $sem_kurzbz);
-
-//		$this->addMeta('LvgesamtnoteModelresult', $result);
-		
-		if(!isError($result) && hasData($result)) {
-			$lvgesamtnote = getData($result)[0];
-			
-			$id = $this->LvgesamtnoteModel->update(
-				[$lvgesamtnote->student_uid, $lvgesamtnote->studiensemester_kurzbz, $lvgesamtnote->lehrveranstaltung_id],
-				array(
-					'note' => $note,
-					'punkte' => $punkte,
-					'benotungsdatum' => date("Y-m-d H:i:s"),
-					'updateamum' => date("Y-m-d H:i:s"),
-					'updatevon' => getAuthUID()
-				)
+		$rows = array();
+		foreach ($payload->students as $student) {
+			$input = (object) array(
+				'datum' => $payload->datum,
+				'note' => $this->field($payload, 'note'),
+				'punkte' => $this->field($payload, 'punkte'),
+				'lehreinheit_id' => $this->field($student, 'lehreinheit_id'),
+				// the dialog sends a Lektor only if all students share one Lehreinheit
+				'mitarbeiter_uid' => $this->field($payload, 'mitarbeiter_uid')
 			);
+			$rows[$student->uid] = $this->savePruefungForStudent($payload->lv_id, $payload->sem_kurzbz, $student->uid, null, $input);
+		}
 
-			$res = null;
-			if($id) {
-				$res = $this->LvgesamtnoteModel->load($id->retval);
-				if(hasData($res)) $lvgesamtnote = getData($res)[0];
+		$this->terminateWithSuccess($rows);
+	}
+
+	/**
+	 * POST 'lv_id', 'sem_kurzbz', 'pruefungen' [{ uid, lehreinheit_id, datum, note, punkte }].
+	 * The Pruefung import: one new Pruefung per row. -> { uid: { pruefung, lvgesamtnote, verlauf } or { error } }
+	 */
+	public function importPruefungen()
+	{
+		$this->assertAction('import');
+
+		$payload = $this->getPostWith(array('lv_id', 'sem_kurzbz', 'pruefungen'));
+		$this->assertRows($payload->pruefungen);
+
+		$this->assertLvAccess($payload->lv_id, $payload->sem_kurzbz);
+		$this->assertFrist($payload->sem_kurzbz);
+
+		// the switch also hides the button; a direct call must not pass it
+		if (!$this->config->item('CIS_GESAMTNOTE_PRUEFUNGSIMPORT')) $this->terminateWithPhrase('benotungstool', 'importAusgeschaltet');
+
+		$rows = array();
+		foreach ($payload->pruefungen as $pruefung) {
+			$row = $this->missingPunkteError($pruefung);
+			if ($row === null) {
+				$row = $this->savePruefungForStudent($payload->lv_id, $payload->sem_kurzbz, $pruefung->uid, null, $pruefung);
 			}
 
-			$this->logLib->logInfoDB(array('saveNotenvorschlag update lv gesamtnote',$res, getAuthUID(), getAuthPersonId()));
-
-		} else if(!isError($result) && !hasData($result)) {
-			$id = $this->LvgesamtnoteModel->insert(
-				array(
-					'student_uid' => $student_uid,
-					'lehrveranstaltung_id' => $lv_id,
-					'studiensemester_kurzbz' => $sem_kurzbz,
-					'note' => $note,
-					'punkte' => $punkte,
-					'mitarbeiter_uid' => $this->benotenderMitarbeiterFuerStudent($lv_id, $student_uid, $sem_kurzbz),
-					'benotungsdatum' => date("Y-m-d H:i:s"),
-					'freigabedatum' => null,
-					'freigabevon_uid' => null,
-					'bemerkung' => null,
-					'updateamum' => null,
-					'updatevon' => null,
-					'insertamum' => date("Y-m-d H:i:s"),
-					'insertvon' => getAuthUID()
-				)
-			);
-			$res = null;
-			if($id) {
-				$res = $this->LvgesamtnoteModel->load($id->retval);
-				if(hasData($res)) $lvgesamtnote = getData($res)[0];
-			}
-
-			$this->logLib->logInfoDB(array('saveNotenvorschlag insert lv gesamtnote',$res, getAuthUID(), getAuthPersonId()));
+			$rows[$pruefung->uid] = $row;
+			if (isset($row['error']) && $this->config->item('CIS_GESAMTNOTE_IMPORT_ABBRUCH')) break;
 		}
 
-		// Ohne geschriebene LV-Note entsteht kein Antritt: eine Prüfung ohne Note ist ein Zustand,
-		// den jeder andere Pfad ablehnt (c4keineLvNoteEingetragen).
-		if($lvgesamtnote === null) {
+		$this->terminateWithSuccess($rows);
+	}
+
+	/**
+	 * POST 'lv_id', 'sem_kurzbz', 'password', 'uids'. The Freigabe of each LV-Note that changed since
+	 * the last Freigabe: sets the freigabedatum, writes Antritt 1 and sends the mail.
+	 * -> { uid: { lvgesamtnote, verlauf } } for each freigegeben LV-Note
+	 */
+	public function saveFreigabe()
+	{
+		$this->assertAction('freigabe');
+
+		$payload = $this->getPostWith(array('lv_id', 'sem_kurzbz', 'password', 'uids'));
+		if (!is_array($payload->uids)) $this->terminateWithPhrase('global', 'wrongParameters');
+
+		// a second factor for a binding Note
+		if ($this->config->item('CIS_GESAMTNOTE_FREIGABE_PASSWORT')
+			&& !$this->AuthLib->checkUserAuthByUsernamePassword(getAuthUID(), $payload->password)->retval) {
+			$this->terminateWithPhrase('password', 'wrongPassword');
+		}
+
+		$this->assertLvAccess($payload->lv_id, $payload->sem_kurzbz);
+		$this->assertFrist($payload->sem_kurzbz);
+
+		// the mail data first: an unknown LV stops the request before any write
+		$mail = $this->prepareFreigabeMail($payload->lv_id, $payload->sem_kurzbz);
+
+		$rows = array();
+		foreach ($payload->uids as $uid) {
+			$row = $this->saveFreigabeForStudent($payload->lv_id, $payload->sem_kurzbz, $uid);
+			if ($row !== null) $rows[$uid] = $row;
+		}
+
+		$this->logLib->logInfoDB(array('saveFreigabe', array_keys($rows), $payload->lv_id, $payload->sem_kurzbz, getAuthUID(), getAuthPersonId()));
+
+		// no mail without a freigegeben LV-Note
+		if ($this->config->item('CIS_GESAMTNOTE_FREIGABEMAIL') && count($rows) > 0) $this->sendFreigabeMail($mail, $rows);
+
+		$this->terminateWithSuccess($rows);
+	}
+
+	// === Write: one student =====================================================================
+
+	/**
+	 * One LV-Note for one student, and Antritt 1 on $datum. saveLvNote and importLvNoten use it.
+	 *
+	 * @param string|null $datum the day of Antritt 1; null = today
+	 * @return array { lvgesamtnote, verlauf } or { error }
+	 */
+	private function saveLvNoteForStudent($lv_id, $sem_kurzbz, $student_uid, $note, $punkte, $datum)
+	{
+		// only a participant of the LV gets a Note
+		if (!$this->lehreinheitenOfStudent($lv_id, $student_uid, $sem_kurzbz)) {
+			return $this->phraseError('benotungstool', 'studentNichtInLv', array($student_uid));
+		}
+
+		// In the Punkte mode the Notenschluessel decides, else the LV-Note contradicts its own Punkte.
+		// Without Punkte (a proposal from Moodle Teilnoten) the given Note applies.
+		if (CIS_GESAMTNOTE_PUNKTE && $punkte !== null && $punkte !== '') {
+			$note = $this->noteFromPunkte($punkte, $lv_id, $sem_kurzbz);
+			if ($note === null) return $this->phraseError('benotungstool', 'c4punkteKeineNoteErmittelt', array($student_uid));
+		}
+
+		// The day is the date of Antritt 1, not the benotungsdatum: the Freigabe compares the
+		// benotungsdatum with the freigabedatum, and a day in the past would look freigegeben.
+		$erstantrittDay = isEmptyString((string) $datum) ? date('Y-m-d') : substr((string) $datum, 0, 10);
+
+		// the checks, the LV-Note and Antritt 1 are one change
+		$this->beginStudentTransaction($student_uid, $lv_id, $sem_kurzbz);
+
+		// the context of the rules, read once inside the lock
+		$zeugnisnote = $this->getZeugnisnote($lv_id, $student_uid, $sem_kurzbz);
+		$lvgesamtnote = $this->getLvGesamtnote($lv_id, $student_uid, $sem_kurzbz);
+		$verlauf = $this->VerlaufLib->getVerlauf($student_uid, $lv_id, $sem_kurzbz, $lvgesamtnote ? $lvgesamtnote->note : null, $zeugnisnote);
+
+		$error = $this->validateLvNote($student_uid, $note, $verlauf, $lvgesamtnote, $zeugnisnote);
+		if ($error === null) $error = $this->validateBenotungsdatum($datum, $student_uid, $sem_kurzbz);
+		if ($error !== null) {
 			$this->db->trans_rollback();
-			$this->terminateWithError($this->p->t('benotungstool', 'c4pruefungNichtGespeichert', [$student_uid]), 'general');
+			return $error;
 		}
 
-		// The course grade IS the first attempt. Write it as its own exam now, or the next exam
-		// becomes attempt 2 and the legacy type of the whole chain moves one place.
-		$this->erstantrittBeiUebernahme($lv_id, $student_uid, $sem_kurzbz, $note, $punkte, $erstantrittDatum);
+		$lvgesamtnote = $lvgesamtnote === null
+			? $this->createLvGesamtnote($lv_id, $student_uid, $sem_kurzbz, $note, $punkte)
+			: $this->updateLvGesamtnote($lvgesamtnote, $note, $punkte, date('Y-m-d H:i:s'));
 
-		if(!$this->entsperreStudent()) {
-			$this->terminateWithError($this->p->t('benotungstool', 'c4pruefungNichtGespeichert', [$student_uid]), 'general');
+		if ($lvgesamtnote === null) {
+			$this->db->trans_rollback();
+			return $this->phraseError('benotungstool', 'lvNoteNichtGespeichert', array($student_uid));
 		}
 
-		// the client shows the new attempt at once, without a reload. The row is the one just written.
-		$lvgesamtnote->verlauf = $this->buildVerlaufSummary($student_uid, $lv_id, $sem_kurzbz, $lvgesamtnote);
+		$this->writeErstantritt($lv_id, $student_uid, $sem_kurzbz, $note, $punkte, $erstantrittDay, PruefungsverlaufLib::SET_DATUM);
 
-		$this->terminateWithSuccess(array($lvgesamtnote));
+		if (!$this->commitStudentTransaction()) return $this->phraseError('benotungstool', 'lvNoteNichtGespeichert', array($student_uid));
+
+		return array(
+			'lvgesamtnote' => $lvgesamtnote,
+			'verlauf' => $this->readVerlaufSummary($student_uid, $lv_id, $sem_kurzbz, $lvgesamtnote)
+		);
 	}
 
 	/**
-	 * POST 'sem_kurzbz', 'lv_id', 'noten'. Bulk saveNotenvorschlag for the CSV import; the answer
-	 * is keyed by uid and holds the course grade or an error per row.
+	 * One Pruefung for one student: check it, write the LV-Note, write the Pruefung. Never the
+	 * Zeugnisnote. Both writes run in one transaction: an LV-Note without its Pruefung is a state that
+	 * no rule describes.
+	 *
+	 * @param mixed    $pruefung_id set = change this Pruefung, null = a new Pruefung
+	 * @param stdClass $input       datum, note, punkte, lehreinheit_id, mitarbeiter_uid
+	 * @return array { pruefung, lvgesamtnote, verlauf } or { error }
 	 */
-	public function saveNotenvorschlagBulk() {
-		// role first: a caller without the action fails on the right, not on missing parameters
-		$this->assertAktion('import');
+	private function savePruefungForStudent($lv_id, $sem_kurzbz, $student_uid, $pruefung_id, $input)
+	{
+		$isNew = isEmptyString((string) $pruefung_id);
+		$note = $this->field($input, 'note');
+		$punkte = $this->field($input, 'punkte');
+		$mitarbeiter_uid = $this->field($input, 'mitarbeiter_uid');
 
-		$result = $this->getPostJSON();
-
-		if(!property_exists($result, 'lv_id') || !property_exists($result, 'sem_kurzbz') ||
-			!property_exists($result, 'noten')) {
-			$this->terminateWithError($this->p->t('global', 'missingParameters'), 'general');
-		}
-		
-		$lv_id = $result->lv_id;
-		$sem_kurzbz = $result->sem_kurzbz;
-		$noten = $result->noten;
-
-		$this->assertLvAccess($lv_id, $sem_kurzbz);
-
-		// examination rules: no entry and no change after the grade entry deadline
-		$this->enforceNoteneintragungsfrist($sem_kurzbz);
-
-		$retLvNoten = [];
-		
-		foreach($noten as $note)
-		{
-			// je Zeile neu: sonst trägt die Variable die Zeile davor, und eine gescheiterte Zeile
-			// meldet die Note der vorherigen Person zurück
-			$lvgesamtnote = null;
-
-			// only a participant of the course gets a grade
-			if(!$this->lehreinheitenFuerStudent($lv_id, $note->uid, $sem_kurzbz)) {
-				$retLvNoten[$note->uid] = $this->p->t('benotungstool', 'c4pruefungNichtGespeichert', [$note->uid]);
-				if($this->importBrichtAb()) break;
-				continue;
-			}
-
-			
-			if(CIS_GESAMTNOTE_PUNKTE) {
-				$abgeleitet = $this->noteAusPunkten($note->punkte, $lv_id, $sem_kurzbz, $note->uid);
-				// no grade can be derived: skip the row, but do not stop the full request
-				if(is_string($abgeleitet)) {
-					$retLvNoten[$note->uid] = $abgeleitet;
-					if($this->importBrichtAb()) break;
-					continue;
-				}
-				$note->note = $abgeleitet;
-			}
-
-			// one bad row must not stop the import, so the message goes into this row
-			$fehler = $this->validateNotenvorschlag($lv_id, $note->uid, $sem_kurzbz, $note->note);
-			if($fehler !== null) {
-				$retLvNoten[$note->uid] = $fehler;
-				// stop here, or keep writing the remaining rows
-				if($this->importBrichtAb()) break;
-				continue;
-			}
-
-			// the course grade and attempt 1 are one change
-			$this->sperreStudent($note->uid, $lv_id, $sem_kurzbz);
-			$result = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lv_id, $note->uid, $sem_kurzbz);
-
-			if(!isError($result) && hasData($result)) {
-				$lvgesamtnote = getData($result)[0];
-
-				$id = $this->LvgesamtnoteModel->update(
-					[$lvgesamtnote->student_uid, $lvgesamtnote->studiensemester_kurzbz, $lvgesamtnote->lehrveranstaltung_id],
-					array(
-						'note' => trim($note->note),
-						'punkte' => $note->punkte,
-						'benotungsdatum' => date("Y-m-d H:i:s"),
-						'updateamum' => date("Y-m-d H:i:s"),
-						'updatevon' => getAuthUID()
-					)
-				);
-
-				$res = null;
-				if($id) {
-					$res = $this->LvgesamtnoteModel->load($id->retval);
-					if(hasData($res)) $lvgesamtnote = getData($res)[0];
-				}
-
-				$this->logLib->logInfoDB(array('saveNotenvorschlagBulk update lv gesamtnote',$res, getAuthUID(), getAuthPersonId()));
-
-			} else if(!isError($result) && !hasData($result)) {
-				$id = $this->LvgesamtnoteModel->insert(
-					array(
-						'student_uid' => $note->uid,
-						'lehrveranstaltung_id' => $lv_id,
-						'studiensemester_kurzbz' => $sem_kurzbz,
-						'note' => trim($note->note),
-						'punkte' => $note->punkte,
-						'mitarbeiter_uid' => $this->benotenderMitarbeiterFuerStudent($lv_id, $note->uid, $sem_kurzbz),
-						'benotungsdatum' => date("Y-m-d H:i:s"),
-						'freigabedatum' => null,
-						'freigabevon_uid' => null,
-						'bemerkung' => null,
-						'updateamum' => null,
-						'updatevon' => null,
-						'insertamum' => date("Y-m-d H:i:s"),
-						'insertvon' => getAuthUID()
-					)
-				);
-				$res = null;
-				if($id) {
-					$res = $this->LvgesamtnoteModel->load($id->retval);
-					if(hasData($res)) $lvgesamtnote = getData($res)[0];
-				}
-
-				$this->logLib->logInfoDB(array('saveNotenvorschlagBulk insert lv gesamtnote',$res, getAuthUID(), getAuthPersonId()));
-			}
-
-			// Ohne geschriebene LV-Note entsteht kein Antritt, und die Zeile meldet den Fehler
-			if($lvgesamtnote === null) {
-				$this->db->trans_rollback();
-				$retLvNoten[$note->uid] = $this->p->t('benotungstool', 'c4pruefungNichtGespeichert', [$note->uid]);
-				continue;
-			}
-
-			// the same rule as the single dialog: the course grade is attempt 1
-			$this->erstantrittBeiUebernahme($lv_id, $note->uid, $sem_kurzbz, trim($note->note), $note->punkte, date("Y-m-d"));
-
-			if(!$this->entsperreStudent()) {
-				$retLvNoten[$note->uid] = $this->p->t('benotungstool', 'c4pruefungNichtGespeichert', [$note->uid]);
-				continue;
-			}
-
-			$lvgesamtnote->verlauf = $this->buildVerlaufSummary($note->uid, $lv_id, $sem_kurzbz, $lvgesamtnote);
-
-			$retLvNoten[$note->uid] = $lvgesamtnote;
+		// in the Punkte mode the Notenschluessel gives the Note
+		if (CIS_GESAMTNOTE_PUNKTE && $punkte !== null && $punkte !== '') {
+			$note = $this->noteFromPunkte($punkte, $lv_id, $sem_kurzbz);
+			if ($note === null) return $this->phraseError('benotungstool', 'c4punkteKeineNoteErmittelt', array($student_uid));
 		}
 
-		$this->terminateWithSuccess($retLvNoten);
-	}
-
-	/**
-	 * POST METHOD
-	 * expects 'lv_id', 'sem_kurzbz', 'pruefungen'
-	 * Bulk variant of saveStudentPruefung, used when importing pruefungsdata from csv with available noten.
-	 */
-	public function savePruefungenBulk() {
-		// role first: a caller without the action fails on the right, not on missing parameters
-		$this->assertAktion('import');
-
-		$result = $this->getPostJSON();
-
-		if(!property_exists($result, 'lv_id') || !property_exists($result, 'sem_kurzbz') ||
-			!property_exists($result, 'pruefungen')) {
-			$this->terminateWithError($this->p->t('global', 'missingParameters'), 'general');
-		}
-
-		$lv_id = $result->lv_id;
-		$sem_kurzbz = $result->sem_kurzbz;
-		$pruefungen = $result->pruefungen;
-
-		$this->assertLvAccess($lv_id, $sem_kurzbz);
-
-		// examination rules: no entry after the grade entry deadline
-		$this->enforceNoteneintragungsfrist($sem_kurzbz);
-
-		$ret = [];
-
-		foreach ($pruefungen as $pruefung) {
-
-			if(CIS_GESAMTNOTE_PUNKTE) {
-				$note = $this->noteAusPunkten($pruefung->punkte, $lv_id, $sem_kurzbz, $pruefung->uid);
-				// no grade can be derived: skip the row, but do not stop the full request
-				if(is_string($note)) {
-					$ret[$pruefung->uid] = $note;
-					if($this->importBrichtAb()) break;
-					continue;
-				}
-				$pruefung->note = $note;
-			}
-
-			// the same as the dialog in the table, but for each import row
-			$ret[$pruefung->uid] = $this->savePruefungFuerStudent(
-				null, $pruefung->uid, $lv_id, $sem_kurzbz, $pruefung->lehreinheit_id,
-				$pruefung->note, $pruefung->punkte, $pruefung->datum,
-				property_exists($pruefung, 'mitarbeiter_uid') ? $pruefung->mitarbeiter_uid : null
-			);
-		}
-
-		$this->logLib->logInfoDB(array('savePruefungenBulk',$ret, getAuthUID(), getAuthPersonId()));
-		
-		$this->terminateWithSuccess($ret);
-	}
-
-	/**
-	 * POST 'lv_id', 'sem_kurzbz', 'password', 'noten'. Releases the grades: sets freigabedatum,
-	 * which drives the offen/changed/freigegeben state, and mails a confirmation table.
-	 */
-	public function saveStudentenNoten() {
-		// role first: a caller without the action fails on the right, not on missing parameters
-		$this->assertAktion('freigabe');
-
-		$result = $this->getPostJSON();
-
-		if(!property_exists($result, 'sem_kurzbz') || !property_exists($result, 'lv_id') || 
-			!property_exists($result, 'password') || !property_exists($result, 'noten')) {
-			$this->terminateWithError($this->p->t('global', 'missingParameters'), 'general');
-		}
-		
-		// second factor for a binding grade; an installation may drop it
-		if($this->config->item('CIS_GESAMTNOTE_FREIGABE_PASSWORT') !== false
-			&& !$this->AuthLib->checkUserAuthByUsernamePassword(getAuthUID(), $result->password)->retval) {
-			$this->terminateWithError($this->p->t('password', 'wrongPassword'), 'general');
-		}
-		
-		$lv_id = $result->lv_id;
-		$sem_kurzbz = $result->sem_kurzbz;
-
-		$this->assertLvAccess($lv_id, $sem_kurzbz);
-
-		$ret = [];
-
-		$res = $this->LehrveranstaltungModel->load($lv_id);
-		if(isError($res) || !hasData($res)) {
-			$this->terminateWithError($this->p->t('benotungstool', 'noValidLvFoundForId', [$lv_id]));
-		}
-
-		$lv = getData($res)[0];
-
-		$studiengang_kz = $lv->studiengang_kz;
-		$res = $this->StudiengangModel->load($studiengang_kz);
-		if(isError($res) || !hasData($res)) {
-			$this->terminateWithError($this->p->t('benotungstool', 'noValidStudiengangFoundForId', [$studiengang_kz]));
-		}
-		$sg = getData($res)[0];
-		$lvaFullName = $sg->kurzbzlang . ' ' . $lv->semester . '.Semester
-					' . $lv->bezeichnung . " - " .$lv->lehrform_kurzbz. " " . $lv->orgform_kurzbz . " - " . $sem_kurzbz;
-		
-		$emails = explode(', ', $sg->email);
-		
-
-		$res = $this->PersonModel->load(getAuthPersonId());
-		if(isError($res) || !hasData($res)) {
-			$this->terminateWithError($this->p->t('benotungstool', 'noValidPersonFoundForId', [getAuthPersonId()]));
-		}
-		$pers = getData($res)[0];
-		$lektorFullName = $pers->anrede.' '.$pers->vorname.' '.$pers->nachname; //.' ('.$pers->kurzbz.')';
-
-		
-		$res = $this->StudienplanModel->getStudienplanByLvaSemKurzbz($lv_id, $sem_kurzbz);
-		$data = getData($res);
-		$studienplan_bezeichnung = '';
-		foreach ($data as $row) {
-			$studienplan_bezeichnung .= $row->bezeichnung . ' ';
-		}
-		$betreff = $this->p->t('benotungstool','notenfreigabe').' ' . $lv->bezeichnung . ' ' . $lv->orgform_kurzbz . ' - ' . $studienplan_bezeichnung;
-		
-		// The mail names the person and the released grade. Both come from the database: a value from
-		// the request could carry markup, and it could name a grade that was never released.
-		$studenten = array();
-		$resStud = $this->LehrveranstaltungModel->getStudentsByLv($sem_kurzbz, $lv_id);
-		if(!isError($resStud) && hasData($resStud)) {
-			foreach(getData($resStud) as $s) $studenten[$s->uid] = $s;
-		}
-		$notenBezeichnungen = $this->aktiveNoten();
-
-		$studlist = "<table border='1'><tr>";
-
-		if (defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE) {
-			$studlist .= "<td><b>" . $this->p->t('person','personenkennzeichen') . "</b></td>\n
-			<td><b>" . $this->p->t('lehre','studiengang') . "</b></td>\n
-			<td><b>" . $this->p->t('benotungstool','c4nachname') . "</b></td>\n
-			<td><b>" . $this->p->t('benotungstool','c4vorname') . "</b></td>\n";
-			if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE) {
-				$studlist .= "<td><b>" . $this->p->t('benotungstool','c4punkte') . "</b></td>\n";
-			}
-			$studlist .= "<td><b>" . $this->p->t('benotungstool','c4grade') . "</b></td>\n";
-			$studlist .= "<td><b>" . $this->p->t('ui','bearbeitetVon') . "</b></td></tr>\n";
-		} else {
-			$studlist .= "<td><b>" . $this->p->t('person','uid') . "</b></td></tr>\n";
-		}
-		
-		foreach($result->noten as $note) {
-
-			// read, release and attempt 1 are one change
-			$this->sperreStudent($note->uid, $lv_id, $sem_kurzbz);
-
-			$resultLVGes = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lv_id, $note->uid, $sem_kurzbz);
-			if (!isError($resultLVGes) && hasData($resultLVGes))
-			{
-				$lvgesamtnote = getData($resultLVGes)[0];
-
-				// only what changed since the last release; same as the old tool
-				if ($lvgesamtnote->benotungsdatum > $lvgesamtnote->freigabedatum)
-				{
-
-					$id = $this->LvgesamtnoteModel->update(
-						[$lvgesamtnote->student_uid, $lvgesamtnote->studiensemester_kurzbz, $lvgesamtnote->lehrveranstaltung_id],
-						array(
-							'note' => $lvgesamtnote->note,
-							'freigabevon_uid' => getAuthUID(),
-							'freigabedatum' => date("Y-m-d H:i:s"),
-							'updateamum' => date("Y-m-d H:i:s"),
-							'updatevon' => getAuthUID()
-						)
-					);
-
-					if($id) {
-						$res = $this->LvgesamtnoteModel->load($id->retval);
-						if(hasData($res)) {
-							$lvgesamtnote = getData($res)[0];
-
-							// The release makes the grade binding, therefore the first exam starts
-							// here. A new exam never creates a second exam in addition.
-							$this->upsertErstantritt(
-								$lv_id, $lvgesamtnote->student_uid, $sem_kurzbz,
-								$lvgesamtnote->note, $lvgesamtnote->punkte, $lvgesamtnote->benotungsdatum
-							);
-
-							// The verlauf goes back with the answer, so the table shows the new exam
-							// at once. Without it the row updates only after a reload.
-							$ret[] = array(
-								'uid' => $note->uid,
-								'freigabedatum' => $lvgesamtnote->freigabedatum,
-								'benotungsdatum' => $lvgesamtnote->benotungsdatum,
-								// the row is the one the release just wrote
-								'verlauf' => $this->buildVerlaufSummary($note->uid, $lv_id, $sem_kurzbz, $lvgesamtnote)
-							);
-						}
-					}
-					 
-					if (defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE)
-					{
-						$stud = isset($studenten[$note->uid]) ? $studenten[$note->uid] : null;
-
-						$noteKey = (string) $lvgesamtnote->note;
-						$noteBez = isset($notenBezeichnungen[$noteKey])
-							? $notenBezeichnungen[$noteKey]->bezeichnung
-							: $noteKey;
-
-						$studlist .= "<tr><td>" . $this->mailZelle($stud ? $stud->matrikelnr : $note->uid) . "</td>";
-						$studlist .= "<td>" . $this->mailZelle($stud ? $stud->kuerzel : '') . "</td>";
-						$studlist .= "<td>" . $this->mailZelle($stud ? $stud->nachname : '') . "</td>";
-						$studlist .= "<td>" . $this->mailZelle($stud ? $stud->vorname : '') . "</td>";
-
-						if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE) {
-							$studlist .= "<td>" . $this->mailZelle($lvgesamtnote->punkte) . "</td>";
-						}
-						$studlist .= "<td>" . $this->mailZelle($noteBez) . "</td>";
-
-						$studlist .= "<td>" . $this->mailZelle($lvgesamtnote->mitarbeiter_uid);
-						if ($lvgesamtnote->updatevon != '')
-							$studlist .= " (" . $this->mailZelle($lvgesamtnote->updatevon) . ")";
-						$studlist .= "</td></tr>";
-					} else {
-						$studlist .= "<tr><td>" . $this->mailZelle($note->uid) . "</td></tr>\n";
-					}
-				}
-			}
-
-			$this->entsperreStudent();
-		}
-		$studlist .= "</table>";
-
-		$this->logLib->logInfoDB(array('saveStudentenNoten', array(
-			'updatevon' => getAuthUID(),
-			'updateamum' => date('Y-m-d H:i:s')
-		), getAuthUID(), getAuthPersonId(), array($result->noten, $lv_id, $sem_kurzbz)));
-		
-		// config toggles the mail itself; FREIGABEMAIL_NOTE toggles how much it carries
-		if($this->config->item('CIS_GESAMTNOTE_FREIGABEMAIL') !== false) {
-			$this->sendFreigabeEmail($lektorFullName, $lvaFullName, count($result->noten), $emails, $studlist, $betreff);
-		}
-		
-		$this->terminateWithSuccess($ret);
-	}
-
-	/**
-	 * POST 'datum' (YYYY-MM-DD), 'lva_id', 'student_uid', 'note'. Inserts or updates one exam and
-	 * the course grade. Never writes the Zeugnisnote - Stv does that.
-	 */
-	public function saveStudentPruefung() { // einzelne pruefung speichern
-		// role first: a caller without the action fails on the right, not on missing parameters
-		$this->assertAktion('pruefung');
-
-		$result = $this->getPostJSON();
-
-		if(!property_exists($result, 'datum') || !property_exists($result, 'lva_id') ||
-			!property_exists($result, 'student_uid') || !property_exists($result, 'note')) {
-			$this->terminateWithError($this->p->t('global', 'missingParameters'), 'general');
-		}
-
-		$student_uid = $result->student_uid;
-		$note = $result->note;
-		$punkte = $result->punkte;
-		$datum = $result->datum;
-		$lva_id = $result->lva_id;
-		$lehreinheit_id = $result->lehreinheit_id;
-		// pruefung_id identifies the record being edited; null when a new pruefung is added
-		$pruefung_id = property_exists($result, 'pruefung_id') ? $result->pruefung_id : null;
-
-		$stsem = $result->sem_kurzbz;
-
-		$this->assertLvAccess($lva_id, $stsem);
-
-		// examination rules: no entry and no change after the grade entry deadline
-		$this->enforceNoteneintragungsfrist($stsem);
-
-		$jetzt = date("Y-m-d H:i:s");
-
-		if(CIS_GESAMTNOTE_PUNKTE && $punkte !== null && $punkte !== '') {
-			// the grading scale decides; points without a grade refuse the entry, as in the bulk paths
-			$note = $this->noteAusPunkten($punkte, $lva_id, $stsem, $student_uid);
-			if(is_string($note)) $this->terminateWithError($note, 'general');
-			
-		}
-
-		// TODO: more sophisticated empty check
-		if($note=='') {
-			// config names the grade, the lib resolves it in tbl_note
+		// without a Note the Pruefung waits for its result
+		if ($note === null || $note === '') {
 			$note = $this->VerlaufLib->getNoteNichtEingetragen();
+			$punkte = null;
 		}
 
-		// the dialog sends the teacher when the Lehreinheit has more than one
-		$mitarbeiter_uid = property_exists($result, 'mitarbeiter_uid') ? $result->mitarbeiter_uid : null;
-
-		$result = $this->savePruefungFuerStudent($pruefung_id, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum, $mitarbeiter_uid);
-
-		// validation errors and write errors come back as a translated message
-		if(is_string($result)) $this->terminateWithError($result, 'general');
-
-		$savedPruefung = $result['savedPruefung'] ?? [];
-		$savedPruefungData = count($savedPruefung) > 0 ? $savedPruefung[0] : null;
-		$lvgesamtnote = $result['lvgesamtnote'] ?? null;
-
-		$this->terminateWithSuccess(array($savedPruefungData, $lvgesamtnote, $result['verlauf'] ?? null));
-	}
-
-	/** Active grades by PK; getNoten() sends the client the same set. @return array note => tbl_note row */
-	private function aktiveNoten()
-	{
-		if($this->aktiveNotenCache !== null) return $this->aktiveNotenCache;
-
-		$this->aktiveNotenCache = array();
-
-		$result = $this->NoteModel->getAllActive($this->config->item('NOTEN_SORTIERUNG'));
-		if(!isError($result) && hasData($result)) {
-			foreach(getData($result) as $n) $this->aktiveNotenCache[(string)$n->note] = $n;
+		// the rules compare Y-m-d strings; another format breaks the order of the Antritte
+		$datum = substr((string) $this->field($input, 'datum'), 0, 10);
+		$parsed = DateTime::createFromFormat('Y-m-d', $datum);
+		if (!$parsed || $parsed->format('Y-m-d') !== $datum) {
+			return $this->phraseError('benotungstool', 'pruefungsdatumUngueltig', array($student_uid));
 		}
 
-		return $this->aktiveNotenCache;
-	}
+		// §7 and §11: each Pruefung takes place before the Frist
+		$error = $this->pruefungDatumFristError($sem_kurzbz, $datum, $student_uid);
+		if ($error !== null) return $error;
 
-	/** Stops the request when no role of the caller carries this action. */
-	private function assertAktion($aktion)
-	{
-		if ($this->darfAktion($aktion)) return;
+		// the Lehreinheit decides the LV of the Pruefung: only one of this student in this LV
+		$lehreinheiten = $this->lehreinheitenOfStudent($lv_id, $student_uid, $sem_kurzbz);
+		if (!$lehreinheiten) return $this->phraseError('benotungstool', 'studentNichtInLv', array($student_uid));
+		$index = array_search($this->field($input, 'lehreinheit_id'), $lehreinheiten);
+		$lehreinheit_id = $lehreinheiten[$index === false ? 0 : $index];
 
-		$this->terminateWithError($this->p->t('benotungstool', 'aktionNichtErlaubt', [$aktion]), 'general');
-	}
+		// the addon runs before the transaction: a failed addon query would abort it
+		$entschuldigt = $this->entschuldigtNoteFromAddon($student_uid, $datum);
 
-	/**
-	 * Scopes access so a guessed URL cannot reach foreign grades: a teacher only their own courses
-	 * in that Studiensemester, an Assistenz the courses of a Studiengang they are entitled for.
-	 *
-	 * The Studiensemester is mandatory. Without it a teacher who taught the course in ANY semester
-	 * passes the check for every semester.
-	 */
-	private function assertLvAccess($lv_id, $sem_kurzbz)
-	{
-		// an empty id widens load() and the model filters to all courses
-		if(!ctype_digit((string) $lv_id) || (int) $lv_id < 1 || !is_string($sem_kurzbz) || trim($sem_kurzbz) === '') {
-			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		$this->beginStudentTransaction($student_uid, $lv_id, $sem_kurzbz);
+
+		// the context of the rules, read once inside the lock
+		$zeugnisnote = $this->getZeugnisnote($lv_id, $student_uid, $sem_kurzbz);
+		$lvgesamtnote = $this->getLvGesamtnote($lv_id, $student_uid, $sem_kurzbz);
+		$lvNote = $lvgesamtnote ? $lvgesamtnote->note : null;
+		$verlauf = $this->VerlaufLib->getVerlauf($student_uid, $lv_id, $sem_kurzbz, $lvNote, $zeugnisnote);
+
+		$error = $this->validatePruefung($student_uid, $pruefung_id, $note, $datum, $verlauf, $lvgesamtnote, $zeugnisnote);
+		if ($error !== null) {
+			$this->db->trans_rollback();
+			return $error;
 		}
 
-		$this->load->library('PermissionLib');
+		// An LV-Note without a Pruefung is Antritt 1: the proposal ran without
+		// CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME, or the Note is older than this tool. Write it now.
+		if ($isNew && count($verlauf->pruefungen) === 0 && $verlauf->implicitErstantritt) {
+			// Antritt 1 stays before the new Pruefung, which can be older than the benotungsdatum
+			$lvNoteDay = substr((string) $lvgesamtnote->benotungsdatum, 0, 10);
+			$erstantrittDay = ($lvNoteDay !== '' && $lvNoteDay < $datum) ? $lvNoteDay : date('Y-m-d', strtotime($datum . ' -1 day'));
 
-		// admins keep full access
-		if ($this->permissionlib->isBerechtigt('admin')) return;
-
-		// teachers: only their own LVs (assigned as lehreinheitmitarbeiter in this semester)
-		if ($this->config->item('CIS_GESAMTNOTE_LEKTOR_NUR_EIGENE_LV') === false
-			&& $this->permissionlib->isBerechtigt('lehre/benotungstool')) {
-			return; // this installation lets a teacher grade every course
+			$this->VerlaufLib->upsertErstantritt(
+				$student_uid, $lv_id, $sem_kurzbz, $lvNote, $lvgesamtnote->punkte, $erstantrittDay,
+				PruefungsverlaufLib::KEEP_DATUM, $this->gradingLektor($lehreinheit_id), $lehreinheit_id
+			);
+			$verlauf = $this->VerlaufLib->getVerlauf($student_uid, $lv_id, $sem_kurzbz, $lvNote, $zeugnisnote);
 		}
 
-		if ($this->permissionlib->isBerechtigt('lehre/benotungstool')) {
-			$res = $this->LehrveranstaltungModel->getLektorIsTeachingLva($lv_id, getAuthUID(), $sem_kurzbz);
-			$rows = getData($res);
-			if (!isError($res) && !empty($rows) && $rows[0]->teaches > 0) return;
-			// not a teacher of this LV -> fall through (a both-role user may still be entitled as Assistenz)
+		// an entschuldigt date replaces the Note of the dialog, within the occurrence limit
+		if ($entschuldigt !== null && !$this->VerlaufLib->exceedsNoteLimit($verlauf->pruefungen, $entschuldigt, $pruefung_id)) {
+			$note = $entschuldigt;
 		}
 
-		// (pure or additional) Assistenz: only LVs of an entitled Studiengang
-		$entitledStgs = $this->permissionlib->getSTG_isEntitledFor('lehre/benotungstool_assistenz');
-		$lv = null;
-		if (is_array($entitledStgs) && count($entitledStgs) > 0) {
-			$res = $this->LehrveranstaltungModel->load($lv_id);
-			if (!isError($res) && hasData($res)) {
-				$lv = getData($res)[0];
-				if (in_array($lv->studiengang_kz, $entitledStgs)) return;
-			}
-		}
-
-		if ($lv === null) {
-			$res = $this->LehrveranstaltungModel->load($lv_id);
-			if (!isError($res) && hasData($res)) $lv = getData($res)[0];
-		}
-		$bezeichnung = $lv !== null ? $lv->bezeichnung : $lv_id;
-
-		$this->terminateWithError(
-			$this->p->t('benotungstool', 'keineBerechtigungNoten', [$bezeichnung, $sem_kurzbz]),
-			'general'
-		);
-	}
-
-	/**
-	 * uid of the grading person for tbl_pruefung and tbl_lvgesamtnote. An assistant may type it in,
-	 * but the grade comes from the teacher; insertvon/updatevon keep the caller.
-	 *
-	 * Order: valid selection, caller if they teach it, the only teacher, the first teacher, caller.
-	 *
-	 * @return string
-	 */
-	private function benotenderMitarbeiter($lehreinheit_id, $gewaehlt = null)
-	{
-		$uids = array();
-		foreach($this->lehrendeDerLehreinheit($lehreinheit_id) as $lehrend) $uids[] = $lehrend->mitarbeiter_uid;
-
-		if(count($uids) === 0) return getAuthUID();
-		if($gewaehlt !== null && $gewaehlt !== '' && in_array($gewaehlt, $uids)) return $gewaehlt;
-		if(in_array(getAuthUID(), $uids)) return getAuthUID();
-
-		return $uids[0];
-	}
-
-	/** Same, for a course grade: the student's Lehreinheit decides. @return string */
-	private function benotenderMitarbeiterFuerStudent($lva_id, $student_uid, $stsem, $gewaehlt = null)
-	{
-		$lehreinheit_id = null;
-
-		$resLe = $this->LehrveranstaltungModel->getLeByStudent($student_uid, $stsem, $lva_id);
-		if(!isError($resLe) && hasData($resLe)) $lehreinheit_id = current(getData($resLe))->lehreinheit_id;
-
-		return $this->benotenderMitarbeiter($lehreinheit_id, $gewaehlt);
-	}
-
-	/**
-	 * Object initialization
-	 */
-	/**
-	 * Permissions that open this tool = keys of CIS_GESAMTNOTE_ROLLENMATRIX.
-	 * Reads the file directly: the constructor runs before CI can load a config.
-	 *
-	 * @return array
-	 */
-	private static function berechtigungenAusMatrix()
-	{
-		$config = array();
-		$datei = APPPATH . 'config/noten.php';
-		if (is_file($datei)) include $datei;
-
-		$matrix = isset($config['CIS_GESAMTNOTE_ROLLENMATRIX']) ? $config['CIS_GESAMTNOTE_ROLLENMATRIX'] : null;
-		if (!is_array($matrix) || count($matrix) === 0) {
-			return array('lehre/benotungstool:rw', 'lehre/benotungstool_assistenz:rw');
-		}
-
-		$berechtigungen = array();
-		foreach (array_keys($matrix) as $rolle) $berechtigungen[] = $rolle . ':rw';
-
-		return $berechtigungen;
-	}
-
-	/**
-	 * The history for the client. Each write answer contains it, so the client calculates nothing.
-	 *
-	 * The caller hands over what it already read. Only the exams are read again, because the write
-	 * just changed them. false = not given, null = read and absent.
-	 *
-	 * @param stdClass|null|false $lvRow
-	 * @param mixed|null|false    $zeugnisNote
-	 */
-	private function buildVerlaufSummary($student_uid, $lva_id, $stsem, $lvRow = false, $zeugnisNote = false)
-	{
-		if($lvRow === false) $lvRow = $this->getLvGesamtnoteRow($lva_id, $student_uid, $stsem);
-		if($zeugnisNote === false) $zeugnisNote = $this->getZeugnisnote($lva_id, $student_uid, $stsem);
-
-		$verlauf = $this->VerlaufLib->getVerlauf(
-			$student_uid, $lva_id, $stsem,
-			$lvRow ? $lvRow->note : null,
-			$zeugnisNote
+		list($newLvNote, $newLvPunkte) = $this->VerlaufLib->deriveLvNote(
+			$verlauf, $pruefung_id, $note, $punkte, $lvNote, $lvgesamtnote ? $lvgesamtnote->punkte : null
 		);
 
-		return $this->verlaufSummary($verlauf, true, $lvRow !== null);
-	}
-
-	/** The deadline from '{SS|WS}yyyy': SS in the same year, WS in the next year. @return DateTime|null */
-	private function computeNoteneintragungsfrist($sem_kurzbz)
-	{
-		if(!is_string($sem_kurzbz) || strlen($sem_kurzbz) < 6) return null;
-
-		$type = strtoupper(substr($sem_kurzbz, 0, 2));
-		$year = (int) substr($sem_kurzbz, 2, 4);
-		if($year <= 0) return null;
-
-		if($type === 'SS') {
-			$deadlineYear = $year;
-		} elseif($type === 'WS') {
-			$deadlineYear = $year + 1;
+		if ($lvgesamtnote === null) {
+			$lvgesamtnote = $this->createLvGesamtnote($lv_id, $student_uid, $sem_kurzbz, $newLvNote, $newLvPunkte, $lehreinheit_id, $mitarbeiter_uid);
 		} else {
+			// the Freigabe state compares benotungsdatum and freigabedatum, so a new benotungsdatum cancels the Freigabe
+			$benotungsdatum = $this->config->item('CIS_GESAMTNOTE_PRUEFUNG_HEBT_FREIGABE_AUF') ? date('Y-m-d H:i:s') : $lvgesamtnote->benotungsdatum;
+			$lvgesamtnote = $this->updateLvGesamtnote($lvgesamtnote, $newLvNote, $newLvPunkte, $benotungsdatum);
+		}
+
+		// no Pruefung without an LV-Note (also one that is not freigegeben)
+		if ($lvgesamtnote === null) {
+			$this->db->trans_rollback();
+			return $this->phraseError('benotungstool', 'c4keineLvNoteEingetragen');
+		}
+
+		if ($isNew) {
+			// one action writes one Pruefung; the Freigabe writes Antritt 1 (writeErstantritt)
+			$type = $verlauf->nextRole === PruefungsverlaufLib::ROLE_ERSTANTRITT
+				? $this->VerlaufLib->legacyTypFuerAntritt(1)
+				: $this->VerlaufLib->legacyTypeForRepeat($verlauf);
+
+			$pruefung = $this->insertPruefung($student_uid, $lehreinheit_id, $note, $punkte, $datum, $mitarbeiter_uid, $type);
+		} else {
+			$pruefung = $this->updatePruefung($pruefung_id, $note, $punkte, $datum);
+		}
+
+		// the saved Pruefung proves the success: a failed insert still leaves a Verlauf
+		if ($pruefung === null) {
+			$this->db->trans_rollback();
+			return $this->phraseError('benotungstool', 'c4pruefungNichtGespeichert', array($student_uid));
+		}
+
+		if (!$this->commitStudentTransaction()) return $this->phraseError('benotungstool', 'c4pruefungNichtGespeichert', array($student_uid));
+
+		return array(
+			'pruefung' => $pruefung,
+			'lvgesamtnote' => $lvgesamtnote,
+			'verlauf' => $this->readVerlaufSummary($student_uid, $lv_id, $sem_kurzbz, $lvgesamtnote)
+		);
+	}
+
+	/**
+	 * The Freigabe of one LV-Note, if it changed since the last Freigabe. It makes the Note binding,
+	 * so Antritt 1 starts here, on the benotungsdatum.
+	 *
+	 * @return array|null { lvgesamtnote, verlauf }, or null if nothing changed
+	 */
+	private function saveFreigabeForStudent($lv_id, $sem_kurzbz, $student_uid)
+	{
+		// the read, the Freigabe and Antritt 1 are one change
+		$this->beginStudentTransaction($student_uid, $lv_id, $sem_kurzbz);
+
+		$lvgesamtnote = $this->getLvGesamtnote($lv_id, $student_uid, $sem_kurzbz);
+
+		// only a change since the last Freigabe, like the old tool
+		if ($lvgesamtnote === null || $lvgesamtnote->benotungsdatum <= $lvgesamtnote->freigabedatum) {
+			$this->commitStudentTransaction();
 			return null;
 		}
 
-		$tag = $this->fristMonatTag($type);
+		$now = date('Y-m-d H:i:s');
+		$this->LvgesamtnoteModel->update($this->lvGesamtnoteKey($lvgesamtnote), array(
+			'freigabevon_uid' => getAuthUID(),
+			'freigabedatum' => $now,
+			'updateamum' => $now,
+			'updatevon' => getAuthUID()
+		));
+		$lvgesamtnote = $this->getLvGesamtnote($lv_id, $student_uid, $sem_kurzbz);
+		if ($lvgesamtnote === null) {
+			$this->db->trans_rollback();
+			return null;
+		}
 
-		$deadline = new DateTime();
-		$deadline->setDate($deadlineYear, $tag['month'], $tag['day']);
-		$deadline->setTime(23, 59, 59);
-		return $deadline;
-	}
-
-	/** Creates a course grade. The student administration writes it to the transcript. @return stdClass|null */
-	private function createLvGesamtnote($lva_id, $student_uid, $stsem, $note, $punkte, $lehreinheit_id = null, $mitarbeiter_uid = null)
-	{
-		$jetzt = date("Y-m-d H:i:s");
-
-		// the caller knows the Lehreinheit here, so no second lookup is needed
-		$benotender = $lehreinheit_id
-			? $this->benotenderMitarbeiter($lehreinheit_id, $mitarbeiter_uid)
-			: $this->benotenderMitarbeiterFuerStudent($lva_id, $student_uid, $stsem, $mitarbeiter_uid);
-
-		$id = $this->LvgesamtnoteModel->insert(
-			array(
-				'student_uid' => $student_uid,
-				'lehrveranstaltung_id' => $lva_id,
-				'studiensemester_kurzbz' => $stsem,
-				'note' => $note,
-				'punkte' => $punkte,
-				'mitarbeiter_uid' => $benotender,
-				'benotungsdatum' => $jetzt,
-				'freigabedatum' => null,
-				'freigabevon_uid' => null,
-				'bemerkung' => null,
-				'updateamum' => null,
-				'updatevon' => null,
-				'insertamum' => $jetzt,
-				'insertvon' => getAuthUID()
-			)
+		// the Freigabe moves no date: an existing Antritt 1 keeps the day that the Lektor picked
+		$this->writeErstantritt(
+			$lv_id, $student_uid, $sem_kurzbz, $lvgesamtnote->note, $lvgesamtnote->punkte,
+			$lvgesamtnote->benotungsdatum, PruefungsverlaufLib::KEEP_DATUM
 		);
-		if(!$id) return null;
 
-		$res = $this->LvgesamtnoteModel->load($id->retval);
-		return hasData($res) ? getData($res)[0] : null;
+		if (!$this->commitStudentTransaction()) return null;
+
+		return array(
+			'lvgesamtnote' => $lvgesamtnote,
+			'verlauf' => $this->readVerlaufSummary($student_uid, $lv_id, $sem_kurzbz, $lvgesamtnote)
+		);
 	}
 
 	/**
-	 * May the caller perform this action? Several roles -> union. Empty matrix = no restriction.
+	 * Writes Antritt 1 when a Note becomes binding: saveLvNote, the imports and the Freigabe.
+	 * CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME switches it off. An Anrechnung forbids each Pruefung.
 	 *
-	 * @return bool
+	 * @param bool $datumMode PruefungsverlaufLib::SET_DATUM (the Lektor picked the day) or KEEP_DATUM
 	 */
-	private function darfAktion($aktion)
+	private function writeErstantritt($lv_id, $student_uid, $sem_kurzbz, $note, $punkte, $datum, $datumMode)
 	{
-		$matrix = $this->config->item('CIS_GESAMTNOTE_ROLLENMATRIX');
-		if (!is_array($matrix) || count($matrix) === 0) return true;
+		if (!$this->config->item('CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME')) return;
+		if ($this->VerlaufLib->isAnrechnungNote($this->getZeugnisnote($lv_id, $student_uid, $sem_kurzbz))) return;
 
-		$this->load->library('PermissionLib');
+		$lehreinheit_id = $this->lehreinheitOfStudent($lv_id, $student_uid, $sem_kurzbz);
 
-		foreach ($matrix as $rolle => $aktionen) {
-			if (!is_array($aktionen) || !in_array($aktion, $aktionen)) continue;
-			if ($this->permissionlib->isBerechtigt($rolle)) return true;
+		$pruefung = $this->VerlaufLib->upsertErstantritt(
+			$student_uid, $lv_id, $sem_kurzbz, $note, $punkte, $datum,
+			$datumMode, $this->gradingLektor($lehreinheit_id), $lehreinheit_id
+		);
+
+		if ($pruefung !== null) $this->logLib->logInfoDB(array('erstantritt', $student_uid, getAuthUID(), getAuthPersonId()));
+	}
+
+	/** In the Punkte mode an import row needs Punkte. @return array|null { error } */
+	private function missingPunkteError($row)
+	{
+		if (!CIS_GESAMTNOTE_PUNKTE || is_numeric($this->field($row, 'punkte'))) return null;
+
+		return $this->phraseError('benotungstool', 'c4punkteKeineNoteErmittelt', array($row->uid));
+	}
+
+	// === Checks =================================================================================
+
+	/**
+	 * Checks a write of the LV-Note. The cell editor reads the same answer (verlauf.lvNoteLocked), but
+	 * the API and the import bypass it.
+	 *
+	 * @param stdClass $verlauf from buildVerlauf, read inside the lock
+	 * @return array|null { error }
+	 */
+	private function validateLvNote($student_uid, $note, $verlauf, $lvgesamtnote, $zeugnisnote)
+	{
+		$value = trim((string) $note);
+
+		// the LV-Note is never 'entschuldigt': an entschuldigt date uses no Antritt
+		if ($value !== '' && $value == $this->VerlaufLib->getSpecialNotes()['entschuldigt']) {
+			return $this->phraseError('benotungstool', 'c4noteNichtInLehre', array($student_uid));
+		}
+
+		$error = $this->lehreNoteError($note, $student_uid);
+		if ($error !== null) return $error;
+
+		$reason = $this->lvNoteLockReason($verlauf, $lvgesamtnote, $zeugnisnote);
+		return $reason === null ? null : $this->phraseError('benotungstool', $reason, array($student_uid));
+	}
+
+	/**
+	 * Why nobody may write the LV-Note of this row directly, or null. validateLvNote and the client
+	 * (verlauf.lvNoteLocked) read this one answer.
+	 *
+	 * @return string|null the phrase key of the reason
+	 */
+	private function lvNoteLockReason($verlauf, $lvgesamtnote, $zeugnisnote)
+	{
+		// Antritt 1 and the LV-Note are the same result. After a repeat the Note belongs to the Pruefung.
+		if ($verlauf->hasRepeat && !$this->config->item('CIS_GESAMTNOTE_VORSCHLAG_NACH_WIEDERHOLUNG')) return 'c4notenvorschlagGesperrt';
+
+		if ($this->config->item('CIS_GESAMTNOTE_FREIGABE_FINAL') && $this->isFreigegeben($lvgesamtnote)) return 'freigabeEndgueltig';
+
+		if ($this->isZeugnisnoteLocked($zeugnisnote)) return 'c4zeugnisnoteGesperrt';
+
+		return null;
+	}
+
+	/**
+	 * Checks a Pruefung write. The lib checks the Antritt chain; this adds the Freigabe, the Lehre
+	 * Noten, the Zeugnisnote and the kommpruef action.
+	 *
+	 * @param stdClass $verlauf from buildVerlauf, read inside the lock
+	 * @return array|null { error }
+	 */
+	private function validatePruefung($student_uid, $pruefung_id, $note, $datum, $verlauf, $lvgesamtnote, $zeugnisnote)
+	{
+		$isNew = isEmptyString((string) $pruefung_id);
+
+		$ruleError = $isNew
+			? $this->VerlaufLib->validateAdd($verlauf, $note, $datum)
+			: $this->VerlaufLib->validateEdit($verlauf, $pruefung_id, $note, $datum);
+		if ($ruleError !== null) {
+			return $this->phraseError('benotungstool', $ruleError[0], array_merge(array($student_uid), $ruleError[1]));
+		}
+
+		if ($this->config->item('CIS_GESAMTNOTE_FREIGABE_FINAL') && $this->isFreigegeben($lvgesamtnote)) {
+			return $this->phraseError('benotungstool', 'freigabeEndgueltig', array($student_uid));
+		}
+
+		// the Pruefung also writes the LV-Note: a Note of the Lehre, or one without an Antritt
+		if (!in_array(trim((string) $note), $this->VerlaufLib->getSpecialNotes()['ohneAntritt'])) {
+			$error = $this->lehreNoteError($note, $student_uid);
+			if ($error !== null) return $error;
+		}
+
+		if ($this->isZeugnisnoteLocked($zeugnisnote)) {
+			return $this->phraseError('benotungstool', 'c4zeugnisnoteGesperrt', array($student_uid));
+		}
+
+		// the Rollenmatrix can reserve the kommissionelle Pruefung for one role
+		if ($isNew && !$this->canDoAction('kommpruef') && $verlauf->nextRole === PruefungsverlaufLib::ROLE_KOMMISSIONELL) {
+			return $this->phraseError('benotungstool', 'kommPruefNichtErlaubt', array($student_uid));
+		}
+
+		return null;
+	}
+
+	/**
+	 * The benotungsdatum becomes the date of Antritt 1, so the rules of a Pruefung date apply.
+	 * Without a date the entry takes today.
+	 *
+	 * @return array|null { error }
+	 */
+	private function validateBenotungsdatum($datum, $student_uid, $sem_kurzbz)
+	{
+		if (isEmptyString((string) $datum)) return null;
+
+		$day = substr((string) $datum, 0, 10);
+		$parsed = DateTime::createFromFormat('Y-m-d', $day);
+		if ($parsed === false || $parsed->format('Y-m-d') !== $day) {
+			return $this->phraseError('benotungstool', 'benotungsdatumUngueltig', array($student_uid));
+		}
+
+		// an assessment that did not happen yet has no date
+		if (!$this->config->item('CIS_GESAMTNOTE_DATUM_ZUKUNFT') && $day > date('Y-m-d')) {
+			return $this->phraseError('benotungstool', 'benotungsdatumInZukunft', array($student_uid));
+		}
+
+		return $this->pruefungDatumFristError($sem_kurzbz, $day, $student_uid);
+	}
+
+	/** With CIS_GESAMTNOTE_LVNOTE_NUR_LEHRENOTEN the LV-Note must be a Note of the Lehre. @return array|null { error } */
+	private function lehreNoteError($note, $student_uid)
+	{
+		$noten = $this->activeNoten();
+		$value = trim((string) $note);
+
+		if (!$this->config->item('CIS_GESAMTNOTE_LVNOTE_NUR_LEHRENOTEN') || (isset($noten[$value]) && $noten[$value]->lehre)) return null;
+
+		return $this->phraseError('benotungstool', 'c4noteNichtInLehre', array($student_uid));
+	}
+
+	/** A Zeugnisnote with lkt_ueberschreibbar = false locks the row. An unknown Note locks nothing. @return bool */
+	private function isZeugnisnoteLocked($zeugnisnote)
+	{
+		$noten = $this->activeNoten();
+		$value = trim((string) $zeugnisnote);
+
+		return isset($noten[$value]) && !$noten[$value]->lkt_ueberschreibbar;
+	}
+
+	// === Access and roles =======================================================================
+
+	/** Stops the request if no permission of the user has this action. */
+	private function assertAction($action)
+	{
+		if (!$this->canDoAction($action)) $this->terminateWithPhrase('benotungstool', 'aktionNichtErlaubt', array($action));
+	}
+
+	/** Does a permission of the user have this action in CIS_GESAMTNOTE_ROLLENMATRIX? @return bool */
+	private function canDoAction($action)
+	{
+		foreach ($this->config->item('CIS_GESAMTNOTE_ROLLENMATRIX') as $permission => $actions) {
+			if (in_array($action, $actions) && $this->permissionlib->isBerechtigt($permission)) return true;
 		}
 
 		return false;
 	}
 
-	/** May the caller enter late? ENTRY only - an exam does not happen retroactively. @return bool */
-	private function darfFristUeberschreiten()
+	/** All actions of the user, for the client. The client only hides buttons; the server decides. @return array */
+	private function allowedActions()
 	{
-		$rollen = $this->config->item('CIS_GESAMTNOTE_FRIST_AUSNAHME');
-		if(!is_array($rollen) || count($rollen) === 0) return false;
+		$actions = array();
+		foreach ($this->config->item('CIS_GESAMTNOTE_ROLLENMATRIX') as $actionsOfPermission) {
+			foreach ($actionsOfPermission as $action) {
+				if (!in_array($action, $actions) && $this->canDoAction($action)) $actions[] = $action;
+			}
+		}
 
-		$this->load->library('PermissionLib');
+		return $actions;
+	}
 
-		foreach($rollen as $rolle) {
-			if($this->permissionlib->isBerechtigt($rolle)) return true;
+	/**
+	 * Stops a request for a foreign LV. A Lektor reaches the own LVs in this Studiensemester, an
+	 * Assistenz the LVs of a Studiengang of the permission. An admin reaches every LV.
+	 *
+	 * The Studiensemester is required: without it a Lektor of ANY semester passes the check.
+	 */
+	private function assertLvAccess($lv_id, $sem_kurzbz)
+	{
+		// an empty id makes load() read all LVs
+		if (!ctype_digit((string) $lv_id) || (int) $lv_id < 1 || isEmptyString((string) $sem_kurzbz)) {
+			$this->terminateWithPhrase('global', 'wrongParameters');
+		}
+
+		if ($this->permissionlib->isBerechtigt('admin')) return;
+
+		if ($this->permissionlib->isBerechtigt('lehre/benotungstool')) {
+			if (!$this->config->item('CIS_GESAMTNOTE_LEKTOR_NUR_EIGENE_LV')) return;
+
+			$result = $this->LehrveranstaltungModel->getLektorIsTeachingLva($lv_id, getAuthUID(), $sem_kurzbz);
+			if (hasData($result) && getData($result)[0]->teaches > 0) return;
+			// not a Lektor of this LV: a user with both permissions can still pass as Assistenz
+		}
+
+		$result = $this->LehrveranstaltungModel->load($lv_id);
+		$lv = hasData($result) ? getData($result)[0] : null;
+
+		$studiengaenge = $this->permissionlib->getSTG_isEntitledFor('lehre/benotungstool_assistenz');
+		if ($lv !== null && is_array($studiengaenge) && in_array($lv->studiengang_kz, $studiengaenge)) return;
+
+		$this->terminateWithPhrase('benotungstool', 'keineBerechtigungNoten', array($lv !== null ? $lv->bezeichnung : $lv_id, $sem_kurzbz));
+	}
+
+	// === Frist ==================================================================================
+
+	/** Stops the request after the Frist of the Studiensemester (CIS_GESAMTNOTE_FRIST_EINGABE). */
+	private function assertFrist($sem_kurzbz)
+	{
+		if (!$this->config->item('CIS_GESAMTNOTE_FRIST_EINGABE') || $this->hasFristException()) return;
+
+		$frist = $this->computeFrist($sem_kurzbz);
+		if ($frist !== null && new DateTime() > $frist) {
+			$this->terminateWithPhrase('benotungstool', 'noteneintragungsfristVorbei', array($frist->format('d.m.Y')));
+		}
+	}
+
+	/** A Pruefung date after the Frist (CIS_GESAMTNOTE_FRIST_PRUEFUNGSDATUM). It has no exception. @return array|null { error } */
+	private function pruefungDatumFristError($sem_kurzbz, $datum, $student_uid)
+	{
+		if (!$this->config->item('CIS_GESAMTNOTE_FRIST_PRUEFUNGSDATUM')) return null;
+
+		$frist = $this->computeFrist($sem_kurzbz);
+		$day = substr((string) $datum, 0, 10);
+		if ($frist === null || $day === '' || $day <= $frist->format('Y-m-d')) return null;
+
+		return $this->phraseError('benotungstool', 'pruefungsdatumNachFrist', array($student_uid, $frist->format('d.m.Y')));
+	}
+
+	/** May the user enter after the Frist (CIS_GESAMTNOTE_FRIST_AUSNAHME)? @return bool */
+	private function hasFristException()
+	{
+		foreach ($this->config->item('CIS_GESAMTNOTE_FRIST_AUSNAHME') as $permission) {
+			if ($this->permissionlib->isBerechtigt($permission)) return true;
 		}
 
 		return false;
 	}
 
-	/** Stops the request if the grade entry deadline of the semester has passed. */
-	private function enforceNoteneintragungsfrist($sem_kurzbz)
+	/** The Frist of 'SSyyyy' (the same year) or 'WSyyyy' (the next year), at 23:59:59. @return DateTime|null */
+	private function computeFrist($sem_kurzbz)
 	{
-		if(!$this->fristAktiv('CIS_GESAMTNOTE_FRIST_EINGABE')) return;
+		$type = strtoupper(substr((string) $sem_kurzbz, 0, 2));
+		$year = (int) substr((string) $sem_kurzbz, 2, 4);
+		if ($year <= 0 || ($type !== 'SS' && $type !== 'WS')) return null;
 
-		// a named role may enter late; the exam date stays bound either way
-		if($this->darfFristUeberschreiten()) return;
+		$monthDay = $this->config->item('NOTENEINTRAGUNGSFRIST_' . $type);
 
-		$deadline = $this->computeNoteneintragungsfrist($sem_kurzbz);
-		if($deadline === null) return;
+		$frist = new DateTime();
+		$frist->setDate($type === 'SS' ? $year : $year + 1, $monthDay['month'], $monthDay['day']);
+		$frist->setTime(23, 59, 59);
+		return $frist;
+	}
 
-		if(new DateTime() > $deadline) {
-			$this->terminateWithError(
-				$this->p->t('benotungstool', 'noteneintragungsfristVorbei', [$deadline->format('d.m.Y')]),
-				'general'
+	// === Proposal ===============================================================================
+
+	/**
+	 * The proposal from the Teilnoten: their average, rounded; in the Punkte mode the Note of the Punkte
+	 * average. null if no Teilnote counts.
+	 *
+	 * @param array $notenForPunkte a cache: equal Punkte give an equal Note
+	 * @return mixed|null
+	 */
+	private function proposeNote($teilnoten, $lv_id, $sem_kurzbz, &$notenForPunkte)
+	{
+		$weighted = (bool) CIS_GESAMTNOTE_GEWICHTUNG;
+		$sum = 0;
+		$divisor = 0;
+
+		foreach ($teilnoten as $teilnote) {
+			// the mode decides which value counts; a row without it would only raise the divisor
+			$value = CIS_GESAMTNOTE_PUNKTE ? ($teilnote['points'] ?? null) : ($teilnote['grade'] ?? null);
+			if (!is_numeric($value)) continue;
+
+			$weight = is_numeric($teilnote['weight'] ?? null) ? $teilnote['weight'] : 0;
+			$sum += $weighted ? $value * $weight : $value;
+			$divisor += $weighted ? $weight : 1;
+		}
+
+		// PHP 7 divides by zero to INF, which gives the best Note
+		if ($divisor <= 0) return null;
+
+		if (!CIS_GESAMTNOTE_PUNKTE) return $this->roundNote($sum / $divisor);
+
+		$punkte = round($sum / $divisor, (int) $this->config->item('CIS_GESAMTNOTE_VORSCHLAG_PUNKTE_STELLEN'));
+		if (!array_key_exists((string) $punkte, $notenForPunkte)) {
+			$notenForPunkte[(string) $punkte] = $this->getDataOrTerminateWithError(
+				$this->NotenschluesselaufteilungModel->getNote($punkte, $lv_id, $sem_kurzbz)
 			);
 		}
+
+		return $notenForPunkte[(string) $punkte];
+	}
+
+	/** Rounds the Teilnoten average (CIS_GESAMTNOTE_VORSCHLAG_RUNDUNG). The smaller number is the better Note. @return int */
+	private function roundNote($average)
+	{
+		switch ($this->config->item('CIS_GESAMTNOTE_VORSCHLAG_RUNDUNG')) {
+			case 'besser': return (int) floor($average);
+			case 'schlechter': return (int) ceil($average);
+			default: return (int) round($average);
+		}
+	}
+
+	/** The Note for $punkte from the Notenschluessel of the LV. @return mixed|null null: the Notenschluessel has none */
+	private function noteFromPunkte($punkte, $lv_id, $sem_kurzbz)
+	{
+		$note = $this->getDataOrTerminateWithError($this->NotenschluesselaufteilungModel->getNote($punkte, $lv_id, $sem_kurzbz));
+
+		return ($note === null || $note === '') ? null : $note;
+	}
+
+	// === Database ===============================================================================
+
+	/** Opens a transaction. A second request for the same student in the same LV waits for it. */
+	private function beginStudentTransaction($student_uid, $lv_id, $sem_kurzbz)
+	{
+		$this->db->trans_begin();
+		$this->db->query('SELECT pg_advisory_xact_lock(hashtext(?))', array($student_uid . '|' . $lv_id . '|' . $sem_kurzbz));
 	}
 
 	/** Commits the write of one student, or rolls it back after a failed statement. @return bool */
-	private function entsperreStudent()
+	private function commitStudentTransaction()
 	{
-		if($this->db->trans_status() === false) {
+		if ($this->db->trans_status() === false) {
 			$this->db->trans_rollback();
 			return false;
 		}
@@ -1556,774 +1128,534 @@ class Noten extends FHCAPI_Controller
 		return $this->db->trans_commit();
 	}
 
-	/** All actions of the caller, for the client. @return array */
-	private function erlaubteAktionen()
-	{
-		$matrix = $this->config->item('CIS_GESAMTNOTE_ROLLENMATRIX');
-		if (!is_array($matrix)) return array();
-
-		$aktionen = array();
-		foreach ($matrix as $aktionenDerRolle) {
-			if (!is_array($aktionenDerRolle)) continue;
-			foreach ($aktionenDerRolle as $aktion) {
-				if (!in_array($aktion, $aktionen) && $this->darfAktion($aktion)) $aktionen[] = $aktion;
-			}
-		}
-
-		return $aktionen;
-	}
-
 	/**
-	 * Writes the first attempt when somebody takes the course grade over, the same way the
-	 * Studierendenverwaltung does it. CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME switches it off.
-	 * A credited transcript grade forbids every exam.
-	 */
-	private function erstantrittBeiUebernahme($lv_id, $student_uid, $sem_kurzbz, $note, $punkte, $datum)
-	{
-		if(!$this->config->item('CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME')) return;
-		if($this->VerlaufLib->istAnrechnungsnote($this->getZeugnisnote($lv_id, $student_uid, $sem_kurzbz))) return;
-
-		// the person who enters the grade picks this date, therefore it also updates attempt 1
-		$lehreinheit_id = $this->lehreinheitFuerStudent($lv_id, $student_uid, $sem_kurzbz);
-
-		$geschrieben = $this->VerlaufLib->upsertErstantritt(
-			$student_uid, $lv_id, $sem_kurzbz, $note, $punkte, $datum,
-			$this->benotenderMitarbeiter($lehreinheit_id), true, $lehreinheit_id
-		);
-
-		if($geschrieben !== null) {
-			$this->logLib->logInfoDB(array('erstantritt (uebernahme)', $student_uid, getAuthUID(), getAuthPersonId()));
-		}
-	}
-
-	/**
-	 * Recipients of the release mail: 'studiengang', 'aufrufer', or any entry containing '@'.
+	 * The LV-Note row WITHOUT the Freigabe filter. Lvgesamtnote_model::getLvGesamtNoten() reads
+	 * 'freigabedatum < NOW()' and hides a new LV-Note. This tool always uses this method.
 	 *
-	 * @return array
+	 * @return stdClass|null
 	 */
-	private function freigabeEmpfaenger($studiengangAdressen)
+	private function getLvGesamtnote($lv_id, $student_uid, $sem_kurzbz)
 	{
-		$adressen = array();
-		foreach($this->freigabeEmpfaengerEintraege() as $eintrag) {
-			if($eintrag === 'studiengang') {
-				foreach($studiengangAdressen as $adresse) {
-					if(trim($adresse) !== '') $adressen[] = trim($adresse);
+		$result = $this->LvgesamtnoteModel->getByStudent($lv_id, $student_uid, $sem_kurzbz);
+		return hasData($result) ? getData($result)[0] : null;
+	}
+
+	/** @return stdClass|null the new LV-Note. The StV writes it into the Zeugnis. */
+	private function createLvGesamtnote($lv_id, $student_uid, $sem_kurzbz, $note, $punkte, $lehreinheit_id = null, $mitarbeiter_uid = null)
+	{
+		if ($lehreinheit_id === null) $lehreinheit_id = $this->lehreinheitOfStudent($lv_id, $student_uid, $sem_kurzbz);
+		$now = date('Y-m-d H:i:s');
+
+		$result = $this->LvgesamtnoteModel->insert(array(
+			'student_uid' => $student_uid,
+			'lehrveranstaltung_id' => $lv_id,
+			'studiensemester_kurzbz' => $sem_kurzbz,
+			'note' => $note,
+			'punkte' => $punkte,
+			'mitarbeiter_uid' => $this->gradingLektor($lehreinheit_id, $mitarbeiter_uid),
+			'benotungsdatum' => $now,
+			'freigabedatum' => null,
+			'freigabevon_uid' => null,
+			'bemerkung' => null,
+			'updateamum' => null,
+			'updatevon' => null,
+			'insertamum' => $now,
+			'insertvon' => getAuthUID()
+		));
+
+		$this->logLib->logInfoDB(array('lvgesamtnote inserted', $student_uid, $lv_id, $sem_kurzbz, $note, getAuthUID(), getAuthPersonId()));
+
+		return isError($result) ? null : $this->getLvGesamtnote($lv_id, $student_uid, $sem_kurzbz);
+	}
+
+	/** @return stdClass the changed LV-Note, or the old one if the update failed */
+	private function updateLvGesamtnote($lvgesamtnote, $note, $punkte, $benotungsdatum)
+	{
+		$this->LvgesamtnoteModel->update($this->lvGesamtnoteKey($lvgesamtnote), array(
+			'note' => $note,
+			'punkte' => $punkte,
+			'benotungsdatum' => $benotungsdatum,
+			'updateamum' => date('Y-m-d H:i:s'),
+			'updatevon' => getAuthUID()
+		));
+
+		$this->logLib->logInfoDB(array('lvgesamtnote updated', $lvgesamtnote->student_uid, $lvgesamtnote->lehrveranstaltung_id,
+			$lvgesamtnote->studiensemester_kurzbz, $note, getAuthUID(), getAuthPersonId()));
+
+		$changed = $this->getLvGesamtnote($lvgesamtnote->lehrveranstaltung_id, $lvgesamtnote->student_uid, $lvgesamtnote->studiensemester_kurzbz);
+		return $changed !== null ? $changed : $lvgesamtnote;
+	}
+
+	/** The primary key of campus.tbl_lvgesamtnote. @return array */
+	private function lvGesamtnoteKey($lvgesamtnote)
+	{
+		return array($lvgesamtnote->student_uid, $lvgesamtnote->studiensemester_kurzbz, $lvgesamtnote->lehrveranstaltung_id);
+	}
+
+	/**
+	 * A new Pruefung. The type has no meaning for the rules; the StV and old reports read it.
+	 *
+	 * @return stdClass|null
+	 */
+	private function insertPruefung($student_uid, $lehreinheit_id, $note, $punkte, $datum, $mitarbeiter_uid, $type)
+	{
+		$result = $this->LePruefungModel->insert(array(
+			'lehreinheit_id' => $lehreinheit_id,
+			'student_uid' => $student_uid,
+			'mitarbeiter_uid' => $this->gradingLektor($lehreinheit_id, $mitarbeiter_uid),
+			'note' => $note,
+			'punkte' => $punkte,
+			'pruefungstyp_kurzbz' => $type,
+			'datum' => $datum,
+			'anmerkung' => '',
+			'insertamum' => date('Y-m-d H:i:s'),
+			'insertvon' => getAuthUID(),
+			'updateamum' => null,
+			'updatevon' => null,
+			'ext_id' => null
+		));
+
+		$this->logLib->logInfoDB(array('pruefung inserted', $student_uid, $type, getAuthUID(), getAuthPersonId()));
+
+		return isError($result) ? null : $this->loadPruefung($result->retval);
+	}
+
+	/** Changes Note, Punkte and date of one Pruefung, never its type. @return stdClass|null */
+	private function updatePruefung($pruefung_id, $note, $punkte, $datum)
+	{
+		$result = $this->LePruefungModel->update($pruefung_id, array(
+			'note' => $note,
+			'punkte' => $punkte,
+			'datum' => $datum,
+			'anmerkung' => '',
+			'updateamum' => date('Y-m-d H:i:s'),
+			'updatevon' => getAuthUID()
+		));
+
+		$this->logLib->logInfoDB(array('pruefung updated', $pruefung_id, getAuthUID(), getAuthPersonId()));
+
+		return isError($result) ? null : $this->loadPruefung($pruefung_id);
+	}
+
+	/** @return stdClass|null */
+	private function loadPruefung($pruefung_id)
+	{
+		$result = $this->LePruefungModel->load($pruefung_id);
+		return hasData($result) ? getData($result)[0] : null;
+	}
+
+	/** Is this LV-Note freigegeben? @return bool */
+	private function isFreigegeben($lvgesamtnote)
+	{
+		return $lvgesamtnote !== null && !isEmptyString((string) $lvgesamtnote->freigabedatum);
+	}
+
+	/** The Zeugnisnote, or null. An Anrechnung is there, not in the LV-Note. @return mixed|null */
+	private function getZeugnisnote($lv_id, $student_uid, $sem_kurzbz)
+	{
+		$key = $lv_id . '|' . $student_uid . '|' . $sem_kurzbz;
+		if (!array_key_exists($key, $this->zeugnisnoteCache)) {
+			$result = $this->ZeugnisnoteModel->load(array(
+				'studiensemester_kurzbz' => $sem_kurzbz,
+				'student_uid' => $student_uid,
+				'lehrveranstaltung_id' => $lv_id
+			));
+			$this->zeugnisnoteCache[$key] = hasData($result) ? getData($result)[0]->note : null;
+		}
+
+		return $this->zeugnisnoteCache[$key];
+	}
+
+	/** The active Noten by key; getNoten() sends the client the same set. @return array */
+	private function activeNoten()
+	{
+		if ($this->activeNotenCache === null) {
+			$this->activeNotenCache = array();
+
+			$result = $this->NoteModel->getAllActive($this->config->item('NOTEN_SORTIERUNG'));
+			foreach ((hasData($result) ? getData($result) : array()) as $note) $this->activeNotenCache[(string) $note->note] = $note;
+		}
+
+		return $this->activeNotenCache;
+	}
+
+	/** The Lehreinheiten of one student in the LV, lowest id first. Empty = no participant. @return array */
+	private function lehreinheitenOfStudent($lv_id, $student_uid, $sem_kurzbz)
+	{
+		$key = $lv_id . '|' . $student_uid . '|' . $sem_kurzbz;
+		if (!array_key_exists($key, $this->lehreinheitenCache)) {
+			$result = $this->LehrveranstaltungModel->getLeIdsByStudent($student_uid, $sem_kurzbz, $lv_id);
+			$this->lehreinheitenCache[$key] = hasData($result) ? array_column(getData($result), 'lehreinheit_id') : array();
+		}
+
+		return $this->lehreinheitenCache[$key];
+	}
+
+	/** The first Lehreinheit of one student in the LV, or null. @return mixed|null */
+	private function lehreinheitOfStudent($lv_id, $student_uid, $sem_kurzbz)
+	{
+		$lehreinheiten = $this->lehreinheitenOfStudent($lv_id, $student_uid, $sem_kurzbz);
+
+		return $lehreinheiten ? $lehreinheiten[0] : null;
+	}
+
+	/** The Lektoren of one Lehreinheit (lehre.tbl_lehreinheitmitarbeiter), sorted by uid. @return array */
+	private function lektorenOfLehreinheit($lehreinheit_id)
+	{
+		if (!$lehreinheit_id) return array();
+
+		$key = (string) $lehreinheit_id;
+		if (!isset($this->lektorenCache[$key])) {
+			$this->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
+			$result = $this->LehreinheitmitarbeiterModel->getLektorenByLe($lehreinheit_id);
+
+			$lektoren = hasData($result) ? getData($result) : array();
+			usort($lektoren, function ($a, $b) {
+				return strcmp($a->mitarbeiter_uid, $b->mitarbeiter_uid);
+			});
+			$this->lektorenCache[$key] = $lektoren;
+		}
+
+		return $this->lektorenCache[$key];
+	}
+
+	/**
+	 * The uid of the grading Lektor for tbl_pruefung and tbl_lvgesamtnote. An Assistenz can select
+	 * one; insertvon and updatevon keep the user.
+	 *
+	 * Order: a valid selection, the user if the user teaches, the first Lektor, the user.
+	 *
+	 * @return string
+	 */
+	private function gradingLektor($lehreinheit_id, $selected = null)
+	{
+		$uids = array_column($this->lektorenOfLehreinheit($lehreinheit_id), 'mitarbeiter_uid');
+
+		if (count($uids) === 0) return getAuthUID();
+		if (!isEmptyString((string) $selected) && in_array($selected, $uids)) return $selected;
+		if (in_array(getAuthUID(), $uids)) return getAuthUID();
+
+		return $uids[0];
+	}
+
+	/** All LV-Noten of the LV by uid, without the Freigabe filter. @return array */
+	private function lvGesamtnotenByUid($lv_id, $sem_kurzbz)
+	{
+		$lvNoten = array();
+		$result = $this->LvgesamtnoteModel->getByLvStudiensemester($lv_id, $sem_kurzbz);
+		foreach ((hasData($result) ? getData($result) : array()) as $row) $lvNoten[$row->student_uid] = $row;
+
+		return $lvNoten;
+	}
+
+	/** All Pruefungen of the LV by uid. @return array */
+	private function pruefungenByUid($lv_id, $sem_kurzbz)
+	{
+		$pruefungen = array();
+		$result = $this->LePruefungModel->getPruefungenByLvStudiensemester($lv_id, $sem_kurzbz);
+		foreach ((hasData($result) ? getData($result) : array()) as $row) $pruefungen[$row->student_uid][] = $row;
+
+		return $pruefungen;
+	}
+
+	/** The mobility text of each student (Mobility/Legende.js explains it). @return array */
+	private function mobilityByUid($uids)
+	{
+		if (count($uids) === 0) return array();
+
+		$erhalter = getData($this->ErhalterModel->load())[0];
+		$erhalter_kz = '9' . sprintf('%03s', $erhalter->erhalter_kz);
+
+		$mobility = array();
+		foreach ($this->getDataOrTerminateWithError($this->MobilitaetModel->getMobilityZusatzForUids($uids)) as $row) {
+			$mobility[$row->uid] = $this->MobilitaetModel->formatZusatz($row, $erhalter_kz);
+		}
+
+		return $mobility;
+	}
+
+	// === Addons =================================================================================
+
+	/** The Teilnoten of each student from the Moodle addon. An addon error goes into the meta data. @return array */
+	private function teilnotenByUid($uids, $lv_id, $sem_kurzbz)
+	{
+		// the addon appends to $grades[uid]['grades']
+		$grades = array();
+		foreach ($uids as $uid) $grades[$uid] = array('grades' => array());
+
+		try {
+			Events::trigger(
+				'getExternalGrades',
+				function & () use (&$grades) {
+					return $grades;
+				},
+				array('lvid' => $lv_id, 'stsem' => $sem_kurzbz)
+			);
+		} catch (Throwable $t) {
+			$this->addMeta('getExternalGradesError', $t->getMessage());
+		}
+
+		$teilnoten = array();
+		foreach ($uids as $uid) $teilnoten[$uid] = $grades[$uid]['grades'];
+
+		return $teilnoten;
+	}
+
+	/** The Anwesenheit in percent by prestudent_id, from the Anwesenheiten addon. @return array */
+	private function getAnwesenheiten($prestudent_ids, $lv_id, $sem_kurzbz)
+	{
+		$anwesenheiten = array();
+
+		try {
+			Events::trigger(
+				'getAnwesenheitenForLvAndSemester',
+				$prestudent_ids,
+				$lv_id,
+				$sem_kurzbz,
+				function ($rows) use (&$anwesenheiten) {
+					foreach ($rows as $row) $anwesenheiten[$row->prestudent_id] = $row->sum;
 				}
-				continue;
-			}
-
-			if($eintrag === 'aufrufer') { $adressen[] = getAuthUID() . '@' . DOMAIN; continue; }
-
-			if(strpos((string) $eintrag, '@') !== false) $adressen[] = trim($eintrag);
+			);
+		} catch (Throwable $t) {
+			$this->addMeta('getAnwesenheitenForLvAndSemester', $t->getMessage());
 		}
 
-		return array_values(array_unique($adressen));
-	}
-
-	/** The configured recipient entries of the release mail. @return array */
-	private function freigabeEmpfaengerEintraege()
-	{
-		$eintraege = $this->config->item('CIS_GESAMTNOTE_FREIGABEMAIL_EMPFAENGER');
-		return is_array($eintraege) ? $eintraege : array('studiengang', 'aufrufer');
-	}
-
-	/** Sancho template of the release mail. @return string */
-	private function freigabeVorlage()
-	{
-		$vorlage = $this->config->item('CIS_GESAMTNOTE_FREIGABEMAIL_VORLAGE');
-		return (is_string($vorlage) && $vorlage !== '') ? $vorlage : 'Notenfreigabe';
-	}
-
-	/** Month and day of the grade entry deadline for 'SS' or 'WS'. @return array */
-	private function fristMonatTag($type)
-	{
-		$cfg = $this->config->item($type === 'SS' ? 'NOTENEINTRAGUNGSFRIST_SS' : 'NOTENEINTRAGUNGSFRIST_WS');
-
-		return array(
-			'month' => (is_array($cfg) && isset($cfg['month'])) ? (int) $cfg['month'] : ($type === 'SS' ? 11 : 5),
-			'day' => (is_array($cfg) && isset($cfg['day'])) ? (int) $cfg['day'] : 15
-		);
+		return $anwesenheiten;
 	}
 
 	/**
-	 * The grade 'entschuldigt' if an addon reports the date as excused, else null. A failure of that
-	 * addon must not stop the grade entry.
-	 *
-	 * Runs BEFORE the transaction: a failed addon query would abort it.
+	 * The Note 'entschuldigt' if an addon reports the date as entschuldigt, else null. A failure of the
+	 * addon must not stop the entry. Call it BEFORE the transaction: a failed addon query aborts it.
 	 *
 	 * @return mixed|null
 	 */
-	private function entschuldigungsNote($student_uid, $datum)
+	private function entschuldigtNoteFromAddon($student_uid, $datum)
 	{
-		$status = [];
+		$status = array();
 
 		try {
 			Events::trigger(
 				'getEntschuldigungsStatusForStudentOnDate',
-				function & () use (&$status)
-				{
+				function & () use (&$status) {
 					return $status;
 				},
-				[
-					'student_uid' => $student_uid,
-					'datum' => $datum
-				]
+				array('student_uid' => $student_uid, 'datum' => $datum)
 			);
 		} catch (Throwable $t) {
 			$this->addMeta('getEntschuldigungsStatusError', $t->getMessage());
 			return null;
 		}
 
-		if(count($status) === 0 || $status[0] != true) return null;
+		if (count($status) === 0 || $status[0] != true) return null;
 
 		return $this->VerlaufLib->getSpecialNotes()['entschuldigt'];
 	}
 
-	/** Does one of the two deadline checks apply? Falls back to the old combined key. @return bool */
-	private function fristAktiv($key)
-	{
-		$wert = $this->config->item($key);
-		if($wert !== null) return (bool) $wert;
+	// === Freigabe mail ==========================================================================
 
-		return (bool) $this->config->item('CIS_GESAMTNOTE_NOTENEINTRAGUNGSFRIST');
+	/** The parts of the mail that do not depend on the rows. Stops the request for an unknown LV. @return stdClass */
+	private function prepareFreigabeMail($lv_id, $sem_kurzbz)
+	{
+		$result = $this->LehrveranstaltungModel->load($lv_id);
+		if (!hasData($result)) $this->terminateWithPhrase('benotungstool', 'noValidLvFoundForId', array($lv_id));
+		$lv = getData($result)[0];
+
+		$result = $this->StudiengangModel->load($lv->studiengang_kz);
+		if (!hasData($result)) $this->terminateWithPhrase('benotungstool', 'noValidStudiengangFoundForId', array($lv->studiengang_kz));
+		$studiengang = getData($result)[0];
+
+		$result = $this->PersonModel->load(getAuthPersonId());
+		if (!hasData($result)) $this->terminateWithPhrase('benotungstool', 'noValidPersonFoundForId', array(getAuthPersonId()));
+		$person = getData($result)[0];
+
+		$studienplaene = array();
+		$result = $this->StudienplanModel->getStudienplanByLvaSemKurzbz($lv_id, $sem_kurzbz);
+		foreach ((hasData($result) ? getData($result) : array()) as $studienplan) $studienplaene[] = $studienplan->bezeichnung;
+
+		// the mail names the person and the Note from the database, never a value from the request
+		$students = array();
+		$result = $this->LehrveranstaltungModel->getStudentsByLv($sem_kurzbz, $lv_id);
+		foreach ((hasData($result) ? getData($result) : array()) as $student) $students[$student->uid] = $student;
+
+		$mail = new stdClass();
+		$mail->students = $students;
+		$mail->studiengangAddresses = explode(', ', $studiengang->email);
+		$mail->lektor = $person->anrede . ' ' . $person->vorname . ' ' . $person->nachname;
+		$mail->lv = $studiengang->kurzbzlang . ' ' . $lv->semester . '.Semester ' . $lv->bezeichnung
+			. ' - ' . $lv->lehrform_kurzbz . ' ' . $lv->orgform_kurzbz . ' - ' . $sem_kurzbz;
+		$mail->subject = $this->p->t('benotungstool', 'notenfreigabe') . ' ' . $lv->bezeichnung . ' ' . $lv->orgform_kurzbz
+			. ' - ' . implode(' ', $studienplaene);
+
+		return $mail;
 	}
 
-	private function getAnwesenheiten($prestudent_ids, $lv_id, $sem_kurzbz) {
-
-		$anwesenheiten = [];
-		try {
-			$downloadFunc = function ($anwesenheitenResult) use (&$anwesenheiten) {
-				// map result rows by prestudent_uid to retrieve them by that key later on
-				foreach ($anwesenheitenResult as $anw) {
-					$anwesenheiten[$anw->prestudent_id] = $anw->sum;
-				}
-			};
-			
-			Events::trigger(
-				'getAnwesenheitenForLvAndSemester',
-				$prestudent_ids,
-				$lv_id,
-				$sem_kurzbz,
-				$downloadFunc
-			);
-		} catch (Throwable $t) {
-			$this->addMeta('getAnwesenheitenForLvAndSemester', $t->getMessage());
-		}
-		
-		return $anwesenheiten;
-		
-	}
-
-	/**
-	 * Reads the course grade WITHOUT the filter. getLvGesamtNoten() uses 'freigabedatum < NOW()'
-	 * and therefore hides a new grade. In this tool this wrapper is always the correct one.
-	 */
-	private function getLvGesamtnoteRow($lva_id, $student_uid, $stsem)
+	/** Sends the Freigabe mail with one table row per freigegeben LV-Note. */
+	private function sendFreigabeMail($mail, $rows)
 	{
-		$res = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lva_id, $student_uid, $stsem);
-		return (!isError($res) && hasData($res)) ? getData($res)[0] : null;
-	}
+		// CIS_GESAMTNOTE_FREIGABEMAIL_NOTE: the full table, else the uids only
+		$details = (bool) CIS_GESAMTNOTE_FREIGABEMAIL_NOTE;
+		$noten = $this->activeNoten();
 
-	/** The transcript grade or null. Credited grades are there, not in the course grade. @return mixed|null */
-	private function getZeugnisnote($lva_id, $student_uid, $stsem)
-	{
-		$key = $lva_id . '|' . $student_uid . '|' . $stsem;
-		if(array_key_exists($key, $this->zeugnisnoteCache)) return $this->zeugnisnoteCache[$key];
-
-		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
-
-		$res = $this->ZeugnisnoteModel->load([
-			'studiensemester_kurzbz' => $stsem,
-			'student_uid' => $student_uid,
-			'lehrveranstaltung_id' => $lva_id
-		]);
-
-		return $this->zeugnisnoteCache[$key] = (!isError($res) && hasData($res)) ? getData($res)[0]->note : null;
-	}
-
-	/** Does a bulk path stop at the first rejected row? @return bool */
-	private function importBrichtAb()
-	{
-		return (bool) $this->config->item('CIS_GESAMTNOTE_IMPORT_ABBRUCH');
-	}
-
-	/** Is this course grade row released? @return bool */
-	private function istFreigegeben($lvRow)
-	{
-		return $lvRow !== null && $lvRow->freigabedatum !== null && $lvRow->freigabedatum !== '';
-	}
-
-	/** Lehreinheiten of one student in the course, lowest id first. Empty = no participant. @return array */
-	private function lehreinheitenFuerStudent($lva_id, $student_uid, $stsem)
-	{
-		$key = $lva_id . '|' . $student_uid . '|' . $stsem;
-		if(!array_key_exists($key, $this->lehreinheitCache)) {
-			$res = $this->LehrveranstaltungModel->getLeIdsByStudent($student_uid, $stsem, $lva_id);
-			$this->lehreinheitCache[$key] = hasData($res) ? array_column(getData($res), 'lehreinheit_id') : array();
+		$header = $details
+			? array($this->p->t('person', 'personenkennzeichen'), $this->p->t('lehre', 'studiengang'),
+				$this->p->t('benotungstool', 'c4nachname'), $this->p->t('benotungstool', 'c4vorname'))
+			: array($this->p->t('person', 'uid'));
+		if ($details && CIS_GESAMTNOTE_PUNKTE) $header[] = $this->p->t('benotungstool', 'c4punkte');
+		if ($details) {
+			$header[] = $this->p->t('benotungstool', 'c4grade');
+			$header[] = $this->p->t('ui', 'bearbeitetVon');
 		}
 
-		return $this->lehreinheitCache[$key];
-	}
+		$table = "<table border='1'><tr><td><b>" . implode("</b></td>\n<td><b>", $header) . "</b></td></tr>\n";
 
-	/** Lehreinheit of one student; the grading person and the exam row both need it. @return mixed|null */
-	private function lehreinheitFuerStudent($lva_id, $student_uid, $stsem)
-	{
-		$lehreinheiten = $this->lehreinheitenFuerStudent($lva_id, $student_uid, $stsem);
+		foreach ($rows as $uid => $row) {
+			$lvgesamtnote = $row['lvgesamtnote'];
+			$student = isset($mail->students[$uid]) ? $mail->students[$uid] : null;
 
-		return $lehreinheiten ? $lehreinheiten[0] : null;
-	}
-
-	/**
-	 * The teachers of one Lehreinheit, from lehre.tbl_lehreinheitmitarbeiter.
-	 *
-	 * @return array
-	 */
-	private function lehrendeDerLehreinheit($lehreinheit_id)
-	{
-		if(!$lehreinheit_id) return array();
-
-		$key = (string) $lehreinheit_id;
-		if(isset($this->lehrendeCache[$key])) return $this->lehrendeCache[$key];
-
-		$this->lehrendeCache[$key] = array();
-
-		$this->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
-		$result = $this->LehreinheitmitarbeiterModel->getLektorenByLe($lehreinheit_id);
-		if(isError($result) || !hasData($result)) return array();
-
-		$lehrende = getData($result);
-		usort($lehrende, function($a, $b) {
-			return strcmp($a->mitarbeiter_uid, $b->mitarbeiter_uid);
-		});
-
-		$this->lehrendeCache[$key] = $lehrende;
-
-		return $lehrende;
-	}
-
-	/** One cell of the release mail. The mail is HTML, therefore no value may carry markup. @return string */
-	private function mailZelle($wert)
-	{
-		return htmlspecialchars(trim((string) $wert), ENT_QUOTES, 'UTF-8');
-	}
-
-	/** Grade from points for ONE bulk row, or a translated error so the caller skips it. @return mixed|string */
-	private function noteAusPunkten($punkte, $lv_id, $sem_kurzbz, $uid)
-	{
-		$result = $this->NotenschluesselaufteilungModel->getNote($punkte, $lv_id, $sem_kurzbz);
-		if(isError($result)) return getError($result);
-
-		$note = getData($result);
-		if($note === null || $note === '') {
-			return $this->p->t('benotungstool', 'c4punkteKeineNoteErmittelt', [$uid]);
-		}
-
-		return $note;
-	}
-
-	/**
-	 * Exam DATE against the deadline. enforceNoteneintragungsfrist asks the other question: the
-	 * time of entry.
-	 *
-	 * @return string|null translated error or null
-	 */
-	private function pruefungsdatumNachFrist($sem_kurzbz, $datum, $student_uid)
-	{
-		if(!$this->fristAktiv('CIS_GESAMTNOTE_FRIST_PRUEFUNGSDATUM')) return null;
-
-		$deadline = $this->computeNoteneintragungsfrist($sem_kurzbz);
-		if($deadline === null) return null;
-
-		$tag = substr((string) $datum, 0, 10);
-		if($tag === '' || $tag <= $deadline->format('Y-m-d')) return null;
-
-		return $this->p->t('benotungstool', 'pruefungsdatumNachFrist', [$student_uid, $deadline->format('d.m.Y')]);
-	}
-
-	/** Decimals of the points average before the scale applies. @return int */
-	private function punkteNachkommastellen()
-	{
-		$stellen = $this->config->item('CIS_GESAMTNOTE_VORSCHLAG_PUNKTE_STELLEN');
-
-		return is_numeric($stellen) && (int) $stellen >= 0 ? (int) $stellen : 2;
-	}
-
-	/**
-	 * Turns a rule answer into a text. Every message names the student first.
-	 *
-	 * @param array|null $fehler [phraseKey, extraParams]
-	 * @return string|null
-	 */
-	private function regelFehlertext($fehler, $student_uid)
-	{
-		if($fehler === null) return null;
-
-		return $this->p->t('benotungstool', $fehler[0], array_merge([$student_uid], $fehler[1]));
-	}
-
-	/**
-	 * Rounds the partial-grade average. Smaller number = better grade, so 'besser' floors.
-	 *
-	 * @return int
-	 */
-	private function rundeNote($wert)
-	{
-		$modus = $this->rundungsModus();
-
-		if($modus === 'besser') return (int) floor($wert);
-		if($modus === 'schlechter') return (int) ceil($wert);
-
-		return (int) round($wert);
-	}
-
-	/** Rounding of the proposal: 'besser', 'schlechter' or 'kaufmaennisch'. @return string */
-	private function rundungsModus()
-	{
-		$modus = $this->config->item('CIS_GESAMTNOTE_VORSCHLAG_RUNDUNG');
-		return in_array($modus, array('besser', 'schlechter'), true) ? $modus : 'kaufmaennisch';
-	}
-
-	/**
-	 * One exam entry for ONE student: validate, write course grade, write exam. Zeugnisnote is
-	 * never touched.
-	 *
-	 * Both writes run in ONE transaction. A course grade without its exam is a state that no rule
-	 * describes, and the client would show an attempt that does not exist.
-	 *
-	 * @return array|string ['savedPruefung', 'lvgesamtnote', 'verlauf'] or an error message
-	 */
-	private function savePruefungFuerStudent($pruefung_id, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum, $mitarbeiter_uid = null)
-	{
-		// the rules compare Y-m-d strings; another format breaks the order of the attempts
-		$tag = substr((string) $datum, 0, 10);
-		$geprueft = DateTime::createFromFormat('Y-m-d', $tag);
-		if(!$geprueft || $geprueft->format('Y-m-d') !== $tag) return $this->p->t('benotungstool', 'pruefungsdatumUngueltig', [$student_uid]);
-		$datum = $tag;
-
-		// §7 and §11: every exam must take place before the grade entry deadline. The kommissionelle
-		// Prüfung is the important case, because it decides if the student loses a semester.
-		$fristError = $this->pruefungsdatumNachFrist($stsem, $datum, $student_uid);
-		if($fristError !== null) return $fristError;
-
-		// the Lehreinheit decides the course of the exam; accept only one of this student in this course
-		$lehreinheiten = $this->lehreinheitenFuerStudent($lva_id, $student_uid, $stsem);
-		if(!$lehreinheiten) return $this->p->t('benotungstool', 'c4pruefungNichtGespeichert', [$student_uid]);
-		$index = array_search($lehreinheit_id, $lehreinheiten);
-		$lehreinheit_id = $lehreinheiten[$index === false ? 0 : $index];
-
-		// the addon runs before the transaction: a failed addon query would abort it
-		$entschuldigt = $this->entschuldigungsNote($student_uid, $datum);
-
-		$this->sperreStudent($student_uid, $lva_id, $stsem);
-
-		// The context of the rules, read once inside the lock. It travels with the call, so no method
-		// below reads the same row again.
-		// The course grade comes without the filter: a grade that is not released still exists. You
-		// must update it, because a new insert breaks the primary key.
-		$zeugnisNote = $this->getZeugnisnote($lva_id, $student_uid, $stsem);
-		$bestehendeLvNote = $this->getLvGesamtnoteRow($lva_id, $student_uid, $stsem);
-		$pruefungen = $this->VerlaufLib->getPruefungen($student_uid, $lva_id, $stsem);
-
-		// validate before any write
-		$regelError = $this->validatePruefung($student_uid, $note, $datum, $pruefung_id, $pruefungen, $bestehendeLvNote, $zeugnisNote);
-		if($regelError !== null) {
-			$this->db->trans_rollback();
-			return $regelError;
-		}
-
-		// A course grade without an exam row is attempt 1: the takeover ran without
-		// CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME, or the grade is older than this tool. The first new exam writes it now.
-		if(($pruefung_id === null || $pruefung_id === '')
-			&& count($pruefungen) === 0 && $bestehendeLvNote !== null
-			&& $this->VerlaufLib->buildVerlauf($pruefungen, $bestehendeLvNote->note, $zeugnisNote)->impliziterErstantritt) {
-			// attempt 1 must stay before the new exam; an exam entered late can be older than the benotungsdatum
-			$tagLvNote = substr((string) $bestehendeLvNote->benotungsdatum, 0, 10);
-			$tagErstantritt = ($tagLvNote !== '' && $tagLvNote < $datum) ? $tagLvNote : date('Y-m-d', strtotime($datum . ' -1 day'));
-
-			$this->VerlaufLib->upsertErstantritt(
-				$student_uid, $lva_id, $stsem, $bestehendeLvNote->note, $bestehendeLvNote->punkte, $tagErstantritt,
-				$this->benotenderMitarbeiter($lehreinheit_id), false, $lehreinheit_id
-			);
-			$pruefungen = $this->VerlaufLib->getPruefungen($student_uid, $lva_id, $stsem);
-		}
-
-		// an excused date replaces the grade of the dialog, within the occurrence limit
-		if($entschuldigt !== null && !$this->VerlaufLib->ueberschreitetNotenLimit($pruefungen, $entschuldigt, $pruefung_id)) {
-			$note = $entschuldigt;
-		}
-
-		$jetzt = date("Y-m-d H:i:s");
-
-		// this decides if the course grade is the implicit first attempt; read it before the update
-		$origLvNote = $bestehendeLvNote ? $bestehendeLvNote->note : null;
-		$lvgesamtnote = $bestehendeLvNote;
-
-		// the rules decide the course grade: the last exam that uses an attempt, never 'entschuldigt'
-		list($lvNoteNeu, $lvPunkteNeu) = $this->VerlaufLib->lvNoteNachTermin(
-			$pruefungen, $pruefung_id, $note, $punkte, $origLvNote, $bestehendeLvNote ? $bestehendeLvNote->punkte : null
-		);
-
-		if($bestehendeLvNote === null) {
-			$lvgesamtnote = $this->createLvGesamtnote($lva_id, $student_uid, $stsem, $lvNoteNeu, $lvPunkteNeu, $lehreinheit_id, $mitarbeiter_uid);
-
-			$this->logLib->logInfoDB(array('pruefung: lvnote angelegt', $student_uid, $lva_id, $stsem,
-				$note, $punkte, getAuthUID(), getAuthPersonId()));
-		} else {
-			// a repeat must not worsen the LV-Note; the exam row keeps the real grade
-			if($lvNoteNeu == $note
-				&& $this->config->item('CIS_GESAMTNOTE_VERBESSERUNG_BESSERE_GEWINNT')
-				&& $this->VerlaufLib->istSchlechter($note, $origLvNote)) {
-				$lvNoteNeu = $origLvNote;
+			$cells = $details
+				? array($student ? $student->matrikelnr : $uid, $student ? $student->kuerzel : '',
+					$student ? $student->nachname : '', $student ? $student->vorname : '')
+				: array($uid);
+			if ($details && CIS_GESAMTNOTE_PUNKTE) $cells[] = $lvgesamtnote->punkte;
+			if ($details) {
+				$note = (string) $lvgesamtnote->note;
+				$cells[] = isset($noten[$note]) ? $noten[$note]->bezeichnung : $note;
+				$cells[] = $lvgesamtnote->mitarbeiter_uid . ($lvgesamtnote->updatevon != '' ? ' (' . $lvgesamtnote->updatevon . ')' : '');
 			}
 
-			// state hangs on benotungsdatum > freigabedatum, so touching the date revokes the release
-			$hebtAuf = $this->config->item('CIS_GESAMTNOTE_PRUEFUNG_HEBT_FREIGABE_AUF') !== false;
-
-			$id = $this->LvgesamtnoteModel->update(
-				[$bestehendeLvNote->student_uid, $bestehendeLvNote->studiensemester_kurzbz, $bestehendeLvNote->lehrveranstaltung_id],
-				array(
-					'note' => $lvNoteNeu,
-					'punkte' => $lvPunkteNeu,
-					'benotungsdatum' => $hebtAuf ? $jetzt : $bestehendeLvNote->benotungsdatum,
-					'updateamum' => $jetzt,
-					'updatevon' => getAuthUID()
-				)
-			);
-
-			if($id) {
-				$res = $this->LvgesamtnoteModel->load($id->retval);
-				if(hasData($res)) $lvgesamtnote = getData($res)[0];
-			}
-
-			$this->logLib->logInfoDB(array('pruefung: lvnote aktualisiert', $student_uid, $lva_id, $stsem,
-				$note, $punkte, getAuthUID(), getAuthPersonId()));
+			$table .= '<tr><td>' . implode('</td><td>', array_map(array($this, 'mailCell'), $cells)) . "</td></tr>\n";
 		}
+		$table .= '</table>';
 
-		// save pruefung after updating lvnote, since pruefungspunkte get loaded by lv punkte
-		$pruefungenChanged = $this->savePruefungstermin(
-			$pruefung_id, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum,
-			$origLvNote, $mitarbeiter_uid, $lvgesamtnote, $pruefungen, $zeugnisNote
-		);
-
-		if(is_string($pruefungenChanged)) {
-			// the course grade alone is not a valid state, therefore it goes back as well
-			$this->db->trans_rollback();
-			return $pruefungenChanged;
-		}
-
-		if(!$this->entsperreStudent()) return $this->p->t('benotungstool', 'c4pruefungNichtGespeichert', [$student_uid]);
-
-		$pruefungenChanged['lvgesamtnote'] = $lvgesamtnote;
-
-		return $pruefungenChanged;
-	}
-
-	/**
-	 * Creates or updates an exam. The type carries no meaning here - position comes from the
-	 * history; pruefungstyp_kurzbz is written but never read back.
-	 *
-	 * @param int                 $pruefung_id set = edit that row, null = new attempt
-	 * @param stdClass|null       $lvgesamtnote the course grade the caller wrote
-	 * @param array               $pruefungen   the exams before this write
-	 * @param mixed|null          $zeugnisNote  the transcript grade the caller read
-	 * @return array|string the changed exams or a translated error message
-	 */
-	private function savePruefungstermin($pruefung_id, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum, $origLvNote = null, $mitarbeiter_uid = null, $lvgesamtnote = null, $pruefungen = array(), $zeugnisNote = null)
-	{
-		// no exam without a course grade (a grade that is not released also counts)
-		if($lvgesamtnote === null) {
-			return $this->p->t('benotungstool', 'c4keineLvNoteEingetragen');
-		}
-
-		$jetzt = date("Y-m-d H:i:s");
-
-		$pruefungenChanged = [];
-
-		// edit: only the addressed record, no type change and no new record
-		if($pruefung_id !== null && $pruefung_id !== '') {
-			$id = $this->LePruefungModel->update(
-				$pruefung_id,
-				array(
-					'updateamum' => $jetzt,
-					'updatevon' => getAuthUID(),
-					'note' => $note,
-					'punkte' => $punkte,
-					'datum' => $datum,
-					'anmerkung' => ""
-				)
-			);
-			$res = null;
-			if($id) {
-				$res = $this->LePruefungModel->load($id->retval);
-				if(hasData($res)) $pruefungenChanged['savedPruefung'] = getData($res);
-			}
-
-			$this->logLib->logInfoDB(array('pruefung updated', $res, getAuthUID(), getAuthPersonId()));
-
-			if(!isset($pruefungenChanged['savedPruefung'])) {
-				return $this->p->t('benotungstool', 'c4pruefungNichtGespeichert', [$student_uid]);
-			}
-
-			$pruefungenChanged['verlauf'] = $this->buildVerlaufSummary($student_uid, $lva_id, $stsem, $lvgesamtnote, $zeugnisNote);
-			return $pruefungenChanged;
-		}
-
-		$verlauf = $this->VerlaufLib->buildVerlauf($pruefungen, $origLvNote);
-		$rolle = $verlauf->naechsteRolle;
-
-		// one action makes one exam; the release creates the first attempt (upsertErstantritt)
-		$typ = ($rolle === PruefungsverlaufLib::ROLLE_ERSTANTRITT)
-			? $this->VerlaufLib->legacyTypFuerAntritt(1)
-			: $this->VerlaufLib->legacyTypFuerWiederholung($verlauf);
-
-		$id = $this->LePruefungModel->insert(
-			array(
-				'lehreinheit_id' => $lehreinheit_id,
-				'student_uid' => $student_uid,
-				'mitarbeiter_uid' => $this->benotenderMitarbeiter($lehreinheit_id, $mitarbeiter_uid),
-				'note' => $note,
-				'punkte' => $punkte,
-				'pruefungstyp_kurzbz' => $typ,
-				'datum' => $datum,
-				'anmerkung' => "",
-				'insertamum' => $jetzt,
-				'insertvon' => getAuthUID(),
-				'updateamum' => null,
-				'updatevon' => null,
-				'ext_id' => null
-			)
-		);
-		$res = null;
-		if($id) {
-			$res = $this->LePruefungModel->load($id->retval);
-			if(hasData($res)) $pruefungenChanged['savedPruefung'] = getData($res);
-		}
-
-		$this->logLib->logInfoDB(array('pruefung inserted ('.$rolle.')', $res, getAuthUID(), getAuthPersonId()));
-
-		// savedPruefung is the proof of success. Without this guard a failed insert (for example
-		// a missing lehreinheit_id) tells the client that the write was successful.
-		if(!isset($pruefungenChanged['savedPruefung'])) {
-			return $this->p->t('benotungstool', 'c4pruefungNichtGespeichert', [$student_uid]);
-		}
-
-		$pruefungenChanged['verlauf'] = $this->buildVerlaufSummary($student_uid, $lva_id, $stsem, $lvgesamtnote, $zeugnisNote);
-		return $pruefungenChanged;
-	}
-
-	private function sendFreigabeEmail($lektorFullName, $lvaFullName, $notenCount, $emailAdressen, $studlist, $betreff)
-	{
-		$emailAdressen = $this->freigabeEmpfaenger($emailAdressen);
-		$adressen = implode(";", $emailAdressen);
-		
-		foreach ($emailAdressen as $email)
-		{
-			// Prepare mail content
-			$body_fields = array(
-				'lektor' => $lektorFullName,
-				'lvaname' => $lvaFullName,
-				'studlist' => $studlist,
-				'neuenotencount' => $notenCount,
-				'adressen' => $adressen
-			);
-
-			// Send mail
+		$recipients = $this->freigabeRecipients($mail->studiengangAddresses);
+		foreach ($recipients as $recipient) {
 			sendSanchoMail(
-				$this->freigabeVorlage(),
-				$body_fields,
-				$email,
-				$betreff
+				$this->config->item('CIS_GESAMTNOTE_FREIGABEMAIL_VORLAGE'),
+				array(
+					'lektor' => $mail->lektor,
+					'lvaname' => $mail->lv,
+					'studlist' => $table,
+					'neuenotencount' => count($rows),
+					'adressen' => implode(';', $recipients)
+				),
+				$recipient,
+				$mail->subject
 			);
 		}
-
 	}
 
-	/** Opens a transaction; a second request for the same student in the same course waits for it. */
-	private function sperreStudent($student_uid, $lva_id, $stsem)
+	/** The recipients from CIS_GESAMTNOTE_FREIGABEMAIL_EMPFAENGER. @return array */
+	private function freigabeRecipients($studiengangAddresses)
 	{
-		$this->db->trans_begin();
-		$this->db->query('SELECT pg_advisory_xact_lock(hashtext(?))', array($student_uid . '|' . $lva_id . '|' . $stsem));
-	}
-
-	/**
-	 * Creates or updates attempt 1 on release, dated on the benotungsdatum. §8 asks for the date of
-	 * the last performance, which the system does not hold - the old tool used the same column.
-	 *
-	 * Applies only while at most one exam exists. A credited grade changes nothing.
-	 */
-	private function upsertErstantritt($lva_id, $student_uid, $stsem, $note, $punkte, $datum)
-	{
-		// same switch as the Übernahme path
-		if(!$this->config->item('CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME')) return;
-
-		if($this->VerlaufLib->istAnrechnungsnote($this->getZeugnisnote($lva_id, $student_uid, $stsem))) return;
-
-		// The release makes the grade binding. It moves no date: an exam keeps the date it carries,
-		// and attempt 1 keeps the date that the person picked while entering the grade. Only a
-		// missing attempt 1 is created, and it is dated on the benotungsdatum.
-		$lehreinheit_id = $this->lehreinheitFuerStudent($lva_id, $student_uid, $stsem);
-
-		$geschrieben = $this->VerlaufLib->upsertErstantritt(
-			$student_uid, $lva_id, $stsem, $note, $punkte, $datum,
-			$this->benotenderMitarbeiter($lehreinheit_id), false, $lehreinheit_id
-		);
-
-		if($geschrieben !== null) {
-			$this->logLib->logInfoDB(array('erstantritt (freigabe)', $student_uid, getAuthUID(), getAuthPersonId()));
-		}
-	}
-
-	/**
-	 * Guards the benotungsdatum. It becomes the date of attempt 1, so the exam date rules apply.
-	 * No date is allowed - the current moment then applies.
-	 *
-	 * @return string|null translated error or null
-	 */
-	private function validateBenotungsdatum($datum, $student_uid, $sem_kurzbz)
-	{
-		if($datum === null || $datum === '') return null;
-
-		$tag = substr((string) $datum, 0, 10);
-		$geprueft = DateTime::createFromFormat('Y-m-d', $tag);
-
-		if($geprueft === false || $geprueft->format('Y-m-d') !== $tag) {
-			return $this->p->t('benotungstool', 'benotungsdatumUngueltig', [$student_uid]);
-		}
-
-		// an assessment that did not happen yet has no date
-		if(!$this->config->item('CIS_GESAMTNOTE_DATUM_ZUKUNFT') && $tag > date('Y-m-d')) {
-			return $this->p->t('benotungstool', 'benotungsdatumInZukunft', [$student_uid]);
-		}
-
-		return $this->pruefungsdatumNachFrist($sem_kurzbz, $tag, $student_uid);
-	}
-
-	/**
-	 * Guards a direct API write of the course grade. The cell editor carries the same rules, but
-	 * API and CSV import bypass it. Order: grade, exam, transcript.
-	 *
-	 * @return string|null translated error or null
-	 */
-	private function validateNotenvorschlag($lva_id, $student_uid, $stsem, $note)
-	{
-		$noten = $this->aktiveNoten();
-		$wert  = trim((string)$note);
-
-		// the course grade is never 'entschuldigt': an excused date uses no attempt
-		if($wert !== '' && $wert == $this->VerlaufLib->getSpecialNotes()['entschuldigt']) {
-			return $this->p->t('benotungstool', 'c4noteNichtInLehre', [$student_uid]);
-		}
-
-		// the editor offers the lehre grades only; an administrative grade belongs to the transcript
-		if($this->config->item('CIS_GESAMTNOTE_VORSCHLAG_NUR_LEHRENOTEN') !== false
-			&& (!isset($noten[$wert]) || !$noten[$wert]->lehre)) {
-			return $this->p->t('benotungstool', 'c4noteNichtInLehre', [$student_uid]);
-		}
-
-		// Antritt 1 und die LV-Note sind dieselbe Leistung, deshalb schreibt dieser Weg sie weiter.
-		// Ab der ersten Wiederholung gehört die Note zum Antritt: dann über den Prüfungsdialog.
-		if($this->config->item('CIS_GESAMTNOTE_VORSCHLAG_NACH_WIEDERHOLUNG') !== true
-			&& $this->VerlaufLib->hatWiederholung($this->VerlaufLib->getPruefungen($student_uid, $lva_id, $stsem))) {
-			return $this->p->t('benotungstool', 'c4notenvorschlagGesperrt', [$student_uid]);
-		}
-
-		// a released grade can be final; then no path may change it any more
-		if($this->config->item('CIS_GESAMTNOTE_FREIGABE_FINAL')
-			&& $this->istFreigegeben($this->getLvGesamtnoteRow($lva_id, $student_uid, $stsem))) {
-			return $this->p->t('benotungstool', 'freigabeEndgueltig', [$student_uid]);
-		}
-
-		// a transcript grade can forbid the teacher to overwrite it, for example 'intern angerechnet'.
-		// An unknown or inactive grade locks nothing, which is what the editor does as well.
-		$zeugnisnote = trim((string)$this->getZeugnisnote($lva_id, $student_uid, $stsem));
-		if(isset($noten[$zeugnisnote]) && !$noten[$zeugnisnote]->lkt_ueberschreibbar) {
-			return $this->p->t('benotungstool', 'c4zeugnisnoteGesperrt', [$student_uid]);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Runs the examination rules for one write. The lib holds the rules; this only translates the
-	 * answer. The caller reads the context, because the write path needs the same three values.
-	 *
-	 * Empty $pruefung_id = new attempt, set = edit.
-	 *
-	 * @param array         $pruefungen  the exams of the student in this course
-	 * @param stdClass|null $lvRow       the course grade, read without the release filter
-	 * @param mixed|null    $zeugnisNote the transcript grade
-	 * @return string|null translated error or null
-	 */
-	private function validatePruefung($student_uid, $note, $datum, $pruefung_id, $pruefungen, $lvRow, $zeugnisNote)
-	{
-		$lvNote = $lvRow ? $lvRow->note : null;
-
-		$neu = ($pruefung_id === null || $pruefung_id === '');
-
-		$fehler = $neu
-			? $this->VerlaufLib->validateAdd($pruefungen, $note, $datum, $lvNote, $zeugnisNote)
-			: $this->VerlaufLib->validateEdit($pruefungen, $pruefung_id, $note, $datum, $lvNote, $zeugnisNote);
-
-		if($fehler !== null) return $this->regelFehlertext($fehler, $student_uid);
-
-		// a released grade can be final; the exam would change it
-		if($this->config->item('CIS_GESAMTNOTE_FREIGABE_FINAL') && $this->istFreigegeben($lvRow)) {
-			return $this->p->t('benotungstool', 'freigabeEndgueltig', [$student_uid]);
-		}
-
-		// the exam also writes the course grade: only a lehre grade, or one that uses no attempt
-		$noten = $this->aktiveNoten();
-		$wert = trim((string) $note);
-		if($this->config->item('CIS_GESAMTNOTE_VORSCHLAG_NUR_LEHRENOTEN') !== false
-			&& !in_array($wert, $this->VerlaufLib->getSpecialNotes()['ohneAntritt'])
-			&& (!isset($noten[$wert]) || !$noten[$wert]->lehre)) {
-			return $this->p->t('benotungstool', 'c4noteNichtInLehre', [$student_uid]);
-		}
-
-		// a locked transcript grade forbids every change, as in validateNotenvorschlag
-		$zeugnis = trim((string) $zeugnisNote);
-		if(isset($noten[$zeugnis]) && !$noten[$zeugnis]->lkt_ueberschreibbar) {
-			return $this->p->t('benotungstool', 'c4zeugnisnoteGesperrt', [$student_uid]);
-		}
-
-		// the matrix can reserve the kommPruef for one role, on top of the global switch
-		if($neu && !$this->darfAktion('kommpruef')) {
-			$verlauf = $this->VerlaufLib->buildVerlauf($pruefungen, $lvNote, $zeugnisNote);
-			if($verlauf->naechsteRolle === PruefungsverlaufLib::ROLLE_KOMMISSIONELL) {
-				return $this->p->t('benotungstool', 'kommPruefNichtErlaubt', [$student_uid]);
+		$addresses = array();
+		foreach ($this->config->item('CIS_GESAMTNOTE_FREIGABEMAIL_EMPFAENGER') as $entry) {
+			if ($entry === 'studiengang') {
+				foreach ($studiengangAddresses as $address) {
+					if (trim($address) !== '') $addresses[] = trim($address);
+				}
+			} elseif ($entry === 'aufrufer') {
+				$addresses[] = getAuthUID() . '@' . DOMAIN;
+			} elseif (strpos((string) $entry, '@') !== false) {
+				$addresses[] = trim($entry);
 			}
 		}
 
-		return null;
+		return array_values(array_unique($addresses));
+	}
+
+	/** One cell of the mail. The mail is HTML, so no value may carry markup. @return string */
+	private function mailCell($value)
+	{
+		return htmlspecialchars(trim((string) $value), ENT_QUOTES, 'UTF-8');
+	}
+
+	// === Answers and errors =====================================================================
+
+	/** The Verlauf for the answer of a write. The client builds the row again from it. @return array */
+	private function readVerlaufSummary($student_uid, $lv_id, $sem_kurzbz, $lvgesamtnote)
+	{
+		$zeugnisnote = $this->getZeugnisnote($lv_id, $student_uid, $sem_kurzbz);
+		$verlauf = $this->VerlaufLib->getVerlauf(
+			$student_uid, $lv_id, $sem_kurzbz, $lvgesamtnote ? $lvgesamtnote->note : null, $zeugnisnote
+		);
+
+		return $this->verlaufSummary($verlauf, $lvgesamtnote, $zeugnisnote);
 	}
 
 	/**
-	 * @param bool $withPruefungen add the exams (for the write paths) or send the counters only
+	 * The fields of the Verlauf that the client reads. The server decides each rule; the client only
+	 * reads these answers, so no rule exists twice.
+	 *
 	 * @return array
 	 */
-	private function verlaufSummary($verlauf, $withPruefungen = false, $hatLvNote = null)
+	private function verlaufSummary($verlauf, $lvgesamtnote, $zeugnisnote)
 	{
-		$summary = array(
+		return array(
+			// each Pruefung also carries note_locked: a later Pruefung locks its Note
+			'pruefungen' => $verlauf->pruefungen,
 			'antrittCount' => $verlauf->antrittCount,
 			'maxAntritte' => $verlauf->maxAntritte,
 			'canAdd' => $verlauf->canAdd,
 			'terminal' => $verlauf->terminal,
-			// closed by a pass, not by the attempt limit
+			// closed by a pass, not by the limit
 			'bestanden' => $verlauf->bestanden,
-			// the takeover path is locked from the first repeat on
-			'hatWiederholung' => $verlauf->hatWiederholung,
-			'erstantrittMoeglich' => $verlauf->erstantrittMoeglich,
-			'naechsteRolle' => $verlauf->naechsteRolle,
-			// the next attempt is kommissionell and this tool may not create it
-			'kommPruefGesperrt' => $verlauf->kommPruefGesperrt,
-			// credited: the row is visible, but you cannot select it and it gets no exams
+			// a second Pruefung exists
+			'hasRepeat' => $verlauf->hasRepeat,
+			// nobody may write the LV-Note directly: the proposal editor and the apply button are locked
+			'lvNoteLocked' => $this->lvNoteLockReason($verlauf, $lvgesamtnote, $zeugnisnote) !== null,
+			// the Lektor may not overwrite the Zeugnisnote: the row gets no Pruefung
+			'zeugnisnoteLocked' => $this->isZeugnisnoteLocked($zeugnisnote),
+			// a new Pruefung must not lie before this day (Y-m-d, or null)
+			'earliestNewDay' => $verlauf->earliestNewDay,
+			// Note => limit: the Noten that NOTEN_OCCURRENCE_LIMIT_MAP allows no more time
+			'notenAtLimit' => $verlauf->notenAtLimit,
+			// the next Antritt is kommissionell, and this tool may not create it
+			'kommPruefLocked' => $verlauf->kommPruefLocked,
+			// the row is visible, but nobody can select it
 			'angerechnet' => $verlauf->angerechnet,
-			'hatLvNote' => $hatLvNote // ungefiltert, also inklusive noch nicht freigegebener
+			// also an LV-Note that is not freigegeben
+			'hasLvNote' => $lvgesamtnote !== null
 		);
+	}
 
-		if($withPruefungen) $summary['pruefungen'] = $verlauf->pruefungen;
+	/** A translated error with its phrase key as code. @return array { error: { code, message } } */
+	private function phraseError($category, $key, $params = array())
+	{
+		return array('error' => array('code' => $key, 'message' => $this->p->t($category, $key, $params)));
+	}
 
-		return $summary;
+	/** Stops the request with a translated error; the phrase key is the code. */
+	private function terminateWithPhrase($category, $key, $params = array())
+	{
+		$error = $this->phraseError($category, $key, $params);
+		$this->terminateWithError($error['error'], 'general');
+	}
+
+	/** The POST body. Stops the request if a key is missing. @return stdClass */
+	private function getPostWith($keys)
+	{
+		$payload = $this->getPostJSON();
+
+		foreach ($keys as $key) {
+			if (!is_object($payload) || !property_exists($payload, $key)) $this->terminateWithPhrase('global', 'missingParameters');
+		}
+
+		return $payload;
+	}
+
+	/** Stops the request unless $rows is a list of objects with a uid. */
+	private function assertRows($rows)
+	{
+		if (!is_array($rows)) $this->terminateWithPhrase('global', 'wrongParameters');
+
+		foreach ($rows as $row) {
+			if (isEmptyString((string) $this->field($row, 'uid'))) $this->terminateWithPhrase('global', 'wrongParameters');
+		}
+	}
+
+	/** An optional field of a request object. @return mixed|null */
+	private function field($object, $key)
+	{
+		return (is_object($object) && property_exists($object, $key)) ? $object->$key : null;
 	}
 }
-

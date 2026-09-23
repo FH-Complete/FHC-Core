@@ -1,31 +1,29 @@
 /**
- * From which attempt the exam is kommissionell.
+ * From which Antritt the Pruefung is kommissionell.
  *
  * The number comes from CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT, not from this test. Checks that
  * the built chain follows it: role -> legacy type -> the `kommissionell` flag.
  */
 
+import { loginAsLektor } from "../../../../support/api/notenApi";
 import { expectNotenSuccess } from "../../../../support/helpers/notenErrors";
 import { skipIf } from "../../../../support/helpers/notenConfig";
-import { attemptDate, loadNotenContext, requireDbReset } from "../../../../support/helpers/notenTestData";
-import {
-	addPruefung,
-	attemptsOfStudent,
-	givenBaseline,
-	readStateViaApi,
-} from "../../../../support/helpers/notenScenario";
+import { antrittDate, loadNotenContext, requireDbReset } from "../../../../support/helpers/notenTestData";
+import { addPruefung, pruefungenOf, givenBaseline, readStateViaApi } from "../../../../support/helpers/notenScenario";
 
 describe("Noten API - ab welchem Antritt kommissionell", () => {
 	let ctx;
 	let fromAntritt; // null means no Antritt is kommissionell
 
 	before(() => {
-		loadNotenContext().then((context) => {
-			ctx = context;
-			fromAntritt = context.cisConfig.CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT ?? null;
-			cy.log(`KOMMISSIONELL_AB_ANTRITT = ${fromAntritt} maxAntritte = ${context.maxAntritte}`);
+		loadNotenContext().then((loaded) => {
+			ctx = loaded;
+			fromAntritt = ctx.cisConfig.CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT ?? null;
+			cy.log(`KOMMISSIONELL_AB_ANTRITT = ${fromAntritt} maxAntritte = ${ctx.maxAntritte}`);
 		});
 	});
+
+	beforeEach(() => loginAsLektor());
 
 	beforeEach(() => requireDbReset());
 
@@ -46,20 +44,20 @@ describe("Noten API - ab welchem Antritt kommissionell", () => {
 		const student = ctx.students[0];
 		expect(student, "ein Student der LV").to.exist;
 
-		// The base step produces step 1. A negative note keeps the chain open.
-		givenBaseline(ctx, student, { note: ctx.notes.negativ });
+		// the baseline is Antritt 1; a negative Note keeps the chain open
+		givenBaseline(ctx, student, { note: ctx.noten.negativ });
 
 		for (let nr = 2; nr <= ctx.maxAntritte; nr += 1) {
-			addPruefung(ctx, student, { note: ctx.notes.negativ, datum: attemptDate(ctx, nr - 1) }).then((response) =>
+			addPruefung(ctx, student, { note: ctx.noten.negativ, datum: antrittDate(ctx, nr - 1) }).then((response) =>
 				expectNotenSuccess(response, `Antritt ${nr}`),
 			);
 		}
 
 		readStateViaApi(ctx).then((data) => {
-			const attempts = attemptsOfStudent(data, student.uid);
-			expect(attempts.length, "die Kette ist vollständig").to.eq(ctx.maxAntritte);
+			const pruefungen = pruefungenOf(data, student.uid);
+			expect(pruefungen.length, "die Kette ist vollständig").to.eq(ctx.maxAntritte);
 
-			attempts.forEach((termin, index) => {
+			pruefungen.forEach((termin, index) => {
 				const nr = index + 1;
 				const expected = fromAntritt !== null && nr >= fromAntritt;
 

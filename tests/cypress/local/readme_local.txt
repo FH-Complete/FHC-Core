@@ -17,7 +17,7 @@ withTunnel.js       Opens the tunnel, starts a command, and closes the tunnel wh
 sshTunnel.js        The tunnel itself (package ssh2). withTunnel.js and profileSwitch.js use it.
 notenProfiles.js    Command line for the profiles: status, apply, restore, run.
 profileSwitch.js    Writes the profile over SFTP, keeps the backups, checks the instance.
-eslint.config.js    Lint rules of the suite. They enforce the conventions in .claude/rules/.
+eslint.config.js    Lint rules of the suite. Two rules check conventions from suites/readme_noten.txt.
 package.json        ssh2, ESLint and Prettier. Cypress, dotenv and pg come from the repository root.
 .env                SSH access and the path of the instance (gitignored).
 
@@ -36,8 +36,8 @@ Create the credentials file:
 
 tests/cypress/local/.env.example -> tests/cypress/local/.env
 
-The tools also read tests/cypress/.env (BASE_URL) and tests/cypress/suites/.env (NOTEN_USER,
-NOTEN_DB_*). Fill out these two files first. readme_benotungstool.txt explains them.
+The tools also read tests/cypress/.env (BASE_URL) and tests/cypress/suites/.env (NOTEN_LEKTOR_USER,
+NOTEN_DB_*). Fill out these two files first. suites/readme_noten.txt explains them.
 
 - NOTEN_DB_HOST in suites/.env stays the real database host, as the SSH host sees it. Do not write
   127.0.0.1. The tunnel changes the value only for the command that it starts.
@@ -115,7 +115,7 @@ The tunnel is up, but the database connection closes immediately
   the expected value. Make sure that NOTEN_REMOTE_ROOT is the path of the instance at BASE_URL.
 
 "getCisConfig antwortet nach dem Profilwechsel mit HTTP ..."
-  HTTP 401: NOTEN_USER or NOTEN_PASSWORD is wrong. Other codes: the changed file contains a PHP
+  HTTP 401: NOTEN_LEKTOR_USER or NOTEN_LEKTOR_PASSWORD is wrong. Other codes: the changed file contains a PHP
   error. Run restore, then examine the values of the profile.
 
 "Auf <path> ist noch "<profile>" aktiv"

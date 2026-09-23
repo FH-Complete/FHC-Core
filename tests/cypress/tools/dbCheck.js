@@ -10,7 +10,7 @@
  * and output are shared and live here. A sqlFiles entry is a path or { file, group }; a
  * "-- ==== <group> ====" line starts a group.
  *
- * `check` is read-only; `seed` needs <PREFIX>_DB_ALLOW_WRITES=true and an owner role.
+ * `check` is read-only; `seed` needs NOTEN_DB_ALLOW_WRITES=true and the owner role.
  */
 
 const fs = require("fs");
@@ -90,7 +90,7 @@ const applySqlFile = async (client, entry) => {
 	const { file, group } = typeof entry === "string" ? { file: entry } : entry;
 	const label = path.relative(process.cwd(), file) + (group ? ` [${group}]` : "");
 	if (!db.writesAllowed()) {
-		console.error(`\nRefusing to write: set ${db.PREFIX}_DB_ALLOW_WRITES=true first.\n`);
+		console.error("\nRefusing to write: set NOTEN_DB_ALLOW_WRITES=true first.\n");
 		return 2;
 	}
 	if (!fs.existsSync(file)) {
@@ -115,7 +115,7 @@ const applySqlFile = async (client, entry) => {
 		// `check` gets by as the application role; seeding creates and grants objects.
 		if (/permission denied/i.test(error.message)) {
 			console.error(`${error.message}\n`);
-			console.error(`Seeding needs the database owner, but ${db.PREFIX}_DB_USER is "${db.env("USER")}".`);
+			console.error(`Seeding needs the database owner, but NOTEN_DB_USER is "${db.env("USER")}".`);
 			console.error("Point it at the owner role, or rebuild the database with db_setup.sh.\n");
 			return 2;
 		}
@@ -135,17 +135,15 @@ const applySqlFile = async (client, entry) => {
 };
 
 const printEnv = () => {
-	const p = db.PREFIX;
 	console.log(`
 Add to tests/cypress/suites/.env (gitignored):
 
-  TEST_ENV_PREFIX=${p}
-  ${p}_DB_HOST=<postgres host>
-  ${p}_DB_PORT=5432
-  ${p}_DB_NAME=<test database>
-  ${p}_DB_USER=<user>
-  ${p}_DB_PASSWORD=<password>
-  ${p}_DB_ALLOW_WRITES=true
+  NOTEN_DB_HOST=<postgres host>
+  NOTEN_DB_PORT=5432
+  NOTEN_DB_NAME=<test database>
+  NOTEN_DB_USER=<user>
+  NOTEN_DB_PASSWORD=<password>
+  NOTEN_DB_ALLOW_WRITES=true
 `);
 };
 
@@ -174,7 +172,7 @@ const main = async () => {
 		return 2;
 	}
 
-	const status = await db.checkAvailability({ requireWrites: mode !== "check" });
+	const status = await db.checkConnection({ requireWrites: mode !== "check" });
 	if (!status.available) {
 		console.error(`\nCould not connect: ${status.reason}\n`);
 		if (status.reason === "not-configured") printEnv();

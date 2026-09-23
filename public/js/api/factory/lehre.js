@@ -36,13 +36,6 @@ export default {
 			url: `/api/frontend/v1/Lehre/Pruefungen/${lehrveranstaltung_id}`
 		};
 	},
-	getZugewieseneLv(uid, sem_kurzbz){
-		return {
-			method: 'get',
-			url: '/api/frontend/v1/Lehre/getZugewieseneLv',
-			params: { uid, sem_kurzbz}
-		};
-	},
 	getSemesterAverageGrade(semester) {
 		return {
 			method: 'get',

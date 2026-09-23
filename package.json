@@ -1,7 +1,7 @@
 {
   "scripts": {
     "noten:check": "node tests/cypress/tools/dbCheck.js noten",
-    "noten:api": "cypress run --spec \"tests/cypress/e2e/specs/{unit,api}/**/*.cy.js\"",
+    "noten:api": "cypress run --spec \"tests/cypress/e2e/specs/api/**/*.cy.js\"",
     "noten:ui": "cypress run --browser chrome --spec \"tests/cypress/e2e/specs/ui/**/*.cy.js\""
   },
   "//": [

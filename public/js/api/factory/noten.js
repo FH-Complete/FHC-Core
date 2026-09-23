@@ -16,93 +16,16 @@
  */
 
 export default {
-	getCisConfig(){
+	getCisConfig() {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/Noten/getCisConfig'
 		};
 	},
-	getStudentenNoten(lv_id, sem_kurzbz) {
-		return {
-			method: 'get',
-			url: '/api/frontend/v1/Noten/getStudentenNoten',
-			params: { lv_id, sem_kurzbz }
-		};
-	},
-	getNoten(){
+	getNoten() {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/Noten/getNoten'
-		};
-	},
-	saveStudentenNoten(password, noten, lv_id, sem_kurzbz) {
-		return {
-			method: 'post',
-			url: '/api/frontend/v1/Noten/saveStudentenNoten',
-			params: { password, noten, lv_id, sem_kurzbz }
-		};
-	},
-	// datum: das gewählte Benotungsdatum (YYYY-MM-DD). Ohne Wert nimmt der Server den aktuellen
-	// Zeitpunkt. Die Freigabe macht daraus das Datum des ersten Antritts.
-	saveNotenvorschlag(lv_id, sem_kurzbz, student_uid, note, punkte = null, datum = null) {
-		return {
-			method: 'post',
-			url: '/api/frontend/v1/Noten/saveNotenvorschlag',
-			params: { lv_id, sem_kurzbz, student_uid, note, punkte, datum }
-		};
-	},
-	// kein Termintyp mehr: welchen Antritt die Prüfung darstellt, leitet der Server aus dem
-	// bestehenden Prüfungsverlauf des Studenten in dieser LV und diesem Semester ab
-	// mitarbeiter_uid: der benotende Lektor. Nur nötig, wenn die Lehreinheit mehrere hat - sonst
-	// löst der Server ihn selbst auf.
-	saveStudentPruefung(student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, pruefung_id = null, mitarbeiter_uid = null){
-		return {
-			method: 'post',
-			url: '/api/frontend/v1/Noten/saveStudentPruefung',
-			params: { student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, pruefung_id, mitarbeiter_uid }
-		};
-	},
-	// note/punkte optional: ohne Auswahl wird der Termin als "noch nicht eingetragen" angelegt
-	createPruefungen(uids, datum, lva_id, sem_kurzbz, note = null, punkte = null, mitarbeiter_uid = null){
-		return {
-			method: 'post',
-			url: '/api/frontend/v1/Noten/createPruefungen',
-			params: { uids, datum, lva_id, sem_kurzbz, note, punkte, mitarbeiter_uid }
-		};
-	},
-	getLehreinheitenFuerLv(lv_id, sem_kurzbz) {
-		return {
-			method: 'get',
-			url: '/api/frontend/v1/Noten/getLehreinheitenFuerLv',
-			params: { lv_id, sem_kurzbz }
-		};
-	},
-	getLehrendeFuerLehreinheit(lehreinheit_id, lv_id, sem_kurzbz) {
-		return {
-			method: 'get',
-			url: '/api/frontend/v1/Noten/getLehrendeFuerLehreinheit',
-			params: { lehreinheit_id, lv_id, sem_kurzbz }
-		};
-	},
-	saveNotenvorschlagBulk(lv_id, sem_kurzbz, noten) {
-		return {
-			method: 'post',
-			url: '/api/frontend/v1/Noten/saveNotenvorschlagBulk',
-			params: { lv_id, sem_kurzbz, noten }
-		};
-	},
-	saveStudentPruefungBulk(lv_id, sem_kurzbz, pruefungen) {
-		return {
-			method: 'post',
-			url: '/api/frontend/v1/Noten/savePruefungenBulk',
-			params: { lv_id, sem_kurzbz, pruefungen }
-		};
-	},
-	getNoteByPunkte(punkte, lv_id, sem_kurzbz) {
-		return {
-			method: 'post',
-			url: '/api/frontend/v1/Noten/getNoteByPunkte',
-			params: { punkte, lv_id, sem_kurzbz }
 		};
 	},
 	getBenotungstoolContext(sem_kurzbz, lv_id = null) {
@@ -118,5 +41,85 @@ export default {
 			url: '/api/frontend/v1/Noten/getLvForStudiengang',
 			params: { studiengang_kz, sem_kurzbz }
 		};
+	},
+	getLehreinheitenForLv(lv_id, sem_kurzbz) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Noten/getLehreinheitenForLv',
+			params: { lv_id, sem_kurzbz }
+		};
+	},
+	getLektorenForLehreinheit(lv_id, sem_kurzbz, lehreinheit_id) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Noten/getLektorenForLehreinheit',
+			params: { lv_id, sem_kurzbz, lehreinheit_id }
+		};
+	},
+	// -> { students, domain }
+	getStudentenNoten(lv_id, sem_kurzbz) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Noten/getStudentenNoten',
+			params: { lv_id, sem_kurzbz }
+		};
+	},
+	getNoteByPunkte(lv_id, sem_kurzbz, punkte) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Noten/getNoteByPunkte',
+			params: { lv_id, sem_kurzbz, punkte }
+		};
+	},
+
+	// Each write answers { <uid>: { lvgesamtnote, verlauf, pruefung } }. A rejected row of a bulk
+	// write is { <uid>: { error: { code, message } } }.
+
+	// datum: the day of Antritt 1 (YYYY-MM-DD); without it the server takes today
+	saveLvNote(lv_id, sem_kurzbz, student_uid, note, punkte, datum) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Noten/saveLvNote',
+			params: { lv_id, sem_kurzbz, student_uid, note, punkte, datum }
+		};
+	},
+	// lv_noten: [{ uid, note, punkte }]
+	importLvNoten(lv_id, sem_kurzbz, lv_noten) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Noten/importLvNoten',
+			params: { lv_id, sem_kurzbz, lv_noten }
+		};
+	},
+	// pruefung: { pruefung_id (null = a new Pruefung), lehreinheit_id, datum, note, punkte, mitarbeiter_uid }
+	savePruefung(lv_id, sem_kurzbz, student_uid, pruefung) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Noten/savePruefung',
+			params: { lv_id, sem_kurzbz, student_uid, ...pruefung }
+		};
+	},
+	// students: [{ uid, lehreinheit_id }]; pruefung: { datum, note, punkte, mitarbeiter_uid }
+	createPruefungen(lv_id, sem_kurzbz, students, pruefung) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Noten/createPruefungen',
+			params: { lv_id, sem_kurzbz, students, ...pruefung }
+		};
+	},
+	// pruefungen: [{ uid, lehreinheit_id, datum, note, punkte }]
+	importPruefungen(lv_id, sem_kurzbz, pruefungen) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Noten/importPruefungen',
+			params: { lv_id, sem_kurzbz, pruefungen }
+		};
+	},
+	saveFreigabe(lv_id, sem_kurzbz, password, uids) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Noten/saveFreigabe',
+			params: { lv_id, sem_kurzbz, password, uids }
+		};
 	}
-}
+};

@@ -1,4 +1,4 @@
-import { notenAuth } from "../../../../support/api/notenApi";
+import { loginAsLektor } from "../../../../support/api/notenApi";
 import { waitForOk } from "../../../../support/helpers/network";
 import {
 	assistenzAuth,
@@ -8,10 +8,10 @@ import {
 import { loadNotenContext, requireDbReset } from "../../../../support/helpers/notenTestData";
 
 /**
- * The route is /Cis/Benotungstool/:sem_kurzbz?/:lv_id?. The semester comes before the course, so
- * the router no longer interprets a URL without a course as lv_id.
+ * The route is /Cis/Benotungstool/:sem_kurzbz?/:lv_id?. The semester comes before the LV, so the
+ * router does not read a URL without an LV as lv_id.
  */
-context("Benotungstool UI - Navigation", () => {
+describe("Benotungstool UI - Navigation", () => {
 	const SEMESTER = "[data-cy='dropdown-semester']";
 	const TIMEOUT = 60_000;
 
@@ -22,9 +22,9 @@ context("Benotungstool UI - Navigation", () => {
 			.should(($label) => expect($label.text().trim(), "vorausgewähltes Semester").to.not.be.empty)
 			.then(($label) => $label.text().trim());
 
+	beforeEach(() => loginAsLektor());
+
 	it("behält ein Semester ohne LV nach einem Reload", () => {
-		const { username, password } = notenAuth();
-		cy.login(username, password);
 		cy.intercept({ method: "GET", url: "**/api/frontend/v1/Noten/getBenotungstoolContext*" }).as("context");
 		cy.visit("/cis.php/Cis/Benotungstool");
 
@@ -37,20 +37,20 @@ context("Benotungstool UI - Navigation", () => {
 					.first();
 			})
 			.then(($item) => {
-				const sem = $item.text().trim();
+				const semKurzbz = $item.text().trim();
 
 				cy.wrap($item).click();
 				waitForOk("@context");
-				cy.location("pathname").should("match", new RegExp(`/Benotungstool/${sem}$`));
+				cy.location("pathname").should("match", new RegExp(`/Benotungstool/${semKurzbz}$`));
 
 				cy.reload();
 
-				selectedSemester().should("eq", sem);
+				selectedSemester().should("eq", semKurzbz);
 				cy.get(".p-toast-message-error").should("not.exist");
 			});
 	});
 
-	// The list contained only the courses that the caller teaches.
+	// the list used to contain only the LVs that the caller teaches
 	it("zeigt einer Assistenz die Lehreinheiten der LV", function () {
 		requireAssistenz(this);
 
@@ -64,10 +64,10 @@ context("Benotungstool UI - Navigation", () => {
 				expect(target, "eine LV der Assistenz mit Lehreinheiten").to.not.be.null;
 
 				cy.login(username, password);
-				cy.intercept({ method: "GET", url: "**/api/frontend/v1/Noten/getLehreinheitenFuerLv*" }).as(
+				cy.intercept({ method: "GET", url: "**/api/frontend/v1/Noten/getLehreinheitenForLv*" }).as(
 					"lehreinheiten",
 				);
-				cy.visit(`/cis.php/Cis/Benotungstool/${target.sem}/${target.lvId}`);
+				cy.visit(`/cis.php/Cis/Benotungstool/${target.semKurzbz}/${target.lvId}`);
 
 				waitForOk("@lehreinheiten");
 				cy.get("[data-cy='dropdown-lehreinheit']", { timeout: TIMEOUT }).click();

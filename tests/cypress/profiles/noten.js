@@ -1,10 +1,10 @@
 /**
- * Configuration profiles for the Grading Tool Suite.
+ * The configurations that the noten suite must pass.
  *
- * A profile specifies only the deviation from the instance's current state. “config” modifies application/config/noten.php,
- * “flags” modifies the define() flags in config/global.config.inc.php. After the change, the suite checks
- * every key that getCisConfig returns under the same name. expect specifies values that a flag only
- * indirectly changes or that getCisConfig returns after resolution.
+ * A profile lists only the differences to the instance. `config` changes application/config/noten.php,
+ * `flags` changes the define() flags in config/global.config.inc.php. After a switch, each key that
+ * getCisConfig returns under the same name must have the profile value. `expect` lists values that a
+ * flag changes only indirectly, or that getCisConfig returns in a resolved form.
  *
  * A profile enables branches that no other profile checks. A run over all profiles lists, at the
  * end, the tests that do not run in any profile.
@@ -22,7 +22,7 @@ module.exports = {
 		shipped: {
 			description: "die Schalter aus global.config-default.inc.php: TERMIN3 an",
 			flags: { CIS_GESAMTNOTE_PRUEFUNG_TERMIN3: true },
-			// 1 + TERMIN2 + TERMIN3 + KOMMPRUEF, solange CIS_GESAMTNOTE_MAX_ANTRITTE fehlt
+			// 1 + TERMIN2 + TERMIN3 + KOMMPRUEF, while CIS_GESAMTNOTE_MAX_ANTRITTE is null
 			expect: { CIS_GESAMTNOTE_MAX_ANTRITTE: 4 },
 		},
 
@@ -55,7 +55,7 @@ module.exports = {
 		"no-kommission": {
 			description: "kein Antritt ist kommissionell",
 			config: { CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT: 0 },
-			// getCisConfig löst 0 zu null auf
+			// getCisConfig resolves 0 to null
 			expect: { CIS_GESAMTNOTE_KOMMISSIONELL_AB_ANTRITT: null },
 		},
 
@@ -63,14 +63,14 @@ module.exports = {
 			description: "die Assistenz darf weder freigeben noch die kommissionelle Prüfung anlegen",
 			config: {
 				CIS_GESAMTNOTE_ROLLENMATRIX: {
-					"lehre/benotungstool": ["vorschlag", "pruefung", "kommpruef", "freigabe", "import"],
-					"lehre/benotungstool_assistenz": ["vorschlag", "pruefung", "import"],
+					"lehre/benotungstool": ["lvnote", "pruefung", "kommpruef", "freigabe", "import"],
+					"lehre/benotungstool_assistenz": ["lvnote", "pruefung", "import"],
 				},
 			},
 		},
 
-		// The specifications call for appearances at 30-day intervals, with one excused appointment in between
-		// 60 days. Both limits allow for these intervals.
+		// The specs put Antritte 30 days apart, or 60 days with an entschuldigt Pruefung in between.
+		// Both limits allow these gaps.
 		"antritt-gap": {
 			description: "Wartefrist 14 Tage und Höchstfrist 400 Tage zwischen zwei Antritten",
 			config: {
@@ -87,10 +87,10 @@ module.exports = {
 			},
 		},
 
-		// not including the start gap: on the same day, the gap is 0 days
+		// without CIS_GESAMTNOTE_ANTRITT_MIN_ABSTAND_TAGE: on the same day the gap is 0 days
 		"same-day": {
 			description: "ein neuer Termin darf am Tag eines bestehenden liegen",
-			config: { CIS_GESAMTNOTE_TERMIN_GLEICHER_TAG: true },
+			config: { CIS_GESAMTNOTE_PRUEFUNG_GLEICHER_TAG: true },
 		},
 
 		"frist-exception": {
@@ -106,9 +106,10 @@ module.exports = {
 
 		open: {
 			description:
-				"frühere Noten änderbar, künftiges Benotungsdatum, keine Datumsfrist, ein Termin hebt die Freigabe nicht auf",
+				"frühere Noten änderbar, künftiges Benotungsdatum, keine Datumsfrist, ein Termin hebt die Freigabe nicht auf, LV-Note nach einer Wiederholung änderbar",
 			config: {
-				CIS_GESAMTNOTE_NOTE_SPERRE_BEI_SPAETEREM_TERMIN: false,
+				CIS_GESAMTNOTE_VORSCHLAG_NACH_WIEDERHOLUNG: true,
+				CIS_GESAMTNOTE_NOTE_SPERRE_BEI_SPAETERER_PRUEFUNG: false,
 				CIS_GESAMTNOTE_DATUM_ZUKUNFT: true,
 				CIS_GESAMTNOTE_FRIST_PRUEFUNGSDATUM: false,
 				CIS_GESAMTNOTE_PRUEFUNG_HEBT_FREIGABE_AUF: false,
@@ -116,10 +117,12 @@ module.exports = {
 		},
 
 		notenimport: {
-			description: "der Notenimport ohne Datum, mit dem Kürzel aus tbl_note.anmerkung",
+			description:
+				"nur der Notenimport: ohne Datum, mit dem Kürzel aus tbl_note.anmerkung, der Prüfungsimport ist aus",
 			config: {
 				CIS_GESAMTNOTE_NOTENIMPORT: true,
 				CIS_GESAMTNOTE_IMPORT_NOTENKUERZEL: true,
+				CIS_GESAMTNOTE_PRUEFUNGSIMPORT: false,
 			},
 		},
 
@@ -128,7 +131,7 @@ module.exports = {
 			flags: { CIS_GESAMTNOTE_PUNKTE: true },
 		},
 
-		// “BESSERE_GEWINNT” is omitted: a lower improvement results in the final grade
+		// without VERBESSERUNG_BESSERE_GEWINNT: a worse Note of the repeat becomes the LV-Note
 		"punkte-notenverbesserung": {
 			description: "Punktemodus mit Notenverbesserung und Notenimport",
 			flags: { CIS_GESAMTNOTE_PUNKTE: true },

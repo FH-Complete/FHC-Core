@@ -5,29 +5,14 @@
 export function escapeHtml(value) {
 	if (value === null || value === undefined) return '';
 
-	const ersatz = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'};
+	const replacements = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'};
 
-	return String(value).replace(/[&<>"']/g, (zeichen) => ersatz[zeichen]);
+	return String(value).replace(/[&<>"']/g, (character) => replacements[character]);
 }
 
 export function capitalize(string) {
-	if (!string) return '';
-	
-	// ref unwrap if we receive such
-	if (Vue.isRef(string)) {
-		return Vue.computed(() => {
-			const val = Vue.unref(string);
-			return (val && typeof val === 'string') ? val.charAt(0).toUpperCase() + val.slice(1) : '';
-		});
-	}
-
-	// just a plain string, return a plain string
-	if (typeof string === 'string') {
-		return string.charAt(0).toUpperCase() + string.slice(1);
-	}
-
-	return '';
-	
+	if (!string) return "";
+	return string[0].toUpperCase() + string.slice(1);
 }
 
 export function convertCase(string, from, to) {

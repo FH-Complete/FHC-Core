@@ -1,31 +1,46 @@
 /**
- * Wrappers over the Benotungstool API. Mirrors public/js/api/factory/noten.js.
+ * The Noten API. The same names and parameters as public/js/api/factory/noten.js.
+ *
+ * notenApi.* calls an endpoint as NOTEN_LEKTOR_USER. apiGet / apiPost call it as another account.
  */
 
 const NOTEN_API = "/index.ci.php/api/frontend/v1/Noten";
 
-// One session for the whole run. Without a session cookie the server checks each Basic-auth request
-// against LDAP, and many LDAP binds can block all PHP-FPM workers of the instance. cy.login creates the
-// session once (cy.session, cacheAcrossSpecs) and restores it before each test of every importing spec.
-beforeEach(() => {
-	const { username, password } = notenAuth();
-	cy.login(username, password);
-});
-
-/** The lecturer the suite works as. No fallback to USER_NAME: that user belongs to every suite. */
-export const notenAuth = () => {
-	const username = Cypress.env("NOTEN_USER");
-	const password = Cypress.env("NOTEN_PASSWORD");
-	if (!username || !password) throw new Error("NOTEN_USER / NOTEN_PASSWORD missing in tests/cypress/suites/.env");
+/** The Lektor the suite works as. No fallback to USER_NAME: that user belongs to every suite. */
+export const lektorAuth = () => {
+	const username = Cypress.env("NOTEN_LEKTOR_USER");
+	const password = Cypress.env("NOTEN_LEKTOR_PASSWORD");
+	if (!username || !password) {
+		throw new Error("NOTEN_LEKTOR_USER / NOTEN_LEKTOR_PASSWORD missing in tests/cypress/suites/.env");
+	}
 	return { username, password };
 };
 
-// Basic auth stays on every call as the fallback; with a session cookie the server uses the cookie.
-const apiGet = (path, qs) =>
-	cy.request({ method: "GET", url: `${NOTEN_API}/${path}`, qs, auth: notenAuth(), failOnStatusCode: false });
+/** The LDAP password for the Freigabe. NOTEN_FREIGABE_PASSWORD, else the password of NOTEN_LEKTOR_USER. */
+export const freigabePassword = () => Cypress.env("NOTEN_FREIGABE_PASSWORD") || lektorAuth().password;
 
-const apiPost = (path, body) =>
-	cy.request({ method: "POST", url: `${NOTEN_API}/${path}`, body, auth: notenAuth(), failOnStatusCode: false });
+/**
+ * Logs in as NOTEN_LEKTOR_USER. Call it in beforeEach: cy.session logs in once per run and restores
+ * the session before each test. Without a session cookie the server checks every request against LDAP,
+ * and many LDAP binds can block all PHP-FPM workers of the instance.
+ */
+export const loginAsLektor = () => {
+	const { username, password } = lektorAuth();
+	cy.login(username, password);
+};
+
+/** auth: the account (default NOTEN_LEKTOR_USER), or null for no credentials. A session cookie wins over auth. */
+export const apiGet = (path, qs, auth = lektorAuth()) =>
+	cy.request({ method: "GET", url: `${NOTEN_API}/${path}`, qs, ...(auth ? { auth } : {}), failOnStatusCode: false });
+
+export const apiPost = (path, body, auth = lektorAuth()) =>
+	cy.request({
+		method: "POST",
+		url: `${NOTEN_API}/${path}`,
+		body,
+		...(auth ? { auth } : {}),
+		failOnStatusCode: false,
+	});
 
 export const notenApi = {
 	getCisConfig: () => apiGet("getCisConfig"),
@@ -36,86 +51,41 @@ export const notenApi = {
 
 	getLvForStudiengang: (studiengang_kz, sem_kurzbz) => apiGet("getLvForStudiengang", { studiengang_kz, sem_kurzbz }),
 
-	getLehrendeFuerLehreinheit: (lehreinheit_id, lv_id, sem_kurzbz) =>
-		apiGet("getLehrendeFuerLehreinheit", { lehreinheit_id, lv_id, sem_kurzbz }),
+	getLehreinheitenForLv: (lv_id, sem_kurzbz) => apiGet("getLehreinheitenForLv", { lv_id, sem_kurzbz }),
 
-	getLehreinheitenFuerLv: (lv_id, sem_kurzbz) => apiGet("getLehreinheitenFuerLv", { lv_id, sem_kurzbz }),
+	getLektorenForLehreinheit: (lv_id, sem_kurzbz, lehreinheit_id) =>
+		apiGet("getLektorenForLehreinheit", { lv_id, sem_kurzbz, lehreinheit_id }),
 
-	/** data ist POSITIONAL: [studenten, pruefungen, DOMAIN, grades-by-uid, anwesenheiten] */
+	/** data -> { students, domain }. Read it with notenScenario.js. */
 	getStudentenNoten: (lv_id, sem_kurzbz) => apiGet("getStudentenNoten", { lv_id, sem_kurzbz }),
 
-	/** Single-student read through the unfiltered getter. uid -> caller. */
-	getNotenvorschlagStudent: (lv_id, sem_kurzbz, uid = null) =>
-		apiGet("getNotenvorschlagStudent", { lv_id, sem_kurzbz, uid }),
+	getNoteByPunkte: (lv_id, sem_kurzbz, punkte) => apiPost("getNoteByPunkte", { lv_id, sem_kurzbz, punkte }),
 
-	/** data -> [lvgesamtnote] */
-	saveNotenvorschlag: (lv_id, sem_kurzbz, student_uid, note, punkte = null, datum = null) =>
-		apiPost("saveNotenvorschlag", { lv_id, sem_kurzbz, student_uid, note, punkte, datum }),
+	// Each write answers data[uid] = { lvgesamtnote, verlauf, pruefung }. A bulk write answers HTTP 200
+	// also for a rejected row: data[uid] = { error: { code, message } }.
 
-	/** data -> [savedPruefung, lvgesamtnote, verlauf]. Kein `typ` auf der Leitung. Ohne mitarbeiter_uid fehlt das Feld. */
-	saveStudentPruefung: ({
-		student_uid,
-		note,
-		punkte = null,
-		datum,
-		lva_id,
-		lehreinheit_id,
-		sem_kurzbz,
-		pruefung_id = null,
-		mitarbeiter_uid,
-	}) =>
-		apiPost("saveStudentPruefung", {
-			student_uid,
-			note,
-			punkte,
-			datum,
-			lva_id,
-			lehreinheit_id,
-			sem_kurzbz,
-			pruefung_id,
-			mitarbeiter_uid,
-		}),
+	saveLvNote: (lv_id, sem_kurzbz, student_uid, note, punkte = null, datum = null) =>
+		apiPost("saveLvNote", { lv_id, sem_kurzbz, student_uid, note, punkte, datum }),
+
+	/** lv_noten: [{ uid, note, punkte }] */
+	importLvNoten: (lv_id, sem_kurzbz, lv_noten) => apiPost("importLvNoten", { lv_id, sem_kurzbz, lv_noten }),
+
+	/** pruefung: { pruefung_id (null = a new Pruefung), lehreinheit_id, datum, note, punkte, mitarbeiter_uid } */
+	savePruefung: (lv_id, sem_kurzbz, student_uid, pruefung) =>
+		apiPost("savePruefung", { lv_id, sem_kurzbz, student_uid, ...pruefung }),
+
+	/** students: [{ uid, lehreinheit_id }]; pruefung: { datum, note, punkte, mitarbeiter_uid } */
+	createPruefungen: (lv_id, sem_kurzbz, students, pruefung) =>
+		apiPost("createPruefungen", { lv_id, sem_kurzbz, students, ...pruefung }),
+
+	/** pruefungen: [{ uid, lehreinheit_id, datum, note, punkte }] */
+	importPruefungen: (lv_id, sem_kurzbz, pruefungen) => apiPost("importPruefungen", { lv_id, sem_kurzbz, pruefungen }),
 
 	/**
-	 * LDAP password-protected data -> [{uid, approval_date, grading_date}]
-	 *
-	 * First, a session: AuthLDAPLib loads ldap.php using require_once. It checks the Basic authentication for the same
-	 * request against LDAP; if the password check for the release finds no configuration, it reports
-	 * “Incorrect password.” With the session cookie, the login does not check against LDAP.
+	 * The Freigabe needs the LDAP password. The getCisConfig call first creates a session. Without it,
+	 * the Basic-auth login loads ldap.php with require_once, and the password check in the same request
+	 * finds no LDAP configuration and answers "Incorrect password".
 	 */
-	saveStudentenNoten: (password, noten, lv_id, sem_kurzbz) =>
-		apiGet("getCisConfig").then(() => apiPost("saveStudentenNoten", { password, noten, lv_id, sem_kurzbz })),
-
-	getNoteByPunkte: (punkte, lv_id, sem_kurzbz) => apiPost("getNoteByPunkte", { punkte, lv_id, sem_kurzbz }),
-
-	// Bulk paths return a 200 response and report errors on a per-row basis in data[uid]
-	saveNotenvorschlagBulk: (lv_id, sem_kurzbz, noten) =>
-		apiPost("saveNotenvorschlagBulk", { lv_id, sem_kurzbz, noten }),
-
-	savePruefungenBulk: (lv_id, sem_kurzbz, pruefungen) =>
-		apiPost("savePruefungenBulk", { lv_id, sem_kurzbz, pruefungen }),
-
-	// note/punkte are optional; without them the Prüfung is created as "Noch nicht eingetragen"
-	createPruefungen: (uids, datum, lva_id, sem_kurzbz, note = null, punkte = null) =>
-		apiPost("createPruefungen", { uids, datum, lva_id, sem_kurzbz, note, punkte }),
+	saveFreigabe: (lv_id, sem_kurzbz, password, uids) =>
+		apiGet("getCisConfig").then(() => apiPost("saveFreigabe", { lv_id, sem_kurzbz, password, uids })),
 };
-
-// --- selectors over the getStudentenNoten payload ---
-
-export const pruefungenOf = (data, uid) => (data[1] || []).filter((p) => p.student_uid === uid);
-
-/** Antritte in chronological order. Check the specs for position/count/start_no/terminal, never the type. */
-export const attemptsOf = (data, uid) =>
-	[...pruefungenOf(data, uid)].sort((a, b) => Number(a.position) - Number(b.position));
-
-/** Only the attempts that consume one - excused / "noch nicht eingetragen" do not. */
-export const countingAttemptsOf = (data, uid) => attemptsOf(data, uid).filter((p) => p.zaehlt);
-
-/** Legacy projection written for old reports. Asserted in exactly one spec, never used as a rule. */
-export const pruefungenOfType = (data, uid, type) =>
-	pruefungenOf(data, uid).filter((p) => p.pruefungstyp_kurzbz === type);
-
-export const gradesOf = (data, uid) => (data[3] || {})[uid];
-
-/** Server-derived rule state per student: antrittCount, maxAntritte, canAdd, terminal, angerechnet. */
-export const verlaufOf = (data, uid) => (gradesOf(data, uid) || {}).verlauf;

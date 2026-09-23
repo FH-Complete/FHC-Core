@@ -1,21 +1,21 @@
 /**
- * The assistant's account: NOTEN_ASSISTENZ_USER / NOTEN_ASSISTENZ_PASSWORD.
+ * The Assistenz account: NOTEN_ASSISTENZ_USER / NOTEN_ASSISTENZ_PASSWORD.
  *
- * getByStgs returns a degree program only for a single semester with a curriculum. The assistants therefore
- * search backward from the semester of the suite. Before the first call, the test requires cy.clearAllCookies(); otherwise,
- * the request will run using the suite user’s cookie.
+ * getByStgs returns a Studiengang only for a semester with a Studienplan. So the helpers search
+ * backwards from the semester of the suite. Call cy.clearAllCookies() before the first request,
+ * otherwise the request runs with the session cookie of NOTEN_LEKTOR_USER.
  */
 
+import { apiGet } from "../api/notenApi";
 import { expectNotenSuccess } from "./notenErrors";
 import { skipIf } from "./notenConfig";
 
-const NOTEN_API = "/index.ci.php/api/frontend/v1/Noten";
 const SEMESTER_SEARCH_DEPTH = 6;
 
 export const assistenzConfigured = () =>
 	Boolean(Cypress.env("NOTEN_ASSISTENZ_USER") && Cypress.env("NOTEN_ASSISTENZ_PASSWORD"));
 
-/** Skip, wenn kein Konto der Assistenz konfiguriert ist. */
+/** Skips if no Assistenz account is configured. */
 export const requireAssistenz = (testContext) =>
 	skipIf(
 		testContext,
@@ -28,14 +28,11 @@ export const assistenzAuth = () => ({
 	password: Cypress.env("NOTEN_ASSISTENZ_PASSWORD"),
 });
 
-const getAsAssistenz = (path, qs) =>
-	cy.request({ method: "GET", url: `${NOTEN_API}/${path}`, qs, auth: assistenzAuth(), failOnStatusCode: false });
-
 /** WS2026 -> [WS2026, SS2026, WS2025, ...] */
-const semestersBackwards = (sem) => {
-	const semesterList = [sem];
-	let type = sem.slice(0, 2);
-	let year = Number(sem.slice(2, 6));
+const semestersBackwards = (semKurzbz) => {
+	const semesterList = [semKurzbz];
+	let type = semKurzbz.slice(0, 2);
+	let year = Number(semKurzbz.slice(2, 6));
 
 	while (semesterList.length < SEMESTER_SEARCH_DEPTH) {
 		if (type === "WS") {
@@ -49,47 +46,52 @@ const semestersBackwards = (sem) => {
 	return semesterList;
 };
 
-/** -> { sem, data } für das neueste Semester, in dem die Assistenz Studiengänge sieht, sonst null. */
-export const assistenzContext = (startSem) => {
-	const semesterList = semestersBackwards(startSem);
+/** -> { semKurzbz, data } for the newest semester in which the Assistenz sees a Studiengang, else null. */
+export const assistenzContext = (startSemKurzbz) => {
+	const semesterList = semestersBackwards(startSemKurzbz);
 
 	const trySemester = (i) =>
 		i >= semesterList.length
 			? cy.wrap(null, { log: false })
-			: getAsAssistenz("getBenotungstoolContext", { sem_kurzbz: semesterList[i] }).then((response) => {
+			: apiGet("getBenotungstoolContext", { sem_kurzbz: semesterList[i] }, assistenzAuth()).then((response) => {
 					const data = expectNotenSuccess(response, `Kontext der Assistenz in ${semesterList[i]}`);
-					return data.studiengaenge.length ? { sem: semesterList[i], data } : trySemester(i + 1);
+					return data.studiengaenge.length ? { semKurzbz: semesterList[i], data } : trySemester(i + 1);
 				});
 
 	return trySemester(0);
 };
 
-/** -> { sem, lvId, lehreinheiten } für eine LV der Assistenz mit Lehreinheiten in der Datenbank, sonst null. */
-export const assistenzLvWithLehreinheiten = (startSem) =>
-	assistenzContext(startSem).then((result) => {
+/** -> { semKurzbz, lvId, lehreinheiten } for an LV of the Assistenz with Lehreinheiten in the database, else null. */
+export const assistenzLvWithLehreinheiten = (startSemKurzbz) =>
+	assistenzContext(startSemKurzbz).then((result) => {
 		if (!result) return null;
 
-		const { sem } = result;
+		const { semKurzbz } = result;
 		const studiengaenge = result.data.studiengaenge;
 
 		const firstLvWithLehreinheiten = (lvs, j) =>
 			j >= lvs.length
 				? cy.wrap(null, { log: false })
 				: cy
-						.task("noten:db:lehreinheitenOfLv", { lvId: lvs[j].lehrveranstaltung_id, semKurzbz: sem })
+						.task("noten:db:readLehreinheitenOfLv", { lvId: lvs[j].lehrveranstaltung_id, semKurzbz })
 						.then((ids) =>
 							ids.length
-								? { sem, lvId: lvs[j].lehrveranstaltung_id, lehreinheiten: ids.map(String).sort() }
+								? {
+										semKurzbz,
+										lvId: lvs[j].lehrveranstaltung_id,
+										lehreinheiten: ids.map(String).sort(),
+									}
 								: firstLvWithLehreinheiten(lvs, j + 1),
 						);
 
 		const tryStudiengang = (i) =>
 			i >= studiengaenge.length
 				? cy.wrap(null, { log: false })
-				: getAsAssistenz("getLvForStudiengang", {
-						studiengang_kz: studiengaenge[i].studiengang_kz,
-						sem_kurzbz: sem,
-					})
+				: apiGet(
+						"getLvForStudiengang",
+						{ studiengang_kz: studiengaenge[i].studiengang_kz, sem_kurzbz: semKurzbz },
+						assistenzAuth(),
+					)
 						.then((response) =>
 							firstLvWithLehreinheiten(expectNotenSuccess(response, "LVs des Studiengangs"), 0),
 						)

@@ -25,8 +25,8 @@ Cypress.Commands.add("checkPageResources", (url) => {
 });
 
 /**
- * Session-Login. cy.session hält es über Specs hinweg, damit nicht jeder Test neu anmeldet.
- * Ohne Argumente meldet sich USER_NAME an.
+ * Session login. cy.session keeps it across specs, so a test does not log in again.
+ * Without arguments it logs in as USER_NAME.
  */
 Cypress.Commands.add("login", (username, password) => {
 	const { adminusername, adminpassword } = Cypress.env();
@@ -40,8 +40,6 @@ Cypress.Commands.add("login", (username, password) => {
 	});
 });
 
-// Anwendungsfehler sollen den Test nicht abbrechen, aber sichtbar sein.
-Cypress.on("uncaught:exception", (err) => {
-	Cypress.log({ name: "app error", message: err.message, consoleProps: () => ({ error: err }) });
-	return false;
-});
+// The FHC API layer shows a server error as a toast and then rejects the promise; the page does not
+// catch it. That is no crash. Every other error of the page fails the test.
+Cypress.on("uncaught:exception", (err) => (err.name === "AxiosError" ? false : undefined));
