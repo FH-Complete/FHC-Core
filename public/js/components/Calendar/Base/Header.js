@@ -58,15 +58,17 @@ export default {
 					<button
 						v-if="btnRange"
 						type="button"
+						:title="$p.t('LvPlan/range')"
 						class="btn btn-outline-secondary"
 						:class="{active: mode === 'range'}"
 						@click="clickMode($event, 'range')"
 					>
-						<i class="fa fa-calendar"></i>
+						<i class="fa-regular fa-calendar-days"></i>
 					</button>
 					<button
 						v-if="btnMonth"
 						type="button"
+						:title="$p.t('LvPlan/month')"
 						class="btn btn-outline-secondary"
 						:class="{active: mode === 'month'}"
 						@click="clickMode($event, 'month')"
@@ -76,6 +78,7 @@ export default {
 					<button
 						v-if="btnWeek"
 						type="button"
+						:title="$p.t('LvPlan/week')"
 						class="btn btn-outline-secondary"
 						:class="{active: mode === 'week'}"
 						@click="clickMode($event, 'week')"
@@ -85,6 +88,7 @@ export default {
 					<button
 						v-if="btnDay"
 						type="button"
+						:title="$p.t('LvPlan/day')"
 						class="btn btn-outline-secondary"
 						:class="{active: mode === 'day'}"
 						@click="clickMode($event, 'day')"
@@ -94,6 +98,7 @@ export default {
 					<button
 						v-if="btnList"
 						type="button"
+						:title="$p.t('LvPlan/list')"
 						class="btn btn-outline-secondary"
 						:class="{active: mode === 'list'}"
 						@click="clickMode($event, 'list')"
