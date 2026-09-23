@@ -292,20 +292,20 @@ else if (isset($_SESSION['pruefling_id']))
 			if ($row->semester == '1')
 			{
 				// Basisgebiete anzeigen
-				echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 3px;">';
+				echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 3px; margin-top: 5px;">';
 				echo '<tr><td class="HeaderTesttool">' . $p->t('testtool/basisgebiete') . '</td></tr>';
 			}
 			else
 			{
 				if (!$quereinsteiger_menu)
 				{
-					echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 3px;">';
+					echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 3px; margin-top: 5px;">';
 					echo '<tr><td class="HeaderTesttool">' . $p->t('testtool/quereinstiegsgebiete') . '</td></tr>';
 					$quereinsteiger_menu = true;
 				}
 				else
 				{
-					echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 3px;">';
+					echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 3px; margin-top: 5px;">';
 				}
 			}
 		}
