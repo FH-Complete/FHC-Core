@@ -60,7 +60,7 @@ export default {
 			case "list":
 				return this.date.toLocaleString(luxon.DateTime.DATE_FULL) + '-' + this.date.plus({ days: this.listLength - 1 }).toLocaleString(luxon.DateTime.DATE_FULL);
 			case "range":
-				return this.date.toLocaleString(luxon.DateTime.DATE_FULL) + '-' + this.date.plus({ days: this.rangeLength - 1 }).toLocaleString(luxon.DateTime.DATE_FULL);
+				return this.date.toLocaleString(luxon.DateTime.DATE_SHORT) + '-' + this.date.plus({ days: this.rangeLength - 1 }).toLocaleString(luxon.DateTime.DATE_SHORT);
 			case "day":
 				return this.date.toLocaleString(luxon.DateTime.DATE_FULL);
 			default:
