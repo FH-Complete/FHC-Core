@@ -188,6 +188,9 @@ export default {
 							description: semester.bezeichnung,
 						};
 					})
+					.sort((semesterA, semesterB) =>
+						semesterA.startDate.ts > semesterB.startDate.ts ? -1 : 1,
+					)
 				};
 			}
 		},

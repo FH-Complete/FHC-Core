@@ -5,7 +5,7 @@ import FhcCalendar from "../../Calendar/LvPlan.js";
 import ApiLvPlan from "../.././../api/factory/lvPlan.js";
 import ApiOtherLvPlan from "../.././../api/factory/otherLvPlan.js";
 import ApiAuthinfo from "../../../api/factory/authinfo.js";
-import ApiStudiensemester from '../../../api/factory/studiensemester.js';
+import ApiStudiensemester from "../../../api/factory/studiensemester.js";
 
 export const DEFAULT_MODE_LVPLAN_DESKTOP = "Week";
 export const DEFAULT_MODE_LVPLAN_MOBILE = "List";
@@ -45,13 +45,13 @@ export default {
 	},
 	inject: ["isMobile"],
 	provide() {
-		return { 
+		return {
 			rangeLength: Vue.computed(() => {
 				if (!this.$route.params.range_length) return 30;
 				else if (this.$route.params.range_length > 365) return 365;
 				else return this.$route.params.range_length;
 			}),
-			rangeViewPresets: Vue.computed(() => this.semesterRangePresets)
+			rangeViewPresets: Vue.computed(() => this.semesterRangePresets),
 		};
 	},
 	computed: {
@@ -261,20 +261,28 @@ export default {
 			);
 		},
 		async fetchSemesters() {
-			const semestersResponse = await this.$api.call(ApiStudiensemester.getAll());
+			const semestersResponse = await this.$api.call(
+				ApiStudiensemester.getAll(),
+			);
 			if (semestersResponse.meta.status === "success") {
 				this.semesterRangePresets = {
 					label: "View specific semester",
-					presets: semestersResponse.data.map((semester) => {
-						let startDate = luxon.DateTime.fromISO(semester.start);
-						let endDate = luxon.DateTime.fromISO(semester.ende);
-						return {
-							startDate,
-							endDate,
-							name: semester.studiensemester_kurzbz,
-							description: semester.bezeichnung,
-						};
-					})
+					presets: semestersResponse.data
+						.map((semester) => {
+							let startDate = luxon.DateTime.fromISO(
+								semester.start,
+							);
+							let endDate = luxon.DateTime.fromISO(semester.ende);
+							return {
+								startDate,
+								endDate,
+								name: semester.studiensemester_kurzbz,
+								description: semester.bezeichnung,
+							};
+						})
+						.sort((semesterA, semesterB) =>
+							semesterA.startDate.ts > semesterB.startDate.ts ? -1 : 1,
+						),
 				};
 			}
 		},
