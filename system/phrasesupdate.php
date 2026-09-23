@@ -35700,6 +35700,226 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorEntUploadFileTooLarge',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Datei ist {size} MB groß. Die maximale Dateigröße ist {max} MB. Verkleinern Sie die Datei und laden Sie sie erneut hoch. Fotografieren Sie das Dokument zum Beispiel mit geringerer Auflösung oder komprimieren Sie das PDF.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The file is {size} MB. The maximum file size is {max} MB. Make the file smaller and upload it again. For example, take the photo of the document with a lower resolution or compress the PDF.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorEntUploadFiletype',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Dateityp von »{file}« ist nicht erlaubt. Erlaubte Dateitypen: {filetypes}. Speichern Sie die Datei in einem erlaubten Dateityp und laden Sie sie erneut hoch.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The file type of "{file}" is not allowed. Allowed file types: {filetypes}. Save the file in an allowed file type and upload it again.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorEntUploadContent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Server kann »{file}« nicht als {type}-Datei lesen. Die Datei ist beschädigt oder hat eine falsche Dateiendung. Öffnen Sie die Datei und speichern Sie sie erneut in einem dieser Dateitypen: {filetypes}.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The server cannot read "{file}" as a {type} file. The file is damaged or has an incorrect file extension. Open the file and save it again in one of these file types: {filetypes}.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorEntUploadEmptyFile',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Datei »{file}« ist leer. Wählen Sie eine andere Datei aus.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The file "{file}" is empty. Select a different file.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorEntUploadPartial',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Server hat die Datei nicht vollständig erhalten. Prüfen Sie Ihre Internetverbindung und laden Sie die Datei erneut hoch.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The server did not receive the complete file. Check your internet connection and upload the file again.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorEntUploadNoFile',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Server hat keine Datei erhalten. Wählen Sie die Datei noch einmal aus und laden Sie sie erneut hoch.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The server did not receive a file. Select the file again and upload it.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorEntUploadTechnical',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Server kann die Datei wegen eines technischen Problems nicht speichern. Versuchen Sie es später erneut. Wenn der Fehler bleibt, wenden Sie sich an den Support und nennen Sie die Fehlernummer {reference}.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The server cannot save the file because of a technical problem. Try again later. If the error continues, contact the support team and give them the error number {reference}.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorEntAlreadyAccepted',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Diese Entschuldigung hat bereits den Status »akzeptiert«. Sie müssen kein Dokument mehr nachreichen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This excuse note already has the status "accepted". You do not have to upload a document.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorEntAlreadyDeclined',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Diese Entschuldigung hat bereits den Status »abgelehnt«. Sie können kein Dokument mehr nachreichen. Wenn Sie Fragen haben, wenden Sie sich an Ihre Studiengangsassistenz.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This excuse note already has the status "declined". You cannot upload a document for it. If you have questions, contact your study program assistant.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entUploadAllowedFiletypes',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erlaubte Dateitypen: {filetypes}.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Allowed file types: {filetypes}.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entUploadMaxFilesize',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Maximale Dateigröße: {max} MB.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Maximum file size: {max} MB.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	//
 	// DIGITALE ANWESENHEITEN PHRASEN END
 	//
