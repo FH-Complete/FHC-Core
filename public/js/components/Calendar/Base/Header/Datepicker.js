@@ -52,19 +52,19 @@ export default {
 		title() {
 			switch (this.mode) {
 			case "month":
-				return this.date.toLocaleString({ month: 'long', year: 'numeric' });
+				return "   " + this.date.toLocaleString({ month: 'long', year: 'numeric' });
 			case "week":
 				var year = this.date.localWeekYear;
 				var week = this.date.toFormat('nn');
-				return this.$p.t('calendar/year_kw', { year, week });
+				return "   " + this.$p.t('calendar/year_kw', { year, week });
 			case "list":
-				return this.date.toLocaleString(luxon.DateTime.DATE_FULL) + '-' + this.date.plus({ days: this.listLength - 1 }).toLocaleString(luxon.DateTime.DATE_FULL);
+				return "   " + this.date.toLocaleString(luxon.DateTime.DATE_FULL) + '-' + this.date.plus({ days: this.listLength - 1 }).toLocaleString(luxon.DateTime.DATE_FULL);
 			case "range":
-				return this.date.toLocaleString(luxon.DateTime.DATE_SHORT) + '-' + this.date.plus({ days: this.rangeLength - 1 }).toLocaleString(luxon.DateTime.DATE_SHORT);
+				return "   " + this.date.toLocaleString(luxon.DateTime.DATE_SHORT) + '-' + this.date.plus({ days: this.rangeLength - 1 }).toLocaleString(luxon.DateTime.DATE_SHORT);
 			case "day":
-				return this.date.toLocaleString(luxon.DateTime.DATE_FULL);
+				return "   " + this.date.toLocaleString(luxon.DateTime.DATE_FULL);
 			default:
-				return 'View not Supported';
+				return "   " + 'View not Supported';
 			}
 		},
 		weekStart() {
