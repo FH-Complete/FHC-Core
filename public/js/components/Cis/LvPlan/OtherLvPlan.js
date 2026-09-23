@@ -37,10 +37,7 @@ export default {
 				photo: "",
 			},
 			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone,
-			semesterRangePresets: {
-				label: null,
-				presets: [],
-			},
+			semesterRangePresets: [],
 		};
 	},
 	inject: ["isMobile"],
@@ -51,7 +48,12 @@ export default {
 				else if (this.$route.params.range_length > 365) return 365;
 				else return this.$route.params.range_length;
 			}),
-			rangeViewPresets: Vue.computed(() => this.semesterRangePresets),
+			rangeViewPresetsConfig: Vue.computed(() => {
+				return {
+					label: this.$p.t("LvPlan/view_specific_semester"),
+					presets: this.semesterRangePresets,
+				};
+			}),
 		};
 	},
 	computed: {
@@ -265,25 +267,22 @@ export default {
 				ApiStudiensemester.getAll(),
 			);
 			if (semestersResponse.meta.status === "success") {
-				this.semesterRangePresets = {
-					label: "View specific semester",
-					presets: semestersResponse.data
-						.map((semester) => {
-							let startDate = luxon.DateTime.fromISO(
-								semester.start,
-							);
-							let endDate = luxon.DateTime.fromISO(semester.ende);
-							return {
-								startDate,
-								endDate,
-								name: semester.studiensemester_kurzbz,
-								description: semester.bezeichnung,
-							};
-						})
-						.sort((semesterA, semesterB) =>
-							semesterA.startDate.ts > semesterB.startDate.ts ? -1 : 1,
-						),
-				};
+				this.semesterRangePresets = semestersResponse.data
+					.map((semester) => {
+						let startDate = luxon.DateTime.fromISO(semester.start);
+						let endDate = luxon.DateTime.fromISO(semester.ende);
+						return {
+							startDate,
+							endDate,
+							name: semester.studiensemester_kurzbz,
+							description: semester.bezeichnung,
+						};
+					})
+					.sort((semesterA, semesterB) =>
+						semesterA.startDate.ts > semesterB.startDate.ts
+							? -1
+							: 1,
+					);
 			}
 		},
 	},

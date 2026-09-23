@@ -1,20 +1,20 @@
 import FhcCalendar from "../../Calendar/LvPlan.js";
 
-import ApiLvPlan from '../../../api/factory/lvPlan.js';
-import ApiAuthinfo from '../../../api/factory/authinfo.js';
-import ApiRoomPlan from '../../../api/factory/calendar/roomPlan.js';
-import ApiStudiensemester from '../../../api/factory/studiensemester.js';
+import ApiLvPlan from "../../../api/factory/lvPlan.js";
+import ApiAuthinfo from "../../../api/factory/authinfo.js";
+import ApiRoomPlan from "../../../api/factory/calendar/roomPlan.js";
+import ApiStudiensemester from "../../../api/factory/studiensemester.js";
 
 export const DEFAULT_MODE_LVPLAN_DESKTOP = "Week";
 export const DEFAULT_MODE_LVPLAN_MOBILE = "List";
 
 export default {
-	name: 'LvPlanPersonal',
+	name: "LvPlanPersonal",
 	components: {
-		FhcCalendar
+		FhcCalendar,
 	},
 	props: {
-		propsViewData: Object
+		propsViewData: Object,
 	},
 	data() {
 		return {
@@ -25,26 +25,31 @@ export default {
 			isMitarbeiter: false,
 			isStudent: false,
 			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone,
-			semesterRangePresets: {
-				label: null,
-				presets: [],
-			},
+			semesterRangePresets: [],
 		};
 	},
 	inject: ["isMobile"],
 	provide() {
-		return { 
+		return {
 			rangeLength: Vue.computed(() => {
 				if (!this.$route.params.range_length) return 30;
 				else if (this.$route.params.range_length > 365) return 365;
 				else return this.$route.params.range_length;
 			}),
-			rangeViewPresets: Vue.computed(() => this.semesterRangePresets)
+			rangeViewPresetsConfig: Vue.computed(() => {
+				return {
+					label: this.$p.t("LvPlan/view_specific_semester"),
+					presets: this.semesterRangePresets,
+				};
+			}),
 		};
 	},
-	computed:{
+	computed: {
 		currentDay() {
-			if (!this.propsViewData?.focus_date || isNaN(new Date(this.propsViewData?.focus_date)))
+			if (
+				!this.propsViewData?.focus_date ||
+				isNaN(new Date(this.propsViewData?.focus_date))
+			)
 				return luxon.DateTime.now().setZone(this.timezone).toISODate();
 			return this.propsViewData?.focus_date;
 		},
@@ -68,39 +73,65 @@ export default {
 			return this.propsViewData?.mode;
 		},
 		downloadLinks() {
-			if (!this.studiensemester_start || !this.studiensemester_ende || !this.uid)
+			if (
+				!this.studiensemester_start ||
+				!this.studiensemester_ende ||
+				!this.uid
+			)
 				return false;
 
 			let type = false;
-			type = this.isStudent ? 'student' : type;
-			type = this.isMitarbeiter ? 'lektor' : type;
-			if (false === type)
-			{
+			type = this.isStudent ? "student" : type;
+			type = this.isMitarbeiter ? "lektor" : type;
+			if (false === type) {
 				return;
 			}
 
 			const opts = { zone: this.timezone };
-			const start = luxon.DateTime
-				.fromISO(this.studiensemester_start, opts)
-				.toUnixInteger();
-			const ende = luxon.DateTime
-				.fromISO(this.studiensemester_ende, opts)
-				.toUnixInteger();
+			const start = luxon.DateTime.fromISO(
+				this.studiensemester_start,
+				opts,
+			).toUnixInteger();
+			const ende = luxon.DateTime.fromISO(
+				this.studiensemester_ende,
+				opts,
+			).toUnixInteger();
 
-			const download_link = FHC_JS_DATA_STORAGE_OBJECT.app_root
-				+ 'cis/private/lvplan/stpl_kalender.php'
-				+ '?type=' + type
-				+ '&pers_uid=' + this.uid
-				+ '&begin=' + start
-				+ '&ende=' + ende;
+			const download_link =
+				FHC_JS_DATA_STORAGE_OBJECT.app_root +
+				"cis/private/lvplan/stpl_kalender.php" +
+				"?type=" +
+				type +
+				"&pers_uid=" +
+				this.uid +
+				"&begin=" +
+				start +
+				"&ende=" +
+				ende;
 
 			return [
-				{ title: "excel", icon: 'fa-solid fa-file-excel', link: download_link + '&format=excel' },
-				{ title: "csv", icon: 'fa-solid fa-file-csv', link: download_link + '&format=csv' },
-				{ title: "ical1", icon: 'fa-regular fa-calendar', link: download_link + '&format=ical&version=1&target=ical' },
-				{ title: "ical2", icon: 'fa-regular fa-calendar', link: download_link + '&format=ical&version=2&target=ical' }
+				{
+					title: "excel",
+					icon: "fa-solid fa-file-excel",
+					link: download_link + "&format=excel",
+				},
+				{
+					title: "csv",
+					icon: "fa-solid fa-file-csv",
+					link: download_link + "&format=csv",
+				},
+				{
+					title: "ical1",
+					icon: "fa-regular fa-calendar",
+					link: download_link + "&format=ical&version=1&target=ical",
+				},
+				{
+					title: "ical2",
+					icon: "fa-regular fa-calendar",
+					link: download_link + "&format=ical&version=2&target=ical",
+				},
 			];
-		}
+		},
 	},
 	watch: {
 		async isMobile() {
@@ -118,38 +149,53 @@ export default {
 			return this.handleChangeMode(newMode, day, rangeLength);
 		},
 		handleChangeMode(newMode, day, range_length = null) {
-			const mode = newMode[0].toUpperCase() + newMode.slice(1)
+			const mode = newMode[0].toUpperCase() + newMode.slice(1);
 			const focus_date = day.toISODate();
-			
+
 			this.$router.push({
 				name: "MyLvPlan",
 				params: {
 					mode,
 					focus_date,
 					range_length,
-				}
+				},
 			});
 		},
 		updateRange(rangeInterval) {
 			this.$api
-				.call(ApiLvPlan.studiensemesterDateInterval(
-					rangeInterval.end.startOf('week').toISODate()
-				))
-				.then(res => {
-					this.studiensemester_kurzbz = res.data.studiensemester_kurzbz;
+				.call(
+					ApiLvPlan.studiensemesterDateInterval(
+						rangeInterval.end.startOf("week").toISODate(),
+					),
+				)
+				.then((res) => {
+					this.studiensemester_kurzbz =
+						res.data.studiensemester_kurzbz;
 					this.studiensemester_start = res.data.start;
 					this.studiensemester_ende = res.data.ende;
 				});
 		},
 		getPromiseFunc(start, end) {
 			return [
-				this.$api.call(ApiLvPlan.eventsPersonal(start.toISODate(), end.toISODate())),
-				this.$api.call(ApiLvPlan.getLvPlanReservierungen(start.toISODate(), end.toISODate()))
+				this.$api.call(
+					ApiLvPlan.eventsPersonal(
+						start.toISODate(),
+						end.toISODate(),
+					),
+				),
+				this.$api.call(
+					ApiLvPlan.getLvPlanReservierungen(
+						start.toISODate(),
+						end.toISODate(),
+					),
+				),
 			];
 		},
 		async fetchAuthInfo() {
-			const authInfoResponse = await this.$api.call(ApiAuthinfo.getAuthInfo());
-			
+			const authInfoResponse = await this.$api.call(
+				ApiAuthinfo.getAuthInfo(),
+			);
+
 			const authInfo = authInfoResponse.data;
 			this.uid = authInfo.uid;
 			this.isMitarbeiter = authInfo.isMitarbeiter;
@@ -174,11 +220,12 @@ export default {
 			this.$refs.calendar.reset();
 		},
 		async fetchSemesters() {
-			const semestersResponse = await this.$api.call(ApiStudiensemester.getAll());
+			const semestersResponse = await this.$api.call(
+				ApiStudiensemester.getAll(),
+			);
 			if (semestersResponse.meta.status === "success") {
-				this.semesterRangePresets = {
-					label: "View specific semester",
-					presets: semestersResponse.data.map((semester) => {
+				this.semesterRangePresets = semestersResponse.data
+					.map((semester) => {
 						let startDate = luxon.DateTime.fromISO(semester.start);
 						let endDate = luxon.DateTime.fromISO(semester.ende);
 						return {
@@ -189,9 +236,10 @@ export default {
 						};
 					})
 					.sort((semesterA, semesterB) =>
-						semesterA.startDate.ts > semesterB.startDate.ts ? -1 : 1,
-					)
-				};
+						semesterA.startDate.ts > semesterB.startDate.ts
+							? -1
+							: 1,
+					);
 			}
 		},
 	},
@@ -199,7 +247,7 @@ export default {
 		await this.fetchAuthInfo();
 		await this.fetchSemesters();
 	},
-	template: /*html*/`
+	template: /*html*/ `
 	<div class="cis-lvplan-personal d-flex flex-column h-100">
 		<h2 id="cis-lvplan-personal-heading">
 			{{ $p.t('lehre/stundenplan') }}
@@ -240,5 +288,5 @@ export default {
 				</div>
 			</div>
 		</fhc-calendar>
-	</div>`
+	</div>`,
 };

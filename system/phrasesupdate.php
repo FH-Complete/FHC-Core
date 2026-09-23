@@ -30185,6 +30185,26 @@ array(
 				)
 			)
 		),
+		array(
+			'app' => 'core',
+			'category' => 'LvPlan',
+			'phrase' => 'view_specific_semester',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Semester anzeigen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'View specific semester',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
 		// LvPlan Phrasen ende
 		//ProfilUpdate Phrasen start
 		array(

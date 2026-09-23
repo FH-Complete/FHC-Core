@@ -13,7 +13,7 @@ export default {
 		rangeLength: {
 			default: 30,
 		},
-		rangeViewPresets: {
+		rangeViewPresetsConfig: {
 			default: {},
 		},
 	},
@@ -47,7 +47,7 @@ export default {
 		selectedRangePreset() {
 			if (!this.selectedRangePreset) return;
 
-			const preset = this.rangeViewPresets.presets.find(
+			const preset = this.rangeViewPresetsConfig.presets.find(
 				(preset) => preset.name === this.selectedRangePreset,
 			);
 			if (!preset) return;
@@ -91,18 +91,18 @@ export default {
 		@cal-click-default.capture="handleClickDefaults"
 	>
 		<div
-			v-if="rangeViewPresets?.presets?.length"
+			v-if="rangeViewPresetsConfig?.presets?.length"
 			id="rangePresetSelector"
 			class="w-100 d-flex flex-row gap-2 justify-content-center align-items-center py-2"
 		>
-			<span>{{ rangeViewPresets.label }}</span>
+			<span>{{ rangeViewPresetsConfig.label }}</span>
 			<form-input
 				name="rangePresetSelector"
 				type="select"
 				v-model="selectedRangePreset"
 				>
 				<option
-					v-for="preset in rangeViewPresets.presets"
+					v-for="preset in rangeViewPresetsConfig.presets"
 					:key="preset.name"
 					:value="preset.name"
 					>
