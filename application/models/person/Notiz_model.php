@@ -98,7 +98,7 @@ class Notiz_model extends DB_Model
 	/**
 	 * Add a Notiz for a given person
 	 */
-	public function addNotizForPerson($person_id, $titel, $text, $erledigt, $verfasser_uid)
+	public function addNotizForPerson($person_id, $titel, $text, $erledigt, $verfasser_uid, $insertvon = null)
 	{
 		// Loads model Notizzuordnung_model
 		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
@@ -106,8 +106,15 @@ class Notiz_model extends DB_Model
 		// Start DB transaction
 		$this->db->trans_start(false);
 
-		$result = $this->insert(array('titel' => $titel, 'text' => $text, 'erledigt' => $erledigt, 'verfasser_uid' => $verfasser_uid,
-			"insertvon" => $verfasser_uid));
+		$result = $this->insert(
+			array(
+				'titel' => $titel,
+				'text' => $text,
+				'erledigt' => $erledigt,
+				'verfasser_uid' => $verfasser_uid,
+				'insertvon' => $insertvon ?? $verfasser_uid
+			)
+		);
 
 		if (isSuccess($result))
 		{
