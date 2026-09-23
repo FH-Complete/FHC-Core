@@ -993,6 +993,7 @@ if ($punkteUebertragen)
 					{
 						$setRTPunkte->new = false;
 						$setRTPunkte->punkte = $rtpunkte;
+						$setRTPunkte->teilgenommen = true;
 						$setRTPunkte->updateamum = date('Y-m-d H:i:s');
 						$setRTPunkte->updatevon = $user;
 
