@@ -71,11 +71,23 @@ export default {
 			this.$emit('update:range', this.range);
 			this.$refs.slider.prevPage().then(this.updatePage);
 		},
+		fastPrevPage() {
+			this.rangeOffset = this.$refs.slider.target - 4;
+			this.$refs.view.$refs.grid.disableAutoScroll();
+			this.$emit('update:range', this.range);
+			this.$refs.slider.prevPageMultiple(4).then(this.updatePage);
+		},
 		nextPage() {
 			this.rangeOffset = this.$refs.slider.target + 1;
 			this.$refs.view.$refs.grid.disableAutoScroll();
 			this.$emit('update:range', this.range);
 			this.$refs.slider.nextPage().then(this.updatePage);
+		},
+		fastNextPage() {
+			this.rangeOffset = this.$refs.slider.target + 4;
+			this.$refs.view.$refs.grid.disableAutoScroll();
+			this.$emit('update:range', this.range);
+			this.$refs.slider.nextPageMultiple(4).then(this.updatePage);
 		},
 		updatePage(weeks) {
 			const newFocusDate = this.focusDate.plus({ weeks });

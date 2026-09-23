@@ -111,12 +111,20 @@ export default {
 		<div class="header-picker">
 			<div class="btn-group" role="group">
 				<button
+					v-if="$props.mode === 'week'"
+					@click="$emit('fastPrev')"
+					:disabled="open"
+					class="btn btn-outline-secondary border-0"
+				>
+					<i class="fa fa-angles-left"></i>
+				</button>
+				<button
 					v-if="$props.mode !== 'range'"
 					@click="$emit('prev')"
 					:disabled="open"
 					class="btn btn-outline-secondary border-0"
 				>
-					<i class="fa fa-chevron-left"></i>
+					<i class="fa fa-angle-left"></i>
 				</button>
 				<date-picker
 					:mode="mode"
@@ -132,7 +140,15 @@ export default {
 					:disabled="open"
 					class="btn btn-outline-secondary border-0"
 				>
-					<i class="fa fa-chevron-right"></i>
+					<i class="fa fa-angle-right"></i>
+				</button>
+				<button
+					v-if="$props.mode === 'week'"
+					@click="$emit('fastNext')"
+					:disabled="open"
+					class="btn btn-outline-secondary border-0"
+				>
+					<i class="fa fa-angles-right"></i>
 				</button>
 			</div>
 		</div>

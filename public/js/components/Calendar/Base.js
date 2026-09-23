@@ -229,6 +229,15 @@ export default {
 			// default: switch page
 			this.$refs.mode.prevPage();
 		},
+		clickFastPrev() {
+			const evt = new Event('click:fastPrev', {cancelable: true});
+			this.$emit('click:fastPrev', evt);
+			if (evt.defaultPrevented)
+				return;
+
+			// default: switch page
+			this.$refs.mode.fastPrevPage();
+		},
 		clickNext() {
 			const evt = new Event('click:next', {cancelable: true});
 			this.$emit('click:next', evt);
@@ -237,6 +246,15 @@ export default {
 
 			// default: switch page
 			this.$refs.mode.nextPage();
+		},
+		clickFastNext() {
+			const evt = new Event('click:fastNext', {cancelable: true});
+			this.$emit('click:fastNext', evt);
+			if (evt.defaultPrevented)
+				return;
+
+			// default: switch page
+			this.$refs.mode.fastNextPage();
 		},
 		handleClickDefaults(evt) {
 			// TODO(chris): implement
@@ -299,7 +317,9 @@ export default {
 				v-model:date="cDate"
 				v-model:mode="cMode"
 				@prev="clickPrev"
+				@fastPrev="clickFastPrev"
 				@next="clickNext"
+				@fastNext="clickFastNext"
 				@click:mode="$emit('click:mode', $event)"
 				:btn-day="!!modes['day'] && (btnDay || (showBtns && btnDay !== false))"
 				:btn-week="!!modes['week'] && (btnWeek || (showBtns && btnWeek !== false))"
