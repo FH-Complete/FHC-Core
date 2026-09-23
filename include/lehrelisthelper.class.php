@@ -287,8 +287,8 @@ class LehreListHelper
 					if(($row->mobilitaetstyp_kurzbz != '') && ($row->doubledegree == 1)) {
 						//Double Degree Student
 						$zusatz .= '(d.d.';
-						if($row->ddtype == 'Intern') $zusatz .= 'i.)';
-						else if ($row->ddtype == 'Extern') $zusatz .='o.)';
+						if($row->ddtype == 'Intern') $zusatz .= 'int.)';
+						else if ($row->ddtype == 'Extern') $zusatz .='ext.)';
 						else $zusatz .= ')';
 					}
 
