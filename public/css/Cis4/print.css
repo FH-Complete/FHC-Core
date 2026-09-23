@@ -17,13 +17,15 @@
 
 body
 {
-  padding-top: 0 !important;
+	padding-top: 0 !important;
 }
 
 header,
 #skiplink,
 #cis-lvplan-personal-heading,
+#cis-other-lvplan-heading,
 .cis-lvplan-personal hr,
+.cis-other-lvplan hr,
 .fhc-calendar-base-header,
 .fhc-calendar-mode-range .grid-allday,
 .fhc-calendar-mode-range #rangePresetSelector,

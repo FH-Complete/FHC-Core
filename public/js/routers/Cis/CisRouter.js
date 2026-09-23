@@ -246,7 +246,7 @@ const router = VueRouter.createRouter({
 			}
 		},
 		{
-      		path: `/Cis/OtherLvPlan/:otherUid/:mode?/:focus_date?`,
+      		path: `/Cis/OtherLvPlan/:otherUid/:mode?/:focus_date?/:range_length?`,
       		name: "OtherLvPlan",
       		component: OtherLvPlan,
       		props(route) {
