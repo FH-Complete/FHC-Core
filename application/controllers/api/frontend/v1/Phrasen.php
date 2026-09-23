@@ -32,6 +32,8 @@ class Phrasen extends FHCAPI_Controller
 			'setLanguage' => self::PERM_ANONYMOUS,
 			'getLanguage' => self::PERM_ANONYMOUS,
 			'getAllLanguages' => self::PERM_ANONYMOUS,
+			'getPhrases' => self::PERM_ANONYMOUS,
+			'getTabulatorPhrases' => self::PERM_ANONYMOUS,
 		]);
 
 		$this->load->helper('hlp_language');
@@ -73,12 +75,78 @@ class Phrasen extends FHCAPI_Controller
 	// gets all languages that are set as active in the database
 	public function getAllLanguages()
 	{
-		$langs = getDBActiveLanguages();
+		$this->load->model('system/Sprache_model', 'SprachenModel');
+
+		// Add order clause by index and select the sprache,bezeichnung and index column
+		$this->SprachenModel->addOrder('index');
+		$this->SprachenModel->addSelect('sprache, bezeichnung, index');
+
+		// Retrieves from public.tbl_sprache
+		$langs = $this->SprachenModel->loadWhere(array('content' => true));
 		$langs = $this->getDataOrTerminateWithError($langs);
 		$langs = array_map(function($lang){
-			return $lang->sprache;
+			$data = new stdClass();
+			$data->sprache = $lang->sprache;
+			$data->bezeichnung = $lang->bezeichnung[($lang->index-1)]; 
+			return $data;
 		}, $langs);
+
 		$this->terminateWithSuccess($langs);
+	}
+
+	public function getPhrases()
+	{
+		$postParams = $this->getPostJSON();
+
+		$languages = $postParams->languages;
+		if (!$languages || !count($languages)) {
+			$this->load->model('system/Sprache_model', 'sprachenModel');
+			$activeLanguages = $this->sprachenModel->loadWhere(array('content' => true));
+			$activeLanguagesData = $this->getDataOrTerminateWithError($activeLanguages);
+			$languages = array_map(
+				function ($languageData) {
+					return $languageData->sprache;
+				},
+				$activeLanguagesData
+			);
+		}
+
+		$this->load->model('system/Phrase_model', 'phraseModel');
+		$phrasesGroupedByCategory = $postParams->phrasesGroupedByCategory;
+		$result = [];
+		foreach ($languages as $language) {
+			$phrases = $this->phraseModel->getPhrasesByCategoryAndPhrasesAndLanguage($phrasesGroupedByCategory, $language);
+			$result[$language] = $this->getDataOrTerminateWithError($phrases);
+		}
+
+		$this->terminateWithSuccess($result);
+	}
+
+	public function getTabulatorPhrases()
+	{
+		$languages = json_decode($this->input->get('languages'));
+		if (!$languages || !count($languages)) {
+			$this->load->model('system/Sprache_model', 'sprachenModel');
+			$activeLanguages = $this->sprachenModel->loadWhere(array('content' => true));
+			$activeLanguagesData = $this->getDataOrTerminateWithError($activeLanguages);
+			$languages = array_map(
+				function ($languageData) {
+					return $languageData->sprache;
+				},
+				$activeLanguagesData
+			);
+		}
+
+		$this->load->model('system/Phrase_model', 'phraseModel');
+		$result = [];
+		foreach ($languages as $language) {
+			$tabulatorPhrases = $this->phraseModel->getPhrasesByCategoryAndLanguage(['tabulator'], $language);
+			$result[$language] = $this->getDataOrTerminateWithError($tabulatorPhrases);
+		}
+
+		header('Pragma: private');
+		header('Cache-Control: private, max-age=' . (60 * 60 * 24 * 30));
+		$this->terminateWithSuccess($result);
 	}
 
 }

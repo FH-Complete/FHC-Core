@@ -227,7 +227,8 @@ if (isset($_GET['sendform']))
 	<table class="tablesorter" id="t1">
 	<thead>
 		<tr>
-			<th><span class="tooltip"><img src="../../skin/images/information.png" height="20px" name="infoicon"/>
+			<th><button type="button" class="resetsaved" title="Reset Filter">Reset Filter</button>
+				<span class="tooltip"><img src="../../skin/images/information.png" height="20px" name="infoicon"/>
 				'.$tooltiptext.'
 				</span>
 			</th>
@@ -364,9 +365,10 @@ if (isset($_GET['sendform']))
 		$("#t1").tablesorter(
 		{
 			sortList: [[3,0]],
-			widgets: ["zebra", "filter", "stickyHeaders"],
+			widgets: ["saveSort", "zebra", "filter", "stickyHeaders"],
 			headers: { 	0: { filter: false,  sorter: false }},
-			widgetOptions : {	filter_functions : {
+			widgetOptions : {	filter_saveFilters : true,
+								filter_functions : {
 									// Add select menu to this column
 									8 : {
 									"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
@@ -381,6 +383,13 @@ if (isset($_GET['sendform']))
 									"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
 									}
 				}}
+		}); 
+
+		$('.resetsaved').click(function()
+		{
+			$("#t1").trigger("filterReset");
+			location.reload(forceGet);
+			return false;
 		});
 	});
 		

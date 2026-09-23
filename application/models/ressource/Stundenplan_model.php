@@ -50,7 +50,6 @@ class Stundenplan_model extends DB_Model
 	 */
 	public function groupedCalendarEvents($ort_kurzbz,$start_date,$end_date){
 
-
 		$gruppierteEvents= $this->execReadOnlyQuery("
 		SELECT
 
@@ -178,7 +177,7 @@ class Stundenplan_model extends DB_Model
 
 		) as subquery
 
-		GROUP BY unr, datum, beginn, ende, ort_kurzbz, titel, lehrform, lehrfach, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
+		GROUP BY unr, datum, beginn, ende, titel, lehrform, lehrfach, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
 
 		ORDER BY datum, beginn
 		");
@@ -187,13 +186,359 @@ class Stundenplan_model extends DB_Model
 	}
 
 	/**
+	 * groups rows of a subquery that fetches data from the lehre.vw_stundenplan table or lehre.vw_stundenplandev
+	 * @param string $stundenplanViewQuery the subquery used to group the result regarding consecutive hours (Tab LV Termine)
+	 *
+	 * @return stdClass
+	 */
+	public function stundenplanGruppierungConsecutive($stundenplanViewQuery)
+	{
+		$query_result = $this->execReadOnlyQuery("
+			SELECT
+			  distinct lehrveranstaltung_id,
+			  datum,
+			  MIN(beginn) as beginn,
+			  MAX(ende) as ende,
+			  type,
+			  topic,
+			  gruppe,
+			  ort_kurzbz,
+			  lehreinheit_id,
+			  lehrfach_bez,
+			  lektor,
+			  lektorname,
+			  gruppen_kuerzel,
+			  farbe
+			FROM
+			  (
+				SELECT
+				'lehreinheit' as type, beginn, ende, datum,
+				CONCAT(lehrfach,'-',lehrform) as topic,
+				array_agg(DISTINCT lektor) as lektor,
+				array_agg(DISTINCT lektorname) as lektorname,
+				array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe,
+				array_agg(DISTINCT (gruppen_kuerzel)) as gruppen_kuerzel,
+				string_agg(DISTINCT ort_kurzbz, '/') as ort_kurzbz,
+				array_agg(DISTINCT lehreinheit_id) as lehreinheit_id,
+				titel, lehrfach, lehrform, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
+
+				FROM
+				(
+					SELECT unr,datum,beginn, ende,
+					CASE
+						WHEN sp.mitarbeiter_kurzbz IS NOT NULL THEN sp.mitarbeiter_kurzbz
+						ELSE lektor
+					END as lektor,
+					CASE
+						WHEN gruppe_kurzbz IS NOT NULL THEN gruppe_kurzbz
+						ELSE (SELECT UPPER(typ || kurzbz) 
+						      FROM public.tbl_studiengang 
+							  WHERE studiengang_kz=sp.studiengang_kz) || COALESCE(sp.semester,'0') || COALESCE(sp.verband,'') || COALESCE(sp.gruppe,'')
+					END as gruppen_kuerzel,
+					(SELECT bezeichnung
+					FROM public.tbl_organisationseinheit
+					WHERE oe_kurzbz IN(
+						SELECT oe_kurzbz
+						FROM lehre.tbl_lehrveranstaltung
+						WHERE lehrveranstaltung_id = sp.lehrveranstaltung_id
+					)) as organisationseinheit,
+					ort_kurzbz, studiengang_kz, titel,lehreinheit_id,lehrfach_id,sp.anmerkung,fix,lehrveranstaltung_id,
+					stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,
+					anmerkung_lehreinheit,gruppe, verband, semester,stg_kurzbz,
+					  CONCAT(p.nachname, ' ', p.vorname) as lektorname
+
+					FROM (".$stundenplanViewQuery.") sp
+					JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde = sp.stunde
+					LEFT JOIN public.tbl_benutzer bn ON bn.uid = sp.uid
+					LEFT JOIN public.tbl_person p ON p.person_id = bn.person_id
+				) as subquery
+
+			GROUP BY unr, datum, beginn, ende, ort_kurzbz, titel, lehrform, lehrfach, lehrfach_bez, organisationseinheit, 
+			farbe, lehrveranstaltung_id
+
+			ORDER BY datum, beginn) t
+
+			GROUP BY
+			  lehrveranstaltung_id,
+			  type,
+			  datum,
+			  topic,
+			  lektor,
+			  lehrfach_bez,
+			  gruppe,
+			  ort_kurzbz,
+			  lehreinheit_id,
+			  lektorname,
+			  gruppen_kuerzel,
+			  farbe
+			ORDER BY
+			  datum, beginn
+			"
+		);
+		return $query_result;
+	}
+
+	/**
+	 * queries Stundenplan but for a whole lva, irrespective of who is requesting it
+	 * 
+	 * @return void
+	 */
+	public function getStundenplanLVA($start_date, $end_date, $lv_id) {
+		return $this->execReadOnlyQuery("
+	
+		SELECT
+		'lehreinheit' as type, beginn, ende, datum,
+		CONCAT(lehrfach,'-',lehrform) as topic,
+		array_agg(DISTINCT lektor) as lektor,
+		array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe,
+		string_agg(DISTINCT ort_kurzbz, '/') as ort_kurzbz,
+		array_agg(DISTINCT lehreinheit_id) as lehreinheit_id,
+
+		titel, lehrfach, lehrform, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
+
+		FROM
+		(
+			SELECT unr,datum,beginn, ende,
+			CASE
+				WHEN sp.mitarbeiter_kurzbz IS NOT NULL THEN sp.mitarbeiter_kurzbz
+				ELSE lektor
+			END as lektor,
+			CASE
+				WHEN gruppe_kurzbz IS NOT NULL THEN gruppe_kurzbz
+				ELSE CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/'))
+			END as gruppen_kuerzel,
+			(SELECT bezeichnung
+			FROM public.tbl_organisationseinheit
+			WHERE oe_kurzbz IN(
+			SELECT oe_kurzbz
+				FROM lehre.tbl_lehrveranstaltung
+				WHERE lehrveranstaltung_id = sp.lehrveranstaltung_id
+			)) as organisationseinheit,
+			ort_kurzbz, studiengang_kz, titel,lehreinheit_id,lehrfach_id,anmerkung,fix,lehrveranstaltung_id,stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,anmerkung_lehreinheit,gruppe, verband, semester,stg_kurzbz
+
+			FROM (
+				SELECT sp.*
+				FROM lehre.vw_stundenplan sp
+				WHERE
+				sp.datum >= ?
+				AND sp.datum <= ? AND sp.lehrveranstaltung_id = ?
+				) sp
+			JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde = sp.stunde
+			
+		) as subquery
+
+		GROUP BY unr, datum, beginn, ende, titel, lehrform, lehrfach, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
+
+		ORDER BY datum, beginn
+		", [$start_date, $end_date, $lv_id]);
+	}
+
+	public function getStundenplanLE($lehreinheit, $start_date, $end_date, $stundenplan)
+	{
+		$qry = "
+			WITH lehreinheiten AS (
+				SELECT lehreinheit_id FROM lehre.tbl_lehreinheit WHERE lehreinheit_id = ?
+			), " . $this->getStundenplanCTE($stundenplan) . "
+			SELECT *
+			FROM stundenplanentries
+		";
+
+		return $this->execReadOnlyQuery($qry, array($lehreinheit, $start_date, $end_date));
+	}
+
+	public function getStundenplanLV($lehrveranstaltung_id, $start_date, $end_date, $stundenplan)
+	{
+		$qry = "
+			WITH lehreinheiten AS (
+				SELECT lehreinheit_id 
+				FROM lehre.tbl_lehreinheit 
+					JOIN tbl_studiensemester USING(studiensemester_kurzbz)
+				WHERE lehrveranstaltung_id = ?
+					AND tbl_studiensemester.start >= ? AND tbl_studiensemester.ende <= ?
+			), " . $this->getStundenplanCTE($stundenplan) . "
+			SELECT *
+			FROM stundenplanentries
+		";
+
+		return $this->execReadOnlyQuery($qry, array($lehrveranstaltung_id, $start_date, $end_date, $start_date, $end_date));
+	}
+
+	private function getStundenplanCTE($stundenplan)
+	{
+		return "entries AS (
+					SELECT
+						datum, min(stunde) as stunde_beginn, max(stunde) as stunde_ende,
+						array_agg(DISTINCT(
+								CASE WHEN gruppe_kurzbz is not null THEN gruppe_kurzbz
+										ELSE (UPPER(stg_typ || stg_kurzbz) || COALESCE(semester,'0') || COALESCE(verband,'') || COALESCE(gruppe,''))
+								END)) as gruppen_kuerzel,
+						array_agg(DISTINCT CONCAT(vorname || ' ' || nachname)) as lektorname,
+						array_agg(DISTINCT stundenplan.ort_kurzbz) as ort_kurzbz,
+						array_agg(DISTINCT titel) as titel,
+						lehrfach_bez, stundenplan.lehreinheit_id, lehrveranstaltung_id
+					FROM lehre.vw_$stundenplan as stundenplan
+						JOIN public.tbl_mitarbeiter ON stundenplan.uid = tbl_mitarbeiter.mitarbeiter_uid
+						JOIN tbl_benutzer ON tbl_mitarbeiter.mitarbeiter_uid = tbl_benutzer.uid
+						JOIN tbl_person USING(person_id)
+						JOIN lehreinheiten ON stundenplan.lehreinheit_id = lehreinheiten.lehreinheit_id
+					WHERE datum >= ? AND datum <= ?
+					GROUP BY datum, unr, stundenplan.lehreinheit_id, lehrveranstaltung_id, lehrfach_bez, lehrfach_bez
+					ORDER BY datum, min(stunde), unr, lehreinheit_id
+				),
+				stundenplanentries AS (
+					SELECT
+						entries.*,
+						stundeb.beginn AS beginn,
+						stundee.ende AS ende
+					FROM entries
+						JOIN lehre.tbl_stunde stundeb ON stundeb.stunde = entries.stunde_beginn
+						JOIN lehre.tbl_stunde stundee ON stundee.stunde = entries.stunde_ende
+				)";
+	}
+	/**
+	 * queries Stundenplan and filters by assigned ma_kurzbz, very similar to get by LVA
+	 *
+	 * @return void
+	 */
+	public function getStundenplanMitarbeiter($start_date, $end_date, $ma_uid) {
+		return $this->execReadOnlyQuery("
+	
+		SELECT
+			'lehreinheit' as type, beginn, ende, datum,
+			CONCAT(lehrfach,'-',lehrform) as topic,
+			array_agg(DISTINCT lektor) as lektor,
+			array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe,
+			string_agg(DISTINCT ort_kurzbz, '/') as ort_kurzbz,
+			array_agg(DISTINCT lehreinheit_id) as lehreinheit_id,
+		
+			titel, lehrfach, lehrform, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
+		
+		FROM
+			(
+				SELECT unr,datum,beginn, ende,
+					   CASE
+						   WHEN sp.mitarbeiter_kurzbz IS NOT NULL THEN sp.mitarbeiter_kurzbz
+						   ELSE sp.lektor
+						   END as lektor,
+					   CASE
+						   WHEN gruppe_kurzbz IS NOT NULL THEN gruppe_kurzbz
+						   ELSE CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/'))
+						   END as gruppen_kuerzel,
+					   (SELECT bezeichnung
+						FROM public.tbl_organisationseinheit
+						WHERE oe_kurzbz IN(
+							SELECT oe_kurzbz
+							FROM lehre.tbl_lehrveranstaltung
+							WHERE lehrveranstaltung_id = sp.lehrveranstaltung_id
+						)) as organisationseinheit,
+					   sp.ort_kurzbz, sp.studiengang_kz, sp.titel,sp.lehreinheit_id,sp.lehrfach_id,sp.anmerkung,fix,lehrveranstaltung_id,stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,anmerkung_lehreinheit,gruppe, verband, semester,stg_kurzbz
+		
+				FROM (
+						 SELECT sp.*
+						 FROM lehre.vw_stundenplan sp
+						 WHERE
+							 sp.datum >= ?
+						   AND sp.datum <= ?
+					 ) sp
+						 JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde = sp.stunde
+						JOIN public.tbl_mitarbeiter ON public.tbl_mitarbeiter.kurzbz = sp.mitarbeiter_kurzbz
+						WHERE mitarbeiter_uid = ?
+		
+			) as subquery
+		
+		GROUP BY unr, datum, beginn, ende,  titel, lehrform, lehrfach, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
+		
+		ORDER BY datum, beginn", [$start_date, $end_date, $ma_uid]);
+	}
+
+	/**
+	 * queries Stundenplan and filters by studiengang, semester, verband gruppe
+	 *
+	 * @return void
+	 */
+	public function getStundenplanStudiengang($start_date, $end_date, $stg_kz, $sem, $verband, $gruppe) {
+
+		$qry_params = [$start_date, $end_date, $stg_kz];
+
+		$qry = "
+		SELECT
+			'lehreinheit' as type, beginn, ende, datum,
+			CONCAT(lehrfach,'-',lehrform) as topic,
+			array_agg(DISTINCT lektor) as lektor,
+			array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe,
+			string_agg(DISTINCT ort_kurzbz, '/') as ort_kurzbz,
+			array_agg(DISTINCT lehreinheit_id) as lehreinheit_id,
+			titel, lehrfach, lehrform, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
+		FROM
+			(
+				SELECT unr,datum,beginn, ende,
+					   CASE
+						   WHEN sp.mitarbeiter_kurzbz IS NOT NULL THEN sp.mitarbeiter_kurzbz
+						   ELSE sp.lektor
+						   END as lektor,
+					   CASE
+						   WHEN gruppe_kurzbz IS NOT NULL THEN gruppe_kurzbz
+						   ELSE CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/'))
+						   END as gruppen_kuerzel,
+					   (SELECT bezeichnung
+						FROM public.tbl_organisationseinheit
+						WHERE oe_kurzbz IN(
+							SELECT oe_kurzbz
+							FROM lehre.tbl_lehrveranstaltung
+							WHERE lehrveranstaltung_id = sp.lehrveranstaltung_id
+						)) as organisationseinheit,
+					   sp.ort_kurzbz, sp.studiengang_kz, sp.titel,sp.lehreinheit_id,sp.lehrfach_id,sp.anmerkung,fix,lehrveranstaltung_id,stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,anmerkung_lehreinheit,gruppe, verband, semester,stg_kurzbz
+				FROM (
+						 SELECT sp.*
+						 FROM lehre.vw_stundenplan sp
+						 WHERE
+							 sp.datum >= ?
+						   AND sp.datum <= ?
+					 ) sp
+						 JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde = sp.stunde
+						WHERE studiengang_kz = ? ";
+
+		if($sem != NULL)
+		{
+			$qry_params[] = $sem;
+			$qry .= " AND (semester = ? OR semester IS NULL)";
+		}
+		if($verband != NULL)
+		{
+			$qry_params[] = $verband;
+			$qry .= " AND (verband = ? OR verband IS NULL OR verband = '0' OR verband = '')";
+		}
+		if($gruppe != NULL)
+		{
+			$qry_params[] = $gruppe;
+			$qry .= " AND (gruppe = ? OR gruppe IS NULL	OR gruppe = '0' OR gruppe = '')	";
+		}
+		$qry.= " AND (
+			gruppe_kurzbz is null OR EXISTS(
+			   SELECT 1
+			  FROM
+				public.tbl_gruppe WHERE gruppe_kurzbz = sp.gruppe_kurzbz AND direktinskription = false
+			)
+		  )";
+
+		$qry.= "	) as subquery
+
+		GROUP BY unr, datum, beginn, ende,  titel, lehrform, lehrfach, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
+		ORDER BY datum, beginn; ";
+
+		return $this->execReadOnlyQuery($qry, $qry_params);
+	}
+	
+	/**
 	 * NO STANDALONE FUNCTION - Generates a SQL query string to fetch 'stundenplan' events for a specific student within the current semester.
-	 * @param string $uid the user id that is used to fetch the stundenplan rows from the lehre.vw_stundenplan table
+	 *
+	 * @param isLvList if condition needed for Tab LV Termine is given
+	 * @param db_stpl_table enables switch to db 'stundenplandev'
 	 *
 	 * @return mixed
 	 */
-	public function getStundenplanQuery($start_date, $end_date,$semester,$gruppen,$studentlehrverbaende){
-		
+	public function getStundenplanQuery($start_date, $end_date, $semester, $gruppen, $studentlehrverbaende, $isLvList=false, $db_stpl_table='stundenplan'){
+
 		// helper function to check if either $gruppen or $studentlehrverbaende are empty for each semester
 		$emptyCheck = function($toBeCheckedArray) use ($semester){
 			$result = true;
@@ -215,7 +560,7 @@ class Stundenplan_model extends DB_Model
 
 		$query =
 		"select sp.*
-		from lehre.vw_stundenplan sp
+		from lehre.vw_".$db_stpl_table." sp
 		WHERE
 		sp.datum >= ".$this->escape($start_date)."
 		AND sp.datum <= ".$this->escape($end_date);
@@ -225,10 +570,10 @@ class Stundenplan_model extends DB_Model
 		{
 			$query .= " AND ( ";
 		} 
-		
+
 		foreach($semester as $sem => $semester_date_range)
 		{
-			
+
 			foreach($semester_date_range as $sem_date => $sem_date_range)
 			{
 				// if there are not groups for the semester skip the iteration step
@@ -248,25 +593,37 @@ class Stundenplan_model extends DB_Model
 		{
 			$query = substr($query, 0, -2);
 		}
-		
+
+		//Condition for showLVList FHC4
+		if(!$isLvList)
+			$stringGroupLv =  "AND gruppe_kurzbz is null";
+		else
+			$stringGroupLv ="";
+
 		foreach($semester as $sem=>$semester_date_range)
 		{
 			foreach($semester_date_range as $sem_date => $sem_date_range)
 			{
-				if(!array_key_exists($sem_date,$studentlehrverbaende) || count($studentlehrverbaende[$sem_date]) == 0)
+				if(!array_key_exists($sem,$studentlehrverbaende) || count($studentlehrverbaende[$sem]) == 0)
 				{
 					continue;
 				}
-				foreach($studentlehrverbaende[$sem_date] as $key=>$lehrverband)
+				$studlvbds = array_filter(
+					$studentlehrverbaende[$sem],
+					function($value) use ($sem_date) {
+						return $value->studiensemester_kurzbz === $sem_date;
+					}
+				);
+				foreach($studlvbds as $key=>$lehrverband)
 				{
-					$query .= "((sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND sp.verband = ".$this->escape($lehrverband->verband)." AND sp.gruppe = ".$this->escape($lehrverband->gruppe)." AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)." AND ".$this->escape($sem_date_range->ende).")";
+					$query .= "(((sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND sp.verband = ".$this->escape($lehrverband->verband)." AND sp.gruppe = ".$this->escape($lehrverband->gruppe)." AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)." AND ".$this->escape($sem_date_range->ende).")";
 					// Eintraege fuer den ganzen Verband
 					$query .= "OR (sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND sp.verband = ".$this->escape($lehrverband->verband)." AND (sp.gruppe is null OR sp.gruppe='') AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)." AND ".$this->escape($sem_date_range->ende).")";
 					// Eintraege fuer das ganze Semester
-					$query .= "OR (sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND (sp.verband is null OR sp.verband='') AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)." AND ".$this->escape($sem_date_range->ende).") AND gruppe_kurzbz is null)";
-					
+					$query .= "OR (sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND (sp.verband is null OR sp.verband='') AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)
+						." AND ".$this->escape($sem_date_range->ende).")) AND gruppe_kurzbz is null)";
+
 					$query .="OR";
-					 
 				}
 			}	
 		}
@@ -325,4 +682,52 @@ class Stundenplan_model extends DB_Model
 		return $this->execQuery($query, [$uid, $uid]);
 	}
 
+	/**
+	 * Get Stundenplantermine for given Lehreinheit.
+	 *
+	 * @param $lehreinheit_id
+	 * @return array|stdClass|null
+	 */
+	public function getTermineByLe($lehreinheit_id)
+	{
+		$qry = '
+			SELECT DISTINCT
+			    datum
+			FROM 
+		       	lehre.vw_stundenplan
+			WHERE 
+				lehreinheit_id = ?
+			ORDER BY 
+			    datum ASC
+		';
+
+		return $this->execQuery($qry, [$lehreinheit_id]);
+	}
+
+	/**
+	 * Get Stundenplantermine for given Lehrveranstaltung of given Studiensemester.
+	 *
+	 * @param $lehrveranstaltung_id
+	 * @param $studiensemester_kurzbz
+	 * @return array|stdClass|null
+	 */
+	public function getTermineByLv($lehrveranstaltung_id, $studiensemester_kurzbz)
+	{
+		$qry = '
+		  	SELECT DISTINCT
+				datum
+	   		FROM
+	   		    lehre.vw_stundenplan
+	  		WHERE 
+	  		    lehreinheit_id IN (
+					SELECT lehreinheit_id
+					FROM lehre.tbl_lehreinheit 
+					WHERE lehrveranstaltung_id = ?
+					AND studiensemester_kurzbz = ?
+				)    
+	   		ORDER BY datum ASC
+		';
+
+		return $this->execQuery($qry, [$lehrveranstaltung_id, $studiensemester_kurzbz]);
+	}
 }

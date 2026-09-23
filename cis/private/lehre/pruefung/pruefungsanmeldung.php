@@ -321,6 +321,20 @@ $studiensemester->getAll();
 				</td>
 			</tr>
 			<?php endif; ?>
+
+			<?php
+			if (defined('CIS_PRUEFUNGSANMELDUNG_ECTS_ANGABE')
+				&& CIS_PRUEFUNGSANMELDUNG_ECTS_ANGABE === true):
+			?>
+			<tr>
+				<td style="vertical-align: top; font-weight: bold;">
+					<?php echo $p->t('pruefung/ects'); ?>:
+				</td>
+				<td>
+					<input type="number" size="3" id="ectsangabe" placeholder="<?php echo $p->t('pruefung/ects'); ?>"/>
+				</td>
+			</tr>
+			<?php endif; ?>
 			<tr id="studiengang">
 			</tr>
 			<tr>

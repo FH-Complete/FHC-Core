@@ -241,7 +241,7 @@ if (isset($_REQUEST["freigabe"]) && ($_REQUEST["freigabe"] == 1))
 				<body>
 					$name hat neue Noten für die Lehrveranstaltung\n\n<br>
 					<b>" . $sg->kuerzel . ' ' . $lv->semester . '.Semester
-					' . $lv->bezeichnung . " " . $lv->orgform_kurzbz . " - " . $stsem . "</b>
+					' . $lv->bezeichnung . " - " .$lv->lehrform_kurzbz. " " . $lv->orgform_kurzbz . " - " . $stsem . "</b>
 					<br>eingetragen.\n<br><br>
 					Die Noten können jetzt ins Zeugnis übernommen werden.\n";
 
@@ -1090,7 +1090,10 @@ foreach ($stsem_obj->studiensemester as $studiensemester)
 }
 $stsem_content .= "</SELECT>\n";
 
-if (! $rechte->isBerechtigt('admin', 0) && ! $rechte->isBerechtigt('admin', $lv_obj->studiengang_kz) && ! $rechte->isBerechtigt('lehre', $lv_obj->studiengang_kz))
+if (! $rechte->isBerechtigt('admin', 0)
+	&& ! $rechte->isBerechtigt('admin', $lv_obj->studiengang_kz)
+	&& ! $rechte->isBerechtigt('lehre', $lv_obj->studiengang_kz)
+	&& ! $rechte->isBerechtigt('lehre', $lv_obj->oe_kurzbz))
 {
 	$qry = "SELECT
 				lehreinheit_id

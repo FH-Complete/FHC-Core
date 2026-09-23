@@ -2,7 +2,6 @@
 $this->load->config('anrechnung');
 
 $includesArray = array(
-	array(
 		'title' => $this->p->t('anrechnung', 'anrechnungenPruefen'),
 		'jquery3' => true,
 		'jqueryui1' => true,
@@ -50,7 +49,6 @@ $includesArray = array(
 			'public/js/bootstrapper.js',
 			'public/js/lehre/anrechnung/reviewAnrechnungDetail.js'
 		)
-	)
 );
 
 if (defined("CIS4")) {

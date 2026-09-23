@@ -13,7 +13,7 @@
 	$ADDITIONAL_STG = $this->config->item('infocenter_studiengang_kz');
 	$AKTE_TYP = '\'identity\', \'zgv_bakk\'';
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
-	$STUDIENGEBUEHR_ANZAHLUNG = '\'StudiengebuehrAnzahlung\'';
+	$KAUTION_DRITT_STAAT = '\'KautionDrittStaat\'';
 	$ORG_NAME = '\'InfoCenter\'';
 	$ONLINE = '\'online\'';
 
@@ -302,7 +302,7 @@
 				FROM public.tbl_konto konto
 				WHERE konto.person_id = p.person_id
 					AND konto.studiensemester_kurzbz = '. $STUDIENSEMESTER .'
-					AND konto.buchungstyp_kurzbz = '. $STUDIENGEBUEHR_ANZAHLUNG .'
+					AND konto.buchungstyp_kurzbz = '. $KAUTION_DRITT_STAAT .'
 			) AS "Kaution"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
@@ -315,22 +315,15 @@
 				 WHERE tpl.app = '.$APP.'
 			) pl USING(person_id)
 	LEFT JOIN (
-				SELECT
+				SELECT DISTINCT ON (tbl_rueckstellung.person_id)
 					tbl_rueckstellung.person_id,
 					tbl_rueckstellung.datum_bis,
 					tbl_rueckstellung.status_kurzbz,
 					array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung
 				FROM public.tbl_rueckstellung
 				JOIN public.tbl_rueckstellung_status USING(status_kurzbz)
-				JOIN public.tbl_person sp ON tbl_rueckstellung.person_id = sp.person_id
-				WHERE tbl_rueckstellung.rueckstellung_id =
-				(
-					SELECT srueck.rueckstellung_id
-					FROM public.tbl_rueckstellung srueck
-					WHERE srueck.person_id = tbl_rueckstellung.person_id
-						AND datum_bis >= NOW()
-					ORDER BY srueck.datum_bis DESC LIMIT 1
-				)
+				WHERE tbl_rueckstellung.datum_bis >= NOW()
+				ORDER BY tbl_rueckstellung.person_id, tbl_rueckstellung.datum_bis DESC
 			) rueck ON rueck.person_id = p.person_id
 		 WHERE
 			EXISTS (

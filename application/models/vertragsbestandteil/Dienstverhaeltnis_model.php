@@ -59,7 +59,14 @@ class Dienstverhaeltnis_model extends DB_Model
 		}
 
 		$qry .="
-        ORDER BY dv.von desc
+        ORDER BY
+			CASE
+				WHEN (COALESCE(dv.bis, '2999-12-31'::date) - NOW()::date) < 0 THEN NULL
+			ELSE
+				(COALESCE(dv.bis, '2999-12-31'::date) - NOW()::date)
+			END ASC NULLS LAST,
+			COALESCE(dv.bis, '2999-12-31'::date) DESC,
+			dv.von DESC
         ";
 
         return $this->execQuery($qry, $data);
@@ -246,4 +253,19 @@ EOSQL;
 	}
 	return $dvs;
     }
+
+	public function existsDienstverhaeltnis($mitarbeiter_uid, $start, $ende, $vertragsart_kurzbz)
+	{
+		$this->addOrder('von', 'DESC');
+		$this->db->where('mitarbeiter_uid', $mitarbeiter_uid);
+		$this->db->where('vertragsart_kurzbz', $vertragsart_kurzbz);
+		$this->db->where('von <=', $ende);
+		$this->db->group_start();
+		$this->db->where('bis >=', $start);
+		$this->db->or_where('bis IS NULL', null, false);
+		$this->db->group_end();
+
+		$this->addLimit(1);
+		return $this->load();
+	}
 }

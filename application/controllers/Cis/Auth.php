@@ -40,7 +40,7 @@ class Auth extends FHC_Controller
 
 		if ($this->form_validation->run())
 		{
-			redirect($this->authlib->getLandingPage('/CisVue/Dashboard'));
+			redirect($this->authlib->getLandingPage('/Cis4'));
 		}
 		else
 		{
@@ -72,6 +72,7 @@ class Auth extends FHC_Controller
 	{
 		$this->load->library('AuthLib');
 		$this->authlib->logout();
-		redirect('/Cis/Auth/login', 'refresh');
+		setcookie('fhclogout', 'fhclogout', 0, '/');
+		redirect(base_url('/cis/private/logout.php'), 'refresh');
 	}
 }

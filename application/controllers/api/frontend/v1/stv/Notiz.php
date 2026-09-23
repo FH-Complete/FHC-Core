@@ -16,7 +16,8 @@ class Notiz extends Notiz_Controller
 			'updateNotiz' => ['admin:rw', 'assistenz:rw'], // TODO(manu): self::PERM_LOGGED
 			'deleteNotiz' => ['admin:r', 'assistenz:r'],
 			'loadDokumente' => ['admin:r', 'assistenz:r'],
-			'getMitarbeiter' => ['admin:r', 'assistenz:r']
+			'getMitarbeiter' => ['admin:r', 'assistenz:r'],
+			'getCountNotes' => ['admin:r', 'assistenz:r'],
 		]);
 
 		//Load Models

@@ -741,7 +741,7 @@ class AnrechnungLib
 		$fullname = hasData($result) ? $result->retval[0]->vorname. $result->retval[0]->nachname : '';
 		
 		// Return filename
-		return 'Anrechnungsantrag'. $orgform_kurzbz .'_LV-'. $lehrveranstaltung_id. '_'. $fullname;
+		return 'Anrechnungsantrag'. $orgform_kurzbz .'_LV-'. $lehrveranstaltung_id. '_'. $fullname . '.pdf';
 	}
 	
 	public function LVhasLector($anrechnung_id)

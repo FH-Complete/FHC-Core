@@ -1,0 +1,605 @@
+import {CoreFilterCmpt} from "../../filter/Filter.js";
+import BsModal from "../../Bootstrap/Modal.js";
+import DetailsForm from "../Details/Form.js";
+import CoreTag from '../../Tag/Tag.js';
+import {
+  buildTagHeaderFilterExpression,
+  buildTagOptionsFromRows,
+  customTagFilter,
+  setTagHeaderFilterValue,
+  tagHeaderFilter,
+  extendedHeaderFilter,
+  syncTagHeaderFilterOptions,
+  syncSelectedTagOptionsWithHeaderFilters
+} from "../../../../js/tabulator/filters/extendedHeaderFilter.js";
+import { tagFormatter } from "../../../../js/tabulator/formatter/tags.js";
+import { addTagInTable, deleteTagInTable, updateTagInTable } from "../../../../js/helpers/TagHelper.js";
+
+import ApiLv from "../../../api/lehrveranstaltung.js";
+import ApiTag from "../../../api/lehrveranstaltung/tag.js";
+import ApiLehreinheit from "../../../api/lehrveranstaltung/lehreinheit.js";
+import ApiTreemenu from "../../../api/factory/treemenu.js";
+
+import LvvColumns from '../../../../../index.ci.php/js/tabulatorcolumns/lvverwaltung';
+
+export default {
+	name: "LVVerwaltungTable",
+	components: {
+		CoreFilterCmpt,
+		BsModal,
+		DetailsForm,
+		CoreTag
+
+	},
+	props: {
+		selected: Object,
+		filter: {
+			type: Object,
+			default: () => ({})
+		}
+	},
+	inject: {
+		currentSemester: {
+			from: 'currentSemester'
+		},
+		lehreinheitAnmerkungDefault: {
+			from: 'lehreinheitAnmerkungDefault',
+			default: ''
+		},
+		lehreinheitRaumtypDefault: {
+			from: 'lehreinheitRaumtypDefault',
+			default: ''
+		},
+		lehreinheitRaumtypAlternativeDefault: {
+			from: 'lehreinheitRaumtypAlternativeDefault',
+			default: ''
+		}
+	},
+	emits: [
+		'update:selected',
+		'row-clicked'
+	],
+	watch: {
+		filter: {
+			handler() {
+				if (this.$refs.table && this.$refs.table.tabulator)
+				{
+					this.expanded = [];
+					this.currentTreeLevel = 0;
+					this.reload();
+				}
+			},
+			deep: true,
+		},
+		currentSemester: {
+			handler(newVal)
+			{
+				this.lv_info_default.studiensemester_kurzbz = newVal
+				this.lv_info = false;
+			}
+		},
+		"tagFilterState.selectedOptions": {
+			handler() {
+				const selectedOptions = this.tagFilterState.selectedOptions;
+				const combinedFilterStatement =
+				buildTagHeaderFilterExpression(selectedOptions);
+
+				setTagHeaderFilterValue(
+					combinedFilterStatement,
+					this.$refs.table.tabulator
+				);
+			},
+			deep: true,
+		},
+	},
+	data() {
+		return {
+			expanded: [],
+			selectedColumnValues: [],
+			tagEndpoint: ApiTag,
+			tabulatorEvents: [
+				{
+					event: 'rowSelectionChanged',
+					handler: this.rowSelectionChanged
+				},
+
+				{
+					event: 'dataProcessed',
+					handler: (data) => {
+						this.reexpandRows()
+						this.$emit('update:selected', {})
+					}
+				},
+				{
+					event: 'dataTreeRowExpanded',
+					handler: (data) => {
+						this.getExpandedRows()
+					}
+				},
+				{
+					event: 'dataTreeRowCollapsed',
+					handler: (data) => {
+						this.getExpandedRows()
+					}
+				},
+				{
+					event: "dataLoaded",
+					handler: (data) => {
+						syncTagHeaderFilterOptions(
+							Array.isArray(data) ? data : [],
+							this.tagFilterState.initialOptions,
+							this.tagFilterState.selectedOptions,
+						);
+					},
+				},
+				{
+					event: "dataFiltered",
+					handler: (filters, rows) => {
+						syncSelectedTagOptionsWithHeaderFilters(
+							filters,
+							this.tagFilterState.selectedOptions,
+							this.tagsEnabled,
+						);
+					},
+				},
+				{
+					event: "columnWidth",
+					handler: (column) => {
+						if (column.getField() !== "tags") return;
+
+						column.getCells().forEach((cell) => {
+						cell.getElement().firstElementChild?.fitTags?.();
+						});
+					},
+				},
+			],
+			formData: {},
+			lv_info: false,
+			lv_info_default: {
+				stundenblockung: 2,
+				wochenrythmus: 1,
+				studiensemester_kurzbz: this.currentSemester,
+				lehrform_kurzbz: 'UE',
+				anmerkung: this.lehreinheitAnmerkungDefault.replace("'","\'"),
+				raumtyp: this.lehreinheitRaumtypDefault,
+				raumtypalternativ: this.lehreinheitRaumtypAlternativeDefault,
+				lehrfach_id: ''
+
+			},
+			tagFilterState: {
+				initialOptions: [],
+				selectedOptions: [],
+			},
+			tagFilterLabels: {
+				tag: "Tag",
+				clear: "Clear",
+				connectors: {
+				AND: "AND",
+				OR: "OR",
+				NOT: "NOT",
+				},
+			},
+		}
+	},
+	computed: {
+		tabulatorOptions() {
+			return {
+				index: 'uniqueindex',
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: async (url, config, params) => {
+					let realUrl = this.buildApiUrl();
+					if (realUrl)
+						return this.$api.call(this.buildApiUrl());
+				},
+				ajaxResponse: (url, params, response) => { return response?.data || [] },
+				dataTree: true,
+				initialSort:[
+					{column: 'lv_bezeichnung', dir: 'desc'},
+				],
+				dataTreeChildIndent: 20,
+				dataTreeElementColumn: "lv_kurzbz",
+				dataTreeStartExpanded: false,
+				dataTreeCollapseElement: '<i class="fa-solid fa-caret-down"></i>',
+				dataTreeExpandElement: '<i class="fa-solid fa-caret-right"></i>',
+				columnDefaults: {
+					tooltip: true,
+					headerFilter: "input",
+					headerFilterFunc: extendedHeaderFilter,
+				},
+				layout: 'fitDataStretch',
+				height: '100%',
+				persistenceID: 'lehrveranstaltungen_2026_07_15_v1',
+				persistence: {
+					sort: true,
+					columns: ["width", "visible"],
+					filter: false,
+					headerFilter: false,
+					group: false,
+					page: false,
+				},
+				selectableRowsRangeMode: 'click',
+				selectableRows: true,
+				rowContextMenu: (component, e) => {
+
+					if (e.getData()?.lehreinheit_id === undefined)
+						return;
+					return [
+						{
+							label: "LV-Teil kopieren",
+							menu: [
+								{
+									label: "Alles",
+									action: (e, row) =>
+									{
+										this.copyLehreinheit(row, "alle");
+									},
+								},
+								{
+									label: "Nur LV-Teil",
+									action: (e, row) =>
+									{
+										this.copyLehreinheit(row, "lvteil");
+									},
+								},
+								{
+									label: "Nur mit Gruppen",
+									action: (e, row) =>
+									{
+										this.copyLehreinheit(row, "gruppen");
+									},
+								},
+								{
+									label: "Nur mit Lehrenden",
+									action: (e, row) =>
+									{
+										this.copyLehreinheit(row, "lektoren");
+									},
+								},
+							],
+						},
+						{
+							label: "Entfernen",
+							action: (e, row)  => {
+								this.deleteLehreinheit(row)
+							},
+						},
+					];
+				},
+
+				columns: LvvColumns,
+				locale: true
+			}
+
+		}
+	},
+	created() {
+		Tabulator.extendModule("format", "formatters", {
+			tagHeaderFilter,
+			tagFormatter: (cell, params, onRendered) => tagFormatter(cell, this.$refs.tagComponent, onRendered),
+			ja_nein: cell => cell.getValue()
+				? this.toUpperCase(this.$p.t('ui', 'ja'))
+				: this.toUpperCase(this.$p.t('ui', 'nein'))
+		});
+		LvvColumns.forEach(col => {
+			if (col.headerFilter == 'input' && col.headerFilterFunc == 'tagHeaderFilter') {
+				col.headerFilter = customTagFilter;
+				col.headerFilterParams = {
+					listOnEmpty: true,
+					autocomplete: true,
+					sort: "asc",
+					initialOptions: this.tagFilterState.initialOptions,
+					selectedOptions: this.tagFilterState.selectedOptions,
+					labels: this.tagFilterLabels,
+				};
+				col.headerSort = false;
+			}
+		});
+	},
+	mounted() {
+		if (this.shouldAutoLoad())
+		{
+			this.reload();
+		}
+	},
+	methods: {
+		shouldAutoLoad() {
+			return this.filter && this.filter.activeFilter;
+		},
+		toUpperCase(str) {
+			if (!str)
+				return '';
+			return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+		},
+		async reload()
+		{
+
+			if (this.shouldAutoLoad)
+			{
+				if (this.$refs.table.tabulator)
+					this.$refs.table.reloadTable();
+			}
+		},
+		rowSelectionChanged(data) {
+			this.selectedRows = this.$refs.table.tabulator.getSelectedRows();
+			this.selectedColumnValues = this.selectedRows.filter(row => row.getData().lehreinheit_id !== undefined && row.getData().lehreinheit_id).map(row => row.getData().lehreinheit_id);
+
+			if (data[0]?.lehreinheit_id !== undefined && this.selectedColumnValues.length === 1)
+			{
+				this.lv_info = false
+			}
+			else if (data[0]?.lehrveranstaltung_id)
+			{
+				this.getLVInfos(data[0]);
+			}
+			this.$emit('update:selected', data);
+		},
+		getLVInfos(data)
+		{
+			this.$api.call(ApiLv.getByLV(data.lehrveranstaltung_id))
+				.then(result => {
+
+					if (result.data?.lehrfach_id === undefined
+						&& Array.isArray(result.data?.lehrfaecher))
+					{
+						const match = result.data.lehrfaecher?.find(
+							lf => lf.lehrfach?.startsWith(result.data.lvbezeichnung)
+						);
+						if (match)
+						{
+							result.data.lehrfach_id = match.lehrveranstaltung_id;
+						}
+					}
+					this.lv_info = {...this.lv_info_default, ...result.data};
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		buildApiUrl()
+		{
+			if (!['emp', 'treemenu'].includes(this.$route.name))
+				return null;
+
+			let url = 'stdsem/' + this.$route.params.stdsem;
+			
+			if (this.$route.params.emp) {
+				url += '/emp/' + this.$route.params.emp;
+			}
+
+			if (this.$route.params.treemenu) {
+				url += '/' + this.$route.params.treemenu.join('/');
+			}
+			
+			return ApiTreemenu.data('lvverwaltung', url);
+		},
+		resetEmployeeFilter()
+		{
+			const newFilter = { ...this.filter };
+			delete newFilter.emp;
+			newFilter.activeFilter = 'verband';
+		},
+		showLehreinheitModal() {
+			this.resetModal();
+			this.$refs.lehreinheitModal.show();
+		},
+		addNewLehreinheit()
+		{
+			return this.$api.call(ApiLehreinheit.add(this.lv_info))
+				.then(result => {
+					this.$refs.lehreinheitModal.hide()
+					this.reload()
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		resetModal()
+		{
+			this.lv_info_default = {
+				stundenblockung: 2,
+				wochenrythmus: 1,
+				studiensemester_kurzbz: this.currentSemester,
+				lehrform_kurzbz: 'UE',
+				anmerkung: this.lehreinheitAnmerkungDefault.replace("'","\'"),
+				raumtyp: this.lehreinheitRaumtypDefault,
+				raumtypalternativ: this.lehreinheitRaumtypAlternativeDefault,
+				lehrfach_id: ''
+			}
+		},
+		addedTag(addedTag)
+		{
+			addTagInTable(addedTag, this.allRows, 'lehreinheit_id');
+			syncTagHeaderFilterOptions(
+				this.$refs.table?.tabulator?.getData() || [],
+				this.tagFilterState.initialOptions,
+				this.tagFilterState.selectedOptions,
+			);
+		},
+		deletedTag(deletedTag)
+		{
+			deleteTagInTable(deletedTag, this.allRows);
+			syncTagHeaderFilterOptions(
+				this.$refs.table?.tabulator?.getData() || [],
+				this.tagFilterState.initialOptions,
+				this.tagFilterState.selectedOptions,
+			);
+		},
+
+		updatedTag(updatedTag)
+		{
+			updateTagInTable(updatedTag, this.allRows);
+			syncTagHeaderFilterOptions(
+				this.$refs.table?.tabulator?.getData() || [],
+				this.tagFilterState.initialOptions,
+				this.tagFilterState.selectedOptions,
+			);
+		},
+		async copyLehreinheit(row, art)
+		{
+			let data = {
+				lehreinheit_id: row.getData().lehreinheit_id,
+				art: art
+			}
+
+			return this.$api.call(ApiLehreinheit.copy(data))
+				.then(result => {
+					this.reload()
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+		},
+
+		async getExpandedRows() {
+			this.expanded = [];
+
+			this.allRows.forEach(row => {
+				if (row.getTreeChildren().length > 0 && row.isTreeExpanded())
+				{
+					this.expanded.push(row.getData().lv_bezeichnung);
+				}
+			});
+		},
+		reexpandRows() {
+			this.allRows = this.getAllRows(this.$refs.table.tabulator.getRows());
+
+			let lastMatchingRow = null;
+
+			this.allRows.forEach(row => {
+				if (this.expanded.includes(row.getData().lv_bezeichnung))
+				{
+					if (row._row.modules.dataTree)
+					{
+						row._row.modules.dataTree.open = true;
+					}
+
+					if (row._row.data._children?.length > 0)
+					{
+						lastMatchingRow = row;
+					}
+				}
+			});
+
+			if (lastMatchingRow)
+			{
+				lastMatchingRow.treeExpand();
+			}
+
+			this.$refs.table.tabulator.redraw();
+		},
+		deleteLehreinheit(row)
+		{
+			let lehreinheit_id = row.getData().lehreinheit_id;
+
+			let is_selected = this.selectedColumnValues.length > 0 && this.selectedColumnValues.includes(lehreinheit_id);
+
+			let deleteData = is_selected ? {lehreinheit_id: [...new Set(this.selectedColumnValues)]} : {lehreinheit_id: lehreinheit_id};
+
+			return this.$api.call(ApiLehreinheit.delete(deleteData))
+				.then(result => {
+
+					if (result?.data?.errors)
+					{
+						result.data.errors.forEach(error  => {
+							this.$fhcAlert.alertError(error)
+						})
+					}
+					this.reload()
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		getAllRows(rows)
+		{
+			let result = [];
+			rows.forEach(row =>
+			{
+				result.push(row);
+				let children = row.getTreeChildren();
+				if(children && children.length > 0)
+				{
+					result = result.concat(this.getAllRows(children));
+				}
+			});
+			return result;
+		},
+		resetTree() {
+			this.allRows.forEach(row => {
+				row._row.modules.dataTree.open = false;
+			});
+
+			let rootRows = this.$refs.table.tabulator.getRows(true);
+			var lastRow = rootRows[rootRows.length - 1];
+			lastRow?.treeCollapse(true)
+
+			this.currentTreeLevel = 0;
+		},
+		expandTree()
+		{
+			this.currentTreeLevel = (this.currentTreeLevel || 1);
+
+			let lastMatchingRow = null;
+
+			this.allRows.forEach(row => {
+				const level = row._row.modules.dataTree?.index ?? 0;
+
+				if (level === this.currentTreeLevel - 1 )
+				{
+					row._row.modules.dataTree.open = true;
+
+					if (row._row.data._children?.length > 0)
+					{
+						lastMatchingRow = row;
+					}
+				}
+			});
+
+			if (lastMatchingRow)
+			{
+				lastMatchingRow.treeExpand();
+				this.currentTreeLevel++;
+			}
+			this.$refs.table.tabulator.redraw();
+		},
+	},
+	template: `
+	<div class="lv-list h-100 pt-3">
+		<div class="tabulator-container d-flex flex-column h-100">
+			<core-filter-cmpt
+				ref="table"
+				:tabulator-options="tabulatorOptions"
+				:tabulator-events="tabulatorEvents"
+				table-only
+				:side-menu="false"
+				:reload=true
+				new-btn-label="LV-Teil hinzufügen"
+				new-btn-show
+				:new-btn-disabled="!lv_info"
+				@click:new="showLehreinheitModal">
+				
+				<template #actions>
+					<button @click="expandTree" class="btn btn-outline-secondary" type="button" :title="$p.t('lehre', 'aufklappen')"><i class="fa-solid fa-maximize"></i></button>
+					<button @click="resetTree" class="btn btn-outline-secondary" type="button" :title="$p.t('lehre', 'zuklappen')"><i id="togglegroup" class="fa-solid fa-minimize"></i></button>
+					<core-tag ref="tagComponent"
+						:endpoint="tagEndpoint"
+						:values="selectedColumnValues"
+						@added="addedTag"
+						@deleted="deletedTag"
+						@updated="updatedTag"
+						zuordnung_typ="lehreinheit_id"
+					></core-tag>
+				</template>
+				<template #search>
+					<slot name="filterzuruecksetzen"></slot>
+				</template>
+			</core-filter-cmpt>
+		</div>
+		<bs-modal ref="lehreinheitModal" dialogClass="modal-xxl">
+			<template #title>
+				<p class="fw-bold mt-3">{{$p.t('lehre', 'newlehreinheit')}}</p>
+			</template>
+				
+			<template v-if="lv_info">
+				<details-form :data="lv_info"/>
+			</template>
+				
+			<template #footer>
+				<button type="button" class="btn btn-primary" @click="addNewLehreinheit">{{$p.t('ui', 'speichern')}}</button>
+			</template>
+		</bs-modal>
+	</div>
+`
+};

@@ -11,4 +11,10 @@ class Paabgabetyp_model extends DB_Model
 		$this->dbTable = 'campus.tbl_paabgabetyp';
 		$this->pk = 'paabgabetyp_kurzbz';
 	}
+	
+	public function getAll() {
+		$qry = "SELECT * FROM campus.tbl_paabgabetyp ORDER BY bezeichnung";
+
+		return $this->execReadOnlyQuery($qry);
+	}
 }

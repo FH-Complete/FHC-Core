@@ -63,3 +63,31 @@ if (!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_lehrveranstaltung_faktor 
 	else
 		echo 'Tabelle: lehre.tbl_lehrveranstaltung_faktor befüllt!';
 }
+
+// Add index to lehre.tbl_lehrveranstaltung_faktor
+if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_lehrveranstaltung_faktor_lvid'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "CREATE INDEX idx_tbl_lehrveranstaltung_faktor_lvid ON lehre.tbl_lehrveranstaltung_faktor USING btree (lehrveranstaltung_id);";
+
+		if (! $db->db_query($qry))
+			echo '<strong>Indizes: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Index fuer lehre.tbl_lehrveranstaltung_faktor.lehrveranstaltung_id hinzugefuegt';
+	}
+}
+
+if(!@$db->db_query("SELECT lehrform_kurzbz FROM lehre.tbl_lehrveranstaltung_faktor LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_lehrveranstaltung_faktor ADD COLUMN lehrform_kurzbz varchar(8);			        
+			ALTER TABLE lehre.tbl_lehrveranstaltung_faktor ADD CONSTRAINT fk_lehrveranstaltung_faktor_lehrform_kurzbz FOREIGN KEY (lehrform_kurzbz) REFERENCES lehre.tbl_lehrform (lehrform_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
+			ALTER TABLE lehre.tbl_lehrveranstaltung_faktor DROP CONSTRAINT fk_lehrveranstaltung_faktor_lehrveranstaltung_id;
+			ALTER TABLE lehre.tbl_lehrveranstaltung_faktor ADD CONSTRAINT fk_lehrveranstaltung_faktor_lehrveranstaltung_id FOREIGN KEY (lehrveranstaltung_id) REFERENCES lehre.tbl_lehrveranstaltung (lehrveranstaltung_id) ON DELETE CASCADE ON UPDATE CASCADE;
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_lehrveranstaltung_faktor '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte lehrform_kurzbz zu Tabelle lehre.tbl_lehrveranstaltung_faktor hinzugefügt';
+}

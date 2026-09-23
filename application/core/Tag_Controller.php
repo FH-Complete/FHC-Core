@@ -7,7 +7,7 @@ class Tag_Controller extends FHCAPI_Controller
 {
 	private $_uid;
 
-	const BERECHTIGUNG_KURZBZ = 'admin:rw';
+	const BERECHTIGUNG_KURZBZ = ['admin:rw'];
 
 	public function __construct($permissions)
 	{
@@ -15,10 +15,11 @@ class Tag_Controller extends FHCAPI_Controller
 			'getTag' => self::BERECHTIGUNG_KURZBZ,
 			'getTags' => self::BERECHTIGUNG_KURZBZ,
 			'addTag' => self::BERECHTIGUNG_KURZBZ,
-
 			'updateTag' => self::BERECHTIGUNG_KURZBZ,
 			'doneTag' => self::BERECHTIGUNG_KURZBZ,
 			'deleteTag' => self::BERECHTIGUNG_KURZBZ,
+			'getAllTags' => self::BERECHTIGUNG_KURZBZ,
+			'rebuildTagsForTypeId' => self::BERECHTIGUNG_KURZBZ,
 		];
 
 		$merged_permissions = array_merge($default_permissions, $permissions);
@@ -26,58 +27,122 @@ class Tag_Controller extends FHCAPI_Controller
 		parent::__construct($merged_permissions);
 
 		$this->_setAuthUID();
+
+		// Library
+		$this->load->library('TagLib');
+
 		$this->load->model('person/Notiz_model', 'NotizModel');
 		$this->load->model('system/Notiztyp_model', 'NotiztypModel');
 		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
+
+		$this->loadPhrases([
+			'ui'
+		]);
 	}
 
-	public function getTag()
+	public function getTag($readonly_tags = null)
 	{
+		$language = $this->_getLanguageIndex();
+		$index_bezeichnung_mehrsprachig = $language - 1;
+
 		$id = $this->input->get('id');
 
+		if (is_array($readonly_tags) && !isEmptyArray($readonly_tags))
+		{
+			$readonly_tags = $this->_filterTag($readonly_tags, true);
+
+			foreach ($readonly_tags as $key => $tag)
+			{
+				$readonly_tags[$key] = $this->NotizModel->db->escape($tag);
+			}
+			$tags = '(' . implode(',', $readonly_tags) . ')';
+
+			$this->NotizModel->addSelect("
+						CASE 
+							WHEN tbl_notiz_typ.typ_kurzbz IN $tags 
+							THEN TRUE 
+							ELSE FALSE 
+						END as readonly
+					");
+		}
+
 		$this->NotizModel->addSelect(
-			'tbl_notiz.titel, 
+			"tbl_notiz.titel, 
 			tbl_notiz.text, 
-			array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung,
+			array_to_json(bezeichnung_mehrsprachig::varchar[])->>". $index_bezeichnung_mehrsprachig . " as bezeichnung,
 			tbl_notiz.notiz_id,
 			tbl_notiz_typ.style,
+			tbl_notiz_typ.automatisiert,
+			tbl_notiz_typ.prioritaet,
 			tbl_notiz.erledigt as done,
 			tbl_notiz.insertamum,
 			tbl_notiz.updateamum,
-			tbl_notiz.insertvon,
-			tbl_notiz.updatevon
-			'
+			(verfasserperson.vorname || ' ' || verfasserperson.nachname || ' ' || '(' || verfasserbenutzer.uid || ')') as verfasser,
+			(bearbeiterperson.vorname || ' ' || bearbeiterperson.nachname || ' ' || '(' || bearbeiterbenutzer.uid || ')') as bearbeiter,
+			tbl_notiz.start,
+			tbl_notiz.ende
+			"
 		);
 		$this->NotizModel->addJoin('public.tbl_notiz_typ', 'public.tbl_notiz.typ = public.tbl_notiz_typ.typ_kurzbz');
+
+		$this->NotizModel->addJoin('public.tbl_benutzer verfasserbenutzer', 'tbl_notiz.verfasser_uid = verfasserbenutzer.uid', 'LEFT');
+		$this->NotizModel->addJoin('public.tbl_person verfasserperson', 'verfasserbenutzer.person_id = verfasserperson.person_id', 'LEFT');
+
+		$this->NotizModel->addJoin('public.tbl_benutzer bearbeiterbenutzer', 'tbl_notiz.bearbeiter_uid = bearbeiterbenutzer.uid', 'LEFT');
+		$this->NotizModel->addJoin('public.tbl_person bearbeiterperson', 'bearbeiterbenutzer.person_id = bearbeiterperson.person_id', 'LEFT');
+
 		$notiz = $this->NotizModel->loadWhere(array('notiz_id' => $id));
+
 
 		$this->terminateWithSuccess(hasData($notiz) ? getData($notiz)[0] : array());
 	}
 
-	public function getTags()
+	public function getTags($tags = null)
 	{
+		$language = $this->_getLanguageIndex();
+		$index_bezeichnung_mehrsprachig = $language - 1;
+
 		$this->NotiztypModel->addSelect(
-			'typ_kurzbz as tag_typ_kurzbz,
-			array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung,
+			"typ_kurzbz as tag_typ_kurzbz,
+			array_to_json(bezeichnung_mehrsprachig::varchar[])->>". $index_bezeichnung_mehrsprachig . " as bezeichnung,
 			style,
 			beschreibung,
-			tag
-			'
+			tag,
+			automatisiert,
+			prioritaet
+			"
 		);
 		$this->NotiztypModel->addOrder('prioritaet');
+
+		if (is_array($tags) && !isEmptyArray($tags))
+		{
+			$tags = $this->_filterTag($tags, false);
+			$this->NotiztypModel->db->where_in('typ_kurzbz', $tags);
+		}
+
 		$notiztypen = $this->NotiztypModel->loadWhere(array('aktiv' => true));
 		$this->terminateWithSuccess(hasData($notiztypen) ? getData($notiztypen) : array());
 	}
 
-	public function addTag($withZuordnung = true)
+	public function addTag($withZuordnung = true, $updatable_tags = null)
 	{
 		$postData = $this->getPostJson();
 
 		$checkTyp = $this->NotiztypModel->loadWhere(array('typ_kurzbz' => $postData->tag_typ_kurzbz));
 
-		if (!hasData($checkTyp))
-			$this->terminateWithError('Error occurred', self::ERROR_TYPE_GENERAL);
+		if (isError($checkTyp))
+			$this->terminateWithError($this->p->t('ui', 'fehlerBeimLesen'));
 
+		if (!hasData($checkTyp))
+			$this->terminateWithError($this->p->t('ui', 'fehlerBeimLesen'));
+
+		if (is_array($updatable_tags) && !isEmptyArray($updatable_tags))
+		{
+			$tags = $this->_filterTag($updatable_tags, false);
+
+			if (!in_array($postData->tag_typ_kurzbz, $tags))
+				$this->terminateWithError($this->p->t('ui', 'keineBerechtigung'));
+		}
 
 		if ($withZuordnung)
 		{
@@ -117,40 +182,88 @@ class Tag_Controller extends FHCAPI_Controller
 		}
 	}
 
-	private function addNotiz($postData)
-	{
-		return $this->NotizModel->insert(array(
-			'titel' => 'TAG', //TODO klären
-			'text' => $postData->notiz,
-			'verfasser_uid' => $this->_uid,
-			'erledigt' => false,
-			'insertamum' => date('Y-m-d H:i:s'),
-			'insertvon' => $this->_uid,
-			'typ' => $postData->tag_typ_kurzbz
-		));
-
-	}
-	public function updateTag()
+	public function updateTag($updatable_tags = null)
 	{
 		$postData = $this->getPostJson();
+		$post_tag = $this->NotizModel->loadWhere(array('notiz_id' => $postData->id));
+
+		if (isError($post_tag))
+			$this->terminateWithError($this->p->t('ui', 'fehlerBeimLesen'));
+
+		if (!hasData($post_tag))
+			$this->terminateWithError($this->p->t('ui', 'fehlerBeimLesen'));
+
+		if (is_array($updatable_tags) && !isEmptyArray($updatable_tags))
+		{
+			$tags = $this->_filterTag($updatable_tags, false);
+
+			$post_tag_typ = getData($post_tag)[0]->typ;
+
+			if (!in_array($post_tag_typ, $tags))
+				$this->terminateWithError($this->p->t('ui', 'keineBerechtigung'));
+		}
+
 		$updateData = $this->NotizModel->update(array('notiz_id' => $postData->id),
-			array('text' => $postData->notiz)
+			array('text' => $postData->notiz,
+				'updateamum' => date('Y-m-d H:i:s'),
+				'updatevon' => $this->_uid,
+				'bearbeiter_uid' => $this->_uid,
+			)
 		);
 		$this->terminateWithSuccess($updateData);
 	}
-	public function doneTag()
+	public function doneTag($updatable_tags = null)
 	{
 		$postData = $this->getPostJson();
-		$updateData = $this->NotizModel->update(array('notiz_id' => $postData->id),
-			array('erledigt' => !$postData->done)
-		);
+		$post_tag = $this->NotizModel->loadWhere(array('notiz_id' => $postData->id));
 
+		if (isError($post_tag))
+			$this->terminateWithError($this->p->t('ui', 'fehlerBeimLesen'));
+
+		if (!hasData($post_tag))
+			$this->terminateWithError($this->p->t('ui', 'fehlerBeimLesen'));
+
+		if (is_array($updatable_tags) && !isEmptyArray($updatable_tags))
+		{
+			$tags = $this->_filterTag($updatable_tags, false);
+
+			$post_tag_typ = getData($post_tag)[0]->typ;
+
+			if (!in_array($post_tag_typ, $tags))
+				$this->terminateWithError($this->p->t('ui', 'keineBerechtigung'));
+		}
+
+		$updateData = $this->NotizModel->update(array('notiz_id' => $postData->id),
+			array('erledigt' => !$postData->done,
+				'text' => $postData->notiz,
+				'updateamum' => date('Y-m-d H:i:s'),
+				'updatevon' => $this->_uid,
+				'bearbeiter_uid' => $this->_uid,
+			)
+		);
 		$this->terminateWithSuccess($updateData);
 	}
 
-	public function deleteTag($withZuordnung = true)
+	public function deleteTag($withZuordnung = true, $updatable_tags = null)
 	{
 		$postData = $this->getPostJson();
+		$post_tag = $this->NotizModel->loadWhere(array('notiz_id' => $postData->id));
+
+		if (isError($post_tag))
+			$this->terminateWithError($this->p->t('ui', 'fehlerBeimLesen'));
+
+		if (!hasData($post_tag))
+			$this->terminateWithError($this->p->t('ui', 'fehlerBeimLesen'));
+
+		if (is_array($updatable_tags) && !isEmptyArray($updatable_tags))
+		{
+			$tags = $this->_filterTag($updatable_tags, false);
+
+			$post_tag_typ = getData($post_tag)[0]->typ;
+
+			if (!in_array($post_tag_typ, $tags))
+				$this->terminateWithError($this->p->t('ui', 'keineBerechtigung'));
+		}
 
 		$deleteNotiz = "";
 		if ($withZuordnung)
@@ -175,6 +288,90 @@ class Tag_Controller extends FHCAPI_Controller
 		$this->terminateWithSuccess($deleteNotiz);
 	}
 
+	public function getAllTags($readonly_tags = false)
+	{
+		$language = $this->_getLanguageIndex();
+		$index_bezeichnung_mehrsprachig = $language - 1;
+		$prestudent_id = $this->input->get('prestudent_id');
+
+		if (is_array($readonly_tags) && !isEmptyArray($readonly_tags))
+		{
+			$readonly_tags = $this->_filterTag($readonly_tags, true);
+
+			foreach ($readonly_tags as $key => $tag)
+			{
+				$readonly_tags[$key] = $this->NotizModel->db->escape($tag);
+			}
+			$tags = '(' . implode(',', $readonly_tags) . ')';
+
+			$this->NotizModel->addSelect("
+						CASE
+							WHEN tbl_notiz_typ.typ_kurzbz IN $tags
+							THEN TRUE
+							ELSE FALSE
+						END as readonly
+					");
+		}
+		$this->NotizModel->addSelect(
+			"tbl_notiz.titel,
+			tbl_notiz.text,
+			array_to_json(bezeichnung_mehrsprachig::varchar[])->>". $index_bezeichnung_mehrsprachig . " as bezeichnung,
+			tbl_notiz.notiz_id,
+			tbl_notiz_typ.style,
+			tbl_notiz_typ.automatisiert,
+			tbl_notiz_typ.prioritaet,
+			tbl_notiz.erledigt as done,
+			tbl_notiz.insertamum,
+			tbl_notiz.updateamum,
+			(verfasserperson.vorname || ' ' || verfasserperson.nachname || ' ' || '(' || verfasserbenutzer.uid || ')') as verfasser,
+			(bearbeiterperson.vorname || ' ' || bearbeiterperson.nachname || ' ' || '(' || bearbeiterbenutzer.uid || ')') as bearbeiter,
+			tbl_notiz.start,
+			tbl_notiz.ende
+			"
+		);
+		$this->NotizModel->addJoin('public.tbl_notiz_typ', 'public.tbl_notiz.typ = public.tbl_notiz_typ.typ_kurzbz');
+
+		$this->NotizModel->addJoin('public.tbl_benutzer verfasserbenutzer', 'tbl_notiz.verfasser_uid = verfasserbenutzer.uid', 'LEFT');
+		$this->NotizModel->addJoin('public.tbl_person verfasserperson', 'verfasserbenutzer.person_id = verfasserperson.person_id', 'LEFT');
+
+		$this->NotizModel->addJoin('public.tbl_benutzer bearbeiterbenutzer', 'tbl_notiz.bearbeiter_uid = bearbeiterbenutzer.uid', 'LEFT');
+		$this->NotizModel->addJoin('public.tbl_person bearbeiterperson', 'bearbeiterbenutzer.person_id = bearbeiterperson.person_id', 'LEFT');
+
+		$this->NotizModel->addJoin('public.tbl_notizzuordnung notizzuordnung', 'tbl_notiz.notiz_id = notizzuordnung.notiz_id');
+
+		$this->NotizModel->addOrder('done');
+		$this->NotizModel->addOrder('tbl_notiz_typ.prioritaet');
+		$notiz = $this->NotizModel->loadWhere(array('prestudent_id' => $prestudent_id));
+
+
+		$this->terminateWithSuccess(hasData($notiz) ? getData($notiz) : array());
+	}
+
+	public function rebuildTagsForTypeId()
+	{
+		$ids = $this->input->post('ids');
+		$typeId = $this->input->post('typeId');
+		$semester = $this->input->post('sem');
+
+		$idsSuccess = [];
+		$idsError = [];
+		$outputResult = [];
+
+		foreach ($ids as $id)
+		{
+			$result = $this->taglib->rebuildTagsForTypeId($typeId, $id, $semester);
+
+			if (isError($result))
+				$idsError[] = $id;
+			else
+				$idsSuccess[] = $id;
+
+			$outputResult[] = $result;
+		}
+
+		$this->terminateWithSuccess([$outputResult, $idsSuccess, $idsError]);
+	}
+
 	private function _setAuthUID()
 	{
 		$this->_uid = getAuthUID();
@@ -183,5 +380,36 @@ class Tag_Controller extends FHCAPI_Controller
 			show_error('User authentification failed');
 	}
 
+	private function _getLanguageIndex()
+	{
+		$this->load->model('system/Sprache_model', 'SpracheModel');
+		$this->SpracheModel->addSelect('index');
+		$result = $this->SpracheModel->loadWhere(array('sprache' => getUserLanguage()));
+
+		return hasData($result) ? getData($result)[0]->index : 1;
+	}
+
+	private function _filterTag($tags, $readonly = true)
+	{
+		$filtered_tags = array_filter($tags, function ($tag) use ($readonly)
+		{
+			return isset($tag['readonly']) && $tag['readonly'] === $readonly;
+		});
+
+		return array_keys($filtered_tags);
+	}
+
+	private function addNotiz($postData)
+	{
+		return $this->NotizModel->insert(array(
+			'titel' => 'TAG', //TODO klären
+			'text' => $postData->notiz,
+			'verfasser_uid' => $this->_uid,
+			'erledigt' => false,
+			'insertamum' => date('Y-m-d H:i:s'),
+			'insertvon' => $this->_uid,
+			'typ' => $postData->tag_typ_kurzbz
+		));
+	}
 
 }

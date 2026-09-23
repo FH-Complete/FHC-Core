@@ -464,6 +464,7 @@ class pruefungCis extends basis_db
 		$obj->anmeldung_von= $row->anmeldung_von;
                 $obj->anmeldung_bis = $row->anmeldung_bis;
 		$obj->ort_kurzbz = $row->ort_kurzbz;
+		$obj->anderer_raum = $row->anderer_raum;
 		$obj->sammelklausur = $row->sammelklausur;
                 array_push($this->termine, $obj);
             }
@@ -639,6 +640,37 @@ class pruefungCis extends basis_db
                 $obj->lehrveranstaltung_pruefung_id = $row->lehrveranstaltung_pruefung_id;
                 $obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
                 $obj->pruefung_id = $row->pruefung_id;
+                array_push($this->lehrveranstaltungen, $obj);
+            }
+            return true;
+        }
+        return false;
+    }
+
+	public function getPruefungByStudiensemester($studiensemester_kurzbz)
+    {
+        if(empty($studiensemester_kurzbz))
+        {
+           $this->errormsg = "Kein Studiensemester übergeben.</br>";
+           return false;
+        }
+
+		$qry = 'SELECT * 
+				FROM campus.tbl_lehrveranstaltung_pruefung
+				JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+				JOIN campus.tbl_pruefung USING (pruefung_id)
+				WHERE tbl_pruefung.studiensemester_kurzbz = ' . $this->db_add_param($studiensemester_kurzbz);
+
+        if($this->db_query($qry))
+        {
+            while($row = $this->db_fetch_object())
+            {
+                $obj = new stdClass();
+                $obj->lehrveranstaltung_pruefung_id = $row->lehrveranstaltung_pruefung_id;
+                $obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+                $obj->pruefung_id = $row->pruefung_id;
+                $obj->storniert = $row->storniert;
+				$obj->bezeichnung = $row->bezeichnung;
                 array_push($this->lehrveranstaltungen, $obj);
             }
             return true;

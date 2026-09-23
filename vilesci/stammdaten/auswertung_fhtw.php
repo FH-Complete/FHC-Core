@@ -581,8 +581,10 @@ if ($rtprueflingEntSperren)
 				while ($row = $db->db_fetch_object($result))
 					$pruefling_ids[] = $row->pruefling_id;
 
+				$art = filter_input(INPUT_POST, 'art', FILTER_VALIDATE_BOOLEAN);
+
 				$qry = "UPDATE testtool.tbl_pruefling
-						SET gesperrt =" . $db->db_add_param($_POST['art'], 'BOOLEAN') . "
+						SET gesperrt =" . $db->db_add_param($art, FHC_BOOLEAN) . "
 						WHERE pruefling_id IN (" . $db->db_implode4SQL($pruefling_ids) . ")";
 
 				$resultSperre = $db->db_query($qry);
@@ -590,7 +592,7 @@ if ($rtprueflingEntSperren)
 
 			if ($resultSperre)
 			{
-				$msg = $_POST['art'] === 'false' ? 'Pruefling wurde gesperrt' : 'Pruefling wurde freigeschaltet';
+				$msg = !$art ? 'Pruefling wurde gesperrt' : 'Pruefling wurde freigeschaltet';
 				echo json_encode(array(
 					'status' => 'ok',
 					'msg' => $msg));
@@ -698,12 +700,14 @@ if ($rtFreischalten)
 	if (isset($_POST['reihungstest_id']) &&	is_numeric($_POST['reihungstest_id'])
 		&& isset($_POST['art']))
 	{
-		$qry = "UPDATE public.tbl_reihungstest SET freigeschaltet=" . $db->db_add_param($_POST['art'], 'BOOLEAN') . "
+		$art = filter_input(INPUT_POST, 'art', FILTER_VALIDATE_BOOLEAN);
+
+		$qry = "UPDATE public.tbl_reihungstest SET freigeschaltet=" . $db->db_add_param($art, FHC_BOOLEAN) . "
 				WHERE reihungstest_id=" . $db->db_add_param($_POST['reihungstest_id']) . ";";
 
 		if ($result = $db->db_query($qry))
 		{
-			$msg = $_POST['art'] === 'false' ? 'Reihungstest wurde gesperrt' : 'Reihungstest wurde freigeschaltet';
+			$msg = !$art ? 'Reihungstest wurde gesperrt' : 'Reihungstest wurde freigeschaltet';
 			echo json_encode(array(
 				'status' => 'ok',
 				'msg' => $msg));
@@ -1046,6 +1050,7 @@ if ($punkteUebertragen)
 					{
 						$setRTPunkte->new = false;
 						$setRTPunkte->punkte = $rtpunkte;
+						$setRTPunkte->teilgenommen = true;
 						$setRTPunkte->updateamum = date('Y-m-d H:i:s');
 						$setRTPunkte->updatevon = $user;
 
@@ -1273,6 +1278,7 @@ $reihungstest = isset($_REQUEST['reihungstest']) ? $_REQUEST['reihungstest'] : '
 $studiengang = isset($_REQUEST['studiengang']) ? $_REQUEST['studiengang'] : '';
 $semester = isset($_REQUEST['semester']) ? $_REQUEST['semester'] : '';
 $prestudent_id = isset($_REQUEST['prestudent_id']) ? $_REQUEST['prestudent_id'] : '';
+$prestudent_ids = isset($_REQUEST['prestudent_ids']) ? $_REQUEST['prestudent_ids'] : '';
 $orgform_kurzbz = isset($_REQUEST['orgform_kurzbz']) ? $_REQUEST['orgform_kurzbz'] : '';
 $format = (isset($_REQUEST['format']) ? $_REQUEST['format'] : '');
 $stgtyp = (isset($_REQUEST['stgtyp']) ? $_REQUEST['stgtyp'] : '');
@@ -1312,7 +1318,7 @@ if ($prestudent_id != '' && !is_numeric($prestudent_id))
 {
 	die('PrestudentID ist ungueltig');
 }
-if (isset($_POST['rtauswsubmit']) && $reihungstest == '' && $studiengang == '' && $semester == '' && $prestudent_id == '' && $datum_von == '' && $datum_bis == '')
+if (isset($_POST['rtauswsubmit']) && $reihungstest == '' && $studiengang == '' && $semester == '' && $prestudent_id == '' && $datum_von == '' && $datum_bis == '' && $prestudent_ids == '')
 {
 	die('Waehlen Sie bitte mindestens eine der Optionen aus');
 }
@@ -1430,6 +1436,10 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 	if ($prestudent_id != '')
 	{
 		$query .= " AND ps.prestudent_id=" . $db->db_add_param($prestudent_id, FHC_INTEGER);
+	}
+	if ($prestudent_ids != '')
+	{
+		$query .= " AND ps.prestudent_id IN (" .$db->db_implode4SQL(explode(',', $prestudent_ids)) . ")";
 	}
 	if ($orgform_kurzbz != '' && $studiengang != '')
 	{
@@ -1663,6 +1673,10 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 	if ($prestudent_id != '')
 	{
 		$query .= " AND ps.prestudent_id=" . $db->db_add_param($prestudent_id, FHC_INTEGER);
+	}
+	if ($prestudent_ids != '')
+	{
+		$query .= " AND ps.prestudent_id IN (" .$db->db_implode4SQL(explode(',',$prestudent_ids)) . ")";
 	}
 	if ($orgform_kurzbz != '')
 	{
@@ -2944,7 +2958,7 @@ else
 	$selectedrtstr = '';
 	$checkbxstr = '';
 	$first = true;
-	$noparamsselected = $prestudent_id == '' && $reihungstest == '' && $datum_von == '' && $datum_bis == '' && $studiengang == '' && $semester == '';
+	$noparamsselected = $prestudent_id == '' && $reihungstest == '' && $datum_von == '' && $datum_bis == '' && $studiengang == '' && $semester == '' && $prestudent_ids == '';
 	//$maxeachline = 1;
 	foreach ($rtest as $rt)
 	{
@@ -3060,6 +3074,9 @@ else
 	echo '</td></tr>';
 	echo '<tr><td>';
 	echo 'PrestudentIn: <INPUT id="prestudent" type="text" name="prestudent_id" size="50" value="' . $prestudent_id . '" placeholder="Name, UID oder Prestudent_id eingeben"/><input type="hidden" id="prestudent_id" name="prestudent_id" value="' . $prestudent_id . '" />';
+	echo '</td></tr>';
+	echo '<tr><td>';
+	echo 'PrestudentIn (Mehrfachauswahl): <input name="prestudent_ids" disabled type="text" size="50" value="' . $prestudent_ids . '"/><input type="hidden" id="prestudent_ids" name="prestudent_ids" value="' . $prestudent_ids . '" />';
 	echo '</td></tr>
 			</table></td><td id="auswertencell">';
 	echo '<INPUT type="submit" class="btn btn-primary" value="Anzeigen" name="rtauswsubmit" id="auswertenButton"/><br><br>';
@@ -3068,6 +3085,7 @@ else
 										&datum_von=' . $datum_von . '
 										&datum_bis=' . $datum_bis . '
 										&prestudent_id=' . $prestudent_id . '
+										&' . http_build_query(array('prestudent_ids' => $prestudent_ids)) . '
 										&' . http_build_query(array('reihungstest' => $reihungstest)) . '
 										&orgform_kurzbz=' . $orgform_kurzbz . '
 										&stgtyp=' . $stgtyp . '
@@ -3121,6 +3139,7 @@ else
 				datum_von=' . $datum_von . '&
 				datum_bis=' . $datum_bis . '&
 				prestudent_id=' . $prestudent_id . '&
+				&' . http_build_query(array('prestudent_ids' => $prestudent_ids)) . '
 				&' . http_build_query(array('reihungstest' => $reihungstest)) . '">
 		<div class="row">';
 	echo '<div class="col-xs-12" id="miscfunctionscol">';

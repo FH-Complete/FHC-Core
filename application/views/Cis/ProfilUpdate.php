@@ -2,10 +2,14 @@
 $includesArray = array(
     'title' => 'Profil Änderungen',
     'vue3' => true,
+	'primevue3' => true,
     'bootstrap5' => true,
     'fontawesome6'=> true,
     'axios027' => true,
     'tabulator5' => true,
+	'customJSs' => array(
+		'vendor/moment/luxonjs/luxon.min.js'
+	),
     'customJSModules' => array(
 	'public/js/apps/Cis/ProfilUpdateRequests.js'
     ),

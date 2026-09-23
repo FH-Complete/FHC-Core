@@ -40,7 +40,7 @@ switch($method)
 				]);
 				break;
 			}
-			if (exists($faktor['lv_id'], $faktor['von'], $faktor['bis']))
+			if (exists($faktor['lv_id'], $faktor['von'], $faktor['bis'], null, $faktor['lehrform_kurzbz']))
 			{
 				echo json_encode([
 					'status' => 'error',
@@ -49,12 +49,22 @@ switch($method)
 				break;
 			}
 
-			$result = $lv_faktor->addFaktor($faktor['lv_id'], $faktor['faktor'], $faktor['von'], $faktor['bis']);
+			$newFaktor = new lehrveranstaltung_faktor();
+			$newFaktor->lehrveranstaltung_id = $faktor['lv_id'];
+			$newFaktor->faktor = $faktor['faktor'];
+			$newFaktor->studiensemester_kurzbz_von = $faktor['von'];
+			$newFaktor->studiensemester_kurzbz_bis = $faktor['bis'];
+			$newFaktor->lehrform_kurzbz = $faktor['lehrform_kurzbz'];
+			$newFaktor->insertvon = get_uid();
+			$result = $newFaktor->save(true);
+
 			echo json_encode($result);
 		}
 		break;
 	case 'updateFaktor':
+
 		$faktor = isset($_REQUEST['faktor']) ? $_REQUEST['faktor']: '' ;
+
 		if ($faktor !== '')
 		{
 			if (vonHigherThanBis($faktor['von'], $faktor['bis']))
@@ -65,7 +75,7 @@ switch($method)
 				]);
 				break;
 			}
-			if (exists($faktor['lv_id'], $faktor['von'], $faktor['bis'], $faktor['id']))
+			if (exists($faktor['lv_id'], $faktor['von'], $faktor['bis'], $faktor['id'], $faktor['lehrform_kurzbz']))
 			{
 				echo json_encode([
 					'status' => 'error',
@@ -74,7 +84,15 @@ switch($method)
 				break;
 			}
 
-			$result = $lv_faktor->updateFaktor($faktor['id'], $faktor['faktor'], $faktor['von'], $faktor['bis']);
+			$updateFaktor = new lehrveranstaltung_faktor();
+			$updateFaktor->lehrveranstaltung_faktor_id = $faktor['id'];
+			$updateFaktor->faktor = $faktor['faktor'];
+			$updateFaktor->studiensemester_kurzbz_von = $faktor['von'];
+			$updateFaktor->studiensemester_kurzbz_bis = $faktor['bis'];
+			$updateFaktor->lehrform_kurzbz = $faktor['lehrform_kurzbz'];
+			$updateFaktor->updatevon = get_uid();
+			$updateFaktor->updateamum = date('Y-m-d H:i:s');
+			$result = $updateFaktor->save();
 			echo json_encode($result);
 		}
 		break;
@@ -99,11 +117,12 @@ function isRightType($lv_id)
 	return false;
 }
 
-function exists($lv_id, $von, $bis, $id = null)
+function exists($lv_id, $von, $bis, $id = null, $lehrform_kurzbz = null)
 {
 	$lv_faktor = new lehrveranstaltung_faktor();
-	$lv_faktor->loadByLV($lv_id, $von, $bis, $id);
-	return !empty($lv_faktor->lv_faktoren);
+
+	$lehrform_kurzbz = $lehrform_kurzbz === ' - ' ? null : $lehrform_kurzbz;
+	return $lv_faktor->checkIfExists($lv_id, $von, $bis, $id, $lehrform_kurzbz);
 }
 
 function vonHigherThanBis($von, $bis)

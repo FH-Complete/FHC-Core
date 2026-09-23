@@ -72,7 +72,7 @@ class Documents extends Auth_Controller
 
 		$stgs = [];
 		$stsemArray = [];
-		$buchungstypen = implode('\',\'', defined("CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN") ? unserialize(CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN) : []);
+		$buchungstypen = defined("CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN") ? unserialize(CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN) : [];
 		$person_ids = [];
 		foreach ($stati as $status) {
 			$person_ids[] = $status->person_id;

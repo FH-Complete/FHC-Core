@@ -1708,6 +1708,7 @@ function MitarbeiterEntwicklungsteamSelect()
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-textbox-studiengang').value=studiengang_kz;
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-beginn').value=beginn;
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-ende').value=ende;
+	document.getElementById('mitarbeiter-entwicklungsteam-detail-entwicklungsteam_id').value=entwicklungsteam_id;
 	MitarbeiterEntwicklungsteamDetailDisableFields(false);
 }
 
@@ -1725,6 +1726,7 @@ function MitarbeiterEntwicklungsteamSpeichern()
 	studiengang_kz_old = document.getElementById('mitarbeiter-entwicklungsteam-detail-textbox-studiengang').value;
 	beginn = document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-beginn').value;
 	ende = document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-ende').value;
+	entwicklungsteam_id = document.getElementById('mitarbeiter-entwicklungsteam-detail-entwicklungsteam_id').value;
 
 	if(studiengang_kz=='')
 	{

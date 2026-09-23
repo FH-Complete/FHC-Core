@@ -22,6 +22,7 @@ class InfoCenter extends Auth_Controller
 	const REIHUNGSTESTABSOLVIERT_PAGE = 'reihungstestAbsolviert';
 	const ABGEWIESEN_PAGE = 'abgewiesen';
 	const AUFGENOMMEN_PAGE = 'aufgenommen';
+	const ONBOARDING_PAGE = 'onboarding';
 	const SHOW_DETAILS_PAGE = 'showDetails';
 	const SHOW_ZGV_DETAILS_PAGE = 'showZGVDetails';
 	const ZGV_UBERPRUEFUNG_PAGE = 'ZGVUeberpruefung';
@@ -32,6 +33,9 @@ class InfoCenter extends Auth_Controller
 	const FILTER_ID = 'filter_id';
 	const PREV_FILTER_ID = 'prev_filter_id';
 	const KEEP_TABLESORTER_FILTER = 'keepTsFilter';
+
+	const ONBOARDING_INSERTVON = 'onboarding';
+	const ONBOARDING_KENNZEICHENTYP = 'eobRegistrierungsId';
 
 	private $_uid; // contains the UID of the logged user
 
@@ -116,6 +120,7 @@ class InfoCenter extends Auth_Controller
 				'index' => 'infocenter:r',
 				'freigegeben' => 'infocenter:r',
 				'abgewiesen' => 'infocenter:r',
+				'onboarding' => 'infocenter:r',
 				'aufgenommen' => 'infocenter:r',
 				'reihungstestAbsolviert' => 'infocenter:r',
 				'showDetails' => 'infocenter:r',
@@ -173,6 +178,7 @@ class InfoCenter extends Auth_Controller
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
 		$this->load->model('person/Geschlecht_model', 'GeschlechtModel');
 		$this->load->model('person/adresse_model', 'AdresseModel');
+		$this->load->model('person/Kennzeichen_model', 'KennzeichenModel');
 
 		// Loads libraries
 		$this->load->library('PersonLogLib');
@@ -229,6 +235,13 @@ class InfoCenter extends Auth_Controller
 		$this->_setNavigationMenu(self::ABGEWIESEN_PAGE); // define the navigation menu for this page
 
 		$this->load->view('system/infocenter/infocenterAbgewiesen.php');
+	}
+
+	public function onboarding()
+	{
+		$this->_setNavigationMenu(self::ONBOARDING_PAGE); // define the navigation menu for this page
+
+		$this->load->view('system/infocenter/onboarding.php');
 	}
 	
 	/**
@@ -361,6 +374,8 @@ class InfoCenter extends Auth_Controller
 		$data[self::FHC_CONTROLLER_ID] = $this->getControllerId();
 		$data[self::ORIGIN_PAGE] = $origin_page;
 		$data[self::PREV_FILTER_ID] = $this->input->get(self::PREV_FILTER_ID);
+
+		$data['studiensemester'] = $this->variablelib->getVar('infocenter_studiensemester');
 
 		$this->load->view('system/infocenter/infocenterDetails.php', $data);
 	}
@@ -1275,7 +1290,6 @@ class InfoCenter extends Auth_Controller
 				'nachname' => $this->input->post('nachname'),
 				'titelpost' => isEmptyString($this->input->post('titelpost')) ? null : $this->input->post('titelpost'),
 				'gebdatum' => isEmptyString($this->input->post('gebdatum')) ? null : date("Y-m-d", strtotime($this->input->post('gebdatum'))),
-				'svnr' => isEmptyString($this->input->post('svnr')) ? null : $this->input->post('svnr'),
 				'staatsbuergerschaft' => isEmptyString($this->input->post('buergerschaft')) ? null : $this->input->post('buergerschaft'),
 				'geschlecht' => $this->input->post('geschlecht'),
 				'geburtsnation' => isEmptyString($this->input->post('gebnation')) ? null : $this->input->post('gebnation'),
@@ -1442,6 +1456,100 @@ class InfoCenter extends Auth_Controller
 
 		$this->outputJsonSuccess("Done!");
 	}
+
+	public function getAbsageData()
+	{
+		$stg_typ = $this->getStudienArtBerechtigung(['b', 'm']);
+
+		if (!is_null($stg_typ))
+		{
+			$statusgruende = $this->StatusgrundModel->getStatus(self::ABGEWIESENERSTATUS, true)->retval;
+			$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
+			$studiengaenge = $this->StudiengangModel->getStudiengaengeWithOrgForm(array_column($stg_typ, 'typ'), $studienSemester);
+
+			$data = array (
+				'statusgruende' => $statusgruende,
+				'studiengaenge' => $studiengaenge->retval
+			);
+
+			$this->outputJsonSuccess($data);
+		}
+		else
+			$this->outputJsonSuccess(null);
+	}
+
+	public function getStudienArtBerechtigung($typ = null)
+	{
+		$studiengang_kz_all = $this->permissionlib->getSTG_isEntitledFor('infocenter');
+		$stg_typ = $this->StudiengangModel->getStudiengangTyp($studiengang_kz_all, $typ);
+		return getData($stg_typ);
+	}
+
+	public function getStudienartData()
+	{
+		$this->outputJsonSuccess($this->getStudienArtBerechtigung(['b', 'm', 'l']));
+	}
+
+	public function saveAbsageForAll()
+	{
+		$statusgrund = $this->input->post('statusgrund');
+		$studiengang = $this->input->post('studiengang');
+		$abgeschickt = $this->input->post('abgeschickt');
+		$personen = $this->input->post('personen');
+		$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
+
+		if ($statusgrund === 'null' || $studiengang === 'null' || $abgeschickt === 'null' || empty($personen))
+			$this->terminateWithJsonError("Bitte füllen Sie alle Felder aus");
+
+		if ($studiengang === 'all' && $abgeschickt === 'all')
+		{
+			foreach($personen as $person)
+			{
+				$prestudenten = $this->PrestudentModel->getByPersonWithoutLehrgang($person, $studienSemester);
+
+				if (!hasData($prestudenten))
+					continue;
+
+				$prestudentenData = getData($prestudenten);
+
+				foreach ($prestudentenData as $prestudent)
+				{
+					$this->saveAbsage($prestudent->prestudent_id, $statusgrund);
+				}
+			}
+		}
+		else
+		{
+			$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
+
+			$this->StudienplanModel->addSelect('1');
+			$this->StudienplanModel->addJoin('lehre.tbl_studienordnung so', 'studienordnung_id');
+			$escaped = $this->StudienplanModel->db->escape(strtoupper($studiengang));
+			$this->StudienplanModel->db->where("UPPER(so.studiengangkurzbzlang || ':' || tbl_studienplan.orgform_kurzbz) = $escaped");
+			$this->StudienplanModel->addLimit(1);
+			$studiengangResult = $this->StudienplanModel->load();
+
+			if (hasData($studiengangResult))
+			{
+				foreach($personen as $person)
+				{
+					$prestudent = $this->PrestudentModel->getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester, $abgeschickt, $abgeschickt === 'all');
+
+					if (!hasData($prestudent))
+						continue;
+
+					$prestudentData = getData($prestudent);
+					$this->saveAbsage($prestudentData[0]->prestudent_id, $statusgrund);
+				}
+			}
+			else
+				$this->terminateWithJsonError("Falschen Studiengang übergeben!");
+
+		}
+
+		$this->outputJsonSuccess("Success");
+	}
+
 	// -----------------------------------------------------------------------------------------------------------------
 	// Private methods
 
@@ -1552,6 +1660,7 @@ class InfoCenter extends Auth_Controller
 		$reihungstestAbsolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
 		$abgewiesenLink = site_url(self::INFOCENTER_URI.'/'.self::ABGEWIESEN_PAGE);
 		$aufgenommenLink = site_url(self::INFOCENTER_URI.'/'.self::AUFGENOMMEN_PAGE);
+		$onboardingLink = site_url(self::INFOCENTER_URI.'/'.self::ONBOARDING_PAGE);
 
 		$currentFilterId = $this->input->get(self::FILTER_ID);
 		if (isset($currentFilterId))
@@ -1560,6 +1669,7 @@ class InfoCenter extends Auth_Controller
 			$reihungstestAbsolviertLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
 			$abgewiesenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
 			$aufgenommenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
+			$onboardingLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
 		}
 
 		$this->navigationlib->setSessionMenu(
@@ -1623,6 +1733,18 @@ class InfoCenter extends Auth_Controller
 					'', 				// target
 					40   				// sort
 				),
+				'ohnePrestudent' => $this->navigationlib->oneLevel(
+					'Electronic Onboarding',		// description
+					$onboardingLink,	// link
+					null,				// children
+					'users',		// icon
+					null,				// subscriptDescription
+					false,				// expand
+					null,				// subscriptLinkClass
+					null, 				// subscriptLinkValue
+					'', 				// target
+					50   				// sort
+				),
 			)
 		);
 	}
@@ -1649,6 +1771,8 @@ class InfoCenter extends Auth_Controller
 			$link = site_url(self::ZGV_UEBERPRUEFUNG_URI);
 		if ($origin_page === self::ABGEWIESEN_PAGE)
 			$link = site_url(self::INFOCENTER_URI.'/'.self::ABGEWIESEN_PAGE);
+		if ($origin_page === self::ONBOARDING_PAGE)
+			$link = site_url(self::INFOCENTER_URI.'/'.self::ONBOARDING_PAGE);
 
 		if ($origin_page === self::AUFGENOMMEN_PAGE)
 			$link = site_url(self::INFOCENTER_URI.'/'.self::AUFGENOMMEN_PAGE);
@@ -1690,6 +1814,7 @@ class InfoCenter extends Auth_Controller
 		$freigegebenLink = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE);
 		$absolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
 		$abgewiesenLink = site_url(self::INFOCENTER_URI.'/'.self::ABGEWIESEN_PAGE);
+		$onboardingLink = site_url(self::INFOCENTER_URI.'/'.self::ONBOARDING_PAGE);
 		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
 		if (isset($prevFilterId))
 		{
@@ -1766,6 +1891,24 @@ class InfoCenter extends Auth_Controller
 				)
 			);
 		}
+		if($page == self::ONBOARDING_PAGE)
+		{
+			$this->navigationlib->setSessionElementMenu(
+				'onboarding',
+				$this->navigationlib->oneLevel(
+					'Electronic Onboarding',		// description
+					$onboardingLink,	// link
+					null,				// children
+					'users',			// icon
+					null,				// subscriptDescription
+					false,				// expand
+					null,				// subscriptLinkClass
+					null, 				// subscriptLinkValue
+					'', 				// target
+					50   				// sort
+				)
+			);
+		}
 	}
 
 	/**
@@ -1816,7 +1959,7 @@ class InfoCenter extends Auth_Controller
 	}
 
 	/**
-	 * Loads all necessary Person data: Stammdaten (name, svnr, contact, ...), Dokumente, Logs and Notizen
+	 * Loads all necessary Person data: Stammdaten (name, contact, ...), Dokumente, Logs and Notizen
 	 * @param $person_id
 	 * @return array
 	 */
@@ -1901,6 +2044,17 @@ class InfoCenter extends Auth_Controller
 			show_error(getError($user_person));
 		}
 
+		// add info about first electronig onboarding login
+		$this->KennzeichenModel->addSelect('insertamum');
+		$onboarding_first_login = $this->KennzeichenModel->loadWhere(
+			array('person_id' => $person_id, 'kennzeichentyp_kurzbz' => self::ONBOARDING_KENNZEICHENTYP)
+		);
+
+		if (isError($onboarding_first_login))
+		{
+			show_error(getError($onboarding_first_login));
+		}
+
 		$data = array (
 			'lockedby' => $lockedby,
 			'lockedbyother' => $lockedbyother,
@@ -1910,7 +2064,9 @@ class InfoCenter extends Auth_Controller
 			'messages' => $messages->retval,
 			'logs' => $logs,
 			'notizen' => $notizen->retval,
-			'notizenbewerbung' => $notizen_bewerbung->retval
+			'notizenbewerbung' => $notizen_bewerbung->retval,
+			'created_by_onboarding' => $stammdaten->retval->insertvon == self::ONBOARDING_INSERTVON,
+			'onboarding_first_login' => hasData($onboarding_first_login) ? getData($onboarding_first_login)[0]->insertamum : null
 		);
 
 		return $data;
@@ -2329,64 +2485,5 @@ class InfoCenter extends Auth_Controller
 		{
 			$this->loglib->logError('Studiengang has no mail for sending Freigabe mail');
 		}
-	}
-
-	public function getAbsageData()
-	{
-		$stg_typ = $this->getStudienArtBerechtigung(['b', 'm']);
-
-		if (!is_null($stg_typ))
-		{
-			$statusgruende = $this->StatusgrundModel->getStatus(self::ABGEWIESENERSTATUS, true)->retval;
-			$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
-			$studiengaenge = $this->StudiengangModel->getStudiengaengeWithOrgForm(array_column($stg_typ, 'typ'), $studienSemester);
-
-			$data = array (
-				'statusgruende' => $statusgruende,
-				'studiengaenge' => $studiengaenge->retval
-			);
-
-			$this->outputJsonSuccess($data);
-		}
-		else
-			$this->outputJsonSuccess(null);
-	}
-
-	public function getStudienArtBerechtigung($typ = null)
-	{
-		$studiengang_kz_all = $this->permissionlib->getSTG_isEntitledFor('infocenter');
-		$stg_typ = $this->StudiengangModel->getStudiengangTyp($studiengang_kz_all, $typ);
-		return getData($stg_typ);
-	}
-
-	public function getStudienartData()
-	{
-		$this->outputJsonSuccess($this->getStudienArtBerechtigung(['b', 'm', 'l']));
-	}
-
-	public function saveAbsageForAll()
-	{
-		$statusgrund = $this->input->post('statusgrund');
-		$studiengang = $this->input->post('studiengang');
-		$abgeschickt = $this->input->post('abgeschickt');
-		$personen = $this->input->post('personen');
-		$studienSemester = $this->variablelib->getVar('infocenter_studiensemester');
-
-		if ($statusgrund === 'null' || $studiengang === 'null' || $abgeschickt === 'null' || empty($personen))
-			$this->terminateWithJsonError("Bitte füllen Sie alle Felder aus");
-
-		foreach($personen as $person)
-		{
-			$prestudent = $this->PrestudentModel->getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester, $abgeschickt);
-
-			if (!hasData($prestudent))
-				continue;
-
-			$prestudentData = getData($prestudent);
-
-			$this->saveAbsage($prestudentData[0]->prestudent_id, $statusgrund);
-		}
-
-		$this->outputJsonSuccess("Success");
 	}
 }

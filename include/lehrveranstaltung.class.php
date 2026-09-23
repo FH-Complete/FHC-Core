@@ -70,6 +70,7 @@ class lehrveranstaltung extends basis_db
 	public $farbe;
 	public $lehrauftrag=true;
 	public $lehrveranstaltung_template_id; // integer
+	public $evaluierung=true; // boolean
 
 
 	public $studienplan_lehrveranstaltung_id;
@@ -170,6 +171,7 @@ class lehrveranstaltung extends basis_db
 			$this->benotung = $this->db_parse_bool($row->benotung);
 			$this->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$this->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+			$this->evaluierung = $this->db_parse_bool($row->evaluierung);
 
 			// FIXME: LV-Bezeichnung richtig mehrsprachig machen
 			// Zwischenzeitlich 'Italian' zum bezeichnung_arr dazugegeben
@@ -244,6 +246,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 			$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+			$lv_obj->evaluierung = $this->db_parse_bool($row->evaluierung);
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -394,6 +397,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 			$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+			$lv_obj->evaluierung = $this->db_parse_bool($row->evaluierung);
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['Italian'] = $row->bezeichnung;
@@ -524,6 +528,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 			$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+			$lv_obj->evaluierung = $this->db_parse_bool($row->evaluierung);
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -607,6 +612,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 			$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+			$lv_obj->evaluierung = $this->db_parse_bool($row->evaluierung);
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -779,7 +785,7 @@ class lehrveranstaltung extends basis_db
 				insertvon, planfaktor, planlektoren, planpersonalkosten, plankostenprolektor, updateamum, updatevon, sort,
 				zeugnis, projektarbeit, sprache, koordinator, bezeichnung_english, orgform_kurzbz, incoming, lehrtyp_kurzbz, oe_kurzbz,
 				raumtyp_kurzbz, anzahlsemester, semesterwochen, lvnr, semester_alternativ, farbe, lehrveranstaltung_template_id,sws,lvs,alvs,lvps,las,benotung,lvinfo,
-				lehrauftrag, lehrmodus_kurzbz) VALUES ('.
+				lehrauftrag, lehrmodus_kurzbz, evaluierung) VALUES ('.
 					$this->db_add_param($this->studiengang_kz). ', '.
 					$this->db_add_param($this->bezeichnung). ', '.
 					$this->db_add_param($this->kurzbz). ', '.
@@ -824,7 +830,8 @@ class lehrveranstaltung extends basis_db
 					$this->db_add_param($this->benotung, FHC_BOOLEAN).','.
 					$this->db_add_param($this->lvinfo, FHC_BOOLEAN).','.
 					$this->db_add_param($this->lehrauftrag, FHC_BOOLEAN).','.
-					$this->db_add_param($this->lehrmodus_kurzbz)
+					$this->db_add_param($this->lehrmodus_kurzbz).','.
+					$this->db_add_param($this->evaluierung, FHC_BOOLEAN)
 					.');';
 		}
 		else
@@ -880,7 +887,8 @@ class lehrveranstaltung extends basis_db
 					'las = '.$this->db_add_param($this->las).', '.
 					'benotung = '.$this->db_add_param($this->benotung, FHC_BOOLEAN).', '.
 					'lvinfo = '.$this->db_add_param($this->lvinfo, FHC_BOOLEAN).', '.
-					'lehrauftrag = '.$this->db_add_param($this->lehrauftrag, FHC_BOOLEAN).' '.
+					'lehrauftrag = '.$this->db_add_param($this->lehrauftrag, FHC_BOOLEAN).', '.
+					'evaluierung = '.$this->db_add_param($this->evaluierung, FHC_BOOLEAN).' '.
 					'WHERE lehrveranstaltung_id = ' . $this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER, false) . ';';
 		}
 
@@ -991,6 +999,7 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 				$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 				$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+				$lv_obj->evaluierung = $this->db_parse_bool($row->evaluierung);
 
 				$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 				$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1086,6 +1095,7 @@ class lehrveranstaltung extends basis_db
 				$l->benotung = $this->db_parse_bool($row->benotung);
 				$l->lvinfo = $this->db_parse_bool($row->lvinfo);
 				$l->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+				$l->evaluierung = $this->db_parse_bool($row->evaluierung);
 
 				$l->bezeichnung_arr['German'] = $row->bezeichnung;
 				$l->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1170,6 +1180,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 			$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+			$lv_obj->evaluierung = $this->db_parse_bool($row->evaluierung);
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1271,6 +1282,7 @@ class lehrveranstaltung extends basis_db
 				$obj->benotung = $this->db_parse_bool($row->benotung);
 				$obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 				$obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+				$obj->evaluierung = $this->db_parse_bool($row->evaluierung);
 
 				$obj->bezeichnung_arr['German'] = $row->bezeichnung;
 				$obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1396,6 +1408,7 @@ class lehrveranstaltung extends basis_db
 				$obj->lvinfo =$this->db_parse_bool( $lv->lvinfo);
 				$obj->zeugnis = $this->db_parse_bool($lv->zeugnis);
 				$obj->lehrauftrag = $this->db_parse_bool($lv->lehrauftrag);
+				$obj->evaluierung = $this->db_parse_bool($lv->evaluierung);
 
 				$values[] = $obj;
 
@@ -1422,6 +1435,7 @@ class lehrveranstaltung extends basis_db
 			$obj->lvinfo =$this->db_parse_bool( $this->lvinfo);
 			$obj->zeugnis = $this->db_parse_bool($this->zeugnis);
 			$obj->lehrauftrag = $this->db_parse_bool($this->lehrauftrag);
+			$obj->evaluierung = $this->db_parse_bool($this->evaluierung);
 
 			$values[] = $obj;
 		}
@@ -1476,6 +1490,7 @@ class lehrveranstaltung extends basis_db
 				$obj->export = $lv->export;
 				$obj->genehmigung = $lv->genehmigung;
 				$obj->lehrauftrag = $lv->lehrauftrag;
+				$obj->evaluierung = $lv->evaluierung;
 				$obj->lehre = $lv->lehre;
 				$obj->children = array();
 				if(count($lv->childs) > 0)
@@ -1507,6 +1522,7 @@ class lehrveranstaltung extends basis_db
 			$obj->zeugnis = $this->db_parse_bool($this->zeugnis);
 			$obj->curriculum = $this->db_parse_bool($this->curriculum);
 			$obj->lehrauftrag = $this->lehrauftrag;
+			$obj->evaluierung = $this->db_parse_bool($this->evaluierung);
 
 			$values[] = $obj;
 		}
@@ -1613,6 +1629,7 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 				$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 				$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+				$lv_obj->evaluierung = $this->db_parse_bool($row->evaluierung);
 
 				$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 				$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1700,6 +1717,7 @@ class lehrveranstaltung extends basis_db
                 $lv_obj->benotung = $this->db_parse_bool($row->benotung);
                 $lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
                 $lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+                $lv_obj->evaluierung = $this->db_parse_bool($row->evaluierung);
 
                 $lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
                 $lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1873,6 +1891,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 			$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+			$lv_obj->evaluierung = $this->db_parse_bool($row->evaluierung);
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -2003,6 +2022,7 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 				$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 				$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+				$lv_obj->evaluierung = $this->db_parse_bool($row->evaluierung);
 
 				$lv_obj->studiengang_kurzbzlang = $row->studiengang_kurzbzlang;
 
@@ -2068,7 +2088,7 @@ class lehrveranstaltung extends basis_db
 	/**
 	 * lädt die Lehrveranstaltungen zum zugehörigen Mitarbeiter
 	 * @param String $uid User ID des Mitarbeiters
-	 * @param String $studiensemster_kurzbz Kurzbezeichnung des Studiensemesters
+	 * @param String $studiensemester_kurzbz Kurzbezeichnung des Studiensemesters
 	 */
 	public function getLVByMitarbeiter($uid, $studiensemester_kurzbz = null)
 	{
@@ -2131,6 +2151,7 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 				$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 				$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+				$lv_obj->evaluierung = $this->db_parse_bool($row->evaluierung);
 
 				$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 				$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -2402,6 +2423,7 @@ class lehrveranstaltung extends basis_db
 				$obj->benotung = $this->db_parse_bool($row->benotung);
 				$obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 				$obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+				$obj->evaluierung = $this->db_parse_bool($row->evaluierung);
 
 				$obj->bezeichnung_arr['German'] = $row->bezeichnung;
 				$obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -2860,6 +2882,205 @@ class lehrveranstaltung extends basis_db
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
+	}
+
+	public function getStudienplanLehrveranstaltung($lehrveranstaltung_id, $studienplan_id)
+	{
+		$qry = "SELECT studienplan_lehrveranstaltung_id
+				FROM lehre.tbl_lehrveranstaltung
+				JOIN lehre.tbl_studienplan_lehrveranstaltung USING(lehrveranstaltung_id)
+				WHERE lehrveranstaltung_id = ".$this->db_add_param($lehrveranstaltung_id)."
+					AND tbl_studienplan_lehrveranstaltung.studienplan_id = ".$this->db_add_param($studienplan_id);"";
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->studienplan_lehrveranstaltung_id;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Ermitteln der studienplan_lehrveranstaltung_id';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg='Fehler bei Datenbankabfrage ' .$this->db_last_error();
+		}
+		return null;
+
+	}
+
+	/**
+	 * Filtert die geladenen Lehrveranstaltungen gegen den aktuellen Studienplan des Studenten.
+	 * Ermittelt den Studienplan über den Prestudent-Status (aktuellster Eintrag) und gleicht
+	 * die vorhandenen IDs mit der Tabelle tbl_studienplan_lehrveranstaltung ab.
+	 * Die interne Liste wird nur bei gefundenen Treffern aktualisiert.
+	 *
+	 * @param string $student_uid Student uid.
+	 * @return bool True bei erfolgreicher Abwicklung oder leeren Ausgangsdaten, False bei Datenbankfehlern.
+	 */
+	public function checkLvaAgainstStudentCurrentStudienplan($student_uid) {
+		$qryStudent = "SELECT prestudent_id FROM tbl_student WHERE student_uid = ".$this->db_add_param($student_uid)."";
+		
+		if($result = $this->db_query($qryStudent))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				$prestudent_id = $row->prestudent_id;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Ermitteln der des aktuellen studienplan für studenten über prestudent';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg='Fehler bei Datenbankabfrage ' .$this->db_last_error();
+			return false;
+		}
+		
+		$qryHistory = "SELECT studienplan_id
+					   FROM public.tbl_prestudentstatus 
+					   WHERE prestudent_id = ".$this->db_add_param($prestudent_id)."
+					   ORDER BY public.tbl_prestudentstatus.datum DESC";
+		if($result = $this->db_query($qryHistory))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				$studienplan_id = $row->studienplan_id;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Ermitteln der des aktuellen studienplan für studenten über prestudentstatus';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg='Fehler bei Datenbankabfrage ' .$this->db_last_error();
+			return false;
+		}
+
+		// needs to have lva_ids from previous query in this context
+		$lvsIDs = array_column($this->lehrveranstaltungen, 'lehrveranstaltung_id');
+
+		if (empty($lvsIDs)) {
+			// exit without modifying object state if no lva_id to query by are found 
+			return true; 
+		}
+		
+		$ids = $this->db_implode4SQL($lvsIDs);
+		
+		$qry = "SELECT tbl_lehrveranstaltung.*,
+				tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id,
+				tbl_studienplan_lehrveranstaltung.semester as stpllv_semester,
+				tbl_studienplan_lehrveranstaltung.pflicht as stpllv_pflicht,
+				tbl_studienplan_lehrveranstaltung.koordinator as stpllv_koordinator,
+				tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent,
+				tbl_studienplan_lehrveranstaltung.sort stpllv_sort,
+				tbl_studienplan_lehrveranstaltung.curriculum,
+				tbl_studienplan_lehrveranstaltung.export,
+				tbl_studienplan_lehrveranstaltung.genehmigung
+			FROM lehre.tbl_lehrveranstaltung
+			JOIN lehre.tbl_studienplan_lehrveranstaltung
+			USING(lehrveranstaltung_id)
+			WHERE tbl_studienplan_lehrveranstaltung.studienplan_id = ".$this->db_add_param($studienplan_id)."
+				AND tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id IN (".$ids.");";
+
+		if($result = $this->db_query($qry))
+		{
+			// reset the lva array and fill it with the new set
+			$temp_lvas = array();
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new lehrveranstaltung();
+
+				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->kurzbz = $row->kurzbz;
+				$obj->lehrform_kurzbz = $row->lehrform_kurzbz;
+				$obj->semester = $row->semester;
+				$obj->ects = $row->ects;
+				$obj->semesterstunden = $row->semesterstunden;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->lehre = $this->db_parse_bool($row->lehre);
+				$obj->lehreverzeichnis = $row->lehreverzeichnis;
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->ext_id = $row->ext_id;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->planfaktor = $row->planfaktor;
+				$obj->planlektoren = $row->planlektoren;
+				$obj->planpersonalkosten = $row->planpersonalkosten;
+				$obj->plankostenprolektor = $row->plankostenprolektor;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->sprache = $row->sprache;
+				$obj->sort = $row->sort;
+				$obj->incoming = $row->incoming;
+				$obj->zeugnis = $this->db_parse_bool($row->zeugnis);
+				$obj->projektarbeit = $this->db_parse_bool($row->projektarbeit);
+				$obj->koordinator = $row->koordinator;
+				$obj->bezeichnung_english = $row->bezeichnung_english;
+				$obj->orgform_kurzbz = $row->orgform_kurzbz;
+				$obj->lehrtyp_kurzbz = $row->lehrtyp_kurzbz;
+				$obj->lehrmodus_kurzbz = $row->lehrmodus_kurzbz;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->raumtyp_kurzbz = $row->raumtyp_kurzbz;
+				$obj->anzahlsemester = $row->anzahlsemester;
+				$obj->semesterwochen = $row->semesterwochen;
+				$obj->lvnr = $row->lvnr;
+				$obj->semester_alternativ = $row->semester_alternativ;
+				$obj->farbe = $row->farbe;
+				$obj->lehrveranstaltung_template_id = $row->lehrveranstaltung_template_id;
+				$obj->stpllv_sort = $row->stpllv_sort;
+				$obj->benotung = $this->db_parse_bool($row->benotung);
+				$obj->lvinfo = $this->db_parse_bool($row->lvinfo);
+				$obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+				$obj->evaluierung = $this->db_parse_bool($row->evaluierung);
+
+				$obj->bezeichnung_arr['German'] = $row->bezeichnung;
+				$obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
+				if ($obj->bezeichnung_arr['English'] == '')
+					$obj->bezeichnung_arr['English'] = $obj->bezeichnung_arr['German'];
+
+				$obj->sws = $row->sws;
+				$obj->lvs = $row->lvs;
+				$obj->alvs = $row->alvs;
+				$obj->lvps = $row->lvps;
+				$obj->las = $row->las;
+
+				$obj->stpllv_semester = $row->stpllv_semester;
+				$obj->stpllv_pflicht = $this->db_parse_bool($row->stpllv_pflicht);
+				$obj->stpllv_koordinator = $row->stpllv_koordinator;
+				$obj->studienplan_lehrveranstaltung_id = $row->studienplan_lehrveranstaltung_id;
+				$obj->studienplan_lehrveranstaltung_id_parent = $row->studienplan_lehrveranstaltung_id_parent;
+				$obj->curriculum = $this->db_parse_bool($row->curriculum);
+				$obj->export = $this->db_parse_bool($row->export);
+				$obj->genehmigung = $this->db_parse_bool($row->genehmigung);
+				$obj->new = false;
+
+				$temp_lvas[] = $obj;
+			}
+			
+			// Only update the class property if we actually found matching records.
+			// If $temp_lvas is empty, $this->lehrveranstaltungen remains unchanged.
+			if (!empty($temp_lvas)) {
+				$this->lehrveranstaltungen = $temp_lvas;
+			}
+
+			return true;
+		}
+		else
+		{
+			$this->errormsg='Fehler bei Datenbankabfrage ' .$this->db_last_error();
+			return false;
+		}
+		
 	}
 }
 ?>

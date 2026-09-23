@@ -43,4 +43,12 @@
     --dp-border-color-hover: var(--bs-success);
 }
 .form-control.is-invalid ~ .dp__clear_icon,
-.was-validated .form-control:invalid ~ .dp__clear_icon { margin-right: calc(1.5em + .75rem - 12px) }
+.was-validated .form-control:invalid ~ .dp__clear_icon {
+	margin-right: calc(1.5em + .75rem - 12px);
+}
+.p-component .dp__input_icons {
+	box-sizing: content-box !important;
+}
+.input-group .dp__input_icons {
+	z-index: 3;
+}

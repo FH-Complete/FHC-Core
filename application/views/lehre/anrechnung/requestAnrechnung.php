@@ -85,7 +85,7 @@ else
     }
 </style>
 
-<div  id="page-wrapper">
+<div cis4Reload="true" id="page-wrapper">
     <div class="container-fluid">
         <!-- header -->
         <div class="row">

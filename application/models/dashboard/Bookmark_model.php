@@ -11,8 +11,4 @@ class Bookmark_model extends DB_Model
 		$this->dbTable = 'dashboard.tbl_bookmark';
 		$this->pk = 'bookmark_id';
 	}
-
-
-	
-
 }

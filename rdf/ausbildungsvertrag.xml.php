@@ -123,8 +123,6 @@ foreach($uid_arr as $uid)
 		$studiengang_bezeichnung = empty($studiengangbezeichnung) ? $studiengang->bezeichnung : $studiengangbezeichnung;
 		$studiengang_bezeichnung_englisch = empty($studiengangbezeichnung_englisch) ? $studiengang->english : $studiengangbezeichnung_englisch;
 
-		$svnr = ($student->svnr == '')?'Ersatzkennzeichen: '.$student->ersatzkennzeichen:$student->svnr;
-
 		//Wenn Lehrgang, dann Erhalter-KZ vor die Studiengangs-Kz hängen
 		if ($studiengang->studiengang_kz<0)
 		{
@@ -146,7 +144,6 @@ foreach($uid_arr as $uid)
 		echo "\t\t<gebdatum>".$gebdatum."</gebdatum>\n";
 		echo "\t\t<gebort>".$student->gebort."</gebort>\n";
 		echo "\t\t<staatsbuergerschaft>".$staatsbuergerschaft->langtext."</staatsbuergerschaft>\n";
-		echo "\t\t<svnr>".$svnr."</svnr>\n";
 		echo "\t\t<matrikelnr>".trim($student->matrikelnr)."</matrikelnr>\n";
 		echo "\t\t<studiengang>".$db->convert_html_chars($studiengang_bezeichnung)."</studiengang>\n";
 		echo "\t\t<studiengang_englisch>".$db->convert_html_chars($studiengang_bezeichnung_englisch)."</studiengang_englisch>\n";
@@ -335,12 +332,16 @@ foreach($prestudent_arr as $prest_id)
 					{
 						$studiengangbezeichnung = $studienordnung->__get('studiengangbezeichnung');
 						$studiengangbezeichnung_englisch = $studienordnung->__get('studiengangbezeichnung_englisch');
+						$akadgrad = new akadgrad();
+						if ($akadgrad->load($studienordnung->__get('akadgrad_id')))
+						{
+							$akadgrad_titel_studienordnung = $akadgrad->titel;
+							$akadgrad_kurzbz_studienordnung = $akadgrad->akadgrad_kurzbz;
+						}
 					}
 				}
 				$studiengang_bezeichnung = empty($studiengangbezeichnung) ? $studiengang->bezeichnung : $studiengangbezeichnung;
 				$studiengang_bezeichnung_englisch = empty($studiengangbezeichnung_englisch) ? $studiengang->english : $studiengangbezeichnung_englisch;
-
-				$svnr = ($person->svnr == '')?($person->ersatzkennzeichen != ''?'Ersatzkennzeichen: '.$person->ersatzkennzeichen:''):$person->svnr;
 
 				//Wenn Lehrgang, dann Erhalter-KZ vor die Studiengangs-Kz hängen
 				if ($studiengang->studiengang_kz<0)
@@ -363,7 +364,6 @@ foreach($prestudent_arr as $prest_id)
 					echo "\t\t<gebdatum>".$gebdatum."</gebdatum>\n";
 					echo "\t\t<gebort>".$person->gebort."</gebort>\n";
 					echo "\t\t<staatsbuergerschaft>".$staatsbuergerschaft->langtext."</staatsbuergerschaft>\n";
-					echo "\t\t<svnr>".$svnr."</svnr>\n";
 					echo "\t\t<studiengang>".$db->convert_html_chars($studiengang_bezeichnung)."</studiengang>\n";
 					echo "\t\t<studiengang_englisch>".$db->convert_html_chars($studiengang_bezeichnung_englisch)."</studiengang_englisch>\n";
 					echo "\t\t<studiengang_kurzbz>".$studiengang->kurzbzlang."</studiengang_kurzbz>\n";
@@ -434,6 +434,8 @@ foreach($prestudent_arr as $prest_id)
 
 					//Wenn Quereinsteiger stimmt studiengang_maxsemester nicht mit der tatsaechlichen Ausbildungsdauer ueberein
 					$student_maxsemester = ($studiengang->max_semester-$ausbildungssemester)+1;
+
+					// TODO: where to get semester duration for master Lehrgaenge?
 					echo "\t\t<student_maxsemester>".$student_maxsemester."</student_maxsemester>\n";
 					echo "\t\t<student_anzahljahre>".($student_maxsemester/2)."</student_anzahljahre>\n";
 
@@ -458,6 +460,8 @@ foreach($prestudent_arr as $prest_id)
 
 					echo "\t\t<akadgrad>".$akadgrad_titel."</akadgrad>\n";
 					echo "\t\t<akadgrad_kurzbz>".$akadgrad_kurzbz."</akadgrad_kurzbz>\n";
+					echo "\t\t<akadgrad_studienordnung>".($akadgrad_titel_studienordnung ?? '')."</akadgrad_studienordnung>\n";
+					echo "\t\t<akadgrad_kurzbz_studienordnung>".($akadgrad_kurzbz_studienordnung ?? '')."</akadgrad_kurzbz_studienordnung>\n";
 
 					echo "\t\t<datum_aktuell>".$datum_aktuell."</datum_aktuell>\n";
 

@@ -44,7 +44,6 @@ $(document).ready(function ()
 			"nachname" : $('#nachname_input').val(),
 			"titelpost" : $('#titelpost_input').val(),
 			"gebdatum" : $('#gebdatum_input').val(),
-			"svnr" : $('#svnr_input').val(),
 			"buergerschaft" : $('#buergerschaft').val(),
 			"geschlecht" : $('#geschlecht').val(),
 			"gebnation" : $('#gebnation').val(),

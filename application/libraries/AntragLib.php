@@ -77,7 +77,9 @@ class AntragLib
 					'studiensemester_kurzbz'=>$prestudentstatus->studiensemester_kurzbz,
 					'ausbildungssemester'=>$prestudentstatus->ausbildungssemester
 				], [
-					'statusgrund_id' => null
+					'statusgrund_id' => null,
+					'updateamum' => date('c'),
+					'updatevon' => $insertvon
 				]);
 			}
 		}
@@ -126,7 +128,7 @@ class AntragLib
 			return $this->_ci->StudierendenantragstatusModel->resumeAntraegeForAbmeldungStgl($antrag_id);
 		}
 		// NOTE(chris): get last status that is not pause
-		$this->_ci->StudierendenantragstatusModel->addOrder('insertamum');
+		$this->_ci->StudierendenantragstatusModel->addOrder('insertamum', 'DESC');
 		$this->_ci->StudierendenantragstatusModel->addLimit(1);
 		$result = $this->_ci->StudierendenantragstatusModel->loadWhere([
 			'studierendenantrag_id' => $antrag_id,
@@ -335,7 +337,10 @@ class AntragLib
 						'status_kurzbz'=>$prestudentstatus->status_kurzbz,
 						'studiensemester_kurzbz'=>$prestudentstatus->studiensemester_kurzbz,
 						'ausbildungssemester'=>$prestudentstatus->ausbildungssemester
-					], []);
+					], [
+						'updateamum' => $insertam,
+						'updatevon' => $insertvon
+					]);
 					if (isError($result))
 					{
 						$errors[] = getError($result);
@@ -1652,7 +1657,7 @@ class AntragLib
 
 		$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere($where);
 		if (isError($result))
-		return $result;
+			return $result;
 
 		if (!hasData($result))
 			return error($this->_ci->p->t('studierendenantrag', "error_no_antrag_found", ['id' => $studierendenantrag_id]));
@@ -1704,6 +1709,7 @@ class AntragLib
 		$result->statustyp = $antrag->statustyp;
 		$result->status_insertvon = $antrag->status_insertvon;
 		$result->grund = $antrag->grund;
+		$result->status_grund = $antrag->status_grund;
 		$result->studierendenantrag_id = $antrag->studierendenantrag_id;
 		$result->typ = $antrag->typ;
 		$result->datum = $antrag->datum;

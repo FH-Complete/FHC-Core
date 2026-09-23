@@ -1,0 +1,14 @@
+/* css overrides for dark mode */
+html.dark #fhc-cms-content *[style*="color"] {
+	color: var(--fhc-text) !important;
+}
+
+/* fhc cms classes */
+html.dark #fhc-cms-content a {
+	color: var(--fhc-link);
+}
+
+html.dark #fhc-cms-content img {
+	background-color: var(--fhc-text);
+	color: var(--fhc-background);
+}

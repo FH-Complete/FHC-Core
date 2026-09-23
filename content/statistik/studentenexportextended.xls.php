@@ -125,8 +125,8 @@ $worksheet->write($zeile, ++$i, "PERSONENKENNZEICHEN", $format_bold);
 $maxlength[$i] = 19;
 $worksheet->write($zeile, ++$i, "STAATSBÜRGERSCHAFT", $format_bold);
 $maxlength[$i] = 16;
-$worksheet->write($zeile, ++$i, "SVNR", $format_bold);
-$maxlength[$i] = 4;
+$worksheet->write($zeile, ++$i, "PERSON_ID", $format_bold);
+$maxlength[$i] = 6;
 $worksheet->write($zeile, ++$i, "ERSATZKENNZEICHEN", $format_bold);
 $maxlength[$i] = 17;
 $worksheet->write($zeile, ++$i, "GESCHLECHT", $format_bold);
@@ -394,10 +394,11 @@ function draw_content($row)
 	$worksheet->write($zeile, $i, $row->staatsbuergerschaft);
 	$i++;
 
-	//SVNR
-	if (mb_strlen($row->svnr) > $maxlength[$i])
-		$maxlength[$i] = mb_strlen($row->svnr);
-	$worksheet->write($zeile, $i, $row->svnr);
+
+	//Person_id
+	if (mb_strlen($row->person_id) > $maxlength[$i])
+		$maxlength[$i] = mb_strlen($row->person_id);
+	$worksheet->write($zeile, $i, $row->person_id);
 	$i++;
 
 	//Ersatzkennzeichen

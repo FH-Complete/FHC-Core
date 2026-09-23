@@ -16,6 +16,7 @@
  */
 
 import {CoreFetchCmpt} from '../../components/Fetch.js';
+import ApiNavigation from '../../api/factory/navigation.js';
 
 /**
  *
@@ -76,13 +77,13 @@ export const CoreNavigationCmpt = {
 		 *
 		 */
 		fetchCmptApiFunctionHeader() {
-			return this.$fhcApi.factory.navigation.getHeader(this.getNavigationPage());
+			return this.$api.call(ApiNavigation.getHeader(this.getNavigationPage()))
 		},
 		/**
 		 *
 		 */
 		fetchCmptApiFunctionSideMenu() {
-			return this.$fhcApi.factory.navigation.getMenu(this.getNavigationPage());
+			return this.$api.call(ApiNavigation.getMenu(this.getNavigationPage()))
 		},
 		/**
 		 *

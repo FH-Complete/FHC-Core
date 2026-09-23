@@ -1,5 +1,5 @@
 import LvZuweisung from '../../../components/Studierendenantrag/Lvzuweisung.js';
-import Phrasen from '../../../plugin/Phrasen.js';
+import PluginsPhrasen from '../../../plugins/Phrasen.js';
 
 const app = Vue.createApp({
 	name: 'LvzuweisungApp',
@@ -12,6 +12,9 @@ const app = Vue.createApp({
 		}
 	}
 });
+
+FhcApps.makeExtendable(app);
+
 app
-	.use(Phrasen)
+	.use(PluginsPhrasen)
 	.mount('#wrapper');

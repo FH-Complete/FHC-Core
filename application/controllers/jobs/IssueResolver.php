@@ -48,7 +48,9 @@ class IssueResolver extends IssueResolver_Controller
 			'CORE_PERSON_0001' => 'CORE_PERSON_0001',
 			'CORE_PERSON_0002' => 'CORE_PERSON_0002',
 			'CORE_PERSON_0003' => 'CORE_PERSON_0003',
-			'CORE_PERSON_0004' => 'CORE_PERSON_0004'
+			'CORE_PERSON_0004' => 'CORE_PERSON_0004',
+			'CORE_PERSON_0005' => 'CORE_PERSON_0005',
+			'CORE_PERSON_0006' => 'CORE_PERSON_0006'
 		);
 
 		// fehler which are resolved by the job the same way as they are produced

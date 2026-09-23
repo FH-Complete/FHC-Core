@@ -122,6 +122,47 @@ class Studiensemester_model extends DB_Model
 		return $this->execQuery($query, array($studiensemester_kurzbz, $limit));
 	}
 
+
+	/**
+	 * Returns the current study semester and the previous semesters of the same type (SS/WS).
+	 *
+	 * Example:
+	 * - SS2026, limit 3:  SS2026, SS2025, SS2024
+	 * - WS2025, limit 2: WS2025, WS2024
+	 *
+	 * @param $studiensemester_kurzbz
+	 * @param $limit
+	 */
+	public function getPreviousSameSemesterFrom($studiensemester_kurzbz, $limit = 1)
+	{
+		$qry = '
+			SELECT 
+			    studiensemester_kurzbz,
+				start,
+				ende
+			FROM 
+			    public.tbl_studiensemester
+			WHERE 
+				SUBSTRING(studiensemester_kurzbz FROM 1 FOR 2) = SUBSTRING(? FROM 1 FOR 2)
+			AND start <= (
+				SELECT start
+				FROM public.tbl_studiensemester
+				WHERE studiensemester_kurzbz = ?
+			)
+			ORDER BY 
+				start DESC
+			LIMIT ?
+		';
+
+		return $this->execQuery($qry,
+			[
+				$studiensemester_kurzbz,
+				$studiensemester_kurzbz,
+				$limit
+			]
+		);
+	}
+
 	/**
 	 * getNearest
 	 */
@@ -171,12 +212,106 @@ class Studiensemester_model extends DB_Model
 	}
 
 	/**
+	 * Gets a Studiensemester for a date
+	 * @param $date
+	 * @return string
+	 */
+	public function getByDate($date)
+	{
+		// gets the studiensemester of a date or the next closest previous studiensemester if a date is not within a studiensemester
+		$query = "
+			SELECT  studiensemester_kurzbz, start, ende
+			FROM	public.tbl_studiensemester
+			WHERE   ( ende >= ?::date AND start <= ?::date ) OR ( ende >= ?::date + '-45 days'::interval AND start <= ?::date + '-45 days'::interval )
+			ORDER BY start DESC
+			LIMIT 1";
+
+		return $this->execQuery($query, array($date,$date,$date,$date));
+	}
+
+	/**
+	 * Gets all Studiensemester where the range dates are contained
+	 * or the nearest if date is not contained
+	 * @param $from
+	 * @param $to
+	 * @return array|null
+	 */
+	public function getContainingOrNearestByDateRange($from, $to)
+	{
+		if (date_format(date_create($from), 'Y-m-d') > (date_format(date_create($to), 'Y-m-d')))
+			return success(array());
+
+		$query = <<<EOSQL
+			WITH semester_interval_startdate AS (
+				SELECT
+					s.*
+				FROM
+					public.tbl_studiensemester s
+				WHERE
+					{$this->db->escape($from)}::date BETWEEN s.start AND s.ende
+				ORDER BY
+					s.start DESC
+				LIMIT 1
+			),
+			semester_interval_enddate AS (
+				SELECT
+					s.*
+				FROM
+					public.tbl_studiensemester s
+				WHERE
+					{$this->db->escape($to)}::date BETWEEN s.start AND s.ende
+				ORDER BY
+					s.start DESC
+				LIMIT 1
+			),
+			nearest_semester_interval_startdate AS (
+				SELECT
+					LEAST(ABS(s.start - {$this->db->escape($from)}::date), ABS(s.ende - {$this->db->escape($from)}::date)) AS mindiff,
+					s.*
+				FROM
+					public.tbl_studiensemester s
+				WHERE
+					s.ende < {$this->db->escape($from)}::date
+				ORDER BY
+					1 ASC
+				LIMIT 1
+			),
+			nearest_semester_interval_enddate AS (
+				SELECT
+					LEAST(ABS(s.start - {$this->db->escape($to)}::date), ABS(s.ende - {$this->db->escape($to)}::date)) AS mindiff,
+					s.*
+				FROM
+					public.tbl_studiensemester s
+				WHERE
+					s.start > {$this->db->escape($to)}::date
+				ORDER BY
+					1 ASC
+				LIMIT 1
+			)
+			SELECT
+				COALESCE(
+					(SELECT studiensemester_kurzbz FROM semester_interval_startdate),
+					(SELECT studiensemester_kurzbz FROM nearest_semester_interval_startdate)
+				) AS studiensemester_kurzbz
+			UNION
+			SELECT
+				COALESCE(
+					(SELECT studiensemester_kurzbz FROM semester_interval_enddate),
+					(SELECT studiensemester_kurzbz FROM nearest_semester_interval_enddate)
+				) AS studiensemester_kurzbz
+
+EOSQL;
+
+		return $this->execReadonlyQuery($query);
+	}
+
+	/**
 	 * Gets all Studiensemester between two dates
 	 * @param $from
 	 * @param $to
 	 * @return array|null
 	 */
-	public function getByDate($from, $to)
+	public function getByDateRange($from, $to)
 	{
 		if (date_format(date_create($from), 'Y-m-d') > (date_format(date_create($to), 'Y-m-d')))
 			return success(array());
@@ -207,7 +342,7 @@ class Studiensemester_model extends DB_Model
 
 	/**
 	 * @param string		$student_uid
-	 * 
+	 *
 	 * @return StdClass
 	 */
 	public function getWhereStudentHasLvs($student_uid)
@@ -220,7 +355,7 @@ class Studiensemester_model extends DB_Model
 		$this->db->where("v.lehreverzeichnis<>''");
 
 		$this->addOrder($this->dbTable . '.start');
-		
+
 		return $this->loadWhere(['uid' => $student_uid, 'v.lehre' => true]);
 	}
 
@@ -274,6 +409,42 @@ class Studiensemester_model extends DB_Model
 	}
 
 	/**
+	 * Get Studienjahr by Studiensemester.
+	 *
+	 * @param $studiensemester_kurzbz
+	 * @return array|stdClass
+	 */
+	public function getStudienjahrByStudiensemester($studiensemester_kurzbz)
+	{
+		$studienjahrObj = null;
+
+		if (!is_numeric($studiensemester_kurzbz))
+		{
+			$this->StudiensemesterModel->addSelect('studienjahr_kurzbz');
+			$result = $this->StudiensemesterModel->loadWhere(array('studiensemester_kurzbz =' => $studiensemester_kurzbz));
+		}
+
+		if (hasData($result))
+		{
+			$studienjahr = getData($result)[0]->studienjahr_kurzbz;
+			$startstudienjahr = substr($studienjahr, 0, 4);
+			$endstudienjahr = substr($studienjahr, 0, 2) . substr($studienjahr, -2);
+
+			$studienjahrObj = new StdClass();
+
+			$studienjahrObj->studienjahr_kurzbz = $studienjahr;
+			$studienjahrObj->startstudienjahr = $startstudienjahr;
+			$studienjahrObj->endstudienjahr= $endstudienjahr;
+		}
+
+		if (isError($result)) {
+			return error(getError($result));
+		}
+
+		return success($studienjahrObj);
+	}
+
+	/**
 	 * Holt Start und Ende des Studiensemester_kurzbz
 	 * @param studiensemester_kurzbz
 	 * @return stdClass
@@ -286,5 +457,11 @@ class Studiensemester_model extends DB_Model
 		FROM public.tbl_studiensemester
 		WHERE studiensemester_kurzbz = ?",[$studiensemester_kurzbz]);
 
+	}
+
+	public function isValidStudiensemester($studiensemester_kurzbz)
+	{
+		$result = $this->load($studiensemester_kurzbz);
+		return hasData($result);
 	}
 }

@@ -40,7 +40,9 @@ abstract class AbstractBestandteil implements IValidation
 		
 		if( is_bool($new_value) && ($old_value !== $new_value) ) {
 			$this->modifiedcolumns[$columnname] = $columnname;
-		} else if($old_value != $new_value) {		
+		} else if(is_null($old_value) xor is_null($new_value)) {
+			$this->modifiedcolumns[$columnname] = $columnname;
+		} else if($old_value != $new_value) {
 			$this->modifiedcolumns[$columnname] = $columnname;
 		}
 	}

@@ -1,18 +1,29 @@
-import {CoreNavigationCmpt} from '../../components/navigation/Navigation.js';
+import { CoreNavigationCmpt } from '../../components/navigation/Navigation.js';
 import DashboardAdmin from '../../components/Dashboard/Admin.js';
-import FhcApi from '../../plugin/FhcApi.js';
-import Phrasen from '../../plugin/Phrasen.js';
+
+import PluginsPhrasen from '../../plugins/Phrasen.js';
 
 const app = Vue.createApp({
-  name: 'AdminApp',
-  data: () => ({
-      appSideMenuEntries: {}
-    }),
-  components: {
-    CoreNavigationCmpt,
-    DashboardAdmin
-  }
+	name: 'DashboardAdminApp',
+	data: () => ({
+		appSideMenuEntries: {}
+	}),
+	components: {
+		CoreNavigationCmpt,
+		DashboardAdmin
+	},
+	provide() {
+		return {
+			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone
+		};
+	}
 });
-app.use(FhcApi);
-app.use(Phrasen);
+app.use(primevue.config.default, {
+	zIndex: {
+		overlay: 9000,
+		tooltip: 8000
+	}
+})
+app.use(PluginsPhrasen);
+app.directive('tooltip', primevue.tooltip);
 app.mount('#main');

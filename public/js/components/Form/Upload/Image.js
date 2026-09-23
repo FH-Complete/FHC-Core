@@ -1,9 +1,14 @@
 export default {
 	emits: [
-		'update:modelValue'
+		'update:modelValue',
+		'actionbutton-clicked'
 	],
 	props: {
-		modelValue: String
+		modelValue: String,
+		titleActionButton: {
+			type: String,
+			default: ""
+		}
 	},
 	computed: {
 		valueAsBase64DataString() {
@@ -28,6 +33,9 @@ export default {
 		},
 		deleteImage() {
 			this.$emit('update:modelValue', '');
+		},
+		emitAction(){
+			this.$emit('actionbutton-clicked', this.modelValue);
 		}
 	},
 	template: `
@@ -42,6 +50,7 @@ export default {
 					<button type="button" class="btn btn-outline-dark btn-sm" @click="openUploadDialog">
 						<i class="fa fa-pen"></i>
 					</button>
+					<button	v-if="titleActionButton" class="btn btn-outline-dark btn-sm" @click="emitAction">{{titleActionButton}}</button>
 				</div>
 			</div>
 		</template>

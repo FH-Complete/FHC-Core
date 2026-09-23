@@ -705,6 +705,8 @@ class prestudent extends person
 				$rolle->studienplan_bezeichnung = $row->studienplan_bezeichnung;
 				$rolle->bestaetigtam = $row->bestaetigtam;
 				$rolle->bestaetigtvon = $row->bestaetigtvon;
+				$rolle->fgm = $row->fgm;
+				$rolle->faktiv = $this->db_parse_bool($row->faktiv);
 				$rolle->anmerkung_status = $row->anmerkung;
 				$rolle->bewerbung_abgeschicktamum = $row->bewerbung_abgeschicktamum;
 				$rolle->rt_stufe = $row->rt_stufe;
@@ -1051,7 +1053,6 @@ class prestudent extends person
 				//$ps->foto = $row->foto;
 				$ps->anmerkungen = $row->anmerkungen;
 				$ps->homepage = $row->homepage;
-				$ps->svnr = $row->svnr;
 				$ps->ersatzkennzeichen = $row->ersatzkennzeichen;
 				$ps->familienstand = $row->familienstand;
 				$ps->geschlecht = $row->geschlecht;

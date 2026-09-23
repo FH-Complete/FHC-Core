@@ -33,4 +33,16 @@ class Benutzergruppe_model extends DB_Model
 		$uids = (hasData($res)) ? getData($res) : array();
 		return $uids;
 	}
+
+	/**
+	 * Laedt die Aufnahmegruppe(n) in Abhängigkeit von User und Studiensemester
+	 * @param uid, gruppe_kurzbz, studiensemester_kurzbz
+	 * @return array
+	 */
+	public function loadAufnahmegruppen($uid, $stsem)
+	{
+		$query = "
+				SELECT * FROM tbl_gruppe WHERE aufnahmegruppe=true;";
+		return $this->execReadOnlyQuery($query);
+	}
 }

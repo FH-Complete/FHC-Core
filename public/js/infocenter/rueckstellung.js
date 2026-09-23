@@ -75,6 +75,7 @@ var Rueckstellung = {
 					if (FHC_AjaxClient.hasData(data))
 					{
 						Rueckstellung.get(personid);
+						InfocenterDetails._refreshMessages();
 						InfocenterDetails._refreshLog()
 					}
 					else
@@ -83,6 +84,33 @@ var Rueckstellung = {
 					}
 				},
 				errorCallback: onRueckstellungError,
+				veilTimeout: 0
+			}
+		);
+	},
+	setForPersons: function(personen, type, date)
+	{
+		if (type === null)
+			return false;
+
+		FHC_AjaxClient.ajaxCallPost(
+			CONTROLLER_RUECKSTELLUNG_URL + '/setForPersonen',
+			{
+				"personen": personen,
+				"datum_bis": date,
+				"status_kurzbz": type,
+			},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.isError(data))
+						FHC_DialogLib.alertError(FHC_AjaxClient.getError(data));
+
+					if (FHC_AjaxClient.hasData(data))
+						FHC_DialogLib.alertSuccess("Erfolgreich gespeichert.")
+				},
+				errorCallback: function(jqXHR, textStatus, errorThrown) {
+					FHC_DialogLib.alertError(textStatus);
+				},
 				veilTimeout: 0
 			}
 		);

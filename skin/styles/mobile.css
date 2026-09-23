@@ -936,3 +936,34 @@ table.hoverbox
 	border-color:grey;
 }
 */
+div.header_logo
+{
+	position: absolute;
+	left: 16px;
+	top: 3%;
+	z-index: 5000;
+
+	background-image:url(styles/tw/logo_250x130.png);
+	background-repeat: no-repeat;
+	width:170px;
+	height:51px;
+	background-size: contain;
+}
+
+td.headerbar
+{
+	background-image: url(styles/tw/header.png);
+	background-position: top;
+	background-repeat: repeat-x;
+}
+
+div.cis_logo
+{
+	background-image:url(styles/tw/cis_logo_text_400x78.png);
+	background-repeat: no-repeat;
+	max-width: 400px;
+	height: 78px;
+	background-size: 100%;
+	width: 90%;
+	background-position: center;
+}

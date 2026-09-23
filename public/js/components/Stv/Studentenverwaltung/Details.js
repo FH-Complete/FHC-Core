@@ -1,16 +1,29 @@
 import FhcTabs from "../../Tabs.js";
+import FhcHeader from "../../DetailHeader/DetailHeader.js";
+
+import ApiStvApp from '../../../api/factory/stv/app.js';
+import ApiStudent from '../../../api/factory/stv/students.js';
 
 // TODO(chris): alt & title
 // TODO(chris): phrasen
 
 export default {
+	name: "DetailsPrestudent",
+	inject: {
+		currentSemester: {
+			from: 'currentSemester',
+		},
+	},
 	components: {
-		FhcTabs
+		FhcTabs,
+		FhcHeader
 	},
 	data() {
 		return {
-			configStudent: null,
-			configStudents: null
+			configStudent: {},
+			configStudents: {},
+			activeTab: null,
+			localStudent: null
 		};
 	},
 	props: {
@@ -19,42 +32,150 @@ export default {
 	computed: {
 		appRoot() {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root;
+		},
+		config() {
+			if (!this.students.length)
+				return {};
+			if (this.students.length == 1) {
+				const student = this.students[0];
+				if (student.uid)
+					return Object.fromEntries(Object.entries(this.configStudent).filter(([ , value ]) => !value.showOnlyWithoutUid));
+				return Object.fromEntries(Object.entries(this.configStudent).filter(([ , value ]) => !value.showOnlyWithUid));
+			} else if (this.students.every(student => student.uid)) {
+				return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithoutUid));
+			} else if (this.students.every(student => !student.uid)) {
+					return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithUid));
+			}
+			return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithUid && !value.showOnlyWithUid));
+		},
+		isLoading() {
+			return this.students === null; //null-> loading, [] -> empty, [...] -> data, necessary for skeleton in child
+		},
+		tile_PersId(){
+			let tile = this.students[0].person_id != null ? this.students[0].person_id : '-';
+			return tile;
+		},
+		tile_MatrNr(){
+			let tile = this.students[0].matr_nr != null ? this.students[0].matr_nr : '-';
+			return tile;
+		},
+		tile_PersKz(){
+			let tile = this.students[0].matrikelnr != null ? this.students[0].matrikelnr : '-';
+			return tile;
+		},
+		tile_PrestdId(){
+			let tile = this.students[0].prestudent_id != null ? this.students[0].prestudent_id : '-';
+			return tile;
+		},
+		tile_UID(){
+			let tile = this.students[0].uid != null ? this.students[0].uid : '-';
+			return tile;
+		},
+	},
+	watch: {
+		'$p.user_language.value'(n, o) {
+			if (n !== o && o !== undefined)
+				this.loadConfig();
+		},
+		currentSemester(newVal) {
+			if (
+				Array.isArray(this.students) &&
+				this.students.length === 1 &&
+				newVal !== this.students[0].query_studiensemester_kurzbz
+			) {
+				this.reloadDataStudent();
+			}
+			else {
+				this.localStudent = null;
+			}
+		},
+		students() {
+			this.localStudent = null;
 		}
 	},
 	methods: {
+		loadConfig() {
+			this.$api
+				.call(ApiStvApp.configStudent())
+				.then(result => {
+					this.configStudent = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+			this.$api
+				.call(ApiStvApp.configStudents())
+				.then(result => {
+					this.configStudents = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		handleTabChanged(key) {
+			this.activeTab = key
+			this.reload()	
+		},
 		reload() {
 			if (this.$refs.tabs?.$refs?.current?.reload)
 				this.$refs.tabs.$refs.current.reload();
-		}
+		},
+		reloadDataStudent(){
+			this.localStudent = null;
+			const studentArr = this.students;
+
+			if (!studentArr || !studentArr.length) {
+				return;
+			}
+
+			this.$api
+				.call(ApiStudent.uid(studentArr[0].uid, this.currentSemester))
+				.then(result => {
+					this.localStudent = result.data;
+				});
+		},
+		reloadList() {
+			this.$emit('reload');
+		},
 	},
 	created() {
-		this.$fhcApi
-			.factory.stv.configStudent()
-			.then(result => {
-				this.configStudent = result.data;
-			})
-			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi
-			.factory.stv.configStudents()
-			.then(result => {
-				this.configStudents = result.data;
-			})
-			.catch(this.$fhcAlert.handleSystemError);
+		this.loadConfig();
 	},
 	template: `
-	<div class="stv-details h-100 pb-3 d-flex flex-column">
+	<div class="stv-details h-100 d-flex flex-column">
 		<div v-if="!students?.length" class="justify-content-center d-flex h-100 align-items-center">
-			Bitte StudentIn auswählen!
+			{{$p.t('ui', 'chooseStudent')}}
 		</div>
-		<div v-else-if="configStudent && configStudents" class="d-flex flex-column h-100 pb-3">
-			<div class="d-flex justify-content-start align-items-center w-100 pb-3 gap-3" style="max-height:8rem">
-				<img v-for="student in students" :key="student.person_id" class="d-block h-100 rounded" alt="profilbild" :src="appRoot + 'cis/public/bild.php?src=person&person_id=' + student.person_id">
-				<div v-if="students.length == 1">
-					<h2 class="h4">{{students[0].titlepre}} {{students[0].vorname}} {{students[0].nachname}} {{students[0].titlepost}}</h2>
-				</div>
-			</div>
-			<fhc-tabs v-if="students.length == 1" ref="tabs" :modelValue="students[0]" :config="configStudent" :default="$route.params.tab" style="flex: 1 1 0%; height: 0%" @changed="reload"></fhc-tabs>
-			<fhc-tabs v-else ref="tabs" :modelValue="students" :config="configStudents" :default="$route.params.tab" style="flex: 1 1 0%; height: 0%" @changed="reload"></fhc-tabs>
+		<div v-else-if="configStudent && configStudents" class="d-flex flex-column h-100">
+			<fhc-header
+				:headerData="localStudent || students"
+				:currentSemester="currentSemester"
+				typeHeader="student"
+				@reload="reloadList"
+				fotoEditable
+				:isLoading="isLoading"
+			>
+				<template #uid>{{tile_UID}}</template>
+				<template #titleAlphaTile>PrestdID</template>
+				<template #valueAlphaTile>{{tile_PrestdId}}</template>
+				<template #titleBetaTile>PersID</template>
+				<template #valueBetaTile>{{tile_PersId}}</template>
+				<template #titleGammaTile>MatrNr</template>
+				<template #valueGammaTile>{{tile_MatrNr}}</template>
+				<template #titleDeltaTile>PersKz</template>
+				<template #valueDeltaTile>{{tile_PersKz}}</template>
+			</fhc-header>
+			<fhc-tabs
+				v-if="students.length == 1"
+				ref="tabs"
+				:useprimevue="true"
+				:modelValue="(Array.isArray(localStudent) && localStudent[0]) || students[0]"
+				:config="config"
+				:default="activeTab ?? $route.params.tab"
+				style="flex: 1 1 0%; height: 0%"
+				@changed="handleTabChanged"
+				>
+				</fhc-tabs>
+			<fhc-tabs v-else ref="tabs" :useprimevue="true" :modelValue="students" :config="config" :default="activeTab ?? $route.params.tab" style="flex: 1 1 0%; height: 0%" @changed="handleTabChanged"></fhc-tabs>
+		</div>
+		<div v-else>
+			Loading...
 		</div>
 	</div>`
 };

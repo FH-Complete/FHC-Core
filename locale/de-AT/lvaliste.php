@@ -7,6 +7,7 @@ $this->phrasen['lvaliste/hilfeAnzeigen']='Hilfe anzeigen';
 
 $this->phrasen['lvaliste/lehrfach']='Lehrfach';
 $this->phrasen['lvaliste/lehrform']='Lehrform';
+$this->phrasen['lvaliste/faktor']='Faktor';
 $this->phrasen['lvaliste/lvBezeichnung']='LV Bezeichnung';
 $this->phrasen['lvaliste/lehrfachBezeichnung']='Lehrfach Bezeichnung';
 $this->phrasen['lvaliste/lektor']='LektorIn';

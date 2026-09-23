@@ -306,4 +306,8 @@ define('FAS_BUCHUNGSTYP_FIXE_KOSTENSTELLE', serialize(
 	)
 ));
 
+//Studierende mit diesen Noten werden von der AnzahlStudenten im Tempus abgezogen 
+define('NICHT_ZUGELASSENE',serialize(array(6)));
+
+
 ?>

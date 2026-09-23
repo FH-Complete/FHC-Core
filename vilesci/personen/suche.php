@@ -715,10 +715,22 @@ function casDeleteMitarbeiter($db, $mitarbeiter_uid, $trans=true)
 	{
 		$qry = '
 			DELETE FROM lehre.tbl_projektbetreuer
-				WHERE projektarbeit_id IN (SELECT projektarbeit_id FROM lehre.tbl_projektarbeit
-					WHERE lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit
-						WHERE lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung
-							WHERE koordinator='.$db->db_add_param($mitarbeiter_uid).')))';
+			WHERE projektarbeit_id IN (
+				SELECT projektarbeit_id 
+				FROM lehre.tbl_projektarbeit
+				WHERE lehre.tbl_projektarbeit.lehrveranstaltung_id 
+					IN (
+						SELECT lehrveranstaltung_id
+						FROM lehre.tbl_lehrveranstaltung
+						WHERE koordinator = '.$db->db_add_param($mitarbeiter_uid).'
+					)
+					AND lehre.tbl_projektarbeit.studiensemester_kurzbz 
+					IN (
+						SELECT studiensemester_kurzbz 
+						FROM lehre.tbl_lehrveranstaltung
+						WHERE koordinator = '.$db->db_add_param($mitarbeiter_uid).')
+					)
+			)';
 		if(!$db->db_query($qry))
 			$error = true;
 	}
@@ -974,7 +986,14 @@ function casDeletePrestudent($db, $prestudent_id, $trans=true)
 	{
 		$qry = '
 			DELETE FROM lehre.tbl_projektbetreuer
-				WHERE projektarbeit_id IN (SELECT projektarbeit_id FROM lehre.tbl_projektarbeit WHERE student_uid IN (SELECT student_uid FROM tbl_student WHERE prestudent_id='.$db->db_add_param($prestudent_id, FHC_INTEGER).'))';
+				WHERE projektarbeit_id IN (
+					SELECT projektarbeit_id 
+					FROM lehre.tbl_projektarbeit 
+					WHERE student_uid IN 
+				    	(
+				    	SELECT student_uid 
+				    	FROM tbl_student 
+				    	WHERE prestudent_id='.$db->db_add_param($prestudent_id, FHC_INTEGER).'))';
 		if(!$db->db_query($qry))
 			$error = true;
 	}
@@ -1049,6 +1068,16 @@ function casDeletePrestudent($db, $prestudent_id, $trans=true)
 		{
 			$error = true;
 		}
+	}
+
+	/* Entries from testtool */
+	if(!$error)
+	{
+		$qry = 'DELETE FROM testtool.tbl_pruefling_frage WHERE pruefling_id=(SELECT pruefling_id FROM testtool.tbl_pruefling WHERE prestudent_id='.$db->db_add_param($prestudent_id, FHC_INTEGER).');
+				DELETE FROM testtool.tbl_antwort WHERE pruefling_id=(SELECT pruefling_id FROM testtool.tbl_pruefling WHERE prestudent_id='.$db->db_add_param($prestudent_id, FHC_INTEGER).');
+				DELETE FROM testtool.tbl_pruefling WHERE prestudent_id='.$db->db_add_param($prestudent_id, FHC_INTEGER).';';
+		if(!$db->db_query($qry))
+			$error = true;
 	}
 
 	/*
@@ -1604,6 +1633,22 @@ function casDeletePerson($db, $person_id, $trans=true)
 				$error = true;
 			}
 		}
+	}
+
+	/* Entries from rt_person */
+	if(!$error)
+	{
+		$qry = 'DELETE FROM public.tbl_rt_person WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER).';';
+		if(!$db->db_query($qry))
+			$error = true;
+	}
+
+	/* Entries from UHSTAT */
+	if(!$error)
+	{
+		$qry = 'DELETE FROM bis.tbl_uhstat1daten WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER).';';
+		if(!$db->db_query($qry))
+			$error = true;
 	}
 
 

@@ -24,7 +24,11 @@ class Studiensemester extends FHCAPI_Controller
 		parent::__construct(
 			array(
 				'getAll' => self::PERM_LOGGED,
-				'getAktNext' => self::PERM_LOGGED
+				'getAktNext' => self::PERM_LOGGED,
+				'getStudienjahrByStudiensemester' => self::PERM_LOGGED,
+				'getAllStudiensemesterAndAktOrNext' => self::PERM_LOGGED,
+				'current' => self::PERM_LOGGED,
+				'set' => self::PERM_LOGGED
 			)
 		);
 		// Load model StudiensemesterModel
@@ -114,5 +118,89 @@ class Studiensemester extends FHCAPI_Controller
 		}
 
 		$this->terminateWithSuccess((getData($result) ?: ''));
+	}
+
+	/**
+	 * Get Studienjahr by Studiensemester.
+	 * input param semester: studiensemester_kurzbz
+	 */
+	public function getStudienjahrByStudiensemester()
+	{
+		$semester = $this->input->get('semester');
+
+		$studienjahrObj = null;
+
+		if (!is_numeric($semester))
+		{
+			$this->StudiensemesterModel->addSelect('studienjahr_kurzbz');
+			$result = $this->StudiensemesterModel->loadWhere(array('studiensemester_kurzbz =' => $semester));
+		}
+
+		if (hasData($result))
+		{
+			$studienjahr = getData($result)[0]->studienjahr_kurzbz;
+			$startstudienjahr = substr($studienjahr, 0, 4);
+			$endstudienjahr = substr($studienjahr, 0, 2) . substr($studienjahr, -2);
+
+			$studienjahrObj = new StdClass();
+
+			$studienjahrObj->studienjahr_kurzbz = $studienjahr;
+			$studienjahrObj->startstudienjahr = $startstudienjahr;
+			$studienjahrObj->endstudienjahr= $endstudienjahr;
+		}
+
+		if (isError($result)) {
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_DB);
+		}
+
+		$this->terminateWithSuccess((getData(success($studienjahrObj))));
+	}
+
+	public function getAllStudiensemesterAndAktOrNext() {
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+
+		$this->StudiensemesterModel->addOrder("start", "DESC");
+		$result = $this->StudiensemesterModel->getAktOrNextSemester();
+		$aktuell = getData($result)[0];
+		$this->StudiensemesterModel->addSelect('*');
+		$result = $this->StudiensemesterModel->load();
+		$studiensemester = getData($result);
+		
+		$this->terminateWithSuccess(array($studiensemester, $aktuell));
+	}
+
+	public function current()
+	{
+		$result = $this->StudiensemesterModel->getNearest();
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		if (!$data)
+			$this->terminateWithError('Kein Studiensemester aktiv');
+		if (count($data) > 1)
+			$this->terminateWithError('Mehrere Studiensemester aktiv');
+
+		$this->terminateWithSuccess(current($data)->studiensemester_kurzbz);
+	}
+
+	public function set()
+	{
+		$this->load->library('AuthLib');
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('studiensemester_kurzbz', 'Studiensemester', 'required');
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$stdsem = $this->input->post('studiensemester_kurzbz');
+
+		$this->load->model('system/Variable_model', 'VariableModel');
+
+		$result = $this->VariableModel->setVariable(getAuthUID(), 'semester_aktuell', $stdsem);
+
+		$this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess(true);
 	}
 }

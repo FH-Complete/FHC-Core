@@ -42,7 +42,7 @@ export default {
 	watch: {
 		selected(n) {
 			this.selectedFields = n;
-		}
+		},
 	},
 	methods: {
 		toggle(field) {

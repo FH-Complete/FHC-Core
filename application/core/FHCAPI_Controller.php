@@ -81,8 +81,11 @@ class FHCAPI_Controller extends Auth_Controller
 		
 		// For JSON Requests (as opposed to multipart/form-data) get the $_POST variable from the input stream instead
 		if ($this->input->get_request_header('Content-Type', true) == 'application/json')
-			$_POST = json_decode($this->security->xss_clean($this->input->raw_input_stream), true);
-		elseif (isset($_POST['_jsondata'])) {
+		{
+			$_POST = json_decode($this->input->raw_input_stream, true);
+		}
+		elseif (isset($_POST['_jsondata']))
+		{
 			$_POST = array_merge($_POST, json_decode($_POST['_jsondata'], true));
 			unset($_POST['_jsondata']);
 		}
@@ -106,10 +109,15 @@ class FHCAPI_Controller extends Auth_Controller
 		$error = [];
 		
 		if (is_array($data)) {
-			if ($type == self::ERROR_TYPE_VALIDATION)
+			if ($type == self::ERROR_TYPE_VALIDATION) {
 				$error['messages'] = $data;
-			else
+			} elseif (array_is_list($data)) {
+				foreach ($data as $d)
+					$this->addError($d, $type);
+				return;
+			} else {
 				$error = $data;
+			}
 		} elseif (is_object($data)) {
 			$error = (array)$data;
 		} else {
@@ -223,9 +231,42 @@ class FHCAPI_Controller extends Auth_Controller
 		return $result->retval;
 	}
 
+	protected function terminateWithFileOutput($contenttype, $content, $filename=null)
+	{
+		$this->clearOutputBuffering();
+		$this->output->set_status_header(200)
+			->set_content_type($contenttype)
+			->set_header('Expires: 0')
+			->set_header('Cache-Control: no-store, no-cache, must-revalidate')
+			->set_header('Pragma: public')
+			->set_header('Content-Length: ' . strlen($content));
+
+		if($filename)
+		{
+			$cleanedfilename = preg_replace('/[^a-zA-Z0-9\-_.]/', '_', $filename);
+			$this->output->set_header('Content-Disposition: attachment; filename="'
+				. $cleanedfilename . '"');
+		}
+		else
+		{
+			$this->output->set_header('Content-Disposition: inline');
+		}
+
+		$this->output->set_output($content)
+			->_display();
+		exit();
+	}
+
+	private function clearOutputBuffering()
+	{
+		while(ob_get_level() > 0)
+		{
+			ob_end_clean();
+		}
+	}
 
 	// ---------------------------------------------------------------
-	// Security
+	// Security Begin
 	// ---------------------------------------------------------------
 
 	/**
@@ -245,5 +286,32 @@ class FHCAPI_Controller extends Auth_Controller
 			'method' => $this->router->method,
 			'required_permissions' => $this->_rpsToString($requiredPermissions, $this->router->method)
 		], self::ERROR_TYPE_AUTH);
+	}
+
+	// ---------------------------------------------------------------
+	// Security End
+	// ---------------------------------------------------------------
+
+	/**
+	 * Checks the client's total request size (Content-Length) against the minimum
+	 * effective PHP limit (min of upload_max_filesize, post_max_size, memory_limit).
+	 * This preempts failures that result in vague "missing parameters" errors on large files.
+	 *
+	 * @return void
+	 */
+	protected function checkUploadSize() {
+		// this number represents bytes
+		$content_length_bytes = (int)$this->input->server('CONTENT_LENGTH');
+		$content_length = $content_length_bytes / 1000000;
+		
+		//get max serverside size upload -> this comes in megabytes
+		$max_upload = (int)(ini_get('upload_max_filesize'));
+		$max_post = (int)(ini_get('post_max_size'));
+		$memory_limit = (int)(ini_get('memory_limit'));
+		$max_upload_mb = min($max_upload, $max_post, $memory_limit);    // smallest of 3 config values
+		
+		if($content_length >= $max_upload_mb) {
+			$this->terminateWithError($this->p->t('global', 'filesizeExceeded'), 'general');
+		}
 	}
 }

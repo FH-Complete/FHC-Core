@@ -43,7 +43,7 @@ class CmsLib
 	 * @param string	$sprache
 	 * @param boolean	$sichtbar
 	 * 
-	 * @return void
+	 * @return stdClass
 	 */
 	public function getContent($content_id, $version = null, $sprache = null, $sichtbar = true)
 	{
@@ -105,7 +105,19 @@ class CmsLib
 		if($content->titel){
 			$betreff = $content->titel;
 		}else{
+			//DomDocument getElementsByTagName returns a DomNodeList
 			$betreff = $XML->getElementsByTagName('betreff');
+			//check if any betreff was found and if it is not empty
+			if($betreff->length > 0 && !empty($betreff->item(0)->nodeValue))
+			{
+				//DomNodeList item() return a DomNode, property nodeValue contains the value of the node
+				$betreff = $betreff->item(0)->nodeValue;
+
+			}
+			else
+			{
+				return error('no betreff found for the content');
+			}
 		}
 
 		$xsltemplate = new DOMDocument();
@@ -221,7 +233,7 @@ class CmsLib
 	 * 
 	 * @return void
 	 */
-	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true, $page = 1, $page_size = 10)
+	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true, $page = 1, $page_size = 10, $sprache)
 	{
 		$this->ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		list($studiengang_kz, $semester) = $this->getStgAndSem($studiengang_kz, $semester);
@@ -230,13 +242,13 @@ class CmsLib
 		$xml = '<?xml version="1.0" encoding="UTF-8"?><content>';
 
 		$this->ci->load->model('content/News_model', 'NewsModel');
-		$news = $this->ci->NewsModel->getNewsWithContent(getSprache(), $studiengang_kz, $semester, null, $sichtbar, 0, $page, $page_size, $all, $mischen);
+		$news = $this->ci->NewsModel->getNewsWithContent($sprache, $studiengang_kz, $semester, null, $sichtbar, 0, $page, $page_size, $all, $mischen);
 
 		if (isError($news))
 			return $news;
 
 		$news = getData($news);
-		//var_dump($news->maxPageCount);
+		
 		foreach ($news as $newsobj) {
 			if ($studiengang_kz && $edit && !$newsobj->studiengang_kz)
 				continue;
@@ -247,7 +259,7 @@ class CmsLib
 			$xml .= "<newswrapper>" . $newsobj->content . $datum . $id . "</newswrapper>";
 		}
 
-		if ($studiengang_kz != 0) {
+		/* if ($studiengang_kz != 0) {
 			$stg_obj = $this->ci->StudiengangModel->load($studiengang_kz);
 			if (isError($stg_obj))
 				return $stg_obj;
@@ -262,7 +274,7 @@ class CmsLib
 				}
 				$xml .= '<studiengang_bezeichnung><![CDATA[' . $stg_obj->bezeichnung . ']]></studiengang_bezeichnung>';
 			}
-		}
+		} */
 
 		if ($titel != '') {
 			$xml .= '<news_titel>' . $titel . '</news_titel>';

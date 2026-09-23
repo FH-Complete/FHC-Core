@@ -67,9 +67,17 @@ function changeSprache(sprache)
     content_params.set('sprache_user', sprache); // add or replace sprache_user
 
     // Pass GET-param sprache_user to topbar.php, menu.php and content (login.php or frage.php) and refresh the frames.
-    location.href = location.pathname + '?sprache_user=' + sprache; // refreshes topbar.php
-    parent.menu.location.href = parent.menu.location.pathname + '?sprache_user=' + sprache; // refreshes menu.php
-    parent.content.location.href = parent.content.location.pathname + '?' + content_params; // refreshes login.php or frage.php
+	if (parent && typeof parent.changeSprache === 'function')
+	{
+		parent.changeSprache(content_params, sprache);
+		return false;
+	}
+	else
+	{
+		location.href = location.pathname + '?sprache_user=' + sprache; // refreshes topbar.php
+		parent.menu.location.href = parent.menu.location.pathname + '?sprache_user=' + sprache; // refreshes menu.php
+		parent.content.location.href = parent.content.location.pathname + '?' + content_params; // refreshes login.php or frage.php
+	}
 }
 
 	$(document).on("keydown", function (e) {

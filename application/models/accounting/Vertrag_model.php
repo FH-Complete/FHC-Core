@@ -31,18 +31,20 @@ class Vertrag_model extends DB_Model
      */
 	public function save($person_id, $mitarbeiter_uid, $lehrveranstaltung_id, $lehreinheit_id, $projektarbeit_id = null, $vertragsstunden, $betrag, $studiensemester_kurzbz)
     {
-        $person_id = (isset($person_id) && is_numeric($person_id))
+		$vertragstyp_kurzbz = (is_null($projektarbeit_id)) ? 'Lehrauftrag' : 'Betreuung';
+        
+		$person_id = (isset($person_id) && is_numeric($person_id))
             ? $person_id
             : show_error('peron_id must be set and numeric.');
-        $lehreinheit_id = (isset($lehreinheit_id) && is_numeric($lehreinheit_id))
-            ? $lehreinheit_id
-            : show_error('lehreinheit_id must be set and numeric.');
         $lehrveranstaltung_id = (isset($lehrveranstaltung_id) && is_numeric($lehrveranstaltung_id))
             ? $lehrveranstaltung_id
             : show_error('lehrveranstaltung_id must be set and numeric.');
         $projektarbeit_id = (isset($projektarbeit_id) && is_numeric($projektarbeit_id))
             ? $projektarbeit_id
             : null;
+		$lehreinheit_id = (isset($lehreinheit_id) && is_numeric($lehreinheit_id))
+			? $lehreinheit_id
+			: (($vertragstyp_kurzbz == 'Betreuung') ? null : show_error('lehreinheit_id must be set and numeric.'));
         $vertragsstunden = (isset($vertragsstunden) && is_numeric($vertragsstunden))
             ? $vertragsstunden
             : 0;
@@ -53,7 +55,7 @@ class Vertrag_model extends DB_Model
             ? $mitarbeiter_uid
             : show_error('mitarbeiter_uid must be set and a string value.');;
 
-        $vertragstyp_kurzbz = (is_null($projektarbeit_id)) ? 'Lehrauftrag' : 'Betreuung';
+        
 
         // First check if Vertrag already exists for that Lehrauftrag or for that Projektbetreuerauftrag
         if ($vertragstyp_kurzbz == 'Lehrauftrag')
@@ -257,7 +259,7 @@ class Vertrag_model extends DB_Model
         }
         elseif ($vertragstyp_kurzbz == 'Betreuung')
         {
-            $this->addSelect('lehreinheit_id');
+            $this->addSelect('lehreinheit_id, lehre.tbl_projektarbeit.lehrveranstaltung_id, lehre.tbl_projektarbeit.studiensemester_kurzbz');
             $this->addJoin('lehre.tbl_projektbetreuer', 'vertrag_id');
             $this->addJoin('lehre.tbl_projektarbeit', 'projektarbeit_id');
             if ($result = $this->loadWhere(array('vertrag_id' => $vertrag_id)))
@@ -281,17 +283,22 @@ class Vertrag_model extends DB_Model
     {
         if ($result = getData($this->getLehreinheitID($vertrag_id)))
         {
-            $this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
-            $this->LehreinheitModel->addSelect($select);
+            if (!empty($result[0]->lehreinheit_id))
+            {
+                $this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
+                $this->LehreinheitModel->addSelect($select);
 
-            if($result = $this->LehreinheitModel->load($result[0]->lehreinheit_id))
-            {
-                return success($result->retval);
+                if ($result = $this->LehreinheitModel->load($result[0]->lehreinheit_id))
+                {
+                    return success($result->retval);
+                }
+                else
+                {
+                    return error('Fehler beim Laden der Lehreinheit');
+                }
             }
-            else
-            {
-                return error('Fehler beim Laden der Lehreinheit');
-            }
+
+            return success($result);
         }
         else
         {
@@ -384,6 +391,80 @@ class Vertrag_model extends DB_Model
 	    }
     }
 
+	public function getVertrag($mitarbeiter_uid, $lehreinheit_id)
+	{
+		$this->addSelect('tbl_lehreinheitmitarbeiter.*, tbl_vertrag.*, status.bezeichnung as vertragsstatus, status.vertragsstatus_kurzbz');
+		$this->addJoin('lehre.tbl_lehreinheitmitarbeiter', 'vertrag_id');
+		$this->addJoin('lehre.tbl_vertragstyp', 'vertragstyp_kurzbz', 'LEFT');
+		$this->addJoin('
+			(
+				SELECT DISTINCT ON(vertrag_id) vertrag_id,
+					bezeichnung, 
+					tbl_vertragsstatus.vertragsstatus_kurzbz 
+				FROM lehre.tbl_vertrag_vertragsstatus 
+					JOIN lehre.tbl_vertragsstatus USING(vertragsstatus_kurzbz) 
+				ORDER BY vertrag_id, datum DESC
+			) as status', 'status.vertrag_id = lehre.tbl_vertrag.vertrag_id', 'LEFT');
+
+		return $this->loadWhere(array('mitarbeiter_uid' => $mitarbeiter_uid, 'lehreinheit_id' => $lehreinheit_id));
+	}
+
+	public function getVertragById($vertrag_id)
+	{
+		$this->addSelect(
+			'tbl_vertrag.vertrag_id, vertragstyp_kurzbz, vertragsstunden, vertragsstunden_studiensemester_kurzbz, status.vertragsstatus_kurzbz,
+			status.bezeichnung AS vertragsstatus, tbl_vertrag.betrag, lema.semesterstunden, lema.stundensatz'
+		);
+		$this->addJoin('lehre.tbl_lehreinheitmitarbeiter lema', 'tbl_vertrag.vertrag_id = lema.vertrag_id', 'LEFT');
+		$this->addJoin('
+			(
+				SELECT DISTINCT ON(vst.vertrag_id) vst.vertrag_id,
+					bezeichnung,
+					tbl_vertragsstatus.vertragsstatus_kurzbz
+				FROM lehre.tbl_vertrag_vertragsstatus vst
+					JOIN lehre.tbl_vertragsstatus USING(vertragsstatus_kurzbz)
+				ORDER BY vst.vertrag_id, datum DESC
+			) as status', 'status.vertrag_id = lehre.tbl_vertrag.vertrag_id', 'LEFT');
+
+		return $this->loadWhere(['tbl_vertrag.vertrag_id' => $vertrag_id]);
+	}
+
+	public function cancelVertrag($vertrag_id, $mitarbeiter_uid)
+	{
+		$vertrag = $this->load($vertrag_id);
+
+		if (!hasData($vertrag))
+			return error("Contract not found");
+
+		$vertrag = getData($vertrag)[0];
+
+		$this->_updateVertragRelevant($vertrag->vertrag_id);
+
+		return $this->VertragvertragsstatusModel->insert(array(
+			'vertrag_id' => $vertrag->vertrag_id,
+			'vertragsstatus_kurzbz' => 'storno',
+			'uid' => $mitarbeiter_uid,
+			'datum' => 'NOW()',
+			'insertamum' => 'NOW()',
+			'insertvon' => getAuthUID()
+		));
+	}
+
+	public function deleteVertrag($vertrag_id)
+	{
+		$vertrag = $this->load($vertrag_id);
+
+		if (!hasData($vertrag))
+			return error("Contract not found");
+
+		$vertrag = getData($vertrag)[0];
+
+		$this->_updateVertragRelevant($vertrag->vertrag_id);
+
+		$this->VertragvertragsstatusModel->delete(array('vertrag_id' => $vertrag->vertrag_id));
+		return $this->delete(array('vertrag_id' => $vertrag->vertrag_id));
+	}
+
     // -----------------------------------------------------------------------------------------------------------------
     // Private methods
 
@@ -415,4 +496,187 @@ class Vertrag_model extends DB_Model
 
         return $bezeichnung;
     }
+
+	/**
+	 * Loads all Contracts of a Person
+	 * @param $person_id
+	 * @return array of objects
+	 */
+	public function loadContractsOfPerson($person_id)
+	{
+		$query = "
+			SELECT
+					*,
+					tbl_vertrag.bezeichnung as bezeichnung,
+					tbl_vertragstyp.bezeichnung as vertragstyp_bezeichnung,
+					tbl_vertrag.vertragsdatum,
+					(SELECT bezeichnung FROM lehre.tbl_vertragsstatus 
+					JOIN lehre.tbl_vertrag_vertragsstatus USING(vertragsstatus_kurzbz)
+						WHERE vertrag_id=tbl_vertrag.vertrag_id ORDER BY datum desc limit 1) as status, anmerkung,
+			    CASE
+					WHEN EXISTS (
+						SELECT 1
+						FROM lehre.tbl_vertrag_vertragsstatus
+						WHERE vertrag_id = tbl_vertrag.vertrag_id
+						AND vertragsstatus_kurzbz = 'abgerechnet'
+					) THEN true 
+					ELSE false
+				END AS isAbgerechnet
+				FROM
+					lehre.tbl_vertrag
+					LEFT JOIN lehre.tbl_vertragstyp USING(vertragstyp_kurzbz)
+				WHERE person_id= ?";
+
+
+		return $this->execQuery($query, array($person_id));
+	}
+
+	/**
+	 * Loads all Contracts of a Person that are not assigned yet
+	 * @param $person_id
+	 * @return array of objects
+	 */
+	public function loadContractsOfPersonNotAssigned($person_id)
+	{
+		$query = "
+SELECT
+			'Lehrauftrag' as type,
+			lehreinheit_id,
+			mitarbeiter_uid,
+			null as pruefung_id,
+			null as projektarbeit_id,
+			(tbl_lehreinheitmitarbeiter.semesterstunden*tbl_lehreinheitmitarbeiter.stundensatz) as betrag1,
+			tbl_lehreinheit.studiensemester_kurzbz,
+			null as betreuerart_kurzbz,
+			(	SELECT
+					upper(tbl_studiengang.typ || tbl_studiengang.kurzbz) || tbl_lehrveranstaltung.semester  || '-' || tbl_lehrveranstaltung.kurzbz || '-' || tbl_lehreinheit.lehrform_kurzbz
+				FROM
+					lehre.tbl_lehrveranstaltung
+					JOIN public.tbl_studiengang USING(studiengang_kz)
+				WHERE
+					lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id)
+			as bezeichnung
+		FROM
+			lehre.tbl_lehreinheitmitarbeiter
+			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+		WHERE
+			mitarbeiter_uid IN (SELECT uid FROM public.tbl_benutzer WHERE person_id=?)
+			AND vertrag_id IS NULL
+		UNION
+		SELECT
+			'Betreuung' as type,
+			tbl_projektarbeit.lehreinheit_id as lehreinheit_id,
+			null as mitarbeiter_uid,
+			null::integer as pruefung_id,
+			projektarbeit_id,
+			(tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag1,
+			tbl_projektarbeit.studiensemester_kurzbz,
+			tbl_projektbetreuer.betreuerart_kurzbz,
+			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=tbl_projektarbeit.student_uid)
+			as bezeichnung
+		FROM
+			lehre.tbl_projektbetreuer
+			JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
+		WHERE
+			tbl_projektbetreuer.person_id=?
+			AND vertrag_id IS NULL
+				";
+
+		return $this->execQuery($query, array($person_id, $person_id));
+	}
+
+	/**
+	 * Loads all Contracts of a Person that are assigned yet
+	 * @param $person_id, $vertrag_id
+	 * @return array of objects
+	 */
+
+	public function loadContractsOfPersonAssigned($person_id, $vertrag_id)
+	{
+		$query = "
+		SELECT
+			'Lehrauftrag' as type,
+			lehreinheit_id,
+			mitarbeiter_uid,
+			null as pruefung_id,
+			null as projektarbeit_id,
+			(tbl_lehreinheitmitarbeiter.semesterstunden * tbl_lehreinheitmitarbeiter.stundensatz) as betrag,
+			tbl_lehreinheit.studiensemester_kurzbz,
+			null as betreuerart_kurzbz,
+			(	SELECT
+					upper(tbl_studiengang.typ || tbl_studiengang.kurzbz) || tbl_lehrveranstaltung.semester  || '-' || tbl_lehrveranstaltung.kurzbz || '-' || tbl_lehreinheit.lehrform_kurzbz
+				FROM
+					lehre.tbl_lehrveranstaltung
+					JOIN public.tbl_studiengang USING(studiengang_kz)
+				WHERE
+					lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id)
+			as bezeichnung, vertrag_id
+		FROM
+			lehre.tbl_lehreinheitmitarbeiter
+			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+		WHERE
+			mitarbeiter_uid IN (SELECT uid FROM public.tbl_benutzer WHERE person_id=?)
+			AND vertrag_id = ?
+		UNION
+		SELECT
+			'Betreuung' as type,
+			tbl_projektarbeit.lehreinheit_id as lehreinheit_id,
+			null as mitarbeiter_uid,
+			null::integer as pruefung_id,
+			projektarbeit_id,
+			(tbl_projektbetreuer.stunden * tbl_projektbetreuer.stundensatz) as betrag,
+			tbl_projektarbeit.studiensemester_kurzbz,
+			tbl_projektbetreuer.betreuerart_kurzbz,
+			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=tbl_projektarbeit.student_uid)
+			as bezeichnung, vertrag_id
+		FROM
+			lehre.tbl_projektbetreuer
+			JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
+		WHERE
+			tbl_projektbetreuer.person_id=?
+			AND vertrag_id = ?
+				";
+
+		return $this->execQuery($query, array($person_id, $vertrag_id, $person_id, $vertrag_id));
+	}
+
+	/**
+	 * Returns all stati of a contract
+	 *
+	 * @param $vertrag_id
+	 * @return array
+	 */
+	public function getStatiOfContract($vertrag_id)
+	{
+		$query = " 
+			SELECT
+				*,
+                tbl_vertrag_vertragsstatus.datum,
+                tbl_vertrag_vertragsstatus.insertamum,
+                tbl_vertrag_vertragsstatus.updateamum
+			FROM
+				lehre.tbl_vertrag_vertragsstatus
+				JOIN lehre.tbl_vertragsstatus USING(vertragsstatus_kurzbz)
+			WHERE
+				tbl_vertrag_vertragsstatus.vertrag_id = ?
+			ORDER BY tbl_vertrag_vertragsstatus.datum DESC";
+
+		return $this->execQuery($query, array($vertrag_id));
+	}
+
+	private function _updateVertragRelevant($vertrag_id)
+	{
+		$this->LehreinheitmitarbeiterModel->update(
+			array("vertrag_id" => $vertrag_id),
+			array(
+				'vertrag_id' => null
+			)
+		);
+		$this->ProjektbetreuerModel->update(
+			array("vertrag_id" => $vertrag_id),
+			array(
+				'vertrag_id' => null
+			)
+		);
+	}
 }

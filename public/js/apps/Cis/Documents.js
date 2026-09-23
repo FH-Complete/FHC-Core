@@ -1,5 +1,5 @@
-import Phrasen from '../../plugin/Phrasen.js';
-import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers";
+import PluginsPhrasen from '../../plugins/Phrasen.js';
+import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers.js";
 
 const app = Vue.createApp({
 	name: 'DocumentsApp',
@@ -87,7 +87,9 @@ const app = Vue.createApp({
 	}
 });
 
+FhcApps.makeExtendable(app);
+
 setScrollbarWidth();
 
-app.use(Phrasen, {reload: true});
+app.use(PluginsPhrasen);
 app.mount('#content');

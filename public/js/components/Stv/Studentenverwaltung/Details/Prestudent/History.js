@@ -1,5 +1,7 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 
+import ApiStvPrestudent from '../../../../../api/factory/stv/prestudent.js';
+
 export default{
 	components: {
 		CoreFilterCmpt
@@ -10,11 +12,20 @@ export default{
 	},
 	data() {
 		return {
-			tabulatorOptions: {
-				ajaxURL: 'api/frontend/v1/stv/Prestudent/getHistoryPrestudents/' + this.personId,
-				ajaxRequestFunc: this.$fhcApi.get,
+			layout: 'fitDataFill',
+			layoutColumnsOnNewData:	false,
+			height:	'auto',
+			selectableRows:	false
+		}
+	},
+	computed: {
+		tabulatorOptions() {
+			const options = {
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: () => this.$api.call(ApiStvPrestudent.getHistoryPrestudents(this.personId)),
 				ajaxResponse: (url, params, response) => response.data,
 				//autoColumns: true,
+				persistenceID: 'stv-details-prestudent-history-20260217',
 				columns:[
 					{title:"StSem", field:"studiensemester_kurzbz"},
 					{title:"Prio", field:"priorisierung"},
@@ -23,7 +34,7 @@ export default{
 					{title:"Studienplan", field:"bezeichnung"},
 					{title:"UID", field:"student_uid"},
 					{title:"Status", field:"status"},
-					{title:"PrestudentId", field:"prestudent_id", visible:false}
+					{title:"Prestudent ID", field:"prestudent_id", visible:false}
 				],
 				rowFormatter: row => {
 					const rowData = row.getData();
@@ -35,39 +46,46 @@ export default{
 						element.classList.add('fw-bold');
 					}
 				},
-				layout: 'fitDataFill',
-				layoutColumnsOnNewData:	false,
-				height:	'auto',
-				selectable:	false,
-				persistenceID: 'stv-details-prestudent-history'
-			},
-			tabulatorEvents: [
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'tableBuilt',
 					handler: async () => {
 						await this.$p.loadCategory(['lehre']);
 
-						let cm = this.$refs.table.tabulator.columnManager;
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('orgform_kurzbz').component.updateDefinition({
-							title: this.$p.t('lehre', 'organisationsform')
-						});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
 
-						cm.getColumnByField('bezeichnung').component.updateDefinition({
-							title: this.$p.t('lehre', 'studienplan')
-						});
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('orgform_kurzbz', this.$p.t('lehre', 'organisationsform'));
+						setHeader('bezeichnung', this.$p.t('lehre', 'studienplan'));
+						setHeader('prestudent_id', this.$p.t('ui', 'prestudent_id'));
+
 					}
 				}
-			]
-		}
+			];
+			return events;
+		},
 	},
 	watch: {
 		personId() {
-			this.$refs.table.tabulator.setData('api/frontend/v1/stv/Prestudent/getHistoryPrestudents/' + this.personId);
-		}
+			this.$refs.table.reloadTable();
+		},
 	},
 	template: `
-	<div class="stv-details-prestudent-history h-100 pt-3">
+	<div class="stv-details-prestudent-history h-100">
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"

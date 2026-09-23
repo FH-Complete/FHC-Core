@@ -57,6 +57,7 @@ $this->phrasen['pruefung/listeOhneNamenDrucken'] = 'Liste ohne Namen drucken';
 $this->phrasen['pruefung/pruefungsraum'] = 'Prüfungsraum: ';
 $this->phrasen['pruefung/pruefungsort'] = 'Prüfungsort ';
 $this->phrasen['pruefung/imBuero'] = ' im Büro';
+$this->phrasen['pruefung/andererRaum'] = 'anderer Raum';
 $this->phrasen['pruefung/raum'] = ' Raum';
 $this->phrasen['pruefung/raumSpeichern'] = ' Raum speichern';
 $this->phrasen['pruefung/reihunghErfolgreichGeaendert'] = 'Reihung erfolgreich geändert.';
@@ -77,6 +78,7 @@ $this->phrasen['pruefung/unbegrenzt'] = 'unbegrenzt';
 $this->phrasen['pruefung/bewertungenZu'] = 'Bewertungen zu';
 $this->phrasen['pruefung/keineAuswahl'] = 'Keine Auswahl';
 $this->phrasen['pruefung/alleBestaetigen'] = 'Alle bestätigen';
+$this->phrasen['pruefung/bitteEmailAngeben'] = 'Bitte geben Sie eine gültige E-Mail-Adresse ein.';
 
 // pruefungsbewertung
 $this->phrasen['pruefung/pruefungsbewertungTitle'] = 'Prüfungsbewertung';
@@ -95,6 +97,7 @@ $this->phrasen['pruefung/lvVonStudiengang'] = 'Lehrveranstaltungen von Studienga
 $this->phrasen['pruefung/lvAlle'] = 'Alle Lehrveranstaltungen';
 $this->phrasen['pruefung/anmeldungSpeichern'] = 'Anmeldung speichern';
 $this->phrasen['pruefung/studienverpflichtung'] = 'Studienverpflichtung';
+$this->phrasen['pruefung/ects'] = 'ECTS';
 
 // liste
 $this->phrasen['pruefung/anmeldungsliste'] = 'Anmeldungsliste';
@@ -138,6 +141,15 @@ $this->phrasen['pruefung/emailBodyMinuten'] = 'Minuten';
 $this->phrasen['pruefung/emailBodyOrt'] = 'Ort:';
 $this->phrasen['pruefung/emailBodyLinkZurAnmeldung'] = 'Link zur Anmeldung';
 $this->phrasen['pruefung/emailBodyBitteHtmlSicht'] = 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.';
+
+
+// Sammelmail
+$this->phrasen['pruefung/sammelemailBody'] = 'Die Anmeldungen zur Prüfung %s am %s wurde von %s bestätigt. <br />';
+$this->phrasen['pruefung/sammelemailBody2'] = 'Ort: %s<br />';
+$this->phrasen['pruefung/sammelemailBodyBestaetigt'] = 'Bestätigt von';
+$this->phrasen['pruefung/sammelemailBodyPruefung'] = 'Prüfung';
+$this->phrasen['pruefung/sammelemailBodyTermin'] = 'Termin';
+$this->phrasen['pruefung/sammelemailBodyDauer'] = 'Dauer';
 
 $this->phrasen['pruefung/emailLektorSubjectAnmeldung'] = 'Anmeldung zur Prüfung';
 $this->phrasen['pruefung/emailLektorStudentIn'] = 'StudentIn';

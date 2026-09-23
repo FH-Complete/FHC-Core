@@ -338,7 +338,6 @@ if(isset($_POST['saveperson']))
 	$person->gebzeit = $_POST['gebzeit'];
 	$person->anmerkungen = $_POST['anmerkungen'];
 	$person->homepage = $_POST['homepage'];
-	$person->svnr = $_POST['svnr'];
 	$person->ersatzkennzeichen = $_POST['ersatzkennzeichen'];
 	$person->familienstand = $_POST['familienstand'];
 	$person->geschlecht = $_POST['geschlecht'];
@@ -606,8 +605,6 @@ if($result = $db->db_query($qry))
 }
 echo '</SELECT></td>';
 echo '</tr><tr>';
-//SVNR
-echo "<td>SVNR:</td><td><input type='text' name='svnr' ".($disabled?'disabled':'')." value='".$person->svnr."'></td>";
 //Ersatzkennzeichen
 echo "<td>Ersatzkennzeichen</td><td><input type='text' name='ersatzkennzeichen' ".($disabled?'disabled':'')." value='".$person->ersatzkennzeichen."'></td>";
 //Geschlecht
