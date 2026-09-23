@@ -30119,7 +30119,7 @@ array(
 				),
 				array(
 					'sprache' => 'English',
-					'text' => 'List View',
+					'text' => 'List view',
 					'description' => '',
 					'insertvon' => 'system'
 				)
@@ -30139,7 +30139,7 @@ array(
 				),
 				array(
 					'sprache' => 'English',
-					'text' => 'Multi-Week View',
+					'text' => 'Multi-Week view',
 					'description' => '',
 					'insertvon' => 'system'
 				)
