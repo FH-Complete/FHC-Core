@@ -39,6 +39,7 @@ class Benutzer extends FHCAPI_Controller
 	public function getUserData()
 	{
 		$uid = $this->input->get("uid") ?? getAuthUID();
+		$this->BenutzerModel->addSelect("uid, person_id, insertamum");
 		$userResult = $this->BenutzerModel->load(["uid" => $uid]);
 		$userData = $this->getDataOrTerminateWithError($userResult);
 		$this->terminateWithSuccess($userData);
