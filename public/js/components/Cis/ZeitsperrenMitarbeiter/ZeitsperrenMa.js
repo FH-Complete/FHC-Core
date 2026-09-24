@@ -65,20 +65,16 @@ export default {
 	},
 	template: `
 		<div class="base-zeitsperrenma">
-			<div class="row g-1 flex-shrink-0">
-				<div
-					class="col"
+			<div class="d-flex flex-row gap-1 overflow-x-auto">
+				<button
 					v-for="button in buttons"
 					:key="button.key"
+					class="btn w-100"
+					:class="button.class"
+					@click="route(button.key)"
 				>
-					<button
-						class="btn w-100"
-						:class="button.class"
-						@click="route(button.key)"
-					>
-						{{ $p.t(button.title) }}
+					{{ $p.t(button.title) }}
 					</button>
-				</div>
 			</div>
 
 			<div class="zeitsperren-list-container">
