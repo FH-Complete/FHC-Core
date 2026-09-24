@@ -13,3 +13,15 @@
     background: var(--bs-table-bg);
     z-index: 2;
 }
+
+.zeitsperrenma-content .zeitsperrenma-name-header {
+	left: 0;
+    z-index: 3;
+}
+
+.zeitsperrenma-content .zeitsperrenma-name {
+    position: sticky;
+    left: 0;
+    background: var(--bs-table-bg);
+    z-index: 2;
+}

@@ -541,7 +541,7 @@ export default {
 			<table v-if="showTable" class="table table-striped table-bordered">
 				<thead>
 					<tr>
-					  <th scope="col"> UID </th>
+						<th class="zeitsperrenma-name-header" scope="col"> UID </th>
 						<th v-for="day in days" :key="day.date">
 							<div>{{ day.weekday }}</div>
 							<div>{{ day.day }}</div>
@@ -553,7 +553,7 @@ export default {
 						v-for="m in mitarbeiter"
 						:key="m.uid"
 					>
-						<td>{{m.sperren[0].nachname}} {{m.sperren[0].vorname}}</td>
+						<td class="zeitsperrenma-name">{{m.sperren[0].nachname}} {{m.sperren[0].vorname}}</td>
 						<td
 							v-for="day in days"
 							:key="day.date"
