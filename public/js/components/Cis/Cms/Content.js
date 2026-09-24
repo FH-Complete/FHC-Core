@@ -38,7 +38,9 @@ export default {
 	methods: {
 		fetchContent(){
 			this.$api
-				.call(ApiCms.content(this.content_id_internal, this.version, this.sprache, this.sichtbar))
+				.call(ApiCms.content(
+					this.content_id_internal, this.version, this.sprache, this.sichtbar, this.preview
+				))
 				.then(res => {
 					this.$nextTick(function() {
 						this.content = res.data.content;
@@ -57,8 +59,14 @@ export default {
 		}
 	},
 	computed: {
+		// The viewer language, unless the address names one. The CMS admin previews a
+		// chosen language, which is not always the language of the editor interface.
 		sprache(){
-			return this.$p.user_language.value;
+			return this.$route?.query?.sprache || this.$p.user_language.value;
+		},
+		// A preview renders the content without counting a view.
+		preview(){
+			return this.$route?.query?.preview === '1';
 		},
 		computeContentType: function () {
 			switch (this.content_type) {

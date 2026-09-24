@@ -256,6 +256,7 @@ export default {
 					<div id="FhcCarouselContainer" style="height: 100%;" ref="carousel" class="carousel slide fhc-carousel ms-2" data-bs-interval="false">
 
 						<div class="carousel-inner" ref="carouselInner"  style="height: 100%; max-width: 100%;">
+							<!-- No contentcomponent-host on purpose: the carousel shows many teasers, and every component would start its own fetch. -->
 							<div ref="carouselItems" v-for="(news, index) in newsList" class="carousel-item fhc-news-card-item" style="overflow-y: auto; overflow-x: hidden; height: 100%;" :id="'card-'+news.news_id" v-html="news.content_obj.content"/>
 						</div>
 						<button @click="setPrev" style="z-index: 100; overflow: hidden; margin-left: 4px; width:35px;" data-bs-target="#FhcCarouselContainer" class="carousel-control-prev" type="button">

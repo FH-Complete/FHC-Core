@@ -99,6 +99,31 @@ class Mitarbeiter_model extends DB_Model
 	}
 
 	/**
+	 * Active staff, names only, for a picker.
+	 *
+	 * getPersonal() returns tbl_person.* including svnr, bpk and
+	 * gebdatum, which is not needed in a CMS endpoint.
+	 *
+	 * @return object
+	 */
+	public function getAktivesPersonalNamen()
+	{
+		$query = '
+			SELECT
+				b.uid,
+				p.vorname,
+				p.nachname
+			FROM public.tbl_benutzer b
+				JOIN public.tbl_mitarbeiter m ON m.mitarbeiter_uid = b.uid
+				JOIN public.tbl_person p ON p.person_id = b.person_id
+			WHERE b.aktiv
+			ORDER BY LOWER(p.nachname), LOWER(p.vorname)
+		';
+
+		return $this->execReadOnlyQuery($query);
+	}
+
+	/**
 	 * gibt Personen mit Übersicht von Vertragsdaten aus
 	 *
 	 * @return array

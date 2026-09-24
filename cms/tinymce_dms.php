@@ -83,12 +83,40 @@ if (! $rechte->isberechtigt('basis/dms', null, 's', null))
 		return confirm('Möchten Sie das File wirklich löschen?');
 	}
 
+	/*
+	 * CIS4 bridge, ticket 78489.
+	 *
+	 * The TinyMCE 5 editor of the new CMS admin cannot receive a selection through the
+	 * TinyMCE 3 API below, so this window posts the URL back to its opener instead.
+	 *
+	 *     message: { typ: 'fhc-dms-selection', url: 'dms.php?id=<dms_id>' }
+	 *     target:  window.opener, origin checked on both sides
+	 *
+	 * The path is chosen by window.name, which the opener sets and which survives the
+	 * internal navigation of this browser.
+	 *
+	 * Receiving side: public/js/components/Cms/Form/FieldWysiwyg.js
+	 */
 	var FileBrowserDialog=
 	{
 		init: function(){
 		},
 		mySubmit : function (id) {
 			var URL = "dms.php?id="+id;
+
+			// CIS4 path: see the comment block above this function. Do not test for
+			// tinyMCEPopup, this page loads tiny_mce_popup.js itself and always defines it.
+			if (window.name === 'DMS_CIS4' && window.opener && !window.opener.closed) {
+				window.opener.postMessage({ typ: 'fhc-dms-selection', url: URL }, window.location.origin);
+				window.close();
+				return;
+			}
+
+			if (typeof tinyMCEPopup === 'undefined') {
+				alert('The calling window is no longer available.');
+				return;
+			}
+
 				var win = tinyMCEPopup.getWindowArg("window");
 
 				// insert information now

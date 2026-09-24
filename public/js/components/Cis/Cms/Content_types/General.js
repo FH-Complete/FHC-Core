@@ -1,4 +1,5 @@
 import { replaceRelativeLegacyLink } from "../../../../helpers/LegacyLinkReplaceHelper.js"
+import ContentcomponentHost from "../../../Contentcomponents/ContentcomponentHost.js";
 export default {
 	name: "GeneralComponent",
     props:{
@@ -6,7 +7,13 @@ export default {
           type:String,
           required:true,
       },
+      content_id:{
+        type: [Number, String],
+      },
     },
+	components: {
+		ContentcomponentHost
+	},
 	methods: {
 		sanitizeLegacyTables(table) {
 			
@@ -124,7 +131,7 @@ export default {
     template: /*html*/ `
       <!-- div that contains the content -->
       <div v-if="content" class="container" style="max-width: 100%;"><div class="row"><div class="col">
-      	<div v-html="content"  ></div>
+      	<contentcomponent-host :content="content" :content-id="content_id"></contentcomponent-host>
       </div></div></div>
       <p v-else>Content was not found</p>
       `,

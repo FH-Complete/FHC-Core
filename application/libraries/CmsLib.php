@@ -42,10 +42,12 @@ class CmsLib
 	 * @param int		$version
 	 * @param string	$sprache
 	 * @param boolean	$sichtbar
+	 * @param boolean	$log		false suppresses the click log entry. The CMS admin
+	 *								preview renders a content without counting a view.
 	 * 
 	 * @return stdClass
 	 */
-	public function getContent($content_id, $version = null, $sprache = null, $sichtbar = true)
+	public function getContent($content_id, $version = null, $sprache = null, $sichtbar = true, $log = true)
 	{
 		if (!is_numeric($content_id))
 			return error('ContentID ist ungueltig');
@@ -72,7 +74,7 @@ class CmsLib
 			return $content;
 
 		// Legt einen Logeintrag für die Klickstatistik an
-		if (defined('LOG_CONTENT') && LOG_CONTENT) {
+		if ($log && defined('LOG_CONTENT') && LOG_CONTENT) {
 			// Nur eingeloggte User werden geloggt, das sonst auch alle Infoscreenaufrufe und dgl. mitgeloggt werden
 			if (isLogged()) {
 				$request_data = 'content_id=' . $content_id;

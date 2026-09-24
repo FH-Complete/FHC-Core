@@ -44,19 +44,22 @@ class Cms extends Auth_Controller
 	 *
 	 * @return void
 	 */
-	public function content($content_id, $version = null, $sprache = null, $sichtbar = true)
+	public function content($content_id = null, $version = null, $sprache = null, $sichtbar = true)
 	{
-		// return early if the content_id for the content is missing
-		if (!isset($content_id))
-			$this->terminateWithError("content_id is missing");
+		if (!is_numeric($content_id))
+			show_404();
 
 		$content = $this->ContentModel->load($content_id);
 		if (isError($content))
-			$this->terminateWithError(getError($content));
+		{
+			show_error('The content could not be loaded');
+		}
 
 		$content = getData($content);
-		if (NULL === $content)
-			$this->terminateWithError("Content not found");
+
+		if (NULL === $content) {
+			show_404();
+		}
 
 		$content = current($content);
 

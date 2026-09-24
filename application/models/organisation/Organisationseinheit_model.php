@@ -259,4 +259,37 @@ class Organisationseinheit_model extends DB_Model
 
 		return $this->execReadOnlyQuery($qry, array($oe_kurzbz));
 	}
+
+	/**
+	 * The unit itself plus its sub units, down to a depth.
+	 *
+	 * tiefe 0 returns only the unit named, which is what a caller without a depth wants.
+	 * The depth bound also ends a cycle: a unit whose parent chain leads back to itself
+	 * would otherwise recurse forever.
+	 *
+	 * @param string $oe_kurzbz root of the walk
+	 * @param int $tiefe how many levels below the root to include
+	 * @return object success with array of rows or error
+	 */
+	public function getMitUntereinheiten($oe_kurzbz, $tiefe)
+	{
+		$query = '
+			WITH RECURSIVE unter(oe_kurzbz, tiefe) AS (
+				SELECT oe_kurzbz, 0
+				FROM public.tbl_organisationseinheit
+				WHERE oe_kurzbz = ?
+				UNION ALL
+				SELECT o.oe_kurzbz, unter.tiefe + 1
+				FROM public.tbl_organisationseinheit o
+					JOIN unter ON o.oe_parent_kurzbz = unter.oe_kurzbz
+				WHERE unter.tiefe < ?
+			)
+			SELECT oe_kurzbz, MIN(tiefe) AS tiefe
+			FROM unter
+			GROUP BY oe_kurzbz
+			ORDER BY MIN(tiefe), oe_kurzbz
+		';
+
+		return $this->execReadOnlyQuery($query, [$oe_kurzbz, (int) $tiefe]);
+	}
 }

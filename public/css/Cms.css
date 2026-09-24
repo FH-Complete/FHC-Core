@@ -1,0 +1,97 @@
+/* Full-height shell. Without a height chain down to .cms-admin the page itself scrolls
+   and the tabs leave the screen while paging through the tree. */
+html,
+body {
+	height: 100%;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+#main {
+	flex: 1 1 auto;
+	min-height: 0;
+}
+
+.cms-admin {
+	min-height: 0;
+}
+
+/* The split component only caps its height with max-height, so give it a definite one. */
+.cms-admin .horizontalsplit-container {
+	height: 100%;
+}
+
+.cms-admin .horizontalsplitted {
+	min-width: 0;
+	overscroll-behavior: contain;
+}
+
+.cms-admin-main {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.cms-admin-tab-content {
+	min-height: 0;
+}
+
+/* Anchor for the overlay that blocks the view during a content switch. */
+.cms-admin {
+	position: relative;
+}
+
+.cms-admin-overlay {
+	position: absolute;
+	inset: 0;
+	z-index: 1050;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(255, 255, 255, 0.6);
+	cursor: wait;
+}
+
+/* content locker to groups get a gold padlock - resembles legacy cms */
+.cms-tree-lock {
+	color: #f0c000;
+	text-shadow: 0 0 1px #8a6000;
+}
+
+/* A frame swallows the mouse events that reach it, so dragging the split handle over the
+   preview ends the drag. Both frames go through for the length of the drag, so the events
+   reach the page underneath. Only a drag sets this class, so the preview stays clickable
+   the rest of the time. */
+.cms-preview-dragging iframe {
+	pointer-events: none;
+}
+
+/* The path down to a search hit, and the subtree under it. Both are context, so they step
+   back and let the hit itself carry the normal weight. */
+.cms-tree-ancestor {
+	font-size: 0.8em;
+	color: #6c757d;
+	line-height: 1.4;
+}
+
+/* The path is context and keeps the grey, but it leads somewhere, so it underlines on
+   hover like any other link. */
+.cms-tree-ancestor a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.cms-tree-ancestor a:hover,
+.cms-tree-ancestor a:focus {
+	color: var(--bs-link-color, #0d6efd);
+	text-decoration: underline;
+}
+
+.cms-tree-context > div > a,
+.cms-tree-context > div > span {
+	font-size: 0.85em;
+	color: #6c757d;
+}
