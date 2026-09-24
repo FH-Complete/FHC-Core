@@ -542,10 +542,10 @@ export default {
 
 		<template v-if="typeHeader==='mitarbeiter'">
 
-				<div class="foto-container col-md-2 d-flex justify-content-start align-items-center w-30 pb-3 gap-3 mt-3 position-relative" style="max-height: 8rem; max-width: 6rem; overflow: hidden;">
+				<div class="foto-container d-flex flex-column align-items-center h-100 position-relative d-inline-block">
 					<img
-					  class="d-block w-100 h-100 rounded"
-					  style="height: 84px; object-fit: contain;"
+					  class="d-block rounded"
+					  style="height: 96px;"
 					  alt="Profilbild"
 					  :src="getFotoSrc(headerDataMa.foto)"
 					/>
@@ -558,15 +558,13 @@ export default {
 					<template v-if="fotoEditable">
 						<button
 							type="button"
-							class="fotoedit btn btn-outline-dark btn-sm d-flex justify-content-center align-items-center position-absolute start-0"
-							style="z-index: 104; font-size: 1rem; width: 2.5rem; height: 2.5rem; opacity:0; transition: opacity 0.2s; top:13%;"
+							class="fotoedit buttonleft btn btn-outline-dark btn-sm d-flex justify-content-center align-items-center position-absolute start-0"
 							@click="showDeleteModal(person_id)">
 							<i class="fa fa-xmark"></i>
 						</button>
 						<button
 							type="button"
-							class="fotoedit btn btn-outline-dark btn-sm d-flex justify-content-center align-items-center position-absolute end-0"
-							style="z-index: 104; font-size: 1rem; width: 2.5rem; height: 2.5rem; opacity:0; transition: opacity 0.2s; top:13%;"
+							class="fotoedit buttonright btn btn-outline-dark btn-sm d-flex justify-content-center align-items-center position-absolute end-0"
 							@click="showModal(person_id)">
 							<i class="fa fa-pen"></i>
 						</button>
