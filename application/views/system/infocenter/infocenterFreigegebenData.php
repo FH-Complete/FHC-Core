@@ -8,6 +8,7 @@
 	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'Attempt to register with existing mailadress\', \'Access code sent\', \'Personal data saved\'';
 	$REJECTED_STATUS = '\'Abgewiesener\'';
 	$ADDITIONAL_STG = $this->config->item('infocenter_studiengang_kz');
+	$QUALIFIKATIONSKURS = $this->config->item('infocenter_qualifikationskurs_kz');
 	$STATUS_KURZBZ = '\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\'';
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
 	$ORG_NAME = '\'InfoCenter\'';
@@ -277,7 +278,26 @@ $query = '
 				WHERE konto.person_id = p.person_id
 					AND konto.studiensemester_kurzbz = '. $STUDIENSEMESTER .'
 					AND konto.buchungstyp_kurzbz = '. $KAUTION_DRITT_STAAT .'
-			) AS "Kaution"
+			) AS "Kaution",
+			(
+				SELECT 1
+				  FROM public.tbl_prestudentstatus pss
+				  JOIN public.tbl_prestudent ps USING(prestudent_id)
+				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
+				  JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+				  JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
+				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
+				   AND pss.bewerbung_abgeschicktamum IS NOT NULL
+				   AND ps.person_id = p.person_id
+				   AND sg.studiengang_kz in('.$QUALIFIKATIONSKURS.')
+				   AND NOT EXISTS (
+					   SELECT 1
+						 FROM tbl_prestudentstatus spss
+						WHERE spss.prestudent_id = ps.prestudent_id
+						  AND spss.status_kurzbz = '.$REJECTED_STATUS.'
+					)
+				 LIMIT 1
+			) AS "Qualikurs"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
 			SELECT tpl.person_id,
@@ -351,7 +371,8 @@ $query = '
 			'ZGV Nation MA',
 			'InfoCenter Mitarbeiter',
 			'Identitätsnachweis',
-			ucfirst($this->p->t('infocenter', 'kaution'))
+			ucfirst($this->p->t('infocenter', 'kaution')),
+			'Qualikurs'
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -480,6 +501,14 @@ $query = '
 				$datasetRaw->{'Kaution'} = 'Offen';
 			}
 
+			if ($datasetRaw->{'Qualikurs'} === null)
+			{
+				$datasetRaw->{'Qualikurs'} = 'Nein';
+			}
+			else
+			{
+				$datasetRaw->{'Qualikurs'} = 'Ja';
+			}
 			return $datasetRaw;
 		},
 		'markRow' => function($datasetRaw) {

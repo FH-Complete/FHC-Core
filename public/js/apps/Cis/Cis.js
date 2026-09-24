@@ -5,7 +5,7 @@ import contrast from '../../directives/contrast.js';
 import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers.js";
 import LvPlan from "../../components/Cis/LvPlan/Lehrveranstaltung.js";
 import MyLvPlan from "../../components/Cis/LvPlan/MyLvPlan.js";
-import Mylv from "../../components/Cis/Mylv/MyLv.js";
+import MylvStudent from "../../components/Cis/Mylv/Student.js";
 import Profil from "../../components/Cis/Profil/Profil.js";
 import Raumsuche from "../../components/Cis/Raumsuche/Raumsuche.js";
 import CmsNews from "../../components/Cis/Cms/News.js";
@@ -24,6 +24,7 @@ import Benotungstool from "../../components/Cis/Benotungstool/Benotungstool.js";
 import Zeitsperren from "../../components/Cis/Zeitsperren/Zeitsperren.js";
 import Compat from "../../components/Cis/Compat.js";
 import ZeitsperrenMa from "../../components/Cis/ZeitsperrenMitarbeiter/ZeitsperrenMa.js";
+import Compat from "../../components/Cis/Compat.js";
 
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
 import {capitalize} from "../../helpers/StringHelpers.js";
@@ -181,7 +182,7 @@ const router = VueRouter.createRouter({
 		{
 			path: `/Cis/MyLv/:studiensemester?`,
 			name: 'MyLv',
-			component: Mylv,
+			component: MylvStudent,
 			props: true,
 		},
 		{
@@ -327,8 +328,8 @@ const app = Vue.createApp({
 			if(target?.id == 'skiplink') return
 			if (target && this.isInternalRoute(target.href)) {
 				const url = new URL(target.href)
-
-				const path = url.pathname
+				
+				const path = url.pathname + url.search;
 				const base = this.$router.options.history.base
 				const route = path.replace(base, '') || '/'
 

@@ -251,6 +251,31 @@ if ($deleteSingleResult)
 			exit();
 		}
 
+		$qry = "SELECT * FROM testtool.tbl_pruefling_gebiet
+				WHERE pruefling_id=" . $db->db_add_param($pruefling->pruefling_id) . " AND gebiet_id=" . $db->db_add_param($_POST['gebiet_id']) . "";
+
+		if ($db->db_query($qry))
+		{
+			while ($row = $db->db_fetch_object())
+			{
+				$undo .= " INSERT INTO testtool.tbl_pruefling_gebiet(prueflinggebiet_id,pruefling_id,gebiet_id, insertamum) VALUES (" .
+					$db->db_add_param($row->prueflinggebiet_id, FHC_INTEGER) . ', ' .
+					$db->db_add_param($row->pruefling_id, FHC_INTEGER) . ', ' .
+					$db->db_add_param($row->gebiet_id, FHC_INTEGER) . ', ' .
+					$db->db_add_param($row->insertamum) . ');';
+			}
+		}
+		else
+		{
+			$db->db_query('ROLLBACK');
+			echo json_encode(array(
+				'status' => 'fehler',
+				'msg' => 'Fehler beim Erstellen des UNDO Befehls fuer testtool.tbl_pruefling_gebiet'
+			));
+			exit();
+		}
+
+
 		//Antworten loeschen
 		$qry = "DELETE FROM testtool.tbl_pruefling_frage where pruefling_id=" . $db->db_add_param($pruefling->pruefling_id, FHC_INTEGER) . " AND
 				frage_id IN (SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id=" . $db->db_add_param($_POST['gebiet_id']) . ");
@@ -258,7 +283,9 @@ if ($deleteSingleResult)
 				DELETE FROM testtool.tbl_antwort
 				WHERE pruefling_id=" . $db->db_add_param($pruefling->pruefling_id) . " AND
 				vorschlag_id IN (SELECT vorschlag_id FROM testtool.tbl_vorschlag WHERE frage_id IN
-				(SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id=" . $db->db_add_param($_POST['gebiet_id']) . "));";
+				(SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id=" . $db->db_add_param($_POST['gebiet_id']) . "));
+				
+				DELETE FROM testtool.tbl_pruefling_gebiet where pruefling_id=" . $db->db_add_param($pruefling->pruefling_id, FHC_INTEGER) . " AND gebiet_id=" . $db->db_add_param($_POST['gebiet_id']) . ";";
 
 		if ($result = $db->db_query($qry))
 		{
@@ -388,9 +415,35 @@ if ($deleteAllResults)
 			exit();
 		}
 
+		$qry = "SELECT * FROM testtool.tbl_pruefling_gebiet WHERE pruefling_id=" . $db->db_add_param($pruefling->pruefling_id, FHC_INTEGER) . ";
+				";
+
+		if ($db->db_query($qry))
+		{
+			while ($row = $db->db_fetch_object())
+			{
+				$undo .= " INSERT INTO testtool.tbl_pruefling_gebiet(prueflinggebiet_id,pruefling_id,gebiet_id,insertamum) VALUES (" .
+					$db->db_add_param($row->prueflinggebiet_id, FHC_INTEGER) . ', ' .
+					$db->db_add_param($row->pruefling_id, FHC_INTEGER) . ', ' .
+					$db->db_add_param($row->gebiet_id, FHC_INTEGER) . ', ' .
+					$db->db_add_param($row->insertamum) . ');';
+			}
+		}
+		else
+		{
+			$db->db_query('ROLLBACK');
+			echo json_encode(array(
+				'status' => 'fehler',
+				'msg' => 'Fehler beim Erstellen des UNDO Befehls fuer testtool.tbl_pruefling_gebiet'
+			));
+			exit();
+		}
+
+
 		//Antworten loeschen
 		$qry = "	DELETE FROM testtool.tbl_pruefling_frage where pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";
-					DELETE FROM testtool.tbl_antwort WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";";
+					DELETE FROM testtool.tbl_antwort where pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";
+					DELETE FROM testtool.tbl_pruefling_gebiet WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";";
 
 		if ($result = $db->db_query($qry))
 		{
@@ -528,8 +581,10 @@ if ($rtprueflingEntSperren)
 				while ($row = $db->db_fetch_object($result))
 					$pruefling_ids[] = $row->pruefling_id;
 
+				$art = filter_input(INPUT_POST, 'art', FILTER_VALIDATE_BOOLEAN);
+
 				$qry = "UPDATE testtool.tbl_pruefling
-						SET gesperrt =" . $db->db_add_param($_POST['art'], 'BOOLEAN') . "
+						SET gesperrt =" . $db->db_add_param($art, FHC_BOOLEAN) . "
 						WHERE pruefling_id IN (" . $db->db_implode4SQL($pruefling_ids) . ")";
 
 				$resultSperre = $db->db_query($qry);
@@ -537,7 +592,7 @@ if ($rtprueflingEntSperren)
 
 			if ($resultSperre)
 			{
-				$msg = $_POST['art'] === 'false' ? 'Pruefling wurde gesperrt' : 'Pruefling wurde freigeschaltet';
+				$msg = !$art ? 'Pruefling wurde gesperrt' : 'Pruefling wurde freigeschaltet';
 				echo json_encode(array(
 					'status' => 'ok',
 					'msg' => $msg));
@@ -645,12 +700,14 @@ if ($rtFreischalten)
 	if (isset($_POST['reihungstest_id']) &&	is_numeric($_POST['reihungstest_id'])
 		&& isset($_POST['art']))
 	{
-		$qry = "UPDATE public.tbl_reihungstest SET freigeschaltet=" . $db->db_add_param($_POST['art'], 'BOOLEAN') . "
+		$art = filter_input(INPUT_POST, 'art', FILTER_VALIDATE_BOOLEAN);
+
+		$qry = "UPDATE public.tbl_reihungstest SET freigeschaltet=" . $db->db_add_param($art, FHC_BOOLEAN) . "
 				WHERE reihungstest_id=" . $db->db_add_param($_POST['reihungstest_id']) . ";";
 
 		if ($result = $db->db_query($qry))
 		{
-			$msg = $_POST['art'] === 'false' ? 'Reihungstest wurde gesperrt' : 'Reihungstest wurde freigeschaltet';
+			$msg = !$art ? 'Reihungstest wurde gesperrt' : 'Reihungstest wurde freigeschaltet';
 			echo json_encode(array(
 				'status' => 'ok',
 				'msg' => $msg));
@@ -993,6 +1050,7 @@ if ($punkteUebertragen)
 					{
 						$setRTPunkte->new = false;
 						$setRTPunkte->punkte = $rtpunkte;
+						$setRTPunkte->teilgenommen = true;
 						$setRTPunkte->updateamum = date('Y-m-d H:i:s');
 						$setRTPunkte->updatevon = $user;
 
