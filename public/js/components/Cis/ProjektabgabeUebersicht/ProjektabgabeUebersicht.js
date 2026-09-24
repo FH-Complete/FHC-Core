@@ -240,10 +240,10 @@ export const ProjektabgabeUebersicht =  {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/api/frontend/v1/education/PaabgabeUebersicht/downloadZip';
 		}
 	},
-	async created() {
-		await this.getViewData();
+	created() {
 		this.phrasenPromise = this.$p.loadCategory(['abgabetool', 'global', 'person', 'ui']);
 		this.phrasenPromise.then(()=> {this.phrasenResolved = true});
+		this.getViewData();
 	},
 	mounted() {
 		this.setupMounted();

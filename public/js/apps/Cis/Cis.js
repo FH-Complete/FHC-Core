@@ -22,7 +22,6 @@ import OtherLvPlan from "../../components/Cis/LvPlan/OtherLvPlan.js";
 import PaabgabeUebersicht from "../../components/Cis/ProjektabgabeUebersicht/ProjektabgabeUebersicht.js";
 import Benotungstool from "../../components/Cis/Benotungstool/Benotungstool.js";
 import Zeitsperren from "../../components/Cis/Zeitsperren/Zeitsperren.js";
-import Compat from "../../components/Cis/Compat.js";
 import ZeitsperrenMa from "../../components/Cis/ZeitsperrenMitarbeiter/ZeitsperrenMa.js";
 import Compat from "../../components/Cis/Compat.js";
 

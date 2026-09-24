@@ -62651,7 +62651,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
 	// ### Infocenter Onboarding END
 	//****************************	 CIS Projektabgabeuebersicht start
 	array(
