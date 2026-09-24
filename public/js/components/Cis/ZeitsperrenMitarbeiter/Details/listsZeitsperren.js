@@ -541,7 +541,7 @@ export default {
 			<table v-if="showTable" class="table table-striped table-bordered">
 				<thead>
 					<tr>
-						<th class="zeitsperrenma-name-header" scope="col"> UID </th>
+						<th class="zeitsperrenma-name-header" scope="col"> {{$p.t("global/name")}} </th>
 						<th v-for="day in days" :key="day.date">
 							<div>{{ day.weekday }}</div>
 							<div>{{ day.day }}</div>
