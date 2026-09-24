@@ -44,6 +44,7 @@ export default {
 			type: Array,
 			default: [],
 		},
+		collapsed: Boolean,
 	},
 	computed: {
 		visibleStart() {
@@ -144,7 +145,8 @@ export default {
 		:data-visible-start="visibleStart.toISO()"
 		:data-visible-end="visibleEnd.toISO()"
 		:class="{
-			'fhc-calendar-base-grid-line-sunday': $props.date.weekday === 7
+			'fhc-calendar-base-grid-line-sunday': $props.date.weekday === 7,
+			'fhc-calendar-base-grid-line-collapsed': collapsed,
 		}"
 		style="position:relative;display:grid;grid-auto-flow:dense"
 		:style="'grid-template-' + axisRow + 's:subgrid'"

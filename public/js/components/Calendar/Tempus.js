@@ -5,7 +5,7 @@ import { useEventLoader } from '../../composables/Tempus/TempusEventLoader.js';
 import ModeWeek from './Mode/Week.js';
 import ModeMonth from './Mode/Month.js';
 import ModeTable from './Mode/Table.js';
-import ModeRange from './Mode/Range.js';
+import ModeMultipleWeeks from './Mode/MultipleWeeks.js';
 import ApiKalender from '../../api/factory/tempus/kalender.js';
 import draggable from '../../directives/draggable.js';
 import ApiStudiensemester from '../../api/factory/studiensemester.js';
@@ -83,7 +83,7 @@ export default {
 		},
 		modes: {
 			type: Array,
-			default: () => ['week', 'month', 'tableList', 'range'],
+			default: () => ['week', 'month', 'tableList', 'multipleWeeks'],
 		},
 		getPromiseFunc: {
 			type: Function,
@@ -159,7 +159,7 @@ export default {
 				week: Vue.markRaw(ModeWeek),
 				month: Vue.markRaw(ModeMonth),
 				tableList: Vue.markRaw(ModeTable),
-				range: Vue.markRaw(ModeRange),
+				multipleWeeks: Vue.markRaw(ModeMultipleWeeks),
 			},
 			modeOptions: {
 				day: {
@@ -216,9 +216,7 @@ export default {
 					end: now.startOf('day')
 				}];
 			}
-			else if (this.mode == 'Range') {
-				return [];
-			} else
+			else
 			{
 				past = [{
 					class: 'background-past',
@@ -234,7 +232,7 @@ export default {
 
 			if (
 				this.isRangeVirtualScrollEnabled
-				&& this.currentMode === 'range'
+				&& this.currentMode === 'multipleWeeks'
 				&& Array.isArray(this.visibleDates)
 			)
 			{
@@ -304,9 +302,12 @@ export default {
 			}
 			this.$emit('update:range', rangeInterval);
 		},
+		updateVisibleDates(visibleDates) {
+			this.visibleDates = visibleDates;
+		},
 		handleDateRange({ start, end }) {
 			this.rangeInterval = luxon.Interval.fromDateTimes(start.startOf('day'), end.endOf('day'));
-			this.reset();
+			this.reset(false, true);
 			this.$emit('update:range', this.rangeInterval);
 			this.$emit('update:date-range', { start, end });
 		},
@@ -322,8 +323,15 @@ export default {
 		onresize(payload) {
 			this.$emit('resize', payload);
 		},
-		resetEventLoader(arePreviousEventsCleared = true) {
-			this.reset(arePreviousEventsCleared);
+		resetEventLoader(arePreviousEventsCleared = true, isLoaderEventVisualReset = true) {
+			this.reset(arePreviousEventsCleared, isLoaderEventVisualReset);
+			if (arguments.length === 0) {
+				this.$nextTick(() => {
+					const view = this.$refs.calendar?.$refs.mode?.$refs.view;
+					view?.resetColumnWidthsForEventReload?.();
+					view?.resetGridHeightsForEventReload?.();
+				});
+			}
 		},
 		reloadEvents() {
 			this.refreshEventsAfterReload = true;
@@ -416,7 +424,7 @@ export default {
 	template: /* html */ `
 	<fhc-calendar
 		ref="calendar"
-		class="fhc-calendar-lvplan"
+		class="fhc-calendar-tempus"
 		:date="date"
 		:modes="availableModes"
 		:mode-options="modeOptions"
@@ -431,12 +439,12 @@ export default {
 		show-btns
 		:draggable-events="isEventDraggingEnabled"
 		:resizable-events="isEventResizingEnabled"
-		:on-drop="isEventDraggingEnabled && ['week', 'range'].includes(currentMode) ? ondrop : null"
+		:on-drop="isEventDraggingEnabled && ['week', 'multipleWeeks'].includes(currentMode) ? ondrop : null"
 		:on-resize="isEventResizingEnabled ? onresize : null"
 		@update:date="handleDateUpdate"
 		@update:mode="(newMode, newDate) => { currentMode = newMode; $emit('update:mode', newMode, newDate) }"
 		@update:range="updateRange"
-		@update:visible-dates="visibleDates = $event"
+		@update:visible-dates="updateVisibleDates"
 		@update:date-range="handleDateRange"
 	>
 		<template v-slot="{ event, mode }">

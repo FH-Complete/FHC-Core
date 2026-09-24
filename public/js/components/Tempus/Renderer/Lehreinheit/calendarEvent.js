@@ -155,28 +155,18 @@ export default {
 		@wheel.stop
 	>
 		<div
-			:class="mode === 'range'
-				? 'position-absolute top-0 end-0 m-1'
-				: 'position-absolute bottom-0 start-0 m-1'"
-		>
-			{{event.verplante_stunden}}
-		</div>
-		<div
 			v-if="!event.allDayEvent && event?.beginn && event?.ende"
-			class="event-time d-none d-xl-grid h-100"
+			class="event-time d-grid h-100"
 		>
 			<span>{{ start }}</span>
 			<span>{{ end }}</span>
 		</div>
 		<div class="event-text" v-tooltip="tooltipString">
 			<div
-				:class="{ 'd-flex align-items-center gap-2': mode === 'range' }"
-				:style="mode === 'range' ? null : { display: 'contents' }"
-			>
+ 			>
 				<span class="event-topic">{{ topicString }}</span>
 				<div
-					class="d-flex gap-1"
-					:class="{ 'position-absolute top-0 start-0 m-1': mode !== 'range' }"
+					class="d-flex gap-1 position-absolute top-0 start-0 m-1"
 				>
 					<i :class="statusIcon"></i>
 					<i

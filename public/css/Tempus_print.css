@@ -30,9 +30,10 @@ header,
 .tempus .horizontalsplit-container > .horizontalsplitted:first-child,
 .tempus .horizontalsplitter,
 .fhc-calendar-base-header,
-.fhc-calendar-mode-range .grid-allday,
-.fhc-calendar-mode-range #rangePresetSelector,
+.fhc-calendar-mode-week .grid-allday,
+.fhc-calendar-mode-week #rangePresetSelector,
 .fhc-calendar-base-grid-dropzone,
+.fhc-calendar-base-grid .main-header .form-check,
 .fhc-calendar-base-grid-line-background {
 	display: none !important;
 }
@@ -56,52 +57,106 @@ header,
 	flex: 0 0 100% !important;
 }
 
-.fhc-calendar-mode-range .main-header-sunday,
-.fhc-calendar-mode-range .fhc-calendar-base-grid-line-sunday {
-	border-bottom-width: 0 !important;
+.fhc-calendar-mode-week,
+.fhc-calendar-mode-week > .flex-grow-1,
+.fhc-calendar-mode-week .fhc-calendar-base-slider {
+	width: 100% !important;
+	max-width: 100% !important;
+	min-width: 0 !important;
 }
 
-.fhc-calendar-base-grid-line-sunday,
-.fhc-calendar-mode-range .main-header-sunday {
+.fhc-calendar-mode-week .fhc-calendar-mode-week-view,
+.fhc-calendar-mode-week .fhc-calendar-mode-week-view > div {
+	width: 100% !important;
+	height: auto !important;
+	min-width: 0 !important;
+	overflow: visible !important;
+}
+
+.fhc-calendar-mode-week .fhc-calendar-mode-week-view > div {
+	width: var(--fhc-calendar-print-layout-width, max-content) !important;
+	zoom: var(--fhc-calendar-print-scale, 1) !important;
+}
+
+.fhc-calendar-print-measure {
+	position: fixed !important;
+	visibility: hidden !important;
+	width: 100vw !important;
+	height: 0 !important;
+	pointer-events: none !important;
+}
+
+.fhc-calendar-mode-week .fhc-calendar-mode-week-view > div {
 	break-after: page !important;
+	page-break-after: always !important;
+	break-inside: avoid-page !important;
+	page-break-inside: avoid !important;
 }
 
-.fhc-calendar-mode-range .fhc-calendar-base-grid {
-	grid-template-rows: auto repeat(var(--fhc-grid-displayed-axis-main-count), auto) !important;
-	gap: 0px !important;
+.fhc-calendar-mode-week .fhc-calendar-base-grid {
+	width: 100% !important;
+	grid-template-rows: auto minmax(0, 1fr) !important;
+	gap: 1px !important;
+	background-color: #b8b8b8 !important;
 }
 
-.fhc-calendar-mode-range .fhc-calendar-base-grid * {
-	gap: 0px !important;
+.fhc-calendar-mode-week .fhc-calendar-base-grid .grid-header,
+.fhc-calendar-mode-week .fhc-calendar-base-grid .grid-main,
+.fhc-calendar-mode-week .fhc-calendar-base-grid .grid-body {
+	gap: 1px !important;
+	background-color: #b8b8b8 !important;
 }
 
-.fhc-calendar-mode-range .main-header:not(.main-header-empty),
-.fhc-calendar-mode-range .fhc-calendar-base-grid-line {
-	border-top: solid 1px black !important;
+.fhc-calendar-mode-week .fhc-calendar-base-grid > #grid-main-scrollable {
+	border-top: solid 1px #b8b8b8 !important;
+	grid-row: 2 !important;
+	height: 100% !important;
+	min-height: 0 !important;
 }
 
-.fhc-calendar-mode-range .main-header:not(.main-header-empty) {
+.fhc-calendar-mode-week .fhc-calendar-base-grid .grid-main,
+.fhc-calendar-mode-week .fhc-calendar-base-grid .grid-body {
+	height: 100% !important;
+	min-height: 0 !important;
+	align-self: stretch !important;
+}
+
+.fhc-calendar-mode-week .fhc-calendar-base-grid .grid-header:before,
+.fhc-calendar-mode-week .fhc-calendar-base-grid .main-header,
+.fhc-calendar-mode-week .fhc-calendar-base-grid .part-header,
+.fhc-calendar-mode-week .fhc-calendar-base-grid .part-body {
+	background-color: white !important;
+	border: 0 !important;
+}
+
+.fhc-calendar-mode-week .fhc-calendar-base-grid .grid-header:before {
+	grid-column: 1 !important;
+	grid-row: 1 !important;
+}
+
+.fhc-calendar-mode-week .main-header:not(.main-header-empty) {
 	padding-top: .25rem !important;
 }
 
-.fhc-calendar-mode-range .fhc-calendar-base-grid-line {
-	grid-auto-rows: max-content !important;
-	overflow: hidden !important;
+.fhc-calendar-mode-week .fhc-calendar-base-grid-line {
+	background-color: transparent !important;
+	border: 0 !important;
+	overflow: visible !important;
 }
 
-.fhc-calendar-mode-range .fhc-calendar-base-grid-line-event {
+.fhc-calendar-mode-week .fhc-calendar-base-grid-line-event {
 	break-inside: avoid !important;
 	margin: 1px !important;
 	page-break-inside: avoid !important;
 	z-index: auto !important;
 }
 
-.fhc-calendar-mode-range .fhc-calendar-base-grid-line-event > .rangePageContainer {
+.fhc-calendar-mode-week .fhc-calendar-base-grid-line-event > .weekPageContainer {
 	background-color: var(--event-bg, var(--event-default-bg)) !important;
 	break-inside: avoid !important;
 	page-break-inside: avoid !important;
 }
 
-.fhc-calendar-mode-range .fhc-calendar-base-grid-line-event > .rangePageContainer * {
+.fhc-calendar-mode-week .fhc-calendar-base-grid-line-event > .weekPageContainer * {
 	background-color: transparent !important;
 }

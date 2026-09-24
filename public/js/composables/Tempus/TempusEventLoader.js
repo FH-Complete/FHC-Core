@@ -36,7 +36,7 @@ export function useEventLoader(
       : PLAN_REQUEST_INTERVAL_DAYS;
   };
 
-  const reload = (isCacheEnabled = true) => {
+  const reload = (isCacheEnabled = true, isLoaderEventVisualReset = true) => {
     if (
       currentlyDisplayedDateRange &&
       currentlyDisplayedDateRange?.start?.ts ===
@@ -56,7 +56,6 @@ export function useEventLoader(
       return;
 
     if (!(currentlyDisplayedDateRange instanceof luxon.Interval)) return;
-
     if (
       cachedEventsStartTimestamp === currentlyDisplayedDateRange.start.ts &&
       cachedEventsEndTimestamp === currentlyDisplayedDateRange.end.ts &&
@@ -68,7 +67,8 @@ export function useEventLoader(
     const promises = requestEvents(
       currentlyDisplayedDateRange.start.ts,
       currentlyDisplayedDateRange.end.ts,
-      isCacheEnabled
+      isCacheEnabled,
+	  isLoaderEventVisualReset
     );
 
     ensureCacheRangeIsInAllowedRange(
@@ -83,7 +83,6 @@ export function useEventLoader(
 
       return;
     }
-	hasFirstLoadOccurred = false;
     
 	addVisualForEventsLoading();
 
@@ -208,15 +207,15 @@ export function useEventLoader(
 
   Vue.watchEffect(reload);
 
-  const reset = (arePreviousEventsCleared = true) => {
-	if (arePreviousEventsCleared) {
+  const reset = (arePreviousEventsCleared = true, isLoaderEventVisualReset = true) => {
+ 	if (arePreviousEventsCleared) {
 		allEvents.value = [];
-		hasFirstLoadOccurred = false;
 	}
-    reload(false);
+	console.log('reset', arePreviousEventsCleared, isLoaderEventVisualReset);
+    reload(false, isLoaderEventVisualReset);
   };
 
-  const requestEvents = (startTimestamp, endTimestamp, isCacheEnabled = true) => {
+  const requestEvents = (startTimestamp, endTimestamp, isCacheEnabled = true, isLoaderEventVisualReset = false) => {
     let result = [];
 
     if (!startTimestamp || !endTimestamp) return result;
@@ -263,6 +262,9 @@ export function useEventLoader(
     }
 
     const cachePadding = getCachePadding();
+	if (isLoaderEventVisualReset) {
+		hasFirstLoadOccurred = false;
+	}
 
     allowedCacheStartTimestamp = startTimestamp - cachePadding;
     allowedCacheEndTimestamp = endTimestamp + cachePadding;
@@ -304,7 +306,7 @@ export function useEventLoader(
   const addVisualForEventsLoading = (startTimestamp, endTimestamp) => {
 	if (hasFirstLoadOccurred) return;
 
-    allEvents.value.push({
+	allEvents.value.push({
       loading_id: 1,
       type: "loading",
       isostart: getISODateFromTimestamp(currentlyDisplayedDateRange.start.ts),

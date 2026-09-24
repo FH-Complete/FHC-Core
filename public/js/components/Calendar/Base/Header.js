@@ -26,7 +26,7 @@ export default {
 		btnDay: Boolean,
 		btnList: Boolean,
 		btnTableList: Boolean,
-		btnRange: Boolean,
+		btnMultipleWeeks: Boolean,
 	},
 	emits: [
 		"next",
@@ -58,11 +58,11 @@ export default {
 			<div class="header-modes">
 				<div class="d-flex gap-1 justify-content-end" role="group">
 					<button
-						v-if="btnRange"
+						v-if="btnMultipleWeeks"
 						type="button"
 						class="btn btn-outline-secondary"
-						:class="{active: mode === 'range'}"
-						@click="clickMode($event, 'range')"
+						:class="{active: mode === 'multipleWeeks'}"
+						@click="clickMode($event, 'multipleWeeks')"
 					>
 						<i class="fa fa-calendar"></i>
 					</button>
@@ -118,7 +118,7 @@ export default {
 		<div class="header-picker">
 			<div class="btn-group" role="group">
 				<button
-					v-if="$props.mode !== 'range' && $props.mode !== 'tableList'"
+					v-if="$props.mode !== 'multipleWeeks' && $props.mode !== 'tableList'"
 					@click="$emit('prev')"
 					:disabled="open"
 					class="btn btn-outline-secondary border-0"
@@ -135,7 +135,7 @@ export default {
 					:list-length="modeOptions.length"
 				/>
 				<button
-					v-if="$props.mode !== 'range' && $props.mode !== 'tableList'"
+					v-if="$props.mode !== 'multipleWeeks' && $props.mode !== 'tableList'"
 					@click="$emit('next')"
 					:disabled="open"
 					class="btn btn-outline-secondary border-0"

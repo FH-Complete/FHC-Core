@@ -158,7 +158,7 @@ export default {
 		data-cy="calendar-event"
 	>
 		<div
-			v-if="resizable & event?.type !== 'loading' && mode !== 'range'"
+			v-if="resizable & event?.type !== 'loading'"
 			class="fhc-resize-bar fhc-resize-bar--top"
 			@pointerdown.prevent.stop="onResizeStart('start', $event)"
 			@click.stop
@@ -169,28 +169,12 @@ export default {
 			{{ event.orig }}
 		</slot>
 		<div
-			v-if="resizable & event?.type !== 'loading' && mode !== 'range'"
+			v-if="resizable & event?.type !== 'loading'"
 			class="fhc-resize-bar fhc-resize-bar--bottom"
 			@pointerdown.prevent.stop="onResizeStart('end', $event)"
 			@click.stop
 		>
 			<i class="fa-solid fa-grip-lines text-muted"></i>
-		</div>
-		<div
-			v-if="resizable & event?.type !== 'loading' && mode === 'range'"
-			class="fhc-resize-bar fhc-resize-bar--left"
-			@pointerdown.prevent.stop="onResizeStart('start', $event)"
-			@click.stop
-		>
-			<i class="fa-solid fa-grip-lines-vertical text-muted"></i>
-		</div>
-		<div
-			v-if="resizable & event?.type !== 'loading' && mode === 'range'"
-			class="fhc-resize-bar fhc-resize-bar--right"
-			@pointerdown.prevent.stop="onResizeStart('end', $event)"
-			@click.stop
-		>
-			<i class="fa-solid fa-grip-lines-vertical text-muted"></i>
 		</div>
 
 		<teleport to="body">

@@ -197,7 +197,6 @@ export function useResizeHandler() {
 			activeResize.eventEl.style.opacity = activeResize.originalOpacity ?? '';
 
 		const result = calculateNewTimes(activeResize, ghost.getPosition());
-
 		ghost.remove();
 
 		if (result)
@@ -212,10 +211,11 @@ export function useResizeHandler() {
 			}
 		}
 
+		activeResize.onFinish?.();
 		activeResize = null;
 	}
 
-	function startResize(edge, evt, { el, gridEl, event, horizontal = false, timeGrid, onEnd })
+	function startResize(edge, evt, { el, gridEl, event, horizontal = false, timeGrid, onEnd, onFinish })
 	{
 		const { startTop, startHeight, startLeft, startWidth } = ghost.create(gridEl, el, edge);
 
@@ -228,6 +228,7 @@ export function useResizeHandler() {
 			horizontal,
 			timeGrid,
 			onEnd,
+			onFinish,
 			dragStartY: (evt.clientY - gridEl.getBoundingClientRect().top) + gridEl.scrollTop,
 			dragStartX: (evt.clientX - gridEl.getBoundingClientRect().left) + gridEl.scrollLeft,
 			startTop,
@@ -253,6 +254,7 @@ export function useResizeHandler() {
 		window.removeEventListener('pointermove', onPointerMove);
 		window.removeEventListener('pointerup', onPointerUp);
 		ghost.remove();
+		activeResize.onFinish?.();
 		activeResize = null;
 	}
 

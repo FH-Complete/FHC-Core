@@ -47,6 +47,8 @@ export default {
 					return [this.convertedDate.startOf('day').ts, this.convertedDate.startOf('day').plus({ days: this.listLength }).ts - 1];
 				case "range":
 					return [this.convertedDate.startOf('day').ts, this.convertedDate.startOf('day').plus({ days: this.rangeLength }).ts - 1];
+				case "multipleWeeks":
+					return [this.convertedDate.startOf('day').ts, this.convertedDate.startOf('day').plus({ days: this.rangeLength }).ts - 1];	
 				case "week":
 					return [this.convertedDate.startOf('week', { useLocaleWeeks: true }).ts, this.convertedDate.endOf('week', { useLocaleWeeks: true }).ts];
 				case "tableList":
@@ -72,6 +74,8 @@ export default {
 					return this.date.toLocaleString(luxon.DateTime.DATE_FULL) + '-' + this.date.plus({ days: this.listLength - 1 }).toLocaleString(luxon.DateTime.DATE_FULL);
 				case "range":
 					return this.date.toLocaleString(luxon.DateTime.DATE_FULL) + '-' + this.date.plus({ days: this.rangeLength - 1 }).toLocaleString(luxon.DateTime.DATE_FULL);
+				case "multipleWeeks":
+					return this.date.toLocaleString(luxon.DateTime.DATE_FULL) + '-' + this.date.plus({ days: this.rangeLength - 1 }).toLocaleString(luxon.DateTime.DATE_FULL);	
 				case "day":
 					return this.date.toLocaleString(luxon.DateTime.DATE_FULL);
 				default:
@@ -84,7 +88,7 @@ export default {
 		rangeConfig() {
 			if (this.$props.mode === "list") {
 				return { autoRange: this.listLength - 1 };
-			} else if (["range", "tableList"].includes(this.$props.mode)) {
+			} else if (["range", "tableList", "multipleWeeks"].includes(this.$props.mode)) {
 				return true;
 			} else {
 				return false;
@@ -94,7 +98,9 @@ export default {
 	methods: {
 		update(value) {
 			let date;
+			let endDate;
 			let rangeLength;
+			
 			switch (this.mode) {
 				case "month":
 					value.month++;
@@ -115,7 +121,12 @@ export default {
 					return;
 				case "range":
 					date = luxon.DateTime.fromJSDate(value[0]).setZone(this.timezone, { keepLocalTime: true }).setLocale(this.locale);
-					let endDate = luxon.DateTime.fromJSDate(value[1]).setZone(this.timezone, { keepLocalTime: true }).setLocale(this.locale);
+					endDate = luxon.DateTime.fromJSDate(value[1]).setZone(this.timezone, { keepLocalTime: true }).setLocale(this.locale);
+					rangeLength = Math.floor(endDate.diff(date, "days").toObject().days) + 1;
+					break;
+				case "multipleWeeks":
+					date = luxon.DateTime.fromJSDate(value[0]).setZone(this.timezone, { keepLocalTime: true }).setLocale(this.locale);
+					endDate = luxon.DateTime.fromJSDate(value[1]).setZone(this.timezone, { keepLocalTime: true }).setLocale(this.locale);
 					rangeLength = Math.floor(endDate.diff(date, "days").toObject().days) + 1;
 					break;
 				case "day":

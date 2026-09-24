@@ -79,6 +79,7 @@ export default {
 			renderers: Vue.computed(() => this.renderers),
 			appConfig: Vue.computed(() => this.appconfig),
 			canToggleGrid: this.permissions.stundenraster,
+			isHeaderSticky: false
 		};
 	},
 	data() {
@@ -86,7 +87,7 @@ export default {
 
 		return {
 			appconfig: {},
-			currentMode: 'range',
+			currentMode: 'multipleWeeks',
 			configEndpoints: ApiTempusConfig,
 			hoveredEvent: null,
 			renderers: {},
@@ -254,7 +255,10 @@ export default {
 				.then(() => {
 					if (onSuccess) {
 						onSuccess();
-						this.$refs.calendar.$refs.calendar.$refs.mode.$refs.view.$refs.grid.disableAutoScroll();
+						this.$refs.calendar.$refs.calendar.$refs.mode.$refs.view.$refs.grid?.disableAutoScroll();
+						this.$refs.calendar.$refs.calendar.$refs.mode.$refs.view.$refs.grids?.forEach(grid => {
+							grid.disableAutoScroll();
+						});
 						this.currentlyUpdatedEvent = obj.orig;
 					}
 				})
@@ -499,13 +503,9 @@ export default {
 					targetGridLine.insertBefore(element, null);
 					element.classList.add('tempus-temporary-calendar-event');
 				}
-				if (this.currentMode === 'range') {
-					element.style.gridColumnStart = 't_' + newPotentialStart;
-					element.style.gridColumnEnd = 't_' + newPotentialEnd;
-				} else {
-					element.style.gridRowStart = 't_' + newPotentialStart;
-					element.style.gridRowEnd = 't_' + newPotentialEnd;
-				}
+
+				element.style.gridRowStart = 't_' + newPotentialStart;
+				element.style.gridRowEnd = 't_' + newPotentialEnd;
 
 				element.scrollIntoView({
 					behavior: 'smooth',
@@ -641,7 +641,7 @@ export default {
 			:date="calendarDate"
 			:range="urlRange"
 			:mode="currentMode"
-			:modes="['range']"
+			:modes="['multipleWeeks']"
 			:parkedEvents="parkedKeys"
 			:visible-lecturers="visibleLecturerUids"
 			:show-events="showEvents"

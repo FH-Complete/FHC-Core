@@ -22,9 +22,7 @@ export default {
 			promiseResolve: null,
 			intersectionObserver: null,
 			mutationObserver: null,
-			gridLineResizeObserver: null,
-			visibleGridLines: Vue.markRaw(new Set()),
-			gridLineHeights: Vue.markRaw(new Map()),
+			visibleGrids: Vue.markRaw(new Set()),
 			visibilityUpdateScheduled: false,
 			lastVisibleDatesKey: null
 		}
@@ -76,26 +74,16 @@ export default {
 			if (!this.onVisibleDatesChanged || typeof IntersectionObserver === 'undefined')
 				return;
 
-			// if (
-			// 	this.$el.closest('.fhc-calendar-mode-range')
-			// 	&& typeof ResizeObserver !== 'undefined'
-			// )
-			// {
-			// 	this.gridLineResizeObserver = Vue.markRaw(new ResizeObserver(entries => {
-			// 		entries.forEach(entry => this.preserveGridLineHeight(entry.target));
-			// 	}));
-			// }
-
 			this.intersectionObserver = Vue.markRaw(new IntersectionObserver(entries => {
 				let changed = false;
 
 				entries.forEach(entry => {
 					if (entry.isIntersecting && entry.intersectionRatio > 0) {
-						if (!this.visibleGridLines.has(entry.target)) {
-							this.visibleGridLines.add(entry.target);
+						if (!this.visibleGrids.has(entry.target)) {
+							this.visibleGrids.add(entry.target);
 							changed = true;
 						}
-					} else if (this.visibleGridLines.delete(entry.target)) {
+					} else if (this.visibleGrids.delete(entry.target)) {
 						changed = true;
 					}
 				});
@@ -112,29 +100,32 @@ export default {
 
 				mutations.forEach(mutation => {
 					if (mutation.type === 'attributes') {
-						// this.applyPreservedGridLineHeight(mutation.target);
-						// this.gridLineResizeObserver?.observe(mutation.target);
-						if (this.visibleGridLines.has(mutation.target))
+						if (this.visibleGrids.has(this.getContainingGrid(mutation.target)))
 							changed = true;
 						return;
 					}
 
-					mutation.addedNodes.forEach(node => this.observeGridLines(node));
+					mutation.addedNodes.forEach(node => this.observeGrids(node));
 					mutation.removedNodes.forEach(node => {
-						this.getGridLines(node).forEach(line => {
-							this.intersectionObserver.unobserve(line);
-							// this.gridLineResizeObserver?.unobserve(line);
-							if (this.visibleGridLines.delete(line))
+						this.getGrids(node).forEach(grid => {
+							this.intersectionObserver.unobserve(grid);
+							if (this.visibleGrids.delete(grid))
 								changed = true;
 						});
 					});
+
+					if (this.visibleGrids.has(this.getContainingGrid(mutation.target)))
+						changed = true;
 				});
 
 				if (changed)
+				{
+					console.log('scheduleVisibleDatesUpdate');
 					this.scheduleVisibleDatesUpdate();
+				}
 			}));
 
-			this.observeGridLines(this.$el);
+			this.observeGrids(this.$el);
 			this.mutationObserver.observe(this.$el, {
 				subtree: true,
 				childList: true,
@@ -142,50 +133,25 @@ export default {
 				attributeFilter: ['data-visible-start', 'data-visible-end']
 			});
 		},
-		getGridLines(node) {
+		getGrids(node) {
 			if (!(node instanceof Element))
 				return [];
 
-			const lines = node.matches('.fhc-calendar-base-grid-line') ? [node] : [];
-			return lines.concat([...node.querySelectorAll('.fhc-calendar-base-grid-line')]);
+			const grids = node.matches('.fhc-calendar-base-grid') ? [node] : [];
+			return grids.concat([...node.querySelectorAll('.fhc-calendar-base-grid')]);
 		},
-		observeGridLines(node) {
-			this.getGridLines(node).forEach(line => {
-				this.applyPreservedGridLineHeight(line);
-				this.intersectionObserver.observe(line);
-				this.gridLineResizeObserver?.observe(line);
+		observeGrids(node) {
+			this.getGrids(node).forEach(grid => {
+				this.intersectionObserver.observe(grid);
 			});
 		},
-		getGridLineKey(line) {
-			return;
-			const start = line.dataset.visibleStart;
-			const end = line.dataset.visibleEnd;
+		getContainingGrid(node) {
+			if (!(node instanceof Element))
+				return null;
 
-			return start && end ? start + '/' + end : null;
-		},
-		applyPreservedGridLineHeight(line) {
-			return;
-			if (!this.gridLineResizeObserver)
-				return;
-
-			const key = this.getGridLineKey(line);
-			const height = key ? this.gridLineHeights.get(key) : null;
-			line.style.minHeight = height ? height + 'px' : '';
-		},
-		preserveGridLineHeight(line) {
-			return;
-			const key = this.getGridLineKey(line);
-			if (!key)
-				return;
-
-			const height = Math.ceil(line.getBoundingClientRect().height);
-			const preservedHeight = this.gridLineHeights.get(key) || 0;
-			if (height > preservedHeight)
-				this.gridLineHeights.set(key, height);
-
-			const minHeight = Math.max(height, preservedHeight);
-			if (minHeight && line.style.minHeight !== minHeight + 'px')
-				line.style.minHeight = minHeight + 'px';
+			return node.matches('.fhc-calendar-base-grid')
+				? node
+				: node.closest('.fhc-calendar-base-grid');
 		},
 		scheduleVisibleDatesUpdate() {
 			if (this.visibilityUpdateScheduled)
@@ -200,14 +166,10 @@ export default {
 		emitVisibleDates() {
 			const datesByKey = new Map();
 
-			this.visibleGridLines.forEach(line => {
-				if (!line.isConnected)
-					return;
-
-				const start = line.dataset.visibleStart;
-				const end = line.dataset.visibleEnd;
-				if (start && end)
-					datesByKey.set(start + '/' + end, { start, end });
+			this.visibleGrids.forEach(grid => {
+				const dates = this.getGridVisibleDates(grid);
+				if (dates)
+					datesByKey.set(dates.start + '/' + dates.end, dates);
 			});
 
 			const dates = [...datesByKey.values()]
@@ -223,15 +185,32 @@ export default {
 			this.lastVisibleDatesKey = key;
 			this.onVisibleDatesChanged(dates);
 		},
+		getGridVisibleDates(grid) {
+			if (!grid.isConnected)
+				return null;
+
+			let start = null;
+			let end = null;
+			grid.querySelectorAll('.fhc-calendar-base-grid-line').forEach(line => {
+				const lineStart = line.dataset.visibleStart;
+				const lineEnd = line.dataset.visibleEnd;
+				if (!lineStart || !lineEnd)
+					return;
+
+				if (!start || lineStart.localeCompare(start) < 0)
+					start = lineStart;
+				if (!end || lineEnd.localeCompare(end) > 0)
+					end = lineEnd;
+			});
+
+			return start && end ? { start, end } : null;
+		},
 		stopVisibilityTracking() {
 			this.intersectionObserver?.disconnect();
 			this.mutationObserver?.disconnect();
-			this.gridLineResizeObserver?.disconnect();
 			this.intersectionObserver = null;
 			this.mutationObserver = null;
-			this.gridLineResizeObserver = null;
-			this.visibleGridLines.clear();
-			this.gridLineHeights.clear();
+			this.visibleGrids.clear();
 			this.onVisibleDatesChanged?.(null);
 		},
 		prevPage() {

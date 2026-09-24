@@ -66,10 +66,19 @@ export default {
 			type: Array,
 			default: null
 		},
+		mainColumnWidths: {
+			type: Array,
+			default: null,
+		},
 		arePartHeadersRepeated: {
 			type: Boolean,
 			default: false,
 		},
+		scrollable: {
+			type: Boolean,
+			default: true
+		},
+		stickyHeader: Boolean,
 	},
 	data() {
 		return {
@@ -187,13 +196,55 @@ export default {
 		},
 		styleGridCols()
 		{
-			if (this.dayVisibility)
+			const hasVisibleDays = this.dayVisibility?.some(day => day);
+			const showAllDaysEqually = Array.isArray(this.dayVisibility)
+				&& this.dayVisibility.length
+				&& !hasVisibleDays;
+			const isManuallyCollapsed = index => hasVisibleDays
+				&& this.displayedAxisMain[index]
+				&& this.isDayUnchecked(index);
+
+			if (
+				Array.isArray(this.mainColumnWidths)
+				&& this.mainColumnWidths.length === this.displayedAxisMain.length
+			) {
+				const weekView = this.$el?.closest('.fhc-calendar-mode-week-view');
+				const gridWidth = weekView?.clientWidth || this.$el?.clientWidth;
+				const timeColumnWidth = this.$el
+					?.querySelector('.part-header')
+					?.getBoundingClientRect().width ?? 0;
+				const columnGap = this.$el
+					? parseFloat(getComputedStyle(this.$el).columnGap) || 0
+					: 0;
+				const equalDayWidth = gridWidth
+					? Math.max(0, (
+						gridWidth
+						- timeColumnWidth
+						- columnGap * this.mainColumnWidths.length
+					) / this.mainColumnWidths.length)
+					: this.mainColumnWidths.reduce(
+						(total, width) => total + width,
+						0,
+					) / this.mainColumnWidths.length;
+
+				return this.mainColumnWidths
+					.map((width, index) => {
+						const minWidth = Math.ceil(
+							showAllDaysEqually
+								? equalDayWidth
+								: isManuallyCollapsed(index)
+									? Math.max(width * 0.1, equalDayWidth)
+									: width,
+						);
+						const fraction = isManuallyCollapsed(index) ? '0.1fr' : '1fr';
+						return `minmax(${minWidth}px, ${fraction})`;
+					})
+					.join(' ');
+			}
+
+			if (hasVisibleDays)
 			{
-				let anyVisible = this.dayVisibility.some(day => day);
-				if (anyVisible)
-				{
-					return this.displayedAxisMain.map((day, i) => day && this.isDayCollapsed(i) ? 'var(--fhc-calendar-axis-collapsible-manual, 0.1fr)' : '1fr').join(' ');
-				}
+				return this.displayedAxisMain.map((day, i) => day && isManuallyCollapsed(i) ? 'var(--fhc-calendar-axis-collapsible-manual, 0.1fr)' : '1fr').join(' ');
 			}
 
 			let cols = 'repeat(' + this.displayedAxisMain.length + ', 1fr)';
@@ -300,19 +351,20 @@ export default {
 		getTimestampFromMouse(evt, dayTimestamp)
 		{
 			let mouse, mouseFrac;
+			const bodyRect = this.$refs.body.getBoundingClientRect();
 
 			const grabOffsetY = parseFloat(evt.dataTransfer.getData('fhc-grab-offset-y')) || 0;
 			const grabOffsetX = parseFloat(evt.dataTransfer.getData('fhc-grab-offset-x')) || 0;
 
 			if (this.flipAxis)
 			{
-				mouse = evt.pageX - this.getPageLeft(this.$refs.body) + this.$refs.scroller.scrollLeft - grabOffsetX;
-				mouseFrac = mouse / this.$refs.body.offsetWidth;
+				mouse = evt.clientX - bodyRect.left - grabOffsetX;
+				mouseFrac = mouse / bodyRect.width;
 			}
 			else
 			{
-				mouse = evt.pageY - this.getPageTop(this.$refs.body) + this.$refs.scroller.scrollTop - grabOffsetY;
-				mouseFrac = mouse / this.$refs.body.offsetHeight;
+				mouse = evt.clientY - bodyRect.top - grabOffsetY;
+				mouseFrac = mouse / bodyRect.height;
 			}
 
 			let rawTimestamp = dayTimestamp + this.start + Math.floor((this.end - this.start) * mouseFrac);
@@ -322,6 +374,9 @@ export default {
 
 		/* SCROLLING */
 		enableAutoScroll() {
+			if (!this.scrollable)
+				return;
+
 			if (!this.resizeObserver)
 				this.resizeObserver = new ResizeObserver(this.scrollToEarliestEvent);
 			this.resizeObserver.observe(this.$refs.body);
@@ -498,12 +553,29 @@ export default {
 			if (!gridEl)
 				return;
 
+			this.$el.dispatchEvent(new CustomEvent('fhc-calendar-grid-resize-state', {
+				bubbles: true,
+				detail: {
+					active: true,
+					eventId: event?.orig?.kalender_id,
+				},
+			}));
+
 			this.resizeHandler.startResize(edge, evt, {
 				el,
 				gridEl,
 				event,
 				horizontal,
 				timeGrid: this.timeGrid,
+				onFinish: () => {
+					this.$el.dispatchEvent(new CustomEvent('fhc-calendar-grid-resize-state', {
+						bubbles: true,
+						detail: {
+							active: false,
+							eventId: event?.orig?.kalender_id,
+						},
+					}));
+				},
 				onEnd: ({ event, newStart, newEnd }) => {
 					const orig = event?.orig;
 					if (!orig || !newStart || !newEnd)
@@ -519,17 +591,17 @@ export default {
 		},
 		isDayCollapsed(index)
 		{
-			const axisMainIndex = this.displayedAxisMainIndexes[index];
-			if (axisMainIndex === null)
-				return false;
+			if (this.dayVisibility?.some(day => day) && this.isDayUnchecked(index))
+				return true;
 
-			if (this.dayVisibility)
-			{
-				let anyVisible = this.dayVisibility.some(day => day);
-				if (anyVisible)
-					return !this.dayVisibility[axisMainIndex];
-			}
 			return this.axisMainCollapsible && this.hasValidEvents && !this.events[index].length;
+		},
+		isDayUnchecked(index)
+		{
+			const axisMainIndex = this.displayedAxisMainIndexes[index];
+			return axisMainIndex !== null
+				&& Array.isArray(this.dayVisibility)
+				&& !this.dayVisibility[axisMainIndex];
 		}
 	},
 	setup()
@@ -545,12 +617,12 @@ export default {
 		class="fhc-calendar-base-grid"
 		style="display:grid;width:100%;height:100%;overflow:auto"
 		data-cy="calendar-base-grid"
-		:style="'--fhc-grid-displayed-axis-main-count: ' + displayedAxisMain.length + ';grid-template-' + axisRow + 's:auto' + (allDayEvents ? ' auto ' : ' ') + '1fr;grid-template-' + axisCol + 's:auto ' + styleGridCols"
+		:style="'--fhc-grid-displayed-axis-main-count: ' + displayedAxisMain.length + ';height:' + (scrollable ? '100%' : 'auto') + ';min-height:' + (scrollable ? '0' : '100%') + ';overflow:' + (scrollable ? 'auto' : 'visible') + ';grid-template-' + axisRow + 's:' + (allDayEvents ? 'auto ' : '') + '1fr;grid-template-' + axisCol + 's:max-content ' + styleGridCols"
 	>
 		<div
 			class="grid-header"
 			style="display:grid"
-			:style="'grid-template-' + axisCol + 's:subgrid;grid-' + axisCol + ':1/-1'"
+			:style="'grid-template-' + axisCol + 's:subgrid;grid-' + axisCol + ':1/-1;position:' + (stickyHeader ? 'sticky' : 'static') + ';top:0;z-index:' + (stickyHeader ? '100' : 'auto') + ';align-self:' + (stickyHeader ? 'start' : 'auto') + ';border-bottom:' + (stickyHeader ? '1px solid var(--bs-gray-500, #adb5bd)' : 'none')"
 		>
 			<template v-for="(date, index) in displayedAxisMain" :key="index">
 				<div
@@ -586,7 +658,7 @@ export default {
 				>
 					<grid-line-event
 						v-for="(event, i) in events"
-						:key="i"
+						:key="i + 50"
 						:event="event"
 					>
 						<template v-slot="slot">
@@ -606,7 +678,7 @@ export default {
 			@scrollend="userScroll ? disableAutoScroll() : userScroll = true"
 			id="grid-main-scrollable"
 			style="display:grid;overflow:auto"
-			:style="'grid-' + axisCol + ':1/-1;grid-template-' + axisCol + 's:subgrid'"
+			:style="'overflow:' + (scrollable ? 'auto' : 'visible') + ';grid-' + axisCol + ':1/-1;grid-template-' + axisCol + 's:subgrid'"
 		>
 			<div
 				ref="main"
@@ -663,7 +735,7 @@ export default {
 								:date="date"
 								:events="eventsNormal[index]"
 								:backgrounds="backgrounds[index]"
-								:class="{ 'fhc-calendar-base-grid-line-collapsed': isDayCollapsed(index) }"
+								:collapsed="isDayUnchecked(index)"
 								style="position:relative"
 								@resize-start="handleResizeStart"
 								:style="'grid-' + axisRow + ':1/-1;grid-' + axisCol + ':' + (1+index)"

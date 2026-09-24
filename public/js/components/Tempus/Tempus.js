@@ -95,6 +95,7 @@ export default {
 				openRaumauswahl: (orig) => this.$refs.raumModal.show(orig),
 			},
 			canToggleGrid: this.permissions.stundenraster,
+			isHeaderSticky: true
 		};
 	},
 	data() {
@@ -565,15 +566,20 @@ export default {
 				.then(() => {
 					if (onSuccess) {
 						onSuccess();
-						this.$refs.calendar.$refs.calendar.$refs.mode.$refs.view.$refs.grid.disableAutoScroll();
+						this.$refs.calendar.$refs.calendar.$refs.mode.$refs.view.$refs.grid?.disableAutoScroll();
+						this.$refs.calendar.$refs.calendar.$refs.mode.$refs.view.$refs.grids?.forEach(grid => {
+							grid.disableAutoScroll();
+						});
 						this.currentlyUpdatedEvent = obj.orig;
 					}
 				})
 				.catch((error) => {
 					this.currentlyUpdatedEvent = null;
 					this.$refs.calendar.clearOutCalendarEventEmphasis();
+				 
 					this.$nextTick(() => {
-						this.$refs.calendar.reloadEvents();
+					 
+						this.$refs.calendar.resetEventLoader(false, false);
 					});
 					throw error;
 				});
@@ -600,6 +606,10 @@ export default {
 			)
 				return;
 
+				this.$refs.calendar.$refs.calendar.$refs.mode.$refs.view.$refs.grid?.disableAutoScroll();
+						this.$refs.calendar.$refs.calendar.$refs.mode.$refs.view.$refs.grids?.forEach(grid => {
+							grid.disableAutoScroll();
+						});
 			this.updateKalenderEventElementDisplay(
 				obj.orig.eindeutige_kalender_gruppen_id,
 				dates.startDT,
@@ -613,7 +623,11 @@ export default {
 				dates.start_time,
 				dates.end_time,
 				() => {
-					this.$refs.calendar.resetEventLoader(false);
+					this.$refs.calendar.$refs.calendar.$refs.mode.$refs.view.$refs.grid?.disableAutoScroll();
+						this.$refs.calendar.$refs.calendar.$refs.mode.$refs.view.$refs.grids?.forEach(grid => {
+							grid.disableAutoScroll();
+						});
+					this.$refs.calendar.resetEventLoader(false, false);
 					this.$refs.sidebar.reloadCoursepicker();
 					this.rebuildRaumvorschlag();
 				},
@@ -644,7 +658,7 @@ export default {
 						),
 					)
 					.then(() => {
-						this.$refs.calendar.resetEventLoader(false);
+						this.$refs.calendar.resetEventLoader(false, false);
 						this.$refs.sidebar.reloadCoursepicker();
 						this.rebuildRaumvorschlag();
 						this.bcc.postMessage('dropped');
@@ -758,7 +772,7 @@ export default {
 							type: obj.type,
 							id: obj.orig.kalender_id,
 						});
-						this.$refs.calendar.resetEventLoader(false);
+						this.$refs.calendar.resetEventLoader(false, false);
 						this.rebuildRaumvorschlag();
 						this.bcc.postMessage('dropped');
 					},
@@ -1039,11 +1053,15 @@ export default {
 				const [rowStart, columnStart, rowEnd] = getComputedStyle(
 					gridLine,
 				).gridArea.split(' / ');
+				const visibleStart = luxon.DateTime.fromISO(gridLine.dataset.visibleStart);
+				const visibleEnd = luxon.DateTime.fromISO(gridLine.dataset.visibleEnd);
 
 				return (
 					rowStart === '1' &&
 					columnStart === String(startDT.weekday) &&
-					rowEnd === '-1'
+					rowEnd === '-1' &&
+					visibleStart <= startDT &&
+					startDT < visibleEnd
 				);
 			});
 			const changedDay =
@@ -1057,13 +1075,9 @@ export default {
 					targetGridLine.insertBefore(element, null);
 					element.classList.add('tempus-temporary-calendar-event');
 				}
-				if (this.currentMode === 'range') {
-					element.style.gridColumnStart = 't_' + newPotentialStart;
-					element.style.gridColumnEnd = 't_' + newPotentialEnd;
-				} else {
-					element.style.gridRowStart = 't_' + newPotentialStart;
-					element.style.gridRowEnd = 't_' + newPotentialEnd;
-				}
+				
+				element.style.gridRowStart = 't_' + newPotentialStart;
+				element.style.gridRowEnd = 't_' + newPotentialEnd;
 
 				element.scrollIntoView({
 					behavior: 'smooth',
