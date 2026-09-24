@@ -617,7 +617,7 @@ export default {
 		class="fhc-calendar-base-grid"
 		style="display:grid;width:100%;height:100%;overflow:auto"
 		data-cy="calendar-base-grid"
-		:style="'--fhc-grid-displayed-axis-main-count: ' + displayedAxisMain.length + ';height:' + (scrollable ? '100%' : 'auto') + ';min-height:' + (scrollable ? '0' : '100%') + ';overflow:' + (scrollable ? 'auto' : 'visible') + ';grid-template-' + axisRow + 's:' + (allDayEvents ? 'auto ' : '') + '1fr;grid-template-' + axisCol + 's:max-content ' + styleGridCols"
+		:style="'--fhc-grid-displayed-axis-main-count: ' + displayedAxisMain.length + ';height:' + (scrollable ? '100%' : 'auto') + ';min-height:' + (scrollable ? '0' : '100%') + ';overflow:' + (scrollable ? 'auto' : 'visible') + ';grid-template-' + axisRow + 's:auto' + (allDayEvents ? ' auto ' : ' ') + 'minmax(0, 1fr);grid-template-' + axisCol + 's:max-content ' + styleGridCols"
 	>
 		<div
 			class="grid-header"
