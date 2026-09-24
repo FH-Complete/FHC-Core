@@ -233,9 +233,10 @@ export default {
 							showAllDaysEqually
 								? equalDayWidth
 								: isManuallyCollapsed(index)
-									? Math.max(width * 0.1, equalDayWidth)
+									? (width * 0.1 < 100 ? 100 : width * 0.1)
 									: width,
 						);
+
 						const fraction = isManuallyCollapsed(index) ? '0.1fr' : '1fr';
 						return `minmax(${minWidth}px, ${fraction})`;
 					})

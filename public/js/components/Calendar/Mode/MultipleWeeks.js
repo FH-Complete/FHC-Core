@@ -182,7 +182,8 @@ export default {
 
 			const weeks = Array.from(view.children);
 			weeks.forEach(week => {
-				week.style.setProperty('--fhc-calendar-print-scale', '1');
+				week.style.setProperty('--fhc-calendar-print-scale-x', '1');
+				week.style.setProperty('--fhc-calendar-print-scale-y', '1');
 				week.style.setProperty('--fhc-calendar-print-layout-width', 'max-content');
 			});
 
@@ -215,8 +216,10 @@ export default {
 					return;
 
 				const scale = Math.min(1, availableWidth / (gridWidth));
+				const verticalScale = 1 - (1 - scale) * 0.9;
 
-				week.style.setProperty('--fhc-calendar-print-scale', scale.toFixed(4));
+				week.style.setProperty('--fhc-calendar-print-scale-x', scale.toFixed(4));
+				week.style.setProperty('--fhc-calendar-print-scale-y', verticalScale.toFixed(4));
 				week.style.setProperty('--fhc-calendar-print-layout-width', gridWidth + 'px');
 			});
 		},
@@ -226,7 +229,8 @@ export default {
 				return;
 
 			Array.from(view.children).forEach(week => {
-				week.style.removeProperty('--fhc-calendar-print-scale');
+				week.style.removeProperty('--fhc-calendar-print-scale-x');
+				week.style.removeProperty('--fhc-calendar-print-scale-y');
 				week.style.removeProperty('--fhc-calendar-print-layout-width');
 			});
 		},

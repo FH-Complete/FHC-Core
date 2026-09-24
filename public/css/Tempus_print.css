@@ -34,7 +34,9 @@ header,
 .fhc-calendar-mode-week #rangePresetSelector,
 .fhc-calendar-base-grid-dropzone,
 .fhc-calendar-base-grid .main-header .form-check,
-.fhc-calendar-base-grid-line-background {
+.fhc-calendar-base-grid-line-background,
+.fhc-calendar-base-grid-line-background > div,
+.p-tooltip{
 	display: none !important;
 }
 
@@ -68,14 +70,18 @@ header,
 .fhc-calendar-mode-week .fhc-calendar-mode-week-view,
 .fhc-calendar-mode-week .fhc-calendar-mode-week-view > div {
 	width: 100% !important;
-	height: auto !important;
+	height: 100vh !important;
 	min-width: 0 !important;
 	overflow: visible !important;
 }
 
 .fhc-calendar-mode-week .fhc-calendar-mode-week-view > div {
-	width: var(--fhc-calendar-print-layout-width, max-content) !important;
-	zoom: var(--fhc-calendar-print-scale, 1) !important;
+	width: var(--fhc-calendar-print-layout-width, 100%) !important;
+	transform: scale(
+		var(--fhc-calendar-print-scale-x, 1),
+		var(--fhc-calendar-print-scale-y, 1)
+	) !important;
+	transform-origin: top left !important;
 }
 
 .fhc-calendar-print-measure {
