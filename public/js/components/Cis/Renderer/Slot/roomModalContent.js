@@ -151,6 +151,12 @@ export default {
 				this.nestedGroupOptions = groupOptionsResponse.data;
 			}
 		},
+		afterTitleInputLosesFocus() {
+			if (this.title?.length && !this.beschreibung?.length) {
+				this.beschreibung = this.title;
+				this.$refs.beschreibungInput.$el.querySelector("input").focus();
+			}
+		},
 	},
 	mounted() {
 		this.syncFromEvent(this.event);
@@ -194,6 +200,7 @@ export default {
 		</div>
 		<div class="row">
 			<form-input
+				@blur="afterTitleInputLosesFocus()"
 				:label="capitalize($p.t('global', 'titel'))"
 				type="text"
 				container-class="col-3"
@@ -203,6 +210,7 @@ export default {
 			/>
 				
 			<form-input
+				ref="beschreibungInput"
 				:label="capitalize($p.t('global', 'beschreibung'))"
 				type="text"
 				container-class="col-4"
