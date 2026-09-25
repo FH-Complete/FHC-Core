@@ -69,9 +69,9 @@ export default {
 			</template>
 			<template #bottom>
 				<widget-edit
-					:key="currentData.widget_id"
 					v-if="currentData"
 					ref="edit"
+					:key="currentData.widget_id"
 					v-model="currentData"
 					:original-data="originalData"
 					:unsaved-progress="unsavedProgress"
