@@ -154,21 +154,23 @@ class Reservierung extends FHCAPI_Controller
 	}
 	public function addReservierung()
 	{
+		$this->_ci->form_validation->set_rules('titel', "titel", "required", ['required' => $this->p->t('ui', 'error_fieldRequired')]);
+		$this->_ci->form_validation->set_rules('beschreibung', "beschreibung", "required", ['required' => $this->p->t('ui', 'error_fieldRequired')]);
+		$this->_ci->form_validation->set_rules('start_date', "start_date", "required", ['required' => $this->p->t('ui', 'error_fieldRequired')]);
+		$this->_ci->form_validation->set_rules('end_date', "end_date", "required", ['required' => $this->p->t('ui', 'error_fieldRequired')]);
 
-		$this->_ci->form_validation->set_data($_POST);
-		$this->_ci->form_validation->set_rules('titel',"titel","required");
-		$this->_ci->form_validation->set_rules('beschreibung',"beschreibung","required");
-		$this->_ci->form_validation->set_rules('ort_kurzbz',"ort_kurzbz","required");
-		$this->_ci->form_validation->set_rules('start_date',"start_date","required");
-		$this->_ci->form_validation->set_rules('end_date',"end_date","required");
-
-
-		if($this->_ci->form_validation->run() === FALSE)
+		if ($this->_ci->form_validation->run() === FALSE)
 			$this->terminateWithValidationErrors($this->_ci->form_validation->error_array());
+
+		$orte = $this->_ci->input->post('orte', TRUE);
+
+		if (empty($orte) || (empty($orte['ort_kurzbz']) && empty($orte['location'])))
+		{
+			$this->terminateWithValidationErrors(['ort_kurzbz' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Raum'])]);
+		}
 
 		$titel = $this->_ci->input->post('titel', TRUE);
 		$beschreibung = $this->_ci->input->post('beschreibung', TRUE);
-		$ort_kurzbz = $this->_ci->input->post('ort_kurzbz', TRUE);
 		$start_date = $this->_ci->input->post('start_date', TRUE);
 		$end_date = $this->_ci->input->post('end_date', TRUE);
 		$teilnehmer = $this->_ci->input->post('teilnehmer', TRUE);
@@ -187,7 +189,7 @@ class Reservierung extends FHCAPI_Controller
 			$teilnehmer[] = array('uid' => getAuthUID(), 'rolle' => 'organisator');
 
 
-		$result = $this->_ci->kalenderlib->addReservierung($titel, $beschreibung, $ort_kurzbz, $start_date, $end_date, $teilnehmer, $specialFinalGroups, $specialGroups, $groups);
+		$result = $this->_ci->kalenderlib->addReservierung($titel, $beschreibung, $orte, $start_date, $end_date, $teilnehmer, $specialFinalGroups, $specialGroups, $groups);
 
 
 		if (isError($result))

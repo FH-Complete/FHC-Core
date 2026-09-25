@@ -50,6 +50,12 @@ else
 $user = get_uid();
 loadVariables($user);
 
+if (isset($_GET['studiensemester_kurzbz']))
+{
+	if (check_stsem($_GET['studiensemester_kurzbz']))
+		$semester_aktuell = $_GET['studiensemester_kurzbz'];
+}
+
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 

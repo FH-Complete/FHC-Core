@@ -137,12 +137,14 @@ export default {
 		"update:date",
 		"update:mode",
 		"update:range",
+		"update:date-range",
 		"drop"
 	],
 	data() {
 		return {
 			internalView: null,
 			internalDate: null,
+			pickedRangeEnd: null,
 			modalEvent: null
 		};
 	},
@@ -164,7 +166,7 @@ export default {
 						res.start = luxon.DateTime.fromMillis(res.start, { zone: this.timezone, locale: this.locale });
 					else if (res.start instanceof Date)
 						res.start = luxon.DateTime.fromJSDate(res.start, { zone: this.timezone, locale: this.locale });
-					else if (typeof res.start === 
+					else if (typeof res.start ===
 						'string' || res.start instanceof String)
 						res.start = luxon.DateTime.fromISO(res.start, { zone: this.timezone, locale: this.locale });
 				}
@@ -173,7 +175,7 @@ export default {
 						res.end = luxon.DateTime.fromMillis(res.end, { zone: this.timezone, locale: this.locale });
 					else if (res.end instanceof Date)
 						res.end = luxon.DateTime.fromJSDate(res.end, { zone: this.timezone, locale: this.locale });
-					else if (typeof res.end === 
+					else if (typeof res.end ===
 						'string' || res.end instanceof String)
 						res.end = luxon.DateTime.fromISO(res.end, { zone: this.timezone, locale: this.locale });
 				}
@@ -199,7 +201,10 @@ export default {
 			// choose default mode
 			let mode = this.mode;
 			if (mode)
-				mode = mode.toLowerCase();
+			{
+				const lower = mode.toLowerCase();
+				mode = Object.keys(this.modes).find(key => key.toLowerCase() === lower) || null;
+			}
 			if (!mode || !this.modes[mode])
 				mode = Object.keys(this.modes).find(Boolean); // start with first entry as active mode
 			return mode || '';
@@ -269,6 +274,10 @@ export default {
 			}
 		},
 
+		handleDateRange({ start, end }) {
+			this.pickedRangeEnd = end;
+			this.$emit('update:date-range', { start, end });
+		},
 		showEventModal(eventObj) {
 			this.modalEvent = eventObj;
 			this.$refs.modal.show();
@@ -297,6 +306,7 @@ export default {
 				class="card-header"
 				v-model:date="cDate"
 				v-model:mode="cMode"
+				@update:date-range="handleDateRange"
 				@prev="clickPrev"
 				@next="clickNext"
 				@click:mode="$emit('click:mode', $event)"
@@ -313,6 +323,7 @@ export default {
 				:is="modes ? modes[cMode] : null || 'div'"
 				ref="mode"
 				v-model:current-date="cDate"
+				:range-end="pickedRangeEnd"
 				@update:range="$emit('update:range', $event)"
 				@request-modal-open="showEventModal"
 				@request-modal-close="hideEventModal"

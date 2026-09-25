@@ -1,5 +1,4 @@
 import { waitForOk } from "../../../../support/helpers/network";
-import { getDateForDay } from "../../../../support/helpers/date";
 import { tempusApi } from "../../../../support/api/tempusApi";
 import {
   LEKTOR,
@@ -12,13 +11,7 @@ context("Tempus role preview tests", () => {
   beforeEach(() => {
     tempusPage.visitAndWaitForPlanner();
 
-    tempusApi
-      .getPlannerEvents(getDateForDay("monday"), getDateForDay("monday"))
-      .then((events) => {
-        events.forEach((event) => {
-          tempusApi.deleteKalenderEvent(event.kalender_id);
-        });
-      });
+    tempusApi.deletePlannerEventsForDay("monday");
   });
 
   it("shows the same number of calendar events for all role previews", () => {

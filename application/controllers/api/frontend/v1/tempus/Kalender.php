@@ -8,29 +8,35 @@ class Kalender extends FHCAPI_Controller
 	const ALLOWED_PLAN_FILTER = ['ort', 'uid', 'stg'];
 	const ALLOWED_ROOM_FILTER = ['lehreinheit_id', 'kalender_id'];
 
-	const ALLOWED_TO_UPDATE = ['start_time', 'end_time', 'ort_kurzbz'];
+	const ALLOWED_TO_UPDATE = ['start_time', 'end_time', 'orte'];
 	/**
 	 * Object initialization
 	 */
 	public function __construct()
 	{
 		parent::__construct([
-			'getStunden' => self::PERM_LOGGED,
-			'getCalendarHours' => self::PERM_LOGGED,
-			'getPlan' => self::PERM_LOGGED,
-			'getPlanByOrt' => self::PERM_LOGGED,
-			'getRaumvorschlag' => self::PERM_LOGGED,
+			'getStunden' => 'lehre/lvplan:rw',
+			'getCalendarHours' => 'lehre/lvplan:rw',
+			'getPlan' => 'lehre/lvplan:rw',
+			'getPlanByOrt' => 'lehre/lvplan:rw',
+			'getRaumvorschlag' => 'lehre/lvplan:rw',
+			'getRaumvorschlagSlots' => 'lehre/lvplan:rw',
+			'getLehreinheiten' => 'lehre/lvplan:rw',
 			'getHistory' => 'lehre/lvplan:rw',
 			'deleteEntry' => 'lehre/lvplan:rw',
 			'syncToLecturer' => 'lehre/lvplan:rw',
 			'syncToStudent' => 'lehre/lvplan:rw',
 			'getPlanLecturer' =>'lehre/lvplan:rw',
 			'getPlanStudent' => 'lehre/lvplan:rw',
-			'getZeitwuensche' => self::PERM_LOGGED,
-			'getZeitsperren' => self::PERM_LOGGED,
+			'getZeitwuensche' => 'lehre/lvplan:rw',
+			'getZeitsperren' => 'lehre/lvplan:rw',
 			'updateKalenderEvent' => 'lehre/lvplan:rw',
+			'deleteOrtEntry' => 'lehre/lvplan:rw',
+			'deleteFromKalenderEvent' => 'lehre/lvplan:rw',
 			'addKalenderEvent' => 'lehre/lvplan:rw',
-			'addReservierung' => 'lehre/lvplan:rw',
+			'calculateMultiWeekPlan' => 'lehre/lvplan:rw',
+			'confirmMultiWeekPlan' => 'lehre/lvplan:rw',
+			'addToKalenderEvent' => 'lehre/lvplan:rw',
 			'sync' => 'lehre/lvplan:rw',
 		]);
 
@@ -39,6 +45,7 @@ class Kalender extends FHCAPI_Controller
 		$this->_ci->load->library('LogLib');
 		$this->_ci->load->library('form_validation');
 		$this->_ci->load->library('KalenderLib', ["uid" => getAuthUID()]);
+		$this->_ci->load->library('KalenderSyncLib');
 		$this->_ci->load->library('RaumvorschlagLib', ["uid" => getAuthUID()]);
 		$this->loadPhrases([
 			'ui'
@@ -87,15 +94,15 @@ class Kalender extends FHCAPI_Controller
 
 	public function getPlan()
 	{
-		$this->_ci->form_validation->set_data($_GET);
+		$this->_ci->form_validation->set_data($_POST);
 		$this->_ci->form_validation->set_rules('start_date',"start_date","required");
 		$this->_ci->form_validation->set_rules('end_date',"end_date","required");
 
 		if($this->_ci->form_validation->run() === FALSE)
 			$this->terminateWithValidationErrors($this->_ci->form_validation->error_array());
 
-		$start_date = $this->_ci->input->get('start_date', TRUE);
-		$end_date = $this->_ci->input->get('end_date', TRUE);
+		$start_date = $this->_ci->input->post('start_date', TRUE);
+		$end_date = $this->_ci->input->post('end_date', TRUE);
 
 		$filter = $this->_checkFilter(self::ALLOWED_PLAN_FILTER);
 
@@ -217,7 +224,24 @@ class Kalender extends FHCAPI_Controller
 		$updateFields = $this->_checkUpdate($this->_ci->input->post('updatedInfos', TRUE));
 		$kalender_id = $this->_ci->input->post('kalender_id', TRUE);
 
-		$result = $this->_ci->kalenderlib->updateKalenderEvent($kalender_id, $updateFields->ort_kurzbz ?? null,  $updateFields->start_time ?? null,  $updateFields->end_time ?? null);
+		$result = $this->_ci->kalenderlib->updateKalenderEvent($kalender_id, $updateFields->orte ?? null,  $updateFields->start_time ?? null,  $updateFields->end_time ?? null, $updateFields->location ?? null);
+
+		if (isError($result))
+			$this->terminateWithError(getError($result),  $result->code);
+
+		$this->terminateWithSuccess(getData($result));
+	}
+
+	public function deleteOrtEntry()
+	{
+		$this->_ci->form_validation->set_data($_POST);
+		$this->_ci->form_validation->set_rules('kalender_id',"kalender_id","required");
+
+		if($this->_ci->form_validation->run() === FALSE)
+			$this->terminateWithValidationErrors($this->_ci->form_validation->error_array());
+
+		$kalender_id = $this->_ci->input->post('kalender_id', TRUE);
+		$result = $this->_ci->kalenderlib->updateOrt($kalender_id, []);
 
 		if (isError($result))
 			$this->terminateWithError(getError($result),  $result->code);
@@ -227,10 +251,39 @@ class Kalender extends FHCAPI_Controller
 
 	public function getRaumvorschlag()
 	{
-		$this->_ci->form_validation->set_data($_GET);
+		$this->_ci->form_validation->set_data($_POST);
 
 		$filter = $this->_checkFilter(self::ALLOWED_ROOM_FILTER);
 		$this->terminateWithSuccess($this->_ci->raumvorschlaglib->getVorschlaege($filter->kalender_id));
+	}
+
+	public function getRaumvorschlagSlots()
+	{
+		$this->_ci->form_validation->set_data($_GET);
+		$this->_ci->form_validation->set_rules('lehreinheit_id',"lehreinheit_id","required");
+		$this->_ci->form_validation->set_rules('start_date',"start_date","required");
+		$this->_ci->form_validation->set_rules('end_date',"end_date","required");
+
+		if($this->_ci->form_validation->run() === FALSE)
+			$this->terminateWithValidationErrors($this->_ci->form_validation->error_array());
+
+		$lehreinheit_id = $this->_ci->input->get('lehreinheit_id', TRUE);
+		$start_date = $this->_ci->input->get('start_date', TRUE);
+		$end_date = $this->_ci->input->get('end_date', TRUE);
+		$this->terminateWithSuccess(getData($this->_ci->raumvorschlaglib->getVorschlaegeSlots($lehreinheit_id, $start_date, $end_date)));
+	}
+
+	public function getLehreinheiten()
+	{
+		$this->_ci->form_validation->set_data($_GET);
+		$this->_ci->form_validation->set_rules('kalender_id', "kalender_id", "required");
+		$kalender_id = $this->_ci->input->get('kalender_id', TRUE);
+		$result = $this->_ci->kalenderlib->getLehreinheiten($kalender_id);
+
+		if (isError($result))
+			$this->terminateWithError(getError($result));
+
+		$this->terminateWithSuccess(hasData($result) ? getData($result) : []);
 	}
 
 	public function getHistory()
@@ -271,7 +324,7 @@ class Kalender extends FHCAPI_Controller
 
 	public function sync()
 	{
-		$result = $this->_ci->kalenderlib->sync();
+		$result = $this->_ci->kalendersynclib->sync();
 		$this->terminateWithSuccess(getData($result));
 	}
 	public function syncToLecturer()
@@ -322,8 +375,6 @@ class Kalender extends FHCAPI_Controller
 		$ort_kurzbz = $this->_ci->input->post('ort_kurzbz', TRUE);
 		$start_date = $this->_ci->input->post('start_date', TRUE);
 		$end_date = $this->_ci->input->post('end_date', TRUE);
-
-
 		$result = $this->_ci->kalenderlib->addKalenderEvent($start_date, $end_date, $lehreinheit_id, $ort_kurzbz);
 
 		if (isError($result))
@@ -332,26 +383,22 @@ class Kalender extends FHCAPI_Controller
 		$this->terminateWithSuccess(getData($result));
 	}
 
-	public function addReservierung()
+	public function calculateMultiWeekPlan()
 	{
 		$this->_ci->form_validation->set_data($_POST);
-		$this->_ci->form_validation->set_rules('titel',"titel","required");
-		$this->_ci->form_validation->set_rules('beschreibung',"beschreibung","required");
-		$this->_ci->form_validation->set_rules('ort_kurzbz',"ort_kurzbz","required");
+		$this->_ci->form_validation->set_rules('lehreinheit_id',"lehreinheit_id","required");
 		$this->_ci->form_validation->set_rules('start_date',"start_date","required");
 		$this->_ci->form_validation->set_rules('end_date',"end_date","required");
 
 		if($this->_ci->form_validation->run() === FALSE)
 			$this->terminateWithValidationErrors($this->_ci->form_validation->error_array());
 
-		$titel = $this->_ci->input->post('titel', TRUE);
-		$beschreibung = $this->_ci->input->post('beschreibung', TRUE);
+		$lehreinheit_id = $this->_ci->input->post('lehreinheit_id', TRUE);
 		$ort_kurzbz = $this->_ci->input->post('ort_kurzbz', TRUE);
 		$start_date = $this->_ci->input->post('start_date', TRUE);
 		$end_date = $this->_ci->input->post('end_date', TRUE);
 
-
-		$result = $this->_ci->kalenderlib->addReservierung($titel, $beschreibung, $ort_kurzbz, $start_date, $end_date);
+		$result = $this->_ci->kalenderlib->calculateMultiWeekPlan($start_date, $end_date, $lehreinheit_id, $ort_kurzbz);
 
 		if (isError($result))
 			$this->terminateWithError(getError($result));
@@ -359,16 +406,78 @@ class Kalender extends FHCAPI_Controller
 		$this->terminateWithSuccess(getData($result));
 	}
 
+	public function confirmMultiWeekPlan()
+	{
+		$this->_ci->form_validation->set_data($_POST);
+		$this->_ci->form_validation->set_rules('plan[]',"plan","required");
+		$this->_ci->form_validation->set_rules('lehreinheit_id',"lehreinheit_id","required");
+
+		if($this->_ci->form_validation->run() === FALSE)
+			$this->terminateWithValidationErrors($this->_ci->form_validation->error_array());
+
+		$plan = $this->_ci->input->post('plan', TRUE);
+		$lehreinheit_id = $this->_ci->input->post('lehreinheit_id', TRUE);
+
+		$result = $this->_ci->kalenderlib->confirmMultiWeekPlan($plan, $lehreinheit_id);
+
+		if (isError($result))
+			$this->terminateWithError(getError($result));
+
+		$this->terminateWithSuccess(getData($result));
+	}
+
+	public function addToKalenderEvent()
+	{
+		$this->_ci->form_validation->set_data($_POST);
+		$this->_ci->form_validation->set_rules('target_kalender_id',"target_kalender_id","required");
+		$this->_ci->form_validation->set_rules('lehreinheit_id',"lehreinheit_id","required");
+
+		if($this->_ci->form_validation->run() === FALSE)
+			$this->terminateWithValidationErrors($this->_ci->form_validation->error_array());
+
+		$target_kalender_id = $this->_ci->input->post('target_kalender_id', TRUE);
+		$lehreinheit_id = $this->_ci->input->post('lehreinheit_id', TRUE);
+
+		$result = $this->_ci->kalenderlib->addToKalenderEvent($target_kalender_id, $lehreinheit_id);
+
+		if (isError($result))
+			$this->terminateWithError(getError($result));
+
+		$this->terminateWithSuccess(getData($result));
+	}
+
+	public function deleteFromKalenderEvent()
+	{
+		$this->_ci->form_validation->set_data($_POST);
+		$this->_ci->form_validation->set_rules('kalender_id',"kalender_id","required");
+		$this->_ci->form_validation->set_rules('lehreinheit_ids[]',"lehreinheit_ids","required");
+
+
+		if($this->_ci->form_validation->run() === FALSE)
+			$this->terminateWithValidationErrors($this->_ci->form_validation->error_array());
+
+		$kalender_id = $this->_ci->input->post('kalender_id', TRUE);
+		$lehreinheit_ids = $this->_ci->input->post('lehreinheit_ids', TRUE);
+
+		$result = $this->_ci->kalenderlib->deleteFromKalenderEvent($kalender_id, $lehreinheit_ids);
+
+		if (isError($result))
+			$this->terminateWithError(getError($result));
+
+		$this->terminateWithSuccess(getData($result));
+	}
+
+
 	private function _checkFilter($filters)
 	{
 		$filter_valid = true;
 		$filter_object = new stdClass();
 		foreach ($filters as $filter)
 		{
-			if ($this->_ci->input->get($filter))
+			if ($this->_ci->input->post($filter))
 			{
 				$filter_valid = true;
-				$filter_object->$filter = $this->_ci->input->get($filter);
+				$filter_object->$filter = $this->_ci->input->post($filter);
 			}
 		}
 

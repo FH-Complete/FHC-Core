@@ -2,6 +2,8 @@ import CalendarGrid from '../../Base/Grid.js';
 import LabelDay from '../../Base/Label/Day.js';
 import LabelDow from '../../Base/Label/Dow.js';
 import LabelTime from '../../Base/Label/Time.js';
+import FormInput from "../../../Form/Input.js";
+
 
 export default {
 	name: "WeekView",
@@ -9,7 +11,8 @@ export default {
 		CalendarGrid,
 		LabelDay,
 		LabelDow,
-		LabelTime
+		LabelTime,
+		FormInput
 	},
 	inject: {
 		timeGrid: "timeGrid",
@@ -22,6 +25,11 @@ export default {
 			required: true
 		},
 		collapseEmptyDays: Boolean
+	},
+	data() {
+		return {
+			visibleDays: JSON.parse(localStorage.getItem('fhc-calender-visible-days')) ?? [true, true, true, true, true, true, true]
+		}
 	},
 	computed: {
 		start() {
@@ -44,11 +52,19 @@ export default {
 				const end = this.hoursPlan?.end ?? 23;
 				return Array.from({ length: end - start + 1 }, (e, i) => luxon.Duration.fromObject({ hours: i + start }));
 			}
+		},
+		dayVisibility() {
+			return this.axisMain.map(date => this.visibleDays[date.weekday -1])
 		}
 	},
 	methods: {
 		isToday(date) {
 			return date.hasSame(luxon.DateTime.now().setZone(this.timezone), 'day');
+		},
+		toggleDay(day)
+		{
+			this.visibleDays.splice(day, 1, !this.visibleDays[day])
+			localStorage.setItem('fhc-calender-visible-days', JSON.stringify(this.visibleDays))
 		}
 	},
 	template: /* html */`
@@ -60,9 +76,10 @@ export default {
 			:axis-main-collapsible="collapseEmptyDays"
 			:snap-to-grid="!!timeGrid"
 			all-day-events
+			:day-visibility="dayVisibility"
 		>
-			<template #main-header="{ date }">
-				<div :class="{ today: isToday(date) }">
+			<template #main-header="{ date, index }">
+				<div :class="{ today: isToday(date) }" class="d-flex flex-column align-items-center">
 					<label-dow
 						v-bind="{ date }"
 						@cal-click="evt => evt.detail.source = 'day'"
@@ -70,6 +87,13 @@ export default {
 					<label-day
 						v-bind="{ date }"
 					/>
+					<form-input
+	 					type="checkbox"
+	 					:checked="visibleDays[date.weekday - 1]"
+	 					@change="toggleDay(date.weekday - 1)"
+	 					@click.stop
+	 				>
+		 			</form-input>
 				</div>
 			</template>
 			<template #part-header="{ part }">

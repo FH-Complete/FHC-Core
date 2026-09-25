@@ -7,11 +7,12 @@ export default {
 	name: 'ReservierungModal',
 	components: {
 		BsModal,
-		FormInput
+		FormInput,
+		Multiselect: primevue.multiselect,
 	},
 	props: {
-		ortKurzbz: {
-			type: String,
+		rooms: {
+			type: Array,
 			default: null
 		}
 	},
@@ -22,7 +23,7 @@ export default {
 			beschreibung: '',
 			start: null,
 			end: null,
-			ort_kurzbz: null,
+			selected_rooms: [],
 			raeume_array: [],
 			studiensemester_array: [],
 			teilnehmer: [],
@@ -32,7 +33,8 @@ export default {
 			show_all_fields: false,
 			filteredUsers: [],
 			filteredGroups: [],
-			abortController: null
+			abortController: null,
+			location: null
 		};
 	},
 	created()
@@ -126,7 +128,10 @@ export default {
 			this.beschreibung = '';
 			this.start = start;
 			this.end = end;
-			this.ort_kurzbz = this.ortKurzbz ?? null;
+
+			let prop_orte = (this.rooms ?? []).map(r => r.ort_kurzbz);
+			this.selected_rooms = this.raeume_array.filter(raum => prop_orte.includes(raum.ort_kurzbz));
+
 			this.teilnehmer = [{ uid: null, rolle: null }];
 			this.specialFinalGroups = [{ gid: null, studiensemester_kurzbz: null, lehrverband: null, gruppe_kurzbz: null, rolle: null }];
 			this.$refs.modal.show();
@@ -137,11 +142,16 @@ export default {
 		},
 		save()
 		{
+
+			let orte = {
+				ort_kurzbz: this.selected_rooms.map(r => r.ort_kurzbz),
+				location: this.location
+			}
 			this.$api.call(
 				ApiReservierung.addReservierung(
 					this.titel,
 					this.beschreibung,
-					this.ort_kurzbz,
+					orte,
 					luxon.DateTime.fromFormat(this.start, 'yyyy-MM-dd HH:mm').toISO(),
 					luxon.DateTime.fromFormat(this.end, 'yyyy-MM-dd HH:mm').toISO(),
 					this.teilnehmer.filter(t => t.uid && t.rolle).map(nehmer => ({ uid: nehmer.uid, rolle: nehmer.rolle })),
@@ -200,24 +210,30 @@ export default {
 						/>
 					</div>
 					<div class="col-6">
+						<label class="form-label">{{ $p.t('global', 'raum') }}</label>
+						<Multiselect
+							v-model="selected_rooms"
+							option-label="ort_kurzbz"
+							:options="raeume_array"
+							placeholder="Raum"
+							display="chip"
+							:hide-selected="false"
+							class="w-100"
+							:selectionLimit="3"
+						>
+							<template #option="{ option }">
+								{{ option.ort_kurzbz }} {{ option.bezeichnung }}
+							</template>
+						</Multiselect>
+					</div>
+					<div class="col-6">
 						<form-input
 							:label="$p.t('global', 'raum')"
-							type="select"
-							container-class="col-6"
-							v-model="ort_kurzbz"
-							name="ort_kurzbz"
-						>
-							<option
-								v-for="raum in raeume_array"
-								:value="raum.ort_kurzbz"
-								:key="raum.ort_kurzbz"
-							>
-								{{ raum.ort_kurzbz }} {{ raum.bezeichnung }}
-							</option>
-						</form-input>
+							type="textarea"
+							name="location"
+							v-model="location"
+						></form-input>
 					</div>
-					
-					
 					<div class="col-12" v-if="show_all_fields">
 						<div v-for="(nehmer, i) in teilnehmer" :key="i" class="d-flex gap-2 mb-2 align-items-end">
 							<form-input

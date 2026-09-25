@@ -16,7 +16,9 @@ context("Tempus filter tests", () => {
       .then((eventJSON) => {
         expect(eventJSON).to.exist;
 
-        const selectedRoom = JSON.parse(eventJSON)?.orig?.ort_kurzbz;
+        let selectedRoom = JSON.parse(eventJSON)?.orig?.ort_kurzbz;
+        if (Array.isArray(selectedRoom)) selectedRoom = selectedRoom.length ? selectedRoom[0] : "";
+
         expect(selectedRoom, "first event room").to.be.a("string").and.not.be
           .empty;
         expect(
@@ -41,11 +43,14 @@ context("Tempus filter tests", () => {
         tempusPage.getCalendarEvents().each(($event) => {
           const eventData = tempusPage.getCalendarEventData($event);
 
-          expect(eventData?.orig?.ort_kurzbz, "event data room").to.eq(
+          let eventRoom = eventData?.orig?.ort_kurzbz;
+          if (Array.isArray(eventRoom)) eventRoom = eventRoom.length ? eventRoom[0] : "";
+
+          expect(eventRoom, "event data room").to.eq(
             selectedRoom,
           );
           cy.wrap($event)
-            .find(".event-place")
+            .find("[data-cy='calendar-event-room']")
             .invoke("text")
             .then((eventPlace) => {
               expect(eventPlace.trim(), "event body room").to.eq(selectedRoom);
@@ -64,7 +69,9 @@ context("Tempus filter tests", () => {
       .then((eventJSON) => {
         expect(eventJSON).to.exist;
 
-        const selectedRoom = JSON.parse(eventJSON)?.orig?.ort_kurzbz;
+        let selectedRoom = JSON.parse(eventJSON)?.orig?.ort_kurzbz;
+        if (Array.isArray(selectedRoom)) selectedRoom = selectedRoom.length ? selectedRoom[0] : "";
+
         expect(selectedRoom, "first event room").to.be.a("string").and.not.be
           .empty;
         expect(
@@ -92,7 +99,7 @@ context("Tempus filter tests", () => {
         tempusPage.getSelectedRoomIndicator(selectedRoom).should("be.visible");
         tempusPage.getCalendarEvents().should("have.length.greaterThan", 0);
 
-        tempusPage.getSelectedRoomRemoveButton(selectedRoom).click();
+        tempusPage.getSelectedRoomRemoveButton(selectedRoom).first().click();
         waitForOk("@fetchPlanData");
         tempusPage.waitForCalendarToFinishLoading();
 

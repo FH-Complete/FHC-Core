@@ -9,3 +9,14 @@ $config['lvverwaltung_tags'] = [
 */
 
 $config['lvverwaltung_tags'] = [];
+
+# Additional columns:
+/*
+$config["list_columns"] = [
+	'fieldname' => [
+		'js' => 'path/to/snippet.js', // tabulator config snippet (eg: return { name: 'Name', field: 'fieldname' }; )
+		// NOTE: 'default' & 'joins' like in stv.php config are currently not available here
+	]
+];
+*/
+

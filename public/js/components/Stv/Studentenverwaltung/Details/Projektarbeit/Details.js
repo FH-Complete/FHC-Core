@@ -5,6 +5,7 @@ import PvAutoComplete from "../../../../../../../index.ci.php/public/js/componen
 import ApiStvProjektarbeit from '../../../../../api/factory/stv/projektarbeit.js';
 
 export default {
+	name: 'ProjektarbeitDetails',
 	components: {
 		FormForm,
 		FormInput,
@@ -110,6 +111,10 @@ export default {
 			this.formData.anmerkung = null;
 			this.$refs.formDetails.clearValidation();
 		},
+		setFormData(projektarbeit) {
+			this.formData = projektarbeit;
+			if (this.formData.firma_id) this.formData.firma = {firma_id: this.formData.firma_id, name: this.formData.firma_name};
+		},
 		getFormData(newProjektarbeit, studiensemester_kurzbz, additional_lehrveranstaltung_id) {
 
 			this.additional_lehrveranstaltung_id = additional_lehrveranstaltung_id;
@@ -148,8 +153,7 @@ export default {
 			return this.$api
 				.call(ApiStvProjektarbeit.loadProjektarbeit(projektarbeit_id))
 				.then(result => {
-					this.formData = result.data;
-					if (this.formData.firma_id) this.formData.firma = {firma_id: this.formData.firma_id, name: this.formData.firma_name};
+					this.setFormData(result.data)
 					return result;
 				})
 				.catch(this.$fhcAlert.handleSystemError)

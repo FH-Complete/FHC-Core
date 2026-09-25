@@ -122,7 +122,7 @@ INSERT INTO lehre.tbl_studienplan_semester (studienplan_id, studiensemester_kurz
 
 
 INSERT INTO lehre.tbl_lehreinheit (lehreinheit_id, lehrveranstaltung_id, studiensemester_kurzbz, lehrfach_id_old, lehrform_kurzbz, stundenblockung, wochenrythmus, start_kw, raumtyp, raumtypalternativ, sprache, lehre, anmerkung, unr, lvnr, updateamum, updatevon, insertamum, insertvon, ext_id, lehrfach_id, gewicht)
-VALUES(51001, 5221, CurrentSemester(), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5221, NULL, '2023-08-24 14:54:43.000', 'oesi', '2023-08-24 14:54:43.000', 'oesi', NULL, 5221, 1);
+VALUES(51001, 5221, COALESCE(CurrentSemester(), LastActiveSemester()), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5221, NULL, '2023-08-24 14:54:43.000', 'oesi', '2023-08-24 14:54:43.000', 'oesi', NULL, 5221, 1);
 
 INSERT INTO lehre.tbl_lehreinheitgruppe
 (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id)
@@ -137,7 +137,7 @@ INSERT INTO lehre.tbl_lehreinheitmitarbeiter
 VALUES(51001, 'demolektor1', 'Lektor', 0, NULL, 1.00, NULL, true, NULL, NULL, '2023-08-24 14:58:40.000', 'oesi', NULL, 0.00, NULL, NULL);
 
 INSERT INTO lehre.tbl_lehreinheit (lehreinheit_id, lehrveranstaltung_id, studiensemester_kurzbz, lehrfach_id_old, lehrform_kurzbz, stundenblockung, wochenrythmus, start_kw, raumtyp, raumtypalternativ, sprache, lehre, anmerkung, unr, lvnr, updateamum, updatevon, insertamum, insertvon, ext_id, lehrfach_id, gewicht)
-VALUES(51002, 5121, CurrentSemester(), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5121, NULL, '2023-08-24 14:54:43.000', 'oesi', '2023-08-24 14:54:43.000', 'oesi', NULL, 5121, 1);
+VALUES(51002, 5121, COALESCE(CurrentSemester(), LastActiveSemester()), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5121, NULL, '2023-08-24 14:54:43.000', 'oesi', '2023-08-24 14:54:43.000', 'oesi', NULL, 5121, 1);
 
 INSERT INTO lehre.tbl_lehreinheitgruppe
 (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id)
@@ -148,7 +148,7 @@ INSERT INTO lehre.tbl_lehreinheitmitarbeiter
 VALUES(51002, 'demolektor2', 'Lektor', 0, NULL, 1.00, NULL, true, NULL, NULL, '2023-08-24 14:58:40.000', 'oesi', NULL, 0.00, NULL, NULL);
 
 INSERT INTO lehre.tbl_lehreinheit (lehreinheit_id, lehrveranstaltung_id, studiensemester_kurzbz, lehrfach_id_old, lehrform_kurzbz, stundenblockung, wochenrythmus, start_kw, raumtyp, raumtypalternativ, sprache, lehre, anmerkung, unr, lvnr, updateamum, updatevon, insertamum, insertvon, ext_id, lehrfach_id, gewicht)
-VALUES(51003, 5141, CurrentSemester(), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5141, NULL, '2023-08-24 14:54:43.000', 'oesi', '2023-08-24 14:54:43.000', 'oesi', NULL, 5141, 1);
+VALUES(51003, 5141, COALESCE(CurrentSemester(), LastActiveSemester()), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5141, NULL, '2023-08-24 14:54:43.000', 'oesi', '2023-08-24 14:54:43.000', 'oesi', NULL, 5141, 1);
 
 INSERT INTO lehre.tbl_lehreinheitgruppe
 (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id)
@@ -159,7 +159,7 @@ INSERT INTO lehre.tbl_lehreinheitmitarbeiter
 VALUES(51003, 'demolektor3', 'Lektor', 0, NULL, 1.00, NULL, true, NULL, NULL, '2023-08-24 14:58:40.000', 'oesi', NULL, 0.00, NULL, NULL);
 
 INSERT INTO lehre.tbl_lehreinheit (lehreinheit_id, lehrveranstaltung_id, studiensemester_kurzbz, lehrfach_id_old, lehrform_kurzbz, stundenblockung, wochenrythmus, start_kw, raumtyp, raumtypalternativ, sprache, lehre, anmerkung, unr, lvnr, updateamum, updatevon, insertamum, insertvon, ext_id, lehrfach_id, gewicht)
-VALUES(51004, 5211, CurrentSemester(), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5211, NULL, '2023-08-24 14:54:43.000', 'oesi', '2023-08-24 14:54:43.000', 'oesi', NULL, 5211, 1);
+VALUES(51004, 5211, COALESCE(CurrentSemester(), LastActiveSemester()), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5211, NULL, '2023-08-24 14:54:43.000', 'oesi', '2023-08-24 14:54:43.000', 'oesi', NULL, 5211, 1);
 
 INSERT INTO lehre.tbl_lehreinheitgruppe
 (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id)
@@ -170,7 +170,7 @@ INSERT INTO lehre.tbl_lehreinheitmitarbeiter
 VALUES(51004, 'demolektor4', 'Lektor', 0, NULL, 1.00, NULL, true, NULL, NULL, '2023-08-24 14:58:40.000', 'oesi', NULL, 0.00, NULL, NULL);
 
 INSERT INTO lehre.tbl_lehreinheit (lehreinheit_id, lehrveranstaltung_id, studiensemester_kurzbz, lehrfach_id_old, lehrform_kurzbz, stundenblockung, wochenrythmus, start_kw, raumtyp, raumtypalternativ, sprache, lehre, anmerkung, unr, lvnr, updateamum, updatevon, insertamum, insertvon, ext_id, lehrfach_id, gewicht)
-VALUES(51005, 5311, CurrentSemester(), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5311, NULL, '2023-08-24 14:54:43.000', 'oesi', '2023-08-24 14:54:43.000', 'oesi', NULL, 5311, 1);
+VALUES(51005, 5311, COALESCE(CurrentSemester(), LastActiveSemester()), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5311, NULL, '2023-08-24 14:54:43.000', 'oesi', '2023-08-24 14:54:43.000', 'oesi', NULL, 5311, 1);
 
 INSERT INTO lehre.tbl_lehreinheitgruppe
 (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id)
@@ -181,7 +181,7 @@ INSERT INTO lehre.tbl_lehreinheitmitarbeiter
 VALUES(51005, 'demolektor4', 'Lektor', 0, NULL, 1.00, NULL, true, NULL, NULL, '2023-08-24 14:58:40.000', 'oesi', NULL, 0.00, NULL, NULL);
 
 INSERT INTO lehre.tbl_lehreinheit (lehreinheit_id, lehrveranstaltung_id, studiensemester_kurzbz, lehrfach_id_old, lehrform_kurzbz, stundenblockung, wochenrythmus, start_kw, raumtyp, raumtypalternativ, sprache, lehre, anmerkung, unr, lvnr, updateamum, updatevon, insertamum, insertvon, ext_id, lehrfach_id, gewicht)
-VALUES(51006, 5321, CurrentSemester(), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5321, NULL, '2023-08-24 14:54:43.000', 'oesi', '2023-08-24 14:54:43.000', 'oesi', NULL, 5321, 1);
+VALUES(51006, 5321, COALESCE(CurrentSemester(), LastActiveSemester()), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5321, NULL, '2023-08-24 14:54:43.000', 'oesi', '2023-08-24 14:54:43.000', 'oesi', NULL, 5321, 1);
 
 INSERT INTO lehre.tbl_lehreinheitgruppe
 (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id)
@@ -210,7 +210,7 @@ VALUES(510021, 31002, 31002, 5, 1, 'B', '', NULL, 'demolektor1', 'EG04', '2025-0
 
 INSERT INTO public.tbl_studentlehrverband
 (student_uid, studiensemester_kurzbz, studiengang_kz, semester, verband, gruppe, updateamum, updatevon, insertamum, insertvon, ext_id)
-VALUES('s125b101', 'SS2026', 5, 2, ' ', ' ', NULL, NULL, '2026-06-11 14:33:58.403', 'auto', NULL);
+VALUES('s125b101', LastActiveSemester(), 5, 2, ' ', ' ', NULL, NULL, '2026-06-11 14:33:58.403', 'auto', NULL);
 
 INSERT INTO public.tbl_gruppe (gruppe_kurzbz, studiengang_kz, semester, bezeichnung, beschreibung, sichtbar, lehre, aktiv, sort, mailgrp, generiert, updateamum, updatevon, insertamum, insertvon, ext_id, orgform_kurzbz, content_visible, gesperrt, direktinskription, zutrittssystem, aufnahmegruppe) VALUES
 ('GRP_51003', 5, 2, 'BS5 2 ENG', null, false, false, true, NULL, false, false, now(), 'demoadmin', now(), 'demoadmin', NULL, NULL, true, false, true, false, false),
@@ -229,4 +229,3 @@ INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, updateamum, updatevon
 ('s125b101', 'GRP_51003', now(), 'demoadmin', now(), 'demoadmin', NULL, NULL),
 ('s125b101', 'GRP_51004', now(), 'demoadmin', now(), 'demoadmin', NULL, NULL)
 ;
- 

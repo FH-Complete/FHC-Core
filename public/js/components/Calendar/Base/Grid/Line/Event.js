@@ -1,10 +1,12 @@
 import draggable from '../../../../../directives/draggable.js';
+import drop from '../../../../../directives/drop.js';
 import CalClick from '../../../../../directives/Calendar/Click.js';
 
 export default {
 	name: "GridLineEvent",
 	directives: {
 		draggable,
+		drop,
 		CalClick
 	},
 	emits: [
@@ -29,6 +31,14 @@ export default {
 		contextMenuActions: {
 			from: "contextMenuActions",
 			default: () => ({})
+		},
+		onDrop: {
+			from: "onDrop",
+			default: () => null
+		},
+		onDropEvent: {
+			from: "onDropEvent",
+			default: () => () => {}
 		}
 	},
 	props: {
@@ -60,6 +70,8 @@ export default {
 				if (this.event.endsHere)
 					classes.push('event-end');
 			}
+
+			classes.push(`calender_id-${this.event.orig.kalender_id}`);
 			return classes;
 		},
 		dragKalenderCollection() {
@@ -73,7 +85,8 @@ export default {
 		activeContextActions() {
 			if (this.isHeaderOrFooter) return [];
 			const type = this.event.orig?.type ?? 'lehreinheit';
-			return this.contextMenuActions[type] ?? this.contextMenuActions['default'] ?? [];
+			const actions = this.contextMenuActions[type] ?? this.contextMenuActions['default'] ?? [];
+			return actions.filter(action => !action.visible || action.visible(this.event.orig));
 		}
 	},
 	methods: {
@@ -102,20 +115,42 @@ export default {
 			evt.dataTransfer.setData('fhc-grab-offset-y', evt.clientY - rect.top);
 			evt.dataTransfer.setData('fhc-grab-offset-x', evt.clientX - rect.left);
 		},
+		onDropOnCard(evt, items) {
+			if (this.isHeaderOrFooter || !this.onDrop)
+				return;
+
+			const list = Array.isArray(items) ? items : [items];
+			const obj = list[0];
+			if (!obj)
+				return;
+
+			if ((evt.ctrlKey || evt.metaKey) && obj.type === 'lehreinheit')
+			{
+				return this.onDrop({
+					item: [obj],
+					ctrlKey: true,
+					targetKalenderId: this.event.orig?.kalender_id ?? null
+				});
+			}
+
+			return this.onDropEvent(evt, items, this.event.start.startOf('day'));
+		},
 	},
 	template:`
 	<div
 		class="fhc-calendar-base-grid-line-event event"
 		:class="classes"
-		style="z-index: 2"
+		style="z-index: 11"
 		:draggable="draggable"
 		:data-id="'event-' + event.orig.kalender_id"
 		:data-group-id="'event-group-' + event.orig.eindeutige_kalender_gruppen_id"
 		ref="eventEl"
 		@dragstart="onDragStart"
 		v-draggable:move.noimage="draggable ? dragKalenderCollection : {}"
+		v-drop:move.lehreinheit.kalender.reservierung="onDropOnCard"
 		v-cal-click:event="isHeaderOrFooter ? event : event.orig"
 		@contextmenu.prevent="onRightClick"
+		data-cy="calendar-event"
 	>
 		<div
 			v-if="resizable"
@@ -147,9 +182,9 @@ export default {
 			/>
 			<ul
 				v-if="contextMenu.show"
-				data-cy="eventContextMenu"
 				class="dropdown-menu show"
 				:style="{ position: 'fixed', top: contextMenu.y + 'px', left: contextMenu.x + 'px', zIndex: 9999 }"
+				data-cy="eventContextMenu"
 			>
 				<li v-for="action in activeContextActions" :key="action.label">
 					<button class="dropdown-item" type="button" @click.stop="onContextAction(action.action)">

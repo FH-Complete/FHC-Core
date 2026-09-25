@@ -34,5 +34,11 @@ export default {
 			url: 'api/frontend/v1/tempus/config/set',
 			params
 		};
+	},
+	updateCollision () {
+		return {
+			method: 'post',
+			url: 'api/frontend/v1/tempus/config/updateCollision'
+		};
 	}
 };

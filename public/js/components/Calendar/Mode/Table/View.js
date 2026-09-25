@@ -1,14 +1,13 @@
 import {CoreFilterCmpt} from "../../../../components/filter/Filter.js";
 import BsModal from '../../../Bootstrap/Modal.js';
 import FormInput from "../../../Form/Input.js";
-import ApiDetails from "../../../../api/lehrveranstaltung/details.js";
-
 
 export default {
 	name: "TableView",
 	inject: {
 		events: "events",
-		timezone: "timezone"
+		timezone: "timezone",
+		tableActions: "tableActions",
 	},
 	components: {
 		CoreFilterCmpt,
@@ -17,6 +16,10 @@ export default {
 	},
 	props: {
 		day: {
+			type: luxon.DateTime,
+			required: true
+		},
+		end: {
 			type: luxon.DateTime,
 			required: true
 		}
@@ -29,10 +32,13 @@ export default {
 	},
 	computed: {
 		start() {
-			return this.day.startOf('week', { useLocaleWeeks: true });
+			return this.day.startOf('day');
+		},
+		tableEnd() {
+			return this.end.endOf('day');
 		},
 		preparedEvents() {
-			const end = this.start.plus({ days: 7 });
+			const end = this.tableEnd;
 			return this.events
 				.filter(e => e.start < end && e.end > this.start)
 				.sort((a, b) => a.start.ts - b.start.ts)
@@ -91,21 +97,25 @@ export default {
 	{
 		openModal() {
 			this.$refs.raumModal.show();
+		},
+		async deleteSelected() {
+			let selected = this.$refs.tableViewTable?.tabulator?.getSelectedData() ?? [];
+
+			if (!selected.length) return;
+
+			let isConfirmed = await this.$fhcAlert.confirmDelete();
+
+			if (!isConfirmed) return;
+
+			await this.tableActions?.deleteEntries(selected)
+
+			this.$refs.tableViewTable.tabulator.deselectRow();
 		}
 	},
 	watch: {
 		preparedEvents(newData) {
 			this.$refs.tableViewTable?.tabulator?.setData(newData);
 		}
-	},
-	mounted() {
-
-		this.$api.call(ApiDetails.getRaumtyp())
-			.then(result => {
-				this.raumtyp_array = result.data;
-			})
-			.catch(this.$fhcAlert.handleSystemError);
-
 	},
 	template: /* html */`
 	<div class="fhc-calendar-mode-table-view h-100 overflow-auto">
@@ -117,12 +127,13 @@ export default {
 			:download="true"
 		>
 			<template #actions>
+				<button @click="deleteSelected" class="btn btn-outline-danger btn-sm">Löschen</button>
 				<button class="btn btn-outline-secondary btn-sm">Verschieben</button>
 				<button @click="openModal" class="btn btn-outline-secondary btn-sm">Raum wechsel</button>
 			</template>
 		</core-filter-cmpt>
 		
-		<bs-modal ref="raumModal" class="bootstrap-prompt" dialogClass="modal-lg">
+		<!--<bs-modal ref="raumModal" class="bootstrap-prompt" dialogClass="modal-lg">
 			<template #title>Raum verschiebung</template>
 				<form-input
 					:label="$p.t('lehre', 'raumtyp')"
@@ -141,7 +152,7 @@ export default {
 			<template #footer>
 				<button type="button" class="btn btn-primary">{{ $p.t('ui', 'speichern') }}</button>
 			</template>
-		</bs-modal>
+		</bs-modal>-->
 	</div>
 	`
 }

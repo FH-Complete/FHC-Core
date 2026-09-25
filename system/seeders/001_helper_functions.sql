@@ -26,3 +26,11 @@ DECLARE res varchar(32);
 		return res;
 	END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION LastActiveSemester() RETURNS varchar(32) AS $$
+DECLARE res varchar(32);
+	BEGIN
+		SELECT studiensemester_kurzbz into res FROM public.tbl_studiensemester WHERE start<=now() ORDER BY start DESC LIMIT 1;
+		return res;
+	END;
+$$ LANGUAGE plpgsql;

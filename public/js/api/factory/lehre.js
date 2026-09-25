@@ -35,5 +35,11 @@ export default {
 			method: 'get',
 			url: `/api/frontend/v1/Lehre/Pruefungen/${lehrveranstaltung_id}`
 		};
+	},
+	getSemesterAverageGrade(semester) {
+		return {
+			method: 'get',
+			url: `/api/frontend/v1/Lehre/semesterAverageGrade/${semester}`
+		}
 	}
 };

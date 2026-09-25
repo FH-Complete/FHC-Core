@@ -3,6 +3,7 @@ import FormInput from "../Form/Input.js";
 import BsModal from '../Bootstrap/Modal.js';
 
 export default {
+	name: 'TagComponent',
 	components: {
 		CoreForm,
 		FormInput,
@@ -14,6 +15,10 @@ export default {
 		'deleted',
 	],
 	props: {
+		isListItemShown: {
+			type: Boolean,
+			default: true
+		},
 		endpoint: {
 			type: Object,
 			required: true
@@ -27,6 +32,10 @@ export default {
 		confirmLimit: {
 			type: Number,
 			default: 20
+		},
+		showHover: {
+			type: Boolean,
+			default: false
 		}
 	},
 	data() {
@@ -44,7 +53,10 @@ export default {
 				insertvon: "",
 				updateamum: "",
 				updatevon: "",
-				response: ""
+				response: "",
+				start: "",
+				ende: "",
+				prioritaet: 100,
 			},
 			mode: "create"
 		};
@@ -71,7 +83,7 @@ export default {
 				'id': tag_id
 			};
 
-			this.$api.call(this.endpoint.getTag(getData))
+			await this.$api.call(this.endpoint.getTag(getData))
 				.then(result => result.data)
 				.then(result => this.openModal(result))
 		},
@@ -87,7 +99,12 @@ export default {
 			this.tagData.bearbeiter = item.bearbeiter;
 			this.tagData.verfasser = item.verfasser;
 			this.tagData.readonly = item.readonly;
-
+			//add for automated tags
+			this.tagData.automatisiert = item.automatisiert;
+			this.tagData.start = this.formatDateTimeDay(item.start);
+			this.tagData.ende = this.formatDateTimeDay(item.ende);
+			this.tagData.prioritaet = item.prioritaet || 100;
+			
 			if (item && item.notiz_id)
 			{
 				this.selectedTagId = item.notiz_id;
@@ -119,7 +136,7 @@ export default {
 			{
 				postData.id = this.selectedTagId;
 				this.tagData.id = this.selectedTagId;
-				this.$api.call(this.endpoint.updateTag(postData));
+				await this.$api.call(this.endpoint.updateTag(postData));
 				this.$emit("updated", this.tagData);
 				this.$refs.tagModal.hide();
 			}
@@ -131,7 +148,7 @@ export default {
 						return;
 				}
 
-				this.$api.call(this.endpoint.addTag(postData))
+				await this.$api.call(this.endpoint.addTag(postData))
 					.then(response => response.data)
 					.then(response => {
 						if (typeof response === 'number') {
@@ -158,7 +175,7 @@ export default {
 				done: !this.tagData.done,
 				notiz: this.tagData.notiz,
 			}
-			this.$api.call(this.endpoint.doneTag(postData))
+			await this.$api.call(this.endpoint.doneTag(postData))
 			this.$emit("updated", this.tagData);
 			this.$refs.tagModal.hide();
 		},
@@ -167,7 +184,7 @@ export default {
 			let postData = {
 				id: this.selectedTagId
 			}
-			this.$api.call(this.endpoint.deleteTag(postData))
+			await this.$api.call(this.endpoint.deleteTag(postData))
 			this.$emit("deleted", this.selectedTagId)
 			this.$refs.tagModal.hide();
 		},
@@ -185,7 +202,8 @@ export default {
 				updateamum: "",
 				bearbeiter: "",
 				response: "",
-				readonly: false
+				readonly: false,
+				prioritaet: 100,
 			};
 			this.selectedTagId = null;
 			this.mode = "create";
@@ -201,16 +219,25 @@ export default {
 				second: "2-digit"
 			});
 		},
+		formatDateTimeDay: (dateString) => {
+			if (!dateString) return null;
+			return new Date(dateString).toLocaleString('de-AT', {
+				year: "numeric",
+				month: "2-digit",
+				day: "2-digit",
+			});
+		},
 		async copy (){
 			await navigator.clipboard.writeText(this.tagData.notiz);
 		}
 	},
 	template: `
-		<div class="plus_button_container" @mouseleave="hideList">
+		<div v-if="isListItemShown" class="plus_button_container" @mouseleave="hideList">
 			<span :title="values.length === 0 ? 'Bitte Zeilen markieren' : ''">
 			<button @mouseover="showList = true" 
 					:disabled="!values || values.length === 0"
-					class="btn btn-sm">
+					class="btn btn-sm"
+					:class="{'btn-hover': showHover}">
 				<i class="fa-solid fa-tag fa-xl"></i>
 			</button>
 			</span>
@@ -257,6 +284,15 @@ export default {
 						<br />
 						<span v-if="tagData.bearbeiter && tagData.insertamum !== tagData.updateamum">
 							{{ $p.t('notiz', 'tag_bearbeiter', { 0: tagData.bearbeiter, 1: tagData.updateamum }) }}
+						</span>
+						<span v-if="tagData.start || tagData.ende" >
+							gültig
+						</span>
+						<span v-if="tagData.start">
+							von {{tagData.start}}
+						</span>
+						<span v-if="tagData.ende">
+							bis {{tagData.ende}}
 						</span>
 					</div>
 				</div>

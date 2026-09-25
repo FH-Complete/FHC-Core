@@ -7,12 +7,15 @@
 		'vue3' => true,
 		'primevue3' => true,
 		'tabulator5' => true,
+		'filtercomponent' => true,
+		'navigationcomponent' => true,
 		'vuedatepicker11' => true,
 		'momentjs2' => true,
+		'tags' => true,
 		'phrases' => array(
 			'global',
 			'ui',
-			'notiz',
+			'lehre'
 		),
 		'customCSSs' => [
 			'public/css/components/vue-datepicker.css',
@@ -23,9 +26,8 @@
 			'public/css/components/function.css'
 		],
 		'customJSs' => [
-			#'vendor/npm-asset/primevue/tree/tree.min.js',
-			#'vendor/npm-asset/primevue/toast/toast.min.js'
-			'vendor/moment/luxonjs/luxon.min.js'
+			'vendor/moment/luxonjs/luxon.min.js',
+			'vendor/npm-asset/primevue/listbox/listbox.min.js'
 		],
 		'customJSModules' => [
 			'public/js/apps/Tempus.js'

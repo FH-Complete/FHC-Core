@@ -160,9 +160,9 @@ export function useEventLoader(rangeInterval, getPromiseFunc, isLoaderVisible = 
 		tempEventsHolder = [];
 		//loadingEvents.value = [];
 		eventsLoaded.splice(0, eventsLoaded.length);
+
 		reload();
 	}
-
 
 	return { events: allEvents, lv, reset }
 }

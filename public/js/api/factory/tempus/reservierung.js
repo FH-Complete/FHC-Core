@@ -48,11 +48,11 @@ export default {
 			url: '/api/frontend/v1/tempus/Reservierung/getRollen',
 		};
 	},
-	addReservierung(titel, beschreibung, ort_kurzbz, start_date, end_date, teilnehmer, specialFinalGroups, specialGroups, groups) {
+	addReservierung(titel, beschreibung, orte, start_date, end_date, teilnehmer, specialFinalGroups, specialGroups, groups) {
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/tempus/Reservierung/addReservierung',
-			params: { titel, beschreibung, ort_kurzbz, start_date, end_date, teilnehmer, specialFinalGroups, specialGroups, groups}
+			params: { titel, beschreibung, orte, start_date, end_date, teilnehmer, specialFinalGroups, specialGroups, groups}
 		};
 	},
 

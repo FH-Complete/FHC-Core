@@ -3,9 +3,17 @@ export default {
 	getPlan(filter, start_date, end_date)
 	{
 		return {
-			method: 'get',
+			method: 'post',
 			url: '/api/frontend/v1/tempus/Kalender/getPlan',
 			params: { ...filter, start_date, end_date }
+		};
+	},
+	getRaumvorschlagSlots(lehreinheit_id, start_date, end_date)
+	{
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/tempus/Kalender/getRaumvorschlagSlots',
+			params: { lehreinheit_id, start_date, end_date }
 		};
 	},
 	getPlanLecturer(start_date, end_date)
@@ -81,6 +89,13 @@ export default {
 			params: { kalender_id, updatedInfos}
 		};
 	},
+	deleteOrtEntry(kalender_id) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/tempus/Kalender/deleteOrtEntry',
+			params: { kalender_id}
+		};
+	},
 	addKalenderEvent(lehreinheit_id, ort_kurzbz, start_date, end_date) {
 		return {
 			method: 'post',
@@ -88,10 +103,39 @@ export default {
 			params: { lehreinheit_id, ort_kurzbz, start_date, end_date}
 		};
 	},
+	calculateMultiWeekPlan(lehreinheit_id, ort_kurzbz, start_date, end_date) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/tempus/Kalender/calculateMultiWeekPlan',
+			params: { lehreinheit_id, ort_kurzbz, start_date, end_date }
+		};
+	},
+	confirmMultiWeekPlan(plan, lehreinheit_id ) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/tempus/Kalender/confirmMultiWeekPlan',
+			params: { plan, lehreinheit_id }
+		};
+	},
+
+	addToKalenderEvent(target_kalender_id, lehreinheit_id ) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/tempus/Kalender/addToKalenderEvent',
+			params: { target_kalender_id, lehreinheit_id }
+		};
+	},
 	getRaumvorschlag(kalender_id) {
 		return {
-			method: 'get',
+			method: 'post',
 			url: '/api/frontend/v1/tempus/Kalender/getRaumvorschlag',
+			params: { kalender_id }
+		};
+	},
+	getLehreinheiten(kalender_id) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/tempus/Kalender/getLehreinheiten',
 			params: { kalender_id }
 		};
 	},
@@ -108,6 +152,13 @@ export default {
 			method: 'post',
 			url: '/api/frontend/v1/tempus/Kalender/deleteEntry',
 			params: { kalender_id }
+		};
+	},
+	deleteFromKalenderEvent(kalender_id, lehreinheit_ids) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/tempus/Kalender/deleteFromKalenderEvent',
+			params: { kalender_id, lehreinheit_ids }
 		};
 	},
 

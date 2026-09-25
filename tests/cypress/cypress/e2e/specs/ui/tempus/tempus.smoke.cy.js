@@ -44,7 +44,7 @@ context("Tempus smoke tests", () => {
     tempusPage.getEventContextMenu().should("be.visible");
   });
 
-  it("shows Raumauswahl modal when selecting Raumauswahl from event context menu", () => {
+  it("shows room selection modal when selecting 'room selection' from event context menu", () => {
     tempusPage.waitForCalendarToFinishLoading();
     tempusPage
       .getCalendarEventsWithLehreinheit()
@@ -54,7 +54,7 @@ context("Tempus smoke tests", () => {
     tempusPage.getEventContextMenuOption("Raumauswahl").click({ force: true });
     waitForOk("@fetchRoomSuggestions");
 
-    tempusPage.getRaumauswahlModal().should("be.visible");
+    tempusPage.getRoomSelectionModal().should("be.visible");
   });
 
   it("shows resources modal when selecting Ressourcen zuordnen from event context menu", () => {
@@ -69,6 +69,20 @@ context("Tempus smoke tests", () => {
     waitForOk("@fetchAssignedResources");
 
     tempusPage.getResourcesModal().should("be.visible");
+  });
+
+  it("shows tags modal when selecting Tags from event context menu", () => {
+    tempusPage.waitForCalendarToFinishLoading();
+    tempusPage
+      .getCalendarEventsByWeekdayAndStartTime("Sunday", "16:55:00")
+      .should("have.length.greaterThan", 0);
+
+    tempusPage.getCalendarEventsByWeekdayAndStartTime("Sunday", "16:55:00").first().rightclick();
+    tempusPage.getEventContextMenuOption("Tags").click({ force: true });
+    waitForOk("@fetchTags");
+    waitForOk("@fetchTagsByCalendar");
+
+    tempusPage.getTagsModal().should("be.visible");
   });
 
   it("shows history modal when selecting History from event context menu", () => {

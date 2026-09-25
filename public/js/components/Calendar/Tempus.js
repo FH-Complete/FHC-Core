@@ -9,57 +9,75 @@ import ApiKalender from "../../api/factory/tempus/kalender.js";
 import draggable from "../../directives/draggable.js";
 
 export default {
-  name: "CalendarTempus",
-  components: {
-    FhcCalendar,
-  },
-  inject: {
-    renderers: { from: "renderers" },
-    appConfig: {
-      from: "appConfig",
-      default: {
-        visible_status: "all",
-      },
-    },
-  },
-  directives: {
-    draggable,
-  },
-  props: {
-    timezone: {
-      type: String,
-      required: true,
-    },
-    date: {
-      type: [Date, String, Number, luxon.DateTime],
-      default: luxon.DateTime.local(),
-    },
-    mode: {
-      type: String,
-      default: "Week",
-    },
-    getPromiseFunc: {
-      type: Function,
-      required: true,
-    },
-    parkedEvents: {
-      type: Object,
-      default: () => new Set(),
-    },
-    visibleLecturers: {
-      type: Array,
-      default: null,
-    },
-    extraBackgrounds: {
-      type: Array,
-      default: () => [],
-    },
-    visibleStatus: {
-      type: Array,
-      default: () => ["all"],
-    },
-  },
-  emits: ["update:date", "update:mode", "update:range", "drop", "resize"],
+	name: "CalendarTempus",
+	components: {
+		FhcCalendar
+	},
+	inject: {
+		renderers: {from: 'renderers'},
+		canToggleGrid: {
+			from: 'canToggleGrid',
+			default: false
+		},
+		appConfig: {
+			from: 'appConfig',
+			default: {
+				visible_status: 'all'
+			}
+		}
+	},
+	directives: {
+		draggable,
+	},
+	props: {
+		timezone: {
+			type: String,
+			required: true
+		},
+		date: {
+			type: [Date, String, Number, luxon.DateTime],
+			default: luxon.DateTime.local()
+		},
+		mode: {
+			type: String,
+			default: 'Week'
+		},
+		getPromiseFunc: {
+			type: Function,
+			required: true
+		},
+		parkedEvents: {
+			type: Object,
+			default: () => new Set()
+		},
+		visibleLecturers: {
+			type: Array,
+			default: null
+		},
+		extraBackgrounds: {
+			type: Array,
+			default: () => []
+		},
+		visibleStatus: {
+			type: Array,
+			default: () => ['all']
+		},
+		showEvents: {
+			type: Boolean,
+			default: true
+		}
+	},
+	emits: [
+		"update:date",
+		"update:mode",
+		"update:range",
+		"update:date-range",
+		"drop",
+		"resize",
+		"event-hover",
+		"event-unhover",
+		"open-reservierung"
+	],
 
   data() {
     return {
@@ -126,52 +144,46 @@ export default {
       if (!this.visibleStatus.length || this.visibleStatus.includes("all"))
         return list;
 
-      return list.filter((event) =>
-        this.visibleStatus.includes(event.status_kurzbz),
-      );
-    },
-  },
-  methods: {
-    eventStyle(event) {
-      if (!event.farbe) return undefined;
-      return "--event-bg:#" + event.farbe;
-    },
-    updateRange(rangeInterval) {
-      this.rangeInterval = rangeInterval;
-      this.$emit("update:range", rangeInterval);
-    },
-    ondrop(payload) {
-      this.$emit("drop", payload);
-    },
-    onresize(payload) {
-      this.$emit("resize", payload);
-    },
-    resetEventLoader() {
-      this.reset();
-    },
-    clearOutCalendarEventEmphasis() {
-      this.$refs.calendar.$el
-        .querySelectorAll(
-          ".fhc-calendar-base-grid .fhc-calendar-base-grid-line-event",
-        )
-        .forEach((el) => {
-          const spinner = el.querySelector(".spinner-overlay");
-          if (spinner) {
-            spinner.remove();
-          }
+			return list.filter(event => this.visibleStatus.includes(event.status_kurzbz));
+		},
+	},
+	methods: {
+		eventStyle(event) {
+			if (!event.farbe)
+				return undefined;
+			return '--event-bg:#' + event.farbe;
+		},
+		updateRange(rangeInterval) {
+			if (this.currentMode === 'tableList')
+				return;
 
-          el.classList.remove(
-            "updating-event",
-            "updated-event",
-            "updated-event-long",
-            "deemphasized-event",
-            "deemphasized-event-long",
-          );
-        });
-    },
-  },
-  setup(props, context) {
-    const rangeInterval = Vue.ref(null);
+			this.rangeInterval = rangeInterval;
+			this.$emit('update:range', rangeInterval);
+		},
+		handleDateRange({ start, end }) {
+			this.rangeInterval = luxon.Interval.fromDateTimes(start.startOf('day'), end.endOf('day'));
+			this.reset();
+			this.$emit('update:range', this.rangeInterval);
+			this.$emit('update:date-range', { start, end });
+		},
+		ondrop(payload){
+			this.$emit('drop', payload);
+		},
+		onresize(payload){
+			this.$emit('resize', payload);
+		},
+		resetEventLoader() {
+			this.reset();
+		},
+		navigatePrev() {
+			this.$refs.calendar.clickPrev();
+		},
+		navigateNext() {
+			this.$refs.calendar.clickNext();
+		},
+	},
+	setup(props, context) {
+		const rangeInterval = Vue.ref(null);
 
     const { events, lv, reset } = useEventLoader(
       rangeInterval,
@@ -228,12 +240,15 @@ export default {
 		@update:date="(newDate, newMode) => $emit('update:date', newDate, newMode)"
 		@update:mode="(newMode, newDate) => { currentMode = newMode; $emit('update:mode', newMode, newDate) }"
 		@update:range="updateRange"
+		@update:date-range="handleDateRange"
 	>
 		<template v-slot="{ event, mode }">
 			<div
-				:class="['event-type-' + event.type + ' ' + mode + 'PageContainer', { 'event--parked': parkedEvents.has(String(event.kalender_id)) }]"
+				:class="['event-type-' + event.type + ' ' + mode + 'PageContainer', { 'event--parked': parkedEvents.has(String(event.kalender_id)) }, {'event--opacity': !showEvents}]"
 				:type="mode == 'day' ? 'button' : undefined"
  				:style="eventStyle(event)"
+				@mouseenter="$emit('event-hover', event)"
+				@mouseleave="$emit('event-unhover', event)"
 			>
 				<component
 					v-if="mode == 'event'"
@@ -258,6 +273,7 @@ export default {
 					class="d-flex align-items-center gap-2" 
 					style="cursor:pointer"
 					@click="showRaster = !showRaster"
+					v-if="canToggleGrid"
 				>
 					<i :class="showRaster ? 'fa-solid fa-toggle-on text-primary' : 'fa-solid fa-toggle-off text-muted'"></i>
 					<span class="form-check-label">Stundenraster</span>
@@ -273,6 +289,12 @@ export default {
 						@click.stop="$emit('open-reservierung')"
 					></i>
 					<span>Reservierung</span>
+				</div>
+				<div class="d-flex align-items-center gap-2">
+					<i :class="appConfig.ignore_kollision ? 'fa-solid fa-triangle-exclamation text-danger' : 'fa-solid fa-circle-check text-success'"></i>
+					<span class="form-check-label">
+						{{ appConfig.ignore_kollision ? 'Kollisionscheck aus' : 'Kollisionscheck an' }}
+					</span>
 				</div>
 			</div>
 		</template>

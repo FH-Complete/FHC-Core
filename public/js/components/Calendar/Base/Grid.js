@@ -27,7 +27,8 @@ export default {
 	provide() {
 		return {
 			flipAxis: Vue.computed(() => this.flipAxis),
-			axisRow: Vue.computed(() => this.axisRow)
+			axisRow: Vue.computed(() => this.axisRow),
+			onDropEvent: Vue.computed(() => this.onDropEvent),
 		};
 	},
 	props: {
@@ -60,7 +61,11 @@ export default {
 		flipAxis: Boolean,
 		allDayEvents: Boolean,
 		axisMainCollapsible: Boolean,
-		snapToGrid: Boolean
+		snapToGrid: Boolean,
+		dayVisibility: {
+			type: Array,
+			default: null
+		}
 	},
 	data() {
 		return {
@@ -159,7 +164,17 @@ export default {
 		hasValidEvents() {
 			return this.events.find(e => e.length);
 		},
-		styleGridCols() {
+		styleGridCols()
+		{
+			if (this.dayVisibility)
+			{
+				let anyVisible = this.dayVisibility.some(day => day);
+				if (anyVisible)
+				{
+					return this.axisMain.map((day, i) => this.isDayCollapsed(i) ? 'var(--fhc-calendar-axis-collapsible-manual, 0.1fr)' : '1fr').join(' ');
+				}
+			}
+
 			let cols = 'repeat(' + this.axisMain.length + ', 1fr)';
 			if (this.axisMainCollapsible) {
 				if (this.hasValidEvents)
@@ -376,6 +391,13 @@ export default {
 			return dropStart.startOf('day').plus(lastBlock.end);
 		},
 
+		onDropEvent(evt, items, date)
+		{
+			if (this.snapToGrid)
+				this.onDropSnap(evt, items, date)
+			else
+				this.onDropFree(evt, items, date)
+		},
 		onDropSnap(evt, items, date, part) {
 			let obj = items;
 			if (!obj?.orig) return;
@@ -389,8 +411,12 @@ export default {
 			const blocks = this.axisPartsWithBreaks.filter(p => p.index !== undefined);
 			const grabOffset = grabTime.diff(dropDay);
 
-			const snappedPart = blocks.find(b => grabOffset >= b.start && grabOffset < b.end) || part;
-			const dropStart = dropDay.plus(snappedPart.start);
+			let snappedPart = blocks.find(b => grabOffset >= b.start && grabOffset < b.end);
+
+			if (!snappedPart)
+				snappedPart = blocks.find(b => b.start >= grabOffset) || blocks[blocks.length - 1];
+
+			const dropStart = snappedPart ? dropDay.plus(snappedPart.start) : grabTime;
 
 			let nettoDuration = this._getNettoDurationForDrop(obj);
 			let dropEnd = this.calculateDropEnd(dropStart, nettoDuration);
@@ -398,7 +424,8 @@ export default {
 			this.onDrop?.({
 				item: [obj],
 				start: dropStart.toISO(),
-				end: dropEnd.toISO()
+				end: dropEnd.toISO(),
+				ctrlKey: !!(evt?.ctrlKey || evt?.metaKey)
 			});
 		},
 
@@ -437,7 +464,8 @@ export default {
 			this.onDrop?.({
 				item: [obj],
 				start: dropStart.toISO(),
-				end: dropEnd.toISO()
+				end: dropEnd.toISO(),
+				ctrlKey: !!(evt?.ctrlKey || evt?.metaKey)
 			});
 		},
 		handleResizeStart({ edge, evt, el, event })
@@ -465,6 +493,16 @@ export default {
 				}
 			});
 		},
+		isDayCollapsed(index)
+		{
+			if (this.dayVisibility)
+			{
+				let anyVisible = this.dayVisibility.some(day => day);
+				if (anyVisible)
+					return !this.dayVisibility[index];
+			}
+			return this.axisMainCollapsible && this.hasValidEvents && !this.events[index].length;
+		}
 	},
 	setup()
 	{
@@ -479,6 +517,7 @@ export default {
 		class="fhc-calendar-base-grid"
 		style="display:grid;width:100%;height:100%;overflow:auto"
 		:style="'grid-template-' + axisRow + 's:auto' + (allDayEvents ? ' auto ' : ' ') + '1fr;grid-template-' + axisCol + 's:auto ' + styleGridCols"
+		data-cy="calendar-base-grid"
 	>
 		<div
 			class="grid-header"
@@ -489,7 +528,7 @@ export default {
 				v-for="(date, index) in axisMain"
 				:key="index"
 				class="main-header"
-				:class="{'collapsed-header': axisMainCollapsible && hasValidEvents && !events[index].length}"
+				:class="{'collapsed-header': isDayCollapsed(index)}"
 				:style="'grid-' + axisCol + ':' + (2+index)"
 			>
 				<slot name="main-header" v-bind="{ index, date }" />
@@ -559,6 +598,8 @@ export default {
 							class="part-body"
 							style="position:relative"
 							:style="'grid-' + axisCol + ':' + (1+index) + ';grid-' + axisRow + ':ps_' + i + '/pe_' + i"
+							:data-drop-index="index * axisPartsSave.length + i + 1"
+							data-cy="calendar-grid-part"
 						>
 							<slot name="part-body" v-bind="{ index, part }" />
 							<div
@@ -575,6 +616,7 @@ export default {
 							:date="date"
 							:events="eventsNormal[index]"
 							:backgrounds="backgrounds[index]"
+							:class="{ 'fhc-calendar-base-grid-line-collapsed': isDayCollapsed(index) }"
 							style="position:relative"
 							@resize-start="handleResizeStart"
 							:style="'grid-' + axisRow + ':1/-1;grid-' + axisCol + ':' + (1+index)"

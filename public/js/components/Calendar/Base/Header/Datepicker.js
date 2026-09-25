@@ -24,8 +24,14 @@ export default {
 		}
 	},
 	emits: [
-		"update:date"
+		"update:date",
+		"update:date-range"
 	],
+	data() {
+		return {
+			rangeEnd: null
+		};
+	},
 	computed: {
 		convertedDate() {
 			// convert to target TZ then strip TZ Information
@@ -34,34 +40,37 @@ export default {
 		},
 		current() {
 			switch (this.mode) {
-			case "month":
-				return {month: this.convertedDate.month-1, year: this.convertedDate.year};
-			case "list":
-				return [this.convertedDate.startOf('day').ts, this.convertedDate.startOf('day').plus({ days: this.listLength }).ts - 1];
-			case "week":
-			case "tableList":
-				return [this.convertedDate.startOf('week', { useLocaleWeeks: true }).ts, this.convertedDate.endOf('week', { useLocaleWeeks: true }).ts];
-			case "day":
-				return this.convertedDate;
-			default:
-				return null;
+				case "month":
+					return {month: this.convertedDate.month-1, year: this.convertedDate.year};
+				case "list":
+					return [this.convertedDate.startOf('day').ts, this.convertedDate.startOf('day').plus({ days: this.listLength }).ts - 1];
+				case "week":
+					return [this.convertedDate.startOf('week', { useLocaleWeeks: true }).ts, this.convertedDate.endOf('week', { useLocaleWeeks: true }).ts];
+				case "tableList":
+					return [this.convertedDate.startOf('day').ts, (this.rangeEnd || this.convertedDate).endOf('day').ts];
+				case "day":
+					return this.convertedDate;
+				default:
+					return null;
 			}
 		},
 		title() {
 			switch (this.mode) {
-			case "month":
-				return this.date.toLocaleString({ month: 'long', year: 'numeric' });
-			case "week":
-			case "tableList":
-				var year = this.date.localWeekYear;
-				var week = this.date.toFormat('nn');
-				return this.$p.t('calendar/year_kw', { year, week });
-			case "list":
-				return this.date.toLocaleString(luxon.DateTime.DATE_FULL) + '-' + this.date.plus({ days: this.listLength - 1 }).toLocaleString(luxon.DateTime.DATE_FULL);
-			case "day":
-				return this.date.toLocaleString(luxon.DateTime.DATE_FULL);
-			default:
-				return 'View not Supported';
+				case "month":
+					return this.date.toLocaleString({ month: 'long', year: 'numeric' });
+				case "week":
+					var year = this.date.localWeekYear;
+					var week = this.date.toFormat('nn');
+					return this.$p.t('calendar/year_kw', { year, week });
+				case "tableList":
+					const end = this.rangeEnd ? this.rangeEnd.setZone(this.timezone, { keepLocalTime: true }) : this.date;
+					return this.date.toLocaleString(luxon.DateTime.DATE_FULL) + '-' + end.toLocaleString(luxon.DateTime.DATE_FULL);
+				case "list":
+					return this.date.toLocaleString(luxon.DateTime.DATE_FULL) + '-' + this.date.plus({ days: this.listLength - 1 }).toLocaleString(luxon.DateTime.DATE_FULL);
+				case "day":
+					return this.date.toLocaleString(luxon.DateTime.DATE_FULL);
+				default:
+					return 'View not Supported';
 			}
 		},
 		weekStart() {
@@ -72,20 +81,28 @@ export default {
 		update(value) {
 			let date;
 			switch (this.mode) {
-			case "month":
-				value.month++;
-				date = luxon.DateTime.fromObject(value).setZone(this.timezone, { keepLocalTime: true }).setLocale(this.locale);
-				break;
-			case "list":
-			case "week":
-			case "tableList":
-				date = luxon.DateTime.fromJSDate(value[0]).setZone(this.timezone, { keepLocalTime: true }).setLocale(this.locale);
-				break;
-			case "day":
-				date = luxon.DateTime.fromJSDate(value).setZone(this.timezone, { keepLocalTime: true }).setLocale(this.locale);
-				break;
-			default:
-				return; // Don't update if the value is invalid!
+				case "month":
+					value.month++;
+					date = luxon.DateTime.fromObject(value).setZone(this.timezone, { keepLocalTime: true }).setLocale(this.locale);
+					break;
+				case "list":
+				case "week":
+					date = luxon.DateTime.fromJSDate(value[0]).setZone(this.timezone, { keepLocalTime: true }).setLocale(this.locale);
+					break;
+				case "tableList":
+					if (!Array.isArray(value) || !value[0] || !value[1])
+						return;
+					this.rangeEnd = luxon.DateTime.fromJSDate(value[1]);
+					const start = luxon.DateTime.fromJSDate(value[0]).setZone(this.timezone, { keepLocalTime: true }).setLocale(this.locale);
+					const end = this.rangeEnd.setZone(this.timezone, { keepLocalTime: true }).setLocale(this.locale);
+					this.$emit('update:date', start);
+					this.$emit('update:date-range', { start, end });
+					return;
+				case "day":
+					date = luxon.DateTime.fromJSDate(value).setZone(this.timezone, { keepLocalTime: true }).setLocale(this.locale);
+					break;
+				default:
+					return; // Don't update if the value is invalid!
 			}
 			this.$emit("update:date", date);
 		},
@@ -99,8 +116,8 @@ export default {
 		@update:model-value="update"
 		:format="() => title"
 		:month-picker="mode == 'month'"
-		:week-picker="mode == 'week' || mode == 'tableList'"
-		:range="mode == 'list' ? { autoRange: listLength - 1 } : false"
+		:week-picker="mode == 'week'"
+		:range="mode == 'list' ? { autoRange: listLength - 1 } : (mode == 'tableList' ? { partialRange: false } : false)"
 		:text-input="mode == 'day'"
 		:week-start="weekStart"
 		:week-numbers="{ type: weekNumbers }"

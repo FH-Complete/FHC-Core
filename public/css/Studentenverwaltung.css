@@ -2,11 +2,14 @@
 @import './SvgIcons.css';
 @import './components/searchbar/searchbar.css';
 @import './components/verticalsplit.css';
+@import './components/horizontalsplit.css';
 @import './components/FilterComponent.css';
 @import './components/Tabs.css';
 @import './components/Notiz.css';
 @import './components/Messages.css';
 @import './components/AppMenu.css';
+@import './components/horizontalsplit.css';
+
 
 html {
   font-size: .875em;
@@ -93,6 +96,13 @@ html.fs_huge {
 /* to avoid interference with Notiz.css and overflow for textfield */
 .stv-details-abschlusspruefung .tabulator-cell {
 	overflow: visible !important;
+}
+
+/* to enable scrolling for many student entries*/
+.stv-details-abschlusspruefung-student-names {
+	max-height: 80px;
+	overflow-y: auto;
+	overflow-x: hidden;
 }
 
 .p-dropdown-item{
@@ -277,3 +287,7 @@ html.fs_huge {
 }
 */
 /* slim ende */
+
+.fhc-xxl-modal {
+	min-width: 80vw;
+}

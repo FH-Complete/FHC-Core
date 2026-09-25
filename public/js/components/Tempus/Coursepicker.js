@@ -10,57 +10,134 @@ export default {
 		draggable
 	},
 	props: {
-		stg: {
-			type: [String, Number],
-			default: null,
+		studiengaenge: {
+			type: Array,
+			default: [],
+		},
+		lecturers: {
+			type: Array,
+			default: [],
 		},
 		studiensemester: {
 			type: String,
 			default: null
 		},
+		previewLehreinheitId: {
+			type: [String, Number],
+			default: null
+		},
+		previewLoading: {
+			type: Boolean,
+			default: false
+		},
 	},
-	emits: ['select-lecturer', 'select-kw'],
+	emits: ['select-lecturer', 'select-kw', 'preview-raumvorschlag'],
 	data() {
 		return {
 			searchparam: '',
 			allCourses: [],
+			sortBy: null,
+			multiWeekIds: new Set(),
+			favorites: new Set(),
+			filter: {}
 		}
 	},
 	computed: {
 		courses() {
 			const query = (this.searchparam ?? '').trim().toLowerCase();
-			if (!query)
-				return this.allCourses;
 
-			return this.allCourses.filter(course =>
-				course.showname.toLowerCase().includes(query) ||
-				course.lektoren?.some(l =>
-					l.name.toLowerCase().includes(query) ||
-					l.kurzbz.toLowerCase().includes(query)
-				)
-			);
+			let result;
+			if (query)
+			{
+				result = this.allCourses.filter(course =>
+					course.showname.toLowerCase().includes(query) ||
+					course.start_kw.includes(query) ||
+					course.lektoren?.some(lektor =>
+						lektor.name.toLowerCase().includes(query) ||
+						lektor.kurzbz.toLowerCase().includes(query)
+					)
+				);
+			}
+			else
+				result = this.allCourses;
+
+			if (this.sortBy === 'lektor-asc' || this.sortBy === 'lektor-desc')
+			{
+				let dir = this.sortBy === 'lektor-asc' ? 1 : -1;
+
+				result = result.sort((a, b) => {
+					let an = a.lektoren?.[0]?.kurzbz ?? '';
+					let bn = b.lektoren?.[0]?.kurzbz ?? '';
+					return an.localeCompare(bn) * dir;
+				});
+			}
+			else if (this.sortBy === 'kw-asc')
+			{
+				result = result.sort((a, b) => (a.start_kw ?? 0) - (b.start_kw ?? 0));
+			}
+			else if (this.sortBy === 'kw-desc')
+			{
+				result = result.sort((a, b) => (b.start_kw ?? 0) - (a.start_kw ?? 0));
+			}
+			else if (this.sortBy === 'stunden-asc')
+			{
+				result = result.sort((a, b) => (a.offenestunden ?? 0) - (b.offenestunden ?? 0));
+			}
+			else if (this.sortBy === 'stunden-desc')
+			{
+				result = result.sort((a, b) => (b.offenestunden ?? 0) - (a.offenestunden ?? 0));
+			}
+
+			return [...result].sort((a, b) => {
+				let ap = this.isPinned(a) ? 1 : 0;
+				let bp = this.isPinned(b) ? 1 : 0;
+				return bp - ap;
+			});
 		}
 	},
 	watch: {
-		stg(val) {
-			this.searchparam = '';
-			this.loadCoursesByStg(val);
+		studiengaenge: {
+			deep: true,
+			handler(val) {
+				this.loadCourses();
+			}
+		},
+		lecturers: {
+			deep: true,
+			handler() {
+				this.loadCourses();
+			}
 		},
 		studiensemester() {
-			if (this.stg)
-				this.loadCoursesByStg(this.stg);
+			if (this.studiengaenge)
+				this.loadCourses();
 		},
 	},
 	methods: {
-		async loadCoursesByStg(stg) {
-			if (!stg) {
-				this.allCourses = [];
-				return;
+		async loadCourses()
+		{
+			const hasLektoren = this.lecturers.length > 0;
+			const hasStg = this.studiengaenge.length > 0;
+
+			this.filter = {};
+			if (hasLektoren)
+				this.filter.uid = this.lecturers;
+
+			if (hasStg) {
+				this.filter.stg = this.studiengaenge.map(
+					({ stg_kz, semester, orgform_kurzbz }) => ({
+						stg_kz,
+						semester,
+						orgform_kurzbz,
+					}),
+				);
 			}
 
-			this.$api.call(ApiCoursePicker.getByStg(this.stg, this.studiensemester))
+			if (Object.keys(this.filter).length === 0)
+				return this.allCourses = [];
+			this.$api.call(ApiCoursePicker.getCourses(this.filter, this.studiensemester))
 				.then(result => {
-					this.allCourses = result.data.map(e => ({
+					this.allCourses = result?.data?.map(e => ({
 						lehreinheit_id: e.lehreinheit_id,
 						lektoren: e.lektoren,
 						raumtyp: e.raumtyp,
@@ -79,7 +156,7 @@ export default {
 						showname: `${e.lehrfach} ${e.lehrform}`,
 						orig: {
 							type: 'lehreinheit',
-							lehreinheit_id: e.lehreinheit_id[0],
+							lehreinheit_id: e.lehreinheit_id,
 							blockung: e.stundenblockung,
 							entry: e,
 						}
@@ -94,6 +171,7 @@ export default {
 				id: orig.lehreinheit_id,
 				orig: orig,
 				stundenblockung: course.stundenblockung,
+				multiweek: this.isMultiWeek(course),
 			};
 		},
 		courseStyle(course) {
@@ -104,7 +182,74 @@ export default {
 		},
 		selectLecturer(lektor) {
 			this.$emit('select-lecturer', lektor);
-		}
+		},
+		setSort(field) {
+			if (this.sortBy === `${field}-asc`)
+				this.sortBy = `${field}-desc`;
+			else if (this.sortBy === `${field}-desc`)
+				this.sortBy = null;
+			else
+				this.sortBy = `${field}-asc`;
+		},
+		sortIcon(field) {
+			if (this.sortBy === `${field}-asc`)
+				return 'fa-arrow-up';
+			if (this.sortBy === `${field}-desc`)
+				return 'fa-arrow-down';
+			return 'fa-sort';
+		},
+		isSortActive(field) {
+			return this.sortBy === `${field}-asc` || this.sortBy === `${field}-desc`;
+		},
+		reload()
+		{
+			this.loadCourses();
+		},
+		toggleMultiWeek(course)
+		{
+			let id = course.lehreinheit_id;
+			let weekIds = new Set(this.multiWeekIds);
+			if (weekIds.has(id))
+				weekIds.delete(id);
+			else
+				weekIds.add(id);
+
+			this.multiWeekIds = weekIds;
+		},
+		isMultiWeek(course)
+		{
+			return this.multiWeekIds.has(course.lehreinheit_id);
+		},
+		togglePin(course)
+		{
+			let id = course.lehreinheit_id;
+			let favs = new Set(this.favorites);
+			if (favs.has(id))
+				favs.delete(id);
+			else
+				favs.add(id);
+
+			this.favorites = favs;
+			localStorage.setItem('tempus_coursepicker_favs', JSON.stringify([...favs]));
+		},
+		isPinned(course)
+		{
+			return this.favorites.has(course.lehreinheit_id);
+		},
+		selectRaumvorschlag(course)
+		{
+			if (this.isRaumvorschlagActive(course))
+				this.$emit('preview-raumvorschlag', null);
+			else
+				this.$emit('preview-raumvorschlag', course.orig);
+		},
+		isRaumvorschlagActive(course)
+		{
+			return this.previewLehreinheitId != null && this.previewLehreinheitId === course.lehreinheit_id;
+		},
+	},
+	mounted() {
+		this.favorites = new Set(JSON.parse(localStorage.getItem('tempus_coursepicker_favs') || '[]'));
 	},
 	template: `
 	<div class="course-picker d-flex flex-column h-100">
@@ -114,35 +259,94 @@ export default {
 				type="text"
 				v-model="searchparam"
 			/>
+			<div class="d-flex gap-1 mt-2">
+				<button
+					type="button"
+					class="btn btn-sm btn-outline-secondary"
+					:disabled="studiengaenge.length <= 0"
+					@click="reload">
+					<i class="fa fa-rotate-right"></i>
+				</button>
+				<button
+					type="button"
+					class="btn btn-sm"
+					:class="isSortActive('lektor') ? 'btn-primary' : 'btn-outline-secondary'"
+					@click="setSort('lektor')">
+					Lkt <i class="fa" :class="sortIcon('lektor')"></i>
+				</button>
+				<button
+					type="button"
+					class="btn btn-sm"
+					:class="isSortActive('kw') ? 'btn-primary' : 'btn-outline-secondary'"
+					@click="setSort('kw')">
+					KW <i class="fa" :class="sortIcon('kw')"></i>
+				</button>
+				<button
+					type="button"
+					class="btn btn-sm"
+					:class="isSortActive('stunden') ? 'btn-primary' : 'btn-outline-secondary'"
+					@click="setSort('stunden')">
+					Std <i class="fa" :class="sortIcon('stunden')"></i>
+				</button>
+			</div>
 		</div>
-		<div v-if="!stg" class="d-flex flex-column align-items-center justify-content-center text-center text-muted py-5 px-3 h-100">
-			<span class="small fw-semibold mb-1">Keine Lehreinheiten</span>
-			<span class="small">Wähle einen Studiengang, um Lehreinheiten anzuzeigen.</span>
+		<div v-if="Object.keys(filter).length <= 0" class="d-flex flex-column align-items-center justify-content-center text-center text-muted py-5 px-3 h-100">
+			<span class="small fw-semibold mb-1">{{$p.t('lehre', 'cptitleempty')}}</span>
+			<span class="small">{{$p.t('lehre', 'cpempty')}}</span>
 		</div>
 		<div v-else class="overflow-auto px-2 pb-2 flex-grow-1">
 			<div
 				v-for="course in courses"
 				:key="course.lehreinheit_id"
+				style="cursor:grab"
 				:style="courseStyle(course)"
-				class="course-picker-row"
+				class="course-picker-row rounded-3 mb-2 p-2"
+				:class="{ 'course-picker-row-pinned': isPinned(course), 'course-picker-row-preview': isRaumvorschlagActive(course) }"
 				v-draggable:move.noimage="dragLehreinheitCollection(course)"
 				tabindex="0"
 			>
-				<div class="d-flex gap-1">
+				<div class="d-flex gap-1 align-items-start">
 					<span class="fw-semibold small w-50" v-tooltip="course.lehrfach_bez">{{ course.lehrfach }} {{ course.lehrform }}</span>
 					<span class="fw-semibold small w-50" v-tooltip="course.raumtypalternativ">{{ course.raumtyp }}</span>
+					<i
+						class="fa fa-thumbtack"
+						:class="isPinned(course) ? 'text-primary' : 'text-muted'"
+						style="cursor:pointer"
+						@click.stop="togglePin(course)"
+					></i>
+					<i
+						class="fa fa-calendar-week"
+						:class="isMultiWeek(course) ? 'text-primary' : 'text-muted'"
+						style="cursor:pointer"
+						v-tooltip="isMultiWeek(course) ? 'MultiWeek aktiv' : 'MultiWeek Verplanung aktivieren'"
+						@click.stop="toggleMultiWeek(course)"
+					></i>
+					<i
+						v-if="!(previewLoading && isRaumvorschlagActive(course))"
+						class="fa fa-door-open"
+						:class="isRaumvorschlagActive(course) ? 'text-primary' : 'text-muted'"
+						style="cursor:pointer"
+						v-tooltip="isRaumvorschlagActive(course) ? 'Raumvorschlag ausblenden' : 'Raumvorschlag einblenden'"
+						@click.stop="selectRaumvorschlag(course)"
+					></i>
+					<i
+						v-else
+						class="fa fa-spinner fa-spin text-primary"
+						v-tooltip="'Räume werden geprüft...'"
+					></i>
 				</div>
 				
 				<!--TODO(david) entfernen, dient nur für das mappen mit der lvverwaltung-->
 				<div class="d-flex gap-1">
-					<span class="small w-50" v-tooltip="course.lehreinheit_id">{{ course.lehreinheit_id[0] }} </span>
+					<span class="small w-50" v-tooltip="course.lehreinheit_id">{{ course.lehreinheit_id }} </span>
 				</div>
 				
 				<div class="d-flex gap-1 text-muted">
-					<div class="w-50 d-flex flex-column" v-tooltip="course.anmerkung">
+					<div class="w-50 d-flex flex-column text-truncate" v-tooltip="course.anmerkung">
 						<span
 							v-for="verband in course.lehrverband"
-							:key="verband">
+							:key="verband"
+							class="text-truncate">
 							{{ verband }}
 						</span>
 					</div>
@@ -165,7 +369,7 @@ export default {
 								{{ lektor.kurzbz }}
 						</span>
 						<span v-if="course.lektoren.length > 3" class="text-muted fst-italic">
-							+{{ course.lektoren.length - 3 }} weitere...
+							+{{ course.lektoren.length - 3 }} {{$p.t('lehre', 'cpmore')}}
 						</span>
 					</div>
 					<span class="w-50 align-self-start">WR: {{ course.wochenrythmus }} Bl: {{ course.stundenblockung }}</span>
