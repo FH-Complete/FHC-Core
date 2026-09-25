@@ -11,7 +11,7 @@ export default {
 		Pagination,
 		StudiengangInformation,
 	},
-	inject: ['isMobile'],
+	inject: ['isMobile', 'isStudent'],
 	data() {
 		return {
 			content: null,
@@ -127,12 +127,9 @@ export default {
 		<hr/>
 		<div class="container-fluid mt-4">
 			<div class="row">
-				<div class="col" v-html="content">
-				</div>
-				<div class="col-auto">
-					<div style="width:15rem">
-						<studiengang-information></studiengang-information>
-					</div>
+				<div :class="isStudent ? 'col-12 col-md-8 col-xl-9' : 'col-12'" v-html="content"></div>
+				<div v-if="isStudent" class="col-12 col-md-4 col-xl-3">
+					<studiengang-information></studiengang-information>
 				</div>
 			</div>
 		</div>
