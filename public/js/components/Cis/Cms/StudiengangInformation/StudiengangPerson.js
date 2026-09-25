@@ -4,6 +4,7 @@ export default {
 		vorname:String,
 		nachname:String,
 		titelpre:String,
+		titelpost:String,
 		kontakt:String,	
 		telefoneklappe:String,
 		email:String,
@@ -71,18 +72,21 @@ export default {
 			return emailArray[0] + '@<wbr>' + emailArray[1];
 		},
 		fullname: function () {
-			if (this.titelpre && this.vorname && this.nachname) {
-				return `${this.titelpre} ${this.vorname} ${this.nachname}`;
+			let fullName = "";
+			if (this.nachname) {
+				fullName = this.nachname;
 			}
-			else if (this.vorname && this.nachname) {
-				return `${this.vorname} ${this.nachname}`;
+			if (this.vorname) {
+				fullName = this.vorname + " " + fullName;
 			}
-			else if (this.nachname) {
-				return this.vorname;
+			if (this.vorname && this.nachname && this.titelpre) {
+				fullName = this.titelpre + " " + fullName;
 			}
-			else {
-				return null;
+			if (this.vorname && this.nachname && this.titelpost) {
+				fullName = fullName + " " + this.titelpost;
 			}
+
+			return fullName;
 		},
 		phone: function () {
 			if (this.kontakt && this.telefoneklappe) {
