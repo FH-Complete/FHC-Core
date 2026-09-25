@@ -245,8 +245,8 @@ export default {
 	template: /*html*/ `
 <div ref="container" class="widgets-news h-100" :class="sizeClass" >
     <div class="d-flex flex-column h-100">
-        <div class="h-100 fhc-news-items-sm" style="overflow-y: auto" v-show="width == 1" >
-            <div  v-for="(news, index) in newsList" :key="news.news_id" class="py-2">
+        <div v-if="newsList.length" class="h-100 fhc-news-items-sm" style="overflow-y: auto" v-show="width == 1" >
+            <div v-for="(news, index) in newsList" :key="news.news_id" class="py-2">
 				<div class="row m-0">
 					<div class="col-12 d-flex">
 						<span class="small">{{ formatDate(news.datum) }} </span>
@@ -257,25 +257,31 @@ export default {
 				</div>
 			</div>
 		</div>
+		<div v-else class="h-100 d-flex flex-row justify-content-center align-items-center">
+			{{ $p.t("news/no_news") }}
+		</div>
         <div v-show="width >1" class="row h-100 g-0">
-		<div :class="'col-'+(width == 4? 3: width == 3? 4 :6)" style="overflow: auto; overscroll-behavior: none;" class="fhc-news-items-lg border-end h-100 g-0 " >
+			<div :class="'col-'+(width == 4? 3: width == 3? 4 :6)" style="overflow: auto; overscroll-behavior: none;" class="fhc-news-items-lg border-end h-100 g-0 " >
         		<template v-for="news in newsList" :key="'menu-'+news.news_id" >
-				<div class="row m-0 py-2" @click="setSelected(news)">
-					<div class="col-md-12 d-flex pe-3">
-						<span class="small ">{{ formatDate(news.datum) }} </span>
+					<div class="row m-0 py-2" @click="setSelected(news)">
+						<div class="col-md-12 d-flex pe-3">
+							<span class="small ">{{ formatDate(news.datum) }} </span>
+						</div>
+						<div class="col-md-12 news-truncate">
+							<span >{{ news.content_obj.betreff?news.content_obj.betreff:getDate(news.datum) }}</span>
+						</div>
 					</div>
-					<div class="col-md-12 news-truncate">
-						<span >{{ news.content_obj.betreff?news.content_obj.betreff:getDate(news.datum) }}</span>
-					</div>
-				</div>
 				</template>
 			</div>
 			<div style="padding-left: 0px; padding-right: 0px;" ref="htmlContent" class="h-100 col">
 				<div class="container h-100" style="padding: 0px;"  ref="carocontainer">
 					<div id="FhcCarouselContainer" style="height: 100%;" ref="carousel" class="carousel slide fhc-carousel ms-2" data-bs-interval="false">
 
-						<div class="carousel-inner" ref="carouselInner"  style="height: 100%; max-width: 100%;">
+						<div v-if="newsList.length" class="carousel-inner" ref="carouselInner"  style="height: 100%; max-width: 100%;">
 							<div ref="carouselItems" v-for="(news, index) in newsList" class="carousel-item fhc-news-card-item" style="overflow-y: auto; overflow-x: hidden; height: 100%;" :id="'card-'+news.news_id" v-html="news.content_obj.content"/>
+						</div>
+						<div v-else class="h-100 d-flex flex-row justify-content-center align-items-center">
+							{{ $p.t("news/no_news") }}
 						</div>
 						<button @click="setPrev" style="z-index: 100; overflow: hidden; margin-left: 4px; width:35px;" data-bs-target="#FhcCarouselContainer" class="carousel-control-prev" type="button">
 							<div style="padding-left: 0.4rem; padding-right: 0.4rem;">
