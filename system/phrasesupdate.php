@@ -44247,6 +44247,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'news',
+		'phrase' => 'no_news',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Nachrichten verfügbar!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No news available!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 // CIS4 phrases from legacy code begin
 	array(
 		'app' => 'core',

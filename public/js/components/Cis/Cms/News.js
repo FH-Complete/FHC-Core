@@ -127,7 +127,16 @@ export default {
 		<hr/>
 		<div class="container-fluid mt-4">
 			<div class="row">
-				<div :class="isStudent ? 'col-12 col-md-8 col-xl-9' : 'col-12'" v-html="content"></div>
+				<div v-if="maxPageCount" :class="isStudent ? 'col-12 col-md-8 col-xl-9' : 'col-12'" v-html="content"></div>
+				<div
+					v-else
+					class="d-flex flex-row justify-content-center pt-3 pb-4"
+					:class="isStudent ? 'col-12 col-md-8 col-xl-9' : 'col-12'"
+				>
+					<span>
+						{{ $p.t('news/no_news') }}
+					</span>
+				</div>
 				<div v-if="isStudent" class="col-12 col-md-4 col-xl-3">
 					<studiengang-information></studiengang-information>
 				</div>
