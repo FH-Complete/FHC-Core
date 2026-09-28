@@ -1,10 +1,10 @@
-const PLAN_REQUEST_INTERVAL_DAYS = 60;
+const MAX_PLAN_REQUEST_INTERVAL_IN_DAYS = 60;
 
 export function useEventLoader(
   rangeInterval,
   getPromiseFunc,
   cacheMultiplier = 1,
-  requestIntervalDays = PLAN_REQUEST_INTERVAL_DAYS,
+  maxPlanRequestIntervalDays = MAX_PLAN_REQUEST_INTERVAL_IN_DAYS,
   waitForAllPromises = true,
 ) {
   let hasFirstLoadOccurred = false;
@@ -28,12 +28,15 @@ export function useEventLoader(
     return Math.round(currentlyDisplayedDateRange.length() * cacheSize) + 1;
   };
 
-  const getRequestIntervalDays = () => {
-    const intervalDays = Number(Vue.toValue(requestIntervalDays));
+  const getMaxPlanRequestIntervalInDays = () => {
+    const normalizedMaxPlanRequestIntervalDays = Number(
+      Vue.toValue(maxPlanRequestIntervalDays),
+    );
 
-    return Number.isFinite(intervalDays) && intervalDays > 0
-      ? Math.max(1, Math.floor(intervalDays))
-      : PLAN_REQUEST_INTERVAL_DAYS;
+    return Number.isFinite(normalizedMaxPlanRequestIntervalDays) &&
+      normalizedMaxPlanRequestIntervalDays > 0
+      ? Math.max(1, Math.floor(normalizedMaxPlanRequestIntervalDays))
+      : MAX_PLAN_REQUEST_INTERVAL_IN_DAYS;
   };
 
   const reload = (isCacheEnabled = true, isLoaderEventVisualReset = true) => {
@@ -269,26 +272,33 @@ export function useEventLoader(
     allowedCacheStartTimestamp = startTimestamp - cachePadding;
     allowedCacheEndTimestamp = endTimestamp + cachePadding;
 
-    const requestEnd = getLuxonDateFromMillis(modifiedRequestEndTimestamp);
-    let requestStart = getLuxonDateFromMillis(modifiedRequestStartTimestamp);
-    const intervalDays = getRequestIntervalDays();
-    const intervalEnd = requestStart
-      .plus({ days: intervalDays - 1 })
+    const requestedPlanRangeEnd = getLuxonDateFromMillis(
+      modifiedRequestEndTimestamp,
+    );
+    let nextPlanRequestStart = getLuxonDateFromMillis(
+      modifiedRequestStartTimestamp,
+    );
+    const effectiveMaxPlanRequestIntervalDays =
+      getMaxPlanRequestIntervalInDays();
+    const firstPlanRequestEnd = nextPlanRequestStart
+      .plus({ days: effectiveMaxPlanRequestIntervalDays - 1 })
       .endOf("day");
 
-    if (requestEnd > intervalEnd) {
-      while (requestStart < requestEnd) {
-        let intervalRequestEnd = requestStart
-          .plus({ days: intervalDays - 1 })
+    if (requestedPlanRangeEnd > firstPlanRequestEnd) {
+      while (nextPlanRequestStart < requestedPlanRangeEnd) {
+        let planRequestEnd = nextPlanRequestStart
+          .plus({ days: effectiveMaxPlanRequestIntervalDays - 1 })
           .endOf("day");
-        if (intervalRequestEnd > requestEnd) intervalRequestEnd = requestEnd;
+        if (planRequestEnd > requestedPlanRangeEnd) {
+          planRequestEnd = requestedPlanRangeEnd;
+        }
 
         result = mergePromiseElements(
-          getPromiseFunc(requestStart, intervalRequestEnd),
+          getPromiseFunc(nextPlanRequestStart, planRequestEnd),
           result,
         );
 
-        requestStart = intervalRequestEnd.plus({ milliseconds: 1 });
+        nextPlanRequestStart = planRequestEnd.plus({ milliseconds: 1 });
       }
 
       return result;
