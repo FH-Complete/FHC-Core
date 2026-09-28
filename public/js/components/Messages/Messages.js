@@ -82,14 +82,16 @@ export default {
 				this.$refs.modalMsg.show();
 			}
 			else if (this.openMode == "inSamePage"){
-				console.log("in same Page");
 				this.isVisibleDiv = true;
-				if(messageId)
-					this.$refs.templateNewDivMessage.loadReplyData(messageId);
-				else
-					this.$refs.templateNewDivMessage.resetForm();
 
-				this.$refs.templateNewDivMessage.showTemplate();
+				this.$nextTick(() => {
+					if(messageId)
+						this.$refs.templateNewDivMessage.loadReplyData(messageId);
+					else
+						this.$refs.templateNewDivMessage.resetForm();
+
+					this.$refs.templateNewDivMessage.showTemplate();
+				});
 			}
 			else
 				console.log("no valid openMode");

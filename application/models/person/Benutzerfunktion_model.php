@@ -260,6 +260,40 @@ class Benutzerfunktion_model extends DB_Model
         return $this->execQuery($query, $parameters_array);
     }
 
+	/**
+	 * Get active Kompetenzfeldleitung bei UID.
+	 *
+	 * @param $uid
+	 * @return array|stdClass|null
+	 */
+	public function getKFLByUID($uid)
+	{
+		$query = '
+            SELECT
+			  	bf.uid,
+				bf.oe_kurzbz,
+  				oe.organisationseinheittyp_kurzbz
+            FROM
+			  	public.tbl_benutzerfunktion bf
+				JOIN public.tbl_organisationseinheit oe USING (oe_kurzbz)
+  				JOIN public.tbl_benutzer b USING (uid)
+            WHERE
+                b.uid = ?
+              	AND b.aktiv = TRUE
+                AND funktion_kurzbz = \'Leitung\'
+               	AND organisationseinheittyp_kurzbz = \'Kompetenzfeld\'
+              	AND (datum_von IS NULL OR datum_von <= now())
+              	AND (datum_bis IS NULL OR datum_bis >= now())
+        ';
+
+		$parameters_array = array();
+		if (is_string($uid))
+		{
+			$parameters_array[] = $uid;
+		}
+
+		return $this->execQuery($query, $parameters_array);
+	}
 
 	public function insertBenutzerfunktion($Json)
 	{
@@ -314,5 +348,64 @@ class Benutzerfunktion_model extends DB_Model
         return success($funktionJson);
     }
 
+	/**
+	 * Gets all Prestudents with details for a given Benutzerfunktion and optionally semester
+	 *
+	 * @param String	$studiensemester_kurzbz
+	 * @return object |null
+	 */
+	public function getPrestudentsOfJgv($semester)
+	{
+		$query = "
+			SELECT DISTINCT ps.prestudent_id, bf.datum_von, bf.datum_bis
+			FROM public.tbl_benutzerfunktion bf
+			JOIN public.tbl_benutzer bn USING (uid)
+			JOIN public.tbl_prestudent ps USING (person_id)
+			JOIN public.tbl_prestudentstatus pss ON (ps.prestudent_id = pss.prestudent_id)
+			JOIN public.tbl_studiensemester ss ON (pss.studiensemester_kurzbz = ss.studiensemester_kurzbz)
+			WHERE ss.studiensemester_kurzbz = ?
+			AND bf.funktion_kurzbz = 'jgv'
+			AND (
+			  bf.datum_von <= ss.ende
+			  AND (
+				bf.datum_bis >= ss.start
+				OR bf.datum_bis IS NULL
+			  )
+			)
+		";
+
+		return $this->execQuery($query, array($semester));
+	}
+
+	/**
+	 * Checks if a certain prestudent has the Benutzerfunktion jgv for a certain semester
+	 *
+	 * @param String $studiensemester_kurzbz
+	 * @param $prestudent_id
+	 * @return object |null
+	 */
+	public function isJgv($semester, $prestudent_id)
+	{
+		$query = "
+			SELECT ps.prestudent_id, ss.start as von, ss.ende as bis
+			FROM public.tbl_benutzerfunktion bf
+			JOIN public.tbl_benutzer bn USING (uid)
+			JOIN public.tbl_prestudent ps USING (person_id)
+			JOIN public.tbl_prestudentstatus pss ON (ps.prestudent_id = pss.prestudent_id)
+			JOIN public.tbl_studiensemester ss ON (pss.studiensemester_kurzbz = ss.studiensemester_kurzbz)
+			WHERE ss.studiensemester_kurzbz = ?
+			AND bf.funktion_kurzbz = 'jgv'
+			AND (
+			  bf.datum_von <= ss.ende
+			  AND (
+				bf.datum_bis >= ss.start
+				OR bf.datum_bis IS NULL
+			  )
+			)
+			AND ps.prestudent_id = ?
+		";
+
+		return $this->execQuery($query, array($semester, $prestudent_id));
+	}
 
 }

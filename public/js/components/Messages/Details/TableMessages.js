@@ -30,6 +30,7 @@ export default {
 			personId: null,
 			layoutColumnsOnNewData:	false,
 			height: '400',
+			arePhrasesLoaded: false
 		}
 	},
 	methods: {
@@ -65,7 +66,14 @@ export default {
 		buildTreemap(messages) {
 			if (!messages || !messages.data || messages.data.length === 0)
 			{
-				return {data: [], last_page: 0};
+				if(this.tabulatorOptions.pagination)
+				{
+					return {data: [], last_page: 0};
+				}
+				else
+				{
+					return [];
+				}
 			}
 
 			const last_page = messages.meta.count;
@@ -106,7 +114,15 @@ export default {
 				// to avoid endless loop
 				if (iteration > messages.length) break;
 			}
-			return {data: messageNested, last_page: last_page};
+
+			if(this.tabulatorOptions.pagination)
+			{
+				return {data: messageNested, last_page: last_page};
+			}
+			else
+			{
+				return messageNested;
+			}
 		},
 		loadAjaxCall(url, config, params){
 			return this.$api.call(
@@ -180,7 +196,7 @@ export default {
 						],
 						formatter: (cell, formatterParams) => {
 							const key = formatterParams[cell.getValue()];
-							return this.$p.t('messages', key);
+							return this.$p?.t?.('messages', key) || key;
 						},
 					},
 					{
@@ -252,7 +268,7 @@ export default {
 						frozen: true
 					}
 				],
-				pagination: true,
+				pagination: false,
 				paginationMode: "remote",
 				paginationSize: 15,
 				paginationInitialPage: 1,
@@ -290,8 +306,6 @@ export default {
 				{
 					event: 'tableBuilt',
 					handler: async() => {
-						await this.$p.loadCategory(['global', 'person', 'stv', 'messages', 'ui', 'notiz']);
-
 						const setHeader = (field, text) => {
 							const col = this.$refs.table.tabulator.getColumn(field);
 							if (!col) return;
@@ -342,6 +356,12 @@ export default {
 				});*/
 	},
 	created(){
+		this.$p
+			.loadCategory(['global', 'person', 'stv', 'messages', 'ui', 'notiz'])
+			.then(() => {
+				this.arePhrasesLoaded = true;
+			});
+
 		if(this.typeId != 'person_id' && Array.isArray(this.id) && this.id.length === 1) {
 			const params = {
 				id: this.id,
@@ -366,6 +386,7 @@ export default {
 				<!--table-->
 				<div class="col-sm-6 pt-1">
 					<core-filter-cmpt
+						v-if="arePhrasesLoaded"
 						ref="table"
 						:tabulator-options="tabulatorOptions"
 						:tabulator-events="tabulatorEvents"
@@ -398,6 +419,7 @@ export default {
 				<div class="col-sm-12 pt-6">
 					<core-filter-cmpt
 						ref="table"
+						v-if="arePhrasesLoaded"
 						:tabulator-options="tabulatorOptions"
 						:tabulator-events="tabulatorEvents"
 						table-only

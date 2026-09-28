@@ -42,4 +42,19 @@ export default {
 		url: `api/frontend/v1/organisation/studiensemester/getStudySemestersByStudyPlanAndDates?filter[studyPlanId]=${studyPlanId}&filter[startDate]=${startDate}&filter[endDate]=${endDate}`,
 		};
 	},
+	current() {
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/organisation/studiensemester/current'
+		};
+	},
+	set(studiensemester_kurzbz) {
+		return {
+			method: 'post',
+			url: 'api/frontend/v1/organisation/studiensemester/set',
+			params: {
+				studiensemester_kurzbz
+			}
+		};
+	}
 };

@@ -142,7 +142,9 @@ if (isset($_REQUEST['prestudent']))
 		}
 		if ($reihungstest_id != '' && $rt->load($reihungstest_id))
 		{
-			if ($rt->freigeschaltet)
+			$pruefling_exist = new Pruefling();
+			$alreadyInRT = $pruefling_exist->personAlreadyInRT($ps->person_id, $rt->reihungstest_id, $ps->prestudent_id);
+			if ($rt->freigeschaltet && !$alreadyInRT)
 			{
 				// regenerate Session ID after Login
 				session_regenerate_id();
@@ -282,7 +284,14 @@ if (isset($_REQUEST['prestudent']))
 			}
 			else
 			{
-				$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestNichtFreigeschalten').'</div>';
+				if ($alreadyInRT)
+				{
+					$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestNichtRegistriert').'</div>';
+				}
+				else
+				{
+					$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestNichtFreigeschalten').'</div>';
+				}
 			}
 		}
 		else
@@ -623,6 +632,7 @@ elseif (isset($prestudent_id))
 
 				$ps_obj->lastStatus = $ps_tmp->status_kurzbz; // letzten Status dem result array hinzufügen
 				$ps_obj->status_mehrsprachig = $ps_tmp->status_mehrsprachig;
+				$ps_obj->ausbildungssemester = $ps_tmp->ausbildungssemester;
 			}
 
 			// Falls Status 'Abgewiesene' vorhanden, nach hinten reihen

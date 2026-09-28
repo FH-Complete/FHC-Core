@@ -56,12 +56,13 @@ $configArray = [
 		<router-view
 			default-semester="<?= $variables['semester_aktuell']; ?>"
 			active-addons="<?= defined('ACTIVE_ADDONS') ? ACTIVE_ADDONS : ''; ?>"
-			stv-root="<?= site_url('Studentenverwaltung'); ?>"
+			stv-root="<?= site_url('studvw'); ?>"
 			cis-root="<?= CIS_ROOT; ?>"
 			avatar-url="<?= site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>" 
 			logout-url="<?= site_url('Cis/Auth/logout'); ?>"
 			:permissions="<?= htmlspecialchars(json_encode($permissions)); ?>"
 			:config="<?=  htmlspecialchars(json_encode($configArray)); ?>"
+			auth-uid="<?= getAuthUID()?>"
 			>
 		</router-view>
 	</div>

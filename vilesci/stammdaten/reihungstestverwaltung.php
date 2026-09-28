@@ -837,6 +837,25 @@ if(isset($_GET['excel']))
 		<script src="../../vendor/fgelinas/timepicker/jquery.ui.timepicker.js" type="text/javascript" ></script>
 
 		<script type="text/javascript">
+			$.tablesorter.addParser({
+				id: "customDate",
+				is: function(s) {
+					//return false;
+					//use the above line if you don\'t want table sorter to auto detected this parser
+					// match dd.mm.yyyy e.g. 01.01.2001 as regex
+					//return /\d{1,4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2} .*/.test(s);
+					return /\d{1,2}.\d{1,2}.\d{1,4}.*/.test(s);
+				},
+				// replace regex-wildcards and return new date
+				format: function(s) {
+					s = s.replace(/\-/g," ");
+					s = s.replace(/:/g," ");
+					s = s.replace(/\./g," ");
+					s = s.split(" ");
+					return $.tablesorter.formatFloat(new Date(s[2], s[1]-1, s[0]).getTime());
+				},
+				type: "numeric"
+			});
 			$(document).ready(function()
 			{
 				// Check, ob Räume zugeteilt sind oder max_teilnehmer gesetzt ist, wenn "öffentlich" gesetzt wird
@@ -1007,7 +1026,7 @@ if(isset($_GET['excel']))
 						{
 							widgets: ["zebra", "filter", "stickyHeaders"],
 							sortList: [[2,0],[3,0]],
-							headers: {0: { sorter: false}},
+							headers: {0: { sorter: false},10: { sorter: "customDate"},11: { sorter: "customDate"}},
 							widgetOptions: {filter_cssFilter: [
 									"filter_clm_null",
 									"filter_clm_prestudent_id",
@@ -1020,6 +1039,7 @@ if(isset($_GET['excel']))
 									"filter_clm_studienplan",
 									"filter_clm_einstiegssemester",
 									"filter_clm_geburtsdatum",
+									"filter_clm_anmeldedatum",
 									"filter_clm_email",
 									"filter_clm_absolviert"]}
 						});
@@ -1072,6 +1092,7 @@ if(isset($_GET['excel']))
 							'clm_studienplan',
 							'clm_einstiegssemester',
 							'clm_geburtsdatum',
+							"filter_clm_anmeldedatum",
 							'clm_email',
 							'clm_absolviert'];
 						for (var i in arr)
@@ -2697,7 +2718,8 @@ if($reihungstest_id!='')
 					WHERE prestudent_id = tbl_prestudent.prestudent_id
 						AND status_kurzbz = 'Interessent'
 					) LIMIT 1
-			) AS orgform_kurzbz
+			) AS orgform_kurzbz,
+       tbl_rt_person.anmeldedatum
 	FROM PUBLIC.tbl_rt_person
 	JOIN PUBLIC.tbl_person USING (person_id)
 	JOIN PUBLIC.tbl_reihungstest rt ON (rt_id = rt.reihungstest_id)
@@ -2786,6 +2808,7 @@ if($reihungstest_id!='')
 	echo '<div id="clm_studienplan" class="active" onclick="hideColumn(\'clm_studienplan\')">Studienplan</div>';
 	echo '<div id="clm_einstiegssemester" class="active" onclick="hideColumn(\'clm_einstiegssemester\')">Einstiegssemester</div>';
 	echo '<div id="clm_geburtsdatum" class="active" onclick="hideColumn(\'clm_geburtsdatum\')">Geburtsdatum</div>';
+	echo '<div id="clm_anmeldedatum" class="active" onclick="hideColumn(\'clm_anmeldedatum\')">Geburtsdatum</div>';
 	echo '<div id="clm_email" class="active" onclick="hideColumn(\'clm_email\')">EMail</div>';
 	echo '<div id="clm_absolviert" class="active" onclick="hideColumn(\'clm_absolviert\')">Absolvierte Tests <span class="wait"></span></div>';
 	//echo '<div id="clm_ergebnis" class="active" onclick="hideColumn(\'clm_ergebnis\')">Ergebnis <span class="wait"></span></div>';
@@ -2827,6 +2850,7 @@ if($reihungstest_id!='')
 					<th style="display: table-cell" class="clm_studienplan">Studienplan</th>
 					<th style="display: table-cell" class="clm_einstiegssemester">Einstiegssemester</th>
 					<th style="display: table-cell" class="clm_geburtsdatum">Geburtsdatum</th>
+					<th style="display: table-cell" class="clm_anmeldedatum">Anmeldedatum</th>
 					<th style="display: table-cell" class="clm_email">EMail</th>
 					<th style="display: table-cell" class="clm_absolviert">bereits absolvierte Verfahren</th>
 					<!--<th style="display: table-cell" class="clm_ergebnis">Ergebnis</th>
@@ -2946,6 +2970,7 @@ if($reihungstest_id!='')
 										<td style="display: table-cell" class="clm_studienplan">'.$db->convert_html_chars($studienplan_bezeichnung).' ('.$row->studienplan_id.')</td>
 										<td style="display: table-cell" class="clm_einstiegssemester">'.$db->convert_html_chars($row->ausbildungssemester).'</td>
 										<td style="display: table-cell" class="clm_geburtsdatum">'.$db->convert_html_chars($row->gebdatum!=''?$datum_obj->convertISODate($row->gebdatum):' ').'</td>
+										<td style="display: table-cell" class="clm_anmeldedatum">'.$db->convert_html_chars($row->anmeldedatum!=''?$datum_obj->convertISODate($row->anmeldedatum):' ').'</td>
 										<td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>
 										<td style="display: table-cell;" class="clm_absolviert">'.$rt_in_anderen_stg.'</td>
 									</tr>';
@@ -3009,6 +3034,7 @@ if($reihungstest_id!='')
 							<th style="display: table-cell" class="clm_studienplan">Studienplan</th>
 							<th style="display: table-cell" class="clm_einstiegssemester">Einstiegssemester</th>
 							<th style="display: table-cell" class="clm_geburtsdatum">Geburtsdatum</th>
+							<th style="display: table-cell" class="clm_anmeldedatum">Anmeldedatum</th>
 							<th style="display: table-cell" class="clm_email">EMail</th>
 							<th style="display: table-cell" class="clm_absolviert">bereits absolvierte Verfahren</th>
 							<!--<th style="display: table-cell" class="clm_ergebnis">Ergebnis</th>
@@ -3128,6 +3154,7 @@ if($reihungstest_id!='')
 									<td style="display: table-cell" class="clm_studienplan">'.$db->convert_html_chars($studienplan_bezeichnung).' ('.$row->studienplan_id.')</td>
 									<td style="display: table-cell" class="clm_einstiegssemester">'.$db->convert_html_chars($row->ausbildungssemester).'</td>
 									<td style="display: table-cell" class="clm_geburtsdatum">'.$db->convert_html_chars($row->gebdatum!=''?$datum_obj->convertISODate($row->gebdatum):' ').'</td>
+									<td style="display: table-cell" class="clm_anmeldedatum">'.$db->convert_html_chars($row->anmeldedatum!=''?$datum_obj->convertISODate($row->anmeldedatum):' ').'</td>
 									<td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>
 									<td style="display: table-cell;" class="clm_absolviert">'.$rt_in_anderen_stg.'</td>';
 							/*echo	'<td style="display: table-cell; align: right" class="clm_ergebnis">'.($rtergebnis==0?'-':number_format($rtergebnis,2,'.','')).' %</td>

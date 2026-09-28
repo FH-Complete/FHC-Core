@@ -149,7 +149,7 @@ class Person_model extends DB_Model
 	 * @param $filter Term to search for.
 	 * @return DB-result
 	 */
-	public function searchPerson($filter)
+	public function searchPerson($filter, $mode=null)
 	{
 		$this->addSelect('vorname, nachname, gebdatum, person_id, titelpre, titelpost');
 		$this->addSelect("CASE
@@ -161,6 +161,26 @@ class Person_model extends DB_Model
 				THEN 'Student'
 				ELSE 'Person'
 			END AS status");
+
+		if($mode == 'mitMaUid')
+		{
+			$this->addSelect("(
+				SELECT m.mitarbeiter_uid
+				FROM public.tbl_benutzer b
+				JOIN public.tbl_mitarbeiter m
+					 ON b.uid = m.mitarbeiter_uid
+				WHERE b.person_id = tbl_person.person_id
+				LIMIT 1
+				)
+				AS uid");
+			$this->addOrder('uid, lower(nachname), lower(vorname)');
+		}
+		else
+		{
+			$this->addOrder('lower(nachname), lower(vorname)');
+		}
+
+
 		$result = $this->loadWhere(
 			'lower(nachname) like '.$this->db->escape('%'.mb_strtolower($filter).'%')."
 			OR lower(vorname) like ".$this->db->escape('%'.$filter.'%')."
@@ -432,5 +452,34 @@ class Person_model extends DB_Model
 		HAVING b.person_id = ? AND b.aktiv IS TRUE;";
 		
 		return $this->execReadOnlyQuery($qry, [$person_id]);
+	}
+
+	//just a test function for a person_id tag
+	//alle personen die innerhalb dieses Zeitraumens 55  werden
+	public function getFiftyFivers($von, $bis)
+	{
+		$qry = "
+				SELECT 
+				    p.person_id
+				FROM public.tbl_person p 
+		         WHERE p.gebdatum >= DATE ? - INTERVAL '55 years' 
+				 AND p.gebdatum <= DATE ? - INTERVAL '55 years';
+		";
+		return $this->execReadOnlyQuery($qry, [$von, $bis]);
+	}
+
+	//just a test function for a person_id tag
+	//check if Person gets 55 in this time
+	public function isFiftyFive($von, $bis, $person_id)
+	{
+		$qry = "
+				SELECT 
+				    p.person_id
+				FROM public.tbl_person p 
+		         WHERE p.gebdatum >= DATE ? - INTERVAL '55 years' 
+				 AND p.gebdatum <= DATE ? - INTERVAL '55 years'
+				 AND p.persond_id = ?;
+		";
+		return $this->execReadOnlyQuery($qry, [$von, $bis, $person_id]);
 	}
 }

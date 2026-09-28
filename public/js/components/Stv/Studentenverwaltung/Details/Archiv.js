@@ -84,6 +84,14 @@ export default {
 					'microcredential_2',
 					'microcredential_3',
 					'microcredential_4',
+					'microdegree_1',
+					'microdegree_2',
+					'microdegree_3',
+					'microdegree_4',
+					'microdegreeabschluss_1',
+					'microdegreeabschluss_2',
+					'microdegreeabschluss_3',
+					'microdegreeabschluss_4',
 				]
 			},
 			documentDropdownObject: {}

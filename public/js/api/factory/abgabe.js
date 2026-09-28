@@ -77,11 +77,25 @@ export default {
 			}
 		};
 	},
+	patchProjektarbeitAbgabeMultiple(payload) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Abgabe/patchProjektarbeitAbgabeMultiple',
+			params: payload
+		};
+	},
 	deleteProjektarbeitAbgabe(paabgabe_id) {
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/Abgabe/deleteProjektarbeitAbgabe',
 			params: { paabgabe_id }
+		};
+	},
+	deleteProjektarbeitAbgabeMultiple(paabgabe_ids) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Abgabe/deleteProjektarbeitAbgabeMultiple',
+			params: { paabgabe_ids }
 		};
 	},
 	postSerientermin(datum, paabgabetyp_kurzbz, bezeichnung, kurzbz, upload_allowed, projektarbeit_ids, fixtermin) {
@@ -138,6 +152,30 @@ export default {
 			method: 'post',
 			url: '/api/frontend/v1/Abgabe/getSignaturStatusForProjektarbeitAbgaben',
 			params: {paabgabe_ids, student_uid},
+
+		};
+	},
+	postStudentProjektarbeitTitel(projektarbeit_id, titel) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Abgabe/postStudentProjektarbeitTitel',
+			params: {projektarbeit_id, titel},
+
+		};
+	},
+	sendZweitbetreuerTokenMail(projektarbeit_id, betreuer_person_id, student_uid) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Abgabe/sendZweitbetreuerTokenMail',
+			params: {projektarbeit_id, bperson_id: betreuer_person_id, student_uid},
+
+		};
+	},
+	fetchProjektarbeitenHistory(student_uid) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Abgabe/fetchProjektarbeitenHistory',
+			params: {student_uid},
 
 		};
 	}

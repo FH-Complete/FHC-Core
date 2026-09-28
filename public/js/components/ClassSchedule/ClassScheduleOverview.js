@@ -76,7 +76,7 @@ export default {
         ajaxResponse: (url, params, response) => response,
         persistenceID: "class_schedule_validity_periods_table",
         selectableRows: true,
-        maxHeight: "100%",
+        maxHeight: "65vh",
         columns: [
           {
             title: this.$capitalize(
@@ -492,7 +492,7 @@ export default {
         <a v-if="hasLehreUnterrichtszeitenTypRPermission" class="btn btn-secondary mb-3" @click="showClassTimeSlotTypeModal">{{$p.t('ui', 'addClassTimeSlotTypeButton')}}</a>
       </div>
     </div>
-    <div class="row mb-3" style="height: 65vh;">
+    <div class="row mb-3">
       <class-schedule-type-modal
         v-if="hasLehreUnterrichtszeitenTypRPermission"
         :isVisible="isClassTimeSlotTypeModalVisible" 

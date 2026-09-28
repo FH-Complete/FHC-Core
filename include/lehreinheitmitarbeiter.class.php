@@ -584,8 +584,9 @@ class lehreinheitmitarbeiter extends basis_db
 
 		$qry = '
 			WITH semester_sws_tbl AS (
-				SELECT DISTINCT lehreinheit_id, studiensemester_kurzbz, lema.semesterstunden,
-					stg.studiengang_kz, stg.melde_studiengang_kz, stg.lgartcode
+				SELECT
+					DISTINCT lehreinheit_id, studiensemester_kurzbz, lema.semesterstunden,
+					stg.studiengang_kz, stg.melde_studiengang_kz, stg.lgartcode, stg.melderelevant
 				FROM lehre.tbl_lehreinheitmitarbeiter lema
 					JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
 					JOIN lehre.tbl_lehrveranstaltung lv USING (lehrveranstaltung_id)
@@ -598,6 +599,7 @@ class lehreinheitmitarbeiter extends basis_db
 					AND ss.studiensemester_kurzbz IN ('.$this->implode4SQL($studiensemester_kurzbz_arr).')
 				-- nur lehre, die bisgemeldet wird
 					AND lema.bismelden
+					AND stg.melderelevant
 				-- keine lehreinheiten ohne semesterstunden
 					AND lema.semesterstunden != 0
 			)

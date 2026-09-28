@@ -242,6 +242,7 @@ class Message_model extends DB_Model
 	 */
 	public function getMessagesForTable($person_id, $offset, $limit)
 	{
+		$limitoffset = (!is_null($offset) && !is_null($limit)) ? 'limit ? offset ?' : '';
 		$sql = <<<EOSQL
 			with filtered_messages as (
 				select
@@ -310,11 +311,12 @@ class Message_model extends DB_Model
 				public.tbl_person pr on pr.person_id = fm.recipient_id
 			order by
 				m.insertamum DESC
-			limit ?
-			offset ?;
+			{$limitoffset}
 EOSQL;
 
-		$parametersArray = array($person_id, $person_id, $limit, $offset);
+		$parametersArray = $limitoffset
+			? array($person_id, $person_id, $limit, $offset)
+			: array($person_id, $person_id);
 
 		$count = 0;
 		$data = $this->execQuery($sql, $parametersArray);
@@ -325,7 +327,7 @@ EOSQL;
 		$data = getData($data);
 		if($data)
 		{
-			$count = ceil($data[0]->total_msgs / $limit);
+			$count = is_null($limit) ? 1 : ceil($data[0]->total_msgs / $limit);
 		}
 
 		return success(['data' => $data, 'count' => $count]);

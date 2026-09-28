@@ -17,7 +17,6 @@
 
 import app from './stv/app.js';
 import lists from './stv/lists.js';
-import verband from './stv/verband.js';
 import students from './stv/students.js';
 import filter from './stv/filter.js';
 import konto from './stv/konto.js';
@@ -34,7 +33,6 @@ import admissionDates from './stv/admissionDates.js';
 export default {
 	app,
 	lists,
-	verband,
 	students,
 	filter,
 	konto,

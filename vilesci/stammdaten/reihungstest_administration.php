@@ -402,7 +402,10 @@ if(isset($_POST['deleteteilgebiet']))
 				DELETE FROM testtool.tbl_antwort
 				WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id)." AND
 				vorschlag_id IN (SELECT vorschlag_id FROM testtool.tbl_vorschlag WHERE frage_id IN
-				(SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id=".$db->db_add_param($_POST['gebiet'])."));";
+				(SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id=".$db->db_add_param($_POST['gebiet'])."));
+				
+				DELETE FROM testtool.tbl_pruefling_gebiet
+				WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id)." AND gebiet_id=".$db->db_add_param($_POST['gebiet']).";";
 
 		if($result = $db->db_query($qry))
 		{
@@ -497,7 +500,8 @@ if(isset($_POST['delete_all']))
 		}
 		//Gebiet loeschen
 		$qry = "DELETE FROM testtool.tbl_pruefling_frage where pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";
-				DELETE FROM testtool.tbl_antwort WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";";
+				DELETE FROM testtool.tbl_antwort WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";
+				DELETE FROM testtool.tbl_pruefling_gebiet WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";";
 
 		if($result = $db->db_query($qry))
 		{
@@ -588,7 +592,9 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 {
 	if(is_numeric($_POST['prestudent_id']) && $_POST['prestudent_id']!='')
 	{
-		$qry="SELECT nachname,vorname,person_id,prestudent_id,tbl_pruefling.pruefling_id,tbl_pruefling_frage.begintime,bezeichnung,kurzbz,tbl_frage.nummer,level, tbl_vorschlag.nummer as antwortnummer, tbl_vorschlag.punkte
+		$qry="SELECT nachname,vorname,person_id,prestudent_id,tbl_pruefling.pruefling_id,
+       				tbl_pruefling_frage.begintime,bezeichnung,kurzbz,tbl_frage.nummer,level, 
+       				tbl_vorschlag.nummer as antwortnummer, tbl_vorschlag.punkte, tbl_frage.frage_id
 				FROM testtool.tbl_antwort
 				JOIN testtool.tbl_vorschlag USING(vorschlag_id)
 				JOIN testtool.tbl_frage USING (frage_id)
@@ -615,6 +621,7 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 						<th>Level</th>
 						<th>Antwort #</th>
 						<th>Punkte</th>
+						<th>FrageID</th>
 					</tr>
 					</thead>
 					<tbody>';
@@ -632,6 +639,7 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 				echo "<td>$row->level</td>";
 				echo "<td>$row->antwortnummer</td>";
 				echo "<td>$row->punkte</td>";
+				echo "<td>$row->frage_id</td>";
 				echo '</tr>';
 			}
 			echo '</tbody></table>';

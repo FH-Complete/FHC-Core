@@ -27,7 +27,7 @@ class Cis4FhcApi extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getViewData' => self::PERM_LOGGED,
+			'dashboardViewData' => self::PERM_LOGGED,
 		]);
 		
 	}
@@ -36,17 +36,22 @@ class Cis4FhcApi extends FHCAPI_Controller
 	// Public methods
 
 	/**
-	 * fetches ViewData
-	 */
-	public function getViewData()
+     * retrieves view data for dashboard view
+     * @access public
+     * @param  $uid the userID for which profile is being viewed, null or missing value implies one's own profile
+     */
+	public function dashboardViewData()
 	{
 		$this->load->model('person/Person_model','PersonModel');
 		$personData = getData($this->PersonModel->getByUid(getAuthUID()))[0];
 
+		$this->load->config('calendar');
+
 		$viewData = array(
 			'uid' => getAuthUID(),
 			'name' => $personData->vorname,
-			'person_id' => $personData->person_id
+			'person_id' => $personData->person_id,
+			'timezone' => $this->config->item('timezone'),
 		);
 
 		$this->terminateWithSuccess($viewData);

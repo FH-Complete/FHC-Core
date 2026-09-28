@@ -457,6 +457,7 @@ class Studiengang_model extends DB_Model
 	 */
 	public function getLeitung($studiengang_kz = null)
 	{
+		$this->addDistinct();
 		$this->addSelect('uid, studiengang_kz, oe_kurzbz, vorname, nachname, email, titelpre, titelpost, alias');
 		$this->addJoin('public.tbl_benutzerfunktion', 'oe_kurzbz');
 		$this->addJoin('public.tbl_benutzer', 'uid');
@@ -594,7 +595,10 @@ class Studiengang_model extends DB_Model
 		$this->addSelect('p.prestudent_id');
 		$this->addSelect('pers.vorname');
 		$this->addSelect('pers.nachname');
-		$this->addSelect("CONCAT(UPPER(pers.nachname), ' ', pers.vorname, ' (', " . $this->dbTable . ".bezeichnung, ')') AS name");
+		$this->addSelect("CONCAT(UPPER(pers.nachname), ' ', pers.vorname, ' (', "
+			. $this->dbTable . ".bezeichnung, ', ', "
+			. "UPPER(" . $this->dbTable . ".typ), "
+			. "UPPER(" . $this->dbTable . ".kurzbz),')') AS name");
 
 		$this->addJoin('public.tbl_prestudent p', 'studiengang_kz');
 		$this->addJoin(
