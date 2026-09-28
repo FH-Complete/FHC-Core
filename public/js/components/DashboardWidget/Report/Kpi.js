@@ -4,7 +4,6 @@ import ConfigKpi from './Config/Kpi.js';
 import { useCalculatedVars } from '../../../composables/DashboardWidget/Report/CalculatedVars.js';
 
 import ApiReport from '../../../api/factory/report.js';
-import ApiStudienjahr from '../../../api/factory/studienjahr.js';
 
 export default {
 	name: "WidgetsReportKpi",
