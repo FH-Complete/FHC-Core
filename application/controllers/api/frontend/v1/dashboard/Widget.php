@@ -213,7 +213,9 @@ class Widget extends FHCAPI_Controller
 		];
 		$result = $this->WidgetModel->insert($data);
 
-		$data = $this->getDataOrTerminateWithError($result);
+		$data['widget_id'] = $this->getDataOrTerminateWithError($result);
+		$data['setup'] = $setup;
+		$data['arguments'] = [];
 
 		$this->terminateWithSuccess($data);
 	}

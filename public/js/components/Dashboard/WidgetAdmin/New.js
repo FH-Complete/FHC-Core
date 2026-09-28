@@ -34,8 +34,8 @@ export default {
 		finish() {
 			this.$refs.form
 				.call(ApiWidget.create(this.result))
-				.then(res => {
-					this.$emit('create', { ...this.result, widget_id: res.data });
+				.then(res => {console.log(res.data);
+					this.$emit('create', res.data);
 					this.$refs.modal.hide();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
