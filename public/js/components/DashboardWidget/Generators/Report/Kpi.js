@@ -37,7 +37,7 @@ export default {
 
 			if (hasVars || hasAggregators) {
 				BsConfirm
-					.popup($p.t('dashboard/widget_report_statistik_change'))
+					.popup(this.$p.t('dashboard/widget_report_statistik_change'))
 					.then(() => {
 						this.modelValue.arguments.statistik_kurzbz = value;
 						this.modelValue.arguments.aggregators = [];
