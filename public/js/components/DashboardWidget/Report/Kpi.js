@@ -7,8 +7,8 @@ import ApiReport from '../../../api/factory/report.js';
 
 export default {
 	name: "WidgetsReportKpi",
-	components:{
-		ConfigKpi
+	components: {
+		ConfigKpi,
 	},
 	mixins: [ AbstractWidget ],
 	inject: {
