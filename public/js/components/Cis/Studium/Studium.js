@@ -420,15 +420,14 @@ export default {
 				v-if="selectedStudiengang"
 				id="studiengang-info-col"
 				class="col-12 order-last d-flex flex-column"
-				:class="{'collapsed col-md-2': !showStudiengangInfo, 'col-md-4 col-xxl-3': showStudiengangInfo}"
+				:class="{'collapsed col-md-1': !showStudiengangInfo, 'col-md-4 col-xxl-3': showStudiengangInfo}"
 			>
-				<h6 id="studiengang-info-title" class="text-wrap"><span>{{$p.t('global','ansprechpartner')}}</span> <span>{{$p.t('lehre','studiengang')}}</span></h6>
 				<div class="d-flex flex-column flex-md-row gap-2">
 					<button
 						@click="showStudiengangInfo ? toggleStudiengangInfoCollapse() : displayStudiengangInfo()"
 						id="studiengang-info-toggle"
 						class="d-flex flex-row justify-content-center align-items-center p-2"
-					>
+						>
 						<i aria-hidden="true" class="fa-solid fa-chevron-right fhc-text"></i>
 					</button>
 					<div id="studiengang-info" class="flex-grow-1">
@@ -437,7 +436,14 @@ export default {
 							id="studiengang-info-body"
 							class="collapse"
 						>
-							<studiengang-information compact :studiengang_kz="selectedStudiengang" :semester="selectedSemester"></studiengang-information>
+							<h5 id="studiengang-info-title" class="text-wrap">
+								<span>{{$p.t('global','ansprechpartner')}}</span> <span>{{$p.t('lehre','studiengang')}}</span>
+							</h5>
+							<studiengang-information
+								compact
+								:studiengang_kz="selectedStudiengang"
+								:semester="selectedSemester"
+							/>
 						</div>
 					</div>
 				</div>
