@@ -204,3 +204,17 @@ if (!$result = @$db->db_query('SELECT 0 FROM lehre.tbl_ferientyp WHERE 0 = 1'))
 	else
 		echo '<br>Granted privileges to <strong>vilesci</strong> on lehre.tbl_ferientyp';
 }
+
+// Add UNIQUE constraint on fehlercode and fehler_kurzbz on system.tbl_fehler
+if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'uk_tbl_ferien_vondatum_bisdatum_oe_bezeichnung'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "ALTER TABLE lehre.tbl_ferien ADD CONSTRAINT uk_tbl_ferien_vondatum_bisdatum_oe_bezeichnung UNIQUE (vondatum, bisdatum, oe_kurzbz, bezeichnung);";
+
+		if (!$db->db_query($qry))
+			echo '<strong>lehre.tbl_ferien '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>added UNIQUE constraint on "vondatum", "bisdatum" and "bezeichnung" for lehre.tbl_ferien<br>';
+	}
+}

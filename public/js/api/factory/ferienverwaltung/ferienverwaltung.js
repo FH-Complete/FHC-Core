@@ -75,5 +75,15 @@ export default {
 			url: 'api/frontend/v1/education/ferien/delete',
 			params: { ferien_id }
 		};
-	}
+	},
+	importFerien(filterVonDatum, filterBisDatum) {
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/education/ferien/importFerien',
+			params: {
+				filterVonDatum,
+				filterBisDatum
+			}
+		};
+	},
 };

@@ -27,6 +27,7 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 class Ferien extends FHCAPI_Controller
 {
 	const DEFAULT_BERECHTIGUNG = 'basis/ferien';
+	const FERIENTYP_KURZBZ = 'Feiertag';
 
 	/**
 	 * Calls the parent's constructor and prepares libraries and phrases
@@ -41,7 +42,8 @@ class Ferien extends FHCAPI_Controller
 			'getFerientypen' => self::DEFAULT_BERECHTIGUNG.':r',
 			'insert' => self::DEFAULT_BERECHTIGUNG.':w',
 			'update' => self::DEFAULT_BERECHTIGUNG.':w',
-			'delete' => self::DEFAULT_BERECHTIGUNG.':w'
+			'delete' => self::DEFAULT_BERECHTIGUNG.':w',
+			'importFerien' => self::DEFAULT_BERECHTIGUNG.':w'
 		]);
 
 		// Load models
@@ -50,6 +52,7 @@ class Ferien extends FHCAPI_Controller
 
 		$this->load->library('PermissionLib');
 
+		$this->load->config('ferienimport');
 
 		// Load language phrases
 		$this->loadPhrases([
@@ -302,6 +305,85 @@ class Ferien extends FHCAPI_Controller
 	}
 
 	/**
+	 * 
+	 * @param
+	 * @return object success or error
+	 */
+	public function importFerien()
+	{
+		$filterVonDatum = $this->input->get('filterVonDatum');
+		$filterBisDatum = $this->input->get('filterBisDatum');
+
+		if (isset($filterVonDatum) && !is_valid_date($filterVonDatum))
+			return $this->terminateWithError($this->p->t('ui', 'error_invalid_date'), self::ERROR_TYPE_GENERAL);
+
+		if (isset($filterBisDatum) && !is_valid_date($filterBisDatum))
+			return $this->terminateWithError($this->p->t('ui', 'error_invalid_date'), self::ERROR_TYPE_GENERAL);
+
+		$noImported = 0;
+
+		$data = file_get_contents($this->config->item('ferien_import_link'));
+
+		if (!$data) return $this->terminateWithError($this->p->t('ferien', 'csvNichtGelesen'), self::ERROR_TYPE_GENERAL);
+
+		$rows = explode("\n", $data);
+		$headers = [];
+		$ferien = [];
+		$headerRow = true;
+
+		foreach($rows as $row)
+		{
+			/*
+			 * Wenn escape auf etwas anderes als eine leere Zeichenkette ("") gesetzt wird, kann dies zu einer CSV-Datei führen,
+			 * die nicht mit » RFC 4180 konform ist oder die den Umlauf durch die PHP-CSV-Funktionen nicht übersteht.
+			 * Der Standardwert für escape ist "\\", weshalb empfohlen wird, diesen Parameter explizit auf eine leere Zeichenkette zu setzen.
+			 */
+
+			$fe = str_getcsv($row, ",", "\"", '');
+			if ($headerRow)
+			{
+				$headers = $fe;
+			}
+			else
+			{
+				$importedFerien = [];
+				foreach ($fe as $idx => $value)
+				{
+					if (!isset($headers[$idx])) continue;
+					$importedFerien[$headers[$idx]] = $value;
+				}
+
+				$ferien = $this->_mapImportFerien($importedFerien);
+				if (
+					!$ferien
+					|| ($filterVonDatum != null && new DateTime($filterVonDatum) > new DateTime($ferien['bisdatum']))
+					|| ($filterBisDatum != null && new DateTime($filterBisDatum) < new DateTime($ferien['vondatum']))
+				) continue;
+
+				$result = $this->FerienModel->loadWhere([
+					'vondatum' => $ferien['vondatum'],
+					'bisdatum' => $ferien['bisdatum'],
+					'bezeichnung' => $ferien['bezeichnung'],
+					'oe_kurzbz' => null
+				]);
+
+				if (isError($result)) return $this->terminateWithError($this->p->t('ferien', 'fehlerBeimLaden'), self::ERROR_TYPE_GENERAL);
+
+				// add Ferien if there have been 
+				if (!hasData($result))
+				{
+					$result = $this->FerienModel->insert($ferien);
+					if (isError($result)) return $this->terminateWithError($this->p->t('ferien', 'fehlerBeimHinzufuegen'), self::ERROR_TYPE_GENERAL);
+					$noImported++;
+				}
+			}
+
+			$headerRow = false;
+		}
+		$this->terminateWithSuccess($noImported);
+	}
+
+	/**
 	 * Validate ferien post input.
 	 */
 	private function _validate()
@@ -367,5 +449,33 @@ class Ferien extends FHCAPI_Controller
 		}
 
 		return $data;
+	}
+
+	/**
+	 * 
+	 * @param
+	 * @return object success or error
+	 */
+	private function _mapImportFerien($importedFerien)
+	{
+		$mappings = [
+			'vondatum' => 'DATUM',
+			'bisdatum' => 'DATUM',
+			'bezeichnung' => 'TEXT'
+		];
+
+		$ferien = [
+			'ferientyp_kurzbz' => self::FERIENTYP_KURZBZ,
+			'insertamum' => date('c'),
+			'insertvon' => getAuthUID()
+		];
+
+		foreach ($mappings as $key => $name)
+		{
+			if (!isset($importedFerien[$name])) return null;
+			$ferien[$key] = $importedFerien[$name];
+		}
+
+		return $ferien;
 	}
 }

@@ -156,47 +156,33 @@ export default {
 					event: 'tableBuilt',
 					handler: async () => {
 
-						//await this.$p.loadCategory(['ferien', 'ui']);
 						await this.$p.loadCategory(['global', 'ferien']);
 
-						let cm = this.$refs.table.tabulator.columnManager;
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('ferien_id').component.updateDefinition({
-							title: this.$p.t('ferien', 'ferienId'),
-						});
-						cm.getColumnByField('vondatum').component.updateDefinition({
-							title: this.$p.t('ferien', 'vondatum'),
-						});
-						cm.getColumnByField('bisdatum').component.updateDefinition({
-							title: this.$p.t('ferien', 'bisdatum'),
-						});
-						cm.getColumnByField('bezeichnung').component.updateDefinition({
-							title: this.$p.t('global', 'bezeichnung'),
-						});
-						cm.getColumnByField('oe_kurzbz').component.updateDefinition({
-							title: this.$p.t('ferien', 'oeKurzbezeichnung'),
-						});
-						cm.getColumnByField('oe_bezeichnung').component.updateDefinition({
-							title: this.$p.t('ferien', 'oeBezeichnung'),
-						});
-						cm.getColumnByField('studienplan_bezeichnung').component.updateDefinition({
-							title: this.$p.t('ferien', 'studienplanBezeichnung'),
-						});
-						cm.getColumnByField('ferientyp_kurzbz').component.updateDefinition({
-							title: this.$p.t('ferien', 'ferientypKurzbz'),
-						});
-						cm.getColumnByField('mitarbeiterrelevant').component.updateDefinition({
-							title: this.$p.t('ferien', 'mitarbeiterrelevant'),
-						});
-						cm.getColumnByField('studierendenrelevant').component.updateDefinition({
-							title: this.$p.t('ferien', 'studierendenrelevant'),
-						});
-						cm.getColumnByField('lehre').component.updateDefinition({
-							title: this.$p.t('ferien', 'lehrePlanbar'),
-						});
-						cm.getColumnByField('actions').component.updateDefinition({
-							title: this.$p.t('global', 'aktionen')
-						});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('ferien_id', this.$p.t('ferien', 'ferienId'));
+						setHeader('vondatum', this.$p.t('ferien', 'vondatum'));
+						setHeader('bisdatum', this.$p.t('ferien', 'bisdatum'));
+						setHeader('bezeichnung', this.$p.t('global', 'bezeichnung'));
+						setHeader('oe_kurzbz', this.$p.t('ferien', 'oeKurzbezeichnung'));
+						setHeader('oe_bezeichnung', this.$p.t('ferien', 'oeBezeichnung'));
+						setHeader('studienplan_bezeichnung', this.$p.t('global', 'studienplanBezeichnung'));
+						setHeader('ferientyp_kurzbz', this.$p.t('ferien', 'ferientypKurzbz'));
+						setHeader('mitarbeiterrelevant', this.$p.t('ferien', 'mitarbeiterrelevant'));
+						setHeader('studierendenrelevant', this.$p.t('ferien', 'studierendenrelevant'));
+						setHeader('lehre', this.$p.t('ferien', 'lehrePlanbar'));
+						setHeader('actions', this.$p.t('global', 'aktionen'));
 					}
 				}
 			]
@@ -210,6 +196,19 @@ export default {
 		},
 		actionNew() {
 			this.$refs.modal.open();
+		},
+		importFerien() {
+			this.$api
+			.call(ApiFerienverwaltung.importFerien(this.filterVonDatum, this.filterBisDatum))
+			.then(result => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ferien', 'importiert') + ": " + result.data);
+					this.reload();
+				}
+			)
+			.catch(error => {
+				if (error)
+					this.$fhcAlert.handleSystemError(error);
+			});
 		}
 	},
 	created() {
@@ -235,8 +234,8 @@ export default {
 	</core-navigation-cmpt>
 
 	<div class="h-100 d-flex flex-column">
-		<div class="row justify-content-center">
-			<div class="col-5">
+		<div class="row">
+			<div class="col-4">
 				<form-input
 					type="DatePicker"
 					v-model="filterVonDatum"
@@ -249,7 +248,7 @@ export default {
 					>
 				</form-input>
 			</div>
-			<div class="col-5">
+			<div class="col-4">
 				<form-input
 					type="DatePicker"
 					v-model="filterBisDatum"
@@ -262,7 +261,7 @@ export default {
 					>
 				</form-input>
 			</div>
-			<div class="col-1 align-self-end">
+			<div class="col-2 align-self-end">
 				<button
 					class="btn btn-primary"
 					@click="reload()"
@@ -270,6 +269,16 @@ export default {
 					>
 					<i v-if="loading" class="fa fa-spinner fa-spin"></i>
 					{{ $p.t('ui/anzeigen') }}
+				</button>
+			</div>
+			<div class="col-2 align-self-end justify-content-end">
+				<button
+					class="btn btn-secondary"
+					@click="importFerien()"
+					:disabled="loading"
+					>
+					<i v-if="loading" class="fa fa-spinner fa-spin"></i>
+					{{ $p.t('lehre/ferienImportieren') }}
 				</button>
 			</div>
 		</div>
