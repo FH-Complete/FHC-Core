@@ -107,8 +107,6 @@ export default {
 			v-model="modelValue.setup"
 			class="border-bottom mb-3"
 			edit-name
-			edit-size
-			edit-hide-footer
 		/>
 		<report-picker
 			ref="picker"
@@ -128,7 +126,10 @@ export default {
 				class="mb-3"
 			/>
 		</template>
-		<div v-else class="placeholder-glow mb-3">
+		<div
+			v-else-if="modelValue?.arguments?.statistik_kurzbz"
+			class="placeholder-glow mb-3"
+		>
 			<span class="placeholder col-6"></span>
 		</div>
 		<edit-permission v-model="modelValue.berechtigung_kurzbz" disabled />
