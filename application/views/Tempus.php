@@ -10,7 +10,6 @@
 		'filtercomponent' => true,
 		'navigationcomponent' => true,
 		'vuedatepicker11' => true,
-		'momentjs2' => true,
 		'tags' => true,
 		'phrases' => array(
 			'global',

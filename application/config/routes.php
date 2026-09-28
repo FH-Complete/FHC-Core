@@ -139,8 +139,6 @@ $route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/emp/(:any)/stg/(
 
 
 $route['api/frontend/v1/lvplan/calendar-events'] = 'api/frontend/v1/LvPlanCalendarEvents/getCalendarData';
-$route['lvplan/caldav'] = 'LvPlanCalDAV';
-$route['lvplan/caldav/.*'] = 'LvPlanCalDAV';
 
 // load routes from extensions, also look for environment-specific configs
 $subdirs = ['application/config/extensions', 'application/config/' . ENVIRONMENT . '/extensions'];

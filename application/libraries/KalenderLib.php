@@ -1590,17 +1590,6 @@ class KalenderLib
 
 		
 		$kalender_entry = getData($entryResult);
-		
-		$calendarResources = $this->_ci->BetriebsmittelKalenderModel->loadWhere(['eindeutige_kalender_gruppen_id' => $kalender_entry->eindeutige_kalender_gruppen_id]);
-		if (isError($calendarResources)) return $calendarResources;
-		
-		$calendarResourcesItems = getData($calendarResources);
-		$calendarResourcesIDs = [];
- 		if (is_array($calendarResourcesItems)) {
-			$calendarResourcesIDs = array_map(function($resource) {
-				return $resource->betriebsmittel_id;
-			}, getData($calendarResources));
-		} 
 
 		if (!$this->_checkPermission($kalender_entry->lehreinheit_id))
 		{

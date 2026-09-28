@@ -32,7 +32,6 @@ class MySabre_DAVACL_PrincipalBackend implements \Sabre\DAVACL\PrincipalBackend\
     protected $groupMembersTableName;
 
 	protected $result_ma;
-	protected $auth;
     /**
      * Sets up the backend.
      *
@@ -121,6 +120,16 @@ class MySabre_DAVACL_PrincipalBackend implements \Sabre\DAVACL\PrincipalBackend\
 		        );
 
 			}*/
+		}
+		else //if($prefixPath=='principals/oesi')
+		{
+			$user = mb_substr($path,11);
+		    $principals[] = array(
+					'id' => $user.'proxyread',
+		            'uri' => 'principals/'.$user.'/calendar-proxy-read',
+		            '{DAV:}displayname' => '',
+		            '{http://sabredav.org/ns}email-address' => '',
+		        );
 		}
 
         return $principals;
@@ -217,18 +226,13 @@ class MySabre_DAVACL_PrincipalBackend implements \Sabre\DAVACL\PrincipalBackend\
 		throw new \Sabre\DAV\Exception('Not implemented');
     }
 
-   public function updatePrincipal($path, \Sabre\DAV\PropPatch $propPatch)
+   public function updatePrincipal($path, $mutations)
    {
-	$propPatch->setRemainingResultCode(403);
+	throw new \Sabre\DAV\Exception('Not implemented');
    }
 
-	public function searchPrincipals($prefixPath, array $searchProperties, $test = 'allof')
+	public function searchPrincipals($prefixPath,array $searchProperties)
 	{
-		return array();
-	}
-
-	public function findByUri($uri, $principalPrefix)
-	{
-		return null;
+		throw new \Sabre\DAV\Exception('Not implemented');
 	}
 }
