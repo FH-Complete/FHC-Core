@@ -31,6 +31,7 @@ class Lehrveranstaltung extends FHCAPI_Controller
 			'getByLe' => ['admin:r', 'assistenz:r'],
 			'getByLv' => ['admin:r', 'assistenz:r'],
 			'getByStg' => ['admin:r', 'assistenz:r'],
+			'getByStgOrgform' => ['admin:r', 'assistenz:r'],
 			'loadByLV' => ['admin:r', 'assistenz:r'],
 		]);
 
@@ -103,30 +104,48 @@ class Lehrveranstaltung extends FHCAPI_Controller
 
 		$tree = [];
 
-		$lehrveranstaltungen = $this->_ci->LehreinheitModel->getLvsById($lehrveranstaltung_id, $studiensemester_kurzbz);
-		$lehrveranstaltungen_data = $this->getDataOrTerminateWithError($lehrveranstaltungen);
+		$this->_ci->LehrveranstaltungModel->addSelect('studiengang_kz');
+		$lv = $this->_ci->LehrveranstaltungModel->load($lehrveranstaltung_id);
+		$lv = $this->getDataOrTerminateWithError($lv);
 
-		if (!hasData($lehrveranstaltungen_data))
+		if (empty($lv))
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+		$lehrveranstaltungen_data = array();
+		foreach ($this->_loadLvRows(current($lv)->studiengang_kz, $studiensemester_kurzbz) as $row)
+		{
+			if ((string)$row->lehrveranstaltung_id === (string)$lehrveranstaltung_id)
+			{
+				$lehrveranstaltungen_data[] = $row;
+				break;
+			}
+		}
+
+		if (empty($lehrveranstaltungen_data))
 		{
 
 			$this->_ci->LehrveranstaltungModel->addSelect('
-				kurzbz as lv_kurzbz,
+				tbl_lehrveranstaltung.*,
+				tbl_lehrveranstaltung.kurzbz as lv_kurzbz,
 				lehrveranstaltung_id,
 				lehrtyp_kurzbz,
 				studiengang_kz as lv_studiengang_kz,
-				semester as lv_semester,
-				bezeichnung as lv_bezeichnung,
+				UPPER(CONCAT(tbl_studiengang.typ, tbl_studiengang.kurzbz)) as studiengang,
+				semester as semester,
+				tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
 				ects as lv_ects,
 				lehreverzeichnis as lv_lehreverzeichnis,
 				planfaktor as lv_planfaktor,
 				planlektoren as lv_planlektoren,
 				planpersonalkosten as lv_planpersonalkosten,
 				plankostenprolektor as lv_plankostenprolektor,
-				orgform_kurzbz as lv_orgform_kurzbz,
+				tbl_lehrveranstaltung.orgform_kurzbz as orgform_kurzbz,
+				tbl_lehrveranstaltung.sprache as sprache,
 				lehrform_kurzbz as lv_lehrform_kurzbz,
-				bezeichnung_english as lv_bezeichnung_english,
+				tbl_lehrveranstaltung.bezeichnung_english as lv_bezeichnung_english,
 				semesterstunden as lv_semesterstunden,
 			');
+			$this->_ci->LehrveranstaltungModel->addJoin('public.tbl_studiengang', 'studiengang_kz');
 			$lehrveranstaltungen = $this->_ci->LehrveranstaltungModel->load($lehrveranstaltung_id);
 			$lehrveranstaltungen_data = $this->getDataOrTerminateWithError($lehrveranstaltungen);
 		}
@@ -143,43 +162,35 @@ class Lehrveranstaltung extends FHCAPI_Controller
 			$tree[] = $lehrveranstaltung;
 		}
 
+		$counter = 0;
+		$this->assignUniqueIndex($tree, $counter);
 		$this->terminateWithSuccess($tree);
 	}
+
 	public function getByStg($studiensemester_kurzbz = null, $stg_kz = null, $semester = null)
+	{
+		$this->_getLvTree($studiensemester_kurzbz, $stg_kz, $semester, null);
+	}
+
+	public function getByStgOrgform($studiensemester_kurzbz = null, $stg_kz = null, $orgform = null, $semester = null)
+	{
+		$orgform_kurzbz = $this->getOrgformKurzbz($orgform);
+		$this->_getLvTree($studiensemester_kurzbz, $stg_kz, $semester, $orgform_kurzbz);
+	}
+
+	private function _getLvTree($studiensemester_kurzbz, $stg_kz, $semester, $orgform_kurzbz)
 	{
 		$studiengang_kz = $this->getStudiengangKz($stg_kz);
 
 		if (is_null($studiengang_kz) || !preg_match("/^(-?[1-9][0-9]*|0)$/", (string)$studiengang_kz))
 			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
-		$verband = null;
-		if (!is_null($semester) && !is_numeric($semester))
-		{
-			$verband = $this->getOrgformKurzbz($semester);
-			$semester = null;
-		}
-
-		$this->_ci->load->model('organisation/Studienplan_model', 'StudienplanModel');
+		if (!is_null($semester) && !ctype_digit((string)$semester))
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
 		$studiensemester_kurzbz = $this->getStudiensemesterKurzbz($studiensemester_kurzbz);
-		$studienplan_data = $this->_ci->StudienplanModel->getStudienplaeneBySemester($studiengang_kz, $studiensemester_kurzbz, $semester, $verband);
 
-		$studienplan_ids = array();
-		$only_ids = array();
-		$placeholders = array();
-
-		if (hasData($studienplan_data))
-		{
-			foreach (getData($studienplan_data) as $studienplan) {
-				$placeholders[] = "(?, ?)";
-				$studienplan_ids[] = $studienplan->studienplan_id;
-				$studienplan_ids[] = $studienplan->semester;
-				$only_ids[] = $studienplan->studienplan_id;
-			}
-		}
-
-		$lehrveranstaltungen_data = $this->_ci->LehrveranstaltungModel->getLvsByStudiengang($studienplan_ids, $placeholders, $only_ids, $studiengang_kz, $studiensemester_kurzbz, $semester, $verband);
-		$lehrveranstaltungen_data = hasData($lehrveranstaltungen_data) ? getData($lehrveranstaltungen_data) : array();
+		$lehrveranstaltungen_data = $this->_loadLvRows($studiengang_kz, $studiensemester_kurzbz, $semester, $orgform_kurzbz);
 
 		$tree = [];
 		foreach ($lehrveranstaltungen_data as $row)
@@ -312,6 +323,31 @@ class Lehrveranstaltung extends FHCAPI_Controller
 
 		$this->LehreinheitModel->getLvsByFachbereich($fachbereich, $studiensemester_kurzbz, $mitarbeiter_uid);
 	}*/
+
+	private function _loadLvRows($studiengang_kz, $studiensemester_kurzbz, $semester = null, $orgform_kurzbz = null)
+	{
+		$this->_ci->load->model('organisation/Studienplan_model', 'StudienplanModel');
+
+		$studienplan_data = $this->_ci->StudienplanModel->getStudienplaeneBySemester($studiengang_kz, $studiensemester_kurzbz, $semester, $orgform_kurzbz);
+
+		$studienplan_ids = array();
+		$only_ids = array();
+		$placeholders = array();
+
+		if (hasData($studienplan_data))
+		{
+			foreach (getData($studienplan_data) as $studienplan) {
+				$placeholders[] = "(?, ?)";
+				$studienplan_ids[] = $studienplan->studienplan_id;
+				$studienplan_ids[] = $studienplan->semester;
+				$only_ids[] = $studienplan->studienplan_id;
+			}
+		}
+
+		$lehrveranstaltungen_data = $this->_ci->LehrveranstaltungModel->getLvsByStudiengang($studienplan_ids, $placeholders, $only_ids, $studiengang_kz, $studiensemester_kurzbz, $semester, $orgform_kurzbz);
+		return hasData($lehrveranstaltungen_data) ? getData($lehrveranstaltungen_data) : array();
+	}
+
 	private function _setAuthUID()
 	{
 		$this->_uid = getAuthUID();
@@ -377,7 +413,7 @@ class Lehrveranstaltung extends FHCAPI_Controller
 		$data = $this->getDataOrTerminateWithError($result);
 
 		if (!$data)
-			return $orgform_kurzbz;
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
 		return current($data)->orgform_kurzbz;
 	}

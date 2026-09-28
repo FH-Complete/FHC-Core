@@ -26,7 +26,8 @@ $config['root'] = [
 			'verband' => [
 				'group'
 			]
-		],
-		'orgform'
+		]
 	]
 ];
+
+$config['root']['stg']['orgform'] = $config['root']['stg'];

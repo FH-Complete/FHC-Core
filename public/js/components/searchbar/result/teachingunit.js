@@ -32,11 +32,28 @@ export default {
 					{{ res.studiengang }}
 				</div>
 			</div>
-			
+			<div class="searchbar_tablerow" v-if="res.oe_bezeichnung">
+				<div class="searchbar_tablecell searchbar_label">{{ $p.t('lehre/organisationseinheit') }}</div>
+				<div class="searchbar_tablecell searchbar_value">
+					{{ res.oe_bezeichnung }}
+				</div>
+			</div>
 			<div class="searchbar_tablerow" v-if="res.studiensemester_kurzbz">
 				<div class="searchbar_tablecell searchbar_label">{{ $p.t('lehre/studiensemester') }}</div>
 				<div class="searchbar_tablecell searchbar_value">
 					{{ res.studiensemester_kurzbz }}
+				</div>
+			</div>
+			<div class="searchbar_tablerow">
+				<div class="searchbar_tablecell searchbar_label">{{ $p.t('lehre/ausbildungssemester') }}</div>
+				<div class="searchbar_tablecell searchbar_value">
+					{{ res.semester }}
+				</div>
+			</div>
+			<div class="searchbar_tablerow">
+				<div class="searchbar_tablecell searchbar_label">{{ $p.t('lehre/lehrform') }}</div>
+				<div class="searchbar_tablecell searchbar_value">
+					{{ res.lehrform_kurzbz }}
 				</div>
 			</div>
 		

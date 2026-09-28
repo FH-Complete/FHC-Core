@@ -180,10 +180,14 @@ class SearchBarLib
 	protected function buildSearchClause(DB_Model $dbModel, array $columns, $searchstr)
 	{
 		$searchstr = preg_replace('/[[:punct:]]/', ' ', $searchstr);
+		$words = preg_split('/\s+/', trim($searchstr), -1, PREG_SPLIT_NO_EMPTY);
+
+		if (empty($words)) return array();
+
 		$document			 = implode(' || \' \' || ', $columns);
-		$query				 = '\'' . implode(':* & ', explode(' ', trim($searchstr))) . ':*\'';
-		$reversequery		 = '\'*:' . implode(' & *:', explode(' ', trim($searchstr))) . '\'';
-		$nospacequery		 = '\'' . implode('', explode(' ', trim($searchstr))) . ':*\'';
+		$query				 = '\'' . implode(':* & ', $words) . ':*\'';
+		$reversequery		 = '\'*:' . implode(' & *:', $words) . '\'';
+		$nospacequery		 = '\'' . implode('', $words) . ':*\'';
 
 		$searchclause = <<<EOSC
 			to_tsvector(lower(regexp_replace({$document}, '[[:punct:]]', ' ', 'g'))) @@ to_tsquery(lower({$query}))
@@ -602,21 +606,39 @@ EOSC;
 	{
 		$dbModel = new DB_Model();
 
+		$idwhere = '';
+		if (ctype_digit(trim($searchstr)))
+		{
+			$id = (int)trim($searchstr);
+			$idwhere = ' OR le.lehreinheit_id = ' . $id;
+		}
+
 		$lehreinheit = $dbModel->execReadOnlyQuery('
 			SELECT
 				\'teachingunit\' AS renderer,
 				\''.$type.'\' AS type,
-				lehreinheit_id as id,
-				studiensemester_kurzbz,
-				lv_bezeichnung as bezeichnung,
-				\'lv_table_icon icon-\' as foto,
-				UPPER(CONCAT(vw_lehreinheit.stg_typ, vw_lehreinheit.stg_kurzbz)) as studiengang
-			FROM campus.vw_lehreinheit
-				JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
-			WHERE cast(lehreinheit_id as text) ILIKE \'%'.$dbModel->escapeLIKE($searchstr).'%\'
-				OR lv_bezeichnung ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-			ORDER BY start DESC, lv_bezeichnung
-		');
+				le.lehreinheit_id AS id,
+				le.studiensemester_kurzbz,
+				lv.bezeichnung,
+				\'lv_table_icon icon-\' AS foto,
+				UPPER(stg.typ || stg.kurzbz) AS studiengang,
+				le.lehrform_kurzbz,
+				lv.semester
+			FROM lehre.tbl_lehreinheit le
+				JOIN lehre.tbl_lehrveranstaltung lv ON (lv.lehrveranstaltung_id = le.lehrveranstaltung_id)
+				JOIN public.tbl_studiengang stg ON (stg.studiengang_kz = lv.studiengang_kz)
+				JOIN public.tbl_studiensemester sem ON (sem.studiensemester_kurzbz = le.studiensemester_kurzbz)
+			WHERE (' .
+				$this->buildSearchClause(
+					$dbModel,
+					array(
+						'(stg.typ || stg.kurzbz)',
+						'lv.semester',
+						'lv.bezeichnung'
+					),
+					$searchstr
+				) . ')' . $idwhere . '
+	');
 
 		// If something has been found then return it
 		if (hasData($lehreinheit)) return getData($lehreinheit);
@@ -629,6 +651,14 @@ EOSC;
 	{
 		$dbModel = new DB_Model();
 
+		$idwhere = '';
+
+		if (ctype_digit(trim($searchstr)))
+		{
+			$id = (int)trim($searchstr);
+			$idwhere = ' OR tbl_lehrveranstaltung.lehrveranstaltung_id = ' . $id;
+		}
+
 		$lehreinheit = $dbModel->execReadOnlyQuery('
 			
 			SELECT
@@ -637,12 +667,23 @@ EOSC;
 				lehrveranstaltung_id as id,
 				tbl_lehrveranstaltung.bezeichnung,
 				\'lv_table_icon icon-lv\' as foto,
-				UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as studiengang
+				UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as studiengang,
+				semester,
+				lehrform_kurzbz,
+				tbl_organisationseinheit.bezeichnung as oe_bezeichnung
 			FROM lehre.tbl_lehrveranstaltung
 				JOIN public.tbl_studiengang USING(studiengang_kz)
-			WHERE cast(lehrveranstaltung_id as text) ILIKE \'%'.$dbModel->escapeLIKE($searchstr).'%\'
-				OR tbl_lehrveranstaltung.bezeichnung ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
-			ORDER BY lehrveranstaltung_id DESC
+				JOIN public.tbl_organisationseinheit ON tbl_lehrveranstaltung.oe_kurzbz = tbl_organisationseinheit.oe_kurzbz
+			WHERE (' .
+				$this->buildSearchClause(
+					$dbModel,
+					array(
+						'(tbl_studiengang.typ || tbl_studiengang.kurzbz)',
+						'semester',
+						'tbl_lehrveranstaltung.bezeichnung'
+					),
+					$searchstr
+				) . ')' . $idwhere . '
 		');
 
 		// If something has been found then return it
