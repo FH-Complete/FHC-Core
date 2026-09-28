@@ -1,4 +1,3 @@
-import FormInput from '../../../../Form/Input.js';
 import ReportAggregator from './Aggregators/Aggregator.js';
 
 let counter = 0;
@@ -6,7 +5,6 @@ let counter = 0;
 export default {
 	name: "WidgetsGenteratorReportAggregators",
 	components: {
-		FormInput,
 		ReportAggregator,
 	},
 	provide() {
@@ -48,11 +46,6 @@ export default {
 		removeAggregator(index) {
 			this.$emit('update:modelValue', this.modelValue.toSpliced(index, 1));
 		},
-		preventOnCheckboxClick(evt) {
-			if (evt.explicitOriginalTarget.classList.contains('form-check-label')) {
-				evt.preventDefault();
-			}
-		},
 		getHeaderStyle(isDefault) {
 			if (!isDefault)
 				return undefined;
@@ -70,11 +63,7 @@ export default {
 	template: /*html*/ `
 	<div class="widgets-report-config-aggregators">
 		<label class="form-label">{{ $p.t('dashboard/widget_report_kpi_aggregators') }}</label>
-		<div
-			class="accordion mb-2"
-			@[\`show.bs.collapse\`]="preventOnCheckboxClick"
-			@[\`hide.bs.collapse\`]="preventOnCheckboxClick"
-		>
+		<div class="accordion mb-2">
 			<div
 				v-for="(agg, i) in modelValue"
 				:key="i"
