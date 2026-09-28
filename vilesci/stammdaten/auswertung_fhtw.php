@@ -251,6 +251,31 @@ if ($deleteSingleResult)
 			exit();
 		}
 
+		$qry = "SELECT * FROM testtool.tbl_pruefling_gebiet
+				WHERE pruefling_id=" . $db->db_add_param($pruefling->pruefling_id) . " AND gebiet_id=" . $db->db_add_param($_POST['gebiet_id']) . "";
+
+		if ($db->db_query($qry))
+		{
+			while ($row = $db->db_fetch_object())
+			{
+				$undo .= " INSERT INTO testtool.tbl_pruefling_gebiet(prueflinggebiet_id,pruefling_id,gebiet_id, insertamum) VALUES (" .
+					$db->db_add_param($row->prueflinggebiet_id, FHC_INTEGER) . ', ' .
+					$db->db_add_param($row->pruefling_id, FHC_INTEGER) . ', ' .
+					$db->db_add_param($row->gebiet_id, FHC_INTEGER) . ', ' .
+					$db->db_add_param($row->insertamum) . ');';
+			}
+		}
+		else
+		{
+			$db->db_query('ROLLBACK');
+			echo json_encode(array(
+				'status' => 'fehler',
+				'msg' => 'Fehler beim Erstellen des UNDO Befehls fuer testtool.tbl_pruefling_gebiet'
+			));
+			exit();
+		}
+
+
 		//Antworten loeschen
 		$qry = "DELETE FROM testtool.tbl_pruefling_frage where pruefling_id=" . $db->db_add_param($pruefling->pruefling_id, FHC_INTEGER) . " AND
 				frage_id IN (SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id=" . $db->db_add_param($_POST['gebiet_id']) . ");
@@ -258,7 +283,9 @@ if ($deleteSingleResult)
 				DELETE FROM testtool.tbl_antwort
 				WHERE pruefling_id=" . $db->db_add_param($pruefling->pruefling_id) . " AND
 				vorschlag_id IN (SELECT vorschlag_id FROM testtool.tbl_vorschlag WHERE frage_id IN
-				(SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id=" . $db->db_add_param($_POST['gebiet_id']) . "));";
+				(SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id=" . $db->db_add_param($_POST['gebiet_id']) . "));
+				
+				DELETE FROM testtool.tbl_pruefling_gebiet where pruefling_id=" . $db->db_add_param($pruefling->pruefling_id, FHC_INTEGER) . " AND gebiet_id=" . $db->db_add_param($_POST['gebiet_id']) . ";";
 
 		if ($result = $db->db_query($qry))
 		{
@@ -388,9 +415,35 @@ if ($deleteAllResults)
 			exit();
 		}
 
+		$qry = "SELECT * FROM testtool.tbl_pruefling_gebiet WHERE pruefling_id=" . $db->db_add_param($pruefling->pruefling_id, FHC_INTEGER) . ";
+				";
+
+		if ($db->db_query($qry))
+		{
+			while ($row = $db->db_fetch_object())
+			{
+				$undo .= " INSERT INTO testtool.tbl_pruefling_gebiet(prueflinggebiet_id,pruefling_id,gebiet_id,insertamum) VALUES (" .
+					$db->db_add_param($row->prueflinggebiet_id, FHC_INTEGER) . ', ' .
+					$db->db_add_param($row->pruefling_id, FHC_INTEGER) . ', ' .
+					$db->db_add_param($row->gebiet_id, FHC_INTEGER) . ', ' .
+					$db->db_add_param($row->insertamum) . ');';
+			}
+		}
+		else
+		{
+			$db->db_query('ROLLBACK');
+			echo json_encode(array(
+				'status' => 'fehler',
+				'msg' => 'Fehler beim Erstellen des UNDO Befehls fuer testtool.tbl_pruefling_gebiet'
+			));
+			exit();
+		}
+
+
 		//Antworten loeschen
 		$qry = "	DELETE FROM testtool.tbl_pruefling_frage where pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";
-					DELETE FROM testtool.tbl_antwort WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";";
+					DELETE FROM testtool.tbl_antwort where pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";
+					DELETE FROM testtool.tbl_pruefling_gebiet WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";";
 
 		if ($result = $db->db_query($qry))
 		{

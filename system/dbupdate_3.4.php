@@ -102,6 +102,8 @@ require_once('dbupdate_3.4/75959_StudVw_Automatische_Tags.php');
 require_once('dbupdate_3.4/76160_lvv_favorites.php');
 require_once('dbupdate_3.4/77080_tabulator_presets_table.php');
 require_once('dbupdate_3.4/78292_gehaltsanpassungtyp.php');
+require_once('dbupdate_3.4/54225_reihungstest_ablauf_fuer_quereinsteiger.php');
+
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -253,7 +255,7 @@ $tabellen=array(
 	"hr.tbl_lohnguide_modellfunktion" => array("modellfunktion_kurzbz", "bezeichnung", "jobfamilie_kurzbz", "aktiv", "sort", "insertvon", "insertamum", "updatevon", "updateamum"),
 	"hr.tbl_lohnguide_modellstelle" => array("modellstelle_kurzbz", "bezeichnung", "grade", "modellfunktion_kurzbz", "aktiv", "sort", "insertvon", "insertamum", "updatevon", "updateamum"),
 	"hr.tbl_lohnguide_fachrichtung" => array("fachrichtung_kurzbz", "bezeichnung", "aktiv", "insertvon", "insertamum", "updatevon", "updateamum"),
-	"hr.tbl_vertragsbestandteil_lohnguide" => array("vertragsbestandteil_id", "stellenbezeichnung", "vordienstzeit", "fachrichtung_kurzbz", "modellstelle_kurzbz", "kommentar_person", "kommentar_modellstelle"),	
+	"hr.tbl_vertragsbestandteil_lohnguide" => array("vertragsbestandteil_id", "stellenbezeichnung", "vordienstzeit", "fachrichtung_kurzbz", "modellstelle_kurzbz", "kommentar_person", "kommentar_modellstelle"),
 	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung","bezeichnung_english","sort"),
 	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","uhrzeit","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note","protokoll","endezeit","pruefungsantritt_kurzbz","freigabedatum"),
 	"lehre.tbl_abschlusspruefung_antritt"  => array("pruefungsantritt_kurzbz","bezeichnung","bezeichnung_english","sort"),
@@ -421,6 +423,7 @@ $tabellen=array(
 	"testtool.tbl_pruefling_frage"  => array("prueflingfrage_id","pruefling_id","frage_id","nummer","begintime","endtime"),
 	"testtool.tbl_frage_sprache"  => array("frage_id","sprache","text","bild","audio","insertamum","insertvon","updateamum","updatevon"),
 	"testtool.tbl_vorschlag_sprache"  => array("vorschlag_id","sprache","text","bild","audio","insertamum","insertvon","updateamum","updatevon"),
+	"testtool.tbl_pruefling_gebiet"  => array("prueflinggebiet_id","pruefling_id","gebiet_id","insertamum"),
 	"system.tbl_app" => array("app"),
 	"system.tbl_appdaten" => array("appdaten_id","uid","app","appversion","version","bezeichnung","daten","freigabe","insertamum","insertvon","updateamum","updatevon"),
 	"system.tbl_cronjob"  => array("cronjob_id","server_kurzbz","titel","beschreibung","file","last_execute","aktiv","running","jahr","monat","tag","wochentag","stunde","minute","standalone","reihenfolge","updateamum", "updatevon","insertamum","insertvon","variablen"),
