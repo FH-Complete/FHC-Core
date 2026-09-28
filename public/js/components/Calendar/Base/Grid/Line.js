@@ -21,10 +21,6 @@ export default {
 		compactibleEventTypes: {
 			from: 'compactibleEventTypes',
 			default: undefined,
-		},
-		uniqueGridId: {
-			from: 'uniqueGridId',
-			default: null,
 		}
 	},
 	props: {

@@ -465,77 +465,6 @@ export default {
 				}
 			}, 100);
 		},
-		updateKalenderEventElementDisplay(calendarGruppenId, startDT, endDT) {
-			if (!calendarGruppenId)
-				return;
-
-			let startOfDay = startDT.startOf('day');
-			let newPotentialStart = startDT.diff(startOfDay).toMillis() ?? 1;
-			let newPotentialEnd = endDT.diff(startOfDay).toMillis();
-
-			const calendar = this.$refs.calendar?.$el;
-			let element = calendar?.querySelector(
-				`[data-group-id="event-group-${calendarGruppenId}"]`,
-			);
-			if (!element) return;
-
-			const targetGridLine = [...calendar.querySelectorAll(
-				'.fhc-calendar-base-grid-line',
-			)].find((gridLine) => {
-				const [rowStart, columnStart, rowEnd] = getComputedStyle(
-					gridLine,
-				).gridArea.split(' / ');
-
-				return (
-					rowStart === '1' &&
-					columnStart === String(startDT.weekday) &&
-					rowEnd === '-1'
-				);
-			});
-			const changedDay =
-				targetGridLine && element.parentElement !== targetGridLine;
-
-			setTimeout(() => {
-				if (!calendar.contains(element)) return;
-
-
-				if (changedDay) {
-					targetGridLine.insertBefore(element, null);
-					element.classList.add('tempus-temporary-calendar-event');
-				}
-
-				element.style.gridRowStart = 't_' + newPotentialStart;
-				element.style.gridRowEnd = 't_' + newPotentialEnd;
-
-				element.scrollIntoView({
-					behavior: 'smooth',
-					inline: 'center',
-					block: 'nearest',
-				});
-			}, 100);
-
-			const outerDiv = document.createElement('div');
-			outerDiv.className = 'spinner-overlay';
-
-			const innerDiv = document.createElement('div');
-			innerDiv.className = 'spinner';
-
-			outerDiv.appendChild(innerDiv);
-
-			element.appendChild(outerDiv);
-
-		},
-		clearTemporaryEvents() {
-			const calendar = this.$refs.calendar?.$el;
-			if (!calendar) return;
-			
-			const tempEvents = calendar.querySelectorAll(
-				'.tempus-temporary-calendar-event',
-			);
-			tempEvents.forEach((event) => {
-				event.remove();
-			});
-		}
 	},
 	watch: {
 		'$route.query': {
@@ -656,7 +585,6 @@ export default {
 			@open-reservierung="openReservierung"
 			:extra-backgrounds="extraBackgrounds"
 			@update:range="handleRange"
-			@events-reloaded="clearTemporaryEvents"
 			class="responsive-calendar"
 			:cache-multiplier="currentMode === 'week' ? 1 : 0"
 		/>
