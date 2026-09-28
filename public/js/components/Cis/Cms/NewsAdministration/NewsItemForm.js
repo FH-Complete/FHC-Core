@@ -246,13 +246,13 @@ export default {
 			const remainingLanguages = Object.values(contentFormItems)
 				.map((item) => item.config?.language)
 				.filter(Boolean);
+
 			contentFormItems.addLanguage = {
 				...addLanguageTab,
 				config: {
-					hasAvailableLanguages: this.availableLanguages.some(
-						(availableLanguage) =>
-							!remainingLanguages.includes(availableLanguage.value),
-					),
+					languages: this.availableLanguages.filter(
+						(language) => !remainingLanguages.includes(language.value),
+					)
 				},
 			};
 
@@ -280,15 +280,18 @@ export default {
 			const addLanguageTab = this.contentFormItems.addLanguage;
 			const contentFormItems = { ...this.contentFormItems };
 			delete contentFormItems.addLanguage;
+
+			
 			contentFormItems[key] = this.createContentFormItem(language);
+			const remainingLanguages = Object.values(contentFormItems)
+				.map((item) => item.config?.language)
+				.filter(Boolean);
 			contentFormItems.addLanguage = {
 				...addLanguageTab,
 				config: {
-					hasAvailableLanguages: this.availableLanguages.some(
-						(availableLanguage) =>
-							availableLanguage.value !== language &&
-							!this.visibleContentLanguages.includes(availableLanguage.value),
-					),
+					languages: this.availableLanguages.filter(
+						(language) => !remainingLanguages.includes(language.value),
+					)
 				},
 			};
 			this.contentFormItems = contentFormItems;
@@ -360,6 +363,10 @@ export default {
 			});
 
 			contentFormItems.addLanguage = this.createAddLanguageTab();
+			if (contentFormItems.addLanguage?.config) {
+				contentFormItems.addLanguage.config.languages = this.languagesToAdd;
+			}
+
 			this.contentFormItems = contentFormItems;
 			this.activeContentFormKey =
 				Object.keys(contentFormItems).find((key) => key !== 'addLanguage') ??
