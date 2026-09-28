@@ -120,7 +120,6 @@ export default {
 
 				if (changed)
 				{
-					console.log('scheduleVisibleDatesUpdate');
 					this.scheduleVisibleDatesUpdate();
 				}
 			}));

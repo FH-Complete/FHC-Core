@@ -69,15 +69,17 @@ export default {
 		currentDate() {
 			if (this.currentDate.locale != this.focusDate.locale) {
 				this.focusDate = this.currentDate;
+				this.rangeOffset = 0;
 				this.$emit('update:range', this.range);
 			} else {
 				this.rangeOffset = this.currentDate.startOf('week', { useLocaleWeeks: true }).diff(this.focusDate.startOf('week', { useLocaleWeeks: true }), 'weeks').weeks;
 				if (this.rangeOffset) {
+					this.focusDate = this.currentDate;
+					this.rangeOffset = 0;
 					this.$refs.view.$refs.grids.forEach(grid => {
 						grid.disableAutoScroll();
 					});
 					this.$emit('update:range', this.range);
-					this.$refs.slider.slidePages(this.rangeOffset).then(this.updatePage);
 				}
 			}
 		},

@@ -211,8 +211,8 @@ export function useEventLoader(
  	if (arePreviousEventsCleared) {
 		allEvents.value = [];
 	}
-	console.log('reset', arePreviousEventsCleared, isLoaderEventVisualReset);
-    reload(false, isLoaderEventVisualReset);
+
+	reload(false, isLoaderEventVisualReset);
   };
 
   const requestEvents = (startTimestamp, endTimestamp, isCacheEnabled = true, isLoaderEventVisualReset = false) => {
