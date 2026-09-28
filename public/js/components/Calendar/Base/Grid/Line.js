@@ -22,6 +22,10 @@ export default {
 			from: 'compactibleEventTypes',
 			default: undefined,
 		},
+		uniqueGridId: {
+			from: 'uniqueGridId',
+			default: null,
+		}
 	},
 	props: {
 		date: {
@@ -157,7 +161,7 @@ export default {
 			:end="end"
 			:background="bg"
 		></line-background>
-		<template v-for="(event, i) in formattedEvents" :key="i">
+		<template v-for="(event, i) in formattedEvents" :key="event.orig?.eindeutige_kalender_gruppen_id || i">
 			<line-event
 				v-if="!event.display || event.display === 'default'"
 				:style="'grid-' + axisRow + ': ' + event.rows.join('/')"
@@ -175,7 +179,7 @@ export default {
 			>
 				<span
 					v-for="(subEvent, subEventIndex) in event.events"
-					:key="subEventIndex"
+					:key="subEvent.orig?.eindeutige_kalender_gruppen_id || subEventIndex"
 					:style="subEvent.farbe ? {'background-color': '#' + subEvent.farbe} : {}"
 					style="height:10px; width:10px;"
 					class="border border-dark rounded-circle"

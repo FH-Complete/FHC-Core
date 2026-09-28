@@ -1043,7 +1043,7 @@ export default {
 
 			const calendar = this.$refs.calendar?.$el;
 			let element = calendar?.querySelector(
-				`[data-group-id="event-group-${calendarGruppenId}"]`,
+				`[data-group-id="event-group-${calendarGruppenId}"]:not(.tempus-temporary-calendar-event)`
 			);
 			if (!element) return;
 

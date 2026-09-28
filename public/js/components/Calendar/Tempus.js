@@ -247,8 +247,6 @@ export default {
 					const eventStart = luxon.DateTime.fromISO(event.isostart).setZone(this.timezone);
 					const eventEnd = luxon.DateTime.fromISO(event.isoend).setZone(this.timezone);
 
-					// Do not hide an event with an invalid date; it is safer to keep it
-					// available for the renderer than to silently discard it.
 					if (!eventStart.isValid || !eventEnd.isValid)
 						return true;
 
