@@ -61886,6 +61886,458 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwLegende',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Legende',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Legend',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipLegendeV2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Legende der Symbole, Farben und Namenszusätze anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show the legend of the symbols, colors and name suffixes',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwLegendeEntschuldigtBestaetigt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bestätigte Entschuldigung am gewählten Datum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Confirmed excuse on the selected date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwLegendeEntschuldigtOffen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Offene Entschuldigung am gewählten Datum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Open excuse on the selected date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwStudierendeImLvTeil',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studierende im LV-Teil',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Students in the teaching unit',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwNamenszusaetze',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Namenszusätze',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Name suffixes',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwZusatzIncoming',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Incoming',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Incoming student',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwZusatzOutgoing',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Outgoing ab dem angegebenen Datum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Outgoing from the given date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwZusatzOutgoingAb',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ab {0}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'from {0}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwZusatzAngerechnet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Angerechnet',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Credited',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwZusatzInternAngerechnet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Intern angerechnet',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Credited internally',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwZusatzNichtZugelassen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nicht zugelassen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Not admitted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwZusatzMitarbeiter',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mitarbeiter*in',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Employee',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwZusatzAusserordentlich',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Außerordentliche*r Hörer*in',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Non-degree student',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwZusatzDoubleDegreeIntern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Double Degree, interne*r Studierende*r',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Double degree, internal student',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwZusatzDoubleDegreeExtern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Double Degree, externe*r Studierende*r',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Double degree, external student',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwLvTeileAuswaehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LV-Teile auswählen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Select teaching units',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwKontrolleId',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontrolle-ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Check ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwLvTeilId',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LV-Teil-ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Teaching unit ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'noStudentsFoundV3',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine zugeteilten Studierenden für Mitarbeiter*in {0} im gewählten LV-Teil {1} gefunden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No assigned students found for employee {0} in the selected teaching unit {1}.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipLektorDeleteKontrolleV2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wenn Sie eine Anwesenheitskontrolle irrtümlich gestartet haben, können Sie diese löschen. Sie können eine Kontrolle bis {0} Tage nach dem Anlegen löschen. Das System löscht dabei auch alle Anwesenheitseinträge der Studierenden zu dieser Kontrolle. Danach berechnet das System die Anwesenheitsquoten neu.
+
+				Wenn die Kontrolle älter als {0} Tage ist, wenden Sie sich an eine*n Administrator*in.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'If you started an attendance check by mistake, you can delete it. You can delete a check for {0} days after you created it. The system then also deletes all attendance entries of the students for this check. Then the system calculates the attendance rates again.
+
+				If the check is older than {0} days, contact an administrator.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipStudentByLvaV2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'In dieser Detailansicht bearbeiten Sie einzelne Anwesenheiten von Studierenden. Das ist zum Beispiel nötig, wenn anwesende Studierende den Zugangscode wegen eines technischen Problems nicht eingeben können. Wenn abwesende Studierende den Zugangscode von anwesenden Studierenden erhalten haben, tragen Sie diese als abwesend ein.
+
+				Wenn eine akzeptierte Entschuldigung den Status bestimmt, können Sie den Status nicht ändern.
+
+				Sie können zu jedem Anwesenheitseintrag eine Notiz erfassen. Die Studierenden sehen diese Notiz nicht.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'In this detail view, you edit single attendance entries of students. For example, do this when a student who is present cannot enter the access code because of a technical problem. When absent students got the access code from students who are present, set these students to absent.
+
+				If an accepted excuse sets the status, you cannot change the status.
+
+				You can add a note to each attendance entry. The students do not see this note.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// ### End Anwesenheiten Sprint 25.2
 	// generic tabulator phrases START
 	array(
