@@ -28,7 +28,7 @@ class ResourcesCollisionCheck implements ICollisionCheck
 
 	public function check($data)
 	{
-		if (!isset($data->betriebsmittel_ids, $data->von, $data->bis, $data->kalender_id)) return [];
+		if (!isset($data->betriebsmittel_ids, $data->von, $data->bis)) return [];
 
 		if (empty($data->betriebsmittel_ids)) return [];
 
