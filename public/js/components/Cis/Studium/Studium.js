@@ -53,12 +53,17 @@ export default {
 				}
 			}
 		},
-		selectedStudiengang: function (newVal, oldVal) {
+		selectedStudiengang: async function (newVal, oldVal) {
 			if (newVal && newVal != oldVal) {
 				const studiengang = this.getDataFromLocalStorage("studiengang");
 				if (!studiengang || (studiengang && studiengang != newVal)) {
 					this.storeDataToLocalStorage("studiengang", JSON.stringify(newVal));
 				}
+			}
+
+			if (newVal && this.showStudiengangInfo) {
+				await this.$nextTick();
+				document.querySelector("#studiengang-info-body").classList.add("show");
 			}
 		},
 		selectedStudienordnung: function (newVal, oldVal) {
@@ -124,9 +129,22 @@ export default {
 			const value = localStorage.getItem(key);
 			return value;
 		},
-		toggleStudiengangInfo(){
-			this.showStudiengangInfo = !this.showStudiengangInfo;
+		displayStudiengangInfo(){
+			this.showStudiengangInfo = true;
 			this.storeDataToLocalStorage("studiengangInfo", this.showStudiengangInfo);
+			setTimeout(() => {
+				this.toggleStudiengangInfoCollapse();
+			}, this.isMobile ? 0 : 500);
+		},
+		hideStudiengangInfo(){
+			this.showStudiengangInfo = false;
+			this.storeDataToLocalStorage("studiengangInfo", this.showStudiengangInfo);
+		},
+		toggleStudiengangInfoCollapse() {
+			new bootstrap.Collapse(
+				"#studiengang-info-body",
+				{ toggle: true },
+			);
 		},
 		changeSelectedStudienSemester(studiensemester_kurzbz) {
 			return this.$api
@@ -398,22 +416,33 @@ export default {
 		<hr>
 
 		<div class="row g-3">
-			<div class="col-12 order-last studiengang-info-col" :class="{collapsed: !showStudiengangInfo}" v-if="selectedStudiengang">
-				<h2 class="studiengang-info-title"><span>{{$p.t('global','ansprechpartner')}}</span> <span>{{$p.t('lehre','studiengang')}}</span></h2>
-				<div class="d-flex flex-column flex-md-row">
-					<button id="studiengang-info-toggle" type="button" class="d-flex justify-content-center p-2 flex-shrink-0"
-						@click="toggleStudiengangInfo"
-						:aria-label="studiengangInfoToggleTitel" :title="studiengangInfoToggleTitel"
-						:aria-expanded="showStudiengangInfo" aria-controls="fhc-studiengang-info-column">
+			<div
+				v-if="selectedStudiengang"
+				id="studiengang-info-col"
+				class="col-12 order-last d-flex flex-column"
+				:class="{'collapsed col-md-2': !showStudiengangInfo, 'col-md-4 col-xxl-3': showStudiengangInfo}"
+			>
+				<h6 id="studiengang-info-title" class="text-wrap"><span>{{$p.t('global','ansprechpartner')}}</span> <span>{{$p.t('lehre','studiengang')}}</span></h6>
+				<div class="d-flex flex-column flex-md-row gap-2">
+					<button
+						@click="showStudiengangInfo ? toggleStudiengangInfoCollapse() : displayStudiengangInfo()"
+						id="studiengang-info-toggle"
+						class="d-flex flex-row justify-content-center align-items-center p-2"
+					>
 						<i aria-hidden="true" class="fa-solid fa-chevron-right fhc-text"></i>
 					</button>
-					<div id="fhc-studiengang-info-column" class="flex-grow-1">
-						<div class="studiengang-info-body">
+					<div id="studiengang-info" class="flex-grow-1">
+						<div
+							@[\`hidden.bs.collapse\`]="hideStudiengangInfo()"
+							id="studiengang-info-body"
+							class="collapse"
+						>
 							<studiengang-information compact :studiengang_kz="selectedStudiengang" :semester="selectedSemester"></studiengang-information>
 						</div>
 					</div>
 				</div>
 			</div>
+
 			<div class="col-12 col-md">
 				<div class="lvUebersicht " >
 					<template v-for="lehrveranstaltung in lehrveranstaltungen" :key="lehrveranstaltung.lehrveranstaltung_id">
