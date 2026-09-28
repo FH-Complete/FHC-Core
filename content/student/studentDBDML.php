@@ -4374,6 +4374,8 @@ if(!$error)
 			$projektarbeit->titel = $_POST['titel'];
 			$projektarbeit->titel_english = $_POST['titel_english'];
 			$projektarbeit->lehreinheit_id = $_POST['lehreinheit_id'];
+			$projektarbeit->lehrveranstaltung_id = $_POST['lehrveranstaltung_id'];
+			$projektarbeit->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 			$projektarbeit->student_uid = $_POST['student_uid'];
 			$projektarbeit->firma_id = $_POST['firma_id'];
 			$projektarbeit->note = $_POST['note'];
