@@ -48,7 +48,7 @@ class bisarchiv extends basis_db
 	 */
 	protected function validate()
 	{
-		if($this->studiensemster_kurzbz == null || mb_strlen($this->studiensemster_kurzbz) > 6)
+		if($this->studiensemester_kurzbz == null || mb_strlen($this->studiensemester_kurzbz) > 6)
 		{
 			$this->errormsg = "Studiensemester ist ungueltig";
 			return false;
@@ -107,7 +107,7 @@ class bisarchiv extends basis_db
 			return false;
 		
 		$qry = "INSERT INTO bis.tbl_archiv (studiensemester_kurzbz, meldung, html, studiengang_kz, insertamum, insertvon, typ) VALUES ("
-			. $this->db_add_param($this->studiensemster_kurzbz) . ","
+			. $this->db_add_param($this->studiensemester_kurzbz) . ","
 			. $this->db_add_param($this->meldung) . ","
 			. $this->db_add_param($this->html) . ","
 			. $this->db_add_param($this->studiengang_kz) . ","

@@ -81,7 +81,7 @@ class Lehrveranstaltung extends FHCAPI_Controller
 	{
 		$studiengang_kz = $this->getStudiengangKz($stg_kz);
 
-		if (is_null($studiengang_kz) || !preg_match("/^-?[1-9][0-9]*$/", (string)$studiengang_kz))
+		if (is_null($studiengang_kz) || !preg_match("/^(-?[1-9][0-9]*|0)$/", (string)$studiengang_kz))
 			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
 		$verband = null;
