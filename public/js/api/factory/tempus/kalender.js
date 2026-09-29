@@ -132,6 +132,12 @@ export default {
 			params: { kalender_id }
 		};
 	},
+	getRaeume() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/tempus/Kalender/getRaeume',
+		};
+	},
 	getLehreinheiten(kalender_id) {
 		return {
 			method: 'get',
@@ -161,5 +167,13 @@ export default {
 			params: { kalender_id, lehreinheit_ids }
 		};
 	},
+	getModalContent(kalender_id)
+	{
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/tempus/Kalender/getModalContent',
+			params: { kalender_id }
+		};
+	}
 
 };
