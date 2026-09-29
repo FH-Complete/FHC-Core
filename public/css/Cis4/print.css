@@ -34,16 +34,10 @@ header,
 }
 
 .fhc-calendar-mode-range .fhc-calendar-base-grid {
-	break-after: page !important;
-	border-bottom-style: none !important;
-}
-
-.fhc-calendar-mode-range .fhc-calendar-base-grid {
-	grid-template-rows: auto repeat(var(--fhc-grid-axis-main-count), auto) !important;
-	gap: 0px !important;
 	border: solid !important;
 	border-color: var(--range-view-print-border-color) !important;
 	border-width: 1px !important;
+	break-after: page !important;
 }
 
 .fhc-calendar-mode-range .fhc-calendar-base-grid * {
