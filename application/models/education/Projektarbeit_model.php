@@ -25,9 +25,9 @@ class Projektarbeit_model extends DB_Model
 	{
 		$sprache_index = "COALESCE((SELECT index FROM public.tbl_sprache WHERE sprache=" . $this->escape(getUserLanguage()) . " LIMIT 1), 1)";
 		$qry = "SELECT
-					pa.*, tbl_projekttyp.bezeichnung,
-					pa.studiensemester_kurzbz, pa.lehrveranstaltung_id,
+					pa.*, tbl_projekttyp.bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
 					tbl_sprache.bezeichnung[".$sprache_index."] AS sprache_bezeichnung,
+					pa.studiensemester_kurzbz, pa.lehrveranstaltung_id,
 					tbl_firma.name AS firma_name,
 					(
 						SELECT

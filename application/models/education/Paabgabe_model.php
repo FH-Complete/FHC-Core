@@ -120,7 +120,6 @@ class Paabgabe_model extends DB_Model
 				JOIN campus.tbl_paabgabetyp abgabetyp USING(paabgabetyp_kurzbz)
 				LEFT JOIN public.tbl_benutzer ben ON(uid=student_uid)
 				LEFT JOIN public.tbl_person pers ON(ben.person_id=pers.person_id)
-				LEFT JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 				LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 				LEFT JOIN public.tbl_studiengang stg USING(studiengang_kz)
 			WHERE
@@ -199,7 +198,6 @@ class Paabgabe_model extends DB_Model
 				JOIN campus.tbl_paabgabe USING(projektarbeit_id)
 				LEFT JOIN public.tbl_benutzer ON(uid=student_uid)
 				LEFT JOIN public.tbl_person ON(tbl_benutzer.person_id=tbl_person.person_id)
-				LEFT JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 				LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 				LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
 			WHERE
