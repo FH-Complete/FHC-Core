@@ -419,18 +419,19 @@ export default {
 			<div
 				v-if="selectedStudiengang"
 				id="studiengang-info-col"
-				class="col-12 order-last d-flex flex-column"
-				:class="{'collapsed col-md-1': !showStudiengangInfo, 'col-md-4 col-xxl-3': showStudiengangInfo}"
+				class="order-last d-flex flex-column"
+				:class="{'collapsed col-md-auto': !showStudiengangInfo, 'col-md-4 col-xxl-3': showStudiengangInfo}"
 			>
-				<div class="d-flex flex-column flex-md-row gap-2">
+				<div class="d-flex flex-column flex-md-row justify-content-start gap-2">
 					<button
 						@click="showStudiengangInfo ? toggleStudiengangInfoCollapse() : displayStudiengangInfo()"
 						id="studiengang-info-toggle"
 						class="d-flex flex-row justify-content-center align-items-center p-2"
+						:title="studiengangInfoToggleTitel"
 						>
 						<i aria-hidden="true" class="fa-solid fa-chevron-right fhc-text"></i>
 					</button>
-					<div id="studiengang-info" class="flex-grow-1">
+					<div id="studiengang-info">
 						<div
 							@[\`hidden.bs.collapse\`]="hideStudiengangInfo()"
 							id="studiengang-info-body"

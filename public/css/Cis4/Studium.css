@@ -65,7 +65,7 @@
 	background-color: var(--fhc-secondary);
 	border: 1px solid var(--fhc-border);
 	border-radius: var(--bs-border-radius);
-	transition: width 0.5s ease-in-out, background-color 0.2s ease-in-out;
+	transition: background-color 0.2s ease-in-out;
 }
 
 #studiengang-info-toggle:hover {
@@ -82,17 +82,16 @@
 }
 
 #studiengang-info {
-	overflow-x: hidden;
 	transition: width 0.5s ease-in-out;
 }
 
 @media (min-width: 768px) {
-	#studiengang-info-col:not(.collapsed) #studiengang-info-toggle {
-		width: 25px;
+	#studiengang-info-col.collapsed {
+		width: 50px;
 	}
 
-	#studiengang-info-col.collapsed #studiengang-info-toggle {
-		width: 100%;
+	#studiengang-info-toggle {
+		min-height: 100px;
 	}
 
 	#studiengang-info-col.collapsed #studiengang-info {
