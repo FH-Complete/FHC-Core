@@ -587,6 +587,17 @@ class NewsAdministrationAPI extends FHCAPI_Controller
 			}
 		}
 
+		$submittedLanguages = array_column($data['translations'], 'sprache');
+		$this->db->where('content_id', $existingNews->content_id);
+		$this->db->where_not_in('sprache', $submittedLanguages);
+
+		if ($this->db->delete('campus.tbl_contentsprache') === false)
+		{
+			$error = $this->db->error();
+			$this->db->trans_rollback();
+			$this->terminateWithError($error, self::ERROR_TYPE_DB);
+		}
+
 		foreach ($data['translations'] as $translation)
 		{
 			$translation['content'] = $this->formatContentURLsToRelative($translation['content']);
