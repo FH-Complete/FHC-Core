@@ -30,6 +30,12 @@ export default {
 	directives: {
 		draggable,
 	},
+	provide() {
+		return {
+			showRaster: Vue.computed(() => this.showRaster),
+			teachingunits: Vue.computed(() => this.teachingunits),
+		}
+	},
 	props: {
 		timezone: {
 			type: String,

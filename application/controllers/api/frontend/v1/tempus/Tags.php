@@ -38,13 +38,15 @@ class Tags extends Tag_Controller
 		$index_bezeichnung_mehrsprachig = $language - 1;
 
 		$this->KalenderNotizModel->addSelect(
-			'tbl_kalender_notiz.notiz_id as notiz_id,
-			typ_kurzbz as tag_typ_kurzbz,
-			array_to_json(bezeichnung_mehrsprachig::varchar[])->>'. $index_bezeichnung_mehrsprachig. ' as bezeichnung,
+			'tbl_kalender_notiz.notiz_id as id,
+			typ_kurzbz,
+			array_to_json(bezeichnung_mehrsprachig::varchar[])->>'. $index_bezeichnung_mehrsprachig. ' as beschreibung,
+			text as notiz,
 			style,
-			beschreibung,
+			tbl_notiz.erledigt as done,
 			tag,
-			tbl_notiz.erledigt as done
+			prioritaet,
+			eindeutige_kalender_gruppen_id
 			'
 		);
 

@@ -1,5 +1,6 @@
 import { numberPadding, formatDate } from "../../../../helpers/DateHelpers.js"
 import LvMenu from "../../../Cis/Mylv/LvMenu.js";
+import TagsAssignmentModal from "../../TagsAssignmentModal.js";
 
 export default {
 	props:{
@@ -15,6 +16,7 @@ export default {
 	},
 	components:{
 		LvMenu,
+		TagsAssignmentModal
 	},
 	computed: {
 		lektorenLinks: function () {
@@ -50,10 +52,26 @@ export default {
 		ortString() {
 			return Array.isArray(this.event.ort_kurzbz) ? this.event.ort_kurzbz.join(', ') : this.event.ort_kurzbz;
 		},
+		tags() {
+			if (typeof this.event.tags === 'string') {
+				try {
+					return JSON.parse(this.event.tags);
+				} catch (e) {
+					console.error('Failed to parse tags:', e);
+					return [];
+				}
+			}
+
+			return this.event.tags || [];
+		},
 	},
 	methods: {
 		methodFormatDate: function (d) {
 			return formatDate(d);
+		},
+		async openTagsModal(tag = null)
+		{
+			await this.$refs.tagsModal.open(this.event, tag);
 		},
 	},
 	template: `
@@ -125,9 +143,34 @@ export default {
 							</div>
 						</td>
 					</tr>
+					<tr>
+						<th>{{
+							$p.t('ui','tags')?
+							$p.t('ui','tags')+':'
+							:''
+						}} <i 
+								class="fa-solid fa-tags"
+								@click="openTagsModal(null)"
+							></i>
+						</th>
+						<td>
+							<div v-if="tags.length">
+								<span
+									v-for="tag in tags"
+									:key="tag.tag_typ_kurzbz"
+									:class="[tag.style, { tag_done: tag.done }]"
+									@click="openTagsModal(tag)"
+									class="tag disabled"
+									>{{ tag.beschreibung }}</span>
+							</div>
+						</td>
+						
+					</tr>
 					
 				</tbody>
 		</table>
 		
+		<tags-assignment-modal ref="tagsModal"/>
+
 	</div>`,
 }

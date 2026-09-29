@@ -36,6 +36,7 @@ import TempusAppMenu from './AppMenu.js';
 import TempusVerbandMenu from './VerbandMenu.js';
 import TempusSidebarMenu from './SidebarMenu.js';
 import RaumauswahlModal from './RaumauswahlModal.js';
+import RaumauswahlMultiModal from './RaumauswahlMultiModal.js';
 import LehreinheitModal from './LehreinheitModal.js';
 import HorizontalSplit from '../horizontalsplit/horizontalsplit.js';
 
@@ -55,6 +56,7 @@ export default {
 		ResourcesAssignmentModal,
 		TagsAssignmentModal,
 		RaumauswahlModal,
+		RaumauswahlMultiModal,
 		LehreinheitModal,
 		HorizontalSplit,
 	},
@@ -82,8 +84,7 @@ export default {
 			contextMenuActions: useContextMenuActions({
 				openRaumauswahl: (orig) => this.$refs.raumModal.show(orig),
 				openLehreinheit: (orig) => this.$refs.lehreinheitModal.show(orig),
-				openResourcesAssignmentModal: (orig) =>
-					this.$refs.resourcesAssignmentModal?.open(orig),
+				openResourcesAssignmentModal: (orig) => this.$refs.resourcesAssignmentModal?.open(orig),
 				openTagsModal: (orig) => this.$refs.tagsAssignmentModal?.open(orig),
 				openHistory: (orig) => this.openHistory(orig),
 				deleteEntry: (orig) => this.deleteEntry(orig),
@@ -92,7 +93,17 @@ export default {
 			}),
 			tableActions: {
 				deleteEntries: (origList) => this.deleteEntries(origList),
-				openRaumauswahl: (orig) => this.$refs.raumModal.show(orig),
+				syncToLecturer: (origList) => this.syncToLecturerList(origList),
+				syncToStudent: (origList) => this.syncToStudentList(origList),
+				openRaumauswahl: (origList) => this.$refs.raumMultiModal.show(origList),
+				reload: () => this.$refs.calendar.resetEventLoader()
+			},
+			modalActions: {
+				saveEventTime: (payload) => this.handleSaveEventTime(payload),
+				addToFilter: (filter, type) => this.addToFilter(filter, type),
+			},
+			reload: () => {
+				this.reload();
 			},
 			canToggleGrid: this.permissions.stundenraster,
 		};
@@ -159,6 +170,11 @@ export default {
 		},
 	},
 	methods: {
+		handleSaveEventTime({ kalender_id, start_time, end_time }) {
+			this.$api
+				.call(ApiKalender.updateKalenderEvent(kalender_id, { start_time, end_time }))
+				.then(() => this.reload());
+		},
 		async deleteEntry(orig) {
 			if (!orig?.kalender_id) return;
 
@@ -193,23 +209,51 @@ export default {
 					this.$refs.historyModal.show();
 				});
 		},
-		syncToLecturer(orig) {
-			if (!orig?.kalender_id) return;
-			return this.$api
-				.call(ApiKalender.syncToLecturer(orig.kalender_id))
-				.then(() => this.$refs.calendar.resetEventLoader());
+		async syncToStudentList(origList) {
+			let validList = (origList ?? []).filter((orig) => orig?.kalender_id && ['planning', 'sync_preview', 'preview'].includes(orig?.status_kurzbz));
+			if (!validList.length) return;
+
+			await Promise.allSettled(
+				validList.map((orig) => this.syncToStudentCall(orig)),
+			);
+			this.$refs.calendar.resetEventLoader();
 		},
-		syncToStudent(orig) {
+		async syncToStudentCall(orig) {
+			await this.$api.call(ApiKalender.syncToStudent(orig.kalender_id))
+		},
+		async syncToStudent(orig) {
 			if (!orig?.kalender_id) return;
-			return this.$api
-				.call(ApiKalender.syncToStudent(orig.kalender_id))
-				.then(() => this.$refs.calendar.resetEventLoader());
+			await this.syncToStudentCall(orig);
+			this.$refs.calendar.resetEventLoader();
+		},
+
+		async syncToLecturerList(origList) {
+			let validList = (origList ?? []).filter((orig) => orig?.kalender_id && orig?.status_kurzbz === 'planning');
+			if (!validList.length) return;
+
+			await Promise.allSettled(
+				validList.map((orig) => this.syncToLecturerCall(orig)),
+			);
+			this.$refs.calendar.resetEventLoader();
+		},
+		async syncToLecturerCall(orig) {
+			await this.$api.call(ApiKalender.syncToLecturer(orig.kalender_id))
+		},
+		async syncToLecturer(orig) {
+			if (!orig?.kalender_id) return;
+			await this.syncToLecturerCall(orig);
+			this.$refs.calendar.resetEventLoader();
 		},
 		rebuildRaumvorschlag() {
 			if (this.raumvorschlagPreview)
 				this.previewRaumvorschlag({
 					lehreinheit_id: this.raumvorschlagPreview?.lehreinheit_id,
 				});
+		},
+		reload() {
+			this.$refs.calendar?.resetEventLoader();
+			this.$refs.sidebar?.reloadCoursepicker();
+			this.rebuildRaumvorschlag();
 		},
 
 		clearRaumvorschlagPreview() {
@@ -276,23 +320,6 @@ export default {
 		setOrt(data) {
 			this.ort_kurzbz = data.ort_kurzbz;
 			this.rooms = [{ ort_kurzbz: data.ort_kurzbz }];
-		},
-		setEmp(data) {
-			const uid = data.uid;
-			const label = data.name;
-
-			this.lecturers = [
-				{
-					uid,
-					label,
-					showEvents: true,
-					overlays: { blocks: true, wishes: true },
-					showCoursePicker: false,
-				},
-			];
-
-			this.$refs.calendar.resetEventLoader();
-			if (this.lastRange) this.handleRange(this.lastRange);
 		},
 		onSelectVerbandAndClose(payload) {
 			this.onSelectVerband(payload);
@@ -1032,17 +1059,14 @@ export default {
 			ref="verbandMenu"
 			@select-verband-and-close="onSelectVerbandAndClose"
 		/>
-		<raumauswahl-modal ref="raumModal" @saved="$refs.calendar.resetEventLoader()"/>
-		<raumauswahl-modal ref="raumModal" @saved="() => {$refs.calendar.resetEventLoader(); $refs.sidebar.reloadCoursepicker(); rebuildRaumvorschlag();}"/>
-		<lehreinheit-modal ref="lehreinheitModal" @saved="$refs.calendar.resetEventLoader(); $refs.sidebar.reloadCoursepicker();"/>
+		<raumauswahl-multi-modal ref="raumMultiModal" @saved="reload()"/>
+		<raumauswahl-modal ref="raumModal" @saved="() => reload()"/>
+		<lehreinheit-modal ref="lehreinheitModal" @saved="reload()"/>
 		<resources-assignment-modal
 		ref="resourcesAssignmentModal"
 		@save-finished="$refs.calendar.resetEventLoader()"
 		/>
-		<tags-assignment-modal
-		ref="tagsAssignmentModal"
-		@tags-changed="$refs.calendar.resetEventLoader()"
-		/>
+		<tags-assignment-modal ref="tagsAssignmentModal"/>
 		<history-modal ref="historyModal" :entries="historyEntries" />
 		<reservierung
 			ref="reservierung"

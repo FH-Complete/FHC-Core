@@ -94,11 +94,38 @@ export default {
 				? this.event.teilnehmer_gruppe.map(gruppe => gruppe.gruppe_kurzbz).join(', ')
 				: this.event.teilnehmer_gruppe;
 		},
+		tags() {
+			if (typeof this.event.tags === 'string') {
+				try {
+					return JSON.parse(this.event.tags);
+				} catch (e) {
+					console.error('Failed to parse tags:', e);
+					return [];
+				}
+			}
+
+			return this.event.tags || [];
+		},
+		tagsTooltip() {
+			if (this.tags.length === 0) {
+				return '';
+			}
+
+			return this.tags.map((tag) => tag.beschreibung).join('\n');
+		},
 	},
 	template: /* html */`
 	<div
 		:class="classes"
+		class="position-relative"
 	>
+		<div class="position-absolute top-0 start-0 m-1">
+			<i 
+				v-tooltip="tagsTooltip"
+				v-if="tags?.length"
+				class="fa-solid fa-tags"
+			></i>
+		</div>
 		<div
 			v-if="!event.allDayEvent && event?.beginn && event?.ende"
 			class="event-time d-grid h-100"

@@ -1,6 +1,21 @@
 import {CoreFilterCmpt} from "../../../../components/filter/Filter.js";
 import BsModal from '../../../Bootstrap/Modal.js';
 import FormInput from "../../../Form/Input.js";
+import CoreTag from '../../../../components/Tag/Tag.js';
+
+import {
+	buildTagHeaderFilterExpression,
+	buildTagOptionsFromRows,
+	customTagFilter,
+	setTagHeaderFilterValue,
+	tagHeaderFilter,
+	extendedHeaderFilter,
+	syncTagHeaderFilterOptions,
+	syncSelectedTagOptionsWithHeaderFilters
+} from "../../../../tabulator/filters/extendedHeaderFilter.js";
+
+import { tagFormatter } from "../../../../tabulator/formatter/tags.js";
+import ApiTempusTag from "../../../../api/factory/tempus/tag.js";
 
 export default {
 	name: "TableView",
@@ -12,7 +27,8 @@ export default {
 	components: {
 		CoreFilterCmpt,
 		BsModal,
-		FormInput
+		FormInput,
+		CoreTag
 	},
 	props: {
 		day: {
@@ -27,7 +43,23 @@ export default {
 	data()
 	{
 		return {
-			raumtyp_array: []
+			raumtyp_array: [],
+			actionSelect: '',
+			tagFilterState: {
+				initialOptions: [],
+				selectedOptions: [],
+			},
+			tagFilterLabels: {
+				tag: "Tag",
+				clear: "Clear",
+				connectors: {
+					AND: "AND",
+					OR: "OR",
+					NOT: "NOT",
+				},
+			},
+			tagEndpoint: ApiTempusTag,
+			selectedColumnValues: []
 		}
 	},
 	computed: {
@@ -52,7 +84,7 @@ export default {
 				index: "row_index",
 				layout: 'fitDataStretch',
 				placeholder: "Keine Daten verfügbar",
-				persistenceID: "2026_03_09_table_view_v1",
+				persistenceID: "2026_09_29_table_view_v1",
 				data: this.preparedEvents,
 				columns: [
 					{
@@ -64,6 +96,16 @@ export default {
 						headerSort: false,
 						width: 40
 					},
+					{
+						title: 'Tags',
+						field: 'tags',
+						tooltip: false,
+						headerFilter: customTagFilter,
+						headerFilterFunc: tagHeaderFilter,
+						formatter: (cell, formatterParams, onRendered) => tagFormatter(cell, this.$refs.tagComponent, onRendered),
+						width: 150,
+					},
+
 					{title: 'Datum', field: 'datum', headerFilter: "input", formatter: (cell) => {
 							let val = cell.getValue();
 							if (!val)
@@ -78,10 +120,31 @@ export default {
 					{title: 'Lehrform', field: 'lehrform', headerFilter: "input"},
 					{title: 'Raum', field: 'ort_kurzbz', headerFilter: "input"},
 					{
+						title: 'Lehreinheit_id',
+						field: 'lehreinheit_id',
+						headerFilter: "input",
+						tooltip: false,
+						formatter: function(cell) {
+							let value = cell.getValue();
+							if (!value || !value.length)
+								return '';
+
+							let semester = cell.getRow().getData().le_studiensemester_kurzbz.toLowerCase();
+							let base_url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+
+							//TODO (david) abhängig von der LVVerwaltung
+							/*return value.map(lehreinheit => {
+								let url = `${base_url}/LVVerwaltung/stdsem/${semester}/le/${lehreinheit}`;
+								return `<a href="${url}" target="_blank">${lehreinheit}</a>`;
+							}).join(', ');*/
+						},
+					},
+					{
 						title: 'Lektor',
 						field: 'lektor',
 						headerFilter: "input",
-						mutator: (value) => {
+						formatter: (cell) => {
+							let value = cell.getValue();
 							if (!value)
 								return '';
 							return value.map(l => l.kurzbz).join(', ') ?? '–'
@@ -91,12 +154,30 @@ export default {
 					{title: 'Status', field: 'status_kurzbz', headerFilter: "input"},
 				]
 			}
-		}
+		},
 	},
 	methods:
 	{
+		tagHeaderFilterParams() {
+			return {
+				listOnEmpty: true,
+				autocomplete: true,
+				initialOptions: this.tagFilterState.initialOptions,
+				selectedOptions: this.tagFilterState.selectedOptions,
+				labels: this.tagFilterLabels,
+			};
+		},
+		tableBuilt() {
+			this.$refs.tableViewTable.tabulator.updateColumnDefinition('tags', {
+				headerFilterParams: this.tagHeaderFilterParams(),
+			});;
+
+		},
 		openModal() {
-			this.$refs.raumModal.show();
+			let selected = this.$refs.tableViewTable?.tabulator?.getSelectedData() ?? [];
+			if (!selected.length)
+				return;
+			this.tableActions?.openRaumauswahl(selected)
 		},
 		async deleteSelected() {
 			let selected = this.$refs.tableViewTable?.tabulator?.getSelectedData() ?? [];
@@ -110,12 +191,165 @@ export default {
 			await this.tableActions?.deleteEntries(selected)
 
 			this.$refs.tableViewTable.tabulator.deselectRow();
-		}
+		},
+		async setStatus() {
+
+			let selected = this.$refs.tableViewTable?.tabulator?.getSelectedData() ?? [];
+
+			if (!selected.length) return;
+
+			if (this.actionSelect === 'delete')
+			{
+				let isConfirmed = await this.$fhcAlert.confirmDelete();
+				if (!isConfirmed) return;
+				await this.tableActions?.deleteEntries(selected)
+			}
+			else if (this.actionSelect === 'toLecturer')
+			{
+				await this.tableActions?.syncToLecturer(selected)
+			}
+			else if (this.actionSelect === 'toStudent')
+			{
+				await this.tableActions?.syncToStudent(selected)
+			}
+		},
+		async fetchAssignedTagsByCalender(calendarGroupId) {
+			const result = await this.$api.call(
+				ApiTempusTag.getTagsByCalendar(calendarGroupId),
+			);
+
+			if (result.meta.status === "success") {
+				return result.data.filter((tag) => !!tag);
+			}
+
+			this.$fhcAlert.alertError(
+				this.$p.t("ui", "failed_assigned_tags_fetch_error_message"),
+			);
+			return [];
+		},
+		async addedTag(addedTag) {
+			let relevantEvents = this.events.filter(event =>
+				this.selectedColumnValues.includes(event.orig.eindeutige_kalender_gruppen_id)
+			);
+
+			await Promise.all(relevantEvents.map(async (event) => {
+				let tags = await this.fetchAssignedTagsByCalender(event.orig.eindeutige_kalender_gruppen_id);
+				event.orig.tags = tags
+			}));
+
+			syncTagHeaderFilterOptions(
+				this.$refs.tableViewTable?.tabulator?.getData() || [],
+				this.tagFilterState.initialOptions,
+				this.tagFilterState.selectedOptions,
+			);
+		},
+
+		async deletedTag(deletedTag) {
+			let calendarIds = this.events
+				.filter(event => event.orig.tags?.some(t => t.id === deletedTag))
+				.map(event => event.orig.eindeutige_kalender_gruppen_id);
+
+			if (!calendarIds.length) return;
+
+			let relevantEvents = this.events.filter(event =>
+				calendarIds.includes(event.orig.eindeutige_kalender_gruppen_id)
+			);
+
+			await Promise.all(relevantEvents.map(async (event) => {
+				let tags = await this.fetchAssignedTagsByCalender(event.orig.eindeutige_kalender_gruppen_id);
+				event.orig.tags = tags;
+			}));
+
+			syncTagHeaderFilterOptions(
+				this.$refs.tableViewTable?.tabulator?.getData() || [],
+				this.tagFilterState.initialOptions,
+				this.tagFilterState.selectedOptions,
+			);
+		},
+		async updatedTag(updatedTag) {
+			let calendarIds = this.events
+				.filter(event => event.orig.tags?.some(t => t.id === updatedTag.id))
+				.map(event => event.orig.eindeutige_kalender_gruppen_id);
+
+			if (!calendarIds.length) return;
+
+			let relevantEvents = this.events.filter(event =>
+				calendarIds.includes(event.orig.eindeutige_kalender_gruppen_id)
+			);
+
+			await Promise.all(relevantEvents.map(async (event) => {
+				let tags = await this.fetchAssignedTagsByCalender(event.orig.eindeutige_kalender_gruppen_id);
+				event.orig.tags = tags;
+			}));
+
+			syncTagHeaderFilterOptions(
+				this.$refs.tableViewTable?.tabulator?.getData() || [],
+				this.tagFilterState.initialOptions,
+				this.tagFilterState.selectedOptions,
+			);
+		},
+		dataLoadedHandler (data) {
+
+			syncTagHeaderFilterOptions(
+				Array.isArray(data) ? data : [],
+				this.tagFilterState.initialOptions,
+				this.tagFilterState.selectedOptions,
+			);
+		},
+		dataFilteredHandler(filters, rows) {
+
+			syncSelectedTagOptionsWithHeaderFilters(
+				filters,
+				this.tagFilterState.selectedOptions
+			);
+		},
+		columnWidthHandler (column) {
+			if (column.getField() !== "tags") return;
+
+			column.getCells().forEach((cell) => {
+				cell.getElement().firstElementChild?.fitTags?.();
+			});
+		},
+		onRowClick(e, row)
+		{
+			if (e.target.closest('a, input'))
+				return;
+
+			let rowIndex = row.getData().row_index;
+			let eventData = this.events.find(ev => ev.id === rowIndex)?.orig ?? row.getData();
+
+			let event = new CustomEvent('cal-click', {
+				cancelable: true,
+				bubbles: true,
+				detail: {source: 'event', value: eventData}
+			})
+
+			row.getElement().dispatchEvent(event)
+		},
+
+		updateSelectedRows() {
+			this.selectedColumnValues = this.$refs.tableViewTable.tabulator.getSelectedRows().map(row => row.getData().eindeutige_kalender_gruppen_id);
+		},
 	},
 	watch: {
-		preparedEvents(newData) {
-			this.$refs.tableViewTable?.tabulator?.setData(newData);
-		}
+		preparedEvents: {
+			handler(newData) {
+				this.$refs.tableViewTable?.tabulator?.setData(newData);
+			},
+			deep: true
+		},
+		"tagFilterState.selectedOptions": {
+			handler() {
+				const selectedOptions = this.tagFilterState.selectedOptions;
+				const combinedFilterStatement = buildTagHeaderFilterExpression(selectedOptions);
+
+				setTagHeaderFilterValue(
+					combinedFilterStatement,
+					this.$refs.tableViewTable.tabulator,
+				);
+			},
+			deep: true,
+		},
 	},
 	template: /* html */`
 	<div class="fhc-calendar-mode-table-view h-100 overflow-auto">
@@ -125,34 +359,40 @@ export default {
 			:table-only="true"
 			:side-menu="false"
 			:download="true"
+			:tabulator-events="[{ event: 'tableBuilt', handler: tableBuilt },
+								{ event: 'rowSelectionChanged', handler: updateSelectedRows },
+								{ event: 'dataLoaded', handler: dataLoadedHandler }, 
+								{ event: 'dataFiltered', handler: dataFilteredHandler }, 
+								{ event: 'columnWidth', handler: columnWidthHandler },
+								{ event: 'rowClick', handler: onRowClick }
+			]"
 		>
 			<template #actions>
+				<core-tag ref="tagComponent"
+					:endpoint="tagEndpoint"
+					:values="selectedColumnValues"
+					@added="addedTag"
+					@deleted="deletedTag"
+					@updated="updatedTag"
+					zuordnung_typ="eindeutige_kalender_gruppen_id"
+					show-hover
+				></core-tag>
+				<div class="d-flex gap-2 align-items-baseline">
+					<select v-model="actionSelect" class="form-select">
+						<option selected disabled value="">Status setzen</option>
+						<option value="delete">Löschen</option>
+						<option value="toLecturer">Freischalten für Voransicht</option>
+						<option value="toStudent">Freischalten für Live</option>
+					</select>
+					<button @click="setStatus" :disabled="!actionSelect" class="btn btn-outline-danger btn-sm text-nowrap">
+						Status setzen
+					</button>
+				</div>
+				
 				<button @click="deleteSelected" class="btn btn-outline-danger btn-sm">Löschen</button>
-				<button class="btn btn-outline-secondary btn-sm">Verschieben</button>
 				<button @click="openModal" class="btn btn-outline-secondary btn-sm">Raum wechsel</button>
 			</template>
 		</core-filter-cmpt>
-		
-		<!--<bs-modal ref="raumModal" class="bootstrap-prompt" dialogClass="modal-lg">
-			<template #title>Raum verschiebung</template>
-				<form-input
-					:label="$p.t('lehre', 'raumtyp')"
-					type="select"
-					container-class="col-3"
-					name="raumtyp"
-				>
-				<option
-					v-for="raumtyp in raumtyp_array"
-					:value="raumtyp.raumtyp_kurzbz"
-					:key="raumtyp.raumtyp_kurzbz"
-				>
-					{{ raumtyp.raumtyp_kurzbz }} {{ raumtyp.beschreibung }}
-				</option>
-			</form-input>
-			<template #footer>
-				<button type="button" class="btn btn-primary">{{ $p.t('ui', 'speichern') }}</button>
-			</template>
-		</bs-modal>-->
 	</div>
 	`
 }

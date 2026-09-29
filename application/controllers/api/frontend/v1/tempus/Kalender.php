@@ -20,6 +20,7 @@ class Kalender extends FHCAPI_Controller
 			'getPlan' => 'lehre/lvplan:rw',
 			'getPlanByOrt' => 'lehre/lvplan:rw',
 			'getRaumvorschlag' => 'lehre/lvplan:rw',
+			'getRaeume' => 'lehre/lvplan:rw',
 			'getRaumvorschlagSlots' => 'lehre/lvplan:rw',
 			'getLehreinheiten' => 'lehre/lvplan:rw',
 			'getHistory' => 'lehre/lvplan:rw',
@@ -38,10 +39,12 @@ class Kalender extends FHCAPI_Controller
 			'confirmMultiWeekPlan' => 'lehre/lvplan:rw',
 			'addToKalenderEvent' => 'lehre/lvplan:rw',
 			'sync' => 'lehre/lvplan:rw',
+			'getModalContent' => 'lehre/lvplan:rw',
 		]);
 
 		$this->_ci =& get_instance();
 
+		$this->_ci->load->model('ressource/Zeitwunsch_model', 'ZeitwunschModel');
 		$this->_ci->load->library('LogLib');
 		$this->_ci->load->library('form_validation');
 		$this->_ci->load->library('KalenderLib');
@@ -81,6 +84,72 @@ class Kalender extends FHCAPI_Controller
 		$this->terminateWithSuccess($stunden);
 	}
 
+	public function getModalContent()
+	{
+		$this->_ci->form_validation->set_data($_GET);
+		$this->_ci->form_validation->set_rules('kalender_id',"kalender_id","required");
+
+		if($this->_ci->form_validation->run() === FALSE)
+			$this->terminateWithValidationErrors($this->_ci->form_validation->error_array());
+
+		$kalender_id = $this->_ci->input->get('kalender_id', TRUE);
+
+		$anzahl = $this->_ci->kalenderlib->getStudentenAnzahl(
+			$kalender_id
+		);
+
+		if (isError($anzahl))
+			$this->terminateWithError(getError($anzahl));
+
+		$anzahlSchwund = $this->_ci->kalenderlib->getStudentenAnzahl(
+			$kalender_id,
+			true
+		);
+
+		if (isError($anzahlSchwund))
+			$this->terminateWithError(getError($anzahl));
+
+		$entryResult = $this->_ci->kalenderlib->getByKalenderId($kalender_id);
+
+		$kalender_entry = $entryResult[0];
+
+		$mitarbeiter_uids = array_values(array_unique((array_column($kalender_entry->lektor, 'mitarbeiter_uid'))));
+		$zeitwunschMap = [];
+		if (!isEmptyArray($mitarbeiter_uids))
+		{
+			$this->_ci->ZeitwunschModel->addSelect('tbl_zeitwunsch.mitarbeiter_uid');
+			$this->_ci->ZeitwunschModel->addSelect('MAX(GREATEST(tbl_zeitwunsch_gueltigkeit.insertamum, tbl_zeitwunsch_gueltigkeit.updateamum)) AS letzte_aenderung', false);
+			$this->_ci->ZeitwunschModel->addJoin('campus.tbl_zeitwunsch_gueltigkeit', 'zeitwunsch_gueltigkeit_id');
+			$this->_ci->ZeitwunschModel->db->where_in('tbl_zeitwunsch.mitarbeiter_uid', $mitarbeiter_uids);
+			$this->_ci->ZeitwunschModel->addGroupBy('tbl_zeitwunsch.mitarbeiter_uid');
+
+			$zeitwunschMapResult = $this->_ci->ZeitwunschModel->load();
+
+			if (isError($zeitwunschMapResult))
+				$this->terminateWithError(getError($zeitwunschMapResult));
+
+			if (hasData($zeitwunschMapResult))
+			{
+				foreach (getData($zeitwunschMapResult) as $row)
+				{
+					$zeitwunschMap[$row->mitarbeiter_uid] = $row->letzte_aenderung;
+				}
+			}
+		}
+
+		$mailResult = $this->_ci->kalenderlib->getMailVerteiler($kalender_id);
+
+		if (isError($mailResult))
+			$this->terminateWithError(getError($mailResult));
+
+		$return = ['anzahl' => getData($anzahl),
+			'anzahlSchwund' => getData($anzahlSchwund),
+			'zeitwunschMap' => $zeitwunschMap,
+			'mails' => getData($mailResult)
+		];
+
+		$this->terminateWithSuccess($return);
+	}
 	public function getCalendarHours()
 	{
 		$calender_start = $this->_ci->config->item('calendar_start') ?? 7;
@@ -255,6 +324,19 @@ class Kalender extends FHCAPI_Controller
 
 		$filter = $this->_checkFilter(self::ALLOWED_ROOM_FILTER);
 		$this->terminateWithSuccess($this->_ci->raumvorschlaglib->getVorschlaege($filter->kalender_id));
+	}
+
+	public function getRaeume()
+	{
+		$this->_ci->OrtModel->addSelect('ort_kurzbz, raumtyp_kurzbz, max_person');
+		$this->_ci->OrtModel->addJoin('public.tbl_ortraumtyp', 'ort_kurzbz');
+		$this->_ci->OrtModel->db->where('aktiv', true);
+		$this->_ci->OrtModel->db->where('lehre', true);
+		$this->_ci->OrtModel->addOrder('raumtyp_kurzbz');
+		$this->_ci->OrtModel->addOrder('ort_kurzbz');
+		$this->_ci->OrtModel->addOrder('max_person');
+		$orte = $this->_ci->OrtModel->load();
+		$this->terminateWithSuccess(hasData($orte) ? getData($orte) : []);
 	}
 
 	public function getRaumvorschlagSlots()

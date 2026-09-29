@@ -278,7 +278,9 @@ class StudentCollisionCheck implements ICollisionCheck
 		$grouped = [];
 		foreach (getData($result) as $row)
 		{
-			$grouped[$row->kalender_id][] = true;
+			$grouped[$row->kalender_id][] = [
+				'message' => $this->_ci->phraseslib->t('ui', 'student_kollision') . ': ' . $row->uid
+			];
 		}
 
 		return $grouped;

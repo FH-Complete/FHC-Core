@@ -313,9 +313,15 @@ class VerbandCollisionCheck implements ICollisionCheck
 		$placeholders = implode(',', array_fill(0, count($kalender_ids), '?'));
 
 		$sql = "
-			SELECT DISTINCT ON (current_kalender.kalender_id) current_kalender.kalender_id
+			SELECT DISTINCT ON (current_kalender.kalender_id) current_kalender.kalender_id,
+				COALESCE(
+					other_lehreinheitguppe.gruppe_kurzbz,
+					UPPER(stg.typ::text || stg.kurzbz::text) || '-' || other_lehreinheitguppe.semester ||
+						COALESCE(other_lehreinheitguppe.verband::text, '') ||
+						COALESCE(other_lehreinheitguppe.gruppe::text, '')
+					) AS gruppenname
 			FROM lehre.tbl_kalender current_kalender
-	
+
 			JOIN (
 				SELECT tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester, tbl_lehreinheitgruppe.verband, tbl_lehreinheitgruppe.gruppe,
 					tbl_lehreinheitgruppe.gruppe_kurzbz, tbl_kalender_lehreinheit.kalender_id
@@ -351,6 +357,8 @@ class VerbandCollisionCheck implements ICollisionCheck
 			LEFT JOIN public.tbl_gruppe other_gruppe
 				ON other_gruppe.gruppe_kurzbz = other_lehreinheitguppe.gruppe_kurzbz
 	
+			LEFT JOIN public.tbl_studiengang stg
+				ON stg.studiengang_kz = other_lehreinheitguppe.studiengang_kz
 			WHERE current_kalender.kalender_id IN ({$placeholders})
 			AND other_kalender.status_kurzbz NOT IN ('archived', 'deleted', 'to_delete', 'to_delete_live', 'to_delete_preview')
 			AND current_lehreinheitguppe.studiengang_kz = other_lehreinheitguppe.studiengang_kz
@@ -404,7 +412,7 @@ class VerbandCollisionCheck implements ICollisionCheck
 		$grouped = [];
 		foreach (getData($result) as $row)
 		{
-			$grouped[$row->kalender_id][] = true;
+			$grouped[$row->kalender_id][] = ['message' => $this->_ci->phraseslib->t('ui', 'verband_kollision') . ': ' . $row->gruppenname];
 		}
 
 		return $grouped;

@@ -53,6 +53,11 @@ export function useContextMenuActions(handlers)
 				action: handlers.openRaumauswahl
 			},
 			{
+				label: 'Tags',
+				icon: 'fa-solid fa-tags',
+				action: handlers.openTagsModal
+			},
+			{
 				label: 'Delete',
 				icon: 'fa-solid fa-calendar-xmark',
 				action: handlers.deleteEntry
