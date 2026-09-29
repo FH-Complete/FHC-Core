@@ -21,21 +21,23 @@ export default {
 	},
 	watch: {
 		propsWatchHelper: function() {
-			let currentiFrameURL = this.$refs.compatiframe ? this.$refs.compatiframe.src : '';
+			if(this.lastLoadediFrameURL === '') {
+				return;
+			}
 
-			console.log('currentiFrameURL: ' + currentiFrameURL);
-			console.log('lastLoadediFrameURL: ' + this.lastLoadediFrameURL);
+			let currentiFrameURL = this.$refs.compatiframe ? this.$refs.compatiframe.src : '';
 
 			let url = this.buildSrcUrl();
 			if(this.lastLoadediFrameURL !== url) {
 				this.srcUrl = url;
+				if(this.srcUrl === url) {
+					this.$refs.compatiframe.contentWindow.location.href = url;
+				}
 			}
 		}
 	},
 	methods: {
 		buildSrcUrl: function() {
-			console.log('srcUrl begin: ' + this.path);
-
 			let url = false;
 			switch(this.mode) {
 				case 'ci':
@@ -51,23 +53,15 @@ export default {
 				url += '?' + this.query_string;
 			}
 
-			console.log('srcUrl end: ' + url);
 			return url;
 		},
 		loadHandler: function() {
-			console.log('loadHandler');
-			console.log(JSON.stringify(this.$refs.compatiframe.contentWindow.location));
-
 			let iframe_href = this.$refs.compatiframe.contentWindow.location.href;
 			let ci_urlstart = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'index.ci.php/';
 			let legacy_urlstart = FHC_JS_DATA_STORAGE_OBJECT.app_root;
 			let routerpath = null;
 
 			this.lastLoadediFrameURL = iframe_href;
-
-			console.log('iframe_href: ' + iframe_href);
-			console.log('ci_urlstart: ' + ci_urlstart);
-			console.log('legacy_url_start: ' + legacy_urlstart);
 
 			if(iframe_href.startsWith(ci_urlstart)) {
 				routerpath = iframe_href.replace(
@@ -78,8 +72,6 @@ export default {
 			} else {
 				return;
 			}
-
-			console.log(routerpath);
 
 			if(this.$route.fullPath !== routerpath) {
 				this.$router.push(routerpath);

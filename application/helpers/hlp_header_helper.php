@@ -83,6 +83,21 @@ function generateCSSsInclude($CSSs)
 }
 
 /**
+ * Generates tags for the style sheets you want to include, the parameter could by a string or an array of strings
+ */
+function generatePrintCSS($path)
+{
+	$cssLink = '<link rel="stylesheet" media="print" href="%s" />';
+
+	$ci =& get_instance();
+	$cachetoken = '?'.$ci->config->item('fhcomplete_build_version');
+
+	if (isset($path)) {
+		echo sprintf($cssLink, base_url($path).$cachetoken) . PHP_EOL;
+	}
+}
+
+/**
  * Generates global JS-Object to pass parms to other javascripts
  */
 function generateJSDataStorageObject($indexPage, $calledPath, $calledMethod)

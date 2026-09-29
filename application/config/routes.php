@@ -61,6 +61,15 @@ $route['api/v1/organisation/[O|o]rganisationseinheit/(:any)'] = 'api/v1/organisa
 $route['api/v1/ressource/[B|b]etriebsmittelperson/(:any)'] = 'api/v1/ressource/betriebsmittelperson2/$1';
 $route['api/v1/system/[S|s]prache/(:any)'] = 'api/v1/system/sprache2/$1';
 
+// Legacy CMS news routes
+$route['api/frontend/v1/Cms/getNewsItem/(:num)'] = 'api/frontend/v1/NewsAdministrationAPI/getNewsItem/$1';
+$route['api/frontend/v1/Cms/storeNewsItem'] = 'api/frontend/v1/NewsAdministrationAPI/storeNewsItem';
+$route['api/frontend/v1/Cms/updateNewsItem/(:num)'] = 'api/frontend/v1/NewsAdministrationAPI/updateNewsItem/$1';
+$route['api/frontend/v1/Cms/deleteNewsItem/(:num)'] = 'api/frontend/v1/NewsAdministrationAPI/deleteNewsItem/$1';
+
+// Keep legacy uppercase URLs refreshable while using the canonical controller method casing
+$route['CisVue/Cms/NewsAdministration'] = 'CisVue/Cms/newsAdministration';
+
 $route['Cis/LvPlan/.*'] = 'Cis/LvPlan/index/$1';
 $route['Cis/MyLvPlan/.*'] = 'Cis/MyLvPlan/index/$1';
 $route['Cis/MyLv/.*'] = 'Cis/MyLv/index/$1';
@@ -68,6 +77,8 @@ $route['Cis/OtherLvPlan/.*'] = 'Cis/OtherLvPlan/index/$1';
 //Route for LV Plan Stg/Semester/Verband/Gruppe
 $route['Cis/StgOrgLvPlan/.*'] = 'Cis/StgOrgLvPlan/index/$1';
 $route['Cis/Benotungstool/.*'] = 'Cis/Benotungstool/index/$1';
+
+$route['Cis/MyReservation'] = 'Cis/MyReservation/index/$1';
 
 //Route for Zeitsperrenma
 $route['Cis/Zeitsperrenma/.*'] = 'Cis/Zeitsperrenma/index/$1';

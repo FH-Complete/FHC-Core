@@ -1,5 +1,10 @@
+import CisMenuLink from "./Link.js";
+
 export default {
     name: 'CisMenuEntry',
+	components: {
+		CisMenuLink
+	},
     props: {
         entry: Object,
         level: {
@@ -56,20 +61,10 @@ export default {
 			return this.entry.url.startsWith(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router)
 		},
         target() {
-            if (this.entry.template_kurzbz == 'redirect') {
-                if (!this.entry.content)
-                    return '';
-                let xmlDoc = (new DOMParser()).parseFromString(this.entry.content,"text/xml");
-                let target = xmlDoc.getElementsByTagName('target')[0];
-                if (!target)
-                    return '';
-                
-                target = target.childNodes[0].nodeValue + "";
-                if (target == 'content' || target == '_self')
-                    target = "";
-                return target;
+            if (this.entry?.target) {
+                return this.entry.target;
             }
-            return ''
+            return '_self';
         },
         hasChilds() {
             return this.entry.childs && this.entry.childs.length !== 0;
@@ -164,7 +159,7 @@ export default {
     </div>
     <template v-else>
 		<div class="btn-group w-100">
-			<a
+			<cis-menu-link
 				@click="handleClickOnMenuNode($event)"
 				:href="menuNodeHref"
 				:target="target"
@@ -176,7 +171,7 @@ export default {
 				:style="'padding-left: calc(var(--bs-btn-padding-x) * ' + $props.level + ');'"
 			>
 				{{ entry.titel }}
-			</a>
+			</cis-menu-link>
 			<button
 				v-if="hasChilds"
 				@click.prevent="toggleCollapse()"

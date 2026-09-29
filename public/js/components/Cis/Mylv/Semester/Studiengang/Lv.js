@@ -3,6 +3,8 @@ import LvPruefungen from "./Lv/Pruefungen.js";
 import ApiLehre from '../../../../../api/factory/lehre.js';
 import ApiAddons from '../../../../../api/factory/addons.js';
 
+import {isCompatLink, calcCompatRouterLink} from '../../../../../helpers/CompatLinkHelpers.js';
+
 // TODO(chris): L10n
 
 export default {
@@ -106,6 +108,12 @@ export default {
 				pruefungenData: this.pruefungenData, 
 				bezeichnung: this.bezeichnung
 			});
+		},
+		isCompatLink(link) {
+			return isCompatLink(link);
+		},
+		calcCompatRouterLink(link) {
+			return calcCompatRouterLink(link);
 		}
 	},
 	created() {
@@ -159,7 +167,13 @@ export default {
 								
 								<ul v-else class="dropdown-menu dropdown-menu p-0">
 									<li v-for="([text, link], i) in menuItem.c4_linkList" :key="i">
-									   <a class="dropdown-item border-bottom" :href="link" target="#">{{ text }}</a>
+										<template v-if="this.isCompatLink(link)">
+											<router-link 
+												class="dropdown-item border-bottom"
+												:to="this.calcCompatRouterLink(link)"
+											>{{ text }}</router-link>
+										</template>
+										<a v-else="" class="dropdown-item border-bottom" :href="link" target="#">{{ text }}</a>
 									</li>
 								</ul>
 							</div>

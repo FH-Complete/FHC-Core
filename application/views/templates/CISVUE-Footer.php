@@ -5,6 +5,11 @@ $includesArray = array(
 	'bootstrap5' => true,
 	'fontawesome6' => true,
 	'axios027' => true,
+	'primevue3' => true,
+	'vuedatepicker11' => true,
+	'customJSs' => array_merge([
+		'vendor/moment/luxonjs/luxon.min.js'
+	], $customJSs ?? []),
 	'customJSModules' => array_merge([
 		'public/js/apps/Cis/Menu.js'
 	], $customJSModules ?? []),

@@ -88,6 +88,29 @@ if (! $rechte->isberechtigt('basis/dms', null, 's', null))
 		init: function(){
 		},
 		mySubmit : function (id) {
+			var messageTarget = window.opener;
+
+			if (!messageTarget && window.parent !== window)
+				messageTarget = window.parent;
+
+			if (messageTarget && typeof(messageTarget.postMessage) == "function")
+			{
+				messageTarget.postMessage(
+					{
+						type: "fhcomplete:dms:selected",
+						dmsId: id
+					},
+					window.location.protocol + "//" + window.location.host
+				);
+			}
+
+			if (
+				typeof(tinyMCEPopup) == "undefined" ||
+				!tinyMCEPopup.params ||
+				typeof(tinyMCEPopup.getWindowArg) != "function"
+			)
+				return;
+
 			var URL = "dms.php?id="+id;
 				var win = tinyMCEPopup.getWindowArg("window");
 
