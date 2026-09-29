@@ -13,6 +13,7 @@
 	overflow: visible !important;
 	scrollbar-color: rgba(0,0,0,0) rgba(0,0,0,0) !important;
 	height: auto !important;
+	position: relative !important;
 }
 
 body
@@ -93,4 +94,13 @@ header,
 
 .fhc-calendar-mode-range .fhc-calendar-base-grid-line-event {
 	z-index: 9999 !important;
+}
+
+.fhc-calendar-mode-range .fhc-calendar-base-grid-line-event {
+	max-height: 50px !important;
+	overflow-y: hidden !important;
+}
+
+.fhc-calendar-mode-range .fhc-calendar-base-grid-line-event .event-lectors {
+	display: none !important;
 }
