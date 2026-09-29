@@ -1,15 +1,15 @@
-import MylvSemesterCards from "./Semester.js";
-import MylvTable from "./Table.js";
-import ApiAddons from "../../../api/factory/addons.js"
+import Lvs from "./Lvs.js";
+import Lehrenheiten from "./Lehrenheiten.js";
+import Supervisor from "./Supervisor.js";
 
-// TODO(chris): phrase: global/studiensemester_auswaehlen
-// TODO(chris): phrase: next & prev +aria-label
+import ApiAddons from "../../../api/factory/addons.js"
 
 export default {
 	name: 'MyLv',
 	components: {
-		MylvSemesterCards,
-		MylvTable
+		Lvs,
+		Lehrenheiten,
+		Supervisor,
 	},
 	data: () => {
 		return {
@@ -17,7 +17,8 @@ export default {
 			studiensemester: null,
 			lvs: {},
 			currentSemester: null,
-			mode: localStorage.getItem('myLvaDefaultMode') ?? 'cards'
+			modes: ["lvs", "lehrenheiten", "supervision"],
+			selectedMode: "lvs"
 		};
 	},
 	provide() {
@@ -91,13 +92,9 @@ export default {
 		},
 		currentIsLast() {
 			return this.studiensemester[this.studiensemester.length-1].studiensemester_kurzbz == this.currentSemester;
-		}
+		},
 	},
 	methods: {
-		clickMode(evt, mode) {
-			localStorage.setItem('myLvaDefaultMode', mode)
-			this.mode = mode
-		},
 		prevSem() {
 			this.$refs.studiensemester.selectedIndex--;
 			this.$refs.studiensemester.dispatchEvent(new Event('change', { bubbles: true }));
@@ -126,7 +123,7 @@ export default {
 		next();
 
 	},
-	template: `
+	template: /*html*/ `
 	<div>
 		<h2>{{$p.t('lehre/myLV')}}</h2>
 		<hr>
@@ -135,48 +132,39 @@ export default {
 				<div class="col-auto d-none">
 					<label class="col-form-label">{{$p.t('lehre/studiensemester')}}</label>
 				</div>
-				<div class="col-auto">
-					<div class="input-group">
-						<button :aria-label="$p.t('lehre','previousStudSemester')" v-tooltip.top="{showDelay:1000, value:$p.t('lehre','previousStudSemester')}" class="btn btn-outline-secondary" type="button" :disabled="currentIsFirst" @click="prevSem">
-							<i class="fa fa-caret-left" aria-hidden="true"></i>
-						</button>
-						<select ref="studiensemester" v-model="currentSemester" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="updateRouter($event.target.value)">
-							<option v-for="semester in studiensemester" :key="semester.studiensemester_kurzbz">{{semester.studiensemester_kurzbz}}</option>
+				<div class="d-flex flex-column flex-md-row justify-content-center gap-2">
+					<div>
+						<div class="input-group">
+							<button :aria-label="$p.t('lehre','previousStudSemester')" v-tooltip.top="{showDelay:1000, value:$p.t('lehre','previousStudSemester')}" class="btn btn-outline-secondary" type="button" :disabled="currentIsFirst" @click="prevSem">
+								<i class="fa fa-caret-left" aria-hidden="true"></i>
+							</button>
+							<select ref="studiensemester" v-model="currentSemester" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="updateRouter($event.target.value)">
+								<option v-for="semester in studiensemester" :key="semester.studiensemester_kurzbz">{{semester.studiensemester_kurzbz}}</option>
+							</select>
+							<button class="btn btn-outline-secondary" :aria-label="$p.t('lehre','nextStudSemester')" v-tooltip.top="{showDelay:1000, value:$p.t('lehre','nextStudSemester')}" type="button" :disabled="currentIsLast" @click="nextSem">
+								<i class="fa fa-caret-right" aria-hidden="true"></i>
+							</button>
+						</div>
+					</div>
+					<div>
+						<select v-model="selectedMode" class="form-select" :aria-label="'mode selector placeholder'">
+							<option v-for="mode in modes" :key="mode"> {{ mode }} </option>
 						</select>
-						<button class="btn btn-outline-secondary" :aria-label="$p.t('lehre','nextStudSemester')" v-tooltip.top="{showDelay:1000, value:$p.t('lehre','nextStudSemester')}" type="button" :disabled="currentIsLast" @click="nextSem">
-							<i class="fa fa-caret-right" aria-hidden="true"></i>
-						</button>
 					</div>
 				</div>
-				<div class=" col-auto my-lva-modes">
-					<div class="d-flex gap-1 justify-content-end" role="group">
-						<button
-							type="button"
-							class="btn btn-outline-secondary"
-							:class="{active: mode === 'cards'}"
-							@click="clickMode($event, 'cards')"
-						>
-							<i class="fa fa-grip"></i>
-						</button>
-						<button
-							type="button"
-							class="btn btn-outline-secondary"
-							:class="{active: mode === 'table'}"
-							@click="clickMode($event, 'table')"
-						>
-							<i class="fa fa-table"></i>
-						</button>
-					</div>
+				<div class="pt-4">
+					<lvs v-if="selectedMode === 'lvs'" :current="current" />
+					<lehrenheiten v-else-if="selectedMode === 'lehrenheiten'" :current="current" />
+					<supervisor v-else-if="selectedMode === 'supervision'" :current="current" />
 				</div>
 			</div>
-			<div class="alert alert-danger" role="alert" v-else>
+			<div v-else class="alert alert-danger" role="alert">
 				{{$p.t('lehre/noLvFound')}}
 			</div>
-			<mylv-semester-cards v-if="mode == 'cards'" v-bind="current"/>
-			<mylv-table v-else-if="mode == 'table'" v-bind="current"/>
 		</div>
 		<div class="mylv text-center" v-else>
 			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 		</div>
-	</div>`
-};
+	</div>
+	`,
+}

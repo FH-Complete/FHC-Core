@@ -22,21 +22,22 @@ export default {
 				layout: 'fitDataStretch',
 				placeholder: this.$p.t('global/noDataAvailable'),
 				columns: [
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('lehre/studiengang'))), field: 'sg_bezeichnung', widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('global/bezeichnung'))), field: 'bezeichnung', widthGrow: 2},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('lehre/orgform'))), field: 'orgform_kurzbz', widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('lehre/kurzbz'))), field: 'studiengang_kuerzel', widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('lehre/semesterstunden'))), field: 'semesterstunden', 
+					{titlePhrase: 'lehre/studiengang', title: 'placeholder', field: 'sg_bezeichnung', widthGrow: 1},
+					{titlePhrase: 'global/bezeichnung', title: 'placeholder', field: 'bezeichnung', widthGrow: 2},
+					{titlePhrase: 'lehre/orgform', title: 'placeholder', field: 'orgform_kurzbz', widthGrow: 1},
+					{titlePhrase: 'lehre/kurzbz', title: 'placeholder', field: 'studiengang_kuerzel', widthGrow: 1},
+					{titlePhrase: 'lehre/semesterstunden', title: 'placeholder', field: 'semesterstunden', 
 						bottomCalc: this.semesterstundenCalc, widthGrow: 1, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('global/actions'))), headerSort: false,
 						field: 'menu', formatter: this.actionFormatter, widthGrow: 1, tooltip: this.spoofingFunc}
 				],
 				persistence: false,
-				persistenceID: "mylv_2026_04_17"
+				persistenceID: "mylv_2026_04_17",
+				locale: true,
 			},
 			mylvTableEventHandlers: [
 				
-			]
+			],
 		}
 	},
 	computed: {
