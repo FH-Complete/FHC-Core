@@ -61558,13 +61558,13 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'X Achse',
+				'text' => 'X-Achse',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'X Axis',
+				'text' => 'X-Axis',
 				'description' => '',
 				'insertvon' => 'system'
 			)
