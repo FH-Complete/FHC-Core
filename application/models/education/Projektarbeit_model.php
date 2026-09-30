@@ -25,7 +25,7 @@ class Projektarbeit_model extends DB_Model
 	{
 		$qry = "SELECT
 					pa.*, tbl_projekttyp.bezeichnung,
-					tbl_lehreinheit.studiensemester_kurzbz, tbl_lehrveranstaltung.lehrveranstaltung_id,
+					pa.studiensemester_kurzbz, pa.lehrveranstaltung_id,
 					tbl_firma.name AS firma_name,
 					(
 						SELECT
@@ -41,7 +41,6 @@ class Projektarbeit_model extends DB_Model
 				FROM
 					lehre.tbl_projektarbeit pa
 					JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
-					JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
 					JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
 					LEFT JOIN public.tbl_firma USING (firma_id)
 				WHERE
@@ -57,7 +56,7 @@ class Projektarbeit_model extends DB_Model
 
 		if (isset($studiensemester_kurzbz))
 		{
-			$qry .= ' AND tbl_lehreinheit.studiensemester_kurzbz=?';
+			$qry .= ' AND tbl_projektarbeit.studiensemester_kurzbz=?';
 			$params[] = $studiensemester_kurzbz;
 		}
 
@@ -134,7 +133,7 @@ class Projektarbeit_model extends DB_Model
 			projektarbeit_id,
 			lehre.tbl_projekttyp.bezeichnung as projekttypbezeichnung,
 			lehre.tbl_projekttyp.projekttyp_kurzbz as projekttypkurzbz,
-			lehre.tbl_lehreinheit.studiensemester_kurzbz,
+			lehre.tbl_projektarbeit.studiensemester_kurzbz,
 			lehre.tbl_lehrveranstaltung.studiengang_kz,
 			public.tbl_studiengang.kurzbzlang,
 			lehre.tbl_projektarbeit.note as note,
@@ -157,7 +156,6 @@ class Projektarbeit_model extends DB_Model
 				 LEFT JOIN public.tbl_benutzer USING(person_id)
 				 LEFT JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
 				 LEFT JOIN lehre.tbl_betreuerart USING(betreuerart_kurzbz)
-				 LEFT JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 				 LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 				 LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_mitarbeiter.mitarbeiter_uid = public.tbl_benutzer.uid)
 				 LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
@@ -366,7 +364,7 @@ class Projektarbeit_model extends DB_Model
 					tbl_studiengang.typ, tbl_studiengang.kurzbz,
 					tbl_projektarbeit.projekttyp_kurzbz, tbl_projekttyp.bezeichnung, 
 					tbl_projektarbeit.titel, tbl_projektarbeit.projektarbeit_id, tbl_projektarbeit.note,
-					student_benutzer.uid, tbl_student.matrikelnr, tbl_lehreinheit.studiensemester_kurzbz, public.tbl_student.student_uid,
+					student_benutzer.uid, tbl_student.matrikelnr, tbl_projektarbeit.studiensemester_kurzbz, public.tbl_student.student_uid,
 		
 					lehre.tbl_projektarbeit.sprache,
 					 lehre.tbl_projektarbeit.seitenanzahl,
@@ -430,7 +428,6 @@ class Projektarbeit_model extends DB_Model
 					LEFT JOIN  public.tbl_benutzer   student_benutzer ON student_benutzer.uid       = lehre.tbl_projektarbeit.student_uid
 					LEFT JOIN  public.tbl_person     student_person   ON student_benutzer.person_id = student_person.person_id
 					LEFT JOIN  public.tbl_student                     ON student_benutzer.uid       = public.tbl_student.student_uid
-					LEFT JOIN  lehre.tbl_lehreinheit                  USING (lehreinheit_id)
 					LEFT JOIN  lehre.tbl_lehrveranstaltung            USING (lehrveranstaltung_id)
 					LEFT JOIN  public.tbl_studiengang                 ON public.tbl_student.studiengang_kz = public.tbl_studiengang.studiengang_kz
 					LEFT JOIN  lehre.tbl_projekttyp                   USING (projekttyp_kurzbz)
@@ -503,7 +500,7 @@ class Projektarbeit_model extends DB_Model
 				 student_person.vorname                       AS student_vorname,
 				 student_person.nachname                      AS student_nachname,
 				 public.tbl_student.matrikelnr,
-				 tbl_lehreinheit.studiensemester_kurzbz,
+				 tbl_projektarbeit.studiensemester_kurzbz,
 				 betreuer_benutzer.uid                        AS betreuer_benutzer_uid,
 				 betreuer_person.titelpre                     AS betreuer_titelpre,
 				 betreuer_person.vorname                      AS betreuer_vorname,
@@ -565,7 +562,6 @@ class Projektarbeit_model extends DB_Model
 				  LEFT JOIN  public.tbl_benutzer   student_benutzer ON student_benutzer.uid       = lehre.tbl_projektarbeit.student_uid
 				  LEFT JOIN  public.tbl_person     student_person   ON student_benutzer.person_id = student_person.person_id
 				  LEFT JOIN  public.tbl_student                     ON student_benutzer.uid       = public.tbl_student.student_uid
-				  LEFT JOIN  lehre.tbl_lehreinheit                  USING (lehreinheit_id)
 				  LEFT JOIN  lehre.tbl_lehrveranstaltung            USING (lehrveranstaltung_id)
 				  LEFT JOIN  public.tbl_studiengang                 ON public.tbl_student.studiengang_kz = public.tbl_studiengang.studiengang_kz
 				  LEFT JOIN  lehre.tbl_projekttyp                   USING (projekttyp_kurzbz)
@@ -633,7 +629,7 @@ class Projektarbeit_model extends DB_Model
 				 student_person.vorname                       AS student_vorname,
 				 student_person.nachname                      AS student_nachname,
 				 public.tbl_student.matrikelnr,
-				 tbl_lehreinheit.studiensemester_kurzbz,
+				 tbl_projektarbeit.studiensemester_kurzbz,
 				 betreuer_benutzer.uid                        AS betreuer_benutzer_uid,
 				 betreuer_person.titelpre                     AS betreuer_titelpre,
 				 betreuer_person.vorname                      AS betreuer_vorname,
@@ -695,7 +691,6 @@ class Projektarbeit_model extends DB_Model
 				  LEFT JOIN  public.tbl_benutzer   student_benutzer ON student_benutzer.uid       = lehre.tbl_projektarbeit.student_uid
 				  LEFT JOIN  public.tbl_person     student_person   ON student_benutzer.person_id = student_person.person_id
 				  LEFT JOIN  public.tbl_student                     ON student_benutzer.uid       = public.tbl_student.student_uid
-				  LEFT JOIN  lehre.tbl_lehreinheit                  USING (lehreinheit_id)
 				  LEFT JOIN  lehre.tbl_lehrveranstaltung            USING (lehrveranstaltung_id)
 				  LEFT JOIN  public.tbl_studiengang                 ON public.tbl_student.studiengang_kz = public.tbl_studiengang.studiengang_kz
 				  LEFT JOIN  lehre.tbl_projekttyp                   USING (projekttyp_kurzbz)
