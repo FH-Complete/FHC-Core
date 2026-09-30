@@ -28,6 +28,7 @@ const copyObject = function (obj, copyArray) {
 const highchartsPlugin = {
 
     install(app, options) {
+        options = options || {};
         
         function destroyChart() {
             if (this.chart) {
