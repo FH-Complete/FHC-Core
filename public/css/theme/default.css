@@ -188,6 +188,9 @@
 	--fhc-light: var(--fhc-white-50);
 
 	--fhc-cis-menu-lvl-1-color: var(--fhc-white-50);
+
+	/* input borders, 3:1 against the background and the tinted card headers (#f8f8f9) */
+	--fhc-input-border: #868e96;
 }
 
 :root.dark {
@@ -233,6 +236,8 @@
 	--fhc-dark: var(--fhc-black-50);
 	--fhc-light: var(--fhc-white-70);
 
+	/* input borders, 3:1 against the background */
+	--fhc-input-border: #7c8791;
 }
 
 :root.purple {
@@ -313,12 +318,13 @@ html.dark .border-primary {
 	border-color: var(--fhc-primary) !important;
 }
 
-/* fhc danger*/
+/* fhc danger: --fhc-danger is a light red for text and borders on the dark background. White text
+ * on it reaches 1.2:1, the backgrounds use the dark red (6.5:1) */
 html.dark .bg-danger,
 html.dark .btn-danger,
 html.dark .btn-outline-danger {
-	background-color: var(--fhc-danger) !important;
-	border-color: var(--fhc-danger) !important;
+	background-color: var(--fhc-red-60) !important;
+	border-color: var(--fhc-red-60) !important;
 	color: white;
 }
 
@@ -333,6 +339,29 @@ html.dark .text-danger {
 
 html.dark .border-danger {
 	border-color: var(--fhc-danger) !important;
+}
+
+/* bootstrap draws btn-outline-secondary in #6c757d: 4.3:1 on the light dialog footer (#f6f6f6).
+ * --fhc-gray-30 reaches 5.4:1 there, the white hover text 5.9:1 */
+html.light .btn-outline-secondary {
+	--bs-btn-color: var(--fhc-gray-30);
+	--bs-btn-border-color: var(--fhc-gray-30);
+	--bs-btn-hover-bg: var(--fhc-gray-30);
+	--bs-btn-hover-border-color: var(--fhc-gray-30);
+	--bs-btn-active-bg: var(--fhc-gray-30);
+	--bs-btn-active-border-color: var(--fhc-gray-30);
+}
+
+/* bootstrap keeps #6c757d for btn-outline-secondary in the dark theme: 2.4:1 on the dark tables and dialogs */
+html.dark .btn-outline-secondary {
+	--bs-btn-color: var(--fhc-white-90);
+	--bs-btn-border-color: var(--fhc-white-90);
+	--bs-btn-hover-color: var(--fhc-black-30);
+	--bs-btn-hover-bg: var(--fhc-white-90);
+	--bs-btn-hover-border-color: var(--fhc-white-90);
+	--bs-btn-active-color: var(--fhc-black-30);
+	--bs-btn-active-bg: var(--fhc-white-90);
+	--bs-btn-active-border-color: var(--fhc-white-90);
 }
 
 
@@ -353,6 +382,52 @@ html.dark .tabulator .tabulator-cell {
 
 html.dark .tabulator .tabulator-header .tabulator-col:hover {
 	background-color: var(--fhc-tertiary) !important;
+}
+
+/* the active sort arrow of tabulator_simple (#666) reaches 2:1 on the dark header */
+html.dark .tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort="ascending"] .tabulator-col-content .tabulator-col-sorter .tabulator-arrow {
+	border-bottom-color: var(--fhc-text);
+}
+
+html.dark .tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort="descending"] .tabulator-col-content .tabulator-col-sorter .tabulator-arrow {
+	border-top-color: var(--fhc-text);
+}
+
+@media (hover: hover) and (pointer: fine) {
+	html.dark .tabulator .tabulator-header .tabulator-col.tabulator-sortable .tabulator-col-content .tabulator-col-sorter.tabulator-col-sorter-element .tabulator-arrow:hover {
+		border-bottom-color: var(--fhc-text);
+		border-top-color: var(--fhc-text);
+	}
+}
+
+/* the group toggle arrow of tabulator_simple (#666) reaches 2:1 on the dark rows */
+html.dark .tabulator .tabulator-row.tabulator-group:not(.tabulator-group-visible) .tabulator-arrow {
+	border-left-color: var(--fhc-text);
+}
+
+html.dark .tabulator .tabulator-row.tabulator-group.tabulator-group-visible .tabulator-arrow {
+	border-top-color: var(--fhc-text);
+}
+
+/* the footer stays white otherwise: the page buttons get the white button text of the dark color scheme */
+html.dark .tabulator .tabulator-footer {
+	background-color: var(--fhc-tertiary);
+	border-top-color: var(--fhc-border);
+	color: var(--fhc-text);
+}
+
+html.dark .tabulator .tabulator-footer .tabulator-page {
+	background: transparent;
+	border-color: var(--fhc-white-90);
+	color: var(--fhc-text);
+}
+
+html.dark .tabulator .tabulator-footer .tabulator-page.active {
+	color: var(--fhc-red-30);
+}
+
+html.dark .tabulator .tabulator-tableholder .tabulator-placeholder .tabulator-placeholder-contents {
+	color: var(--fhc-white-90);
 }
 
 .p-paginator{
@@ -376,4 +451,35 @@ html.dark .tabulator .tabulator-header .tabulator-col:hover {
 
 .p-link:focus {
 	box-shadow: 0 0 0 0.2rem rgba(var(--fhc-primary), 0.5) !important;
+}
+
+/* input borders: 3:1 against the background (WCAG 1.4.11), the bootstrap, primevue and datepicker defaults
+ * reach 1.3 - 1.9:1. Focus and checked states of the libraries stay */
+.form-control,
+.form-select,
+.form-check-input,
+.p-inputtext,
+.p-inputtext:enabled:hover:not(:focus),
+.p-dropdown,
+.p-dropdown:not(.p-disabled):hover:not(.p-focus),
+.p-multiselect,
+.p-multiselect:not(.p-disabled):hover:not(.p-focus),
+.p-checkbox .p-checkbox-box,
+.p-radiobutton .p-radiobutton-box {
+	border-color: var(--fhc-input-border, #868e96);
+}
+
+/* the datepicker css loads after the theme, html raises the specificity */
+html .dp__theme_light,
+html .dp__theme_dark {
+	--dp-border-color: var(--fhc-input-border, #868e96);
+	--dp-border-color-hover: var(--fhc-border-highlight, #495057);
+}
+
+/* the light datepicker (also in the dark cis4 theme) draws the days of other months in #c0c4cc (1.8:1),
+ * the icons in #959595 (3:1) and the selected day in #f8f5f5 on #1976d2 (4.2:1) */
+html .dp__theme_light {
+	--dp-secondary-color: #6c6c6c;
+	--dp-icon-color: #6c757d;
+	--dp-primary-text-color: #fff;
 }

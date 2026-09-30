@@ -121,8 +121,9 @@
 	background-color: #000;
 }
 
+/* contrast: #777 reaches 4.48:1 on the odd and 4:1 on the even rows (#f2f2f2), #6c6c6c 5.3:1 and 4.7:1 */
 .tabulator-row.tabulator-unselectable:not(.tabulator-calcs) {
-	color: #777 !important;
+	color: #6c6c6c !important;
 }
 
 .tabulator-cell .btn {
@@ -155,4 +156,24 @@
 .tabulator-edit-list .tabulator-edit-list-item.focused {
 	color: #fff;
 	background: #1d68cd;
+}
+
+/* contrast (WCAG 1.4.11): tabulator_simple draws the inactive sort arrow in #bbb (1.9:1) and the
+ * placeholder in #ccc (1.6:1). #8f8f8f (3.2:1) is close to the grey of the active arrow, so the
+ * active arrow gets the primary color (6.8:1) */
+.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-sorter .tabulator-arrow,
+.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort="none"] .tabulator-col-content .tabulator-col-sorter .tabulator-arrow {
+	border-bottom-color: #8f8f8f;
+}
+
+.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort="ascending"] .tabulator-col-content .tabulator-col-sorter .tabulator-arrow {
+	border-bottom-color: var(--fhc-primary, #006095);
+}
+
+.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort="descending"] .tabulator-col-content .tabulator-col-sorter .tabulator-arrow {
+	border-top-color: var(--fhc-primary, #006095);
+}
+
+.tabulator .tabulator-tableholder .tabulator-placeholder .tabulator-placeholder-contents {
+	color: #6c757d;
 }

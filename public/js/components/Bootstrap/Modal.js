@@ -73,6 +73,7 @@ export default {
 		}
 	},
 	computed: {
+		// opacity 0.5 reaches 2.4:1 on the blue cis4 modal header, 0.75 reaches 3.6:1 (WCAG 1.4.11)
 		getExpandButtonStyles() {
 			const hovered = this.expandBtnHovered;
 			const focused = this.expandBtnFocused;
@@ -85,12 +86,11 @@ export default {
 					border: 0;
 					background: transparent;
 					font-size: 1em;
-					opacity: 0.5;
 					color: inherit;
 					cursor: pointer;
 					line-height: 1;
 					transition: opacity 0.15s ease;
-					opacity: ${focused ? '1' : hovered ? '0.75' : '0.5'};
+					opacity: ${focused || hovered ? '1' : '0.75'};
 					outline: ${focused ? '1px solid currentColor' : 'none'};
 					outline-offset: 2px;`
 		}	
