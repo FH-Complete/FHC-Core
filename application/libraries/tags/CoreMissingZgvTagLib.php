@@ -1,0 +1,112 @@
+<?php
+/**
+ * Description of zgv_auto
+ *
+ * @author ma0068
+ */
+class CoreMissingZgvTagLib
+{
+	protected $ci;
+
+	public function __construct()
+	{
+		$this->ci = get_instance();
+		$this->ci->load->model('crm/Prestudent_model', 'PrestudentModel');
+	}
+
+	public function getZuordnungIds(array $params)
+	{
+		if(!isset($params['studiensemester_kurzbz']))
+		{
+			return (object) array(
+				'idArray' => []
+			);
+		}
+
+		$semester = $params['studiensemester_kurzbz'];
+
+		$this->ci->PrestudentModel->addJoin('public.tbl_prestudentstatus', 'prestudent_id');
+		$this->ci->PrestudentModel->addJoin('public.tbl_benutzer bn', 'person_id');
+		$this->ci->PrestudentModel->addJoin('public.tbl_studiengang', 'studiengang_kz');
+
+		$this->ci->PrestudentModel->db->group_start();
+
+		$this->ci->PrestudentModel->db->where('zgvdatum', null);
+		$this->ci->PrestudentModel->db->where('typ', 'b');
+
+		$this->ci->PrestudentModel->db->or_group_start();
+		$this->ci->PrestudentModel->db->where('zgvmadatum', null);
+		$this->ci->PrestudentModel->db->where('typ', 'm');
+		$this->ci->PrestudentModel->db->group_end();
+
+		$this->ci->PrestudentModel->db->group_end();
+
+		$result = $this->ci->PrestudentModel-> loadWhere(array(
+			'bn.aktiv' => true,
+			'studiensemester_kurzbz' => $semester
+		));
+
+		$data = $result->retval;
+
+		$zgvmissing_data = array_map(function($item) {
+			return [
+				'id' => $item->prestudent_id,
+				'von' => null,
+				'bis' => null
+			];
+		}, $data);
+
+		return (object) array(
+			'typeId' => 'prestudent_id',
+			'data' => $zgvmissing_data
+		);
+
+	}
+
+	public function isCriteriaSetFor(array $params)
+	{
+		if ( !isset($params['id'], $params['studiensemester_kurzbz'], $params['typeId']) ||	$params['typeId'] !== 'prestudent_id')
+			return false;
+
+		$semester = $params['studiensemester_kurzbz'];
+		$prestudent_id = $params['id'];
+
+		$this->ci->PrestudentModel->addSelect('prestudent_id');
+		$this->ci->PrestudentModel->addSelect('start as von');
+		$this->ci->PrestudentModel->addSelect('ende as bis');
+		$this->ci->PrestudentModel->addJoin('public.tbl_prestudentstatus', 'prestudent_id');
+
+		//add studiensemester also here for manual rebuild
+		$this->ci->PrestudentModel->addJoin('public.tbl_studiensemester', 'studiensemester_kurzbz');
+
+		$this->ci->PrestudentModel->addJoin('public.tbl_benutzer bn', 'person_id');
+		$this->ci->PrestudentModel->addJoin('public.tbl_studiengang', 'studiengang_kz');
+
+		$this->ci->PrestudentModel->db->group_start();
+
+		$this->ci->PrestudentModel->db->where('zgvdatum', null);
+		$this->ci->PrestudentModel->db->where('typ', 'b');
+
+		$this->ci->PrestudentModel->db->or_group_start();
+		$this->ci->PrestudentModel->db->where('zgvmadatum', null);
+		$this->ci->PrestudentModel->db->where('typ', 'm');
+		$this->ci->PrestudentModel->db->group_end();
+
+		$this->ci->PrestudentModel->db->group_end();
+		$this->ci->PrestudentModel->db->limit(1);
+
+		$result = $this->ci->PrestudentModel-> loadWhere(array(
+			'bn.aktiv' => true,
+			'studiensemester_kurzbz' => $semester,
+			'prestudent_id' => $prestudent_id
+		));
+
+		if(hasData($result))
+		{
+			return $result;
+		}
+		else
+			return null;
+	}
+
+}

@@ -12,74 +12,13 @@ const router = VueRouter.createRouter({
 			component: LVVerwaltung
 		},
 		{
-			name: `byEmp`,
-			path: `/emp/:studiensemester_kurzbz/:emp/:stg?/:semester?`,
+			name: 'stdsem',
+			path: '/stdsem/:stdsem',
 			component: LVVerwaltung,
-			props: route => {
-				let {emp, stg, semester, studiensemester_kurzbz} = route.params;
-
-				if (emp === '')
-					emp = undefined;
-
-				if (stg === '')
-					stg = undefined;
-
-				if (studiensemester_kurzbz === '')
-					studiensemester_kurzbz = undefined;
-
-				return {
-					studiensemester_kurzbz: studiensemester_kurzbz,
-					emp: emp,
-					stg: stg,
-					semester: semester
-				};
-			},
-			beforeEnter: (to, from, next) => {
-				const { studiensemester_kurzbz } = to.params;
-				const isSemester = /^(SS|WS)\d{4}$/.test(studiensemester_kurzbz);
-
-				if (!isSemester)
-					return next({ path: '/' });
-				else
-					next();
-			}
-		},
-		/*{
-			name: `byFachbereich`,
-			path: `/fachbereich/:fachbereich/:emp?`,
-			component: LVVerwaltung
-		},*/
-		{
-			name: `byStg`,
-			path: '/stg/:studiensemester_kurzbz/:stg?/:semester?/',
-			component: LVVerwaltung,
-			props: route => {
-				let { studiensemester_kurzbz, stg, semester } = route.params;
-
-				if (semester === '')
-					semester = undefined;
-
-				if (studiensemester_kurzbz === '')
-					studiensemester_kurzbz = undefined;
-
-				if (stg === '')
-					stg = undefined;
-
-				return {
-					studiensemester_kurzbz: studiensemester_kurzbz,
-					stg: stg,
-					semester: semester,
-				};
-			},
-			beforeEnter: (to, from, next) => {
-				const studiensemester_kurzbz = to.params?.studiensemester_kurzbz
-				const isSemester = /^(SS|WS)\d{4}$/.test(studiensemester_kurzbz);
-
-				if (!isSemester)
-					return next({ path: '/' });
-				else
-					next();
-			}
+			children: [
+				{ name: 'emp', path: 'emp/:emp/:treemenu(.*)*', component: LVVerwaltung },
+				{ name: 'treemenu', path: ':treemenu(.*)*', component: LVVerwaltung }
+			]
 		},
 		{
 			path: '/:pathMatch(.*)*',
@@ -91,7 +30,9 @@ const router = VueRouter.createRouter({
 
 FhcApps.router.makeExtendable(router);
 
-const app = Vue.createApp();
+const app = Vue.createApp({
+	name: 'LvVwApp'
+});
 
 FhcApps.makeExtendable(app);
 

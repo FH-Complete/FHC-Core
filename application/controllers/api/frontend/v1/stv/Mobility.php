@@ -237,8 +237,8 @@ class Mobility extends FHCAPI_Controller
 		}
 		$formData = $this->input->post('formData');
 
-		$von = $formData['von'] ?? null;
-		$bis = $formData['bis'] ?? null;
+		$von = ($formData['von'] ?? '') ?: null;
+		$bis = ($formData['bis'] ?? '') ?: null;
 		$nation_code = $formData['nation_code'] ?? null;
 		$mobilitaetsprogramm_code = $formData['mobilitaetsprogramm_code'] ?? null;
 		$herkunftsland_code = $formData['herkunftsland_code'] ?? null;

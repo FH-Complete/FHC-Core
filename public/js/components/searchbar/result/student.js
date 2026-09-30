@@ -25,7 +25,7 @@ export default {
 			return new Set(this.res.email);
 		}
 	},
-	template: `
+	template: /*html*/ `
 	<template-frame
 		class="searchbar-result-student"
 		:res="res"
@@ -49,9 +49,15 @@ export default {
 				</div>
 			</div>
 			<div class="searchbar_tablerow">
+				<div class="searchbar_tablecell searchbar_label">{{ $p.t('abschlusspruefung/personenkennzeichen') }}</div>
+				<div class="searchbar_tablecell searchbar_value">
+					{{ res.personenkennzeichen }}
+				</div>
+			</div>
+			<div class="searchbar_tablerow">
 				<div class="searchbar_tablecell searchbar_label">{{ $p.t('person/matrikelnummer') }}</div>
 				<div class="searchbar_tablecell searchbar_value">
-					{{ res.matrikelnr }}
+					{{ res.matrikelnummer }}
 				</div>
 			</div>
 			<div class="searchbar_tablerow">

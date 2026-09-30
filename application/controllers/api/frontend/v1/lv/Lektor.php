@@ -134,14 +134,22 @@ class Lektor extends FHCAPI_Controller
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
-		if (isset($formData['semesterstunden']) && (!is_numeric($formData['semesterstunden']) || $formData['semesterstunden'] === ''))
+		$nullable_fields = array('semesterstunden', 'stundensatz', 'planstunden');
+
+		foreach ($nullable_fields as $nullable_field)
 		{
-			$formData['semesterstunden'] = null;
+			if (isset($formData[$nullable_field]) && (!is_numeric($formData[$nullable_field]) || $formData[$nullable_field] === ''))
+			{
+				$formData[$nullable_field] = null;
+			}
 		}
 
 		$lehreinheit_permission = $this->checkPermission($lehreinheit_id, array('admin', 'assistenz', 'lv-plan'));
 
 		if (!$lehreinheit_permission)
+			$this->terminateWithError($this->p->t('ui', 'error_fieldWriteAccess'));
+
+		if (!is_null($this->getLektorVertrag($lehreinheit_id, $mitarbeiter_uid)) && (array_key_exists('mitarbeiter_uid', $formData) && $mitarbeiter_uid !== $formData['mitarbeiter_uid']))
 			$this->terminateWithError($this->p->t('ui', 'error_fieldWriteAccess'));
 
 		$result = $this->_ci->lektorlib->updateLektorFromLehreinheit($lehreinheit_id, $mitarbeiter_uid, $formData);
@@ -154,7 +162,7 @@ class Lektor extends FHCAPI_Controller
 	{
 		$value = str_replace(',', '.', $value);
 
-		if (!is_numeric($value))
+		if (!is_numeric($value) && $value !== "")
 		{
 			$this->form_validation->set_message('_check_decimal', 'Das Feld {field} muss eine Zahl sein.');
 			return false;

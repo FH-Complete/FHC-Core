@@ -325,6 +325,7 @@ export default {
 						:label="$p.t('infocenter', 'zgvDatum')"
 						type="DatePicker"
 						v-model="data.zgvdatum"
+						model-type="yyyy-MM-dd"
 						name="zgvdatum"
 						no-today
 						auto-apply
@@ -389,6 +390,7 @@ export default {
 						:label="$p.t('lehre', 'zgvMasterDatum')"
 						type="DatePicker"
 						v-model="data.zgvmadatum"
+						model-type="yyyy-MM-dd"
 						name="zgvmadatum"
 						no-today
 						auto-apply
@@ -454,6 +456,7 @@ export default {
 						:label="$p.t('lehre', 'zgvDoktorDatum')"
 						type="DatePicker"
 						v-model="data.zgvdoktordatum"
+						model-type="yyyy-MM-dd"
 						name="zgvdoktordatum"
 						no-today
 						auto-apply

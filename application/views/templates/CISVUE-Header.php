@@ -8,7 +8,7 @@ $includesArray = array(
 	'axios027' => true,
 	'primevue3' => true,
 	'customJSModules' => array_merge([
-		'public/js/apps/Cis.js'
+		'public/js/apps/Cis/Menu.js'
 	], $customJSModules ?? []),
 	'customCSSs' => array_merge([
 		'public/css/Cis4/Cis.css',

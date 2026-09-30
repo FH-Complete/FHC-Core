@@ -10,7 +10,8 @@ export default {
 		selectedData: Array,
 		columns: Array,
 		stgL: Array,
-		stgA: Array
+		stgA: Array,
+		abmeldung_enabled: Boolean,
 	},
 	emits: [
 		'reload',
@@ -64,7 +65,7 @@ export default {
 	template: `
 	<div class="studierendenantrag-leitung-actions fhc-table-actions d-flex flex-wrap justify-content-between mb-2">
 		<div class="d-flex align-items-center gap-2">
-			<actions-new @reload="$emit('reload')"></actions-new>
+			<actions-new v-if="abmeldung_enabled" @reload="$emit('reload')"></actions-new>
 			<button type="button" class="btn btn-outline-secondary" @click="$emit('reload')" :title="$p.t('table','reload')">
 				<i class="fa-solid fa-rotate-right"></i>
 			</button>

@@ -551,6 +551,7 @@ export default {
 							container-class="mb-3 col-3"
 							type="DatePicker"
 							v-model="formData.datum_von"
+							model-type="yyyy-MM-dd"
 							name="datum_von"
 							:label="$p.t('ui/from') + ' *'"
 							auto-apply
@@ -566,6 +567,7 @@ export default {
 							container-class="mb-3 col-3"
 							type="DatePicker"
 							v-model="formData.datum_bis"
+							model-type="yyyy-MM-dd"
 							name="datum_bis"
 							:label="$p.t('global/bis')"
 							auto-apply

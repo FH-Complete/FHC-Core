@@ -1,6 +1,7 @@
 <?php
 
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH'))
+	exit('No direct script access allowed');
 
 /**
  *
@@ -13,9 +14,9 @@ class Cis4 extends Auth_Controller
 	public function __construct()
 	{
 		parent::__construct(
-		    array(
-			'index' => 'basis/cis:r'
-		    )
+			array(
+				'index' => 'basis/cis:r'
+			)
 		);
 
 		// Load Config
@@ -30,16 +31,6 @@ class Cis4 extends Auth_Controller
 	 */
 	public function index()
 	{
-		$this->load->model('person/Person_model', 'PersonModel');
-		$personData = getData($this->PersonModel->getByUid(getAuthUID()))[0];
-		
-		$viewData = array(
-			'uid' => getAuthUID(),
-			'name' => $personData->vorname,
-			'person_id' => $personData->person_id,
-			'timezone' => $this->config->item('timezone')
-		);
-
-		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'FhcDashboard']);
+		$this->load->view('CisRouterView/CisRouterView.php', ['route' => 'FhcDashboard']);
 	}
 }

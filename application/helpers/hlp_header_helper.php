@@ -111,7 +111,8 @@ function generateJSDataStorageObject($indexPage, $calledPath, $calledMethod)
 		'theme' => [
 			'name'=>$ci->config->item('theme_name'),
 			'modes'=>$ci->config->item('theme_modes'),
-		]
+		],
+		'domain' => DOMAIN
 	);
 
 	$toPrint = "\n";
@@ -268,6 +269,28 @@ function absoluteJsImportUrl($relurl)
 		$url = base_url($relurl) . '?'. $ci->config->item('fhcomplete_build_version');
 	}
 	return $url;
+}
+
+/*
+ * Generate Css File Include if Extension contains file
+ *
+ * @param $relativeFilePath path relative to Extension public/css dir
+ */
+function generateCSSsIncludeIfExtensionCssExists($relativeFilePath)
+{
+	$fsiterator = new FilesystemIterator(FHCPATH . 'application/extensions');
+	foreach ($fsiterator as $fsitem)
+	{
+		if(preg_match('/^FHC-Core-/', $fsitem->getBasename()))
+		{
+			$extensionfile = 'public/extensions/' . $fsitem->getBasename() 
+				. '/css/' . $relativeFilePath;
+			if(is_readable(FHCPATH . $extensionfile))
+			{
+				generateCSSsInclude($extensionfile);
+			}
+		}
+	}
 }
 
 /*

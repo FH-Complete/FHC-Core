@@ -34,4 +34,10 @@ export default {
 			url: 'api/frontend/v1/detailheader/detailheader/getLeitungOrg/' + oekurzbz,
 		};
 	},
+	getSemesterStati(prestudent_id){
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/detailheader/detailheader/getSemesterStati/' + prestudent_id,
+		};
+	},
 }

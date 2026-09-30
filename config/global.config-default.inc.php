@@ -373,4 +373,8 @@ define('TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED', false);
 
 //enable tags in StudVW
 define('STV_TAGS_ENABLED', false);
+
+//student accounts grace period
+define('STUDENTS_KEEP_PERMISSIONS_AFTER_USER_INACTIVE_PERIOD', '0 days');
+define('STUDENTS_KEEP_PERMISSIONS_AFTER_USER_INACTIVE_ROLES', serialize(array('NO_DEFINED_ROLE')));
 ?>

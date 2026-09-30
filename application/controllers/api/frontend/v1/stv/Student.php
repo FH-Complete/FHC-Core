@@ -144,6 +144,7 @@ class Student extends FHCAPI_Controller
 				. $this->PrestudentModel->escape($studiensemester_kurzbz)
 				. ")  AS statusofsemester"
 		);
+		$this->PrestudentModel->addSelect($this->PrestudentModel->escape($studiensemester_kurzbz) . ' as query_studiensemester_kurzbz');
 
 		$this->PrestudentModel->addJoin('public.tbl_student s', 'prestudent_id', 'LEFT');
 		$this->PrestudentModel->addJoin('public.tbl_benutzer b', 'student_uid = uid', 'LEFT');
@@ -295,6 +296,10 @@ class Student extends FHCAPI_Controller
 			{
 				$fotoval = ($val == '') ? null : str_replace('data:image/jpeg;base64,', '', $val);
 				$update_person[$prop] = $fotoval;
+			}
+			else if ($prop == 'gebdatum')
+			{
+				$update_person[$prop] = ($val == '') ? null : $val;
 			}
 			else
 			{

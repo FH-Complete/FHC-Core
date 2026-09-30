@@ -38,7 +38,8 @@ class Lehre extends FHCAPI_Controller
 		parent::__construct([
 			'lvStudentenMail' => self::PERM_LOGGED,
 			'LV' => self::PERM_LOGGED,
-			'Pruefungen' => self::PERM_LOGGED
+			'Pruefungen' => self::PERM_LOGGED,
+			'semesterAverageGrade' => self::PERM_LOGGED,
 		]);
 		
 	}
@@ -99,6 +100,50 @@ class Lehre extends FHCAPI_Controller
 		$result = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($result);
+	}
+
+	/**
+	 * calculates and returns the grade average and weighted average for a specific semester
+	 * @param string $studiensemester_kurzbz
+	 * @return void
+	 */
+
+	public function semesterAverageGrade($studiensemester_kurzbz)
+	{
+		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+		$semesterLvs = $this->LehrveranstaltungModel->getLvsByStudentWithGrades(getAuthUID(), $studiensemester_kurzbz, getUserLanguage());
+
+		if (isError($semesterLvs))
+			return $this->outputJsonError(getError($semesterLvs));
+
+		$semesterLvsData = getData($semesterLvs);
+
+		$doGradesExist = false;
+		$sum = 0;
+		$count = 0;
+		$sumWeighted = 0;
+		$sumEcts = 0;
+
+		foreach ($semesterLvsData as $lv) {
+			if (!$lv->znote || $lv->znote < 1 || $lv->znote > 5)
+				continue;
+
+			$doGradesExist = true;
+
+			$sum += $lv->znote;
+			$count++;
+			$sumWeighted += $lv->znote * floatval($lv->ects);
+			$sumEcts += floatval($lv->ects);
+		}
+
+		$averageGrade = null;
+		$weightedAverageGrade = null;
+		if ($doGradesExist) {
+			$averageGrade = $sum/$count;
+			$weightedAverageGrade = $sumWeighted/$sumEcts;
+		}
+
+		$this->terminateWithSuccess(['average_grade' => $averageGrade, 'weighted_average_grade' => $weightedAverageGrade]);
 	}
 }
 
