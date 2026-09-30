@@ -12,6 +12,7 @@ $this->load->view(
 		'primevue3' => true,
 		'vuedatepicker11' => true,
 		'customJSs' => [
+			'vendor/npm-asset/primevue/colorpicker/colorpicker.js',
 			'vendor/moment/luxonjs/luxon.min.js'
 		],
 		'customJSModules' => ['public/js/apps/Dashboard/WidgetAdmin.js'],
