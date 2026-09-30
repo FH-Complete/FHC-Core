@@ -29446,7 +29446,7 @@ array(
 		array(
 			'app' => 'core',
 			'category' => 'profil',
-			'phrase' => 'fhAusweisStatusKeine',
+			'phrase' => 'fhAusweisStatusNichtAusgegeben',
 			'insertvon' => 'system',
 			'phrases' => array(
 				array(
