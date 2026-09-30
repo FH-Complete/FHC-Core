@@ -137,7 +137,7 @@ export default {
 					return this.hasErrors = true;
 				
 				const hasEmptyUserValues = Object.entries(this.config.vars)
-					.some(([v, key]) => {
+					.some(([key, v]) => {
 						if (v.type != 'user')
 							return false;
 						if (!this.config.uservars)
