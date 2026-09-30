@@ -40,6 +40,7 @@ export const AbgabetoolMitarbeiter = {
 			selectedcount: 0,
 			qgate1FilterSelected: [],
 			qgate2FilterSelected: [],
+			note_bezFilterSelected: [],
 			abgabetypenBetreuer: null,
 			detailIsFullscreen: false,
 			phrasenPromise: null,
@@ -145,7 +146,7 @@ export const AbgabetoolMitarbeiter = {
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4orgformv2'))), field: 'orgform', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 50, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4projekttyp'))), field: 'projekttyp_kurzbz', formatter: this.centeredTextFormatter, minWidth: 100,visible: true},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 50, visible: true},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note_bez', headerFilter: true, visible: false, sorter: this.notenSorter, minWidth: 200, formatter: this.centeredTextFormatter},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note_bez', headerFilter: this.notenHeaderFilterEditor, headerFilterFunc: this.notenHeaderFilterFunc, headerFilterParams: {}, headerFilterFuncParams: { noteField: 'note' }, visible: false, sorter: this.notenSorter, minWidth: 200, formatter: this.centeredTextFormatter},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, formatter: this.centeredTextFormatter, visible: true, minWidth: 100},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, width: 500, visible: true},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerv2'))), field: 'betreuer_full_name', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
@@ -269,6 +270,94 @@ export const AbgabetoolMitarbeiter = {
 			const aData = aRow.getData()
 			const bData = bRow.getData()
 			return aData.note - bData.note
+		},
+		notenHeaderFilterEditor(cell, onRendered, success, cancel, editorParams) {
+			const field = cell.getField();
+			const stateKey = field + 'FilterSelected';
+			let selected = [...(this[stateKey] || [])];
+
+			const wrapper = document.createElement('div');
+			wrapper.style.cssText = 'position: relative; width: 100%;';
+
+			const display = document.createElement('input');
+			display.readOnly = true;
+			display.placeholder = '';
+			display.style.cssText = 'padding: 4px; width: 100%; box-sizing: border-box; cursor: default; border: 1px solid; outline: none; background: #fff; appearance: none; caret-color: transparent;';
+
+			const dropdown = document.createElement('div');
+			dropdown.style.cssText = 'display: none; position: fixed; background: #fff; border: 1px solid; z-index: 9999; min-width: 180px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);';
+
+
+			// the table is built before getNoten resolves, so resolve the options on open
+			const getOptions = () => this.notenOptions ?? [];
+
+			const updateDisplay = () => {
+				display.value = getOptions()
+					.filter(o => selected.includes(o.note))
+					.map(o => o.bezeichnung)
+					.join(', ');
+			};
+			const buildDropdown = () => dropdown.replaceChildren(...getOptions().map(opt => {
+				const row = document.createElement('label');
+				row.style.cssText = 'display: flex; align-items: center; gap: 6px; padding: 4px 8px; cursor: pointer; white-space: nowrap;';
+				row.addEventListener('mousedown', e => e.preventDefault());
+
+				const cb = document.createElement('input');
+				cb.type = 'checkbox';
+				cb.value = opt.note;
+				cb.checked = selected.includes(opt.note);
+				cb.style.cssText = 'margin: 0 6px;';
+				cb.addEventListener('change', () => {
+					selected = cb.checked
+						? [...selected, opt.note]
+						: selected.filter(v => v !== opt.note);
+					this[stateKey] = [...selected];
+					updateDisplay();
+					success([...selected]);
+				});
+
+				const labelText = document.createElement('span');
+				labelText.textContent = opt.bezeichnung;
+
+				row.appendChild(cb);
+				row.appendChild(labelText);
+				return row;
+			}));
+
+			updateDisplay();
+
+			display.addEventListener('click', () => {
+				if (dropdown.style.display === 'none') {
+					buildDropdown();
+					updateDisplay();
+					const rect = display.getBoundingClientRect();
+					dropdown.style.top = rect.bottom + 'px';
+					dropdown.style.left = rect.left + 'px';
+					dropdown.style.display = 'block';
+				} else {
+					dropdown.style.display = 'none';
+				}
+			});
+
+			display.addEventListener('blur', () => {
+				setTimeout(() => { dropdown.style.display = 'none'; }, 150);
+			});
+
+			document.body.appendChild(dropdown);
+			wrapper.appendChild(display);
+			cell.getElement().addEventListener('remove', () => dropdown.remove());
+			onRendered(() => display.focus());
+
+			return wrapper;
+		},
+
+		notenHeaderFilterFunc(filterVal, rowVal, rowData, filterParams) {
+			if (!Array.isArray(filterVal) || !filterVal.length) return true;
+			// noteField: the column shows a text, the note id is in another field
+			const noteVal = filterParams?.noteField ? rowData[filterParams.noteField] : rowVal;
+			// noteVal is the raw integer note id or a note object
+			const noteId = typeof noteVal === 'object' ? noteVal?.note : noteVal;
+			return filterVal.some(val => val == noteId); // loose equality: filter vals are numbers, noteId might be string
 		},
 		async openBenotung(type, link) {
 			if(type === 'new') {
@@ -782,6 +871,8 @@ export const AbgabetoolMitarbeiter = {
 					if (saved?.headerFilters && !this.headerFiltersRestored) {
 						this.headerFiltersRestored = true // instantly avoid retriggers
 						for (let hf of saved.headerFilters) {
+							// older saved states hold a text filter here
+							if (hf.field === 'note_bez') this.note_bezFilterSelected = Array.isArray(hf.value) ? hf.value : [];
 							table.setHeaderFilterValue(hf.field, hf.value);
 						}
 					}

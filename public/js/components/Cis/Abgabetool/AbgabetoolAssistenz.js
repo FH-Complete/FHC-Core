@@ -54,6 +54,7 @@ export const AbgabetoolAssistenz = {
 			qgate2FilterSelected: [],
 			pa_noteFilterSelected: [],
 			noteFilterSelected: [],
+			note_bezFilterSelected: [],
 			count: 0,
 			filteredcount: 0,
 			selectedcount: 0,
@@ -211,7 +212,7 @@ export const AbgabetoolAssistenz = {
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4orgformv2'))), field: 'orgform', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 50, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4projekttyp'))), field: 'projekttyp_kurzbz', formatter: this.centeredTextFormatter, minWidth: 150, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 50, visible: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note_bez', headerFilter: true, sorter: this.notenSorter, visible: false, minWidth: 200, formatter: this.centeredTextFormatter},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note_bez', headerFilter: this.notenHeaderFilterEditor, headerFilterFunc: this.notenHeaderFilterFunc, headerFilterParams: {}, headerFilterFuncParams: { noteField: 'note' }, sorter: this.notenSorter, visible: false, minWidth: 200, formatter: this.centeredTextFormatter},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, visible: false, formatter: this.centeredTextFormatter, minWidth: 100},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true,  formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerv2'))), field: 'erstbetreuer', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
@@ -536,8 +537,6 @@ export const AbgabetoolAssistenz = {
 			return aData.note - bData.note
 		},
 		notenHeaderFilterEditor(cell, onRendered, success, cancel, editorParams) {
-			if (!this.notenOptions) return;
-
 			const field = cell.getField();
 			const stateKey = field + 'FilterSelected';
 			let selected = [...(this[stateKey] || [])];
@@ -554,21 +553,16 @@ export const AbgabetoolAssistenz = {
 			dropdown.style.cssText = 'display: none; position: fixed; background: #fff; border: 1px solid; z-index: 9999; min-width: 180px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);';
 
 
-			// mapping evaluated at render time, not at column definition time
-			const fieldOptionsMap = {
-				'pa_note': this.notenOptions,
-				'note': this.allowedNotenOptions,
-			};
-			const options = fieldOptionsMap[cell.getField()] ?? this.notenOptions;
-			if (!options) return;
-			
+			// the table is built before getNoten resolves, so resolve the options on open
+			const getOptions = () => (field === 'note' ? this.allowedNotenOptions : this.notenOptions) ?? [];
+
 			const updateDisplay = () => {
-				display.value = options
+				display.value = getOptions()
 					.filter(o => selected.includes(o.note))
 					.map(o => o.bezeichnung)
 					.join(', ');
 			};
-			options.forEach(opt => {
+			const buildDropdown = () => dropdown.replaceChildren(...getOptions().map(opt => {
 				const row = document.createElement('label');
 				row.style.cssText = 'display: flex; align-items: center; gap: 6px; padding: 4px 8px; cursor: pointer; white-space: nowrap;';
 				row.addEventListener('mousedown', e => e.preventDefault());
@@ -592,13 +586,15 @@ export const AbgabetoolAssistenz = {
 
 				row.appendChild(cb);
 				row.appendChild(labelText);
-				dropdown.appendChild(row);
-			});
+				return row;
+			}));
 
 			updateDisplay();
 
 			display.addEventListener('click', () => {
 				if (dropdown.style.display === 'none') {
+					buildDropdown();
+					updateDisplay();
 					const rect = display.getBoundingClientRect();
 					dropdown.style.top = rect.bottom + 'px';
 					dropdown.style.left = rect.left + 'px';
@@ -621,9 +617,11 @@ export const AbgabetoolAssistenz = {
 		},
 
 		notenHeaderFilterFunc(filterVal, rowVal, rowData, filterParams) {
-			if (!filterVal || !filterVal.length) return true;
-			// rowVal is the raw integer note id or a note object
-			const noteId = typeof rowVal === 'object' ? rowVal?.note : rowVal;
+			if (!Array.isArray(filterVal) || !filterVal.length) return true;
+			// noteField: the column shows a text, the note id is in another field
+			const noteVal = filterParams?.noteField ? rowData[filterParams.noteField] : rowVal;
+			// noteVal is the raw integer note id or a note object
+			const noteId = typeof noteVal === 'object' ? noteVal?.note : noteVal;
 			return filterVal.some(val => val == noteId); // loose equality: filter vals are numbers, noteId might be string
 		},
 		handleFilterActiveChanged(active) {
@@ -1496,6 +1494,8 @@ export const AbgabetoolAssistenz = {
 						for (let hf of saved.headerFilters) {
 							if (hf.field === 'qgate1Status') this.qgate1FilterSelected = hf.value || [];
 							if (hf.field === 'qgate2Status') this.qgate2FilterSelected = hf.value || [];
+							// older saved states hold a text filter here
+							if (hf.field === 'note_bez') this.note_bezFilterSelected = Array.isArray(hf.value) ? hf.value : [];
 							table.setHeaderFilterValue(hf.field, hf.value);
 						}
 					}

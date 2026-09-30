@@ -15,7 +15,11 @@ class Note_model extends DB_Model
 	public function getAllActive() {
 		$qry ="SELECT *
 			FROM lehre.tbl_note
-			WHERE aktiv = true";
+			WHERE aktiv = true
+			ORDER BY CASE WHEN note BETWEEN 1 AND 5 THEN 0 ELSE 1 END,
+				CASE WHEN note BETWEEN 1 AND 5 THEN note END,
+				bezeichnung";
+		
 
 		return $this->execReadOnlyQuery($qry);
 	}
