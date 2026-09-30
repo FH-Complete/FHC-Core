@@ -521,5 +521,63 @@ class adresse extends basis_db
 		}
 		return true;
 	}
+
+	/**
+	 * Laedt die österreichische Zustell Adresse einer Person
+	 * @param  $person_id ID der Person
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function loadOesterreichischeZustellAdresse($person_id, $typ = null)
+	{
+		//Pruefen ob person_id eine gueltige Zahl ist
+		if(!is_numeric($person_id) || $person_id == '')
+		{
+			$this->errormsg = 'PersonID muss eine Zahl sein';
+			return false;
+		}
+		$typ_clause = '';
+		if (isset($typ)) $typ_clause = "AND typ=".$this->db_add_param($typ);
+
+		//Daten aus der Datenbank lesen
+		$qry = "SELECT * FROM public.tbl_adresse WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER, false)."
+			AND nation = 'A'
+			{$typ_clause}
+			ORDER BY zustelladresse DESC, adresse_id DESC LIMIT 1";
+
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
+			return false;
+		}
+
+		if($row = $this->db_fetch_object())
+		{
+			$this->adresse_id		= $row->adresse_id;
+			$this->heimatadresse 	= $this->db_parse_bool($row->heimatadresse);
+			$this->zustelladresse	= $this->db_parse_bool($row->zustelladresse);
+			$this->gemeinde			= $row->gemeinde;
+			$this->name				= $row->name;
+			$this->nation			= $row->nation;
+			$this->ort				= $row->ort;
+			$this->person_id		= $row->person_id;
+			$this->plz				= $row->plz;
+			$this->strasse			= $row->strasse;
+			$this->typ				= $row->typ;
+			$this->updateamum		= $row->updateamum;
+			$this->updatevon		= $row->updatevon;
+			$this->insertamum		= $row->insertamum;
+			$this->insertvon		= $row->insertvon;
+			$this->firma_id			= $row->firma_id;
+			$this->rechnungsadresse = $this->db_parse_bool($row->rechnungsadresse);
+			$this->anmerkung        = $row->anmerkung;
+			$this->co_name			= $row->co_name;
+		}
+		else
+		{
+			$this->errormsg = 'Es ist kein Datensatz mit dieser ID vorhanden';
+			return false;
+		}
+		return true;
+	}
 }
 ?>
