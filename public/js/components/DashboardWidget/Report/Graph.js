@@ -23,6 +23,7 @@ export default {
 	},
 	data() {
 		return {
+			calledVars: {},
 			data: undefined,
 			hasErrors: false,
 		};
@@ -36,10 +37,25 @@ export default {
 		filteredData() {
 			if (!this.data)
 				return null;
-			
+
+			const title = (this.config.title || '').replace(
+				/\{\s*([^\}]+)\s*\}/g,
+				(match, key) => {
+					if (this.calledVars[key] === undefined)
+						return match;
+					if (this.config.vars[key].detail?.options) {
+						const options = this.config.vars[key].detail.options;
+						const res = options.find(opt => opt.value == this.calledVars[key]);
+						if (res?.label)
+							return res.label;
+					}
+					return this.calledVars[key];
+				}
+			);
+
 			let result = {
 				title: {
-					text: this.config.title,
+					text: title,
 				},
 				credits: {
 					text: "",
@@ -181,6 +197,8 @@ export default {
 					}
 				}
 			}
+
+			this.calledVars = vars;
 
 			try {
 				const result = await this.$api.call(
