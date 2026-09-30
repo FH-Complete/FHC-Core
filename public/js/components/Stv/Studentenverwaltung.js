@@ -295,22 +295,6 @@ export default {
 				this.$refs.stvList.updateUrl(n || []);
 			}
 		},
-		'appconfig.font_size'() {
-			// add to html class
-			const classList = Object.keys(this.$refs.config.setup.font_size.options);
-			classList.forEach(cn => document.documentElement.classList.remove(cn));
-			document.documentElement.classList.add(this.appconfig.font_size);
-			// recalc Tabulator heights
-			if (this.$el) {
-				const tabulatorEls = this.$el.querySelectorAll('.tabulator');
-				for (const el of tabulatorEls) {
-					const tabulators = Tabulator.findTable(el);
-					if (tabulators) {
-						tabulators[0].searchRows().forEach(row => row.normalizeHeight());
-					}
-				}
-			}
-		},
 		sidebarCollapsed(newVal) {
 			if(newVal) this.$refs.hSplit.collapseLeft()
 			else this.$refs.hSplit.showBoth()

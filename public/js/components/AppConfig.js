@@ -66,10 +66,28 @@ export default {
 					})
 					.catch(this.$fhcAlert.handleSystemErrors);
 			}
-		}
+		},
+		'modelValue.font_size'(fontSize) {
+			this.applyFontSize(fontSize);
+		},
 
 	},
 	methods: {
+		applyFontSize(fontSize) {
+			const options = this.setup.font_size?.options;
+
+			if (!fontSize || !options)
+				return;
+
+			Object.keys(options).forEach(cn => document.documentElement.classList.remove(cn));
+			document.documentElement.classList.add(fontSize);
+
+			document.querySelectorAll('.tabulator').forEach(el => {
+				const tabulators = Tabulator.findTable(el);
+				if (tabulators)
+					tabulators[0].searchRows().forEach(row => row.normalizeHeight());
+			});
+		},
 		update() {
 			this.$refs.form
 				.call(this.endpoints.set(this.tempValues))

@@ -19,12 +19,12 @@ class Config extends FHCAPI_Controller
 		$this->_setAuthUID();
 
 		$this->loadPhrases([
-			'lehre'
+			'lehre',
+			'stv'
 		]);
 
 		$this->_ci->load->library('VariableLib', ['uid' => $this->_uid]);
 		$this->_ci->load->library('PermissionLib');
-
 	}
 
 
@@ -55,14 +55,46 @@ class Config extends FHCAPI_Controller
 			"value" => $ignore_reservierung,
 		];
 
+		$result = $this->VariableModel->getVariables(getAuthUID(), ['font_size']);
+		$data = $this->getDataOrTerminateWithError($result);
+		$config['font_size'] = [
+			"type" => "select",
+			"label" => $this->p->t('stv', 'settings_fontsize'),
+			"value" => $data['font_size'] ?? "fs_normal",
+			"options" => [
+				"fs_xx-small" => $this->p->t('stv', 'settings_fontsize_xx-small'),
+				"fs_x-small" => $this->p->t('stv', 'settings_fontsize_x-small'),
+				"fs_small" => $this->p->t('stv', 'settings_fontsize_small'),
+				"fs_normal" => $this->p->t('stv', 'settings_fontsize_normal'),
+				"fs_big" => $this->p->t('stv', 'settings_fontsize_big'),
+				"fs_huge" => $this->p->t('stv', 'settings_fontsize_huge')
+			]
+		];
+
 		$this->terminateWithSuccess($config);
 	}
 	public function set()
 	{
+		$this->load->model('system/Variable_model', 'VariableModel');
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules(
+			'font_size',
+			$this->p->t('stv', 'settings_fontsize'),
+			'required|in_list[fs_xx-small,fs_x-small,fs_small,fs_normal,fs_big,fs_huge]'
+		);
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$this->VariableModel->setVariable(
+			getAuthUID(),
+			'font_size',
+			$this->input->post('font_size')
+		);
+
 		if (!($this->permissionlib->isBerechtigt('basis/tempus')) && !($this->permissionlib->isBerechtigt('lv-plan')))
 			$this->terminateWithSuccess([]);
-
-		$this->load->model('system/Variable_model', 'VariableModel');
 
 		foreach (['ignore_kollision','ignore_zeitsperre','ignore_reservierung'] as $variable)
 		{

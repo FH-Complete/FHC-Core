@@ -80,12 +80,12 @@ class Config extends FHCAPI_Controller
 		];
 
 		#font_size
-		$result = $this->VariableModel->getVariables(getAuthUID(), ['stv_font_size']);
+		$result = $this->VariableModel->getVariables(getAuthUID(), ['font_size']);
 		$data = $this->getDataOrTerminateWithError($result);
 		$config['font_size'] = [
 			"type" => "select",
 			"label" => $this->p->t('stv', 'settings_fontsize'),
-			"value" => $data['stv_font_size'] ?? "fs_normal",
+			"value" => $data['font_size'] ?? "fs_normal",
 			"options" => [
 				"fs_xx-small" => $this->p->t('stv', 'settings_fontsize_xx-small'),
 				"fs_x-small" => $this->p->t('stv', 'settings_fontsize_x-small'),
@@ -136,7 +136,7 @@ class Config extends FHCAPI_Controller
 		);
 		$this->VariableModel->setVariable(
 			getAuthUID(),
-			'stv_font_size',
+			'font_size',
 			$this->input->post('font_size')
 		);
 

@@ -87,7 +87,6 @@ require_once('dbupdate_3.4/62063_lv_evaluierung.php');
 require_once('dbupdate_3.4/67490_studstatus_suche_abort_controller_haengt.php');
 require_once('dbupdate_3.4/61164_abgabetool_quality_gates.php');
 require_once('dbupdate_3.4/69065_Projektarbeiten_Firmen_verwalten.php');
-require_once('dbupdate_3.4/68744_StV_settings.php');
 require_once('dbupdate_3.4/62889_reihungstest_ueberwachung_mit_constructor.php');
 require_once('dbupdate_3.4/71399_dashboard_update_widget_paths.php');
 require_once('dbupdate_3.4/71645_studvw_messagetab_ladezeit.php');
@@ -103,6 +102,7 @@ require_once('dbupdate_3.4/76160_lvv_favorites.php');
 require_once('dbupdate_3.4/77080_tabulator_presets_table.php');
 require_once('dbupdate_3.4/78292_gehaltsanpassungtyp.php');
 require_once('dbupdate_3.4/54225_reihungstest_ablauf_fuer_quereinsteiger.php');
+require_once('dbupdate_3.4/83591_lvverwaltung_zoom_faktor.php');
 
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
