@@ -35,7 +35,7 @@ export default {
 			</edit-size>
 		</div>
 		<form-input
-			v-model="modelValue.hidefooter"
+			v-model="modelValue.hideFooter"
 			type="checkbox"
 			container-class="form-switch mb-3"
 			role="switch"
