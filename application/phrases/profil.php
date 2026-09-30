@@ -1392,4 +1392,28 @@ array (
     ),
   ),
 )
+,
+array (
+  'app' => 'core',
+  'category' => 'profil',
+  'phrase' => 'fhAusweisStatusNichtAusgegeben',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Der FH Ausweis wurde noch nicht ausgegeben.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The FH ID card has not been issued yet.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );

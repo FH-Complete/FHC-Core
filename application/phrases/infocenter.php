@@ -2081,5 +2081,53 @@ array (
     ),
   ),
 )
+,
+array (
+  'app' => 'core',
+  'category' => 'infocenter',
+  'phrase' => 'onboardingRegistriert',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Über ElectronicOnboarding registriert',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Registered with Electronic Onboarding',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'infocenter',
+  'phrase' => 'ersterOnboardingLogin',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Erster Electronic Onboarding Login',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'First Electronic Onboarding Login',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );
 
