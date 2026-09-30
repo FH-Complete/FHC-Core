@@ -60,7 +60,7 @@ export default {
 		},
 	},
 	template: /*html*/ `
-	<div class="widgets-report-kpi-config-kpi">
+	<div class="widgets-report-config-kpi">
 		<div v-if="hasCustomVars" :class="config.aggregators.length > 1 ? 'mb-3' : ''">
 			<label class="form-label">{{ $p.t('dashboard/widget_report_vars') }}</label>
 			<vars-var
