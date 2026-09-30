@@ -202,7 +202,7 @@ export default {
 			return true;
 		},
 		download(config) {
-			this.tabulator.download(config.formatter, config.file, config.options)
+			this.tabulator.download(config.formatter, config.file, config.options, config.rowRange)
 		}
 	},
 	template: `

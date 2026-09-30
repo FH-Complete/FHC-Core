@@ -80,10 +80,12 @@ class StundenplanLib
 		if (isError($semester_range))
 			return $semester_range;
 		$semester_range = getData($semester_range);
+		$this->_ci->addMeta('semester_range', $semester_range);
 
 		$this->sortStudienSemester($semester_range);
 
 		$function_error = $this->applyLoadUeberSemesterHaelfte($semester_range);
+		$this->_ci->addMeta('nach_apply_semester_range', $semester_range);
 		if ($function_error)
 			return $function_error;
 		
@@ -92,13 +94,13 @@ class StundenplanLib
 		if (isError($benutzer_gruppen))
 			return $benutzer_gruppen;
 		$benutzer_gruppen = getData($benutzer_gruppen);
-
+		$this->_ci->addMeta('spezialgruppen', $benutzer_gruppen);
 		// getting the student_lehrverbaende of the student in the different studiensemester
 		$student_lehrverband = $this->fetchStudentlehrverbandFromStudiensemester($student_uid, $semester_range);
 		if (isError($student_lehrverband))
 			return $student_lehrverband;
 		$student_lehrverband = getData($student_lehrverband);
-		
+		$this->_ci->addMeta('studentlehrvebaende', $student_lehrverband);
 		$stundenplan_query = $this->_ci->StundenplanModel->getStundenplanQuery(
 			$start,
 			$end,
@@ -184,6 +186,21 @@ class StundenplanLib
 		return success($stundenplan_data);
 	}
 
+	public function getEventsByLE($lehreinheit_id, $start, $end, $stundenplan)
+	{
+		$this->_ci =& get_instance();
+
+		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+		return $this->_ci->StundenplanModel->getStundenplanLE($lehreinheit_id, $start, $end, $stundenplan);
+	}
+
+	public function getEventsByLV($lehrveranstaltung_id, $start, $end, $stundenplan)
+	{
+		$this->_ci =& get_instance();
+
+		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+		return $this->_ci->StundenplanModel->getStundenplanLV($lehrveranstaltung_id, $start, $end, $stundenplan);
+	}
 	/**
 	 * Get stundenplan for a room
 	 *
@@ -615,6 +632,7 @@ class StundenplanLib
 						$result->semester = $item->semester;
 						$result->verband = $item->verband;
 						$result->gruppe = $item->gruppe;
+						$result->studiensemester_kurzbz = $item->studiensemester_kurzbz;
 						return $result;
 					},
 					$lehrverband_query_result);
@@ -784,7 +802,8 @@ class StundenplanLib
 		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		// gets all studiensemester from the student from start_date to end_date
-		$semester_range = $this->_ci->StudiensemesterModel->getByDateRange($start_date, $end_date);
+		//$semester_range = $this->_ci->StudiensemesterModel->getByDateRange($start_date, $end_date);
+		$semester_range = $this->_ci->StudiensemesterModel->getContainingOrNearestByDateRange($start_date, $end_date);
 		if (isError($semester_range))
 			return $semester_range;
 		

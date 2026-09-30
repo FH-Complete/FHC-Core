@@ -37,7 +37,6 @@ export default {
 		"width",
 		"height",
 		"custom",
-		"hidden",
 		"editMode",
 		"loading", // widget got added and is waiting for backend to save in db
 		"item_data",
@@ -122,14 +121,6 @@ export default {
 		},
 		ready() {
 			return this.component && this.arguments !== null;
-		},
-		visible: {
-			get() {
-				return !this.hidden;
-			},
-			set(value) {
-				this.$emit('remove', this.hidden);
-			}
 		}
 	},
 	methods: {
@@ -213,10 +204,8 @@ export default {
 	},
 	template: /*html*/ `
 	<article
-		v-if="!hidden || editMode"
 		class="dashboard-item card overflow-hidden h-100 position-relative"
 		:class="{
-			'hidden-widget': hidden,
 			[arguments?.className]: arguments && arguments.className
 		}"
 	>
@@ -310,9 +299,9 @@ export default {
 				>
 					<i class="fa-solid fa-gear" aria-hidden="true"></i>
 				</a>
-				<!-- delete button -->
+				<!-- delete/hide button -->
 				<a
-					v-if="custom && editMode"
+					v-if="editMode"
 					href="#"
 					class="col-auto px-1"
 					:aria-label="$p.t('dashboard/widget_delete')"
@@ -321,19 +310,6 @@ export default {
 				>
 					<i class="fa-solid fa-trash" aria-hidden="true"></i>
 				</a>
-				<!-- hide button -->
-				<Transition>
-					<div v-if="!custom && editMode" class="col-auto px-1 form-switch">
-						<input
-							type="checkbox"
-							role="switch"
-							v-model="visible"
-							class="form-check-input ms-0"
-							:value="true"
-							:aria-label="$p.t('dashboard/widget_toggle_visibility')"
-						>
-					</div>
-				</Transition>
 			</header>
 			<!-- TODO Manu rename/remove-->
 			<div v-if="ready" class="card-body overflow-hidden p-0">

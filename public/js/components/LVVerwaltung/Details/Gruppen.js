@@ -2,12 +2,16 @@ import {CoreFilterCmpt} from "../../filter/Filter.js";
 import FormForm from '../../Form/Form.js';
 import FormInput from '../../Form/Input.js';
 import ApiGruppe from "../../../api/lehrveranstaltung/gruppe.js";
+import drop from '../../../directives/drop.js';
 export default{
 	name: "LVGruppen",
 	components: {
 		CoreFilterCmpt,
 		FormForm,
 		FormInput
+	},
+	directives: {
+		drop
 	},
 	props: {
 		lehreinheit_id: Number
@@ -187,28 +191,48 @@ export default{
 					this.reload();
 				})
 		},
+		onDropVerband(node, gruppe) {
+			this.$api.call(ApiGruppe.getGruppe(gruppe))
+				.then(result => result.data)
+				.then(result => {
+
+					let newData = {
+						'gid': result,
+						'lehreinheit_id': this.lehreinheit_id,
+						'lehrverband': gruppe.lehrverband,
+					}
+					this.$api.call(ApiGruppe.add(newData))
+						.then(result => {
+							this.reload()
+						})
+			});
+
+		},
+
 	},
 	template: `
-		<core-filter-cmpt
-			ref="table"
-			:tabulator-options="tabulatorOptions"
-			:tabulator-events="tabulatorEvents"
-			table-only
-			:side-menu="false"
-			:reload=true
-			>
-			<template #search> <!--TODO (david) Slot prüfen -->
-				<form-input
-					type="autocomplete"
-					:suggestions="filteredGroups"
-					:placeholder="$p.t('lehre', 'addGroup')"
-					v-model="selectedGroup"
-					field="label"
-					@item-select="addGroup"
-					@complete="searchGroup"
-				></form-input>
-			</template>
-			
-		</core-filter-cmpt>
+		<div v-drop:link-strict.verband="(evt, gruppe) => onDropVerband(node, gruppe)">
+			<core-filter-cmpt
+				ref="table"
+				:tabulator-options="tabulatorOptions"
+				:tabulator-events="tabulatorEvents"
+				table-only
+				:side-menu="false"
+				:reload=true
+				>
+				<template #search> <!--TODO (david) Slot prüfen -->
+					<form-input
+						type="autocomplete"
+						:suggestions="filteredGroups"
+						:placeholder="$p.t('lehre', 'addGroup')"
+						v-model="selectedGroup"
+						field="label"
+						@item-select="addGroup"
+						@complete="searchGroup"
+					></form-input>
+				</template>
+				
+			</core-filter-cmpt>
+		</div>
 		`
 };

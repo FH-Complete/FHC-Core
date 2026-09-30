@@ -233,6 +233,14 @@ export default {
 			if (value == oldValue)
 				return;
 
+			/** NOTE(chris): tempPositionUpdates depends on the cols not to be
+			 * updated. So if they do we reset to get a clean value. In case the
+			 * drag and drop operation is still motion on the next tick this
+			 * will be correct again and if there is no such operation we clean
+			 * up.
+			 */
+			this.tempPositionUpdates = null;
+
 			this.reinitGrid();
 		},
 	    rows: {
@@ -246,6 +254,11 @@ export default {
 		},
 		indexedItems: {
 			handler(value) {
+				/** NOTE(chris): there was an update of the items, so in case
+				 * it came from a drag and drop operation we need to clean up
+				 */
+				this.tempPositionUpdates = null;
+			
 				this.reinitGrid();
 			},
 			immediate: true,

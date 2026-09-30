@@ -457,6 +457,7 @@ class Studiengang_model extends DB_Model
 	 */
 	public function getLeitung($studiengang_kz = null)
 	{
+		$this->addDistinct();
 		$this->addSelect('uid, studiengang_kz, oe_kurzbz, vorname, nachname, email, titelpre, titelpost, alias');
 		$this->addJoin('public.tbl_benutzerfunktion', 'oe_kurzbz');
 		$this->addJoin('public.tbl_benutzer', 'uid');
