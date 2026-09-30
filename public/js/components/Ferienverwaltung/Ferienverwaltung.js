@@ -278,7 +278,7 @@ export default {
 					:disabled="loading"
 					>
 					<i v-if="loading" class="fa fa-spinner fa-spin"></i>
-					{{ $p.t('lehre/ferienImportieren') }}
+					{{ $p.t('ferien/ferienImportieren') }}
 				</button>
 			</div>
 		</div>
