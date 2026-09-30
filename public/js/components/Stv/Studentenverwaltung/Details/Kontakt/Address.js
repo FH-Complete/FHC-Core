@@ -4,6 +4,7 @@ import FhcFormValidation from '../../../../Form/Validation.js';
 import BsModal from "../../../../Bootstrap/Modal.js";
 import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
+import NationsDropdown from '../../../../Dropdowns/NationsDropdown.js';
 
 import ApiStvAddress from '../../../../../api/factory/stv/kontakt/address.js';
 
@@ -15,11 +16,15 @@ export default{
 		FhcFormValidation,
 		BsModal,
 		FormForm,
-		FormInput
+		FormInput,
+		NationsDropdown
 	},
 	props: {
 		uid: Number
 	},
+	emits: [
+		'updateNation'
+	],
 	data() {
 		return {
 			addressData: {
@@ -231,7 +236,6 @@ export default{
 					//	delete this.addressData.plz;
 					this.loadPlaces(this.addressData.address.plz);
 					this.$refs.adressModal.show();
-
 				}
 			});
 		},
@@ -338,6 +342,9 @@ export default{
 
 			this.statusNew = true;
 		},
+		handleChangeNation({nation_code}){
+			this.addressData.nation = nation_code;
+		},
 	},
 	created() {
 		this.$api
@@ -397,182 +404,174 @@ export default{
 							v-model="addressData.strasse"
 						>
 						</form-input>					
-				</div>
+					</div>
 
-				<div class="row mb-3">
-					<form-input
-						type="select"
-						name="nation"
-						:label="$p.t('person/nation')"
-						v-model="addressData.nation"
-						>
-						<option 
-							v-for="nation in nations" 
-							:key="nation.nation_code" 
-							:value="nation.nation_code" 
-							:disabled="nation.sperre"
-							>
-							{{nation.kurztext}}
-						</option>
-						</form-input>
-				</div>
-							
-				<div class="row mb-3">
-					<form-input
-						type="text"
-						name="address[plz]"
-						:label="$p.t('person/plz') + ' *'"
-						v-model="addressData.address.plz"
-						required
-						@input="loadPlaces"
-					>
-					</form-input>					
-				</div>
+					<div class="row mb-3">
+							<nations-dropdown
+								container-class="col-12"
+								:label-dropdown="$p.t('person', 'nation')"
+								:nation="addressData.nation"
+								name="nation"
+								@updateNation="handleChangeNation"
+								>
+							</nations-dropdown>
+					</div>
 
-				<div class="row mb-3">
-					<form-input
-						v-if="addressData.nation == 'A'"
-						type="select"
-						name="gemeinde"
-						:label="$p.t('person/gemeinde')"
-						v-model="addressData.gemeinde"
-						>
-						<option v-if="!gemeinden.length" disabled>{{$p.t('ui', 'bittePlzWaehlen')}}</option>
-						<option 
-							v-for="gemeinde in gemeinden" 
-							:key="gemeinde.name" 
-							:value="gemeinde.name"
-							>
-							{{gemeinde.name}}
-						</option>
-					</form-input>
-					<form-input
-							v-else
+					<div class="row mb-3">
+						<form-input
 							type="text"
+							name="address[plz]"
+							:label="$p.t('person/plz') + ' *'"
+							v-model="addressData.address.plz"
+							required
+							@input="loadPlaces"
+						>
+						</form-input>
+					</div>
+
+					<div class="row mb-3">
+						<form-input
+							v-if="addressData.nation == 'A'"
+							type="select"
+							name="gemeinde"
 							:label="$p.t('person/gemeinde')"
-							name="addressData.gemeinde"
 							v-model="addressData.gemeinde"
-						>	
-					</form-input>
-				</div>
-
-				<div class="row mb-3">
-					<form-input
-						v-if="addressData.nation == 'A'" 
-						type="select"
-						name="ort"
-						:label="$p.t('person/ort')"
-						v-model="addressData.ort"
-						>
-						<option v-if="!orte.length" disabled>{{$p.t('ui', 'bitteGemeindeWaehlen')}}</option>
-						<option 
-							v-for="ort in orte" 
-							:key="ort.ortschaftsname" 
-							:value="ort.ortschaftsname"
 							>
-							{{ort.ortschaftsname}}
-						</option>
-					</form-input>
-					<form-input
-							v-else
-							type="text"
-							:label="$p.t('person/ort')"
+							<option v-if="!gemeinden.length" disabled>{{$p.t('ui', 'bittePlzWaehlen')}}</option>
+							<option
+								v-for="gemeinde in gemeinden"
+								:key="gemeinde.name"
+								:value="gemeinde.name"
+								>
+								{{gemeinde.name}}
+							</option>
+						</form-input>
+						<form-input
+								v-else
+								type="text"
+								:label="$p.t('person/gemeinde')"
+								name="addressData.gemeinde"
+								v-model="addressData.gemeinde"
+							>
+						</form-input>
+					</div>
+
+					<div class="row mb-3">
+						<form-input
+							v-if="addressData.nation == 'A'"
+							type="select"
 							name="ort"
+							:label="$p.t('person/ort')"
 							v-model="addressData.ort"
-						>	
-					</form-input>
-				</div>
-
-				<div class="row mb-3">
-					<div class="col-sm-4">
+							>
+							<option v-if="!orte.length" disabled>{{$p.t('ui', 'bitteGemeindeWaehlen')}}</option>
+							<option
+								v-for="ort in orte"
+								:key="ort.ortschaftsname"
+								:value="ort.ortschaftsname"
+								>
+								{{ort.ortschaftsname}}
+							</option>
+						</form-input>
 						<form-input
-							container-class="form-check"
-							type="checkbox"
-							name="heimatadresse"
-							:label="$p.t('person/heimatadresse')"
-							v-model="addressData.heimatadresse"
-						>
+								v-else
+								type="text"
+								:label="$p.t('person/ort')"
+								name="ort"
+								v-model="addressData.ort"
+							>
 						</form-input>
 					</div>
-				</div>
 
-				<div class="row mb-3">
-					<div class="col-sm-4">
-						<form-input
-							container-class="form-check"
-							type="checkbox"
-							name="zustelladresse"
-							:label="$p.t('person/zustelladresse')"
-							v-model="addressData.zustelladresse"
-						>
-						</form-input>
+					<div class="row mb-3">
+						<div class="col-sm-4">
+							<form-input
+								container-class="form-check"
+								type="checkbox"
+								name="heimatadresse"
+								:label="$p.t('person/heimatadresse')"
+								v-model="addressData.heimatadresse"
+							>
+							</form-input>
+						</div>
 					</div>
-				</div>
 
-				<div class="row mb-3">
-					<form-input
-						type="text"
-						name="co_name"
-						:label="$p.t('person/co_name')"
-						v-model="addressData.co_name"
-					>
-					</form-input>
-				</div>
-
-				<div class="row mb-3">
-					<div class="col-sm-4">
-						<form-input
-							container-class="form-check"
-							type="checkbox"
-							name="rechnungsadresse"
-							:label="$p.t('person/rechnungsadresse')"
-							v-model="addressData.rechnungsadresse"
-						>
-						</form-input>
+					<div class="row mb-3">
+						<div class="col-sm-4">
+							<form-input
+								container-class="form-check"
+								type="checkbox"
+								name="zustelladresse"
+								:label="$p.t('person/zustelladresse')"
+								v-model="addressData.zustelladresse"
+							>
+							</form-input>
+						</div>
 					</div>
-				</div>
 
-				<div class="row mb-3">
-					<form-input
-						type="autocomplete"
-						:label="$p.t('person/firma')"
-						name="firma_name"
-						v-model="selectedFirma"
-						optionLabel="label"
-						optionValue="firma_id"
-						dropdown
-						forceSelection
-						:suggestions="filteredFirmen" 
-						@complete="filterFirmen"
-						:min-length="3"
-					>
-					</form-input>
-				</div>
-
-				<div class="row mb-3">
-					<input type="hidden" class="form-control" id="firma_id" v-model="addressData.firma_id">
-				</div>
-
-				<div class="row mb-3">
-					<form-input
-						type="text"
-						name="firma_zusatz"
-						:label="$p.t('global/name')"
-						v-model="addressData.name"
-					>
-					</form-input>
-				</div>
-
-				<div class="row mb-3">
-					<form-input
+					<div class="row mb-3">
+						<form-input
 							type="text"
-							name="anmerkung"
-							:label="$p.t('global/anmerkung')"
-							v-model="addressData.anmerkung"
+							name="co_name"
+							:label="$p.t('person/co_name')"
+							v-model="addressData.co_name"
 						>
-					</form-input>
-				</div>
+						</form-input>
+					</div>
 
+					<div class="row mb-3">
+						<div class="col-sm-4">
+							<form-input
+								container-class="form-check"
+								type="checkbox"
+								name="rechnungsadresse"
+								:label="$p.t('person/rechnungsadresse')"
+								v-model="addressData.rechnungsadresse"
+							>
+							</form-input>
+						</div>
+					</div>
+
+					<div class="row mb-3">
+						<form-input
+							type="autocomplete"
+							:label="$p.t('person/firma')"
+							name="firma_name"
+							v-model="selectedFirma"
+							optionLabel="label"
+							optionValue="firma_id"
+							dropdown
+							forceSelection
+							:suggestions="filteredFirmen"
+							@complete="filterFirmen"
+							:min-length="3"
+						>
+						</form-input>
+					</div>
+
+					<div class="row mb-3">
+						<input type="hidden" class="form-control" id="firma_id" v-model="addressData.firma_id">
+					</div>
+
+					<div class="row mb-3">
+						<form-input
+							type="text"
+							name="firma_zusatz"
+							:label="$p.t('global/name')"
+							v-model="addressData.name"
+						>
+						</form-input>
+					</div>
+
+					<div class="row mb-3">
+						<form-input
+								type="text"
+								name="anmerkung"
+								:label="$p.t('global/anmerkung')"
+								v-model="addressData.anmerkung"
+							>
+						</form-input>
+					</div>
 			</form-form>
 
 			<template #footer>

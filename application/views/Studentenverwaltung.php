@@ -21,7 +21,8 @@
 			'public/css/components/primevue.css',
 			'public/css/Studentenverwaltung.css',
 			'public/css/components/function.css',
-			'public/css/components/Detailheader.css'
+			'public/css/components/Detailheader.css',
+			'public/css/components/dropdown.css'
 		],
 		'customJSs' => [
 			'vendor/vuejs/vuedatepicker_js/vue-datepicker.iife.js',

@@ -3,6 +3,7 @@ import FormInput from '../../../Form/Input.js';
 import TblHistory from "./Prestudent/History.js";
 
 import CoreUdf from '../../../Udf/Udf.js';
+import NationsDropdown from '../../../Dropdowns/NationsDropdown.js';
 
 import ApiStvPrestudent from '../../../../api/factory/stv/prestudent.js';
 
@@ -12,7 +13,8 @@ export default {
 		FormForm,
 		FormInput,
 		TblHistory,
-		CoreUdf
+		CoreUdf,
+		NationsDropdown
 	},
 	inject: {
 		lists: {
@@ -58,6 +60,9 @@ export default {
 			default: {}
 		}
 	},
+	emits: [
+		'updateNation'
+	],
 	data() {
 		return {
 			data: [],
@@ -177,6 +182,15 @@ export default {
 			this.filteredDoktorZgvs = this.listZgvsdoktor.filter(item =>
 				item.label.toLowerCase().includes(query)
 			)
+		},
+		handleChangeZGVNation({nation_code}){
+			this.data.zgvnation = nation_code;
+		},
+		handleChangeZGVMaNation({nation_code}){
+			this.data.zgvmanation = nation_code;
+		},
+		handleChangeZGVDrNation({nation_code}){
+			this.data.zgvdoktornation = nation_code;
 		},
 	},
 	async created() {
@@ -336,18 +350,15 @@ export default {
 						:teleport="true"
 						>
 					</form-input>
-					<form-input
-						v-if="!config.hiddenFields.includes('zgvNation')"
-						container-class="col stv-details-prestudent-zgvNation"
-						:label="$p.t('infocenter', 'zgvNation')"
-						type="select"
-						v-model="data.zgvnation"
+					<nations-dropdown
+						v-if="!config.hiddenFields.includes('zgvnation')"
+						container-class="col stv-details-prestudent-zgvnation"
+						:label-dropdown="$p.t('infocenter', 'zgvNation')"
+						:nation="data.zgvnation"
 						name="zgvnation"
+						@updateNation="handleChangeZGVNation"
 						>
-						<!-- TODO(chris): gesperrte nationen können nicht ausgewählt werden! Um das zu realisieren müsste man ein pseudo select machen -->
-						<option value="">&nbsp;</option>
-						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
-					</form-input>
+					</nations-dropdown>
 				</div>
 				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 gx-3 gy-1 mb-1">
 					<form-input
@@ -401,18 +412,15 @@ export default {
 						:teleport="true"
 						>
 					</form-input>
-					<form-input
+					<nations-dropdown
 						v-if="!config.hiddenFields.includes('zgvmanation')"
 						container-class="col stv-details-prestudent-zgvmanation"
-						:label="$p.t('lehre', 'zgvMasterNation')"
-						type="select"
-						v-model="data.zgvmanation"
+						:label-dropdown="$p.t('lehre', 'zgvMasterNation')"
+						:nation="data.zgvmanation"
 						name="zgvmanation"
+						@updateNation="handleChangeZGVMaNation"
 						>
-						<!-- TODO(chris): gesperrte nationen können nicht ausgewählt werden! Um das zu realisieren müsste man ein pseudo select machen -->
-						<option value="">&nbsp;</option>
-						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
-					</form-input>
+					</nations-dropdown>
 				</div>
 				<!--ZGV Doktor-->
 				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 gx-3 gy-1 mb-1">
@@ -467,18 +475,15 @@ export default {
 						:teleport="true"
 						>
 					</form-input>
-					<form-input
+					<nations-dropdown
 						v-if="!config.hiddenFields.includes('zgvdoktornation')"
 						container-class="col stv-details-prestudent-zgvdoktornation"
-						:label="$p.t('lehre', 'zgvDoktorNation')"
-						type="select"
-						v-model="data.zgvdoktornation"
+						:label-dropdown="$p.t('lehre', 'zgvDoktorNation')"
+						:nation="data.zgvdoktornation"
 						name="zgvdoktornation"
+						@updateNation="handleChangeZGVDrNation"
 						>
-						<!-- TODO(chris): gesperrte nationen können nicht ausgewählt werden! Um das zu realisieren müsste man ein pseudo select machen -->
-						<option value="">&nbsp;</option>
-						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
-					</form-input>
+					</nations-dropdown>
 				</div>
 
 				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 gx-3 gy-1 mb-1">

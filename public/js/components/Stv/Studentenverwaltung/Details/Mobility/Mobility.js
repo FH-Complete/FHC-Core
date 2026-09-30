@@ -4,6 +4,7 @@ import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
 import MobilityPurpose from './List/Purpose.js';
 import MobilitySupport from './List/Support.js';
+import NationsDropdown from '../../../../Dropdowns/NationsDropdown.js';
 
 import ApiStvMobility from '../../../../../api/factory/stv/mobility.js';
 
@@ -14,7 +15,8 @@ export default {
 		FormForm,
 		FormInput,
 		MobilityPurpose,
-		MobilitySupport
+		MobilitySupport,
+		NationsDropdown
 	},
 	inject: {
 		$reloadList: {
@@ -35,6 +37,15 @@ export default {
 	props: {
 		student: Object
 	},
+	emits: [
+		'updateNation',
+		'deleteMobilityPurpose',
+		'setMobilityPurpose',
+		'setMobilityPurposeToNewMobility',
+		'deleteMobilitySupport',
+		'setMobilitySupport',
+		'setMobilitySupportToNewMobility'
+	],
 	data() {
 		return {
 			formData: {
@@ -392,6 +403,14 @@ export default {
 		addSupportToMobility({aufenthaltfoerderung_code}){
 			this.formData.localSupports.push(aufenthaltfoerderung_code);
 		},
+		handleChangeGastnation({nation_code}){
+			console.log("update Gastnation with" + nation_code);
+			this.formData.nation_code = nation_code;
+		},
+		handleChangeHerkunftsland({nation_code}){
+			console.log("update erkunftsland with" + nation_code);
+			this.formData.herkunftsland_code = nation_code;
+		}
 	},
 	created() {
 		this.$api
@@ -429,6 +448,24 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
+	/*
+	* 					<form-input
+						container-class="col-6 stv-details-mobility-herkunftsland"
+						:label="$p.t('mobility', 'herkunftsland')"
+						type="select"
+						v-model="formData.herkunftsland_code"
+						name="herkunftsland_code"
+						>
+						<option
+						v-for="nation in lists.nations"
+						:key="nation.nation_code"
+						:value="nation.nation_code"
+						:disabled="nation.sperre"
+						>
+						{{nation.kurztext}}
+						</option>
+					</form-input>
+	* */
 	template: `
 	<div class="stv-details-mobility h-100 pb-3">
 		<h4>In / Out</h4>
@@ -559,66 +596,59 @@ export default {
 				</div>
 				
 				<div class="row mb-3">
-					<form-input
-						container-class="col-6 stv-details-mobility-gastnation"
-						:label="$p.t('mobility', 'gastnation')"
-						type="select"
-						v-model="formData.nation_code"
-						name="nation_code"
-						>
-						<option 
-						v-for="nation in lists.nations" 
-						:key="nation.nation_code" 
-						:value="nation.nation_code" 
-						:disabled="nation.sperre"
-						>
-						{{nation.kurztext}}
-						</option>
-					</form-input>
-					<form-input
-						container-class="col-6 stv-details-mobility-universitaet"
-						:label="$p.t('mobility', 'universitaet')"
-						type="text"
-						v-model="formData.universitaet"
-						name="universitaet"
-						>
-
-					</form-input>
+					<div class="col-6">
+						<nations-dropdown
+							container-class="col-12 stv-details-mobility-gastnation"
+							:label-dropdown="$p.t('mobility', 'gastnation')"
+							:nation="formData.nation_code"
+							name="nation_code"
+							@updateNation="handleChangeGastnation"
+							>
+						</nations-dropdown>
+					</div>
+					<div class="col-6">
+						<form-input
+							container-class="stv-details-mobility-universitaet"
+							:label="$p.t('mobility', 'universitaet')"
+							type="text"
+							v-model="formData.universitaet"
+							name="universitaet"
+							>
+						</form-input>
+					</div>
 				</div>
 				
 				<div class="row mb-3">
-					<form-input
-						container-class="col-6 stv-details-mobility-herkunftsland"
-						:label="$p.t('mobility', 'herkunftsland')"
-						type="select"
-						v-model="formData.herkunftsland_code"
-						name="herkunftsland_code"
-						>
-						<option 
-						v-for="nation in lists.nations" 
-						:key="nation.nation_code" 
-						:value="nation.nation_code" 
-						:disabled="nation.sperre"
-						>
-						{{nation.kurztext}}
-						</option>
-					</form-input>
-					<form-input
-						container-class="col-3 stv-details-mobility-ects_erworben"
-						:label="$p.t('mobility', 'ects_erworben')"
-						type="text"
-						v-model="formData.ects_erworben"
-						name="ects_erworben"
-						>
-					</form-input>				
-					<form-input
-						container-class="col-3 stv-details-mobility-ects_angerechnet"
-						:label="$p.t('mobility', 'ects_angerechnet')"
-						type="text"
-						v-model="formData.ects_angerechnet"
-						name="ects_angerechnet"
-						>
-					</form-input>
+					<div class="col-6">
+						<nations-dropdown
+							container-class="col-12 stv-details-mobility-herkunftsland"
+							:label-dropdown="$p.t('mobility', 'herkunftsland')"
+							:nation="formData.herkunftsland_code"
+							name="herkunftsland_code"
+							@updateNation="handleChangeHerkunftsland"
+							>
+						</nations-dropdown>
+					</div>
+					<div class="col-6">
+						<div class="row">
+							<form-input
+								container-class="col-6 stv-details-mobility-ects_erworben"
+								:label="$p.t('mobility', 'ects_erworben')"
+								type="text"
+								v-model="formData.ects_erworben"
+								name="ects_erworben"
+								>
+							</form-input>
+							<form-input
+								container-class="col-6 stv-details-mobility-ects_angerechnet"
+								:label="$p.t('mobility', 'ects_angerechnet')"
+								type="text"
+								v-model="formData.ects_angerechnet"
+								name="ects_angerechnet"
+								>
+							</form-input>
+						</div>
+					</div>
 				</div>
 				
 				<div class="row mb-3">

@@ -42,11 +42,15 @@ class Address extends FHCAPI_Controller
 	{
 		$this->load->model('codex/Nation_model', 'NationModel');
 
-		$this->NationModel->addOrder('kurztext');
+		//show at first entries staatenlos and Stbg. ungeklaert
+		$this->db->order_by("kontinent IS NULL DESC, kurztext ASC", '', FALSE);
+		$this->NationModel->addSelect("langtext as label");
+		$this->NationModel->addSelect('kurztext');
+		$this->NationModel->addSelect('nation_code');
 
 		$result = $this->NationModel->load();
 		$data = $this->getDataOrTerminateWithError($result);
-		
+
 		$this->terminateWithSuccess($data);
 	}
 

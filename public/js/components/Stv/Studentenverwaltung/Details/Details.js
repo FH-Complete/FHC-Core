@@ -3,9 +3,9 @@ import FormInput from '../../../Form/Input.js';
 import FormUploadImage from '../../../Form/Upload/Image.js';
 
 import CoreUdf from '../../../Udf/Udf.js';
+import NationsDropdown from '../../../Dropdowns/NationsDropdown.js';
 
 import ApiStvDetails from '../../../../api/factory/stv/details.js';
-
 
 export default {
 	name: "TabDetails",
@@ -13,7 +13,8 @@ export default {
 		CoreForm,
 		FormInput,
 		FormUploadImage,
-		CoreUdf
+		CoreUdf,
+		NationsDropdown
 	},
 	inject: {
 		showBpk: {
@@ -54,11 +55,14 @@ export default {
 			default: {}
 		}
 	},
+	emits: [
+		'updateNation'
+	],
 	data() {
 		return {
 			original: null,
 			data: null,
-			changed: {}
+			changed: {},
 		}
 	},
 	computed: {
@@ -79,7 +83,7 @@ export default {
 				"v": this.$p.t('person', 'verheiratet'),
 				"w": this.$p.t('person', 'verwitwet'),
 			};
-		}
+		},
 	},
 	watch: {
 		modelValue(n) {
@@ -100,7 +104,7 @@ export default {
 				this.changed = res;
 			},
 			deep: true
-		}
+		},
 	},
 	methods: {
 		updateStudent(n) {
@@ -168,6 +172,12 @@ export default {
 			const bodyEncoded = encodeURIComponent(bodyWithNewLines);
 
 			window.location.href = "mailto:" + this.modelValue.mail_intern + "?subject=" + subjectEncoded + "&body=" + bodyEncoded;
+		},
+		handleChangeNation({nation_code}){
+			this.data.geburtsnation = nation_code;
+		},
+		handleChangeStbg({nation_code}){
+			this.data.staatsbuergerschaft = nation_code;
 		}
 	},
 	created() {
@@ -325,28 +335,26 @@ export default {
 						maxlength="128"
  						>
 					</form-input>
-					<form-input
+					<nations-dropdown
 						v-if="!config.hiddenFields.includes('geburtsnation')"
 						container-class="col stv-details-details-geburtsnation"
-						:label="$p.t('person', 'geburtsnation')"
-						type="select"
-						v-model="data.geburtsnation"
+						:label-dropdown="$p.t('person', 'geburtsnation')"
+						:nation="data.geburtsnation"
+						:nullLabel="' -- ' + $p.t('fehlermonitoring', 'keineAuswahl') + ' -- '"
 						name="geburtsnation"
- 						>
-						<option value="">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
-						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
-					</form-input>
-					<form-input
+						@updateNation="handleChangeNation"
+						>
+					</nations-dropdown>
+					<nations-dropdown
 						v-if="!config.hiddenFields.includes('staatsbuergerschaft')"
 						container-class="col stv-details-details-staatsbuergerschaft"
-						:label="$p.t('person', 'staatsbuergerschaft')"
-						type="select"
-						v-model="data.staatsbuergerschaft"
+						:label-dropdown="$p.t('person', 'staatsbuergerschaft')"
+						:nation="data.staatsbuergerschaft"
+						:nullLabel="' -- ' + $p.t('fehlermonitoring', 'keineAuswahl') + ' -- '"
+						@updateNation="handleChangeStbg"
 						name="staatsbuergerschaft"
- 						>
-						<option value="">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
-						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
-					</form-input>
+						>
+					</nations-dropdown>
 				</div>
 				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 gx-3 gy-1 mb-1">
 
