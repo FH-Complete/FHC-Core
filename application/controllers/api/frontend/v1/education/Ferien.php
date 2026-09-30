@@ -305,9 +305,7 @@ class Ferien extends FHCAPI_Controller
 	}
 
 	/**
-	 * 
-	 * @param
-	 * @return object success or error
+	 * Import Ferien from external source
 	 */
 	public function importFerien()
 	{
@@ -353,7 +351,10 @@ class Ferien extends FHCAPI_Controller
 					$importedFerien[$headers[$idx]] = $value;
 				}
 
+				// map Ferien so they can be imported
 				$ferien = $this->_mapImportFerien($importedFerien);
+
+				// do not import Ferien if no successfull import or not in date range
 				if (
 					!$ferien
 					|| ($filterVonDatum != null && new DateTime($filterVonDatum) > new DateTime($ferien['bisdatum']))
@@ -452,9 +453,9 @@ class Ferien extends FHCAPI_Controller
 	}
 
 	/**
-	 * 
-	 * @param
-	 * @return object success or error
+	 * Map ferien from external source to internal format 
+	 * @param $importedFerien from external source
+	 * @return array imported Ferien, in fhcomplete format
 	 */
 	private function _mapImportFerien($importedFerien)
 	{
