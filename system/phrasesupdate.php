@@ -29526,6 +29526,26 @@ array(
 		array(
 			'app' => 'core',
 			'category' => 'profil',
+			'phrase' => 'fhAusweisStatusNichtAusgegeben',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Der FH Ausweis wurde noch nicht ausgegeben.',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'The FH ID card has not been issued yet.',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
 			'phrase' => 'mailverteiler',
 			'insertvon' => 'system',
 			'phrases' => array(
@@ -49675,6 +49695,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Identifier',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'widget_missing_permission',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ihnen fehlt die erforderliche Berechtigung, um dieses Widget anzuzeigen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You do not have the permission required to display this widget.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
