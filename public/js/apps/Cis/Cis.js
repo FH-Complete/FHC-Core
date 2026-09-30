@@ -1,5 +1,6 @@
 import FhcDashboard from '../../components/Dashboard/Dashboard.js';
 import PluginsPhrasen from '../../plugins/Phrasen.js';
+import PluginsCharts from '../../plugins/highchartsVue.js';
 import Theme from '../../plugins/Theme.js';
 import contrast from '../../directives/contrast.js';
 import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers.js";
@@ -335,6 +336,7 @@ app.use(PluginsPhrasen);
 app.use(Theme);
 app.directive('contrast', contrast);
 app.mount('#fhccontent');
+app.use(PluginsCharts);
 
 router.afterEach((to, from, failure) => {
 	app.config.globalProperties.$api.call(ApiRouteInfo.info('cis4', to.fullPath));

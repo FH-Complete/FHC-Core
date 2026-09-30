@@ -10,6 +10,7 @@ $includesArray = array(
 	'primevue3' => true,
 	'skipID' => '#fhccontent',
 	'vuedatepicker11' => true,
+	'highcharts' => true,
 	'customCSSs' => array(
 		'public/css/components/verticalsplit.css',
 		'public/css/components/searchbar/searchbar.css',
