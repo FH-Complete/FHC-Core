@@ -1480,7 +1480,6 @@ array (
     ),
   ),
 ),
-
 array (
   'app' => 'international',
   'category' => 'international',
@@ -1504,4 +1503,75 @@ array (
     ),
   ),
 ),
+array (
+  'app' => 'international',
+  'category' => 'international',
+  'phrase' => 'massnahmeneinmalig',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Diese Maßnahme ist nur einmalig planbar.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'This measure may only be planned once.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'international',
+  'category' => 'international',
+  'phrase' => 'personenMassnahmen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'alle Maßnahmen der Personen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => ' all measures of the people',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'international',
+  'category' => 'international',
+  'phrase' => 'erroreinmalig',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Diese Maßnahme kann nur einmal geplant werden',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'This measure can only be planned once.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );
