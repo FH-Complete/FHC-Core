@@ -75,6 +75,7 @@ var Rueckstellung = {
 					if (FHC_AjaxClient.hasData(data))
 					{
 						Rueckstellung.get(personid);
+						InfocenterDetails._refreshMessages();
 						InfocenterDetails._refreshLog()
 					}
 					else
