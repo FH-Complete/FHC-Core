@@ -1,0 +1,196 @@
+/* Contentcomponents in CIS4 content.
+ *
+ * A contentcomponent renders inside its marker div, below #fhc-cms-content. The
+ * components themselves carry Bootstrap utility classes only, so without this file they
+ * read as unstyled Bootstrap.
+ *
+ * The class names are the contract with the components. A root class follows the pattern
+ * fhc-contentcomponent-<name> and is set in the template of the component.
+ *
+ * Colours come from the theme. public/css/theme/default.css declares the semantic
+ * variables under :root.light and :root.dark, never on bare :root, so every var() below
+ * carries a fallback. The fallback repeats the light value.
+ *
+ * Two themes are covered: light and dark. purple takes the light values.
+ */
+
+:root {
+	--fhc-cc-muted: #6c757d;
+	--fhc-cc-accent: var(--fhc-primary, #006095);
+	--fhc-cc-surface: var(--fhc-secondary, #f6f6f6);
+	--fhc-cc-hover: var(--fhc-tertiary, #e9ecef);
+	--fhc-cc-border: var(--fhc-border, #dee2e6);
+	--fhc-cc-radius: 0.3rem;
+}
+
+/* Two values need a step of their own. #006095 and #6c757d both fall under 3:1 on the
+   dark background, which is too little even for secondary text and for an icon. */
+:root.dark {
+	--fhc-cc-muted: var(--fhc-white-90, #aeb3b8);
+	--fhc-cc-accent: var(--fhc-blue-40, #61aed8);
+}
+
+/* --------------------------------------------------------------------------------- */
+/* The marker                                                                          */
+/* --------------------------------------------------------------------------------- */
+
+/* The marker stays in the DOM and wraps the component. scan.js empties it, Teleport
+   renders the component root into it. It is therefore the place for the outer spacing. */
+.fhc-contentcomponent {
+	display: block;
+	margin: 1.25rem 0;
+}
+
+.fhc-contentcomponent:first-child {
+	margin-top: 0;
+}
+
+.fhc-contentcomponent:last-child {
+	margin-bottom: 0;
+}
+
+.fhc-contentcomponent .alert {
+	margin-bottom: 0;
+}
+
+/* --------------------------------------------------------------------------------- */
+/* Person block                                                                        */
+/* --------------------------------------------------------------------------------- */
+
+/* PersonBlock.js. It carries person-block and every row of oe-personen. */
+.fhc-contentcomponent-person {
+	/* flow-root contains the floated photo. It spares the clearfix element, which the
+	   component does not render. */
+	display: flow-root;
+	padding: 0.75rem 1rem;
+	border: 1px solid var(--fhc-cc-border);
+	border-radius: var(--fhc-cc-radius);
+	background-color: var(--fhc-cc-surface);
+	/* The block carries mb-3. The gap of the two lists below owns the spacing instead,
+	   so the last block does not push the content under it. Bootstrap writes the utility
+	   with !important, so this needs it as well. */
+	margin-bottom: 0 !important;
+}
+
+/* The photo carries its width and its object-fit as an inline style. No rule here can
+   beat that, so only the placement is set. */
+.fhc-contentcomponent-person > img {
+	float: left;
+	margin-right: 1rem;
+	border-radius: var(--fhc-cc-radius);
+}
+
+/* The name. It is the first div, with or without a photo above it. */
+.fhc-contentcomponent-person > div:first-of-type {
+	font-size: 1.05em;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+/* Function, phone, room and mail. The mail and phone links keep the link colour. */
+.fhc-contentcomponent-person > div:not(:first-of-type) {
+	font-size: 0.95em;
+	color: var(--fhc-cc-muted);
+}
+
+/* --------------------------------------------------------------------------------- */
+/* oe-personen, person-block                                                           */
+/* --------------------------------------------------------------------------------- */
+
+.fhc-contentcomponent-oepersonen,
+.fhc-contentcomponent-personkontakt {
+	display: grid;
+	gap: 0.75rem;
+}
+
+/* --------------------------------------------------------------------------------- */
+/* dms-liste, dms-dokumente                                                            */
+/* --------------------------------------------------------------------------------- */
+
+/* Both render DokumentListe.js: ul.list-unstyled with one li per document. */
+.fhc-contentcomponent-dmsliste ul,
+.fhc-contentcomponent-dmsdokumente ul {
+	border: 1px solid var(--fhc-cc-border);
+	border-radius: var(--fhc-cc-radius);
+	/* Keeps the first and the last row inside the rounded corners. */
+	overflow: hidden;
+}
+
+.fhc-contentcomponent-dmsliste li,
+.fhc-contentcomponent-dmsdokumente li {
+	padding: 0.5rem 0.75rem;
+	border-top: 1px solid var(--fhc-cc-border);
+	/* The row carries mb-2. The line above separates the rows instead. */
+	margin-bottom: 0 !important;
+}
+
+.fhc-contentcomponent-dmsliste li:first-child,
+.fhc-contentcomponent-dmsdokumente li:first-child {
+	border-top: 0;
+}
+
+.fhc-contentcomponent-dmsliste li:hover,
+.fhc-contentcomponent-dmsdokumente li:hover {
+	background-color: var(--fhc-cc-surface);
+}
+
+/* The file type icon sits inside the link and would take the link colour. A fixed width
+   lines the names up over every row, whatever the icon is. */
+.fhc-contentcomponent-dmsliste li i,
+.fhc-contentcomponent-dmsdokumente li i {
+	width: 1.25rem;
+	margin-right: 0.25rem;
+	text-align: center;
+	color: var(--fhc-cc-accent);
+}
+
+.fhc-contentcomponent-dmsliste li a,
+.fhc-contentcomponent-dmsdokumente li a {
+	text-decoration: none;
+}
+
+.fhc-contentcomponent-dmsliste li a:hover,
+.fhc-contentcomponent-dmsliste li a:focus,
+.fhc-contentcomponent-dmsdokumente li a:hover,
+.fhc-contentcomponent-dmsdokumente li a:focus {
+	text-decoration: underline;
+}
+
+/* The description is the only block element in the row. It starts below the icon, so it
+   takes the width of the icon as an indent and lines up with the document name. */
+.fhc-contentcomponent-dmsliste li > div,
+.fhc-contentcomponent-dmsdokumente li > div {
+	padding-left: 1.5rem;
+}
+
+/* --------------------------------------------------------------------------------- */
+/* contentchild-menu                                                                   */
+/* --------------------------------------------------------------------------------- */
+
+/* The successor of the legacy menubox. The accent rule replaces its grey background as
+   the mark that says: this is a menu, not running text. */
+.fhc-contentcomponent-contentchildmenu ul {
+	padding: 0.5rem;
+	border-left: 3px solid var(--fhc-cc-accent);
+	border-radius: 0 var(--fhc-cc-radius) var(--fhc-cc-radius) 0;
+	background-color: var(--fhc-cc-surface);
+}
+
+.fhc-contentcomponent-contentchildmenu li {
+	/* The entry carries mb-1. The link padding owns the spacing instead. */
+	margin-bottom: 0 !important;
+}
+
+/* A block link makes the whole row the target, not the length of the title. */
+.fhc-contentcomponent-contentchildmenu a {
+	display: block;
+	padding: 0.35rem 0.5rem;
+	border-radius: var(--fhc-cc-radius);
+	text-decoration: none;
+}
+
+.fhc-contentcomponent-contentchildmenu a:hover,
+.fhc-contentcomponent-contentchildmenu a:focus {
+	background-color: var(--fhc-cc-hover);
+	text-decoration: underline;
+}
