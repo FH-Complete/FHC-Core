@@ -37,7 +37,45 @@ class Betreuungen extends FHCAPI_Controller
 
 	public function getBetreuungen()
 	{
-		
+		$semester = $this->input->get("semester");
+		if (!$semester) $this->terminateWithError("Missing parameters!");
+
+		$personId = getAuthPersonId();
+
+		$betreuungenQuery = "SELECT
+			tbl_lehrveranstaltung.bezeichnung,
+			tbl_projektarbeit.titel,
+			(SELECT nachname || ' ' || vorname
+				FROM public.tbl_benutzer
+				JOIN public.tbl_person USING(person_id)
+				WHERE uid=student_uid)
+				as name,
+			(SELECT uid
+				FROM public.tbl_benutzer
+				WHERE uid=student_uid)
+				as uid,
+			tbl_lehrveranstaltung.studiengang_kz,
+			tbl_lehrveranstaltung.semester,
+			tbl_studiengang.kurzbzlang as studiengang,
+			tbl_studiengang.email,
+			tbl_betreuerart.beschreibung AS beutreuerart_beschreibung,
+			tbl_projektbetreuer.stunden
+			FROM
+				lehre.tbl_lehrveranstaltung, lehre.tbl_projektarbeit, lehre.tbl_projektbetreuer, public.tbl_studiengang, lehre.tbl_betreuerart
+			WHERE
+				tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_projektarbeit.lehrveranstaltung_id AND
+				tbl_projektarbeit.studiensemester_kurzbz = '$semester' AND
+				tbl_projektarbeit.projektarbeit_id = tbl_projektbetreuer.projektarbeit_id AND
+				tbl_lehrveranstaltung.studiengang_kz = tbl_studiengang.studiengang_kz AND
+				tbl_projektbetreuer.betreuerart_kurzbz = tbl_betreuerart.betreuerart_kurzbz AND
+				tbl_projektbetreuer.person_id = '$personId'";
+		$this->addMeta("query", $betreuungenQuery);
+
+		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+		$result = $this->LehrveranstaltungModel->execReadOnlyQuery($betreuungenQuery);
+		$result = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($result);
 	}
 
 }

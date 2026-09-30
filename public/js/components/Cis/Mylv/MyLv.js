@@ -17,7 +17,7 @@ export default {
 			studiensemester: null,
 			lvs: {},
 			currentSemester: null,
-			modes: ["lvs", "lehrenheiten", "supervision"],
+			modes: ["lvs", "lehrenheiten", "supervision", "all"],
 			selectedMode: "lvs"
 		};
 	},
@@ -153,9 +153,11 @@ export default {
 					</div>
 				</div>
 				<div class="pt-4">
-					<lvs v-if="selectedMode === 'lvs'" :current="current" />
-					<lehrenheiten v-else-if="selectedMode === 'lehrenheiten'" :current="current" />
-					<supervisor v-else-if="selectedMode === 'supervision'" :current="current" />
+					<lvs v-if="selectedMode === 'lvs' || selectedMode === 'all'" :current="current" />
+					<hr v-if="selectedMode === 'all'">
+					<lehrenheiten v-if="selectedMode === 'lehrenheiten' || selectedMode === 'all'" :current="current" />
+					<hr v-if="selectedMode === 'all'">
+					<supervisor v-if="selectedMode === 'supervision' || selectedMode === 'all'" :semester="currentSemester" />
 				</div>
 			</div>
 			<div v-else class="alert alert-danger" role="alert">
