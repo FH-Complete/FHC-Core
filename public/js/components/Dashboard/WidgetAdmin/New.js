@@ -34,7 +34,7 @@ export default {
 		finish() {
 			this.$refs.form
 				.call(ApiWidget.create(this.result))
-				.then(res => {console.log(res.data);
+				.then(res => {
 					this.$emit('create', res.data);
 					this.$refs.modal.hide();
 				})
