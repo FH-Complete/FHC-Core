@@ -33,9 +33,17 @@ export default {
 
 			return this.activeAggregator.label.replace(
 				/\{\s*([^\}]+)\s*\}/g,
-				(match, key) => this.calledVars[key] === undefined
-					? match
-					: this.calledVars[key]
+				(match, key) => {
+					if (this.calledVars[key] === undefined)
+						return match;
+					if (this.config.vars[key].detail?.options) {
+						const options = this.config.vars[key].detail.options;
+						const res = options.find(opt => opt.value == this.calledVars[key]);
+						if (res?.label)
+							return res.label;
+					}
+					return this.calledVars[key];
+				}
 			);
 		},
 		activeAggregator() {
