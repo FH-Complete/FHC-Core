@@ -1,26 +1,37 @@
-import CisMenuEntry from "./Menu/Entry.js";
-import FhcSearchbar from "../searchbar/searchbar.js";
-import CisSprachen from "./Sprachen.js"
-import ThemeSwitch from "./ThemeSwitch.js";
+import CisMenuEntry from './Menu/Entry.js';
+import FhcSearchbar from '../searchbar/searchbar.js';
+import CisSprachen from './Sprachen.js';
+import ThemeSwitch from './ThemeSwitch.js';
 import ApiCisMenu from '../../api/factory/cis/menu.js';
+import ApiSearchbar from '../../api/factory/searchbar.js';
+import ApiLvPlan from "../../api/factory/lvPlan.js";
 
 export default {
-    components: {
-        CisMenuEntry,
-        FhcSearchbar,
+	components: {
+		CisMenuEntry,
+		FhcSearchbar,
 		CisSprachen,
 		ThemeSwitch,
     },
     props: {
-		rootUrl: String,
-        logoUrl: String,
-        avatarUrl: String,
-        logoutUrl: String,
-		selectedtypes: Array,
-        searchbaroptions: Object,
-        searchfunction: Function
+		rootUrl: {
+			type: String,
+			default: () => document.getElementById('cis-header')?.dataset.rootUrl ?? ''
+		},
+		logoUrl: {
+			type: String,
+			default: () => document.getElementById('cis-header')?.dataset.logoUrl ?? ''
+		},
+		avatarUrl: {
+			type: String,
+			default: () => document.getElementById('cis-header')?.dataset.avatarUrl ?? ''
+		},
+		logoutUrl: {
+			type: String,
+			default: () => document.getElementById('cis-header')?.dataset.logoutUrl ?? ''
+		},
     },
-    data: () => {
+    data: function() {
         return {
             entries: [],
 			activeEntry:null,
@@ -28,6 +39,128 @@ export default {
 			urlMatchRankings:[],
 			navUserDropdown:null,
 			menuOpen:true,
+			searchbaroptions: {
+				origin: "cis",
+				cssclass: "",
+				calcheightonly: true,
+				types: {
+					employee: Vue.computed(() => this.$p.t("search/type_employee")),
+					student: Vue.computed(() => this.$p.t("search/type_student")),
+					room: Vue.computed(() => this.$p.t("search/type_room")),
+					organisationunit: Vue.computed(() => this.$p.t("search/type_organisationunit")),
+					cms: Vue.computed(() => this.$p.t("search/type_cms")),
+					dms: Vue.computed(() => this.$p.t("search/type_dms"))
+				},
+				actions: {
+					employee: {
+						defaultaction: {
+							type: "link",
+							action: function(data) {
+								return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+									"/Cis/Profil/View/" + data.uid;
+							}
+						},
+						childactions: [
+							{
+								label: Vue.computed(() => this.$p.t("profil/zeitsperren")),
+								icon: "fas fa-calendar-days",
+								type: "link",
+								action: function (data) {
+									const uid = JSON.parse(data.data).uid;
+									const link =
+										FHC_JS_DATA_STORAGE_OBJECT.app_root +
+										FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+										"/Cis/Zeitsperrenma/ma/" +
+										uid;
+									return link;
+								}
+							}
+						]
+					},
+					student: {
+						defaultaction: {
+							type: "link",
+							action: function(data) {
+								return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+									"/Cis/Profil/View/" + data.uid;
+							}
+						},
+						childactions: []
+					},
+					room: {
+						defaultaction: {
+							type: "link",
+							renderif: function(data) {
+								return data.content_id !== null;
+							},
+							action: function(data) {
+								return FHC_JS_DATA_STORAGE_OBJECT.app_root +
+									FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+									'/CisVue/Cms/content/' + data.content_id;
+							}
+						},
+						childactions: [
+							{
+								label: "LV-Plan",
+								icon: "fas fa-bookmark",
+								type: "link",
+								action: function(data) {
+									return FHC_JS_DATA_STORAGE_OBJECT.app_root +
+										FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+										'/CisVue/Cms/getRoomInformation/' + data.ort_kurzbz;
+								}
+							},
+							{
+								label: "Rauminformation",
+								icon: "fas fa-info-circle",
+								type: "link",
+								renderif: function(data) {
+									return data.content_id !== null;
+								},
+								action: function(data) {
+									return FHC_JS_DATA_STORAGE_OBJECT.app_root +
+										FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+										'/CisVue/Cms/content/' + data.content_id;
+								}
+							},
+						]
+					},
+					organisationunit: {
+						defaultaction: {
+							type: "link",
+							renderif: function(data) {
+								return !!data.mailgroup;
+							},
+							action: function(data) {
+								return 'mailto:' + data.mailgroup;
+							}
+						},
+						childactions: []
+					},
+					cms: {
+						defaultaction: {
+							type: "link",
+							action: function(data) {
+								return FHC_JS_DATA_STORAGE_OBJECT.app_root +
+									FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+									'/CisVue/Cms/content/' + data.content_id;
+							}
+						},
+						childactions: []
+					},
+					dms: {
+						defaultaction: {
+							type: "link",
+							action: function(data) {
+								return FHC_JS_DATA_STORAGE_OBJECT.app_root +
+									'cms/dms.php?id=' + data.dms_id;
+							}
+						},
+						childactions: []
+					}
+				}
+			},
+			openMenuHierarchy: [],
         };
     },
 	inject: ["isNarrow", "isMobile"],
@@ -35,38 +168,44 @@ export default {
 		return{
 			setActiveEntry: this.setActiveEntry,
 			addUrlCount: this.addUrlCount,
-			makeParentContentActive: this.makeParentContentActive,
+			setOpenMenuHierarchy: this.setOpenMenuHierarchy,
 		}
 	},
-	computed:{
-		menuCollapseAriaLabel(){
-			if(this.menuOpen){
+	computed: {
+		menuCollapseAriaLabel() {
+			if (this.menuOpen) {
 				return this.$p.t('global', 'collapseMenu');
-			}else{
+			} else {
 				return this.$p.t('global', 'extendMenu');
 			}
 		},
-		highestMatchingUrlCount(){
+		highestMatchingUrlCount() {
 			// gets the hightest ranking inside the array
 			let highestMatch = Math.max(...this.urlMatchRankings);
 
-			if(this.urlMatchRankings.length > 0){
+			if (this.urlMatchRankings.length > 0) {
 				// if more than one entry has the same ranking, none should be active
-				return this.urlMatchRankings.filter((value)=>value == highestMatch).length > 1 ? null : highestMatch;
+				return this.urlMatchRankings.filter((value) => value == highestMatch)
+					.length > 1
+					? null
+					: highestMatch;
 			}
 
 			return null;
 		},
-		site_url(){
-			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+		site_url() {
+			return (
+				FHC_JS_DATA_STORAGE_OBJECT.app_root +
+				FHC_JS_DATA_STORAGE_OBJECT.ci_router
+			);
 		},
 	},
 	methods: {
 		fetchMenu() {
 			return this.$api
 				.call(ApiCisMenu.getMenu())
-				.then(res => res.data)
-				.then(menu => {
+				.then((res) => res.data)
+				.then((menu) => {
 					this.entries = menu;
 				});
 		},
@@ -76,43 +215,36 @@ export default {
 				this.navUserDropdown.hide();
 			}
 		},
-		handleShowNavUser(){
-			document.addEventListener("click", this.checkSettingsVisibility);
+		handleShowNavUser() {
+			document.addEventListener('click', this.checkSettingsVisibility);
 		},
 		handleHideNavUser(){
 			document.removeEventListener("click", this.checkSettingsVisibility);
-		},
-		makeParentContentActive(content_id, collection=this.entries, parent=null){
-			if(!collection) return;
-			if (typeof collection == 'object' && !Array.isArray(collection) && Object.entries(collection).length > 0) {
-				collection = Object.values(collection);
-			}
-			for(let entry of collection){
-				if(entry.content_id == content_id){
-					this.activeEntry = parent;
-				}
-				this.makeParentContentActive(content_id, entry.childs, entry.content_id);
-			}
-			
 		},
 		addUrlCount(count){
 			this.urlMatchRankings.push(count);
 		},
 
-		setActiveEntry(content_id){
+		setActiveEntry(content_id) {
 			this.activeEntry = content_id;
 		},
+		searchfunction(searchsettings) {
+			return this.$api.call(ApiSearchbar.searchCis(searchsettings));
+		},
+		setOpenMenuHierarchy(openMenuHierarchy) {
+			this.openMenuHierarchy = openMenuHierarchy;
+		},
 	},
-	created(){
+	created() {
 		this.fetchMenu();
 	},
-	mounted(){
+	async mounted() {
 		this.$p.loadCategory(['ui', 'global', 'profilUpdate'])
 		this.navUserDropdown = new bootstrap.Collapse(this.$refs.navUserDropdown,{
 			toggle: false
 		});
 	},
-    template: /*html*/`
+	template: /*html*/ `
 	<div id="cis-header-bar" class="d-flex flex-row flex-grow-1">
 		<div id="nav-logo" class="d-none d-lg-block">
 			<div class="d-flex h-100 justify-content-between">
@@ -192,7 +324,14 @@ export default {
 				<div class="offcanvas-body p-0">
 					<div id="nav-main-menu" class="nav-menu-collapse collapse collapse-horizontal show">
 						<div class="flex-grow-1">
-							<cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeEntry" v-for="entry in entries" :key="entry.content_id" :entry="entry" />
+							<cis-menu-entry
+								v-for="entry in entries"
+								:key="entry.content_id"
+								:highestMatchingUrlCount="highestMatchingUrlCount"
+								:activeContent="activeEntry"
+								:entry="entry"
+								:openMenuHierarchy="openMenuHierarchy"
+							/>
 						</div>
 					</div>
 				</div>
@@ -212,5 +351,5 @@ export default {
 				</div>
 			</div>
 		</div>
-    </nav>`
+    </nav>`,
 };

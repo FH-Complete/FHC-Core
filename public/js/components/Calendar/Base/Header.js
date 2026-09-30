@@ -24,7 +24,8 @@ export default {
 		btnMonth: Boolean,
 		btnWeek: Boolean,
 		btnDay: Boolean,
-		btnList: Boolean
+		btnList: Boolean,
+		btnRange: Boolean,
 	},
 	emits: [
 		"next",
@@ -35,7 +36,8 @@ export default {
 	],
 	data() {
 		return {
-			open: false
+			open: false,
+			semesterOptions: [],
 		};
 	},
 	methods: {
@@ -54,8 +56,19 @@ export default {
 			<div class="header-modes">
 				<div class="d-flex gap-1 justify-content-end" role="group">
 					<button
+						v-if="btnRange"
+						type="button"
+						:title="$p.t('LvPlan/modeRange')"
+						class="btn btn-outline-secondary"
+						:class="{active: mode === 'range'}"
+						@click="clickMode($event, 'range')"
+					>
+						<i class="fa-regular fa-calendar-days"></i>
+					</button>
+					<button
 						v-if="btnMonth"
 						type="button"
+						:title="$p.t('LvPlan/modeMonth')"
 						class="btn btn-outline-secondary"
 						:class="{active: mode === 'month'}"
 						@click="clickMode($event, 'month')"
@@ -65,6 +78,7 @@ export default {
 					<button
 						v-if="btnWeek"
 						type="button"
+						:title="$p.t('LvPlan/modeWeek')"
 						class="btn btn-outline-secondary"
 						:class="{active: mode === 'week'}"
 						@click="clickMode($event, 'week')"
@@ -74,6 +88,7 @@ export default {
 					<button
 						v-if="btnDay"
 						type="button"
+						:title="$p.t('LvPlan/modeDay')"
 						class="btn btn-outline-secondary"
 						:class="{active: mode === 'day'}"
 						@click="clickMode($event, 'day')"
@@ -83,6 +98,7 @@ export default {
 					<button
 						v-if="btnList"
 						type="button"
+						:title="$p.t('LvPlan/modeList')"
 						class="btn btn-outline-secondary"
 						:class="{active: mode === 'list'}"
 						@click="clickMode($event, 'list')"
@@ -95,11 +111,20 @@ export default {
 		<div class="header-picker">
 			<div class="btn-group" role="group">
 				<button
+					v-if="$props.mode === 'week'"
+					@click="$emit('fastPrev')"
+					:disabled="open"
 					class="btn btn-outline-secondary border-0"
+				>
+					<i class="fa fa-angles-left"></i>
+				</button>
+				<button
+					v-if="$props.mode !== 'range'"
 					@click="$emit('prev')"
 					:disabled="open"
+					class="btn btn-outline-secondary border-0"
 				>
-					<i class="fa fa-chevron-left"></i>
+					<i class="fa fa-angle-left"></i>
 				</button>
 				<date-picker
 					:mode="mode"
@@ -110,11 +135,20 @@ export default {
 					:list-length="modeOptions.length"
 				/>
 				<button
-					class="btn btn-outline-secondary border-0"
+					v-if="$props.mode !== 'range'"
 					@click="$emit('next')"
 					:disabled="open"
+					class="btn btn-outline-secondary border-0"
 				>
-					<i class="fa fa-chevron-right"></i>
+					<i class="fa fa-angle-right"></i>
+				</button>
+				<button
+					v-if="$props.mode === 'week'"
+					@click="$emit('fastNext')"
+					:disabled="open"
+					class="btn btn-outline-secondary border-0"
+				>
+					<i class="fa fa-angles-right"></i>
 				</button>
 			</div>
 		</div>

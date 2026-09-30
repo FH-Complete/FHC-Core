@@ -4,7 +4,9 @@ import MyLvPlan from "../../components/Cis/LvPlan/MyLvPlan.js";
 import Mylv from "../../components/Cis/Mylv/MyLv.js";
 import Profil from "../../components/Cis/Profil/Profil.js";
 import Raumsuche from "../../components/Cis/Raumsuche/Raumsuche.js";
+import MyReservation from "../../components/Cis/MyReservation/MyReservation.js";
 import CmsNews from "../../components/Cis/Cms/News.js";
+import NewsAdministration from '../../components/Cis/Cms/NewsAdministration/NewsAdministration.js';
 import CmsContent from "../../components/Cis/Cms/Content.js";
 import Info from "../../components/Cis/Mylv/Semester/Studiengang/Lv/Info.js";
 import RoomInformation, {DEFAULT_MODE_RAUMINFO_DESKTOP, DEFAULT_MODE_RAUMINFO_MOBILE} from "../../components/Cis/Mylv/RoomInformation.js";
@@ -85,6 +87,12 @@ const router = VueRouter.createRouter({
 			path: `/Cis/Raumsuche`,
 			name: 'Raumsuche',
 			component: Raumsuche,
+			props: true
+		},
+		{
+			path: `/Cis/MyReservation`,
+			name: 'MyReservation',
+			component: MyReservation,
 			props: true
 		},
 		{
@@ -171,6 +179,12 @@ const router = VueRouter.createRouter({
 			props: true
 		},
 		{
+			path: `/CisVue/Cms/newsAdministration`,
+			name: 'NewsAdministration',
+			component: NewsAdministration,
+			props: true,
+		},
+		{
 			path: `/Cis/MyLv/:studiensemester?`,
 			name: 'MyLv',
 			component: Mylv,
@@ -212,7 +226,7 @@ const router = VueRouter.createRouter({
 			}
 		},
 		{
-			path: `/Cis/MyLvPlan/:mode?/:focus_date?`,
+			path: `/Cis/MyLvPlan/:mode?/:focus_date?/:range_length?`,
 			name: 'MyLvPlan',
 			component: MyLvPlan,
 			props(route) {
@@ -232,7 +246,7 @@ const router = VueRouter.createRouter({
 			}
 		},
 		{
-      		path: `/Cis/OtherLvPlan/:otherUid/:mode?/:focus_date?`,
+      		path: `/Cis/OtherLvPlan/:otherUid/:mode?/:focus_date?/:range_length?`,
       		name: "OtherLvPlan",
       		component: OtherLvPlan,
       		props(route) {

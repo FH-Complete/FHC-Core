@@ -384,7 +384,7 @@ if (!$berechtigung->isBerechtigt('admin')
 					{
 						$worksheet->write($lines,3,$elem->vorname);
 					}
-					$worksheet->write($lines,4,$elem->semester.$elem->verband.$elem->gruppe);
+					$worksheet->writeString($lines,4,$elem->semester.$elem->verband.$elem->gruppe);
 					$worksheet->write($lines,5,trim($elem->matrikelnr),$fmtNoteImportPkz);
 					$worksheet->write($lines,6, $note, $fmtNoteImportNote);
 

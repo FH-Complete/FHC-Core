@@ -402,7 +402,10 @@ if(isset($_POST['deleteteilgebiet']))
 				DELETE FROM testtool.tbl_antwort
 				WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id)." AND
 				vorschlag_id IN (SELECT vorschlag_id FROM testtool.tbl_vorschlag WHERE frage_id IN
-				(SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id=".$db->db_add_param($_POST['gebiet'])."));";
+				(SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id=".$db->db_add_param($_POST['gebiet'])."));
+				
+				DELETE FROM testtool.tbl_pruefling_gebiet
+				WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id)." AND gebiet_id=".$db->db_add_param($_POST['gebiet']).";";
 
 		if($result = $db->db_query($qry))
 		{
@@ -497,7 +500,8 @@ if(isset($_POST['delete_all']))
 		}
 		//Gebiet loeschen
 		$qry = "DELETE FROM testtool.tbl_pruefling_frage where pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";
-				DELETE FROM testtool.tbl_antwort WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";";
+				DELETE FROM testtool.tbl_antwort WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";
+				DELETE FROM testtool.tbl_pruefling_gebiet WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";";
 
 		if($result = $db->db_query($qry))
 		{

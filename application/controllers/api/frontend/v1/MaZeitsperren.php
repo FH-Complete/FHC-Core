@@ -7,15 +7,15 @@ class MaZeitsperren extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getAllActiveZeitsperren' => self::PERM_LOGGED,
-			'getAllZeitsperrenFixeMa' => self::PERM_LOGGED,
-			'getAllZeitsperrenLector' => self::PERM_LOGGED,
-			'getAllZeitsperrenOes' => self::PERM_LOGGED,
-			'getZeitsperrenAss' => self::PERM_LOGGED,
+			'getAllActiveZeitsperren' => ['basis/mitarbeiter:r', 'admin:r', 'assistenz:r'],
+			'getAllZeitsperrenFixeMa' => ['basis/mitarbeiter:r', 'admin:r', 'assistenz:r'],
+			'getAllZeitsperrenLector' => ['basis/mitarbeiter:r', 'admin:r', 'assistenz:r'],
+			'getAllZeitsperrenOes' => ['basis/mitarbeiter:r', 'admin:r', 'assistenz:r'],
+			'getZeitsperrenAss' => ['basis/mitarbeiter:r', 'admin:r', 'assistenz:r'],
 			'getStgLectors' => self::PERM_LOGGED,
-			'loadZeitsperrenLectorStg' => self::PERM_LOGGED,
-			'loadZeitsperrenMa' => self::PERM_LOGGED,
-			'getDetailsMa' => self::PERM_LOGGED,
+			'loadZeitsperrenLectorStg' => ['basis/mitarbeiter:r', 'admin:r', 'assistenz:r'],
+			'loadZeitsperrenMa' => ['basis/mitarbeiter:r', 'admin:r', 'assistenz:r'],
+			'getDetailsMa' => self::PERM_LOGGED
 		]);
 
 		// Load Libraries

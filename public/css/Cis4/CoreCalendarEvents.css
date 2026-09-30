@@ -59,11 +59,20 @@
 	padding: .25em .5em .25em .25em;
 	margin-inline-end: .25rem;
 }
+.rangePageContainer .calendar-event-default .event-time {
+	display: none !important;
+}
 .weekPageContainer .calendar-event-default .event-text {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-evenly;
 	align-items: center;
+}
+.rangePageContainer .calendar-event-default .event-text {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-evenly;
+	align-items: start;
 }
 .dayPageContainer .calendar-event-default,
 .listPageContainer .calendar-event-default {

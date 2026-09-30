@@ -412,58 +412,59 @@ export default {
 		<h4>{{$p.t('zeitsperren', 'header_zeitsperren')}} ({{uid}})</h4>
 
 			<form-form class="row g-3 mt-3" ref="dataZeitsperre">
-				<div class= "w-50">
-					<div class="row mb-3">
-						<form-input
-							type="select"
-							:class="showInfo ? 'is-info' : ''"
-							name="zeitsperretyp_kurzbz"
-							:label="$capitalize($p.t('person/grund'))"
-							v-model="zeitsperreData.zeitsperretyp_kurzbz"
-							@change="handleStunden"
-						>
-							<option
-								v-for="typ in listTypenZeitsperren"
-								:key="typ.zeitsperretyp_kurzbz"
-								:value="typ.zeitsperretyp_kurzbz"
-								:disabled="typ.zeitsperretyp_kurzbz == 'Urlaub'"
-								>
-								 {{typ.beschreibung}}
-							</option>
-						</form-input>
-						<div v-if="showInfo" class="info-feedback">
-							<strong> Dienstfreistellungen</strong> nur in Absprache mit HR Service eintragen!
-						 </div>
-					</div>
-
-					<div v-if="zeitsperreData.zeitsperretyp_kurzbz == 'DienstV'" class="row mb-3">
-						<form-input
-							type="select"
-							name="beschreibung"
-							:label="$capitalize($p.t('ui/bezeichnung'))"
-							v-model="zeitsperreData.bezeichnung"
-						>
-							<option v-for="(beschreibung, key) in dienstverhinderungen"
-								:key="key"
-								:value="key">{{beschreibung}}
-							</option>
-
-						</form-input>
-					</div>
-					<div v-else class="row mb-3">
-						<form-input
-							type="text"
-							name="beschreibung"
-							:label="$capitalize($p.t('ui/bezeichnung'))"
-							v-model="zeitsperreData.bezeichnung"
-						>
-						</form-input>
-					</div>
-				</div>
-
 				<div>
 					<div class="row">
-						<div class="mb-3 col-2">
+						<div class="col-12 col-md-9 col-lg-6 mb-3">
+							<form-input
+								type="select"
+								:class="showInfo ? 'is-info' : ''"
+								name="zeitsperretyp_kurzbz"
+								:label="$capitalize($p.t('person/grund'))"
+								v-model="zeitsperreData.zeitsperretyp_kurzbz"
+								@change="handleStunden"
+							>
+								<option
+									v-for="typ in listTypenZeitsperren"
+									:key="typ.zeitsperretyp_kurzbz"
+									:value="typ.zeitsperretyp_kurzbz"
+									:disabled="typ.zeitsperretyp_kurzbz == 'Urlaub'"
+									>
+									{{typ.beschreibung}}
+								</option>
+							</form-input>
+							<div v-if="showInfo" class="info-feedback">
+								<strong> Dienstfreistellungen</strong> nur in Absprache mit HR Service eintragen!
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div v-if="zeitsperreData.zeitsperretyp_kurzbz == 'DienstV'" class="col-12 col-md-9 col-lg-6 mb-3">
+							<form-input
+								type="select"
+								name="beschreibung"
+								:label="$capitalize($p.t('ui/bezeichnung'))"
+								v-model="zeitsperreData.bezeichnung"
+							>
+								<option v-for="(beschreibung, key) in dienstverhinderungen"
+									:key="key"
+									:value="key">{{beschreibung}}
+								</option>
+
+							</form-input>
+						</div>
+						<div v-else class="col-12 col-md-9 col-lg-6 mb-3">
+							<form-input
+								type="text"
+								name="beschreibung"
+								:label="$capitalize($p.t('ui/bezeichnung'))"
+								v-model="zeitsperreData.bezeichnung"
+							>
+							</form-input>
+						</div>
+					</div>
+					<div class="row">
+						<div class="mb-3 col-4 col-md-3 col-lg-2">
 							<form-input
 								type="DatePicker"
 								name="vondatum"
@@ -479,7 +480,7 @@ export default {
 							>
 							</form-input>
 						</div>
-						<div class="mb-3 col-1 d-flex align-items-end">
+						<div class="mb-3 col-2 col-lg-1 d-flex align-items-end">
 							<button
 							class="btn btn-outline-secondary"
 							title="Für Bis-Datum übernehmen"
@@ -489,7 +490,7 @@ export default {
 							</button>
 						</div>
 
-						<div class="mb-3 col-3">
+						<div class="mb-3 col-6 col-md-4 col-lg-3">
 							<form-input
 								v-if="!typesHideStunden.includes(zeitsperreData.zeitsperretyp_kurzbz)"
 								type="select"
@@ -532,7 +533,7 @@ export default {
 					</div>
 
 					<div class="row">
-						<div class="mb-3 col-2">
+						<div class="mb-3 col-4 col-md-3 col-lg-2">
 							<form-input
 								type="DatePicker"
 								name="bisdatum"
@@ -548,9 +549,9 @@ export default {
 							>
 							</form-input>
 						</div>
-						<div class="mb-3 col-1"></div>
+						<div class="mb-3 col-2 col-lg-1"></div>
 
-						<div class="mb-3 col-3">
+						<div class="mb-3 col-6 col-md-4 col-lg-3">
 							<form-input
 								v-if="!typesHideStunden.includes(zeitsperreData.zeitsperretyp_kurzbz)"
 								type="select"
@@ -590,8 +591,8 @@ export default {
 
 					</div>
 
-					<div class= "w-50">
-						<div class="row mb-3">
+					<div class= "row">
+						<div class="col-12 col-md-9 col-lg-6 mb-3">
 							<form-input
 								type="autocomplete"
 								name="vertretung_uid"
@@ -610,7 +611,7 @@ export default {
 					</div>
 
 					<div class="row align-items-end">
-						<div class="mb-3 col-4">
+						<div class="mb-3 col-12 col-md-9 col-lg-6">
 							<form-input
 								type="select"
 								name="erreichbarkeit"
@@ -626,23 +627,32 @@ export default {
 								</option>
 							</form-input>
 						</div>
+					</div>
 
-						<div class="mb-3 col-3">
+					<div class="row">
+						<div class="col-12 col-md-9 col-lg-6 d-flex flex-row justify-content-end gap-2">
 							<button
-							  v-if="statusNew"
-							  type="button"
-							  class="btn btn-primary"
-							  @click="saveZeitsperre()">
-							  {{$capitalize($p.t('zeitsperren', 'addZeitsperre'))}}
-							</button>							
-							<button
-							  v-else
-							  type="button"
-							  class="btn btn-warning"
-							  @click="saveZeitsperre(zeitsperreData.zeitsperre_id)">
-							  {{$capitalize($p.t('zeitsperren', 'saveZeitsperre'))}}
+								v-if="statusNew"
+								type="button"
+								class="btn btn-primary"
+								@click="saveZeitsperre()">
+								{{$capitalize($p.t('zeitsperren', 'addZeitsperre'))}}
 							</button>
-						  </div>
+							<template v-else>
+								<button
+									type="button"
+									class="btn btn-secondary"
+									@click="reset()">
+									{{$capitalize($p.t('ui', 'abbrechen'))}}
+								</button>
+								<button
+									type="button"
+									class="btn btn-warning"
+									@click="saveZeitsperre(zeitsperreData.zeitsperre_id)">
+									{{$capitalize($p.t('zeitsperren', 'saveZeitsperre'))}}
+								</button>
+							</template>
+						</div>
 					</div>
 
 				</div>

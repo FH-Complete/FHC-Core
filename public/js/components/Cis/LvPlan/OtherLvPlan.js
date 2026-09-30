@@ -5,6 +5,8 @@ import FhcCalendar from "../../Calendar/LvPlan.js";
 import ApiLvPlan from "../.././../api/factory/lvPlan.js";
 import ApiOtherLvPlan from "../.././../api/factory/otherLvPlan.js";
 import ApiAuthinfo from "../../../api/factory/authinfo.js";
+import ApiStudiensemester from "../../../api/factory/studiensemester.js";
+import ApiBenutzer from "../../../api/factory/benutzer.js";
 
 export const DEFAULT_MODE_LVPLAN_DESKTOP = "Week";
 export const DEFAULT_MODE_LVPLAN_MOBILE = "List";
@@ -36,9 +38,25 @@ export default {
 				photo: "",
 			},
 			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone,
+			semesterRangePresets: [],
 		};
 	},
 	inject: ["isMobile"],
+	provide() {
+		return {
+			rangeLength: Vue.computed(() => {
+				if (!this.$route.params.range_length) return 30;
+				else if (this.$route.params.range_length > 365) return 365;
+				else return this.$route.params.range_length;
+			}),
+			rangeViewPresetsConfig: Vue.computed(() => {
+				return {
+					label: this.$p.t("LvPlan/view_specific_semester"),
+					presets: this.semesterRangePresets,
+				};
+			}),
+		};
+	},
 	computed: {
 		currentDay() {
 			if (
@@ -50,7 +68,11 @@ export default {
 		},
 		currentMode() {
 			let validModes = ["day", "month"];
-			validModes.push(this.isMobile ? "list" : "week");
+			if (!this.isMobile) {
+				validModes.push("week", "range");
+			} else {
+				validModes.push("list");
+			}
 
 			const defaultMode = this.isMobile
 				? DEFAULT_MODE_LVPLAN_MOBILE
@@ -151,10 +173,10 @@ export default {
 		},
 	},
 	methods: {
-		handleChangeDate(day, newMode) {
-			return this.handleChangeMode(newMode, day);
+		handleChangeDate(day, newMode, rangeLength) {
+			return this.handleChangeMode(newMode, day, rangeLength);
 		},
-		handleChangeMode(newMode, day) {
+		handleChangeMode(newMode, day, range_length = null) {
 			const mode = newMode[0].toUpperCase() + newMode.slice(1);
 			const focus_date = day.toISODate();
 
@@ -163,6 +185,7 @@ export default {
 				params: {
 					mode,
 					focus_date,
+					range_length,
 				},
 			});
 		},
@@ -240,15 +263,57 @@ export default {
 				this.$p.t("profil/name_title_clipboard_copy_confirmation"),
 			);
 		},
+		async fetchSemesters() {
+			let userCreatedAt = null;
+			const userResponse = await this.$api.call(
+				ApiBenutzer.getUserData(this.propsViewData.otherUid),
+			);
+			if (
+				userResponse.meta.status === "success" &&
+				userResponse.data[0].insertamum
+			) {
+				userCreatedAt = luxon.DateTime.fromFormat(
+					userResponse.data[0].insertamum.split(" ")[0],
+					"yy-MM-dd",
+				);
+			}
+			const semestersResponse = await this.$api.call(
+				ApiStudiensemester.getAll(),
+			);
+			if (semestersResponse.meta.status === "success") {
+				this.semesterRangePresets = semestersResponse.data
+					.map((semester) => {
+						let startDate = luxon.DateTime.fromISO(semester.start);
+						let endDate = luxon.DateTime.fromISO(semester.ende);
+						return {
+							startDate,
+							endDate,
+							name: semester.studiensemester_kurzbz,
+							description: semester.bezeichnung,
+						};
+					})
+					.filter((semester) => {
+						if (!userCreatedAt) return true;
+
+						return userCreatedAt.ts < semester.endDate.ts;
+					})
+					.sort((semesterA, semesterB) =>
+						semesterA.startDate.ts > semesterB.startDate.ts
+							? -1
+							: 1,
+					);
+			}
+		},
 	},
 	async created() {
 		await this.redirectToMyLvPlanIfAuthUid();
 		await this.fetchViewData();
 		await this.$p.loadCategory(["profil"]);
+		await this.fetchSemesters();
 	},
 	template: /*html*/ `
-    <div class="d-flex flex-column h-100">
-        <h2>
+    <div class="cis-other-lvplan d-flex flex-column h-100">
+        <h2 id="cis-other-lvplan-heading">
             <div class="d-flex flex-row justify-content-between align-items-center">
 			          <span>    
                     {{ $p.t('lehre/stundenplan') + (studiensemester_kurzbz ? " " + studiensemester_kurzbz : "") }}
@@ -272,6 +337,7 @@ export default {
             :get-promise-func="getPromiseFunc"
             :date="currentDay"
             :mode="currentMode"
+			:shouldIncludeRangeMode="true"
             @update:date="handleChangeDate"
             @update:mode="handleChangeMode"
             @update:range="updateRange"
