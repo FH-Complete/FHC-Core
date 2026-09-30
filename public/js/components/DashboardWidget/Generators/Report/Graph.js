@@ -4,6 +4,7 @@ import ReportPicker from '../../../Dashboard/WidgetAdmin/Edit/Report/Picker.js';
 import ReportVars from '../../../Dashboard/WidgetAdmin/Edit/Report/Vars.js';
 import ReportAxis from '../../../Dashboard/WidgetAdmin/Edit/Report/Axis.js';
 import ReportCharts from '../../../Dashboard/WidgetAdmin/Edit/Report/Charts.js';
+import FormInput from '../../../Form/Input.js';
 import BsConfirm from "../../../Bootstrap/Confirm.js";
 
 import ApiReport from '../../../../api/factory/report.js';
@@ -17,6 +18,7 @@ export default {
 		ReportVars,
 		ReportAxis,
 		ReportCharts,
+		FormInput,
 	},
 	props: {
 		modelValue: Object,
@@ -44,6 +46,7 @@ export default {
 			
 			const hasVars = Object.entries(this.modelValue.arguments.vars).length;
 			const hasGraphoptions = this.modelValue.arguments.charts.length;
+			const hasDefaultTitle = this.modelValue.arguments.title == this.getTitleFromPicker();
 
 			if (hasVars || hasGraphoptions) {
 				BsConfirm
@@ -51,7 +54,8 @@ export default {
 					.then(() => {
 						this.modelValue.arguments.statistik_kurzbz = value;
 						this.modelValue.arguments.charts = [];
-						this.modelValue.arguments.title = this.getTitleFromPicker();
+						if (hasDefaultTitle || this.modelValue.arguments.title == '')
+							this.modelValue.arguments.title = this.getTitleFromPicker();
 						this.loadDetails();
 					})
 					.catch(() => {
@@ -59,7 +63,8 @@ export default {
 					});
 			} else {
 				this.modelValue.arguments.statistik_kurzbz = value;
-				this.modelValue.arguments.title = this.getTitleFromPicker();
+				if (hasDefaultTitle || this.modelValue.arguments.title == '')
+					this.modelValue.arguments.title = this.getTitleFromPicker();
 				this.loadDetails();
 			}
 		},
@@ -124,6 +129,11 @@ export default {
 			edit-name
 			edit-size
 			edit-hide-footer
+		/>
+		<form-input
+			v-model="modelValue.arguments.title"
+			:label="$p.t('global/titel')"
+			class="mb-3"
 		/>
 		<report-picker
 			ref="picker"
