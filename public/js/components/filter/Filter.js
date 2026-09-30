@@ -106,6 +106,10 @@ export const CoreFilterCmpt = {
 			type: Array,
 			default: [],
 		},
+		hiddenColumns: {
+			type: Array,
+			default: []
+		}
 	},
 	data: function () {
 		return {
@@ -216,6 +220,7 @@ export const CoreFilterCmpt = {
 
 			return this.$props.tabulatorOptions?.columns
 				?.filter((column) => column.formatter !== "responsiveCollapse")
+				?.filter((column) => !this.hiddenColumns.includes(column.field))
 				.map((column) => column.field) ?? [];
 		},
 		idExtra() {

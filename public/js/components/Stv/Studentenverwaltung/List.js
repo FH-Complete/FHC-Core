@@ -225,7 +225,8 @@ export default {
       isLoading: false,
       progress: -1,
       total: -1,
-      processed: -1
+      processed: -1,
+      hiddenColumns: ['unruly']
     }
   },
   computed: {
@@ -392,7 +393,7 @@ export default {
             prestudent_id: capitalize(this.$p.t("ui/prestudent_id")),
             priorisierung_relativ: capitalize(this.$p.t("lehre/prioritaet")),
             mentor: capitalize(this.$p.t("stv/mentor")),
-            bnaktiv: capitalize(this.$p.t("person/aktiv")),
+            bnaktiv: capitalize(this.$p.t("person/aktiv"))
           };
 
             /** NOTE(chris):
@@ -820,6 +821,7 @@ export default {
         @table-built="translateTabulator"
         :useSelectionSpan="false"
         @headerFilterOn="handleHeaderFilter"
+        :hidden-columns="hiddenColumns"
       >
 
     
