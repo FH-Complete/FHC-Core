@@ -49,6 +49,52 @@ export default{
 				{title: this.$p.t('person', 'nachname'), field:"nachname"},
 				{title: this.$p.t('person', 'vorname'), field:"vorname"},
 				{title: this.$p.t('person', 'uid'), field:"mitarbeiter_uid"},
+				{title: this.$p.t('global/insertvon'), field: 'insertvon', visible: false},
+				{
+					title: this.$p.t('global/insertamum'),
+					field: "insertamum",
+					visible: false,
+					formatter: function (cell) {
+						const dateStr = cell.getValue();
+
+						if (!dateStr) return "";
+
+						const date = new Date(dateStr);
+
+						return date.toLocaleString("de-DE", {
+							day: "2-digit",
+							month: "2-digit",
+							year: "numeric",
+							hour: "2-digit",
+							minute: "2-digit",
+							second: "2-digit",
+							hour12: false
+						});
+					}
+				},
+				{title: this.$p.t('global/updatevon'), field: 'updatevon', visible: false},
+				{
+					title: this.$p.t('global/updateamum'),
+					field: "updateamum",
+					visible: false,
+					formatter: function (cell) {
+						const dateStr = cell.getValue();
+
+						if (!dateStr) return "";
+
+						const date = new Date(dateStr);
+
+						return date.toLocaleString("de-DE", {
+							day: "2-digit",
+							month: "2-digit",
+							year: "numeric",
+							hour: "2-digit",
+							minute: "2-digit",
+							second: "2-digit",
+							hour12: false
+						});
+					}
+				},
 				{title: this.$p.t('lehre', 'lehreinheit_id'), field:"lehreinheit_id"},
 				{
 					title: this.$p.t('lehre', 'verplant'),
@@ -102,7 +148,7 @@ export default{
 				selectable: true,
 				selectableRangeMode: 'click',
 				selectableRows:1,
-				persistenceID: 'lehrveranstaltungen_lektor_table_2025_05_27_v1',
+				persistenceID: 'lehrveranstaltungen_lektor_table_2026_09_11_v1',
 		}},
 	},
 	mounted(){
