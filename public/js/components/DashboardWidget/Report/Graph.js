@@ -1,4 +1,5 @@
 import AbstractWidget from '../Abstract.js';
+import ReportError from './Error/Error.js';
 import ConfigGraph from './Config/Graph.js';
 import FhcChart from '../../Chart/FhcChart.js';
 
@@ -9,6 +10,7 @@ import ApiReport from '../../../api/factory/report.js';
 export default {
 	name: "WidgetsReportGraph",
 	components: {
+		ReportError,
 		ConfigGraph,
 		FhcChart,
 	},
@@ -223,24 +225,7 @@ export default {
 	},
 	template: /*html*/ `
 	<div class="widgets-report-graph w-100 h-100 d-flex flex-column justify-content-center align-items-center">
-		<div
-			v-if="hasErrors === true"
-			class="alert alert-danger m-0 h-100 w-100 border-0 rounded-0 d-flex justify-content-center align-items-center"
-		>
-			{{ $p.t('ui/errorConfigFehlt') }}
-		</div>
-		<template v-else-if="hasErrors">
-			<template v-for="error in hasErrors" :key="error">
-				<div v-if="error.message" class="alert alert-danger mx-1">
-					{{ error.message }}
-				</div>
-				<template v-else-if="error.messages">
-					<div v-for="msg in error.messages" :key="msg" class="alert alert-danger mx-1">
-						{{ msg }}
-					</div>
-				</template>
-			</template>
-		</template>
+		<report-error v-if="hasErrors" :errors="hasErrors" />
 		<template v-else-if="chartSetup !== false">
 			<fhc-chart ref="chart" :chart-options="chartSetup" />
 		</template>
