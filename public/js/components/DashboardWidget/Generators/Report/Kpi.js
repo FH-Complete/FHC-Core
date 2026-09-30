@@ -90,7 +90,7 @@ export default {
 					name: '',
 					width: 1,
 					height: 1,
-					hideFooter: true,
+					hideFooter: false,
 				},
 				arguments: {
 					statistik_kurzbz: '',
