@@ -21,11 +21,23 @@ export default {
 	},
 	data() {
 		return {
+			calledVars: {},
 			data: undefined,
 			hasErrors: false,
 		};
 	},
 	computed: {
+		activeLabel() {
+			if (!this.activeAggregator.label)
+				return '';
+
+			return this.activeAggregator.label.replace(
+				/\{\s*([^\}]+)\s*\}/g,
+				(match, key) => this.calledVars[key] === undefined
+					? match
+					: this.calledVars[key]
+			);
+		},
 		activeAggregator() {
 			if (this.config.aggregators.length == 1)
 				return this.config.aggregators[0];
@@ -128,6 +140,8 @@ export default {
 				}
 			}
 
+			this.calledVars = vars;
+
 			try {
 				const result = await this.$api.call(
 					ApiReport.get(this.config.statistik_kurzbz, vars),
@@ -177,7 +191,7 @@ export default {
 		<report-error v-if="hasErrors" :errors="hasErrors" />
 		<template v-else-if="kpi !== false">
 			<div class="h1 text-center">{{ kpi }}</div>
-			<small>{{ activeAggregator.label }}</small>
+			<small>{{ activeLabel }}</small>
 		</template>
 		<i v-else class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 	</div>
