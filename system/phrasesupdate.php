@@ -35963,6 +35963,26 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
+		'phrase' => 'errorEntUploadDeadlinePassed',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Frist zum Nachreichen ist am {deadline} abgelaufen. Sie können ein Dokument bis zu {workdays} Werktage nach dem Erstellen der Entschuldigung hochladen. Wenn Sie Fragen haben, wenden Sie sich an Ihre Studiengangsassistenz.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The deadline to upload a document ended on {deadline}. You can upload a document up to {workdays} workdays after you create the excuse note. If you have questions, contact your study program assistant.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
 		'phrase' => 'entUploadAllowedFiletypes',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -62533,6 +62553,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 			array(
 				'sprache' => 'English',
 				'text' => 'More than one student account',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwLegendeKeinEintrag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Eintrag: Die Person war bei dieser Kontrolle nicht der Gruppe zugeteilt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No entry: the student was not in the group at the time of this check',
 				'description' => '',
 				'insertvon' => 'system'
 			)
