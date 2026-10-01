@@ -106,6 +106,13 @@ export const CoreFilterCmpt = {
 			type: Array,
 			default: [],
 		},
+		// fields of the columns a preset is allowed to handle. Give the constant
+		// columns here if the table builds dynamic columns at runtime. An empty
+		// array gives the preset every column of the table.
+		presetColumns: {
+			type: Array,
+			default: [],
+		},
 	},
 	data: function () {
 		return {
@@ -942,6 +949,10 @@ export const CoreFilterCmpt = {
 				return res;
 			}, {});
 		},
+		isColumnInPresetScope(columnField) {
+			if (!this.$props.presetColumns.length) return true;
+			return this.$props.presetColumns.includes(columnField);
+		},
 		afterTablePresetApplied(preset) {
 			this.selectedFields = [...preset.displayedColumns];
 			this.appliedPreset = { ...preset };
@@ -973,6 +984,7 @@ export const CoreFilterCmpt = {
 
 			const displayedColumns = this.tabulator.columnManager.columns
 				.filter((column) => column.field !== "collapse")
+				.filter((column) => this.isColumnInPresetScope(column.field))
 				.filter((column) => column.visible)
 				.map((column) => column.field);
 
@@ -1029,12 +1041,13 @@ export const CoreFilterCmpt = {
 			});
 
 			const activeSort = this.tabulator.getSorters()[0];
-			const sort = activeSort
-				? {
-						column: activeSort.field,
-						direction: activeSort.dir,
-					}
-				: null;
+			const sort =
+				activeSort && this.isColumnInPresetScope(activeSort.field)
+					? {
+							column: activeSort.field,
+							direction: activeSort.dir,
+						}
+					: null;
 			if (
 				sort?.column !== this.appliedPreset.sort?.column ||
 				sort?.direction !== this.appliedPreset.sort?.direction
@@ -1148,6 +1161,7 @@ export const CoreFilterCmpt = {
 				:presetsId="$props.presetsId"
 				:tabulator="tabulator"
 				:generalPresets="$props.generalPresets"
+				:presetColumns="$props.presetColumns"
 				ref="tablePresets"
 				class="card-body collapse"
 			></table-presets>

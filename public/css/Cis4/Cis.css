@@ -840,8 +840,11 @@ html {
 	color: var(--fhc-light);
 }
 
+/* the bootstrap opacity 0.5 reaches 2.9:1 on the blue header, 0.75 reaches 4.5:1 (WCAG 1.4.11) */
 #cis-main .modal-header .btn-close{
 	filter: invert(1);
+	--bs-btn-close-opacity: 0.75;
+	--bs-btn-close-hover-opacity: 1;
 }
 
 #cis-main .modal-footer {

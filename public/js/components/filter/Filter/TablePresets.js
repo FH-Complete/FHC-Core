@@ -26,6 +26,9 @@ export default {
 		presetsId: { type: String },
 		tabulator: { type: Object },
 		generalPresets: { type: Array, default: [] },
+		// fields of the columns the preset is allowed to handle. An empty array
+		// gives the preset every column of the table.
+		presetColumns: { type: Array, default: [] },
 	},
 	emits: ["tablePresetApplied"],
 	data: function () {
@@ -162,6 +165,10 @@ export default {
 		},
 	},
 	methods: {
+		isInPresetScope(columnField) {
+			if (!this.$props.presetColumns.length) return true;
+			return this.$props.presetColumns.includes(columnField);
+		},
 		getPresetIndex() {
 			return this.presetIndexBeingApplied;
 		},
@@ -227,9 +234,9 @@ export default {
 			}
 		},
 		generateNewPreset() {
-			const columns = this.tabulator.columnManager.columns.filter(
-				(column) => column.field !== "collapse",
-			);
+			const columns = this.tabulator.columnManager.columns
+				.filter((column) => column.field !== "collapse")
+				.filter((column) => this.isInPresetScope(column.field));
 
 			const displayedColumns = columns
 				.filter((column) => column.visible)
@@ -251,12 +258,13 @@ export default {
 			);
 
 			const activeSort = this.tabulator.getSorters()[0];
-			const sort = activeSort
-				? {
-						column: activeSort.field,
-						direction: activeSort.dir,
-					}
-				: null;
+			const sort =
+				activeSort && this.isInPresetScope(activeSort.field)
+					? {
+							column: activeSort.field,
+							direction: activeSort.dir,
+						}
+					: null;
 
 			this.newPreset = {
 				displayedColumns,
@@ -325,8 +333,11 @@ export default {
 					preset.displayedColumns.length;
 				preset.displayedColumns = preset.displayedColumns.filter(
 					(columnField) => {
-						return validColumns.some(
-							(column) => column.field === columnField,
+						return (
+							this.isInPresetScope(columnField) &&
+							validColumns.some(
+								(column) => column.field === columnField,
+							)
 						);
 					},
 				);
@@ -365,10 +376,11 @@ export default {
 
 			if (preset.sort) {
 				if (
+					!this.isInPresetScope(preset.sort.column) ||
 					!validColumns.some(
 						(column) =>
 							column.field === preset.sort.column &&
-							column.headerSort,
+							column.headerSort !== false,
 					)
 				) {
 					preset.sort = null;
@@ -407,7 +419,10 @@ export default {
 				window.localStorage["tabulatorPreset-" + this.$props.presetsId] =
 					preset.id ? "custom:" + preset.id : "general:" + preset.name;
 	
-				this.$props.tabulator.modules.tablePresets.applyPreset(preset);
+				this.$props.tabulator.modules.tablePresets.applyPreset(
+					preset,
+					this.$props.presetColumns,
+				);
 				
 				this.$emit("tablePresetApplied", { preset });
 	
