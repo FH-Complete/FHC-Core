@@ -91,10 +91,10 @@ export default {
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-8">
+			<div class="col-6">
 				<noten-zeugnis ref="zeugnis" :id="modelValue.prestudent_id" :all-semester="!!stdsem" :endpoint="endpoint" @loaded="onZeugnisLoaded"></noten-zeugnis>
 			</div>
-			<div class="col-4">
+			<div class="col-6">
 				<noten-teacher ref="teacher" :id="modelValue.prestudent_id" :endpoint="endpoint" :all-semester="!!stdsem" @copied="reload" @loaded="onTeacherLoaded"></noten-teacher>
 				<noten-repeater class="mt-4" ref="repeater" :student="modelValue" :all-semester="!!stdsem" @copied="reload"></noten-repeater>
 			</div>

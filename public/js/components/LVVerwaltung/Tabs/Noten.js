@@ -108,7 +108,7 @@ export default {
 			</select>
 		</div>
 		<div class="row">
-			<div class="col-8">
+			<div class="col-6">
 				<noten-zeugnis 
 					ref="zeugnis" 
 					:id="modelValue.lehrveranstaltung_id"
@@ -117,7 +117,7 @@ export default {
 					:optionalTabulatorOptions="tabulatorOptionsZeugnis"
 					@loaded="onZeugnisLoaded"/>
 			</div>
-			<div class="col-4">
+			<div class="col-6">
 				<noten-teacher 
 					ref="teacher"
 					:id="modelValue.lehrveranstaltung_id"
