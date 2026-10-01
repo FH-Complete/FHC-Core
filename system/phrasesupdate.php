@@ -20072,6 +20072,26 @@ array(
 	array(
 		'app' => 'international',
 		'category' => 'international',
+		'phrase' => 'massnahmeneinmalig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Diese Maßnahme ist nur einmalig planbar.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This measure may only be planned once.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
 		'phrase' => 'alleStudierendeJetzt',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -20852,6 +20872,26 @@ array(
 	array(
 		'app' => 'international',
 		'category' => 'international',
+		'phrase' => 'personenMassnahmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'alle Maßnahmen der Personen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => ' all measures of the people',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
 		'phrase' => 'wenigerbestaetigt',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -20924,6 +20964,46 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Add measure',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'einmalig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur einmal planbar',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'One-time only',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'erroreinmalig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Diese Maßnahme kann nur einmal geplant werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This measure can only be planned once.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -29618,6 +29698,26 @@ array(
 				array(
 					'sprache' => 'English',
 					'text' => 'The FH ID card was issued on {0}',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'fhAusweisStatusNichtAusgegeben',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Der FH Ausweis wurde noch nicht ausgegeben.',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'The FH ID card has not been issued yet.',
 					'description' => '',
 					'insertvon' => 'system'
 				)
@@ -48858,6 +48958,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
+		'phrase' => 'c4termineTimeLine',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zeitstrahl Termine',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Timeline Deadlines',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
 		'phrase' => 'c4noZuordnungBetreuerStudent',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -49855,6 +49975,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Identifier',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'widget_missing_permission',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ihnen fehlt die erforderliche Berechtigung, um dieses Widget anzuzeigen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You do not have the permission required to display this widget.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -63431,6 +63571,68 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'info_deleteMarkEntry',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Noteneintrag entfernen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Remove grade entry',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// ### Infocenter Onboarding START
+	array(
+		'app' => 'core',
+		'category' => 'infocenter',
+		'phrase' => 'onboardingRegistriert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Über ElectronicOnboarding registriert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Registered with Electronic Onboarding',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'infocenter',
+		'phrase' => 'ersterOnboardingLogin',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erster Electronic Onboarding Login',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'First Electronic Onboarding Login',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	)
+	// ### Infocenter Onboarding END
 );
 
 
