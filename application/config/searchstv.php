@@ -5,6 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 $CI =& get_instance();
 
+#$config['LIMIT'] = 1000;
 
 $config['student'] = $CI->config->item('student', 'search');
 $config['student']['searchfields']['pkz'] = [

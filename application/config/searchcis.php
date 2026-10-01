@@ -5,6 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 $CI =& get_instance();
 
+$config['LIMIT'] = 100;
 
 $config['employee'] = $CI->config->item('employee', 'search');
 $config['employee']['resultjoin'] = "

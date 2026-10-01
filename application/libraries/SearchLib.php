@@ -109,6 +109,9 @@ class SearchLib
 			$types = $tmp;
 		}
 
+		// LIMIT is never a type it's a reserved config
+		if(isset($types['LIMIT']))
+			unset($types['LIMIT']);
 
 		// Convert searchstring into array
 		list($searchArray, $searchstring) = $this->_convertQuery($searchstring, $types);
@@ -272,13 +275,16 @@ class SearchLib
 			SELECT " . $this->_ci->db->escape(getAuthUID()) . " AS uid
 		)");
 
+		$limit = $this->_ci->config->item('LIMIT', 'search') ?: "";
+		if ($limit)
+			$limit = " LIMIT " . $limit;
+		
 		return success("
 			WITH " . $recursive . implode(", ", $with) . "
 			SELECT *
 			FROM (" . implode(" UNION ", $selects) . ") q
 			ORDER BY rank DESC
-			LIMIT 100
-		");
+		" . $limit);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
