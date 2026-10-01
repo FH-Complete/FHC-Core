@@ -124,8 +124,6 @@ export default {
 			const studiengang_kz = this.studiengang_kz || '';
 			const studiensemester = this.selectedStudiensemester;
 			const semester = this.semester || '';
-			const uid = this.emp || '';
-
 
 			extraItems.push(
 				{
@@ -150,25 +148,8 @@ export default {
 							description: 'lehre/lehrauftragsliste',
 							requires: ['studiengang_kz']
 						},
-						{
-							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
-								+ 'content/pdfExport.php?xml=lehrauftrag.xml.php'
-								+ '&xsl=Lehrauftrag'
-								+ '&stg_kz=' + studiengang_kz
-								+ '&ss=' + studiensemester,
-							description: 'lehre/lehrauftraege',
-							requires: ['studiengang_kz']
-						},
-						{
-							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
-								+ 'content/pdfExport.php?xml=lehrauftrag.xml.php'
-								+ '&xsl=Lehrauftrag'
-								+ '&stg_kz=' + studiengang_kz
-								+ '&ss=' + studiensemester
-								+ '&uid=' + uid,
-							description: 'lehre/lehrauftragslisteemp',
-							requires: ['emp']
-						}
+						this.lehrauftragLink,
+						this.lehrauftragEmpLink,
 					]
 				},
 				{
@@ -181,6 +162,33 @@ export default {
 			);
 
 			return extraItems;
+		},
+		lehrauftragLink()
+		{
+			return {
+				link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+					+ 'content/pdfExport.php?xml=lehrauftrag.xml.php'
+					+ '&xsl=Lehrauftrag'
+					+ '&stg_kz=' +  (this.studiengang_kz || '')
+					+ '&ss=' + this.selectedStudiensemester,
+				description: 'lehre/lehrauftraege',
+				requires: ['studiengang_kz'],
+				shortDescription: 'F9'
+			}
+		},
+		lehrauftragEmpLink()
+		{
+			return {
+				link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+					+ 'content/pdfExport.php?xml=lehrauftrag.xml.php'
+					+ '&xsl=Lehrauftrag'
+					+ '&stg_kz=' + (this.studiengang_kz || '')
+					+ '&ss=' + this.selectedStudiensemester
+					+ '&uid=' + (this.emp || ''),
+				description: 'lehre/lehrauftragslisteemp',
+				requires: ['emp'],
+				shortDescription: 'F9'
+			}
 		}
 	},
 
@@ -253,6 +261,7 @@ export default {
 					params
 				});
 			}
+			this.studiengang_kz = '';
 		},
 		searchfunction(params, config) {
 			return this.$api.call(ApiSearchbar.search(params), config);
@@ -292,7 +301,25 @@ export default {
 
 			return item.requires.some(req => !values[req]);
 
-		}
+		},
+		handleKeydown(event)
+		{
+			if (event.key !== 'F9' || event.repeat)
+				return;
+
+			event.preventDefault();
+			if (this.emp && !this.isDisabled(this.lehrauftragEmpLink))
+				window.open(this.lehrauftragEmpLink.link, '_blank');
+			else if (!this.isDisabled(this.lehrauftragLink))
+				window.open(this.lehrauftragLink.link, '_blank');
+		},
+	},
+	mounted()
+	{
+		document.addEventListener('keydown', this.handleKeydown)
+	},
+	beforeUnmount() {
+		document.removeEventListener('keydown', this.handleKeydown);
 	},
 	created() {
 		if (!this.$route.params.stdsem) {
@@ -437,8 +464,11 @@ export default {
 											v-for="(child, childKey) in item.children"
 											:key="childKey"
 										>
-											<a class="dropdown-item" :href="child.link" target="_blank" :class="{ disabled: isDisabled(child) }">
-												{{ $p.t(child.description) }}
+											<a class="dropdown-item d-flex justify-content-between align-items-center" :href="child.link" target="_blank" :class="{ disabled: isDisabled(child) }">
+												{{ $p.t(child.description) }} 
+												 <small v-if="child.shortDescription" class="text-muted ms-3">
+													{{ child.shortDescription }}
+												</small>
 											</a>
 										</li>
 									</ul>
