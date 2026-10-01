@@ -100,7 +100,7 @@ export default {
 		this.$api
 			.call(ApiStvGrades.list())
 			.then(result => {
-				this.grades = result.data;
+				this.grades = result.data.map(grade => ({...grade, bezeichnung: this.$capitalize(grade.bezeichnung)}));
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},

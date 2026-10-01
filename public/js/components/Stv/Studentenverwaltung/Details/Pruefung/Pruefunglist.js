@@ -80,7 +80,7 @@ export default{
 							});
 						}},
 					{title: "Lehrveranstaltung", field: "lehrveranstaltung_bezeichnung"},
-					{title: "Note", field: "note_bezeichnung"},
+					{title: "Note", field: "note_bezeichnung", formatter: cell => this.$capitalize(cell.getValue())},
 					{title: "Anmerkung", field: "anmerkung"},
 					{title: "Typ", field: "pruefungstyp_kurzbz"},
 					{title: "PruefungId", field: "pruefung_id", visible: false},
@@ -516,7 +516,7 @@ export default{
 						:value="note.note"
 						:disabled="!note.aktiv"
 						>
-						{{ note.bezeichnung }}
+						{{ $capitalize(note.bezeichnung) }}
 					</option>
 				</form-input>
 		

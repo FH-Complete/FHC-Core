@@ -82,13 +82,13 @@ export default {
 		tabulatorOptions() {
 			const listPromise = this.$api
 				.call(this.endpoint.list())
-				.then(res => res.data.map(({bezeichnung: label, note: value}) => ({label, value})));
+				.then(res => res.data.map(({bezeichnung, note: value}) => ({label: this.$capitalize(bezeichnung), value})));
 
 			let gradeField = {
 				field: 'note',
 				title: this.$p.t('lehre/note'),
-				formatter: cell => cell.getData().note_bezeichnung,
-				tooltip: (evt, cell) => cell.getData().note_bezeichnung
+				formatter: cell => this.$capitalize(cell.getData().note_bezeichnung),
+				tooltip: (evt, cell) => this.$capitalize(cell.getData().note_bezeichnung)
 			};
 			if (['both', 'inline'].includes(this.config.edit)) {
 				gradeField.editor = 'list';

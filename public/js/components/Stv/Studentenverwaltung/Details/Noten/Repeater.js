@@ -38,7 +38,7 @@ export default {
 				},
 				columns: [
 					{ field: 'lv_bezeichnung', title: this.$p.t('lehre/lehrveranstaltung') },
-					{ field: 'note_bezeichnung', title: this.$p.t('lehre/note') },
+					{ field: 'note_bezeichnung', title: this.$p.t('lehre/note'), formatter: cell => this.$capitalize(cell.getValue()) },
 					{ field: 'insertvon', title: this.$p.t('profil/mitarbeiterIn'), visible: false },
 					{ field: 'benotungsdatum', title: this.$p.t('stv/grades_gradingdate'), visible: false,
 						formatter: function (cell) {

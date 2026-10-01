@@ -58,12 +58,9 @@ class Grades extends FHCAPI_Controller
 	 */
 	public function list()
 	{
-		$this->load->model('codex/Note_model', 'NoteModel');
+		$this->load->model('education/Note_model', 'NoteModel');
 
-		$this->NoteModel->addOrder('notenwert', 'ASC');
-		$this->NoteModel->addOrder('bezeichnung', 'ASC');
-		
-		$result = $this->NoteModel->load();
+		$result = $this->NoteModel->getAll();
 
 		$grades = $this->getDataOrTerminateWithError($result);
 		

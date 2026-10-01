@@ -1,5 +1,6 @@
 import LVVerwaltung from "../components/LVVerwaltung/LVVerwaltung.js";
 import Phrasen from "../plugins/Phrasen.js";
+import {capitalize} from "../helpers/StringHelpers.js";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
@@ -33,6 +34,8 @@ FhcApps.router.makeExtendable(router);
 const app = Vue.createApp({
 	name: 'LvVwApp'
 });
+
+app.config.globalProperties.$capitalize = capitalize;
 
 FhcApps.makeExtendable(app);
 

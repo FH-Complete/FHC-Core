@@ -344,8 +344,7 @@ class Pruefung extends FHCAPI_Controller
 	{
 		$this->load->model('education/Note_model', 'NoteModel');
 
-		$this->NoteModel->addOrder('note', 'ASC');
-		$result = $this->NoteModel->load();
+		$result = $this->NoteModel->getAll();
 
 		if (isError($result)) {
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);

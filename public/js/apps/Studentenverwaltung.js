@@ -19,6 +19,7 @@ import FhcStudentenverwaltung from "../components/Stv/Studentenverwaltung.js";
 import fhcapifactory from "./api/fhcapifactory.js";
 
 import PluginsPhrasen from "../plugins/Phrasen.js";
+import {capitalize} from "../helpers/StringHelpers.js";
 
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
@@ -76,6 +77,8 @@ FhcApps.router.makeExtendable(router);
 const app = Vue.createApp({
 	name: 'StudVwApp'
 });
+
+app.config.globalProperties.$capitalize = capitalize;
 
 FhcApps.makeExtendable(app);
 

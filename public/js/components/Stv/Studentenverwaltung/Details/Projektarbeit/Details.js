@@ -439,7 +439,7 @@ export default {
 							:key="note.note"
 							:value="note.note"
 							>
-							{{note.bezeichnung}}
+							{{$capitalize(note.bezeichnung)}}
 						</option>
 					</form-input>
 					<div class="col-4">
