@@ -36,7 +36,8 @@ class Ort extends FHCAPI_Controller
 			'ContentID' => self::PERM_LOGGED,
 			'getOrtKurzbzContent' => self::PERM_LOGGED,
 			'getRooms' => self::PERM_LOGGED,
-			'getTypes' => self::PERM_LOGGED
+			'getTypes' => self::PERM_LOGGED,
+			'getStandorte' => self::PERM_LOGGED
 		]);
 
 		$this->load->model('ressource/Ort_model', 'OrtModel');
@@ -56,6 +57,7 @@ class Ort extends FHCAPI_Controller
 		$this->form_validation->set_rules('datum','Datum','required');
 		$this->form_validation->set_rules('von','Uhrzeit Von','required|regex_match[/^[0-9]{2}:[0-9]{2}$/]');
 		$this->form_validation->set_rules('bis','Uhrzeit Bis','required|regex_match[/^[0-9]{2}:[0-9]{2}$/]');
+		$this->form_validation->set_rules('standort_id','Standort','integer');
 		if($this->form_validation->run() == FALSE) {
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
@@ -65,6 +67,7 @@ class Ort extends FHCAPI_Controller
 		$bis = $this->input->get('bis', TRUE);
 		$typ = $this->input->get('typ', TRUE);
 		$personenanzahl = $this->input->get('personenanzahl', TRUE);
+		$standort_id = $this->input->get('standort_id', TRUE);
 		
 		
 		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
@@ -75,14 +78,22 @@ class Ort extends FHCAPI_Controller
 		$bisStunde = getData($this->StundeModel->getStundeForTime($bis))[0]->stunde;
 		
 		$params = array();
-		$qry = "SELECT DISTINCT tbl_ort.*
+		// a leading _ in ort_kurzbz or planbezeichnung marks a dummy room
+		$qry = "SELECT DISTINCT tbl_ort.*, tbl_standort.bezeichnung AS standort
 			FROM public.tbl_ort JOIN public.tbl_ortraumtyp USING(ort_kurzbz)
-			WHERE aktiv AND lehre AND ort_kurzbz NOT LIKE '\\\\_%'";
+			LEFT JOIN public.tbl_standort USING(standort_id)
+			WHERE aktiv AND lehre AND left(ort_kurzbz, 1) <> '_'
+			AND (planbezeichnung IS NULL OR left(planbezeichnung, 1) <> '_')";
 		if($typ) {
 			$params[] = $typ;
 			$qry.= "AND raumtyp_kurzbz = ?";
 		}
 		
+		if($standort_id) {
+			$params[] = $standort_id;
+			$qry.= " AND standort_id = ?";
+		}
+
 		if(!$isMitarbeiter) { // students are only allowed to get a subset defined by config
 			$qry.= ' AND raumtyp_kurzbz IN ?';
 			$params[] = $this->config->item('roomtypes_student');
@@ -127,6 +138,22 @@ class Ort extends FHCAPI_Controller
 		$this->terminateWithSuccess(getData($result));
 	}
 	
+	/**
+	 * Standorte of the rooms that pass the base filter of getRooms
+	 */
+	public function getStandorte()
+	{
+		$qry = "SELECT DISTINCT standort_id, tbl_standort.bezeichnung
+			FROM public.tbl_ort JOIN public.tbl_standort USING(standort_id)
+			WHERE aktiv AND lehre AND left(ort_kurzbz, 1) <> '_'
+			AND (planbezeichnung IS NULL OR left(planbezeichnung, 1) <> '_')
+			ORDER BY tbl_standort.bezeichnung";
+
+		$result = $this->OrtModel->execReadOnlyQuery($qry);
+
+		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result));
+	}
+
 	/**
 	 * Gets a JSON body via HTTP POST and provides the parameters
 	 */

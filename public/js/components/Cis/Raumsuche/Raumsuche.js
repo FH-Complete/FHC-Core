@@ -23,6 +23,8 @@ export const Raumsuche =  {
 			},
 			anzahl: 1,
 			selectedType: null,
+			standorte: null,
+			standort_id: null,
 			datum: new Date(),
 			von: Vue.ref({
 				hours: new Date().getHours(),
@@ -55,6 +57,7 @@ export const Raumsuche =  {
 					{title: Vue.computed(() => this.$p.t('rauminfo/raum_kurzbz')), field: 'ort_kurzbz', widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('global/bezeichnung')), field: 'bezeichnung', widthGrow: 2},
 					{title: Vue.computed(() => this.$p.t('rauminfo/raumnummer')), field: 'nummer', widthGrow: 1},
+					{title: Vue.computed(() => this.$p.t('rauminfo/standort')), field: 'standort', widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('rauminfo/personcap')), field: 'personen', widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('rauminfo/rauminfo')),
 						field: 'linkInfo', formatter: this.linkFormatter, widthGrow: 1},
@@ -115,6 +118,7 @@ export const Raumsuche =  {
 					ort_kurzbz: room.ort_kurzbz,
 					bezeichnung: room.bezeichnung.replace('&amp;', '&'),
 					nummer: room.planbezeichnung,
+					standort: room.standort,
 					personen: room.max_person,
 					linkInfo: room.content_id ? this.roomInfoLink(room) : null,
 					linkRes: this.roomPlanLink(room)
@@ -135,8 +139,14 @@ export const Raumsuche =  {
 				this.roomtypes = res?.data ?? []
 			})
 		},
+		loadStandorte() {
+			this.$api.call(ApiOrt.getStandorte())
+				.then(res => {
+					this.standorte = res?.data ?? []
+				})
+		},
 		loadRooms() {
-			this.$api.call(ApiOrt.getRooms(this.datum.toISOString(), this.getTimeString(this.von), this.getTimeString(this.bis), this.selectedType?.raumtyp_kurzbz ?? '', this.anzahl))
+			this.$api.call(ApiOrt.getRooms(this.datum.toISOString(), this.getTimeString(this.von), this.getTimeString(this.bis), this.selectedType?.raumtyp_kurzbz ?? '', this.anzahl, this.standort_id))
 				.then(res => {
 					if(res?.data?.retval) this.setupData(res.data.retval)
 			})
@@ -167,6 +177,7 @@ export const Raumsuche =  {
 			await this.tableBuiltPromise
 			
 			this.loadRoomTypes()
+			this.loadStandorte()
 			this.loadRooms()
 
 			const tableID = this.tabulatorUuid ? ('-' + this.tabulatorUuid) : ''
@@ -235,23 +246,30 @@ export const Raumsuche =  {
 			</VueDatePicker>
 		</div>
 		
-		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-3">
+		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-2">
 			<select ref="raumtyp" id="raumtypSelect" v-model="selectedType" class="form-select" 
-			:aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setRoute($event.target.value)">
+			:aria-label="$p.t('rauminfo/raumtyp')" @change="setRoute($event.target.value)">
 				<option :key="defaultType" selected :value="defaultType">{{defaultType.beschreibung}}</option>
 				<option v-for="typ in roomtypes" :key="typ" :value="typ">{{typ.beschreibung}}</option>
 			</select>
 		</div>
+
+		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-2">
+			<select id="standortSelect" v-model="standort_id" class="form-select" :aria-label="$p.t('rauminfo/standort')">
+				<option :value="null">{{ $p.t('rauminfo/alleStandorte') }}</option>
+				<option v-for="standort in standorte" :key="standort.standort_id" :value="standort.standort_id">{{ standort.bezeichnung }}</option>
+			</select>
+		</div>
 		
 
-		<div :class="{'pb-2': isMobile}" class="col-12 col-lg-3">
+		<div :class="{'pb-2': isMobile}" class="col-12 col-lg">
 			<InputNumber v-model="anzahl" 
 			:prefix="$p.t('rauminfo/minCapacity') + ': '" 
 			inputId="anzahlInput" :min="1" :max="1000" 
 			:style="{'width': '100%'}"
 			/>
 		</div>
-		<div class="col-12 col-lg-2">
+		<div class="col-12 col-lg-auto">
 			<button class="btn btn-primary border-0" @click="search">{{ $p.t('rauminfo/roomSearch') }} <i class="fa fa-magnifying-glass"></i></button>
 		</div>
 	</div>
