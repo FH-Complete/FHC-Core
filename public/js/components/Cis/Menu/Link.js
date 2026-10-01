@@ -40,10 +40,10 @@ export default {
 		}
 	},
 	template: `
-		<router-link v-if="resolvedRoute !== null" :to="resolvedRoute">
+		<router-link v-if="resolvedRoute !== null" :to="resolvedRoute" draggable="false">
 			<slot></slot>
 		</router-link>
-		<a v-else :href="href">
+		<a v-else :href="href" draggable="false">
 			<slot></slot>
 		</a>
 	`

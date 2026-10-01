@@ -183,16 +183,18 @@ export default {
 			</button>
 		</div>
 		<ul v-if="hasChilds" ref="children" class="nav w-100 collapse" >
-			<cis-menu-entry
-				v-for="child in entry.childs"
-				:key="child"
-				:highestMatchingUrlCount="highestMatchingUrlCount"
-				:activeContent="activeContent"
-				:entry="child"
-				:level="level + 1"
-				:openMenuHierarchy="$props.openMenuHierarchy.slice(1)"
-				:precedingMenuHierarchy="menuHierarchy"
-			/>
+			<li>
+				<cis-menu-entry
+					v-for="child in entry.childs"
+					:key="child"
+					:highestMatchingUrlCount="highestMatchingUrlCount"
+					:activeContent="activeContent"
+					:entry="child"
+					:level="level + 1"
+					:openMenuHierarchy="$props.openMenuHierarchy.slice(1)"
+					:precedingMenuHierarchy="menuHierarchy"
+				/>
+			</li>
 		</ul>
     </template>`
 };
