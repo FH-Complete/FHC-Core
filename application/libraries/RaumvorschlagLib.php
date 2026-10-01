@@ -552,7 +552,7 @@ class RaumvorschlagLib
 			$this->_ci->OrtModel->db->where('reservieren', true);
 
 		$this->_ci->OrtModel->db->where('aktiv', true);
-		$this->_ci->OrtModel->db->where("ort_kurzbz NOT LIKE '\_%'", null, false);
+		$this->_ci->OrtModel->db->where("ort_kurzbz NOT LIKE '\\\\_%'", null, false);
 
 		if (!empty($belegte_orte))
 			$this->_ci->OrtModel->db->where_not_in('ort_kurzbz', $belegte_orte);
