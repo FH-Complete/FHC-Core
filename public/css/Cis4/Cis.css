@@ -854,3 +854,19 @@ html {
 	border-radius: 0.5rem;
 	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
+
+.cis-main-menu {
+	max-width: 100vw;
+}
+
+.cis-main-menu ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.cis-main-menu ul li {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
