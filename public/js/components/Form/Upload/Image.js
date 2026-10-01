@@ -32,7 +32,13 @@ export default {
 			}
 		},
 		deleteImage() {
-			this.$emit('update:modelValue', '');
+			this.$fhcAlert
+				.confirmDelete()
+				.then(result => {
+					if (result) {
+						this.$emit('update:modelValue', '');
+					}
+				});
 		},
 		emitAction(){
 			this.$emit('actionbutton-clicked', this.modelValue);
