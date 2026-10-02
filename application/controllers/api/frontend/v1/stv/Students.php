@@ -837,7 +837,8 @@ class Students extends FHCAPI_Controller
 		foreach ($filter as $item) {
 			if (isset($item['usestdsem']) && $item['usestdsem'])
 				$item['studiensemester_kurzbz'] = $studiensemester_kurzbz;
-			if (!$this->PrestudentModel->addFilter($item)) {
+			
+			if (!$this->studentlistlib->addFilter($item)) {
 				$this->addMeta('addfilter', 'invalid filter: ' . json_encode($item));
 				return;
 			}
