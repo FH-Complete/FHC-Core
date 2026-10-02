@@ -48,7 +48,7 @@ function hf_filterTrueFalse(headerValue, rowValue) {
     return rowValue == "false";
   }
 
-  if ((headerValue = "-")) {
+  if (headerValue === "-") {
     return rowValue == null;
   }
 }
@@ -63,13 +63,13 @@ function func_tableBuilt(table) {
   table.tabulator(
     "addColumn",
     {
-      title: "Details",
+      title: FHC_PhrasesLib.t("global", "details"),
       field: "details",
       align: "center",
       width: 100,
       formatter: "link",
       formatterParams: {
-        label: "Details",
+        label: FHC_PhrasesLib.t("global", "details"),
         url: function (cell) {
           return (
             BASE_URL +
@@ -122,7 +122,7 @@ function func_tooltips(e, cell, onRendered) {
 
   // Return tooltip if row is unselectable
   if (!func_selectableCheck(cell.getRow())) {
-    return FHC_PhrasesLib.t("ui", "nichtSelektierbarAufgrundVon") + "Status";
+    return FHC_PhrasesLib.t("ui", "nichtSelektierbarAufgrundVon") + FHC_PhrasesLib.t("global", "status");
   }
 }
 
@@ -175,7 +175,7 @@ $(function () {
   var canPromise = !!window.Promise;
   if (!canPromise) {
     alert(
-      "Diese Seite kann mit ihrem Browser nicht angezeigt werden. Bitte verwenden Sie Firefox, Chrome oder Edge um die Seite anzuzeigen"
+      FHC_PhrasesLib.t("anrechnung", "browserNichtUnterstuetzt")
     );
     window.location.href = "about:blank";
     return;

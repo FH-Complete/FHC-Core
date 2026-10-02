@@ -236,7 +236,7 @@ export default {
 				selectableRows: 1,
 				index: 'projektarbeit_id',
 				persistence:{
-					columns: true, //persist column layout
+					columns: ["width", "visible"], //persist column layout
 				},
 				persistenceID: 'stv-details-projektarbeit-20260217'
 			}

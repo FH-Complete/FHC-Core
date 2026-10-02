@@ -136,7 +136,8 @@ export const CoreFilterCmpt = {
 			selectedData: [],
 			persistence: {
 				sort: true,
-				columns: true,
+				// Not true: that also stores the title, and the stored title hides a translated header
+				columns: ["width", "visible"],
 				filter: false,
 				headerFilter: false,
 				group: false,

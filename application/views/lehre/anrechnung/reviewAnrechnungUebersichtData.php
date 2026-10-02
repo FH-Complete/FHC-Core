@@ -2,6 +2,9 @@
 $STUDIENSEMESTER = $studiensemester_selected;
 $LEKTOR_UID = getAuthUID();
 $LANGUAGE_INDEX = getUserLanguage() == 'German' ? '1' : '2';
+// English names only if the Studiengang or LV has one
+$STG_BEZEICHNUNG = getUserLanguage() == 'German' ? 'stg.bezeichnung' : 'COALESCE(NULLIF(stg.english, \'\'), stg.bezeichnung)';
+$LV_BEZEICHNUNG = getUserLanguage() == 'German' ? 'lv.bezeichnung' : 'COALESCE(NULLIF(lv.bezeichnung_english, \'\'), lv.bezeichnung)';
 
 $query = '
 	WITH anrechnungen AS
@@ -13,11 +16,11 @@ $query = '
 			anrechnung.dms_id,
 			anrechnung.studiensemester_kurzbz,
 			stg.studiengang_kz,
-			stg.bezeichnung AS "stg_bezeichnung",
-			lv.bezeichnung AS "lv_bezeichnung",
+			' . $STG_BEZEICHNUNG . ' AS "stg_bezeichnung",
+			' . $LV_BEZEICHNUNG . ' AS "lv_bezeichnung",
 			lv.ects,
 			(person.nachname || \' \' || person.vorname) AS "student",
-			begruendung.bezeichnung AS "begruendung",
+			COALESCE(begruendung.bezeichnung_mehrsprachig[' . $LANGUAGE_INDEX . '], begruendung.bezeichnung) AS "begruendung",
 			dmsversion.name AS "dokument_bezeichnung",
 			anrechnung.anmerkung_student,
 			(SELECT COALESCE(
@@ -129,7 +132,7 @@ $filterWidgetArray = array(
 	'requiredPermissions' => 'lehre/anrechnung_empfehlen',
 	'datasetRepresentation' => 'tabulator',
 	'columnsAliases' => array(
-		'Empfehlungsberechtigt',
+		$this->p->t('anrechnung', 'empfehlungsberechtigt'),
 		'anrechnung_id',
 		'lehrveranstaltung_id',
 		'begruendung_id',
@@ -138,7 +141,7 @@ $filterWidgetArray = array(
 		'studiengang_kz',
 		ucfirst($this->p->t('lehre', 'studiengang')),
 		ucfirst($this->p->t('lehre', 'lehrveranstaltung')),
-		'ECTS',
+		$this->p->t('lehre', 'ects'),
 		ucfirst($this->p->t('person', 'studentIn')),
 		ucfirst($this->p->t('global', 'begruendung')),
 		ucfirst($this->p->t('anrechnung', 'nachweisdokumente')),
@@ -147,7 +150,7 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('anrechnung', 'antragdatum')),
 		ucfirst($this->p->t('anrechnung', 'empfehlung')),
 		'status_kurzbz',
-		'Status'
+		$this->p->t('global', 'status')
 	),
 	'datasetRepOptions' => '{
 		height: func_height(this),

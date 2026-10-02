@@ -91,7 +91,7 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 
 		if(isEmptyArray($data))
 		{
-			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
+			return $this->outputJsonError($this->p->t('anrechnung', 'fehlerDatenuebertragung'));
 		}
 
 		foreach ($data as $item)
@@ -140,7 +140,7 @@ class reviewAnrechnungUebersicht extends Auth_Controller
 
 		if(isEmptyArray($data))
 		{
-			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
+			return $this->outputJsonError($this->p->t('anrechnung', 'fehlerDatenuebertragung'));
 		}
 
 		foreach ($data as $item)

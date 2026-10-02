@@ -124,7 +124,7 @@ export default {
 				selectableRows: 1,
 				index: 'betreuer_id',
 				persistence:{
-					columns: true, //persist column layout
+					columns: ["width", "visible"], //persist column layout
 				},
 				persistenceID: 'stv-details-projektbetreuer-20260217'
 			},

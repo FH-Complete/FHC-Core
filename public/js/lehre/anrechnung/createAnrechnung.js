@@ -170,7 +170,11 @@ var createAnrechnung = {
 
                         // Append Lehrveranstaltungen
                         for (let lv of lehrveranstaltungen){
-                            $('#select-lehrveranstaltung').append('<option value="'+ lv.lehrveranstaltung_id +'">'+ lv.bezeichnung +'</option>');
+                            // English name only if the LV has one
+                            let bezeichnung = FHC_JS_DATA_STORAGE_OBJECT.user_language != 'German' && lv.bezeichnung_english
+                                ? lv.bezeichnung_english
+                                : lv.bezeichnung;
+                            $('#select-lehrveranstaltung').append('<option value="'+ lv.lehrveranstaltung_id +'">'+ bezeichnung +'</option>');
                         }
                     }
                 },

@@ -116,7 +116,7 @@ class reviewAnrechnungDetail extends Auth_Controller
 
 		if(isEmptyArray($data))
 		{
-			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
+			return $this->outputJsonError($this->p->t('anrechnung', 'fehlerDatenuebertragung'));
 		}
 
 		// Get lectors person data
@@ -173,7 +173,7 @@ class reviewAnrechnungDetail extends Auth_Controller
 
 		if(isEmptyArray($data))
 		{
-			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
+			return $this->outputJsonError($this->p->t('anrechnung', 'fehlerDatenuebertragung'));
 		}
 
 		// Get lectors person data

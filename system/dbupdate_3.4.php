@@ -104,6 +104,7 @@ require_once('dbupdate_3.4/77080_tabulator_presets_table.php');
 require_once('dbupdate_3.4/78292_gehaltsanpassungtyp.php');
 require_once('dbupdate_3.4/54225_reihungstest_ablauf_fuer_quereinsteiger.php');
 require_once('dbupdate_3.4/77757_widgets_berechtigungen.php');
+require_once('dbupdate_3.4/83598_anrechnung_begruendung_mehrsprachig.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -263,7 +264,7 @@ $tabellen=array(
 	"lehre.tbl_anrechnung"  => array("anrechnung_id","prestudent_id","lehrveranstaltung_id","begruendung_id","lehrveranstaltung_id_kompatibel","genehmigt_von","insertamum","insertvon","updateamum","updatevon","ext_id", "dms_id", "studiensemester_kurzbz", "anmerkung_student", "empfehlung_anrechnung", "begruendung_ects", "begruendung_lvinhalt"),
 	"lehre.tbl_anrechnungstatus"  => array("status_kurzbz", "bezeichnung_mehrsprachig"),
 	"lehre.tbl_anrechnung_anrechnungstatus"  => array("anrechnungstatus_id", "anrechnung_id", "status_kurzbz", "datum", "insertamum", "insertvon"),
-	"lehre.tbl_anrechnung_begruendung"  => array("begruendung_id","bezeichnung"),
+	"lehre.tbl_anrechnung_begruendung"  => array("begruendung_id","bezeichnung","bezeichnung_mehrsprachig"),
 	"lehre.tbl_anrechnungszeitraum"  => array("anrechnungszeitraum_id","studiensemester_kurzbz","anrechnungstart","anrechnungende", "insertamum", "insertvon"),
 	"lehre.tbl_betreuerart"  => array("betreuerart_kurzbz","beschreibung","aktiv"),
 	"lehre.tbl_ferien"  => array("bezeichnung","studiengang_kz","vondatum","bisdatum"),

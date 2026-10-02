@@ -7,7 +7,7 @@ $includesArray = array(
 		'jqueryui1' => true,
 		'bootstrap5' => true,
 		'cis' => true,
-		'fontawesome4' => true,
+		'fontawesome6' => true,
 		'ajaxlib' => true,
 		'dialoglib' => true,
 		'phrases' => array(
@@ -39,7 +39,8 @@ $includesArray = array(
 			),
 			'anrechnung' => array(
 				'empfehlungPositivConfirmed',
-				'empfehlungNegativConfirmed'
+				'empfehlungNegativConfirmed',
+				'browserNichtUnterstuetzt'
 			)
 		),
 		'customCSSs' => array(
@@ -380,7 +381,7 @@ if (defined("CIS4")) {
 
 			<div class="col-4 ">
 				<div class="mb-5 alert text-center">
-					Status:
+					<?php echo $this->p->t('global', 'status'); ?>:
 					<b><span class="text-uppercase" id="reviewAnrechnungDetail-status_kurzbz"
 							data-status_kurzbz="<?php echo $anrechnungData->status_kurzbz ?>">
 							<?php echo $anrechnungData->status; ?>

@@ -19,12 +19,14 @@ $includesArray = array(
             'anrechnungszeitraumHinzufuegen',
             'anrechnungszeitraumSpeichern',
             'anrechnungszeitraumStart',
-            'anrechnungszeitraumEnde'
+            'anrechnungszeitraumEnde',
+            'anrechnungszeitraumBearbeiten'
         ),
         'ui' => array(
             'aktion',
             'geloescht',
             'gespeichert',
+            'systemfehler',
             'frageSicherLoeschen',
             'spaltenEinstellen'
         ),
@@ -113,7 +115,7 @@ if (defined("CIS4")) {
                                 <input type="hidden" id="defaultStudiensemester_kurzbz"
                                     value="<?php echo $studiensemester_kurzbz ?>">
                                 <div class="col-xs-4">
-                                    <label for="studiensemester" class="small">Studiensemester</label>
+                                    <label for="studiensemester" class="small"><?php echo ucfirst($this->p->t('lehre', 'studiensemester')); ?></label>
                                     <?php
                                     echo $this->widgetlib->widget(
                                         'Studiensemester_widget',
@@ -128,11 +130,11 @@ if (defined("CIS4")) {
                                     ?>
                                 </div>
                                 <div class="col-xs-4">
-                                    <label for="azrStart" class="small">Anr.-Zeitraum Start</label>
+                                    <label for="azrStart" class="small"><?php echo $this->p->t('anrechnung', 'anrechnungszeitraumStart'); ?></label>
                                     <input type="date" id="azrStart" value="" class="form-control" required>
                                 </div>
                                 <div class="col-xs-4">
-                                    <label for="azrEnde" class="small">Anr.-Zeitraum Ende</label>
+                                    <label for="azrEnde" class="small"><?php echo $this->p->t('anrechnung', 'anrechnungszeitraumEnde'); ?></label>
                                     <input type="date" id="azrEnde" value="" class="form-control" required>
                                 </div>
                             </div>

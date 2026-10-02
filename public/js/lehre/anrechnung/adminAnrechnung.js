@@ -9,7 +9,7 @@ function func_tableBuilt(table) {
   table.tabulator(
     "addColumn",
     {
-      title: "Aktion",
+      title: FHC_PhrasesLib.t("ui", "aktion"),
       align: "center",
       width: 150,
       formatter: addActionButtons,
@@ -193,7 +193,7 @@ var adminAnrechnung = {
     var anrechnungstart = row.getData().anrechnungstart;
     var anrechnungende = row.getData().anrechnungende;
 
-    $(".modal-header #azrModalLabel").text("Anrechnungszeitraum bearbeiten");
+    $(".modal-header #azrModalLabel").text(FHC_PhrasesLib.t("anrechnung", "anrechnungszeitraumBearbeiten"));
 
     $(".modal-body #anrechnungszeitraum_id").val(anrechnungszeitraum_id);
     $(".modal-body #studiensemester").val(studiensemester_kurzbz).change();

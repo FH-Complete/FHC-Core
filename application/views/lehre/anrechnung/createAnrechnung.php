@@ -5,7 +5,7 @@ $includesArray = array(
 	'jquery3' => true,
 	'jqueryui1' => true,
 	'bootstrap5' => true,
-	'fontawesome4' => true,
+	'fontawesome6' => true,
 	'ajaxlib' => true,
 	'dialoglib' => true,
 	'tabulator5' => true,
@@ -20,7 +20,9 @@ $includesArray = array(
 			'antragBearbeiten'
 		),
 		'ui' => array(
-			'hochladen'
+			'hochladen',
+			'errorDokumentZuGross',
+			'systemfehler'
 		),
 		'lehre' => array(
 			'studiensemester',

@@ -135,7 +135,7 @@ export default {
 				persistence: {
 					sort: true,
 					page: true,
-					columns: true,
+					columns: ["width", "visible"],
 					filter: false //to avoids js errors
 				},
 				persistenceID: 'core-contracts-2026050501',

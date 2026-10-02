@@ -313,6 +313,9 @@ class TableWidget extends Widget
 		// If session is NOT empty -> a table was already loaded
 		if ($session != null)
 		{
+			// Aliases from the current request, otherwise the headers keep the language of the first load
+			$this->tablewidgetlib->setSessionElement(TableWidgetLib::SESSION_COLUMNS_ALIASES, $this->_columnsAliases);
+
 			// Get SESSION_DATASET_RELOAD from the session
 			$sessionReloadDataset = $this->tablewidgetlib->getSessionElement(TableWidgetLib::SESSION_DATASET_RELOAD);
 

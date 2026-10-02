@@ -5,7 +5,7 @@ $includesArray = array(
     'jquery3' => true,
     'jqueryui1' => true,
     'bootstrap5' => true,
-    'fontawesome4' => true,
+    'fontawesome6' => true,
     'tabulator5' => true,
     'tabulator5JQuery' => true,
     'cis' => true,
@@ -15,12 +15,15 @@ $includesArray = array(
     'phrases' => array(
         'global' => array(
             'begruendung',
-            'zgv'
+            'zgv',
+            'details',
+            'status'
         ),
         'anrechnung' => array(
             'nachweisdokumente',
             'empfehlung',
-            'herkunft'
+            'herkunft',
+            'browserNichtUnterstuetzt'
         ),
         'ui' => array(
             'anzeigen',
@@ -216,12 +219,12 @@ if (defined("CIS4")) {
                         <button id="show-recommended" class="btn btn-outline-secondary btn-clearfilter" type="button"
                             data-bs-toggle="tooltip" data-bs-placement="left" data-bs-html="true"
                             title="<?php echo $this->p->t('ui', 'nurEmpfohleneAnzeigen'); ?>"><i
-                                class='fa fa-thumbs-o-up'></i>
+                                class='fa-regular fa-thumbs-up'></i>
                         </button>
                         <button id="show-not-recommended" class="btn btn-outline-secondary btn-clearfilter"
                             type="button" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-html="true"
                             title="<?php echo $this->p->t('ui', 'nurNichtEmpfohleneAnzeigen'); ?>"><i
-                                class='fa fa-thumbs-o-down'></i>
+                                class='fa-regular fa-thumbs-down'></i>
                         </button>
                         <button id="show-approved" class="btn btn-outline-secondary btn-clearfilter" type="button"
                             data-bs-toggle="tooltip" data-bs-placement="left" data-bs-html="true"

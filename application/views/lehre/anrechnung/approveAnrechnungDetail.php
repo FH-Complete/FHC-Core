@@ -7,7 +7,7 @@ $includesArray = 	array(
 	'jqueryui1' => true,
 	'bootstrap5' => true,
 	'cis' => true,
-	'fontawesome4' => true,
+	'fontawesome6' => true,
 	'ajaxlib' => true,
 	'dialoglib' => true,
 	'phrases' => array(
@@ -47,7 +47,9 @@ $includesArray = 	array(
 			'erfolgreichZurueckgenommen',
 			'empfehlungPositivConfirmed',
 			'empfehlungNegativConfirmed',
-			'anrechnungEctsTooltipTextBeiUeberschreitung'
+			'anrechnungEctsTooltipTextBeiUeberschreitung',
+			'hoechstgrenzeUeberschritten',
+			'browserNichtUnterstuetzt'
 		)
 	),
 	'customCSSs' => array(
@@ -161,12 +163,12 @@ if (defined("CIS4")) {
 														</span>
 													</th>
 													<td>
-														Total: <span
+														<?php echo $this->p->t('anrechnung', 'totalEcts'); ?>: <span
 															id="sumEctsTotal"><?php echo number_format($antragData->sumEctsSchulisch + $antragData->sumEctsBeruflich, 1) ?></span>
-														[Schulisch: <span id="sumEctsSchulisch"
+														[<?php echo $this->p->t('anrechnung', 'schulisch'); ?>: <span id="sumEctsSchulisch"
 															value="<?php echo $antragData->sumEctsSchulisch ?>"><?php echo $antragData->sumEctsSchulisch ?></span>
 														/
-														Beruflich: <span id="sumEctsBeruflich"
+														<?php echo $this->p->t('anrechnung', 'beruflich'); ?>: <span id="sumEctsBeruflich"
 															value="<?php echo $antragData->sumEctsBeruflich ?>"><?php echo $antragData->sumEctsBeruflich ?></span>
 														]
 														<div class="p-1 align-items-center" id="sumEctsMsg"></div>
@@ -498,7 +500,7 @@ if (defined("CIS4")) {
 			<div class="col-4">
 				<!-- -Statusleiste -->
 				<div class="mb-5 alert text-center">
-					Status: <b><span class="text-uppercase" id="approveAnrechnungDetail-status_kurzbz"
+					<?php echo $this->p->t('global', 'status'); ?>: <b><span class="text-uppercase" id="approveAnrechnungDetail-status_kurzbz"
 							data-status_kurzbz="<?php echo $anrechnungData->status_kurzbz ?>">
 							<?php echo $anrechnungData->status; ?>
 						</span></b>

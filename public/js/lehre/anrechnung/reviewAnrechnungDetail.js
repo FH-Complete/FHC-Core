@@ -16,7 +16,7 @@ $(function(){
     var canPromise = !! window.Promise;
     if(!canPromise)
     {
-        alert("Diese Seite kann mit ihrem Browser nicht angezeigt werden. Bitte verwenden Sie Firefox, Chrome oder Edge um die Seite anzuzeigen");
+        alert(FHC_PhrasesLib.t("anrechnung", "browserNichtUnterstuetzt"));
         window.location.href='about:blank';
         return;
     }

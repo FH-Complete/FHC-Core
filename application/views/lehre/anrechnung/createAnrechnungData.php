@@ -3,13 +3,15 @@
 $STUDIENSEMESTER = $studiensemester_selected;
 $STUDIENGAENGE_ENTITLED = implode(', ', $studiengaenge_entitled);
 $LANGUAGE_INDEX = getUserLanguage() == 'German' ? '1' : '2';
+// English name only if the Studiengang has one
+$STG_BEZEICHNUNG = getUserLanguage() == 'German' ? 'stg.bezeichnung' : 'COALESCE(NULLIF(stg.english, \'\'), stg.bezeichnung)';
 
 $query = '
 	SELECT pst.prestudent_id,
 		person.person_id,
 		pststatus.studienplan_id,
 		stg.studiengang_kz,
-		stg.bezeichnung AS "stg_bezeichnung",
+		' . $STG_BEZEICHNUNG . ' AS "stg_bezeichnung",
 		ausbildungssemester,
 		nachname,
 		vorname,
@@ -47,7 +49,7 @@ $filterWidgetArray = array(
 		'studienplan_id',
 		'studiengang_kz',
 		ucfirst($this->p->t('lehre', 'studiengang')),
-		'Semester',
+		$this->p->t('lehre', 'semester'),
 		ucfirst($this->p->t('person', 'nachname')),
 		ucfirst($this->p->t('person', 'vorname')),
 		ucfirst($this->p->t('global', 'zgv'))

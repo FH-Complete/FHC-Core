@@ -585,7 +585,7 @@ var FHC_TableWidget = {
 
 				let defaultPersistence = {
 					sort: true,
-					columns: true,
+					columns: ["width", "visible"],
 					filter: false,
 					headerFilter: false,
 					group: false,

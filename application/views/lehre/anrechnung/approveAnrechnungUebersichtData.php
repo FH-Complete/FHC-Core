@@ -6,6 +6,9 @@ $STUDIENSEMESTER = $studiensemester_selected;
 $STUDIENGAENGE_ENTITLED = implode(', ', $studiengaenge_entitled);						// alle STG mit Lese- und Schreibberechtigung
 $ORGANISATIONSEINHEITEN_SCHREIBBERECHTIGT = "'" . implode('\',\'', $oes_schreibberechtigt) . "'";		// alle OE nur mit Schreibberechtigung; singlequote für jeden string notwendig
 $LANGUAGE_INDEX = getUserLanguage() == 'German' ? '1' : '2';
+// English names only if the Studiengang or LV has one
+$STG_BEZEICHNUNG = getUserLanguage() == 'German' ? 'stg.bezeichnung' : 'COALESCE(NULLIF(stg.english, \'\'), stg.bezeichnung)';
+$LV_BEZEICHNUNG = getUserLanguage() == 'German' ? 'lv.bezeichnung' : 'COALESCE(NULLIF(lv.bezeichnung_english, \'\'), lv.bezeichnung)';
 
 $query = '
 	WITH anrechnungen AS
@@ -21,7 +24,7 @@ $query = '
 			END "schreibberechtigt",
 			anrechnung.studiensemester_kurzbz,
 			stg.studiengang_kz,
-			stg.bezeichnung AS stg_bezeichnung,
+			' . $STG_BEZEICHNUNG . ' AS stg_bezeichnung,
 			lv.orgform_kurzbz,
 			(SELECT ausbildungssemester
 			FROM public.tbl_prestudentstatus press
@@ -31,12 +34,12 @@ $query = '
 			ORDER BY press.datum DESC
 			LIMIT 1
 			),
-			lv.bezeichnung AS lv_bezeichnung,
+			' . $LV_BEZEICHNUNG . ' AS lv_bezeichnung,
 			lv.ects::numeric(4,1),
 	        get_ects_summe_schulisch(student.student_uid, anrechnung.prestudent_id, stg.studiengang_kz) AS ectsSumSchulisch,
 	        get_ects_summe_beruflich(student.student_uid) AS ectsSumBeruflich,
 			(person.nachname || \' \' || person.vorname) AS "student",
-			begruendung.bezeichnung AS "begruendung",
+			COALESCE(begruendung.bezeichnung_mehrsprachig[' . $LANGUAGE_INDEX . '], begruendung.bezeichnung) AS "begruendung",
 			dmsversion.name AS "dokument_bezeichnung",
 			anrechnung.anmerkung_student,
 			(SELECT COALESCE(
@@ -178,17 +181,17 @@ $filterWidgetArray = array(
 		'lehrveranstaltung_id',
 		'begruendung_id',
 		'dms_id',
-		'Schreibberechtigt',
+		$this->p->t('anrechnung', 'schreibberechtigt'),
 		'studiensemester_kurzbz',
 		'studiengang_kz',
 		ucfirst($this->p->t('lehre', 'studiengang')),
 		ucfirst($this->p->t('lehre', 'organisationsform')),
-		'Semester',
+		$this->p->t('lehre', 'semester'),
 		ucfirst($this->p->t('lehre', 'lehrveranstaltung')),
-		'ECTS (LV)',
-		'ECTS (LV + Bisher)',
-		'ECTS (Bisher schulisch)',
-		'ECTS (Bisher beruflich',
+		$this->p->t('anrechnung', 'ectsLv'),
+		$this->p->t('anrechnung', 'ectsLvUndBisher'),
+		$this->p->t('anrechnung', 'ectsBisherSchulisch'),
+		$this->p->t('anrechnung', 'ectsBisherBeruflich'),
 		ucfirst($this->p->t('global', 'begruendung')),
 		ucfirst($this->p->t('person', 'studentIn')),
 		ucfirst($this->p->t('anrechnung', 'nachweisdokumente')),
@@ -197,7 +200,7 @@ $filterWidgetArray = array(
 		ucfirst($this->p->t('anrechnung', 'antragdatum')),
 		ucfirst($this->p->t('anrechnung', 'empfehlung')),
 		'status_kurzbz',
-		'Status',
+		$this->p->t('global', 'status'),
 		'PrestudentID',
 		ucfirst($this->p->t('anrechnung', 'empfehlungsanfrageAm')),
 		ucfirst($this->p->t('anrechnung', 'empfehlungsanfrageAn'))
