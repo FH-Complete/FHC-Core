@@ -255,6 +255,39 @@ class StudentListLib
 	}
 
 	/**
+	 * Starts a WHERE GROUP
+	 *
+	 * @return StudentListLib
+	 */
+	public function groupStart()
+	{
+		$this->_wheres[] = 'group_start';
+		return $this;
+	}
+
+	/**
+	 * Starts a OR WHERE GROUP
+	 *
+	 * @return StudentListLib
+	 */
+	public function orGroupStart()
+	{
+		$this->_wheres[] = 'or_group_start';
+		return $this;
+	}
+
+	/**
+	 * Ends a OR WHERE GROUP
+	 *
+	 * @return StudentListLib
+	 */
+	public function groupEnd()
+	{
+		$this->_wheres[] = 'group_end';
+		return $this;
+	}
+
+	/**
 	 * Generates the query and executes it.
 	 *
 	 * @param string|null	$studiensemester_kurzbz
@@ -297,7 +330,13 @@ class StudentListLib
 			$this->_ci->PrestudentModel->addSelect($select[0], $select[1]);
 
 		foreach ($this->_wheres as $where) {
-			if (!is_array($where[0]) && is_array($where[1])) {
+			if ($where == 'group_start') {
+				$this->_ci->PrestudentModel->db->group_start();
+			} elseif ($where == 'or_group_start') {
+				$this->_ci->PrestudentModel->db->or_group_start();
+			} elseif ($where == 'group_end') {
+				$this->_ci->PrestudentModel->db->group_end();
+			} elseif (!is_array($where[0]) && is_array($where[1])) {
 				if ($where[3])
 					$this->_ci->PrestudentModel->db->or_where_in($where[0], $where[1], $where[2]);
 				else
