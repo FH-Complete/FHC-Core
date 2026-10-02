@@ -18,6 +18,8 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use CI3_Events as Events;
+
 /**
  * This generates a list of students and or prestudents used for Studierendenverwaltung
  */
@@ -355,6 +357,120 @@ class StudentListLib
 		return $this->_ci->PrestudentModel->load();
 	}
 
+	/**
+	 * Adds additional filters to the query
+	 *
+	 * @param array		$filter
+	 *
+	 * @return void
+	 */
+	public function addFilter($filter)
+	{
+		if (!isset($filter['type']))
+			return false;
+
+		switch ($filter['type']) {
+			case 'konto':
+				$bt = '';
+				$stdsem = '';
+				$comp = '!=';
+
+				if (isset($filter['buchungstyp_kurzbz']) && $filter['buchungstyp_kurzbz'] != 'all')
+					$bt = ' AND buchungstyp_kurzbz=' . $this->_ci->PrestudentModel->escape($filter['buchungstyp_kurzbz']);
+				
+				if (isset($filter['studiensemester_kurzbz']))
+					$stdsem = ' AND studiensemester_kurzbz=' . $this->_ci->PrestudentModel->escape($filter['studiensemester_kurzbz']);
+
+				if (isset($filter['missing']) && $filter['missing']) {
+					$comp = '=';
+					$this->addWhere('get_rolle_prestudent(tbl_prestudent.prestudent_id, NULL) !=', 'Incoming');
+				}
+
+				$this->addWhere('(
+					SELECT count(*) 
+					FROM public.tbl_konto 
+					WHERE person_id=tbl_prestudent.person_id 
+					' . $bt . ' 
+					' . $stdsem . '
+				) ' . $comp, 0);
+				break;
+			
+			case 'konto_counter':
+				$bt = '';
+				$samestg = '';
+				$past = '';
+
+				if (isset($filter['buchungstyp_kurzbz']) && $filter['buchungstyp_kurzbz'] != 'all')
+					$bt = ' AND buchungstyp_kurzbz = ' . $this->_ci->PrestudentModel->escape($filter['buchungstyp_kurzbz']);
+				
+				if (isset($filter['samestg']) && $filter['samestg'])
+					$samestg = ' AND studiengang_kz = tbl_prestudent.studiengang_kz';
+
+				if (isset($filter['past']) && $filter['past'])
+					$past = ' AND buchungsdatum < NOW()';
+
+				$this->addWhere('(
+					SELECT sum(betrag) 
+					FROM public.tbl_konto 
+					WHERE person_id = tbl_prestudent.person_id 
+					' . $bt . ' 
+					' . $samestg . '
+					' . $past . '
+				) !=', 0);
+				break;
+			
+			case 'zgv':
+				$this
+					->groupStart()
+						->groupStart()
+							->addWhere('zgv_code IS NOT NULL')
+							->addWhere('zgvdatum IS NULL')
+						->groupEnd()
+						->orGroupStart()
+							->addWhere('zgvmas_code IS NOT NULL')
+							->addWhere('zgvmadatum IS NULL')
+						->groupEnd()
+						->orGroupStart()
+							->addWhere('zgvdoktor_code IS NOT NULL')
+							->addWhere('zgvdoktordatum IS NULL')
+						->groupEnd()
+					->groupEnd();
+				break;
+			
+			case 'documents':
+				$this->addWhere('(
+					SELECT count(*) 
+					FROM public.tbl_dokumentstudiengang 
+					WHERE dokument_kurzbz NOT IN (
+						SELECT dokument_kurzbz 
+						FROM tbl_dokumentprestudent 
+						WHERE prestudent_id=tbl_prestudent.prestudent_id
+					)
+					AND studiengang_kz=tbl_prestudent.studiengang_kz
+				) !=', 0);
+				break;
+
+			case 'statusgrund':
+				if (!isset($filter['statusgrund_id']))
+					return false;
+
+				if (isset($filter['studiensemester_kurzbz']))
+					$stdsem = ' AND studiensemester_kurzbz=' . $this->_ci->PrestudentModel->escape($filter['studiensemester_kurzbz']);
+
+				$this->addWhere('(
+					SELECT count(*) 
+					FROM public.tbl_prestudentstatus 
+					WHERE prestudent_id = tbl_prestudent.prestudent_id 
+					AND statusgrund_id = ' . $this->_ci->PrestudentModel->escape($filter['statusgrund_id']) . '
+					' . $stdsem . '
+				) !=', 0);
+				break;
+		}
+
+		Events::trigger('studentlistlib_add_filter', $filter);
+
+		return true;
+	}
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Protected methods
