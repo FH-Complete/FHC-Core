@@ -157,7 +157,7 @@ class StudentListLib
 	 * @param string|array	$select
 	 * @param boolean		$escape (optional)
 	 *
-	 * @return void
+	 * @return StudentListLib
 	 */
 	public function addSelect($select, $escape = true)
 	{
@@ -168,6 +168,8 @@ class StudentListLib
 		}
 		$alias = $this->getAliasFromSelect($select);
 		$this->_selects[$alias] = [$select, $escape];
+
+		return $this;
 	}
 
 	/**
@@ -178,7 +180,7 @@ class StudentListLib
 	 * @param string		$type (optional)
 	 * @param string		$position (optional)
 	 *
-	 * @return void
+	 * @return StudentListLib
 	 */
 	public function addJoin($table, $cond, $type = '', $position = 'end')
 	{
@@ -218,6 +220,8 @@ class StudentListLib
 		}
 
 		$this->_joins = $front_part + [$alias => [$table, $cond, $type]] + $back_part;
+	
+		return $this;
 	}
 
 	/**
@@ -227,11 +231,12 @@ class StudentListLib
 	 * @param string|array	$value
 	 * @param boolean		$escape
 	 *
-	 * @return void
+	 * @return StudentListLib
 	 */
 	public function addWhere($key, $value = null, $escape = true)
 	{
 		$this->_wheres[] = [$key, $value, $escape, false];
+		return $this;
 	}
 
 	/**
@@ -241,11 +246,12 @@ class StudentListLib
 	 * @param string|array	$value
 	 * @param boolean		$escape
 	 *
-	 * @return void
+	 * @return StudentListLib
 	 */
 	public function addOrWhere($key, $value = null, $escape = true)
 	{
 		$this->_wheres[] = [$key, $value, $escape, true];
+		return $this;
 	}
 
 	/**
