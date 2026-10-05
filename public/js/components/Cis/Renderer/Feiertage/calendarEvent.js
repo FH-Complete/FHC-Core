@@ -1,5 +1,6 @@
 
 export default {
+	name: 'Cis-Renderer-Feiertag-CalendarEvent',
 	props: {
 		event: {
 			type: Object,

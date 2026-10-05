@@ -1,4 +1,5 @@
 export default {
+	name: 'Cis-Renderer-Reservierung-CalendarEvent',
 	props: {
 		event: {
 			type: Object,
