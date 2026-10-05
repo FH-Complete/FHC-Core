@@ -2,6 +2,7 @@ import { numberPadding, formatDate } from "../../../../helpers/DateHelpers.js"
 import LvMenu from "../../Mylv/LvMenu.js";
 
 export default {
+	name: 'Cis-Renderer-Reservierung-ModalContent',
 	props:{
 		event: {
 			type: Object,
