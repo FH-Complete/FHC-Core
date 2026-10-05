@@ -99,10 +99,9 @@ $qry_stg = "SELECT distinct studiengang_kz, typ, kurzbz
 					studiengang_kz
 				FROM
 					lehre.tbl_projektbetreuer JOIN lehre.tbl_projektarbeit ON tbl_projektbetreuer.projektarbeit_id=tbl_projektarbeit.projektarbeit_id
-					JOIN lehre.tbl_lehreinheit ON tbl_lehreinheit.lehreinheit_id = tbl_projektarbeit.lehreinheit_id
-					JOIN lehre.tbl_lehrveranstaltung ON tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id
+					JOIN lehre.tbl_lehrveranstaltung ON tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_projektarbeit.lehrveranstaltung_id
 				WHERE
-					lehre.tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
+					lehre.tbl_projektarbeit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
 				) as foo
 				JOIN public.tbl_studiengang USING (studiengang_kz)
 				";
@@ -506,10 +505,9 @@ if ($result_stg = $db->db_query($qry_stg))
 						JOIN public.tbl_benutzer ON tbl_benutzer.person_id=tbl_person.person_id
 						JOIN public.tbl_mitarbeiter ON tbl_mitarbeiter.mitarbeiter_uid=tbl_benutzer.uid
 						JOIN lehre.tbl_projektarbeit ON tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id
-						JOIN lehre.tbl_lehreinheit ON tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id
-						JOIN lehre.tbl_lehrveranstaltung ON tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id
+						JOIN lehre.tbl_lehrveranstaltung ON tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_projektarbeit.lehrveranstaltung_id
 					WHERE
-						tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
+						tbl_projektarbeit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
 						tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
 						NOT EXISTS (SELECT
 										mitarbeiter_uid
@@ -589,12 +587,11 @@ if ($result_stg = $db->db_query($qry_stg))
 					FROM
 						lehre.tbl_projektbetreuer JOIN public.tbl_benutzer ON tbl_projektbetreuer.person_id = tbl_benutzer.person_id
 						JOIN lehre.tbl_projektarbeit ON tbl_projektarbeit.projektarbeit_id = tbl_projektbetreuer.projektarbeit_id
-						JOIN lehre.tbl_lehreinheit ON tbl_lehreinheit.lehreinheit_id = tbl_projektarbeit.lehreinheit_id
-						JOIN lehre.tbl_lehrveranstaltung ON tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
+						JOIN lehre.tbl_lehrveranstaltung ON tbl_projektarbeit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
 						JOIN campus.vw_student ON vw_student.uid = student_uid
 					WHERE
 						tbl_benutzer.uid = ".$db->db_add_param($uid)."
-						AND tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
+						AND tbl_projektarbeit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
 						AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
 
 				if ($result = $db->db_query($qry))
@@ -825,15 +822,14 @@ if ($result_stg = $db->db_query($qry_stg))
 	$worksheet =& $workbook->addWorksheet('Betreuerstunden');
 	$worksheet->setInputEncoding('utf-8');
 	$qry = "SELECT
-				studiensemester_kurzbz, nachname, vorname, sum(stunden) AS stunden, titelpre,
+				lehre.tbl_projektarbeit.studiensemester_kurzbz, nachname, vorname, sum(stunden) AS stunden, titelpre,
 				sum(tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)::numeric(8, 2) AS euro, person_id
 			FROM
 				public.tbl_person JOIN lehre.tbl_projektbetreuer USING (person_id)
 				JOIN lehre.tbl_projektarbeit USING (projektarbeit_id)
-				JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
 				JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 			WHERE
-				studiensemester_kurzbz = ".$db->db_add_param($semester_aktuell)." AND
+				lehre.tbl_projektarbeit.studiensemester_kurzbz = ".$db->db_add_param($semester_aktuell)." AND
 				stunden > 0";
 
 	if (count($stg_arr) > 0)
@@ -841,7 +837,7 @@ if ($result_stg = $db->db_query($qry_stg))
 
 	$qry .= "
 			GROUP BY
-				studiensemester_kurzbz, person_id, nachname, vorname, titelpre
+				lehre.tbl_projektarbeit.studiensemester_kurzbz, person_id, nachname, vorname, titelpre
 			ORDER BY
 				nachname, vorname
 			";
