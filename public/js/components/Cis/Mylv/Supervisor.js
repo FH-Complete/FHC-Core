@@ -1,11 +1,11 @@
-import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
+import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 
 import ApiBetreuungen from "../../../api/factory/betreuungen.js";
 
 export default {
 	name: "Supervisor",
 	components: {
-		CoreFilterCmpt
+		CoreFilterCmpt,
 	},
 	props: {
 		semester: null | String,
@@ -15,14 +15,21 @@ export default {
 			students: [],
 			isFetchingStudents: false,
 			supervisorTableOptions: {
-				index: 'lehrveranstaltung_id',
-				layout: 'fitColumns',
+				index: "lehrveranstaltung_id",
+				layout: "fitColumns",
 				columns: [
 					{
 						titlePhrase: "betreuungen/studiengang",
 						title: "placeholder",
 						field: "studiengang",
 						widthGrow: 1,
+						formatter: "link",
+						formatterParams: {
+							target: "_blank",
+							url: (cell) => {
+								return "mailto:" + cell._cell.row.data.email;
+							},
+						},
 					},
 					{
 						titlePhrase: "betreuungen/semester",
@@ -35,6 +42,8 @@ export default {
 						title: "placeholder",
 						field: "stunden",
 						widthGrow: 1,
+						bottomCalc: "sum",
+						bottomCalcParams: { precision: 2 },
 					},
 					{
 						titlePhrase: "betreuungen/lvBezeichnung",
@@ -49,11 +58,12 @@ export default {
 						widthGrow: 3,
 						formatter: "link",
 						formatterParams: {
-							target:"_blank",
+							target: "_blank",
 							url: (cell) => {
-								const uid = cell._cell.row.data.uid;
-								// todo: get full profilview url (or just use cell click instead of link formatter)
-								return this.$router.resolve("ProfilView").href;
+								return this.$router.resolve({
+									name: "ProfilView",
+									params: { uid: cell._cell.row.data.uid },
+								}).href;
 							},
 						},
 					},
@@ -92,7 +102,12 @@ export default {
 				ApiBetreuungen.getBetreuungen(this.$props.semester),
 			);
 			if (studentsResponse.meta.status === "success") {
-				this.students = studentsResponse.data;
+				this.students = studentsResponse.data.map((studentData) => {
+					studentData.stunden = parseFloat(
+						studentData.stunden,
+					).toFixed(2);
+					return { ...studentData };
+				});
 				this.setTableData();
 			}
 
@@ -103,15 +118,12 @@ export default {
 		},
 		setTableData() {
 			if (this.$refs.supervisorTable && this.students?.length) {
-				this.$refs.supervisorTable.tabulator.setData(
-					this.students
-				);
+				this.$refs.supervisorTable.tabulator.setData(this.students);
 			}
 		},
 	},
 	mounted() {
 		this.getStudents();
-		console.log(this.$router);
 	},
 	template: /*html*/ `
 	<div>
