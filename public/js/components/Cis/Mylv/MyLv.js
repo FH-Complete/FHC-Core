@@ -1,5 +1,5 @@
 import Lvs from "./Lvs.js";
-import Lehrenheiten from "./Lehrenheiten.js";
+import Lehreinheiten from "./Lehreinheiten.js";
 import Supervisor from "./Supervisor.js";
 
 import ApiAddons from "../../../api/factory/addons.js"
@@ -8,7 +8,7 @@ export default {
 	name: 'MyLv',
 	components: {
 		Lvs,
-		Lehrenheiten,
+		Lehreinheiten,
 		Supervisor,
 	},
 	data: () => {
@@ -155,7 +155,7 @@ export default {
 				<div class="pt-4">
 					<lvs v-if="selectedMode === 'lvs' || selectedMode === 'all'" :current="current" />
 					<hr v-if="selectedMode === 'all'">
-					<lehrenheiten v-if="selectedMode === 'lehrenheiten' || selectedMode === 'all'" :current="current" />
+					<lehreinheiten v-if="selectedMode === 'lehrenheiten' || selectedMode === 'all'" :semester="currentSemester" />
 					<hr v-if="selectedMode === 'all'">
 					<supervisor v-if="selectedMode === 'supervision' || selectedMode === 'all'" :semester="currentSemester" />
 				</div>

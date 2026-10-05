@@ -763,4 +763,37 @@ EOSQL;
 
 		return $this->execQuery($query, [$lva_id, $sem_kurzbz, $ma_uid]);
 	}
+
+	public function getLehrenheitenBySemester($uid, $semester)
+	{
+		$query = "SELECT
+			tbl_lehreinheit.lehreinheit_id,
+			lehrfach.kurzbz as lehrfach,
+			tbl_lehreinheit.lehrform_kurzbz as lehrform,
+			tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
+			(SELECT kurzbz FROM public.tbl_mitarbeiter
+			WHERE mitarbeiter_uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid) as lektor,
+			UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg_kurzbz,
+			tbl_lehrveranstaltung.semester as lv_semester,
+			tbl_lehreinheit.raumtyp,
+			tbl_lehreinheit.raumtypalternativ,
+			tbl_lehreinheit.stundenblockung,
+			tbl_lehreinheit.wochenrythmus,
+			tbl_lehreinheitmitarbeiter.semesterstunden as semesterstunden,
+			tbl_lehreinheit.start_kw,
+			lvangebot.anmeldefenster_start,
+			lvangebot.anmeldefenster_ende
+		FROM
+			lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+			JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+			JOIN public.tbl_studiengang USING(studiengang_kz)
+			JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
+			LEFT JOIN lehre.tbl_lvangebot as lvangebot ON(tbl_lehrveranstaltung.lehrveranstaltung_id=lvangebot.lehrveranstaltung_id)
+		WHERE
+			tbl_lehreinheit.studiensemester_kurzbz = '$semester'
+			AND mitarbeiter_uid = '$uid'
+		ORDER BY stg_kurzbz,lv_semester,lv_bezeichnung";
+
+		return $this->execReadOnlyQuery($query);
+	}
 }

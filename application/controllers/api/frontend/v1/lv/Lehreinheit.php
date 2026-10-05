@@ -19,7 +19,8 @@ class Lehreinheit extends FHCAPI_Controller
 			'getLehrfach' => ['admin:r', 'assistenz:r'],
 			'getSprache' => ['admin:r', 'assistenz:r'],
 			'getRaumtyp' => ['admin:r', 'assistenz:r'],
-			'getLehrform' => ['admin:r', 'assistenz:r']
+			'getLehrform' => ['admin:r', 'assistenz:r'],
+			'getLehreinheitenBySemester' => self::PERM_LOGGED,
 		]);
 
 		$this->_ci = &get_instance();
@@ -436,6 +437,14 @@ class Lehreinheit extends FHCAPI_Controller
 		if (isError($result))
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		$this->terminateWithSuccess($this->p->t('global', 'gespeichert'));
+	}
+
+	public function getLehreinheitenBySemester()
+	{
+		$semester = $this->input->get('semester');
+		$lehreinheiten = $this->LehreinheitModel->getLehrenheitenBySemester(getAuthUID(), $semester);
+		$lehreinheiten = $this->getDataOrTerminateWithError($lehreinheiten);
+		$this->terminateWithSuccess($lehreinheiten);
 	}
 
 

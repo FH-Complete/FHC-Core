@@ -15,7 +15,6 @@ export default {
 			students: [],
 			isFetchingStudents: false,
 			supervisorTableOptions: {
-				index: "lehrveranstaltung_id",
 				layout: "fitColumns",
 				columns: [
 					{
@@ -131,7 +130,7 @@ export default {
 			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 		</div>
 		<div v-else-if="students?.length">
-			<span>{{ students.length + " supervised students" }}</span>
+			<h5>{{ students.length + " supervised students" }}</h5>
 			<core-filter-cmpt
 				@tableBuilt="handleTableBuilt()"
 				ref="supervisorTable"
