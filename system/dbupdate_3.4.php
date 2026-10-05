@@ -104,7 +104,7 @@ require_once('dbupdate_3.4/76160_lvv_favorites.php');
 require_once('dbupdate_3.4/77080_tabulator_presets_table.php');
 require_once('dbupdate_3.4/78292_gehaltsanpassungtyp.php');
 require_once('dbupdate_3.4/54225_reihungstest_ablauf_fuer_quereinsteiger.php');
-
+require_once('dbupdate_3.4/77757_widgets_berechtigungen.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
