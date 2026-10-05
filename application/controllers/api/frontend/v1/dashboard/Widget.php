@@ -101,6 +101,9 @@ class Widget extends FHCAPI_Controller
 			$tmpsetup = json_decode($widget->setup);
 			$tmpsetup->file = absoluteJsImportUrl($tmpsetup->file);
 			$widget->setup = $tmpsetup;
+			$widget->permitted = empty($widget->berechtigung_kurzbz) 
+				|| $this->permissionlib->isBerechtigt($widget->berechtigung_kurzbz);
+
 			return $widget;
 		}, $widgets);
 
