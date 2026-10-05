@@ -134,7 +134,7 @@ export default {
 					event: 'tableBuilt',
 					handler: async () => {
 
-						await this.$p.loadCategory(['anrechnungen', 'global', 'ui', 'lehre']);
+						await this.$p.loadCategory(['anrechnung', 'global', 'ui', 'lehre']);
 
 						const setHeader = (field, text) => {
 							const col = this.$refs.table.tabulator.getColumn(field);
@@ -158,6 +158,10 @@ export default {
 						setHeader(	'genehmigt_von', this.$p.t('anrechnung', 'genehmigtVon'));
 						setHeader(	'notizen_anzahl', this.$p.t('anrechnung', 'existingNotes'));
 						setHeader(	'insertamum', this.$p.t('global', 'datum'));
+						setHeader(	'actions', this.$p.t('global', 'aktionen'));
+
+						// Render the action buttons again, their phrases can arrive after the data
+						this.$refs.table.tabulator.redraw(true);
 					}
 				}
 			];
@@ -280,6 +284,12 @@ export default {
 		resetLvKompatibel(){
 			this.formData.lehrveranstaltung_id_kompatibel = null;
 			this.handleInput();
+		},
+		lvBezeichnung(lv) {
+			// English name only if the LV has one
+			return this.$p.user_language.value != 'German' && lv.bezeichnung_english
+				? lv.bezeichnung_english
+				: lv.bezeichnung;
 		}
 	},
 	created() {
@@ -380,7 +390,7 @@ export default {
 										:key="entry.lehrveranstaltung_id"
 										:value="entry.lehrveranstaltung_id"
 										>
-										{{entry.bezeichnung}} Semester {{entry.semester}} {{entry.lehrform_kurzbz}}
+										{{lvBezeichnung(entry)}} Semester {{entry.semester}} {{entry.lehrform_kurzbz}}
 									</option>
 								</form-input>
 							</div>
@@ -407,7 +417,7 @@ export default {
 							<div v-if="formData.begruendung_id == '2'" class="row mb-3">
 								<form-input
 									type="select"
-									label="Lehrveranstaltung Kompatibel"
+									:label="$p.t('anrechnung/lehrveranstaltung_bez_kompatibel')"
 									name="lehrveranstaltung_id_kompatibel"
 									v-model="formData.lehrveranstaltung_id_kompatibel"
 									>
@@ -416,7 +426,7 @@ export default {
 										:key="entry.lehrveranstaltung_id"
 										:value="entry.lehrveranstaltung_id"
 										>
-										{{entry.bezeichnung}} Semester {{entry.semester}} {{entry.lehrform_kurzbz}}
+										{{lvBezeichnung(entry)}} Semester {{entry.semester}} {{entry.lehrform_kurzbz}}
 									</option>
 								</form-input>
 							</div>						

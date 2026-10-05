@@ -13745,6 +13745,46 @@ Any unusual occurrences
     array(
         'app' => 'core',
         'category' => 'anrechnung',
+        'phrase' => 'keineGenehmigungZumZuruecknehmen',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Es gibt keine Genehmigung oder Ablehnung zum Zurücknehmen. Der Antrag ist noch in Bearbeitung.',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'There is no approval or rejection to withdraw. The application is still in progress.',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'fehlerBeimLoeschen',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Fehler beim Löschen',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Error while deleting',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
         'phrase' => 'textUebernehmenOderEigenenBegruendungstext',
         'insertvon' => 'system',
         'phrases' => array(

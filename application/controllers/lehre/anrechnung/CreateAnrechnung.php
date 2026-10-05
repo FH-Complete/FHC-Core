@@ -76,6 +76,13 @@ class CreateAnrechnung extends Auth_Controller
 		
 		// Get Anrechnungsbegruendungen
 		$this->load->model('education/Anrechnungbegruendung_model', 'AnrechnungbegruendungModel');
+
+		// Begruendung in the users language, German name if no translation exists
+		$language_index = getUserLanguage() == 'German' ? 1 : 2;
+		$this->AnrechnungbegruendungModel->addSelect(
+			'begruendung_id, COALESCE(bezeichnung_mehrsprachig[' . $language_index . '], bezeichnung) AS bezeichnung',
+			false
+		);
 		$begruendung_arr = getData($this->AnrechnungbegruendungModel->load());
 		
 		$viewData = array(
@@ -94,6 +101,12 @@ class CreateAnrechnung extends Auth_Controller
 	{
 		$prestudent_id = $this->input->post('prestudent_id');
 		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
+
+		// Exit if user has no permission for the Studiengang of the student
+		if (!$this->anrechnunglib->isBerechtigtForPrestudent(self::BERECHTIGUNG_ANRECHNUNG_ANLEGEN, 's', $prestudent_id))
+		{
+			$this->terminateWithJsonError($this->p->t('ui', 'keineBerechtigung'));
+		}
 		
 		// Get Student UID
 		$student_uid = $this->StudentModel->getUID($prestudent_id);
@@ -135,6 +148,19 @@ class CreateAnrechnung extends Auth_Controller
 		if (isEmptyString($begruendung_id) || isEmptyString($lehrveranstaltung_id))
 		{
 			$this->terminateWithJsonError($this->p->t('ui', 'errorFelderFehlen'));
+		}
+
+		// Exit if user has no write permission for the Studiengang of the student
+		if (!$this->anrechnunglib->isBerechtigtForPrestudent(self::BERECHTIGUNG_ANRECHNUNG_ANLEGEN, 'suid', $prestudent_id))
+		{
+			$this->terminateWithJsonError($this->p->t('ui', 'keineBerechtigung'));
+		}
+
+		// Exit if the Lehrveranstaltung is not one of the LVs the form offers for this student
+		$result = $this->LehrveranstaltungModel->getLvsByStudent($this->StudentModel->getUID($prestudent_id), $studiensemester_kurzbz);
+		if (!in_array($lehrveranstaltung_id, array_column(hasData($result) ? getData($result) : array(), 'lehrveranstaltung_id')))
+		{
+			$this->terminateWithJsonError($this->p->t('anrechnung', 'lvNichtZugeteilt'));
 		}
 		
 		// Exit if application already exists

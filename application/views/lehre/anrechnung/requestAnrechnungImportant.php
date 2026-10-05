@@ -3,10 +3,10 @@
 	<?php if (isset($this->config->item('display_infobox')['fristen']) && $this->config->item('display_infobox')['fristen'] === true): ?>
         <div class="accordion-item">
             <h2 class="accordion-header">
-                <div class="bg-info-subtle accordion-button" type="button" data-bs-toggle="collapse"
-                     data-bs-target="#Beantragung" aria-expanded="true" aria-controls="Beantragung">
-                    <div class="d-flex">
-
+				<div class="d-flex">
+                	<div class="bg-info-subtle accordion-button" type="button" data-bs-toggle="collapse"
+                     	data-bs-target="#Beantragung" aria-expanded="true" aria-controls="Beantragung">
+						
                         <i class="me-2 fa fa-lg fa-info-circle" aria-hidden="true"></i>&ensp;
 						<?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoFristenTitle'); ?>
                     </div>
@@ -23,9 +23,10 @@
 	<?php if (isset($this->config->item('display_infobox')['referenzbeispiele_ects']) && $this->config->item('display_infobox')['referenzbeispiele_ects'] === true): ?>
         <div class="accordion-item">
             <h2 class="accordion-header">
-                <div class="bg-info-subtle accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                     data-bs-target="#Referenzbeispiele" aria-expanded="false" aria-controls="Referenzbeispiele">
-                    <div class="d-flex">
+				<div class="d-flex">
+                	<div class="bg-info-subtle accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    	 data-bs-target="#Referenzbeispiele" aria-expanded="false" aria-controls="Referenzbeispiele">
+                    
                         <i class="me-2 fa fa-lg fa-info-circle" aria-hidden="true"></i>&ensp;
 						<?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoEctsBerechnungTitle'); ?>
                     </div>
@@ -63,9 +64,10 @@
 	<?php if (isset($this->config->item('display_infobox')['herkunft_kenntnisse']) && $this->config->item('display_infobox')['herkunft_kenntnisse'] === true): ?>
         <div class="accordion-item">
             <h2 class="accordion-header">
-                <div class="bg-info-subtle accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                     data-bs-target="#HerkunftKenntnisse" aria-expanded="false" aria-controls="HerkunftKenntnisse">
-                    <div class="d-flex">
+				<div class="d-flex">
+                	<div class="bg-info-subtle accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+						data-bs-target="#HerkunftKenntnisse" aria-expanded="false" aria-controls="HerkunftKenntnisse">
+                    
                         <i class="me-2 fa fa-lg fa-info-circle" aria-hidden="true"></i>&ensp;
 						<?php echo $this->p->t('anrechnung', 'requestAnrechnungInfoHerkunftKenntnisseTitle'); ?>
                     </div>

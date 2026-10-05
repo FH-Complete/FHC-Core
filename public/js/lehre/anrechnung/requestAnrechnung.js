@@ -181,9 +181,10 @@ var requestAnrechnung = {
         const anrechnung_id = $('#requestAnrechnung-sperre').data('anrechnung_id');
         const is_expired = $('#requestAnrechnung-sperre').data('expired');
         const is_blocked = $('#requestAnrechnung-sperre').data('blocked');
+        const is_not_in_studienplan = $('#requestAnrechnung-sperre').data('not_in_studienplan');
 
-        // If Deadline is expired or is blocked by grades of LV, AND not already angerechnet
-        if ((is_expired || is_blocked) && anrechnung_id == '')
+        // If Deadline is expired, LV is blocked by grades or LV is not in the Studienplan, AND not already angerechnet
+        if ((is_expired || is_blocked || is_not_in_studienplan) && anrechnung_id == '')
         {
             // Hide status panel
             $('#requestAnrechnung-status').hide();
@@ -194,7 +195,10 @@ var requestAnrechnung = {
                 .html(function(){
                     let sperregrund = FHC_PhrasesLib.t('global', 'bearbeitungGesperrt') + ': ';
 
-                    if (is_expired) {
+                    if (is_not_in_studienplan) {
+                        sperregrund += FHC_PhrasesLib.t('anrechnung', 'lvNichtImStudienplan');
+                    }
+                    else if (is_expired) {
                         sperregrund += FHC_PhrasesLib.t('anrechnung', 'deadlineUeberschritten');
                     }
                     else if (is_blocked){
@@ -294,7 +298,7 @@ var requestAnrechnung = {
         )
         {
             $('#requestAnrechnung-maxEctsUeberschrittenMsg')
-                .html("<span class='flex-fill fw-bold'>Die Höchstgrenze für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz ist überschritten. </span><i class='mx-4 fa fa-lg fa-info-circle'></i>")
+                .html("<span class='flex-fill fw-bold'>" + FHC_PhrasesLib.t("anrechnung", "hoechstgrenzeUeberschritten") + " </span><i class='mx-4 fa fa-lg fa-info-circle'></i>")
                 .addClass('bg-danger-subtle')
                 .tooltip({
                     title: FHC_PhrasesLib.t("anrechnung", "anrechnungEctsTooltipTextBeiUeberschreitung"),
@@ -351,11 +355,12 @@ var requestAnrechnung = {
     },
     getMsgBeiEctsUeberschreitung: function(begruendung_id, ects, sumEctsSchulisch, sumEctsBeruflich){
 
-        const phraseUsed = '<span class="d-block">Die Höchstgrenze für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz wird überschritten.</span><span class=" fw-bold">Bisherige ECTS + ECTS dieser LV: Total: {0} [ Schulisch: {1}  | Beruflich: {2}  ]</span>&emsp;';
-
         return $('<div class="p-1" id="sumEctsMsg"></div>')
-            .html(phraseUsed) // schulisch
-            .append('<i class="fa fa-lg fa-info-circle"></i>')
+            .html(FHC_PhrasesLib.t("anrechnung", "anrechnungEctsTextBeiUeberschreitung",
+                begruendung_id == 4
+                    ? [(sumEctsSchulisch + sumEctsBeruflich + ects), sumEctsSchulisch, (sumEctsBeruflich + ects)] // beruflich
+                    : [(sumEctsSchulisch + sumEctsBeruflich + ects), (sumEctsSchulisch + ects), sumEctsBeruflich])) // schulisch
+            .append('&emsp;<i class="fa fa-lg fa-info-circle"></i>')
             .addClass('bg-danger-subtle')
             .tooltip({
                 title: FHC_PhrasesLib.t("anrechnung", "anrechnungEctsTooltipTextBeiUeberschreitung"),

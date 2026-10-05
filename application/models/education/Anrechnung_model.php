@@ -61,7 +61,7 @@ class Anrechnung_model extends DB_Model
 		if ($this->db->trans_status() === false)
 		{
 			$this->db->trans_rollback();
-			return error('Failed inserting Anrechnung', EXIT_ERROR);
+			return error($this->p->t('ui', 'fehlerBeimSpeichern'), EXIT_ERROR);
 		}
 		
 		return success($lastInsert_anrechnung_id);
@@ -166,7 +166,7 @@ class Anrechnung_model extends DB_Model
 		// Get last Anrechnungstatus
 		if (!$result = getData($this->AnrechnungModel->getLastAnrechnungstatus($anrechnung_id))[0])
 		{
-			return error('Failed loading Anrechnung');
+			return error($this->p->t('ui', 'fehlerBeimLesen'));
 		}
 		
 		$last_status = $result->status_kurzbz;
@@ -175,7 +175,7 @@ class Anrechnung_model extends DB_Model
 		// Exit, if last status is not approved / rejected
 		if ($last_status != self::ANRECHNUNGSTATUS_APPROVED && $last_status != self::ANRECHNUNGSTATUS_REJECTED)
 		{
-			return error('Nothing to withdraw. Application is still in progress');
+			return error($this->p->t('anrechnung', 'keineGenehmigungZumZuruecknehmen'));
 		}
 		
 		// Start DB transaction
@@ -197,7 +197,7 @@ class Anrechnung_model extends DB_Model
 		if ($this->db->trans_status() === false)
 		{
 			$this->db->trans_rollback();
-			return error('Failed withdrawing Genehmigung', EXIT_ERROR);
+			return error($this->p->t('anrechnung', 'antragNichtZurueckgenommen'), EXIT_ERROR);
 		}
 		return success();
 		
@@ -211,21 +211,31 @@ class Anrechnung_model extends DB_Model
 	 */
 	public function getAnrechnungsData($prestudent_id)
 	{
+		// Names in the users language, German if no translation exists
+		$english = getUserLanguage() != 'German';
+		$language_index = $english ? 2 : 1;
+		$lv_bezeichnung = $english
+			? 'COALESCE(NULLIF(lehre.tbl_lehrveranstaltung.bezeichnung_english, \'\'), lehre.tbl_lehrveranstaltung.bezeichnung)'
+			: 'lehre.tbl_lehrveranstaltung.bezeichnung';
+		$lv_comp_bezeichnung = $english
+			? 'COALESCE(NULLIF(lv_comp.bezeichnung_english, \'\'), lv_comp.bezeichnung)'
+			: 'lv_comp.bezeichnung';
+
 		$qry = '
 			SELECT
 			  lehre.tbl_anrechnung.anrechnung_id,
 			  lehre.tbl_anrechnung.prestudent_id,
 			  lehre.tbl_anrechnung.lehrveranstaltung_id,
-			  lehre.tbl_lehrveranstaltung.bezeichnung AS bez_lehrveranstaltung,
-			  lehre.tbl_anrechnung_begruendung.bezeichnung AS begruendung,
-			  lehre.tbl_anrechnung_anrechnungstatus.status_kurzbz AS status,
+			  ' . $lv_bezeichnung . ' AS bez_lehrveranstaltung,
+			  COALESCE(lehre.tbl_anrechnung_begruendung.bezeichnung_mehrsprachig[' . $language_index . '], lehre.tbl_anrechnung_begruendung.bezeichnung) AS begruendung,
+			  COALESCE(lehre.tbl_anrechnungstatus.bezeichnung_mehrsprachig[' . $language_index . '], lehre.tbl_anrechnung_anrechnungstatus.status_kurzbz) AS status,
 			  genehmigt_von,
 			  lehre.tbl_anrechnung.insertamum,
 			  lehre.tbl_anrechnung.insertvon,
 			  lehre.tbl_anrechnung.updateamum,
 			  lehre.tbl_anrechnung.updatevon,
 			  lehrveranstaltung_id_kompatibel,
-			  lv_comp.bezeichnung as lehrveranstaltung_bez_kompatibel,
+			  ' . $lv_comp_bezeichnung . ' as lehrveranstaltung_bez_kompatibel,
 			  count(nz.notizzuordnung_id) AS notizen_anzahl
 			FROM
 			  lehre.tbl_anrechnung

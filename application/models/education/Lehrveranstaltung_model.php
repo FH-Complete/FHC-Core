@@ -659,6 +659,26 @@ class Lehrveranstaltung_model extends DB_Model
 	}
 
 	/**
+	 * Gets the Lehrveranstaltung if it is in a Studienplan of the prestudent.
+	 * Checks the Studienplaene of all statuses, because the status of a future semester can be missing.
+	 * @param $prestudent_id
+	 * @param $lehrveranstaltung_id
+	 * @return array|null
+	 */
+	public function getLvInStudienplan($prestudent_id, $lehrveranstaltung_id)
+	{
+		$query = '
+			SELECT DISTINCT spl.lehrveranstaltung_id
+			FROM public.tbl_prestudentstatus ps
+			JOIN lehre.tbl_studienplan_lehrveranstaltung spl USING (studienplan_id)
+			WHERE ps.prestudent_id = ?
+			AND spl.lehrveranstaltung_id = ?;
+		';
+
+		return $this->execQuery($query, array($prestudent_id, $lehrveranstaltung_id));
+	}
+
+	/**
 	 * Get Lehreinheit.
 	 *
 	 * @param string				$student_uid

@@ -31,7 +31,7 @@ class Anrechnungszeitraum_model extends DB_Model
 
         if (isError($result))
         {
-            return error('Fehler bei Anrechnungszeitraum speichern.');
+            return error($this->p->t('ui', 'fehlerBeimSpeichern'));
         }
 
         // Return new anrechnungszeitraum_id
@@ -50,7 +50,7 @@ class Anrechnungszeitraum_model extends DB_Model
 
         if (isError($result))
         {
-            return error('Fehler bei Anrechnungszeitraum löschen.');
+            return error($this->p->t('anrechnung', 'fehlerBeimLoeschen'));
         }
 
         return success($result->retval);
@@ -78,7 +78,7 @@ class Anrechnungszeitraum_model extends DB_Model
 
         if (isError($result))
         {
-            return error('Fehler bei Anrechnungszeitraum update.');
+            return error($this->p->t('ui', 'fehlerBeimSpeichern'));
         }
 
         return success($result->retval);

@@ -88,6 +88,10 @@ class requestAnrechnung extends Auth_Controller
 		// Get Anrechung data
 		$anrechnungData = $this->anrechnunglib->getAnrechnungDataByLv($lehrveranstaltung_id, $studiensemester_kurzbz, $prestudent_id);
 
+		// Check if a new Antrag is for a Lehrveranstaltung outside the Studienplan (e.g. LV of a parallel study)
+		$is_not_in_studienplan = !is_numeric($anrechnungData->anrechnung_id)
+			&& !hasData($this->LehrveranstaltungModel->getLvInStudienplan($prestudent_id, $lehrveranstaltung_id));
+
 		// Get Antrag data
 		$antragData = $this->anrechnunglib->getAntragData($prestudent_id, $studiensemester_kurzbz, $lehrveranstaltung_id, $anrechnungData->anrechnung_id);
 		
@@ -95,7 +99,8 @@ class requestAnrechnung extends Auth_Controller
 			'antragData' => $antragData,
 			'anrechnungData' => $anrechnungData,
 			'is_expired' => $is_expired,
-			'is_blocked' => $is_blocked
+			'is_blocked' => $is_blocked,
+			'is_not_in_studienplan' => $is_not_in_studienplan
 		);
 		
 		$this->load->view('lehre/anrechnung/requestAnrechnung.php', $viewData);
@@ -154,13 +159,37 @@ class requestAnrechnung extends Auth_Controller
 		// Exit if application already exists
 		if (self::_applicationExists($lehrveranstaltung_id, $studiensemester_kurzbz, $prestudent_id))
 		{
-			return $this->outputJsonError($this->p->t('anrechnung', 'antragBereitsGestellt'));
+			return $this->outputJsonError($this->p->t('global', 'antragBereitsGestellt'));
 		}
 		
 		// Exit if application is a past ( < actual ) studysemester
 		if (self::_applicationIsPastSS($studiensemester_kurzbz))
 		{
 			return $this->outputJsonError($this->p->t('anrechnung', 'antragNichtFuerVerganganeSS'));
+		}
+
+		// Exit if student is not assigned to the Lehrveranstaltung
+		if (!hasData($this->LehrveranstaltungModel->getLvByStudent($this->_uid, $studiensemester_kurzbz, $lehrveranstaltung_id)))
+		{
+			return $this->outputJsonError($this->p->t('anrechnung', 'lvNichtZugeteilt'));
+		}
+
+		// Exit if Lehrveranstaltung is not in the Studienplan of the student (e.g. LV of a parallel study)
+		if (!hasData($this->LehrveranstaltungModel->getLvInStudienplan($prestudent_id, $lehrveranstaltung_id)))
+		{
+			return $this->outputJsonError($this->p->t('anrechnung', 'lvNichtImStudienplan'));
+		}
+
+		// Exit if application deadline is expired
+		if ($this->_isExpired($studiensemester_kurzbz))
+		{
+			return $this->outputJsonError($this->p->t('anrechnung', 'deadlineUeberschritten'));
+		}
+
+		// Exit if Lehrveranstaltung was already graded with application blocking grades
+		if (self::_LVhasBlockingGrades($studiensemester_kurzbz, $lehrveranstaltung_id))
+		{
+			return $this->outputJsonError($this->p->t('anrechnung', 'antragBenotungBlockiert'));
 		}
 		
 		// Upload document

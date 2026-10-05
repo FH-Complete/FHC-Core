@@ -141,7 +141,8 @@ if (defined("CIS4")) {
                     </div>
                     
                     <button type="submit"
-                            class="btn btn-outline-secondary col-auto"><?php echo ucfirst($this->p->t('ui', 'anzeigen')); ?></button>
+                            class="btn btn-outline-secondary col-auto"><?php echo ucfirst($this->p->t('ui', 'anzeigen')); ?>
+					</button>
                 </form>
             </div>
         </div>
@@ -179,9 +180,11 @@ if (defined("CIS4")) {
                         </li>
                         <li class="list-group-item  list-group-item-secondary"><?php echo $this->p->t('anrechnung', 'genehmigungNegativKenntnisseNichtGleichwertigWeilHinweis'); ?></li>
                     </ol>
-                    <textarea class="form-control" name="begruendung" id="approveAnrechnungUebersicht-begruendung"
+                    <textarea class="form-control" 
+							  name="begruendung" id="approveAnrechnungUebersicht-begruendung"
                               rows="2"
-                              placeholder="<?php echo $this->p->t('anrechnung', 'textUebernehmenOderEigenenBegruendungstext'); ?>" required></textarea>
+                              placeholder="<?php echo $this->p->t('anrechnung', 'textUebernehmenOderEigenenBegruendungstext'); ?>"
+							  required></textarea>
                 </div>
                
                 <!-- Action Button 'Abbrechen'-->

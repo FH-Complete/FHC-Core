@@ -21,7 +21,7 @@ class NotizAnrechnung extends Notiz_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
-			'ui'
+			'ui', 'lehre'
 		]);
 	}
 

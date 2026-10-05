@@ -11,7 +11,7 @@ $includesArray = array(
 	'jquery3' => true,
 	'jqueryui1' => true,
 	'bootstrap5' => true,
-	'fontawesome4' => true,
+	'fontawesome6' => true,
 	'ajaxlib' => true,
 	'dialoglib' => true,
 	'cis'=>true,
@@ -36,8 +36,10 @@ $includesArray = array(
 		'anrechnung' => array(
 			'deadlineUeberschritten',
 			'benotungDerLV',
+			'lvNichtImStudienplan',
             'anrechnungEctsTextBeiUeberschreitung',
-            'anrechnungEctsTooltipTextBeiUeberschreitung'
+            'anrechnungEctsTooltipTextBeiUeberschreitung',
+            'hoechstgrenzeUeberschritten'
 		),
 		'person' => array(
 			'student',
@@ -158,9 +160,9 @@ else
                                                     </div>
                                                 </th>
                                                 <td colspan="3">
-                                                    Total ECTS: <span id="sumEctsTotal"><?php echo number_format($antragData->sumEctsSchulisch + $antragData->sumEctsBeruflich, 1) ?></span>
-                                                    [ Schulisch: <span id="sumEctsSchulisch"><?php echo $antragData->sumEctsSchulisch ?></span> |
-                                                    Beruflich: <span id="sumEctsBeruflich"><?php echo $antragData->sumEctsBeruflich ?></span> ]
+                                                    <?php echo $this->p->t('anrechnung', 'totalEcts'); ?>: <span id="sumEctsTotal"><?php echo number_format($antragData->sumEctsSchulisch + $antragData->sumEctsBeruflich, 1) ?></span>
+                                                    [ <?php echo $this->p->t('anrechnung', 'schulisch'); ?>: <span id="sumEctsSchulisch"><?php echo $antragData->sumEctsSchulisch ?></span> |
+                                                    <?php echo $this->p->t('anrechnung', 'beruflich'); ?>: <span id="sumEctsBeruflich"><?php echo $antragData->sumEctsBeruflich ?></span> ]
                                                     <div class="p-1 align-items-center" id="requestAnrechnung-maxEctsUeberschrittenMsg"></div>
                                                 </td>
                                             </tr>
@@ -184,43 +186,31 @@ else
 								<div class="col-lg-12">
 									<div class="border border-dark border-3 rounded p-3" >
 										<p ><?php echo $this->p->t('anrechnung', 'antragStellenText'); ?></p>
-										
 										<div class="ps-3 ">
-										
 											<div  class="form-check mb-1">
-											
 												<input class="form-check-input" type="radio" name="begruendung" value="1" <?php echo $anrechnungData->begruendung_id == '1' ? 'checked' : ''; ?> required />
 												<?php echo $this->p->t('anrechnung', 'antragStellenWegenZeugnis'); ?>&emsp;
 												<div class="d-inline" id="requestAnrechnung-anrechnungGrundZeugnisTooltip" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
 														data-bs-title="<?php echo $this->p->t('anrechnung', 'anrechnungGrundZeugnisTooltipText'); ?>" >
 													<i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
 												</div>
-											
 											</div>
-										
 											<div class="form-check mb-1">
-											
 												<input class="form-check-input" type="radio" name="begruendung" value="5" <?php echo $anrechnungData->begruendung_id == '5' ? 'checked' : ''; ?>  required />
 												<?php echo $this->p->t('anrechnung', 'antragStellenWegenHochschulzeugnis'); ?>&emsp;
 												<div class="d-inline" id="requestAnrechnung-anrechnungGrundHochschulzeugnisTooltip" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
                                                       data-bs-title="<?php echo $this->p->t('anrechnung', 'anrechnungGrundZeugnisTooltipText'); ?>">
                                                 	<i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
                                                 </div>
-										
 											</div>
 											<div class="form-check mb-1">
-											
 												<input class="form-check-input" type="radio" name="begruendung" value="4" <?php echo $anrechnungData->begruendung_id == '4' ? 'checked' : ''; ?>  required />
 												<?php echo $this->p->t('anrechnung', 'antragStellenWegenPraxis'); ?>&emsp;
 												<div class="d-inline" id="requestAnrechnung-anrechnungGrundBerufTooltip" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
 													  data-bs-title="<?php echo $this->p->t('anrechnung', 'anrechnungGrundBerufTooltipText'); ?>">
 													<i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
 												</div>
-											
 											</div>
-											
-                                        
-										
 										</div>
 									</div>
 								</div>
@@ -285,7 +275,7 @@ else
 														required>
 												<div class="mx-4 " id="requestAnrechnung-uploadTooltip" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
 											   		data-bs-title="<?php echo $this->p->t('ui', 'uploadTooltipText'); ?>">
-													<i class="fa fa-lg fa-question-circle-o" aria-hidden="true"></i>
+													<i class="fa-regular fa-lg fa-circle-question" aria-hidden="true"></i>
 												</div>
 												<a class="mx-4 float-end <?php echo !empty($anrechnungData->dms_id) ? '' : 'visually-hidden' ?>"
 													id="requestAnrechnung-downloadDocLink"
@@ -293,9 +283,6 @@ else
 													target="_blank"><?php echo htmlentities($anrechnungData->dokumentname) ?>
 												</a>
 											</div>
-												
-											
-											
 										</div>
 									</div>
 								</div>
@@ -303,38 +290,35 @@ else
 							<!-- Herkunft der Kenntnisse -->
 							<div class="row mb-3">
 								<div class="col-lg-12">
-									
-											<div class="card">
-												<div class="card-header">
-													<span class="fw-bold"><?php echo $this->p->t('anrechnung', 'herkunftDerKenntnisse'); ?></span>&emsp;
-													<div class="d-inline" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="<?php echo $this->p->t('anrechnung', 'anrechnungInfoTooltipText'); ?>">
-														<i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
-													</div>
-												</div>
-												<div class="card-body">
-													<textarea class="form-control" name="anmerkung" rows="1" id="requestAnrechnung-herkunftDerKenntnisse"
-                                                              maxlength="<?php echo CHAR_LENGTH125 ?>" required><?php echo $anrechnungData->anmerkung; ?></textarea>
-													<small><span class="text-muted float-end"><?php echo $this->p->t('ui', 'maxZeichen'); ?> :<span id="requestAnrechnung-herkunftDerKenntnisse-charCounter"><?php echo CHAR_LENGTH125 ?></span></span></small>
-												</div>
+									<div class="card">
+										<div class="card-header">
+											<span class="fw-bold"><?php echo $this->p->t('anrechnung', 'herkunftDerKenntnisse'); ?></span>&emsp;
+											<div class="d-inline" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="<?php echo $this->p->t('anrechnung', 'anrechnungInfoTooltipText'); ?>">
+												<i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
 											</div>
 										</div>
-									
+										<div class="card-body">
+											<textarea class="form-control" name="anmerkung" rows="1" id="requestAnrechnung-herkunftDerKenntnisse"
+													  maxlength="<?php echo CHAR_LENGTH125 ?>" required><?php echo $anrechnungData->anmerkung; ?></textarea>
+											<small><span class="text-muted float-end"><?php echo $this->p->t('ui', 'maxZeichen'); ?> :<span id="requestAnrechnung-herkunftDerKenntnisse-charCounter"><?php echo CHAR_LENGTH125 ?></span></span></small>
+										</div>
+									</div>
+								</div>
 							</div>
 							<!-- Bestaetigung-->
 							<div class="row mb-3">
 								<div class="col-lg-12">
 									<div class="border border-3 rounded border-dark p-3" >
-										
-											<div class="form-check">
+										<div class="form-check">
 											<input class="form-check-input border-3" type="checkbox" name="bestaetigung" required>
 											<small  class=" fw-bold"><?php echo $this->p->t('anrechnung', 'bestaetigungstext'); ?></small>
-											</div>
+										</div>
 									</div>
 								</div>
 							</div>
 							<!-- Button 'Anrechnung beantragen'-->
 							<div class="float-end">
-								<input type="submit" id="requestAnrechnung-apply-anrechnung" class="btn btn-primary"
+								<input type="submit" id="requestAnrechnung-apply-anrechnung" class="btn btn-primary" 
 									   value="<?php echo $this->p->t('anrechnung', 'anrechnungBeantragen'); ?>">
 							</div>
 						</form>
@@ -343,16 +327,18 @@ else
             </div>
             <div class="col-4">
 				 <!-- Status panel -->
-                <div class="alert text-center" id="requestAnrechnung-status">Status: <span class="fw-bold text-uppercase" id="requestAnrechnung-status_kurzbz"
-                             data-status_kurzbz="<?php echo $anrechnungData->status_kurzbz ?>">
-                            <?php echo $anrechnungData->status; ?>
-                        </span>
+                <div class="alert text-center" id="requestAnrechnung-status"><?php echo $this->p->t('global', 'status'); ?>: 
+					<span class="fw-bold text-uppercase" id="requestAnrechnung-status_kurzbz"
+						 data-status_kurzbz="<?php echo $anrechnungData->status_kurzbz ?>">
+						<?php echo $anrechnungData->status; ?>
+					</span>
 				</div>
 				<!-- Sperregrund panel (hidden by default) -->
 				<div class="alert bg-danger-subtle text-center visually-hidden" id="requestAnrechnung-sperre"
 					 data-anrechnung_id="<?php echo empty($anrechnungData->anrechnung_id) ? '' : $anrechnungData->anrechnung_id; ?>"
 					 data-expired="<?php echo json_encode($is_expired); ?>"
-					 data-blocked="<?php echo json_encode($is_blocked) ?>">
+					 data-blocked="<?php echo json_encode($is_blocked) ?>"
+					 data-not_in_studienplan="<?php echo json_encode($is_not_in_studienplan) ?>">
 				</div>
 				<?php $this->load->view('lehre/anrechnung/requestAnrechnungImportant'); ?>
             </div>

@@ -106,7 +106,8 @@ if (defined("CIS4")) {
                 <h3 class="fw-normal">
                     <?php echo $this->p->t('anrechnung', 'anrechnungenPruefen'); ?>
                     <small class="text-secondary fs-6">|
-                        <?php echo ucfirst($this->p->t('global', 'uebersicht')); ?></small>
+                        <?php echo ucfirst($this->p->t('global', 'uebersicht')); ?>
+					</small>
                 </h3>
             </div>
         </div>
@@ -130,7 +131,8 @@ if (defined("CIS4")) {
                         ?>
                     </div>
                     <button type="submit"
-                        class="btn btn-outline-secondary col-auto"><?php echo ucfirst($this->p->t('ui', 'anzeigen')); ?></button>
+                        class="btn btn-outline-secondary col-auto"><?php echo ucfirst($this->p->t('ui', 'anzeigen')); ?>
+					</button>
                 </form>
             </div>
         </div>
@@ -148,10 +150,12 @@ if (defined("CIS4")) {
                         <?php echo $this->p->t('anrechnung', 'empfehlungenNegativQuestion'); ?>
                     </h4>
                     <div class="mb-4">
-                        <b><span>&ensp;<?php echo $this->p->t('anrechnung', 'bitteBegruendungAngeben'); ?></span>
+                        <b>
+							<span>&ensp;<?php echo $this->p->t('anrechnung', 'bitteBegruendungAngeben'); ?></span>
                             <span class="text-danger">
                                 <?php echo $this->p->t('anrechnung', 'begruendungWirdFuerAlleUebernommen'); ?>
-                            </span></b>
+                            </span>
+						</b>
                     </div>
 
                     <ul class="list-group mb-4">

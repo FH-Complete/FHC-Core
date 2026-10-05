@@ -25,7 +25,7 @@ class Anrechnungen extends FHCAPI_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
-			'ui', 'lehre'
+			'ui', 'lehre', 'anrechnung'
 		]);
 
 		// Load models
@@ -45,6 +45,12 @@ class Anrechnungen extends FHCAPI_Controller
 	{
 		$this->load->model('education/Anrechnungbegruendung_model', 'AnrechnungbegrueundungsModel');
 
+		// Begruendung in the users language, German name if no translation exists
+		$language_index = getUserLanguage() == 'German' ? 1 : 2;
+		$this->AnrechnungbegrueundungsModel->addSelect(
+			'begruendung_id, COALESCE(bezeichnung_mehrsprachig[' . $language_index . '], bezeichnung) AS bezeichnung',
+			false
+		);
 		$result = $this->AnrechnungbegrueundungsModel->load();
 		if (isError($result)) {
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
@@ -118,22 +124,22 @@ class Anrechnungen extends FHCAPI_Controller
 			: null;
 
 		$this->form_validation->set_rules('lehrveranstaltung_id', 'Lehrveranstaltung_id', 'required', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Lehrveranstaltung'])
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('lehre', 'lehrveranstaltung')])
 		]);
 
 		$this->form_validation->set_rules('begruendung', 'Begruendung', 'required', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Begruendung'])
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('anrechnung', 'begruendung')])
 		]);
 
 		if($_POST['begruendung'] == 2)
 		{
 			$this->form_validation->set_rules('lehrveranstaltung_id_kompatibel', 'Lehrveranstaltung_id', 'required', [
-				'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Lehrveranstaltung Kompatibel'])
+				'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('anrechnung', 'lehrveranstaltung_bez_kompatibel')])
 			]);
 		}
 
 		$this->form_validation->set_rules('genehmigtVon', 'GenehmigtVon', 'required', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'GenehmigtVon'])
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('anrechnung', 'genehmigtVon')])
 		]);
 
 		if ($this->form_validation->run() == false)
@@ -190,22 +196,22 @@ class Anrechnungen extends FHCAPI_Controller
 		$_POST['genehmigtVon'] = (isset($formData['genehmigt_von']) && !empty($formData['genehmigt_von'])) ? $formData['genehmigt_von'] : null;
 
 		$this->form_validation->set_rules('lehrveranstaltung_id', 'Lehrveranstaltung_id', 'required', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Lehrveranstaltung'])
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('lehre', 'lehrveranstaltung')])
 		]);
 
 		$this->form_validation->set_rules('begruendung', 'Begruendung', 'required', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Begruendung'])
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('anrechnung', 'begruendung')])
 		]);
 
 		if($_POST['begruendung'] == 2)
 		{
 			$this->form_validation->set_rules('lehrveranstaltung_id_kompatibel', 'Lehrveranstaltung_id', 'required', [
-				'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Lehrveranstaltung Kompatibel'])
+				'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('anrechnung', 'lehrveranstaltung_bez_kompatibel')])
 			]);
 		}
 
 		$this->form_validation->set_rules('genehmigtVon', 'GenehmigtVon', 'required', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'GenehmigtVon'])
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('anrechnung', 'genehmigtVon')])
 		]);
 
 		if ($this->form_validation->run() == false)

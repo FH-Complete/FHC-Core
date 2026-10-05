@@ -152,7 +152,6 @@ if (defined("CIS4")) {
 									<div class="col-lg-8">
 										<table class="table table-bordered table-condensed table-fixed mb-0">
 											<tbody>
-
 												<tr>
 													<th class="col-4">
 														<?php echo ucfirst($this->p->t('global', 'zgv')); ?>
@@ -192,7 +191,6 @@ if (defined("CIS4")) {
 											<?php endif; ?>
 											</tbody>
 										</table>
-
 									</div>
 								</div>
 							</div>
@@ -215,7 +213,6 @@ if (defined("CIS4")) {
 									<?php echo $this->p->t('anrechnung', 'empfehlungdatum'); ?>:
 									<span
 										id="reviewAnrechnungDetail-empfehlungAm"><?php echo $empfehlungData->empfehlung_am ?></span>
-
 								</div>
 							</div>
 							<div class="card-body">
@@ -383,9 +380,9 @@ if (defined("CIS4")) {
 				<div class="mb-5 alert text-center">
 					<?php echo $this->p->t('global', 'status'); ?>:
 					<b><span class="text-uppercase" id="reviewAnrechnungDetail-status_kurzbz"
-							data-status_kurzbz="<?php echo $anrechnungData->status_kurzbz ?>">
-							<?php echo $anrechnungData->status; ?>
-						</span></b>
+						data-status_kurzbz="<?php echo $anrechnungData->status_kurzbz ?>">
+						<?php echo $anrechnungData->status; ?>
+					</span></b>
 				</div>
 
 				<?php $this->load->view('lehre/anrechnung/reviewAnrechnungInfo'); ?>

@@ -59,7 +59,7 @@ class AnrechnungLib
 			// Load LV, but check if student is assigned to that LV. Break, if not.
 			if(!$lv = getData($this->ci->LehrveranstaltungModel->getLvByStudent($uid, $studiensemester_kurzbz, $lv_id))[0])
 			{
-				show_error('You are not assigned to this course yet.');
+				show_error($this->ci->p->t('anrechnung', 'lvNichtZugeteilt'));
 			}
 		}
 
@@ -788,7 +788,7 @@ class AnrechnungLib
 		$result = $this->ci->AnrechnungModel->load($anrechnung_id);
 		if (!hasData($result))
 		{
-			showError('Anrechnung existiert nicht');
+			show_error('Failed loading Anrechnung');
 		}
 		
 		// Get lectors of lehrveranstaltung

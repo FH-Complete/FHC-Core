@@ -13,7 +13,7 @@ if ($result = $db->db_query("SELECT 1 FROM information_schema.columns WHERE tabl
 			UPDATE lehre.tbl_anrechnung_begruendung SET bezeichnung_mehrsprachig = ARRAY[
 				bezeichnung,
 				CASE bezeichnung
-					WHEN 'externes Zeugnis' THEN 'external certificate'
+					WHEN 'schulisches Zeugnis' THEN 'school certificate'
 					WHEN 'kompatible Lehrveranstaltung' THEN 'compatible course'
 					WHEN 'Prüfung' THEN 'examination'
 					WHEN 'berufliche Praxis' THEN 'professional practice'
