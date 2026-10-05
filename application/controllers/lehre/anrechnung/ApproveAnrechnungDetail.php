@@ -128,7 +128,7 @@ class approveAnrechnungDetail extends Auth_Controller
 		// Validate data
 		if (isEmptyArray($data))
 		{
-			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
+			return $this->outputJsonError($this->p->t('anrechnung', 'fehlerDatenuebertragung'));
 		}
 
 		// Get STGLs person data
@@ -159,7 +159,7 @@ class approveAnrechnungDetail extends Auth_Controller
 		}
 		else
 		{
-			return $this->outputJsonError('Es wurden keine Anrechnungen genehmigt.');
+			return $this->outputJsonError($this->p->t('anrechnung', 'keineAnrechnungenGenehmigt'));
 		}
 	}
 
@@ -173,7 +173,7 @@ class approveAnrechnungDetail extends Auth_Controller
 		// Validate data
 		if (isEmptyArray($data))
 		{
-			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
+			return $this->outputJsonError($this->p->t('anrechnung', 'fehlerDatenuebertragung'));
 		}
 
 		// Get STGLs person data
@@ -217,7 +217,7 @@ class approveAnrechnungDetail extends Auth_Controller
 
 		if(isEmptyString($anrechnung_id))
 		{
-			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
+			return $this->outputJsonError($this->p->t('anrechnung', 'fehlerDatenuebertragung'));
 		}
 
 		$retval = array();
@@ -225,7 +225,7 @@ class approveAnrechnungDetail extends Auth_Controller
         // Check if Anrechnungs-LV has lector
         if (!$this->anrechnunglib->LVhasLector($anrechnung_id))
         {
-            $this->terminateWithJsonError('LV has no lector');
+            $this->terminateWithJsonError($this->p->t('anrechnung', 'lvHatKeineLektoren'));
         }
 
         // Get Fachbereichsleitung or LV Leitung.
@@ -258,13 +258,13 @@ class approveAnrechnungDetail extends Auth_Controller
         if ($empfehlungsanfrage_an == '')
         {
             $this->terminateWithJsonError(
-                "Empfehlung wurde nicht angefordert,\nDer LV sind keine LektorInnen zugeteilt."
+                $this->p->t('anrechnung', 'empfehlungNichtAngefordert') . "\n" . $this->p->t('anrechnung', 'lvHatKeineLektoren')
             );
         }
 
 		if (isEmptyArray($retval))
 		{
-            $this->terminateWithJsonError("Empfehlung wurde nicht angefordert");
+            $this->terminateWithJsonError($this->p->t('anrechnung', 'empfehlungNichtAngefordert'));
 		}
         else
         {
@@ -283,6 +283,12 @@ class approveAnrechnungDetail extends Auth_Controller
 		if (!is_numeric($anrechnung_id))
 		{
 			$this->terminateWithJsonError($this->p->t('ui', 'errorFelderFehlen'));
+		}
+
+		// Exit if user has no write permission for the Studiengang of the Anrechnung
+		if (!$this->anrechnunglib->isBerechtigtForAnrechnung(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 'suid', $anrechnung_id))
+		{
+			$this->terminateWithJsonError($this->p->t('ui', 'keineBerechtigung'));
 		}
 
 		// Delete last status approved / rejected.
@@ -313,6 +319,12 @@ class approveAnrechnungDetail extends Auth_Controller
 			show_error('Wrong parameter.');
 		}
 
+		// Exit if user has no write permission for the Studiengang of the Anrechnung
+		if (!$this->anrechnunglib->isBerechtigtForAnrechnung(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 'suid', $anrechnung_id))
+		{
+			return $this->outputJsonError($this->p->t('ui', 'keineBerechtigung'));
+		}
+
 		// Get boolean empfehlung of given Anrechnung
 		if (!$result = getData($this->AnrechnungModel->load($anrechnung_id))[0])
 		{
@@ -333,7 +345,7 @@ class approveAnrechnungDetail extends Auth_Controller
 		// Return if Anrechnung was not waiting for recommendation or if Anrechnung has already been recommended
 		if ($last_status != self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR || !is_null($empfehlung))
 		{
-			return $this->outputJsonError('No recommendation to withdraw.');
+			return $this->outputJsonError($this->p->t('anrechnung', 'keineEmpfehlungZumZuruecknehmen'));
 		}
 
 		// Reset status to 'inProgressDP'
@@ -341,7 +353,7 @@ class approveAnrechnungDetail extends Auth_Controller
 
 		if (isError($result))
 		{
-			return $this->outputJsonError('Could not withdraw this application.');
+			return $this->outputJsonError($this->p->t('anrechnung', 'antragNichtZurueckgenommen'));
 		}
 
 		// Success output to AJAX
@@ -359,7 +371,20 @@ class approveAnrechnungDetail extends Auth_Controller
 		// Validate data
 		if (isEmptyString($anrechnung_id))
 		{
-			$this->terminateWithJsonError($this->p->t('ui', 'systemFehler'));
+			$this->terminateWithJsonError($this->p->t('ui', 'systemfehler'));
+		}
+
+		// Exit if user has no write permission for the Studiengang of the Anrechnung
+		if (!$this->anrechnunglib->isBerechtigtForAnrechnung(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 'suid', $anrechnung_id))
+		{
+			$this->terminateWithJsonError($this->p->t('ui', 'keineBerechtigung'));
+		}
+
+		// Exit if the posted Notiz is not an Empfehlungsnotiz of this Anrechnung
+		$result = $this->NotizModel->getNotizByAnrechnung($anrechnung_id, self::ANRECHNUNG_NOTIZTITEL_EMPFEHLUNGSNOTIZ_BY_STGL);
+		if (!isEmptyString($notiz_id) && !in_array($notiz_id, array_column(hasData($result) ? getData($result) : array(), 'notiz_id')))
+		{
+			$this->terminateWithJsonError($this->p->t('ui', 'keineBerechtigung'));
 		}
 
 		// Save Empfehlungstext
@@ -423,14 +448,8 @@ class approveAnrechnungDetail extends Auth_Controller
 			show_error('Failed loading Anrechnung');
 		}
 		
-		$result = $this->LehrveranstaltungModel->loadWhere(array(
-			'lehrveranstaltung_id' => getData($result)[0]->lehrveranstaltung_id
-		));
-
-	    $studiengang_kz = getData($result)[0]->studiengang_kz;
-
-        // Check if user is entitled
-        if (!$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 's', $studiengang_kz))
+        // Check if user is entitled for the Studiengang of the Anrechnung
+        if (!$this->anrechnunglib->isBerechtigtForAnrechnung(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 's', $anrechnung_id))
         {
             show_error('You are not entitled to read this page');
         }
@@ -449,14 +468,8 @@ class approveAnrechnungDetail extends Auth_Controller
 			show_error('Failed retrieving Anrechnung');
 		}
 
-		$result = $this->LehrveranstaltungModel->loadWhere(array(
-			'lehrveranstaltung_id' => $result->lehrveranstaltung_id
-		));
-
-		$studiengang_kz = getData($result)[0]->studiengang_kz;
-
-        // Check if user is entitled
-        if (!$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 's', $studiengang_kz))
+        // Check if user is entitled for the Studiengang of the Anrechnung
+        if (!$this->anrechnunglib->isBerechtigtForAnrechnung(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 's', $result->anrechnung_id))
         {
             show_error('You are not entitled to read this document');
         }

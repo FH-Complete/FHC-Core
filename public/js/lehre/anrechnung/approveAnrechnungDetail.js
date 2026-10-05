@@ -15,7 +15,7 @@ $(function(){
     var canPromise = !! window.Promise;
     if(!canPromise)
     {
-        alert("Diese Seite kann mit ihrem Browser nicht angezeigt werden. Bitte verwenden Sie Firefox, Chrome oder Edge um die Seite anzuzeigen");
+        alert(FHC_PhrasesLib.t("anrechnung", "browserNichtUnterstuetzt"));
         window.location.href='about:blank';
         return;
     }
@@ -630,7 +630,7 @@ var approveAnrechnungDetail = {
         ){
        
             $('#sumEctsMsg')
-                .html("<span class='flex-fill fw-bold'>Die Höchstgrenze für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz ist überschritten. </span><i class='mx-4 fa fa-lg fa-info-circle'></i>")
+                .html("<span class='flex-fill fw-bold'>" + FHC_PhrasesLib.t("anrechnung", "hoechstgrenzeUeberschritten") + " </span><i class='mx-4 fa fa-lg fa-info-circle'></i>")
                 .addClass('bg-danger-subtle')
                 .tooltip({
                     title: FHC_PhrasesLib.t("anrechnung", "anrechnungEctsTooltipTextBeiUeberschreitung"),

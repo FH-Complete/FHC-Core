@@ -123,7 +123,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		// Validate data
 		if (isEmptyArray($data))
 		{
-			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
+			return $this->outputJsonError($this->p->t('anrechnung', 'fehlerDatenuebertragung'));
 		}
 
         $json = array(
@@ -154,7 +154,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		}
 		else
 		{
-			return $this->outputJsonError('Es wurden keine Anrechnungen genehmigt.');
+			return $this->outputJsonError($this->p->t('anrechnung', 'keineAnrechnungenGenehmigt'));
 		}
 	}
 
@@ -168,7 +168,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		// Validate data
 		if (isEmptyArray($data))
 		{
-			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
+			return $this->outputJsonError($this->p->t('anrechnung', 'fehlerDatenuebertragung'));
 		}
 
 		// Reject Anrechnung
@@ -191,7 +191,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		}
 		else
 		{
-			return $this->outputJsonError('Es wurden keine Anrechnungen genehmigt.');
+			return $this->outputJsonError($this->p->t('anrechnung', 'keineAnrechnungenAbgelehnt'));
 		}
 	}
 
@@ -204,7 +204,7 @@ class approveAnrechnungUebersicht extends Auth_Controller
 
 		if(isEmptyArray($data))
 		{
-			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
+			return $this->outputJsonError($this->p->t('anrechnung', 'fehlerDatenuebertragung'));
 		}
 
 		$retval = array();
@@ -254,10 +254,10 @@ class approveAnrechnungUebersicht extends Auth_Controller
 		{
             if ($counter > 0)
             {
-                $this->terminateWithJsonError('Bei '. $counter.' LV sind keine LektorInnen zugeteilt.');
+                $this->terminateWithJsonError($this->p->t('anrechnung', 'lvsOhneLektoren', array($counter)));
             }
 
-			$this->terminateWithJsonError('Es wurden keine Empfehlungen angefordert');
+			$this->terminateWithJsonError($this->p->t('anrechnung', 'keineEmpfehlungenAngefordert'));
 		}
 
 		$this->outputJsonSuccess($retval);
@@ -312,19 +312,8 @@ class approveAnrechnungUebersicht extends Auth_Controller
 			show_error('Failed retrieving Anrechnung');
 		}
 
-		$result = $this->LehrveranstaltungModel->loadWhere(array(
-			'lehrveranstaltung_id' => $result->lehrveranstaltung_id
-		));
-
-		if(!$result = getData($result)[0])
-		{
-			show_error('Failed loading Lehrveranstaltung');
-		}
-
-        $studiengang_kz = $result->studiengang_kz;
-
-		// Check if user is entitled
-		if (!$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 's', $studiengang_kz))
+		// Check if user is entitled for the Studiengang of the Anrechnung
+		if (!$this->anrechnunglib->isBerechtigtForAnrechnung(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 's', $result->anrechnung_id))
         {
             show_error('You are not entitled to read this document');
         }

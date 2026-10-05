@@ -14,6 +14,8 @@ class AnrechnungLib
 	const ANRECHNUNG_NOTIZTITEL_NOTIZ_BY_STGL = 'AnrechnungNotizSTGL';
 	const ANRECHNUNG_NOTIZTITEL_EMPFEHLUNGSNOTIZ_BY_STGL = 'AnrechnungEmpfehlungsnotizSTGL';
 
+	const BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN = 'lehre/anrechnung_genehmigen';
+
 	public function __construct()
 	{
 		$this->ci =& get_instance();
@@ -73,8 +75,8 @@ class AnrechnungLib
 			show_error(getError($student));
 		}
 
-		// Get studiengang bezeichnung
-		if (!$studiengang = getData($this->ci->StudiengangModel->load($lv->studiengang_kz))[0])
+		// Get studiengang bezeichnung of the student, not of the LV
+		if (!$studiengang = getData($this->ci->StudiengangModel->load($student->studiengang_kz))[0])
 		{
 			show_error('Failed loading studiengang data.');
 		}
@@ -93,15 +95,20 @@ class AnrechnungLib
 		$latest_zgv_bezeichnung = hasData($result) ? getData($result)[0]->bezeichnung : '';
 
         // Get Sum of berufliche and schulische ECTS
-        $result = $this->ci->LehrveranstaltungModel->getEctsSumSchulisch($uid, $prestudent_id, $lv->studiengang_kz);
+        $result = $this->ci->LehrveranstaltungModel->getEctsSumSchulisch($uid, $prestudent_id, $student->studiengang_kz);
         $sumEctsSchulisch = getData($result)[0]->ectssumschulisch;
 
         $result = $this->ci->LehrveranstaltungModel->getEctsSumBeruflich($uid);
         $sumEctsBeruflich = getData($result)[0]->ectssumberuflich;
 
+		// English names only if the LV or Studiengang has one
+		$english = getUserLanguage() != 'German';
+
 		// Set the given studiensemester
 		$antrag_data->lv_id = $lv_id;
-		$antrag_data->lv_bezeichnung = $lv->bezeichnung;
+		$antrag_data->lv_bezeichnung = $english && !isEmptyString($lv->bezeichnung_english)
+			? $lv->bezeichnung_english
+			: $lv->bezeichnung;
 		$antrag_data->ects = $lv->ects;
         $antrag_data->sumEctsSchulisch = $sumEctsSchulisch;
         $antrag_data->sumEctsBeruflich = $sumEctsBeruflich;
@@ -111,7 +118,9 @@ class AnrechnungLib
 		$antrag_data->student_uid = $uid;
 		$antrag_data->matrikelnr = $student->matrikelnr;
         $antrag_data->studiengang_kz = $studiengang->studiengang_kz;
-		$antrag_data->stg_bezeichnung = $studiengang->bezeichnung;
+		$antrag_data->stg_bezeichnung = $english && !isEmptyString($studiengang->english)
+			? $studiengang->english
+			: $studiengang->bezeichnung;
 		$antrag_data->lektoren = $lv_lektoren_arr;
 		$antrag_data->zgv = $latest_zgv_bezeichnung;
 
@@ -458,6 +467,12 @@ class AnrechnungLib
 	 */
 	public function approveAnrechnung($anrechnung_id)
 	{
+		// Exit if user has no write permission for the Studiengang of the Anrechnung
+		if (!$this->isBerechtigtForAnrechnung(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 'suid', $anrechnung_id))
+		{
+			return false;
+		}
+
 		// Check last Anrechnungstatus
 		if (!$result = getData($this->ci->AnrechnungModel->getLastAnrechnungstatus($anrechnung_id))[0])
 		{
@@ -507,6 +522,12 @@ class AnrechnungLib
 	 */
 	public function rejectAnrechnung($anrechnung_id, $begruendung)
 	{
+		// Exit if user has no write permission for the Studiengang of the Anrechnung
+		if (!$this->isBerechtigtForAnrechnung(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 'suid', $anrechnung_id))
+		{
+			return false;
+		}
+
 		// Check last Anrechnungstatus
 		if (!$result = getData($this->ci->AnrechnungModel->getLastAnrechnungstatus($anrechnung_id))[0])
 		{
@@ -555,6 +576,12 @@ class AnrechnungLib
 	 */
 	public function requestRecommendation($anrechnung_id)
 	{
+		// Exit if user has no write permission for the Studiengang of the Anrechnung
+		if (!$this->isBerechtigtForAnrechnung(self::BERECHTIGUNG_ANRECHNUNG_GENEHMIGEN, 'suid', $anrechnung_id))
+		{
+			return false;
+		}
+
 		// Check last Anrechnungstatus
 		if (!$result = getData($this->ci->AnrechnungModel->getLastAnrechnungstatus($anrechnung_id))[0])
 		{
@@ -609,6 +636,12 @@ class AnrechnungLib
 	 */
 	public function recommendAnrechnung($anrechnung_id)
 	{
+		// Exit if user did not receive the request for recommendation
+		if (!$this->isEmpfehlungsberechtigt($anrechnung_id))
+		{
+			return false;
+		}
+
 		// Check last Anrechnungstatus
 		if (!$result = getData($this->ci->AnrechnungModel->getLastAnrechnungstatus($anrechnung_id))[0])
 		{
@@ -620,7 +653,7 @@ class AnrechnungLib
 		// Exit if already approved or rejected
 		if ($status_kurzbz == self::ANRECHNUNGSTATUS_APPROVED || $status_kurzbz == self::ANRECHNUNGSTATUS_REJECTED)
 		{
-			return success(false);  // dont approve
+			return false;  // dont approve
 		}
 
 		// Start DB transaction
@@ -657,6 +690,12 @@ class AnrechnungLib
 	 */
 	public function dontRecommendAnrechnung($anrechnung_id, $begruendung)
 	{
+		// Exit if user did not receive the request for recommendation
+		if (!$this->isEmpfehlungsberechtigt($anrechnung_id))
+		{
+			return false;
+		}
+
 		// Check last Anrechnungstatus
 		if (!$result = getData($this->ci->AnrechnungModel->getLastAnrechnungstatus($anrechnung_id))[0])
 		{
@@ -770,16 +809,72 @@ class AnrechnungLib
      */
     public function isEmpfehlungsberechtigt($anrechnung_id)
     {
-        if($this->ci->config->item('fbl') === TRUE)
+        // load() without an ID loads all Anrechnungen
+        if (!is_numeric($anrechnung_id))
         {
-            return true;
+            return false;
         }
-        // Get lv-leitungen or, if not present, all lectors of lv.
-        $lector_arr = $this->getLectors($anrechnung_id);
 
-        // Return false if lv-leitung is present and user is not lv-leitung. Otherways return always true.
-        return in_array(getAuthUID(), array_column($lector_arr, 'uid'));
+        // Get Leitungen of the LV-OE (fbl), or lv-leitungen or, if not present, all lectors of lv.
+        $receiver_arr = $this->ci->config->item('fbl') === TRUE
+            ? $this->getLeitungOfLvOe($anrechnung_id)
+            : $this->getLectors($anrechnung_id);
+
+        // True if user received the request for recommendation
+        return is_array($receiver_arr) && in_array(getAuthUID(), array_column($receiver_arr, 'uid'));
     }
+
+	/**
+	 * Check the permission for the Studiengang of the Anrechnung.
+	 * The Studiengang of an Anrechnung is the Studiengang of its prestudent, not of the LV.
+	 *
+	 * @param $berechtigung_kurzbz
+	 * @param $art
+	 * @param $anrechnung_id
+	 * @return bool
+	 */
+	public function isBerechtigtForAnrechnung($berechtigung_kurzbz, $art, $anrechnung_id)
+	{
+		// load() without an ID loads all Anrechnungen
+		if (!is_numeric($anrechnung_id))
+		{
+			return false;
+		}
+
+		$result = $this->ci->AnrechnungModel->load($anrechnung_id);
+
+		return hasData($result)
+			&& $this->isBerechtigtForPrestudent($berechtigung_kurzbz, $art, getData($result)[0]->prestudent_id);
+	}
+
+	/**
+	 * Check the permission for the Studiengang of the prestudent.
+	 *
+	 * @param $berechtigung_kurzbz
+	 * @param $art
+	 * @param $prestudent_id
+	 * @return bool
+	 */
+	public function isBerechtigtForPrestudent($berechtigung_kurzbz, $art, $prestudent_id)
+	{
+		// load() without an ID loads all prestudents
+		if (!is_numeric($prestudent_id))
+		{
+			return false;
+		}
+
+		$result = $this->ci->PrestudentModel->load($prestudent_id);
+
+		// Without a Studiengang, isBerechtigt checks the permission for any OE
+		if (!hasData($result))
+		{
+			return false;
+		}
+
+		$this->ci->load->library('PermissionLib');
+
+		return $this->ci->permissionlib->isBerechtigt($berechtigung_kurzbz, $art, getData($result)[0]->studiengang_kz);
+	}
 	
 	/**
 	 * Get LV Leitung. If not present, get all LV lectors.
@@ -856,6 +951,11 @@ class AnrechnungLib
         $this->ci->AnrechnungModel->addSelect('lehrveranstaltung_id');
         $result = $this->ci->AnrechnungModel->load($anrechnung_id);
 
+        if (!hasData($result))
+        {
+            return false;
+        }
+
         $lehrveranstaltung_id = getData($result)[0]->lehrveranstaltung_id;
 
         // Get Leitungen
@@ -889,7 +989,11 @@ class AnrechnungLib
 		$anrechnung_data->prestudent_id = $anrechnung->prestudent_id;
 		$anrechnung_data->lehrveranstaltung_id = $anrechnung->lehrveranstaltung_id;
 		$anrechnung_data->begruendung_id =  $anrechnung->begruendung_id;
-		$anrechnung_data->begruendung =  $anrechnung->bezeichnung;
+		// Begruendung in the users language, German name if no translation exists
+		$language_index = getUserLanguage() == 'German' ? 0 : 1;
+		$anrechnung_data->begruendung = !empty($anrechnung->bezeichnung_mehrsprachig[$language_index])
+			? $anrechnung->bezeichnung_mehrsprachig[$language_index]
+			: $anrechnung->bezeichnung;
 		$anrechnung_data->anmerkung = $anrechnung->anmerkung_student;
 		$anrechnung_data->dms_id = $anrechnung->dms_id;
 		$anrechnung_data->insertamum = (new DateTime($anrechnung->insertamum))->format('d.m.Y');
