@@ -18,8 +18,7 @@ export default {
 			lvs: {},
 			currentSemester: null,
 			modes: ["lvs", "lehrenheiten", "supervision", "all"],
-			// todo: replace with lvs after dev
-			selectedMode: "lehrenheiten"
+			selectedMode: "lvs"
 		};
 	},
 	provide() {
@@ -95,6 +94,19 @@ export default {
 			return this.studiensemester[this.studiensemester.length-1].studiensemester_kurzbz == this.currentSemester;
 		},
 	},
+	watch: {
+		isMitarbeiter() {
+			if (this.isMitarbeiter) {
+				const lastSelectedMode = window.localStorage.getItem("cis4-mylv-lastSelectedMode");
+				if (this.modes.includes(lastSelectedMode)) {
+					this.selectedMode = lastSelectedMode;
+				}
+			}
+		},
+		selectedMode(mode) {
+			window.localStorage.setItem("cis4-mylv-lastSelectedMode", mode);
+		},
+	},
 	methods: {
 		prevSem() {
 			this.$refs.studiensemester.selectedIndex--;
@@ -147,9 +159,9 @@ export default {
 							</button>
 						</div>
 					</div>
-					<div>
+					<div v-if="isMitarbeiter">
 						<select v-model="selectedMode" class="form-select" :aria-label="'mode selector placeholder'">
-							<option v-for="mode in modes" :key="mode" :value="mode"> {{ mode }} </option>
+							<option v-for="mode in modes" :key="mode" :value="mode"> {{ $p.t("mylv/" + mode) }} </option>
 						</select>
 					</div>
 				</div>
