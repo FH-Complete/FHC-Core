@@ -371,8 +371,8 @@ export default {
 						}}</th>
 						<td>
 							<div v-for="lehrveranstaltung in event.lehrveranstaltung_infos" class="d-block">
-								<!--<a v-if="lvLinks.lvverwaltung[lehrveranstaltung.lehrveranstaltung_id]" target='_blank' :aria-label="$p.t('lehre','lehrveranstaltung')" :title="$p.t('lehre','lehrveranstaltung')" :href="lvLinks.lvverwaltung[lehrveranstaltung.lehrveranstaltung_id]"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C" aria-hidden="true"></i></a>
-								<a v-if="lvLinks.vilesci[lehrveranstaltung.lehrveranstaltung_id]" target='_blank' :aria-label="$p.t('lehre','lvInfoBearbeiten')" :title="$p.t('lehre','lehrveranstaltung')" :href="lvLinks.vilesci[lehrveranstaltung.lehrveranstaltung_id]"><i class="fa fa-pen-to-square me-1" style="color:#00649C" aria-hidden="true"></i></a>-->
+								<a v-if="lvLinks.lvverwaltung[lehrveranstaltung.lehrveranstaltung_id]" target='_blank' :aria-label="$p.t('lehre','lehrveranstaltung')" :title="$p.t('lehre','lehrveranstaltung')" :href="lvLinks.lvverwaltung[lehrveranstaltung.lehrveranstaltung_id]"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C" aria-hidden="true"></i></a>
+								<a v-if="lvLinks.vilesci[lehrveranstaltung.lehrveranstaltung_id]" target='_blank' :aria-label="$p.t('lehre','lvInfoBearbeiten')" :title="$p.t('lehre','lehrveranstaltung')" :href="lvLinks.vilesci[lehrveranstaltung.lehrveranstaltung_id]"><i class="fa fa-pen-to-square me-1" style="color:#00649C" aria-hidden="true"></i></a>
 								<span v-tooltip="lehrveranstaltung.oe_bezeichnung">{{'('+ lehrveranstaltung.lehrform_kurzbz + ') ' + lehrveranstaltung.lehrfach_bezeichnung }} </span>
 							</div>
 						</td>
@@ -385,7 +385,7 @@ export default {
 						}}</th>
 						<td>
 							<div v-for="lehreinheit in event.lehreinheit_infos" class="d-block">
-								<!--<a v-if="leLinks[lehreinheit.lehreinheit_id]" target='_blank' :aria-label="$p.t('lehre','lehreinheit')" :title="$p.t('lehre','lehreinheit')" :href="leLinks[lehreinheit.lehreinheit_id]"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C" aria-hidden="true"></i></a>-->
+								<a v-if="leLinks[lehreinheit.lehreinheit_id]" target='_blank' :aria-label="$p.t('lehre','lehreinheit')" :title="$p.t('lehre','lehreinheit')" :href="leLinks[lehreinheit.lehreinheit_id]"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C" aria-hidden="true"></i></a>
 								<span v-tooltip="lehreinheit.anmerkung">{{lehreinheit.lehrfach_bezeichnung}}</span>
 							</div>
 						</td>
