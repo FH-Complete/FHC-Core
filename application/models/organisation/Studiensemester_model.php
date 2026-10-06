@@ -218,7 +218,7 @@ class Studiensemester_model extends DB_Model
 	 */
 	public function getByDate($date)
 	{
-		// gets the studiensemster of a date or the next closest previous studiensemester if a date is not within a studiensemester
+		// gets the studiensemester of a date or the next closest previous studiensemester if a date is not within a studiensemester
 		$query = "
 			SELECT  studiensemester_kurzbz, start, ende
 			FROM	public.tbl_studiensemester
@@ -292,13 +292,29 @@ class Studiensemester_model extends DB_Model
 				COALESCE(
 					(SELECT studiensemester_kurzbz FROM semester_interval_startdate),
 					(SELECT studiensemester_kurzbz FROM nearest_semester_interval_startdate)
-				) AS studiensemester_kurzbz
+				) AS studiensemester_kurzbz,
+				COALESCE(
+					(SELECT start FROM semester_interval_startdate),
+					(SELECT start FROM nearest_semester_interval_startdate)
+				) as start,
+				COALESCE(
+					(SELECT ende FROM semester_interval_startdate),
+					(SELECT ende FROM nearest_semester_interval_startdate)
+				) as ende
 			UNION
 			SELECT
 				COALESCE(
 					(SELECT studiensemester_kurzbz FROM semester_interval_enddate),
 					(SELECT studiensemester_kurzbz FROM nearest_semester_interval_enddate)
-				) AS studiensemester_kurzbz
+				) AS studiensemester_kurzbz,
+				COALESCE(
+					(SELECT start FROM semester_interval_enddate),
+					(SELECT start FROM nearest_semester_interval_enddate)
+				) as start,
+				COALESCE(
+					(SELECT ende FROM semester_interval_enddate),
+					(SELECT ende FROM nearest_semester_interval_enddate)
+				) as ende
 
 EOSQL;
 
