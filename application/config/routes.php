@@ -146,12 +146,18 @@ $route['api/frontend/v1/treemenudata/stv/.*'] = 'api/frontend/v1/stv/students/in
 $route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByStg/$1/$2';
 $route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/semester/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByStg/$1/$2/$3';
 $route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/semester/(:any)/.*'] = 'api/frontend/v1/Lehrveranstaltung/getByStg/$1/$2/$3';
-$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/orgform/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByStg/$1/$2/$3';
-$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/orgform/(:any)/.*'] = 'api/frontend/v1/Lehrveranstaltung/getByStg/$1/$2/$3';
+
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/orgform/(:any)/semester/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByStgOrgform/$1/$2/$3/$4';
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/orgform/(:any)/semester/(:any)/.*'] = 'api/frontend/v1/Lehrveranstaltung/getByStgOrgform/$1/$2/$3/$4';
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/orgform/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByStgOrgform/$1/$2/$3';
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/orgform/(:any)/.*'] = 'api/frontend/v1/Lehrveranstaltung/getByStgOrgform/$1/$2/$3';
 
 $route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/emp/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByEmp/$1/$2';
 $route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/emp/(:any)/stg/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByEmp/$1/$2/$3';
 $route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/emp/(:any)/stg/(:any)/.*'] = 'api/frontend/v1/Lehrveranstaltung/getByEmp/$1/$2/$3';
+
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/le/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByLe/$1/$2';
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/lv/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByLv/$1/$2';
 
 
 // load routes from extensions, also look for environment-specific configs
