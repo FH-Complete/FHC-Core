@@ -1,6 +1,7 @@
 import { formatDate } from "../../../../helpers/DateHelpers.js"
 
 export default {
+	name: 'Cis-Renderer-Feiertag-ModalContent',
 	props:{
 		event: {
 			type: Object,
