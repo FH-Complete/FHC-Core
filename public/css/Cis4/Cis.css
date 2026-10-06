@@ -7,6 +7,11 @@ html {
   font-size: 0.875em;
 }
 
+body.compat,
+body.compat main#cis-main {
+	background-color: #fff;
+}
+
 .fhc-dark-bg{
 	background-color: var(--fhc-dark);
 	color:var(--fhc-light) !important;
