@@ -133,7 +133,6 @@ export default {
 				);
 			}
 
-			//TODO (david) abhängig von der LVVerwaltung
 			if (Object.keys(this.filter).length === 0)
 				return this.allCourses = [];
 			this.$api.call(ApiCoursePicker.getCourses(this.filter, this.studiensemester))
@@ -155,8 +154,7 @@ export default {
 						lehrfach_farbe: e.lehrfach_farbe,
 						lehrverband: e.lehrverband,
 						showname: `${e.lehrfach} ${e.lehrform}`,
-						//lvverwaltunglink: FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/LVVerwaltung/stdsem/' + e.studiensemester_kurzbz.toLowerCase() + '/le/' + e.lehreinheit_id,
-						lvverwaltunglink: '',
+						lvverwaltunglink: FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/LVVerwaltung/stdsem/' + e.studiensemester_kurzbz.toLowerCase() + '/le/' + e.lehreinheit_id,
 						orig: {
 							type: 'lehreinheit',
 							lehreinheit_id: e.lehreinheit_id,
