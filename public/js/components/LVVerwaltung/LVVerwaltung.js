@@ -75,8 +75,10 @@ export default {
 				types: [
 					"mitarbeiter",
 					"mitarbeiter_ohne_zuordnung",
+/*
 					"lehreinheit",
 					"lehrveranstaltung",
+*/
 				],
 				actions: {
 					employee: {
