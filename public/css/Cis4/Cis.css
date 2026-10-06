@@ -760,7 +760,7 @@ html {
 }
 
 .dashboard-item {
-	overscroll-behavior: none;
+	overscroll-behavior: auto;
 }
 
 .abgabe-zieldatum-border-red,
