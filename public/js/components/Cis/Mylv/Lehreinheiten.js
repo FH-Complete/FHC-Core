@@ -84,6 +84,7 @@ export default {
 						title: "placeholder",
 						field: "groups",
 						widthGrow: 2,
+						formatter: "textarea",
 					},
 					{
 						titlePhrase: "lehreinheiten/room",
@@ -169,6 +170,7 @@ export default {
 							lector: lehreinheitData.lektor,
 							stg: lehreinheitData.stg_kurzbz,
 							semester: lehreinheitData.lv_semester,
+							groups: lehreinheitData.groups?.join("\n"),
 							room: lehreinheitData.raumtyp,
 							alternativeRoom: lehreinheitData.raumtypalternativ,
 							block: lehreinheitData.stundenblockung,

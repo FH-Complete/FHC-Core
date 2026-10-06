@@ -444,6 +444,19 @@ class Lehreinheit extends FHCAPI_Controller
 		$semester = $this->input->get('semester');
 		$lehreinheiten = $this->LehreinheitModel->getLehrenheitenBySemester(getAuthUID(), $semester);
 		$lehreinheiten = $this->getDataOrTerminateWithError($lehreinheiten);
+
+		foreach ($lehreinheiten as $lehreinheit) {
+			$groups = $this->LehreinheitModel->getGroupsByLehreinheit($lehreinheit->lehreinheit_id);
+			$groups = $this->getDataOrTerminateWithError($groups);
+			$stgKurzbz = $lehreinheit->stg_kurzbz;
+			$lehreinheit->groups = array_map(
+				function ($group) use ($stgKurzbz) {
+					return $group->gruppe_kurzbz ?? $stgKurzbz . "-" . $group->semester . $group->verband . $group->gruppe;
+				},
+				$groups
+			);
+		}
+
 		$this->terminateWithSuccess($lehreinheiten);
 	}
 

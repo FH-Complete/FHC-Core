@@ -797,4 +797,13 @@ EOSQL;
 
 		return $this->execReadOnlyQuery($query);
 	}
+
+	public function getGroupsByLehreinheit($lehreinheitId)
+	{
+		$query = "SELECT *
+		FROM lehre.tbl_lehreinheitgruppe
+		WHERE lehreinheit_id='$lehreinheitId'";
+
+		return $this->execReadOnlyQuery($query);
+	}
 }
