@@ -57,6 +57,7 @@ class studiengang extends basis_db
 	public $foerderrelevant;		// boolean
 	public $standort_code;			// integer
 	public $melde_studiengang_kz;	// varchar(32)
+	public $account_creation;	// boolean
 
 	public $kuerzel;	// = typ + kurzbz (Bsp: BBE)
 	public $kuerzel_arr = array();			// Array mit allen Kurzeln Index=studiengangs_kz
@@ -75,6 +76,8 @@ class studiengang extends basis_db
 	public function __construct($studiengang_kz=null)
 	{
 		parent::__construct();
+
+		$this->account_creation = true; // default value
 
 		if(!is_null($studiengang_kz))
 			$this->load($studiengang_kz);
@@ -136,6 +139,7 @@ class studiengang extends basis_db
 				$this->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
 				$this->standort_code = $row->standort_code;
 				$this->melde_studiengang_kz = $row->melde_studiengang_kz;
+				$this->account_creation = $this->db_parse_bool($row->account_creation);
 
 				$this->bezeichnung_arr['German'] = $this->bezeichnung;
 				$this->bezeichnung_arr['English'] = $this->english;
@@ -213,6 +217,7 @@ class studiengang extends basis_db
 			$stg_obj->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
 			$stg_obj->standort_code = $row->standort_code;
 			$stg_obj->melde_studiengang_kz = $row->melde_studiengang_kz;
+			$stg_obj->account_creation = $this->db_parse_bool($row->account_creation);
 
 			$stg_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$stg_obj->bezeichnung_arr['English'] = $row->english;
@@ -435,6 +440,7 @@ class studiengang extends basis_db
 			$stg_obj->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
 			$stg_obj->standort_code = $row->standort_code;
 			$stg_obj->melde_studiengang_kz = $row->melde_studiengang_kz;
+			$stg_obj->account_creation = $this->db_parse_bool($row->account_creation);
 
 			$stg_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$stg_obj->bezeichnung_arr['English'] = $row->english;
@@ -510,7 +516,7 @@ class studiengang extends basis_db
 				typ, farbe, email, telefon, max_verband, max_semester, max_gruppe, erhalter_kz, bescheid, bescheidbgbl1,
 				bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, aktiv, onlinebewerbung, orgform_kurzbz, zusatzinfo_html,
 				oe_kurzbz, moodle, sprache, testtool_sprachwahl, studienplaetze, lgartcode, mischform,projektarbeit_note_anzeige,
-				melderelevant, foerderrelevant, standort_code, melde_studiengang_kz) VALUES ('.
+				melderelevant, foerderrelevant, standort_code, melde_studiengang_kz, account_creation) VALUES ('.
 				$this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 				$this->db_add_param($this->kurzbz).', '.
 				$this->db_add_param($this->kurzbzlang).', '.
@@ -545,7 +551,8 @@ class studiengang extends basis_db
 				$this->db_add_param($this->melderelevant, FHC_BOOLEAN).','.
 				$this->db_add_param($this->foerderrelevant, FHC_BOOLEAN).','.
 				$this->db_add_param($this->standort_code).','.
-				$this->db_add_param($this->melde_studiengang_kz).');';
+				$this->db_add_param($this->melde_studiengang_kz).','.
+				$this->db_add_param($this->account_creation, FHC_BOOLEAN).');';
 		}
 		else
 		{
@@ -586,7 +593,8 @@ class studiengang extends basis_db
 				'melderelevant='.$this->db_add_param($this->melderelevant, FHC_BOOLEAN).', '.
 				'foerderrelevant='.$this->db_add_param($this->foerderrelevant, FHC_BOOLEAN).', '.
 				'standort_code='.$this->db_add_param($this->standort_code).', '.
-				'melde_studiengang_kz='.$this->db_add_param($this->melde_studiengang_kz).' '.
+				'melde_studiengang_kz='.$this->db_add_param($this->melde_studiengang_kz).', '.
+				'account_creation='.$this->db_add_param($this->account_creation, FHC_BOOLEAN).' '.
 				'WHERE studiengang_kz='.$this->db_add_param($this->studiengang_kz, FHC_INTEGER, false).';';
 		}
 
@@ -625,6 +633,27 @@ class studiengang extends basis_db
 			return false;
 		}
 
+	}
+
+	/**
+	 * Toggle the IDAM flag account_creation
+	 */
+	public function toggleAccountCreation($studiengang_kz)
+	{
+		if( !is_numeric($studiengang_kz))
+		{
+			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$qry = 'UPDATE public.tbl_studiengang SET account_creation = NOT account_creation WHERE studiengang_kz = '.$this->db_add_param($studiengang_kz, FHC_INTEGER);
+		if (!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -713,6 +742,7 @@ class studiengang extends basis_db
 				$this->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
 				$this->standort_code = $row->standort_code;
 				$this->melde_studiengang_kz = $row->melde_studiengang_kz;
+				$this->account_creation = $this->db_parse_bool($row->account_creation);
 				$this->projektarbeit_note_anzeige = $this->db_parse_bool($row->projektarbeit_note_anzeige);
 
 				$this->bezeichnung_arr['German'] = $this->bezeichnung;
@@ -857,6 +887,7 @@ class studiengang extends basis_db
 				$obj->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
 				$obj->standort_code = $row->standort_code;
 				$obj->melde_studiengang_kz = $row->melde_studiengang_kz;
+				$obj->account_creation = $this->db_parse_bool($row->account_creation);
 				$obj->aktiv = $this->db_parse_bool($row->aktiv);
 
 				$this->result[] = $obj;
@@ -1038,6 +1069,7 @@ class studiengang extends basis_db
 				$obj->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
 				$obj->standort_code = $row->standort_code;
 				$obj->melde_studiengang_kz = $row->melde_studiengang_kz;
+				$obj->account_creation = $this->db_parse_bool($row->account_creation);
 
 				$obj->bezeichnung_arr['German'] = $obj->bezeichnung;
 				$obj->bezeichnung_arr['English'] = $obj->english;
@@ -1176,6 +1208,7 @@ class studiengang extends basis_db
 				$obj->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
 				$obj->standort_code = $row->standort_code;
 				$obj->melde_studiengang_kz = $row->melde_studiengang_kz;
+				$obj->account_creation = $this->db_parse_bool($row->account_creation);
 
 				$obj->bezeichnung_arr['German'] = $obj->bezeichnung;
 				$obj->bezeichnung_arr['English'] = $obj->english;

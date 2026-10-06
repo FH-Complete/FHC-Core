@@ -93,6 +93,7 @@ $melderelevant = false;
 $foerderrelevant = false;
 $standort_code='';
 $melde_studiengang_kz = '';
+$account_creation = true;
 $schick = filter_input(INPUT_POST, 'schick');
 $onlinebewerbung = false;
 
@@ -157,6 +158,7 @@ if($schick)
 	$foerderrelevant = filter_input(INPUT_POST, 'foerderrelevant', FILTER_VALIDATE_BOOLEAN);
 	$standort_code = filter_input(INPUT_POST, 'standort_code');
 	$melde_studiengang_kz = filter_input(INPUT_POST, 'melde_studiengang_kz');
+	$account_creation = filter_input(INPUT_POST, 'account_creation', FILTER_VALIDATE_BOOLEAN);
 
 	$ext_id = filter_input(INPUT_POST, 'ext_id');
 
@@ -226,6 +228,7 @@ if($schick)
 		$sg_update->foerderrelevant = $foerderrelevant;
 		$sg_update->standort_code = $standort_code;
 		$sg_update->melde_studiengang_kz = $melde_studiengang_kz;
+		$sg_update->account_creation = $account_creation;
 
 		$sg_update->bescheidvom=$date->formatDatum($sg_update->bescheidvom,'Y-m-d');
 		$sg_update->titelbescheidvom=$date->formatDatum($sg_update->titelbescheidvom,'Y-m-d');
@@ -296,6 +299,7 @@ if ((isset($_REQUEST['studiengang_kz'])) && ((!isset($_REQUEST['neu'])) || ($_RE
 	$foerderrelevant = $sg->foerderrelevant;
 	$standort_code = $sg->standort_code;
 	$melde_studiengang_kz = $sg->melde_studiengang_kz;
+	$account_creation = $sg->account_creation;
 }
 
 $erh = new erhalter();
@@ -444,6 +448,13 @@ if (!$erh->getAll('kurzbz'))
 								<td>
 									<input type="hidden" name="mischform" value="0">
 									<input type="checkbox" name="mischform" <?php echo $mischform ? 'checked' : '' ?> onchange="submitable()">
+								</td>
+							</tr>
+							<tr>
+								<td valign="top">IDAM student accounts creation</td>
+								<td>
+									<input type="hidden" name="account_creation" value="0">
+									<input type="checkbox" name="account_creation" <?php echo $account_creation ? 'checked' : '' ?> onchange="submitable()">
 								</td>
 							</tr>
 						</table>

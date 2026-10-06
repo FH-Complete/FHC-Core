@@ -49,6 +49,23 @@ require_once('../../include/benutzerberechtigung.class.php');
 		else 
 			die('Sie haben keine Rechte fuer diese Aktion');
 	}
+
+	if (isset($_GET["toggleAC"]) && ($_GET["kz"] != ""))
+	{
+		$kennzahl = intval($_GET["kz"]);
+		$stg_hlp = new studiengang();
+		if(!$stg_hlp->load($kennzahl))
+			die('Studiengang nicht gefunden');
+
+		if ($rechte->isBerechtigt('basis/studiengang', $stg_hlp->oe_kurzbz, 'suid'))
+		{
+			$sg_update = new studiengang();
+			if (!$sg_update->toggleAccountCreation($kennzahl))
+				die($sg_update->errormsg);
+		}
+		else
+			die('Sie haben keine Rechte fuer diese Aktion');
+	}
 	
 	$sg = new studiengang();
 	if (!$sg->loadArray($rechte->getStgKz('basis/studiengang'),'kurzbzlang',false))
@@ -67,6 +84,7 @@ require_once('../../include/benutzerberechtigung.class.php');
 			<th>Englisch</th>
 			<th>Lehrgangsart</th>
 			<th data-placeholder="t or f">Aktiv</th>
+			<th data-placeholder="t or f">IDAM</th>
 			<th>Email</th>
 		</tr></thead><tbody>
 		';
@@ -93,6 +111,16 @@ require_once('../../include/benutzerberechtigung.class.php');
 		$aktivlink = "?toggle=true&kz=".$stg->studiengang_kz;
 		
 		$htmlstr .= "		<td align='center'><a href='".$aktivlink."'><img src='../../skin/images/".$aktivbild."' height='20px' alt='".$aktivbild."'></a></td>\n";
+
+		// IDAM account activation
+		if($stg->account_creation)
+			$acbild = "true.png";
+		else
+			$acbild = "false.png";
+
+		$aclink = "?toggleAC=true&kz=".$stg->studiengang_kz;
+		$htmlstr .= "		<td align='center'><a href='".$aclink."'><img src='../../skin/images/".$acbild."' height='20px' alt='".$acbild."'></a></td>\n";
+
 		$htmlstr .= "	   <td><a href='mailto:".$stg->email."'>".$stg->email."</a></td>\n";
 		$htmlstr .= "   </tr>\n";
 		$i++;
