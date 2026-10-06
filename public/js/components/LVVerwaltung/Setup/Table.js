@@ -57,7 +57,8 @@ export default {
 	},
 	emits: [
 		'update:selected',
-		'row-clicked'
+		'row-clicked',
+		'selectLV',
 	],
 	watch: {
 		filter: {
@@ -106,8 +107,24 @@ export default {
 				{
 					event: 'dataProcessed',
 					handler: (data) => {
-						this.reexpandRows()
-						this.$emit('update:selected', {})
+						if (this.$route.params.le)
+						{
+							this.$refs.table.tabulator.selectRow(this.$refs.table.tabulator.getRows());
+						}
+						else if (this.$route.params.lv)
+						{
+							this.$refs.table.tabulator.selectRow(this.$refs.table.tabulator.getRows());
+
+							this.allRows = this.getAllRows(this.$refs.table.tabulator.getRows());
+							this.allRows.forEach(row => {
+								row.treeExpand()
+							});
+						}
+						else
+						{
+							this.reexpandRows()
+							this.$emit('update:selected', {})
+						}
 					}
 				},
 				{
@@ -221,35 +238,35 @@ export default {
 				selectableRows: true,
 				rowContextMenu: (component, e) => {
 
-					if (e.getData()?.lehreinheit_id === undefined)
-						return;
+					if (e.getData()?.lehreinheit_id === undefined || !e.getData()?.lehreinheit_id)
+						return [];
 					return [
 						{
-							label: "LV-Teil kopieren",
+							label: this.$p.t('lehre', 'lvteilkopieren'),
 							menu: [
 								{
-									label: "Alles",
+									label: this.$p.t('lehre', 'alles'),
 									action: (e, row) =>
 									{
 										this.copyLehreinheit(row, "alle");
 									},
 								},
 								{
-									label: "Nur LV-Teil",
+									label: this.$p.t('lehre', 'nurlvteil'),
 									action: (e, row) =>
 									{
 										this.copyLehreinheit(row, "lvteil");
 									},
 								},
 								{
-									label: "Nur mit Gruppen",
+									label: this.$p.t('lehre', 'nurmitgruppen'),
 									action: (e, row) =>
 									{
 										this.copyLehreinheit(row, "gruppen");
 									},
 								},
 								{
-									label: "Nur mit Lehrenden",
+									label: this.$p.t('lehre', 'nurmitlehrende'),
 									action: (e, row) =>
 									{
 										this.copyLehreinheit(row, "lektoren");
@@ -258,7 +275,21 @@ export default {
 							],
 						},
 						{
-							label: "Entfernen",
+							label: this.$p.t('lehre', 'zurlvspringen'),
+							action: (e, row)  => {
+								this.openLV(row)
+							},
+						},
+						{
+							label: this.$p.t('lehre', 'lvteillinkkopieren'),
+							action: (e, row)  => {
+								let rowData = row.getData();
+								let link = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/LVVerwaltung/stdsem/' + rowData.studiensemester_kurzbz.toLowerCase() + '/le/' + rowData.lehreinheit_id;
+								navigator.clipboard.writeText(link);
+							},
+						},
+						{
+							label: this.$p.t('ui', 'entfernen'),
 							action: (e, row)  => {
 								this.deleteLehreinheit(row)
 							},
@@ -355,13 +386,21 @@ export default {
 		},
 		buildApiUrl()
 		{
-			if (!['emp', 'treemenu'].includes(this.$route.name))
+			if (!['emp', 'treemenu', 'le', 'lv'].includes(this.$route.name))
 				return null;
 
 			let url = 'stdsem/' + this.$route.params.stdsem;
 			
 			if (this.$route.params.emp) {
 				url += '/emp/' + this.$route.params.emp;
+			}
+
+			if (this.$route.params.le) {
+				url += '/le/' + this.$route.params.le;
+			}
+
+			if (this.$route.params.lv) {
+				url += '/lv/' + this.$route.params.lv;
 			}
 
 			if (this.$route.params.treemenu) {
@@ -501,6 +540,17 @@ export default {
 					this.reload()
 				})
 				.catch(this.$fhcAlert.handleSystemError);
+		},
+		openLV(row)
+		{
+			let rowData = row.getData();
+
+
+			let data = {
+				id: rowData.lehrveranstaltung_id,
+				studiensemester_kurzbz: rowData.studiensemester_kurzbz
+			}
+			this.$emit('selectLV', data);
 		},
 		getAllRows(rows)
 		{
