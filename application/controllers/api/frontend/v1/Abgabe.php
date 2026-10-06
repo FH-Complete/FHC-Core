@@ -1916,7 +1916,7 @@ class Abgabe extends FHCAPI_Controller
 
 				if (!$mailres)
 				{
-					$this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailBegutachterv2'), 'general');
+					$this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailZweitBegutachterv2'), 'general');
 				}
 
 			}
