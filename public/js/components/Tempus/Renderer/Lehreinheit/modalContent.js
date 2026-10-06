@@ -1,13 +1,15 @@
-import TagsAssignmentModal from "../../TagsAssignmentModal.js";
 import ApiKalender from '../../../../api/factory/tempus/kalender.js';
 import FormInput from "../../../Form/Input.js";
 import RaumauswahlModal from '../../RaumauswahlModal.js';
+import CoreTag from '../../../../components/Tag/Tag.js';
+import ApiTempusTag from "../../../../api/factory/tempus/tag.js";
+import { idTagFormatter } from "../../../Tag/tagFormatter.js";
 
 export default {
 	components:{
 		FormInput,
-		TagsAssignmentModal,
-		RaumauswahlModal
+		RaumauswahlModal,
+		CoreTag
 	},
 	props:{
 		event: {
@@ -46,7 +48,8 @@ export default {
 			anzahl: '',
 			anzahlSchwund: '',
 			mailto: '',
-			zeitwunschMap: {}
+			zeitwunschMap: {},
+			tagEndpoint: ApiTempusTag,
 		};
 	},
 	watch: {
@@ -54,9 +57,17 @@ export default {
 			if (this.editStundeBis !== null && this.editStundeBis < newVal)
 				this.editStundeBis = newVal;
 		},
+		tags: {
+			handler() {
+				this.renderTags();
+			},
+			deep: true
+		}
 	},
 	computed: {
-
+		tagValues() {
+			return this.event.eindeutige_kalender_gruppen_id ? [this.event.eindeutige_kalender_gruppen_id] : [];
+		},
 		lektorenLinks: function () {
 			if (!this.event || !Array.isArray(this.event.lektor) || !this.event.lektor.length) return "a";
 
@@ -66,14 +77,8 @@ export default {
 			})
 			return lektorenLinks;
 		},
-		getOrtContentLink: function () {
-			if (!this.event || !this.event.ort_content_id) return "a";
-
-			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + `/CisVue/Cms/content/${this.event.ort_content_id}`
-		},
 		lvLinks()
 		{
-			//TODO (david) abhängig von der LVVerwaltung
 			let semester = this.event.le_studiensemester_kurzbz.toLowerCase();
 			let base_url = FHC_JS_DATA_STORAGE_OBJECT.app_root;
 			let ci_url = base_url + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
@@ -82,25 +87,21 @@ export default {
 				lvverwaltung: {},
 				vilesci: {},
 			}
-			/*this.event.lehrveranstaltung_infos.forEach(lehrveranstaltung => {
+			this.event.lehrveranstaltung_infos.forEach(lehrveranstaltung => {
 				lvLinks.lvverwaltung[lehrveranstaltung.lehrveranstaltung_id] = `${ci_url}/LVVerwaltung/stdsem/${semester}/lv/${lehrveranstaltung.lehrveranstaltung_id}`;
 				lvLinks.vilesci[lehrveranstaltung.lehrveranstaltung_id] = `${base_url}vilesci/lehre/lehrveranstaltung_details.php?lv_id=${lehrveranstaltung.lehrveranstaltung_id}`;
-			})*/
+			})
 			return lvLinks;
 		},
 		leLinks()
 		{
-			//TODO (david) abhängig von der LVVerwaltung
 			let base_url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
 			let leLinks = {};
-		/*	this.event.lehreinheit_infos.forEach(lehreinheit => {
+			this.event.lehreinheit_infos.forEach(lehreinheit => {
 				leLinks[lehreinheit.lehreinheit_id] = `${base_url}/LVVerwaltung/stdsem/${lehreinheit.studiensemester_kurzbz}/le/${lehreinheit.lehreinheit_id}`;
-			})*/
+			})
 			return leLinks;
-		},
-		ortString() {
-			return Array.isArray(this.event.ort_kurzbz) ? this.event.ort_kurzbz.join(', ') : this.event.ort_kurzbz;
 		},
 		tags() {
 			if (typeof this.event.tags === 'string') {
@@ -181,9 +182,27 @@ export default {
 
 			this.modalActions.saveEventTime({kalender_id: this.event.kalender_id, start_time, end_time});
 		},
-		async openTagsModal(tag = null)
-		{
-			await this.$refs.tagsModal.open(this.event, tag);
+		async fetchAssignedTagsByCalender(calendarGroupId) {
+			let result = await this.$api.call(
+				ApiTempusTag.getTagsByCalendar(calendarGroupId),
+			);
+
+			if (result.meta.status === "success")
+				return result.data.filter(tag => !!tag);
+
+			this.$fhcAlert.alertError(
+				this.$p.t("ui", "failed_assigned_tags_fetch_error_message"),
+			);
+			return [];
+		},
+		async onTagsChanged() {
+			let id = this.event.eindeutige_kalender_gruppen_id;
+			if (!id) return;
+
+			this.event.tags = await this.fetchAssignedTagsByCalender(id);
+		},
+		editTag(tag) {
+			this.$refs.tagComponent?.editTag(tag.id);
 		},
 		openRaumvorschlag()
 		{
@@ -200,6 +219,26 @@ export default {
 				ort_kurzbz: room,
 			}, 'ort');
 		},
+		renderTags()
+		{
+			let el = this.$refs.tagWrapper;
+			if (!el) return;
+
+			const tagData = this.tags.map(t => ({
+				...t,
+				notiz_id: t.id,
+				bezeichnung: t.beschreibung,
+			}));
+
+			el.replaceChildren(
+				idTagFormatter(
+					this.event.eindeutige_kalender_gruppen_id,
+					tagData,
+					this.$refs.tagComponent,
+					'eindeutige_kalender_gruppen_id'
+				) ?? ''
+			);
+		}
 	},
 	created() {
 		if (this.event.type == 'lehreinheit') {
@@ -214,6 +253,10 @@ export default {
 				})
 		}
 	},
+	mounted()
+	{
+		this.renderTags();
+	},
 	template: /*html*/`
 	<div>
 		<h5>
@@ -223,7 +266,7 @@ export default {
 				<tbody>
 				
 					<tr v-if="this.event.collisions.length > 0">
-						<th><i class="fa-solid fa-triangle-exclamation text-danger"></i> {{ $p.t('ui','collision') }}</th>
+						<th><i class="fa-solid fa-triangle-exclamation text-danger"></i> {{ $p.t('ui','collision') }}:</th>
 						<td>
 							<div v-for="collision in this.event.collisions" class="d-block">
 								{{collision.message}}
@@ -231,13 +274,8 @@ export default {
 						</td>
 					</tr>
 					<tr>
-						<th>{{
-							$p.t('global','datum')?
-							$p.t('global','datum')+':'
-							:''
-						}}</th>
-						<td>	
-							
+						<th>{{$p.t('global','datum')+':'}}</th>
+						<td>
 							<form-input
 								ref="editDatumInput"
 								type="DatePicker"
@@ -254,11 +292,7 @@ export default {
 						</td>
 					</tr>
 					<tr>
-						<th>{{
-								$p.t('ui','zeitraum')?
-								$p.t('ui','zeitraum')+':'
-								:''
-							}}</th>
+						<th>{{$p.t('ui','zeitraum')+':'}}</th>
 						<td>
 						<template v-if="showRaster">
 							<select v-model="editStundeVon" class="form-select form-select-sm w-auto d-inline-block">
@@ -308,7 +342,7 @@ export default {
 					</td>
 					</tr>
 					<tr>
-						<th>{{$p.t('global','raum')}}
+						<th>{{$p.t('global','raum')}}:
 							<i 
 								class="fa-solid fa-refresh"
 								@click="openRaumvorschlag"
@@ -323,7 +357,7 @@ export default {
 					</tr>
 					
 					<tr>
-						<th>{{$p.t('global','anzahl')}} {{$p.t('global','students')}}
+						<th>{{$p.t('global','anzahl')}} {{$p.t('global','students')}}:
 						</th>
 						<td>
 							{{anzahlSchwund}} ({{anzahl}})
@@ -376,40 +410,36 @@ export default {
 						</td>
 					</tr>
 					<tr v-if="resourcesValue">
-						<th>{{
-							$p.t('ui','betriebsmittel')?
-							$p.t('ui','betriebsmittel')+':'
-							:''
-						}}</th>
+						<th>{{$p.t('ui','betriebsmittel') + ':'}}</th>
 						<td>
 							{{ resourcesValue }}
 						</td>
 					</tr>
 					<tr>
-						<th>{{
-							$p.t('ui','tags')?
-							$p.t('ui','tags')+':'
-							:''
-						}} <i 
-								class="fa-solid fa-tags"
-								@click="openTagsModal(null)"
-							></i>
+						<th>
+							<div class="d-flex align-items-center flex-wrap">
+								{{$p.t('ui','tags')}}:
+								<div class="fw-normal">
+									<core-tag
+										v-if="tagValues.length"
+										ref="tagComponent"
+										:endpoint="tagEndpoint"
+										:values="tagValues"
+										zuordnung_typ="eindeutige_kalender_gruppen_id"
+										show-hover
+										@added="onTagsChanged"
+										@deleted="onTagsChanged"
+										@updated="onTagsChanged"
+									></core-tag>
+								</div>
+							</div>
 						</th>
 						<td>
-							<div v-if="tags.length">
-								<span
-									v-for="tag in tags"
-									:key="tag.tag_typ_kurzbz"
-									:class="[tag.style, { tag_done: tag.done }]"
-									@click="openTagsModal(tag)"
-									class="tag disabled"
-									>{{ tag.beschreibung }}</span>
-							</div>
+							<div ref="tagWrapper"></div>
 						</td>
-						
 					</tr>
 					<tr>
-						<th>{{$p.t('lehre','mail')}} </th>
+						<th>{{$p.t('lehre','mail')}}: </th>
 						<td>
 							<a class="fhc-link-color" :href="'mailto:' + mailto">
 								<i class="fa-solid fa-envelope"></i>
@@ -418,7 +448,6 @@ export default {
 					</tr>
 				</tbody>
 		</table>
-		<tags-assignment-modal ref="tagsModal"/>
 		<raumauswahl-modal ref="raumModal" @saved="reload()"/>
 		<button type="button" class="btn btn-primary " @click.stop="onSave">{{$p.t('ui', 'speichern')}}</button>
 	</div>`,

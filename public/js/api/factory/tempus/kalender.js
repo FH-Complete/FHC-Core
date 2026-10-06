@@ -96,11 +96,11 @@ export default {
 			params: { kalender_id}
 		};
 	},
-	addKalenderEvent(lehreinheit_id, ort_kurzbz, start_date, end_date) {
+	addKalenderEvent(lehreinheit_id, ort_kurzbz, start_date, end_date, first_run) {
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/tempus/Kalender/addKalenderEvent',
-			params: { lehreinheit_id, ort_kurzbz, start_date, end_date}
+			params: { lehreinheit_id, ort_kurzbz, start_date, end_date, first_run}
 		};
 	},
 	calculateMultiWeekPlan(lehreinheit_id, ort_kurzbz, start_date, end_date) {

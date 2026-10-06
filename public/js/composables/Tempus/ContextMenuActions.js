@@ -19,11 +19,6 @@ export function useContextMenuActions(handlers)
 				action: handlers.openResourcesAssignmentModal
 			},
 			{
-				label: 'Tags',
-				icon: 'fa-solid fa-tags',
-				action: handlers.openTagsModal
-			},
-			{
 				label: 'Freischalten für Voransicht',
 				icon: 'fa-solid fa-chalkboard-user',
 				action: handlers.syncToLecturer,
@@ -51,11 +46,6 @@ export function useContextMenuActions(handlers)
 				label: 'Raumauswahl',
 				icon: 'fa-solid fa-door-open',
 				action: handlers.openRaumauswahl
-			},
-			{
-				label: 'Tags',
-				icon: 'fa-solid fa-tags',
-				action: handlers.openTagsModal
 			},
 			{
 				label: 'Delete',

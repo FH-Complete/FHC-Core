@@ -48,7 +48,8 @@ export default {
 		this.$emit('update:range', this.range);
 	},
 	template: `
-	<div>
+	<div
+		class="fhc-calendar-mode-month flex-grow-1 position-relative">
 		<table-view ref="view" v-bind="$attrs" :day="focusDate" :end="focusEnd">
 			<template v-slot="slot"><slot v-bind="slot" mode="week" /></template>
 		</table-view>

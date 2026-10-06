@@ -457,7 +457,8 @@ class Kalender extends FHCAPI_Controller
 		$ort_kurzbz = $this->_ci->input->post('ort_kurzbz', TRUE);
 		$start_date = $this->_ci->input->post('start_date', TRUE);
 		$end_date = $this->_ci->input->post('end_date', TRUE);
-		$result = $this->_ci->kalenderlib->addKalenderEvent($start_date, $end_date, $lehreinheit_id, $ort_kurzbz);
+		$first_run = $this->_ci->input->post('first_run', TRUE) ?? true;
+		$result = $this->_ci->kalenderlib->addKalenderEvent($start_date, $end_date, $lehreinheit_id, $ort_kurzbz, $first_run);
 
 		if (isError($result))
 			$this->terminateWithError(getError($result));

@@ -39,8 +39,7 @@ class Config extends FHCAPI_Controller
 			'ignore_zeitsperre',
 			'ignore_resources_collisions',
 			'roomless_planning',
-			'priority_room_planning',
-			'dialog_room_planning'
+			'room_planning',
 		);
 		$result = $this->_ci->VariableModel->getVariables(getAuthUID(), $var_array);
 
@@ -49,7 +48,6 @@ class Config extends FHCAPI_Controller
 			"type"  => "checkbox",
 			"label" => $this->p->t('ui', 'ignore_kollision'),
 			"value" => ($data['ignore_kollision'] ?? 'false') === 'true'
-
 		];
 
 		$config['kollision_student'] = [
@@ -83,18 +81,15 @@ class Config extends FHCAPI_Controller
 			"value" => ($data['roomless_planning'] ?? 'false') === 'true'
 		];
 
-		$config['priority_room_planning'] = [
-			"type"  => "checkbox",
-			"label" => $this->p->t('ui', 'priority_room_planning'),
-			"value" => ($data['priority_room_planning'] ?? 'false') === 'true'
+		$config['room_planning'] = [
+			"type"  => "select",
+			"label" => $this->p->t('ui', 'room_planning'),
+			"value" => $data['room_planning'] ?? "dialog_room_planning",
+			"options" => [
+				'dialog_room_planning' => $this->p->t('ui', 'dialog_room_planning'),
+				'priority_room_planning' => $this->p->t('ui', 'priority_room_planning'),
+			],
 		];
-
-		$config['dialog_room_planning'] = [
-			"type"  => "checkbox",
-			"label" => $this->p->t('ui', 'dialog_room_planning'),
-			"value" => ($data['dialog_room_planning'] ?? 'false') === 'true'
-		];
-
 
 		$this->terminateWithSuccess($config);
 	}
@@ -121,6 +116,8 @@ class Config extends FHCAPI_Controller
 
 	public function set()
 	{
+		$this->_ci->load->library('form_validation');
+
 		$configs = array(
 			'ignore_kollision',
 			'kollision_student',
@@ -128,9 +125,17 @@ class Config extends FHCAPI_Controller
 			'ignore_zeitsperre',
 			'ignore_resources_collisions',
 			'roomless_planning',
-			'priority_room_planning',
-			'dialog_room_planning'
 		);
+
+		$this->form_validation->set_rules(
+			'room_planning',
+			$this->p->t('ui', 'room_planning'),
+			'required|in_list[dialog_room_planning,priority_room_planning]'
+		);
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
 
 		foreach ($configs as $config)
 		{
@@ -140,6 +145,12 @@ class Config extends FHCAPI_Controller
 				$this->input->post($config) === true ? 'true' : 'false'
 			);
 		}
+
+		$this->VariableModel->setVariable(
+			getAuthUID(),
+			'room_planning',
+			$this->input->post('room_planning')
+		);
 
 		$this->terminateWithSuccess();
 	}

@@ -50,7 +50,6 @@ class KalenderLib
 	public function getForRaumvorschlag($start_date, $end_date, $lektor_uids = [], $gruppen_kurzbz = [], $lehrverband_gruppen = [])
 	{
 		$start_date = date('Y-m-d', strtotime($start_date));
-		$end_date = date('Y-m-d', strtotime($end_date . ' +1 day'));
 
 		$this->_buildBasePlanQuery();
 
@@ -169,23 +168,38 @@ class KalenderLib
 		if (!is_null($studiengaenge))
 		{
 			$db = $this->_ci->KalenderModel->db;
-			$or_conditions = array();
+			$lv_or_conditions = array();
+			$teilnehmer_or_conditions = array();
 
 			foreach ($studiengaenge as $studiengang)
 			{
-				$conditions = array();
-				$conditions[] = 'filter_lv.studiengang_kz = ' . $db->escape($studiengang['stg_kz']);
+				$stg_kz = $db->escape($studiengang['stg_kz']);
+
+				$lv_conditions = array('filter_lv.studiengang_kz = '. $stg_kz);
+				$teilnehmer_conditions = array('COALESCE(filter_teilnehmer.studiengang_kz, filter_grp.studiengang_kz) = ' .$stg_kz);
+
 
 				if (isset($studiengang['semester']))
-					$conditions[] = 'filter_lv.semester = ' . $db->escape($studiengang['semester']);
+				{
+					$semester = $db->escape($studiengang['semester']);
+
+					$lv_conditions[] = 'filter_lv.semester = ' . $semester;
+					$teilnehmer_conditions[] = 'COALESCE(filter_teilnehmer.semester, filter_grp.semester) = ' . $semester;
+				}
 
 				if (isset($studiengang['orgform_kurzbz']))
-					$conditions[] = 'filter_lv.orgform_kurzbz = ' . $db->escape($studiengang['orgform_kurzbz']);
+				{
+					$orgform_kurzbz = $db->escape($studiengang['orgform_kurzbz']);
+					$lv_conditions[] = 'filter_lv.orgform_kurzbz = ' . $orgform_kurzbz;
+					$teilnehmer_conditions[] = 'COALESCE(filter_lehrverband.orgform_kurzbz, filter_grp.orgform_kurzbz) = ' . $orgform_kurzbz;
+				}
 
-				$or_conditions[] = '(' . implode(' AND ', $conditions) . ')';
+				$lv_or_conditions[] = '(' . implode(' AND ', $lv_conditions) . ')';
+				$teilnehmer_or_conditions[] = '(' . implode(' AND ', $teilnehmer_conditions) . ')';
 			}
 
-			$or_block = implode(' OR ', $or_conditions);
+			$lv_or_block = implode(' OR ', $lv_or_conditions);
+			$teilnehmer_or_block = implode(' OR ', $teilnehmer_or_conditions);
 
 			$this->_ci->KalenderModel->db->where(
 				"(EXISTS (
@@ -194,8 +208,20 @@ class KalenderLib
 					JOIN lehre.tbl_lehreinheit filter_le ON filter_le.lehreinheit_id = filter_kl.lehreinheit_id
 					JOIN lehre.tbl_lehrveranstaltung filter_lv ON filter_lv.lehrveranstaltung_id = filter_le.lehrveranstaltung_id
 					WHERE filter_kl.kalender_id = tbl_kalender.kalender_id
-						AND ($or_block)
-				))"
+						AND ($lv_or_block)
+				)
+				OR EXISTS ( 
+					SELECT 1 
+					FROM lehre.tbl_kalender_event_teilnehmer filter_teilnehmer
+						LEFT JOIN public.tbl_gruppe filter_grp ON filter_grp.gruppe_kurzbz = filter_teilnehmer.gruppe_kurzbz
+						LEFT JOIN public.tbl_lehrverband filter_lehrverband ON filter_lehrverband.studiengang_kz = filter_teilnehmer.studiengang_kz
+							AND filter_lehrverband.semester = filter_teilnehmer.semester
+							AND TRIM(COALESCE(filter_teilnehmer.verband::text, '')) = TRIM(filter_lehrverband.verband::text)
+							AND TRIM(COALESCE(filter_teilnehmer.gruppe::text, '')) = TRIM(filter_lehrverband.gruppe::text)
+					WHERE filter_teilnehmer.kalender_id = tbl_kalender.kalender_id
+						AND (filter_teilnehmer.gruppe_kurzbz IS NOT NULL OR filter_teilnehmer.studiengang_kz IS NOT NULL)
+						AND ($teilnehmer_or_block)
+				))", null, false
 			);
 		}
 
@@ -537,6 +563,11 @@ class KalenderLib
 			'false'
 		);
 
+		$this->_ci->StundeModel->addLimit(1);
+		$this->_ci->StundeModel->addOrder('stunde', 'DESC');
+		$letzte_stunde_result = $this->_ci->StundeModel->load();
+
+		$letzte_stunde = getData($letzte_stunde_result)[0];
 		while ($rest > 0 && new DateTime($current_date) < $ende)
 		{
 			$max_skip = 52;
@@ -564,12 +595,7 @@ class KalenderLib
 
 			if (!hasData($end_stunde_result))
 			{
-				$errors[] = [
-					'datum' => $current_date,
-					'message' => 'Endzeit entspricht keinem gültigen Raster',
-				];
-				$current_date = $this->_addWeeks($current_date, $wochenrythmus);
-				continue;
+				$current_block = $letzte_stunde->stunde - $start_stunde_nr + 1;
 			}
 
 			$end_time = getData($end_stunde_result)[0]->ende;
@@ -655,7 +681,7 @@ class KalenderLib
 	}
 
 
-	public function addKalenderEvent($start_date, $end_date, $lehreinheit_id, $ort_kurzbz)
+	public function addKalenderEvent($start_date, $end_date, $lehreinheit_id, $ort_kurzbz, $first_run = false)
 	{
 		if (!$this->_checkPermission((array)$lehreinheit_id))
 		{
@@ -674,24 +700,45 @@ class KalenderLib
 
 			$raum_vorschlaege = $this->_ci->raumvorschlaglib->getVorschlaegeByLehreinheit($lehreinheit_id, $start_date, $end_date);
 
-			if (($this->_ci->variablelib->getVar('dialog_room_planning') ?? 'false') === 'true')
+			$room_planning = $this->_ci->variablelib->getVar('room_planning') ?? 'priority_room_planning';
+			if ($first_run || (($this->_ci->variablelib->getVar('roomless_planning') ?? 'false') !== 'true'))
 			{
-				return success([
-					'needs_room_selection' => true,
-					'raum_vorschlaege' => is_array($raum_vorschlaege) ? $raum_vorschlaege : [],
-				]);
-			}
+				if ($room_planning === 'dialog_room_planning')
+				{
+					if (!$first_run)
+					{
+						return error([
+							'message' => $this->_ci->phraseslib->t('ui', 'roomless_planning_error'),
+							'errorCode' => 'roomless_planning_error'
+						]);
+					}
+					else
+					{
+						return success([
+							'needs_room_selection' => true,
+							'raum_vorschlaege' => is_array($raum_vorschlaege) ? $raum_vorschlaege : [],
+						]);
+					}
+				}
+				else if ($room_planning === 'priority_room_planning')
+				{
+					$ort_kurzbz = !empty($raum_vorschlaege[0]['ort_kurzbz']) ? $raum_vorschlaege[0]['ort_kurzbz'] : null;
 
-			if (($this->_ci->variablelib->getVar('priority_room_planning') ?? 'false') === 'true')
-			{
-				$ort_kurzbz = (is_array($raum_vorschlaege)) ? $raum_vorschlaege[0]['ort_kurzbz'] : null;
-			}
-			else if (!(($this->_ci->variablelib->getVar('roomless_planning') ?? 'false') === 'true'))
-			{
-				return error([
-					'message' => $this->_ci->phraseslib->t('ui', 'roomless_planning_error'),
-					'errorCode' => 'roomless_planning_error'
-				]);
+					if (is_null($ort_kurzbz) && !(($this->_ci->variablelib->getVar('roomless_planning') ?? 'false') === 'true'))
+					{
+						return error([
+							'message' => $this->_ci->phraseslib->t('ui', 'roomless_prio_planning_error'),
+							'errorCode' => 'roomless_planning_error'
+						]);
+					}
+				}
+				else if (!(($this->_ci->variablelib->getVar('roomless_planning') ?? 'false') === 'true'))
+				{
+					return error([
+						'message' => $this->_ci->phraseslib->t('ui', 'roomless_planning_error'),
+						'errorCode' => 'roomless_planning_error'
+					]);
+				}
 			}
 		}
 
@@ -901,7 +948,7 @@ class KalenderLib
 		if (!empty($errors)) {
 			return error($errors);
 		}
-		
+
 		$this->_ci->db->trans_start();
 
 		$allowedResourceIDs = array_filter(array_map(
@@ -984,7 +1031,7 @@ class KalenderLib
 
 		if (!is_null($orte))
 		{
-			$kalender_entry->ort_kurbz = !isEmptyArray($orte['ort_kurzbz'] ?? null) ? (array) $orte['ort_kurzbz'] : $kalender_entry->ort_kurzbz;
+			$kalender_entry->ort_kurzbz = !isEmptyArray($orte['ort_kurzbz'] ?? null) ? (array) $orte['ort_kurzbz'] : $kalender_entry->ort_kurzbz;
 			$kalender_entry->location = array_key_exists('location', $orte) && !is_null($orte['location']) ? $orte['location'] : $kalender_entry->location;
 		}
 		$kalender_entry->von = $start_time ?? $kalender_entry->von;
@@ -1657,7 +1704,7 @@ class KalenderLib
 
 			if ($row->verband_grp)
 			{
-				if (!in_array($row->teilnehmerg_grp, array_column($events[$id]->teilnehmer_gruppe, 'gruppe_kurzbz')))
+				if (!in_array($row->verband_grp, array_column($events[$id]->teilnehmer_gruppe, 'gruppe_kurzbz')))
 				{
 					$events[$id]->teilnehmer_gruppe[] = [
 						'gruppe_kurzbz' => $row->verband_grp,
@@ -1718,6 +1765,11 @@ class KalenderLib
 			}
 		}
 
+		foreach ($events as $event)
+		{
+			usort($event->ort_kurzbz, 'strnatcasecmp');
+		}
+
 		return array_values($events);
 	}
 
@@ -1753,6 +1805,8 @@ class KalenderLib
 
 		if (hasData($ferien_result))
 			return true;
+
+		return false;
 	}
 
 	private function _insertKalenderEventRaw($start_date, $end_date, $lehreinheit_id, $ort_kurzbz)
@@ -2140,7 +2194,7 @@ class KalenderLib
 
 		$lehreinheit = $this->_ci->LehreinheitModel->load();
 		if (!hasData($lehreinheit))
-			return error('Lehreinheit nicht gefunden');
+			return false;
 
 		$studiengaenge = array_unique(array_column(getData($lehreinheit), 'studiengang_kz'));
 

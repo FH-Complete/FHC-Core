@@ -29,7 +29,6 @@ import { useContextMenuActions } from '../../composables/Tempus/ContextMenuActio
 import MultiWeekPlanModal from './MultiWeekPlanModal.js';
 import HistoryModal from './HistoryModal.js';
 import ResourcesAssignmentModal from './ResourcesAssignmentModal.js';
-import TagsAssignmentModal from './TagsAssignmentModal.js';
 import { getTempusSearchbarOptions } from './Filters/searchbarOptions.js';
 import TempusHeader from './Header.js';
 import TempusAppMenu from './AppMenu.js';
@@ -54,7 +53,6 @@ export default {
 		MultiWeekPlanModal,
 		HistoryModal,
 		ResourcesAssignmentModal,
-		TagsAssignmentModal,
 		RaumauswahlModal,
 		RaumauswahlMultiModal,
 		LehreinheitModal,
@@ -85,7 +83,6 @@ export default {
 				openRaumauswahl: (orig) => this.$refs.raumModal.show(orig),
 				openLehreinheit: (orig) => this.$refs.lehreinheitModal.show(orig),
 				openResourcesAssignmentModal: (orig) => this.$refs.resourcesAssignmentModal?.open(orig),
-				openTagsModal: (orig) => this.$refs.tagsAssignmentModal?.open(orig),
 				openHistory: (orig) => this.openHistory(orig),
 				deleteEntry: (orig) => this.deleteEntry(orig),
 				syncToLecturer: (orig) => this.syncToLecturer(orig),
@@ -1066,7 +1063,6 @@ export default {
 		ref="resourcesAssignmentModal"
 		@save-finished="$refs.calendar.resetEventLoader()"
 		/>
-		<tags-assignment-modal ref="tagsAssignmentModal"/>
 		<history-modal ref="historyModal" :entries="historyEntries" />
 		<reservierung
 			ref="reservierung"

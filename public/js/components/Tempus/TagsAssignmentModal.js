@@ -31,21 +31,6 @@ export default {
 		},
 	},
 	methods: {
-		async open(calendar, tagToEdit = null) {
-			if (!calendar?.eindeutige_kalender_gruppen_id) return;
-
-			this.calendar = calendar;
-			this.availableTags = await this.fetchAvailableTags();
-			this.filteredAvailableTags = [...this.dropdownParsedAvailableTags];
-			this.assignedTags = await this.fetchAssignedTagsByCalender(
-				calendar.eindeutige_kalender_gruppen_id,
-			);
-
-			this.show();
-
-			if (tagToEdit)
-				this.editTag(tagToEdit);
-		},
 		show() {
 			this.$refs.modal.show();
 		},

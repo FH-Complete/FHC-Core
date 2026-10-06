@@ -1,6 +1,6 @@
 import { numberPadding, formatDate } from "../../../../helpers/DateHelpers.js"
-import LvMenu from "../../../Cis/Mylv/LvMenu.js";
-import TagsAssignmentModal from "../../TagsAssignmentModal.js";
+import ApiTempusTag from "../../../../api/factory/tempus/tag.js";
+import CoreTag from '../../../../components/Tag/Tag.js';
 
 export default {
 	props:{
@@ -8,17 +8,20 @@ export default {
 			type: Object,
 			required: true,
 		},
-		lvMenu:{
-			type: Object,
-			required: false,
-			default: null,
-		},
 	},
-	components:{
-		LvMenu,
-		TagsAssignmentModal
+	components: {
+		CoreTag
+	},
+	data()
+	{
+		return {
+			tagEndpoint: ApiTempusTag
+		}
 	},
 	computed: {
+		tagValues() {
+			return this.event.eindeutige_kalender_gruppen_id ? [this.event.eindeutige_kalender_gruppen_id] : [];
+		},
 		lektorenLinks: function () {
 			if (!this.event || !Array.isArray(this.event.lektor) || !this.event.lektor.length) return "a";
 
@@ -69,9 +72,27 @@ export default {
 		methodFormatDate: function (d) {
 			return formatDate(d);
 		},
-		async openTagsModal(tag = null)
-		{
-			await this.$refs.tagsModal.open(this.event, tag);
+		async fetchAssignedTagsByCalender(calendarGroupId) {
+			let result = await this.$api.call(
+				ApiTempusTag.getTagsByCalendar(calendarGroupId),
+			);
+
+			if (result.meta.status === "success")
+				return result.data.filter(tag => !!tag);
+
+			this.$fhcAlert.alertError(
+				this.$p.t("ui", "failed_assigned_tags_fetch_error_message"),
+			);
+			return [];
+		},
+		async onTagsChanged() {
+			let id = this.event.eindeutige_kalender_gruppen_id;
+			if (!id) return;
+
+			this.event.tags = await this.fetchAssignedTagsByCalender(id);
+		},
+		editTag(tag) {
+			this.$refs.tagComponent?.editTag(tag.id);
 		},
 	},
 	template: `
@@ -129,11 +150,7 @@ export default {
 					</tr>
 					
 					<tr>
-						<th>{{
-							$p.t('ui','teilnehmende')?
-							$p.t('ui','teilnehmende')+':'
-							:''
-						}}</th>
+						<th>{{$p.t('ui','teilnehmende')+':'}}</th>
 						<td>
 							<div v-for="teilnehmer in event.teilnehmer_person" class="d-block">
 								{{teilnehmer.kurzbz}}
@@ -144,33 +161,38 @@ export default {
 						</td>
 					</tr>
 					<tr>
-						<th>{{
-							$p.t('ui','tags')?
-							$p.t('ui','tags')+':'
-							:''
-						}} <i 
-								class="fa-solid fa-tags"
-								@click="openTagsModal(null)"
-							></i>
+						<th>
+							<div class="d-flex align-items-center flex-wrap">
+								{{$p.t('ui','tags')}}:
+								<div class="fw-normal">
+									<core-tag
+										v-if="tagValues.length"
+										ref="tagComponent"
+										:endpoint="tagEndpoint"
+										:values="tagValues"
+										zuordnung_typ="eindeutige_kalender_gruppen_id"
+										show-hover
+										@added="onTagsChanged"
+										@deleted="onTagsChanged"
+										@updated="onTagsChanged"
+									></core-tag>
+								</div>
+							</div>
 						</th>
 						<td>
-							<div v-if="tags.length">
-								<span
-									v-for="tag in tags"
-									:key="tag.tag_typ_kurzbz"
-									:class="[tag.style, { tag_done: tag.done }]"
-									@click="openTagsModal(tag)"
-									class="tag disabled"
-									>{{ tag.beschreibung }}</span>
-							</div>
+							<span
+								v-for="tag in tags"
+								:key="tag.id"
+								:class="[tag.style, { tag_done: tag.done }]"
+								@click="editTag(tag)"
+								class="tag"
+							>{{ tag.beschreibung }}</span>
 						</td>
-						
 					</tr>
 					
 				</tbody>
 		</table>
 		
-		<tags-assignment-modal ref="tagsModal"/>
 
 	</div>`,
 }

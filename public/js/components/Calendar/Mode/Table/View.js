@@ -85,6 +85,7 @@ export default {
 				layout: 'fitDataStretch',
 				placeholder: "Keine Daten verfügbar",
 				persistenceID: "2026_09_29_table_view_v1",
+				height: '100%',
 				data: this.preparedEvents,
 				columns: [
 					{
@@ -132,11 +133,10 @@ export default {
 							let semester = cell.getRow().getData().le_studiensemester_kurzbz.toLowerCase();
 							let base_url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
-							//TODO (david) abhängig von der LVVerwaltung
-							/*return value.map(lehreinheit => {
+							return value.map(lehreinheit => {
 								let url = `${base_url}/LVVerwaltung/stdsem/${semester}/le/${lehreinheit}`;
 								return `<a href="${url}" target="_blank">${lehreinheit}</a>`;
-							}).join(', ');*/
+							}).join(', ');
 						},
 					},
 					{
@@ -352,7 +352,7 @@ export default {
 		},
 	},
 	template: /* html */`
-	<div class="fhc-calendar-mode-table-view h-100 overflow-auto">
+	<div class="fhc-calendar-mode-table-view position-absolute top-0 start-0 w-100 h-100 d-flex flex-column">
 		<core-filter-cmpt
 			ref="tableViewTable"
 			:tabulator-options="tabulatorOptions"
@@ -380,7 +380,6 @@ export default {
 				<div class="d-flex gap-2 align-items-baseline">
 					<select v-model="actionSelect" class="form-select">
 						<option selected disabled value="">Status setzen</option>
-						<option value="delete">Löschen</option>
 						<option value="toLecturer">Freischalten für Voransicht</option>
 						<option value="toStudent">Freischalten für Live</option>
 					</select>
