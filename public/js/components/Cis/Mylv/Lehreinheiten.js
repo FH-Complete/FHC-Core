@@ -22,6 +22,21 @@ export default {
 						title: "placeholder",
 						field: "inputGrades",
 						widthGrow: 2,
+						formatter: () => {
+							return '<i class="fa-solid fa-up-right-from-square"></i>';
+						},
+						hozAlign: "center",
+						cellClick: (event, cell) => {
+							window.open(
+								FHC_JS_DATA_STORAGE_OBJECT.app_root +
+									FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+									"/Cis/Compat/legacy/cis/private/lehre/benotungstool/lvgesamtnoteverwalten.php?lvid=" +
+									cell._cell.row.data.lvId +
+									"&stsem=" +
+									this.$props.semester,
+								"_blank",
+							);
+						},
 					},
 					{
 						title: "ID",
@@ -147,6 +162,7 @@ export default {
 					(lehreinheitData) => {
 						return {
 							lehreinheitId: lehreinheitData.lehreinheit_id,
+							lvId: lehreinheitData.lehrveranstaltung_id,
 							subject: lehreinheitData.lehrfach,
 							lehrform: lehreinheitData.lehrform,
 							title: lehreinheitData.lv_bezeichnung,
@@ -176,7 +192,9 @@ export default {
 		},
 		setTableData() {
 			if (this.$refs.lehreinheitenTable && this.lehreinheiten?.length) {
-				this.$refs.lehreinheitenTable.tabulator.setData(this.lehreinheiten);
+				this.$refs.lehreinheitenTable.tabulator.setData(
+					this.lehreinheiten,
+				);
 			}
 		},
 	},

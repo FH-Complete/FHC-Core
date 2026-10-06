@@ -782,7 +782,8 @@ EOSQL;
 			tbl_lehreinheitmitarbeiter.semesterstunden as semesterstunden,
 			tbl_lehreinheit.start_kw,
 			lvangebot.anmeldefenster_start,
-			lvangebot.anmeldefenster_ende
+			lvangebot.anmeldefenster_ende,
+			tbl_lehrveranstaltung.lehrveranstaltung_id
 		FROM
 			lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
 			JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)

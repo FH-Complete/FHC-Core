@@ -18,7 +18,8 @@ export default {
 			lvs: {},
 			currentSemester: null,
 			modes: ["lvs", "lehrenheiten", "supervision", "all"],
-			selectedMode: "lvs"
+			// todo: replace with lvs after dev
+			selectedMode: "lehrenheiten"
 		};
 	},
 	provide() {
@@ -148,7 +149,7 @@ export default {
 					</div>
 					<div>
 						<select v-model="selectedMode" class="form-select" :aria-label="'mode selector placeholder'">
-							<option v-for="mode in modes" :key="mode"> {{ mode }} </option>
+							<option v-for="mode in modes" :key="mode" :value="mode"> {{ mode }} </option>
 						</select>
 					</div>
 				</div>
