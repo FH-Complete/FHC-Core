@@ -1660,22 +1660,19 @@ class Status extends FHCAPI_Controller
 			'updatevon' => $authUID
 		]);
 
-		$this->getDataOrTerminateWithError($result);
+		$data = $this->getDataOrTerminateWithError($result);
 
 		//Send Message
-		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+/*		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 
 		$this->PrestudentModel->addSelect('p.*');
 		$this->PrestudentModel->addSelect('stg.oe_kurzbz');
 		$this->PrestudentModel->addSelect('stg.bezeichnung AS stg_bezeichnung');
 		$this->PrestudentModel->addSelect('stg.email AS stg_email');
-//		$this->PrestudentModel->addSelect('plan.orgform_kurzbz');
 		$this->PrestudentModel->addSelect('typ.bezeichnung AS typ_bezeichnung');
-
 		$this->PrestudentModel->addJoin('public.tbl_person p', 'person_id');
 		$this->PrestudentModel->addJoin('public.tbl_studiengang stg', 'studiengang_kz');
 		$this->PrestudentModel->addJoin('public.tbl_studiengangstyp typ', 'typ');
-//		$this->PrestudentModel->addJoin('public.tbl_studienplan plan', 'studienplan_id', 'LEFT');
 
 		$result = $this->PrestudentModel->load($prestudent_id);
 
@@ -1683,7 +1680,6 @@ class Status extends FHCAPI_Controller
 		$studentdata = current($studentdata);
 		$orgform = $oldstatus->orgform_kurzbz || '';
 
-		//TODO(Manu) test mail and check if orgform_kurzbz is necessary
 		$this->load->library('MessageLib');
 		$result = $this->messagelib->sendMessageUserTemplate(
 			$studentdata->person_id,				// receiversPersonId
@@ -1704,9 +1700,9 @@ class Status extends FHCAPI_Controller
 			null,									// relationmessage_id
 			MSG_PRIORITY_NORMAL,					// priority
 			true									// multiPartMime
-		);
+		);*/
 
-		$this->terminateWithSuccess(true);
+		$this->terminateWithSuccess($data);
 	}
 
 	/**
