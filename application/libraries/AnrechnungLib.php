@@ -75,8 +75,14 @@ class AnrechnungLib
 			show_error(getError($student));
 		}
 
-		// Get studiengang bezeichnung of the student, not of the LV
-		if (!$studiengang = getData($this->ci->StudiengangModel->load($student->studiengang_kz))[0])
+		// Studiengang of the prestudent, not of the LV (same source as the permission checks)
+		if (!$prestudent = getData($this->ci->PrestudentModel->load($prestudent_id))[0])
+		{
+			show_error('Failed loading prestudent data.');
+		}
+
+		// Get studiengang bezeichnung
+		if (!$studiengang = getData($this->ci->StudiengangModel->load($prestudent->studiengang_kz))[0])
 		{
 			show_error('Failed loading studiengang data.');
 		}
@@ -95,7 +101,7 @@ class AnrechnungLib
 		$latest_zgv_bezeichnung = hasData($result) ? getData($result)[0]->bezeichnung : '';
 
         // Get Sum of berufliche and schulische ECTS
-        $result = $this->ci->LehrveranstaltungModel->getEctsSumSchulisch($uid, $prestudent_id, $student->studiengang_kz);
+        $result = $this->ci->LehrveranstaltungModel->getEctsSumSchulisch($uid, $prestudent_id, $prestudent->studiengang_kz);
         $sumEctsSchulisch = getData($result)[0]->ectssumschulisch;
 
         $result = $this->ci->LehrveranstaltungModel->getEctsSumBeruflich($uid);
@@ -602,7 +608,7 @@ class AnrechnungLib
 		$this->ci->db->trans_start(false);
 
 		// Insert new status inProgressLektor
-		$result = $this->ci->AnrechnungModel->saveAnrechnungstatus($anrechnung_id, self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR);
+		$this->ci->AnrechnungModel->saveAnrechnungstatus($anrechnung_id, self::ANRECHNUNGSTATUS_PROGRESSED_BY_LEKTOR);
 
 		/**
 		 * Anyway update empfehlung_anrechnung to be null
@@ -622,7 +628,7 @@ class AnrechnungLib
 		if ($this->ci->db->trans_status() === false)
 		{
 			$this->ci->db->trans_rollback();
-			return error($result->msg, EXIT_ERROR);
+			return false;
 		}
 
 		return true;   // recommended
