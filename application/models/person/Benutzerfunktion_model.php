@@ -295,6 +295,35 @@ class Benutzerfunktion_model extends DB_Model
 		return $this->execQuery($query, $parameters_array);
 	}
 
+	/**
+	 * Get active Fachkoordinator bei UID.
+	 *
+	 * @param $uid
+	 * @return array|stdClass|null
+	 */
+	public function getFachkoordinatorByUID($uid)
+	{
+		$qry = '
+            SELECT
+			  	bf.uid,
+				bf.oe_kurzbz,
+  				oe.organisationseinheittyp_kurzbz
+            FROM
+			  	public.tbl_benutzerfunktion bf
+				JOIN public.tbl_organisationseinheit oe USING (oe_kurzbz)
+  				JOIN public.tbl_benutzer b USING (uid)
+            WHERE
+                b.uid = ?
+              	AND b.aktiv = TRUE
+                AND funktion_kurzbz = \'fachkoordinator\'
+               	AND organisationseinheittyp_kurzbz = \'Fachgebiet\'
+              	AND (datum_von IS NULL OR datum_von <= now())
+              	AND (datum_bis IS NULL OR datum_bis >= now())
+        ';
+
+		return $this->execQuery($qry, [$uid]);
+	}
+
 	public function insertBenutzerfunktion($Json)
 	{
 		unset($Json['benutzerfunktion_id']);
