@@ -325,22 +325,25 @@ export default {
 			deep: true
 		}
 	},
-	template: `
-	<div class="mylv-semester-table" v-if="ready">
-		 <core-filter-cmpt
-			v-if="phrasenResolved"
-			@uuidDefined="handleUuidDefined"
-			:title="''"
-			ref="mylvTable"
-			:tabulator-options="mylvTableOptions"
-			:tabulator-events="mylvTableEventHandlers"
-			@tableBuilt="handleTableBuilt"
-			tableOnly
-			:sideMenu="false"
-		 />
-	</div>
-	<div v-if="tabulatorUuid === null" class="text-center d-flex justify-content-center align-items-center h-100" >
-		<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
+	template: /*html*/ `
+	<div class="d-flex flex-column gap-3">
+		<div class="mylv-semester-table" v-if="ready">
+			<core-filter-cmpt
+				v-if="phrasenResolved"
+				@uuidDefined="handleUuidDefined"
+				:title="''"
+				ref="mylvTable"
+				:tabulator-options="mylvTableOptions"
+				:tabulator-events="mylvTableEventHandlers"
+				@tableBuilt="handleTableBuilt"
+				tableOnly
+				:sideMenu="false"
+			/>
+		</div>
+		<div v-if="tabulatorUuid === null" class="text-center d-flex justify-content-center align-items-center h-100" >
+			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
+		</div>
+		<slot name="averageGrade"></slot>
 	</div>
 	`
 };

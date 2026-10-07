@@ -1,12 +1,15 @@
 import MylvSemesterCards from "./Semester.js";
 import MylvTable from "./Table.js";
+import MylvSemesterStudiengangAverageGrade from "./AverageGrade.js";
 
 export default {
 	name: "Lvs",
 	components: {
 		MylvSemesterCards,
-		MylvTable
+		MylvTable,
+		MylvSemesterStudiengangAverageGrade,
 	},
+	inject: ['isStudent'],
 	props: ["current"],
 	data() {
 		return {
@@ -39,8 +42,20 @@ export default {
 				<i class="fa fa-table"></i>
 			</button>
 		</div>
-		<mylv-semester-cards v-if="mode == 'cards'" v-bind="$props.current"/>
-		<mylv-table v-else-if="mode == 'table'" v-bind="$props.current"/>
+		<mylv-semester-cards v-if="mode == 'cards'" v-bind="$props.current">
+			<template #averageGrade v-if="isStudent && $props.current.semester">
+				<mylv-semester-studiengang-average-grade
+					:semesterInfo="$props.current.semester"
+				/>
+			</template>
+		</mylv-semester-cards>
+		<mylv-table v-else-if="mode == 'table'" v-bind="$props.current">
+			<template #averageGrade v-if="isStudent && $props.current.semester">
+				<mylv-semester-studiengang-average-grade
+					:semesterInfo="$props.current.semester"
+				/>
+			</template>
+		</mylv-table>
 	</div>
 	`,
 }
