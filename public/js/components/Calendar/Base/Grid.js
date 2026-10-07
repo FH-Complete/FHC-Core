@@ -60,7 +60,7 @@ export default {
 		axisMainCollapsible: Boolean,
 		snapToGrid: Boolean,
 		overwrittenEvents: {
-			type: Array | null,
+			type: [Array, null],
 			default: null,
 		},
 		shouldMatchParentHeight: {
