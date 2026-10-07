@@ -130,7 +130,7 @@ export default {
 			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 		</div>
 		<div v-else-if="students?.length">
-			<h5>{{ students.length + " supervised students" }}</h5>
+			<h5>{{ students.length + " " + $p.t("mylv/supervised_students") }}</h5>
 			<core-filter-cmpt
 				@tableBuilt="handleTableBuilt()"
 				ref="supervisorTable"
@@ -140,7 +140,7 @@ export default {
 			/>
 		</div>
 		<div v-else class="d-flex flex-row justify-content-center pt-3">
-			<h4>No supervised students found!</h4>
+			<h4>{{ $p.t("mylv/no_supervised") }}</h4>
 		</div>
 	</div>
 	`,

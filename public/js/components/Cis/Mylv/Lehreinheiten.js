@@ -209,7 +209,7 @@ export default {
 			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 		</div>
 		<div v-else-if="lehreinheiten?.length">
-			<h5>{{ lehreinheiten.length + " teaching units" }}</h5>
+			<h5>{{ lehreinheiten.length + " " + $p.t("mylv/lehreinheiten") }}</h5>
 			<core-filter-cmpt
 				@tableBuilt="handleTableBuilt()"
 				ref="lehreinheitenTable"
