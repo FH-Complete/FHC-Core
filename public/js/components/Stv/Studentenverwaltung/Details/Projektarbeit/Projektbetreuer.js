@@ -433,7 +433,11 @@ export default {
 		},
 		actionKontaktdatenBearbeiten() {
 			if (!this.autocompleteSelectedBetreuer) return;
-			if (this.isMitarbeiter) this.$fhcAlert.alertError(this.$p.t('ui', 'editingMitarbeiterPVonly'));
+			if (this.isMitarbeiter)
+			{
+				this.$fhcAlert.alertError(this.$p.t('ui', 'editingMitarbeiterPVonly'));
+				return;
+			} 
 			this.$refs.kontaktdatenModal.show();
 		},
 		// stuff to do after new person has been saved
