@@ -333,6 +333,25 @@ html.dark .btn-danger:hover {
 	filter: brightness(90%);
 }
 
+/* the dark primevue theme draws p-button-danger (e.g. FhcAlert.confirmDelete) light pink with black text,
+ * use the dark red of .btn-danger */
+html.dark .p-button.p-button-danger {
+	color: white;
+	background: var(--fhc-red-60);
+	border-color: var(--fhc-red-60);
+}
+
+html.dark .p-button.p-button-danger:enabled:hover,
+html.dark .p-button.p-button-danger:enabled:active {
+	color: white;
+	background: var(--fhc-red-70);
+	border-color: var(--fhc-red-70);
+}
+
+html.dark .p-button.p-button-danger:enabled:focus {
+	box-shadow: 0 0 0 0.2rem rgba(225, 110, 120, 0.5);
+}
+
 html.dark .text-danger {
 	color: var(--fhc-danger) !important;
 }
@@ -362,6 +381,32 @@ html.dark .btn-outline-secondary {
 	--bs-btn-active-color: var(--fhc-black-30);
 	--bs-btn-active-bg: var(--fhc-white-90);
 	--bs-btn-active-border-color: var(--fhc-white-90);
+}
+
+/* the primevue multiselect renders the check icon also in unchecked boxes and hides it by color:
+ * white on white in the light theme, but #151515 on #20262e in the dark theme */
+html.dark .p-checkbox .p-checkbox-box:not(.p-highlight) .p-checkbox-icon {
+	color: transparent;
+}
+
+/* FhcAlert.confirm passes bootstrap classes to the primevue buttons. The primevue theme loads after
+ * bootstrap, its .p-button colors replace the .btn colors: every button blue */
+.p-button.btn {
+	color: var(--bs-btn-color);
+	background: var(--bs-btn-bg);
+	border-color: var(--bs-btn-border-color);
+}
+
+.p-button.btn:enabled:hover {
+	color: var(--bs-btn-hover-color);
+	background: var(--bs-btn-hover-bg);
+	border-color: var(--bs-btn-hover-border-color);
+}
+
+.p-button.btn:enabled:active {
+	color: var(--bs-btn-active-color);
+	background: var(--bs-btn-active-bg);
+	border-color: var(--bs-btn-active-border-color);
 }
 
 
