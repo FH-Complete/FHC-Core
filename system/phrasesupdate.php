@@ -67486,7 +67486,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'LVs',
+				'text' => 'Lehrveranstaltungen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
