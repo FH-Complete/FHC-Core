@@ -490,7 +490,7 @@ class Student extends FHCAPI_Controller
 		$this->PersonModel->addSelect(
 			'person_id, vorname, nachname, vornamen, wahlname, gebdatum, staatsbuergerschaft, geburtsnation, sprache, anrede,
 			titelpost, titelpre, gebort, gebzeit, homepage, geschlecht, matr_nr,
-			aktiv, unruly, tbl_geschlecht.bezeichnung_mehrsprachig AS geschlecht_bezeichnung'
+			aktiv, tbl_geschlecht.bezeichnung_mehrsprachig AS geschlecht_bezeichnung'
 		);
 		$this->PersonModel->addJoin('public.tbl_geschlecht', 'geschlecht');
 

@@ -122,7 +122,6 @@ class StudentListLib
 		) || ' (' || COALESCE(tbl_prestudent.priorisierung::text, ' '::text) || ')' AS priorisierung_relativ", false);
 		$this->addSelect('mentor');
 		$this->addSelect('b.aktiv AS bnaktiv');
-		$this->addSelect('unruly');
 		
 		// Add default JOINs
 		$this->addJoin('public.tbl_studiengang stg', 'studiengang_kz', 'LEFT');
