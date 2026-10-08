@@ -50,6 +50,7 @@ class Cis4FhcApi extends FHCAPI_Controller
 		$viewData = array(
 			'uid' => getAuthUID(),
 			'name' => $personData->vorname,
+			'wahlname' => $personData->wahlname,
 			'person_id' => $personData->person_id,
 			'timezone' => $this->config->item('timezone'),
 		);

@@ -213,7 +213,7 @@ export default {
 			this.isOtherPersonStudent = !!viewData?.user_data?.is_student;
 			let fullNameWithTitleFragments = [
 				viewData?.user_data?.titel,
-				viewData?.user_data?.vorname,
+				viewData?.user_data?.wahlname ?? viewData?.user_data?.vorname,
 				viewData?.user_data?.nachname,
 				viewData?.user_data?.postnomen,
 			];

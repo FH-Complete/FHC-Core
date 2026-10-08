@@ -62,6 +62,7 @@ class OtherLvPlan extends FHCAPI_Controller
 				"foto" => $profileData->data->foto,
 				"vorname" => $profileData->data->vorname,
 				"nachname" => $profileData->data->nachname,
+				"wahlname" => $profileData->data->wahlname,
 				"titel" => $profileData->data->titel,
 				"postnomen" => $profileData->data->postnomen,
 			],

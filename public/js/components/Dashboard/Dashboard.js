@@ -184,7 +184,7 @@ export default {
 			let viewDataResult = await this.$api.call(ApiDashboard.getViewData());
 			const viewData = viewDataResult.data;
 			this.timezone = viewData?.timezone;
-			this.userFirstName = viewData?.name;
+			this.userFirstName = viewData?.wahlname ?? viewData?.name;
 		}
 	},
 	async created() {

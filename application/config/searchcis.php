@@ -25,7 +25,7 @@ $config['student']['resultfields'] = [
 	"s.matrikelnr AS personenkennzeichen",
 	"p.person_id",
 	"p.matr_nr AS matrikelnummer",
-	"(p.vorname || ' ' || p.nachname) AS name",
+	"CASE WHEN p.wahlname IS NOT NULL THEN (p.wahlname || ' ' || p.nachname) ELSE (p.vorname || ' ' || p.nachname) END AS name",
 	"ARRAY[s.student_uid || '@' || '" . DOMAIN . "'] AS email",
 	"CASE
 		WHEN (p.foto_sperre = false AND p.foto IS NOT NULL) THEN 'data:image/jpeg' || CONVERT_FROM(DECODE('3b','hex'), 'UTF8') || 'base64,' || p.foto

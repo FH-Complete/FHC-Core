@@ -160,7 +160,7 @@ export default {
 			}
 
 			return {
-				Vorname: this.data.vorname,
+				Vorname: this.data.wahlname ?? this.data.vorname,
 				Nachname: this.data.nachname,
 				Username: this.data.username,
 				Anrede: this.data.anrede,

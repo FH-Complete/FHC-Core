@@ -329,7 +329,7 @@ class ProfilLib{
 	private function getPersonInfo($uid, $geburtsInfo = null)
 	{
 		$this->ci->load->model("person/Benutzer_model","BenutzerModel");
-		$selectClause = ["foto", "foto_sperre", "anrede", "titelpost as postnomen", "titelpre as titel", "vorname", "nachname"];
+		$selectClause = ["foto", "foto_sperre", "anrede", "titelpost as postnomen", "titelpre as titel", "vorname", "nachname", "wahlname"];
 		/** @param integer $geburtsInfo */
 		if ($geburtsInfo) {
 			array_push($selectClause, "gebort");

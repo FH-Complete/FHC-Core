@@ -26,6 +26,10 @@ $config['person'] = [
 			'comparison' => 'similar',
 			'field' => 'nachname'
 		],
+		'wahlname' => [
+			'comparison' => 'similar',
+			'field' => 'wahlname'
+		],
 		'name' => [
 			'comparison' => 'similar',
 			'field' => "(vorname || ' ' || nachname)"
@@ -68,7 +72,7 @@ $config['person'] = [
 	'resultfields' => [
 		"ARRAY( SELECT uid FROM public.tbl_benutzer WHERE person_id = p.person_id ) AS uids",
 		"p.person_id",
-		"(p.vorname || ' ' || p.nachname) AS name",
+		"CASE WHEN p.wahlname IS NOT NULL THEN (p.wahlname || ' ' || p.nachname) ELSE (p.vorname || ' ' || p.nachname) END AS name",
 		"ARRAY( SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp = 'email' AND person_id=p.person_id ) AS email",
 		"CASE
 			WHEN p.foto IS NOT NULL THEN 'data:image/jpeg' || CONVERT_FROM(DECODE('3b','hex'), 'UTF8') || 'base64,' || p.foto
@@ -106,6 +110,20 @@ $config['student'] = [
 			'alias' => ['lastname', 'surename'],
 			'comparison' => 'similar',
 			'field' => 'nachname',
+			'join' => [
+				[
+					'table' => "public.tbl_prestudent",
+					'using' => "prestudent_id"
+				],
+				[
+					'table' => "public.tbl_person",
+					'using' => "person_id"
+				]
+			]
+		],
+		'wahlname' => [
+			'comparison' => 'similar',
+			'field' => 'wahlname',
 			'join' => [
 				[
 					'table' => "public.tbl_prestudent",
@@ -196,7 +214,7 @@ $config['student'] = [
 		"s.student_uid AS uid",
 		"s.matrikelnr",
 		"p.person_id",
-		"(p.vorname || ' ' || p.nachname) AS name",
+		"CASE WHEN p.wahlname IS NOT NULL THEN (p.wahlname || ' ' || p.nachname) ELSE (p.vorname || ' ' || p.nachname) END AS name",
 		"(s.student_uid || '@" . DOMAIN . "') || ARRAY( SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp = 'email' AND person_id=p.person_id ) AS email",
 		"CASE
 			WHEN p.foto IS NOT NULL THEN 'data:image/jpeg' || CONVERT_FROM(DECODE('3b','hex'), 'UTF8') || 'base64,' || p.foto
@@ -252,6 +270,14 @@ $config['prestudent'] = [
 			'alias' => ['lastname', 'surename'],
 			'comparison' => 'similar',
 			'field' => 'nachname',
+			'join' => [
+				'table' => "public.tbl_person",
+				'using' => "person_id"
+			]
+		],
+		'wahlname' => [
+			'comparison' => 'similar',
+			'field' => 'wahlname',
 			'join' => [
 				'table' => "public.tbl_person",
 				'using' => "person_id"
@@ -314,7 +340,7 @@ $config['prestudent'] = [
 		"s.matrikelnr",
 		"p.person_id",
 		"b.uid",
-		"(p.vorname || ' ' || p.nachname) AS name",
+		"CASE WHEN p.wahlname IS NOT NULL THEN (p.wahlname || ' ' || p.nachname) ELSE (p.vorname || ' ' || p.nachname) END AS name",
 		"(b.uid || '@" . DOMAIN . "') || ARRAY( SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp = 'email' AND person_id=p.person_id ) AS email",
 		"CASE
 			WHEN p.foto IS NOT NULL THEN 'data:image/jpeg' || CONVERT_FROM(DECODE('3b','hex'), 'UTF8') || 'base64,' || p.foto
@@ -379,6 +405,20 @@ $config['employee'] = [
 			'alias' => ['lastname', 'surename'],
 			'comparison' => 'similar',
 			'field' => "nachname",
+			'join' => [
+				[
+					'table' => "public.tbl_benutzer",
+					'on' => "uid = mitarbeiter_uid"
+				],
+				[
+					'table' => "public.tbl_person",
+					'using' => "person_id"
+				]
+			]
+		],
+		'wahlname' => [
+			'comparison' => 'similar',
+			'field' => "wahlname",
 			'join' => [
 				[
 					'table' => "public.tbl_benutzer",
@@ -472,7 +512,7 @@ $config['employee'] = [
 	'resultfields' => [
 		"b.uid",
 		"p.person_id",
-		"(p.vorname || ' ' || p.nachname) AS name",
+		"CASE WHEN p.wahlname IS NOT NULL THEN (p.wahlname || ' ' || p.nachname) ELSE (p.vorname || ' ' || p.nachname) END AS name",
 		"ARRAY(
 			SELECT
 				'[' || ot.bezeichnung || '] ' || o.bezeichnung AS bezeichnung
