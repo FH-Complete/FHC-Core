@@ -23,11 +23,11 @@ export default {
 			params: { ort_kurzbz: ort_kurbz }
 		};
 	},
-	getRooms(datum, von, bis, typ, personenanzahl = 0, standort_id = null) {
+	getRooms(datum, von, bis, typ, personenanzahl = 0, standort_id = null, advancedFilters = {}) {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/Ort/getRooms',
-			params: { datum, von, bis, typ, personenanzahl, standort_id }
+			params: { datum, von, bis, typ, personenanzahl, standort_id, ...advancedFilters }
 		};
 	},
 	getRoomTypes() {
@@ -41,6 +41,13 @@ export default {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/Ort/getStandorte',
+			params: { }
+		};
+	},
+	getAdvancedFilterOptions() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Ort/getAdvancedFilterOptions',
 			params: { }
 		};
 	}

@@ -25,7 +25,19 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  */
 class Ort extends FHCAPI_Controller
 {
-	
+	// advanced filters of getRooms: tbl_ort column => filter type, the same list as in Raumsuche.js.
+	// text: contains, case-insensitive; select: equals; range: <column>_min, <column>_max; flag: true; exists: not null
+	const ADVANCED_FILTERS = [
+		'ort_kurzbz' => 'text',
+		'bezeichnung' => 'text',
+		'planbezeichnung' => 'text',
+		'stockwerk' => 'range',
+		'gebteil' => 'select',
+		'm2' => 'range',
+		'lehre' => 'flag',
+		'content_id' => 'exists'
+	];
+
 	/**
 	 * Object initialization
 	 */
@@ -37,7 +49,8 @@ class Ort extends FHCAPI_Controller
 			'getOrtKurzbzContent' => self::PERM_LOGGED,
 			'getRooms' => self::PERM_LOGGED,
 			'getTypes' => self::PERM_LOGGED,
-			'getStandorte' => self::PERM_LOGGED
+			'getStandorte' => self::PERM_LOGGED,
+			'getAdvancedFilterOptions' => self::PERM_LOGGED
 		]);
 
 		$this->load->model('ressource/Ort_model', 'OrtModel');
@@ -57,7 +70,17 @@ class Ort extends FHCAPI_Controller
 		$this->form_validation->set_rules('datum','Datum','required');
 		$this->form_validation->set_rules('von','Uhrzeit Von','required|regex_match[/^[0-9]{2}:[0-9]{2}$/]');
 		$this->form_validation->set_rules('bis','Uhrzeit Bis','required|regex_match[/^[0-9]{2}:[0-9]{2}$/]');
-		$this->form_validation->set_rules('standort_id','Standort','integer');
+		$this->form_validation->set_rules('standort_id','Standort','regex_match[/^([0-9]+|none)$/]');
+		foreach (self::ADVANCED_FILTERS as $column => $type) {
+			if ($type == 'range') {
+				$this->form_validation->set_rules($column.'_min', $column, 'numeric');
+				$this->form_validation->set_rules($column.'_max', $column, 'numeric');
+			} elseif ($type == 'flag' || $type == 'exists') {
+				$this->form_validation->set_rules($column, $column, 'in_list[true]');
+			} else {
+				$this->form_validation->set_rules($column, $column, 'max_length[255]');
+			}
+		}
 		if($this->form_validation->run() == FALSE) {
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
@@ -78,21 +101,25 @@ class Ort extends FHCAPI_Controller
 		$bisStunde = getData($this->StundeModel->getStundeForTime($bis))[0]->stunde;
 		
 		$params = array();
-		// a leading _ in ort_kurzbz or planbezeichnung marks a dummy room
 		$qry = "SELECT DISTINCT tbl_ort.*, tbl_standort.bezeichnung AS standort
 			FROM public.tbl_ort JOIN public.tbl_ortraumtyp USING(ort_kurzbz)
 			LEFT JOIN public.tbl_standort USING(standort_id)
-			WHERE aktiv AND lehre AND left(ort_kurzbz, 1) <> '_'
-			AND (planbezeichnung IS NULL OR left(planbezeichnung, 1) <> '_')";
+			WHERE aktiv AND reservieren";
 		if($typ) {
 			$params[] = $typ;
-			$qry.= "AND raumtyp_kurzbz = ?";
+			$qry.= " AND raumtyp_kurzbz = ?";
 		}
 		
-		if($standort_id) {
+		if($standort_id === 'none') { // rooms without a Standort
+			$qry.= " AND standort_id IS NULL";
+		} elseif($standort_id) {
 			$params[] = $standort_id;
 			$qry.= " AND standort_id = ?";
+		} else {
+			$qry.= " AND standort_id IS NOT NULL";
 		}
+
+		$qry.= $this->advancedFilterSql($params);
 
 		if(!$isMitarbeiter) { // students are only allowed to get a subset defined by config
 			$qry.= ' AND raumtyp_kurzbz IN ?';
@@ -100,7 +127,7 @@ class Ort extends FHCAPI_Controller
 			$this->addMeta('config', $this->config->item('roomtypes_student'));
 		}
 		
-		$qry.= "AND (max_person>= ? OR max_person is null)";
+		$qry.= " AND (max_person>= ? OR max_person is null)";
 		$params[] = $personenanzahl;
 
 		$qry.="	AND ort_kurzbz NOT IN 
@@ -145,13 +172,32 @@ class Ort extends FHCAPI_Controller
 	{
 		$qry = "SELECT DISTINCT standort_id, tbl_standort.bezeichnung
 			FROM public.tbl_ort JOIN public.tbl_standort USING(standort_id)
-			WHERE aktiv AND lehre AND left(ort_kurzbz, 1) <> '_'
-			AND (planbezeichnung IS NULL OR left(planbezeichnung, 1) <> '_')
+			WHERE aktiv AND reservieren
 			ORDER BY tbl_standort.bezeichnung";
 
 		$result = $this->OrtModel->execReadOnlyQuery($qry);
 
 		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result));
+	}
+
+	/**
+	 * Values of the select filters: column => distinct values of the rooms that pass the base filter of getRooms
+	 */
+	public function getAdvancedFilterOptions()
+	{
+		$options = [];
+		foreach (self::ADVANCED_FILTERS as $column => $type) {
+			if ($type != 'select')
+				continue;
+
+			$result = $this->OrtModel->execReadOnlyQuery("SELECT DISTINCT ".$column." AS value
+				FROM public.tbl_ort
+				WHERE aktiv AND reservieren AND ".$column." <> ''
+				ORDER BY ".$column);
+			$options[$column] = array_column($this->getDataOrTerminateWithError($result), 'value');
+		}
+
+		$this->terminateWithSuccess($options);
 	}
 
 	/**
@@ -200,6 +246,50 @@ class Ort extends FHCAPI_Controller
 		$content = hasData($content) ? getData($content) : null;
 
 		$this->terminateWithSuccess($content);
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Private methods
+
+	/**
+	 * SQL conditions of the advanced filters in the GET parameters, adds their values to $params
+	 */
+	private function advancedFilterSql(&$params)
+	{
+		// no xss_clean: the values are bound, and it could change a select value so that it no longer equals the column
+		$sql = '';
+		foreach (self::ADVANCED_FILTERS as $column => $type) {
+			if ($type == 'range') {
+				$min = $this->input->get($column.'_min');
+				$max = $this->input->get($column.'_max');
+				if ($min !== null && $min !== '') {
+					$sql.= " AND tbl_ort.".$column." >= ?::numeric";
+					$params[] = $min;
+				}
+				if ($max !== null && $max !== '') {
+					$sql.= " AND tbl_ort.".$column." <= ?::numeric";
+					$params[] = $max;
+				}
+				continue;
+			}
+
+			$value = $this->input->get($column);
+			if ($value === null || $value === '')
+				continue;
+
+			if ($type == 'flag') {
+				$sql.= " AND tbl_ort.".$column;
+			} elseif ($type == 'exists') {
+				$sql.= " AND tbl_ort.".$column." IS NOT NULL";
+			} elseif ($type == 'select') {
+				$sql.= " AND tbl_ort.".$column." = ?";
+				$params[] = $value;
+			} else {
+				$sql.= " AND strpos(lower(tbl_ort.".$column."), lower(?)) > 0";
+				$params[] = $value;
+			}
+		}
+		return $sql;
 	}
 }
 

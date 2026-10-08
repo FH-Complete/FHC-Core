@@ -21713,6 +21713,204 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'rauminfo',
+		'phrase' => 'ohneStandort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Ohne Standort",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "No Site",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'rauminfo',
+		'phrase' => 'tooltipRaumsuchev2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Die Raumsuche zeigt freie Räume für einen Zeitraum. Ein Raum ist frei, wenn im Stundenplan keine Lehrveranstaltung steht und niemand den Raum reserviert hat. Beim Öffnen zeigt die Liste die Räume, die ab jetzt für eine Stunde frei sind.
+
+So finden Sie einen freien Raum:
+1. Wählen Sie Datum und Uhrzeit.
+2. Optional: Wählen Sie einen Raumtyp, einen Standort und eine Mindestpersonenkapazität.
+Die Liste lädt neu, sobald Sie einen Filter ändern.
+
+In der Liste:
+• Raum Informationen: Das Symbol öffnet die Infoseite des Raums. Ein Strich bedeutet: Der Raum hat keine Infoseite.
+• Raum Reservierungen: Das Symbol öffnet den Kalender des Raums. Der Kalender zeigt alle Lehrveranstaltungen und Reservierungen.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "The room search shows free rooms for a time period. A room is free when the timetable shows no course in the room and nobody reserved the room. When you open the page, the list shows the rooms that are free from now for one hour.
+
+How to find a free room:
+1. Select the date and the time.
+2. Optional: select a room type, a site and a minimum person capacity.
+The list loads again when you change a filter.
+
+In the list:
+• Room Information: the icon opens the information page of the room. A dash means that the room has no information page.
+• Room Reservations: the icon opens the calendar of the room. The calendar shows all courses and reservations.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'rauminfo',
+		'phrase' => 'erweiterteFilter',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Erweiterte Filter",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Advanced filters",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'rauminfo',
+		'phrase' => 'nurLehrraeume',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Nur Lehrräume",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Only teaching rooms",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'rauminfo',
+		'phrase' => 'nurMitInfoseite',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Nur Räume mit Infoseite",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Only rooms with an information page",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'rauminfo',
+		'phrase' => 'lehrraum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Lehrraum",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Teaching room",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'rauminfo',
+		'phrase' => 'stockwerk',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Stockwerk",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Floor",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'rauminfo',
+		'phrase' => 'gebaeudeteil',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Gebäudeteil",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Building section",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'rauminfo',
+		'phrase' => 'flaeche',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Fläche in m²",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Area in m²",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'rauminfo',
 		'phrase' => 'raumtyp',
 		'insertvon' => 'system',
 		'phrases' => array(
