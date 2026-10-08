@@ -162,7 +162,8 @@ if (!isset($_GET['kz']))
 if (isset($_GET['all']))
 {
 	$qry = "SELECT
-				vorname, nachname, uid, geschlecht
+				vorname, nachname, wahlname, uid, geschlecht,
+				CASE WHEN wahlname IS NOT NULL THEN wahlname ELSE vorname END AS orderVorname
 			FROM
 				campus.vw_student
 			WHERE
@@ -170,12 +171,13 @@ if (isset($_GET['all']))
 				AND studiengang_kz=".$db->db_add_param($_GET['kz'])."
 				AND semester<10
 				AND semester>0
-			ORDER BY nachname, vorname";
+			ORDER BY nachname, orderVorname";
 }
 else
 {
 	$qry = "SELECT
-				vorname, nachname, uid, geschlecht
+				vorname, nachname, wahlname, uid, geschlecht,
+				CASE WHEN wahlname IS NOT NULL THEN wahlname ELSE vorname END AS orderVorname
 			FROM
 				campus.vw_student
 			WHERE
@@ -191,7 +193,7 @@ else
 	if (isset($_GET['grp']))
 		$qry.=" AND gruppe=".$db->db_add_param($_GET['grp']);
 
-	$qry.= ' ORDER BY nachname, vorname';
+	$qry.= ' ORDER BY nachname, orderVorname';
 }
 echo '<p>'.$p->t('mailverteiler/anleitungstextMailPersInGroup').'<p>';
 echo '<a class="buttongreen" href="#" onclick="SendMail()" id="mailSendButton">' . $p->t('mailverteiler/mailAnAlleSenden') . '</a>';
@@ -223,7 +225,7 @@ if ($result = $db->db_query($qry))
 		echo "<tr>";
 		echo '	<td style="text-align: center"><input type="checkbox" class="chkbox" id="checkbox_'.$row->uid.'" name="checkbox['.$row->uid.']"></td>';
 		echo "  <td>$row->nachname</td>";
-		echo "  <td>$row->vorname</td>";
+		echo "  <td>" . ($row->wahlname ? $row->wahlname : $row->vorname) . "</td>";
 		echo '	<td>'.strtoupper($row->geschlecht).'</td>';
 		echo '	<td class="clm_email"><a href="mailto:'.$row->uid.'@' . DOMAIN . '" class="Item">'.$row->uid .'@' . DOMAIN . '</a></td>';
 		echo "</tr>";

@@ -179,7 +179,8 @@ echo '	<title>' . $p->t('mailverteiler/personenImVerteiler') . '</title>
 <body id="inhalt">';
 
 $qry = "SELECT
-				uid, vorname, nachname, geschlecht, fixangestellt
+				uid, vorname, nachname, wahlname, geschlecht, fixangestellt,
+				CASE WHEN wahlname IS NOT NULL THEN wahlname ELSE vorname END AS orderVorname
 			FROM
 				campus.vw_benutzer
 			JOIN
@@ -202,7 +203,7 @@ $qry = "SELECT
 			}
 
 			$qry .= " ORDER BY
-				nachname, vorname";
+				nachname, orderVorname";
 
 echo '<p>'.$p->t('mailverteiler/anleitungstextMailPersInGroup').'<p>';
 echo '<a class="buttongreen" href="#" onclick="SendMail()" id="mailSendButton">' . $p->t('mailverteiler/mailAnAlleSenden') . '</a>';
@@ -236,7 +237,7 @@ if ($result = $db->db_query($qry))
 		echo '<tr>';
 		echo '	<td style="text-align: center"><input type="checkbox" class="chkbox" id="checkbox_'.$row->uid.'" name="checkbox['.$row->uid.']"></td>';
 		echo '	<td>'.$row->nachname.'</td>';
-		echo '	<td>'.$row->vorname.'</td>';
+		echo '	<td>'. ($row->wahlname ? $row->wahlname : $row->vorname) .'</td>';
 		echo '	<td>'.strtoupper($row->geschlecht).'</td>';
 		echo '	<td>'.($row->fixangestellt != '' ? ($row->fixangestellt == 't' ? 'Ja' : 'Nein') :'-').'</td>';
 		echo '	<td class="clm_email"><a href="mailto:'.$row->uid.'@' . DOMAIN . '" class="Item">'.$row->uid .'@' . DOMAIN . '</a></td>';
