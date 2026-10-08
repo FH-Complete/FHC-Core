@@ -63319,18 +63319,18 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'anwVerspaetet',
+		'phrase' => 'anwStatusFehlminuten',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'verspätet',
+				'text' => 'Fehlminuten',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'late',
+				'text' => 'missed minutes',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -63339,12 +63339,12 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'anwVerspaetungErfassen',
+		'phrase' => 'anwFehlminutenErfassen',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Versäumte Minuten erfassen',
+				'text' => 'Fehlminuten erfassen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -63359,12 +63359,12 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'anwFehlminutenLabel',
+		'phrase' => 'anwFehlminutenLabelV2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Versäumte Minuten',
+				'text' => 'Fehlminuten',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -63379,12 +63379,12 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'anwFehlminutenHinweis',
+		'phrase' => 'anwFehlminutenHinweisV2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Die versäumten Minuten zählen nicht zur Anwesenheit. Die restliche Zeit der Kontrolle zählt als anwesend.',
+				'text' => 'Die Fehlminuten zählen nicht zur Anwesenheit. Die restliche Zeit der Kontrolle zählt als anwesend.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -63459,18 +63459,18 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'anwMinutenVersaeumt',
+		'phrase' => 'anwFehlminutenAnzahl',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '{minuten} Min. versäumt',
+				'text' => 'Fehlminuten ({minuten})',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '{minuten} min missed',
+				'text' => 'missed minutes ({minuten})',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -63479,12 +63479,12 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'anwFehlminutenAendern',
+		'phrase' => 'anwFehlminutenAendernV2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Versäumte Minuten ändern',
+				'text' => 'Fehlminuten ändern',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -63499,18 +63499,18 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'anwLegendeVerspaetet',
+		'phrase' => 'anwLegendeFehlminuten',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Verspätet oder früher gegangen. Die versäumten Minuten zählen nicht zur Anwesenheit.',
+				'text' => 'Fehlminuten: zu spät gekommen oder früher gegangen. Die Fehlminuten zählen nicht zur Anwesenheit.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Late or left early. The missed minutes do not count as attendance.',
+				'text' => 'Missed minutes: came late or left early. The missed minutes do not count as attendance.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -63559,18 +63559,78 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'anwKontrolleKuerzerAlsFehlminuten',
+		'phrase' => 'anwKontrolleKuerzerAlsFehlminutenV2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Die Kontrolle ist zu kurz. {name} hat {fehlminuten} versäumte Minuten. Die Kontrolle muss mindestens {minimum} Minuten Unterrichtszeit dauern. Ändern Sie zuerst die versäumten Minuten.',
+				'text' => 'Die Kontrolle ist zu kurz. {name} hat {fehlminuten} Fehlminuten. Die Kontrolle muss mindestens {minimum} Minuten Unterrichtszeit dauern. Ändern Sie zuerst die Fehlminuten.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
 				'text' => 'The attendance check is too short. {name} has {fehlminuten} missed minutes. The attendance check must have a minimum of {minimum} minutes of lesson time. First change the missed minutes.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwFehlminutenBegruendung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Begründung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwFehlminutenGrundVerspaetung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Verspätung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Late arrival',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwFehlminutenGrundFrueherGegangen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Früher gegangen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Left early',
 				'description' => '',
 				'insertvon' => 'system'
 			)
