@@ -62361,26 +62361,6 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'entOffenAusserhalbZeitraum',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Offen außerhalb des Zeitraums',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Open outside the date range',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'anwesenheiten',
-		'category' => 'global',
 		'phrase' => 'entMehrereAccounts',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -62401,18 +62381,18 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'entAlleOffenenLaden',
+		'phrase' => 'entAlleOffenenAnzeigen',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Zeitraum erweitern und alle offenen Entschuldigungen laden',
+				'text' => 'Alle offenen Entschuldigungen unabhängig vom gewählten Zeitraum anzeigen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Extend the date range and load all open excuse notes',
+				'text' => 'Show all open excuse notes regardless of the selected date range',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -62421,18 +62401,62 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'entAlleOffenenGeladen',
+		'phrase' => 'entAnzahlVerfuegbar',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Alle offenen geladen',
+				'text' => '{count} verfügbar',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'All open loaded',
+				'text' => '{count} available',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipEntAlleOffenenAnzeigenv2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Tabelle zeigt nur Entschuldigungen mit einem Antragsdatum im gewählten Zeitraum. Offene Entschuldigungen mit einem früheren oder späteren Antragsdatum fehlen deshalb in der Tabelle.
+
+				Wenn Sie diese Schaltfläche drücken, passiert Folgendes:
+				- Das System erweitert den Zeitraum. Der neue Zeitraum enthält alle offenen Entschuldigungen.
+				- Die Felder „Antragsdatum von“ und „Antragsdatum bis“ zeigen den neuen Zeitraum.
+				- Die Tabelle zeigt nur offene Entschuldigungen aus dem neuen Zeitraum.
+				- Akzeptierte und abgelehnte Entschuldigungen fehlen in dieser Ansicht.
+				- Ihre Filter bleiben aktiv.
+				- Das System ändert keine Entschuldigung.
+
+				Um wieder alle Entschuldigungen zu sehen, drücken Sie „Vorherigen Zeitraum wiederherstellen“. Die Tabelle zeigt dann alle Entschuldigungen im alten Zeitraum.
+
+				Wenn Sie vorher ein Datum selbst ändern, ist der alte Zeitraum verloren. Die Tabelle zeigt dann alle Entschuldigungen im geänderten Zeitraum. Bei einem großen Zeitraum lädt die Tabelle länger.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The table shows only excuse notes with an application date in the selected date range. Thus, the table does not show open excuse notes with an earlier or later application date.
+
+				When you click this button, these steps occur:
+				- The system extends the date range. The new date range contains all open excuse notes.
+				- The fields "Application date from" and "Application date to" show the new date range.
+				- The table shows only open excuse notes from the new date range.
+				- The table does not show accepted and declined excuse notes in this view.
+				- Your filters stay active.
+				- The system does not change an excuse note.
+
+				To see all excuse notes again, click "Restore the previous date range". The table then shows all excuse notes in the old date range.
+
+				If you change a date yourself before that, the old date range is lost. The table then shows all excuse notes in the changed date range. For a large date range, the table loads for a longer time.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -62493,46 +62517,6 @@ I have been informed that I am under no obligation to consent to the transmissio
 			array(
 				'sprache' => 'English',
 				'text' => 'Application date to',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'anwesenheiten',
-		'category' => 'global',
-		'phrase' => 'entNurStatusAnzeigen',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Nur diesen Status anzeigen',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Show only this status',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'anwesenheiten',
-		'category' => 'global',
-		'phrase' => 'entStatusFilterAufheben',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Statusfilter aufheben',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Remove the status filter',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -62633,6 +62617,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 			array(
 				'sprache' => 'English',
 				'text' => 'Read only: compare the teaching units of this course or export data. Attendance checks are not possible in this mode.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwFremdeLeNurAnsicht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Read only: Dieser LV-Teil gehört zu {0}. Kontrollen und Änderungen in LV-Teilen von Kolleg*innen erfordern die Berechtigung für Supplierungen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Read only: this teaching unit belongs to {0}. Attendance checks and changes in teaching units of colleagues require the substitution permission.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
