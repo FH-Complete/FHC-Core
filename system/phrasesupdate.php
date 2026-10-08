@@ -50474,7 +50474,7 @@ array(
 	'phrases' => array(
 		array(
 			'sprache' => 'German',
-			'text' => 'Wahlname',
+			'text' => 'Wahlvorname',
 			'description' => '',
 			'insertvon' => 'system'
 		),
