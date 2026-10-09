@@ -263,7 +263,7 @@ export default {
 			this.$refs[modalRef].hide();
 		},
 		reload() {
-			this.$refs.table.reloadTable();
+			this.$refs.table?.reloadTable();
 		},
 		searchFirma(event) {
 			if (this.abortController.firmen) {

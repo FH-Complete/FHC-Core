@@ -63774,6 +63774,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 	// ### Infocenter Onboarding END
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'editingMitarbeiterPVonly',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontaktdaten von Mitarbeiter*innen dürfen nur in der Personalverwaltung editiert werden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Employee contact details may only be edited in the personnel administration system.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	//****************************	 CIS Projektabgabeuebersicht start
 	array(
 		'app' => 'core',
