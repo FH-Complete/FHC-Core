@@ -54,7 +54,8 @@ export default {
 		initTabulatorOptions(){
 			this.tabulatorOptions = {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: () => this.$api.call(this.endpoint.getCourselist(this.id, this.dataSem.start, this.dataSem.ende, this.dbStundenplanTable)),
+				//ajaxRequestFunc: () => this.$api.call(this.endpoint.getCourselist(this.id, this.dataSem.start, this.dataSem.ende, this.dbStundenplanTable)),
+				ajaxRequestFunc: () => this.$api.call(this.endpoint.getCourselistByStudiensemester(this.id, this.currentSemester, this.dbStundenplanTable)),
 				ajaxResponse: (url, params, response) => {
 					return response.data;
 				},

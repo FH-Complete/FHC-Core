@@ -78,7 +78,7 @@ class LvTermine extends FHCAPI_Controller
 		if ($function_error)
 			return $function_error;
 
-		$benutzer_gruppen = $this->fetchBenutzerGruppenFromStudiensemester($student_uid, $semester_range);
+		$benutzer_gruppen = $this->fetchBenutzerGruppenFromStudiensemester($student_uid, $semester_range, $nextstudiensemester->studiensemester_kurzbz);
 		if (isError($benutzer_gruppen))
 			return $benutzer_gruppen;
 		$benutzer_gruppen = getData($benutzer_gruppen);
@@ -160,8 +160,6 @@ class LvTermine extends FHCAPI_Controller
 			$data = current($result);
 			$semesterStud = $data->ausbildungssemester;
 		}
-
-		$ci->addMeta('semester of studentUid', $semesterStud);
 
 		$stundenplan_query = $this->StundenplanModel->getStundenplanQuery(
 			$start_date,
@@ -252,7 +250,7 @@ class LvTermine extends FHCAPI_Controller
 		);
 	}
 
-	private function fetchBenutzerGruppenFromStudiensemester($student_uid, $semester_range)
+	private function fetchBenutzerGruppenFromStudiensemester($student_uid, $semester_range, $skip_semester_kurzbz)
 	{
 		$this->load->model('person/Benutzergruppe_model', 'BenutzergruppeModel');
 
@@ -271,6 +269,10 @@ class LvTermine extends FHCAPI_Controller
 			// each semester could have ajoint semesters that need to be checked
 			foreach($semester_array as $semester=>$semester_date_range)
 			{
+				if($semester === $skip_semester_kurzbz)
+				{
+					continue;
+				}
 				// for each active semester query the benutzer_gruppen associated to the semester
 				$benutzer_query = $this->BenutzergruppeModel->execReadOnlyQuery("
 				SELECT * FROM tbl_benutzergruppe where uid = ? AND studiensemester_kurzbz = ?",[$student_uid, $semester]);

@@ -599,10 +599,10 @@ EOSQL;
 				// converts the array of gruppen strings into a sql IN (_,_,_) chain
 				$groups = implode(', ', $gruppen[$sem_date]);
 				$spezgrpclauses[] = <<<EOSPEZGRP
-					(
-						sp.gruppe_kurzbz IN ({$groups})
-						AND sp.datum BETWEEN {$this->escape($sem_date_range->start)} AND {$this->escape($sem_date_range->ende)}
-					)
+						(
+							sp.gruppe_kurzbz IN ({$groups})
+							AND sp.datum BETWEEN {$this->escape($sem_date_range->start)} AND {$this->escape($sem_date_range->ende)}
+						)
 EOSPEZGRP;
 
 			}
@@ -650,7 +650,7 @@ EOSQL;
 
 		$lvbdclauses = $this->genLehrverbandClauses($semester, $studentlehrverbaende);
 		$spezgrpclauses = $this->genSpezialgruppenClauses($semester, $gruppen);
-		$chainingand = ($lvbdclauses && $spezgrpclauses) ? 'AND' : '';
+		$chainingor = ($lvbdclauses && $spezgrpclauses) ? 'OR' : '';
 
 		$query = <<<EOSQL
 			with preprocessedsp as (
@@ -673,7 +673,7 @@ EOSQL;
 					 preprocessedsp sp
 				where
 					{$lvbdclauses}
-					{$chainingand}
+					{$chainingor}
 					{$spezgrpclauses}
 			)
 
