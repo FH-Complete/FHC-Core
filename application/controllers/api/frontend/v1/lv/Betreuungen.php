@@ -45,7 +45,7 @@ class Betreuungen extends FHCAPI_Controller
 		$betreuungenQuery = "SELECT
 			tbl_lehrveranstaltung.bezeichnung,
 			tbl_projektarbeit.titel,
-			(SELECT nachname || ' ' || vorname
+			(SELECT nachname || ' ' || (CASE WHEN wahlname IS NOT NULL THEN wahlname ELSE vorname END)
 				FROM public.tbl_benutzer
 				JOIN public.tbl_person USING(person_id)
 				WHERE uid=student_uid)
