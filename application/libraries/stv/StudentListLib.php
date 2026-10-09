@@ -360,23 +360,11 @@ class StudentListLib
 					FROM public.tbl_notizzuordnung AS nz
 					JOIN public.tbl_notiz AS n ON nz.notiz_id = n.notiz_id AND nz.prestudent_id IS NOT NULL
 					JOIN public.tbl_notiz_typ AS nt ON n.typ = nt.typ_kurzbz " . $whereTags . "
+					JOIN public.tbl_studiensemester AS studsem ON studiensemester_kurzbz = " . $studiensemester_kurzbz_escaped . "
 				WHERE
-				  COALESCE(n.start, '1970-01-01') <= (
-					SELECT
-					  ende
-					FROM
-					  public.tbl_studiensemester
-					WHERE
-					  studiensemester_kurzbz = " . $studiensemester_kurzbz_escaped . "
-				  )
-				  AND COALESCE(n.ende, '2170-12-31') >= (
-					SELECT
-					  start
-					FROM
-					  public.tbl_studiensemester
-					WHERE
-					  studiensemester_kurzbz = " . $studiensemester_kurzbz_escaped . "
-				  )
+				  COALESCE(n.start, '1970-01-01') <= studsem.ende
+				  AND COALESCE(n.ende, '2170-12-31') >= studsem.start
+				  AND ((CURRENT_DATE NOT BETWEEN studsem.start AND studsem.ende) OR (COALESCE(n.ende, '2170-12-31') >= CURRENT_DATE))
 				) AS tag
 				GROUP BY tag.prestudent_id
 			) AS tag_data_agg";
