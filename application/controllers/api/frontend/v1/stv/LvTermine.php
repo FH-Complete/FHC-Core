@@ -32,9 +32,14 @@ class LvTermine extends FHCAPI_Controller
 		$this->load->model('person/Benutzergruppe_model', 'BenutzergruppeModel');
 	}
 
+	public function getStundenplan($uid, $start_date = null, $end_date = null, $dbStundenplanTable = "stundenplan", $groupConsecutiveHours = false)
+	{
+		$this->getStundenplanbh($uid, '2026-02-04', '2027-02-03', $dbStundenplanTable, $groupConsecutiveHours);
+	}
+
 	//TODO Build own lib or combine with Controller Stundenplan.php
 	//here use of logic of Stundenplan.php, extended with parameters uid, grouping, and used dbTable
-	public function getStundenplan($uid, $start_date = null, $end_date = null, $dbStundenplanTable = "stundenplan", $groupConsecutiveHours = false)
+	public function getStundenplanbh($uid, $start_date = null, $end_date = null, $dbStundenplanTable = "stundenplan", $groupConsecutiveHours = false)
 	{
 		$ci = get_instance();
 		$student_uid = $uid;
@@ -59,8 +64,24 @@ class LvTermine extends FHCAPI_Controller
 		$ci->addMeta('spezialgruppen', $benutzer_gruppen);
 		// getting the student_lehrverbaende of the student in the different studiensemester
 
-		$ende_semProlonged  = $semester_range[$first_semester][$first_semester]->ende;
-		$ci->addMeta(' E N D E _semProlonged', $ende_semProlonged);
+		$ci->addMeta('bhsemtest', print_r($semester_range, true));
+
+		$semester_range = array(
+			'SS2026' => array(
+				'WS2025' => (object) array(
+					'start' => '2026-02-04',
+					'ende' => '2026-05-19'
+				),
+				'SS2026' => (object) array(
+					'start' => '2026-02-04',
+					'ende' => '2026-11-15'
+				),
+				'WS2026' => (object) array(
+					'start' => '2026-09-01',
+					'ende' => '2027-02-03'
+				)
+			)
+		);
 
 		$student_lehrverband = $this->fetchStudentlehrverbandFromStudiensemester($student_uid, $semester_range);
 
@@ -68,6 +89,40 @@ class LvTermine extends FHCAPI_Controller
 		if (isError($student_lehrverband))
 			return $student_lehrverband;
 		$student_lehrverband = getData($student_lehrverband);
+
+		$student_lehrverband = array (
+			'SS2026' =>
+			array (
+			  0 =>
+				  (object) array(
+				 'verbandsgruppe' => 'BEE1A',
+				 'studiengang_kz' => 476,
+				 'semester' => 1,
+				 'verband' => 'A',
+				 'gruppe' => ' ',
+				 'studiensemester_kurzbz' => 'WS2025',
+			  ),
+			  1 =>
+				  (object) array(
+				 'verbandsgruppe' => 'BEE2A',
+				 'studiengang_kz' => 476,
+				 'semester' => 2,
+				 'verband' => 'A',
+				 'gruppe' => ' ',
+				 'studiensemester_kurzbz' => 'SS2026',
+			  ),
+			  2 =>
+				  (object) array(
+				 'verbandsgruppe' => 'BEE3A',
+				 'studiengang_kz' => 476,
+				 'semester' => 3,
+				 'verband' => 'A',
+				 'gruppe' => ' ',
+				 'studiensemester_kurzbz' => 'SS2026',
+			  ),
+			),
+		);
+
 		$ci->addMeta('studentlehrverbaende', $student_lehrverband);
 
 		$this->load->model('crm/Student_model', 'StudentModel');
@@ -95,9 +150,11 @@ class LvTermine extends FHCAPI_Controller
 			$student_lehrverband,
 			$dbStundenplanTable,
 			$groupConsecutiveHours,
-			$ende_semProlonged,
-			$semesterStud
+			null,
+			null
 		);
+
+		$ci->addMeta('bhstdplanquery', $stundenplan_query);
 
 		if(!$stundenplan_query)
 		{
@@ -258,7 +315,7 @@ class LvTermine extends FHCAPI_Controller
 			{
 				// for each active semester query the student_lehrverband associated to the semester
 				$lehrverband_query = $this->BenutzergruppeModel->execReadOnlyQuery("
-				SELECT * FROM tbl_studentlehrverband where student_uid = ? AND studiensemester_kurzbz = ?", [$student_uid, $semester]);
+				SELECT vbd.*, UPPER(s.typ || s.kurzbz) as stg FROM tbl_studentlehrverband vbd join tbl_studiengang s USING(studiengang_kz) where vbd.student_uid = ? AND vbd.studiensemester_kurzbz = ?", [$student_uid, $semester]);
 				if(isError($lehrverband_query)){
 					return error(getData($lehrverband_query));
 				}
@@ -268,6 +325,7 @@ class LvTermine extends FHCAPI_Controller
 					function ($item)
 					{
 						$result = new stdClass();
+						$result->verbandsgruppe = $item->stg . $item->semester . trim($item->verband) . trim($item->gruppe);
 						$result->studiengang_kz = $item->studiengang_kz;
 						$result->semester = $item->semester;
 						$result->verband = $item->verband;

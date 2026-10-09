@@ -88,7 +88,22 @@ class StundenplanLib
 		$this->_ci->addMeta('nach_apply_semester_range', $semester_range);
 		if ($function_error)
 			return $function_error;
-		
+
+		$this->_ci->addMeta('bhsemtest', print_r($semester_range, true));
+
+		$semester_range = array(
+			'SS2026' => array(
+				'WS2025' => (object) array(
+					'start' => '2026-02-04',
+					'ende' => '2026-05-19'
+				),
+				'SS2026' => (object) array(
+					'start' => '2026-02-04',
+					'ende' => '2026-11-15'
+				),
+			)
+		);
+
 		// getting the gruppen_kurzbz of the student in the different studiensemester
 		$benutzer_gruppen = $this->fetchBenutzerGruppenFromStudiensemester($student_uid, $semester_range);
 		if (isError($benutzer_gruppen))
