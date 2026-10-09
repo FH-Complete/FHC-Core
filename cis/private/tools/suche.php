@@ -180,7 +180,7 @@ function searchPerson($searchItems)
 			echo '<td>',$row->anrede,'</td>';
 
 			if ($row->wahlname)
-				echo '<td>',$row->wahlname, ' ' ,$row->vorname, '</td>';
+				echo '<td>',$row->wahlname,'</td>';
 			else
 					echo '<td>',$row->vorname, '</td>';
 

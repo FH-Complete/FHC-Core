@@ -256,7 +256,9 @@ echo '
 		'.$p->t('global/anrede').': '.$user->anrede.'<br>
 		'.$p->t('global/titel').': '.$user->titelpre.' <br>';
 
-if (!$ansicht)
+if ($user->wahlname)
+	echo $p->t('global/vorname').': '.$user->wahlname.'  <br>';
+else if (!$ansicht)
 	echo $p->t('global/vorname').': '.$user->vorname.'  '.$user->vornamen.'<br>';
 else
 	echo $p->t('global/vorname').': '.$user->vorname.'  <br>';
