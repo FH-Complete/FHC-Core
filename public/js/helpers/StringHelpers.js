@@ -47,3 +47,7 @@ function splitWordsInCamelCase(string) {
 	splitWords.push(string.slice(lastUpperCaseLetterIndex));
 	return splitWords;
 }
+
+export function isString(str) {
+	return typeof str === 'string' || str instanceof String;
+}
