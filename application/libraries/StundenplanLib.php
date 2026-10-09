@@ -683,8 +683,9 @@ class StundenplanLib
 		return success($student_lehrverband);
 	}
 
-	private function applyLoadUeberSemesterHaelfte(&$semester_range)
+	public function applyLoadUeberSemesterHaelfte(&$semester_range)
 	{
+		$this->_ci = &get_instance();
 		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		/*
@@ -812,8 +813,9 @@ class StundenplanLib
 		}
 	}
 
-	private function studienSemesterErmitteln($start_date, $end_date)
+	public function studienSemesterErmitteln($start_date, $end_date)
 	{
+		$this->_ci = &get_instance();
 		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		// gets all studiensemester from the student from start_date to end_date

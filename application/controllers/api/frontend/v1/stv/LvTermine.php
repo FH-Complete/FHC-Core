@@ -11,6 +11,7 @@ class LvTermine extends FHCAPI_Controller
 		parent::__construct([
 			'getStundenplan' => ['admin:r', 'assistenz:r'],
 			'getStudiensemester' => ['admin:r', 'assistenz:r'],
+			'getStundenplanForStudiensemester' => ['admin:r', 'assistenz:r'],
 		]);
 
 		// Load Libraries
@@ -37,13 +38,33 @@ class LvTermine extends FHCAPI_Controller
 		$this->getStundenplanbh($uid, '2026-02-04', '2027-02-03', $dbStundenplanTable, $groupConsecutiveHours);
 	}
 
+	public function getStundenplanForStudiensemester($uid, $studiensemester_kurzbz, $dbStundenplanTable = "stundenplan", $groupConsecutiveHours = false)
+	{
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		$resstudiensemester = getData($this->StudiensemesterModel->getStartEndeFromStudiensemester($studiensemester_kurzbz));
+		$resnextstudiensemester = getData($this->StudiensemesterModel->getNextFrom($studiensemester_kurzbz));
+
+		$studiensemester = ($resstudiensemester && count($resstudiensemester) > 0) ? $resstudiensemester[0] : null;
+		$studiensemester->studiensemester_kurzbz = $studiensemester_kurzbz;
+		$nextstudiensemester = ($resnextstudiensemester && count($resnextstudiensemester) > 0) ? $resnextstudiensemester[0] : null;
+
+		$this->addMeta('bhsemester', $studiensemester);
+		$this->addMeta('bhnextsemester', $nextstudiensemester);
+
+		$this->getStundenplanbh($uid, $studiensemester, $nextstudiensemester, $dbStundenplanTable, $groupConsecutiveHours);
+	}
+
 	//TODO Build own lib or combine with Controller Stundenplan.php
 	//here use of logic of Stundenplan.php, extended with parameters uid, grouping, and used dbTable
-	public function getStundenplanbh($uid, $start_date = null, $end_date = null, $dbStundenplanTable = "stundenplan", $groupConsecutiveHours = false)
+	public function getStundenplanbh($uid, $studiensemester, $nextstudiensemester, $dbStundenplanTable = "stundenplan", $groupConsecutiveHours = false)
 	{
+		$start_date = $studiensemester->start;
+		$end_date = $nextstudiensemester->ende;
+		$this->load->library('StundenplanLib');
+
 		$ci = get_instance();
 		$student_uid = $uid;
-		$semester_range = $this->studienSemesterErmitteln($start_date, $end_date);
+		$semester_range = $this->stundenplanlib->studienSemesterErmitteln($start_date, $end_date);
 		if (isError($semester_range))
 			return $semester_range;
 		$semester_range = getData($semester_range);
@@ -52,7 +73,7 @@ class LvTermine extends FHCAPI_Controller
 		$first_semester = $semester_range[0];
 
 		$this->sortStudienSemester($semester_range);
-		$function_error = $this->applyLoadUeberSemesterHaelfte($semester_range);
+		$function_error = $this->stundenplanlib->applyLoadUeberSemesterHaelfte($semester_range);
 		$ci->addMeta('nach_apply_semester_range', $semester_range);
 		if ($function_error)
 			return $function_error;
@@ -65,7 +86,7 @@ class LvTermine extends FHCAPI_Controller
 		// getting the student_lehrverbaende of the student in the different studiensemester
 
 		$ci->addMeta('bhsemtest', print_r($semester_range, true));
-
+/*
 		$semester_range = array(
 			'SS2026' => array(
 				'WS2025' => (object) array(
@@ -82,14 +103,14 @@ class LvTermine extends FHCAPI_Controller
 				)
 			)
 		);
-
-		$student_lehrverband = $this->fetchStudentlehrverbandFromStudiensemester($student_uid, $semester_range);
+*/
+		$student_lehrverband = $this->fetchStudentlehrverbandFromStudiensemester($student_uid, $semester_range, $studiensemester->studiensemester_kurzbz, $nextstudiensemester->studiensemester_kurzbz);
 
 		//get semester
 		if (isError($student_lehrverband))
 			return $student_lehrverband;
 		$student_lehrverband = getData($student_lehrverband);
-
+/*
 		$student_lehrverband = array (
 			'SS2026' =>
 			array (
@@ -122,7 +143,7 @@ class LvTermine extends FHCAPI_Controller
 			  ),
 			),
 		);
-
+*/
 		$ci->addMeta('studentlehrverbaende', $student_lehrverband);
 
 		$this->load->model('crm/Student_model', 'StudentModel');
@@ -295,7 +316,7 @@ class LvTermine extends FHCAPI_Controller
 		return success($benutzer_gruppen);
 	}
 
-	private function fetchStudentlehrverbandFromStudiensemester($student_uid, $semester_range)
+	private function fetchStudentlehrverbandFromStudiensemester($student_uid, $semester_range, $studiensemester_kurzbz, $nextstudiensemester_kurzbz)
 	{
 		$this->load->model('person/Benutzergruppe_model', 'BenutzergruppeModel');
 
@@ -322,7 +343,7 @@ class LvTermine extends FHCAPI_Controller
 				$lehrverband_query_result = getData($lehrverband_query)??[];
 
 				$converted_studentLehrverband= array_map(
-					function ($item)
+					function ($item) use($nextstudiensemester_kurzbz, $studiensemester_kurzbz)
 					{
 						$result = new stdClass();
 						$result->verbandsgruppe = $item->stg . $item->semester . trim($item->verband) . trim($item->gruppe);
@@ -331,6 +352,7 @@ class LvTermine extends FHCAPI_Controller
 						$result->verband = $item->verband;
 						$result->gruppe = $item->gruppe;
 						$result->studiensemester_kurzbz = $item->studiensemester_kurzbz;
+						$result->query_studiensemester_kurzbz = ($item->studiensemester_kurzbz === $nextstudiensemester_kurzbz) ? $studiensemester_kurzbz : $item->studiensemester_kurzbz;
 						return $result;
 					},
 					$lehrverband_query_result);

@@ -557,7 +557,7 @@ class Stundenplan_model extends DB_Model
 							(
 								{$this->escape($lehrverband->verbandsgruppe)} like sp.verbandsgruppe || '%'
 								and sp.datum between {$this->escape($sem_date_range->start)} and {$this->escape($sem_date_range->ende)}
-								and (sp.studiensemester_kurzbz is null or sp.studiensemester_kurzbz = {$this->escape($lehrverband->studiensemester_kurzbz)})
+								and (sp.studiensemester_kurzbz is null or sp.studiensemester_kurzbz = {$this->escape($lehrverband->query_studiensemester_kurzbz)})
 							)
 EOCLAUSE;
 
