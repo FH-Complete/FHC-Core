@@ -6,10 +6,16 @@ export default {
 		BsModal,
 		WidgetIcon,
 	},
-	props: [
-		"widgets",
-		"hiddenWidgets"
-	],
+	props: {
+		widgets: {
+			type: [ Array, null ],
+			required: true
+		},
+		hiddenWidgets: {
+			type: Array,
+			default: []
+		}
+	},
 	data: () => ({
 		callbacks: {}
 	}),
