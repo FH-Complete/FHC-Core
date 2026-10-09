@@ -30,6 +30,9 @@ export default {
 	computed: {
 		betreuerFormOpened() {
 			return this.newMode || this.editMode;
+		},
+		isMitarbeiter(){
+			return this.autocompleteSelectedBetreuer?.name?.includes('Mitarbeiter') ?? false;
 		}
 	},
 	props: {
@@ -430,6 +433,11 @@ export default {
 		},
 		actionKontaktdatenBearbeiten() {
 			if (!this.autocompleteSelectedBetreuer) return;
+			if (this.isMitarbeiter)
+			{
+				this.$fhcAlert.alertError(this.$p.t('ui', 'editingMitarbeiterPVonly'));
+				return;
+			} 
 			this.$refs.kontaktdatenModal.show();
 		},
 		// stuff to do after new person has been saved
@@ -494,7 +502,12 @@ export default {
 						<button class="btn btn-outline-secondary" @click="actionNewPerson">{{ $p.t('projektarbeit', 'neuePersonAnlegen') }}</button>
 					</div>
 					<div class="col-6">
-						<button class="btn btn-outline-secondary float-end" @click="actionKontaktdatenBearbeiten">{{ $p.t('projektarbeit', 'kontaktdatenBearbeiten') }}</button>
+						<button
+							class="btn btn-outline-secondary float-end"
+							@click="actionKontaktdatenBearbeiten"
+						>
+							{{ $p.t('projektarbeit', 'kontaktdatenBearbeiten') }}
+						</button>
 					</div>
 				</div>
 
@@ -605,7 +618,7 @@ export default {
 				</contact>
 			</div>
 		</div>
-
 	</bs-modal>
+
 `
 }

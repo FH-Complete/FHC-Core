@@ -1,5 +1,5 @@
-import Phrasen from "../../../../../mixins/Phrasen.js";
-import ApiLehre from "../../../../../api/factory/lehre.js";
+import Phrasen from "../../../mixins/Phrasen.js";
+import ApiLehre from "../../../api/factory/lehre.js";
 
 export default {
 	mixins: [

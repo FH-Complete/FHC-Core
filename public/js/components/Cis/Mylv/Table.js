@@ -22,21 +22,22 @@ export default {
 				layout: 'fitDataStretch',
 				placeholder: this.$p.t('global/noDataAvailable'),
 				columns: [
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('lehre/studiengang'))), field: 'sg_bezeichnung', widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('global/bezeichnung'))), field: 'bezeichnung', widthGrow: 2},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('lehre/orgform'))), field: 'orgform_kurzbz', widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('lehre/kurzbz'))), field: 'studiengang_kuerzel', widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('lehre/semesterstunden'))), field: 'semesterstunden', 
+					{titlePhrase: 'lehre/studiengang', title: 'placeholder', field: 'sg_bezeichnung', widthGrow: 1},
+					{titlePhrase: 'global/bezeichnung', title: 'placeholder', field: 'bezeichnung', widthGrow: 2},
+					{titlePhrase: 'lehre/orgform', title: 'placeholder', field: 'orgform_kurzbz', widthGrow: 1},
+					{titlePhrase: 'lehre/kurzbz', title: 'placeholder', field: 'studiengang_kuerzel', widthGrow: 1},
+					{titlePhrase: 'lehre/semesterstunden', title: 'placeholder', field: 'semesterstunden', 
 						bottomCalc: this.semesterstundenCalc, widthGrow: 1, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('global/actions'))), headerSort: false,
 						field: 'menu', formatter: this.actionFormatter, widthGrow: 1, tooltip: this.spoofingFunc}
 				],
 				persistence: false,
-				persistenceID: "mylv_2026_04_17"
+				persistenceID: "mylv_2026_04_17",
+				locale: true,
 			},
 			mylvTableEventHandlers: [
 				
-			]
+			],
 		}
 	},
 	computed: {
@@ -324,22 +325,25 @@ export default {
 			deep: true
 		}
 	},
-	template: `
-	<div class="mylv-semester-table" v-if="ready">
-		 <core-filter-cmpt
-			v-if="phrasenResolved"
-			@uuidDefined="handleUuidDefined"
-			:title="''"
-			ref="mylvTable"
-			:tabulator-options="mylvTableOptions"
-			:tabulator-events="mylvTableEventHandlers"
-			@tableBuilt="handleTableBuilt"
-			tableOnly
-			:sideMenu="false"
-		 />
-	</div>
-	<div v-if="tabulatorUuid === null" class="text-center d-flex justify-content-center align-items-center h-100" >
-		<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
+	template: /*html*/ `
+	<div class="d-flex flex-column gap-3">
+		<div class="mylv-semester-table" v-if="ready">
+			<core-filter-cmpt
+				v-if="phrasenResolved"
+				@uuidDefined="handleUuidDefined"
+				:title="''"
+				ref="mylvTable"
+				:tabulator-options="mylvTableOptions"
+				:tabulator-events="mylvTableEventHandlers"
+				@tableBuilt="handleTableBuilt"
+				tableOnly
+				:sideMenu="false"
+			/>
+		</div>
+		<div v-if="tabulatorUuid === null" class="text-center d-flex justify-content-center align-items-center h-100" >
+			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
+		</div>
+		<slot name="averageGrade"></slot>
 	</div>
 	`
 };
