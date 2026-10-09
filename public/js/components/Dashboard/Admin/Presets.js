@@ -22,7 +22,7 @@ export default {
 	},
 	computed: {
 		pickerWidgets() {
-			return this.widgets.filter(widget => widget.allowed);
+			return this.widgets.filter(widget => widget.allowed).map(widget => ({ ...widget, permitted: true }));
 		},
 		sizeLimits() {
 			return Object.fromEntries(this.widgets.map(({ setup, widget_id: type }) => {
