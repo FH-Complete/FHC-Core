@@ -103,6 +103,13 @@ export default {
 				keyboard: this.keyboard
 			});
 	},
+	//to avoid pagelocks if more than one instance
+	beforeUnmount() {
+		if (this.modal) {
+			this.modal.dispose();
+			this.modal = null;
+		}
+	},
 	popup(body, options, title, footer) {
 		const BsModal = this,
 			slots = {};
