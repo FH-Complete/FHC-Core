@@ -211,11 +211,10 @@ export function useEventLoader(
   Vue.watchEffect(reload);
 
   const reset = (arePreviousEventsCleared = true, isLoaderEventVisualReset = true) => {
- 	if (arePreviousEventsCleared) {
+	if (arePreviousEventsCleared) {
 		allEvents.value = [];
 	}
-
-	reload(false, isLoaderEventVisualReset);
+    reload(false, isLoaderEventVisualReset);
   };
 
   const requestEvents = (startTimestamp, endTimestamp, isCacheEnabled = true, isLoaderEventVisualReset = false) => {
@@ -269,6 +268,10 @@ export function useEventLoader(
 		hasFirstLoadOccurred = false;
 	}
 
+	if (isLoaderEventVisualReset) {
+		hasFirstLoadOccurred = false;
+	}
+	
     allowedCacheStartTimestamp = startTimestamp - cachePadding;
     allowedCacheEndTimestamp = endTimestamp + cachePadding;
 
