@@ -179,6 +179,21 @@ class Zeitsperren extends FHCAPI_Controller
 		);
 		$data = $this->getDataOrTerminateWithError($result);
 
+		if($zeitsperretyp_kurzbz == 'ZA')
+		{
+			$res = $this->sendSanchoMailToVorgesetzten(
+				'Sancho_Content_Zeitausgleich',
+				array(
+					'beschreibung' =>$zeitsperretyp_kurzbz,
+					'vonDatum' => (new DateTime($vondatum))->format('d.m.Y'),
+					'bisDatum' => (new DateTime($bisdatum))->format('d.m.Y'),
+					'Saldo'=> ''
+				), 
+				$this->p->t('zeitsperren', 'zeitausgleichNeu'),
+				$mitarbeiter_uid
+			);
+		}
+
 		$this->terminateWithSuccess($data);
 	}
 
@@ -285,9 +300,13 @@ class Zeitsperren extends FHCAPI_Controller
 			$zeitsperretyp_kurzbz = array_key_exists('zeitsperretyp_kurzbz', $post) ? $update['zeitsperretyp_kurzbz'] : $data->zeitsperretyp_kurzbz;
 
 			$result = $this->ZeitsperreModel->getSperreByDate($mitarbeiter_uid, $vondatum, $vonstunde, true);
-			$data = $this->getDataOrTerminateWithError($result);
+			$data = (array) $this->getDataOrTerminateWithError($result);
 
-			if(hasData($result))
+			$data = array_filter($data, function($zeitsperre) use ($zeitsperre_id) {
+				return $zeitsperre->zeitsperre_id != $zeitsperre_id;
+			});
+
+			if(count($data) > 0)
 			{
 				$this->terminateWithError($this->p->t('zeitsperren', 'error_existingZeitsperre', ['typ'=> current($data)->zeitsperretyp_kurzbz]), self::ERROR_TYPE_GENERAL);
 			}
@@ -309,6 +328,21 @@ class Zeitsperren extends FHCAPI_Controller
 
 			$data = $this->getDataOrTerminateWithError($result);
 
+			if($zeitsperretyp_kurzbz == 'ZA')
+			{
+				$res = $this->sendSanchoMailToVorgesetzten(
+					'Sancho_Content_ZA_Aendern',
+					array(
+						'beschreibung' =>$zeitsperretyp_kurzbz,
+						'vonDatum' => (new DateTime($vondatum))->format('d.m.Y'),
+						'bisDatum' => (new DateTime($bisdatum))->format('d.m.Y'),
+						'Saldo'=> ''
+					), 
+					$this->p->t('zeitsperren', 'zeitausgleichGeaendert'),
+					$mitarbeiter_uid
+				);
+			}
+
 			$this->terminateWithSuccess($data);
 		}
 		else
@@ -327,7 +361,8 @@ class Zeitsperren extends FHCAPI_Controller
 		$loggedInUser = getAuthUID();
 		$result = $this->ZeitsperreModel->load($zeitsperre_id);
 		$data = $this->getDataOrTerminateWithError($result);
-		$uid = current($data)->mitarbeiter_uid;
+		$zeitsperre = (is_array($data) && count($data) > 0) ? current($data) : null;
+		$uid = (!is_null($zeitsperre)) ? $zeitsperre->mitarbeiter_uid : '';
 
 		if($uid != $loggedInUser)
 			$this->terminateWithError($this->p->t('ui', 'noPermission'), self::ERROR_TYPE_GENERAL);
@@ -339,6 +374,21 @@ class Zeitsperren extends FHCAPI_Controller
 		if (isError($result)) {
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
+
+		if($zeitsperre->zeitsperretyp_kurzbz == 'ZA')
+		{
+			$res = $this->sendSanchoMailToVorgesetzten(
+				'Sancho_Mail_ZA_loeschen',
+				array(
+					'beschreibung' =>$zeitsperre->zeitsperretyp_kurzbz,
+					'vonDatum' => (new DateTime($zeitsperre->vondatum))->format('d.m.Y'),
+					'bisDatum' => (new DateTime($zeitsperre->bisdatum))->format('d.m.Y')
+				),
+				$this->p->t('zeitsperren', 'zeitausgleichGeloescht'),
+				$zeitsperre->mitarbeiter_uid
+			);
+		}
+
 		$this->terminateWithSuccess((getData($result) ?: []));
 	}
 
@@ -363,5 +413,37 @@ class Zeitsperren extends FHCAPI_Controller
 		return $tage <= 14;
 	}
 
+	protected function sendSanchoMailToVorgesetzten($sancho_vorlage_kurzbz,
+		$sancho_vorlage_data, $subject, $mauid)
+	{
+		$this->load->helper('hlp_sancho_helper');
 
+		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
+		$this->load->model('person/Person_model', 'PersonModel');
+
+		$fullname = getData($this->PersonModel->getFullName($mauid));
+		$vorgesetzte = (array) getData($this->MitarbeiterModel->getVorgesetzte($mauid));
+
+		$this->addMeta('bhvorgesetzte', $vorgesetzte);
+
+		$to = array();
+		$vorgesetzte_namen = array();
+
+		foreach($vorgesetzte as $vg)
+		{
+			$to[] = $vg->vorgesetzter .'@' . DOMAIN;
+			$vorgesetzter_fullname = getData($this->PersonModel->getFullName($vg->vorgesetzter));
+			$vorgesetzte_namen[] = $vorgesetzter_fullname;
+		}
+
+		$sancho_vorlage_data['vorgesetzter'] = implode(', ', $vorgesetzte_namen);
+		$sancho_vorlage_data['nameMitarbeiter'] = $fullname;
+
+		return sendSanchoMail(
+			$sancho_vorlage_kurzbz,
+			$sancho_vorlage_data,
+			implode(',', $to),
+			$subject
+		);
+	}
 }
