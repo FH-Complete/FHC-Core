@@ -371,6 +371,9 @@ define('STATUS_VORRUECKEN_ANZEIGEN', true);
 //externe Ueberwachung im Testtool erlauben
 define('TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED', false);
 
+//externe Ueberwachung bei neuen Reihungstests standardmaessig aktivieren/deaktivieren
+define('TESTTOOL_EXTERNE_UEBERWACHUNG_DEFAULT_ACTIVATION', false);
+
 //enable tags in StudVW
 define('STV_TAGS_ENABLED', false);
 

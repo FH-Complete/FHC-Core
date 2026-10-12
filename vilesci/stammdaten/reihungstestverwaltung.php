@@ -1479,7 +1479,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 			$reihungstest->anmeldefrist = $datum_obj->formatDatum($_POST['anmeldefrist']);
 			$reihungstest->zugangs_ueberpruefung = false;
 			$reihungstest->zugangscode = null;
-			$reihungstest->externe_ueberwachung = false;
+			$reihungstest->externe_ueberwachung = isset($_POST['externe_ueberwachung']);
 		}
 		else
 		{
@@ -2594,14 +2594,24 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 				<input type="number" class="input" id="zugangcode" name="zugangcode" value="<?php echo $db->convert_html_chars($reihungstest->zugangscode) ?>"> (Verpflichtend, wenn die Zugangsüberprüfung aktiviert ist)
 			</td>
 		</tr>
-		<?php if(defined('TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED') && TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED) : ?>
-			<tr>
-				<td class="feldtitel">Externe Überwachnung</td>
-				<td>
-					<input type="checkbox" id="externe_ueberwachung" name="externe_ueberwachung"<?php echo $reihungstest->externe_ueberwachung ? 'checked="checked"' : '' ?>>
-				</td>
-			</tr>
-		<?php endif; ?>
+			<?php if(defined('TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED') && TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED) : ?>
+				<?php
+				if (!empty($reihungstest->reihungstest_id))
+				{
+					$externe_ueberwachung_checked = (bool)$reihungstest->externe_ueberwachung;
+				}
+				else
+				{
+					$externe_ueberwachung_checked = defined('TESTTOOL_EXTERNE_UEBERWACHUNG_DEFAULT_ACTIVATION') && TESTTOOL_EXTERNE_UEBERWACHUNG_DEFAULT_ACTIVATION;
+				}
+				?>
+				<tr>
+					<td class="feldtitel">Externe Überwachung</td>
+					<td>
+						<input type="checkbox" id="externe_ueberwachung" name="externe_ueberwachung"<?php echo $externe_ueberwachung_checked ? ' checked="checked"' : '' ?>>
+					</td>
+				</tr>
+			<?php endif; ?>
 		<tr>
 			<td>&nbsp;</td>
 		</tr>
