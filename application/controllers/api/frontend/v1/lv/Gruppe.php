@@ -4,18 +4,20 @@ if (!defined('BASEPATH'))
 
 class Gruppe extends FHCAPI_Controller
 {
+	const BERECHTIGUNG_KURZBZ = 'basis/lvverwaltung';
+	
 	private $_uid;
 	private $_ci;
 	public function __construct()
 	{
 		parent::__construct([
-			'add' => ['admin:rw', 'assistenz:rw'],
-			'delete' => ['admin:rw', 'assistenz:rw'],
-			'deleteFromLVPlan' => ['admin:rw', 'assistenz:rw'],
-			'getBenutzerSearch' => ['admin:r', 'assistenz:r'],
-			'getAllSearch' => ['admin:r', 'assistenz:r'],
-			'getByLehreinheit' => ['admin:r', 'assistenz:r'],
-			'getGruppe' => ['admin:r', 'assistenz:r'],
+			'add' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
+			'delete' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
+			'deleteFromLVPlan' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
+			'getBenutzerSearch' => [self::BERECHTIGUNG_KURZBZ . ':r'],
+			'getAllSearch' => [self::BERECHTIGUNG_KURZBZ . ':r'],
+			'getByLehreinheit' => [self::BERECHTIGUNG_KURZBZ . ':r'],
+			'getGruppe' => [self::BERECHTIGUNG_KURZBZ . ':r'],
 		]);
 
 		$this->_ci = &get_instance();
@@ -33,6 +35,10 @@ class Gruppe extends FHCAPI_Controller
 		$this->_ci->load->model('education/Lehreinheitgruppe_model', 'LehreinheitgruppeModel');
 		$this->_ci->load->model('person/Person_model', 'PersonModel');
 		$this->_ci->load->model('ressource/stundenplandev_model', 'StundenplandevModel');
+		$this->_ci->load->model('education/Lehreinheit_model', 'LehreinheitModel');
+
+		$this->_ci->load->library('LVVerwaltungPermissionLib');
+
 	}
 
 	public function delete()
@@ -43,11 +49,11 @@ class Gruppe extends FHCAPI_Controller
 		if (is_null($lehreinheit_id) || !ctype_digit((string)$lehreinheit_id) || is_null($lehreinheitgruppe_id) || !ctype_digit((string)$lehreinheitgruppe_id))
 			$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
-		$lehreinheitgruppe_result = $this->_ci->LehreinheitgruppeModel->loadWhere(array('lehreinheitgruppe_id' => $lehreinheitgruppe_id));
+		$lehreinheitgruppe_result = $this->_ci->LehreinheitgruppeModel->loadWhere(array('lehreinheitgruppe_id' => $lehreinheitgruppe_id, 'lehreinheit_id' => $lehreinheit_id));
 		if (!hasData($lehreinheitgruppe_result) || isError($lehreinheitgruppe_result))
 			$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
-		$this->checkPermission($lehreinheit_id);
+		$this->checkPermission($lehreinheit_id, 'suid');
 
 		$result = $this->_ci->LehreinheitgruppeModel->deleteGroup($lehreinheit_id, $lehreinheitgruppe_id);
 
@@ -66,7 +72,7 @@ class Gruppe extends FHCAPI_Controller
 		if (is_null($lehreinheit_id) || !ctype_digit((string)$lehreinheit_id) || is_null($gid) || !ctype_digit((string)$gid) || is_null($lehrverband))
 			$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
-		$this->checkPermission($lehreinheit_id);
+		$this->checkPermission($lehreinheit_id, 'suid');
 
 		$result = $this->_ci->LehreinheitgruppeModel->addGroup($lehreinheit_id, $gid, $lehrverband === true || $lehrverband === 'true');
 
@@ -146,7 +152,7 @@ class Gruppe extends FHCAPI_Controller
 		if (is_null($lehreinheit_id) || !ctype_digit((string)$lehreinheit_id))
 			$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
-		$this->checkPermission($lehreinheit_id);
+		$this->checkPermission($lehreinheit_id, 's');
 
 		$gruppen = $this->_ci->LehreinheitgruppeModel->getByLehreinheit($lehreinheit_id);
 		$this->terminateWithSuccess(hasData($gruppen) ? getData($gruppen) : array());
@@ -164,7 +170,7 @@ class Gruppe extends FHCAPI_Controller
 		if (!hasData($lehreinheitgruppe_result) || isError($lehreinheitgruppe_result))
 			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
-		$this->checkPermission($lehreinheit_id);
+		$this->checkPermission($lehreinheit_id, 'suid');
 
 		$result = $this->_ci->StundenplandevModel->deleteGroupPlanning($lehreinheit_id, $lehreinheitgruppe_id);
 
@@ -291,26 +297,15 @@ class Gruppe extends FHCAPI_Controller
 			show_error('User authentification failed');
 	}
 
-	private function checkPermission($lehreinheit_id)
+	private function checkPermission($lehreinheit_id, $art)
 	{
 		$lehreinheit_result = $this->_ci->LehreinheitModel->load($lehreinheit_id);
 
 		if (!hasData($lehreinheit_result) || isError($lehreinheit_result))
 			$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
-		$result = $this->_ci->LehreinheitModel->getOes($lehreinheit_id);
-
-		if (isError($result))
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-
-		$oe_array = [];
-		if (hasData($result))
-			$oe_array = getData($result);
-
-		if (!$this->_ci->permissionlib->isBerechtigtMultipleOe('admin', $oe_array, 'suid') &&
-			!$this->_ci->permissionlib->isBerechtigtMultipleOe('assistenz', $oe_array, 'suid') &&
-			!$this->_ci->permissionlib->isBerechtigtMultipleOe('lv-plan', $oe_array, 'suid'))
-			$this->terminateWithError($this->p->t('ui', 'error_fieldWriteAccess'));
+		if (!$this->_ci->lvverwaltungpermissionlib->isEntitledForLehreinheit($lehreinheit_id, $art, array('lv-plan', 'basis/lvverwaltung')))
+			$this->terminateWithError($this->p->t('ui', 'notAuthorized'));
 	}
 
 }

@@ -2097,6 +2097,26 @@ $phrases = array(
 	array(
 		'app' => 'core',
 		'category' => 'ui',
+		'phrase' => 'notAuthorized',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie sind nicht berechtigt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You are not authorized.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
 		'phrase' => 'error_fieldMustBeArray',
 		'insertvon' => 'system',
 		'phrases' => array(

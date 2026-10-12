@@ -5,14 +5,15 @@ if (!defined('BASEPATH'))
 
 class Config extends FHCAPI_Controller
 {
+	const BERECHTIGUNG_KURZBZ = 'basis/lvverwaltung';
 	private $_ci;
 	private $_uid;
 
 	public function __construct()
 	{
 		parent::__construct([
-			'get' => ['admin:r', 'assistenz:r'],
-			'set' => ['admin:r', 'assistenz:r'],
+			'get' => [self::BERECHTIGUNG_KURZBZ . ':r'],
+			'set' => [self::BERECHTIGUNG_KURZBZ . ':r'],
 		]);
 
 		$this->_ci = &get_instance();

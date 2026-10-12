@@ -5,20 +5,20 @@ if (!defined('BASEPATH'))
 
 class Tags extends Tag_Controller
 {
-	const BERECHTIGUNG_KURZBZ = ['admin:rw', 'assistenz:r'];
+	const BERECHTIGUNG_KURZBZ = 'basis/lvverwaltung';
 
 	public function __construct()
 	{
 		parent::__construct([
-			'getTag' => self::BERECHTIGUNG_KURZBZ,
-			'getTags' => self::BERECHTIGUNG_KURZBZ,
-			'addTag' => self::BERECHTIGUNG_KURZBZ,
-			'updateTag' => self::BERECHTIGUNG_KURZBZ,
-			'doneTag' => self::BERECHTIGUNG_KURZBZ,
-			'deleteTag' => self::BERECHTIGUNG_KURZBZ,
-			'updateLehre' => self::BERECHTIGUNG_KURZBZ,
-			'doneLehre' => self::BERECHTIGUNG_KURZBZ,
-			'deleteLehre' => self::BERECHTIGUNG_KURZBZ,
+			'getTag' => [self::BERECHTIGUNG_KURZBZ . ':r'],
+			'getTags' => [self::BERECHTIGUNG_KURZBZ . ':r'],
+			'addTag' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
+			'updateTag' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
+			'doneTag' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
+			'deleteTag' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
+			'updateLehre' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
+			'doneLehre' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
+			'deleteLehre' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
 		]);
 
 		$this->config->load('lvverwaltung');

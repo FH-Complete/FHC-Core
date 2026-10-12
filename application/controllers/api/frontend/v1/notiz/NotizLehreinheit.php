@@ -4,18 +4,20 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class NotizLehreinheit extends Notiz_Controller
 {
+	const PERMISSION = 'basis/lvverwaltung';
+	
 	public function __construct()
 	{
 		parent::__construct([
-			'getUid' => ['admin:r', 'assistenz:r'],
-			'getNotizen' => ['admin:r', 'assistenz:r'],
-			'loadNotiz' => ['admin:r', 'assistenz:r'],
-			'addNewNotiz' => ['admin:rw', 'assistenz:rw'],
-			'updateNotiz' => ['admin:rw', 'assistenz:rw'],
-			'deleteNotiz' => ['admin:rw', 'assistenz:rw'],
-			'loadDokumente' => ['admin:r', 'assistenz:r'],
-			'getMitarbeiter' => ['admin:r', 'assistenz:r'],
-			'isBerechtigt' => ['admin:r', 'assistenz:r'],
+			'getUid' => [self::PERMISSION . ':r'],
+			'getNotizen' => [self::PERMISSION . ':r'],
+			'loadNotiz' => [self::PERMISSION . ':r'],
+			'addNewNotiz' => [self::PERMISSION . ':rw'],
+			'updateNotiz' => [self::PERMISSION . ':rw'],
+			'deleteNotiz' => [self::PERMISSION . ':rw'],
+			'loadDokumente' => [self::PERMISSION . ':r'],
+			'getMitarbeiter' => [self::PERMISSION . ':r'],
+			'isBerechtigt' => [self::PERMISSION . ':r'],
 		]);
 
 		//Load Models
@@ -25,9 +27,7 @@ class NotizLehreinheit extends Notiz_Controller
 
 		// Load Libraries
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
-
-		//Permission checks for allowed Oes
-		$allowedOes = $this->permissionlib->getOE_isEntitledFor('assistenz') ?: [];
+		$this->load->library('LVVerwaltungPermissionLib');
 
 		if ($this->router->method == 'addNewNotiz')
 		{
@@ -39,7 +39,7 @@ class NotizLehreinheit extends Notiz_Controller
 			{
 				return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Lehreinheit ID']), self::ERROR_TYPE_GENERAL);
 			}
-			$this->_checkAllowedOesFromLehreinheit($lehreinheit_id, $allowedOes);
+			$this->_checkAllowedOesFromLehreinheit($lehreinheit_id);
 		}
 
 		if ($this->router->method == 'updateNotiz')
@@ -63,7 +63,7 @@ class NotizLehreinheit extends Notiz_Controller
 			{
 				return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Lehreinheit ID']), self::ERROR_TYPE_GENERAL);
 			}
-			$this->_checkAllowedOesFromLehreinheit($lehreinheit_id, $allowedOes);
+			$this->_checkAllowedOesFromLehreinheit($lehreinheit_id);
 		}
 
 		if ($this->router->method == 'deleteNotiz')
@@ -80,7 +80,7 @@ class NotizLehreinheit extends Notiz_Controller
 			{
 				return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Lehreinheit ID']), self::ERROR_TYPE_GENERAL);
 			}
-			$this->_checkAllowedOesFromLehreinheit($lehreinheit_id, $allowedOes);
+			$this->_checkAllowedOesFromLehreinheit($lehreinheit_id);
 		}
 
 		// Load language phrases
@@ -91,25 +91,18 @@ class NotizLehreinheit extends Notiz_Controller
 
 	private function _checkAllowedOesFromLehreinheit($lehreinheit_id, $allowedOes)
 	{
-		//get oe from lehreinheit
-		$result = $this->LehreinheitModel->getOes($lehreinheit_id);
-		$data = $this->getDataOrTerminateWithError($result);
-		$oes = current($data);
-
-		if (!in_array($oes, $allowedOes))
-		{
-			return $this->terminateWithError($this->p->t('ui', 'error_keineBerechtigungStg') . " " . $oes, self::ERROR_TYPE_GENERAL);
-		}
+		if (!$this->lvverwaltungpermissionlib->isEntitledForLehreinheit($lehreinheit_id, 'suid'))
+			return $this->terminateWithError($this->p->t('ui', 'notAuthorized'), self::ERROR_TYPE_GENERAL);
 	}
 
 	public function isBerechtigt($id, $typeId)
 	{
-			if($typeId != "lehreinheit_id")
+		if($typeId != "lehreinheit_id")
 		{
 			$this->terminateWithError($this->p->t('ui','error_typeNotizIdIncorrect'), self::ERROR_TYPE_GENERAL);
 		}
 
-		if(!$this->permissionlib->isBerechtigt('admin', 'suid') && !$this->permissionlib->isBerechtigt('assistenz', 'suid'))
+		if(!$this->lvverwaltungpermissionlib->isEntitledForLehreinheit($id, 'suid'))
 		{
 			$result =  $this->p->t('lehre','error_keineSchreibrechte');
 

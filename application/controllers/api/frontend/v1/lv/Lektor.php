@@ -4,21 +4,23 @@ if (!defined('BASEPATH'))
 
 class Lektor extends FHCAPI_Controller
 {
+	const BERECHTIGUNG_KURZBZ = 'basis/lvverwaltung';
+
 	private $_uid;
 	private $_ci;
 	public function __construct()
 	{
 		parent::__construct([
-			'add' => ['admin:rw', 'assistenz:rw'],
-			'update' => ['admin:rw', 'assistenz:rw'],
-			'cancelVertrag' => ['admin:rw', 'assistenz:rw'],
-			'deleteLVPlan' => ['admin:rw', 'assistenz:rw'],
-			'deletePerson' => ['admin:rw', 'assistenz:rw'],
-			'getLehrfunktionen' => ['admin:r', 'assistenz:r'],
-			'getLektorenSearch' => ['admin:r', 'assistenz:r'],
-			'getLektorenByLE' => ['admin:r', 'assistenz:r'],
-			'getLektorDaten' => ['admin:r', 'assistenz:r'],
-			'getLektorVertrag' => ['admin:r', 'assistenz:r'],
+			'add' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
+			'update' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
+			'cancelVertrag' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
+			'deleteLVPlan' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
+			'deletePerson' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
+			'getLehrfunktionen' => [self::BERECHTIGUNG_KURZBZ . ':r'],
+			'getLektorenSearch' => [self::BERECHTIGUNG_KURZBZ . ':r'],
+			'getLektorenByLE' => [self::BERECHTIGUNG_KURZBZ . ':r'],
+			'getLektorDaten' => [self::BERECHTIGUNG_KURZBZ . ':r'],
+			'getLektorVertrag' => [self::BERECHTIGUNG_KURZBZ . ':r'],
 
 		]);
 
@@ -39,17 +41,8 @@ class Lektor extends FHCAPI_Controller
 		$this->_ci->load->model('ressource/stundenplandev_model', 'StundenplandevModel');
 		$this->_ci->load->model('ressource/Stundensatz_model', 'StundensatzModel');
 
-	}
+		$this->_ci->load->library('LVVerwaltungPermissionLib');
 
-	private function checkMitarbeiter($mitarbeiter_uid)
-	{
-		if (is_null($mitarbeiter_uid))
-			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
-
-		$mitarbeiter_result = $this->_ci->MitarbeiterModel->load($mitarbeiter_uid);
-
-		if (!hasData($mitarbeiter_result) || isError($mitarbeiter_result))
-			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 	}
 
 	public function add()
@@ -59,11 +52,7 @@ class Lektor extends FHCAPI_Controller
 
 		$this->checkLehreinheit($lehreinheit_id);
 		$this->checkMitarbeiter($mitarbeiter_uid);
-		$lehrfach_permission = $this->checkLehrfachPermission($lehreinheit_id, array('assistenz', 'admin'));
-		$lehreinheit_permission = $this->checkPermission($lehreinheit_id, array('admin', 'assistenz', 'lv-plan'));
-
-		if (!$lehrfach_permission && !$lehreinheit_permission)
-			$this->terminateWithError($this->p->t('ui', 'error_fieldWriteAccess'));
+		$this->checkPermission($lehreinheit_id, 'suid');
 
 		$result = $this->_ci->lektorlib->addLektorToLehreinheit($lehreinheit_id, $mitarbeiter_uid);
 
@@ -144,10 +133,7 @@ class Lektor extends FHCAPI_Controller
 			}
 		}
 
-		$lehreinheit_permission = $this->checkPermission($lehreinheit_id, array('admin', 'assistenz', 'lv-plan'));
-
-		if (!$lehreinheit_permission)
-			$this->terminateWithError($this->p->t('ui', 'error_fieldWriteAccess'));
+		$this->checkPermission($lehreinheit_id, 'suid');
 
 		if (!is_null($this->getLektorVertrag($lehreinheit_id, $mitarbeiter_uid)) && (array_key_exists('mitarbeiter_uid', $formData) && $mitarbeiter_uid !== $formData['mitarbeiter_uid']))
 			$this->terminateWithError($this->p->t('ui', 'error_fieldWriteAccess'));
@@ -247,22 +233,12 @@ class Lektor extends FHCAPI_Controller
 		$this->terminateWithSuccess(hasData($result) ? getData($result) : array());
 	}
 
-	private function checkLehreinheit($lehreinheit_id)
-	{
-		if (is_null($lehreinheit_id) || !ctype_digit((string)$lehreinheit_id))
-			$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
-		$lehreinheit_result = $this->_ci->LehreinheitModel->load($lehreinheit_id);
-
-		if (!hasData($lehreinheit_result) || isError($lehreinheit_result))
-			$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
-
-		return getData($lehreinheit_result)[0];
-
-	}
 	public function getLektorenByLE($lehreinheit_id = null)
 	{
 		$this->checkLehreinheit($lehreinheit_id);
+		$this->checkPermission($lehreinheit_id, 's');
+
 		$le_mitarbeiter_data = $this->_ci->LehreinheitmitarbeiterModel->getLektorenByLe($lehreinheit_id);
 		$this->terminateWithSuccess(hasData($le_mitarbeiter_data) ? getData($le_mitarbeiter_data) : array());
 	}
@@ -270,6 +246,7 @@ class Lektor extends FHCAPI_Controller
 	public function getLektorDaten($lehreinheit_id = null, $mitarbeiter_uid = null)
 	{
 		$lehreinheit = $this->checkLehreinheit($lehreinheit_id);
+		$this->checkPermission($lehreinheit_id, 's');
 
 		if (is_null($mitarbeiter_uid))
 			$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
@@ -298,56 +275,6 @@ class Lektor extends FHCAPI_Controller
 		$this->terminateWithSuccess($le_mitarbeiter_data);
 	}
 
-	private function getLektorVertrag($lehreinheit_id = null, $mitarbeiter_uid = null)
-	{
-		$this->_ci->load->model('accounting/Vertrag_model', 'VertragModel');
-		$vertrag = $this->_ci->VertragModel->getVertrag($mitarbeiter_uid, $lehreinheit_id);
-		return hasData($vertrag) ? getData($vertrag)[0] : null;
-	}
-
-	private function checkLehrfachPermission($lehreinheit_id, $permissions)
-	{
-		$lehrfach_oe_kurzbz = $this->_ci->LehreinheitModel->getLehrfachOe($lehreinheit_id);
-
-		if (isError($lehrfach_oe_kurzbz))
-			$this->terminateWithError(getError($lehrfach_oe_kurzbz), self::ERROR_TYPE_GENERAL);
-
-		$lehrfach_oe_kurzbz = array('');
-		if (hasData($lehrfach_oe_kurzbz))
-			$lehrfach_oe_kurzbz = array_column(getData($lehrfach_oe_kurzbz), 'oe_kurzbz');
-
-
-		return $this->checkPermissionGenerel($permissions, $lehrfach_oe_kurzbz);
-	}
-
-	private function checkPermissionGenerel($permissions, $oe_array)
-	{
-		$hasPermission = false;
-		foreach ($permissions as $permission)
-		{
-			if ($this->_ci->permissionlib->isBerechtigtMultipleOe($permission, $oe_array, 'suid'))
-			{
-				$hasPermission = true;
-				break;
-			}
-		}
-
-		return $hasPermission;
-	}
-
-	private function checkPermission($lehreinheit_id, $permissions)
-	{
-		$result = $this->_ci->LehreinheitModel->getOes($lehreinheit_id);
-
-		if (isError($result))
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-
-		$oe_array = [];
-		if (hasData($result))
-			$oe_array = getData($result);
-
-		return $this->checkPermissionGenerel($permissions, $oe_array);
-	}
 	public function cancelVertrag()
 	{
 		$vertrag_id = $this->input->post('vertrag_id');
@@ -355,7 +282,9 @@ class Lektor extends FHCAPI_Controller
 		$mitarbeiter_uid = $this->input->post('mitarbeiter_uid');
 
 		$this->checkLehreinheit($lehreinheit_id);
-		$this->checkPermission($lehreinheit_id, array('admin', 'lehre/lehrauftrag_bestellen'));
+		$this->checkPermission($lehreinheit_id, 'suid');
+		$this->checkPermission($lehreinheit_id, 'suid', 'lehre/lehrauftrag_bestellen');
+
 
 		if (is_null($vertrag_id) || !ctype_digit((string)$vertrag_id))
 			$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
@@ -373,6 +302,10 @@ class Lektor extends FHCAPI_Controller
 		if (!hasData($mitarbeiter_result) || isError($mitarbeiter_result))
 			$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
+		$vertrag = $this->getLektorVertrag($lehreinheit_id, $mitarbeiter_uid);
+		if (is_null($vertrag) || (string)$vertrag->vertrag_id !== (string)$vertrag_id)
+			$this->terminateWithError($this->p->t('ui', 'error_fieldWriteAccess'));
+
 		$result = $this->_ci->VertragModel->cancelVertrag($vertrag_id, $mitarbeiter_uid);
 
 		if (isError($result))
@@ -387,7 +320,7 @@ class Lektor extends FHCAPI_Controller
 		$mitarbeiter_uid = $this->input->post('mitarbeiter_uid');
 
 		$this->checkLehreinheit($lehreinheit_id);
-		$this->checkPermission($lehreinheit_id, array('admin', 'assistenz', 'lv-plan'));
+		$this->checkPermission($lehreinheit_id, 'suid');
 
 		if (is_null($mitarbeiter_uid))
 			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
@@ -411,7 +344,8 @@ class Lektor extends FHCAPI_Controller
 		$mitarbeiter_uid = $this->input->post('mitarbeiter_uid');
 
 		$this->checkLehreinheit($lehreinheit_id);
-		$this->checkPermission($lehreinheit_id, array('lv-plan/lektorentfernen'));
+		$this->checkPermission($lehreinheit_id, 'suid');
+		$this->checkPermission($lehreinheit_id, 'suid', 'lv-plan/lektorentfernen');
 
 		if (is_null($mitarbeiter_uid))
 			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
@@ -428,6 +362,43 @@ class Lektor extends FHCAPI_Controller
 			$this->terminateWithError(getError($delete_result));
 
 		$this->terminateWithSuccess($delete_result);
+	}
+
+	private function checkLehreinheit($lehreinheit_id)
+	{
+		if (is_null($lehreinheit_id) || !ctype_digit((string)$lehreinheit_id))
+			$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+		$lehreinheit_result = $this->_ci->LehreinheitModel->load($lehreinheit_id);
+
+		if (!hasData($lehreinheit_result) || isError($lehreinheit_result))
+			$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+		return getData($lehreinheit_result)[0];
+
+	}
+
+	private function getLektorVertrag($lehreinheit_id = null, $mitarbeiter_uid = null)
+	{
+		$this->_ci->load->model('accounting/Vertrag_model', 'VertragModel');
+		$vertrag = $this->_ci->VertragModel->getVertrag($mitarbeiter_uid, $lehreinheit_id);
+		return hasData($vertrag) ? getData($vertrag)[0] : null;
+	}
+
+	private function checkPermission($lehreinheit_id, $art, $berechtigung = null)
+	{
+		if (!$this->_ci->lvverwaltungpermissionlib->isEntitledForLehreinheit($lehreinheit_id, $art, $berechtigung))
+			$this->terminateWithError($this->p->t('ui', 'error_fieldWriteAccess'));
+	}
+	private function checkMitarbeiter($mitarbeiter_uid)
+	{
+		if (is_null($mitarbeiter_uid))
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+		$mitarbeiter_result = $this->_ci->MitarbeiterModel->load($mitarbeiter_uid);
+
+		if (!hasData($mitarbeiter_result) || isError($mitarbeiter_result))
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 	}
 
 	private function _setAuthUID()

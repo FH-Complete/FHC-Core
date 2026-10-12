@@ -21,13 +21,15 @@ if (!defined('BASEPATH'))
 
 class DirektGruppe extends FHCAPI_Controller
 {
+	const BERECHTIGUNG_KURZBZ = 'basis/lvverwaltung';
+
 	private $_ci;
 	public function __construct()
 	{
 		parent::__construct([
-			'add' => ['admin:rw', 'assistenz:rw'],
-			'delete' => ['admin:rw', 'assistenz:rw'],
-			'getByLehreinheit' => ['admin:r', 'assistenz:r'],
+			'add' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
+			'delete' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
+			'getByLehreinheit' => [self::BERECHTIGUNG_KURZBZ . ':r'],
 		]);
 
 		$this->_ci = &get_instance();
@@ -38,6 +40,7 @@ class DirektGruppe extends FHCAPI_Controller
 		$this->_ci->load->model('education/Lehreinheitgruppe_model', 'LehreinheitgruppeModel');
 		$this->_ci->load->model('education/lehreinheit_model', 'LehreinheitModel');
 		$this->_ci->load->model('person/Benutzer_model', 'BenutzerModel');
+		$this->_ci->load->library('LVVerwaltungPermissionLib');
 	}
 
 	public function add()
@@ -45,7 +48,7 @@ class DirektGruppe extends FHCAPI_Controller
 		$uid = $this->input->post('uid');
 		$lehreinheit_id = $this->input->post('lehreinheit_id');
 
-		$this->checkPermission($lehreinheit_id, $uid);
+		$this->checkPermission($lehreinheit_id, 'suid', $uid);
 
 		$result = $this->_ci->LehreinheitgruppeModel->direktUserAdd($uid, $lehreinheit_id);
 
@@ -60,7 +63,7 @@ class DirektGruppe extends FHCAPI_Controller
 		$uid = $this->input->post('uid');
 		$lehreinheit_id = $this->input->post('lehreinheit_id');
 
-		$this->checkPermission($lehreinheit_id, $uid);
+		$this->checkPermission($lehreinheit_id, 'suid', $uid);
 
 		$result = $this->_ci->LehreinheitgruppeModel->direktUserDelete($uid, $lehreinheit_id);
 
@@ -72,12 +75,12 @@ class DirektGruppe extends FHCAPI_Controller
 
 	public function getByLehreinheit($lehreinheit_id = null)
 	{
-		$this->checkPermission($lehreinheit_id);
+		$this->checkPermission($lehreinheit_id, 's');
 		$gruppen = $this->_ci->LehreinheitgruppeModel->getDirectGroup($lehreinheit_id);
 		$this->terminateWithSuccess(hasData($gruppen) ? getData($gruppen) : array());
 	}
 
-	private function checkPermission($lehreinheit_id, $uid = false)
+	private function checkPermission($lehreinheit_id, $art, $uid = false)
 	{
 		if (is_null($lehreinheit_id) || !ctype_digit((string)$lehreinheit_id))
 			$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
@@ -94,17 +97,7 @@ class DirektGruppe extends FHCAPI_Controller
 				$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 		}
 
-		$result = $this->_ci->LehreinheitModel->getOes($lehreinheit_id);
-
-		if (isError($result))
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-
-		$oe_array = [];
-		if (hasData($result))
-			$oe_array = getData($result);
-
-		if (!$this->_ci->permissionlib->isBerechtigtMultipleOe('admin', $oe_array, 'suid') &&
-			!$this->_ci->permissionlib->isBerechtigtMultipleOe('assistenz', $oe_array, 'suid'))
-			$this->terminateWithError($this->p->t('ui', 'error_fieldWriteAccess'));
+		if (!$this->_ci->lvverwaltungpermissionlib->isEntitledForLehreinheit($lehreinheit_id, $art))
+			$this->terminateWithError($this->p->t('ui', 'notAuthorized'));
 	}
 }

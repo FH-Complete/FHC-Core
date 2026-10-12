@@ -21,18 +21,20 @@ if (!defined('BASEPATH'))
 
 class Lehrveranstaltung extends FHCAPI_Controller
 {
+	const PERMISSION = 'basis/lvverwaltung';
+
 	private $_ci;
 	private $_uid;
 
 	public function __construct()
 	{
 		parent::__construct([
-			'getByEmp' => ['admin:r', 'assistenz:r'],
-			'getByLe' => ['admin:r', 'assistenz:r'],
-			'getByLv' => ['admin:r', 'assistenz:r'],
-			'getByStg' => ['admin:r', 'assistenz:r'],
-			'getByStgOrgform' => ['admin:r', 'assistenz:r'],
-			'loadByLV' => ['admin:r', 'assistenz:r'],
+			'getByEmp' => [self::PERMISSION . ':r'],
+			'getByLe' => [self::PERMISSION . ':r'],
+			'getByLv' => [self::PERMISSION . ':r'],
+			'getByStg' => [self::PERMISSION . ':r'],
+			'getByStgOrgform' => [self::PERMISSION . ':r'],
+			'loadByLV' => [self::PERMISSION . ':r'],
 		]);
 
 		$this->_ci = &get_instance();
@@ -43,6 +45,7 @@ class Lehrveranstaltung extends FHCAPI_Controller
 		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		$this->_ci->load->library('VariableLib', ['uid' => $this->_uid]);
+		$this->_ci->load->library('LVVerwaltungPermissionLib');
 
 		$this->loadPhrases(
 			array(
@@ -64,12 +67,36 @@ class Lehrveranstaltung extends FHCAPI_Controller
 		$lehrveranstaltungen = $this->_ci->LehreinheitModel->getLvsByEmployee($mitarbeiter_uid, $studiensemester_kurzbz, $studiengang_kz);
 		$lehrveranstaltungen_data = $this->getDataOrTerminateWithError($lehrveranstaltungen);
 
+		$les_by_lv = array();
+		foreach ($lehrveranstaltungen_data as $lehrveranstaltung)
+		{
+			$lehreinheiten = $this->_ci->LehreinheitModel->getByLvidStudiensemester($lehrveranstaltung->lehrveranstaltung_id, $studiensemester_kurzbz, $mitarbeiter_uid);
+			$les_by_lv[$lehrveranstaltung->lehrveranstaltung_id] = $this->getDataOrTerminateWithError($lehreinheiten);
+		}
+
+		$alle_le_ids = array();
+		foreach ($les_by_lv as $lehreinheiten)
+		{
+			foreach ($lehreinheiten as $le)
+				$alle_le_ids[] = $le->lehreinheit_id;
+		}
+
+		$erlaubte_le_ids = $this->_ci->lvverwaltungpermissionlib->filterLehreinheitIds($alle_le_ids);
+		$erlaubte_lv_ids = $this->_ci->lvverwaltungpermissionlib->filterLVIds(array_column($lehrveranstaltungen_data, 'lehrveranstaltung_id'), 's', false);
+
 		$tree = [];
 
 		foreach ($lehrveranstaltungen_data as $lehrveranstaltung)
 		{
-			$lehreinheiten = $this->_ci->LehreinheitModel->getByLvidStudiensemester($lehrveranstaltung->lehrveranstaltung_id, $studiensemester_kurzbz, $mitarbeiter_uid);
-			$lehreinheiten_data = $this->getDataOrTerminateWithError($lehreinheiten);
+			$lehreinheiten_data = array();
+			foreach ($les_by_lv[$lehrveranstaltung->lehrveranstaltung_id] as $le)
+			{
+				if (in_array($le->lehreinheit_id, $erlaubte_le_ids))
+					$lehreinheiten_data[] = $le;
+			}
+
+			if (!in_array($lehrveranstaltung->lehrveranstaltung_id, $erlaubte_lv_ids) && empty($lehreinheiten_data))
+				continue;
 
 			if (!isset($lehrveranstaltung->_children))
 			{
@@ -83,8 +110,11 @@ class Lehrveranstaltung extends FHCAPI_Controller
 
 	public function getByLe($studiensemester_kurzbz = null, $lehreinheit_id = null)
 	{
-		if (is_null($lehreinheit_id))
+		if (is_null($lehreinheit_id) || !ctype_digit((string)$lehreinheit_id))
 			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+		if (!$this->_ci->lvverwaltungpermissionlib->isEntitledForLehreinheit($lehreinheit_id, 's'))
+			$this->terminateWithError($this->p->t('ui', 'notAuthorized'));
 
 		$studiensemester_kurzbz = $this->getStudiensemesterKurzbz($studiensemester_kurzbz);
 
@@ -97,8 +127,11 @@ class Lehrveranstaltung extends FHCAPI_Controller
 
 	public function getByLv($studiensemester_kurzbz = null, $lehrveranstaltung_id = null)
 	{
-		if (is_null($lehrveranstaltung_id))
+		if (is_null($lehrveranstaltung_id) || !ctype_digit((string)$lehrveranstaltung_id))
 			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+		if (!$this->_ci->lvverwaltungpermissionlib->isEntitledForLV($lehrveranstaltung_id, 's'))
+			$this->terminateWithError($this->p->t('ui', 'notAuthorized'));
 
 		$studiensemester_kurzbz = $this->getStudiensemesterKurzbz($studiensemester_kurzbz);
 
@@ -155,9 +188,19 @@ class Lehrveranstaltung extends FHCAPI_Controller
 			$lehreinheiten = $this->_ci->LehreinheitModel->getByLvidStudiensemester($lehrveranstaltung->lehrveranstaltung_id, $studiensemester_kurzbz);
 			$lehreinheiten_data = $this->getDataOrTerminateWithError($lehreinheiten);
 
+			// nur die LEs, auf die man berechtigt ist (LV selbst ist oben schon geprüft)
+			$erlaubte_le_ids = $this->_ci->lvverwaltungpermissionlib->filterLehreinheitIds(array_column($lehreinheiten_data, 'lehreinheit_id'));
+
+			$erlaubte_lehreinheiten = array();
+			foreach ($lehreinheiten_data as $le)
+			{
+				if (in_array($le->lehreinheit_id, $erlaubte_le_ids))
+					$erlaubte_lehreinheiten[] = $le;
+			}
+
 			if (!isset($lehrveranstaltung->_children))
 			{
-				$lehrveranstaltung->_children = $lehreinheiten_data;
+				$lehrveranstaltung->_children = $erlaubte_lehreinheiten;
 			}
 			$tree[] = $lehrveranstaltung;
 		}
@@ -192,17 +235,47 @@ class Lehrveranstaltung extends FHCAPI_Controller
 
 		$lehrveranstaltungen_data = $this->_loadLvRows($studiengang_kz, $studiensemester_kurzbz, $semester, $orgform_kurzbz);
 
+		$les_by_lv = array();
+		foreach ($lehrveranstaltungen_data as $row)
+		{
+			$lehreinheiten_data = $this->_ci->LehreinheitModel->getByLvidStudiensemester($row->lehrveranstaltung_id, $studiensemester_kurzbz);
+			$les_by_lv[$row->lehrveranstaltung_id] = hasData($lehreinheiten_data) ? getData($lehreinheiten_data) : array();
+		}
+
+		$alle_le_ids = array();
+		foreach ($les_by_lv as $lehreinheiten)
+		{
+			foreach ($lehreinheiten as $le)
+				$alle_le_ids[] = $le->lehreinheit_id;
+		}
+
+		$erlaubte_le_ids = $this->_ci->lvverwaltungpermissionlib->filterLehreinheitIds($alle_le_ids);
+		$erlaubte_lv_ids = $this->_ci->lvverwaltungpermissionlib->filterLVIds(array_column($lehrveranstaltungen_data, 'lehrveranstaltung_id'), 's', false);
+
+		$sichtbare_lv_ids = array();
+		foreach ($lehrveranstaltungen_data as $row)
+		{
+			$erlaubte_lehreinheiten = array();
+			foreach ($les_by_lv[$row->lehrveranstaltung_id] as $le)
+			{
+				if (in_array($le->lehreinheit_id, $erlaubte_le_ids))
+					$erlaubte_lehreinheiten[] = $le;
+			}
+			$les_by_lv[$row->lehrveranstaltung_id] = $erlaubte_lehreinheiten;
+
+			if (in_array($row->lehrveranstaltung_id, $erlaubte_lv_ids) || !empty($erlaubte_lehreinheiten))
+				$sichtbare_lv_ids[] = $row->lehrveranstaltung_id;
+		}
+
 		$tree = [];
 		foreach ($lehrveranstaltungen_data as $row)
 		{
 			$rowData = $row;
 
-			$lehreinheiten_data = $this->_ci->LehreinheitModel->getByLvidStudiensemester($row->lehrveranstaltung_id, $studiensemester_kurzbz);
+			$lehreinheiten = $les_by_lv[$row->lehrveranstaltung_id];
 
-			if (hasData($lehreinheiten_data))
+			if (!empty($lehreinheiten))
 			{
-				$lehreinheiten = getData($lehreinheiten_data);
-
 				if (!isset($row->_children))
 				{
 					$row->_children = $lehreinheiten;
@@ -246,7 +319,7 @@ class Lehrveranstaltung extends FHCAPI_Controller
 							break;
 						}
 					}
-
+					unset($searchParent);
 				}
 			}
 			else
@@ -254,6 +327,8 @@ class Lehrveranstaltung extends FHCAPI_Controller
 				$tree[] = $rowData;
 			}
 		}
+
+		$tree = $this->_entferneNichtSichtbareLVs($tree, $sichtbare_lv_ids);
 
 		$counter = 0;
 		$this->assignUniqueIndex($tree, $counter);
@@ -265,6 +340,9 @@ class Lehrveranstaltung extends FHCAPI_Controller
 	{
 		if (is_null($lehrveranstaltung_id) || !ctype_digit((string)$lehrveranstaltung_id))
 			$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+		if (!$this->_ci->lvverwaltungpermissionlib->isEntitledForLV($lehrveranstaltung_id, 's'))
+			$this->terminateWithError($this->p->t('ui', 'notAuthorized'));
 
 		$this->_ci->LehrveranstaltungModel->addSelect('lehrveranstaltung_id, lehrform_kurzbz, lehre, bezeichnung as lvbezeichnung, sprache');
 		$lehrveranstaltung_result = $this->_ci->LehrveranstaltungModel->loadWhere(array('lehrveranstaltung_id' => $lehrveranstaltung_id));
@@ -346,6 +424,33 @@ class Lehrveranstaltung extends FHCAPI_Controller
 
 		$lehrveranstaltungen_data = $this->_ci->LehrveranstaltungModel->getLvsByStudiengang($studienplan_ids, $placeholders, $only_ids, $studiengang_kz, $studiensemester_kurzbz, $semester, $orgform_kurzbz);
 		return hasData($lehrveranstaltungen_data) ? getData($lehrveranstaltungen_data) : array();
+	}
+
+	private function _entferneNichtSichtbareLVs($nodes, $sichtbare_lv_ids)
+	{
+		$result = array();
+
+		foreach ($nodes as $node)
+		{
+			if (isset($node->lehreinheit_id))
+			{
+				$result[] = $node;
+				continue;
+			}
+
+			if (!empty($node->_children))
+			{
+				if (!is_array($node->_children))
+					$node->_children = [$node->_children];
+
+				$node->_children = $this->_entferneNichtSichtbareLVs($node->_children, $sichtbare_lv_ids);
+			}
+
+			if (in_array($node->lehrveranstaltung_id, $sichtbare_lv_ids) || !empty($node->_children))
+				$result[] = $node;
+		}
+
+		return $result;
 	}
 
 	private function _setAuthUID()

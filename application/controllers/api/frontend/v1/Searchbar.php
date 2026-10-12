@@ -37,7 +37,8 @@ class Searchbar extends FHCAPI_Controller
 		parent::__construct([
 			'search' => self::PERM_LOGGED,
 			'searchCis' => self::PERM_LOGGED,
-			'searchStv' => self::PERM_LOGGED
+			'searchStv' => self::PERM_LOGGED,
+			'searchLV' => self::PERM_LOGGED,
 		]);
 
 		$this->load->model('system/Webservicelog_model', 'WebservicelogModel');
@@ -85,6 +86,14 @@ class Searchbar extends FHCAPI_Controller
 	public function searchStv()
 	{
 		return $this->searchAdvanced([ 'config' => 'searchstv' ]);
+	}
+
+	/**
+	 * Gets a JSON body via HTTP POST and provides the parameters
+	 */
+	public function searchLV()
+	{
+		return $this->searchAdvanced([ 'config' => 'searchlv' ]);
 	}
 
 	/**

@@ -164,10 +164,7 @@ class LvVwLib
 
 	protected function getPermittedStudiengangKzs()
 	{
-		$permittedStgs = $this->_ci->permissionlib->getSTG_isEntitledFor('admin') ?: [];
-		$permittedStgs = array_merge($permittedStgs, $this->_ci->permissionlib->getSTG_isEntitledFor('assistenz') ?: []);
-
-		return $permittedStgs;
+		return $this->_ci->permissionlib->getSTG_isEntitledFor('basis/lvverwaltung') ?: [];
 	}
 
 	protected function getStgFromUrl($stg)

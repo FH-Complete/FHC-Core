@@ -207,6 +207,10 @@ class LvPlan extends FHCAPI_Controller
 
 	public function getLeEvents($le_id = null, $start_date = null, $end_date = null, $stundenplan = 'stundenplandev')
 	{
+		$this->load->library('LVVerwaltungPermissionLib');
+
+		if (!$this->lvverwaltungpermissionlib->isEntitledForLehreinheit($le_id, 's'))
+			$this->terminateWithError($this->p->t('ui', 'notAuthorized'));
 
 		if (is_null($le_id) || is_null($start_date) || is_null($end_date))
 			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
@@ -224,6 +228,11 @@ class LvPlan extends FHCAPI_Controller
 
 	public function getLvEvents($lv_id = null, $start_date = null, $end_date = null, $stundenplan = 'stundenplandev')
 	{
+		$this->load->library('LVVerwaltungPermissionLib');
+
+		if (!$this->lvverwaltungpermissionlib->isEntitledForLV($lv_id))
+			$this->terminateWithError($this->p->t('ui', 'notAuthorized'));
+
 		if (is_null($lv_id) || is_null($start_date) || is_null($end_date))
 			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 

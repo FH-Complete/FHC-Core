@@ -4,28 +4,31 @@ if (!defined('BASEPATH'))
 
 class Lehreinheit extends FHCAPI_Controller
 {
+	const BERECHTIGUNG_KURZBZ = 'basis/lvverwaltung';
+
 	private $_uid;
 	private $_ci;
 	public function __construct()
 	{
 		parent::__construct([
-			'add' => ['admin:rw',  'assistenz:rw'],
-			'copy' => ['admin:rw',  'assistenz:rw'],
-			'delete' => ['admin:rw',  'assistenz:rw'],
-			'update' => ['admin:rw',  'assistenz:rw'],
+			'add' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
+			'copy' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
+			'delete' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
+			'update' => [self::BERECHTIGUNG_KURZBZ . ':rw'],
 
-			'get' =>  ['admin:r', 'assistenz:r'],
-			'getStudiensemester' => ['admin:r', 'assistenz:r'],
-			'getLehrfach' => ['admin:r', 'assistenz:r'],
-			'getSprache' => ['admin:r', 'assistenz:r'],
-			'getRaumtyp' => ['admin:r', 'assistenz:r'],
-			'getLehrform' => ['admin:r', 'assistenz:r']
+			'get' =>  [self::BERECHTIGUNG_KURZBZ . ':r'],
+			'getStudiensemester' => [self::BERECHTIGUNG_KURZBZ . ':r'],
+			'getLehrfach' => [self::BERECHTIGUNG_KURZBZ . ':r'],
+			'getSprache' => [self::BERECHTIGUNG_KURZBZ . ':r'],
+			'getRaumtyp' => [self::BERECHTIGUNG_KURZBZ . ':r'],
+			'getLehrform' => [self::BERECHTIGUNG_KURZBZ . ':r'],
 		]);
 
 		$this->_ci = &get_instance();
 		$this->_setAuthUID();
 		$this->_ci->load->library('VariableLib', ['uid' => $this->_uid]);
 		$this->_ci->load->library('PhrasesLib');
+		$this->_ci->load->library('LVVerwaltungPermissionLib');
 		$this->loadPhrases(
 			array(
 				'global',
@@ -34,6 +37,7 @@ class Lehreinheit extends FHCAPI_Controller
 		);
 
 		$this->_ci->load->model('education/Lehreinheit_model', 'LehreinheitModel');
+		$this->_ci->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 		$this->_ci->load->model('education/Lehreinheitgruppe_model', 'LehreinheitgruppeModel');
 		$this->_ci->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
 	}
@@ -41,29 +45,9 @@ class Lehreinheit extends FHCAPI_Controller
 	public function get($lehreinheit_id)
 	{
 		$lehreinheit = $this->checkLehreinheit($lehreinheit_id);
+		$this->checkPermission($lehreinheit_id, 's');
 		$lehreinheit->lehrfaecher = $this->getLehrfaecher($lehreinheit);
 		$this->terminateWithSuccess($lehreinheit);
-	}
-
-	private function getLehrfaecher($lehreinheit)
-	{
-		$lehrfacher_array = array($lehreinheit->lehrfach_id);
-		$this->_ci->LehreinheitModel->addSelect('lehrveranstaltung_id_kompatibel');
-		$this->_ci->LehreinheitModel->addJoin('lehre.tbl_lehrveranstaltung_kompatibel', 'lehrveranstaltung_id');
-		$lehrfaecher = $this->_ci->LehreinheitModel->loadWhere(array('lehrveranstaltung_id' => $lehreinheit->lehrveranstaltung_id));
-
-
-		if (hasData($lehrfaecher))
-			$lehrfaecher_array = array_merge($lehrfacher_array, array_column(getData($lehrfaecher), 'lehrveranstaltung_id_kompatibel'));
-
-		$lehrfaecher_array[] = $lehreinheit->lehrveranstaltung_id;
-
-		$this->_ci->LehrveranstaltungModel->addDistinct('lehrfach_id');
-		$this->_ci->LehrveranstaltungModel->addSelect("tbl_lehrveranstaltung.lehrveranstaltung_id, CONCAT(tbl_lehrveranstaltung.bezeichnung || '(' || tbl_lehrveranstaltung.oe_kurzbz || ')') as lehrfach");
-		$this->_ci->LehrveranstaltungModel->db->where_in('tbl_lehrveranstaltung.lehrveranstaltung_id', $lehrfaecher_array);
-		$lehrfaecher_result = $this->_ci->LehrveranstaltungModel->load();
-
-		return hasData($lehrfaecher_result) ? getData($lehrfaecher_result) : array();
 	}
 
 	public function add()
@@ -77,16 +61,6 @@ class Lehreinheit extends FHCAPI_Controller
 
 		if (!hasData($lehrveranstaltung_result) || isError($lehrveranstaltung_result))
 			$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
-
-		$lehrveranstaltung = getData($lehrveranstaltung_result)[0];
-
-		$oe_result = $this->_ci->LehrveranstaltungModel->getAllOe($lehrveranstaltung->lehrveranstaltung_id);
-		$oe_array = hasData($oe_result) ? array_column(getData($oe_result), 'oe_kurzbz') : array();
-
-		if (!$this->_ci->permissionlib->isBerechtigtMultipleOe('admin', $oe_array, 'suid') &&
-			!$this->_ci->permissionlib->isBerechtigtMultipleOe('assistenz', $oe_array, 'suid') &&
-			!$this->_ci->permissionlib->isBerechtigtMultipleOe('lv-plan', $oe_array, 'suid'))
-			$this->terminateWithError($this->p->t('ui', 'error_fieldWriteAccess'));
 
 		$this->_ci->load->library('form_validation');
 
@@ -164,6 +138,9 @@ class Lehreinheit extends FHCAPI_Controller
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
+		if (!$this->_ci->lvverwaltungpermissionlib->isEntitledForLVUndLehrfach($lehrveranstaltung_id, $this->input->post('lehrfach_id'), 'suid', array('lv-plan', 'basis/lvverwaltung')))
+			$this->terminateWithError($this->p->t('ui', 'error_fieldWriteAccess'));
+
 		$updateData = array();
 		foreach ($updatableFields as $field)
 		{
@@ -186,6 +163,9 @@ class Lehreinheit extends FHCAPI_Controller
 			$updateData
 		);
 
+		if (isError($result))
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+
 		if (!isset($updateData['unr']))
 		{
 			$unr = getData($result);
@@ -201,7 +181,7 @@ class Lehreinheit extends FHCAPI_Controller
 		$art = $this->input->post('art');
 
 		$lehreinheit_old = $this->checkLehreinheit($lehreinheit_id);
-		$this->checkPermission($lehreinheit_old->lehreinheit_id);
+		$this->checkPermission($lehreinheit_old->lehreinheit_id, 'suid');
 
 		$lehreinheit_new = $lehreinheit_old;
 
@@ -291,10 +271,13 @@ class Lehreinheit extends FHCAPI_Controller
 		{
 			foreach ($lehreinheit_id as $le_id)
 			{
-				$lehreinheit = $this->checkLehreinheit($le_id);
-				$this->checkPermission($lehreinheit->lehreinheit_id);
+				$this->checkLehreinheit($le_id);
+				$this->checkPermission($le_id, 'suid');
+			}
 
-				$result = $this->_ci->LehreinheitModel->deleteLehreinheit($lehreinheit->lehreinheit_id);
+			foreach ($lehreinheit_id as $le_id)
+			{
+				$result = $this->_ci->LehreinheitModel->deleteLehreinheit($le_id);
 
 				if (isError($result))
 				{
@@ -305,7 +288,7 @@ class Lehreinheit extends FHCAPI_Controller
 		else
 		{
 			$lehreinheit = $this->checkLehreinheit($lehreinheit_id);
-			$this->checkPermission($lehreinheit->lehreinheit_id);
+			$this->checkPermission($lehreinheit->lehreinheit_id,'suid');
 
 			$result = $this->_ci->LehreinheitModel->deleteLehreinheit($lehreinheit->lehreinheit_id);
 
@@ -328,11 +311,14 @@ class Lehreinheit extends FHCAPI_Controller
 	{
 		$lehreinheit = $this->checkLehreinheit($this->input->post('lehreinheit_id'));
 
-		$this->checkPermission($lehreinheit->lehreinheit_id);
+		$this->checkPermission($lehreinheit->lehreinheit_id, 'suid');
 
 		$this->_ci->load->library('form_validation');
 
 		$formData = $this->input->post('formData');
+
+		if (!is_array($formData))
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
 		$updatableFields = array(
 			'lehrveranstaltung_id',
@@ -423,12 +409,18 @@ class Lehreinheit extends FHCAPI_Controller
 			}
 		}
 
+		$ziel_lv = isset($updateData['lehrveranstaltung_id']) ? $updateData['lehrveranstaltung_id'] : $lehreinheit->lehrveranstaltung_id;
+		$ziel_lehrfach = isset($updateData['lehrfach_id']) ? $updateData['lehrfach_id'] : $lehreinheit->lehrfach_id;
+
+		if (($ziel_lv != $lehreinheit->lehrveranstaltung_id || $ziel_lehrfach != $lehreinheit->lehrfach_id)
+			&& !$this->_ci->lvverwaltungpermissionlib->isEntitledForLVUndLehrfach($ziel_lv, $ziel_lehrfach, 'suid', array('lv-plan', 'basis/lvverwaltung')))
+			$this->terminateWithError($this->p->t('ui', 'error_fieldWriteAccess'));
 
 		$updateData['updatevon'] = $this->_uid;
 		$updateData['updateamum'] = date('Y-m-d H:i:s');
 		$result = $this->_ci->LehreinheitModel->update(
 			[
-				'lehreinheit_id' => $this->input->post('lehreinheit_id'),
+				'lehreinheit_id' => $lehreinheit->lehreinheit_id,
 			],
 			$updateData
 		);
@@ -439,21 +431,30 @@ class Lehreinheit extends FHCAPI_Controller
 	}
 
 
-	private function checkPermission($lehreinheit_id)
+	private function getLehrfaecher($lehreinheit)
 	{
-		$result = $this->_ci->LehreinheitModel->getOes($lehreinheit_id);
+		$lehrfaecher_array = array($lehreinheit->lehrfach_id);
+		$this->_ci->LehreinheitModel->addSelect('lehrveranstaltung_id_kompatibel');
+		$this->_ci->LehreinheitModel->addJoin('lehre.tbl_lehrveranstaltung_kompatibel', 'lehrveranstaltung_id');
+		$lehrfaecher = $this->_ci->LehreinheitModel->loadWhere(array('lehrveranstaltung_id' => $lehreinheit->lehrveranstaltung_id));
 
-		if (isError($result))
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		if (hasData($lehrfaecher))
+			$lehrfaecher_array = array_merge($lehrfaecher_array,array_column(getData($lehrfaecher), 'lehrveranstaltung_id_kompatibel'));
 
-		$oe_array = [];
-		if (hasData($result))
-			$oe_array = getData($result);
+		$lehrfaecher_array[] = $lehreinheit->lehrveranstaltung_id;
 
-		if (!$this->_ci->permissionlib->isBerechtigtMultipleOe('admin', $oe_array, 'suid') &&
-			!$this->_ci->permissionlib->isBerechtigtMultipleOe('assistenz', $oe_array, 'suid') &&
-			!$this->_ci->permissionlib->isBerechtigtMultipleOe('lv-plan', $oe_array, 'suid'))
-			$this->terminateWithError($this->p->t('ui', 'error_fieldWriteAccess'));
+		$this->_ci->LehrveranstaltungModel->addDistinct('lehrfach_id');
+		$this->_ci->LehrveranstaltungModel->addSelect("tbl_lehrveranstaltung.lehrveranstaltung_id, CONCAT(tbl_lehrveranstaltung.bezeichnung || '(' || tbl_lehrveranstaltung.oe_kurzbz || ')') as lehrfach");
+		$this->_ci->LehrveranstaltungModel->db->where_in('tbl_lehrveranstaltung.lehrveranstaltung_id', $lehrfaecher_array);
+		$lehrfaecher_result = $this->_ci->LehrveranstaltungModel->load();
+
+		return hasData($lehrfaecher_result) ? getData($lehrfaecher_result) : array();
+	}
+	private function checkPermission($lehreinheit_id, $art)
+	{
+		if (!$this->_ci->lvverwaltungpermissionlib->isEntitledForLehreinheit($lehreinheit_id, $art, array('lv-plan', 'basis/lvverwaltung')))
+			$this->terminateWithError($this->p->t('ui', 'notAuthorized'));
+
 	}
 	private function checkLehreinheit($lehreinheit_id)
 	{

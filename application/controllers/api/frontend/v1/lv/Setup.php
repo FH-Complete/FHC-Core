@@ -23,18 +23,19 @@ use CI3_Events as Events;
 
 class Setup extends FHCAPI_Controller
 {
+	const BERECHTIGUNG_KURZBZ = 'basis/lvverwaltung';
 	private $_ci;
 	private $_uid;
 
 	public function __construct()
 	{
 		parent::__construct([
-			'getLETabs' => ['admin:r', 'assistenz:r'],
-			'getLVTabs' => ['admin:r', 'assistenz:r'],
-			'getStudiensemester' => ['admin:r', 'assistenz:r'],
-			'getSprache' => ['admin:r', 'assistenz:r'],
-			'getRaumtyp' => ['admin:r', 'assistenz:r'],
-			'getLehrform' => ['admin:r', 'assistenz:r'],
+			'getLETabs' => [self::BERECHTIGUNG_KURZBZ . ':r'],
+			'getLVTabs' => [self::BERECHTIGUNG_KURZBZ . ':r'],
+			'getStudiensemester' => [self::BERECHTIGUNG_KURZBZ . ':r'],
+			'getSprache' => [self::BERECHTIGUNG_KURZBZ . ':r'],
+			'getRaumtyp' => [self::BERECHTIGUNG_KURZBZ . ':r'],
+			'getLehrform' => [self::BERECHTIGUNG_KURZBZ . ':r'],
 		]);
 
 		$this->_ci = &get_instance();

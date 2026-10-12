@@ -73,12 +73,9 @@ export default {
 				cssclass: "position-relative",
 				calcheightonly: true,
 				types: [
-					"mitarbeiter",
-					"mitarbeiter_ohne_zuordnung",
-/*
+					"employee",
 					"lehreinheit",
 					"lehrveranstaltung",
-*/
 				],
 				actions: {
 					employee: {
@@ -312,7 +309,7 @@ export default {
 			}
 		},
 		searchfunction(params, config) {
-			return this.$api.call(ApiSearchbar.search(params), config);
+			return this.$api.call(ApiSearchbar.searchLv(params), config);
 		},
 		studiensemesterChanged(stdsem) {
 			if (!stdsem) {
