@@ -10,14 +10,14 @@ class Tags extends Tag_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getTag' => self::BERECHTIGUNG_KURZBZ,
-			'getTags' => self::BERECHTIGUNG_KURZBZ,
+			'getTag' => ['admin:rw', 'assistenz:r'],
+			'getTags' => ['admin:rw', 'assistenz:r'],
 			'addTag' => self::BERECHTIGUNG_KURZBZ,
 			'updateTag' => self::BERECHTIGUNG_KURZBZ,
 			'doneTag' => self::BERECHTIGUNG_KURZBZ,
 			'deleteTag' => self::BERECHTIGUNG_KURZBZ,
-			'getAllTags' => self::BERECHTIGUNG_KURZBZ,
-			'rebuildTagsForTypeId' => self::BERECHTIGUNG_KURZBZ,
+			'getAllTags' => ['admin:rw', 'assistenz:r'],
+			'rebuildTagsForTypeId' => ['admin:rw', 'assistenz:r'],
 		]);
 
 	$this->config->load('stv');
