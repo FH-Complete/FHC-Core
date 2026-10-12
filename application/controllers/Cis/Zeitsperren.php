@@ -7,7 +7,7 @@ class Zeitsperren extends Auth_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'index' => ['basis/cis:r'],
+			'index' => ['cis/eigene_zeitsperren:r'],
 		]);
 
 		// Load Libraries

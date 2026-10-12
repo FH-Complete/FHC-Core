@@ -7,14 +7,14 @@ class MaZeitsperren extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getAllActiveZeitsperren' => ['basis/mitarbeiter:r', 'admin:r', 'assistenz:r'],
-			'getAllZeitsperrenFixeMa' => ['basis/mitarbeiter:r', 'admin:r', 'assistenz:r'],
-			'getAllZeitsperrenLector' => ['basis/mitarbeiter:r', 'admin:r', 'assistenz:r'],
-			'getAllZeitsperrenOes' => ['basis/mitarbeiter:r', 'admin:r', 'assistenz:r'],
-			'getZeitsperrenAss' => ['basis/mitarbeiter:r', 'admin:r', 'assistenz:r'],
+			'getAllActiveZeitsperren' => ['cis/andere_zeitsperren:r', 'admin:r', 'assistenz:r'],
+			'getAllZeitsperrenFixeMa' => ['cis/andere_zeitsperren:r', 'admin:r', 'assistenz:r'],
+			'getAllZeitsperrenLector' => ['cis/andere_zeitsperren:r', 'admin:r', 'assistenz:r'],
+			'getAllZeitsperrenOes' => ['cis/andere_zeitsperren:r', 'admin:r', 'assistenz:r'],
+			'getZeitsperrenAss' => ['cis/andere_zeitsperren:r', 'admin:r', 'assistenz:r'],
 			'getStgLectors' => self::PERM_LOGGED,
-			'loadZeitsperrenLectorStg' => ['basis/mitarbeiter:r', 'admin:r', 'assistenz:r'],
-			'loadZeitsperrenMa' => ['basis/mitarbeiter:r', 'admin:r', 'assistenz:r'],
+			'loadZeitsperrenLectorStg' => ['cis/andere_zeitsperren:r', 'admin:r', 'assistenz:r'],
+			'loadZeitsperrenMa' => ['cis/andere_zeitsperren:r', 'admin:r', 'assistenz:r'],
 			'getDetailsMa' => self::PERM_LOGGED
 		]);
 
