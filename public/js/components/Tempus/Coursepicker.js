@@ -252,7 +252,7 @@ export default {
 		this.favorites = new Set(JSON.parse(localStorage.getItem('tempus_coursepicker_favs') || '[]'));
 	},
 	template: `
-	<div class="course-picker d-flex flex-column h-100">
+	<div class="course-picker d-flex flex-column h-100" data-cy="coursepicker">
 		<div class="p-2">
 			<form-input
 				:label="$p.t('ui', 'suche')"
@@ -304,6 +304,7 @@ export default {
 				:class="{ 'course-picker-row-pinned': isPinned(course), 'course-picker-row-preview': isRaumvorschlagActive(course) }"
 				v-draggable:move.noimage="dragLehreinheitCollection(course)"
 				tabindex="0"
+				data-cy="coursepicker-row"
 			>
 				<div class="d-flex gap-1 align-items-start">
 					<span class="fw-semibold small w-50" v-tooltip="course.lehrfach_bez">{{ course.lehrfach }} {{ course.lehrform }}</span>

@@ -194,7 +194,11 @@ VALUES
 
 INSERT INTO public.tbl_variable
 (name, uid, wert)
-VALUES('ignore_resources_collisions', 'demoadmin', 'false');
+VALUES
+('ignore_resources_collisions', 'demoadmin', 'false'),
+('roomless_planning', 'demoadmin', 'false'),
+('priority_room_planning', 'demoadmin', 'false'),
+('dialog_room_planning', 'demoadmin', 'false');
 
 INSERT INTO lehre.tbl_betriebsmittel_kalender
 (eindeutige_kalender_gruppen_id, betriebsmittel_id, anmerkung, quelle, insertamum, insertvon, updateamum, updatevon)

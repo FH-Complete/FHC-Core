@@ -36,7 +36,7 @@ class TempusPage {
     });
 
   setupIntercepts = () => {
-    cy.intercept({ method: "GET", url: "**/StgTree" }).as("fetchCourseTree");
+    cy.intercept({ method: "GET", url: "**/tempus/Info/getStudiengaenge" }).as("fetchCourseTree");
     cy.intercept({
       method: "POST",
       url: /\/tempus\/Kalender\/getPlan(?:\?|$)/,
@@ -80,10 +80,10 @@ class TempusPage {
       method: "GET",
       url: "**/tempus/Tags/getTagsByCalendar/**",
     }).as("fetchTagsByCalendar");
-    cy.intercept({
-      method: "POST",
-      url: "**/tempus/coursepicker/getByStg**",
-    }).as("fetchCoursePickerCourses");
+    // cy.intercept({
+    //   method: "POST",
+    //   url: "**/tempus/coursepicker/getByStg**",
+    // }).as("fetchCoursePickerCourses");
     cy.intercept({
       method: "POST",
       url: "**/searchbar/search**",
@@ -117,20 +117,20 @@ class TempusPage {
     this.getTempusOverview().find(".fhc-calendar-base");
   getCalendarBaseGrid = () =>
     this.getCalendarSection().find("[data-cy='calendar-base-grid']");
-  getCoursePicker = () => this.getTempusOverview().find(".course-picker");
+  getCoursePicker = () => this.getTempusOverview().find("[data-cy='coursepicker']");
   getPreviewRoleOptionsHolder = () =>
     this.getTempusOverview().find("[data-cy='previewRoleOptionsHolder']");
   getAllCoursesSliderBtn = () =>
     this.getSidebarMenu().find("button[title='Verband']").first();
   getCourseTreeRows = () =>
     this.getSlideInCoursesMenu()
-      .find("[data-cy='course-tree-row']")
-      .closest("[role='row']");
+      .find("tbody tr td.text-break")
+	  .closest("[role='cell']");
   getCourseTreeRowByName = (courseShortName) =>
     this.getSlideInCoursesMenu()
-      .contains("[data-cy='course-tree-row']", courseShortName)
-      .closest("[role='row']");
-  getCoursePickerRows = () => this.getCoursePicker().find(".course-picker-row");
+      .contains("tbody tr td.text-break .treemenu-entry", courseShortName)
+      .closest("[role='cell']");
+  getCoursePickerRows = () => this.getCoursePicker().find("[data-cy='coursepicker-row']");
   getCoursePickerSearchInput = () => this.getCoursePicker().find("input");
   getCalendarEventsPerWeekHolders = () =>
     this.getCalendarBaseGrid().find(".fhc-calendar-base-grid-line");

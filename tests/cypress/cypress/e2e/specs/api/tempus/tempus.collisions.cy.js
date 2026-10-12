@@ -21,7 +21,7 @@ describe("Tempus Kalender API", () => {
   });
 
   it("event creation works for non collision case", () => {
-    tempusApi.getStudyPlansTree().then((stgTree) => {
+    tempusApi.getDegreeProgramTree().then((stgTree) => {
       let studyPlan = stgTree.find((plan) =>
         plan.name.includes(TEMPUS_TEST_STUDY_PLAN_SHORT_CODE),
       );
@@ -46,6 +46,7 @@ describe("Tempus Kalender API", () => {
               tempusApi
                 .createKalenderEvent(lehreinheitId, startDateTime, endDateTime)
                 .then((response) => {
+					console.log("response", response.body);
                   expect(response.status).to.eq(200);
                   expect(response.body).to.have.nested.property(
                     "meta.status",
@@ -58,7 +59,7 @@ describe("Tempus Kalender API", () => {
   });
 
   it("prohibited event creation due to zeitsperre collision", () => {
-    tempusApi.getStudyPlansTree().then((stgTree) => {
+    tempusApi.getDegreeProgramTree().then((stgTree) => {
       let studyPlan = stgTree.find((plan) =>
         plan.name.includes(TEMPUS_TEST_STUDY_PLAN_SHORT_CODE),
       );
@@ -106,7 +107,7 @@ describe("Tempus Kalender API", () => {
   });
 
   it("prohibited event creation due to student group collision", () => {
-    tempusApi.getStudyPlansTree().then((stgTree) => {
+    tempusApi.getDegreeProgramTree().then((stgTree) => {
       let studyPlan = stgTree.find((plan) =>
         plan.name.includes(TEMPUS_TEST_STUDY_PLAN_SHORT_CODE),
       );
@@ -158,7 +159,7 @@ describe("Tempus Kalender API", () => {
     let settingsData = tempusApi.getSettingsData();
     settingsData.kollision_student = true;
 
-    tempusApi.getStudyPlansTree().then((stgTree) => {
+    tempusApi.getDegreeProgramTree().then((stgTree) => {
       let studyPlan = stgTree.find((plan) =>
         plan.name.includes(TEMPUS_TEST_STUDY_PLAN_SHORT_CODE),
       );
@@ -216,7 +217,7 @@ describe("Tempus Kalender API", () => {
   });
 
   it("prohibited event creation due to lector collision", () => {
-    tempusApi.getStudyPlansTree().then((stgTree) => {
+    tempusApi.getDegreeProgramTree().then((stgTree) => {
       let studyPlan = stgTree.find((plan) =>
         plan.name.includes(TEMPUS_TEST_STUDY_PLAN_SHORT_CODE),
       );
