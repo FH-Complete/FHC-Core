@@ -68077,6 +68077,68 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 	// MYLV PHRASES END
+	// Zeitsperren Sancho Subjects begin
+	array(
+		'app' => 'core',
+		'category' => 'zeitsperren',
+		'phrase' => 'zeitausgleichNeu',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zeitausgleich wurde neu eingetragen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Compensatory time was entered',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'zeitsperren',
+		'phrase' => 'zeitausgleichGeaendert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zeitausgleich wurde geändert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Compensatory time was changed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'zeitsperren',
+		'phrase' => 'zeitausgleichGeloescht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zeitausgleich wurde gelöscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Compensatory time was deleted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// Zeitsperren Sancho Subjects end
 );
 
 
