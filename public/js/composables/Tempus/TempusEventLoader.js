@@ -24,7 +24,7 @@ export function useEventLoader(
     return Math.round(currentlyDisplayedDateRange.length() * cacheSize) + 1;
   };
 
-  const reload = (isCacheEnabled = true) => {
+  const reload = (isCacheEnabled = true, isLoaderEventVisualReset = true) => {
     if (
       currentlyDisplayedDateRange &&
       currentlyDisplayedDateRange?.start?.ts ===
@@ -56,7 +56,8 @@ export function useEventLoader(
     const promises = requestEvents(
       currentlyDisplayedDateRange.start.ts,
       currentlyDisplayedDateRange.end.ts,
-      isCacheEnabled
+      isCacheEnabled,
+	  isLoaderEventVisualReset
     );
 
     ensureCacheRangeIsInAllowedRange(
@@ -71,8 +72,6 @@ export function useEventLoader(
 
       return;
     }
-
-	hasFirstLoadOccurred = false;
 	
     addVisualForEventsLoading();
 
@@ -131,15 +130,14 @@ export function useEventLoader(
 
   Vue.watchEffect(reload);
 
-  const reset = (arePreviousEventsCleared = true) => {
+  const reset = (arePreviousEventsCleared = true, isLoaderEventVisualReset = true) => {
 	if (arePreviousEventsCleared) {
 		allEvents.value = [];
-		hasFirstLoadOccurred = false;
 	}
-    reload(false);
+    reload(false, isLoaderEventVisualReset);
   };
 
-  const requestEvents = (startTimestamp, endTimestamp, isCacheEnabled = true) => {
+  const requestEvents = (startTimestamp, endTimestamp, isCacheEnabled = true, isLoaderEventVisualReset = false) => {
     let result = [];
 
     if (!startTimestamp || !endTimestamp) return result;
@@ -187,6 +185,10 @@ export function useEventLoader(
 
     const cachePadding = getCachePadding();
 
+	if (isLoaderEventVisualReset) {
+		hasFirstLoadOccurred = false;
+	}
+	
     allowedCacheStartTimestamp = startTimestamp - cachePadding;
     allowedCacheEndTimestamp = endTimestamp + cachePadding;
 

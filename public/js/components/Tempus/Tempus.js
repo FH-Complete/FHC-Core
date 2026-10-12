@@ -500,7 +500,7 @@ export default {
 
 			if (response) {
 				response[0].then((result) => {
-					this.scrollToAndEmphasizeUpdatedEvent();
+					this.scrollToAndEmphasizeCurrentlyUpdatedCalendarEvent();
 				});
 			}
 
@@ -554,9 +554,9 @@ export default {
 				})
 				.catch((error) => {
 					this.currentlyUpdatedEvent = null;
-					this.$refs.calendar.clearOutCalendarEventEmphasis();
+					this.removeVisualForUpdatingCalendarEvent(obj.orig.eindeutige_kalender_gruppen_id);
 					this.$nextTick(() => {
-						this.$refs.calendar.reloadEvents();
+						this.$refs.calendar.resetEventLoader(false, false);
 					});
 					throw error;
 				});
@@ -583,10 +583,8 @@ export default {
 			)
 				return;
 
-			this.updateKalenderEventElementDisplay(
-				obj.orig.eindeutige_kalender_gruppen_id,
-				dates.startDT,
-				dates.endDT,
+			this.addVisualForUpdatingCalendarEvent(
+				obj.orig.eindeutige_kalender_gruppen_id
 			);
 
 			return this._updateKalenderEvent(
@@ -596,7 +594,7 @@ export default {
 				dates.start_time,
 				dates.end_time,
 				() => {
-					this.$refs.calendar.resetEventLoader(false);
+					this.$refs.calendar.resetEventLoader(false, false);
 					this.$refs.sidebar.reloadCoursepicker();
 					this.rebuildRaumvorschlag();
 				},
@@ -627,7 +625,7 @@ export default {
 						),
 					)
 					.then(() => {
-						this.$refs.calendar.resetEventLoader(false);
+						this.$refs.calendar.resetEventLoader(false, false);
 						this.$refs.sidebar.reloadCoursepicker();
 						this.rebuildRaumvorschlag();
 						this.bcc.postMessage('dropped');
@@ -647,10 +645,8 @@ export default {
 
 			const { startDT, endDT, start_time, end_time } = dates;
 
-			this.updateKalenderEventElementDisplay(
-				obj.orig.eindeutige_kalender_gruppen_id,
-				startDT,
-				endDT,
+			this.addVisualForUpdatingCalendarEvent(
+				obj.orig.eindeutige_kalender_gruppen_id
 			);
 
 			if (obj.type === 'reservierung') {
@@ -741,7 +737,7 @@ export default {
 							type: obj.type,
 							id: obj.orig.kalender_id,
 						});
-						this.$refs.calendar.resetEventLoader(false);
+						this.$refs.calendar.resetEventLoader(false, false);
 						this.rebuildRaumvorschlag();
 						this.bcc.postMessage('dropped');
 					},
@@ -942,12 +938,16 @@ export default {
 		focusSearchbar() {
 			this.$refs.header?.focusSearchbar();
 		},
-		scrollToAndEmphasizeUpdatedEvent() {
-			if (!this.currentlyUpdatedEvent) return;
+		scrollToAndEmphasizeCurrentlyUpdatedCalendarEvent() {
+			if (!this.currentlyUpdatedEvent) {
+				this.$refs.calendar.clearOutCalendarEventEmphasis();
+				return;
+			}
 
 			document
 				.querySelectorAll(
-					'.fhc-calendar-base-grid .fhc-calendar-base-grid-line-event',
+					'.fhc-calendar-base-grid .fhc-calendar-base-grid-line-event:not([data-group-id="event-group-' + this.currentlyUpdatedEvent.eindeutige_kalender_gruppen_id +
+						'"])',
 				)
 				.forEach((el) => {
 					const spinner = el.querySelector('.spinner-overlay');
@@ -968,6 +968,9 @@ export default {
 				);
 				if (!eventEl) return;
 
+				this.removeVisualForUpdatingCalendarEvent(
+					this.currentlyUpdatedEvent.eindeutige_kalender_gruppen_id,
+				);
 				const calendar = document.querySelector('.fhc-calendar-base-grid');
 				const eventRect = eventEl.getBoundingClientRect();
 
@@ -1002,48 +1005,16 @@ export default {
 				this.currentlyUpdatedEvent = null;
 			}, 100);
 		},
-		updateKalenderEventElementDisplay(calendarGruppenId, startDT, endDT) {
+		addVisualForUpdatingCalendarEvent(calendarGruppenId) {
 			if (!calendarGruppenId)
 				return;
-
-			let startOfDay = startDT.startOf('day');
-			let newPotentialStart = startDT.diff(startOfDay).toMillis() ?? 1;
-			let newPotentialEnd = endDT.diff(startOfDay).toMillis();
 
 			const calendar = this.$refs.calendar?.$el;
 			let element = calendar?.querySelector(
 				`[data-group-id="event-group-${calendarGruppenId}"]`,
 			);
 			if (!element) return;
-
-			const targetGridLine = [...calendar.querySelectorAll(
-				'.fhc-calendar-base-grid-line',
-			)].find((gridLine) => {
-				const [rowStart, columnStart, rowEnd] = getComputedStyle(
-					gridLine,
-				).gridArea.split(' / ');
-
-				return (
-					rowStart === '1' &&
-					columnStart === String(startDT.weekday) &&
-					rowEnd === '-1'
-				);
-			});
-			const changedDay =
-				targetGridLine && element.parentElement !== targetGridLine;
-
-			setTimeout(() => {
-				if (!calendar.contains(element)) return;
-
-
-				if (changedDay) {
-					targetGridLine.insertBefore(element, null);
-					element.classList.add('tempus-temporary-calendar-event');
-				}
-				element.style.gridRowEnd = 't_' + newPotentialEnd;
-				element.style.gridRowStart = 't_' + newPotentialStart;
-			}, 100);
-
+ 
 			const outerDiv = document.createElement('div');
 			outerDiv.className = 'spinner-overlay';
 
@@ -1053,37 +1024,22 @@ export default {
 			outerDiv.appendChild(innerDiv);
 
 			element.appendChild(outerDiv);
+		},
+		removeVisualForUpdatingCalendarEvent(calendarGruppenId) {
+			if (!calendarGruppenId)
+				return;
 
-			const eventRect = element.getBoundingClientRect();
+			const calendar = this.$refs.calendar?.$el;
+			let element = calendar?.querySelector(
+				`[data-group-id="event-group-${calendarGruppenId}"]`,
+			);
+			if (!element) return;
 
-			const offset = 300;
-
-			const isInsideScrolledView =
-				element.offsetLeft < calendar.scrollLeft + calendar.clientWidth &&
-				element.offsetLeft + element.offsetWidth > calendar.scrollLeft &&
-				element.offsetTop < calendar.scrollTop + calendar.clientHeight &&
-				element.offsetTop + element.offsetHeight > calendar.scrollTop;
-
-			const rect = element.getBoundingClientRect();
-			if (!isInsideScrolledView) {
-				element.scrollIntoView({
-					behavior: 'smooth',
-					inline: 'center',
-					block: 'nearest',
-				});
+			const spinner = element.querySelector('.spinner-overlay');
+			if (spinner) {
+				spinner.remove();
 			}
 		},
-		clearTemporaryEvents() {
-			const calendar = this.$refs.calendar?.$el;
-			if (!calendar) return;
-			
-			const tempEvents = calendar.querySelectorAll(
-				'.tempus-temporary-calendar-event',
-			);
-			tempEvents.forEach((event) => {
-				event.remove();
-			});
-		}
 	},
 	watch: {
 		lecturers: {
@@ -1233,7 +1189,6 @@ export default {
 							@open-reservierung="openReservierung"
 							:extra-backgrounds="extraBackgrounds"
 							@update:range="handleRange"
-							@events-reloaded="clearTemporaryEvents"
 							class="responsive-calendar"
 							:cache-multiplier="currentMode === 'week' ? 1 : 0"
 						/>

@@ -190,8 +190,8 @@ export default {
 		onresize(payload) {
 			this.$emit('resize', payload);
 		},
-		resetEventLoader(arePreviousEventsCleared = true) {
-			this.reset(arePreviousEventsCleared);
+		resetEventLoader(arePreviousEventsCleared = true, isLoaderEventVisualReset = true) {
+			this.reset(arePreviousEventsCleared, isLoaderEventVisualReset);
 		},
 		reloadEvents() {
 			this.refreshEventsAfterReload = true;
