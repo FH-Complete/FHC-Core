@@ -946,20 +946,26 @@ export default {
 
 			document
 				.querySelectorAll(
-					'.fhc-calendar-base-grid .fhc-calendar-base-grid-line-event:not([data-group-id="event-group-' + this.currentlyUpdatedEvent.eindeutige_kalender_gruppen_id +
-						'"])',
+					'.fhc-calendar-base-grid .fhc-calendar-base-grid-line-event',
 				)
 				.forEach((el) => {
-					const spinner = el.querySelector('.spinner-overlay');
-					if (spinner) {
-						spinner.remove();
-					}
-
 					el.classList.remove(
 						'updating-event',
 						'updated-event',
 						'updated-event-long',
 					);
+				});
+
+			document
+				.querySelectorAll(
+					'.fhc-calendar-base-grid .fhc-calendar-base-grid-line-event:not([data-group-id="event-group-' + this.currentlyUpdatedEvent.eindeutige_kalender_gruppen_id +
+						'"])',
+				)
+				.forEach((el) => {
+					const spinner = el.querySelector('.spinner-overlay');
+					if (!spinner) return;
+
+					spinner.remove();
 				});
 
 			setTimeout(() => {
