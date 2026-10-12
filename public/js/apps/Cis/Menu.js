@@ -2,6 +2,8 @@ import CisMenu from "../../components/Cis/Menu.js";
 import PluginsPhrasen from '../../plugins/Phrasen.js';
 import Theme from "../../plugins/Theme.js";
 
+import ApiAuthinfo from "../../api/factory/authinfo.js";
+
 const app = Vue.createApp({
 	name: 'CisMenuApp',
 	components: {
@@ -9,11 +11,15 @@ const app = Vue.createApp({
 	},
 	data: () => ({
 		windowWidth: 0,
+		isStudent: null,
+		isMitarbeiter: null,
 	}),
 	provide() {
 		return {
 			isNarrow: Vue.computed(() => this.windowWidth < 992),
 			isMobile: Vue.computed(() => this.windowWidth < 767),
+			isStudent: Vue.computed(() => this.isStudent),
+			isMitarbeiter: Vue.computed(() => this.isMitarbeiter)
 		}
 	},
 	methods: {
@@ -21,8 +27,12 @@ const app = Vue.createApp({
 			this.windowWidth = window.innerWidth;
 		},
 	},
-	created() {
+	async created() {
 		this.windowWidth = window.innerWidth;
+		await this.$api.call(ApiAuthinfo.getAuthInfo()).then((res) => {
+			this.isMitarbeiter = res.data.isMitarbeiter;
+			this.isStudent = res.data.isStudent;
+		});
 	},
 	mounted() {
 		window.addEventListener("resize", this.handleWindowResize);

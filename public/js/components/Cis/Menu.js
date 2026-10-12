@@ -65,6 +65,10 @@ export default {
 								label: Vue.computed(() => this.$p.t("profil/zeitsperren")),
 								icon: "fas fa-calendar-days",
 								type: "link",
+								isMitarbeiter: Vue.computed(() => this.isMitarbeiter),
+								renderif: function() {
+									return this.isMitarbeiter;
+								},
 								action: function (data) {
 									const uid = JSON.parse(data.data).uid;
 									const link =
@@ -163,7 +167,7 @@ export default {
 			openMenuHierarchy: [],
         };
     },
-	inject: ["isNarrow", "isMobile"],
+	inject: ["isNarrow", "isMobile", "isMitarbeiter", "isStudent"],
 	provide(){
 		return{
 			setActiveEntry: this.setActiveEntry,
