@@ -140,7 +140,10 @@ export default {
 			:end="end"
 			:background="bg"
 		></line-background>
-		<template v-for="(event, i) in formattedEvents" :key="i">
+		<template
+			v-for="(event, i) in formattedEvents"
+			:key="event.orig?.eindeutige_kalender_gruppen_id ?? event.orig?.kalender_id ?? i"
+		>
 			<line-event
 				v-if="!event.display || event.display === 'default'"
 				:style="'grid-' + axisRow + ': ' + event.rows.join('/')"

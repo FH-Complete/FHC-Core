@@ -1016,7 +1016,7 @@ export default {
 				return;
 
 			const calendar = this.$refs.calendar?.$el;
-			let element = calendar?.querySelector(
+			const element = calendar?.querySelector(
 				`[data-group-id="event-group-${calendarGruppenId}"]`,
 			);
 			if (!element) return;
