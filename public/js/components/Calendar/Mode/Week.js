@@ -87,6 +87,7 @@ export default {
 				// default: Set current-date
 				this.$emit('update:currentDate', evt.detail.value);
 				break;
+			//TODO (david) prüfen notwendig? wird in Base abgefangen
 			case 'event':
 				// default: Request Modal
 				this.$emit('requestModalOpen', { event: evt.detail.value });

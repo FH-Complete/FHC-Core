@@ -227,7 +227,16 @@ export default {
 		sMode() {
 			if (this.sMode)
 				this.internalView = this.sMode;
-		}
+		},
+		events(newEvents)
+		{
+			if (!this.modalEvent)
+				return;
+
+			const freshEvent = newEvents.find(e => e.kalender_id === this.modalEvent.event.kalender_id);
+			if (freshEvent)
+				this.modalEvent.event = freshEvent;
+		},
 	},
 	methods: {
 		clickPrev() {
@@ -271,6 +280,10 @@ export default {
 					this.cMode = 'week';
 				}
 				break;
+			case 'event':
+				evt.stopPropagation();
+				this.showEventModal({ event: evt.detail.value });
+				break;
 			}
 		},
 
@@ -289,8 +302,12 @@ export default {
 			this.modalEvent = null;
 		},
 		onModalHidden() {
+			if (this.$refs.modal.$refs.modal.classList.contains('show'))
+				return;
+
 			if (this.modalEvent.closeFn)
 				this.modalEvent.closeFn();
+			this.modalEvent = null;
 		}
 	},
 	beforeUnmount() {

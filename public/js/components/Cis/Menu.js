@@ -186,7 +186,7 @@ export default {
 		</div>
 	</div>
 
-    <nav id="nav-main" class="offcanvas offcanvas-start" tabindex="-1" aria-labelledby="nav-main-btn" data-bs-backdrop="false">
+    <nav id="nav-main" class="cis-main-menu offcanvas offcanvas-start" tabindex="-1" aria-labelledby="nav-main-btn" data-bs-backdrop="false">
 		<div id="nav-main-sticky">
 			<div class="d-flex flex-row h-100">
 				<div class="offcanvas-body p-0">

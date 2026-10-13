@@ -214,3 +214,8 @@ body {
 	align-items: center;
 	width: 100%;
 }
+
+.timepicker-row {
+	display: flex;
+	align-items: center;
+}

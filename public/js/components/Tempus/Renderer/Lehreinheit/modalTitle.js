@@ -5,8 +5,14 @@ export default {
 			required: true,
 		}
 	},
-	template:`
-			<div v-if="event.titel">{{ event.titel + ' - ' + event.lehrfach_bez + ' [' + event.ort_kurzbz+']'}}</div>
-			<div v-else>{{ event.lehrfach_bez + ' [' + event.ort_kurzbz+']'}}</div>
-`
+	computed: {
+		titel()
+		{
+			return this.event.lehrveranstaltung_infos.map(lehrveranstaltung => `[${lehrveranstaltung.lehrform_kurzbz}] ${lehrveranstaltung.lehrfach_bezeichnung}`).join(', ');
+		},
+	},
+	template:  /*html*/`
+		{{titel}}
+		
+	`
 }

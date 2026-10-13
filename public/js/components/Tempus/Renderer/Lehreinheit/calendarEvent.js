@@ -14,11 +14,6 @@ export default {
 				'w-100',
 				'p-1',
 			];
-
-			if (this.event.collisions) {
-				classes.push('calendar-event-collisions');
-			}
-
 			return classes;
 		},
 		topicString() {
@@ -148,7 +143,8 @@ export default {
 		class="position-relative"
 		@wheel.stop
 	>
-		<div class="position-absolute top-0 start-0 m-1 d-flex gap-1" >
+		<div class="position-absolute top-0 start-0 m-1">
+			<i class="fa-solid fa-triangle-exclamation text-muted" v-if="event.collisions.length"></i>
 			<i :class="statusIcon"></i>
 			<i
 				v-tooltip="resourcesTooltip"

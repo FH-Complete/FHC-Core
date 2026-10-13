@@ -1995,5 +1995,23 @@ class mitarbeiter extends benutzer
 			return true;
 		}
 	}
+
+	/**
+	 * Prueft ob eine existierende ma_uid übergeben wurde
+	 * @param	String $mitarbeiter_uid mitarbeiter_uid
+	 * @return	bool	True wenn mitarbeiter_uid vorhanden sonst false.
+	 */
+	public function checkIfExistingUid($mitarbeiter_uid)
+	{
+		$qry = "Select 1 from public.tbl_mitarbeiter where mitarbeiter_uid =".$this->db_add_param($mitarbeiter_uid);
+
+		if ($result = $this->db_query($qry))
+		{
+			if ($this->db_num_rows($result) > 0)
+				return true;
+			else
+				return false;
+		}
+	}
 }
 ?>

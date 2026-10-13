@@ -21,6 +21,7 @@ $this->load->view('templates/FHC-Header', $includesArray);
 ?>
 
 <script type="text/javascript">
+	document.body.classList.add("cis4");
 	if (window.self !== window.top)
 		document.body.classList.add("in-frame");
 </script>

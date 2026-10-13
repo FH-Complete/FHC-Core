@@ -162,6 +162,7 @@ export default {
 			<div class="btn-group w-100">
  				<a :target="target" 
  					:href="(entry.menu_open && hasFullLink) ? entry.url : null"
+					draggable="false"
 					@click="toggleCollapse"
                     :class="{
                         'btn btn-default rounded-0 text-start': true,
@@ -180,12 +181,15 @@ export default {
             </div>
             <ul ref="children"
                 class="nav w-100 collapse">
-                <cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeContent" v-for="child in entry.childs" :key="child" :entry="child" :level="level + 1"/>
+				<li>
+					<cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeContent" v-for="child in entry.childs" :key="child" :entry="child" :level="level + 1"/>
+				</li>
             </ul>
         </template>
 		<a v-else
             :href="entry.url"
             :target="target"
+			draggable="false"
             :class="{
                 'btn btn-default rounded-0 w-100 text-start': true,
                 ['btn-level-' + level]: true,

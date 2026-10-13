@@ -73,7 +73,7 @@ export default  {
 			// check if the lv has lvplan entries for this studiensemester
 			if (this.studiensemester && this.event) {
 				return this.$fhcApi.factory.studium.getLvPlanForStudiensemester(this.studiensemester, this.event.lehreinheit_id ?? this.event.lehrveranstaltung_id)
-					.then(data => data.data)
+					.then(data => data.data?.retval)
 					.then(res => {
 						if (Array.isArray(res) && res.length > 0) {
 							this.hasLvPlanEintraege = true;
