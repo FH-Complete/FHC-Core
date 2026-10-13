@@ -91,6 +91,15 @@ export default {
 				.then(() => this.deleteZeitsperre(zeitsperre_id))
 				.catch(this.$fhcAlert.handleSystemError);
 		},
+		alertMailstatus(response) {
+			if(response?.meta?.mailstatus) {
+				if(response.meta.mailstatus.mailsent) {
+					this.$fhcAlert.alertInfo(response.meta.mailstatus.msg);
+				} else {
+					this.$fhcAlert.alertWarning(response.meta.mailstatus.msg);
+				}
+			}
+		},
 		saveZeitsperre(zeitsperreId = null) {
 			const isNew = !zeitsperreId;
 
@@ -109,8 +118,9 @@ export default {
 
 			return this.$refs.dataZeitsperre
 				.call(request)
-				.then(() => {
+				.then((response) => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.alertMailstatus(response);
 
 					this.reset();
 					this.reload();
@@ -122,6 +132,7 @@ export default {
 				.call(ApiTimelocks.deleteZeitsperre(zeitsperre_id))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
+					this.alertMailstatus(response);
 				})
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(()=> {

@@ -68138,6 +68138,66 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'zeitsperren',
+		'phrase' => 'VorgesetzteInformiert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Email wurde an {vorgesetzte} versandt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Email was sent to {vorgesetzte}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'zeitsperren',
+		'phrase' => 'fehlerBeimSendenAufgetreten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Senden des Freigabemails an {vorgesetzte}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error occured sending mail to {vorgesetzte}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'zeitsperren',
+		'phrase' => 'konnteKeinFreigabemailVersendetWerden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es konnte kein Freigabemail versendet werden, da kein Vorgesetzter eingetragen ist!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'An approval mail could not be sent because the “Superior” field was left blank!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// Zeitsperren Sancho Subjects end
 );
 
