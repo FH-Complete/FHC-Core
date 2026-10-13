@@ -32,7 +32,6 @@ class Funktionen extends FHCAPI_Controller
 		]);
 
 		// Load models
-		$this->load->model('extensions/FHC-Core-Personalverwaltung/Api_model', 'ApiModel');
 		$this->load->model('ressource/Funktion_model', 'FunktionModel');
 		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 
