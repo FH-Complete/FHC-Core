@@ -181,7 +181,7 @@ class Zeitsperren extends FHCAPI_Controller
 
 		if($zeitsperretyp_kurzbz == 'ZA')
 		{
-			$res = $this->sendSanchoMailToVorgesetzten(
+			$this->sendSanchoMailToVorgesetzten(
 				'Sancho_Content_Zeitausgleich',
 				array(
 					'beschreibung' =>$zeitsperretyp_kurzbz,
@@ -330,7 +330,7 @@ class Zeitsperren extends FHCAPI_Controller
 
 			if($zeitsperretyp_kurzbz == 'ZA')
 			{
-				$res = $this->sendSanchoMailToVorgesetzten(
+				$this->sendSanchoMailToVorgesetzten(
 					'Sancho_Content_ZA_Aendern',
 					array(
 						'beschreibung' =>$zeitsperretyp_kurzbz,
@@ -424,26 +424,46 @@ class Zeitsperren extends FHCAPI_Controller
 		$fullname = getData($this->PersonModel->getFullName($mauid));
 		$vorgesetzte = (array) getData($this->MitarbeiterModel->getVorgesetzte($mauid));
 
-		$this->addMeta('bhvorgesetzte', $vorgesetzte);
-
 		$to = array();
 		$vorgesetzte_namen = array();
+		$mailsent = false;
+		$msg = $this->p->t('zeitsperren', 'konnteKeinFreigabemailVersendetWerden');
 
-		foreach($vorgesetzte as $vg)
+		if(count($vorgesetzte) > 0)
 		{
-			$to[] = $vg->vorgesetzter .'@' . DOMAIN;
-			$vorgesetzter_fullname = getData($this->PersonModel->getFullName($vg->vorgesetzter));
-			$vorgesetzte_namen[] = $vorgesetzter_fullname;
+			foreach($vorgesetzte as $vg)
+			{
+				$to[] = $vg->vorgesetzter .'@' . DOMAIN;
+				$vorgesetzter_fullname = getData($this->PersonModel->getFullName($vg->vorgesetzter));
+				$vorgesetzte_namen[] = $vorgesetzter_fullname;
+			}
+
+			$sancho_vorlage_data['vorgesetzter'] = implode(', ', $vorgesetzte_namen);
+			$sancho_vorlage_data['nameMitarbeiter'] = $fullname;
+
+			$mailsent = sendSanchoMail(
+				$sancho_vorlage_kurzbz,
+				$sancho_vorlage_data,
+				implode(',', $to),
+				$subject
+			);
+
+			if($mailsent)
+			{
+				$msg = $this->p->t('zeitsperren', 'VorgesetzteInformiert', 
+					array('vorgesetzte' => $sancho_vorlage_data['vorgesetzter']));
+			}
+			else
+			{
+				$msg = $this->p->t('zeitsperren', 'fehlerBeimSendenAufgetreten', 
+					array('vorgesetzte' => $sancho_vorlage_data['vorgesetzter']));
+			}
 		}
 
-		$sancho_vorlage_data['vorgesetzter'] = implode(', ', $vorgesetzte_namen);
-		$sancho_vorlage_data['nameMitarbeiter'] = $fullname;
-
-		return sendSanchoMail(
-			$sancho_vorlage_kurzbz,
-			$sancho_vorlage_data,
-			implode(',', $to),
-			$subject
+		$res = (object) array(
+			'mailsent' => $mailsent,
+			'msg' => $msg
 		);
+		$this->addMeta('mailstatus', $res);
 	}
 }
