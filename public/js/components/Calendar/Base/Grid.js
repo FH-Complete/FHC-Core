@@ -659,7 +659,7 @@ export default {
 				>
 					<grid-line-event
 						v-for="(event, i) in events"
-						:key="i + 50"
+						:key="event.orig?.eindeutige_kalender_gruppen_id ?? event.orig?.kalender_id ?? i"
 						:event="event"
 					>
 						<template v-slot="slot">

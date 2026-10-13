@@ -108,6 +108,7 @@ export default {
 				month: today,
 				tableList: today,
 				range: today,
+				multipleWeeks: today,
 			},
 			historyEntries: [],
 			previewRole: 'planer',
@@ -480,7 +481,7 @@ export default {
 
 				this.calendarDatesByMode = {
 					...this.calendarDatesByMode,
-					range: rangeStart,
+					multipleWeeks: rangeStart,
 				};
 			},
 		},
