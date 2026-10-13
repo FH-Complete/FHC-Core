@@ -53,7 +53,7 @@ class LectureCollisionCheck implements ICollisionCheck
 		$kollisionsfreie_user = unserialize(KOLLISIONSFREIE_USER);
 		$grouped = [];
 
-		$this->_ci->KalenderModel->addSelect('DISTINCT ON (tbl_kalender.kalender_id) tbl_kalender.kalender_id');
+		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id, current_lehreinheit_ma.mitarbeiter_uid');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit current_kalender_le', 'current_kalender_le.kalender_id = tbl_kalender.kalender_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheit current_lehreinheit', 'current_lehreinheit.lehreinheit_id = current_kalender_le.lehreinheit_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter current_lehreinheit_ma', 'current_lehreinheit_ma.lehreinheit_id = current_lehreinheit.lehreinheit_id');
@@ -85,11 +85,13 @@ class LectureCollisionCheck implements ICollisionCheck
 		{
 			foreach (getData($result) as $row)
 			{
-				$grouped[$row->kalender_id][] = true;
+				$grouped[$row->kalender_id][] = [
+					'message' => $this->_ci->phraseslib->t('ui', 'ma_le_kollision') . ': ' . $row->mitarbeiter_uid,
+				];
 			}
 		}
 
-		$this->_ci->KalenderModel->addSelect('DISTINCT ON (tbl_kalender.kalender_id) tbl_kalender.kalender_id');
+		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id, current_lehreinheit_ma.mitarbeiter_uid');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit current_kalender_le', 'current_kalender_le.kalender_id = tbl_kalender.kalender_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheit current_lehreinheit', 'current_lehreinheit.lehreinheit_id = current_kalender_le.lehreinheit_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter current_lehreinheit_ma', 'current_lehreinheit_ma.lehreinheit_id = current_lehreinheit.lehreinheit_id');
@@ -120,11 +122,13 @@ class LectureCollisionCheck implements ICollisionCheck
 		{
 			foreach (getData($result) as $row)
 			{
-				$grouped[$row->kalender_id][] = true;
+				$grouped[$row->kalender_id][] = [
+					'message' => $this->_ci->phraseslib->t('ui', 'reservierung_kollision') . ': ' . $row->mitarbeiter_uid,
+				];
 			}
 		}
 
-		$this->_ci->KalenderModel->addSelect('DISTINCT ON (tbl_kalender.kalender_id) tbl_kalender.kalender_id');
+		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id, z.mitarbeiter_uid');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit current_kalender_le', 'current_kalender_le.kalender_id = tbl_kalender.kalender_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheit current_lehreinheit', 'current_lehreinheit.lehreinheit_id = current_kalender_le.lehreinheit_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter current_lehreinheit_ma', 'current_lehreinheit_ma.lehreinheit_id = current_lehreinheit.lehreinheit_id');
@@ -151,7 +155,9 @@ class LectureCollisionCheck implements ICollisionCheck
 		{
 			foreach (getData($result) as $row)
 			{
-				$grouped[$row->kalender_id][] = true;
+				$grouped[$row->kalender_id][] = [
+					'message' => $this->_ci->phraseslib->t('ui', 'ma_zeitsperre_kollision') . ': ' . $row->mitarbeiter_uid,
+				];
 			}
 		}
 
@@ -243,7 +249,6 @@ class LectureCollisionCheck implements ICollisionCheck
 		if ($this->_ci->variablelib->getVar('ignore_reservierung') === 'true') return [];
 
 		$kollisionsfreie_user = unserialize(KOLLISIONSFREIE_USER);
-
 
 		$this->_ci->KalenderModel->addDistinct('tbl_kalender_event_teilnehmer.uid, tbl_kalender.von, tbl_kalender.bis');
 		$this->_ci->KalenderModel->addSelect('tbl_kalender_event_teilnehmer.uid, tbl_kalender.von, tbl_kalender.bis');

@@ -96,16 +96,3 @@
 .fhc-roominformation .calendar-event-default .event-place {
 	display: none;
 }
-
-.weekPageContainer .calendar-event-collisions
-{
-	display: grid;
-	grid-template-columns: auto 1fr;
-	background: repeating-linear-gradient(
-			135deg,
-			transparent,
-			transparent 16px,
-			rgba(0, 0, 0, 0.3) 16px,
-			rgba(0, 0, 0, 0.3) 32px
-	);
-}

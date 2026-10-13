@@ -154,6 +154,7 @@ export default {
 						lehrfach_farbe: e.lehrfach_farbe,
 						lehrverband: e.lehrverband,
 						showname: `${e.lehrfach} ${e.lehrform}`,
+						lvverwaltunglink: FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/LVVerwaltung/stdsem/' + e.studiensemester_kurzbz.toLowerCase() + '/le/' + e.lehreinheit_id,
 						orig: {
 							type: 'lehreinheit',
 							lehreinheit_id: e.lehreinheit_id,
@@ -306,7 +307,7 @@ export default {
 				tabindex="0"
 			>
 				<div class="d-flex gap-1 align-items-start">
-					<span class="fw-semibold small w-50" v-tooltip="course.lehrfach_bez">{{ course.lehrfach }} {{ course.lehrform }}</span>
+					<span class="fw-semibold small w-50" v-tooltip="course.lehrfach_bez"> <a :href="course.lvverwaltunglink" target="_blank">{{ course.lehrfach }} {{ course.lehrform }}</a></span>
 					<span class="fw-semibold small w-50" v-tooltip="course.raumtypalternativ">{{ course.raumtyp }}</span>
 					<i
 						class="fa fa-thumbtack"

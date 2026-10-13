@@ -4,7 +4,7 @@ if (! defined('DB_NAME')) exit('No direct script access allowed');
 //Add column entwicklungs_id to bis.tbl_entwicklungsteam
 if(!@$db->db_query("SELECT taglib FROM public.tbl_notiz_typ LIMIT 1"))
 {
-	$qry = 'ALTER TABLE public.tbl_notiz_typ ADD COLUMN taglib character varying(32);';
+	$qry = 'ALTER TABLE public.tbl_notiz_typ ADD COLUMN taglib character varying(255);';
 
 	if(!$db->db_query($qry))
 		echo '<strong> public.tbl_notiz_typ '.$db->db_last_error().'</strong><br>';
@@ -135,5 +135,32 @@ foreach ($tags as $tag) {
 				echo '<br>public.tbl_notiz_typ: Automatic Tag '.$tag['typ_kurzbz'].' hinzugefuegt';
 			}
 		}
+	}
+}
+
+// increase length of taglib column if created with length < 255
+$ctaglibsql = <<<EOSQL
+	select
+		*
+	from
+		information_schema.columns c
+	where
+		c.table_schema = 'public'
+		and c.table_name = 'tbl_notiz_typ'
+		and c.column_name = 'taglib'
+		and c.data_type = 'character varying'
+		and c.character_maximum_length < 255
+EOSQL;
+
+if($res = $db->db_query($ctaglibsql))
+{
+	if($db->db_num_rows($res) > 0)
+	{
+		$qry = 'ALTER TABLE public.tbl_notiz_typ ALTER COLUMN taglib TYPE varchar(255) USING taglib::varchar(255)';
+
+		if(!$db->db_query($qry))
+			echo '<strong> public.tbl_notiz_typ '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>public.tbl_notiz_typ: Spalte taglib Datentyp zu varchar(255) geaendert.';
 	}
 }

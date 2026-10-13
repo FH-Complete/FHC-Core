@@ -383,12 +383,12 @@ export default {
 				if (accumulated >= duration)
 				{
 					const overflow = accumulated.minus(duration);
-					return blockEnd.minus(overflow);
+					return {end: blockEnd.minus(overflow), shortened: false}
 				}
 			}
 
 			const lastBlock = blocks[blocks.length - 1];
-			return dropStart.startOf('day').plus(lastBlock.end);
+			return {end: dropStart.startOf('day').plus(lastBlock.end), shortened: true}
 		},
 
 		onDropEvent(evt, items, date)
@@ -398,7 +398,7 @@ export default {
 			else
 				this.onDropFree(evt, items, date)
 		},
-		onDropSnap(evt, items, date, part) {
+		async onDropSnap(evt, items, date, part) {
 			let obj = items;
 			if (!obj?.orig) return;
 
@@ -419,7 +419,13 @@ export default {
 			const dropStart = snappedPart ? dropDay.plus(snappedPart.start) : grabTime;
 
 			let nettoDuration = this._getNettoDurationForDrop(obj);
-			let dropEnd = this.calculateDropEnd(dropStart, nettoDuration);
+
+			let {end: dropEnd, shortened} = this.calculateDropEnd(dropStart, nettoDuration);
+
+			if (shortened && await this.$fhcAlert.confirm({message: 'Wird auf ' + dropEnd.toFormat('HH:mm') + ' gekürzt. Fortfahren?'}) === false)
+			{
+				return;
+			}
 
 			this.onDrop?.({
 				item: [obj],
@@ -449,7 +455,7 @@ export default {
 
 			return luxon.Duration.fromObject({ minutes: 45 });
 		},
-		onDropFree(evt, items, date)
+		async onDropFree(evt, items, date)
 		{
 			let obj = items;
 			if (!obj?.orig)
@@ -459,8 +465,12 @@ export default {
 			const dropStart = luxon.DateTime.fromMillis(timestamp);
 
 			let nettoDuration = this._getNettoDurationForDrop(obj);
-			let dropEnd = this.calculateDropEnd(dropStart, nettoDuration);
+			let {end: dropEnd, shortened} = this.calculateDropEnd(dropStart, nettoDuration);
 
+			if (shortened && await this.$fhcAlert.confirm({message: 'Wird auf ' + dropEnd.toFormat('HH:mm') + ' gekürzt. Fortfahren?'}) === false)
+			{
+				return;
+			}
 			this.onDrop?.({
 				item: [obj],
 				start: dropStart.toISO(),

@@ -340,6 +340,20 @@ EOSQL;
 	}
 
 
+	public function getByLeStudiensemester($lehreinheit_id, $studiensemester_kurzbz)
+	{
+		$qry = "WITH lehreinheiten AS (
+				SELECT *
+				FROM lehre.tbl_lehreinheit
+				WHERE lehreinheit_id = ?
+					AND studiensemester_kurzbz = ?
+			)," . $this->_getLeCTE();
+
+		$params = array($lehreinheit_id, $studiensemester_kurzbz);
+
+		return $this->execReadOnlyQuery($qry, $params);
+
+	}
 	public function getByLvidStudiensemester($lv_id, $studiensemester_kurzbz, $mitarbeiter_uid = null, $fachbereich_kurzbz = null)
 	{
 		$qry = "WITH lehreinheiten AS (
@@ -347,35 +361,7 @@ EOSQL;
 				FROM lehre.tbl_lehreinheit
 				WHERE lehrveranstaltung_id = ?
 					AND studiensemester_kurzbz = ?
-			),
-				". $this->_getGruppenCTE() . ", 
-				". $this->_getLektorenCTE() . ", 
-				". $this->_getFachbereichCTE() . ",
-				". $this->_getTagsCTE() . "
-				
-				SELECT lehreinheiten.*,
-						lehreinheiten.lehrform_kurzbz as lv_lehrform_kurzbz,
-						tbl_lehrveranstaltung.kurzbz as lv_kurzbz,
-						tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
-						COALESCE(tag_data_agg.tags, '[]'::json) AS tags,
-						gruppen.gruppen,
-						mitarbeiter.lektoren,
-						mitarbeiter.le_planstunden,
-						mitarbeiter.vorname,
-						mitarbeiter.nachname,
-						mitarbeiter.semesterstunden,
-						fachbereich.bezeichnung as fachbereich,
-						UPPER(CONCAT(tbl_studiengang.typ,tbl_studiengang.kurzbz)) as studiengang,
-						semester
-				FROM lehreinheiten
-					LEFT JOIN lehre.tbl_lehrveranstaltung ON tbl_lehrveranstaltung.lehrveranstaltung_id = lehreinheiten.lehrfach_id
-					LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
-					LEFT JOIN tag_data_agg ON tag_data_agg.lehreinheit_id = lehreinheiten.lehreinheit_id
-					LEFT JOIN mitarbeiter ON lehreinheiten.lehreinheit_id = mitarbeiter.lehreinheit_id
-					LEFT JOIN fachbereich ON lehreinheiten.lehreinheit_id = fachbereich.lehreinheit_id
-					LEFT JOIN gruppen ON lehreinheiten.lehreinheit_id = gruppen.lehreinheit_id
-				WHERE true 
-				";
+			)," . $this->_getLeCTE();
 
 		$params = array($lv_id, $studiensemester_kurzbz);
 
@@ -469,9 +455,9 @@ EOSQL;
 		return $db->execReadOnlyQuery($qry, array_merge($lehreinheit_ids, $lehreinheit_ids));
 	}
 
-	private function getLVTmp($stg_kz = null)
+	private function getLVTmp()
 	{
-		$qry = "SELECT DISTINCT ON(lehrveranstaltung_id) *, 
+		return "SELECT DISTINCT ON(lehrveranstaltung_id) *, 
 						'' as stundenblockung,
 						'' as lehreinheit_id,
 						'' as wochenrythmus,
@@ -482,24 +468,33 @@ EOSQL;
 						'' as studienplan_beeichnung, 
 						UPPER(CONCAT(vw_lehreinheit.stg_typ, vw_lehreinheit.stg_kurzbz)) as studiengang
                 FROM campus.vw_lehreinheit
-				WHERE mitarbeiter_uid = ?
-				  AND studiensemester_kurzbz = ?";
-
-		if (!is_null($stg_kz)) {
-			$qry .= " AND lv_studiengang_kz = ?";
-		}
-
-		return $qry;
+				WHERE studiensemester_kurzbz = ? ";
 	}
 
-	public function getLvsByEmployee($mitarbeiter_uid, $studiensemester_kurzbz, $stg_kz = null)
+	public function getLvsById($lehrveranstaltung_id, $studiensemester_kurzbz)
 	{
-		$qry = "WITH lvs AS (" . $this->getLVTmp($stg_kz) . ")
+		$where = ' AND lehrveranstaltung_id = ?';
+		$qry = "WITH lvs AS (" . $this->getLVTmp() . $where .")
 				SELECT lvs.*
 				FROM lvs
-				";
+			";
 
-		$params = array($mitarbeiter_uid, $studiensemester_kurzbz);
+		$params = array($studiensemester_kurzbz, $lehrveranstaltung_id);
+		return $this->execReadOnlyQuery($qry, $params);
+	}
+	public function getLvsByEmployee($mitarbeiter_uid, $studiensemester_kurzbz, $stg_kz = null)
+	{
+		$where = ' AND mitarbeiter_uid = ?';
+
+		if ($stg_kz != null)
+			$where .= " AND lv_studiengang_kz = ?";
+
+		$qry = "WITH lvs AS (" . $this->getLVTmp() . $where .")
+				SELECT lvs.*
+				FROM lvs";
+
+		$params = array($studiensemester_kurzbz, $mitarbeiter_uid);
+
 		if (!is_null($stg_kz))
 		{
 			$params[] = $stg_kz;
@@ -706,6 +701,36 @@ EOSQL;
 		return success('Contract successfully updated.');
 	}
 
+	private function _getLeCTE()
+	{
+		return $this->_getGruppenCTE() . ",
+				". $this->_getLektorenCTE() . ",
+				". $this->_getFachbereichCTE() . ",
+				". $this->_getTagsCTE() . "
+
+				SELECT lehreinheiten.*,
+						lehreinheiten.lehrform_kurzbz as lv_lehrform_kurzbz,
+						tbl_lehrveranstaltung.kurzbz as lv_kurzbz,
+						tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
+						COALESCE(tag_data_agg.tags, '[]'::json) AS tags,
+						gruppen.gruppen,
+						mitarbeiter.lektoren,
+						mitarbeiter.le_planstunden,
+						mitarbeiter.vorname,
+						mitarbeiter.nachname,
+						mitarbeiter.semesterstunden,
+						fachbereich.bezeichnung as fachbereich,
+						UPPER(CONCAT(tbl_studiengang.typ,tbl_studiengang.kurzbz)) as studiengang,
+						semester
+				FROM lehreinheiten
+					LEFT JOIN lehre.tbl_lehrveranstaltung ON tbl_lehrveranstaltung.lehrveranstaltung_id = lehreinheiten.lehrfach_id
+					LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
+					LEFT JOIN tag_data_agg ON tag_data_agg.lehreinheit_id = lehreinheiten.lehreinheit_id
+					LEFT JOIN mitarbeiter ON lehreinheiten.lehreinheit_id = mitarbeiter.lehreinheit_id
+					LEFT JOIN fachbereich ON lehreinheiten.lehreinheit_id = fachbereich.lehreinheit_id
+					LEFT JOIN gruppen ON lehreinheiten.lehreinheit_id = gruppen.lehreinheit_id
+				WHERE true";
+	}
 	private function _getGruppenCTE()
 	{
 		return "gruppen AS (

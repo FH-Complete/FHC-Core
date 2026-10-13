@@ -454,14 +454,14 @@ class MigrateKalender extends CLI_Controller
 		$db->db->query("DELETE FROM public.tbl_notiz
 			WHERE notiz_id IN (
 				SELECT notiz_id
-				FROM public.tbl_notizzuordnung
+				FROM lehre.tbl_kalender_notiz
 				WHERE eindeutige_kalender_gruppen_id IN (
 					SELECT eindeutige_kalender_gruppen_id
 					FROM lehre.tbl_kalender
 				)
 			)");
 
-		$db->db->query("DELETE FROM public.tbl_notizzuordnung
+		$db->db->query("DELETE FROM lehre.tbl_kalender_notiz
 			WHERE eindeutige_kalender_gruppen_id IN (
 				SELECT eindeutige_kalender_gruppen_id
 				FROM lehre.tbl_kalender
@@ -771,7 +771,7 @@ class MigrateKalender extends CLI_Controller
 
 		$this->load->model('person/Notiz_model', 'NotizModel');
 		$this->load->model('system/Notiztyp_model', 'NotiztypModel');
-		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
+		$this->load->model('ressource/KalenderNotiz_model', 'KalenderNotizModel');
 
 		$checkTyp = $this->NotiztypModel->loadWhere(array('typ_kurzbz' => $notizType));
 
@@ -788,16 +788,16 @@ class MigrateKalender extends CLI_Controller
 		}
 		 
 
-		$this->NotizzuordnungModel->addJoin('tbl_notiz', 'tbl_notiz.notiz_id = tbl_notizzuordnung.notiz_id', 'LEFT');
-		$this->NotizzuordnungModel->db->where('tbl_notiz.typ', $notizType);
-		$this->NotizzuordnungModel->db->where('tbl_notiz.insertvon', $insertvonMockUser);
-		$oldNotizZuordnung = $this->NotizzuordnungModel->loadWhere(array('eindeutige_kalender_gruppen_id' => $eindeutige_kalender_gruppen_id));
-		if (isError($oldNotizZuordnung))
+		$this->KalenderNotizModel->addJoin('tbl_notiz', 'tbl_notiz.notiz_id = tbl_kalender_notiz.notiz_id', 'LEFT');
+		$this->KalenderNotizModel->db->where('tbl_notiz.typ', $notizType);
+		$this->KalenderNotizModel->db->where('tbl_notiz.insertvon', $insertvonMockUser);
+		$oldKalenderNotiz = $this->KalenderNotizModel->loadWhere(array('eindeutige_kalender_gruppen_id' => $eindeutige_kalender_gruppen_id));
+		if (isError($oldKalenderNotiz))
 		{
-			error("Error occurred while checking Notizzuordnung: " . $oldNotizZuordnung->message);
+			error("Error occurred while checking KalenderNotiz: " . $oldKalenderNotiz->message);
 			return false;
 		}
-		if (hasData($oldNotizZuordnung))
+		if (hasData($oldKalenderNotiz))
 		{
 			return $this->updateTag($eindeutige_kalender_gruppen_id, $notizText, $lastUpdatedInOldSystem);
 		}
@@ -819,14 +819,14 @@ class MigrateKalender extends CLI_Controller
 			return false;
 		}
 
-		$insertZuordnung = $this->NotizzuordnungModel->insert(array(
+		$insertKalenderNotiz = $this->KalenderNotizModel->insert(array(
 			'notiz_id' => $insertResult->retval,
 			'eindeutige_kalender_gruppen_id' => $eindeutige_kalender_gruppen_id
 		));
 
-		if (isError($insertZuordnung)) 
+		if (isError($insertKalenderNotiz)) 
 		{
-			error("Error occurred while inserting Notizzuordnung: " . $insertZuordnung->message);
+			error("Error occurred while inserting KalenderNotiz: " . $insertKalenderNotiz->message);
 			return false;
 		}
 
@@ -838,18 +838,18 @@ class MigrateKalender extends CLI_Controller
 		$notizType = 'hinweis';
 		$insertvonMockUser = 'oldToNewTempusMigration';
 		
-		$this->NotizzuordnungModel->addJoin('tbl_notiz', 'tbl_notiz.notiz_id = tbl_notizzuordnung.notiz_id', 'LEFT');
-		$this->NotizzuordnungModel->db->where('tbl_notiz.typ', $notizType);
-		$this->NotizzuordnungModel->db->where('tbl_notiz.insertvon', $insertvonMockUser);
-		$notizZuordnungRes = $this->NotizzuordnungModel->loadWhere(array('eindeutige_kalender_gruppen_id' => $eindeutige_kalender_gruppen_id));
-		if (isError($notizZuordnungRes))
+		$this->KalenderNotizModel->addJoin('tbl_notiz', 'tbl_notiz.notiz_id = tbl_kalender_notiz.notiz_id', 'LEFT');
+		$this->KalenderNotizModel->db->where('tbl_notiz.typ', $notizType);
+		$this->KalenderNotizModel->db->where('tbl_notiz.insertvon', $insertvonMockUser);
+		$kalenderNotizRes = $this->KalenderNotizModel->loadWhere(array('eindeutige_kalender_gruppen_id' => $eindeutige_kalender_gruppen_id));
+		if (isError($kalenderNotizRes))
 		{
-			error("Error occurred while loading Notizzuordnung: " . $notizZuordnungRes->message);
+			error("Error occurred while loading KalenderNotiz: " . $kalenderNotizRes->message);
 			return false;
 		}
 
 
-		$tag = $this->NotizModel->loadWhere(array('notiz_id' => $notizZuordnungRes->retval[0]->notiz_id));
+		$tag = $this->NotizModel->loadWhere(array('notiz_id' => $kalenderNotizRes->retval[0]->notiz_id));
 		if (isError($tag))
 		{
 			error("Error occurred while loading Notiz: " . $tag->message);
@@ -858,7 +858,7 @@ class MigrateKalender extends CLI_Controller
 
 		if (!hasData($tag))
 		{
-			error("Error occurred while loading Notiz: " . $tag->message);
+			error("Error occurred while loading KalenderNotiz: " . $tag->message);
 			return false;
 		}
 
