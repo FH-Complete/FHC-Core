@@ -62611,8 +62611,70 @@ I have been informed that I am under no obligation to consent to the transmissio
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
 	// ### Infocenter Onboarding END
+	// ### SaveStudent START
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_updateBenutzer',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler bei Aktualisierung Benutzer',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error during insert/update Benutzer',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_updatePerson',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler bei Aktualisierung Person',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error during insert/update person',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_updateStudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler bei Aktualisierung Student',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error during insert/update student',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// ### SaveStudent END
 );
 
 

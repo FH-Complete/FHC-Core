@@ -182,31 +182,14 @@ class Student extends FHCAPI_Controller
 		return $islaufendesSemester;
 	}
 
-	/**
-	 * Saves data to a prestudent
-	 *
-	 * @param string			$prestudent_id
-	 * @return void
-	 */
-	public function save($prestudent_id, $studiensemester_kurzbz)
+	protected function validateParams($prestudent_id, $studiensemester_kurzbz, $params)
 	{
-		$this->load->model('person/Person_model', 'PersonModel');
-		$this->load->model('person/Benutzer_model', 'BenutzerModel');
-		$this->load->model('crm/Student_model', 'StudentModel');
-		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
-		$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
-		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
-
 		$this->load->library('form_validation');
 
 		if (!$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
 		{
 			$this->terminateWithError($studiensemester_kurzbz . ' - ' . $this->p->t('lehre', 'error_noStudiensemester'));
 		}
-
-		$authuid = getAuthUID();
-		$now = date('c');
 
 		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'is_valid_date');
 
@@ -216,43 +199,135 @@ class Student extends FHCAPI_Controller
 		);
 
 		$this->form_validation->set_rules('alias', 'Alias', 'regex_match[/^[-a-z0-9\_\.]*[a-z0-9]{1,}\.[-a-z0-9\_]{1,}$/]',
-		[
-			'regex_match' => $this->p->t('ui', 'error_fieldInvalidAlias')
-		]);
-
-		$this->load->library('UDFLib');
-
-		$result = $this->udflib->getCiValidations($this->PersonModel, $this->input->post());
-
-		$udf_field_validations = $this->getDataOrTerminateWithError($result);
-
-		$this->form_validation->set_rules($udf_field_validations);
+			[
+				'regex_match' => $this->p->t('ui', 'error_fieldInvalidAlias')
+			]);
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
+		else
+			return true;
+	}
 
-		$result = $this->StudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
+	protected function checkifExistsLehrverband($studiengang_kz, $verband, $gruppe, $semester)
+	{
+		$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
+		$result = $this->LehrverbandModel->loadWhere([
+			'studiengang_kz' => $studiengang_kz,
+			'semester' => $semester,
+			'verband' => $verband,
+			'gruppe' => $gruppe
+		]);
+		if(hasData($result))
+			return true;
+		else
+			return false;
+	}
 
-		$student = $this->getDataOrTerminateWithError($result);
-
-		$uid = $student ? current($student)->student_uid : null;
-
-		$studiengang_kz = $student ? current($student)->studiengang_kz : null;
-
-		$result = $this->PrestudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
-
-		$person = $this->getDataOrTerminateWithError($result);
-
-		$person_id = $person ? current($person)->person_id : null;
-
+	protected function updateLehrverband($uid, $studiensemester_kurzbz, $studiengang_kz, $prestudent_id, $params)
+	{
 		$array_allowed_props_lehrverband = ['verband', 'semester', 'gruppe'];
 		$update_lehrverband = array();
-		foreach ($array_allowed_props_lehrverband as $prop) {
-			$val = $this->input->post($prop);
-			if ($val !== null) {
-				$update_lehrverband[$prop] = $val;
+			foreach ($array_allowed_props_lehrverband as $prop)
+			{
+				if (array_key_exists($prop, $params) && $params[$prop] !== null)
+				{
+					$update_lehrverband[$prop] = $params[$prop];
+				}
+		}
+
+		if(count($update_lehrverband))
+		{
+			if ($uid === null)
+			{
+				throw new Exception($this->p->t('lehre', 'error_updateLehrverband') . ": " . $this->p->t('lehre', 'error_no_student'));
+			}
+
+			$authuid = getAuthUID();
+			$now = date('c');
+			$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
+			$curstudlvb = $this->StudentlehrverbandModel->load([
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+				'student_uid' => $uid
+			]);
+
+			if(!hasData($curstudlvb))
+			{
+				//check if valid status of semester
+				$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+				$result = $this->PrestudentstatusModel->loadWhere([
+					'prestudent_id' => $prestudent_id,
+					'studiensemester_kurzbz' => $studiensemester_kurzbz]);
+				if(!hasData($result))
+				{
+					throw new Exception($this->p->t('lehre', 'error_updateLehrverband') . ": "
+						. $this->p->t('lehre', 'textNoStatusInSem',['sem' => $studiensemester_kurzbz]));
+				}
+
+				$verband = isset($update_lehrverband['verband']) ? $update_lehrverband['verband'] : '';
+				$gruppe = isset($update_lehrverband['gruppe']) ? $update_lehrverband['gruppe'] : '';
+				$semester = isset($update_lehrverband['semester']) ? $update_lehrverband['semester'] : '';
+				$isExistingLvbd = $this->checkifExistsLehrverband($studiengang_kz, $verband, $gruppe, $semester);
+
+				if(!$isExistingLvbd)
+				{
+					throw new Exception($this->p->t('lehre', 'error_updateLehrverband') . ": " . $this->p->t('lehre', 'error_noLehrverband'));
+				}
+				else
+				{
+					$update_lehrverband['verband'] = isset($update_lehrverband['verband']) ? $update_lehrverband['verband'] : '';
+					$update_lehrverband['gruppe'] = isset($update_lehrverband['gruppe']) ? $update_lehrverband['gruppe'] : '';
+					$update_lehrverband['semester'] = isset($update_lehrverband['semester']) ? $update_lehrverband['semester'] : '';
+				}
+			}
+			else
+			{
+				$data = getData($curstudlvb);
+				$data = current($data);
+
+				$studiengang_kz = $data->studiengang_kz;
+				$verband = isset($update_lehrverband['verband']) ? $update_lehrverband['verband'] : $data->verband;
+				$gruppe = isset($update_lehrverband['gruppe']) ? $update_lehrverband['gruppe'] : $data->gruppe;
+				$semester = isset($update_lehrverband['semester']) ? $update_lehrverband['semester'] : $data->semester;
+				$isExistingLvbd = $this->checkifExistsLehrverband($studiengang_kz, $verband, $gruppe, $semester);
+
+				if(!$isExistingLvbd)
+				{
+					throw new Exception($this->p->t('lehre', 'error_updateLehrverband') . ": " . $this->p->t('lehre', 'error_noLehrverband'));
+				}
+
+			}
+
+			if(hasData($curstudlvb) && count(getData($curstudlvb)) > 0 )
+			{
+				$update_lehrverband['updatevon'] = $authuid;
+				$update_lehrverband['updateamum'] = $now;
+				$result = $this->StudentlehrverbandModel->update([
+					'studiensemester_kurzbz' => $studiensemester_kurzbz,
+					'student_uid' => $uid
+				], $update_lehrverband);
+			}
+			else
+			{
+				$update_lehrverband['insertvon'] = $authuid;
+				$update_lehrverband['insertamum'] = $now;
+				$result = $this->StudentlehrverbandModel->insert(array_merge([
+					'studiensemester_kurzbz' => $studiensemester_kurzbz,
+					'student_uid' => $uid,
+					'studiengang_kz' => $studiengang_kz
+				], $update_lehrverband));
+			}
+			if(isError($result))
+			{
+				throw new Exception($this->p->t('lehre', 'error_updateLehrverband'));
 			}
 		}
+		return $update_lehrverband;
+	}
+
+	protected function updatePerson($person_id, $params)
+	{
+		$this->load->model('person/Person_model', 'PersonModel');
 
 		$array_allowed_props_person = [
 			'anrede',
@@ -286,146 +361,113 @@ class Student extends FHCAPI_Controller
 			$array_allowed_props_person[] = $def['name'];
 
 		$update_person = array();
-		foreach ($array_allowed_props_person as $prop) {
-			$val = $this->input->post($prop);
-			if ($val === null)
+		foreach ($array_allowed_props_person as $prop)
+		{
+			if (array_key_exists($prop, $params))
 			{
-				continue;
-			}
-			if($prop == 'foto')
-			{
-				$fotoval = ($val == '') ? null : str_replace('data:image/jpeg;base64,', '', $val);
-				$update_person[$prop] = $fotoval;
-			}
-			else if ($prop == 'gebdatum')
-			{
-				$update_person[$prop] = ($val == '') ? null : $val;
-			}
-			else
-			{
-				$update_person[$prop] = $val;
+				if($params[$prop] !== null)
+				{
+					if($prop == 'gebdatum' && $params[$prop] === '')
+					{
+						$update_person [$prop] = null;
+					}
+					elseif($prop == 'foto')
+					{
+						$fotoval = ($params[$prop] == '') ? null : str_replace('data:image/jpeg;base64,', '', $params[$prop]);
+						$update_person[$prop] = $fotoval;
+					}
+					else
+						$update_person[$prop] = $params[$prop];
+				}
 			}
 		}
 
+		if(count($update_person))
+		{
+			if ($person_id === null)
+			{
+				throw new Exception($this->p->t('lehre', 'error_no_person'));
+			}
+
+			$authuid = getAuthUID();
+			$now = date('c');
+
+			$update_person['updatevon'] = $authuid;
+			$update_person['updateamum'] = $now;
+
+			$result = $this->PersonModel->update(
+				$person_id,
+				$update_person
+			);
+			if(isError($result))
+			{
+				throw new Exception($this->p->t('lehre', 'error_updatePerson'));
+			}
+		}
+		return $update_person;
+	}
+
+	protected function updateStudent($uid, $studiensemester_kurzbz, $params)
+	{
 		$array_allowed_props_student = ['matrikelnr'];
 		if($this->isLaufendesSemester($studiensemester_kurzbz))
 		{
 			$array_allowed_props_student = ['matrikelnr', 'verband', 'semester', 'gruppe'];
 		}
 		$update_student = array();
-		foreach ($array_allowed_props_student as $prop) {
-			$val = $this->input->post($prop);
-			if ($val !== null) {
-				$update_student[$prop] = $val;
-			}
-		}
-
-		$array_allowed_props_benutzer = ['aktiv', 'alias'];
-		$update_benutzer = array();
-		foreach ($array_allowed_props_benutzer as $prop) {
-			$val = $this->input->post($prop);
-			if ($val !== null) {
-				if($prop === 'alias' && $val === '')
-				{
-					$val = null;
-				}
-				$update_benutzer[$prop] = $val;
-			}
-		}
-
-		// Check PKs
-		if (count($update_lehrverband) + count($update_student) && $uid === null) {
-			$this->terminateWithValidationErrors(['' => $this->p->t('lehre', 'error_no_student')]);
-		}
-		if (count($update_person) && $person_id === null) {
-			$this->terminateWithValidationErrors(['' => $this->p->t('lehre', 'error_no_person')]);
-		}
-		if (count($update_benutzer) && $uid === null) {
-			$this->terminateWithValidationErrors(['' => $this->p->t('lehre', 'error_no_student')]);
-		}
-
-		// Do Updates
-
-		// use transactions
-		$this->db->trans_begin();
-
-		if (count($update_lehrverband)) {
-
-			$curstudlvb = $this->StudentlehrverbandModel->load([
-				'studiensemester_kurzbz' => $studiensemester_kurzbz,
-				'student_uid' => $uid
-			]);
-
-			$data = $this->getDataOrTerminateWithError($curstudlvb);
-			$data = current($data);
-
-			$verbandCurrent = $data->verband;
-			$studiengang_kz = $data->studiengang_kz;
-			$semesterCurrent = $data->semester;
-			$gruppeCurrent = $data->gruppe;
-
-			$verband = isset($update_lehrverband['verband']) ? $update_lehrverband['verband'] : $verbandCurrent;
-			$gruppe = isset($update_lehrverband['gruppe']) ? $update_lehrverband['gruppe'] : $gruppeCurrent;
-			$semester = isset($update_lehrverband['semester']) ? $update_lehrverband['semester'] : $semesterCurrent;
-
-			//check if existing Lehrverband of new data to avoid Error
-			$result = $this->LehrverbandModel->loadWhere([
-				'verband' => $verband,
-				'gruppe' => $gruppe,
-				'semester' => $semester,
-				'studiengang_kz' => $studiengang_kz,
-			]);
-
-			if(!hasData($result))
+		foreach ($array_allowed_props_student as $prop)
+		{
+			if (array_key_exists($prop, $params) && $params[$prop] !== null)
 			{
-				$this->terminateWithError($this->p->t('lehre', 'error_noLehrverband'), self::ERROR_TYPE_GENERAL);
+				$update_student[$prop] = $params[$prop];
 			}
-
-			if(hasData($curstudlvb) && count(getData($curstudlvb)) > 0 )
-			{
-				$update_lehrverband['updatevon'] = $authuid;
-				$update_lehrverband['updateamum'] = $now;
-				$result = $this->StudentlehrverbandModel->update([
-					'studiensemester_kurzbz' => $studiensemester_kurzbz,
-					'student_uid' => $uid
-				], $update_lehrverband);
-			}
-			else
-			{
-				$update_lehrverband['insertvon'] = $authuid;
-				$update_lehrverband['insertamum'] = $now;
-				$result = $this->StudentlehrverbandModel->insert(array_merge([
-					'studiensemester_kurzbz' => $studiensemester_kurzbz,
-					'student_uid' => $uid,
-					'studiengang_kz' => $studiengang_kz
-				], $update_lehrverband));
-			}
-
-			$this->getDataOrTerminateWithError($result);
 		}
 
-		if (count($update_person)) {
-			$update_person['updatevon'] = $authuid;
-			$update_person['updateamum'] = $now;
-			$result = $this->PersonModel->update(
-				$person_id,
-				$update_person
-			);
-			$this->getDataOrTerminateWithError($result);
-		}
+		if (count($update_student))
+		{
+			if ($uid === null)
+			{
+				$this->terminateWithValidationErrors(['' => $this->p->t('lehre', 'error_no_student')]);
+			}
+			$authuid = getAuthUID();
+			$now = date('c');
 
-
-		if (count($update_student)) {
 			$update_student['updatevon'] = $authuid;
 			$update_student['updateamum'] = $now;
+			$this->load->model('crm/Student_model', 'StudentModel');
 			$result = $this->StudentModel->update(
 				[$uid],
 				$update_student
 			);
-			$this->getDataOrTerminateWithError($result);
+			if(isError($result))
+			{
+				throw new Exception($this->p->t('lehre', 'error_updateStudent'));
+			}
 		}
+		return $update_student;
+	}
 
-		if (count($update_benutzer)) {
+	protected function updateBenutzer($uid, $params)
+	{
+		$array_allowed_props_benutzer = ['aktiv', 'alias'];
+		$update_benutzer = array();
+		foreach ($array_allowed_props_benutzer as $prop)
+		{
+			if (array_key_exists($prop, $params) && $params[$prop] !== null)
+			{
+				$update_benutzer[$prop] = $params[$prop];
+			}
+		}
+		if (count($update_benutzer))
+		{
+			if ($uid === null)
+			{
+				throw new Exception($this->p->t('lehre', 'error_updateBenutzer') . ": ". $this->p->t('lehre', 'error_no_student'));
+			}
+
+			$authuid = getAuthUID();
+			$now = date('c');
+
 			$update_benutzer['updatevon'] = $authuid;
 			$update_benutzer['updateamum'] = $now;
 			if (array_key_exists("aktiv", $update_benutzer))
@@ -433,24 +475,62 @@ class Student extends FHCAPI_Controller
 				$update_benutzer['updateaktivvon'] = $authuid;
 				$update_benutzer['updateaktivam'] = $now;
 			}
+			$this->load->model('person/Benutzer_model', 'BenutzerModel');
 			$result = $this->BenutzerModel->update(
 				[$uid],
 				$update_benutzer
 			);
-			$this->getDataOrTerminateWithError($result);
+			if(isError($result))
+			{
+				throw new Exception($this->p->t('lehre', 'error_updateBenutzer'));
+			}
 		}
+		return $update_benutzer;
+	}
 
-		if ($this->db->trans_status() === FALSE)
+	/**
+	 * Saves data to a prestudent
+	 *
+	 * @param string			$prestudent_id
+	 * @return void
+	 */
+	public function save($prestudent_id, $studiensemester_kurzbz)
+	{
+		$params = $this->input->post();
+		$this->validateParams($prestudent_id, $studiensemester_kurzbz, $params);
+
+		$this->load->model('crm/Student_model', 'StudentModel');
+		$result = $this->StudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
+
+		$student = $this->getDataOrTerminateWithError($result);
+		$uid = $student ? current($student)->student_uid : null;
+		$studiengang_kz = $student ? current($student)->studiengang_kz : null;
+
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$result = $this->PrestudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
+		$person = $this->getDataOrTerminateWithError($result);
+		$person_id = $person ? current($person)->person_id : null;
+
+		$this->db->trans_begin();
+
+		try
+		{
+			$update_lehrverband = $this->updateLehrverband($uid, $studiensemester_kurzbz, $studiengang_kz, $prestudent_id, $params);
+			$update_person = $this->updatePerson($person_id, $params);
+			$update_student = $this->updateStudent($uid, $studiensemester_kurzbz, $params);
+			$update_benutzer = $this->updateBenutzer($uid, $params);
+
+			if( $this->db->trans_status() === false )
+			{
+				throw new Exception("Transaction failed");
+			}
+			$this->db->trans_commit();
+		}
+		catch (Exception $ex)
 		{
 			$this->db->trans_rollback();
-
-			$this->terminateWithError(
-				$this->p->t('ui', 'error_save'),
-				self::ERROR_TYPE_GENERAL
-			);
+			$this->terminateWithError($ex->getMessage());
 		}
-
-		$this->db->trans_commit();
 
 		$this->terminateWithSuccess(array_fill_keys(array_merge(
 			array_keys($update_lehrverband),
