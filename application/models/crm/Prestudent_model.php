@@ -89,6 +89,30 @@ class Prestudent_model extends DB_Model
 	}
 
 	/**
+	 * Gets the Studiengang and current Ausbildungssemester for every
+	 * Prestudent belonging to the same person as the student.
+	 *
+	 * @param string $student_uid
+	 * @return stdClass
+	 */
+	public function getStudiengaengAndAusbildungssemesterByStudentUid($student_uid)
+	{
+		$query = 'SELECT p.studiengang_kz,
+						 (
+							SELECT ps.ausbildungssemester
+							  FROM public.tbl_prestudentstatus ps
+							 WHERE ps.prestudent_id = p.prestudent_id
+						  ORDER BY ps.datum DESC, ps.insertamum DESC, ps.ext_id DESC
+							 LIMIT 1
+						 ) AS ausbildungssemester
+					FROM public.tbl_student s
+					JOIN public.tbl_prestudent p USING (prestudent_id)
+				   WHERE s.student_uid = ?';
+
+		return $this->execQuery($query, array($student_uid));
+	}
+
+	/**
 	 * updateAufnahmegruppe
 	 */
 	public function updateAufnahmegruppe($prestudentIdArray, $aufnahmegruppe)
