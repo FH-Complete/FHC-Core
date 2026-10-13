@@ -281,5 +281,9 @@ body {
 	to {
 		transform: rotate(360deg);
 	}
+}
 
+.timepicker-row {
+	display: flex;
+	align-items: center;
 }

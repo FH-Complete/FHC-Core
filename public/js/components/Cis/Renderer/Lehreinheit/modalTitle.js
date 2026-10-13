@@ -1,4 +1,5 @@
 export default {
+	name: 'Cis-Renderer-Lehreinheit-ModalTitle',
 	props:{
 		event: {
 			type: Object,

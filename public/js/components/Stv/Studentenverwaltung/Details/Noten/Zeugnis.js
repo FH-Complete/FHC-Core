@@ -255,7 +255,7 @@ export default {
 							deleteButton.className = 'btn btn-outline-secondary';
 							const icon = document.createElement('i');
 							icon.className = 'fa fa-trash';
-							icon.title = this.$p.t('ui/loeschen');
+							icon.title = this.$p.t('lehre/info_deleteMarkEntry');
 							deleteButton.append(icon);
 							deleteButton.addEventListener('click', evt => {
 								evt.stopPropagation();

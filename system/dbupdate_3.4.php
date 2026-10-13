@@ -92,6 +92,7 @@ require_once('dbupdate_3.4/68744_StV_settings.php');
 require_once('dbupdate_3.4/62889_reihungstest_ueberwachung_mit_constructor.php');
 require_once('dbupdate_3.4/71399_dashboard_update_widget_paths.php');
 require_once('dbupdate_3.4/71645_studvw_messagetab_ladezeit.php');
+require_once('dbupdate_3.4/75469_le_optional_4_projektarbeit.php');
 require_once('dbupdate_3.4/71566_studienordnungsdokument_neuer_organisationseinheitstyp_programm.php');
 require_once('dbupdate_3.4/70376_lohnguide.php');
 require_once('dbupdate_3.4/75888_reihungstest_mehrfachdurchfuehrung.php');
@@ -108,6 +109,8 @@ require_once('dbupdate_3.4/77949_tempus_synchronisation.php');
 require_once('dbupdate_3.4/78287_tempus_raumzuordnung.php');
 require_once('dbupdate_3.4/78285_tempus_stundenraster.php');
 require_once('dbupdate_3.4/83437_kalender_notiz_tbl.php');
+require_once('dbupdate_3.4/54225_reihungstest_ablauf_fuer_quereinsteiger.php');
+require_once('dbupdate_3.4/77757_widgets_berechtigungen.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -259,7 +262,7 @@ $tabellen=array(
 	"hr.tbl_lohnguide_modellfunktion" => array("modellfunktion_kurzbz", "bezeichnung", "jobfamilie_kurzbz", "aktiv", "sort", "insertvon", "insertamum", "updatevon", "updateamum"),
 	"hr.tbl_lohnguide_modellstelle" => array("modellstelle_kurzbz", "bezeichnung", "grade", "modellfunktion_kurzbz", "aktiv", "sort", "insertvon", "insertamum", "updatevon", "updateamum"),
 	"hr.tbl_lohnguide_fachrichtung" => array("fachrichtung_kurzbz", "bezeichnung", "aktiv", "insertvon", "insertamum", "updatevon", "updateamum"),
-	"hr.tbl_vertragsbestandteil_lohnguide" => array("vertragsbestandteil_id", "stellenbezeichnung", "vordienstzeit", "fachrichtung_kurzbz", "modellstelle_kurzbz", "kommentar_person", "kommentar_modellstelle"),	
+	"hr.tbl_vertragsbestandteil_lohnguide" => array("vertragsbestandteil_id", "stellenbezeichnung", "vordienstzeit", "fachrichtung_kurzbz", "modellstelle_kurzbz", "kommentar_person", "kommentar_modellstelle"),
 	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung","bezeichnung_english","sort"),
 	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","uhrzeit","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note","protokoll","endezeit","pruefungsantritt_kurzbz","freigabedatum"),
 	"lehre.tbl_abschlusspruefung_antritt"  => array("pruefungsantritt_kurzbz","bezeichnung","bezeichnung_english","sort"),
@@ -289,7 +292,7 @@ $tabellen=array(
 	"lehre.tbl_notenschluesselaufteilung" => array("notenschluesselaufteilung_id","notenschluessel_kurzbz","note","punkte"),
 	"lehre.tbl_notenschluesselzuordnung" => array("notenschluesselzuordnung_id","notenschluessel_kurzbz","lehrveranstaltung_id","studienplan_id","oe_kurzbz","studiensemester_kurzbz"),
 	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe","positiv","notenwert","aktiv","lehre","offiziell","bezeichnung_mehrsprachig","lkt_ueberschreibbar"),
-	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english","seitenanzahl","abgabedatum","kontrollschlagwoerter","schlagwoerter","schlagwoerter_en","abstract", "abstract_en", "sprache","final"),
+	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","lehrveranstaltung_id","studiensemester_kurzbz","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english","seitenanzahl","abgabedatum","kontrollschlagwoerter","schlagwoerter","schlagwoerter_en","abstract", "abstract_en", "sprache","final"),
 	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id","vertrag_id", "zugangstoken", "zugangstoken_gueltigbis"),
 	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung","aktiv"),
 	"lehre.tbl_pruefung"  => array("pruefung_id","lehreinheit_id","student_uid","mitarbeiter_uid","note","pruefungstyp_kurzbz","datum","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","pruefungsanmeldung_id","vertrag_id", "punkte"),
@@ -427,6 +430,7 @@ $tabellen=array(
 	"testtool.tbl_pruefling_frage"  => array("prueflingfrage_id","pruefling_id","frage_id","nummer","begintime","endtime"),
 	"testtool.tbl_frage_sprache"  => array("frage_id","sprache","text","bild","audio","insertamum","insertvon","updateamum","updatevon"),
 	"testtool.tbl_vorschlag_sprache"  => array("vorschlag_id","sprache","text","bild","audio","insertamum","insertvon","updateamum","updatevon"),
+	"testtool.tbl_pruefling_gebiet"  => array("prueflinggebiet_id","pruefling_id","gebiet_id","insertamum"),
 	"system.tbl_app" => array("app"),
 	"system.tbl_appdaten" => array("appdaten_id","uid","app","appversion","version","bezeichnung","daten","freigabe","insertamum","insertvon","updateamum","updatevon"),
 	"system.tbl_cronjob"  => array("cronjob_id","server_kurzbz","titel","beschreibung","file","last_execute","aktiv","running","jahr","monat","tag","wochentag","stunde","minute","standalone","reihenfolge","updateamum", "updatevon","insertamum","insertvon","variablen"),

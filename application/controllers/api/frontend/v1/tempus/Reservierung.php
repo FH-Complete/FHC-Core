@@ -138,6 +138,12 @@ class Reservierung extends FHCAPI_Controller
 			return in_array($gruppe->studiengang_kz, $stg_berechtigungen);
 		});
 
+
+		usort($gefilterte_gruppen, function ($a, $b)
+		{
+			return [(int) $a->semester, $a->gruppe_kurzbz] <=> [(int) $b->semester, $b->gruppe_kurzbz];
+		});
+
 		$this->terminateWithSuccess($gefilterte_gruppen);
 	}
 

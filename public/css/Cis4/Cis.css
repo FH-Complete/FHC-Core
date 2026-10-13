@@ -454,8 +454,8 @@ html {
 
 /* desktop */
 @media (min-width: 992px) {
-  body {
-    display: flex;
+	body.cis4 {
+		display: flex;
     padding-top: var(--fhc-cis-header-height);
     width: calc(100svw - var(--scrollbar-width, 0px));
     /* overflow: visible !important; */
@@ -853,4 +853,20 @@ html {
 	border: 1px solid rgba(0, 0, 0, 0.15);
 	border-radius: 0.5rem;
 	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.cis-main-menu {
+	max-width: 100vw;
+}
+
+.cis-main-menu ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.cis-main-menu ul li {
+	margin: 0;
+	padding: 0;
+	width: 100%;
 }

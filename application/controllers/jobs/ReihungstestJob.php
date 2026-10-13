@@ -803,7 +803,7 @@ class ReihungstestJob extends JOB_Controller
 	{
 		if (!isset($studiensemester) || isEmptyString($studiensemester))
 		{
-			$this->logError("Studiensemster not passed as parameter");
+			$this->logError("Studiensemester not passed as parameter");
 			return;
 		}
 

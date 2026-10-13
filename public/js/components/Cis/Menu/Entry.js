@@ -72,20 +72,10 @@ export default {
 			return this.entry.url.startsWith(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router)
 		},
         target() {
-            if (this.entry.template_kurzbz == 'redirect') {
-                if (!this.entry.content)
-                    return '';
-                let xmlDoc = (new DOMParser()).parseFromString(this.entry.content,"text/xml");
-                let target = xmlDoc.getElementsByTagName('target')[0];
-                if (!target)
-                    return '';
-                
-                target = target.childNodes[0].nodeValue + "";
-                if (target == 'content' || target == '_self')
-                    target = "";
-                return target;
+            if (this.entry?.target) {
+                return this.entry.target;
             }
-            return ''
+            return '_self';
         },
         hasChilds() {
             return this.entry.childs && this.entry.childs.length !== 0;
@@ -172,6 +162,7 @@ export default {
 			<div class="btn-group w-100">
  				<a :target="target" 
  					:href="(entry.menu_open && hasFullLink) ? entry.url : null"
+					draggable="false"
 					@click="toggleCollapse"
                     :class="{
                         'btn btn-default rounded-0 text-start': true,
@@ -190,12 +181,15 @@ export default {
             </div>
             <ul ref="children"
                 class="nav w-100 collapse">
-                <cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeContent" v-for="child in entry.childs" :key="child" :entry="child" :level="level + 1"/>
+				<li>
+					<cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeContent" v-for="child in entry.childs" :key="child" :entry="child" :level="level + 1"/>
+				</li>
             </ul>
         </template>
 		<a v-else
             :href="entry.url"
             :target="target"
+			draggable="false"
             :class="{
                 'btn btn-default rounded-0 w-100 text-start': true,
                 ['btn-level-' + level]: true,

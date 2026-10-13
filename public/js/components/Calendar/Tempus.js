@@ -31,10 +31,8 @@ export default {
 			rangeLength: Vue.computed(() => this.currentRangeLength),
 			rangeViewPresets: Vue.computed(() => this.semesterRangePresets),
 			rangeViewPreviewLink: Vue.computed(() => this.rangeViewPreviewLink),
-			// rangeViewSelectedPreset: Vue.computed({
-			// 	get: () => this.selectedRangePreset,
-			// 	set: value => this.selectedRangePreset = value,
-			// }),
+			showRaster: Vue.computed(() => this.showRaster),
+			teachingunits: Vue.computed(() => this.teachingunits),
 		};
 	},
 	inject: {

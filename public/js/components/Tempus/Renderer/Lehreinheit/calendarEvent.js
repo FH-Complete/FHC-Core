@@ -20,11 +20,6 @@ export default {
 				'w-100',
 				'p-1',
 			];
-
-			if (this.event.collisions) {
-				classes.push('calendar-event-collisions');
-			}
-
 			return classes;
 		},
 		topicString() {
@@ -154,6 +149,23 @@ export default {
 		class="position-relative"
 		@wheel.stop
 	>
+		<div class="position-absolute top-0 start-0 m-1">
+			<i class="fa-solid fa-triangle-exclamation text-muted" v-if="event.collisions.length"></i>
+			<i :class="statusIcon"></i>
+			<i
+				v-tooltip="resourcesTooltip"
+				v-if="event.has_assigned_resources"
+			  	class="fa-solid fa-table-list text-muted"
+			></i>
+			<i 
+				v-tooltip="tagsTooltip"
+				v-if="tags?.length"
+				class="fa-solid fa-tags"
+			></i>
+		</div>
+		<div class="position-absolute bottom-0 start-0 m-1">
+			{{event.verplante_stunden}}
+		</div>
 		<div
 			v-if="!event.allDayEvent && event?.beginn && event?.ende"
 			class="event-time d-grid h-100"
