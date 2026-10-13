@@ -1291,7 +1291,7 @@ export const Benotungstool = {
 			
 			const data = cell.getData()
 			if(field == 'note' && data.note && data.note != data.lv_note) {
-				style += 'color:red; border-color:red; border-style:solid; border-width:1px;'
+				style += 'color: var(--fhc-danger, red); border-color: var(--fhc-danger, red); border-style:solid; border-width:1px;'
 			}
 
 			const match = this.notenOptions.find(opt => opt.note == value)
@@ -1310,7 +1310,7 @@ export const Benotungstool = {
 				'<div data-cy="freigabe-state" data-state="' + value + '" style="' + style + '">' + icon + '</div>'
 
 			if(value === 'ok') {
-				return wrap('<i class="fa fa-circle-check" style="color:green"></i>')
+				return wrap('<i class="fa fa-circle-check" style="color: var(--fhc-success, green)"></i>')
 			} else if (value === 'offen') {
 				return wrap('<i class="fa-regular fa-circle"></i>')
 			} else if (value === 'changed') {
@@ -1604,7 +1604,7 @@ export const Benotungstool = {
 			let style = 'display: flex; justify-content: center; align-items: center; height: 100%;'
 			
 			return '<div style="'+style+'">' +
-				'<a href='+val+'><i class="fa fa-envelope" style="color:#00649C"></i></a></div>'
+				'<a href='+val+'><i class="fa fa-envelope fhc-primary-color"></i></a></div>'
 		},
 		percentFormatter(cell) {
 			const data = cell.getData()
@@ -1682,7 +1682,7 @@ export const Benotungstool = {
 					// some moodle noten are numeric, some are strings like "Sehr Gut", "Bestanden" etc...
 					const notenOption = this.notenOptions.find(n=>n.note == g.grade || n.bezeichnung == g.grade)
 					if(notenOption.positiv) s.teilnote += ('<span>'+g.text +'</span>'+ '<br/>')
-					else s.teilnote += ('<span style="color: red;">'+g.text +'</span>'+ '<br/>')
+					else s.teilnote += ('<span style="color: var(--fhc-danger, red);">'+g.text +'</span>'+ '<br/>')
 				})
 
 				this.recalculateSelectable(s)

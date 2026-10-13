@@ -148,7 +148,7 @@ export default {
 								<div class="d-flex">
 									<div class="text-muted small me-auto"><small>{{$p.t('ampeln','ampelnDeadline',{value:getDate(ampel.deadline)})}}</small></div>
 									<div v-if="(new Date() > new Date(ampel.deadline)) && !ampel.bestaetigt "><span class="badge bg-danger"><i class="fa fa-solid fa-bolt"></i></span></div>
-									<div v-if="ampel.verpflichtend"><span class="badge bg-warning ms-1"><i class="fa fa-solid fa-triangle-exclamation"></i></span></div>
+									<div v-if="ampel.verpflichtend"><span class="badge text-bg-warning ms-1"><i class="fa fa-solid fa-triangle-exclamation"></i></span></div>
 									<div v-if="ampel.bestaetigt"><span class="badge bg-success ms-1"><i class="fa fa-solid fa-circle-check"></i></span></div>
 								</div>
 							</div>
@@ -232,7 +232,7 @@ export default {
 										</span>
 									</div>
 									<div v-if="ampel.verpflichtend">
-										<span class="badge bg-warning ms-1">
+										<span class="badge text-bg-warning ms-1">
 											<i class="fa fa-solid fa-triangle-exclamation"></i>
 										</span>
 									</div>

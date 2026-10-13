@@ -48,7 +48,7 @@ export const ProjektabgabeUebersicht =  {
 							container.className = "d-flex gap-2";
 
 							let downloadButton = document.createElement('button');
-							downloadButton.className = 'btn btn-outline-secondary';
+							downloadButton.className = 'btn btn-outline-secondary fhc-action-btn';
 							downloadButton.innerHTML = '<i class="fa fa-download"></i>';
 							downloadButton.title = this.$p.t('ui', 'downloadDok');
 							downloadButton.addEventListener('click', evt => {
@@ -60,7 +60,7 @@ export const ProjektabgabeUebersicht =  {
 							if (this.showEdit)
 							{
 								let editButton = document.createElement('button');
-								editButton.className = 'btn btn-outline-secondary';
+								editButton.className = 'btn btn-outline-secondary fhc-action-btn';
 								editButton.innerHTML = '<i class="fa fa-edit"></i>';
 								//editButton.addEventListener('click', () =>
 									//this.$refs.edit.open(cell.getData())

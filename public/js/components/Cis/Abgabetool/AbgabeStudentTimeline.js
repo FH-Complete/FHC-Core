@@ -98,7 +98,7 @@ export const AbgabeStudentTimeline = {
 		<div v-for="projekt in projekte" :key="projekt.projektarbeit_id" class="mb-2">
 
 			<button
-				class="btn btn-sm w-100 text-start d-flex align-items-center gap-2 rounded bg-light border-0 py-2 px-3"
+				class="btn btn-sm w-100 text-start d-flex align-items-center gap-2 rounded bg-body-tertiary border-0 py-2 px-3"
 				@click="toggleProject(projekt.projektarbeit_id)"
 			>
 				<i

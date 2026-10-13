@@ -145,6 +145,9 @@
 	/* fhc base colors */
 	--fhc-primary: var(--fhc-blue-primary);
 	--fhc-primary-highlight: var(--fhc-blue-primary-highlight);
+	--fhc-primary-text: var(--fhc-primary);
+	/* darker primary for hover and selected backgrounds with light text */
+	--fhc-primary-shade: var(--fhc-blue-50);
 
 	--fhc-secondary: var(--fhc-white-20);
 	--fhc-secondary-highlight: var(--fhc-white-40);
@@ -178,12 +181,11 @@
 	--fhc-link: var(--fhc-blue-10);
 
 	/* disabled */
-	--fhc-disabled: var(--fhc-gray-90);
-	--fhc-disabled-background: var(--fhc-gray-30);
+	--fhc-disabled: var(--fhc-gray-20);
 
 	/* status colors */
-	--fhc-danger: var(--fhc-red-10);
-	--fhc-success: var(--fhc-green-10);
+	--fhc-danger: var(--fhc-red-60);
+	--fhc-success: var(--fhc-green-70);
 	--fhc-dark: var(--fhc-black-30);
 	--fhc-light: var(--fhc-white-50);
 
@@ -195,6 +197,9 @@
 	/* fhc base colors */
 	--fhc-primary: var(--fhc-blue-primary);
 	--fhc-primary-highlight: var(--fhc-blue-primary-highlight);
+	/* --fhc-primary is too dark for text on the dark background */
+	--fhc-primary-text: var(--fhc-blue-40);
+	--fhc-primary-shade: var(--fhc-blue-50);
 
 	--fhc-secondary: var(--fhc-black-50);
 	--fhc-secondary-highlight: var(--fhc-black-70);
@@ -202,7 +207,12 @@
 	--fhc-tertiary: var(--fhc-black-70);
 	--fhc-tertiary-highlight: var(--fhc-gray-40);
 
-	--fhc-danger: var(--fhc-red-10);
+	--fhc-fourth: var(--fhc-gray-40);
+	--fhc-fourth-highlight: var(--fhc-gray-30);
+
+	/* lighter steps fail with --fhc-text, so level 5 repeats level 4 */
+	--fhc-fifth: var(--fhc-gray-40);
+	--fhc-fifth-highlight: var(--fhc-gray-30);
 
 	/*background*/
 	--fhc-background: var(--fhc-black-30);
@@ -225,13 +235,15 @@
 
 	/* disabled */
 	--fhc-disabled: var(--fhc-gray-10);
-	--fhc-disabled-background: var(--fhc-gray-120);
 
 	/* status colors */
-	--fhc-danger: var(--fhc-red-10);
-	--fhc-success: var(--fhc-green-10);
+	--fhc-danger: var(--fhc-red-30);
+	--fhc-success: var(--fhc-green-30);
 	--fhc-dark: var(--fhc-black-50);
 	--fhc-light: var(--fhc-white-70);
+
+	/* calendar: beige-10 is too bright behind light day numbers */
+	--fhc-calendar-bg-markings-past: var(--fhc-beige-20);
 
 }
 
@@ -253,12 +265,21 @@
 	/* fhc base colors */
 	--fhc-primary: var(--fhc-purple-primary-highlight);
 	--fhc-primary-highlight: var(--fhc-purple-primary);
+	--fhc-primary-text: var(--fhc-primary);
+	--fhc-primary-shade: var(--fhc-primary-highlight);
 
 	--fhc-secondary: var(--fhc-purple-20);
 	--fhc-secondary-highlight: var(--fhc-purple-40);
 
 	--fhc-tertiary: var(--fhc-purple-30);
 	--fhc-tertiary-highlight: var(--fhc-purple-50);
+
+	--fhc-fourth: var(--fhc-purple-40);
+	--fhc-fourth-highlight: var(--fhc-purple-50);
+
+	/* darker steps fail with --fhc-text, so level 5 repeats level 4 */
+	--fhc-fifth: var(--fhc-purple-40);
+	--fhc-fifth-highlight: var(--fhc-purple-50);
 
 	/* background */
 	--fhc-background: var(--fhc-purple-5);
@@ -283,8 +304,8 @@
 	--fhc-disabled: var(--fhc-purple-20);
 
 	/* status colors */
-	--fhc-danger: var(--fhc-red-10);
-	--fhc-success: var(--fhc-green-10);
+	--fhc-danger: var(--fhc-red-60);
+	--fhc-success: var(--fhc-green-70);
 	--fhc-dark: var(--fhc-black-20);
 	--fhc-light: var(--fhc-white-70);
 
@@ -314,11 +335,12 @@ html.dark .border-primary {
 }
 
 /* fhc danger*/
+/* dark --fhc-danger is a text color, white text needs a dark fill */
 html.dark .bg-danger,
 html.dark .btn-danger,
 html.dark .btn-outline-danger {
-	background-color: var(--fhc-danger) !important;
-	border-color: var(--fhc-danger) !important;
+	background-color: var(--fhc-red-70) !important;
+	border-color: var(--fhc-red-70) !important;
 	color: white;
 }
 
@@ -333,6 +355,61 @@ html.dark .text-danger {
 
 html.dark .border-danger {
 	border-color: var(--fhc-danger) !important;
+}
+
+/* btn-light stays light in dark mode, so it needs the dark red */
+html.dark .btn-light.text-danger {
+	color: var(--fhc-red-70) !important;
+}
+
+/* fhc success */
+html.dark .text-success {
+	color: var(--fhc-success) !important;
+}
+
+/* Bootstrap keeps #6c757d for secondary text and outline buttons in dark mode */
+html.dark .text-secondary {
+	color: var(--bs-secondary-color) !important;
+}
+
+html.dark .btn-outline-secondary {
+	--bs-btn-color: var(--fhc-white-90);
+	--bs-btn-border-color: var(--fhc-white-90);
+}
+
+/* btn-outline-dark is dark on the dark background, use the theme text color */
+html.dark .btn-outline-dark {
+	--bs-btn-color: var(--fhc-text);
+	--bs-btn-border-color: var(--fhc-text);
+	--bs-btn-hover-color: var(--fhc-background);
+	--bs-btn-hover-bg: var(--fhc-text);
+	--bs-btn-hover-border-color: var(--fhc-text);
+	--bs-btn-active-color: var(--fhc-background);
+	--bs-btn-active-bg: var(--fhc-text);
+	--bs-btn-active-border-color: var(--fhc-text);
+	--bs-btn-disabled-color: var(--fhc-text);
+	--bs-btn-disabled-border-color: var(--fhc-text);
+}
+
+/* btn-dark fills with the page color in dark mode, mirror it so it stays distinct from btn-outline-dark */
+html.dark .btn-dark {
+	--bs-btn-color: var(--fhc-background);
+	--bs-btn-bg: var(--fhc-text);
+	--bs-btn-border-color: var(--fhc-text);
+	--bs-btn-hover-color: var(--fhc-background);
+	--bs-btn-hover-bg: var(--fhc-light);
+	--bs-btn-hover-border-color: var(--fhc-light);
+	--bs-btn-active-color: var(--fhc-background);
+	--bs-btn-active-bg: var(--fhc-light);
+	--bs-btn-active-border-color: var(--fhc-light);
+	--bs-btn-disabled-color: var(--fhc-background);
+	--bs-btn-disabled-bg: var(--fhc-text);
+	--bs-btn-disabled-border-color: var(--fhc-text);
+}
+
+/* SB Admin 2 fills #page-wrapper white (Pruefungsprotokoll, Anrechnung admin) */
+html.dark #page-wrapper {
+	background-color: var(--fhc-background);
 }
 
 
@@ -351,8 +428,50 @@ html.dark .tabulator .tabulator-cell {
 	border-color: var(--fhc-border) !important;
 }
 
+/* selected rows: the vendor #9abcea is too dark for the red and green cell content */
+.tabulator .tabulator-row.tabulator-selected .tabulator-cell {
+	background-color: var(--bs-primary-bg-subtle);
+}
+
+/* the gray outline button text fails on any row tint, so give it an opaque fill */
+.tabulator .tabulator-row.tabulator-selected .btn-outline-secondary {
+	--bs-btn-bg: var(--fhc-background);
+}
+
+/* selected rows: dark blue keeps the status text colors readable */
+html.dark .tabulator .tabulator-row.tabulator-selected .tabulator-cell {
+	background-color: var(--fhc-indigo-90) !important;
+}
+
 html.dark .tabulator .tabulator-header .tabulator-col:hover {
 	background-color: var(--fhc-tertiary) !important;
+}
+
+/* tabulator_simple: fixed light colors for the placeholder, sort arrows and menus */
+html.dark .tabulator .tabulator-tableholder .tabulator-placeholder span {
+	color: var(--fhc-text);
+}
+
+html.dark .tabulator .tabulator-col[aria-sort="ascending"] .tabulator-arrow {
+	border-bottom-color: var(--fhc-text) !important;
+}
+
+html.dark .tabulator .tabulator-col[aria-sort="descending"] .tabulator-arrow {
+	border-top-color: var(--fhc-text) !important;
+}
+
+/* both modes: the vendor #bbb for unsorted columns is too light on white */
+.tabulator .tabulator-col[aria-sort="none"] .tabulator-arrow {
+	border-bottom-color: var(--fhc-disabled) !important;
+}
+
+html.dark .tabulator-popup-container.tabulator-menu {
+	background: var(--fhc-background);
+	color: var(--fhc-text);
+}
+
+html.dark .tabulator-menu .tabulator-menu-item:not(.tabulator-menu-item-disabled):hover {
+	background: var(--fhc-tertiary);
 }
 
 .p-paginator{
@@ -371,7 +490,7 @@ html.dark .tabulator .tabulator-header .tabulator-col:hover {
 .p-paginator .p-paginator-prev,
 .p-paginator .p-paginator-first,
 .p-paginator .p-paginator-last {
-	color: var(--fhc-primary) !important;
+	color: var(--fhc-primary-text) !important;
 }
 
 .p-link:focus {

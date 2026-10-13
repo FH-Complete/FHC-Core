@@ -255,6 +255,50 @@
 	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
+/* Status icons: fixed color per background, the inherited text color fails on the 50-70 steps */
+.verpasst-header,
+.nichtbestanden-header,
+.erledigt-header,
+.abgegeben-header,
+.bestanden-header {
+	--abgabe-status-icon: var(--fhc-white-10);
+	color: var(--abgabe-status-icon);
+}
+
+.abzugeben-header,
+.beurteilungerforderlich-header,
+.verspaetet-header,
+.standard-header {
+	--abgabe-status-icon: var(--fhc-black-30);
+	color: var(--abgabe-status-icon);
+}
+
+/* white on green-50 is below 3:1 */
+.p-accordion-tab-active > .abgegeben-header,
+.p-accordion-tab-active > .bestanden-header {
+	--abgabe-status-icon: var(--fhc-black-30);
+}
+
+/* the accordion link sets its own text color, so the icon reads the variable */
+.abgabe-status-icon {
+	color: var(--abgabe-status-icon);
+}
+
+/* dark mode: the PrimeVue hover makes the link transparent, so the label would sit on the status color */
+html.dark .p-accordion .p-accordion-header:is(
+	.verpasst-header,
+	.nichtbestanden-header,
+	.erledigt-header,
+	.abzugeben-header,
+	.beurteilungerforderlich-header,
+	.verspaetet-header,
+	.abgegeben-header,
+	.bestanden-header,
+	.standard-header
+):hover .p-accordion-header-link {
+	background: var(--fhc-black-70);
+}
+
 #abgabetoolroot .modal-header{
 	background-color: var(--fhc-blue-primary);
 	color: var(--fhc-white-50);

@@ -24,6 +24,12 @@
     border-color: #DEE2E6 !important;
 }
 
+/* the light fill above stays light in dark mode */
+html.dark .bg-secondary-subtle {
+    background-color: var(--fhc-tertiary) !important;
+    border-color: var(--fhc-border) !important;
+}
+
 
 /* html attribute disabled and title don't work together, sets the pointer-event to auto in order to see the title toolip */
 .btn:disabled {

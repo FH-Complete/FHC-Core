@@ -36,6 +36,27 @@
     --dp-hover-icon-color: rgba(var(--bs-black-rgb), .75);
     --dp-range-between-dates-text-color: var(--dp-hover-text-color, var(--text-color));
 }
+/* dark mode: the picker always uses its light theme class, and --text-color (PrimeVue) turns white there */
+html.dark .dp__theme_light {
+    --dp-background-color: var(--fhc-background);
+    --dp-text-color: var(--fhc-text);
+    --dp-hover-color: var(--fhc-tertiary);
+    --dp-hover-text-color: var(--fhc-text);
+    --dp-primary-color: var(--fhc-primary);
+    --dp-primary-text-color: var(--fhc-white-10);
+    --dp-secondary-color: var(--fhc-disabled);
+    --dp-border-color: var(--fhc-border);
+    --dp-menu-border-color: var(--fhc-border);
+    --dp-border-color-hover: var(--fhc-border-highlight);
+    --dp-icon-color: rgba(var(--bs-white-rgb), .5);
+    --dp-hover-icon-color: rgba(var(--bs-white-rgb), .75);
+    --dp-disabled-color: var(--fhc-secondary);
+    --dp-disabled-color-text: var(--fhc-disabled);
+    --dp-scroll-bar-background: var(--fhc-background);
+    --dp-scroll-bar-color: var(--fhc-tertiary-highlight);
+    --dp-tooltip-color: var(--fhc-tertiary);
+    --dp-highlight-color: rgb(0 92 178 / 20%);
+}
 .dp__theme_light .form-control.is-invalid {
     --dp-border-color-hover: var(--bs-danger);
 }

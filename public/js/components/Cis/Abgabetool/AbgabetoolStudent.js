@@ -222,22 +222,22 @@ export const AbgabetoolStudent = {
 
 			if(val.mode === 'detailTermine') {
 				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' +
-					'<a><i class="fa fa-folder-open" style="color:#00649C"></i></a></div>'
+					'<a><i class="fa fa-folder-open fhc-primary-color"></i></a></div>'
 			} else if (val.mode === 'beurteilungDownload') {
 				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' +
-					'<a><i class="fa fa-file-pdf" style="color:#00649C"></i></a></div>'
+					'<a><i class="fa fa-file-pdf fhc-primary-color"></i></a></div>'
 			}
 		},
 		mailFormatter(cell) {
 			const val = cell.getValue()
 			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' +
-				'<a href='+val+'><i class="fa fa-envelope" style="color:#00649C"></i></a></div>'
+				'<a href='+val+'><i class="fa fa-envelope fhc-primary-color"></i></a></div>'
 		},
 		beurteilungFormatter(cell) {
 			const val = cell.getValue()
 			if(val) {
 				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' +
-					'<a><i class="fa fa-file-pdf" style="color:#00649C"></i></a></div>'
+					'<a><i class="fa fa-file-pdf fhc-primary-color"></i></a></div>'
 			} else return '-'
 		},
 		buildMailToLink(projekt) {
@@ -518,7 +518,7 @@ export const AbgabetoolStudent = {
 				<div class="row mt-2">
 					<div class="col-4 col-md-3 fw-bold">{{ getErstbetreuerEmailLabel(projektarbeit) }}</div>
 					<div class="col-8 col-md-9">
-						<a :href="getMailLink(projektarbeit)"><i class="fa fa-envelope" style="color:#00649C"></i></a>
+						<a :href="getMailLink(projektarbeit)"><i class="fa fa-envelope fhc-primary-color"></i></a>
 					</div>
 				</div>
 				<div v-if="projektarbeit.zweitbetreuer_person_id || projektarbeit.zweitbetreuer" class="row mt-2">
@@ -530,7 +530,7 @@ export const AbgabetoolStudent = {
 				<div v-if="projektarbeit.zweitbetreuer_person_id || projektarbeit.zweitbetreuer" class="row mt-2">
 					<div class="col-4 col-md-3 fw-bold">{{ getZweitbetreuerEmailLabel(projektarbeit) }}</div>
 					<div class="col-8 col-md-9">
-						<a v-if="projektarbeit.zweitbetreuer_mail" :href="getZweitbetreuerMailLink(projektarbeit)"><i class="fa fa-envelope" style="color:#00649C"></i></a>
+						<a v-if="projektarbeit.zweitbetreuer_mail" :href="getZweitbetreuerMailLink(projektarbeit)"><i class="fa fa-envelope fhc-primary-color"></i></a>
 						<span v-else>-</span>
 					</div>
 				</div>

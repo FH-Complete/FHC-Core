@@ -74,7 +74,7 @@ export const MyReservation =  {
 
 			const createButton = (iconClass, titleKey, clickHandler) => {
 				const btn = document.createElement('button');
-				btn.className = 'btn btn-outline-secondary';
+				btn.className = 'btn btn-outline-secondary fhc-action-btn';
 				btn.style.display = "flex";
 				btn.style.alignItems = "center"; // center icon vertically
 				btn.style.justifyContent = "center"; // center icon horizontally
@@ -82,7 +82,7 @@ export const MyReservation =  {
 				btn.style.aspectRatio = "1 / 1"; // keep square shape (optional)
 				btn.style.padding = "0"; // remove extra padding for compactness
 				if(iconClass == 'fa fa-timeline') btn.style.transform = "rotate(90deg)";
-				btn.innerHTML = `<i class="${iconClass}" style="color:#00649C; font-size:1.1rem;"></i>`;
+				btn.innerHTML = `<i class="${iconClass}" style="font-size:1.1rem;"></i>`;
 				btn.title = this.$capitalize(this.$p.t(titleKey));
 				btn.addEventListener('click', (e) => {
 					e.stopPropagation();

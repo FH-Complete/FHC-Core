@@ -1,7 +1,7 @@
 :root{
     --fhc-news-widget-height: 1;
 	--fhc-news-widget-bg: var(--fhc-primary);
-	--fhc-news-widget-highlight-color: var(--fhc-primary-highlight);
+	--fhc-news-widget-highlight-color: var(--fhc-primary-shade);
 	--fhc-news-widget-border: var(--fhc-border);
 	--fhc-news-widget-border-highlight: var(--fhc-border-highlight);
 	--fhc-news-widget-text-light: var(--fhc-light);
@@ -171,7 +171,7 @@
 
 
 .fhc-news-items-lg .row .news-truncate span{
-	color: var(--fhc-primary);
+	color: var(--fhc-primary-text);
 	cursor: pointer;
 }
 

@@ -78,7 +78,6 @@
 
 #studiengang-info-col.collapsed #studiengang-info-toggle .fa-chevron-right {
 	transform: scaleX(-1);
-	color: var(--fhc-black-40);
 }
 
 #studiengang-info {

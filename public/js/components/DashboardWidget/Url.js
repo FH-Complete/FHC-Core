@@ -297,7 +297,7 @@ export default {
 					<span
 						v-if="hasTags(link)"
 						:title="hasTags(link)"
-						style="color: silver;"
+						style="color: var(--fhc-disabled, silver);"
 					>
 						<i
 							class="fa fa-solid fa-tag text-gray-500"

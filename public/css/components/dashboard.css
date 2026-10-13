@@ -3,7 +3,6 @@
 @import './dashboard/LvPlan.css';
 
 :root {
-	--fhc-dashboard-danger: var(--fhc-danger, #842029);
 	--fhc-dashboard-grid-size: 4;
 	--fhc-dashboard-link: var(--fhc-link, #0a57ca);
 	--fhc-dashboard-gridrow-background: var(--fhc-background, white);
@@ -12,8 +11,8 @@
 	--fhc-dashboard-item-overlay-background: var(--fhc-background-highlight, rgba(0, 100, 156, 1));
 	--fhc-dashboard-item-overly-border-color: var(--fhc-border, lightgray);
 	--fhc-dashboard-denied-dragging-animation-color: var(--fhc-danger, red);
-	--fhc-dashboard-pin-pinned-hover-color: var(--fhc-fifth-highlight, rgb(153, 116, 116));
-	--fhc-dashboard-section-info-color: var(--fhc-primary, #00649c);
+	--fhc-dashboard-pin-pinned-hover-color: var(--fhc-disabled, rgb(153, 116, 116));
+	--fhc-dashboard-section-info-color: var(--fhc-primary-text, #00649c);
 	--fhc-dashboard-section-info-color-hover: var(--fhc-primary-highlight, #005585);
 }
 
@@ -64,17 +63,12 @@
 }
 
 .newGridRow:hover {
-	color: white;
+	color: var(--fhc-text);
 	background-color: var(--fhc-dashboard-gridrow-background-highlight);
 }
 
 .empty-tile-hover:hover {
 	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-500 -500 1448 1512"><path fill="rgb(211, 211, 211)" d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zM200 344V280H136c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H248v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/></svg>');
-}
-
-.alert-danger .form-check-input:checked {
-	border-color: var(--fhc-dashboard-danger);
-	background-color: var(--fhc-dashboard-danger);
 }
 
 @media(max-width: 1200px) {
@@ -162,10 +156,6 @@
 	border-color: rgba(var(--bs-danger-rgb), var(--bs-border-opacity)) !important;
 }
 
-#deleteBookmark i {
-	color: var(--fhc-dashboard-danger);
-}
-
 .pin:hover {
 	cursor: pointer;
 }
@@ -210,15 +200,4 @@
 		transform: rotate(0em);
 	}
 
-}
-
-.hidden-widget {
-	background: var(--fhc-disabled-background);
-	opacity: 40%;
-}
-
-.hidden-widget .card,
-.hidden-widget .card-body,
-.hidden-widget .card-body * {
-	background: inherit !important;
 }

@@ -55,6 +55,8 @@
 }
 .fhc-calendar-mode-month .fhc-calendar-base-grid-line-event.event-header {
 	--event-bg: transparent;
+	/* the day row is an .event, without this it gets the black event text color */
+	--event-color: var(--fhc-text, #000);
 	font-weight: bold;
 	font-size: var(--fhc-calendar-fontsize-month-day, 1rem);
 }

@@ -57,6 +57,11 @@
 	transition: transform 0.15s ease;
 }
 
+/* dark mode replaces the yellow cell background with the dark cell background */
+html.dark #notentable .tabulator-tableholder .tabulator-editable[tabulator-field="note_vorschlag"]::after {
+	color: var(--fhc-text);
+}
+
 /* rotate the indicator up while the dropdown editor is open */
 #notentable .tabulator-tableholder .tabulator-cell.tabulator-editing[tabulator-field="note_vorschlag"]::after {
 	transform: translateY(-50%) rotate(180deg);
@@ -139,8 +144,9 @@
 }
 
 .pruefung-badge.attempt-t1::before { background: #0072B2; }
-.pruefung-badge.attempt-t2::before { background: #E69F00; }
-.pruefung-badge.attempt-t3::before { background: #CC79A7; }
-.pruefung-badge.attempt-k::before  { background: #D55E00; }
+/* white text fails on the lighter badge colors */
+.pruefung-badge.attempt-t2::before { background: #E69F00; color: #000; }
+.pruefung-badge.attempt-t3::before { background: #CC79A7; color: #000; }
+.pruefung-badge.attempt-k::before  { background: #D55E00; color: #000; }
 /* Termin ohne verbrauchten Antritt (entschuldigt, nicht beurteilt) - traegt keine Nummer */
 .pruefung-badge.attempt-none::before { background: #767676; }

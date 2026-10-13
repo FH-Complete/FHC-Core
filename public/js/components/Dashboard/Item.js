@@ -275,7 +275,7 @@ export default {
 						:aria-label="$p.t('dashboard/widget_pin')"
 						@click="pinItem"
 					>
-						<i class="fa-solid fa-thumbtack" aria-hidden="true" style="color:lightgray;"></i>
+						<i class="fa-solid fa-thumbtack" aria-hidden="true" style="color: var(--fhc-disabled, lightgray);"></i>
 					</div>
 				</template>
 				<!-- widget link -->

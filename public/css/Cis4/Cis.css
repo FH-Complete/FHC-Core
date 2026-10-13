@@ -31,7 +31,7 @@ body.compat main#cis-main {
 }
 
 .fhc-primary-color{
-	color: var(--fhc-primary) !important;
+	color: var(--fhc-primary-text) !important;
 }
 
 .fhc-primary-bg {
@@ -44,6 +44,17 @@ body.compat main#cis-main {
 
 .fhc-primary-highlight-color {
 	color: var(--fhc-primary-highlight) !important;
+}
+
+/* icon buttons in table action cells, white icon on the gray hover fill and in dark mode */
+.fhc-action-btn i {
+	color: var(--fhc-primary);
+}
+
+.fhc-action-btn:hover i,
+.fhc-action-btn:active i,
+html.dark .fhc-action-btn i {
+	color: var(--fhc-white-10);
 }
 
 .fhc-body-bg{
@@ -128,7 +139,7 @@ body.compat main#cis-main {
 
 	--fhc-cis-menu-lvl-1-bg: var(--fhc-primary);
 	--fhc-cis-menu-lvl-1-color: var(--fhc-light);
-	--fhc-cis-menu-lvl-1-bg-hover: var(--fhc-primary-highlight);
+	--fhc-cis-menu-lvl-1-bg-hover: var(--fhc-primary-shade);
 	--fhc-cis-menu-lvl-1-color-hover: var(--fhc-light);
 
 	--fhc-cis-menu-lvl-2-bg: var(--fhc-secondary);
@@ -156,10 +167,6 @@ body.compat main#cis-main {
   --fhc-offcanvas-zindex: 1045;
 }
 
-#themeSwitch i{
-	color: var(fhc-light) !important;
-}
-
 @media (min-width: 992px) {
 	:root {
 		--fhc-cis-menu-width: 250px;
@@ -185,11 +192,13 @@ body.compat main#cis-main {
 }
 
 #cis-menu .menu-entry:hover .submenu{
-	background-color: var(--fhc-primary-highlight);
+	background-color: var(--fhc-primary-shade);
 	color: inherit;
 }
 
+/* dark text needs a light background, the shade is too dark for it */
 #cis-menu .menu-entry:hover .submenu:hover{
+	background-color: var(--fhc-light);
 	color: var(--fhc-dark);
 }
 
@@ -521,7 +530,6 @@ body.compat main#cis-main {
   }
   #nav-main-toggle .collapsed .fa-chevron-left {
     transform: scaleX(-1);
-    color: var(--fhc-black-40);
   }
   #nav-search {
 	position: relative;
@@ -637,7 +645,7 @@ body.compat main#cis-main {
   }
 }
 .fhc-header > h1 > small {
-  color: var(--fhc-tertiary);
+  color: var(--bs-secondary-color);
   font-size: 1rem;
 }
 .fhc-header > h1 > small:before {

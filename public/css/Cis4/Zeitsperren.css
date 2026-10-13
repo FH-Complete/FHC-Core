@@ -37,3 +37,8 @@
 .is-info {
     border-color: #0d6efd;
 }
+
+/* #0d6efd is too dark for text on the dark background */
+html.dark .info-feedback {
+    color: var(--fhc-primary-text);
+}

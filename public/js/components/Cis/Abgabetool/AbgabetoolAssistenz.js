@@ -548,10 +548,10 @@ export const AbgabetoolAssistenz = {
 			const display = document.createElement('input');
 			display.readOnly = true;
 			display.placeholder = '';
-			display.style.cssText = 'padding: 4px; width: 100%; box-sizing: border-box; cursor: default; border: 1px solid; outline: none; background: #fff; appearance: none; caret-color: transparent;';
+			display.style.cssText = 'padding: 4px; width: 100%; box-sizing: border-box; cursor: default; border: 1px solid; outline: none; background: var(--fhc-background); color: var(--fhc-text); appearance: none; caret-color: transparent;';
 
 			const dropdown = document.createElement('div');
-			dropdown.style.cssText = 'display: none; position: fixed; background: #fff; border: 1px solid; z-index: 9999; min-width: 180px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);';
+			dropdown.style.cssText = 'display: none; position: fixed; background: var(--fhc-background); color: var(--fhc-text); border: 1px solid; z-index: 9999; min-width: 180px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);';
 
 
 			// mapping evaluated at render time, not at column definition time
@@ -814,10 +814,10 @@ export const AbgabetoolAssistenz = {
 			const display = document.createElement('input');
 			display.readOnly = true;
 			display.placeholder = '';
-			display.style.cssText = 'padding: 4px; width: 100%; box-sizing: border-box; cursor: default; border: 1px solid; outline: none; background: #fff; appearance: none; caret-color: transparent;';
+			display.style.cssText = 'padding: 4px; width: 100%; box-sizing: border-box; cursor: default; border: 1px solid; outline: none; background: var(--fhc-background); color: var(--fhc-text); appearance: none; caret-color: transparent;';
 
 			const dropdown = document.createElement('div');
-			dropdown.style.cssText = 'display: none; position: fixed; background: #fff; border: 1px solid; z-index: 9999; min-width: 220px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);';
+			dropdown.style.cssText = 'display: none; position: fixed; background: var(--fhc-background); color: var(--fhc-text); border: 1px solid; z-index: 9999; min-width: 220px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);';
 
 			const updateDisplay = () => {
 				display.value = options
@@ -912,10 +912,10 @@ export const AbgabetoolAssistenz = {
 			const display = document.createElement('input');
 			display.readOnly = true;
 			display.placeholder = '';
-			display.style.cssText = 'padding: 4px; width: 100%; box-sizing: border-box; cursor: default; border: 1px solid; outline: none; background: #fff; appearance: none; caret-color: transparent;';
+			display.style.cssText = 'padding: 4px; width: 100%; box-sizing: border-box; cursor: default; border: 1px solid; outline: none; background: var(--fhc-background); color: var(--fhc-text); appearance: none; caret-color: transparent;';
 
 			const dropdown = document.createElement('div');
-			dropdown.style.cssText = 'display: none; position: fixed; background: #fff; border: 1px solid; z-index: 9999; min-width: 180px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);';
+			dropdown.style.cssText = 'display: none; position: fixed; background: var(--fhc-background); color: var(--fhc-text); border: 1px solid; z-index: 9999; min-width: 180px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);';
 
 			options.forEach(opt => {
 				const row = document.createElement('label');
@@ -1669,7 +1669,7 @@ export const AbgabetoolAssistenz = {
 
 			const createButton = (iconClass, titleKey, clickHandler) => {
 				const btn = document.createElement('button');
-				btn.className = 'btn btn-outline-secondary';
+				btn.className = 'btn btn-outline-secondary fhc-action-btn';
 				btn.style.display = "flex";
 				btn.style.alignItems = "center"; // center icon vertically
 				btn.style.justifyContent = "center"; // center icon horizontally
@@ -1677,7 +1677,7 @@ export const AbgabetoolAssistenz = {
 				btn.style.aspectRatio = "1 / 1"; // keep square shape (optional)
 				btn.style.padding = "0"; // remove extra padding for compactness
 				if(iconClass == 'fa fa-timeline') btn.style.transform = "rotate(90deg)";
-				btn.innerHTML = `<i class="${iconClass}" style="color:#00649C; font-size:1.1rem;"></i>`;
+				btn.innerHTML = `<i class="${iconClass}" style="font-size:1.1rem;"></i>`;
 				btn.title = this.$capitalize(this.$p.t(titleKey));
 				btn.addEventListener('click', (e) => {
 					e.stopPropagation();
@@ -1964,28 +1964,28 @@ export const AbgabetoolAssistenz = {
 				let icon = ''
 				switch(dateStyle) {
 					case 'verspaetet':
-						icon = '<i style="color: #000000 !important;" class="fa-solid fa-triangle-exclamation"></i>'
+						icon = '<i class="fa-solid fa-triangle-exclamation"></i>'
 						break
 					case 'verpasst':
-						icon = '<i style="color: #000000 !important;" class="fa-solid fa-calendar-xmark"></i>'
+						icon = '<i class="fa-solid fa-calendar-xmark"></i>'
 						break
 					case 'abzugeben':
-						icon = '<i style="color: #000000 !important;" class="fa-solid fa-hourglass-half"></i>'
+						icon = '<i class="fa-solid fa-hourglass-half"></i>'
 						break
 					case 'standard':
-						icon = '<i style="color: #000000 !important;" class="fa-solid fa-clock"></i>'
+						icon = '<i class="fa-solid fa-clock"></i>'
 						break
 					case 'abgegeben':
-						icon = '<i style="color: #000000 !important;" class="fa-solid fa-paperclip"></i>'
+						icon = '<i class="fa-solid fa-paperclip"></i>'
 						break
 					case 'beurteilungerforderlich':
-						icon = '<i style="color: #000000 !important;" class="fa-solid fa-list-check"></i>'
+						icon = '<i class="fa-solid fa-list-check"></i>'
 						break
 					case 'bestanden':
-						icon = '<i style="color: #000000 !important;" class="fa-solid fa-check"></i>'
+						icon = '<i class="fa-solid fa-check"></i>'
 						break
 					case 'nichtbestanden':
-						icon = '<i style="color: #000000 !important;" class="fa-solid fa-circle-exclamation"></i>'
+						icon = '<i class="fa-solid fa-circle-exclamation"></i>'
 						break
 				}
 

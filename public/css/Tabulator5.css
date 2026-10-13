@@ -122,7 +122,7 @@
 }
 
 .tabulator-row.tabulator-unselectable:not(.tabulator-calcs) {
-	color: #777 !important;
+	color: #666 !important;
 }
 
 .tabulator-cell .btn {
