@@ -486,7 +486,7 @@ export default {
 				filter.uid = this.lecturers.map((lecture) => lecture.uid);
 
 			let response = null;
-			if (this.previewRole === 'lektor')
+			if (this.previewRole === 'lektor') {
 				response = [
 					this.$api.call(
 						ApiKalender.getPlanLecturer(
@@ -497,8 +497,7 @@ export default {
 						),
 					),
 				];
-
-			if (this.previewRole === 'student')
+			} else if (this.previewRole === 'student'){
 				response = [
 					this.$api.call(
 						ApiKalender.getPlanStudent(
@@ -509,18 +508,19 @@ export default {
 						),
 					),
 				];
-
-			response = [
-				this.$api.call(
-					ApiKalender.getPlan(
-						filter,
-						start.toISODate(),
-						end.toISODate(),
-						collisionCheck,
-						maxDailyEventLimit,
+			} else {
+				response = [
+					this.$api.call(
+						ApiKalender.getPlan(
+							filter,
+							start.toISODate(),
+							end.toISODate(),
+							collisionCheck,
+							maxDailyEventLimit,
+						),
 					),
-				),
-			];
+				];
+			}
 
 			if (response) {
 				response[0].then((result) => {

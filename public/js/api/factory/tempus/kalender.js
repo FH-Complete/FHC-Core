@@ -22,7 +22,7 @@ export default {
 			params: { lehreinheit_id, start_date, end_date }
 		};
 	},
-	getPlanLecturer(start_date, end_date)
+	getPlanLecturer(start_date, end_date, collisionCheck = true, maxDailyEventLimit = null)
 	{
 		return {
 			method: 'get',

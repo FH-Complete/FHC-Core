@@ -243,7 +243,7 @@ class KalenderLib
 		return $this->_mapEvents($data, $collisionCheck, $maxDailyEventLimit);
 	}
 
-	public function getPlanForStudent($start_date, $end_date)
+	public function getPlanForStudent($start_date, $end_date, $collisionCheck = true, $maxDailyEventLimit = null)
 	{
 		$this->_buildBasePlanQuery();
 
@@ -251,11 +251,11 @@ class KalenderLib
 
 		$data = $this->_loadFilteredBasePlan($start_date, $end_date);
 
-		return $this->_mapEvents($data);
+		return $this->_mapEvents($data, $collisionCheck, $maxDailyEventLimit);
 	}
 
 
-	public function getPlanForLecturer($start_date, $end_date)
+	public function getPlanForLecturer($start_date, $end_date, $collisionCheck = true, $maxDailyEventLimit = null)
 	{
 		$this->_buildBasePlanQuery();
 
@@ -271,7 +271,7 @@ class KalenderLib
 		)", NULL, FALSE);
 		$data = $this->_loadFilteredBasePlan($start_date, $end_date);
 
-		return $this->_mapEvents($data);
+		return $this->_mapEvents($data, $collisionCheck, $maxDailyEventLimit);
 	}
 	public function getZeitsperren($start_date, $end_date, $emp)
 	{
