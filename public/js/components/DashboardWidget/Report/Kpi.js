@@ -65,7 +65,7 @@ export default {
 				const fields = this.activeAggregator.fields.split(',');
 				return this.data.reduce(
 					(res, curr) => res + fields.reduce(
-						(sum, key) => sum + (curr[key] || 0),
+						(sum, key) => sum + (Number(curr[key]) || 0),
 						0
 					),
 					0
