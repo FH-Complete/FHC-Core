@@ -1601,7 +1601,7 @@ class KalenderLib
 		return $this->_ci->KalenderModel->execReadOnlyQuery($query);
 	}
 
-	private function _mapEvents($data, $collisionCheck = true)
+	private function _mapEvents($data, $collisionCheck = true, $maxDailyEventLimit = null)
 	{
 		$stundenplan_data = [];
 
@@ -1767,6 +1767,21 @@ class KalenderLib
 		foreach ($events as $event)
 		{
 			usort($event->ort_kurzbz, 'strnatcasecmp');
+		}
+
+		if (!is_null($maxDailyEventLimit) && is_numeric($maxDailyEventLimit) && $maxDailyEventLimit > 0)
+		{
+			$eventsPerDay = [];
+			$events = array_filter($events, function ($event) use (&$eventsPerDay, $maxDailyEventLimit) {
+				$date = $event->datum;
+				$eventsPerDay[$date] = $eventsPerDay[$date] ?? 0;
+	
+				if ($eventsPerDay[$date] >= $maxDailyEventLimit)
+					return false;
+	
+				$eventsPerDay[$date]++;
+				return true;
+			});
 		}
 
 		return array_values($events);
