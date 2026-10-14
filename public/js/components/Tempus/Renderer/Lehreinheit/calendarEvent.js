@@ -142,7 +142,6 @@ export default {
 		:class="classes"
 		class="position-relative"
 		@wheel.stop
-		data-cy="calendar-event"
 	>
 		<div class="position-absolute top-0 start-0 m-1">
 			<i class="fa-solid fa-triangle-exclamation text-muted" v-if="event.collisions.length"></i>

@@ -167,13 +167,13 @@ export default {
 				>
 				
 				<template #option="{ option }">
-					<div class="room-option">
+					<div class="room-option" data-cy="room-option">
 						<i class="fa-solid fa-door-open text-muted"></i>
 						<span v-if="option.raumtyp_kurzbz">
 							[{{ option.raumtyp_kurzbz }}]
 						</span>
 						<span v-else></span>
-						<span class="fw-semibold">
+						<span class="fw-semibold" data-cy="room-ort-kurzbz">
 							{{ option.ort_kurzbz }}
 						</span>
 						<span class="text-muted small text-nowrap">
@@ -206,6 +206,7 @@ export default {
 						type="button"
 						class="btn btn-primary"
 						@click="confirm"
+						data-cy="saveRoomSelection"
 					>
 						{{ $p.t('global','speichern') }}
 					</button>

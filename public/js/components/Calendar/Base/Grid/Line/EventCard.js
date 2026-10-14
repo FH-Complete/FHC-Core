@@ -48,7 +48,7 @@ export default {
 		class="course-parker event"
 		v-draggable:move.noimage="dragKalenderCollection"
 		:style="eventStyle(event.orig)"
-		data-cy="calendar-event"
+		data-cy="parked-calendar-event"
 	>
 		<button v-if="parked" class="unpark-btn" type="button" @click="unpark">
 			<i class="fa-solid fa-xmark"></i>

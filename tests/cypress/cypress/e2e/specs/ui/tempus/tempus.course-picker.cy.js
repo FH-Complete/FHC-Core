@@ -14,7 +14,7 @@ context("Tempus course picker tests", () => {
     tempusPage.visitAndWaitForPlanner();
   });
 
-  it("can select one course and show preview of its events", () => {
+  it("shows a course's events after selecting it", () => {
     tempusPage.getSlideInCoursesMenu().should("exist");
     tempusPage.getCourseTreeRows().should("have.length.greaterThan", 0);
     tempusPage.getCoursePicker().should("exist");
@@ -26,7 +26,7 @@ context("Tempus course picker tests", () => {
     tempusPage.getCoursePickerRows().should("have.length.greaterThan", 0);
   });
 
-  it("can search for a course event in the course picker", () => {
+  it("filters course teaching units using the course-picker search", () => {
     tempusPage.selectCourseByName(TARGETED_STUDY_PLAN_SHORT_CODE);
     waitForOk("@fetchCoursePickerCourses");
 
@@ -50,7 +50,7 @@ context("Tempus course picker tests", () => {
     });
   });
 
-  it("can drag and drop one course event into the calendar", () => {
+  it("adds a course teaching unit to the calendar when it is dropped", () => {
     tempusApi.deletePlannerEventsForDay("monday");
     tempusPage.getCalendarSection().should("exist");
     tempusPage.waitForCalendarToFinishLoading();
@@ -67,6 +67,8 @@ context("Tempus course picker tests", () => {
     tempusPage.getCoursePickerRows().should("have.length.greaterThan", 0);
     tempusPage.dropCourseOnCalendarPart(0, 10);
 
+    waitForOk("@addCalendarEvent");
+    tempusPage.selectFirstRoomAndSave();
     waitForOk("@addCalendarEvent");
     waitForOk("@fetchPlanData");
 

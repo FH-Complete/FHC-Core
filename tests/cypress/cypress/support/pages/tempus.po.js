@@ -26,17 +26,28 @@ class TempusPage {
     parkingSlot: "div[data-cy='tempus'] #parkingslot",
   };
 
-  visit = () =>
-    cy.visit("/index.ci.php/tempus", {
+  // Test setup
+  visit = () => {
+    const { adminusername, adminpassword } = Cypress.env();
+
+    return cy.visit("/index.ci.php/tempus", {
+      auth: {
+        username: adminusername,
+        password: adminpassword,
+      },
       onBeforeLoad(win) {
         win.localStorage.removeItem("tempus_parking");
         win.localStorage.removeItem("tempus_searchtypes");
         win.sessionStorage.removeItem("tempus_searchstr");
       },
     });
+  };
 
   setupIntercepts = () => {
-    cy.intercept({ method: "GET", url: "**/tempus/Info/getStudiengaenge" }).as("fetchCourseTree");
+    cy.intercept({
+      method: "GET",
+      url: "**/tempus/Info/getStudiengaenge",
+    }).as("fetchCourseTree");
     cy.intercept({
       method: "POST",
       url: /\/tempus\/Kalender\/getPlan(?:\?|$)/,
@@ -54,11 +65,11 @@ class TempusPage {
     );
     cy.intercept({
       method: "GET",
-      url: "**/components/stv/studiensemester/now**",
+      url: "**/organisation/studiensemester/current**",
     }).as("getCurrentSemester");
     cy.intercept({
       method: "POST",
-      url: "**/components/stv/studiensemester/set**",
+      url: "**/organisation/studiensemester/set**",
     }).as("setSemester");
     cy.intercept({
       method: "POST",
@@ -80,10 +91,10 @@ class TempusPage {
       method: "GET",
       url: "**/tempus/Tags/getTagsByCalendar/**",
     }).as("fetchTagsByCalendar");
-    // cy.intercept({
-    //   method: "POST",
-    //   url: "**/tempus/coursepicker/getByStg**",
-    // }).as("fetchCoursePickerCourses");
+    cy.intercept({
+      method: "POST",
+      url: "**/tempus/coursepicker/getCourses**",
+    }).as("fetchCoursePickerCourses");
     cy.intercept({
       method: "POST",
       url: "**/searchbar/search**",
@@ -110,6 +121,7 @@ class TempusPage {
     }).as("deleteCalendarEvent");
   };
 
+  // Main page selectors
   getTempusOverview = () => cy.get("div[data-cy='tempus']");
   getSlideInCoursesMenu = () => cy.get("div[data-cy='verbandMenu']");
   getSidebarMenu = () => this.getTempusOverview().find("#sidebarMenu");
@@ -125,13 +137,15 @@ class TempusPage {
   getCourseTreeRows = () =>
     this.getSlideInCoursesMenu()
       .find("tbody tr td.text-break")
-	  .closest("[role='cell']");
+      .closest("[role='cell']");
   getCourseTreeRowByName = (courseShortName) =>
     this.getSlideInCoursesMenu()
       .contains("tbody tr td.text-break .treemenu-entry", courseShortName)
       .closest("[role='cell']");
   getCoursePickerRows = () => this.getCoursePicker().find("[data-cy='coursepicker-row']");
   getCoursePickerSearchInput = () => this.getCoursePicker().find("input");
+
+  // Calendar selectors and filters
   getCalendarEventsPerWeekHolders = () =>
     this.getCalendarBaseGrid().find(".fhc-calendar-base-grid-line");
   getCalendarEvents = () =>
@@ -174,6 +188,8 @@ class TempusPage {
 
       return !!eventData?.orig?.ort_kurzbz;
     });
+
+  // Navbar filters
   getNavbarSearchInput = () =>
     this.getTempusOverview().find("header .searchbar_input");
   getNavbarRoomSearchResult = (room) => {
@@ -207,6 +223,7 @@ class TempusPage {
       .parent()
       .contains(".d-flex.align-items-center", "Zeitwünsche");
 
+  // Calendar event selectors and data helpers
   getCalendarEventById = (id) =>
     this.getCalendarEvents().filter(`div[data-id="event-${id}"]`);
   getCalendarEventByUniqueCalenderGroupId = (groupId) =>
@@ -220,9 +237,9 @@ class TempusPage {
       .invoke("attr", "style")
       .then((style) => this.getEventGridRowFromStyle(style));
   getGridRowByContainingUniqueCalendarGroupId = (groupId) =>
-	this.getCalendarEventByUniqueCalenderGroupId(groupId)
-	  .invoke("attr", "style")
-	  .then((style) => this.getEventGridRowFromStyle(style));
+    this.getCalendarEventByUniqueCalenderGroupId(groupId)
+      .invoke("attr", "style")
+      .then((style) => this.getEventGridRowFromStyle(style));
   getCalendarEventsByWeekday = (weekday) =>
     this.getCalendarEventsPerWeekHolders()
       .eq(weekdayToGridRowMap[weekday] - 1)
@@ -279,10 +296,12 @@ class TempusPage {
   getFirstLecturer = (eventData) =>
     eventData?.orig?.lektor?.find((lecturer) => lecturer?.kurzbz);
   getUpdatedKalenderId = (interception) => {
-    const retval = interception.response.body?.data?.retval;
+    const retval = interception.response.body?.data?.kalender_id;
 
     return retval?.kalender_id ?? retval;
   };
+
+  // Room-selection actions
   chooseDifferentRoomForEvent = (eventId, originalRoom) => {
     this.getCalendarEventById(eventId)
       .scrollIntoView()
@@ -291,27 +310,62 @@ class TempusPage {
     this.getEventContextMenuOption("Raumauswahl").click({ force: true });
     waitForOk("@fetchRoomSuggestions");
 
-    return this.getRaumauswahlRoomOptions()
+    return this.getRoomSelectionOptions()
       .should("have.length.greaterThan", 0)
       .then(($roomOptions) => {
+        const getRoomCode = (option) => option.textContent.trim();
+        const currentRoomOption = [...$roomOptions].find(
+          (option) => getRoomCode(option) === originalRoom,
+        );
         const roomOption = [...$roomOptions].find((option) => {
-          const room = option.innerText.trim();
+          const room = getRoomCode(option);
 
           return room && room !== originalRoom;
         });
 
+        expect(currentRoomOption, "current room suggestion").to.exist;
         expect(roomOption, "different room suggestion").to.exist;
 
-        const newRoom = roomOption.innerText.trim();
+        const newRoom = getRoomCode(roomOption);
 
-        return cy.wrap(roomOption).click().then(() => newRoom);
+        return cy
+          .wrap(currentRoomOption)
+          .click()
+          .then(() => cy.wrap(roomOption).click())
+          .then(() =>
+            cy
+              .get("[data-cy='saveRoomSelection']")
+              .should("be.visible")
+              .click({ force: true }),
+          )
+          .then(() => newRoom);
       });
   };
+
+  selectFirstRoomAndSave = () =>
+    this.getRoomSelectionOptions()
+      .should("have.length.greaterThan", 0)
+      .first()
+      .then(($roomOption) => {
+        const room = $roomOption.text().trim();
+
+        return cy
+          .wrap($roomOption)
+          .click()
+          .then(() =>
+            cy
+              .get("[data-cy='saveRoomSelection']")
+              .should("be.visible")
+              .click({ force: true }),
+          )
+          .then(() => room);
+      });
+
   waitForUpdatedEventId = () =>
     cy.wait("@updateCalendarEvent").then((interception) => {
       expect(interception.response.statusCode).to.eq(200);
-      console.log("interception.response.body", interception.response);
-      const updatedEventId = this.getUpdatedKalenderId(interception);
+
+	  const updatedEventId = this.getUpdatedKalenderId(interception);
       expect(updatedEventId, "updated planner event id").to.exist;
 
       return updatedEventId;
@@ -325,6 +379,8 @@ class TempusPage {
         return cy.wrap({ newRoom, updatedEventId });
       }),
     );
+
+  // Calendar state and modal selectors
   getMondayFirstColumnEventData = ($body) =>
     [
       ...$body
@@ -351,16 +407,16 @@ class TempusPage {
     this.getEventContextMenu().contains("button", option);
   getRoomSelectionModal = () =>
     cy
-      .contains(".bootstrap-modal.show .modal-title", "Raumauswahl")
+      .get("[data-cy='raumauswahlModal']")
       .closest(".bootstrap-modal.show");
-  getRaumauswahlRoomOptions = () =>
-    this.getRoomSelectionModal().find(".list-group-item span");
+  getRoomSelectionOptions = () =>
+    this.getRoomSelectionModal().find("[data-cy='room-ort-kurzbz']");
   getResourcesModal = () =>
     cy
       .get("[data-cy='resourcesAssignmentModal']")
       .closest(".bootstrap-modal.show");
   getTagsModal = () =>
-    cy.get("[data-cy='tagsAssignmentModal']").closest(".bootstrap-modal.show")
+    cy.get("[data-cy='tagsAssignmentModal']").closest(".bootstrap-modal.show");
   getCalendarEventRoom = (id) =>
     this.getCalendarEventById(id).find("[data-cy='calendar-event-room']");
   getStundenrasterToggle = () =>
@@ -370,10 +426,11 @@ class TempusPage {
   getReservationModal = () => cy.get("[data-cy='reservationModal']");
   getEventParkingSlot = () => this.getSidebarMenu().find("#parkingslot");
   getParkedEvents = () =>
-    this.getEventParkingSlot().find("[data-cy='calendar-event']");
+    this.getEventParkingSlot().find("[data-cy='parked-calendar-event']");
   getPreviewRoleButton = (role) =>
     this.getPreviewRoleOptionsHolder().contains("button", role);
 
+  // Navigation and preview actions
   getSemesterSetterButton = () =>
     this.getSidebarMenu().find(".stv-studiensemester button").last();
 
@@ -409,6 +466,7 @@ class TempusPage {
     this.waitForCalendarToFinishLoading();
   };
 
+  // Assertions and loading state
   expectCalendarEventRoom = (eventId, expectedRoom) => {
     this.getCalendarEventRoom(eventId)
       .scrollIntoView()
@@ -450,6 +508,7 @@ class TempusPage {
     waitForOk("@getCurrentSemester");
   };
 
+  // Drag-and-drop actions
   dropEventOnCalendarPart = (eventId, partIndex, options = {}) => {
     const event = this.getCalendarEventById(eventId);
 
@@ -462,7 +521,7 @@ class TempusPage {
         ...options,
       });
   };
-  
+
   dropCourseOnCalendarPart = (courseIndex, partIndex, options = {}) => {
     const course = this.getCoursePickerRows()
       .eq(courseIndex)
