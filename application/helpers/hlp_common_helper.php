@@ -424,6 +424,27 @@ if (!function_exists('array_is_list')) {
         return array_keys($arr) === range(0, count($arr) - 1);
     }
 }
+/**
+ * Porting of PHP 8.4 function
+ *
+ * @param array<TKey, TValue>						$array
+ * @param callable(TValue $value, TKey $key): bool	$callback
+ * @return ?TValue
+ *
+ * @see https://www.php.net/manual/en/function.array-find.php
+ */
+if (!function_exists('array_find')) {
+	function array_find(array $array, callable $callback)
+	{
+		foreach ($array as $key => $value) {
+			if ($callback($value, $key)) {
+				return $value;
+			}
+		}
+
+		return null;
+	}
+}
 
 // ------------------------------------------------------------------------
 // Collection of utility functions for form validation purposes
