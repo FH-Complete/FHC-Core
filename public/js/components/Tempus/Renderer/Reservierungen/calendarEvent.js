@@ -58,13 +58,13 @@ export default {
 			if (Array.isArray(this.event.teilnehmer_person) && this.event.teilnehmer_person.length > 0) {
 				if (this.event.teilnehmer_person.length > 3) {
 					tooltipArray.push([
-						this.$p.t('lehre/teilnehmer'),
+						this.$p.t('ui/teilnehmende'),
 						this.event.teilnehmer_person.slice(0, 3).map(person => `${person.vorname} ${person.nachname}`).join("\n")
-						+ "\n" + this.$p.t('lehre/weitereTeilnehmer', [this.event.teilnehmer_person.length - 3])
+						+ "\n" + this.$p.t('ui/weitereTeilnehmende', [this.event.teilnehmer_person.length - 3])
 					].join(": "));
 				} else {
 					tooltipArray.push([
-						this.$p.t('lehre/teilnehmer'),
+						this.$p.t('ui/teilnehmende'),
 						this.event.teilnehmer_person.map(person => `${person.vorname} ${person.nachname}`).join("\n")
 					].join(": "));
 				}

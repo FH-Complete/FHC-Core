@@ -112,7 +112,7 @@ export default {
 			params: { kalender_id}
 		};
 	},
-	addKalenderEvent(lehreinheit_id, ort_kurzbz, start_date, end_date, first_run) {
+	addKalenderEvent(lehreinheit_id, ort_kurzbz, start_date, end_date, first_run = true) {
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/tempus/Kalender/addKalenderEvent',
