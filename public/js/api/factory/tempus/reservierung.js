@@ -55,5 +55,12 @@ export default {
 			params: { titel, beschreibung, orte, start_date, end_date, teilnehmer, specialFinalGroups, specialGroups, groups}
 		};
 	},
+	updateTeilnehmer(kalender_id, teilnehmer, gruppen) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/tempus/Reservierung/updateTeilnehmer',
+			params: { kalender_id, teilnehmer, gruppen }
+		};
+	},
 
 };

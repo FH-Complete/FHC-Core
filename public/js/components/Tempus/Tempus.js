@@ -98,6 +98,9 @@ export default {
 			modalActions: {
 				saveEventTime: (payload) => this.handleSaveEventTime(payload),
 				addToFilter: (filter, type) => this.addToFilter(filter, type),
+				goToEvent: ({datum, kalender_id}) => {
+					this.jumpToDate(datum);
+				}
 			},
 			reload: () => {
 				this.reload();
@@ -410,6 +413,22 @@ export default {
 
 			this.$refs.calendar.resetEventLoader();
 			if (this.lastRange) this.handleRange(this.lastRange);
+		},
+		jumpToDate(value) {
+			if (!value) return;
+
+			let zone = this.config.timezone;
+			let date = luxon.DateTime.fromSQL(value, { zone });
+			if (!date.isValid)
+				date = luxon.DateTime.fromISO(value, { zone });
+			if (!date.isValid)
+				return;
+
+			this.calendarDatesByMode = {
+				...this.calendarDatesByMode,
+				week: date.startOf('week').toISODate(),
+			};
+			this.currentMode = 'week';
 		},
 		jumpToKw(kw) {
 			const num = parseInt(kw);
@@ -1232,8 +1251,8 @@ export default {
 			@select-verband-and-close="onSelectVerbandAndClose"
 		/>
 		<raumauswahl-multi-modal ref="raumMultiModal" @saved="reload()"/>
-		<raumauswahl-modal ref="raumModal" @saved="() => {$refs.calendar.resetEventLoader(); $refs.sidebar.reloadCoursepicker(); rebuildRaumvorschlag();}"/>
-		<lehreinheit-modal ref="lehreinheitModal" @saved="$refs.calendar.resetEventLoader(); $refs.sidebar.reloadCoursepicker();"/>
+		<raumauswahl-modal ref="raumModal" @saved="() => reload()"/>
+		<lehreinheit-modal ref="lehreinheitModal" @saved="reload()"/>
 		<resources-assignment-modal
 		ref="resourcesAssignmentModal"
 		@save-finished="$refs.calendar.resetEventLoader()"

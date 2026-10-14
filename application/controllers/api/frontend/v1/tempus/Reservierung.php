@@ -12,10 +12,11 @@ class Reservierung extends FHCAPI_Controller
 	{
 		parent::__construct([
 			'addReservierung' => 'lehre/lvplan:rw',
-			'getRollen' => 'lehre/lvplan:rw',
-			'getInformation' => 'lehre/lvplan:rw',
-			'getLektor' => 'lehre/lvplan:rw',
-			'searchGroup' => 'lehre/lvplan:rw',
+			'getRollen' => 'lehre/lvplan:r',
+			'getInformation' => 'lehre/lvplan:r',
+			'getLektor' => 'lehre/lvplan:r',
+			'searchGroup' => 'lehre/lvplan:r',
+			'updateTeilnehmer' => 'lehre/reservierung:rw',
 		]);
 
 		$this->_ci =& get_instance();
@@ -72,12 +73,17 @@ class Reservierung extends FHCAPI_Controller
 
 		$rollen = $this->_ci->KalenderEventRolleModel->load();
 
+		$this->_ci->KalenderEventRolleModel->addOrder('sort');
+		$this->_ci->KalenderEventRolleModel->addSelect('rolle_kurzbz, array_to_json(bezeichnung_mehrsprachig::varchar[])->>'. $language. ' as bezeichnung');
+		$gruppen_rollen = $this->_ci->KalenderEventRolleModel->loadWhere(array('rolle_kurzbz !=' => 'organisator'));
+
 		$this->_ci->StudiensemesterModel->addOrder('start', 'DESC');
 		$studiensemester = $this->_ci->StudiensemesterModel->load();
 
 		$return_array['studiengaenge'] = hasData($studiengaenge) ? getData($studiengaenge) : [];
 		$return_array['berechtigt'] = true;
 		$return_array['rollen'] = hasData($rollen) ? getData($rollen) : [];
+		$return_array['gruppen_rollen'] = hasData($gruppen_rollen) ? getData($gruppen_rollen) : [];
 		$return_array['studiensemester'] = hasData($studiensemester) ? getData($studiensemester) : [];
 
 
@@ -234,6 +240,47 @@ class Reservierung extends FHCAPI_Controller
 		$this->_ci->MitarbeiterModel->addOrder('vorname');
 		$result = $this->_ci->MitarbeiterModel->load();
 		$this->terminateWithSuccess(hasData($result) ? getData($result) : array());
+	}
+
+	public function updateTeilnehmer()
+	{
+		$this->_ci->form_validation->set_rules('kalender_id', 'kalender_id', 'required|numeric', [
+			'required' => $this->p->t('ui', 'error_fieldRequired'),
+		]);
+
+		if ($this->_ci->form_validation->run() === FALSE)
+			$this->terminateWithValidationErrors($this->_ci->form_validation->error_array());
+
+		if (!$this->_ci->permissionlib->isBerechtigt('lehre/reservierung'))
+			$this->terminateWithError($this->p->t('ui', 'keineBerechtigung'), self::ERROR_TYPE_GENERAL);
+
+		$kalender_id = $this->_ci->input->post('kalender_id', TRUE);
+		$teilnehmer = $this->_ci->input->post('teilnehmer', TRUE);
+		$gruppen = $this->_ci->input->post('gruppen', TRUE);
+
+		$teilnehmer = is_array($teilnehmer) ? $teilnehmer : [];
+		$gruppen = is_array($gruppen) ? $gruppen : [];
+
+		$hat_organisator = false;
+
+		foreach ($teilnehmer as $teil)
+		{
+			if (!empty($teil['uid']) && isset($teil['rolle']) && $teil['rolle'] === 'organisator')
+			{
+				$hat_organisator = true;
+				break;
+			}
+		}
+
+		if (!$hat_organisator)
+			$teilnehmer[] = array('uid' => getAuthUID(), 'rolle' => 'organisator');
+
+		$result = $this->_ci->kalenderlib->updateReservierungTeilnehmer($kalender_id, $teilnehmer, $gruppen);
+
+		if (isError($result))
+			$this->terminateWithError(getError($result));
+
+		$this->terminateWithSuccess(getData($result));
 	}
 
 }

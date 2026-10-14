@@ -1,6 +1,8 @@
-import { numberPadding, formatDate } from "../../../../helpers/DateHelpers.js"
-import ApiTempusTag from "../../../../api/factory/tempus/tag.js";
-import CoreTag from '../../../../components/Tag/Tag.js';
+import ZeitRow from '../../Modal/ZeitRow.js'
+import RaumRow from '../../Modal/RaumRow.js'
+import KollisionRow from '../../Modal/KollisionRow.js'
+import TagRow from '../../Modal/TagRow.js'
+import TeilnehmerRow from '../../Modal/TeilnehmerRow.js'
 
 export default {
 	props:{
@@ -10,90 +12,17 @@ export default {
 		},
 	},
 	components: {
-		CoreTag
-	},
-	data()
-	{
-		return {
-			tagEndpoint: ApiTempusTag
-		}
-	},
-	computed: {
-		tagValues() {
-			return this.event.eindeutige_kalender_gruppen_id ? [this.event.eindeutige_kalender_gruppen_id] : [];
-		},
-		lektorenLinks: function () {
-			if (!this.event || !Array.isArray(this.event.lektor) || !this.event.lektor.length) return "a";
-
-			let lektorenLinks = {};
-			this.event.lektor.forEach((lektor) => {
-				lektorenLinks[lektor.kurzbz] = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + `/Cis/Profil/View/${lektor.mitarbeiter_uid}`;
-			})
-			return lektorenLinks;
-		},
-		getOrtContentLink: function () {
-			if (!this.event || !this.event.ort_content_id) return "a";
-
-			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + `/CisVue/Cms/content/${this.event.ort_content_id}`
-		},
-		start_time: function () {
-			if (!this.event.beginn)
-				return 'N/A';
-			if (!(this.event.beginn instanceof Date)) {
-				return this.event.beginn;
-			}
-			return numberPadding(this.event.beginn.getHours()) + ":" + numberPadding(this.event.beginn.getMinutes());
-		},
-		end_time: function () {
-			if (!this.event.ende)
-				return 'N/A';
-			if (!(this.event.ende instanceof Date)) {
-				return this.event.ende;
-			}
-			return numberPadding(this.event.ende.getHours()) + ":" + numberPadding(this.event.ende.getMinutes());
-		},
-		ortString() {
-			return Array.isArray(this.event.ort_kurzbz) ? this.event.ort_kurzbz.join(', ') : this.event.ort_kurzbz;
-		},
-		tags() {
-			if (typeof this.event.tags === 'string') {
-				try {
-					return JSON.parse(this.event.tags);
-				} catch (e) {
-					console.error('Failed to parse tags:', e);
-					return [];
-				}
-			}
-
-			return this.event.tags || [];
-		},
+		ZeitRow,
+		RaumRow,
+		KollisionRow,
+		TagRow,
+		TeilnehmerRow
 	},
 	methods: {
-		methodFormatDate: function (d) {
-			return formatDate(d);
-		},
-		async fetchAssignedTagsByCalender(calendarGroupId) {
-			let result = await this.$api.call(
-				ApiTempusTag.getTagsByCalendar(calendarGroupId),
-			);
-
-			if (result.meta.status === "success")
-				return result.data.filter(tag => !!tag);
-
-			this.$fhcAlert.alertError(
-				this.$p.t("ui", "failed_assigned_tags_fetch_error_message"),
-			);
-			return [];
-		},
-		async onTagsChanged() {
-			let id = this.event.eindeutige_kalender_gruppen_id;
-			if (!id) return;
-
-			this.event.tags = await this.fetchAssignedTagsByCalender(id);
-		},
-		editTag(tag) {
-			this.$refs.tagComponent?.editTag(tag.id);
-		},
+		async saveAll() {
+			await this.$refs.teilnehmerRow.save();
+			this.$refs.zeit.save();
+		}
 	},
 	template: `
 	<div>
@@ -108,91 +37,13 @@ export default {
 		
 		<table class="table table-hover mb-4">
 				<tbody>
-					<tr>
-						<th>{{
-							$p.t('global','datum')?
-							$p.t('global','datum')+':'
-							:''
-						}}</th>
-						<td>{{methodFormatDate(event.datum)}}</td>
-					</tr>
-					<tr>
-						<th>{{
-								$p.t('ui','zeitraum')?
-								$p.t('ui','zeitraum')+':'
-								:''
-							}}</th>
-						<td>{{start_time + ' - ' + end_time}}</td>
-					</tr>
-					<tr>
-						<th>{{
-							$p.t('global','raum')?
-							$p.t('global','raum')+':'
-							:''
-						}}</th>
-						<td>
-							<a v-if="event.ort_content_id" :aria-label="$p.t('global','raum')" :title="$p.t('global','raum')" :href="getOrtContentLink"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C" aria-hidden="true"></i></a>
-							{{ortString}}
-						</td>
-					</tr>
-					<tr>
-						<th>{{
-							$p.t('ui','organisierende')?
-							$p.t('ui','organisierende')+':'
-							:''
-						}}</th>
-						<td>
-							<div v-for="lektor in event.lektor" class="d-block">
-								<a v-if="lektorenLinks[lektor.kurzbz]" :aria-label="$p.t('lehre','lektor')" :tooltip="$p.t('lehre','lektor')" :href="lektorenLinks[lektor.kurzbz]"><i class="fa fa-arrow-up-right-from-square me-1" aria-hidden="true" style="color:#00649C"></i></a>
-								{{lektor.kurzbz}}
-							</div>
-						</td>
-					</tr>
-					
-					<tr>
-						<th>{{$p.t('ui','teilnehmende')+':'}}</th>
-						<td>
-							<div v-for="teilnehmer in event.teilnehmer_person" class="d-block">
-								{{teilnehmer.kurzbz}}
-							</div>
-							<div v-for="gruppe in event.teilnehmer_gruppe" class="d-block">
-								{{gruppe.gruppe_kurzbz}}
-							</div>
-						</td>
-					</tr>
-					<tr>
-						<th>
-							<div class="d-flex align-items-center flex-wrap">
-								{{$p.t('ui','tags')}}:
-								<div class="fw-normal">
-									<core-tag
-										v-if="tagValues.length"
-										ref="tagComponent"
-										:endpoint="tagEndpoint"
-										:values="tagValues"
-										zuordnung_typ="eindeutige_kalender_gruppen_id"
-										show-hover
-										@added="onTagsChanged"
-										@deleted="onTagsChanged"
-										@updated="onTagsChanged"
-									></core-tag>
-								</div>
-							</div>
-						</th>
-						<td>
-							<span
-								v-for="tag in tags"
-								:key="tag.id"
-								:class="[tag.style, { tag_done: tag.done }]"
-								@click="editTag(tag)"
-								class="tag"
-							>{{ tag.beschreibung }}</span>
-						</td>
-					</tr>
-					
+					<kollision-row :event="event" />
+					<zeit-row ref="zeit" :event="event" />
+					<raum-row :event="event" />
+					<tag-row :event="event" />
 				</tbody>
 		</table>
-		
-
+		<teilnehmer-row ref="teilnehmerRow" :event="event" class="mb-3" />
+		<button type="button" class="btn btn-primary" @click.stop="saveAll">{{$p.t('ui', 'speichern')}}</button>
 	</div>`,
 }
