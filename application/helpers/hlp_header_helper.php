@@ -127,7 +127,9 @@ function generateJSDataStorageObject($indexPage, $calledPath, $calledMethod)
 			'name'=>$ci->config->item('theme_name'),
 			'modes'=>$ci->config->item('theme_modes'),
 		],
-		'domain' => DOMAIN
+		'domain' => DOMAIN,
+		'fhcomplete_build_version' => $ci->config->item('fhcomplete_build_version'),
+		'use_fhcomplete_build_version_in_path' => $ci->config->item('use_fhcomplete_build_version_in_path'),
 	);
 
 	$toPrint = "\n";
@@ -194,6 +196,8 @@ function generateJSModulesInclude($JSModules)
 
 	$ci =& get_instance();
 	$cachetoken = '?'.$ci->config->item('fhcomplete_build_version');
+	$ci->load->config('javascript');
+	$use_bundled_javascript = $ci->config->item('use_bundled_javascript');
 
 	if (isset($JSModules))
 	{
@@ -201,14 +205,20 @@ function generateJSModulesInclude($JSModules)
 
 		for ($tmpJSsCounter = 0; $tmpJSsCounter < count($tmpJSs); $tmpJSsCounter++)
 		{
+			$item = $tmpJSs[$tmpJSsCounter];
+			if($use_bundled_javascript && preg_match('#/js/apps/#', $item))
+			{
+				$item = preg_replace('#^public/#', 'public/dist/', $item);
+			}
+			echo "<!--{$item}-->".PHP_EOL;
 			if($ci->config->item('use_fhcomplete_build_version_in_path'))
 			{
-				$relurl = preg_replace('#public/#', 'public/' . $ci->config->item('fhcomplete_build_version') . '/', $tmpJSs[$tmpJSsCounter]);
+				$relurl = preg_replace('#public/#', 'public/' . $ci->config->item('fhcomplete_build_version') . '/', $item);
 				$toPrint = sprintf($jsInclude, base_url($relurl)).PHP_EOL;
 			}
 			else
 			{
-				$toPrint = sprintf($jsInclude, base_url($tmpJSs[$tmpJSsCounter].$cachetoken)).PHP_EOL;
+				$toPrint = sprintf($jsInclude, base_url($item.$cachetoken)).PHP_EOL;
 			}
 
 			if ($tmpJSsCounter > 0) $toPrint = "\t\t".$toPrint;

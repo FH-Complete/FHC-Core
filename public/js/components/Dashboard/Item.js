@@ -9,6 +9,8 @@ if (!document.dragDropTouchActive) {
 	document.dragDropTouchActive = true;
 }
 
+import {absoluteJsImportUrl} from "../../helpers/UrlHelpers.js";
+
 export default {
 	name: 'Item',
 	components: {
