@@ -1059,8 +1059,12 @@ class KalenderLib
 			$result = $this->updateZeit($kalender_id, $start_time, $end_time);
 			if (isError($result)) return $result;
 		}
+		
+		$updatedEntryResult = $this->_loadKalenderEntry($kalender_id);
+		if (isError($updatedEntryResult)) return $updatedEntryResult;
 
-		return success($result);
+		log_message('error', 'Kalender event updated: ' . json_encode($updatedEntryResult));
+		return success(getData($updatedEntryResult));
 	}
 
 	public function updateZeit($kalender_id, $start_date, $end_date)

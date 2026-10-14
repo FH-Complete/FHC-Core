@@ -56,25 +56,25 @@ context("Tempus role preview tests", () => {
 
         cy.wait("@updateCalendarEvent").then((interception) => {
           expect(interception.response.statusCode).to.eq(200);
-          expect(interception.response.body.data.retval).to.exist;
+          expect(interception.response.body.data).to.exist;
 
-          const updatedEventId =
-            interception.response.body.data.retval?.kalender_id ??
-            interception.response.body.data.retval;
+          const updatedEventGroupId =
+            interception.response.body.data?.eindeutige_kalender_gruppen_id ??
+            interception.response.body.data;
 
-          cy.wrap(updatedEventId).as("updatedEventId");
+          cy.wrap(updatedEventGroupId).as("updatedEventGroupId");
         });
         waitForOk("@fetchPlanData");
 
-        cy.get("@updatedEventId").then((updatedEventId) => {
-          tempusPage.getEventGridRow(updatedEventId).then((gridRowStyle) => {
+        cy.get("@updatedEventGroupId").then((updatedEventGroupId) => {
+          tempusPage.getGridRowByContainingUniqueCalendarGroupId(updatedEventGroupId).then((gridRowStyle) => {
             tempusPage.selectRoleAndWait(LEKTOR);
-            tempusPage.getEventGridRow(eventId).then((lecturerGridRow) => {
+            tempusPage.getGridRowByContainingUniqueCalendarGroupId(updatedEventGroupId).then((lecturerGridRow) => {
               expect(lecturerGridRow).to.not.eq(gridRowStyle);
             });
 
             tempusPage.selectRoleAndWait(STUDENT);
-            tempusPage.getEventGridRow(eventId).then((studentGridRow) => {
+            tempusPage.getGridRowByContainingUniqueCalendarGroupId(updatedEventGroupId).then((studentGridRow) => {
               expect(studentGridRow).to.not.eq(gridRowStyle);
             });
           });
@@ -107,30 +107,31 @@ context("Tempus role preview tests", () => {
 
         cy.wait("@updateCalendarEvent").then((interception) => {
           expect(interception.response.statusCode).to.eq(200);
-          expect(interception.response.body.data.retval).to.exist;
+          expect(interception.response.body.data).to.exist;
+		
+          const updatedEventGroupId =
+            interception.response.body.data?.eindeutige_kalender_gruppen_id ??
+            interception.response.body.data;
 
-          const updatedEventId =
-            interception.response.body.data.retval?.kalender_id ??
-            interception.response.body.data.retval;
-
-          cy.wrap(updatedEventId).as("updatedEventId");
+          cy.wrap(updatedEventGroupId).as("updatedEventGroupId");
         });
         waitForOk("@fetchPlanData");
 
         tempusPage.syncAndReloadPlanner();
 
-        cy.get("@updatedEventId").then((updatedEventId) => {
-          tempusPage.getEventGridRow(updatedEventId).then((gridRowStyle) => {
+        cy.get("@updatedEventGroupId").then((updatedEventGroupId) => {
+			console.log("Updated Event Group ID:", updatedEventGroupId); // Debugging line
+          tempusPage.getGridRowByContainingUniqueCalendarGroupId(updatedEventGroupId).then((gridRowStyle) => {
             tempusPage.selectRoleAndWait(LEKTOR);
             tempusPage
-              .getEventGridRow(updatedEventId)
+              .getGridRowByContainingUniqueCalendarGroupId(updatedEventGroupId)
               .then((lecturerGridRow) => {
                 expect(lecturerGridRow).to.eq(gridRowStyle);
               });
 
             tempusPage.selectRoleAndWait(STUDENT);
             tempusPage
-              .getEventGridRow(updatedEventId)
+              .getGridRowByContainingUniqueCalendarGroupId(updatedEventGroupId)
               .then((studentGridRow) => {
                 expect(studentGridRow).to.eq(gridRowStyle);
               });
@@ -156,7 +157,7 @@ context("Tempus role preview tests", () => {
         });
 
         cy.wait("@updateCalendarEvent")
-          .its("response.body.data.retval.kalender_id")
+          .its("response.body.data.kalender_id")
           .as("updatedEventId");
         waitForOk("@fetchPlanData");
 
@@ -170,16 +171,16 @@ context("Tempus role preview tests", () => {
           tempusPage.getEventContextMenuOption("Freischalten für Live").click();
           waitForOk("@syncCalendarToStudent");
 
-          tempusPage.getEventGridRow(updatedEventId).then((gridRowStyle) => {
+          tempusPage.getGridRowByContainingEventId(updatedEventId).then((gridRowStyle) => {
             tempusPage.selectRoleAndWait(LEKTOR);
             tempusPage
-              .getEventGridRow(updatedEventId)
+              .getGridRowByContainingEventId(updatedEventId)
               .then((lecturerGridRow) => {
                 expect(lecturerGridRow).to.eq(gridRowStyle);
               });
 
             tempusPage.selectRoleAndWait(STUDENT);
-            tempusPage.getEventGridRow(eventId).then((studentGridRow) => {
+            tempusPage.getGridRowByContainingEventId(eventId).then((studentGridRow) => {
               expect(studentGridRow).to.not.eq(gridRowStyle);
             });
           });
@@ -206,14 +207,14 @@ context("Tempus role preview tests", () => {
 
         cy.get("@updateCalendarEvent").should("not.exist");
 
-        tempusPage.getEventGridRow(eventId).then((gridRowStyle) => {
+        tempusPage.getGridRowByContainingEventId(eventId).then((gridRowStyle) => {
           tempusPage.selectRoleAndWait(LEKTOR);
-          tempusPage.getEventGridRow(eventId).then((lecturerGridRow) => {
+          tempusPage.getGridRowByContainingEventId(eventId).then((lecturerGridRow) => {
             expect(lecturerGridRow).to.eq(gridRowStyle);
           });
 
           tempusPage.selectRoleAndWait(STUDENT);
-          tempusPage.getEventGridRow(eventId).then((studentGridRow) => {
+          tempusPage.getGridRowByContainingEventId(eventId).then((studentGridRow) => {
             expect(studentGridRow).to.eq(gridRowStyle);
           });
         });
@@ -239,14 +240,14 @@ context("Tempus role preview tests", () => {
 
         cy.get("@updateCalendarEvent").should("not.exist");
 
-        tempusPage.getEventGridRow(eventId).then((gridRowStyle) => {
+        tempusPage.getGridRowByContainingEventId(eventId).then((gridRowStyle) => {
           tempusPage.selectRoleAndWait(LEKTOR);
-          tempusPage.getEventGridRow(eventId).then((lecturerGridRow) => {
+          tempusPage.getGridRowByContainingEventId(eventId).then((lecturerGridRow) => {
             expect(lecturerGridRow).to.eq(gridRowStyle);
           });
 
           tempusPage.selectRoleAndWait(STUDENT);
-          tempusPage.getEventGridRow(eventId).then((studentGridRow) => {
+          tempusPage.getGridRowByContainingEventId(eventId).then((studentGridRow) => {
             expect(studentGridRow).to.eq(gridRowStyle);
           });
         });

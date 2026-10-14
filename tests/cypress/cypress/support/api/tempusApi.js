@@ -178,7 +178,7 @@ export const tempusApi = {
     ignore_zeitsperre: false,
     ignore_resources_collisions: false,
     roomless_planning: true,
-    priority_room_planning: false,
+    room_planning: "dialog_room_planning",
     dialog_room_planning: false,
   }),
 

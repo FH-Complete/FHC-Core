@@ -188,6 +188,39 @@ INSERT INTO lehre.tbl_kalender_lehreinheit
 VALUES
 (51004, 33);
 
+-- Assign a UUID to every root calendar entry and propagate it to its children.
+UPDATE lehre.tbl_kalender
+SET eindeutige_kalender_gruppen_id = gen_random_uuid()
+WHERE vorgaenger_kalender_id IS NULL
+	AND eindeutige_kalender_gruppen_id IS NULL;
+
+WITH RECURSIVE tree AS
+(
+	SELECT
+		kalender_id,
+		vorgaenger_kalender_id,
+		kalender_id AS root_id,
+		eindeutige_kalender_gruppen_id AS root_eindeutige_kalender_gruppen_id
+	FROM lehre.tbl_kalender
+	WHERE vorgaenger_kalender_id IS NULL
+
+	UNION ALL
+
+	SELECT
+		i.kalender_id,
+		i.vorgaenger_kalender_id,
+		t.root_id,
+		t.root_eindeutige_kalender_gruppen_id
+	FROM lehre.tbl_kalender i
+	JOIN tree t ON i.vorgaenger_kalender_id = t.kalender_id
+	WHERE i.eindeutige_kalender_gruppen_id IS NULL
+)
+UPDATE lehre.tbl_kalender k
+SET eindeutige_kalender_gruppen_id = t.root_eindeutige_kalender_gruppen_id
+FROM tree t
+WHERE k.kalender_id = t.kalender_id
+	AND k.eindeutige_kalender_gruppen_id IS NULL;
+
 -- INSERT INTO public.tbl_variablenname
 -- (name, defaultwert)
 -- VALUES('ignore_resources_collisions', 'false');
@@ -196,9 +229,7 @@ INSERT INTO public.tbl_variable
 (name, uid, wert)
 VALUES
 ('ignore_resources_collisions', 'demoadmin', 'false'),
-('roomless_planning', 'demoadmin', 'false'),
-('priority_room_planning', 'demoadmin', 'false'),
-('dialog_room_planning', 'demoadmin', 'false');
+('roomless_planning', 'demoadmin', 'false');
 
 INSERT INTO lehre.tbl_betriebsmittel_kalender
 (eindeutige_kalender_gruppen_id, betriebsmittel_id, anmerkung, quelle, insertamum, insertvon, updateamum, updatevon)
@@ -221,5 +252,4 @@ VALUES(26, 'teilnehmer', 'demolektor4', NULL, NULL, NULL, NULL, NULL, NULL, NULL
 INSERT INTO campus.tbl_zeitsperre
 (zeitsperre_id, zeitsperretyp_kurzbz, mitarbeiter_uid, bezeichnung, vondatum, vonstunde, bisdatum, bisstunde, vertretung_uid, updateamum, updatevon, insertamum, insertvon, erreichbarkeit_kurzbz, freigabeamum, freigabevon)
 VALUES(1, 'DienstV', 'demolektor1', 'Test', date_trunc('week', CURRENT_DATE) + INTERVAL '5 day', NULL, date_trunc('week', CURRENT_DATE) + INTERVAL '5 day', NULL, 'demoadmin', '2007-04-02 11:04:31.000', 'demoadmin', '2007-04-02 11:04:31.000', 'demoadmin', 't', NULL, NULL);
-
 

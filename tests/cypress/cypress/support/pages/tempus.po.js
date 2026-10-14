@@ -209,14 +209,20 @@ class TempusPage {
 
   getCalendarEventById = (id) =>
     this.getCalendarEvents().filter(`div[data-id="event-${id}"]`);
+  getCalendarEventByUniqueCalenderGroupId = (groupId) =>
+    this.getCalendarEvents().filter(`div[data-group-id="event-group-${groupId}"]`);
   getCalendarPartDropTarget = (partIndex) =>
     `${this.selectors.calendarBaseGrid} [data-cy='calendar-grid-part'][data-drop-index='${partIndex}']`;
   getEventGridRowFromStyle = (style) =>
     /grid-row:\s*([^;]+)/.exec(style)?.[1]?.trim();
-  getEventGridRow = (id) =>
+  getGridRowByContainingEventId = (id) =>
     this.getCalendarEventById(id)
       .invoke("attr", "style")
       .then((style) => this.getEventGridRowFromStyle(style));
+  getGridRowByContainingUniqueCalendarGroupId = (groupId) =>
+	this.getCalendarEventByUniqueCalenderGroupId(groupId)
+	  .invoke("attr", "style")
+	  .then((style) => this.getEventGridRowFromStyle(style));
   getCalendarEventsByWeekday = (weekday) =>
     this.getCalendarEventsPerWeekHolders()
       .eq(weekdayToGridRowMap[weekday] - 1)

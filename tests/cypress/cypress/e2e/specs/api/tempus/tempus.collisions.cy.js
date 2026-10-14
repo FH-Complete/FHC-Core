@@ -46,7 +46,6 @@ describe("Tempus Kalender API", () => {
               tempusApi
                 .createKalenderEvent(lehreinheitId, startDateTime, endDateTime)
                 .then((response) => {
-					console.log("response", response.body);
                   expect(response.status).to.eq(200);
                   expect(response.body).to.have.nested.property(
                     "meta.status",
@@ -186,8 +185,8 @@ describe("Tempus Kalender API", () => {
                 expect(lehreinheitId, "lehreinheit id for test event creation")
                   .to.exist;
 
-                const startDateTime = `${getDateForDay("wednesday")} 18:35`;
-                const endDateTime = `${getDateForDay("wednesday")} 19:20`;
+                const startDateTime = `${getDateForDay("friday")} 20:15`;
+                const endDateTime = `${getDateForDay("friday")} 21:00`;
 
                 tempusApi
                   .createKalenderEvent(
@@ -425,7 +424,8 @@ describe("Tempus Kalender API", () => {
             (event) =>
               event.type === "lehreinheit" &&
               event.beginn === "19:30:00" &&
-              event.ende === "20:15:00",
+              event.ende === "20:15:00" &&
+              event.lektor.some((lector) => lector.kurzbz === "DemoLKT3"),
           );
           expect(
             sourceEvent,
