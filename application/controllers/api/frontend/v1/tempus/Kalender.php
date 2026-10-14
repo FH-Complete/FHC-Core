@@ -173,7 +173,11 @@ class Kalender extends FHCAPI_Controller
 		$start_date = $this->_ci->input->post('start_date', TRUE);
 		$end_date = $this->_ci->input->post('end_date', TRUE);
 
-		$isCollisionCheckEnabled = $this->_ci->input->post('collisionCheck', TRUE) ?? false;
+		$isCollisionCheckEnabled = filter_var(
+			$this->_ci->input->post('collisionCheck', TRUE) ?? false,
+			FILTER_VALIDATE_BOOLEAN
+		);
+
 		$maxDailyEventLimit = $this->_ci->input->post('maxDailyEventLimit', TRUE) ?? false;
 
 		$filter = $this->_checkFilter(self::ALLOWED_PLAN_FILTER);
