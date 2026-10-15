@@ -315,8 +315,8 @@ export default {
 			if (e.target.closest('a, input'))
 				return;
 
-			let rowIndex = row.getData().row_index;
-			let eventData = this.events.find(ev => ev.id === rowIndex)?.orig ?? row.getData();
+			let rowData = row.getData();
+			let eventData = this.events.find(ev => ev.orig?.eindeutige_kalender_gruppen_id === rowData.eindeutige_kalender_gruppen_id)?.orig ?? rowData;
 
 			let event = new CustomEvent('cal-click', {
 				cancelable: true,

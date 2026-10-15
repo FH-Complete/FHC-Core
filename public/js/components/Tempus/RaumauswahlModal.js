@@ -86,7 +86,8 @@ export default {
 						this.pendingEvent.lehreinheit_id,
 						this.selectedRooms.map((room) => room.ort_kurzbz),
 						this.pendingEvent.start_time,
-						this.pendingEvent.end_time
+						this.pendingEvent.end_time,
+						false
 					)
 				).then((result) => result.data)
 

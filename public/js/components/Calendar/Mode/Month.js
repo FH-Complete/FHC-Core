@@ -27,18 +27,9 @@ export default {
 	},
 	computed: {
 		range() {
-			let first = this.focusDate.startOf('month').startOf('week', { useLocaleWeeks: true });
-			let last = first.plus({ days: 41 }).endOf('day'); // NOTE(chris): 6 weeks minus 1 day
-
-			if (this.rangeOffset != 0) {
-				const nextFocusDate = this.focusDate.plus({ months: this.rangeOffset});
-				const nextRangeStart = nextFocusDate.startOf('month').startOf('week', { useLocaleWeeks: true });
-				if (this.rangeOffset < 0) {
-					first = nextRangeStart;
-				} else {
-					last = nextRangeStart.plus({ days: 41 }).endOf('day');
-				}
-			}
+			const targetDate = this.focusDate.plus({ months: this.rangeOffset });
+			const first = targetDate.startOf('month').startOf('week', { useLocaleWeeks: true });
+			const last = first.plus({ days: 41 }).endOf('day'); // NOTE(chris): 6 weeks minus 1 day
 
 			return luxon.Interval.fromDateTimes(first, last);
 		}

@@ -1,11 +1,17 @@
 const clickListeners = [];
 
-function saveAddClickListener(el, source, value) {
+function removeClickListener(el) {
 	const index = clickListeners.findIndex(data => data.el == el);
-	if (index >= 0) {
-		el.removeEventListener('click', clickListeners[index].listener);
-		clickListeners.splice(index, 1);
-	}
+	if (index < 0)
+		return;
+
+	el.removeEventListener('click', clickListeners[index].listener);
+	clickListeners.splice(index, 1);
+}
+
+function saveAddClickListener(el, source, value) {
+	removeClickListener(el);
+
 	const listener = evt => {
 		evt.preventDefault();
 		evt.stopPropagation();
@@ -45,5 +51,9 @@ export default {
 		if (binding.arg != 'container') {
 			saveAddClickListener(el, binding.arg, binding.value);
 		}
+	},
+	beforeUnmount(el, binding) {
+		if (binding.arg != 'container')
+			removeClickListener(el);
 	}
 }

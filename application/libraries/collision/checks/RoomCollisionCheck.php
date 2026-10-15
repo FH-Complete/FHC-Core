@@ -54,7 +54,7 @@ class RoomCollisionCheck implements ICollisionCheck
 	{
 		if (empty($kalender_ids)) return [];
 
-		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id, current_ort.ort_kurzbz');
+		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id, current_ort.ort_kurzbz, other_kalender.von, other_kalender.kalender_id as other_kalender_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_ort current_ort', 'current_ort.kalender_id = tbl_kalender.kalender_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_ort other_ort', 'other_ort.ort_kurzbz = current_ort.ort_kurzbz');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender other_kalender', 'other_kalender.kalender_id = other_ort.kalender_id');
@@ -83,7 +83,9 @@ class RoomCollisionCheck implements ICollisionCheck
 		foreach (getData($result) as $row)
 		{
 			$grouped[$row->kalender_id][] = [
-				'message' => $this->_ci->phraseslib->t('ui', 'raum_kollision') . ': ' . $row->ort_kurzbz
+				'message' => $this->_ci->phraseslib->t('ui', 'raum_kollision') . ': ' . $row->ort_kurzbz,
+				'kalender_id' => $row->other_kalender_id,
+				'datum' => $row->von,
 			];
 		}
 
