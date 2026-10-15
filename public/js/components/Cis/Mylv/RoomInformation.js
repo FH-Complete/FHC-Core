@@ -1,6 +1,8 @@
 import FhcCalendar from "../../Calendar/LvPlan.js";
 
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
+import ApiRoomPlan from '../../../api/factory/calendar/roomPlan.js';
+import ApiRoom from '../../../api/factory/ort.js';
 
 export const DEFAULT_MODE_RAUMINFO_MOBILE = 'List';
 export const DEFAULT_MODE_RAUMINFO_DESKTOP = 'Week';
@@ -24,6 +26,22 @@ export default {
 			return this.propsViewData?.mode || defaultMode;
 		}
 	},
+	data() {
+		return {
+			filteredGroups: [],
+			abortController: null,
+			createContext: {
+				scope: 'slot_room',
+				show_all_fields: false,
+				room_create_information: {
+					studiengaenge: [],
+					searchGroup: this.searchGroup,
+					searchLektor: this.searchLektor,
+				},
+			},
+			roomAdditionalInfo: null,
+		}
+	},
 	methods:{
 		handleChangeDate(day, newMode) {
 			return this.handleChangeMode(newMode, day);
@@ -41,24 +59,127 @@ export default {
 				}
 			});
 		},
+		async handleCreateEvent(event) {
+			event.ort_kurzbz = this.propsViewData.ort_kurzbz;
+			const reservationCreationResponse = await this.$api.call(
+				ApiRoomPlan.addRoomReservation(event),
+			);
+			if (reservationCreationResponse.meta.status === "success") {
+				this.$refs.calendar.resetEventLoader();
+				this.$refs.calendar.closeModal();
+			}
+		},
+		async handleDeleteEvent(event)
+		{
+			if (event.type !== 'reservierung')
+				return;
+
+			if (luxon.DateTime.fromISO(`${event.datum}T${event.beginn}`) < luxon.DateTime.now())
+				return;
+
+			await this.$api.call(ApiRoomPlan.deleteRoomReservation(event.reservierung_id));
+
+			this.$refs.calendar.reset();
+
+		},
+		async searchGroup(event)
+		{
+			const query = event.query.trim();
+
+			if (query.length < 2)
+				return [];
+
+			if (this.abortController)
+				this.abortController.abort();
+
+			this.abortController = new AbortController();
+			const signal = this.abortController.signal;
+
+			return this.$api.call(ApiRoomPlan.getGruppen(query), { signal })
+				.then(result => {
+					return result.data.map(gruppe => ({
+							label: gruppe.bezeichnung
+								? `${gruppe.gruppe_kurzbz.trim()} (${gruppe.bezeichnung})`
+								: gruppe.gruppe_kurzbz.trim(),
+							gid: gruppe.gid,
+							gruppe_kurzbz: gruppe.gruppe_kurzbz.trim(),
+							lehrverband: gruppe.lehrverband,
+						})
+					);
+				})
+				.catch((e)=> {
+					this.$fhcAlert.handleSystemError(e)
+					return []
+				})
+		},
+		async searchLektor(event)
+		{
+			const query = event.query.trim();
+
+			if (query.length < 2)
+				return [];
+
+			if (this.abortController)
+				this.abortController.abort();
+
+			this.abortController = new AbortController();
+			const signal = this.abortController.signal;
+
+			return this.$api.call(ApiRoomPlan.getLektor(query), { signal })
+				.then(result => {
+					return result.data.map(lektor => ({
+							label: `${lektor.nachname} ${lektor.vorname} (${lektor.uid})`,
+							uid: lektor.uid
+						})
+					)})
+				.catch(this.$fhcAlert.handleSystemError)
+		},
 		getPromiseFunc(start, end) {
 			return [
+				this.$api.call(ApiRoomPlan.getReservableMap(this.propsViewData.ort_kurzbz, start.toISODate(), end.toISODate())),
 				this.$api.call(ApiLvPlan.getRoomInfo(this.propsViewData.ort_kurzbz, start.toISODate(), end.toISODate())),
 				this.$api.call(ApiLvPlan.getOrtReservierungen(this.propsViewData.ort_kurzbz, start.toISODate(), end.toISODate()))
 			];
 		}
 	},
+	async created() {
+		const roomCreationInfoResponse = await this.$api.call(
+			ApiRoomPlan.getRoomCreationInfo(),
+		);
+		if (roomCreationInfoResponse.meta?.status === "success") {
+			const berechtigt = !!roomCreationInfoResponse.data?.berechtigt;
+			if (roomCreationInfoResponse.data?.berechtigt) {
+				this.createContext.room_create_information.studiengaenge =
+					roomCreationInfoResponse.data?.studiengaenge;
+			}
+			this.createContext.show_all_fields =
+				roomCreationInfoResponse.data?.berechtigt;
+		}
+
+		const roomInfoResponse = await this.$api.call(
+			ApiRoom.getRoomInfo(this.$props.propsViewData.ort_kurzbz),
+		);
+		this.roomAdditionalInfo = roomInfoResponse.data.ausstattung;
+	},
 	template: /*html*/`
 	<div class="fhc-roominformation d-flex flex-column h-100">
 		<h2>{{ $p.t('rauminfo/rauminfo') }} {{ propsViewData.ort_kurzbz }}</h2>
+		<span v-if="roomAdditionalInfo?.length">
+			{{ $p.t("search/result_equipment") + ":" }}
+			<span v-html="roomAdditionalInfo"></span>
+		</span>
 		<hr>
 		<fhc-calendar 
 			ref="calendar"
 			:get-promise-func="getPromiseFunc"
 			:date="currentDay"
 			:mode="currentMode"
+			:reservierbar="true"
+			:create-context="createContext"
 			@update:date="handleChangeDate"
 			@update:mode="handleChangeMode"
+			@create-event="handleCreateEvent"
+			@delete-event="handleDeleteEvent"
 			class="responsive-calendar"
 		></fhc-calendar>
 	</div>`
