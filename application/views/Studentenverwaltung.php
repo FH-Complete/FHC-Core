@@ -30,7 +30,7 @@
 			#'vendor/npm-asset/primevue/toast/toast.min.js'
 		],
 		'customJSModules' => [
-			'public/dist/js/apps/Studentenverwaltung.js'
+			'public/js/apps/Studentenverwaltung.js'
 		]
 	);
 
