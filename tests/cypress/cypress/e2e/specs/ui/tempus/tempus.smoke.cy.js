@@ -18,6 +18,22 @@ context("Tempus smoke tests", () => {
     tempusPage.getPreviewRoleOptionsHolder().should("be.visible");
   });
 
+  it("loads events in every calendar mode", () => {
+    tempusPage
+      .getCalendarModeButtons()
+      .should("have.length.greaterThan", 0)
+      .each(($modeButton) => {
+        cy.wrap($modeButton).click().should("have.class", "active");
+        tempusPage.waitForCalendarToFinishLoading();
+
+        if ($modeButton.find(".fa-table-list").length) {
+          tempusPage.getCalendarTableRows().should("have.length.greaterThan", 0);
+        } else {
+          tempusPage.getCalendarEvents().should("have.length.greaterThan", 0);
+        }
+      });
+  });
+
   it("opens the courses menu", () => {
     tempusPage.getSlideInCoursesMenu().should("exist").should("be.hidden");
 

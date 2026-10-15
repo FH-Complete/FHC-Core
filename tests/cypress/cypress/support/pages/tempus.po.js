@@ -133,6 +133,12 @@ class TempusPage {
     this.getTempusOverview().find(".fhc-calendar-base");
   getCalendarBaseGrid = () =>
     this.getCalendarSection().find("[data-cy='calendar-base-grid']");
+  getCalendarModeButtons = () =>
+    this.getCalendarSection().find("[data-cy='calender-header-modes'] button");
+  getCalendarTableRows = () =>
+    this.getCalendarSection().find(
+      "[data-cy='calender-table-view'] .tabulator-row",
+    );
   getCoursePicker = () => this.getTempusOverview().find("[data-cy='coursepicker']");
   getPreviewRoleOptionsHolder = () =>
     this.getTempusOverview().find("[data-cy='previewRoleOptionsHolder']");
@@ -281,6 +287,17 @@ class TempusPage {
       );
       return eventData?.orig?.beginn === startTime;
     });
+  getCalendarEventsByWeekdayAndTimeRange = (weekday, startTime, endTime) =>
+    this.getCalendarEventsByWeekday(weekday).filter((index, event) => {
+      const eventData = JSON.parse(
+        event.getAttribute("data-fhc-draggable-value"),
+      );
+
+      return (
+        eventData?.orig?.beginn === startTime &&
+        eventData?.orig?.ende === endTime
+      );
+    });
   getCalendarEventsWithLehreinheitAndRoomByWeekdayAndStartTime = (
     weekday,
     startTime,
@@ -363,6 +380,36 @@ class TempusPage {
               .click({ force: true }),
           )
           .then(() => room);
+      });
+
+  selectAdditionalRoomsAndSave = (currentRooms, roomCount = 2) =>
+    this.getRoomSelectionOptions()
+      .should("have.length.greaterThan", roomCount)
+      .then(($roomOptions) => {
+        const selectedRooms = new Set(
+          (Array.isArray(currentRooms) ? currentRooms : [currentRooms]).filter(
+            Boolean,
+          ),
+        );
+        const additionalRoomOptions = [...$roomOptions]
+          .filter((roomOption) => !selectedRooms.has(roomOption.textContent.trim()))
+          .slice(0, roomCount);
+
+        expect(additionalRoomOptions, "additional room suggestions").to.have.length(
+          roomCount,
+        );
+
+        const additionalRooms = additionalRoomOptions.map((roomOption) =>
+          roomOption.textContent.trim(),
+        );
+
+        additionalRoomOptions.forEach((roomOption) => cy.wrap(roomOption).click());
+
+        return cy
+          .get("[data-cy='saveRoomSelection']")
+          .should("be.visible")
+          .click({ force: true })
+          .then(() => additionalRooms);
       });
 
   waitForUpdatedEventId = () =>
@@ -478,6 +525,18 @@ class TempusPage {
       .invoke("text")
       .then((roomText) => {
         expect(roomText.trim(), "event room").to.eq(expectedRoom);
+      });
+  };
+
+  expectCalendarEventRooms = (eventId, expectedRooms) => {
+    this.getCalendarEventRoom(eventId)
+      .scrollIntoView()
+      .should("be.visible")
+      .invoke("text")
+      .then((roomText) => {
+        expectedRooms.forEach((room) => {
+          expect(roomText.trim(), "event rooms").to.include(room);
+        });
       });
   };
 

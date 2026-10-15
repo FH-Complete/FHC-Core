@@ -200,7 +200,7 @@ export default {
 				></form-input>
 			
 				<div class="d-flex justify-content-end gap-2 mt-3">
-					<button type="button" class="btn btn-secondary" @click="hide">
+					<button type="button" class="btn btn-secondary" @click="hide" data-cy="closeRoomSelection">
 						{{ $p.t('ui','abbrechen') }}
 					</button>
 					<button

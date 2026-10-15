@@ -135,7 +135,7 @@ export const tempusApi = {
         ),
       ),
 
-  createKalenderEvent: (lehreinheitId, startDateTime, endDateTime) =>
+  createKalenderEvent: (lehreinheitId, startDateTime, endDateTime, roomShortCodes = [], isFirstAttempt = true) =>
     cy.request({
       method: "POST",
       url: `${KALENDER_API}/Kalender/addKalenderEvent`,
@@ -143,6 +143,8 @@ export const tempusApi = {
         lehreinheit_id: lehreinheitId,
         start_date: startDateTime,
         end_date: endDateTime,
+        ort_kurzbz: roomShortCodes,
+        first_run: isFirstAttempt,
       },
       failOnStatusCode: false,
     }),

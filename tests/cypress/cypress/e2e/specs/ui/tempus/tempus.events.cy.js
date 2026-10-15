@@ -59,51 +59,99 @@ context("Tempus event mutation tests", () => {
       });
   });
 
-//   it("shows an updated room in all previews after syncing", () => {
-//     tempusPage.syncAndReloadPlanner();
+  it("selects and displays a room for an event", () => {
+    tempusPage
+      .getCalendarEventsByWeekdayAndTimeRange(
+        "Thursday",
+        "14:30:00",
+        "15:15:00",
+      )
+      .should("have.length.greaterThan", 0)
+      .first()
+      .rightclick();
 
-//     tempusPage
-//       .getCalendarEventsWithLehreinheitAndRoomByWeekdayAndStartTime(
-//         "Wednesday",
-//         "08:00:00",
-//       )
-//       .should("have.length.greaterThan", 0);
+    tempusPage.getEventContextMenuOption("Raumauswahl").click({ force: true });
+    waitForOk("@fetchRoomSuggestions");
 
-//     tempusPage
-//       .getCalendarEventsWithLehreinheitAndRoomByWeekdayAndStartTime(
-//         "Wednesday",
-//         "08:00:00",
-//       )
-//       .first()
-//       .invoke("attr", "data-fhc-draggable-value")
-//       .then((eventJSON) => {
-//         expect(eventJSON).to.exist;
+    tempusPage.selectFirstRoomAndSave().then((selectedRoom) => {
+      tempusPage.waitForUpdatedEventId().then((updatedEventId) => {
+        waitForOk("@fetchPlanData");
+        tempusPage.waitForCalendarToFinishLoading();
 
-//         const eventData = JSON.parse(eventJSON);
-//         const eventId = eventData?.id;
-//         let originalRoom = eventData?.orig?.ort_kurzbz;
-//         if (Array.isArray(originalRoom)) originalRoom = originalRoom.length ? originalRoom[0] : "";
+        tempusPage.expectCalendarEventRoom(updatedEventId, selectedRoom);
+      });
+    });
+  });
 
-//         expect(eventId, "planner event id").to.exist;
-//         expect(originalRoom, "original event room").to.be.a("string").and.not.be
-//           .empty;
+  it("changes an event room", () => {
+    tempusPage
+      .getCalendarEventsByWeekdayAndTimeRange(
+        "Thursday",
+        "15:15:00",
+        "16:00:00",
+      )
+      .should("have.length.greaterThan", 0)
+      .first()
+      .invoke("attr", "data-fhc-draggable-value")
+      .then((eventJSON) => {
+        expect(eventJSON).to.exist;
 
-//         tempusPage.changeEventRoom(eventId, originalRoom).then((result) => {
-//           const { newRoom, updatedEventId } = result;
+        const eventData = JSON.parse(eventJSON);
+        const eventId = eventData?.id;
+        let originalRoom = eventData?.orig?.ort_kurzbz;
+        if (Array.isArray(originalRoom))
+          originalRoom = originalRoom.length ? originalRoom[0] : "";
 
-//           tempusPage.expectCalendarEventRoom(updatedEventId, newRoom);
+        expect(eventId, "planner event id").to.exist;
+        expect(originalRoom, "original event room").to.be.a("string").and.not
+          .be.empty;
 
-//           tempusPage.syncAndReloadPlanner();
-//           tempusPage.expectCalendarEventRoom(updatedEventId, newRoom);
+        tempusPage.changeEventRoom(eventId, originalRoom).then((result) => {
+          expect(result.newRoom, "updated room").to.not.eq(originalRoom);
+          tempusPage.expectCalendarEventRoom(
+            result.updatedEventId,
+            result.newRoom,
+          );
+        });
+      });
+  });
 
-//           tempusPage.selectRoleAndWait(LEKTOR);
-//           tempusPage.expectCalendarEventRoom(updatedEventId, newRoom);
+  it("adds multiple rooms to an event", () => {
+    tempusPage
+      .getCalendarEventsByWeekdayAndTimeRange(
+        "Thursday",
+        "15:15:00",
+        "16:00:00",
+      )
+      .should("have.length.greaterThan", 0)
+      .first()
+      .invoke("attr", "data-fhc-draggable-value")
+      .then((eventJSON) => {
+        expect(eventJSON).to.exist;
 
-//           tempusPage.selectRoleAndWait(STUDENT);
-//           tempusPage.expectCalendarEventRoom(updatedEventId, newRoom);
-//         });
-//       });
-//   });
+        const eventData = JSON.parse(eventJSON);
+        const eventId = eventData?.id;
+        const currentRooms = eventData?.orig?.ort_kurzbz ?? [];
+
+        expect(eventId, "planner event id").to.exist;
+
+        tempusPage.getCalendarEventById(eventId).rightclick();
+        tempusPage.getEventContextMenuOption("Raumauswahl").click({ force: true });
+        waitForOk("@fetchRoomSuggestions");
+
+        tempusPage
+          .selectAdditionalRoomsAndSave(currentRooms)
+          .then((additionalRooms) => {
+            tempusPage.waitForUpdatedEventId().then((updatedEventId) => {
+              waitForOk("@fetchPlanData");
+              tempusPage.waitForCalendarToFinishLoading();
+
+              tempusPage.expectCalendarEventRooms(updatedEventId, additionalRooms);
+            });
+          });
+      });
+  });
+
 
   it("moves an event from the calendar to the parking slot", () => {
     tempusPage.getEventParkingSlot().should("exist");
@@ -117,71 +165,91 @@ context("Tempus event mutation tests", () => {
     tempusPage.getParkedEvents().should("have.length", 1);
   });
 
-//   it("keeps a deleted event in the planner preview until syncing, but hides it in other previews", () => {
-//     tempusPage.syncAndReloadPlanner();
+ it("keeps a deleted planner event visible in lecturer and student previews", () => {
+	tempusPage.syncAndReloadPlanner();
 
-//     tempusPage
-//       .getCalendarEventsByWeekdayAndStartTime("Wednesday", "09:40:00")
-//       .first()
-//       .invoke("attr", "data-fhc-draggable-value")
-//       .then((eventJSON) => {
-//         expect(eventJSON).to.exist;
+	tempusPage
+		.getCalendarEventsBySoftTimeRange("16:10:00", "16:55:00")
+		.first()
+		.invoke("attr", "data-fhc-draggable-value")
+		.then((eventJSON) => {
+		expect(eventJSON).to.exist;
 
-//         let eventId = JSON.parse(eventJSON)?.id;
-//         expect(eventId).to.exist;
-//         tempusPage
-//           .getCalendarEventById(eventId)
-//           .should("be.visible")
-//           .rightclick();
-//         tempusPage.getEventContextMenuOption("Delete").click();
+		const eventGroupId =
+			JSON.parse(eventJSON)?.orig?.eindeutige_kalender_gruppen_id;
+		expect(eventGroupId).to.exist;
 
-//         cy.wait("@deleteCalendarEvent");
-//         waitForOk("@fetchPlanData");
+		tempusPage
+			.getCalendarEventByUniqueCalenderGroupId(eventGroupId)
+			.rightclick();
 
-//         tempusPage.waitForCalendarToFinishLoading();
+		tempusPage
+			.getEventContextMenuOption("Delete")
+			.click({ force: true });
 
-//         tempusPage.getCalendarEventById(eventId).should("be.visible");
+		waitForOk("@fetchPlanData");
 
-//         tempusPage.selectRoleAndWait(LEKTOR);
-//         tempusPage.getCalendarEventById(eventId).should("not.exist");
+		tempusPage
+			.getCalendarEventByUniqueCalenderGroupId(eventGroupId)
+			.should("not.exist");
 
-//         tempusPage.selectRoleAndWait(STUDENT);
-//         tempusPage.getCalendarEventById(eventId).should("not.exist");
-//       });
-//   });
+		tempusPage.selectRoleAndWait(LEKTOR);
+		tempusPage
+			.getCalendarEventByUniqueCalenderGroupId(eventGroupId)
+			.should("exist");
 
-//   it("removes a deleted event from all previews after syncing", () => {
-//     tempusPage.syncAndReloadPlanner();
+		tempusPage.selectRoleAndWait(STUDENT);
+		tempusPage
+			.getCalendarEventByUniqueCalenderGroupId(eventGroupId)
+			.should("exist");
+		});
+});
 
-//     tempusPage
-//       .getCalendarEventsByWeekdayAndStartTime("Wednesday", "10:25:00")
-//       .first()
-//       .invoke("attr", "data-fhc-draggable-value")
-//       .then((eventJSON) => {
-//         expect(eventJSON).to.exist;
+it("keeps a deleted planner event invisible after syncing", () => {
+  tempusPage.syncAndReloadPlanner();
 
-//         let eventId = JSON.parse(eventJSON)?.id;
-//         expect(eventId).to.exist;
-//         tempusPage
-//           .getCalendarEventById(eventId)
-//           .should("be.visible")
-//           .rightclick();
-//         tempusPage.getEventContextMenuOption("Delete").click();
+  tempusPage
+    .getCalendarEventsBySoftTimeRange("16:55:00", "17:40:00")
+    .first()
+    .invoke("attr", "data-fhc-draggable-value")
+    .then((eventJSON) => {
+      expect(eventJSON).to.exist;
 
-//         cy.wait("@deleteCalendarEvent");
-//         waitForOk("@fetchPlanData");
+      const eventGroupId =
+        JSON.parse(eventJSON)?.orig?.eindeutige_kalender_gruppen_id;
+      expect(eventGroupId).to.exist;
 
-//         tempusPage.syncAndReloadPlanner();
+      tempusPage
+        .getCalendarEventByUniqueCalenderGroupId(eventGroupId)
+        .rightclick();
 
-//         tempusPage.getCalendarEventById(eventId).should("not.exist");
+      tempusPage
+        .getEventContextMenuOption("Delete")
+        .click({ force: true });
 
-//         tempusPage.selectRoleAndWait(LEKTOR);
-//         tempusPage.getCalendarEventById(eventId).should("not.exist");
+      waitForOk("@fetchPlanData");
 
-//         tempusPage.selectRoleAndWait(STUDENT);
-//         tempusPage.getCalendarEventById(eventId).should("not.exist");
-//       });
-//   });
+      tempusPage
+        .getCalendarEventByUniqueCalenderGroupId(eventGroupId)
+        .should("not.exist");
+
+      tempusPage.syncAndReloadPlanner();
+
+      tempusPage
+        .getCalendarEventByUniqueCalenderGroupId(eventGroupId)
+        .should("not.exist");
+
+      tempusPage.selectRoleAndWait(LEKTOR);
+      tempusPage
+        .getCalendarEventByUniqueCalenderGroupId(eventGroupId)
+        .should("exist");
+
+      tempusPage.selectRoleAndWait(STUDENT);
+      tempusPage
+        .getCalendarEventByUniqueCalenderGroupId(eventGroupId)
+        .should("exist");
+    });
+});
 
   it("resizes an event from the bottom in the planner preview", () => {
     tempusPage.getCalendarSection().should("exist");

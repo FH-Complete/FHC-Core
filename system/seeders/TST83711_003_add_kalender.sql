@@ -192,6 +192,37 @@ INSERT INTO lehre.tbl_kalender_lehreinheit
 VALUES
 (51004, 35);
 
+-- Calendar setup for room selection tests
+INSERT INTO lehre.tbl_kalender
+(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, eindeutige_kalender_gruppen_id, insertamum, insertvon, updateamum, updatevon)
+VALUES
+(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '15:15:00', 'lehreinheit', 'live', NULL, null, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '15:15:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '16:00:00', 'lehreinheit', 'live', NULL, null, now(), 'demoadmin', NULL, 'demoadmin');
+
+INSERT INTO lehre.tbl_kalender_lehreinheit
+(lehreinheit_id, kalender_id)
+VALUES
+(51004, 36),
+(51004, 37);
+
+INSERT INTO lehre.tbl_kalender_ort
+(location, ort_kurzbz, kalender_id)
+VALUES
+(NULL, 'Bro_F7.37', 37);
+
+-- Calendar setup for event deletion tests
+INSERT INTO lehre.tbl_kalender
+(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, eindeutige_kalender_gruppen_id, insertamum, insertvon, updateamum, updatevon)
+VALUES
+(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '16:10:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '16:55:00', 'lehreinheit', 'live', NULL, null, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '16:55:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '17:40:00', 'lehreinheit', 'live', NULL, null, now(), 'demoadmin', NULL, 'demoadmin');
+
+INSERT INTO lehre.tbl_kalender_lehreinheit
+(lehreinheit_id, kalender_id)
+VALUES
+(51004, 38),
+(51004, 39);
+
 -- Assign a UUID to every root calendar entry and propagate it to its children.
 UPDATE lehre.tbl_kalender
 SET eindeutige_kalender_gruppen_id = gen_random_uuid()

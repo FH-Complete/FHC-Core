@@ -50,36 +50,136 @@ context("Tempus course picker tests", () => {
     });
   });
 
-  it("adds a course teaching unit to the calendar when it is dropped", () => {
+it("for active room selection dialog config option, shows room selection dialog when adding a course from the course-picker", () => {
+  	let settingsData = tempusApi.getSettingsData();
+	settingsData.roomless_planning = false;
+	settingsData.room_planning = "dialog_room_planning";
+
+	tempusApi.updateSettingsData(settingsData).then((response) => {
+		tempusApi.deletePlannerEventsForDay("monday");
+
+		tempusPage.visitAndWaitForPlanner();
+		tempusPage.waitForCalendarToFinishLoading();
+
+		tempusPage.selectCourseByName(TARGETED_STUDY_PLAN_SHORT_CODE);
+		waitForOk("@fetchCoursePickerCourses");
+
+		tempusPage.getCoursePickerRows().should("have.length.greaterThan", 0);
+
+		tempusPage.getCalendarEvents().then(($events) => {
+			const initialEventCount = $events.length;
+
+			tempusPage.dropCourseOnCalendarPart(0, 10);
+			waitForOk("@addCalendarEvent");
+			
+			tempusPage.getRoomSelectionModal().should("be.visible");
+			tempusPage.selectFirstRoomAndSave();
+
+			waitForOk("@addCalendarEvent");
+			waitForOk("@fetchPlanData");
+
+			tempusPage.waitForCalendarToFinishLoading();
+
+			tempusPage
+				.getCalendarEvents()
+				.should("have.length", initialEventCount + 1);
+		});
+	});
+});
+
+it("for active room selection dialog config option, does not add an event to the calendar when the room selection dialog is closed", () => {
+  let settingsData = tempusApi.getSettingsData();
+  settingsData.roomless_planning = false;
+  settingsData.room_planning = "dialog_room_planning";
+
+  tempusApi.updateSettingsData(settingsData).then((response) => {
     tempusApi.deletePlannerEventsForDay("monday");
-    tempusPage.getCalendarSection().should("exist");
+
+    tempusPage.visitAndWaitForPlanner();
     tempusPage.waitForCalendarToFinishLoading();
 
     tempusPage.selectCourseByName(TARGETED_STUDY_PLAN_SHORT_CODE);
     waitForOk("@fetchCoursePickerCourses");
 
-    cy.wait(1000);
+    tempusPage.getCoursePickerRows().should("have.length.greaterThan", 0);
 
     tempusPage.getCalendarEvents().then(($events) => {
-      cy.wrap($events.length).as("initialEventCount");
-    });
+      const initialEventCount = $events.length;
 
-    tempusPage.getCoursePickerRows().should("have.length.greaterThan", 0);
-    tempusPage.dropCourseOnCalendarPart(0, 10);
+      tempusPage.dropCourseOnCalendarPart(0, 10);
 
-    waitForOk("@addCalendarEvent");
-    tempusPage.selectFirstRoomAndSave();
-    waitForOk("@addCalendarEvent");
-    waitForOk("@fetchPlanData");
+      tempusPage.getRoomSelectionModal().should("be.visible");
+      tempusPage.getRoomSelectionModal().find("button[data-cy='closeRoomSelection']").click();
+      tempusPage.getRoomSelectionModal().should("not.exist");
 
-    tempusPage.waitForCalendarToFinishLoading();
-    
-    cy.wait(1000);
-    
-    cy.get("@initialEventCount").then((initialEventCount) => {
-      tempusPage
-        .getCalendarEvents()
-        .should("have.length", initialEventCount + 1);
+      tempusPage.waitForCalendarToFinishLoading();
+
+      tempusPage.getCalendarEvents().should("have.length", initialEventCount);
     });
   });
+});
+
+it("for active room selection dialog config option, does not add an event to the calendar when no room is selected", () => {
+  let settingsData = tempusApi.getSettingsData();
+  settingsData.roomless_planning = false;
+  settingsData.room_planning = "dialog_room_planning";
+
+  tempusApi.updateSettingsData(settingsData).then((response) => {
+    tempusApi.deletePlannerEventsForDay("monday");
+
+    tempusPage.visitAndWaitForPlanner();
+    tempusPage.waitForCalendarToFinishLoading();
+
+    tempusPage.selectCourseByName(TARGETED_STUDY_PLAN_SHORT_CODE);
+    waitForOk("@fetchCoursePickerCourses");
+
+    tempusPage.getCoursePickerRows().should("have.length.greaterThan", 0);
+
+    tempusPage.getCalendarEvents().then(($events) => {
+      const initialEventCount = $events.length;
+
+      tempusPage.dropCourseOnCalendarPart(0, 10);
+
+      tempusPage.getRoomSelectionModal().should("be.visible");
+      tempusPage.getRoomSelectionModal().find("button[data-cy='saveRoomSelection']").click();
+      tempusPage.getRoomSelectionModal().should("exist");
+
+      tempusPage.waitForCalendarToFinishLoading();
+
+      tempusPage.getCalendarEvents().should("have.length", initialEventCount);
+    });
+  });
+});
+
+it("for active priority room config option, adds an event to the calendar without room selection dialog", () => {
+  let settingsData = tempusApi.getSettingsData();
+  settingsData.roomless_planning = false;
+  settingsData.room_planning = "priority_room_planning";
+
+  tempusApi.updateSettingsData(settingsData).then((response) => {
+    tempusApi.deletePlannerEventsForDay("monday");
+
+    tempusPage.visitAndWaitForPlanner();
+    tempusPage.waitForCalendarToFinishLoading();
+
+    tempusPage.selectCourseByName(TARGETED_STUDY_PLAN_SHORT_CODE);
+    waitForOk("@fetchCoursePickerCourses");
+
+    tempusPage.getCoursePickerRows().should("have.length.greaterThan", 0);
+
+    tempusPage.getCalendarEvents().then(($events) => {
+      const initialEventCount = $events.length;
+
+      tempusPage.dropCourseOnCalendarPart(0, 10);
+
+      tempusPage.getRoomSelectionModal().should("not.exist");
+      tempusPage.getCalendarEvents().should("have.length", initialEventCount);
+
+      tempusPage.waitForCalendarToFinishLoading();
+
+      tempusPage.getCalendarEvents().should("have.length", initialEventCount);
+    });
+  });
+});
+
 });

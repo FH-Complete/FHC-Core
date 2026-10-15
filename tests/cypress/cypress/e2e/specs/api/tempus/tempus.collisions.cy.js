@@ -733,4 +733,229 @@ describe("Tempus Kalender API", () => {
         });
     });
   });
+
+  it("event creation fails for inactive roomless and active room selection dialog config option, if no room is selected, for the first attempt", () => {
+    tempusApi.getDegreeProgramTree().then((stgTree) => {
+      let studyPlan = stgTree.find((plan) =>
+        plan.name.includes(TEMPUS_TEST_STUDY_PLAN_SHORT_CODE),
+      );
+      expect(studyPlan, "study plan for test event creation").to.exist;
+
+	  let settingsData = tempusApi.getSettingsData();
+		settingsData.roomless_planning = false;
+		settingsData.room_planning = "dialog_room_planning";
+
+      tempusApi
+        .getCoursesByStudyPlan(studyPlan.studiengang_kz, TEMPUS_TEST_SEMESTER)
+        .then((courses) => {
+          let course = courses.find((course) => course.lehrfach === "MAT");
+          expect(course, "course for test event creation").to.exist;
+
+          tempusApi
+            .updateSettingsData(settingsData)
+            .then((response) => {
+              const lehreinheitId = course.lehreinheit_id;
+              expect(lehreinheitId, "lehreinheit id for test event creation").to
+                .exist;
+
+              const startDateTime = `${getDateForDay("monday")} 17:50`;
+              const endDateTime = `${getDateForDay("monday")} 18:35`;
+
+              tempusApi
+                .createKalenderEvent(lehreinheitId, startDateTime, endDateTime, [])
+                .then((response) => {
+                  expect(response.status).to.eq(200);
+                  expect(response.body).to.have.nested.property(
+					"data.needs_room_selection",
+					true,
+				  );
+				  expect(response.body).to.have.nested.property(
+                    "meta.status",
+                    "success",
+                  );
+                });
+            });
+        });
+    });
+  });
+
+  it("event creation fails for inactive roomless and active room selection dialog config option, if no room is selected, for the second attempt", () => {
+    tempusApi.getDegreeProgramTree().then((stgTree) => {
+      let studyPlan = stgTree.find((plan) =>
+        plan.name.includes(TEMPUS_TEST_STUDY_PLAN_SHORT_CODE),
+      );
+      expect(studyPlan, "study plan for test event creation").to.exist;
+
+	  let settingsData = tempusApi.getSettingsData();
+		settingsData.roomless_planning = false;
+		settingsData.room_planning = "dialog_room_planning";
+
+      tempusApi
+        .getCoursesByStudyPlan(studyPlan.studiengang_kz, TEMPUS_TEST_SEMESTER)
+        .then((courses) => {
+          let course = courses.find((course) => course.lehrfach === "MAT");
+          expect(course, "course for test event creation").to.exist;
+
+          tempusApi
+            .updateSettingsData(settingsData)
+            .then((response) => {
+              const lehreinheitId = course.lehreinheit_id;
+              expect(lehreinheitId, "lehreinheit id for test event creation").to
+                .exist;
+
+              const startDateTime = `${getDateForDay("monday")} 17:50`;
+              const endDateTime = `${getDateForDay("monday")} 18:35`;
+
+              tempusApi
+                .createKalenderEvent(lehreinheitId, startDateTime, endDateTime, [], false)
+                .then((response) => {
+                  expect(response.status).to.eq(500);
+				   expect(response.body.errors).to.be.an("array");
+					let hasRoomlessPlanningError = response.body.errors.some(
+						(error) => error.errorCode === "roomless_planning_error",
+					);
+					expect(
+						hasRoomlessPlanningError,
+						"response contains roomless planning error",
+					).to.be.true;
+                });
+            });
+        });
+    });
+  });
+
+  it("event creation works for inactive roomless and active priority room config option, if no room is selected", () => {
+    tempusApi.getDegreeProgramTree().then((stgTree) => {
+      let studyPlan = stgTree.find((plan) =>
+        plan.name.includes(TEMPUS_TEST_STUDY_PLAN_SHORT_CODE),
+      );
+      expect(studyPlan, "study plan for test event creation").to.exist;
+
+	  let settingsData = tempusApi.getSettingsData();
+		settingsData.roomless_planning = false;
+		settingsData.room_planning = "priority_room_planning";
+
+      tempusApi
+        .getCoursesByStudyPlan(studyPlan.studiengang_kz, TEMPUS_TEST_SEMESTER)
+        .then((courses) => {
+          let course = courses.find((course) => course.lehrfach === "MAT");
+          expect(course, "course for test event creation").to.exist;
+
+          tempusApi
+            .updateSettingsData(settingsData)
+            .then((response) => {
+              const lehreinheitId = course.lehreinheit_id;
+              expect(lehreinheitId, "lehreinheit id for test event creation").to
+                .exist;
+
+              const startDateTime = `${getDateForDay("monday")} 17:50`;
+              const endDateTime = `${getDateForDay("monday")} 18:35`;
+
+              tempusApi
+                .createKalenderEvent(lehreinheitId, startDateTime, endDateTime, [])
+                .then((response) => {
+                  expect(response.status).to.eq(200);
+                  expect(response.body).to.not.have.nested.property(
+					"data.needs_room_selection",
+					true,
+				  );
+				  expect(response.body).to.have.nested.property(
+                    "meta.status",
+                    "success",
+                  );
+                });
+            });
+        });
+    });
+  });
+
+  it("event creation fails for active roomless and active room selection dialog config option, if no room is selected, for the first attempt", () => {
+    tempusApi.getDegreeProgramTree().then((stgTree) => {
+      let studyPlan = stgTree.find((plan) =>
+        plan.name.includes(TEMPUS_TEST_STUDY_PLAN_SHORT_CODE),
+      );
+      expect(studyPlan, "study plan for test event creation").to.exist;
+
+	  let settingsData = tempusApi.getSettingsData();
+		settingsData.roomless_planning = true;
+		settingsData.room_planning = "dialog_room_planning";
+
+      tempusApi
+        .getCoursesByStudyPlan(studyPlan.studiengang_kz, TEMPUS_TEST_SEMESTER)
+        .then((courses) => {
+          let course = courses.find((course) => course.lehrfach === "MAT");
+          expect(course, "course for test event creation").to.exist;
+
+          tempusApi
+            .updateSettingsData(settingsData)
+            .then((response) => {
+              const lehreinheitId = course.lehreinheit_id;
+              expect(lehreinheitId, "lehreinheit id for test event creation").to
+                .exist;
+
+              const startDateTime = `${getDateForDay("monday")} 17:50`;
+              const endDateTime = `${getDateForDay("monday")} 18:35`;
+
+              tempusApi
+                .createKalenderEvent(lehreinheitId, startDateTime, endDateTime, [], true)
+                .then((response) => {
+                  expect(response.status).to.eq(200);
+                  expect(response.body).to.have.nested.property(
+					"data.needs_room_selection",
+					true,
+				  );
+				  expect(response.body).to.have.nested.property(
+                    "meta.status",
+                    "success",
+                  );
+                });
+            });
+        });
+    });
+  });
+
+  it("event creation works for active roomless and active room selection dialog config option, if no room is selected, for the second attempt", () => {
+    tempusApi.getDegreeProgramTree().then((stgTree) => {
+      let studyPlan = stgTree.find((plan) =>
+        plan.name.includes(TEMPUS_TEST_STUDY_PLAN_SHORT_CODE),
+      );
+      expect(studyPlan, "study plan for test event creation").to.exist;
+
+	  let settingsData = tempusApi.getSettingsData();
+		settingsData.roomless_planning = true;
+		settingsData.room_planning = "dialog_room_planning";
+
+      tempusApi
+        .getCoursesByStudyPlan(studyPlan.studiengang_kz, TEMPUS_TEST_SEMESTER)
+        .then((courses) => {
+          let course = courses.find((course) => course.lehrfach === "MAT");
+          expect(course, "course for test event creation").to.exist;
+
+          tempusApi
+            .updateSettingsData(settingsData)
+            .then((response) => {
+              const lehreinheitId = course.lehreinheit_id;
+              expect(lehreinheitId, "lehreinheit id for test event creation").to
+                .exist;
+
+              const startDateTime = `${getDateForDay("monday")} 17:50`;
+              const endDateTime = `${getDateForDay("monday")} 18:35`;
+
+              tempusApi
+                .createKalenderEvent(lehreinheitId, startDateTime, endDateTime, [], false)
+                .then((response) => {
+                  expect(response.status).to.eq(200);
+                  expect(response.body).to.not.have.nested.property(
+					"data.needs_room_selection",
+					true,
+				  );
+				  expect(response.body).to.have.nested.property(
+                    "meta.status",
+                    "success",
+                  );
+                });
+            });
+        });
+    });
+  });
 });

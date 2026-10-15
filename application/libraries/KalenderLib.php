@@ -1062,7 +1062,6 @@ class KalenderLib
 		$updatedEntryResult = $this->_loadKalenderEntry($kalender_id);
 		if (isError($updatedEntryResult)) return $updatedEntryResult;
 
-		log_message('error', 'Kalender event updated: ' . json_encode($updatedEntryResult));
 		return success(getData($updatedEntryResult));
 	}
 
