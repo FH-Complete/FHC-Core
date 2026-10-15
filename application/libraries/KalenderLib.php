@@ -265,7 +265,7 @@ class KalenderLib
 			'LEFT'
 		);
 		$this->_ci->KalenderModel->db->where("(
-			tbl_kalender.status_kurzbz = 'sync_live'
+			tbl_kalender.status_kurzbz IN ('sync_live', 'to_delete_live')
 			OR (tbl_kalender.status_kurzbz = 'preview' AND neuerer.kalender_id IS NULL)
 			OR (tbl_kalender.status_kurzbz = 'live' AND neuerer.kalender_id IS NULL)
 		)", NULL, FALSE);

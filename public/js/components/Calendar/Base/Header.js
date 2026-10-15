@@ -155,7 +155,7 @@ export default {
 					<i class="fa fa-angle-right"></i>
 				</button>
 				<button
-					v-if="$props.mode === 'week"
+					v-if="$props.mode === 'week'"
 					@click="$emit('fastNext')"
 					:disabled="open"
 					class="btn btn-outline-secondary border-0"
