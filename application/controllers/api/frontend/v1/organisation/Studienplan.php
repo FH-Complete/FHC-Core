@@ -61,6 +61,8 @@ class Studienplan extends FHCAPI_Controller
 		$this->addMeta('sem2', $ausbildungssemester);
 		$this->addMeta('org', $orgform_kurzbz);
 
+		// SELECT * would let tbl_studienordnung.bezeichnung overwrite the Studienplan name
+		$this->StudienplanModel->addSelect('tbl_studienplan.*');
 		$result = $this->StudienplanModel->getStudienplaeneBySemester($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester, $orgform_kurzbz);
 		if (isError($result)) $this->terminateWithError(getError($result), self::ERROR_TYPE_DB);
 

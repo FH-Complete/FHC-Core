@@ -38,6 +38,7 @@ class Student extends FHCAPI_Controller
 			'save' => ['admin:rw', 'assistenz:rw'],
 			'saveStudent' => ['admin:rw', 'assistenz:rw'],
 			'getPerson' => ['admin:rw', 'assistenz:rw'],
+			'getPersonByEmail' => ['admin:rw', 'assistenz:rw'],
 			'add' => ['admin:rw', 'assistenz:rw'] // TODO(chris): extra permissions
 		]);
 
@@ -478,12 +479,16 @@ class Student extends FHCAPI_Controller
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
-		$vorname = $this->input->post('vorname');
-		$nachname = $this->input->post('nachname');
+		$vorname = trim($this->input->post('vorname') ?? '');
+		$nachname = trim($this->input->post('nachname') ?? '');
 		$gebdatum = $this->input->post('gebdatum');
+		$limit = 20;
+		// Rows to skip for "Weitere Treffer laden"
+		$offset = max(0, (int)($this->input->post('offset') ?? 0));
 
-		if (!$vorname && !$nachname && !$gebdatum)
-			$this->terminateWithValidationErrors(['At least one of vorname, nachname or gebdatum must be set']);
+		// Without a Nachname the query would load all persons
+		if (mb_strlen($nachname) < 2)
+			$this->terminateWithSuccess([]);
 
 		$this->load->model('person/Person_model', 'PersonModel');
 
@@ -494,20 +499,35 @@ class Student extends FHCAPI_Controller
 		);
 		$this->PersonModel->addJoin('public.tbl_geschlecht', 'geschlecht');
 
+		// COALESCE(...) matches the trigram indexes on tbl_person; escapeLike escapes with '!'
+		$this->PersonModel->db->where("COALESCE(nachname, '') ILIKE '%" . $this->PersonModel->escapeLike($nachname) . "%' ESCAPE '!'", null, false);
+		if ($vorname) {
+			$like = "ILIKE '%" . $this->PersonModel->escapeLike($vorname) . "%' ESCAPE '!'";
+			$this->PersonModel->db->where("(COALESCE(vorname, '') $like OR COALESCE(wahlname, '') $like OR COALESCE(vornamen, '') $like)", null, false);
+		}
 		if ($gebdatum)
 			$this->PersonModel->db->where('gebdatum', (new DateTime($gebdatum))->format('Y-m-d'));
-		if ($vorname && $nachname) {
-			$this->PersonModel->db->or_group_start();
-			$this->PersonModel->db->where('LOWER(nachname)', 'LOWER(' . $this->PersonModel->db->escape(trim($nachname)) . ')', false);
-			$this->PersonModel->db->where('LOWER(vorname)', 'LOWER(' . $this->PersonModel->db->escape(trim($vorname)) . ')', false);
-			$this->PersonModel->db->group_end();
-		} elseif ($nachname) {
-			$this->PersonModel->db->or_where('LOWER(nachname)', 'LOWER(' . $this->PersonModel->escape(trim($nachname)) . ')', false);
-		}
+
+		// Exact Nachname and exact Vorname/Wahlname first, then the closest Nachname (pg_trgm distance), then alphabetical
+		$this->PersonModel->db->order_by('LOWER(TRIM(nachname)) = LOWER(' . $this->PersonModel->escape($nachname) . ')', 'DESC', false);
+		// Also without a Vorname, so a duplicate without Vorname stays in the rows; IS TRUE: DESC sorts NULL first
+		$exactVorname = 'LOWER(' . $this->PersonModel->escape($vorname) . ')';
+		$this->PersonModel->db->order_by("(LOWER(TRIM(COALESCE(vorname, ''))) = $exactVorname OR LOWER(TRIM(wahlname)) = $exactVorname) IS TRUE", 'DESC', false);
+		$this->PersonModel->db->order_by("COALESCE(nachname, '') <->> " . $this->PersonModel->escape($nachname), 'ASC', false);
+		$this->PersonModel->addOrder('nachname');
+		$this->PersonModel->addOrder('vorname');
+		$this->PersonModel->addOrder('gebdatum');
+		// The pages need a stable order
+		$this->PersonModel->addOrder('person_id');
+		// One extra row tells the frontend that more persons match
+		$this->PersonModel->addLimit($limit + 1, $offset);
 
 		$result = $this->PersonModel->load();
 
 		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->addMeta('more', count($data) > $limit);
+		$data = array_slice($data, 0, $limit);
 
 		$this->load->model('person/Adresse_model', 'AdresseModel');
 		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
@@ -533,10 +553,40 @@ class Student extends FHCAPI_Controller
 
 			$status = $this->getDataOrTerminateWithError($result);
 
+			// Newest status first; the model query has no ORDER BY
+			usort($status, function ($a, $b) {
+				return strcmp($b->datum ?? '', $a->datum ?? '');
+			});
+
 			$person->status = $status;
 		}
 
 		$this->terminateWithSuccess($data);
+	}
+
+	public function getPersonByEmail()
+	{
+		$email = trim($this->input->post('email') ?? '');
+
+		// Not an address yet
+		if (strpos($email, '@') === false)
+			$this->terminateWithSuccess([]);
+
+		$this->load->model('person/Kontakt_model', 'KontaktModel');
+
+		$this->KontaktModel->addDistinct();
+		$this->KontaktModel->addSelect('p.person_id, p.vorname, p.nachname, p.gebdatum');
+		$this->KontaktModel->addJoin('public.tbl_person p', 'person_id');
+		$this->KontaktModel->db->where_in('kontakttyp', ['email', 'email_unverifiziert']);
+		// ILIKE without wildcards: case-insensitive equality that uses the trigram index on kontakt
+		$this->KontaktModel->db->where("COALESCE(kontakt, '') ILIKE '" . $this->KontaktModel->escapeLike($email) . "' ESCAPE '!'", null, false);
+		$this->KontaktModel->addOrder('p.nachname');
+		$this->KontaktModel->addOrder('p.vorname');
+		$this->KontaktModel->addLimit(10);
+
+		$result = $this->KontaktModel->load();
+
+		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result));
 	}
 
 	public function add()

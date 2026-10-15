@@ -67,6 +67,13 @@ export default {
 			params
 		};
 	},
+	getPersonByEmail(params) {
+		return {
+			method: 'post',
+			url: 'api/frontend/v1/stv/student/getPersonByEmail',
+			params
+		};
+	},
 	add(params) {
 		return {
 			method: 'post',

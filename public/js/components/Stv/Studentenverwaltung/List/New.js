@@ -4,6 +4,7 @@ import FhcForm from '../../../Form/Form.js';
 import FormValidation from '../../../Form/Validation.js';
 import FormInput from '../../../Form/Input.js';
 import accessibility from '../../../../directives/accessibility.js';
+import {debounce} from '../../../../helpers/debounce.js';
 
 import ApiStvStudents from '../../../../api/factory/stv/students.js';
 import ApiStvAddress from '../../../../api/factory/stv/kontakt/address.js';
@@ -24,13 +25,34 @@ const FORMDATA_DEFAULT = {
 	orgform_kurzbz: '',
 	studienplan_id: ''
 };
+// Same minimum as Student::getPerson
+const NACHNAME_MIN_LENGTH = 2;
+
+// Shows the text with the search term in bold, without v-html
+const MarkMatch = {
+	props: {
+		text: String,
+		term: String
+	},
+	computed: {
+		parts() {
+			const term = (this.term || '').trim();
+			if (!this.text || !term)
+				return [this.text || ''];
+			// The pattern is one capture group, so the matches are at the odd indexes
+			return this.text.split(new RegExp('(' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi'));
+		}
+	},
+	template: `<template v-for="(part, index) in parts" :key="index"><strong v-if="index % 2">{{ part }}</strong><template v-else>{{ part }}</template></template>`
+};
 
 export default {
 	components: {
 		BsModal,
 		FhcForm,
 		FormValidation,
-		FormInput
+		FormInput,
+		MarkMatch
 	},
 	directives: {
 		accessibility
@@ -48,13 +70,21 @@ export default {
 		return {
 			places: [],
 			formData: null,
-			suggestions: {},
+			suggestions: [],
+			suggestionsLoading: false,
+			suggestionsMore: false,
+			emailOwners: [],
+			duplicates: [],
+			saving: false,
 			person: null,
 			semester: [],
 			studienplaene: [],
+			debouncedLoadSuggestions: null,
+			debouncedCheckEmail: null,
 			abortController: {
 				suggestions: null,
-				places: null
+				places: null,
+				email: null
 			}
 		}
 	},
@@ -88,6 +118,33 @@ export default {
 			set(v) {
 				this.formData.studiensemester_kurzbz = v;
 			}
+		},
+		nachnameTooShort() {
+			return (this.formData?.nachname || '').trim().length < NACHNAME_MIN_LENGTH;
+		},
+		suggestionsHint() {
+			if (this.nachnameTooShort)
+				return this.$p.t('person', 'sucheNachnameMindestensZeichen', [NACHNAME_MIN_LENGTH]);
+			if (this.suggestionsLoading)
+				return '';
+			if (!this.suggestions.length)
+				return this.$p.t('lehre', 'error_no_person');
+			if (this.suggestionsMore)
+				return this.$p.t('person', 'sucheMehrAlsTreffer', [this.suggestions.length]);
+			return '';
+		},
+		emailOwnersText() {
+			return this.emailOwners.map(this.personText).join(', ');
+		},
+		duplicatesText() {
+			return this.duplicates.map(this.personText).join(', ');
+		},
+		submitLabel() {
+			if (this.person === null)
+				return this.$p.t('person', 'neuePersonAnlegen');
+			if (this.duplicates.length)
+				return this.$p.t('person', 'trotzdemAnlegen');
+			return this.personOnly ? this.$p.t('person', 'personAnlegen') : this.$p.t('lehre', 'interessentAnlegen');
 		}
 	},
 	watch: {
@@ -96,6 +153,21 @@ export default {
 		},
 		formDataSem() {
 			this.loadStudienplaene();
+		},
+		// The e-mail field shows the value of the other person now
+		person() {
+			this.checkEmail();
+			this.duplicates = [];
+		},
+		// Other data needs a new duplicate check before the person is created
+		'formData.nachname'() {
+			this.duplicates = [];
+		},
+		'formData.vorname'() {
+			this.duplicates = [];
+		},
+		'formData.gebdatum'() {
+			this.duplicates = [];
 		}
 	},
 	methods: {
@@ -105,35 +177,92 @@ export default {
 		reset() {
 			this.formData = JSON.parse(JSON.stringify(FORMDATA_DEFAULT));
 			this.person = null;
-			this.suggestions = [];
+			this.duplicates = [];
+			// The fields are empty now: both calls stop a running request and clear their result
+			this.loadSuggestions();
+			this.checkEmail();
 			if (this.$refs.form) this.$refs.form.clearValidation();
+		},
+		back() {
+			this.person = null;
+			this.formData.address.checked = true;
+			// Page 2 can change the search fields
+			this.loadSuggestions();
+		},
+		// The spinner starts with the keystroke, so no old result or hint shows during the debounce delay
+		onSearchInput() {
+			if (this.abortController.suggestions)
+				this.abortController.suggestions.abort();
+			this.suggestionsLoading = !this.nachnameTooShort;
+			this.debouncedLoadSuggestions();
 		},
 		loadSuggestions() {
 			if (this.abortController.suggestions)
 				this.abortController.suggestions.abort();
+			this.suggestionsLoading = false;
 			if (this.person !== null)
 				return;
-
+			if (this.nachnameTooShort) {
+				this.suggestionsMore = false;
+				return this.suggestions = [];
+			}
+			this.fetchSuggestions(0);
+		},
+		// Appends the next rows of the same search
+		loadMoreSuggestions() {
+			this.fetchSuggestions(this.suggestions.length);
+		},
+		fetchSuggestions(offset) {
 			this.abortController.suggestions = new AbortController();
+			this.suggestionsLoading = true;
 
 			this.$api
 				.call(ApiStvStudents.getPerson({
 					vorname: this.formData?.vorname,
 					nachname: this.formData?.nachname,
-					gebdatum: this.formData?.gebdatum
+					gebdatum: this.formData?.gebdatum,
+					offset
 				}), {
 					signal: this.abortController.suggestions.signal
 				})
-				.then(result => this.suggestions = result.data)
+				.then(result => {
+					this.suggestions = offset ? this.suggestions.concat(result.data) : result.data;
+					this.suggestionsMore = result.meta.more;
+					this.suggestionsLoading = false;
+				})
 				.catch(error => {
+					// A newer search stopped this one
+					if (error.code == 'ERR_CANCELED')
+						return;
+					// A failed next page keeps the rows that the list shows already
+					if (!offset)
+						this.suggestions = [];
+					this.suggestionsMore = false;
+					this.suggestionsLoading = false;
+					if (error.code != 'ERR_BAD_REQUEST')
+						this.$fhcAlert.handleSystemError(error);
+				});
+		},
+		checkEmail() {
+			if (this.abortController.email)
+				this.abortController.email.abort();
+			const email = (this.formDataPerson?.email || '').trim();
+			if (!email.includes('@'))
+				return this.emailOwners = [];
 
-					if (error.code == 'ERR_BAD_REQUEST') {
-						return this.suggestions = [];
-					}
+			this.abortController.email = new AbortController();
 
-					// NOTE(chris): repeat request
-					if (error.code != "ERR_CANCELED")
-						window.setTimeout(this.loadSuggestions, 100);
+			this.$api
+				.call(ApiStvStudents.getPersonByEmail({ email }), {
+					signal: this.abortController.email.signal
+				})
+				// The selected person may own the address already
+				.then(result => this.emailOwners = result.data.filter(owner => owner.person_id != this.person?.person_id))
+				.catch(error => {
+					if (error.code == 'ERR_CANCELED')
+						return;
+					this.emailOwners = [];
+					this.$fhcAlert.handleSystemError(error);
 				});
 		},
 		loadPlaces() {
@@ -192,9 +321,31 @@ export default {
 				this.formData.staatsbuergerschaft = e.target.value;
 			this.loadPlaces();
 		},
-		send(e) {
+		async send(e) {
 			if (this.person === null)
 				return this.person = 0;
+			// A second click during the check or the save must not create the person twice
+			if (this.saving)
+				return;
+			this.saving = true;
+			try {
+				await this.save();
+			} finally {
+				this.saving = false;
+			}
+		},
+		async save() {
+			// New person: the first submit shows exact duplicates, the second submit creates the person anyway
+			if (this.person === 0 && !this.duplicates.length) {
+				const { nachname, vorname, gebdatum } = this.formData;
+				const duplicates = await this.findDuplicates(nachname, vorname, gebdatum);
+				// The dialog can close, go back or get other data during the request
+				if (this.person !== 0 || duplicates === null
+					|| this.formData.nachname !== nachname || this.formData.vorname !== vorname || this.formData.gebdatum !== gebdatum)
+					return;
+				if (duplicates.length)
+					return this.duplicates = duplicates;
+			}
 
 			//this.$fhcAlert.resetFormValidation(this.$refs.form);
 			const data = {...this.formData, ...(this.person || {})};
@@ -205,7 +356,7 @@ export default {
 
 			data.personOnly = this.personOnly;
 
-			this.$refs.form.call(
+			return this.$refs.form.call(
 				ApiStvStudents.add(data)
 			)
 			.then(result => {
@@ -214,6 +365,23 @@ export default {
 				this.$refs.modal.hide();
 			})
 			.catch(this.$fhcAlert.handleSystemError);
+		},
+		// Persons with the same Nachname and Vorname/Wahlname (getPerson filters the Geburtsdatum); null on error
+		async findDuplicates(nachname, vorname, gebdatum) {
+			let result;
+			try {
+				result = await this.$api.call(ApiStvStudents.getPerson({ nachname, vorname, gebdatum }));
+			} catch (error) {
+				this.$fhcAlert.handleSystemError(error);
+				return null;
+			}
+			const same = (a, b) => (a || '').trim().toLowerCase() == (b || '').trim().toLowerCase();
+			return result.data.filter(match => same(match.nachname, nachname)
+				&& (same(match.vorname, vorname) || (match.wahlname && same(match.wahlname, vorname))));
+		},
+		personText(person) {
+			const name = [person.vorname, person.nachname].filter(Boolean).join(' ');
+			return person.gebdatum ? name + ' (' + this.dateFormatter(person.gebdatum) + ')' : name;
 		},
 		setPerson(suggestion)
 		{
@@ -234,6 +402,8 @@ export default {
 	},
 	created() {
 		this.uuid = _uuid++;
+		this.debouncedLoadSuggestions = debounce(this.loadSuggestions, 300);
+		this.debouncedCheckEmail = debounce(this.checkEmail, 300);
 		this.reset();
 		this.$api.call(ApiStudiensemester.getAll())
 		.then(result => result.data || [])
@@ -244,13 +414,14 @@ export default {
 	},
 	template: `
 	<fhc-form ref="form" class="stv-list-new" @submit.prevent="send">
-		<bs-modal ref="modal" dialog-class="modal-lg modal-dialog-scrollable" style="min-height: 500px" @hidden-bs-modal="reset">
+		<bs-modal ref="modal" dialog-class="modal-lg modal-dialog-scrollable" style="min-height: 500px" allow-fullscreen-expand @hidden-bs-modal="reset">
 			<template #title>
 				{{ personOnly ? $p.t('person', 'personAnlegen') : $p.t('lehre', 'interessentAnlegen') }}
 			</template>
 			<template #default>
 
 				<template v-if="person === null">
+					<p>{{ $p.t('person', 'personUebernehmenOderAnlegen') }}</p>
 					<div class="row">
 						<div class="col-sm-4 mb-3">
 							<form-input
@@ -260,8 +431,7 @@ export default {
 								name="nachname"
 								v-model="formDataPerson['nachname']"
 								:disabled="!!person"
-								@input="loadSuggestions"
-								:min-length="3"
+								@input="onSearchInput"
 								>
 							</form-input>
 						</div>
@@ -273,8 +443,7 @@ export default {
 								name="vorname"
 								v-model="formDataPerson['vorname']"
 								:disabled="!!person"
-								@input="loadSuggestions"
-								:min-length="3"
+								@input="onSearchInput"
 								>
 							</form-input>
 						</div>
@@ -287,7 +456,7 @@ export default {
 								v-model="formDataPerson['gebdatum']"
 								model-type="yyyy-MM-dd"
 								:disabled="!!person"
-								@update:model-value="loadSuggestions"
+								@update:model-value="onSearchInput"
 								text-input
 								auto-apply
 								no-today
@@ -299,27 +468,36 @@ export default {
 						</div>
 					</div>
 					<table class="table caption-top table-striped table-hover" >
-						<caption>{{ $p.t('person', 'personExistiertPruefung') }}</caption>
+						<caption>
+							{{ $p.t('person', 'personExistiertPruefungv2') }}
+							<span v-if="suggestionsLoading" class="spinner-border spinner-border-sm ms-2" aria-hidden="true"></span>
+						</caption>
 						<thead v-if="suggestions?.length">
 							<th>{{ $p.t('person', 'nachname') }}</th>
 							<th>{{ $p.t('person', 'vorname') }}</th>
+							<th>{{ $p.t('person', 'wahlname') }}</th>
 							<th>{{ $p.t('person', 'weitereVornamen') }}</th>
 							<th>{{ $p.t('person', 'geburtsdatum') }}</th>
 							<th>{{ $p.t('person', 'geschlecht') }}</th>
 							<th>{{ $p.t('person', 'adresse') }}</th>
 							<th>Status</th>
+							<th><span class="visually-hidden">{{ $p.t('person', 'personInNeuemTabOeffnen') }}</span></th>
 						</thead>
 						<tbody>
 							<tr
-								v-for="(suggestion, index) in suggestions"
+								v-for="suggestion in suggestions"
 								:key="suggestion.person_id"
-								:class="{'active': index == 2}"
-								@click="(index == 2) ? suggestions.shift() : setPerson(suggestion)"
+								:class="{'stv-list-new-inactive': !suggestion.aktiv}"
+								@click="setPerson(suggestion)"
 								v-accessibility:tab.vertical
 								>
-								<td>{{ suggestion.nachname }}</td>
-								<td>{{ suggestion.vorname }}</td>
-								<td>{{ suggestion.vornamen }}</td>
+								<td>
+									<mark-match :text="suggestion.nachname" :term="formData.nachname"></mark-match>
+									<span v-if="!suggestion.aktiv" class="visually-hidden"> ({{ $p.t('global', 'inaktiv') }})</span>
+								</td>
+								<td><mark-match :text="suggestion.vorname" :term="formData.vorname"></mark-match></td>
+								<td><mark-match :text="suggestion.wahlname" :term="formData.vorname"></mark-match></td>
+								<td><mark-match :text="suggestion.vornamen" :term="formData.vorname"></mark-match></td>
 								<td>{{ dateFormatter(suggestion.gebdatum) }}</td>
 								<td>{{ suggestion.geschlecht_bezeichnung }}</td>
 								<td>
@@ -329,12 +507,34 @@ export default {
 								</td>
 								<td>
 									<div v-for="status in suggestion.status">
-										{{ status.status_kurzbz + " " + status.studiengang_kuerzel }}
+										{{ status.status_kurzbz + " " + status.studiengang_kuerzel + " " + status.studiensemester_kurzbz }}
 									</div>
+								</td>
+								<td>
+									<!-- Only a person with a prestudent shows in the StV list; .stop: the link must not select the row -->
+									<a
+										v-if="suggestion.status?.length"
+										:href="$router.resolve({ name: 'person', params: { person_id: suggestion.person_id } }).href"
+										target="_blank"
+										rel="noopener"
+										:title="$p.t('person', 'personInNeuemTabOeffnen')"
+										:aria-label="$p.t('person', 'personInNeuemTabOeffnen')"
+										@click.stop
+										@keydown.enter.stop
+										>
+										<i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+									</a>
 								</td>
 							</tr>
 						</tbody>
 					</table>
+					<div class="text-body-secondary" role="status">
+						<span v-if="suggestionsLoading" class="visually-hidden">{{ $p.t('ui', 'loading') }}</span>
+						{{ suggestionsHint }}
+					</div>
+					<button v-if="suggestionsMore && !suggestionsLoading" type="button" class="btn btn-outline-secondary btn-sm mt-2" @click="loadMoreSuggestions">
+						{{ $p.t('person', 'weitereTrefferLaden') }}
+					</button>
 				</template>
 				<template v-else>
 					<div class="row">
@@ -381,8 +581,6 @@ export default {
 								name="nachname"
 								v-model="formDataPerson['nachname']"
 								:disabled="!!person"
-								@input="loadSuggestions"
-								:min-length="3"
 								>
 							</form-input>
 						</div>
@@ -394,8 +592,6 @@ export default {
 								name="vorname"
 								v-model="formDataPerson['vorname']"
 								:disabled="!!person"
-								@input="loadSuggestions"
-								:min-length="3"
 								>
 							</form-input>
 						</div>
@@ -444,8 +640,8 @@ export default {
 								uid="stv-list-new-gebdatum"
 								name="gebdatum"
 								v-model="formDataPerson['gebdatum']"
+								model-type="yyyy-MM-dd"
 								:disabled="!!person"
-								@update:model-value="loadSuggestions"
 								text-input
 								auto-apply
 								no-today
@@ -590,8 +786,14 @@ export default {
 								id="stv-list-new-email"
 								name="email"
 								v-model="formDataPerson['email']"
+								@input="debouncedCheckEmail"
 								>
 							</form-input>
+							<div role="status">
+								<div v-if="emailOwners.length" class="alert alert-warning small py-1 px-2 mt-1 mb-0">
+									{{ $p.t('person', 'emailBereitsVergeben', [emailOwnersText]) }}
+								</div>
+							</div>
 						</div>
 						<div class="col-sm-4 mb-3">
 							<form-input
@@ -733,8 +935,11 @@ export default {
 				</template>
 			</template>
 			<template #footer>
-				<button v-if="person !== null" type="button" class="btn btn-secondary" @click="person = null; formData.address.checked = true;"><i class="fa fa-chevron-left"></i>{{ $p.t('ui', 'zurueck') }}</button>
-				<button type="submit" class="btn btn-primary">{{ person === null || personOnly ? $p.t('person', 'personAnlegen') : $p.t('lehre', 'interessentAnlegen') }}</button>
+				<div v-if="duplicates.length" class="alert alert-warning w-100" role="alert">
+					{{ $p.t('person', 'personExistiertTrotzdemAnlegen', [duplicatesText]) }}
+				</div>
+				<button v-if="person !== null" type="button" class="btn btn-secondary" :disabled="saving" @click="back"><i class="fa fa-chevron-left"></i>{{ $p.t('ui', 'zurueck') }}</button>
+				<button type="submit" class="btn btn-primary" :disabled="saving">{{ submitLabel }}</button>
 			</template>
 		</bs-modal>
 	</fhc-form>`

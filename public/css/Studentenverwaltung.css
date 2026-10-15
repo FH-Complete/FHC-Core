@@ -289,3 +289,12 @@ html.fs_huge {
 .fhc-xxl-modal {
 	min-width: 80vw;
 }
+
+/* Inactive person in the duplicate check of List/New.js; tokens keep the striped and hover rows grey */
+.stv-list-new .table > tbody > tr.stv-list-new-inactive {
+	--bs-table-color: var(--bs-secondary-color);
+	--bs-table-striped-color: var(--bs-secondary-color);
+	--bs-table-hover-color: var(--bs-secondary-color);
+	--bs-table-active-color: var(--bs-secondary-color);
+	font-style: italic;
+}
