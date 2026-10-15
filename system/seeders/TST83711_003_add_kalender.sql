@@ -79,6 +79,8 @@ VALUES
 INSERT INTO lehre.tbl_kalender
 (von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
 (date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '13:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '13:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '13:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
 (date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '13:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
 ;
 
@@ -86,7 +88,9 @@ INSERT INTO lehre.tbl_kalender_lehreinheit
 (lehreinheit_id, kalender_id)
 VALUES
 (51001, 12),
-(51002, 13);
+(51002, 13),
+(51003, 14),
+(51004, 15);
 -- ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 -- Calendar setup for API event creation tests
@@ -99,8 +103,8 @@ INSERT INTO lehre.tbl_kalender
 INSERT INTO lehre.tbl_kalender_lehreinheit
 (lehreinheit_id, kalender_id)
 VALUES
-(51003, 14),
-(51005, 15);
+(51003, 16),
+(51005, 17);
 -- ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -130,17 +134,17 @@ VALUES
 INSERT INTO lehre.tbl_kalender_lehreinheit
 (lehreinheit_id, kalender_id)
 VALUES
-(51001, 16),
-(51001, 17),
-(51003, 18),
+(51001, 18),
 (51001, 19),
 (51003, 20),
-(51003, 21),
-(51006, 22),
-(51004, 23),
-(51005, 24),
+(51001, 21),
+(51003, 22),
+(51003, 23),
+(51006, 24),
 (51004, 25),
-(51006, 26);
+(51005, 26),
+(51004, 27),
+(51006, 28);
 -- ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -154,8 +158,8 @@ INSERT INTO lehre.tbl_kalender
 INSERT INTO lehre.tbl_kalender_lehreinheit
 (lehreinheit_id, kalender_id)
 VALUES
-(51002, 27),
-(51006, 28);
+(51002, 29),
+(51006, 30);
 -- ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -172,10 +176,10 @@ VALUES
 INSERT INTO lehre.tbl_kalender_lehreinheit
 (lehreinheit_id, kalender_id)
 VALUES
-(51004, 29),
-(51006, 30),
-(51006, 31),
-(51004, 32);
+(51004, 31),
+(51006, 32),
+(51006, 33),
+(51004, 34);
 
 -- Calendar setup for tags tests
 INSERT INTO lehre.tbl_kalender
@@ -186,7 +190,7 @@ VALUES
 INSERT INTO lehre.tbl_kalender_lehreinheit
 (lehreinheit_id, kalender_id)
 VALUES
-(51004, 33);
+(51004, 35);
 
 -- Assign a UUID to every root calendar entry and propagate it to its children.
 UPDATE lehre.tbl_kalender

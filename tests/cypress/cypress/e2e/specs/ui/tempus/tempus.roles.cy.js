@@ -138,6 +138,134 @@ context("Tempus role preview tests", () => {
         });
       });
   });
+
+  it("updates events in the lecturer preview but not the student preview after releasing and syncing", () => {
+    tempusPage.syncAndReloadPlanner();
+
+    tempusPage
+      .getCalendarEventsBySoftTimeRange("13:35:00", "14:20:00")
+      .first()
+      .invoke("attr", "data-fhc-draggable-value")
+      .then((eventJSON) => {
+        expect(eventJSON).to.exist;
+
+        const eventId = JSON.parse(eventJSON)?.id;
+        expect(eventId).to.exist;
+
+		const updatedEventGroupId = JSON.parse(eventJSON)?.orig?.eindeutige_kalender_gruppen_id;
+		expect(updatedEventGroupId).to.exist;
+
+        tempusPage.dropEventOnCalendarPart(eventId, 4, {
+          scrollIntoView: true,
+        });
+
+        cy.wait("@updateCalendarEvent").then((interception) => {
+          expect(interception.response.statusCode).to.eq(200);
+          expect(interception.response.body.data).to.exist;
+
+          const updatedEventGroupId =
+            interception.response.body.data?.eindeutige_kalender_gruppen_id ??
+            interception.response.body.data;
+
+          cy.wrap(updatedEventGroupId).as("updatedEventGroupId");
+        });
+        waitForOk("@fetchPlanData");
+
+        tempusPage.getCalendarEventByUniqueCalenderGroupId(updatedEventGroupId).rightclick();
+        tempusPage
+          .getEventContextMenuOption("Freischalten für Voransicht")
+          .click({ force: true });
+        waitForOk("@syncCalendarToLecturer");
+        waitForOk("@fetchPlanData");
+
+        tempusPage.syncAndReloadPlanner();
+
+        cy.get("@updatedEventGroupId").then((updatedEventGroupId) => {
+          tempusPage
+            .getGridRowByContainingUniqueCalendarGroupId(updatedEventGroupId)
+            .then((plannerGridRow) => {
+              tempusPage.selectRoleAndWait(LEKTOR);
+              tempusPage
+                .getGridRowByContainingUniqueCalendarGroupId(updatedEventGroupId)
+                .then((lecturerGridRow) => {
+                  expect(lecturerGridRow).to.eq(plannerGridRow);
+                });
+
+              tempusPage.selectRoleAndWait(STUDENT);
+              tempusPage
+                .getGridRowByContainingUniqueCalendarGroupId(updatedEventGroupId)
+                .then((studentGridRow) => {
+                  expect(studentGridRow).not.to.eq(plannerGridRow);
+                });
+            });
+        });
+      });
+  });
+
+  it("updates events in the lecturer and student previews after releasing for live and syncing", () => {
+    tempusPage.syncAndReloadPlanner();
+
+    tempusPage
+      .getCalendarEventsBySoftTimeRange("13:35:00", "14:20:00")
+      .first()
+      .invoke("attr", "data-fhc-draggable-value")
+      .then((eventJSON) => {
+        expect(eventJSON).to.exist;
+
+        const eventId = JSON.parse(eventJSON)?.id;
+        expect(eventId).to.exist;
+        const updatedEventGroupId =
+          JSON.parse(eventJSON)?.orig?.eindeutige_kalender_gruppen_id;
+        expect(updatedEventGroupId).to.exist;
+
+        tempusPage.dropEventOnCalendarPart(eventId, 4, {
+          scrollIntoView: true,
+        });
+
+        cy.wait("@updateCalendarEvent").then((interception) => {
+          expect(interception.response.statusCode).to.eq(200);
+          expect(interception.response.body.data).to.exist;
+
+          const updatedEventGroupId =
+            interception.response.body.data?.eindeutige_kalender_gruppen_id ??
+            interception.response.body.data;
+
+          cy.wrap(updatedEventGroupId).as("updatedEventGroupId");
+        });
+        waitForOk("@fetchPlanData");
+
+        tempusPage
+          .getCalendarEventByUniqueCalenderGroupId(updatedEventGroupId)
+          .rightclick();
+        tempusPage
+          .getEventContextMenuOption("Freischalten für Live")
+          .click({ force: true });
+        waitForOk("@syncCalendarToStudent");
+        waitForOk("@fetchPlanData");
+
+        tempusPage.syncAndReloadPlanner();
+
+        cy.get("@updatedEventGroupId").then((updatedEventGroupId) => {
+          tempusPage
+            .getGridRowByContainingUniqueCalendarGroupId(updatedEventGroupId)
+            .then((plannerGridRow) => {
+              tempusPage.selectRoleAndWait(LEKTOR);
+              tempusPage
+                .getGridRowByContainingUniqueCalendarGroupId(updatedEventGroupId)
+                .then((lecturerGridRow) => {
+                  expect(lecturerGridRow).to.eq(plannerGridRow);
+                });
+
+              tempusPage.selectRoleAndWait(STUDENT);
+              tempusPage
+                .getGridRowByContainingUniqueCalendarGroupId(updatedEventGroupId)
+                .then((studentGridRow) => {
+                  expect(studentGridRow).to.eq(plannerGridRow);
+                });
+            });
+        });
+      });
+  });
   
   it("prevents event changes in the lecturer preview", () => {
     tempusPage.syncAndReloadPlanner();

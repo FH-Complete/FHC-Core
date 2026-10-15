@@ -113,6 +113,10 @@ class TempusPage {
     }).as("syncCalendar");
     cy.intercept({
       method: "POST",
+      url: "**/tempus/Kalender/syncToLecturer**",
+    }).as("syncCalendarToLecturer");
+    cy.intercept({
+      method: "POST",
       url: "**/tempus/Kalender/syncToStudent**",
     }).as("syncCalendarToStudent");
     cy.intercept({
