@@ -9,22 +9,8 @@ $sitesettings = array(
 	'ajaxlib' => true,
 	'sbadmintemplate3' => true,
 	'phrases' => array(
-		'abschlusspruefung' => array(
-			'freigegebenAm',
-			'pruefungGespeichert',
-			'pruefungSpeichernFehler',
-			'abschlussbeurteilungLeer',
-			'beginnzeitLeer',
-			'beginnzeitFormatError',
-			'endezeitLeer',
-			'endezeitFormatError',
-			'endezeitBeforeError',
-			'verfNotice'
-		),
-		'ui' => array(
-			'stunde',
-			'minute'
-		)
+		'abschlusspruefung',
+		'ui'
 	),
 	'customCSSs' => array(
 		'public/css/sbadmin2/admintemplate_contentonly.css',
@@ -37,10 +23,18 @@ $sitesettings = array(
 	)
 );
 
-$this->load->view(
-	'templates/FHC-Header',
-	$sitesettings
-);
+if(defined('CIS4')){
+	$this->load->view(
+		'templates/CISVUE-Header',
+		$sitesettings
+	);
+}else{
+	$this->load->view(
+		'templates/FHC-Header',
+		$sitesettings
+	);
+}
+
 ?>
 <div id="wrapper">
 	<div id="page-wrapper">
@@ -162,6 +156,14 @@ $this->load->view(
 									</td>
 								</tr>
 								<tr>
+									<td>
+										<?php echo $this->p->t('abschlusspruefung', 'spracheDerArbeit') ?>&nbsp;<?php echo $arbeit_name ?>
+									</td>
+									<td colspan="5">
+										<?php echo $abschlusspruefung->abschlussarbeit_sprache ?? '' ?>
+									</td>
+								</tr>
+								<tr>
 									<td colspan="6">
 										<?php echo ucfirst($this->p->t('global', 'notizen')); ?>
 									</td>
@@ -201,7 +203,9 @@ $this->load->view(
 				<div class="col-lg-12 text-right">
 					<p>
 						<?php $freigegeben = isset($abschlusspruefung->freigabedatum); ?>
-						<button id="saveProtocolBtn" class="btn btn-default"<?php echo $freigegeben ? " disabled" : "" ?>><?php echo $this->p->t('ui', 'speichern') ?></button>
+						<button id="saveProtocolBtn" class="btn btn-default"<?php echo $freigegeben ? ' disabled title="'.$this->p->t('abschlusspruefung', 'bereitsFreigegeben').'"' : '' ?>>
+							<?php echo $this->p->t('ui', 'speichern') ?>
+						</button>
 					</p>
 				</div>
 			</div>
@@ -236,7 +240,14 @@ $this->load->view(
 	</div>
 </div>
 <?php
-$this->load->view(
-	'templates/FHC-Footer',
-	$sitesettings
-);
+if (defined('CIS4')) {
+	$this->load->view(
+		'templates/CISVUE-Footer',
+		$sitesettings
+	);
+} else {
+	$this->load->view(
+		'templates/FHC-Footer',
+		$sitesettings
+	);
+}

@@ -1,4 +1,4 @@
-import FhcCalendar from "../../Calendar/LvPlan.js";
+import FhcCalendar from '../../Calendar/LvPlan.js';
 
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
@@ -9,10 +9,10 @@ export const DEFAULT_MODE_LVPLAN_DESKTOP = 'Week';
 export default {
 	name: 'LvPlan',
 	components: {
-		FhcCalendar
+		FhcCalendar,
 	},
 	props: {
-		propsViewData: Object
+		propsViewData: Object,
 	},
 	data() {
 		return {
@@ -24,65 +24,102 @@ export default {
 			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone,
 		};
 	},
-	inject: ["isMobile"],
-	computed:{
+	inject: {
+		isMobile: {
+			default: false,
+		},
+	},
+	computed: {
 		currentDay() {
-			return this.propsViewData?.focus_date || luxon.DateTime.now().setZone(this.timezone).toISODate();
+			return (
+				this.propsViewData?.focus_date ||
+				luxon.DateTime.now().setZone(this.timezone).toISODate()
+			);
 		},
 		currentMode() {
-			const defaultMode = this.isMobile ? DEFAULT_MODE_LVPLAN_MOBILE : DEFAULT_MODE_LVPLAN_DESKTOP;
+			const defaultMode = this.isMobile
+				? DEFAULT_MODE_LVPLAN_MOBILE
+				: DEFAULT_MODE_LVPLAN_DESKTOP;
 			return this.propsViewData?.mode || defaultMode;
 		},
 		downloadLinks() {
-			if (!this.studiensemester_start || !this.studiensemester_ende || !this.uid)
+			if (
+				!this.studiensemester_start ||
+				!this.studiensemester_ende ||
+				!this.uid
+			)
 				return false;
-			
-			const opts = { zone: this.timezone };
-			const start = luxon.DateTime
-				.fromISO(this.studiensemester_start, opts)
-				.toUnixInteger();
-			const ende = luxon.DateTime
-				.fromISO(this.studiensemester_ende, opts)
-				.toUnixInteger();
 
-			const download_link = FHC_JS_DATA_STORAGE_OBJECT.app_root
-				+ 'cis/private/lvplan/stpl_kalender.php'
-				+ '?type=student'
-				+ '&pers_uid=' + this.uid
-				+ '&begin=' + start
-				+ '&ende=' + ende;
+			const opts = { zone: this.timezone };
+			const start = luxon.DateTime.fromISO(
+				this.studiensemester_start,
+				opts,
+			).toUnixInteger();
+			const ende = luxon.DateTime.fromISO(
+				this.studiensemester_ende,
+				opts,
+			).toUnixInteger();
+
+			const download_link =
+				FHC_JS_DATA_STORAGE_OBJECT.app_root +
+				'cis/private/lvplan/stpl_kalender.php' +
+				'?type=student' +
+				'&pers_uid=' +
+				this.uid +
+				'&begin=' +
+				start +
+				'&ende=' +
+				ende;
 
 			return [
-				{ title: "excel", icon: 'fa-solid fa-file-excel', link: download_link + '&format=excel' },
-				{ title: "csv", icon: 'fa-solid fa-file-csv', link: download_link + '&format=csv' },
-				{ title: "ical1", icon: 'fa-regular fa-calendar', link: download_link + '&format=ical&version=1&target=ical' },
-				{ title: "ical2", icon: 'fa-regular fa-calendar', link: download_link + '&format=ical&version=2&target=ical' }
+				{
+					title: 'excel',
+					icon: 'fa-solid fa-file-excel',
+					link: download_link + '&format=excel',
+				},
+				{
+					title: 'csv',
+					icon: 'fa-solid fa-file-csv',
+					link: download_link + '&format=csv',
+				},
+				{
+					title: 'ical1',
+					icon: 'fa-regular fa-calendar',
+					link: download_link + '&format=ical&version=1&target=ical',
+				},
+				{
+					title: 'ical2',
+					icon: 'fa-regular fa-calendar',
+					link: download_link + '&format=ical&version=2&target=ical',
+				},
 			];
-		}
+		},
 	},
 	methods: {
 		handleChangeDate(day, newMode) {
 			return this.handleChangeMode(newMode, day);
 		},
 		handleChangeMode(newMode, day) {
-			const mode = newMode[0].toUpperCase() + newMode.slice(1)
+			const mode = newMode[0].toUpperCase() + newMode.slice(1);
 			const focus_date = day.toISODate();
-			
+
 			this.$router.push({
-				name: "LvPlan",
+				name: 'LvPlan',
 				params: {
 					mode,
 					focus_date,
-					lv_id: this.propsViewData?.lv_id ?? null
-				}
+					lv_id: this.propsViewData?.lv_id ?? null,
+				},
 			});
 		},
 		updateRange(rangeInterval) {
 			this.$api
-				.call(ApiLvPlan.studiensemesterDateInterval(
-					rangeInterval.end.startOf('week').toISODate()
-				))
-				.then(res => {
+				.call(
+					ApiLvPlan.studiensemesterDateInterval(
+						rangeInterval.end.startOf('week').toISODate(),
+					),
+				)
+				.then((res) => {
 					this.studiensemester_kurzbz = res.data.studiensemester_kurzbz;
 					this.studiensemester_start = res.data.start;
 					this.studiensemester_ende = res.data.ende;
@@ -90,19 +127,25 @@ export default {
 		},
 		getPromiseFunc(start, end) {
 			return [
-				this.$api.call(ApiLvPlan.LvPlanEvents(start.toISODate(), end.toISODate(), this.propsViewData.lv_id)),
-				this.$api.call(ApiLvPlan.getLvPlanReservierungen(start.toISODate(), end.toISODate()))
+				this.$api.call(
+					ApiLvPlan.LvPlanEvents(
+						start.toISODate(),
+						end.toISODate(),
+						this.propsViewData.lv_id,
+					),
+				),
+				this.$api.call(
+					ApiLvPlan.getLvPlanReservierungen(start.toISODate(), end.toISODate()),
+				),
 			];
-		}
+		},
 	},
 	created() {
-		this.$api
-			.call(ApiAuthinfo.getAuthUID())
-			.then(res => {
-				this.uid = res.data.uid;
-			});
+		this.$api.call(ApiAuthinfo.getAuthUID()).then((res) => {
+			this.uid = res.data.uid;
+		});
 	},
-	template: /*html*/`
+	template: /*html*/ `
 	<div class="cis-lvplan-personal d-flex flex-column h-100">
 		<h2>
 			{{ $p.t('lehre/stundenplan') }}
@@ -144,5 +187,5 @@ export default {
 				</div>
 			</div>
 		</fhc-calendar>
-	</div>`
+	</div>`,
 };

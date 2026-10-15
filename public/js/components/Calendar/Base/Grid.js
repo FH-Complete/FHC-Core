@@ -3,6 +3,7 @@ import GridLineEvent from './Grid/Line/Event.js';
 
 import drop from '../../../directives/drop.js';
 import { useResizeHandler } from '../../../helpers/Tempus/ResizeHandler.js';
+import CalClick from '../../../directives/Calendar/Click.js';
 
 export default {
 	name: "CalendarGrid",
@@ -11,18 +12,22 @@ export default {
 		GridLineEvent
 	},
 	directives: {
-		drop
+		drop,
+		CalClick
 	},
 	inject: {
 		originalEvents: "events",
 		originalBackgrounds: "backgrounds",
-		dropAllowed: "dropAllowed",
 		onDrop: "onDrop",
 		onResize: "onResize",
 		timeGrid: {
 			from: "timeGrid",
 			default: () => []
-		}
+		},
+		dropAllowed: "dropAllowed",
+		timezone: "timezone",
+		reservierbar: "isReservierbar",
+		reservierbarMap: "reservierbarMap",
 	},
 	provide() {
 		return {
@@ -61,11 +66,19 @@ export default {
 		flipAxis: Boolean,
 		allDayEvents: Boolean,
 		axisMainCollapsible: Boolean,
-		snapToGrid: Boolean,
 		dayVisibility: {
 			type: Array,
 			default: null
-		}
+		},
+		snapToGrid: Boolean,
+		overwrittenEvents: {
+			type: [Array, null],
+			default: null,
+		},
+		shouldMatchParentHeight: {
+			type: Boolean,
+			default: true,
+		},
 	},
 	data() {
 		return {
@@ -76,6 +89,9 @@ export default {
 		};
 	},
 	computed: {
+		parsedEvents() {
+			return this.$props.overwrittenEvents ?? this.originalEvents;
+		},
 		axisRow() {
 			return this.flipAxis ? 'column' : 'row';
 		},
@@ -140,23 +156,25 @@ export default {
 			return ends;
 		},
 		axisMainBorders() {
-			return this.axisMain.reduce(
-				(res, curr) => res.concat([curr.plus(this.start), curr.plus(this.end)]),
+			return this.$props.axisMain.reduce(
+				(res, curr) => res.concat(curr ? [curr.plus(this.start), curr.plus(this.end)] : [null, null]),
 				[]
 			);
 		},
 		eventsAllDay() {
 			if (!this.allDayEvents)
 				return [];
-			return this.mapIntoMainAxis(this.originalEvents.filter(event => event.orig.allDayEvent));
+
+			let eventsAllDay = this.mapIntoMainAxis(this.parsedEvents.filter(event => event.orig.allDayEvent));
+			return eventsAllDay;
 		},
 		eventsNormal() {
 			if (!this.allDayEvents)
 				return this.events;
-			return this.mapIntoMainAxis(this.originalEvents.filter(event => !event.orig.allDayEvent));
+			return this.mapIntoMainAxis(this.parsedEvents.filter(event => !event.orig.allDayEvent));
 		},
 		events() {
-			return this.mapIntoMainAxis(this.originalEvents);
+			return this.mapIntoMainAxis(this.parsedEvents);
 		},
 		backgrounds() {
 			return this.mapIntoMainAxis(this.originalBackgrounds);
@@ -175,7 +193,7 @@ export default {
 				}
 			}
 
-			let cols = 'repeat(' + this.axisMain.length + ', 1fr)';
+			let cols = 'repeat(' + this.$props.axisMain.length + ', 1fr)';
 			if (this.axisMainCollapsible) {
 				if (this.hasValidEvents)
 					cols = this.events
@@ -203,7 +221,7 @@ export default {
 			});
 
 			this.eventsNormal.forEach((events, mainIndex) => {
-				let day = this.axisMain[mainIndex];
+				let day = this.$props.axisMain[mainIndex];
 				events.forEach(event => {
 					if (!event.startsHere && !event.endsHere)
 						return;
@@ -233,15 +251,15 @@ export default {
 	},
 	methods: {
 		mapIntoMainAxis(target) {
-			const result = Array.from({length: this.axisMain.length}, () => Array());
+			const result = Array.from({length: this.$props.axisMain.length}, () => Array());
 
 			target.forEach(event => {
 				const start = event.start || this.axisMainBorders[0].plus(-1);
 				const end = event.end || this.axisMainBorders[this.axisMainBorders.length - 1].plus(1);
 
-				for (var i = 0; i < this.axisMain.length; i++) {
-					let laneStart = this.axisMainBorders[i * 2];
-					let laneEnd = this.axisMainBorders[i * 2 + 1];
+				this.$props.axisMain.forEach((part, index) => {
+					let laneStart = this.axisMainBorders[index * 2];
+					let laneEnd = this.axisMainBorders[index * 2 + 1];
 					if (event.orig?.allDayEvent) {
 						laneStart = laneStart.startOf('day');
 						laneEnd = laneEnd.endOf('day');
@@ -249,13 +267,13 @@ export default {
 					if (start < laneEnd && end > laneStart) {
 						const startsHere = start >= laneStart;
 						const endsHere = end <= laneEnd;
-						result[i].push({
+						result[index].push({
 							...event,
 							startsHere,
 							endsHere
 						});
 					}
-				}
+				});
 			});
 
 			return result;
@@ -512,7 +530,36 @@ export default {
 					return !this.dayVisibility[index];
 			}
 			return this.axisMainCollapsible && this.hasValidEvents && !this.events[index].length;
+		},
+		isFollowedByBreak(index) {
+			if (index === this.axisPartsSave.length - 1) return false;
+
+			const targetPartEnd = this.axisPartsSave[index].end;
+			const nextPartStart = this.axisPartsSave[index + 1].start;
+			if (!targetPartEnd || !nextPartStart) return false;
+
+			return !(
+				targetPartEnd.hours === nextPartStart.hours &&
+				targetPartEnd.minutes === nextPartStart.minutes
+			);
+		},
+		isFreeSlot(date, part, dayEvents) {
+			const pastEnd = luxon.DateTime.now().setZone(this.timezone);
+
+			const start = date.plus(part.start || part);
+			const end = date.plus(part.end || part.plus({ hours: 1 }));
+
+			if (start < pastEnd)
+				return false;
+
+			if (!dayEvents || !dayEvents.length)
+				return true;
+
+			return !dayEvents.some(ev => ev.start < end && ev.end > start);
 		}
+	},
+	created() {
+		this.$p.loadCategory(["LvPlan"]);
 	},
 	setup()
 	{
@@ -525,8 +572,9 @@ export default {
 	template: /* html */`
 	<div
 		class="fhc-calendar-base-grid"
-		style="display:grid;width:100%;height:100%;overflow:auto"
-		:style="'grid-template-' + axisRow + 's:auto' + (allDayEvents ? ' auto ' : ' ') + '1fr;grid-template-' + axisCol + 's:auto ' + styleGridCols"
+		:class="{'h-100': $props.shouldMatchParentHeight}"
+		style="display:grid;width:100%;overflow:auto"
+		:style="'--fhc-grid-axis-main-count: ' + $props.axisMain.length + ';grid-template-' + axisRow + 's:auto' + (allDayEvents ? ' auto ' : ' ') + '1fr;grid-template-' + axisCol + 's:auto ' + styleGridCols"
 		data-cy="calendar-base-grid"
 	>
 		<div
@@ -535,10 +583,10 @@ export default {
 			:style="'grid-template-' + axisCol + 's:subgrid;grid-' + axisCol + ':1/-1'"
 		>
 			<div
-				v-for="(date, index) in axisMain"
+				v-for="(date, index) in $props.axisMain"
 				:key="index"
 				class="main-header"
-				:class="{'collapsed-header': isDayCollapsed(index)}"
+				:class="{'collapsed-header': isDayCollapsed(index), 'main-header-sunday': date.weekday === 7,}"
 				:style="'grid-' + axisCol + ':' + (2+index)"
 			>
 				<slot name="main-header" v-bind="{ index, date }" />
@@ -550,26 +598,34 @@ export default {
 			style="display:grid"
 			:style="'grid-template-' + axisCol + 's:subgrid;grid-' + axisCol + ':1/-1'"
 		>
-			<div
-				v-for="(events, index) in eventsAllDay"
-				:key="index"
-				class="all-day-events"
-				:style="'grid-' + axisCol + ':' + (2+index)"
-			>
-				<grid-line-event
-					v-for="(event, i) in events"
-					:key="event.orig?.eindeutige_kalender_gruppen_id ?? event.orig?.kalender_id ?? i"
-					:event="event"
+			<template v-for="(events, index) in eventsAllDay" :key="index">
+				<div
+					v-if="$props.axisMain[index]"
+					class="all-day-events"
+					:class="{'all-day-events-sunday': $props.axisMain[index].weekday === 7}"
+					:style="'grid-' + axisCol + ':' + (2+index)"
 				>
-					<template v-slot="slot">
-						<slot name="event" v-bind="slot" />
-					</template>
-				</grid-line-event>
-			</div>
+					<grid-line-event
+						v-for="(event, i) in events"
+						:key="event.orig?.eindeutige_kalender_gruppen_id ?? event.orig?.kalender_id ?? i"
+						:event="event"
+					>
+						<template v-slot="slot">
+							<slot name="event" v-bind="slot" />
+						</template>
+					</grid-line-event>
+				</div>
+				<div
+					v-else
+					class="all-day-events"
+					:style="'grid-' + axisCol + ':' + (2+index)"
+				></div>
+			</template>
 		</div>
 		<div
 			ref="scroller"
 			@scrollend="userScroll ? disableAutoScroll() : userScroll = true"
+			id="grid-main-scrollable"
 			style="display:grid;overflow:auto"
 			:style="'grid-' + axisCol + ':1/-1;grid-template-' + axisCol + 's:subgrid'"
 		>
@@ -583,7 +639,8 @@ export default {
 					v-for="(part, index) in axisPartsSave"
 					:key="index"
 					class="part-header"
-					:style="'grid-' + axisCol + ':1;grid-' + axisRow + ': ps_' + index + '/pe_' + index"
+					:class="{'part-header-followed-by-break': isFollowedByBreak(index)}"
+					:style="'grid-' + axisCol + ':1;grid-' + axisRow + ': ps_' + index + '/pe_' + index + ';min-width:50px;'"
 				>
 					<slot name="part-header" v-bind="{ index, part }" />
 				</div>
@@ -599,23 +656,38 @@ export default {
 					:style="'grid-' + axisCol + ':2/-1;grid-' + axisRow + ':1/-1'"
 				>
 					<template
-						v-for="(date, index) in axisMain"
+						v-for="(date, index) in $props.axisMain"
 						:key="index"
 					>
 						<div
 							v-for="(part, i) in axisPartsSave"
 							:key="i"
 							class="part-body"
+							:class="{'part-body-followed-by-break': isFollowedByBreak(i)}"
 							style="position:relative"
 							:style="'grid-' + axisCol + ':' + (1+index) + ';grid-' + axisRow + ':ps_' + i + '/pe_' + i"
 							:data-drop-index="index * axisPartsSave.length + i + 1"
 							data-cy="calendar-grid-part"
 						>
 							<slot name="part-body" v-bind="{ index, part }" />
+							
+							<div
+								v-if="isFreeSlot(date, part, eventsNormal[index]) && reservierbar"
+								class="fhc-calendar-empty-slot"
+								style="position:absolute; inset:0; z-index:1"
+								v-cal-click:slot="{ date, part }"
+								:title="reservierbarMap?.[date.toISODate()] ? $p.t('LvPlan/add_reservation') : $p.t('LvPlan/reservation_not_allowed')"
+							>
+								<div class="fhc-calendar-empty-slot-plus">
+									<i v-if="reservierbarMap?.[date.toISODate()]" class="fa-solid fa-plus"></i>
+									<i v-else class="fa-solid fa-ban" style="color: red;"></i>
+								</div>
+							</div>
+
 							<div
 								v-if="snapToGrid"
 								style="position:absolute;inset:0"
-								:style="{ zIndex: isDragging ? 10 : 1 }"
+								:style="{ zIndex: isDragging ? 10 : 1, pointerEvents: isDragging ? 'auto' : 'none' }"
 								:data-day="date.toFormat('yyyy-MM-dd')"
 								v-drop:move.lehreinheit.kalender.reservierung="(evt, item) => onDropSnap(evt, item, date, part)"
 							></div>
@@ -638,7 +710,7 @@ export default {
 								<div
 									v-if="!snapToGrid"
 									style="position:absolute;inset:0"
-									:style="{ zIndex: isDragging ? 10 : 1 }"
+									:style="{ zIndex: isDragging ? 10 : 1, pointerEvents: isDragging ? 'auto' : 'none' }"
 									v-drop:move.lehreinheit.kalender.reservierung="(evt, item) => onDropFree(evt, item, date)"
 								></div>
 							</template>

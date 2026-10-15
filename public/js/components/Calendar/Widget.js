@@ -5,6 +5,8 @@ import { useRenderers } from '../../composables/Renderers.js';
 
 import ModeList from '../Calendar/Mode/List.js';
 
+import ApiRoomPlan from '../../api/factory/calendar/roomPlan.js';
+
 export default {
 	name: "CalendarWidget",
 	components: {
@@ -49,17 +51,36 @@ export default {
 		},
 		updateRange(rangeInterval) {
 			this.rangeInterval = rangeInterval;
-		}
+		},
+		deleteEvent(event) {
+			if (event.type === "reservierung") {
+				this.deleteReservation(event);
+			}
+		},
+		async deleteReservation(event) {
+			if (
+				luxon.DateTime.fromISO(`${event.datum}T${event.beginn}`) <
+				luxon.DateTime.now()
+			)
+				return;
+
+			await this.$api.call(
+				ApiRoomPlan.deleteRoomReservation(event.reservierung_id),
+			);
+
+			this.reset();
+		},
 	},
 	setup(props) {
 		const rangeInterval = Vue.ref(null);
 		
-		const { events } = useEventLoader(rangeInterval, props.getPromiseFunc);
+		const { events, reset } = useEventLoader(rangeInterval, props.getPromiseFunc);
 		const { renderers } = useRenderers();
 
 		return {
 			rangeInterval,
 			events,
+			reset,
 			renderers
 		};
 	},
@@ -83,17 +104,17 @@ export default {
 				<span class="placeholder col-12"></span>
 			</div>
 			<component
-				v-else-if="mode == 'eventheader'"
+				v-else-if="renderers && mode == 'eventheader'"
 				:is="renderers[event.type]?.modalTitle"
 				:event="event"
 			></component>
 			<component
-				v-else-if="mode == 'event'"
+				v-else-if="renderers && mode == 'event'"
 				:is="renderers[event.type]?.modalContent"
 				:event="event"
 			></component>
 			<div
-				v-else
+				v-else-if="renderers"
 				:class="'event-type-' + event.type + ' ' + mode + 'PageContainer'"
  				:style="eventStyle(event)"
 			>
@@ -101,6 +122,7 @@ export default {
 					:is="renderers[event.type]?.calendarEvent"
 					:event="event"
 					:timeSlotDisplayBehavior="'always'"
+					@delete-event="(event) => deleteEvent(event)"
 				></component>
 			</div>
 		</template>

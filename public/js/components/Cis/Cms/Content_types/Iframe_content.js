@@ -1,5 +1,3 @@
-import { replaceRelativeLegacyLink } from "../../../../helpers/LegacyLinkReplaceHelper.js";
-
 export default {
 	name: "iframe_content",
 	props: {
@@ -15,7 +13,7 @@ export default {
 				return "";
 
 			let url = iframe.getAttribute("src") || "";
-			return replaceRelativeLegacyLink(url);
+			return url.replace(/\.\.\//, FHC_JS_DATA_STORAGE_OBJECT.app_root);
 		}
 	},
 	template: `

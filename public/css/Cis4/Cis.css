@@ -7,6 +7,11 @@ html {
   font-size: 0.875em;
 }
 
+body.compat,
+body.compat main#cis-main {
+	background-color: #fff;
+}
+
 .fhc-dark-bg{
 	background-color: var(--fhc-dark);
 	color:var(--fhc-light) !important;
@@ -760,7 +765,7 @@ html {
 }
 
 .dashboard-item {
-	overscroll-behavior: none;
+	overscroll-behavior: auto;
 }
 
 .abgabe-zieldatum-border-red,
