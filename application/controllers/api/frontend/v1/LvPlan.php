@@ -51,6 +51,8 @@ class LvPlan extends FHCAPI_Controller
 			'compactibleEventTypes' => self::PERM_LOGGED,
 			'getLeEvents' => self::PERM_LOGGED,
 			'getLvEvents' => self::PERM_LOGGED,
+			'getLvEventsFromStudiensemester' => self::PERM_LOGGED,
+			'getLeEventsFromStudiensemester' => self::PERM_LOGGED,
 		]);
 
 		$this->load->library('LogLib');
@@ -222,8 +224,36 @@ class LvPlan extends FHCAPI_Controller
 		$this->terminateWithSuccess($lvplanEvents);
 	}
 
+	public function getLeEventsFromStudiensemester($le_id = null, $studiensemester_kurzbz = null, $stundenplan = 'stundenplandev')
+	{
+		if (is_null($le_id) || is_null($studiensemester_kurzbz))
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+		if ($stundenplan !== 'stundenplandev' && $stundenplan !== 'stundenplan')
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		$resstudiensemester = getData($this->StudiensemesterModel->getStartEndeFromStudiensemester($studiensemester_kurzbz));
+		$studiensemester = ($resstudiensemester && count($resstudiensemester) > 0) ? $resstudiensemester[0] : null;
+		$start_date = $studiensemester->start;
+		$end_date = $studiensemester->ende;
+		$this->addMeta('startDate berechnet', $start_date);
+		$this->addMeta('end_date berechnet', $end_date);
+		$this->addMeta('le_id', $le_id);
+
+		$this->load->library('StundenplanLib');
+
+		$result = $this->stundenplanlib->getEventsByLE($le_id, $start_date, $end_date, $stundenplan);
+		$lvplanEvents = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($lvplanEvents);
+	}
+
 	public function getLvEvents($lv_id = null, $start_date = null, $end_date = null, $stundenplan = 'stundenplandev')
 	{
+		$this->addMeta('startDate', $start_date);
+		$this->addMeta('end_date', $end_date);
+		$this->addMeta('lv_id', $lv_id);
 		if (is_null($lv_id) || is_null($start_date) || is_null($end_date))
 			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
@@ -233,6 +263,31 @@ class LvPlan extends FHCAPI_Controller
 		$this->load->library('StundenplanLib');
 
 		$result = $this->stundenplanlib->getEventsByLV($lv_id, $start_date, $end_date, $stundenplan);
+
+		$this->terminateWithSuccess(hasData($result) ? getData($result) : []);
+	}
+
+	public function getLvEventsFromStudiensemester($lv_id = null, $studiensemester_kurzbz = null, $stundenplan = 'stundenplandev')
+	{
+		if (is_null($lv_id) || is_null($studiensemester_kurzbz))
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+		if ($stundenplan !== 'stundenplandev' && $stundenplan !== 'stundenplan')
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		$resstudiensemester = getData($this->StudiensemesterModel->getStartEndeFromStudiensemester($studiensemester_kurzbz));
+		$studiensemester = ($resstudiensemester && count($resstudiensemester) > 0) ? $resstudiensemester[0] : null;
+		$start_date = $studiensemester->start;
+		$end_date = $studiensemester->ende;
+		$this->addMeta('startDate berechnet', $start_date);
+		$this->addMeta('end_date berechnet', $end_date);
+		$this->addMeta('lv_id', $lv_id);
+
+		$this->load->library('StundenplanLib');
+
+		$result = $this->stundenplanlib->getEventsByLV($lv_id, $start_date, $end_date, $stundenplan);
+
 
 		$this->terminateWithSuccess(hasData($result) ? getData($result) : []);
 	}

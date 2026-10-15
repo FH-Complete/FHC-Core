@@ -146,7 +146,7 @@ class LvTermine extends FHCAPI_Controller
 */
 		$ci->addMeta('studentlehrverbaende', $student_lehrverband);
 
-		$this->load->model('crm/Student_model', 'StudentModel');
+/*		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->StudentModel->addSelect('ausbildungssemester');
 		$this->StudentModel->addJoin('public.tbl_prestudentstatus ps', 'prestudent_id');
 		$result = $this->StudentModel->loadWhere(array(
@@ -159,7 +159,7 @@ class LvTermine extends FHCAPI_Controller
 			$result = getData($result);
 			$data = current($result);
 			$semesterStud = $data->ausbildungssemester;
-		}
+		}*/
 
 		$stundenplan_query = $this->StundenplanModel->getStundenplanQuery(
 			$start_date,
@@ -202,10 +202,6 @@ class LvTermine extends FHCAPI_Controller
 			$data = $this->getDataOrTerminateWithError($result);
 			$this->terminateWithSuccess($data);
 	}
-
-	// TODO(Manu) following 5 private functions are copybased of StundenplanLib,
-	// just applyLoadUeberSemesterHaelfte is different
-	// after approval: change to public in StundenplanLib and use it here?
 
 	private function sortStudienSemester(&$semester_range){
 		usort(

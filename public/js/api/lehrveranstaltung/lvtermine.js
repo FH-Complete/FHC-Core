@@ -16,4 +16,10 @@ export default {
 			url: '/api/frontend/v1/lv/setup/getStudiensemester/'
 		};
 	},
+	getCourselistByStudiensemester(lv_id, studiensemester_kurzbz, stundenplan) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/lvPlan/getLvEventsFromStudiensemester/' + encodeURIComponent(lv_id) + "/" + encodeURIComponent(studiensemester_kurzbz) + "/" + encodeURIComponent(stundenplan),
+		};
+	},
 };
