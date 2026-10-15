@@ -128,8 +128,8 @@ VALUES
 INSERT INTO lehre.tbl_kalender_ort
 (location, ort_kurzbz, kalender_id)
 VALUES
-(NULL, 'Bro_F7.37', 17),
-(NULL, 'Bro_F7.37', 18);
+(NULL, 'Bro_F7.37', 19),
+(NULL, 'Bro_F7.37', 20);
 
 INSERT INTO lehre.tbl_kalender_lehreinheit
 (lehreinheit_id, kalender_id)
@@ -247,11 +247,11 @@ VALUES
 
 INSERT INTO lehre.tbl_kalender_event
 (kalender_id, titel, beschreibung)
-VALUES(26, 'Test reservation', NULL);
+VALUES(28, 'Test reservation', NULL);
 
 INSERT INTO lehre.tbl_kalender_event_teilnehmer
 (kalender_id, rolle_kurzbz, uid, studiensemester_kurzbz, gruppe_kurzbz, studiengang_kz, semester, verband, gruppe, studentenlehrverband_id)
-VALUES(26, 'teilnehmer', 'demolektor4', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+VALUES(28, 'teilnehmer', 'demolektor4', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 INSERT INTO campus.tbl_zeitsperre
 (zeitsperre_id, zeitsperretyp_kurzbz, mitarbeiter_uid, bezeichnung, vondatum, vonstunde, bisdatum, bisstunde, vertretung_uid, updateamum, updatevon, insertamum, insertvon, erreichbarkeit_kurzbz, freigabeamum, freigabevon)
