@@ -50,8 +50,7 @@ class Paabgabe_model extends DB_Model
 					JOIN lehre.tbl_projektbetreuer USING(projektarbeit_id)
 					JOIN public.tbl_benutzer bn_student ON(tbl_projektarbeit.student_uid=bn_student.uid)
 					JOIN public.tbl_person person_student ON(bn_student.person_id=person_student.person_id)
-					JOIN lehre.tbl_lehreinheit ON(tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id)
-					JOIN lehre.tbl_lehrveranstaltung ON(tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id)
+					JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 					JOIN public.tbl_studiengang ON(tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz)
 					JOIN campus.tbl_paabgabetyp USING(paabgabetyp_kurzbz)
 				WHERE
@@ -61,6 +60,172 @@ class Paabgabe_model extends DB_Model
 		return $this->execReadOnlyQuery($qry, array($person_id));
 	}
 
+	/**
+	 * Gets project submissions for search criteria.
+	 * @param array $projekttyp_kurzbz_arr contains all relevant project types (e.g. Bachelor)
+	 * @param int $studiengang_kz study program
+	 * @param string $abgabetyp_kurzbz project submission type (e.g. end upload, intermediate submission)
+	 * @param string $abgabedatum due date for hand-in
+	 * @param string $personSearchString for searching by person, i.e. name, uid, person/prestudent id
+	 * @param int $limit limiting max number of results if search criteria is not precise enough
+	 * @return object
+	 */
+	public function getPaAbgaben(
+		$projekttyp_kurzbz_arr,
+		$studiengang_kz = null,
+		$abgabetyp_kurzbz = null,
+		$abgabedatum = null,
+		$personSearchString = null,
+		$limit = 1000
+	) {
+		$params = [];
+
+		$qry = "
+			SELECT
+				stg.bezeichnung AS stgbez, paabg.datum AS termin,
+				paabg.paabgabe_id, paabg.projektarbeit_id, paabg.paabgabetyp_kurzbz, paabg.abgabedatum,
+				abgabetyp.bezeichnung AS paabgabetyp_bezeichnung, ben.uid, pers.vorname, pers.nachname, pa.projekttyp_kurzbz, pa.titel,
+				UPPER(stg.typ || stg.kurzbz) AS studiengang_kuerzel,
+				(
+					 /* show all relevant Studiengänge of person and wether it is an employee*/
+					SELECT
+						STRING_AGG(studiengang || ' ' || last_status, ' | ')
+						|| (CASE WHEN EXISTS (
+							SELECT 1 FROM public.tbl_mitarbeiter ma
+							JOIN public.tbl_benutzer ben ON ma.mitarbeiter_uid = ben.uid
+							WHERE person_id = prestudents.person_id
+							AND ben.aktiv
+							) THEN ' | Mitarbeiter' ELSE '' END)
+					FROM (
+						SELECT
+							DISTINCT person_id, prestudent_id, UPPER(stg.typ || stg.kurzbz) AS studiengang,
+							get_rolle_prestudent(ps.prestudent_id, null) AS last_status
+						FROM
+							public.tbl_prestudent ps
+						JOIN public.tbl_studiengang stg USING (studiengang_kz)
+						WHERE
+							person_id = pers.person_id
+						ORDER BY
+							prestudent_id DESC
+					) prestudents
+					WHERE
+						last_status IN ('Abgewiesener','Aufgenommener', 'Student', 'Incoming', 'Diplomand', 'Abbrecher', 'Unterbrecher', 'Absolvent')
+					GROUP BY
+						person_id
+					LIMIT 1;
+				) AS status
+			FROM
+				lehre.tbl_projektarbeit pa
+				JOIN campus.tbl_paabgabe paabg USING(projektarbeit_id)
+				JOIN campus.tbl_paabgabetyp abgabetyp USING(paabgabetyp_kurzbz)
+				LEFT JOIN public.tbl_benutzer ben ON(uid=student_uid)
+				LEFT JOIN public.tbl_person pers ON(ben.person_id=pers.person_id)
+				LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+				LEFT JOIN public.tbl_studiengang stg USING(studiengang_kz)
+			WHERE
+				TRUE";
+
+		if (isset($projekttyp_kurzbz_arr) && !isEmptyArray($projekttyp_kurzbz_arr))
+		{
+			$qry .= " AND projekttyp_kurzbz IN ?";
+			$params[] = $projekttyp_kurzbz_arr;
+		}
+
+		if (isset($studiengang_kz) && is_numeric($studiengang_kz))
+		{
+			$qry .= " AND stg.studiengang_kz=?";
+			$params[] = $studiengang_kz;
+		}
+
+		if (isset($abgabetyp_kurzbz))
+		{
+			$qry .= " AND paabg.paabgabetyp_kurzbz=?";
+			$params[] = $abgabetyp_kurzbz;
+		}
+
+		if (isset($abgabedatum))
+		{
+			$qry .= " AND paabg.datum=?";
+			$params[] = $abgabedatum;
+		}
+
+		if (is_numeric($personSearchString))
+		{
+			$personSearchString = (int) $personSearchString;
+			$params = array_merge($params, [$personSearchString, $personSearchString]);
+			$qry .= " AND (
+				pers.person_id = ?
+				OR EXISTS (SELECT 1 FROM public.tbl_prestudent WHERE person_id = pers.person_id AND prestudent_id = ?)
+			)";
+		}
+		elseif (is_string($personSearchString))
+		{
+			// remove empty spaces and lowercase
+			$personSearchString = strtolower(str_replace(' ', '', $personSearchString));
+			$qry .= " AND (
+				LOWER(REPLACE(pers.nachname || pers.vorname || pers.nachname, ' ', '')) LIKE ".$this->db->escape('%'.$personSearchString.'%')."
+				OR ben.uid LIKE ".$this->db->escape('%'.$personSearchString.'%')."
+			)";
+		}
+
+		$qry .= " ORDER BY nachname";
+
+		if (isset($limit) && is_numeric($limit) && (!isset($studiengang_kz) || !is_numeric($studiengang_kz)) && !isset($abgabedatum))
+		{
+			$qry .= " LIMIT ?";
+			$params[] = $limit;
+		}
+
+		return $this->execReadOnlyQuery($qry, $params);
+	}
+
+	/**
+	 * Gets due dates for projekt submission search criteria.
+	 * @param array $projekttyp_kurzbz_arr contains all relevant project types (e.g. Bachelor)
+	 * @param int $studiengang_kz study program
+	 * @param string $abgabetyp_kurzbz project submission type (e.g. end upload, intermediate submission)
+	 * @return object
+	 */
+	public function getTermine($projekttyp_kurzbz_arr, $studiengang_kz, $abgabetyp_kurzbz)
+	{
+		$params = [];
+
+		$qry = "
+			SELECT
+				DISTINCT tbl_paabgabe.datum as termin, to_char(tbl_paabgabe.datum, 'DD.MM.YYYY') as termin_anzeige
+			FROM
+				lehre.tbl_projektarbeit
+				JOIN campus.tbl_paabgabe USING(projektarbeit_id)
+				LEFT JOIN public.tbl_benutzer ON(uid=student_uid)
+				LEFT JOIN public.tbl_person ON(tbl_benutzer.person_id=tbl_person.person_id)
+				LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+				LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
+			WHERE
+				TRUE";
+
+		if (isset($projekttyp_kurzbz_arr) && !isEmptyArray($projekttyp_kurzbz_arr))
+		{
+			$qry .= " AND projekttyp_kurzbz IN ?";
+			$params[] = $projekttyp_kurzbz_arr;
+		}
+
+		if (isset($studiengang_kz) && is_numeric($studiengang_kz))
+		{
+			$qry .= " AND public.tbl_studiengang.studiengang_kz=?";
+			$params[] = $studiengang_kz;
+		}
+
+		if (isset($abgabetyp_kurzbz))
+		{
+			$qry .= " AND campus.tbl_paabgabe.paabgabetyp_kurzbz=?";
+			$params[] = $abgabetyp_kurzbz;
+		}
+
+		$qry .= " ORDER BY termin DESC";
+
+		return $this->execReadOnlyQuery($qry, $params);
+	}
+
 	public function findAbgabenNewOrUpdatedSince($interval, $relevantTypes)
 	{
 
@@ -68,14 +233,13 @@ class Paabgabe_model extends DB_Model
 			   campus.tbl_paabgabe.insertvon, campus.tbl_paabgabe.insertamum, campus.tbl_paabgabe.updatevon, campus.tbl_paabgabe.updateamum,
 			   campus.tbl_paabgabe.note, upload_allowed, beurteilungsnotiz, student_uid, tbl_projektarbeit.note, lehre.tbl_projektarbeit.titel,
 			   UPPER(tbl_studiengang.typ) as stgtyp, UPPER(tbl_studiengang.kurzbz) as stgkz, public.tbl_studiengang.studiengang_kz,
-			   public.tbl_studiengang.oe_kurzbz as stg_oe_kurzbz, tbl_lehreinheit.studiensemester_kurzbz,
+			   public.tbl_studiengang.oe_kurzbz as stg_oe_kurzbz, tbl_projektarbeit.studiensemester_kurzbz,
 			   public.tbl_person.anrede, public.tbl_person.titelpre, public.tbl_person.vorname, public.tbl_person.nachname, public.tbl_person.titelpost
 		FROM campus.tbl_paabgabe
 				 JOIN campus.tbl_paabgabetyp USING (paabgabetyp_kurzbz)
 				 JOIN lehre.tbl_projektarbeit USING (projektarbeit_id)
-				 JOIN lehre.tbl_lehreinheit using(lehreinheit_id)
-				 JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id)
-				 JOIN public.tbl_studiengang on(lehre.tbl_lehrveranstaltung.studiengang_kz = public.tbl_studiengang.studiengang_kz)
+				 JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+				 JOIN public.tbl_studiengang ON(lehre.tbl_lehrveranstaltung.studiengang_kz = public.tbl_studiengang.studiengang_kz)
 				 JOIN public.tbl_benutzer ON (public.tbl_benutzer.uid = student_uid)
 				 JOIN public.tbl_person USING (person_id)
 		
@@ -93,7 +257,7 @@ class Paabgabe_model extends DB_Model
 					   campus.tbl_paabgabe.insertvon, campus.tbl_paabgabe.insertamum, campus.tbl_paabgabe.updatevon, campus.tbl_paabgabe.updateamum,
 					   campus.tbl_paabgabe.note, upload_allowed, beurteilungsnotiz, student_uid, tbl_projektarbeit.note, lehre.tbl_projektarbeit.titel,
 					   UPPER(tbl_studiengang.typ) as stgtyp, UPPER(tbl_studiengang.kurzbz) as stgkz, public.tbl_studiengang.studiengang_kz,
-					   public.tbl_studiengang.oe_kurzbz as stg_oe_kurzbz, tbl_lehreinheit.studiensemester_kurzbz,
+					   public.tbl_studiengang.oe_kurzbz as stg_oe_kurzbz, tbl_projektarbeit.studiensemester_kurzbz,
 					   lehre.tbl_projektbetreuer.betreuerart_kurzbz, lehre.tbl_projektbetreuer.person_id,
 					   public.tbl_person.anrede, public.tbl_person.titelpre, public.tbl_person.vorname, public.tbl_person.nachname, public.tbl_person.titelpost
 				
@@ -101,8 +265,7 @@ class Paabgabe_model extends DB_Model
 						 JOIN campus.tbl_paabgabetyp USING (paabgabetyp_kurzbz)
 						 JOIN lehre.tbl_projektarbeit USING (projektarbeit_id)
 						 JOIN lehre.tbl_projektbetreuer USING (projektarbeit_id)
-						 JOIN lehre.tbl_lehreinheit using(lehreinheit_id)
-						 JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id)
+						 JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 						 JOIN public.tbl_studiengang on(lehre.tbl_lehrveranstaltung.studiengang_kz = public.tbl_studiengang.studiengang_kz)
 						 JOIN public.tbl_benutzer ON (public.tbl_benutzer.uid = student_uid)
 						 JOIN public.tbl_person ON (public.tbl_benutzer.person_id = public.tbl_person.person_id)

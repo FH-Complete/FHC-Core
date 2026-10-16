@@ -5,6 +5,7 @@ import ApiLvPlan from '../../../../api/factory/lvPlan.js';
 import ApiAddons from '../../../../api/factory/addons.js';
 
 export default {
+	name: 'Cis-Renderer-Lehreinheit-ModalContent',
 	components:{
 		LvMenu,
 	},
@@ -49,7 +50,27 @@ export default {
 				return this.event.ende;
 			}
 			return numberPadding(this.event.ende.getHours()) + ":" + numberPadding(this.event.ende.getMinutes());
+		},
+		showLvMenu: function() {
+			const hideOnRoutes = [
+				'OtherLvPlan',
+				'StgOrgLvPlan'
+			];
+			if(hideOnRoutes.includes(this.$route.name)) {
+				return false;
+			}
+			return true;
 		}
+	},
+	watch: {
+		event: {
+			async handler() {
+				if (this.$props.event.type == "lehreinheit") {
+					await this.getLvMenu();
+				}
+			},
+			deep: true,
+		},
 	},
 	methods: {
 		mehtodNumberPadding: function (number) {
@@ -58,21 +79,31 @@ export default {
 		methodFormatDate: function (d) {
 			return formatDate(d);
 		},
+		async getLvMenu() {
+			const semesterResponse = await this.$api.call(
+				ApiLvPlan.getLehreinheitStudiensemester(
+					Array.isArray(this.event.lehreinheit_id)
+						? this.event.lehreinheit_id[0]
+						: this.event.lehreinheit_id,
+				),
+			);
+			if (semesterResponse.meta.status !== "success") return;
+
+			const studiensemesterKurzbz = semesterResponse.data;
+			const lvMenuResponse = await this.$api.call(
+				ApiAddons.getLvMenu(
+					this.event.lehrveranstaltung_id,
+					studiensemesterKurzbz,
+				),
+			);
+			if (lvMenuResponse.meta.status !== "success") return;
+
+			this.lvMenu = lvMenuResponse.data;
+		},
 	},
-	created() {
-		if (this.event.type == 'lehreinheit') {
-			this.$api
-				.call(ApiLvPlan.getLehreinheitStudiensemester(Array.isArray(this.event.lehreinheit_id) ? this.event.lehreinheit_id[0] : this.event.lehreinheit_id))
-				.then(res => res.data)
-				.then(studiensemester_kurzbz => this.$api.call(
-					ApiAddons.getLvMenu(
-						this.event.lehrveranstaltung_id,
-						studiensemester_kurzbz
-					)
-				))
-				.then(res => {
-					this.lvMenu = res.data;
-				});
+	async created() {
+		if (this.$props.event.type == 'lehreinheit') {
+			await this.getLvMenu();
 		}
 	},
 	template: `
@@ -142,6 +173,6 @@ export default {
 					</tr>
 				</tbody>
 		</table>
-		<lv-menu v-if="lvMenu.length && $route.name === 'MyLvPlan'" :containerStyles="['p-0']" :rowStyles="['m-0']" :menu="lvMenu" />
+		<lv-menu v-if="lvMenu.length && showLvMenu" :containerStyles="['p-0']" :rowStyles="['m-0']" :menu="lvMenu" />
 	</div>`,
 }

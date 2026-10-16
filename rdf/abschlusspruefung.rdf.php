@@ -192,8 +192,7 @@ function draw_content_xml($row)
 			$note = (isset($note_arr[$row_proj->note])?$note_arr[$row_proj->note]:$row_proj->note);
 			$datum_projekt = $datum_obj->convertISODate($row_proj->ende);
 			$projektarbeit = new projektarbeit($row_proj->projektarbeit_id);
-			$lehreinheit = new lehreinheit($projektarbeit->lehreinheit_id);
-			$lehrveranstaltung = new lehrveranstaltung($lehreinheit->lehrveranstaltung_id);
+			$lehrveranstaltung = new lehrveranstaltung($projektarbeit->lehrveranstaltung_id);
 			$projektnote = new note($note);
 		}
 

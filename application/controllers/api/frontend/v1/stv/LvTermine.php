@@ -370,6 +370,7 @@ class LvTermine extends FHCAPI_Controller
 						$result->semester = $item->semester;
 						$result->verband = $item->verband;
 						$result->gruppe = $item->gruppe;
+						$result->studiensemester_kurzbz = $item->studiensemester_kurzbz;
 						return $result;
 					},
 					$lehrverband_query_result));

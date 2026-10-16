@@ -29,6 +29,7 @@ require_once('../../include/sprache.class.php');
 require_once '../../include/phrasen.class.php';
 require_once '../../include/studiengang.class.php';
 require_once('../../include/gebiet.class.php');
+require_once('../../include/gebiet_pruefling.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -198,8 +199,8 @@ else if (isset($_SESSION['pruefling_id']))
 		)
 
 
-		SELECT DISTINCT ON
-			(gebiet_id, semester, reihung)
+		SELECT * FROM (SELECT DISTINCT ON
+			(gebiet_id)
 			semester,
 			gebiet_id,
 			STRING_AGG(studiengang_kz::TEXT, ', ' ORDER BY studiengang_kz) AS studiengang_kz_list,
@@ -226,13 +227,7 @@ else if (isset($_SESSION['pruefling_id']))
 				JOIN
 					testtool.tbl_gebiet USING (gebiet_id)
 				WHERE
-					(
-						(prestudent_data.semester= 1 AND tbl_ablauf.semester = 1)
-						OR
-						(prestudent_data.semester= 2 AND tbl_ablauf.semester = 2)
-						OR
-						(prestudent_data.semester= 3 AND tbl_ablauf.semester IN (1,3))
-					)
+					tbl_ablauf.semester <= prestudent_data.semester
 				AND (   
 						prestudent_data.studienplan_id = tbl_ablauf.studienplan_id
 						OR
@@ -259,9 +254,7 @@ else if (isset($_SESSION['pruefling_id']))
 				JOIN
 					testtool.tbl_gebiet USING (gebiet_id)
 				WHERE
-					(prestudent_data.semester= 1 AND tbl_ablauf.semester = 1)
-				OR
-					(prestudent_data.semester= 3 AND tbl_ablauf.semester IN (1,3))
+					tbl_ablauf.semester <= prestudent_data.semester
 				)
 			) temp
 		) temp2
@@ -270,7 +263,7 @@ else if (isset($_SESSION['pruefling_id']))
 			semester,
 			 gebiet_id,
 			 bezeichnung,
-			". $bezeichnung_mehrsprachig_sel ." 
+			". $bezeichnung_mehrsprachig_sel ." ) temp3
 
 		ORDER BY
 			semester,
@@ -283,6 +276,8 @@ else if (isset($_SESSION['pruefling_id']))
 	$lastsemester = '';
 	$quereinsteiger_stg = '';
 	$_SESSION['alleGebiete']= [];
+	$gebiet_pruefling = new gebiet_pruefling();
+	$quereinsteiger_menu = false;
 	while($row = $db->db_fetch_object($result))
 	{
 		//Jedes Semester in einer eigenen Tabelle anzeigen
@@ -294,8 +289,25 @@ else if (isset($_SESSION['pruefling_id']))
 			}
 			$lastsemester = $row->semester;
 
-			echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 3px; margin-top: 5px;">';
-			echo '<tr><td class="HeaderTesttool">'. ($row->semester == '1' ? $p->t('testtool/basisgebiete') : $p->t('testtool/quereinstiegsgebiete')).'</td></tr>';
+			if ($row->semester == '1')
+			{
+				// Basisgebiete anzeigen
+				echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 3px; margin-top: 5px;">';
+				echo '<tr><td class="HeaderTesttool">' . $p->t('testtool/basisgebiete') . '</td></tr>';
+			}
+			else
+			{
+				if (!$quereinsteiger_menu)
+				{
+					echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 3px; margin-top: 5px;">';
+					echo '<tr><td class="HeaderTesttool">' . $p->t('testtool/quereinstiegsgebiete') . '</td></tr>';
+					$quereinsteiger_menu = true;
+				}
+				else
+				{
+					echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 3px; margin-top: 5px;">';
+				}
+			}
 		}
 
 		// Bei Quereinstiegsgebieten nach STG clustern und die STG anzeigen
@@ -394,6 +406,12 @@ else if (isset($_SESSION['pruefling_id']))
 						</td>
 					<!--<td width="10" class="ItemTesttoolRight" nowrap>&nbsp;</td>-->
 					</tr>';
+			if (!$gebiet_pruefling->checkIfExists($_SESSION['pruefling_id'], $row->gebiet_id))
+			{
+				$gebiet_pruefling->pruefling_id = $_SESSION['pruefling_id'];
+				$gebiet_pruefling->gebiet_id = $row->gebiet_id;
+				$gebiet_pruefling->saveGebietForPruefling();
+			}
 			$_SESSION['alleGebiete'][] = $row->gebiet_id;
 		}
 		else

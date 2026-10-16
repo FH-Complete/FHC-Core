@@ -124,8 +124,6 @@ export default {
 				return { ...item, ...placement, weight };
 			});
 
-			if (this.editModeIsActive)
-				return placedItems;
 			return placedItems.filter(item => !item.hidden);
 		}
 	},
@@ -141,22 +139,12 @@ export default {
 		handleConfigClosed() {
 			this.configOpened = false
 		},
-		removeWidget(item, revert) {
+		removeWidget(item) {
 			if (item.custom) {
 				BsConfirm.popup(this.$p.t('dashboard', 'alert_deleteWidget')).then(() => this.$emit('widgetRemove', item.id, this.name));
 			} else {
 				let update = {};
-				update[item.id] = { hidden: !revert };
-				
-				if (!revert) {
-					// NOTE(chris): move to last line
-					update[item.id].place = [];
-					let y = this.gridHeight;
-					if (this.additionalRow)
-						y--;
-					update[item.id].place[this.gridWidth] = { x: 0, y };
-				}
-				
+				update[item.id] = { hidden: true };
 				this.updatePreset(update);
 			}
 		},
@@ -251,13 +239,12 @@ export default {
 					:loading="item.loading"
 					:config="item.config"
 					:custom="item.custom"
-					:hidden="item.hidden"
 					:editMode="editModeIsActive"
 					:place="item.place[gridWidth]"
 					:widget-template="indexedWidgetsTemplates[item.widget]"
 					:source="adminMode ? null : item.source || 'custom'"
 					@change="saveConfig($event, item)"
-					@remove="removeWidget(item, $event)"
+					@remove="removeWidget(item)"
 					@config-opened="handleConfigOpened"
 					@config-closed="handleConfigClosed"
 					@pin-item="updatePositions"

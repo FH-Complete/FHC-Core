@@ -159,8 +159,6 @@ class LvVwLib
 		if (!$stg->mischform)
 			return [];
 		
-		$this->_ci->StudiengangModel->db->select('TRUE AS leaf', false);
-
 		return $this->_ci->stglib->orgform($path_template, $stg->studiengang_kz);
 	}
 

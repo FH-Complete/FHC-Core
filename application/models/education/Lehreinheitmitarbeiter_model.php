@@ -85,9 +85,18 @@ class Lehreinheitmitarbeiter_model extends DB_Model
 
 	public function getLektorenByLe($lehreinheit_id)
 	{
-		$this->addSelect('vorname, nachname, tbl_lehreinheitmitarbeiter.*, stundenplan.verplant');
+		$this->addSelect('tbl_person.vorname, tbl_person.nachname, tbl_lehreinheitmitarbeiter.*, stundenplan.verplant, 
+		COALESCE(insertvonperson.vorname || \' \' || insertvonperson.nachname, tbl_lehreinheitmitarbeiter.insertvon) as insertvon,
+		COALESCE(updatevonperson.vorname || \' \' || updatevonperson.nachname, tbl_lehreinheitmitarbeiter.updatevon) as updatevon');
 		$this->addJoin('tbl_benutzer', 'uid = mitarbeiter_uid');
 		$this->addJoin('tbl_person', 'person_id');
+		$this->addJoin('tbl_benutzer insertvonbenutzer', 'insertvonbenutzer.uid = tbl_lehreinheitmitarbeiter.insertvon', 'LEFT');
+		$this->addJoin('tbl_person insertvonperson', 'insertvonperson.person_id = insertvonbenutzer.person_id', 'LEFT');
+
+		$this->addJoin('tbl_benutzer updatevonbenutzer', 'updatevonbenutzer.uid = tbl_lehreinheitmitarbeiter.updatevon', 'LEFT');
+		$this->addJoin('tbl_person updatevonperson', 'updatevonperson.person_id = updatevonbenutzer.person_id', 'LEFT');
+
+
 
 		$this->addJoin('(
 			SELECT 1 as verplant, lehreinheit_id, mitarbeiter_uid
