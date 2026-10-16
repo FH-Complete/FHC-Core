@@ -98,7 +98,7 @@ export default {
 	watch: {
 		studiengaenge: {
 			deep: true,
-			handler(val) {
+			handler() {
 				this.loadCourses();
 			}
 		},
