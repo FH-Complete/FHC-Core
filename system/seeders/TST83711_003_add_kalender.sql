@@ -81,6 +81,8 @@ INSERT INTO lehre.tbl_kalender
 (date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '13:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
 (date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '13:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
 (date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '13:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '13:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '13:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
 (date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '13:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
 ;
 
@@ -90,7 +92,9 @@ VALUES
 (51001, 12),
 (51002, 13),
 (51003, 14),
-(51004, 15);
+(51004, 15),
+(51005, 16),
+(51006, 17);
 -- ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 -- Calendar setup for API event creation tests
@@ -103,8 +107,8 @@ INSERT INTO lehre.tbl_kalender
 INSERT INTO lehre.tbl_kalender_lehreinheit
 (lehreinheit_id, kalender_id)
 VALUES
-(51003, 16),
-(51005, 17);
+(51003, 18),
+(51005, 19);
 -- ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -128,23 +132,23 @@ VALUES
 INSERT INTO lehre.tbl_kalender_ort
 (location, ort_kurzbz, kalender_id)
 VALUES
-(NULL, 'Bro_F7.37', 19),
-(NULL, 'Bro_F7.37', 20);
+(NULL, 'Bro_F7.37', 21),
+(NULL, 'Bro_F7.37', 22);
 
 INSERT INTO lehre.tbl_kalender_lehreinheit
 (lehreinheit_id, kalender_id)
 VALUES
-(51001, 18),
-(51001, 19),
-(51003, 20),
+(51001, 20),
 (51001, 21),
 (51003, 22),
-(51003, 23),
-(51006, 24),
-(51004, 25),
-(51005, 26),
+(51001, 23),
+(51003, 24),
+(51003, 25),
+(51006, 26),
 (51004, 27),
-(51006, 28);
+(51005, 28),
+(51004, 29),
+(51006, 30);
 -- ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -158,8 +162,8 @@ INSERT INTO lehre.tbl_kalender
 INSERT INTO lehre.tbl_kalender_lehreinheit
 (lehreinheit_id, kalender_id)
 VALUES
-(51002, 29),
-(51006, 30);
+(51002, 31),
+(51006, 32);
 -- ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -176,10 +180,10 @@ VALUES
 INSERT INTO lehre.tbl_kalender_lehreinheit
 (lehreinheit_id, kalender_id)
 VALUES
-(51004, 31),
-(51006, 32),
-(51006, 33),
-(51004, 34);
+(51004, 33),
+(51006, 34),
+(51006, 35),
+(51004, 36);
 
 -- Calendar setup for tags tests
 INSERT INTO lehre.tbl_kalender
@@ -190,7 +194,7 @@ VALUES
 INSERT INTO lehre.tbl_kalender_lehreinheit
 (lehreinheit_id, kalender_id)
 VALUES
-(51004, 35);
+(51004, 37);
 
 -- Calendar setup for room selection tests
 INSERT INTO lehre.tbl_kalender
@@ -202,13 +206,13 @@ VALUES
 INSERT INTO lehre.tbl_kalender_lehreinheit
 (lehreinheit_id, kalender_id)
 VALUES
-(51004, 36),
-(51004, 37);
+(51004, 38),
+(51004, 39);
 
 INSERT INTO lehre.tbl_kalender_ort
 (location, ort_kurzbz, kalender_id)
 VALUES
-(NULL, 'Bro_F7.37', 37);
+(NULL, 'Bro_F7.37', 39);
 
 -- Calendar setup for event deletion tests
 INSERT INTO lehre.tbl_kalender
@@ -220,8 +224,8 @@ VALUES
 INSERT INTO lehre.tbl_kalender_lehreinheit
 (lehreinheit_id, kalender_id)
 VALUES
-(51004, 38),
-(51004, 39);
+(51004, 40),
+(51004, 41);
 
 -- Assign a UUID to every root calendar entry and propagate it to its children.
 UPDATE lehre.tbl_kalender
@@ -278,11 +282,11 @@ VALUES
 
 INSERT INTO lehre.tbl_kalender_event
 (kalender_id, titel, beschreibung)
-VALUES(28, 'Test reservation', NULL);
+VALUES(30, 'Test reservation', NULL);
 
 INSERT INTO lehre.tbl_kalender_event_teilnehmer
 (kalender_id, rolle_kurzbz, uid, studiensemester_kurzbz, gruppe_kurzbz, studiengang_kz, semester, verband, gruppe, studentenlehrverband_id)
-VALUES(28, 'teilnehmer', 'demolektor4', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+VALUES(30, 'teilnehmer', 'demolektor4', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 INSERT INTO campus.tbl_zeitsperre
 (zeitsperre_id, zeitsperretyp_kurzbz, mitarbeiter_uid, bezeichnung, vondatum, vonstunde, bisdatum, bisstunde, vertretung_uid, updateamum, updatevon, insertamum, insertvon, erreichbarkeit_kurzbz, freigabeamum, freigabevon)

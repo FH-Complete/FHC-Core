@@ -44,16 +44,16 @@ context("Tempus filter tests", () => {
           const eventData = tempusPage.getCalendarEventData($event);
 
           let eventRoom = eventData?.orig?.ort_kurzbz;
-          if (Array.isArray(eventRoom)) eventRoom = eventRoom.length ? eventRoom[0] : "";
+          if (Array.isArray(eventRoom)) eventRoom = eventRoom.length ? eventRoom.join(",") : "";
 
-          expect(eventRoom, "event data room").to.eq(
+          expect(eventRoom, "event data room").to.contain(
             selectedRoom,
           );
           cy.wrap($event)
             .find("[data-cy='calendar-event-room']")
             .invoke("text")
             .then((eventPlace) => {
-              expect(eventPlace.trim(), "event body room").to.eq(selectedRoom);
+              expect(eventPlace.trim(), "event body room").to.contain(selectedRoom);
             });
         });
       });

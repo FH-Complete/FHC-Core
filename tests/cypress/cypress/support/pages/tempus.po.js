@@ -107,6 +107,10 @@ class TempusPage {
       method: "POST",
       url: "**/tempus/Kalender/updateKalenderEvent**",
     }).as("updateCalendarEvent");
+	cy.intercept({
+      method: "POST",
+      url: "**/tempus/Kalender/deleteEntry**",
+    }).as("deleteCalendarEvent");
     cy.intercept({
       method: "POST",
       url: "**/tempus/Kalender/sync**",

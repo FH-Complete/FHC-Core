@@ -687,7 +687,7 @@ export default {
 							<div
 								v-if="snapToGrid"
 								style="position:absolute;inset:0"
-								:style="{ zIndex: isDragging ? 10 : 1, pointerEvents: isDragging ? 'auto' : 'none' }"
+								:style="{ zIndex: isDragging ? 10 : 1 }"
 								:data-day="date.toFormat('yyyy-MM-dd')"
 								v-drop:move.lehreinheit.kalender.reservierung="(evt, item) => onDropSnap(evt, item, date, part)"
 							></div>
@@ -710,7 +710,7 @@ export default {
 								<div
 									v-if="!snapToGrid"
 									style="position:absolute;inset:0"
-									:style="{ zIndex: isDragging ? 10 : 1, pointerEvents: isDragging ? 'auto' : 'none' }"
+									:style="{ zIndex: isDragging ? 10 : 1 }"
 									v-drop:move.lehreinheit.kalender.reservierung="(evt, item) => onDropFree(evt, item, date)"
 								></div>
 							</template>

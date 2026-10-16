@@ -27,10 +27,19 @@ context("Tempus course picker tests", () => {
   });
 
   it("filters course teaching units using the course-picker search", () => {
+	tempusPage.getSlideInCoursesMenu().should("exist");
+    tempusPage.getCourseTreeRows().should("have.length.greaterThan", 0);
+    tempusPage.getCoursePicker().should("exist");
+    tempusPage.getCoursePickerRows().should("have.length", 0);
+
     tempusPage.selectCourseByName(TARGETED_STUDY_PLAN_SHORT_CODE);
     waitForOk("@fetchCoursePickerCourses");
 
-    tempusPage.getCoursePickerRows().should("have.length.greaterThan", 0);
+	cy.wait(1000);
+
+    tempusPage.getCoursePickerRows()
+		.should("be.visible")
+		.should("have.length.greaterThan", 0);
 
     tempusPage
       .getCoursePickerRows()

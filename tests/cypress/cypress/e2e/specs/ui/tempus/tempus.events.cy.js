@@ -165,7 +165,7 @@ context("Tempus event mutation tests", () => {
     tempusPage.getParkedEvents().should("have.length", 1);
   });
 
- it("keeps a deleted planner event visible in lecturer and student previews", () => {
+ it("keeps a deleted planner event visible in lecturer and student previews, before syncing", () => {
 	tempusPage.syncAndReloadPlanner();
 
 	tempusPage
@@ -187,11 +187,12 @@ context("Tempus event mutation tests", () => {
 			.getEventContextMenuOption("Delete")
 			.click({ force: true });
 
+		waitForOk("@deleteCalendarEvent");
 		waitForOk("@fetchPlanData");
 
 		tempusPage
 			.getCalendarEventByUniqueCalenderGroupId(eventGroupId)
-			.should("not.exist");
+			.should("exist");
 
 		tempusPage.selectRoleAndWait(LEKTOR);
 		tempusPage
@@ -226,12 +227,13 @@ it("keeps a deleted planner event invisible after syncing", () => {
       tempusPage
         .getEventContextMenuOption("Delete")
         .click({ force: true });
-
+	
+      waitForOk("@deleteCalendarEvent");
       waitForOk("@fetchPlanData");
 
       tempusPage
         .getCalendarEventByUniqueCalenderGroupId(eventGroupId)
-        .should("not.exist");
+        .should("exist");
 
       tempusPage.syncAndReloadPlanner();
 
@@ -242,12 +244,12 @@ it("keeps a deleted planner event invisible after syncing", () => {
       tempusPage.selectRoleAndWait(LEKTOR);
       tempusPage
         .getCalendarEventByUniqueCalenderGroupId(eventGroupId)
-        .should("exist");
+        .should("not.exist");
 
       tempusPage.selectRoleAndWait(STUDENT);
       tempusPage
         .getCalendarEventByUniqueCalenderGroupId(eventGroupId)
-        .should("exist");
+        .should("not.exist");
     });
 });
 
