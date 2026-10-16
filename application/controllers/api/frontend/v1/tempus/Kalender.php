@@ -323,6 +323,7 @@ class Kalender extends FHCAPI_Controller
 		if (isError($result))
 			$this->terminateWithError(getError($result),  $result->code);
 
+		
 		$this->terminateWithSuccess(getData($result));
 	}
 

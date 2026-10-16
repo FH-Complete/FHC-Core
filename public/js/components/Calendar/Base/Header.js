@@ -54,7 +54,7 @@ export default {
 			<div class="header-userdefined">
 				<slot />
 			</div>
-			<div class="header-modes">
+			<div class="header-modes" data-cy="calender-header-modes">
 				<div class="d-flex gap-1 justify-content-end" role="group">
 					<button
 						v-if="btnRange"

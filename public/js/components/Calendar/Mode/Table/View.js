@@ -352,7 +352,7 @@ export default {
 		},
 	},
 	template: /* html */`
-	<div class="fhc-calendar-mode-table-view position-absolute top-0 start-0 w-100 h-100 d-flex flex-column">
+	<div class="fhc-calendar-mode-table-view position-absolute top-0 start-0 w-100 h-100 d-flex flex-column" data-cy="calender-table-view">
 		<core-filter-cmpt
 			ref="tableViewTable"
 			:tabulator-options="tabulatorOptions"

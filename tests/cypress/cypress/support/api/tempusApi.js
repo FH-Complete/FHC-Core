@@ -21,11 +21,11 @@ const updatePlannerEventsForDay = (day, predicate, startTime, endTime) => {
 };
 
 export const tempusApi = {
-  getStudyPlansTree: () =>
+  getDegreeProgramTree: () =>
     cy
       .request({
         method: "GET",
-        url: `/index.ci.php/api/frontend/v1/lv/StgTree`,
+        url: `/index.ci.php/api/frontend/v1/tempus/Info/getStudiengaenge`,
       })
       .then((response) => {
         expect(response.status).to.eq(200);
@@ -53,18 +53,19 @@ export const tempusApi = {
       }),
 
   getCoursesByStudyPlan: (studyPlanId, semesterShortCode) => {
-    let parsedStudyPlans = [
-      {
-        studiengang_kz: studyPlanId,
-      },
-    ];
+    // let parsedStudyPlans = [
+    //   {
+    //     studiengang_kz: studyPlanId,
+    //   },
+    // ];
+	let parsedStudyPlans = [{"stg_kz":studyPlanId}];
 
     return cy
       .request({
         method: "POST",
-        url: `/index.ci.php/api/frontend/v1/tempus/coursepicker/getByStg`,
+        url: `/index.ci.php/api/frontend/v1/tempus/coursepicker/getCourses`,
         body: {
-          studiengaenge: parsedStudyPlans,
+          stg: parsedStudyPlans,
           studiensemester_kurzbz: semesterShortCode,
         },
       })
@@ -134,7 +135,7 @@ export const tempusApi = {
         ),
       ),
 
-  createKalenderEvent: (lehreinheitId, startDateTime, endDateTime) =>
+  createKalenderEvent: (lehreinheitId, startDateTime, endDateTime, roomShortCodes = [], isFirstAttempt = true) =>
     cy.request({
       method: "POST",
       url: `${KALENDER_API}/Kalender/addKalenderEvent`,
@@ -142,6 +143,8 @@ export const tempusApi = {
         lehreinheit_id: lehreinheitId,
         start_date: startDateTime,
         end_date: endDateTime,
+        ort_kurzbz: roomShortCodes,
+        first_run: isFirstAttempt,
       },
       failOnStatusCode: false,
     }),
@@ -176,6 +179,9 @@ export const tempusApi = {
     ignore_reservierung: false,
     ignore_zeitsperre: false,
     ignore_resources_collisions: false,
+    roomless_planning: true,
+    room_planning: "dialog_room_planning",
+    dialog_room_planning: false,
   }),
 
   updateSettingsData: (options) =>

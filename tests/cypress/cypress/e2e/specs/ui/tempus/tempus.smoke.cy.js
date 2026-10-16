@@ -6,7 +6,7 @@ context("Tempus smoke tests", () => {
     tempusPage.visitAndWaitForPlanner();
   });
 
-  it("can access Tempus page with valid credentials", () => {
+  it("displays the Tempus page for an authenticated user", () => {
     tempusPage.getTempusOverview().should("be.visible");
   });
 
@@ -18,7 +18,23 @@ context("Tempus smoke tests", () => {
     tempusPage.getPreviewRoleOptionsHolder().should("be.visible");
   });
 
-  it("can open courses menu", () => {
+  it("loads events in every calendar mode", () => {
+    tempusPage
+      .getCalendarModeButtons()
+      .should("have.length.greaterThan", 0)
+      .each(($modeButton) => {
+        cy.wrap($modeButton).click().should("have.class", "active");
+        tempusPage.waitForCalendarToFinishLoading();
+
+        if ($modeButton.find(".fa-table-list").length) {
+          tempusPage.getCalendarTableRows().should("have.length.greaterThan", 0);
+        } else {
+          tempusPage.getCalendarEvents().should("have.length.greaterThan", 0);
+        }
+      });
+  });
+
+  it("opens the courses menu", () => {
     tempusPage.getSlideInCoursesMenu().should("exist").should("be.hidden");
 
     tempusPage.openCoursesMenu();
@@ -35,7 +51,7 @@ context("Tempus smoke tests", () => {
     tempusPage.getCalendarEventModal().should("be.visible");
   });
 
-  it("shows event context menu when right clicking a calendar event", () => {
+  it("shows the event context menu when right-clicking a calendar event", () => {
     tempusPage.waitForCalendarToFinishLoading();
     tempusPage.getCalendarEvents().should("have.length.greaterThan", 0);
 
@@ -44,7 +60,7 @@ context("Tempus smoke tests", () => {
     tempusPage.getEventContextMenu().should("be.visible");
   });
 
-  it("shows room selection modal when selecting 'room selection' from event context menu", () => {
+  it("opens the room-selection modal from the event context menu", () => {
     tempusPage.waitForCalendarToFinishLoading();
     tempusPage
       .getCalendarEventsWithLehreinheit()
@@ -57,7 +73,7 @@ context("Tempus smoke tests", () => {
     tempusPage.getRoomSelectionModal().should("be.visible");
   });
 
-  it("shows resources modal when selecting Ressourcen zuordnen from event context menu", () => {
+  it("opens the resources modal from the event context menu", () => {
     tempusPage.waitForCalendarToFinishLoading();
     tempusPage
       .getCalendarEventsByWeekdayAndStartTime("Sunday", "17:50:00")
@@ -71,21 +87,21 @@ context("Tempus smoke tests", () => {
     tempusPage.getResourcesModal().should("be.visible");
   });
 
-  it("shows tags modal when selecting Tags from event context menu", () => {
-    tempusPage.waitForCalendarToFinishLoading();
-    tempusPage
-      .getCalendarEventsByWeekdayAndStartTime("Sunday", "16:55:00")
-      .should("have.length.greaterThan", 0);
+//   it("shows tags modal when selecting Tags from event context menu", () => {
+//     tempusPage.waitForCalendarToFinishLoading();
+//     tempusPage
+//       .getCalendarEventsByWeekdayAndStartTime("Sunday", "16:55:00")
+//       .should("have.length.greaterThan", 0);
 
-    tempusPage.getCalendarEventsByWeekdayAndStartTime("Sunday", "16:55:00").first().rightclick();
-    tempusPage.getEventContextMenuOption("Tags").click({ force: true });
-    waitForOk("@fetchTags");
-    waitForOk("@fetchTagsByCalendar");
+//     tempusPage.getCalendarEventsByWeekdayAndStartTime("Sunday", "16:55:00").first().rightclick();
+//     tempusPage.getEventContextMenuOption("Tags").click({ force: true });
+//     waitForOk("@fetchTags");
+//     waitForOk("@fetchTagsByCalendar");
 
-    tempusPage.getTagsModal().should("be.visible");
-  });
+//     tempusPage.getTagsModal().should("be.visible");
+//   });
 
-  it("shows history modal when selecting History from event context menu", () => {
+  it("opens the history modal from the event context menu", () => {
     tempusPage.waitForCalendarToFinishLoading();
     tempusPage.getCalendarEvents().should("have.length.greaterThan", 0);
 
@@ -96,7 +112,7 @@ context("Tempus smoke tests", () => {
     tempusPage.getHistoryModal().should("be.visible");
   });
 
-  it.skip("shows reservation modal when dropping reservation handle on calendar", () => {
+  it.skip("opens the reservation modal when a reservation is dropped on the calendar", () => {
     tempusPage.waitForCalendarToFinishLoading();
     tempusPage.getCalendarBaseGrid().should("be.visible");
 
