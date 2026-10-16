@@ -5,7 +5,7 @@ import { useEventLoader } from '../../composables/Tempus/TempusEventLoader.js';
 import ModeWeek from './Mode/Week.js';
 import ModeMonth from './Mode/Month.js';
 import ModeTable from './Mode/Table.js';
-import ModeMultipleWeeks from './Mode/MultipleWeeks.js';
+import ModeRange from './Mode/Range.js';
 import ApiKalender from '../../api/factory/tempus/kalender.js';
 import draggable from '../../directives/draggable.js';
 import ApiStudiensemester from '../../api/factory/studiensemester.js';
@@ -81,7 +81,7 @@ export default {
 		},
 		modes: {
 			type: Array,
-			default: () => ['week', 'month', 'tableList', 'multipleWeeks'],
+			default: () => ['week', 'month', 'tableList', 'range'],
 		},
 		getPromiseFunc: {
 			type: Function,
@@ -157,7 +157,7 @@ export default {
 				week: Vue.markRaw(ModeWeek),
 				month: Vue.markRaw(ModeMonth),
 				tableList: Vue.markRaw(ModeTable),
-				multipleWeeks: Vue.markRaw(ModeMultipleWeeks),
+				range: Vue.markRaw(ModeRange),
 			},
 			modeOptions: {
 				day: {
@@ -230,7 +230,7 @@ export default {
 
 			if (
 				this.isRangeVirtualScrollEnabled
-				&& this.currentMode === 'multipleWeeks'
+				&& this.currentMode === 'range'
 				&& Array.isArray(this.visibleDates)
 			)
 			{
@@ -435,7 +435,7 @@ export default {
 		show-btns
 		:draggable-events="isEventDraggingEnabled"
 		:resizable-events="isEventResizingEnabled"
-		:on-drop="isEventDraggingEnabled && ['week', 'multipleWeeks'].includes(currentMode) ? ondrop : null"
+		:on-drop="isEventDraggingEnabled && ['week', 'range'].includes(currentMode) ? ondrop : null"
 		:on-resize="isEventResizingEnabled ? onresize : null"
 		@update:date="handleDateUpdate"
 		@update:mode="(newMode, newDate) => { currentMode = newMode; $emit('update:mode', newMode, newDate) }"

@@ -87,7 +87,7 @@ export default {
 
 		return {
 			appconfig: {},
-			currentMode: 'multipleWeeks',
+			currentMode: 'range',
 			configEndpoints: ApiTempusConfig,
 			hoveredEvent: null,
 			renderers: {},
@@ -108,7 +108,7 @@ export default {
 				month: today,
 				tableList: today,
 				range: today,
-				multipleWeeks: today,
+				range: today,
 			},
 			historyEntries: [],
 			previewRole: 'planer',
@@ -481,7 +481,7 @@ export default {
 
 				this.calendarDatesByMode = {
 					...this.calendarDatesByMode,
-					multipleWeeks: rangeStart,
+					range: rangeStart,
 				};
 			},
 		},
@@ -571,7 +571,7 @@ export default {
 			:date="calendarDate"
 			:range="urlRange"
 			:mode="currentMode"
-			:modes="['multipleWeeks']"
+			:modes="['range']"
 			:parkedEvents="parkedKeys"
 			:visible-lecturers="visibleLecturerUids"
 			:show-events="showEvents"

@@ -347,7 +347,7 @@ export default {
 				:btn-month="!!modes['month'] && (btnMonth || (showBtns && btnMonth !== false))"
 				:btn-list="!!modes['list'] && (btnList || (showBtns && btnList !== false))"
 				:btn-table-list="!!modes['tableList'] && (btnTableList || (showBtns && btnTableList !== false))"
-				:btn-multiple-weeks="!!modes['multipleWeeks'] && (btnRange || (showBtns && btnList !== false))"
+				:btn-range="!!modes['range'] && (btnRange || (showBtns && btnList !== false))"
 				:mode-options="modeOptions ? modeOptions[cMode] : undefined"
 			>
 				<slot name="actions" />

@@ -1,13 +1,13 @@
-import BaseSlider from "../Base/Slider.js";
-import RangeView from "./Range/View.js";
+import BaseSlider from '../Base/Slider.js';
+import RangeView from './Range/View.js';
 import FormInput from "../../Form/Input.js";
 
 export default {
-	name: "ModeRange",
+	name: "Ranges",
 	components: {
 		BaseSlider,
 		RangeView,
-		FormInput,
+		FormInput
 	},
 	inject: {
 		rangeLength: {
@@ -23,10 +23,15 @@ export default {
 	props: {
 		currentDate: {
 			type: luxon.DateTime,
-			required: true,
-		},
+			required: true
+		}
 	},
-	emits: ["update:currentDate", "update:date", "update:range", "click", "requestModalOpen"],
+	emits: [
+		"update:currentDate",
+		"update:range",
+		"click",
+		"requestModalOpen"
+	],
 	setup() {
 		const selectedRangePreset = Vue.inject(
 			"rangeViewSelectedPreset",
@@ -37,7 +42,10 @@ export default {
 	},
 	data() {
 		return {
-			applyingRangePreset: false,
+			focusDate: this.currentDate,
+			rangeOffset: 0,
+			beforePrintHandler: null,
+			afterPrintHandler: null,
 		};
 	},
 	computed: {
@@ -47,18 +55,33 @@ export default {
 			);
 		},
 		range() {
-			const first = this.$props.currentDate.startOf("day");
-			const last = first
-				.plus({ days: Math.max(Number(this.rangeLength) - 1, 0) })
-				.endOf("day");
+			const targetDate = this.focusDate.plus({ weeks: this.rangeOffset });
+			const first = targetDate.startOf('week', { useLocaleWeeks: true });
+			const rangeLength = Math.max(parseInt(this.rangeLength) || 1, 1);
+			const last = targetDate
+				.plus({ days: rangeLength - 1 })
+				.endOf('week', { useLocaleWeeks: true });
 
 			return luxon.Interval.fromDateTimes(first, last);
-		},
+		}
 	},
 	watch: {
 		currentDate() {
-			this.syncSelectedRangePreset();
-			this.$emit("update:range", this.range);
+			if (this.currentDate.locale != this.focusDate.locale) {
+				this.focusDate = this.currentDate;
+				this.rangeOffset = 0;
+				this.$emit('update:range', this.range);
+			} else {
+				this.rangeOffset = this.currentDate.startOf('week', { useLocaleWeeks: true }).diff(this.focusDate.startOf('week', { useLocaleWeeks: true }), 'weeks').weeks;
+				if (this.rangeOffset) {
+					this.focusDate = this.currentDate;
+					this.rangeOffset = 0;
+					this.$refs.view.$refs.grids.forEach(grid => {
+						grid.disableAutoScroll();
+					});
+					this.$emit('update:range', this.range);
+				}
+			}
 		},
 		rangeLength() {
 			this.syncSelectedRangePreset();
@@ -87,6 +110,53 @@ export default {
 		},
 	},
 	methods: {
+		prevPage() {
+			this.rangeOffset = this.$refs.slider.target - 1;
+
+			this.$refs.view.$refs.grids.forEach(grid => {
+				grid.disableAutoScroll();
+			});
+
+			this.$emit('update:range', this.range);
+			this.$refs.slider.prevPage().then(this.updatePage);
+		},
+		nextPage() {
+			this.rangeOffset = this.$refs.slider.target + 1;
+			
+			this.$refs.view.$refs.grids.forEach(grid => {
+				grid.disableAutoScroll();
+			});
+
+			this.$emit('update:range', this.range);
+			this.$refs.slider.nextPage().then(this.updatePage);
+		},
+		updatePage(weeks) {
+			const newFocusDate = this.focusDate.plus({ weeks });
+			this.focusDate = newFocusDate;
+			this.rangeOffset = 0;
+			this.$emit('update:currentDate', this.focusDate);
+			this.$emit('update:range', this.range);
+			this.$refs.view.$refs.grids.forEach(grid => {
+				grid.enableAutoScroll();
+			});
+		},
+		viewAttrs(weeks) {
+			const day = this.focusDate.plus({ weeks });
+			const rangeLength = parseInt(this.rangeLength);
+			return { ...this.$attrs, day, rangeLength };
+		},
+		handleClickDefaults(evt) {
+			switch (evt.detail.source) {
+			case 'day':
+				// default: Set current-date
+				this.$emit('update:currentDate', evt.detail.value);
+				break;
+			case 'event':
+				// default: Request Modal
+				this.$emit('requestModalOpen', { event: evt.detail.value });
+				break;
+			}
+		},
 		matchesRangePreset(preset) {
 			const rangeLength =
 				preset.endDate.diff(preset.startDate, "days").days + 1;
@@ -107,38 +177,92 @@ export default {
 			if (!this.applyingRangePreset)
 				this.selectedRangePreset = null;
 		},
-		viewAttrs() {
-			const day = this.$props.currentDate.startOf("day");
-			const rangeLength = parseInt(this.rangeLength);
-			return { ...this.$attrs, day, rangeLength };
+		preparePrintLayout() {
+			const view = this.$el?.querySelector('.fhc-calendar-mode-week-view');
+			if (!view)
+				return;
+
+			const weeks = Array.from(view.children);
+			weeks.forEach(week => {
+				week.style.setProperty('--fhc-calendar-print-scale-x', '1');
+				week.style.setProperty('--fhc-calendar-print-scale-y', '1');
+				week.style.setProperty('--fhc-calendar-print-layout-width', 'max-content');
+			});
+
+
+			const viewWidth = view.getBoundingClientRect().width;
+			const printViewportWidth = document.querySelector(".fhc-calendar-base-slider").getBoundingClientRect().width;
+			const availableWidth = printViewportWidth
+				? Math.min(viewWidth, printViewportWidth)
+				: viewWidth;
+			if (!availableWidth)
+				return;
+
+			weeks.forEach(week => {
+				const grid = week.querySelector('.fhc-calendar-base-grid');
+				if (!grid)
+					return;
+
+				const gridRect = grid.getBoundingClientRect();
+				const contentRight = Array.from(grid.querySelectorAll('*')).reduce(
+					(right, element) => Math.max(right, element.getBoundingClientRect().right),
+					gridRect.right,
+				);
+				const gridWidth = Math.ceil(Math.max(
+					week.scrollWidth,
+					grid.scrollWidth,
+					gridRect.width,
+					contentRight - gridRect.left,
+				));
+				if (!gridWidth)
+					return;
+
+				const scale = Math.min(1, availableWidth / (gridWidth));
+				const verticalScale = 1 - (1 - scale) * 0.9;
+
+				week.style.setProperty('--fhc-calendar-print-scale-x', scale.toFixed(4));
+				week.style.setProperty('--fhc-calendar-print-scale-y', verticalScale.toFixed(4));
+				week.style.setProperty('--fhc-calendar-print-layout-width', gridWidth + 'px');
+			});
 		},
-		handleClickDefaults(evt) {
-			switch (evt.detail.source) {
-				case "day":
-					// default: Set current-date
-					this.$emit("update:currentDate", {
-						date: evt.detail.value,
-					});
-					break;
-				case "event":
-					// default: Request Modal
-					this.$emit("requestModalOpen", { event: evt.detail.value });
-					break;
-			}
+		resetPrintLayout() {
+			const view = this.$el?.querySelector('.fhc-calendar-mode-week-view');
+			if (!view)
+				return;
+
+			Array.from(view.children).forEach(week => {
+				week.style.removeProperty('--fhc-calendar-print-scale-x');
+				week.style.removeProperty('--fhc-calendar-print-scale-y');
+				week.style.removeProperty('--fhc-calendar-print-layout-width');
+			});
 		},
 	},
 	mounted() {
-		this.$emit("update:range", this.range);
+		this.$emit('update:range', this.range);
+
+		this.$refs.view.$refs.grids.forEach(grid => {
+			grid.enableAutoScroll();
+		});
+
+		this.beforePrintHandler = () => this.preparePrintLayout();
+		this.afterPrintHandler = () => this.resetPrintLayout();
+		window.addEventListener('beforeprint', this.beforePrintHandler);
+		window.addEventListener('afterprint', this.afterPrintHandler);
 	},
-	template: /*html*/ `
+	beforeUnmount() {
+		window.removeEventListener('beforeprint', this.beforePrintHandler);
+		window.removeEventListener('afterprint', this.afterPrintHandler);
+	},
+	template: /* html */`
 	<div
-		class="fhc-calendar-mode-range flex-grow-1 position-relative d-flex flex-column"
+		class="fhc-calendar-mode-week flex-grow-1 position-relative d-flex flex-column"
 		@cal-click-default.capture="handleClickDefaults"
 	>
+		<div ref="printMeasure" class="fhc-calendar-print-measure" aria-hidden="true"></div>
 		<div
-			v-if="rangeViewPresets?.presets?.length || rangeViewPreviewLink"
+			v-if="rangeViewPresets?.presets?.length"
 			id="rangePresetSelector"
-			class="w-100 d-flex flex-row gap-2 justify-content-center align-items-center py-2"
+			class="w-100 d-flex flex-row gap-2 justify-content-center align-items-center py-2 border-bottom"
 		>
 			<span v-if="rangeViewPresets?.presets?.length">{{ rangeViewPresets.label }}</span>
 			<form-input
@@ -169,11 +293,11 @@ export default {
 		</div>
 		<div class="flex-grow-1">
 			<base-slider ref="slider" v-slot="slot">
-				<range-view ref="view" v-bind="viewAttrs()">
-					<template v-slot="slot"><slot v-bind="slot" mode="range" /></template>
+				<range-view ref="view" v-bind="viewAttrs(slot.offset)">
+					<template v-slot="slot"><slot v-bind="slot" mode="week" /></template>
 				</range-view>
 			</base-slider>
 		</div>
 	</div>
-	`,
-};
+	`
+}
