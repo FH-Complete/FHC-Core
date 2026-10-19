@@ -604,9 +604,11 @@ export default {
 
 	<!--Modal: KontaktdatenModal -->
 	<bs-modal
+		v-if="autocompleteSelectedBetreuer && autocompleteSelectedBetreuer.person_id"
+		@hideBsModal.stop=""
 		ref="kontaktdatenModal"
 		dialog-class="modal-xl modal-dialog-scrollable"
-		v-if="autocompleteSelectedBetreuer && autocompleteSelectedBetreuer.person_id">
+	>
 
 		<template #title>
 			<p class="fw-bold mt-3">{{$p.t('projektarbeit', 'kontaktdatenBearbeiten')}}</p>

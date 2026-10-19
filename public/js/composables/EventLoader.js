@@ -7,6 +7,12 @@ export function useEventLoader(rangeInterval, getPromiseFunc) {
 	const allEvents = Vue.computed(() => events.value.concat(loadingEvents.value));
 	const lv = Vue.ref(null);
 	const eventsLoaded = [];
+	const reservierbarMap = Vue.ref({});
+
+	const mergeReservierbarMap = (incoming) => {
+		if (!incoming) return;
+		reservierbarMap.value = { ...reservierbarMap.value, ...incoming };
+	};
 
 	const mergePromiseArr = (n, o) => {
 		if (Array.isArray(n))
@@ -128,6 +134,7 @@ export function useEventLoader(rangeInterval, getPromiseFunc) {
 							lv.value = res.value.meta.lv;
 
 						events.value = events.value.concat(res.value.data);
+						mergeReservierbarMap(res.value.data?.reservierbarMap);
 						loadingEvents.value = [];
 					}
 				})
@@ -135,15 +142,15 @@ export function useEventLoader(rangeInterval, getPromiseFunc) {
 	};
 
 	Vue.watchEffect(reload);
-	
+
 	const reset = () => {
 		loading_id = 0;
 		events.value = [];
 		loadingEvents.value = [];
+		reservierbarMap.value = {};
 		eventsLoaded.splice(0, eventsLoaded.length);
-
 		reload();
 	}
 
-	return { events: allEvents, lv, reset }
+	return { events: allEvents, lv, reservierbarMap, reset }
 }

@@ -24,7 +24,7 @@ class Reservierung_model extends DB_Model
 		$lvplan_reservierungen_query = "SELECT r.* , stund.beginn, stund.ende,
 			CASE
 				WHEN r.gruppe_kurzbz IS NOT NULL THEN r.gruppe_kurzbz 
-				ELSE CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',COALESCE(CAST(r.semester AS varchar),'/'),COALESCE(CAST(r.verband AS varchar),'/')) 
+				ELSE CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',COALESCE(CAST(r.semester AS varchar),'/'),COALESCE(CAST(r.verband AS varchar),'/'),COALESCE(CAST(r.gruppe AS varchar),'/')) 
 			END as gruppen_kuerzel
 			FROM campus.vw_reservierung r
 			JOIN public.tbl_studiengang studg ON studg.studiengang_kz=r.studiengang_kz
@@ -39,7 +39,7 @@ class Reservierung_model extends DB_Model
 		$raum_reservierungen_query = "SELECT res.*, beginn, ende,
 			CASE
 				WHEN res.gruppe_kurzbz IS NOT NULL THEN res.gruppe_kurzbz 
-				ELSE CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',COALESCE(CAST(res.semester AS varchar),'/'),COALESCE(CAST(res.verband AS varchar),'/')) 
+				ELSE CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',COALESCE(CAST(res.semester AS varchar),'/'),COALESCE(CAST(res.verband AS varchar),'/'),COALESCE(CAST(res.gruppe AS varchar),'/')) 
 			END as gruppen_kuerzel
 			FROM campus.vw_reservierung res
 			JOIN public.tbl_studiengang studg ON studg.studiengang_kz=res.studiengang_kz
@@ -50,11 +50,12 @@ class Reservierung_model extends DB_Model
 
 		$query_result = $this->execReadOnlyQuery("
 		SELECT 
-		'reservierung' as type, beginn, ende, datum,
+		DISTINCT(insertvon),  
+		'reservierung' as type, beginn, ende, datum, array_agg(DISTINCT reservierung_id) AS reservierung_id,
 		COALESCE(titel, beschreibung) as topic,
 		array_agg(DISTINCT mitarbeiter_kurzbz) as lektor,
 		array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe, 
-		
+		array_agg(DISTINCT(uid)) as uids,
 		ort_kurzbz, 'FFFFFF' as farbe
 		
 		FROM 
@@ -62,7 +63,7 @@ class Reservierung_model extends DB_Model
 			" . $subquery . "
 		) AS subquery
 
-		GROUP BY datum, beginn, ende, ort_kurzbz, titel, beschreibung
+		GROUP BY datum, beginn, ende, ort_kurzbz, titel, beschreibung, insertvon
 		
 		ORDER BY datum, beginn
 		", is_null($ort_kurzbz) ? [$uid ?? getAuthUID(), $uid ?? getAuthUID(), $start_date, $end_date] : [$ort_kurzbz, $start_date, $end_date]);
@@ -82,7 +83,7 @@ class Reservierung_model extends DB_Model
 		$raum_reservierungen_query = "SELECT res.*, beginn, ende,
 			CASE
 				WHEN res.gruppe_kurzbz IS NOT NULL THEN res.gruppe_kurzbz 
-				ELSE CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',COALESCE(CAST(res.semester AS varchar),'/'),COALESCE(CAST(res.verband AS varchar),'/')) 
+				ELSE CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',COALESCE(CAST(res.semester AS varchar),'/'),COALESCE(CAST(res.verband AS varchar),'/'),COALESCE(CAST(res.gruppe AS varchar),'/')) 
 			END as gruppen_kuerzel
 			FROM campus.vw_reservierung res
 			JOIN public.tbl_studiengang studg ON studg.studiengang_kz=res.studiengang_kz
@@ -94,11 +95,12 @@ class Reservierung_model extends DB_Model
 
 		$query_result = $this->execReadOnlyQuery("
 		SELECT 
-		'reservierung' as type, beginn, ende, datum,
+		DISTINCT(insertvon),  
+		'reservierung' as type, beginn, ende, datum, array_agg(DISTINCT reservierung_id) AS reservierung_id,
 		COALESCE(titel, beschreibung) as topic,
 		array_agg(DISTINCT mitarbeiter_kurzbz) as lektor,
 		array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe, 
-		
+		array_agg(DISTINCT(uid)) as uids,
 		ort_kurzbz, 'FFFFFF' as farbe
 		
 		FROM 
@@ -106,7 +108,7 @@ class Reservierung_model extends DB_Model
 			" . $subquery . "
 		) AS subquery
 
-		GROUP BY datum, beginn, ende, ort_kurzbz, titel, beschreibung
+		GROUP BY datum, beginn, ende, ort_kurzbz, titel, beschreibung, insertvon
 		
 		ORDER BY datum, beginn
 		", [$uid ?? getAuthUID(), $start_date, $end_date]);
@@ -146,4 +148,40 @@ class Reservierung_model extends DB_Model
 		return $this->execReadOnlyQuery($qry, [$uid, $datum, $stunde]);
 	}
 
+	public function deleteReservation($reservierung_id) {
+		$uid = getAuthUID();
+
+		$result = $this->load($reservierung_id);
+
+		if (isError($result))
+			return $result;
+
+		if (!hasData($result))
+			return error('Reservierung nicht gefunden');
+
+		$row = $result->retval[0];
+
+		if ($row->uid !== $uid && $row->insertvon !== $uid)
+			return error('Keine Berechtigung');
+
+		return $this->delete($reservierung_id);
+	}
+
+	public function getMyReservation() {
+		$uid = getAuthUID();
+		$date = date("Y-m-d",time());
+
+		$qry = "SELECT vw_reservierung.*, 
+					trim(COALESCE(vw_mitarbeiter.titelpre,'')||' '||COALESCE(vw_mitarbeiter.vorname,'')||' '||COALESCE(vw_mitarbeiter.nachname,'')||' '||COALESCE(vw_mitarbeiter.titelpost,'')) as reserviert_fuer,
+					trim(COALESCE(reserviert_von.titelpre,'')||' '||COALESCE(reserviert_von.vorname,'')||' '||COALESCE(reserviert_von.nachname,'')||' '||COALESCE(reserviert_von.titelpost,'')) as reserviert_von
+				FROM campus.vw_reservierung
+				JOIN campus.vw_mitarbeiter ON vw_reservierung.uid=vw_mitarbeiter.uid
+				LEFT JOIN campus.vw_mitarbeiter reserviert_von ON vw_reservierung.insertvon=reserviert_von.uid
+				WHERE datum >= ?
+ 				AND (vw_reservierung.uid= ? OR vw_reservierung.insertvon= ? )
+				ORDER BY  datum, titel, ort_kurzbz, stunde";
+		
+		return $this->execReadOnlyQuery($qry, [$date, $uid, $uid]);
+	}
+	
 }
