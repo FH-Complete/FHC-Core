@@ -38,21 +38,17 @@ Cypress.Commands.add("login", () => {
   cy.session(
     ["tempus-login", adminusername, userToImpersonate],
     () => {
-      cy.request({
-        url: "/index.ci.php/tempus",
-        method: "POST",
+      cy.visit("/index.ci.php/tempus", {
         auth,
-        body: {
-          searchstr: userToImpersonate,
-          types: ["employee"],
-        },
-      }).its("status").should("eq", 200);
+      });
+      cy.get("div[data-cy='tempus']").should("be.visible");
     },
     {
       cacheAcrossSpecs: true,
       validate() {
         cy.request({
           url: "/index.ci.php/tempus",
+          method: "GET",
           auth,
         }).its("status").should("eq", 200);
       },

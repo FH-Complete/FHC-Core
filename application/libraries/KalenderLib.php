@@ -104,7 +104,7 @@ class KalenderLib
 		$data = $this->_loadFilteredBasePlan($kalender_entry->von, $kalender_entry->bis);
 		return $this->_mapEvents($data);
 	}
-	public function getPlanForPlanner($start_date, $end_date, $ort = null, $uids = null, $studiengaenge = null)
+	public function getPlanForPlanner($start_date, $end_date, $ort = null, $uids = null, $studiengaenge = null, $collisionCheck = true, $maxDailyEventLimit = null)
 	{
 		$this->_buildBasePlanQuery();
 
@@ -240,11 +240,10 @@ class KalenderLib
 		
 		$data = $this->_loadFilteredBasePlan($start_date, $end_date);
 
-
-		return $this->_mapEvents($data);
+		return $this->_mapEvents($data, $collisionCheck, $maxDailyEventLimit);
 	}
 
-	public function getPlanForStudent($start_date, $end_date)
+	public function getPlanForStudent($start_date, $end_date, $collisionCheck = true, $maxDailyEventLimit = null)
 	{
 		$this->_buildBasePlanQuery();
 
@@ -252,11 +251,11 @@ class KalenderLib
 
 		$data = $this->_loadFilteredBasePlan($start_date, $end_date);
 
-		return $this->_mapEvents($data);
+		return $this->_mapEvents($data, $collisionCheck, $maxDailyEventLimit);
 	}
 
 
-	public function getPlanForLecturer($start_date, $end_date)
+	public function getPlanForLecturer($start_date, $end_date, $collisionCheck = true, $maxDailyEventLimit = null)
 	{
 		$this->_buildBasePlanQuery();
 
@@ -266,13 +265,13 @@ class KalenderLib
 			'LEFT'
 		);
 		$this->_ci->KalenderModel->db->where("(
-			tbl_kalender.status_kurzbz = 'sync_live'
+			tbl_kalender.status_kurzbz IN ('sync_live', 'to_delete_live')
 			OR (tbl_kalender.status_kurzbz = 'preview' AND neuerer.kalender_id IS NULL)
 			OR (tbl_kalender.status_kurzbz = 'live' AND neuerer.kalender_id IS NULL)
 		)", NULL, FALSE);
 		$data = $this->_loadFilteredBasePlan($start_date, $end_date);
 
-		return $this->_mapEvents($data);
+		return $this->_mapEvents($data, $collisionCheck, $maxDailyEventLimit);
 	}
 	public function getZeitsperren($start_date, $end_date, $emp)
 	{
@@ -1059,8 +1058,11 @@ class KalenderLib
 			$result = $this->updateZeit($kalender_id, $start_time, $end_time);
 			if (isError($result)) return $result;
 		}
+		
+		$updatedEntryResult = $this->_loadKalenderEntry($kalender_id);
+		if (isError($updatedEntryResult)) return $updatedEntryResult;
 
-		return success($result);
+		return success(getData($updatedEntryResult));
 	}
 
 	public function updateZeit($kalender_id, $start_date, $end_date)
@@ -1390,6 +1392,72 @@ class KalenderLib
 		return $dbModel->execReadOnlyQuery($history_sql, $params);
 	}
 
+
+	public function updateReservierungTeilnehmer($kalender_id, $teilnehmer, $specialFinalGroups)
+	{
+		$entryResult = $this->_loadKalenderEntry($kalender_id);
+		if (isError($entryResult))
+			return $entryResult;
+
+		$kalender_entry = getData($entryResult);
+
+		if ($kalender_entry->typ !== 'reservierung')
+		{
+			return error([
+				'message' => $this->_ci->phraseslib->t('ui', 'entry_not_editable'),
+				'errorCode' => 'entry_not_editable'
+			]);
+		}
+
+		$this->_ci->KalenderModel->db->trans_start();
+
+		$deleteresult = $this->_deleteReservierungTeilnehmerEntry($kalender_entry);
+		if (isError($deleteresult))
+		{
+			$this->_ci->KalenderModel->db->trans_rollback();
+			return $deleteresult;
+		}
+
+		foreach ($teilnehmer as $teil)
+		{
+			$teilnehmerresult = $this->_addTeilnehmerToEvent($kalender_id, $teil['uid'], $teil['rolle']);
+			if (isError($teilnehmerresult))
+			{
+				$this->_ci->KalenderModel->db->trans_rollback();
+				return $teilnehmerresult;
+			}
+		}
+
+		foreach ($specialFinalGroups as $group)
+		{
+			$specialgroupresult = $this->_addFinalGroupToEvent($kalender_id, $group['gid'], !($group['lehrverband'] === 'false'), $group['gruppe_kurzbz'], $group['studiensemester_kurzbz'], $group['rolle']);
+			if (isError($specialgroupresult))
+			{
+				$this->_ci->KalenderModel->db->trans_rollback();
+				return $specialgroupresult;
+			}
+		}
+
+		$entryResult = $this->_loadKalenderEntry($kalender_id);
+		if (isError($entryResult))
+		{
+			$this->_ci->KalenderModel->db->trans_rollback();
+			return $entryResult;
+		}
+
+		$kalender_entry = getData($entryResult);
+		$errors = $this->_ci->collisionchecker->run($kalender_entry);
+
+		if (!empty($errors))
+		{
+			$this->_ci->KalenderModel->db->trans_rollback();
+			return error($errors);
+		}
+
+		$this->_ci->KalenderModel->db->trans_complete();
+		return success($kalender_id);
+	}
+
 	private function _buildFilteredKalenderCte($start_date, $end_date)
 	{
 		$end_date = date('Y-m-d', strtotime($end_date . ' +1 day'));
@@ -1419,6 +1487,7 @@ class KalenderLib
 			tbl_kalender.bis,
 			tbl_kalender_ort.location,
 			tbl_kalender_ort.ort_kurzbz,
+			tbl_ort.content_id as ort_content_id,
 			tbl_lehreinheit.lehreinheit_id,
 			tbl_lehreinheit.anmerkung as le_anmerkung,
 			tbl_lehreinheit.lehrveranstaltung_id,
@@ -1440,6 +1509,10 @@ class KalenderLib
 				COALESCE(verbandgruppe.verband::varchar, \'\') || 
 				COALESCE(verbandgruppe.gruppe, \'\'), 
 			\'\') as verband_grp,
+			teilnehmer.studiensemester_kurzbz AS teilnehmer_studiensemester_kurzbz,
+			teilnehmer.rolle_kurzbz AS teilnehmer_rolle_kurzbz,
+			teilnehmergruppe.gid AS teilnehmerg_grp_gid,
+			verbandgruppe.gid AS verband_grp_gid,
 			tbl_kalender_event.beschreibung,
 			tbl_kalender_event.titel,
 			teilmitarbeiter.kurzbz as teilnehmer_kurzbz,
@@ -1524,6 +1597,7 @@ class KalenderLib
 												 AND TRIM(COALESCE(tbl_lehreinheitgruppe.verband::text, \'\')) = TRIM(le_lehrverband.verband::text)
 												 AND TRIM(COALESCE(tbl_lehreinheitgruppe.gruppe::text, \'\')) = TRIM(le_lehrverband.gruppe::text)', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('public.tbl_studiengang le_studiengang', 'le_lehrverband.studiengang_kz = le_studiengang.studiengang_kz', 'LEFT');
+		$this->_ci->KalenderModel->addJoin('public.tbl_ort', 'tbl_ort.ort_kurzbz = tbl_kalender_ort.ort_kurzbz', 'LEFT');
 
 		// Include tags in the query
 		$this->_ci->load->config('tempus');
@@ -1602,7 +1676,7 @@ class KalenderLib
 		return $this->_ci->KalenderModel->execReadOnlyQuery($query);
 	}
 
-	private function _mapEvents($data, $collisionCheck = true)
+	private function _mapEvents($data, $collisionCheck = true, $maxDailyEventLimit = null)
 	{
 		$stundenplan_data = [];
 
@@ -1633,6 +1707,7 @@ class KalenderLib
 					'tooltip' => 'tip',
 					'status_kurzbz' => $row->status_kurzbz,
 					'ort_kurzbz' => [],
+					'ort_infos' => [],
 					'location' => null,
 					'lehrfach' => isset($row->lehrfach_kurzbz) ? $row->lehrfach_kurzbz : '',
 					'farbe' => isset($row->farbe) ? $row->farbe : '',
@@ -1680,7 +1755,10 @@ class KalenderLib
 				];
 			}
 			if (isset($row->ort_kurzbz) && $row->ort_kurzbz !== '' && !in_array($row->ort_kurzbz, $events[$id]->ort_kurzbz))
+			{
 				$events[$id]->ort_kurzbz[] = $row->ort_kurzbz;
+				$events[$id]->ort_infos[] = ['ort_kurzbz' => $row->ort_kurzbz, 'ort_content_id' => $row->ort_content_id];
+			}
 
 			if (isset($row->location) && $row->location !== '' && is_null($events[$id]->location))
 				$events[$id]->location = $row->location;
@@ -1708,6 +1786,10 @@ class KalenderLib
 				{
 					$events[$id]->teilnehmer_gruppe[] = [
 						'gruppe_kurzbz' => $row->verband_grp,
+						'gid' => $row->verband_grp_gid,
+						'lehrverband' => 'true',
+						'studiensemester_kurzbz' => $row->teilnehmer_studiensemester_kurzbz,
+						'rolle' => $row->teilnehmer_rolle_kurzbz,
 					];
 				}
 			}
@@ -1718,6 +1800,10 @@ class KalenderLib
 				{
 					$events[$id]->teilnehmer_gruppe[] = [
 						'gruppe_kurzbz' => $row->teilnehmerg_grp,
+						'gid' => $row->teilnehmerg_grp_gid,
+						'lehrverband' => 'false',
+						'studiensemester_kurzbz' => $row->teilnehmer_studiensemester_kurzbz,
+						'rolle' => $row->teilnehmer_rolle_kurzbz,
 					];
 				}
 			}
@@ -1768,6 +1854,21 @@ class KalenderLib
 		foreach ($events as $event)
 		{
 			usort($event->ort_kurzbz, 'strnatcasecmp');
+		}
+
+		if (!is_null($maxDailyEventLimit) && is_numeric($maxDailyEventLimit) && $maxDailyEventLimit > 0)
+		{
+			$eventsPerDay = [];
+			$events = array_filter($events, function ($event) use (&$eventsPerDay, $maxDailyEventLimit) {
+				$date = $event->datum;
+				$eventsPerDay[$date] = $eventsPerDay[$date] ?? 0;
+	
+				if ($eventsPerDay[$date] >= $maxDailyEventLimit)
+					return false;
+	
+				$eventsPerDay[$date]++;
+				return true;
+			});
 		}
 
 		return array_values($events);
@@ -1887,7 +1988,7 @@ class KalenderLib
 					'kalender_id' => $kalender_id,
 					'studiengang_kz' => $gruppe->studiengang_kz,
 					'studiensemester_kurzbz' => $studiensemester_kurzbz,
-					'semester' => isEmptyString($gruppe->semester) ? null : $gruppe->semester,
+					'semester' => ($gruppe->semester === null || $gruppe->semester === '') ? null : $gruppe->semester,
 					'verband' => isEmptyString($gruppe->verband) ? null : $gruppe->verband,
 					'gruppe' => isEmptyString($gruppe->gruppe) ? null : $gruppe->gruppe,
 					'rolle_kurzbz' => $rolle

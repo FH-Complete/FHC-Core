@@ -215,8 +215,14 @@ export default {
 		prevPage() {
 			return this.slidePages(-1);
 		},
+		prevPageMultiple(num) {
+			return this.slidePages(-num);
+		},
 		nextPage() {
 			return this.slidePages(1);
+		},
+		nextPageMultiple(num) {
+			return this.slidePages(num);
 		},
 		slidePages(dir) {
 			return new Promise(resolve => {

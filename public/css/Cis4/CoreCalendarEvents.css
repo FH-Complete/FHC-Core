@@ -121,3 +121,31 @@
 			rgba(0, 0, 0, 0.3) 32px
 	);
 }
+
+.tag-row-cell {
+	width: 100%;
+	max-width: 0;
+}
+
+.tag-row-wrapper,
+.tag-row-wrapper > * {
+	display: flex;
+	flex-wrap: wrap !important;
+	max-width: 100%;
+	white-space: normal !important;
+	overflow: visible !important;
+}
+.fhc-calendar-empty-slot-plus {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+	font-size: 18px;
+	opacity: 0;
+	pointer-events: none;
+	user-select: none;
+}
+
+.part-body:hover .fhc-calendar-empty-slot-plus {
+	opacity: 1;
+}

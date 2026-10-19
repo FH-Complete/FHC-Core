@@ -13,11 +13,8 @@ export default {
 		rangeLength: {
 			default: 30,
 		},
-		rangeViewPresets: {
+		rangeViewPresetsConfig: {
 			default: {},
-		},
-		rangeViewPreviewLink: {
-			default: null,
 		},
 	},
 	props: {
@@ -26,87 +23,45 @@ export default {
 			required: true,
 		},
 	},
-	emits: ["update:currentDate", "update:date", "update:range", "click", "requestModalOpen"],
-	setup() {
-		const selectedRangePreset = Vue.inject(
-			"rangeViewSelectedPreset",
-			Vue.ref(null),
-		);
-
-		return { selectedRangePreset };
-	},
+	emits: ["update:currentDate", "update:range", "click", "requestModalOpen"],
 	data() {
 		return {
-			applyingRangePreset: false,
+			selectedRangePreset: null,
 		};
 	},
 	computed: {
-		activeRangePreset() {
-			return this.rangeViewPresets?.presets?.find(
-				(preset) => preset.name === this.selectedRangePreset,
-			);
-		},
 		range() {
-			const first = this.$props.currentDate.startOf("day");
-			const last = first
-				.plus({ days: Math.max(Number(this.rangeLength) - 1, 0) })
-				.endOf("day");
+			let first = this.$props.currentDate;
+			let last = first.plus({ days: this.rangeLength });
 
 			return luxon.Interval.fromDateTimes(first, last);
 		},
 	},
 	watch: {
 		currentDate() {
-			this.syncSelectedRangePreset();
 			this.$emit("update:range", this.range);
 		},
 		rangeLength() {
-			this.syncSelectedRangePreset();
 			this.$emit("update:range", this.range);
 		},
-		activeRangePreset: {
-			handler(preset) {
-				if (!preset) {
-					this.applyingRangePreset = false;
-					return;
-				}
+		selectedRangePreset() {
+			if (!this.selectedRangePreset) return;
 
-				if (this.matchesRangePreset(preset)) {
-					this.applyingRangePreset = false;
-					return;
-				}
+			const preset = this.rangeViewPresetsConfig.presets.find(
+				(preset) => preset.name === this.selectedRangePreset,
+			);
+			if (!preset) return;
 
-				this.applyingRangePreset = true;
-				this.$emit("update:date", {
-					date: preset.startDate,
-					rangeLength:
-						preset.endDate.diff(preset.startDate, "days").days + 1,
-				});
-			},
-			immediate: true,
+			this.$emit("update:date", {
+				date: preset.startDate,
+				rangeLength:
+					preset.endDate.diff(preset.startDate, "days").days + 1,
+			});
+
+			this.selectedRangePreset = null;
 		},
 	},
 	methods: {
-		matchesRangePreset(preset) {
-			const rangeLength =
-				preset.endDate.diff(preset.startDate, "days").days + 1;
-
-			return (
-				this.currentDate.hasSame(preset.startDate, "day") &&
-				Number(this.rangeLength) === rangeLength
-			);
-		},
-		syncSelectedRangePreset() {
-			if (!this.activeRangePreset) return;
-
-			if (this.matchesRangePreset(this.activeRangePreset)) {
-				this.applyingRangePreset = false;
-				return;
-			}
-
-			if (!this.applyingRangePreset)
-				this.selectedRangePreset = null;
-		},
 		viewAttrs() {
 			const day = this.$props.currentDate.startOf("day");
 			const rangeLength = parseInt(this.rangeLength);
@@ -136,36 +91,24 @@ export default {
 		@cal-click-default.capture="handleClickDefaults"
 	>
 		<div
-			v-if="rangeViewPresets?.presets?.length || rangeViewPreviewLink"
+			v-if="rangeViewPresetsConfig?.presets?.length"
 			id="rangePresetSelector"
 			class="w-100 d-flex flex-row gap-2 justify-content-center align-items-center py-2"
 		>
-			<span v-if="rangeViewPresets?.presets?.length">{{ rangeViewPresets.label }}</span>
+			<span>{{ rangeViewPresetsConfig.label }}</span>
 			<form-input
-				v-if="rangeViewPresets?.presets?.length"
 				name="rangePresetSelector"
 				type="select"
 				v-model="selectedRangePreset"
 				>
 				<option
-					v-for="preset in rangeViewPresets.presets"
+					v-for="preset in rangeViewPresetsConfig.presets"
 					:key="preset.name"
 					:value="preset.name"
 					>
 					{{ preset.name }}
 				</option>
 			</form-input>
-			<a
-				v-if="rangeViewPreviewLink"
-				:href="rangeViewPreviewLink"
-				target="_blank"
-				rel="noopener"
-				class="btn btn-outline-secondary"
-				aria-label="Vorschau öffnen"
-				title="Vorschau öffnen"
-			>
-				<i class="fa-solid fa-eye"></i>
-			</a>
 		</div>
 		<div class="flex-grow-1">
 			<base-slider ref="slider" v-slot="slot">

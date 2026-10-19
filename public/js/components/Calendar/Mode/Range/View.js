@@ -1,7 +1,7 @@
-import CalendarGrid from '../../Base/Grid.js';
-import LabelDay from '../../Base/Label/Day.js';
-import LabelDow from '../../Base/Label/Dow.js';
-import LabelTime from '../../Base/Label/Time.js';
+import CalendarGrid from "../../Base/Grid.js";
+import LabelDay from "../../Base/Label/Day.js";
+import LabelDow from "../../Base/Label/Dow.js";
+import LabelTime from "../../Base/Label/Time.js";
 
 export default {
 	name: "RangeView",
@@ -9,55 +9,84 @@ export default {
 		CalendarGrid,
 		LabelDay,
 		LabelDow,
-		LabelTime
+		LabelTime,
 	},
 	inject: {
 		timeGrid: "timeGrid",
-		timezone: "timezone"
+		timezone: "timezone",
+		events: "events",
 	},
 	props: {
 		day: {
 			type: luxon.DateTime,
-			required: true
+			required: true,
 		},
 		collapseEmptyDays: Boolean,
 		rangeLength: Number,
 	},
 	computed: {
-		axisMain() {
-			return Array.from({ length: this.$props.rangeLength }, (e, i) => this.$props.day.plus({ days: i }));
+		axisMainGroupedByWeek() {
+			const focusDayStartOfWeek = this.$props.day.startOf("week");
+			const prefixedDaysCount = this.$props.day.weekday - 1;
+			let rangeLength = this.$props.rangeLength + prefixedDaysCount;
+			rangeLength = rangeLength + (7 - (rangeLength % 7));
+
+			let axisMain = Array.from({ length: rangeLength }, (e, i) =>
+				focusDayStartOfWeek.plus({ days: i }),
+			);
+			return Object.groupBy(axisMain, (day) => {
+				return day.startOf("week").toISO().slice(0, 10);
+			});
+		},
+		weeks() {
+			return Object.keys(this.axisMainGroupedByWeek).sort();
 		},
 		axisParts() {
 			if (this.timeGrid) {
 				// create {start, end} array
-				return this.timeGrid.map(tu => {
+				return this.timeGrid.map((tu) => {
 					return {
 						start: luxon.Duration.fromISOTime(tu.start),
-						end: luxon.Duration.fromISOTime(tu.end)
+						end: luxon.Duration.fromISOTime(tu.end),
 					};
 				});
 			} else {
 				// create 07:00-23:00
-				return Array.from({ length: 17 }, (e, i) => luxon.Duration.fromObject({ hours: i + 7 }));
+				return Array.from({ length: 17 }, (e, i) =>
+					luxon.Duration.fromObject({ hours: i + 7 }),
+				);
 			}
-		}
+		},
+		eventsGroupedByWeek() {
+			return Object.groupBy(
+				this.events.filter((event) => !event.orig.allDayEvent),
+				(event) => {
+					return event.start.startOf("week").toISO().slice(0, 10);
+				},
+			);
+		},
 	},
 	methods: {
 		isToday(date) {
-			return date.hasSame(luxon.DateTime.now().setZone(this.timezone), 'day');
-		}
+			return date.hasSame(
+				luxon.DateTime.now().setZone(this.timezone),
+				"day",
+			);
+		},
 	},
-	template: /* html */`
-	<div class="fhc-calendar-mode-range-view h-100">
+	template: /* html */ `
+	<div class="fhc-calendar-mode-range-view h-100 overflow-y-scroll">
 		<calendar-grid
-			ref="grid"
-			:axis-main="axisMain"
+			v-for="week in weeks"
+			:key="week"
+			:axis-main="axisMainGroupedByWeek[week]"
 			:axis-parts="axisParts"
 			:axis-main-collapsible="collapseEmptyDays"
 			:snap-to-grid="!!timeGrid"
-			:flip-axis="true"
-			:arePartHeadersRepeated="true"
-			all-day-events
+			:overwrittenEvents="
+				week in eventsGroupedByWeek ? eventsGroupedByWeek[week] : []
+			"
+			:shouldMatchParentHeight="false"
 		>
 			<template #main-header="{ date }">
 				<div :class="{ today: isToday(date) }">
@@ -73,9 +102,6 @@ export default {
 			<template #part-header="{ part }">
 				<label-time v-bind="{ part }" :alignItemsClassSuffix="'center'" />
 			</template>
-			<template #part-header-repeat="{ part }">
-				<label-time v-bind="{ part }" :alignItemsClassSuffix="'center'" />
-			</template>
 			<template #event="slot">
 				<div v-if="slot.event.type == 'loading'" class="placeholder-glow h-100 opacity-50">
 					<span class="placeholder w-100 h-100" />
@@ -84,5 +110,5 @@ export default {
 			</template>
 		</calendar-grid>
 	</div>
-	`
-}
+	`,
+};

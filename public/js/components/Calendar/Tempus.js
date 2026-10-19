@@ -6,6 +6,7 @@ import ModeWeek from './Mode/Week.js';
 import ModeMonth from './Mode/Month.js';
 import ModeTable from './Mode/Table.js';
 import ModeMultipleWeeks from './Mode/MultipleWeeks.js';
+import ModeRange from './Mode/Range.js';
 import ApiKalender from '../../api/factory/tempus/kalender.js';
 import draggable from '../../directives/draggable.js';
 import ApiStudiensemester from '../../api/factory/studiensemester.js';
@@ -33,6 +34,12 @@ export default {
 			rangeViewPreviewLink: Vue.computed(() => this.rangeViewPreviewLink),
 			showRaster: Vue.computed(() => this.showRaster),
 			teachingunits: Vue.computed(() => this.teachingunits),
+			rangeViewPresetsConfig: Vue.computed(() => {
+				return {
+					label: this.$p.t("LvPlan/view_specific_semester"),
+					presets: this.semesterRangePresets?.presets,
+				};
+			}),
 		};
 	},
 	inject: {
@@ -81,7 +88,7 @@ export default {
 		},
 		modes: {
 			type: Array,
-			default: () => ['week', 'month', 'tableList', 'multipleWeeks'],
+			default: () => ['week', 'month', 'tableList', 'multipleWeeks', 'range'],
 		},
 		getPromiseFunc: {
 			type: Function,
@@ -158,6 +165,7 @@ export default {
 				month: Vue.markRaw(ModeMonth),
 				tableList: Vue.markRaw(ModeTable),
 				multipleWeeks: Vue.markRaw(ModeMultipleWeeks),
+				range: Vue.markRaw(ModeRange),
 			},
 			modeOptions: {
 				day: {

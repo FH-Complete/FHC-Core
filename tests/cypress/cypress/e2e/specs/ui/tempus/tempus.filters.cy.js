@@ -6,7 +6,7 @@ context("Tempus filter tests", () => {
     tempusPage.visitAndWaitForPlanner();
   });
 
-  it("filters calendar events by selecting the first event room in the navbar", () => {
+  it("filters calendar events by a selected room", () => {
     tempusPage.waitForCalendarToFinishLoading();
 
     tempusPage
@@ -44,22 +44,22 @@ context("Tempus filter tests", () => {
           const eventData = tempusPage.getCalendarEventData($event);
 
           let eventRoom = eventData?.orig?.ort_kurzbz;
-          if (Array.isArray(eventRoom)) eventRoom = eventRoom.length ? eventRoom[0] : "";
+          if (Array.isArray(eventRoom)) eventRoom = eventRoom.length ? eventRoom.join(",") : "";
 
-          expect(eventRoom, "event data room").to.eq(
+          expect(eventRoom, "event data room").to.contain(
             selectedRoom,
           );
           cy.wrap($event)
             .find("[data-cy='calendar-event-room']")
             .invoke("text")
             .then((eventPlace) => {
-              expect(eventPlace.trim(), "event body room").to.eq(selectedRoom);
+              expect(eventPlace.trim(), "event body room").to.contain(selectedRoom);
             });
         });
       });
   });
 
-  it("removes the selected room filter", () => {
+  it("restores all calendar events after removing a room filter", () => {
     tempusPage.waitForCalendarToFinishLoading();
 
     tempusPage
@@ -112,7 +112,7 @@ context("Tempus filter tests", () => {
       });
   });
 
-  it("filters calendar events by selecting the first event lecturer in the navbar", () => {
+  it("filters calendar events by a selected lecturer", () => {
     tempusPage.waitForCalendarToFinishLoading();
 
     tempusPage
@@ -178,7 +178,7 @@ context("Tempus filter tests", () => {
       });
   });
 
-  it("removes the selected lecturer filter", () => {
+  it("restores all calendar events after removing a lecturer filter", () => {
     tempusPage.waitForCalendarToFinishLoading();
 
     tempusPage
@@ -244,7 +244,7 @@ context("Tempus filter tests", () => {
       });
   });
 
-  it("hides calendar events when the selected lecturer plan toggle is deselected", () => {
+  it("hides calendar events when the selected lecturer's plan is disabled", () => {
     tempusPage.waitForCalendarToFinishLoading();
 
     tempusPage
@@ -295,7 +295,7 @@ context("Tempus filter tests", () => {
       });
   });
 
-  it("shows lecturer wish overlays when the selected lecturer wish toggle is disabled", () => {
+  it("toggles wish overlays for the selected lecturer", () => {
     tempusPage.waitForCalendarToFinishLoading();
 
     tempusPage

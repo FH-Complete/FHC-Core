@@ -3,14 +3,18 @@ export default {
 		title:String,
 		vertretungsList:Array,
 		showBezeichnung:Boolean,
+		compact:{
+			type:Boolean,
+			default:false,
+		},
 	},
 	template:/*html*/`
-	<div class="card mb-3 border-0">
-		<div class="card-header">
-			<span>{{title}}</span>
+	<div :class="compact ? 'mb-2' : 'card mb-3 border-0'">
+		<div :class="compact ? '' : 'card-header'">
+			<span :class="compact ? 'fw-semibold' : ''">{{title}}</span>
 		</div>
-		<div class="card-body">
-			<p v-for="vertretung in vertretungsList">
+		<div :class="compact ? '' : 'card-body'">
+			<p v-for="vertretung in vertretungsList" :class="compact ? 'mb-0' : ''">
 				<a v-if="profilViewLink(vertretung.uid)" :href="profilViewLink(vertretung.uid)" :aria-label="$p.t('profil','profil')" :title="$p.t('profil','profil')">
 					<i class="me-2 fa fa-arrow-up-right-from-square fhc-primary-color" aria-hidden="true"></i>
 				</a>

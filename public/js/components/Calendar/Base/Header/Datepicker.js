@@ -51,6 +51,8 @@ export default {
 					return [this.convertedDate.startOf('day').ts, this.convertedDate.startOf('day').plus({ days: this.rangeLength }).ts - 1];	
 				case "week":
 					return [this.convertedDate.startOf('week', { useLocaleWeeks: true }).ts, this.convertedDate.endOf('week', { useLocaleWeeks: true }).ts];
+				case "range":
+					return [this.convertedDate.startOf('day').ts, this.convertedDate.startOf('day').plus({ days: this.rangeLength }).ts - 1];
 				case "tableList":
 					return [this.convertedDate.startOf('day').ts, (this.rangeEnd || this.convertedDate).endOf('day').ts];
 				case "day":
@@ -70,6 +72,8 @@ export default {
 				case "tableList":
 					const end = this.rangeEnd ? this.rangeEnd.setZone(this.timezone, { keepLocalTime: true }) : this.date;
 					return this.date.toLocaleString(luxon.DateTime.DATE_FULL) + '-' + end.toLocaleString(luxon.DateTime.DATE_FULL);
+				case "range":
+					return this.date.toLocaleString(luxon.DateTime.DATE_SHORT) + '-' + this.date.plus({ days: this.rangeLength - 1 }).toLocaleString(luxon.DateTime.DATE_SHORT);
 				case "list":
 					return this.date.toLocaleString(luxon.DateTime.DATE_FULL) + '-' + this.date.plus({ days: this.listLength - 1 }).toLocaleString(luxon.DateTime.DATE_FULL);
 				case "range":
@@ -90,6 +94,10 @@ export default {
 				return { autoRange: this.listLength - 1 };
 			} else if (["range", "tableList", "multipleWeeks"].includes(this.$props.mode)) {
 				return true;
+			} else if (this.$props.mode === "range") {
+				return true;
+			} else if (this.$props.mode === "tableList") {
+				return { partialRange: false };
 			} else {
 				return false;
 			}
@@ -145,7 +153,7 @@ export default {
 	<vue-date-picker
 		:model-value="current"
 		@update:model-value="update"
-		:format="() => title"
+		:format="() => ' ' + title"
 		:month-picker="mode == 'month'"
 		:week-picker="mode == 'week'"
 		:range="rangeConfig"

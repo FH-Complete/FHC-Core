@@ -21,7 +21,7 @@ export default {
 		studierendenantragId: Number,
 		infoArray: Array,
 		statusMsg: String,
-		statusSeverity: String
+		statusSeverity: String,
 	},
 	data() {
 		return {

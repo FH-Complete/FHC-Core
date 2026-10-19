@@ -98,6 +98,9 @@ export default {
 			modalActions: {
 				saveEventTime: (payload) => this.handleSaveEventTime(payload),
 				addToFilter: (filter, type) => this.addToFilter(filter, type),
+				goToEvent: ({datum}) => {
+					this.jumpToDate(datum);
+				}
 			},
 			reload: () => {
 				this.reload();
@@ -427,6 +430,22 @@ export default {
 			this.$refs.calendar.resetEventLoader();
 			if (this.lastRange) this.handleRange(this.lastRange);
 		},
+		jumpToDate(value) {
+			if (!value) return;
+
+			let zone = this.config.timezone;
+			let date = luxon.DateTime.fromSQL(value, { zone });
+			if (!date.isValid)
+				date = luxon.DateTime.fromISO(value, { zone });
+			if (!date.isValid)
+				return;
+
+			this.calendarDatesByMode = {
+				...this.calendarDatesByMode,
+				week: date.startOf('week').toISODate(),
+			};
+			this.currentMode = 'week';
+		},
 		jumpToKw(kw) {
 			const num = parseInt(kw);
 			if (!num) return;
@@ -541,7 +560,7 @@ export default {
 			}
 
 			if (response) {
-				response[0].then((result) => {
+				response[0].then(() =>  {
 					this.scrollToAndEmphasizeCurrentlyUpdatedCalendarEvent();
 				});
 			}
@@ -1032,9 +1051,6 @@ export default {
 					this.currentlyUpdatedEvent.eindeutige_kalender_gruppen_id,
 				);
 				const calendar = document.querySelector('.fhc-calendar-base-grid');
-				const eventRect = eventEl.getBoundingClientRect();
-
-				const offset = 300;
 
 				const isInsideScrolledView =
 					eventEl.offsetLeft < calendar.scrollLeft + calendar.clientWidth &&
@@ -1042,7 +1058,6 @@ export default {
 					eventEl.offsetTop < calendar.scrollTop + calendar.clientHeight &&
 					eventEl.offsetTop + eventEl.offsetHeight > calendar.scrollTop;
 
-				const rect = eventEl.getBoundingClientRect();
 				if (!isInsideScrolledView) {
 					eventEl.scrollIntoView({
 						behavior: 'smooth',

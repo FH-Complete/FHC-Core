@@ -86,7 +86,8 @@ export default {
 						this.pendingEvent.lehreinheit_id,
 						this.selectedRooms.map((room) => room.ort_kurzbz),
 						this.pendingEvent.start_time,
-						this.pendingEvent.end_time
+						this.pendingEvent.end_time,
+						false
 					)
 				).then((result) => result.data)
 
@@ -167,13 +168,13 @@ export default {
 				>
 				
 				<template #option="{ option }">
-					<div class="room-option">
+					<div class="room-option" data-cy="room-option">
 						<i class="fa-solid fa-door-open text-muted"></i>
 						<span v-if="option.raumtyp_kurzbz">
 							[{{ option.raumtyp_kurzbz }}]
 						</span>
 						<span v-else></span>
-						<span class="fw-semibold">
+						<span class="fw-semibold" data-cy="room-ort-kurzbz">
 							{{ option.ort_kurzbz }}
 						</span>
 						<span class="text-muted small text-nowrap">
@@ -199,13 +200,14 @@ export default {
 				></form-input>
 			
 				<div class="d-flex justify-content-end gap-2 mt-3">
-					<button type="button" class="btn btn-secondary" @click="hide">
+					<button type="button" class="btn btn-secondary" @click="hide" data-cy="closeRoomSelection">
 						{{ $p.t('ui','abbrechen') }}
 					</button>
 					<button
 						type="button"
 						class="btn btn-primary"
 						@click="confirm"
+						data-cy="saveRoomSelection"
 					>
 						{{ $p.t('global','speichern') }}
 					</button>

@@ -263,7 +263,7 @@ export default {
 			this.$refs[modalRef].hide();
 		},
 		reload() {
-			this.$refs.table.reloadTable();
+			this.$refs.table?.reloadTable();
 		},
 		searchFirma(event) {
 			if (this.abortController.firmen) {
@@ -317,7 +317,7 @@ export default {
 		<div class="stv-details-kontakt-contact h-100 pt-3">
 
 		<!--Modal: contactModal-->
-		<bs-modal ref="contactModal">
+		<bs-modal ref="contactModal" @hideBsModal.stop="">
 			<template #title>
 				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('person', 'kontakt_new')}}</p>
 				<p v-else class="fw-bold mt-3">{{$p.t('person', 'kontakt_edit')}}</p>

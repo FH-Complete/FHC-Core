@@ -111,6 +111,8 @@ require_once('dbupdate_3.4/78285_tempus_stundenraster.php');
 require_once('dbupdate_3.4/83437_kalender_notiz_tbl.php');
 require_once('dbupdate_3.4/54225_reihungstest_ablauf_fuer_quereinsteiger.php');
 require_once('dbupdate_3.4/77757_widgets_berechtigungen.php');
+require_once('dbupdate_3.4/77048_cis4_mitarbeiter_studstatus_widget.php');
+require_once('dbupdate_3.4/83538_cis4_employees.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
