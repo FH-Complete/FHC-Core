@@ -19332,6 +19332,86 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'priority_info_1',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Must Have: Unverzichtbare, kritische Aufgaben (Compliance, Sicherheit, Strategie), ohne die ein Vorhaben/Projekt scheitert. Bei Entwicklung: mindestens ein MVP.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Must Have: Essential, critical tasks (compliance, security, strategy) without which an initiative or project would fail. In terms of development, this includes at least an MVP.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'priority_info_2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Should Have: Wichtige Aufgaben - den Musts nachgestellt und nicht wettbewerbskritisch. Priorisierung nach Skalierbarkeit/Effizienzbeitrag.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Should Have: Important tasks - secondary to the must-haves and not critical to competitive advantage. Prioritized based on scalability or contribution to efficiency.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'priority_info_3',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Could have: Wünschenswert, aber geringe Priorität/Wichtigkeit.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Could Have: Desirable, but of low priority or importance.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'priority_info_4',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Won't have: Aktuell nicht relevant. Bleibt vorerst unbearbeitet und eventuell \"geparkt\" für später.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Won't Have: Not currently relevant. These remain unaddressed for the time being and may be \"parked\" for later consideration.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
     //*******************	KVP end
 	array(
 		'app' => 'international',
