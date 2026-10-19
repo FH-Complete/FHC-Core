@@ -78,7 +78,6 @@ export default {
 		},
 		axisParts() {
 			if (this.timeGrid) {
-				// create {start, end} array
 				return this.timeGrid.map(tu => {
 					return {
 						start: luxon.Duration.fromISOTime(tu.start),

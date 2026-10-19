@@ -101,7 +101,7 @@ export default {
 			this.$emit('resize-start', {
 				edge,
 				evt,
-				horizontal: this.mode === 'range',
+				horizontal: false,
 				el: this.$refs.eventEl,
 				event: this.event,
 			});

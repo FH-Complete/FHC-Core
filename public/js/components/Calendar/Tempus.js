@@ -443,7 +443,7 @@ export default {
 		show-btns
 		:draggable-events="isEventDraggingEnabled"
 		:resizable-events="isEventResizingEnabled"
-		:on-drop="isEventDraggingEnabled && ['week', 'multipleWeeks'].includes(currentMode) ? ondrop : null"
+		:on-drop="isEventDraggingEnabled && ['week', 'multipleWeeks', 'range'].includes(currentMode) ? ondrop : null"
 		:on-resize="isEventResizingEnabled ? onresize : null"
 		@update:date="handleDateUpdate"
 		@update:mode="(newMode, newDate) => { currentMode = newMode; $emit('update:mode', newMode, newDate) }"

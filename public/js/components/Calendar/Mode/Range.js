@@ -16,6 +16,9 @@ export default {
 		rangeViewPresetsConfig: {
 			default: {},
 		},
+		rangeViewPreviewLink: {
+			default: null,
+		},
 	},
 	props: {
 		currentDate: {
@@ -109,10 +112,21 @@ export default {
 					{{ preset.name }}
 				</option>
 			</form-input>
+			<a
+				v-if="rangeViewPreviewLink"
+				:href="rangeViewPreviewLink"
+				target="_blank"
+				rel="noopener"
+				class="btn btn-outline-secondary"
+				aria-label="Vorschau öffnen"
+				title="Vorschau öffnen"
+			>
+				<i class="fa-solid fa-eye"></i>
+			</a>
 		</div>
 		<div class="flex-grow-1">
 			<base-slider ref="slider" v-slot="slot">
-				<range-view ref="view" v-bind="viewAttrs()">
+				<range-view ref="view" v-bind="viewAttrs(slot.offset)">
 					<template v-slot="slot"><slot v-bind="slot" mode="range" /></template>
 				</range-view>
 			</base-slider>
