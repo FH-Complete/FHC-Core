@@ -1,8 +1,10 @@
 import DmsItem from './Dms/Item.js';
+import DmsPreview from './Dms/Preview.js';
 
 export default {
 	components: {
-		DmsItem
+		DmsItem,
+		DmsPreview
 	},
 	emits: [
 		'update:modelValue'
@@ -24,6 +26,21 @@ export default {
 		disabled: {
 			type: Boolean,
 			default: false
+		},
+		// shows the chosen images and pdfs below the input before the upload
+		preview: Boolean,
+		// small, medium, large or a css length like '400px'
+		previewHeight: {
+			type: String,
+			default: 'medium'
+		}
+	},
+	computed: {
+		previewFiles() {
+			if (!this.preview || !this.modelValue)
+				return [];
+			// stored dms files are json placeholders, they have no content to show
+			return Array.from(this.modelValue).filter(file => file instanceof File && file.type != 'application/x.fhc-dms+json');
 		}
 	},
 	methods: {
@@ -103,5 +120,6 @@ export default {
 				>
 			</dms-item>
 		</ul>
+		<dms-preview v-for="(file, index) in previewFiles" :key="index" :file="file" :height="previewHeight"></dms-preview>
 	</div>`
 }
