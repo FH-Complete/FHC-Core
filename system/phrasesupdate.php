@@ -63185,6 +63185,58 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
+		'phrase' => 'tooltipStudentEntschuldigungV3',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie können eine Entschuldigung für einen Zeitraum von bis zu {0} Tagen in die Vergangenheit und bis zum Ende des aktuellen Semesters hochladen.
+
+				Das Dokument muss denselben Zeitraum und dieselben Daten zeigen wie Ihre Angaben bei Von und Bis. Wenn der Zeitraum oder die Daten nicht übereinstimmen, lehnt die Studiengangsassistenz Ihre Entschuldigung ab.
+
+				Sobald Sie eine Entschuldigung hochladen, wird die zugehörige Studiengangsassistenz informiert und Ihr Anliegen überprüft. Solange Ihre Entschuldigung noch keinen akzeptierten oder abgelehnten Status erhalten hat, steht es Ihnen frei, diese inklusive Datei zu löschen. Sobald sie entweder akzeptiert oder abgelehnt wurde, können Sie den Eintrag nicht mehr löschen.
+
+				Bei einer akzeptierten Entschuldigung werden sämtliche digitalen Anwesenheiten in diesem Zeitraum als positiv gewertet. Eine abgelehnte Entschuldigung hat keine Auswirkungen auf Ihre Anwesenheitsquote.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You can upload an excuse note for a period of up to {0} days in the past and up to the end of the current semester.
+
+				The document must show the same period and the same dates as your entries in From and Until. If the period or the dates do not match, the study program assistant declines your excuse note.
+
+				As soon as you upload an excuse note, the responsible study program assistant is informed and reviews your request. As long as your excuse note is not accepted or declined, you can delete it together with its file. After it is accepted or declined, you can no longer delete the entry.
+
+				If an excuse note is accepted, all digital attendances in this period count as positive. A declined excuse note has no effect on your attendance rate.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entInfoTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hinweise zur Entschuldigung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Information on excuse notes',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
 		'phrase' => 'tooltipLektorStartKontrolleV5',
 		'insertvon' => 'system',
 		'phrases' => array(
