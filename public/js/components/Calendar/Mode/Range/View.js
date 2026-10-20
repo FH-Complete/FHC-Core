@@ -80,10 +80,11 @@ export default {
 		daysGroupedByWeek() {
 			const focusDayStartOfWeek = this.$props.day.startOf('week');
 			const prefixedDaysCount = this.$props.day.weekday - 1;
-			let rangeLength = this.$props.rangeLength + prefixedDaysCount;
-			rangeLength = rangeLength + (7 - (rangeLength % 7));
 
-			let axisMain = Array.from({ length: rangeLength }, (e, i) =>
+			const totalDays =
+				Math.ceil((this.$props.rangeLength + prefixedDaysCount) / 7) * 7;
+
+			let axisMain = Array.from({ length: totalDays }, (e, i) =>
 				focusDayStartOfWeek.plus({ days: i }),
 			);
 

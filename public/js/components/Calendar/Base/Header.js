@@ -64,7 +64,7 @@ export default {
 						:class="{active: mode === 'range'}"
 						@click="clickMode($event, 'range')"
 					>
-						<i class="fa-regular fa-calendar-days"></i>
+						<i class="fa-regular fa-calendar"></i>
 					</button>
 					<button
 						v-if="btnMonth"
