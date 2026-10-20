@@ -1,356 +1,370 @@
-import { waitForOk } from "../../../../support/helpers/network";
-import { tempusPage } from "../../../../support/pages/tempus.po";
+import { waitForOk } from '../../../../support/helpers/network';
+import { tempusPage } from '../../../../support/pages/tempus.po';
+import { tempusApi } from '../../../../support/api/tempusApi';
 
-context("Tempus filter tests", () => {
-  beforeEach(() => {
-    tempusPage.visitAndWaitForPlanner();
-  });
+context('Tempus filter tests', () => {
+	before(() => {
+		cy.login();
 
-  it("filters calendar events by a selected room", () => {
-    tempusPage.waitForCalendarToFinishLoading();
+		let settingsData = tempusApi.getSettingsData();
+		settingsData.ignore_kollision = true;
+		settingsData.roomless_planning = false;
+		settingsData.room_planning = 'dialog_room_planning';
+		tempusApi.updateSettingsData(settingsData);
+	});
 
-    tempusPage
-      .getCalendarEventsWithRoom()
-      .first()
-      .invoke("attr", "data-fhc-draggable-value")
-      .then((eventJSON) => {
-        expect(eventJSON).to.exist;
+	beforeEach(() => {
+		tempusPage.visitAndWaitForPlanner();
+	});
 
-        let selectedRoom = JSON.parse(eventJSON)?.orig?.ort_kurzbz;
-        if (Array.isArray(selectedRoom)) selectedRoom = selectedRoom.length ? selectedRoom[0] : "";
+	it('filters calendar events by a selected room', () => {
+		tempusPage.waitForCalendarToFinishLoading();
 
-        expect(selectedRoom, "first event room").to.be.a("string").and.not.be
-          .empty;
-        expect(
-          selectedRoom.length,
-          "room search query length",
-        ).to.be.greaterThan(1);
+		tempusPage
+			.getCalendarEventsWithRoom()
+			.first()
+			.invoke('attr', 'data-fhc-draggable-value')
+			.then((eventJSON) => {
+				expect(eventJSON).to.exist;
 
-        tempusPage.getNavbarSearchInput().clear().type(selectedRoom, {
-          parseSpecialCharSequences: false,
-        });
-        waitForOk("@searchbarSearch");
+				let selectedRoom = JSON.parse(eventJSON)?.orig?.ort_kurzbz;
+				if (Array.isArray(selectedRoom))
+					selectedRoom = selectedRoom.length ? selectedRoom[0] : '';
 
-        tempusPage
-          .getNavbarRoomSearchResult(selectedRoom)
-          .should("be.visible")
-          .click();
-        waitForOk("@fetchPlanData");
-        tempusPage.waitForCalendarToFinishLoading();
+				expect(selectedRoom, 'first event room').to.be.a('string').and.not.be
+					.empty;
+				expect(
+					selectedRoom.length,
+					'room search query length',
+				).to.be.greaterThan(1);
 
-        tempusPage.getSelectedRoomIndicator(selectedRoom).should("be.visible");
-        tempusPage.getCalendarEvents().should("have.length.greaterThan", 0);
-        tempusPage.getCalendarEvents().each(($event) => {
-          const eventData = tempusPage.getCalendarEventData($event);
+				tempusPage.getNavbarSearchInput().clear().type(selectedRoom, {
+					parseSpecialCharSequences: false,
+				});
+				waitForOk('@searchbarSearch');
 
-          let eventRoom = eventData?.orig?.ort_kurzbz;
-          if (Array.isArray(eventRoom)) eventRoom = eventRoom.length ? eventRoom.join(",") : "";
+				tempusPage
+					.getNavbarRoomSearchResult(selectedRoom)
+					.should('be.visible')
+					.click();
+				waitForOk('@fetchPlanData');
+				tempusPage.waitForCalendarToFinishLoading();
 
-          expect(eventRoom, "event data room").to.contain(
-            selectedRoom,
-          );
-          cy.wrap($event)
-            .find("[data-cy='calendar-event-room']")
-            .invoke("text")
-            .then((eventPlace) => {
-              expect(eventPlace.trim(), "event body room").to.contain(selectedRoom);
-            });
-        });
-      });
-  });
+				tempusPage.getSelectedRoomIndicator(selectedRoom).should('be.visible');
+				tempusPage.getCalendarEvents().should('have.length.greaterThan', 0);
+				tempusPage.getCalendarEvents().each(($event) => {
+					const eventData = tempusPage.getCalendarEventData($event);
 
-  it("restores all calendar events after removing a room filter", () => {
-    tempusPage.waitForCalendarToFinishLoading();
+					let eventRoom = eventData?.orig?.ort_kurzbz;
+					if (Array.isArray(eventRoom))
+						eventRoom = eventRoom.length ? eventRoom.join(',') : '';
 
-    tempusPage
-      .getCalendarEventsWithRoom()
-      .first()
-      .invoke("attr", "data-fhc-draggable-value")
-      .then((eventJSON) => {
-        expect(eventJSON).to.exist;
+					expect(eventRoom, 'event data room').to.contain(selectedRoom);
+					cy.wrap($event)
+						.find("[data-cy='calendar-event-room']")
+						.invoke('text')
+						.then((eventPlace) => {
+							expect(eventPlace.trim(), 'event body room').to.contain(
+								selectedRoom,
+							);
+						});
+				});
+			});
+	});
 
-        let selectedRoom = JSON.parse(eventJSON)?.orig?.ort_kurzbz;
-        if (Array.isArray(selectedRoom)) selectedRoom = selectedRoom.length ? selectedRoom[0] : "";
+	it('restores all calendar events after removing a room filter', () => {
+		tempusPage.waitForCalendarToFinishLoading();
 
-        expect(selectedRoom, "first event room").to.be.a("string").and.not.be
-          .empty;
-        expect(
-          selectedRoom.length,
-          "room search query length",
-        ).to.be.greaterThan(1);
+		tempusPage
+			.getCalendarEventsWithRoom()
+			.first()
+			.invoke('attr', 'data-fhc-draggable-value')
+			.then((eventJSON) => {
+				expect(eventJSON).to.exist;
 
-        tempusPage.getCalendarEvents().then(($events) => {
-          const originalEventCount = $events.length;
-          cy.wrap(originalEventCount).as("originalEventCount");
-        });
+				let selectedRoom = JSON.parse(eventJSON)?.orig?.ort_kurzbz;
+				if (Array.isArray(selectedRoom))
+					selectedRoom = selectedRoom.length ? selectedRoom[0] : '';
 
-        tempusPage.getNavbarSearchInput().clear().type(selectedRoom, {
-          parseSpecialCharSequences: false,
-        });
-        waitForOk("@searchbarSearch");
+				expect(selectedRoom, 'first event room').to.be.a('string').and.not.be
+					.empty;
+				expect(
+					selectedRoom.length,
+					'room search query length',
+				).to.be.greaterThan(1);
 
-        tempusPage
-          .getNavbarRoomSearchResult(selectedRoom)
-          .should("be.visible")
-          .click();
-        waitForOk("@fetchPlanData");
-        tempusPage.waitForCalendarToFinishLoading();
+				tempusPage.getCalendarEvents().then(($events) => {
+					const originalEventCount = $events.length;
+					cy.wrap(originalEventCount).as('originalEventCount');
+				});
 
-        tempusPage.getSelectedRoomIndicator(selectedRoom).should("be.visible");
-        tempusPage.getCalendarEvents().should("have.length.greaterThan", 0);
+				tempusPage.getNavbarSearchInput().clear().type(selectedRoom, {
+					parseSpecialCharSequences: false,
+				});
+				waitForOk('@searchbarSearch');
 
-        tempusPage.getSelectedRoomRemoveButton(selectedRoom).first().click();
-        waitForOk("@fetchPlanData");
-        tempusPage.waitForCalendarToFinishLoading();
+				tempusPage
+					.getNavbarRoomSearchResult(selectedRoom)
+					.should('be.visible')
+					.click();
+				waitForOk('@fetchPlanData');
+				tempusPage.waitForCalendarToFinishLoading();
 
-        tempusPage.getSelectedRoomIndicator(selectedRoom).should("not.exist");
-        cy.get("@originalEventCount").then((originalEventCount) => {
-          tempusPage
-            .getCalendarEvents()
-            .should("have.length", originalEventCount);
-        });
-      });
-  });
+				tempusPage.getSelectedRoomIndicator(selectedRoom).should('be.visible');
+				tempusPage.getCalendarEvents().should('have.length.greaterThan', 0);
 
-  it("filters calendar events by a selected lecturer", () => {
-    tempusPage.waitForCalendarToFinishLoading();
+				tempusPage.getSelectedRoomRemoveButton(selectedRoom).first().click();
+				waitForOk('@fetchPlanData');
+				tempusPage.waitForCalendarToFinishLoading();
 
-    tempusPage
-      .getCalendarEventsWithLecturer()
-      .first()
-      .invoke("attr", "data-fhc-draggable-value")
-      .then((eventJSON) => {
-        expect(eventJSON).to.exist;
+				tempusPage.getSelectedRoomIndicator(selectedRoom).should('not.exist');
+				cy.get('@originalEventCount').then((originalEventCount) => {
+					tempusPage
+						.getCalendarEvents()
+						.should('have.length', originalEventCount);
+				});
+			});
+	});
 
-        const selectedLecturer = tempusPage.getFirstLecturer(
-          JSON.parse(eventJSON),
-        );
-        expect(selectedLecturer?.kurzbz, "first event lecturer").to.exist;
+	it('filters calendar events by a selected lecturer', () => {
+		tempusPage.waitForCalendarToFinishLoading();
 
-        const lecturerSearch =
-          selectedLecturer.mitarbeiter_uid ??
-          selectedLecturer.uid ??
-          selectedLecturer.kurzbz;
-        expect(lecturerSearch, "lecturer search query").to.be.a("string").and
-          .not.be.empty;
+		tempusPage
+			.getCalendarEventsWithLecturer()
+			.first()
+			.invoke('attr', 'data-fhc-draggable-value')
+			.then((eventJSON) => {
+				expect(eventJSON).to.exist;
 
-        tempusPage.getNavbarSearchInput().clear().type(lecturerSearch, {
-          parseSpecialCharSequences: false,
-        });
-        waitForOk("@searchbarSearch");
+				const selectedLecturer = tempusPage.getFirstLecturer(
+					JSON.parse(eventJSON),
+				);
+				expect(selectedLecturer?.kurzbz, 'first event lecturer').to.exist;
 
-        tempusPage
-          .getFirstNavbarEmployeeSearchResult()
-          .should("be.visible")
-          .invoke("text")
-          .then((lecturerName) => {
-            const selectedLecturerName = lecturerName.trim();
+				const lecturerSearch =
+					selectedLecturer.mitarbeiter_uid ??
+					selectedLecturer.uid ??
+					selectedLecturer.kurzbz;
+				expect(lecturerSearch, 'lecturer search query').to.be.a('string').and
+					.not.be.empty;
 
-            tempusPage.getFirstNavbarEmployeeSearchResult().click();
-            waitForOk("@fetchPlanData");
-            tempusPage.waitForCalendarToFinishLoading();
+				tempusPage.getNavbarSearchInput().clear().type(lecturerSearch, {
+					parseSpecialCharSequences: false,
+				});
+				waitForOk('@searchbarSearch');
 
-            tempusPage
-              .getSelectedLecturerIndicator(selectedLecturerName)
-              .should("be.visible");
-            tempusPage.getCalendarEvents().should("have.length.greaterThan", 0);
-            tempusPage.getCalendarEvents().each(($event) => {
-              const eventData = tempusPage.getCalendarEventData($event);
-              const eventLecturers = eventData?.orig?.lektor ?? [];
+				tempusPage
+					.getFirstNavbarEmployeeSearchResult()
+					.should('be.visible')
+					.invoke('text')
+					.then((lecturerName) => {
+						const selectedLecturerName = lecturerName.trim();
 
-              expect(
-                eventLecturers.map((lecturer) => lecturer.kurzbz),
-                "event data lecturers",
-              ).to.include(selectedLecturer.kurzbz);
-              cy.wrap($event)
-                .find(".event-lectors")
-                .then(($lecturers) => {
-                  const bodyLecturers = [...$lecturers].map((lecturer) =>
-                    lecturer.innerText.trim(),
-                  );
+						tempusPage.getFirstNavbarEmployeeSearchResult().click();
+						waitForOk('@fetchPlanData');
+						tempusPage.waitForCalendarToFinishLoading();
 
-                  expect(bodyLecturers, "event body lecturers").to.include(
-                    selectedLecturer.kurzbz,
-                  );
-                });
-            });
-          });
-      });
-  });
+						tempusPage
+							.getSelectedLecturerIndicator(selectedLecturerName)
+							.should('be.visible');
+						tempusPage.getCalendarEvents().should('have.length.greaterThan', 0);
+						tempusPage.getCalendarEvents().each(($event) => {
+							const eventData = tempusPage.getCalendarEventData($event);
+							const eventLecturers = eventData?.orig?.lektor ?? [];
 
-  it("restores all calendar events after removing a lecturer filter", () => {
-    tempusPage.waitForCalendarToFinishLoading();
+							expect(
+								eventLecturers.map((lecturer) => lecturer.kurzbz),
+								'event data lecturers',
+							).to.include(selectedLecturer.kurzbz);
+							cy.wrap($event)
+								.find('.event-lectors')
+								.then(($lecturers) => {
+									const bodyLecturers = [...$lecturers].map((lecturer) =>
+										lecturer.innerText.trim(),
+									);
 
-    tempusPage
-      .getCalendarEventsWithLecturer()
-      .first()
-      .invoke("attr", "data-fhc-draggable-value")
-      .then((eventJSON) => {
-        expect(eventJSON).to.exist;
+									expect(bodyLecturers, 'event body lecturers').to.include(
+										selectedLecturer.kurzbz,
+									);
+								});
+						});
+					});
+			});
+	});
 
-        const selectedLecturer = tempusPage.getFirstLecturer(
-          JSON.parse(eventJSON),
-        );
-        expect(selectedLecturer?.kurzbz, "first event lecturer").to.exist;
+	it('restores all calendar events after removing a lecturer filter', () => {
+		tempusPage.waitForCalendarToFinishLoading();
 
-        const lecturerSearch =
-          selectedLecturer.mitarbeiter_uid ??
-          selectedLecturer.uid ??
-          selectedLecturer.kurzbz;
-        expect(lecturerSearch, "lecturer search query").to.be.a("string").and
-          .not.be.empty;
+		tempusPage
+			.getCalendarEventsWithLecturer()
+			.first()
+			.invoke('attr', 'data-fhc-draggable-value')
+			.then((eventJSON) => {
+				expect(eventJSON).to.exist;
 
-        tempusPage.getCalendarEvents().then(($events) => {
-          const originalEventCount = $events.length;
-          cy.wrap(originalEventCount).as("originalEventCount");
-        });
+				const selectedLecturer = tempusPage.getFirstLecturer(
+					JSON.parse(eventJSON),
+				);
+				expect(selectedLecturer?.kurzbz, 'first event lecturer').to.exist;
 
-        tempusPage.getNavbarSearchInput().clear().type(lecturerSearch, {
-          parseSpecialCharSequences: false,
-        });
-        waitForOk("@searchbarSearch");
+				const lecturerSearch =
+					selectedLecturer.mitarbeiter_uid ??
+					selectedLecturer.uid ??
+					selectedLecturer.kurzbz;
+				expect(lecturerSearch, 'lecturer search query').to.be.a('string').and
+					.not.be.empty;
 
-        tempusPage
-          .getFirstNavbarEmployeeSearchResult()
-          .should("be.visible")
-          .invoke("text")
-          .then((lecturerName) => {
-            const selectedLecturerName = lecturerName.trim();
+				tempusPage.getCalendarEvents().then(($events) => {
+					const originalEventCount = $events.length;
+					cy.wrap(originalEventCount).as('originalEventCount');
+				});
 
-            tempusPage.getFirstNavbarEmployeeSearchResult().click();
-            waitForOk("@fetchPlanData");
-            tempusPage.waitForCalendarToFinishLoading();
+				tempusPage.getNavbarSearchInput().clear().type(lecturerSearch, {
+					parseSpecialCharSequences: false,
+				});
+				waitForOk('@searchbarSearch');
 
-            tempusPage
-              .getSelectedLecturerIndicator(selectedLecturerName)
-              .should("be.visible");
-            tempusPage.getCalendarEvents().should("have.length.greaterThan", 0);
+				tempusPage
+					.getFirstNavbarEmployeeSearchResult()
+					.should('be.visible')
+					.invoke('text')
+					.then((lecturerName) => {
+						const selectedLecturerName = lecturerName.trim();
 
-            tempusPage
-              .getSelectedLecturerRemoveButton(selectedLecturerName)
-              .click();
-            waitForOk("@fetchPlanData");
-            tempusPage.waitForCalendarToFinishLoading();
+						tempusPage.getFirstNavbarEmployeeSearchResult().click();
+						waitForOk('@fetchPlanData');
+						tempusPage.waitForCalendarToFinishLoading();
 
-            tempusPage
-              .getSelectedLecturerIndicator(selectedLecturerName)
-              .should("not.exist");
-            cy.get("@originalEventCount").then((originalEventCount) => {
-              tempusPage
-                .getCalendarEvents()
-                .should("have.length", originalEventCount);
-            });
-          });
-      });
-  });
+						tempusPage
+							.getSelectedLecturerIndicator(selectedLecturerName)
+							.should('be.visible');
+						tempusPage.getCalendarEvents().should('have.length.greaterThan', 0);
 
-  it("hides calendar events when the selected lecturer's plan is disabled", () => {
-    tempusPage.waitForCalendarToFinishLoading();
+						tempusPage
+							.getSelectedLecturerRemoveButton(selectedLecturerName)
+							.click();
+						waitForOk('@fetchPlanData');
+						tempusPage.waitForCalendarToFinishLoading();
 
-    tempusPage
-      .getCalendarEventsWithLecturer()
-      .first()
-      .invoke("attr", "data-fhc-draggable-value")
-      .then((eventJSON) => {
-        expect(eventJSON).to.exist;
+						tempusPage
+							.getSelectedLecturerIndicator(selectedLecturerName)
+							.should('not.exist');
+						cy.get('@originalEventCount').then((originalEventCount) => {
+							tempusPage
+								.getCalendarEvents()
+								.should('have.length', originalEventCount);
+						});
+					});
+			});
+	});
 
-        const selectedLecturer = tempusPage.getFirstLecturer(
-          JSON.parse(eventJSON),
-        );
-        expect(selectedLecturer?.kurzbz, "first event lecturer").to.exist;
+	it("hides calendar events when the selected lecturer's plan is disabled", () => {
+		tempusPage.waitForCalendarToFinishLoading();
 
-        const lecturerSearch =
-          selectedLecturer.mitarbeiter_uid ??
-          selectedLecturer.uid ??
-          selectedLecturer.kurzbz;
-        expect(lecturerSearch, "lecturer search query").to.be.a("string").and
-          .not.be.empty;
+		tempusPage
+			.getCalendarEventsWithLecturer()
+			.first()
+			.invoke('attr', 'data-fhc-draggable-value')
+			.then((eventJSON) => {
+				expect(eventJSON).to.exist;
 
-        tempusPage.getNavbarSearchInput().clear().type(lecturerSearch, {
-          parseSpecialCharSequences: false,
-        });
-        waitForOk("@searchbarSearch");
+				const selectedLecturer = tempusPage.getFirstLecturer(
+					JSON.parse(eventJSON),
+				);
+				expect(selectedLecturer?.kurzbz, 'first event lecturer').to.exist;
 
-        tempusPage
-          .getFirstNavbarEmployeeSearchResult()
-          .should("be.visible")
-          .invoke("text")
-          .then((lecturerName) => {
-            const selectedLecturerName = lecturerName.trim();
+				const lecturerSearch =
+					selectedLecturer.mitarbeiter_uid ??
+					selectedLecturer.uid ??
+					selectedLecturer.kurzbz;
+				expect(lecturerSearch, 'lecturer search query').to.be.a('string').and
+					.not.be.empty;
 
-            tempusPage.getFirstNavbarEmployeeSearchResult().click();
-            waitForOk("@fetchPlanData");
-            tempusPage.waitForCalendarToFinishLoading();
+				tempusPage.getNavbarSearchInput().clear().type(lecturerSearch, {
+					parseSpecialCharSequences: false,
+				});
+				waitForOk('@searchbarSearch');
 
-            tempusPage
-              .getSelectedLecturerIndicator(selectedLecturerName)
-              .should("be.visible");
-            tempusPage.getCalendarEvents().should("have.length.greaterThan", 0);
+				tempusPage
+					.getFirstNavbarEmployeeSearchResult()
+					.should('be.visible')
+					.invoke('text')
+					.then((lecturerName) => {
+						const selectedLecturerName = lecturerName.trim();
 
-            tempusPage
-              .getSelectedLecturerPlanToggle(selectedLecturerName)
-              .click();
-            tempusPage.getCalendarEvents().should("not.exist");
-          });
-      });
-  });
+						tempusPage.getFirstNavbarEmployeeSearchResult().click();
+						waitForOk('@fetchPlanData');
+						tempusPage.waitForCalendarToFinishLoading();
 
-  it("toggles wish overlays for the selected lecturer", () => {
-    tempusPage.waitForCalendarToFinishLoading();
+						tempusPage
+							.getSelectedLecturerIndicator(selectedLecturerName)
+							.should('be.visible');
+						tempusPage.getCalendarEvents().should('have.length.greaterThan', 0);
 
-    tempusPage
-      .getCalendarEventsWithLecturer()
-      .first()
-      .invoke("attr", "data-fhc-draggable-value")
-      .then((eventJSON) => {
-        expect(eventJSON).to.exist;
+						tempusPage
+							.getSelectedLecturerPlanToggle(selectedLecturerName)
+							.click();
+						tempusPage.getCalendarEvents().should('not.exist');
+					});
+			});
+	});
 
-        const selectedLecturer = tempusPage.getFirstLecturer(
-          JSON.parse(eventJSON),
-        );
-        expect(selectedLecturer?.kurzbz, "first event lecturer").to.exist;
+	it('toggles wish overlays for the selected lecturer', () => {
+		tempusPage.waitForCalendarToFinishLoading();
 
-        const lecturerSearch =
-          selectedLecturer.mitarbeiter_uid ??
-          selectedLecturer.uid ??
-          selectedLecturer.kurzbz;
-        expect(lecturerSearch, "lecturer search query").to.be.a("string").and
-          .not.be.empty;
+		tempusPage
+			.getCalendarEventsWithLecturer()
+			.first()
+			.invoke('attr', 'data-fhc-draggable-value')
+			.then((eventJSON) => {
+				expect(eventJSON).to.exist;
 
-        tempusPage.getNavbarSearchInput().clear().type(lecturerSearch, {
-          parseSpecialCharSequences: false,
-        });
-        waitForOk("@searchbarSearch");
+				const selectedLecturer = tempusPage.getFirstLecturer(
+					JSON.parse(eventJSON),
+				);
+				expect(selectedLecturer?.kurzbz, 'first event lecturer').to.exist;
 
-        tempusPage
-          .getFirstNavbarEmployeeSearchResult()
-          .should("be.visible")
-          .invoke("text")
-          .then((lecturerName) => {
-            const selectedLecturerName = lecturerName.trim();
+				const lecturerSearch =
+					selectedLecturer.mitarbeiter_uid ??
+					selectedLecturer.uid ??
+					selectedLecturer.kurzbz;
+				expect(lecturerSearch, 'lecturer search query').to.be.a('string').and
+					.not.be.empty;
 
-            tempusPage.getFirstNavbarEmployeeSearchResult().click();
-            waitForOk("@fetchPlanData");
+				tempusPage.getNavbarSearchInput().clear().type(lecturerSearch, {
+					parseSpecialCharSequences: false,
+				});
+				waitForOk('@searchbarSearch');
 
-            tempusPage.waitForCalendarToFinishLoading();
+				tempusPage
+					.getFirstNavbarEmployeeSearchResult()
+					.should('be.visible')
+					.invoke('text')
+					.then((lecturerName) => {
+						const selectedLecturerName = lecturerName.trim();
 
-            tempusPage
-              .getSelectedLecturerIndicator(selectedLecturerName)
-              .should("be.visible");
-            tempusPage
-              .getSelectedLecturerWishToggle(selectedLecturerName)
-              .should("be.visible")
-              .click();
-            tempusPage.getLecturerWishOverlays().should("have.length", 0);
+						tempusPage.getFirstNavbarEmployeeSearchResult().click();
+						waitForOk('@fetchPlanData');
 
-            tempusPage
-              .getSelectedLecturerWishToggle(selectedLecturerName)
-              .should("be.visible")
-              .click();
-            tempusPage
-              .getLecturerWishOverlays()
-              .should("have.length.greaterThan", 0);
-          });
-      });
-  });
+						tempusPage.waitForCalendarToFinishLoading();
+
+						tempusPage
+							.getSelectedLecturerIndicator(selectedLecturerName)
+							.should('be.visible');
+						tempusPage
+							.getSelectedLecturerWishToggle(selectedLecturerName)
+							.should('be.visible')
+							.click();
+						tempusPage.getLecturerWishOverlays().should('have.length', 0);
+
+						tempusPage
+							.getSelectedLecturerWishToggle(selectedLecturerName)
+							.should('be.visible')
+							.click();
+						tempusPage
+							.getLecturerWishOverlays()
+							.should('have.length.greaterThan', 0);
+					});
+			});
+	});
 });

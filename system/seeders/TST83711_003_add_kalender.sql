@@ -30,14 +30,14 @@ VALUES
 -- Calendar setup for event drag and drop tests
 INSERT INTO lehre.tbl_kalender
 (von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '08:00:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '08:45:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '08:45:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '09:30:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '09:40:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '10:25:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '10:25:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '11:10:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '09:40:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '10:25:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '09:40:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '10:25:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '10:25:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '11:10:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '10:25:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '11:10:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
+(get_current_week_timestamp(2, '08:00:00', INTERVAL '+02:00'), get_current_week_timestamp(2, '08:45:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(2, '08:45:00', INTERVAL '+02:00'), get_current_week_timestamp(2, '09:30:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(2, '09:40:00', INTERVAL '+02:00'), get_current_week_timestamp(2, '10:25:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(2, '10:25:00', INTERVAL '+02:00'), get_current_week_timestamp(2, '11:10:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(2, '09:40:00', INTERVAL '+02:00'), get_current_week_timestamp(2, '10:25:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(2, '09:40:00', INTERVAL '+02:00'), get_current_week_timestamp(2, '10:25:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(2, '10:25:00', INTERVAL '+02:00'), get_current_week_timestamp(2, '11:10:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(2, '10:25:00', INTERVAL '+02:00'), get_current_week_timestamp(2, '11:10:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
 ;
 
 INSERT INTO lehre.tbl_kalender_ort
@@ -61,10 +61,14 @@ VALUES
 -- Calendar setup for resize tests
 INSERT INTO lehre.tbl_kalender
 (von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '08:00:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '08:45:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '10:25:00', date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '11:10:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '10:25:00', date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '11:10:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
+(get_current_week_timestamp(3, '08:00:00', INTERVAL '+02:00'), get_current_week_timestamp(3, '08:45:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(3, '10:25:00', INTERVAL '+02:00'), get_current_week_timestamp(3, '11:10:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(3, '10:25:00', INTERVAL '+02:00'), get_current_week_timestamp(3, '11:10:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
 ;
+
+INSERT INTO lehre.tbl_kalender_ort
+(location, ort_kurzbz, kalender_id)
+VALUES(NULL, 'Bro_F7.39', 9);
 
 INSERT INTO lehre.tbl_kalender_lehreinheit
 (lehreinheit_id, kalender_id)
@@ -78,12 +82,12 @@ VALUES
 -- Calendar setup for role preview tests
 INSERT INTO lehre.tbl_kalender
 (von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '13:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '13:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '13:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '13:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '13:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '13:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
+(get_current_week_timestamp(3, '13:35:00', INTERVAL '+02:00'), get_current_week_timestamp(3, '14:20:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(3, '13:35:00', INTERVAL '+02:00'), get_current_week_timestamp(3, '14:20:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(3, '13:35:00', INTERVAL '+02:00'), get_current_week_timestamp(3, '14:20:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(3, '13:35:00', INTERVAL '+02:00'), get_current_week_timestamp(3, '14:20:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(3, '13:35:00', INTERVAL '+02:00'), get_current_week_timestamp(3, '14:20:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(3, '13:35:00', INTERVAL '+02:00'), get_current_week_timestamp(3, '14:20:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
 ;
 
 INSERT INTO lehre.tbl_kalender_lehreinheit
@@ -100,8 +104,8 @@ VALUES
 -- Calendar setup for API event creation tests
 INSERT INTO lehre.tbl_kalender
 (von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '18:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '19:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '18:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '19:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
+(get_current_week_timestamp(2, '18:35:00', INTERVAL '+02:00'), get_current_week_timestamp(2, '19:20:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(3, '18:35:00', INTERVAL '+02:00'), get_current_week_timestamp(3, '19:20:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
 ;
 
 INSERT INTO lehre.tbl_kalender_lehreinheit
@@ -116,17 +120,17 @@ VALUES
 INSERT INTO lehre.tbl_kalender
 (von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon)
 VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '1 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '1 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '20:15:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '21:00:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '20:15:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '21:00:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '20:15:00', date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '21:00:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '5 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '5 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '5 day' + TIME '20:15:00', date_trunc('week', CURRENT_DATE) + INTERVAL '5 day' + TIME '21:00:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '5 day' + TIME '20:15:00', date_trunc('week', CURRENT_DATE) + INTERVAL '5 day' + TIME '21:00:00', 'reservierung', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
+(get_current_week_timestamp(1, '19:30:00', INTERVAL '+02:00'), get_current_week_timestamp(1, '20:15:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(2, '19:30:00', INTERVAL '+02:00'), get_current_week_timestamp(2, '20:15:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(2, '20:15:00', INTERVAL '+02:00'), get_current_week_timestamp(2, '21:00:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(3, '19:30:00', INTERVAL '+02:00'), get_current_week_timestamp(3, '20:15:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(3, '20:15:00', INTERVAL '+02:00'), get_current_week_timestamp(3, '21:00:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(4, '19:30:00', INTERVAL '+02:00'), get_current_week_timestamp(4, '20:15:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(4, '19:30:00', INTERVAL '+02:00'), get_current_week_timestamp(4, '20:15:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(4, '20:15:00', INTERVAL '+02:00'), get_current_week_timestamp(4, '21:00:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(5, '19:30:00', INTERVAL '+02:00'), get_current_week_timestamp(5, '20:15:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(5, '20:15:00', INTERVAL '+02:00'), get_current_week_timestamp(5, '21:00:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(5, '20:15:00', INTERVAL '+02:00'), get_current_week_timestamp(5, '21:00:00', INTERVAL '+02:00'), 'reservierung', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
 ;
 
 INSERT INTO lehre.tbl_kalender_ort
@@ -155,8 +159,8 @@ VALUES
 -- Calendar setup for Stundenraster disabled tests
 INSERT INTO lehre.tbl_kalender
 (von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '11:20:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '12:05:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '11:20:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '12:05:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
+(get_current_week_timestamp(2, '11:20:00', INTERVAL '+02:00'), get_current_week_timestamp(2, '12:05:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(2, '11:20:00', INTERVAL '+02:00'), get_current_week_timestamp(2, '12:05:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
 ;
 
 INSERT INTO lehre.tbl_kalender_lehreinheit
@@ -171,10 +175,10 @@ VALUES
 INSERT INTO lehre.tbl_kalender
 (von, bis, typ, status_kurzbz, vorgaenger_kalender_id, eindeutige_kalender_gruppen_id, insertamum, insertvon, updateamum, updatevon)
 VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, 'ec1bd001-facf-4b21-a671-bcb2d4f037fd', now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '20:15:00', date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '21:00:00', 'lehreinheit', 'live', NULL, 'ec2bd001-facf-4b21-a671-bcb2d4f037fd', now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '17:50:00', date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '18:35:00', 'lehreinheit', 'live', NULL, 'ec3bd001-facf-4b21-a671-bcb2d4f037fd', now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '18:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '19:20:00', 'lehreinheit', 'live', NULL, 'ec4bd001-facf-4b21-a671-bcb2d4f037fd', now(), 'demoadmin', NULL, 'demoadmin')
+(get_current_week_timestamp(6, '19:30:00', INTERVAL '+02:00'), get_current_week_timestamp(6, '20:15:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, 'ec1bd001-facf-4b21-a671-bcb2d4f037fd', now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(6, '20:15:00', INTERVAL '+02:00'), get_current_week_timestamp(6, '21:00:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, 'ec2bd001-facf-4b21-a671-bcb2d4f037fd', now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(6, '17:50:00', INTERVAL '+02:00'), get_current_week_timestamp(6, '18:35:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, 'ec3bd001-facf-4b21-a671-bcb2d4f037fd', now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(6, '18:35:00', INTERVAL '+02:00'), get_current_week_timestamp(6, '19:20:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, 'ec4bd001-facf-4b21-a671-bcb2d4f037fd', now(), 'demoadmin', NULL, 'demoadmin')
 ;
 
 INSERT INTO lehre.tbl_kalender_lehreinheit
@@ -189,7 +193,7 @@ VALUES
 INSERT INTO lehre.tbl_kalender
 (von, bis, typ, status_kurzbz, vorgaenger_kalender_id, eindeutige_kalender_gruppen_id, insertamum, insertvon, updateamum, updatevon)
 VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '16:55:00', date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '17:40:00', 'lehreinheit', 'live', NULL, 'ec1bd001-facf-4b21-a671-bcb2d4f037fd', now(), 'demoadmin', NULL, 'demoadmin');
+(get_current_week_timestamp(6, '16:55:00', INTERVAL '+02:00'), get_current_week_timestamp(6, '17:40:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, 'ec1bd001-facf-4b21-a671-bcb2d4f037fd', now(), 'demoadmin', NULL, 'demoadmin');
 
 INSERT INTO lehre.tbl_kalender_lehreinheit
 (lehreinheit_id, kalender_id)
@@ -200,8 +204,8 @@ VALUES
 INSERT INTO lehre.tbl_kalender
 (von, bis, typ, status_kurzbz, vorgaenger_kalender_id, eindeutige_kalender_gruppen_id, insertamum, insertvon, updateamum, updatevon)
 VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '15:15:00', 'lehreinheit', 'live', NULL, null, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '15:15:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '16:00:00', 'lehreinheit', 'live', NULL, null, now(), 'demoadmin', NULL, 'demoadmin');
+(get_current_week_timestamp(3, '14:30:00', INTERVAL '+02:00'), get_current_week_timestamp(3, '15:15:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, null, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(3, '15:15:00', INTERVAL '+02:00'), get_current_week_timestamp(3, '16:00:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, null, now(), 'demoadmin', NULL, 'demoadmin');
 
 INSERT INTO lehre.tbl_kalender_lehreinheit
 (lehreinheit_id, kalender_id)
@@ -218,8 +222,8 @@ VALUES
 INSERT INTO lehre.tbl_kalender
 (von, bis, typ, status_kurzbz, vorgaenger_kalender_id, eindeutige_kalender_gruppen_id, insertamum, insertvon, updateamum, updatevon)
 VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '16:10:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '16:55:00', 'lehreinheit', 'live', NULL, null, now(), 'demoadmin', NULL, 'demoadmin'),
-(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '16:55:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '17:40:00', 'lehreinheit', 'live', NULL, null, now(), 'demoadmin', NULL, 'demoadmin');
+(get_current_week_timestamp(3, '16:10:00', INTERVAL '+02:00'), get_current_week_timestamp(3, '16:55:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, null, now(), 'demoadmin', NULL, 'demoadmin'),
+(get_current_week_timestamp(3, '16:55:00', INTERVAL '+02:00'), get_current_week_timestamp(3, '17:40:00', INTERVAL '+02:00'), 'lehreinheit', 'live', NULL, null, now(), 'demoadmin', NULL, 'demoadmin');
 
 INSERT INTO lehre.tbl_kalender_lehreinheit
 (lehreinheit_id, kalender_id)
@@ -290,5 +294,5 @@ VALUES(30, 'teilnehmer', 'demolektor4', NULL, NULL, NULL, NULL, NULL, NULL, NULL
 
 INSERT INTO campus.tbl_zeitsperre
 (zeitsperre_id, zeitsperretyp_kurzbz, mitarbeiter_uid, bezeichnung, vondatum, vonstunde, bisdatum, bisstunde, vertretung_uid, updateamum, updatevon, insertamum, insertvon, erreichbarkeit_kurzbz, freigabeamum, freigabevon)
-VALUES(1, 'DienstV', 'demolektor1', 'Test', date_trunc('week', CURRENT_DATE) + INTERVAL '5 day', NULL, date_trunc('week', CURRENT_DATE) + INTERVAL '5 day', NULL, 'demoadmin', '2007-04-02 11:04:31.000', 'demoadmin', '2007-04-02 11:04:31.000', 'demoadmin', 't', NULL, NULL);
+VALUES(1, 'DienstV', 'demolektor1', 'Test', get_current_week_timestamp(5, '00:00:00', INTERVAL '+02:00'), NULL, get_current_week_timestamp(5, '00:00:00', INTERVAL '+02:00'), NULL, 'demoadmin', '2007-04-02 11:04:31.000', 'demoadmin', '2007-04-02 11:04:31.000', 'demoadmin', 't', NULL, NULL);
 

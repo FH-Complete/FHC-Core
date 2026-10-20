@@ -34,3 +34,20 @@ DECLARE res varchar(32);
 		return res;
 	END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_current_week_timestamp(
+    p_day_offset INTEGER,
+    p_time TIME,
+    p_utc_offset INTERVAL DEFAULT INTERVAL '+00:00'
+)
+RETURNS TIMESTAMPTZ
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN (
+        date_trunc('week', CURRENT_DATE)
+        + (p_day_offset * INTERVAL '1 day')
+        + p_time
+    ) AT TIME ZONE p_utc_offset;
+END;
+$$;
