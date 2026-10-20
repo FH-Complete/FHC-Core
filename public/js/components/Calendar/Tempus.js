@@ -238,7 +238,7 @@ export default {
 
 			if (
 				this.isRangeVirtualScrollEnabled
-				&& this.currentMode === 'multipleWeeks'
+				&& (this.currentMode === 'multipleWeeks' || this.currentMode === 'range')
 				&& Array.isArray(this.visibleDates)
 			)
 			{
