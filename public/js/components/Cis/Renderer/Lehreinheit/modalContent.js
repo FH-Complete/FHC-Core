@@ -5,6 +5,7 @@ import ApiLvPlan from '../../../../api/factory/lvPlan.js';
 import ApiAddons from '../../../../api/factory/addons.js';
 
 export default {
+	name: 'Cis-Renderer-Lehreinheit-ModalContent',
 	components:{
 		LvMenu,
 	},
@@ -63,6 +64,16 @@ export default {
 				+ `&sem=${encodeURIComponent(d.sem ?? '')}`
 				+ `&lvid=${encodeURIComponent(d.lv_id)}`
 				+ `&sem_kurzbz=${encodeURIComponent(d.sem_kurzbz)}`;
+		},
+		showLvMenu: function() {
+			const hideOnRoutes = [
+				'OtherLvPlan',
+				'StgOrgLvPlan'
+			];
+			if(hideOnRoutes.includes(this.$route.name)) {
+				return false;
+			}
+			return true;
 		}
 	},
 	watch: {
@@ -186,6 +197,6 @@ export default {
 					</tr>
 				</tbody>
 		</table>
-		<lv-menu v-if="lvMenu.length && $route.name === 'MyLvPlan'" :containerStyles="['p-0']" :rowStyles="['m-0']" :menu="lvMenu" />
+		<lv-menu v-if="lvMenu.length && showLvMenu" :containerStyles="['p-0']" :rowStyles="['m-0']" :menu="lvMenu" />
 	</div>`,
 }

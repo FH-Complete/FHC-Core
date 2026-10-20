@@ -150,6 +150,8 @@ $berechtigungen = array(
 	array('lehre','Berechtigung fuer CIS-Seite'),
 	array('lehre/abgabetool','Projektabgabetool, Studentenansicht'),
 	array('lehre/abgabetool:download','Download von Projektarbeitsabgaben'),
+	array('lehre/benotungstool','Cis4 Gesamtnoteneingabe'),
+	array('lehre/benotungstool_assistenz','Cis4 Gesamtnoteneingabe für Assistenz'),
 	array('lehre/freifach','Freifachverwaltung'),
 	array('lehre/lehrfach','Lehrfachverwaltung'),
 	array('lehre/lehrfach:begrenzt','Lehrfachverwaltung - nur aktiv aenderbar, nur aktive LF werden angezeigt'),
