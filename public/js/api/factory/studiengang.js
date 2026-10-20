@@ -38,7 +38,7 @@ export default {
 	},
 	getAllowed(permissions) {
 		if (!Array.isArray(permissions))
-			permissions = permissions.split(',');
+			permissions = permissions ? permissions.split(',') : [];
 		
 		return {
 			method: 'post',
