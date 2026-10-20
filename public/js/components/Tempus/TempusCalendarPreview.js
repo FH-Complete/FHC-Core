@@ -33,8 +33,7 @@ function getRangeFromQuery(query, timezone) {
 		zone: timezone,
 	}).endOf('day');
 
-	if (!start.isValid || !end.isValid || end < start)
-		return null;
+	if (!start.isValid || !end.isValid || end < start) return null;
 
 	return luxon.Interval.fromDateTimes(start, end);
 }
@@ -79,15 +78,17 @@ export default {
 			renderers: Vue.computed(() => this.renderers),
 			appConfig: Vue.computed(() => this.appconfig),
 			canToggleGrid: this.permissions.stundenraster,
-			isHeaderSticky: false
+			isHeaderSticky: false,
 		};
 	},
 	data() {
-		const today = luxon.DateTime.now().setZone(this.config.timezone).toISODate();
+		const today = luxon.DateTime.now()
+			.setZone(this.config.timezone)
+			.toISODate();
 
 		return {
 			appconfig: {},
-			currentMode: 'multipleWeeks',
+			currentMode: 'range',
 			configEndpoints: ApiTempusConfig,
 			hoveredEvent: null,
 			renderers: {},
@@ -108,7 +109,6 @@ export default {
 				month: today,
 				tableList: today,
 				range: today,
-				multipleWeeks: today,
 			},
 			historyEntries: [],
 			previewRole: 'planer',
@@ -177,7 +177,6 @@ export default {
 							start.toISODate(),
 							end.toISODate(),
 							collisionCheck,
-							
 						),
 					),
 				];
@@ -188,22 +187,20 @@ export default {
 							start.toISODate(),
 							end.toISODate(),
 							collisionCheck,
-							
 						),
 					),
 				];
 			} else {
 				response = [
-				this.$api.call(
-					ApiKalender.getPlan(
-						filter,
-						start.toISODate(),
-						end.toISODate(),
-						collisionCheck,
-						
+					this.$api.call(
+						ApiKalender.getPlan(
+							filter,
+							start.toISODate(),
+							end.toISODate(),
+							collisionCheck,
+						),
 					),
-				),
-			];
+				];
 			}
 
 			if (response) {
@@ -257,9 +254,11 @@ export default {
 					if (onSuccess) {
 						onSuccess();
 						this.$refs.calendar.$refs.calendar.$refs.mode.$refs.view.$refs.grid?.disableAutoScroll();
-						this.$refs.calendar.$refs.calendar.$refs.mode.$refs.view.$refs.grids?.forEach(grid => {
-							grid.disableAutoScroll();
-						});
+						this.$refs.calendar.$refs.calendar.$refs.mode.$refs.view.$refs.grids?.forEach(
+							(grid) => {
+								grid.disableAutoScroll();
+							},
+						);
 						this.currentlyUpdatedEvent = obj.orig;
 					}
 				})
@@ -474,14 +473,15 @@ export default {
 				this.planFilter = getPlanFilterFromQuery(query);
 				this.previewRole = Array.isArray(query?.previewRole)
 					? query.previewRole[0]
-					: query?.previewRole ?? 'planer';
+					: (query?.previewRole ?? 'planer');
 				this.urlRange = getRangeFromQuery(query, this.config.timezone);
-				const rangeStart = this.urlRange?.start.toISODate()
-					?? luxon.DateTime.now().setZone(this.config.timezone).toISODate();
+				const rangeStart =
+					this.urlRange?.start.toISODate() ??
+					luxon.DateTime.now().setZone(this.config.timezone).toISODate();
 
 				this.calendarDatesByMode = {
 					...this.calendarDatesByMode,
-					multipleWeeks: rangeStart,
+					range: rangeStart,
 				};
 			},
 		},
@@ -571,7 +571,7 @@ export default {
 			:date="calendarDate"
 			:range="urlRange"
 			:mode="currentMode"
-			:modes="['multipleWeeks']"
+			:modes="['range']"
 			:parkedEvents="parkedKeys"
 			:visible-lecturers="visibleLecturerUids"
 			:show-events="showEvents"

@@ -8,21 +8,22 @@ import Draggable from '../../directives/draggable.js';
 import Drop from '../../directives/drop.js';
 
 export default {
-	name: "CalendarBase",
+	name: 'CalendarBase',
 	components: {
 		BaseHeader,
 		BaseSlider,
-		BsModal
+		BsModal,
 	},
 	directives: {
 		CalClick,
 		DragClick,
 		Draggable,
-		Drop
+		Drop,
 	},
 	provide() {
 		return {
-			calendarVisibleDatesChanged: dates => this.$emit('update:visible-dates', dates),
+			calendarVisibleDatesChanged: (dates) =>
+				this.$emit('update:visible-dates', dates),
 			events: Vue.computed(() => this.convertedEvents),
 			backgrounds: Vue.computed(() => this.convertedBackgrounds),
 			dropAllowed: Vue.computed(() => !!this.onDrop),
@@ -32,33 +33,29 @@ export default {
 			timeGrid: Vue.computed(() => this.timeGrid),
 			hoursPlan: Vue.computed(() => this.hoursPlan),
 			draggableEvents: Vue.computed(() => {
-				if (!this.draggableEvents)
-					return () => false;
+				if (!this.draggableEvents) return () => false;
 
 				if (Array.isArray(this.draggableEvents))
-					return event => this.draggableEvents.includes(event.type);
+					return (event) => this.draggableEvents.includes(event.type);
 				if (this.draggableEvents instanceof Function)
 					return this.draggableEvents;
-				
+
 				return () => true;
 			}),
 			dropableEvents: Vue.computed(() => {
-				if (!this.onDrop)
-					return () => false;
+				if (!this.onDrop) return () => false;
 
 				if (Array.isArray(this.dropableEvents))
-					return item => this.dropableEvents.includes(item.type);
-				if (this.dropableEvents instanceof Function)
-					return this.dropableEvents;
+					return (item) => this.dropableEvents.includes(item.type);
+				if (this.dropableEvents instanceof Function) return this.dropableEvents;
 
 				return () => true;
 			}),
 			resizableEvents: Vue.computed(() => {
-				if (!this.resizableEvents)
-					return () => false;
+				if (!this.resizableEvents) return () => false;
 
 				if (Array.isArray(this.resizableEvents))
-					return event => this.resizableEvents.includes(event.type);
+					return (event) => this.resizableEvents.includes(event.type);
 				if (this.resizableEvents instanceof Function)
 					return this.resizableEvents;
 
@@ -69,62 +66,63 @@ export default {
 			onResize: Vue.computed(() => this.onResize || null),
 			reservierbarMap: Vue.computed(() => this.reservierbarMap),
 			isReservierbar: Vue.computed(() => this.isReservierbar),
-			createContext: Vue.computed(() => this.createContext)
+			createContext: Vue.computed(() => this.createContext),
 		};
 	},
 	props: {
 		locale: {
 			type: String,
-			default: 'de'
+			default: 'de',
 		},
 		timezone: {
 			type: String,
-			required: true
+			required: true,
 		},
 		date: {
 			type: [Date, String, Number, luxon.DateTime],
-			default: props => luxon.DateTime.now().setZone(props.timezone).startOf('day')
+			default: (props) =>
+				luxon.DateTime.now().setZone(props.timezone).startOf('day'),
 		},
 		modes: {
 			type: Object,
 			required: true,
-			default: {}
+			default: {},
 			// TODO(chris): verfication functions
 		},
 		mode: String,
 		modeOptions: Object,
 		events: {
 			type: Array,
-			default: []
+			default: [],
 		},
 		backgrounds: {
 			type: Array,
-			default: []
+			default: [],
 		},
 		showBtns: Boolean,
 		btnMonth: {
 			type: Boolean,
-			default: undefined
+			default: undefined,
 		},
 		btnWeek: {
 			type: Boolean,
-			default: undefined
+			default: undefined,
 		},
 		btnDay: {
 			type: Boolean,
-			default: undefined
+			default: undefined,
 		},
 		btnList: {
 			type: Boolean,
-			default: undefined
+			default: undefined,
 		},
 		btnRange: {
 			type: Boolean,
-			default: undefined
+			default: undefined,
 		},
 		btnTableList: {
 			type: Boolean,
-			default: undefined
+			default: undefined,
 		},
 		timeGrid: Array,
 		hoursPlan: Object,
@@ -141,72 +139,89 @@ export default {
 		createContext: Object,
 		reservierbarMap: {
 			type: Object,
-			default: () => ({})
+			default: () => ({}),
 		},
-		onResize: Function
+		onResize: Function,
 	},
 	emits: [
-		"click:next",
-		"click:prev",
-		"click:mode",
-		"click:event",
-		"click:day",
-		"click:slot",
-		"click:week",
-		"update:date",
-		"update:mode",
-		"update:range",
-		"update:visible-dates",
-		"update:date-range",
-		"drop",
-		"create-event"
+		'click:next',
+		'click:prev',
+		'click:mode',
+		'click:event',
+		'click:day',
+		'click:slot',
+		'click:week',
+		'update:date',
+		'update:mode',
+		'update:range',
+		'update:visible-dates',
+		'update:date-range',
+		'drop',
+		'create-event',
 	],
 	data() {
 		return {
 			internalView: null,
 			internalDate: null,
 			pickedRangeEnd: null,
-			modalEvent: null
+			modalEvent: null,
 		};
 	},
 	computed: {
 		convertedEvents() {
-			return this.events.map(orig => ({
+			return this.events.map((orig) => ({
 				id: orig.type + orig[orig.type + '_id'],
 				type: orig.type,
 				start: luxon.DateTime.fromISO(orig.isostart).setZone(this.timezone),
 				end: luxon.DateTime.fromISO(orig.isoend).setZone(this.timezone),
-				orig
+				orig,
 			}));
 		},
 		convertedBackgrounds() {
-			return this.backgrounds.map(bg => {
+			return this.backgrounds.map((bg) => {
 				const res = { ...bg };
 				if (res.start) {
 					if (Number.isInteger(res.start))
-						res.start = luxon.DateTime.fromMillis(res.start, { zone: this.timezone, locale: this.locale });
+						res.start = luxon.DateTime.fromMillis(res.start, {
+							zone: this.timezone,
+							locale: this.locale,
+						});
 					else if (res.start instanceof Date)
-						res.start = luxon.DateTime.fromJSDate(res.start, { zone: this.timezone, locale: this.locale });
-					else if (typeof res.start ===
-						'string' || res.start instanceof String)
-						res.start = luxon.DateTime.fromISO(res.start, { zone: this.timezone, locale: this.locale });
+						res.start = luxon.DateTime.fromJSDate(res.start, {
+							zone: this.timezone,
+							locale: this.locale,
+						});
+					else if (typeof res.start === 'string' || res.start instanceof String)
+						res.start = luxon.DateTime.fromISO(res.start, {
+							zone: this.timezone,
+							locale: this.locale,
+						});
 				}
 				if (res.end) {
 					if (Number.isInteger(res.end))
-						res.end = luxon.DateTime.fromMillis(res.end, { zone: this.timezone, locale: this.locale });
+						res.end = luxon.DateTime.fromMillis(res.end, {
+							zone: this.timezone,
+							locale: this.locale,
+						});
 					else if (res.end instanceof Date)
-						res.end = luxon.DateTime.fromJSDate(res.end, { zone: this.timezone, locale: this.locale });
-					else if (typeof res.end ===
-						'string' || res.end instanceof String)
-						res.end = luxon.DateTime.fromISO(res.end, { zone: this.timezone, locale: this.locale });
+						res.end = luxon.DateTime.fromJSDate(res.end, {
+							zone: this.timezone,
+							locale: this.locale,
+						});
+					else if (typeof res.end === 'string' || res.end instanceof String)
+						res.end = luxon.DateTime.fromISO(res.end, {
+							zone: this.timezone,
+							locale: this.locale,
+						});
 				}
 				return res;
 			});
 		},
 		sDate() {
-			if (this.date instanceof luxon.DateTime)
-				return this.date;
-			return luxon.DateTime.fromJSDate(new Date(this.date)).setZone(this.timezone);
+			if (this.date instanceof luxon.DateTime) return this.date;
+			return luxon.DateTime.fromJSDate(new Date(this.date)).setZone(
+				this.timezone,
+			);
 		},
 		cDate: {
 			get() {
@@ -224,15 +239,16 @@ export default {
 				}
 				this.internalDate = date;
 				this.$emit('update:date', date, this.cMode, rangeLength);
-			}
+			},
 		},
 		sMode() {
 			// choose default mode
 			let mode = this.mode;
-			if (mode)
-			{
+			if (mode) {
 				const lower = mode.toLowerCase();
-				mode = Object.keys(this.modes).find(key => key.toLowerCase() === lower) || null;
+				mode =
+					Object.keys(this.modes).find((key) => key.toLowerCase() === lower) ||
+					null;
 			}
 			if (!mode || !this.modes[mode])
 				mode = Object.keys(this.modes).find(Boolean); // start with first entry as active mode
@@ -245,61 +261,58 @@ export default {
 			set(value) {
 				this.internalView = value;
 				this.$emit('update:mode', value, this.cDate);
-			}
-		}
+			},
+		},
 	},
 	watch: {
 		sDate(n, o) {
-			if (this.sDate.isValid && (!this.internalDate || !this.sDate.hasSame(this.internalDate, 'day')))
+			if (
+				this.sDate.isValid &&
+				(!this.internalDate || !this.sDate.hasSame(this.internalDate, 'day'))
+			)
 				this.internalDate = this.sDate;
 		},
 		sMode() {
-			if (this.sMode)
-				this.internalView = this.sMode;
+			if (this.sMode) this.internalView = this.sMode;
 		},
-		events(newEvents)
-		{
-			if (!this.modalEvent)
-				return;
+		events(newEvents) {
+			if (!this.modalEvent) return;
 
-			const freshEvent = newEvents.find(e => e.kalender_id === this.modalEvent.event.kalender_id);
-			if (freshEvent)
-				this.modalEvent.event = freshEvent;
+			const freshEvent = newEvents.find(
+				(e) => e.kalender_id === this.modalEvent.event.kalender_id,
+			);
+			if (freshEvent) this.modalEvent.event = freshEvent;
 		},
 	},
 	methods: {
 		clickPrev() {
-			const evt = new Event('click:prev', {cancelable: true});
+			const evt = new Event('click:prev', { cancelable: true });
 			this.$emit('click:prev', evt);
-			if (evt.defaultPrevented)
-				return;
+			if (evt.defaultPrevented) return;
 
 			// default: switch page
 			this.$refs.mode.prevPage();
 		},
 		clickFastPrev() {
-			const evt = new Event('click:fastPrev', {cancelable: true});
+			const evt = new Event('click:fastPrev', { cancelable: true });
 			this.$emit('click:fastPrev', evt);
-			if (evt.defaultPrevented)
-				return;
+			if (evt.defaultPrevented) return;
 
 			// default: switch page
 			this.$refs.mode.fastPrevPage();
 		},
 		clickNext() {
-			const evt = new Event('click:next', {cancelable: true});
+			const evt = new Event('click:next', { cancelable: true });
 			this.$emit('click:next', evt);
-			if (evt.defaultPrevented)
-				return;
+			if (evt.defaultPrevented) return;
 
 			// default: switch page
 			this.$refs.mode.nextPage();
 		},
 		clickFastNext() {
-			const evt = new Event('click:fastNext', {cancelable: true});
+			const evt = new Event('click:fastNext', { cancelable: true });
 			this.$emit('click:fastNext', evt);
-			if (evt.defaultPrevented)
-				return;
+			if (evt.defaultPrevented) return;
 
 			// default: switch page
 			this.$refs.mode.fastNextPage();
@@ -307,30 +320,33 @@ export default {
 		handleClickDefaults(evt) {
 			// TODO(chris): implement
 			switch (evt.detail.source) {
-			case 'day':
-				if (this.cMode != 'day' && this.modes['day']) {
+				case 'day':
+					if (this.cMode != 'day' && this.modes['day']) {
+						evt.stopPropagation();
+						this.cDate = evt.detail.value;
+						this.cMode = 'day';
+					}
+					break;
+				case 'week':
+					if (this.cMode != 'week' && this.modes['week']) {
+						evt.stopPropagation();
+						this.cDate = luxon.DateTime.fromObject(
+							{
+								localWeekNumber: evt.detail.value.number,
+								localWeekYear: evt.detail.value.year,
+							},
+							{
+								zone: this.cDate.zoneName,
+								locale: this.cDate.locale,
+							},
+						);
+						this.cMode = 'week';
+					}
+					break;
+				case 'event':
 					evt.stopPropagation();
-					this.cDate = evt.detail.value;
-					this.cMode = 'day';
-				}
-				break;
-			case 'week':
-				if (this.cMode != 'week' && this.modes['week']) {
-					evt.stopPropagation();
-					this.cDate = luxon.DateTime.fromObject({
-						localWeekNumber: evt.detail.value.number,
-						localWeekYear: evt.detail.value.year
-					}, {
-						zone: this.cDate.zoneName,
-						locale: this.cDate.locale
-					});
-					this.cMode = 'week';
-				}
-				break;
-			case 'event':
-				evt.stopPropagation();
-				this.showEventModal({ event: evt.detail.value });
-				break;
+					this.showEventModal({ event: evt.detail.value });
+					break;
 			}
 		},
 
@@ -343,24 +359,21 @@ export default {
 			this.$refs.modal.show();
 		},
 		hideEventModal() {
-			if (this.modalEvent)
-				this.modalEvent.closeFn = undefined;
+			if (this.modalEvent) this.modalEvent.closeFn = undefined;
 			this.$refs.modal.hide();
 			this.modalEvent = null;
 		},
 		onModalHidden() {
-			if (this.$refs.modal.$refs.modal.classList.contains('show'))
-				return;
+			if (this.$refs.modal.$refs.modal.classList.contains('show')) return;
 
-			if (this.modalEvent.closeFn)
-				this.modalEvent.closeFn();
+			if (this.modalEvent.closeFn) this.modalEvent.closeFn();
 			this.modalEvent = null;
-		}
+		},
 	},
 	beforeUnmount() {
 		this.hideEventModal();
 	},
-	template: /* html */`
+	template: /* html */ `
 	<div class="fhc-calendar-base h-100">
 		<div class="card h-100"
 			v-cal-click:container
@@ -381,7 +394,6 @@ export default {
 				:btn-month="!!modes['month'] && (btnMonth || (showBtns && btnMonth !== false))"
 				:btn-list="!!modes['list'] && (btnList || (showBtns && btnList !== false))"
 				:btn-table-list="!!modes['tableList'] && (btnTableList || (showBtns && btnTableList !== false))"
-				:btn-multiple-weeks="!!modes['multipleWeeks'] && (btnRange || (showBtns && btnList !== false))"
 				:btn-range="!!modes['range'] && (btnRange || (showBtns && btnRange !== false))"
 				:mode-options="modeOptions ? modeOptions[cMode] : undefined"
 			>
@@ -412,5 +424,5 @@ export default {
 			</template>
 		</bs-modal>
 	</div>
-	`
-}
+	`,
+};

@@ -32,8 +32,7 @@
 			'public/js/apps/Tempus.js'
 		],
 		'printCssPath' => [
-			'public/css/Tempus_print.css',
-			'public/css/Tempus_print_range.css'
+			'public/css/Tempus_print.css'
 		]
 	);
 

@@ -4,38 +4,37 @@
 import DatePicker from './Header/Datepicker.js';
 
 export default {
-	name: "CalendarHeader",
+	name: 'CalendarHeader',
 	components: {
-		DatePicker
+		DatePicker,
 	},
 	props: {
 		date: {
 			type: luxon.DateTime,
-			required: true
+			required: true,
 		},
 		mode: {
 			type: String,
-			required: true
+			required: true,
 		},
 		modeOptions: {
 			type: Object,
-			default: {}
+			default: {},
 		},
 		btnMonth: Boolean,
 		btnWeek: Boolean,
 		btnDay: Boolean,
 		btnList: Boolean,
 		btnTableList: Boolean,
-		btnMultipleWeeks: Boolean,
 		btnRange: Boolean,
 	},
 	emits: [
-		"next",
-		"prev",
-		"click:mode",
-		"update:date",
-		"update:mode",
-		"update:date-range"
+		'next',
+		'prev',
+		'click:mode',
+		'update:date',
+		'update:mode',
+		'update:date-range',
 	],
 	data() {
 		return {
@@ -46,11 +45,10 @@ export default {
 	methods: {
 		clickMode(evt, mode) {
 			this.$emit('click:mode', evt);
-			if (!evt.defaultPrevented)
-				this.$emit('update:mode', mode);
-		}
+			if (!evt.defaultPrevented) this.$emit('update:mode', mode);
+		},
 	},
-	template: /* html */`
+	template: /* html */ `
 	<div class="fhc-calendar-base-header">
 		<div class="header-actions">
 			<div class="header-userdefined">
@@ -58,15 +56,6 @@ export default {
 			</div>
 			<div class="header-modes" data-cy="calender-header-modes">
 				<div class="d-flex gap-1 justify-content-end" role="group">
-					<button
-						v-if="btnMultipleWeeks"
-						type="button"
-						class="btn btn-outline-secondary"
-						:class="{active: mode === 'multipleWeeks'}"
-						@click="clickMode($event, 'multipleWeeks')"
-					>
-						<i class="fa fa-calendar"></i>
-					</button>
 					<button
 						v-if="btnRange"
 						type="button"
@@ -141,7 +130,7 @@ export default {
 					<i class="fa fa-angles-left"></i>
 				</button>
 				<button
-					v-if="$props.mode !== 'multipleWeeks' && $props.mode !== 'tableList' && $props.mode !== 'range'"
+					v-if="$props.mode !== 'tableList' && $props.mode !== 'range'"
 					@click="$emit('prev')"
 					:disabled="open"
 					class="btn btn-outline-secondary border-0"
@@ -158,7 +147,7 @@ export default {
 					:list-length="modeOptions.length"
 				/>
 				<button
-					v-if="$props.mode !== 'multipleWeeks' && $props.mode !== 'tableList' && $props.mode !== 'range'"
+					v-if="$props.mode !== 'tableList' && $props.mode !== 'range'"
 					@click="$emit('next')"
 					:disabled="open"
 					class="btn btn-outline-secondary border-0"
@@ -176,5 +165,5 @@ export default {
 			</div>
 		</div>
 	</div>
-	`
-}
+	`,
+};

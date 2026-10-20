@@ -5,15 +5,13 @@ import { useEventLoader } from '../../composables/Tempus/TempusEventLoader.js';
 import ModeWeek from './Mode/Week.js';
 import ModeMonth from './Mode/Month.js';
 import ModeTable from './Mode/Table.js';
-import ModeMultipleWeeks from './Mode/MultipleWeeks.js';
 import ModeRange from './Mode/Range.js';
 import ApiKalender from '../../api/factory/tempus/kalender.js';
 import draggable from '../../directives/draggable.js';
 import ApiStudiensemester from '../../api/factory/studiensemester.js';
 
 function getRangeLength(range) {
-	if (!(range instanceof luxon.Interval) || !range.isValid)
-		return null;
+	if (!(range instanceof luxon.Interval) || !range.isValid) return null;
 
 	const start = range.start.startOf('day');
 	const end = range.end.startOf('day');
@@ -36,27 +34,27 @@ export default {
 			teachingunits: Vue.computed(() => this.teachingunits),
 			rangeViewPresetsConfig: Vue.computed(() => {
 				return {
-					label: this.$p.t("LvPlan/view_specific_semester"),
+					label: this.$p.t('LvPlan/view_specific_semester'),
 					presets: this.semesterRangePresets?.presets,
 				};
 			}),
 		};
 	},
 	inject: {
-		renderers: {from: 'renderers'},
+		renderers: { from: 'renderers' },
 		currentSemester: {
 			from: 'currentSemester',
 			default: null,
 		},
 		canToggleGrid: {
 			from: 'canToggleGrid',
-			default: false
+			default: false,
 		},
 		appConfig: {
 			from: 'appConfig',
 			default: {
-				visible_status: 'all'
-			}
+				visible_status: 'all',
+			},
 		},
 		rangeLength: {
 			default: 30,
@@ -88,7 +86,7 @@ export default {
 		},
 		modes: {
 			type: Array,
-			default: () => ['week', 'month', 'tableList', 'multipleWeeks', 'range'],
+			default: () => ['week', 'month', 'tableList', 'range'],
 		},
 		getPromiseFunc: {
 			type: Function,
@@ -96,7 +94,7 @@ export default {
 		},
 		cacheMultiplier: {
 			type: Number,
-			default: 1
+			default: 1,
 		},
 		waitForAllPromises: {
 			type: Boolean,
@@ -120,7 +118,7 @@ export default {
 		},
 		showEvents: {
 			type: Boolean,
-			default: true
+			default: true,
 		},
 		isEventDraggingEnabled: {
 			type: Boolean,
@@ -141,19 +139,19 @@ export default {
 		rangeViewPreviewLink: {
 			type: String,
 			default: null,
-		}
+		},
 	},
 	emits: [
-		"update:date",
-		"update:mode",
-		"update:range",
-		"update:date-range",
-		"drop",
-		"resize",
-		"event-hover",
-		"event-unhover",
-		"open-reservierung",
-		"events-reloaded",
+		'update:date',
+		'update:mode',
+		'update:range',
+		'update:date-range',
+		'drop',
+		'resize',
+		'event-hover',
+		'event-unhover',
+		'open-reservierung',
+		'events-reloaded',
 	],
 	data() {
 		return {
@@ -164,7 +162,6 @@ export default {
 				week: Vue.markRaw(ModeWeek),
 				month: Vue.markRaw(ModeMonth),
 				tableList: Vue.markRaw(ModeTable),
-				multipleWeeks: Vue.markRaw(ModeMultipleWeeks),
 				range: Vue.markRaw(ModeRange),
 			},
 			modeOptions: {
@@ -200,7 +197,7 @@ export default {
 			}
 
 			this.$emit('events-reloaded');
-		}
+		},
 	},
 	computed: {
 		availableModes() {
@@ -215,20 +212,23 @@ export default {
 			let now = luxon.DateTime.now().setZone(this.timezone);
 
 			let past = [];
-			if (this.mode == 'Month')
-			{
-				past = [{
-					class: 'background-past',
-					end: now.startOf('day')
-				}];
-			}
-			else
-			{
-				past = [{
-					class: 'background-past',
-					end: now,
-					label: now.startOf('minute').toISOTime({ suppressSeconds: true, includeOffset: false })
-				}];
+			if (this.mode == 'Month') {
+				past = [
+					{
+						class: 'background-past',
+						end: now.startOf('day'),
+					},
+				];
+			} else {
+				past = [
+					{
+						class: 'background-past',
+						end: now,
+						label: now
+							.startOf('minute')
+							.toISOTime({ suppressSeconds: true, includeOffset: false }),
+					},
+				];
 			}
 
 			return [...past, ...(this.extraBackgrounds || [])];
@@ -237,33 +237,41 @@ export default {
 			let list = this.events;
 
 			if (
-				this.isRangeVirtualScrollEnabled
-				&& (this.currentMode === 'multipleWeeks' || this.currentMode === 'range')
-				&& Array.isArray(this.visibleDates)
-			)
-			{
+				this.isRangeVirtualScrollEnabled &&
+				this.currentMode === 'range' &&
+				Array.isArray(this.visibleDates)
+			) {
 				const visibleIntervals = this.visibleDates
-					.map(date => luxon.Interval.fromDateTimes(
-						luxon.DateTime.fromISO(date.start).setZone(this.timezone).minus({ days: 1 }),
-						luxon.DateTime.fromISO(date.end).setZone(this.timezone).plus({ days: 1 })
-					))
-					.filter(interval => interval.isValid);
+					.map((date) =>
+						luxon.Interval.fromDateTimes(
+							luxon.DateTime.fromISO(date.start)
+								.setZone(this.timezone)
+								.minus({ days: 1 }),
+							luxon.DateTime.fromISO(date.end)
+								.setZone(this.timezone)
+								.plus({ days: 1 }),
+						),
+					)
+					.filter((interval) => interval.isValid);
 
-				list = list.filter(event => {
-					const eventStart = luxon.DateTime.fromISO(event.isostart).setZone(this.timezone);
-					const eventEnd = luxon.DateTime.fromISO(event.isoend).setZone(this.timezone);
+				list = list.filter((event) => {
+					const eventStart = luxon.DateTime.fromISO(event.isostart).setZone(
+						this.timezone,
+					);
+					const eventEnd = luxon.DateTime.fromISO(event.isoend).setZone(
+						this.timezone,
+					);
 
-					if (!eventStart.isValid || !eventEnd.isValid)
-						return true;
+					if (!eventStart.isValid || !eventEnd.isValid) return true;
 
-					return visibleIntervals.some(interval =>
-						eventStart < interval.end && eventEnd > interval.start
+					return visibleIntervals.some(
+						(interval) =>
+							eventStart < interval.end && eventEnd > interval.start,
 					);
 				});
 			}
 
-			if (Array.isArray(this.visibleLecturers))
-			{
+			if (Array.isArray(this.visibleLecturers)) {
 				const visibleLectures = new Set(this.visibleLecturers);
 
 				list = list.filter((event) => {
@@ -288,21 +296,21 @@ export default {
 			return '--event-bg:#' + event.farbe;
 		},
 		updateRange(rangeInterval) {
-			if (this.currentMode === 'tableList')
-				return;
+			if (this.currentMode === 'tableList') return;
 
 			this.rangeInterval = rangeInterval;
 			if (
-				this.visibleDates === null
-				&& rangeInterval instanceof luxon.Interval
-				&& rangeInterval.isValid
-			)
-			{
+				this.visibleDates === null &&
+				rangeInterval instanceof luxon.Interval &&
+				rangeInterval.isValid
+			) {
 				const start = rangeInterval.start.startOf('day');
-				this.visibleDates = [{
-					start: start.toISO(),
-					end: start.plus({ days: 7 }).toISO()
-				}];
+				this.visibleDates = [
+					{
+						start: start.toISO(),
+						end: start.plus({ days: 7 }).toISO(),
+					},
+				];
 			}
 			this.$emit('update:range', rangeInterval);
 		},
@@ -310,7 +318,10 @@ export default {
 			this.visibleDates = visibleDates;
 		},
 		handleDateRange({ start, end }) {
-			this.rangeInterval = luxon.Interval.fromDateTimes(start.startOf('day'), end.endOf('day'));
+			this.rangeInterval = luxon.Interval.fromDateTimes(
+				start.startOf('day'),
+				end.endOf('day'),
+			);
 			this.reset(false, true);
 			this.$emit('update:range', this.rangeInterval);
 			this.$emit('update:date-range', { start, end });
@@ -321,13 +332,16 @@ export default {
 
 			this.$emit('update:date', newDate, newMode);
 		},
-		ondrop(payload){
+		ondrop(payload) {
 			this.$emit('drop', payload);
 		},
 		onresize(payload) {
 			this.$emit('resize', payload);
 		},
-		resetEventLoader(arePreviousEventsCleared = true, isLoaderEventVisualReset = true) {
+		resetEventLoader(
+			arePreviousEventsCleared = true,
+			isLoaderEventVisualReset = true,
+		) {
 			this.reset(arePreviousEventsCleared, isLoaderEventVisualReset);
 			if (arguments.length === 0) {
 				this.$nextTick(() => {
@@ -348,23 +362,25 @@ export default {
 			this.$refs.calendar.clickNext();
 		},
 		async fetchSemesters() {
-					const semestersResponse = await this.$api.call(ApiStudiensemester.getAll());
-					if (semestersResponse.meta.status === "success") {
-						this.semesterRangePresets = {
-							label: "View specific semester",
-							presets: semestersResponse.data.map((semester) => {
-								let startDate = luxon.DateTime.fromISO(semester.start);
-								let endDate = luxon.DateTime.fromISO(semester.ende);
-								return {
-									startDate,
-									endDate,
-									name: semester.studiensemester_kurzbz,
-									description: semester.bezeichnung,
-								};
-							})
+			const semestersResponse = await this.$api.call(
+				ApiStudiensemester.getAll(),
+			);
+			if (semestersResponse.meta.status === 'success') {
+				this.semesterRangePresets = {
+					label: 'View specific semester',
+					presets: semestersResponse.data.map((semester) => {
+						let startDate = luxon.DateTime.fromISO(semester.start);
+						let endDate = luxon.DateTime.fromISO(semester.ende);
+						return {
+							startDate,
+							endDate,
+							name: semester.studiensemester_kurzbz,
+							description: semester.bezeichnung,
 						};
-					}
-				},
+					}),
+				};
+			}
+		},
 		clearOutCalendarEventEmphasis() {
 			this.$refs.calendar.$el
 				.querySelectorAll(
@@ -443,7 +459,7 @@ export default {
 		show-btns
 		:draggable-events="isEventDraggingEnabled"
 		:resizable-events="isEventResizingEnabled"
-		:on-drop="isEventDraggingEnabled && ['week', 'multipleWeeks', 'range'].includes(currentMode) ? ondrop : null"
+		:on-drop="isEventDraggingEnabled && ['week', 'range'].includes(currentMode) ? ondrop : null"
 		:on-resize="isEventResizingEnabled ? onresize : null"
 		@update:date="handleDateUpdate"
 		@update:mode="(newMode, newDate) => { currentMode = newMode; $emit('update:mode', newMode, newDate) }"
@@ -511,5 +527,5 @@ export default {
 				</div>
 			</div>
 		</template>
-	</fhc-calendar>`
-}
+	</fhc-calendar>`,
+};
