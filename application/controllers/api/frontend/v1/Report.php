@@ -196,12 +196,26 @@ class Report extends FHCAPI_Controller
 		
 		if (count($vars)) {
 			$this->load->library('form_validation');
+			$this->lang->load('form_validation');
+			
 			foreach ($vars as $var) {
 				$key = $var['kurzbz'];
 				$label = $var['title'];
 				$checks = 'required';
 				
 				if (isset($var['multiple']) && $var['multiple']) {
+					$value = $this->input->post($key);
+					$this->form_validation->set_rules($key, $label, [
+						[
+							'is_not_empty_array',
+							function ($_null) use ($value) {
+								return !$_null && is_array($value) && $value;
+							}
+						]
+					], [
+						'is_not_empty_array' => $this->lang->line('form_validation_required')
+					]);
+
 					$key .= '[]';
 				}
 
