@@ -308,13 +308,13 @@ class Config extends FHCAPI_Controller
 		$result['details'] = [
 			'title' => $this->p->t('stv', 'tab_details'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Details.js'),
-			'config' => $config['details']
+			'config' => $config['details'] ?? []
 		];
 
 		$result['notes'] = [
 			'title' => $this->p->t('stv', 'tab_notes'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Notizen.js'),
-			'config'	=> $config['notes'],
+			'config'	=> $config['notes'] ?? [],
 			'showSuffix' => ($config['notes']['showCountNotes'] ?? false),
 			'suffixhelper' => absoluteJsImportUrl('public/js/helpers/Stv/Studentenverwaltung/Details/Notizen/NotizenSuffixHelper.js')
 		];
@@ -330,7 +330,7 @@ class Config extends FHCAPI_Controller
 		$result['prestudent'] = [
 			'title' => $this->p->t('stv', 'tab_prestudent'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Prestudent.js'),
-			'config' => $config['prestudent']
+			'config' => $config['prestudent'] ?? []
 		];
 		$result['status'] = [
 			'title' => 'Status',
@@ -392,21 +392,21 @@ class Config extends FHCAPI_Controller
 		$result['exemptions'] = [
 			'title' => $this->p->t('lehre', 'anrechnungen'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Anrechnungen.js'),
-			'config' => $config['exemptions']
+			'config' => $config['exemptions'] ?? []
 		];
 
 		$result['finalexam'] = [
 			'title' => $this->p->t('stv', 'tab_finalexam'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Abschlusspruefung.js'),
 			'showOnlyWithUid' => true,
-			'config' => $config['finalexam']
+			'config' => $config['finalexam'] ?? []
 		];
 
 		$result['projektarbeit'] = [
 			'title' => $this->p->t('stv', 'tab_projektarbeit'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Projektarbeit.js'),
 			'config' => array_merge(
-				$config['projektarbeit'],
+				$config['projektarbeit'] ?? [],
 				['showVertragsdetails' =>
 					defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN') && FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN]
 			)
@@ -493,7 +493,7 @@ class Config extends FHCAPI_Controller
 			'title' => $this->p->t('stv', 'tab_finalexam'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Abschlusspruefung.js'),
 			'showOnlyWithUid' => true,
-			'config' => $config['finalexam']
+			'config' => $config['finalexam'] ?? []
 		];
 		$result['archive'] = [
 			'title' => $this->p->t('stv', 'tab_archive'),
@@ -508,7 +508,7 @@ class Config extends FHCAPI_Controller
 			$result['combinePeople'] = [
 				'title' => $this->p->t('stv', 'tab_combine_people'),
 				'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/CombinePeople.js'),
-				'config' => $config['combinePeople']
+				'config' => $config['combinePeople'] ?? []
 			];
 		}
 
