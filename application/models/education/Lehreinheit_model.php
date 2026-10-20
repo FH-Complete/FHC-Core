@@ -455,50 +455,53 @@ EOSQL;
 		return $db->execReadOnlyQuery($qry, array_merge($lehreinheit_ids, $lehreinheit_ids));
 	}
 
-	private function getLVTmp()
-	{
-		return "SELECT DISTINCT ON(lehrveranstaltung_id) *, 
-						'' as stundenblockung,
-						'' as lehreinheit_id,
-						'' as wochenrythmus,
-						'' as raumtyp,
-						'' as raumtypalternativ,
-						'' as gruppen,
-						'' as studienplan_id,
-						'' as studienplan_beeichnung, 
-						UPPER(CONCAT(vw_lehreinheit.stg_typ, vw_lehreinheit.stg_kurzbz)) as studiengang
-                FROM campus.vw_lehreinheit
-				WHERE studiensemester_kurzbz = ? ";
-	}
-
-	public function getLvsById($lehrveranstaltung_id, $studiensemester_kurzbz)
-	{
-		$where = ' AND lehrveranstaltung_id = ?';
-		$qry = "WITH lvs AS (" . $this->getLVTmp() . $where .")
-				SELECT lvs.*
-				FROM lvs
-			";
-
-		$params = array($studiensemester_kurzbz, $lehrveranstaltung_id);
-		return $this->execReadOnlyQuery($qry, $params);
-	}
 	public function getLvsByEmployee($mitarbeiter_uid, $studiensemester_kurzbz, $stg_kz = null)
 	{
-		$where = ' AND mitarbeiter_uid = ?';
+		$qry = "SELECT
+					lv.*,
+					lv.kurzbz AS lv_kurzbz,
+					lv.studiengang_kz AS lv_studiengang_kz,
+					UPPER(stg.typ || stg.kurzbz) AS studiengang,
+					lv.bezeichnung AS lv_bezeichnung,
+					lv.ects AS lv_ects,
+					lv.lehreverzeichnis AS lv_lehreverzeichnis,
+					lv.planfaktor AS lv_planfaktor,
+					lv.planlektoren AS lv_planlektoren,
+					lv.planpersonalkosten AS lv_planpersonalkosten,
+					lv.plankostenprolektor AS lv_plankostenprolektor,
+					lv.lehrform_kurzbz AS lv_lehrform_kurzbz,
+					lv.bezeichnung_english AS lv_bezeichnung_english,
+					lv.semesterstunden AS lv_semesterstunden,
+					?::varchar AS studiensemester_kurzbz,
+					'' AS stundenblockung,
+					'' AS lehreinheit_id,
+					'' AS wochenrythmus,
+					'' AS raumtyp,
+					'' AS raumtypalternativ,
+					'' AS gruppen,
+					'' AS studienplan_id,
+					'' AS studienplan_bezeichnung
+				FROM lehre.tbl_lehrveranstaltung lv
+					JOIN public.tbl_studiengang stg ON stg.studiengang_kz = lv.studiengang_kz
+				WHERE EXISTS (
+					SELECT 1
+					FROM lehre.tbl_lehreinheit le
+						JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
+					WHERE le.lehrveranstaltung_id = lv.lehrveranstaltung_id
+						AND le.studiensemester_kurzbz = ?
+						AND lema.mitarbeiter_uid = ?
+				)";
 
-		if ($stg_kz != null)
-			$where .= " AND lv_studiengang_kz = ?";
-
-		$qry = "WITH lvs AS (" . $this->getLVTmp() . $where .")
-				SELECT lvs.*
-				FROM lvs";
-
-		$params = array($studiensemester_kurzbz, $mitarbeiter_uid);
+		$params = array($studiensemester_kurzbz, $studiensemester_kurzbz, $mitarbeiter_uid);
 
 		if (!is_null($stg_kz))
 		{
+			$qry .= " AND lv.studiengang_kz = ?";
 			$params[] = $stg_kz;
 		}
+
+		$qry .= " ORDER BY lv.bezeichnung";
+
 		return $this->execReadOnlyQuery($qry, $params);
 	}
 

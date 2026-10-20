@@ -78,6 +78,8 @@ class Lehrveranstaltung extends FHCAPI_Controller
 			$tree[] = $lehrveranstaltung;
 		}
 
+		$counter = 0;
+		$this->assignUniqueIndex($tree, $counter);
 		$this->terminateWithSuccess($tree);
 	}
 
@@ -143,8 +145,7 @@ class Lehrveranstaltung extends FHCAPI_Controller
 				tbl_lehrveranstaltung.sprache as sprache,
 				lehrform_kurzbz as lv_lehrform_kurzbz,
 				tbl_lehrveranstaltung.bezeichnung_english as lv_bezeichnung_english,
-				semesterstunden as lv_semesterstunden,
-			');
+				semesterstunden as lv_semesterstunden');
 			$this->_ci->LehrveranstaltungModel->addJoin('public.tbl_studiengang', 'studiengang_kz');
 			$lehrveranstaltungen = $this->_ci->LehrveranstaltungModel->load($lehrveranstaltung_id);
 			$lehrveranstaltungen_data = $this->getDataOrTerminateWithError($lehrveranstaltungen);
