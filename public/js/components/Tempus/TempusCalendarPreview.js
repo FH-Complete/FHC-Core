@@ -430,9 +430,6 @@ export default {
 				if (!eventEl) return;
 
 				const calendar = document.querySelector('.fhc-calendar-base-grid');
-				const eventRect = eventEl.getBoundingClientRect();
-
-				const offset = 300;
 
 				const isInsideScrolledView =
 					eventEl.offsetLeft < calendar.scrollLeft + calendar.clientWidth &&
@@ -440,7 +437,6 @@ export default {
 					eventEl.offsetTop < calendar.scrollTop + calendar.clientHeight &&
 					eventEl.offsetTop + eventEl.offsetHeight > calendar.scrollTop;
 
-				const rect = eventEl.getBoundingClientRect();
 				if (!isInsideScrolledView) {
 					eventEl.scrollIntoView({
 						behavior: 'smooth',

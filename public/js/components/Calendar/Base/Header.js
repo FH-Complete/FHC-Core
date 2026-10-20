@@ -39,7 +39,6 @@ export default {
 	data() {
 		return {
 			open: false,
-			semesterOptions: [],
 		};
 	},
 	methods: {

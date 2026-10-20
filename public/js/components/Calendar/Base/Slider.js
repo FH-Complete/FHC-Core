@@ -2,17 +2,15 @@ export default {
 	name: 'CalendarSlider',
 	inject: {
 		time: {
-			from: "sliderTime",
-			default: ".3s"
+			from: 'sliderTime',
+			default: '.3s',
 		},
 		onVisibleDatesChanged: {
-			from: "calendarVisibleDatesChanged",
-			default: null
-		}
+			from: 'calendarVisibleDatesChanged',
+			default: null,
+		},
 	},
-	emits: [
-		'slid'
-	],
+	emits: ['slid'],
 	data() {
 		return {
 			target: 0,
@@ -24,15 +22,15 @@ export default {
 			mutationObserver: null,
 			visibleGrids: Vue.markRaw(new Set()),
 			visibilityUpdateScheduled: false,
-			lastVisibleDatesKey: null
-		}
+			lastVisibleDatesKey: null,
+		};
 	},
 	computed: {
 		itemsAfter() {
-			return [...Array(this.extrasAfter)].map((i, k) => 1+k);
+			return [...Array(this.extrasAfter)].map((i, k) => 1 + k);
 		},
 		itemsBefore() {
-			return [...Array(this.extrasBefore)].map((i, k) => k-this.extrasBefore);
+			return [...Array(this.extrasBefore)].map((i, k) => k - this.extrasBefore);
 		},
 		styleSlider() {
 			const style = {
@@ -40,10 +38,10 @@ export default {
 				top: 0,
 				left: 0,
 				width: '100%',
-				height: '100%'
+				height: '100%',
 			};
 			if (this.running) {
-				style.left = (-this.target * 100) + '%';
+				style.left = -this.target * 100 + '%';
 				style.transition = 'left ' + this.time + ' ease-in-out';
 			}
 			return style;
@@ -55,7 +53,7 @@ export default {
 				height: '100%',
 				display: 'flex',
 				right: '100%',
-				width: (this.extrasBefore * 100) + '%'
+				width: this.extrasBefore * 100 + '%',
 			};
 		},
 		styleAfter() {
@@ -65,96 +63,104 @@ export default {
 				height: '100%',
 				display: 'flex',
 				left: '100%',
-				width: (this.extrasAfter * 100) + '%'
+				width: this.extrasAfter * 100 + '%',
 			};
-		}
+		},
 	},
 	methods: {
 		startVisibilityTracking() {
-			if (!this.onVisibleDatesChanged || typeof IntersectionObserver === 'undefined')
+			if (
+				!this.onVisibleDatesChanged ||
+				typeof IntersectionObserver === 'undefined'
+			)
 				return;
 
-			this.intersectionObserver = Vue.markRaw(new IntersectionObserver(entries => {
-				let changed = false;
+			this.intersectionObserver = Vue.markRaw(
+				new IntersectionObserver(
+					(entries) => {
+						let changed = false;
 
-				entries.forEach(entry => {
-					if (entry.isIntersecting && entry.intersectionRatio > 0) {
-						if (!this.visibleGrids.has(entry.target)) {
-							this.visibleGrids.add(entry.target);
-							changed = true;
+						entries.forEach((entry) => {
+							if (entry.isIntersecting && entry.intersectionRatio > 0) {
+								if (!this.visibleGrids.has(entry.target)) {
+									this.visibleGrids.add(entry.target);
+									changed = true;
+								}
+							} else if (this.visibleGrids.delete(entry.target)) {
+								changed = true;
+							}
+						});
+
+						if (changed) this.scheduleVisibleDatesUpdate();
+					},
+					{
+						root: this.$el,
+						threshold: 0,
+					},
+				),
+			);
+
+			this.mutationObserver = Vue.markRaw(
+				new MutationObserver((mutations) => {
+					let changed = false;
+
+					mutations.forEach((mutation) => {
+						if (mutation.type === 'attributes') {
+							if (
+								this.visibleGrids.has(this.getContainingGrid(mutation.target))
+							)
+								changed = true;
+							return;
 						}
-					} else if (this.visibleGrids.delete(entry.target)) {
-						changed = true;
-					}
-				});
 
-				if (changed)
-					this.scheduleVisibleDatesUpdate();
-			}, {
-				root: this.$el,
-				threshold: 0
-			}));
+						mutation.addedNodes.forEach((node) => this.observeGrids(node));
+						mutation.removedNodes.forEach((node) => {
+							this.getGrids(node).forEach((grid) => {
+								this.intersectionObserver.unobserve(grid);
+								if (this.visibleGrids.delete(grid)) changed = true;
+							});
+						});
 
-			this.mutationObserver = Vue.markRaw(new MutationObserver(mutations => {
-				let changed = false;
-
-				mutations.forEach(mutation => {
-					if (mutation.type === 'attributes') {
 						if (this.visibleGrids.has(this.getContainingGrid(mutation.target)))
 							changed = true;
-						return;
-					}
-
-					mutation.addedNodes.forEach(node => this.observeGrids(node));
-					mutation.removedNodes.forEach(node => {
-						this.getGrids(node).forEach(grid => {
-							this.intersectionObserver.unobserve(grid);
-							if (this.visibleGrids.delete(grid))
-								changed = true;
-						});
 					});
 
-					if (this.visibleGrids.has(this.getContainingGrid(mutation.target)))
-						changed = true;
-				});
-
-				if (changed)
-				{
-					this.scheduleVisibleDatesUpdate();
-				}
-			}));
+					if (changed) {
+						this.scheduleVisibleDatesUpdate();
+					}
+				}),
+			);
 
 			this.observeGrids(this.$el);
 			this.mutationObserver.observe(this.$el, {
 				subtree: true,
 				childList: true,
 				attributes: true,
-				attributeFilter: ['data-visible-start', 'data-visible-end']
+				attributeFilter: ['data-visible-start', 'data-visible-end'],
 			});
 		},
 		getGrids(node) {
-			if (!(node instanceof Element))
-				return [];
+			if (!(node instanceof Element)) return [];
 
 			const grids = node.matches('.fhc-calendar-base-grid') ? [node] : [];
-			return grids.concat([...node.querySelectorAll('.fhc-calendar-base-grid')]);
+			return grids.concat([
+				...node.querySelectorAll('.fhc-calendar-base-grid'),
+			]);
 		},
 		observeGrids(node) {
-			this.getGrids(node).forEach(grid => {
+			this.getGrids(node).forEach((grid) => {
 				this.intersectionObserver.observe(grid);
 			});
 		},
 		getContainingGrid(node) {
-			if (!(node instanceof Element))
-				return null;
+			if (!(node instanceof Element)) return null;
 
 			return node.matches('.fhc-calendar-base-grid')
 				? node
 				: node.closest('.fhc-calendar-base-grid');
 		},
 		scheduleVisibleDatesUpdate() {
-			if (this.visibilityUpdateScheduled)
-				return;
+			if (this.visibilityUpdateScheduled) return;
 
 			this.visibilityUpdateScheduled = true;
 			this.$nextTick(() => {
@@ -165,41 +171,35 @@ export default {
 		emitVisibleDates() {
 			const datesByKey = new Map();
 
-			this.visibleGrids.forEach(grid => {
+			this.visibleGrids.forEach((grid) => {
 				const dates = this.getGridVisibleDates(grid);
-				if (dates)
-					datesByKey.set(dates.start + '/' + dates.end, dates);
+				if (dates) datesByKey.set(dates.start + '/' + dates.end, dates);
 			});
 
-			const dates = [...datesByKey.values()]
-				.sort((a, b) => a.start.localeCompare(b.start));
-			if (!dates.length)
-				return;
+			const dates = [...datesByKey.values()].sort((a, b) =>
+				a.start.localeCompare(b.start),
+			);
+			if (!dates.length) return;
 
-			const key = dates.map(date => date.start + '/' + date.end).join('|');
+			const key = dates.map((date) => date.start + '/' + date.end).join('|');
 
-			if (key === this.lastVisibleDatesKey)
-				return;
+			if (key === this.lastVisibleDatesKey) return;
 
 			this.lastVisibleDatesKey = key;
 			this.onVisibleDatesChanged(dates);
 		},
 		getGridVisibleDates(grid) {
-			if (!grid.isConnected)
-				return null;
+			if (!grid.isConnected) return null;
 
 			let start = null;
 			let end = null;
-			grid.querySelectorAll('.fhc-calendar-base-grid-line').forEach(line => {
+			grid.querySelectorAll('.fhc-calendar-base-grid-line').forEach((line) => {
 				const lineStart = line.dataset.visibleStart;
 				const lineEnd = line.dataset.visibleEnd;
-				if (!lineStart || !lineEnd)
-					return;
+				if (!lineStart || !lineEnd) return;
 
-				if (!start || lineStart.localeCompare(start) < 0)
-					start = lineStart;
-				if (!end || lineEnd.localeCompare(end) > 0)
-					end = lineEnd;
+				if (!start || lineStart.localeCompare(start) < 0) start = lineStart;
+				if (!end || lineEnd.localeCompare(end) > 0) end = lineEnd;
 			});
 
 			return start && end ? { start, end } : null;
@@ -225,16 +225,14 @@ export default {
 			return this.slidePages(num);
 		},
 		slidePages(dir) {
-			return new Promise(resolve => {
+			return new Promise((resolve) => {
 				this.promiseResolve = resolve;
 				this.running = true;
 				const newTarget = this.target + dir;
 				if (newTarget > 0) {
-					if (this.extrasAfter < newTarget)
-						this.extrasAfter = newTarget;
+					if (this.extrasAfter < newTarget) this.extrasAfter = newTarget;
 				} else if (newTarget < 0) {
-					if (-this.extrasBefore > newTarget)
-						this.extrasBefore = -newTarget;
+					if (-this.extrasBefore > newTarget) this.extrasBefore = -newTarget;
 				}
 				this.target = newTarget;
 			});
@@ -248,7 +246,7 @@ export default {
 			this.running = false;
 			this.target = 0;
 			this.extrasAfter = this.extrasBefore = 0;
-		}
+		},
 	},
 	mounted() {
 		this.startVisibilityTracking();
@@ -256,7 +254,7 @@ export default {
 	beforeUnmount() {
 		this.stopVisibilityTracking();
 	},
-	template: /* html */`
+	template: /* html */ `
 	<div
 		class="fhc-calendar-base-slider h-100"
 		style="position:relative;overflow:hidden"
@@ -288,5 +286,5 @@ export default {
 			</div>
 		</div>
 	</div>
-	`
-}
+	`,
+};

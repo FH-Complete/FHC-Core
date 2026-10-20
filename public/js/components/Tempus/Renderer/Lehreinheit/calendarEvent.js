@@ -1,10 +1,4 @@
 export default {
-	inject: {
-		mode: {
-			from: 'mode',
-			default: null,
-		},
-	},
 	props: {
 		event: {
 			type: Object,
@@ -168,31 +162,13 @@ export default {
 		</div>
 		<div
 			v-if="!event.allDayEvent && event?.beginn && event?.ende"
-			class="event-time d-grid h-100"
+			class="event-time d-none d-xl-grid h-100"
 		>
 			<span>{{ start }}</span>
 			<span>{{ end }}</span>
 		</div>
 		<div class="event-text" v-tooltip="tooltipString">
-			<div
- 			>
-				<span class="event-topic">{{ topicString }}</span>
-				<div
-					class="d-flex gap-1 position-absolute top-0 start-0 m-1"
-				>
-					<i :class="statusIcon"></i>
-					<i
-						v-if="event.has_assigned_resources"
-						v-tooltip="resourcesTooltip"
-						class="fa-solid fa-table-list text-muted"
-					></i>
-					<i
-						v-if="tags?.length"
-						v-tooltip="tagsTooltip"
-						class="fa-solid fa-tags"
-					></i>
-				</div>
-			</div>
+			<span class="event-topic">{{ topicString }}</span>
 			<span
 				class="event-place"
 				data-cy="calendar-event-room"

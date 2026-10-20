@@ -27,11 +27,10 @@ export default {
 	},
 	provide() {
 		return {
-			rangeLength: Vue.computed(() => this.currentRangeLength),
-			rangeViewPresets: Vue.computed(() => this.semesterRangePresets),
-			rangeViewPreviewLink: Vue.computed(() => this.rangeViewPreviewLink),
 			showRaster: Vue.computed(() => this.showRaster),
 			teachingunits: Vue.computed(() => this.teachingunits),
+			rangeLength: Vue.computed(() => this.currentRangeLength),
+			rangeViewPreviewLink: Vue.computed(() => this.rangeViewPreviewLink),
 			rangeViewPresetsConfig: Vue.computed(() => {
 				return {
 					label: this.$p.t('LvPlan/view_specific_semester'),
@@ -42,10 +41,6 @@ export default {
 	},
 	inject: {
 		renderers: { from: 'renderers' },
-		currentSemester: {
-			from: 'currentSemester',
-			default: null,
-		},
 		canToggleGrid: {
 			from: 'canToggleGrid',
 			default: false,
@@ -178,7 +173,6 @@ export default {
 			hoursplan: null,
 			showRaster: true,
 			currentRangeLength: getRangeLength(this.range) ?? this.rangeLength,
-			selectedRangePreset: null, //this.currentSemester, TODO: This is a hack to make the range mode work, but it should be fixed in the future
 			semesterRangePresets: {
 				label: null,
 				presets: [],

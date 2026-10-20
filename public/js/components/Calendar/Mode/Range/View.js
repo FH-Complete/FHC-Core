@@ -102,7 +102,6 @@ export default {
 						start: luxon.Duration.fromISOTime(tu.start),
 						end: luxon.Duration.fromISOTime(tu.end),
 					};
-					scroll;
 				});
 			} else if (this.hoursPlan) {
 				const start = this.hoursPlan?.start ?? 7;
