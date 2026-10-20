@@ -74,6 +74,9 @@ $config['tabs'] =
 					],
 				],
 			],
+			'hiddenFields' => [
+				'uhrzeit'
+			]
 		],
 		'exemptions' => [
 			//if true, Anrechnungen can be added and edited in tab Anrechnungen
@@ -182,6 +185,3 @@ $config['stv_prestudent_tags'] = [
 ];
 
 $config['userAutomatedTags'] = 'sftest';
-
-//Config for showing/hiding field Uhrzeit in Tab Final Exam
-//$config['tabs']['finalexam']['hiddenFields'] = ['uhrzeit'];

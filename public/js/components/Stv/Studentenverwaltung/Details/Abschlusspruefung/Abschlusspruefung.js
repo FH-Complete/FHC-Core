@@ -311,6 +311,7 @@ export default {
 
 				this.formData.pruefungstyp_kurzbz = data.pruefungstyp_kurzbz;
 				this.formData.datum = data.datum;
+				this.formData.uhrzeit = data.uhrzeit;
 				this.formData.sponsion = data.sponsion;
 				this.formData.akadgrad_id = data.akadgrad_id;
 				this.formData.pruefungsantritt_kurzbz = data.pruefungsantritt_kurzbz;
@@ -412,12 +413,12 @@ export default {
 				pruefer3_label: this.selectedPruefer3?.label || null,
 				akadgrad_id: this.formData.akadgrad_id,
 				datum: this.formData.datum,
+				uhrzeit: this.formData.uhrzeit || null,
 				sponsion: this.formData.sponsion
 			};
 			localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
 		},
 		addNewAbschlusspruefung() {
-			this.checkFormatUhrzeit();
 			const dataToSend = {
 				uid: this.student.uid,
 				formData: this.formData
@@ -438,7 +439,6 @@ export default {
 				});
 		},
 		async addNewAbschlusspruefungMulti(){
-			this.checkFormatUhrzeit();
 			try {
 				const arraySuccessfullySent = [];
 				const arrayError = [];
@@ -492,7 +492,6 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		updateAbschlusspruefung(abschlusspruefung_id) {
-			this.checkFormatUhrzeit();
 			const dataToSend = {
 				id: abschlusspruefung_id,
 				formData: this.formData
@@ -625,13 +624,6 @@ export default {
 				  );
 			  }
 			});
-		},
-		checkFormatUhrzeit(){
-			if(this.formData.uhrzeit) {
-				this.formData.uhrzeit = typeof (this.formData.uhrzeit) == 'object' ?
-					`${String(this.formData.uhrzeit.hours).padStart(2, '0')}:${String(this.formData.uhrzeit.minutes).padStart(2, '0')}`
-					: this.formData.uhrzeit;
-			}
 		}
 	},
 	created() {
@@ -933,10 +925,13 @@ export default {
 						:label="$p.t('global', 'uhrzeit')"
 						type="DatePicker"
 						v-model="formData.uhrzeit"
+						model-type="HH:mm:ss"
 						time-picker
 						text-input
 						name="uhrzeit"
 						:teleport="true"
+						:cancel-text="$p.t('ui', 'abbrechen')"
+						:select-text="$p.t('ui', 'ok')"
 					/>
 				</div>
 
@@ -1003,7 +998,7 @@ export default {
 				:cisRoot="cisRoot"
 				@linkGenerated="printDocument"
 			></abschlusspruefung-dropdown>
-		</Teleport>		
+		</Teleport>
 	</div>
 `
 }
