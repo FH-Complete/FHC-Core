@@ -147,8 +147,12 @@ class Report extends FHCAPI_Controller
 							$label .= ((array)$option)[array_find(array_keys((array)$option), function ($key) {
 								return $key != 'value';
 							})];
+						
+						// Remove hacks in sql query like preselecting an entry (eg: '" selected="selected')
+						$value = preg_replace('#([^\\\])".*#', '$1', $option->value);
+
 						return [
-							'value' => $option->value,
+							'value' => $value,
 							'label' => $label,
 						];
 					}, $options);
