@@ -26,7 +26,11 @@ export default {
 				}
 				return true;
 			}
-		}
+		},
+		alignItemsClassSuffix: {
+			type: String,
+			default: "end",
+		},
 	},
 	computed: {
 		sanitizedTimestamps() {
@@ -49,7 +53,7 @@ export default {
 		}
 	},
 	template: `
-	<div class="fhc-calendar-base-label-time">
+	<div class="fhc-calendar-base-label-time" :class="'align-items-' + $props.alignItemsClassSuffix">
 		<span v-if="start">{{ start }}</span>
 		<span v-if="end">-</span>
 		<span v-if="end">{{ end }}</span>

@@ -30,6 +30,12 @@ export default {
 			params: { order, start }
 		};
 	},
+	getStudiensemester() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Studiensemester/getStudiensemester'
+		};
+	},
 	current() {
 		return {
 			method: 'get',
@@ -44,5 +50,15 @@ export default {
 				studiensemester_kurzbz
 			}
 		};
-	}
+	},
+	getContainingOrNearestByDateRange(from, to) {
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/organisation/studiensemester/getContainingOrNearestByDateRange',
+			params: {
+				from,
+				to,
+			}
+		};
+	},
 };

@@ -61,12 +61,29 @@ $route['api/v1/organisation/[O|o]rganisationseinheit/(:any)'] = 'api/v1/organisa
 $route['api/v1/ressource/[B|b]etriebsmittelperson/(:any)'] = 'api/v1/ressource/betriebsmittelperson2/$1';
 $route['api/v1/system/[S|s]prache/(:any)'] = 'api/v1/system/sprache2/$1';
 
+// Legacy CMS news routes
+$route['api/frontend/v1/Cms/getNewsItem/(:num)'] = 'api/frontend/v1/NewsAdministrationAPI/getNewsItem/$1';
+$route['api/frontend/v1/Cms/storeNewsItem'] = 'api/frontend/v1/NewsAdministrationAPI/storeNewsItem';
+$route['api/frontend/v1/Cms/updateNewsItem/(:num)'] = 'api/frontend/v1/NewsAdministrationAPI/updateNewsItem/$1';
+$route['api/frontend/v1/Cms/deleteNewsItem/(:num)'] = 'api/frontend/v1/NewsAdministrationAPI/deleteNewsItem/$1';
+
+// Keep legacy uppercase URLs refreshable while using the canonical controller method casing
+$route['CisVue/Cms/NewsAdministration'] = 'CisVue/Cms/newsAdministration';
+
 $route['Cis/LvPlan/.*'] = 'Cis/LvPlan/index/$1';
 $route['Cis/MyLvPlan/.*'] = 'Cis/MyLvPlan/index/$1';
 $route['Cis/MyLv/.*'] = 'Cis/MyLv/index/$1';
 $route['Cis/OtherLvPlan/.*'] = 'Cis/OtherLvPlan/index/$1';
 //Route for LV Plan Stg/Semester/Verband/Gruppe
 $route['Cis/StgOrgLvPlan/.*'] = 'Cis/StgOrgLvPlan/index/$1';
+$route['Cis/Benotungstool/.*'] = 'Cis/Benotungstool/index/$1';
+
+$route['Cis/MyReservation'] = 'Cis/MyReservation/index/$1';
+
+//Route for Zeitsperrenma
+$route['Cis/Zeitsperrenma/.*'] = 'Cis/Zeitsperrenma/index/$1';
+//Route für Zeitsperren
+$route['Cis/Zeitsperren/.*'] = 'Cis/Zeitsperren/index/$1';
 
 $route['Abgabetool/Assistenz'] = 'Cis/Abgabetool/Assistenz';
 $route['Abgabetool/Assistenz/(:any)'] = 'Cis/Abgabetool/Assistenz/$1';
@@ -129,12 +146,18 @@ $route['api/frontend/v1/treemenudata/stv/.*'] = 'api/frontend/v1/stv/students/in
 $route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByStg/$1/$2';
 $route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/semester/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByStg/$1/$2/$3';
 $route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/semester/(:any)/.*'] = 'api/frontend/v1/Lehrveranstaltung/getByStg/$1/$2/$3';
-$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/orgform/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByStg/$1/$2/$3';
-$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/orgform/(:any)/.*'] = 'api/frontend/v1/Lehrveranstaltung/getByStg/$1/$2/$3';
+
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/orgform/(:any)/semester/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByStgOrgform/$1/$2/$3/$4';
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/orgform/(:any)/semester/(:any)/.*'] = 'api/frontend/v1/Lehrveranstaltung/getByStgOrgform/$1/$2/$3/$4';
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/orgform/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByStgOrgform/$1/$2/$3';
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/stg/(:any)/orgform/(:any)/.*'] = 'api/frontend/v1/Lehrveranstaltung/getByStgOrgform/$1/$2/$3';
 
 $route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/emp/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByEmp/$1/$2';
 $route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/emp/(:any)/stg/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByEmp/$1/$2/$3';
 $route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/emp/(:any)/stg/(:any)/.*'] = 'api/frontend/v1/Lehrveranstaltung/getByEmp/$1/$2/$3';
+
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/le/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByLe/$1/$2';
+$route['api/frontend/v1/treemenudata/lvverwaltung/stdsem/(:any)/lv/(:any)'] = 'api/frontend/v1/Lehrveranstaltung/getByLv/$1/$2';
 
 
 // load routes from extensions, also look for environment-specific configs

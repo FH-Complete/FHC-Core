@@ -1,4 +1,5 @@
 export default {
+	name: 'Cis-Renderer-Reservierung-CalendarEvent',
 	props: {
 		event: {
 			type: Object,
@@ -10,6 +11,10 @@ export default {
 			// options: default, always, never 
 		}
 	},
+	inject: {
+		mode: "mode",
+	},
+	emits: ['delete-event'],
 	computed: {
 		tooltipString() {
 			const tooltipArray = [];
@@ -27,6 +32,11 @@ export default {
 			tooltipArray.push([
 				this.$p.t('person/ort'),
 				this.event.ort_kurzbz
+			].join(": "));
+
+			tooltipArray.push([
+				this.$p.t('lehre/gruppe'),
+				this.event.gruppe[0].kuerzel.split("/")[0]
 			].join(": "));
 			
 			if (Array.isArray(this.event.lektor) && this.event.lektor.length > 0) {
@@ -56,6 +66,10 @@ export default {
 				.fromISOTime(this.event.ende)
 				.toISOTime({ suppressSeconds: true });
 		},
+		isFutureEvent() {
+			const eventStart = luxon.DateTime.fromISO(`${this.event.datum}T${this.event.beginn}`);
+			return eventStart > luxon.DateTime.now();
+		},
 		timeSlotDisplayClasses() {
 			switch (this.$props.timeSlotDisplayBehavior) {
 				case "always":
@@ -67,10 +81,14 @@ export default {
 			}
 		},
 	},
+	methods: {
+		handleDelete() {
+			this.$emit('delete-event', this.event);
+		},
+	},
 	template: /* html */`
 	<div
-		class="cis-renderer-reservierungen-calendar-event calendar-event-default h-100 w-100 p-1"
-	>
+		class="cis-renderer-reservierungen-calendar-event calendar-event-default h-100 w-100 p-1 position-relative">
 		<div
 			v-if="!event?.allDayEvent && event?.beginn && event?.ende"
 			:class="timeSlotDisplayClasses"
@@ -80,8 +98,18 @@ export default {
 			<span>{{ end }}</span>
 		</div>
 		<div class="event-text" v-tooltip="tooltipString">
+			<button
+				v-if="isFutureEvent && event.type === 'reservierung' && event.deletable && mode !== 'Month'"
+				class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-1"
+				title="Löschen"
+				@click.stop="handleDelete"
+			>
+				<i class="fa-solid fa-xmark"></i>
+			</button>
+		
 			<span class="event-topic">{{ event.topic }}</span>
 			<span class="event-place">{{ event.ort_kurzbz }}</span>
+			<span>{{ event.gruppe[0].kuerzel.split("/")[0] }}</span>
 			<span
 				v-for="lektor in event.lektor.slice(0, 3)"
 				class="event-lectors"
