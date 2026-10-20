@@ -38,7 +38,7 @@ export default {
 	},
 	data() {
 		return {
-			visibleDays: JSON.parse(
+			dayVisibilityStates: JSON.parse(
 				localStorage.getItem('fhc-calender-visible-days'),
 			) ?? [true, true, true, true, true, true, true],
 			gridWidthEqualizingData: {
@@ -47,11 +47,6 @@ export default {
 				animationFrame: null,
 				syncing: false,
 				isActive: false,
-			},
-			gridHeightEqualizingData: {
-				resizeObserver: null,
-				gridHeights: [],
-				observedGrids: Vue.markRaw(new Set()),
 			},
 			gridColumnWidthEqualizingData: {
 				sharedDayWidths: null,
@@ -128,21 +123,16 @@ export default {
 				},
 			);
 		},
-		dayVisibility() {
-			return this.daysGroupedByWeek[this.weekStartDays[0]].map(
-				(date) => this.visibleDays[date.weekday - 1],
-			);
-		},
 	},
 	methods: {
 		isToday(date) {
 			return date.hasSame(luxon.DateTime.now().setZone(this.timezone), 'day');
 		},
 		toggleDayVisibility(day) {
-			this.visibleDays.splice(day, 1, !this.visibleDays[day]);
+			this.dayVisibilityStates.splice(day, 1, !this.dayVisibilityStates[day]);
 			localStorage.setItem(
 				'fhc-calender-visible-days',
-				JSON.stringify(this.visibleDays),
+				JSON.stringify(this.dayVisibilityStates),
 			);
 			this.$nextTick(() => this.scheduleGridWidthSync());
 		},
@@ -281,55 +271,6 @@ export default {
 				grid.style.removeProperty('min-width'),
 			);
 		},
-		resetGridHeightsForEventReload() {
-			this.gridHeightEqualizingData.gridHeights = [];
-			this.$nextTick(() => this.initializeGridHeights());
-		},
-		initializeGridHeights() {
-			const grids = this.getGridElements();
-			const firstGrid = grids[0];
-			if (!firstGrid) return;
-			const initialGridHeight = Math.ceil(
-				firstGrid.getBoundingClientRect().height,
-			);
-			if (!Number.isFinite(initialGridHeight) || initialGridHeight <= 0) return;
-			this.gridHeightEqualizingData.gridHeights = grids.map(
-				() => initialGridHeight,
-			);
-			this.$nextTick(() => this.syncGridResizeObservation());
-		},
-		syncGridResizeObservation() {
-			const grids = this.getGridElements();
-			const currentGrids = new Set(grids);
-			this.gridHeightEqualizingData.observedGrids.forEach((grid) => {
-				if (!currentGrids.has(grid)) {
-					this.gridHeightEqualizingData?.resizeObserver.unobserve(grid);
-					this.gridHeightEqualizingData.observedGrids.delete(grid);
-				}
-			});
-			if (this.gridHeightEqualizingData.gridHeights.length > grids.length)
-				this.gridHeightEqualizingData.gridHeights.splice(grids.length);
-			grids.forEach((grid, index) => {
-				if (!this.gridHeightEqualizingData.observedGrids.has(grid)) {
-					this.gridHeightEqualizingData.resizeObserver.observe(grid);
-					this.gridHeightEqualizingData.observedGrids.add(grid);
-					this.setGridHeight(
-						index,
-						Math.ceil(grid.getBoundingClientRect().height),
-					);
-				}
-			});
-		},
-		measureAndRecordGridHeight(grid) {
-			const index = this.getGridElements().indexOf(grid);
-			if (index === -1) return;
-			this.setGridHeight(index, Math.ceil(grid.getBoundingClientRect().height));
-		},
-		setGridHeight(index, height) {
-			if (!Number.isFinite(height) || height <= 0) return;
-			if (this.gridHeightEqualizingData.gridHeights[index] !== height)
-				this.gridHeightEqualizingData.gridHeights.splice(index, 1, height);
-		},
 		resetColumnWidthAdjustment() {
 			this.gridColumnWidthEqualizingData.sharedDayWidths = null;
 			this.gridColumnWidthEqualizingData.largestDayWidths = null;
@@ -360,7 +301,7 @@ export default {
 		flushFreshColumnWidthSync() {
 			if (
 				!this.gridColumnWidthEqualizingData.syncRequested ||
-				this.gridWidthEqualizingData.syncing
+				this.gridColumnWidthEqualizingData.syncing
 			)
 				return;
 			this.gridColumnWidthEqualizingData.syncRequested = false;
@@ -400,7 +341,6 @@ export default {
 				);
 				if (!relevantMutations.length) return;
 				this.$nextTick(() => {
-					this.syncGridResizeObservation();
 					if (
 						!this.gridColumnWidthEqualizingData.initialEventsSeen &&
 						this.hasColumnWidthEvents()
@@ -417,15 +357,6 @@ export default {
 			childList: true,
 			subtree: true,
 		});
-
-		this.gridHeightEqualizingData.resizeObserver = Vue.markRaw(
-			new ResizeObserver((entries) => {
-				entries.forEach((entry) =>
-					this.measureAndRecordGridHeight(entry.target),
-				);
-			}),
-		);
-		this.initializeGridHeights();
 
 		if (this.hasColumnWidthEvents()) {
 			this.gridColumnWidthEqualizingData.initialEventsSeen = true;
@@ -445,8 +376,6 @@ export default {
 			cancelAnimationFrame(
 				this.gridColumnWidthEqualizingData.initialSyncAnimationFrame,
 			);
-
-		this.gridHeightEqualizingData?.resizeObserver?.disconnect();
 	},
 	template: /* html */ `
 	<div 
@@ -468,7 +397,7 @@ export default {
 					weekStartDay in eventsGroupedByWeek ? eventsGroupedByWeek[weekStartDay] : []
 				"
 				:shouldMatchParentHeight="false"
-				:day-visibility="dayVisibility"
+				:day-visibility="dayVisibilityStates"
 				:sticky-header="isHeaderSticky"
 				:scrollable="false"
 				:main-column-widths="gridColumnWidthEqualizingData.sharedDayWidths"
@@ -485,7 +414,7 @@ export default {
 						/>
 						<form-input
 								type="checkbox"
-								:checked="visibleDays[date.weekday - 1]"
+								:checked="dayVisibilityStates[date.weekday - 1]"
 								@change="toggleDayVisibility(date.weekday - 1)"
 								@click.stop
 							>

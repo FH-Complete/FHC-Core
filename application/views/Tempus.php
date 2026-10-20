@@ -31,7 +31,10 @@
 		'customJSModules' => [
 			'public/js/apps/Tempus.js'
 		],
-		'printCssPath' => 'public/css/Tempus_print.css'
+		'printCssPath' => [
+			'public/css/Tempus_print.css',
+			'public/css/Tempus_print_range.css'
+		]
 	);
 
 	$this->load->view('templates/FHC-Header', $includesArray);

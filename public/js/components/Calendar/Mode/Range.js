@@ -1,9 +1,9 @@
-import BaseSlider from "../Base/Slider.js";
-import RangeView from "./Range/View.js";
-import FormInput from "../../Form/Input.js";
+import BaseSlider from '../Base/Slider.js';
+import RangeView from './Range/View.js';
+import FormInput from '../../Form/Input.js';
 
 export default {
-	name: "ModeRange",
+	name: 'ModeRange',
 	components: {
 		BaseSlider,
 		RangeView,
@@ -26,7 +26,7 @@ export default {
 			required: true,
 		},
 	},
-	emits: ["update:currentDate", "update:range", "click", "requestModalOpen"],
+	emits: ['update:currentDate', 'update:range', 'click', 'requestModalOpen'],
 	data() {
 		return {
 			selectedRangePreset: null,
@@ -34,18 +34,21 @@ export default {
 	},
 	computed: {
 		range() {
-			let first = this.$props.currentDate;
-			let last = first.plus({ days: this.rangeLength });
+			const rangeLength = Math.max(parseInt(this.rangeLength) || 1, 1);
+			const first = this.currentDate.startOf('week', { useLocaleWeeks: true });
+			const last = this.currentDate
+				.plus({ days: rangeLength - 1 })
+				.endOf('week', { useLocaleWeeks: true });
 
 			return luxon.Interval.fromDateTimes(first, last);
 		},
 	},
 	watch: {
 		currentDate() {
-			this.$emit("update:range", this.range);
+			this.$emit('update:range', this.range);
 		},
 		rangeLength() {
-			this.$emit("update:range", this.range);
+			this.$emit('update:range', this.range);
 		},
 		selectedRangePreset() {
 			if (!this.selectedRangePreset) return;
@@ -55,10 +58,9 @@ export default {
 			);
 			if (!preset) return;
 
-			this.$emit("update:date", {
+			this.$emit('update:date', {
 				date: preset.startDate,
-				rangeLength:
-					preset.endDate.diff(preset.startDate, "days").days + 1,
+				rangeLength: preset.endDate.diff(preset.startDate, 'days').days + 1,
 			});
 
 			this.selectedRangePreset = null;
@@ -66,33 +68,113 @@ export default {
 	},
 	methods: {
 		viewAttrs() {
-			const day = this.$props.currentDate.startOf("day");
+			const day = this.$props.currentDate.startOf('day');
 			const rangeLength = parseInt(this.rangeLength);
 			return { ...this.$attrs, day, rangeLength };
 		},
 		handleClickDefaults(evt) {
 			switch (evt.detail.source) {
-				case "day":
+				case 'day':
 					// default: Set current-date
-					this.$emit("update:currentDate", {
+					this.$emit('update:currentDate', {
 						date: evt.detail.value,
 					});
 					break;
-				case "event":
+				case 'event':
 					// default: Request Modal
-					this.$emit("requestModalOpen", { event: evt.detail.value });
+					this.$emit('requestModalOpen', { event: evt.detail.value });
 					break;
 			}
 		},
+		preparePrintLayout() {
+			const view = this.$el?.querySelector('.fhc-calendar-mode-range-view');
+			if (!view) return;
+
+			const weeks = Array.from(view.children);
+			weeks.forEach((week) => {
+				week.style.setProperty('--fhc-calendar-print-scale-x', '1');
+				week.style.setProperty('--fhc-calendar-print-scale-y', '1');
+				week.style.setProperty(
+					'--fhc-calendar-print-layout-width',
+					'max-content',
+				);
+			});
+
+			const viewWidth = view.getBoundingClientRect().width;
+			const printViewportWidth = document
+				.querySelector('.fhc-calendar-base-slider')
+				.getBoundingClientRect().width;
+			const availableWidth = printViewportWidth
+				? Math.min(viewWidth, printViewportWidth)
+				: viewWidth;
+			if (!availableWidth) return;
+
+			weeks.forEach((week) => {
+				const grid = week.querySelector('.fhc-calendar-base-grid');
+				if (!grid) return;
+
+				const gridRect = grid.getBoundingClientRect();
+				const contentRight = Array.from(grid.querySelectorAll('*')).reduce(
+					(right, element) =>
+						Math.max(right, element.getBoundingClientRect().right),
+					gridRect.right,
+				);
+				const gridWidth = Math.ceil(
+					Math.max(
+						week.scrollWidth,
+						grid.scrollWidth,
+						gridRect.width,
+						contentRight - gridRect.left,
+					),
+				);
+				if (!gridWidth) return;
+
+				const scale = Math.min(1, availableWidth / gridWidth);
+				const verticalScale = 1 - (1 - scale) * 0.9;
+
+				week.style.setProperty(
+					'--fhc-calendar-print-scale-x',
+					scale.toFixed(4),
+				);
+				week.style.setProperty(
+					'--fhc-calendar-print-scale-y',
+					verticalScale.toFixed(4),
+				);
+				week.style.setProperty(
+					'--fhc-calendar-print-layout-width',
+					gridWidth + 'px',
+				);
+			});
+		},
+		resetPrintLayout() {
+			const view = this.$el?.querySelector('.fhc-calendar-mode-week-view');
+			if (!view) return;
+
+			Array.from(view.children).forEach((week) => {
+				week.style.removeProperty('--fhc-calendar-print-scale-x');
+				week.style.removeProperty('--fhc-calendar-print-scale-y');
+				week.style.removeProperty('--fhc-calendar-print-layout-width');
+			});
+		},
 	},
 	mounted() {
-		this.$emit("update:range", this.range);
+		this.$emit('update:range', this.range);
+
+		this.beforePrintHandler = () => this.preparePrintLayout();
+		this.afterPrintHandler = () => this.resetPrintLayout();
+		window.addEventListener('beforeprint', this.beforePrintHandler);
+		window.addEventListener('afterprint', this.afterPrintHandler);
+	},
+	beforeUnmount() {
+		window.removeEventListener('beforeprint', this.beforePrintHandler);
+		window.removeEventListener('afterprint', this.afterPrintHandler);
 	},
 	template: /*html*/ `
 	<div
 		class="fhc-calendar-mode-range flex-grow-1 position-relative d-flex flex-column"
 		@cal-click-default.capture="handleClickDefaults"
 	>
+		<div ref="printMeasure" class="fhc-calendar-print-measure" aria-hidden="true"></div>
 		<div
 			v-if="rangeViewPresetsConfig?.presets?.length"
 			id="rangePresetSelector"
