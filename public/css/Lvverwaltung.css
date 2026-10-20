@@ -44,3 +44,7 @@ textarea[name="anmerkung"] {
 	-webkit-user-select: none;
 	-moz-user-select: none;
 }
+
+.stunden-row .form-control {
+	margin-top: auto;
+}

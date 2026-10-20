@@ -74,6 +74,16 @@ export default{
 			}
 
 		},
+		'data.planstunden': {
+			handler(newVal) {
+				if (newVal === null || newVal === '' || newVal === undefined)
+					return;
+
+				const num = Number(newVal);
+				if (!isNaN(num) && !Number.isInteger(num))
+					this.data.planstunden = Math.trunc(num);
+			}
+		},
 		data: {
 			handler(newValue) {
 				if (newValue === null)
@@ -181,7 +191,13 @@ export default{
 					)})
 				.catch(this.$fhcAlert.handleSystemError)
 		},
+		onSemesterstundenChanged(value)
+		{
+			if (value === null || value === '' || isNaN(Number(value)))
+				return;
 
+			this.data.planstunden = Math.trunc(Number(value));
+		},
 	},
 	template: `
 		<core-form ref="form" @submit.prevent="updateDaten">
@@ -233,28 +249,29 @@ export default{
 					</form-input>
 				</div>
 				
-				<div class="row mb-3">
+				<div class="row mb-3 stunden-row">
 					<form-input
 						:label="$p.t('lehre', 'las')"
 						type="number"
 						min="0"
-						step="0.01"
-						container-class="col-3"
+						step="any"
+						container-class="col-3 d-flex flex-column"
 						:disabled="data.vertrag?.vertragsstatus_kurzbz === 'akzeptiert'"
 						v-model="data.semesterstunden"
+						@update:model-value="onSemesterstundenChanged"
 						name="semesterstunden"
-						>
+					>
 					</form-input>
-					
+				
 					<form-input
 						:label="$p.t('lehre', 'planstunden')"
 						type="number"
 						min="0"
-						step="0.01"
-						container-class="col-3"
+						step="1"
+						container-class="col-3 d-flex flex-column"
 						v-model="data.planstunden"
 						name="planstunden"
-						>
+					>
 					</form-input>
 
 				</div>
@@ -265,7 +282,7 @@ export default{
 							: $p.t('lehre', 'stundensatz')"
 						type="number"
 						min="0"
-						step="0.01"
+						step="1"
 						container-class="col-3"
 						v-model="data.stundensatz"
 						:disabled="data.vertrag?.vertragsstatus_kurzbz === 'akzeptiert'"
