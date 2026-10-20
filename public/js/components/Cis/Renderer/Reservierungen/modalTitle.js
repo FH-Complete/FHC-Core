@@ -1,4 +1,5 @@
 export default {
+	name: 'Cis-Renderer-Reservierung-ModalTitle',
 	props:{
 		event: {
 			type: Object,

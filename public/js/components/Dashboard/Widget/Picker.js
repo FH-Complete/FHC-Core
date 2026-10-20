@@ -14,10 +14,14 @@ export default {
 		callbacks: {}
 	}),
 	computed: {
+		// filter widgets away the user has no permissions for
+		availableWidgets() {
+			return (this.widgets || []).filter(widget => widget.permitted !== false);
+		},
 		hasAnyWidgets() {
 			if (!this.widgets)
 				return false;
-			if (!this.widgets.length && !this.hiddenWidgets?.length)
+			if (!this.availableWidgets.length && !this.hiddenWidgets?.length)
 				return false;
 			return true;
 		}
@@ -54,7 +58,7 @@ export default {
 			<template v-slot:default>
 				<template v-if="widgets && hiddenWidgets">
 					<div
-						v-if="!widgets.length && !hiddenWidgets.length"
+						v-if="!availableWidgets.length && !hiddenWidgets.length"
 						class="row g-2"
 					>
 						<div>{{ $p.t('dashboard/noWidgetsAvailable') }}</div>
@@ -74,16 +78,17 @@ export default {
 							</div>
 						</div>
 						<div
-							v-if="widgets.length"
+							v-if="availableWidgets.length"
 							class="row g-2"
 						>
-							<div
-								v-for="widget in widgets"
+							<template
+								v-for="widget in availableWidgets"
 								:key="widget.widget_id"
-								class="widget-icon-container col-sm-6 col-md-4 col-lg-3 col-xl-2"
 							>
-								<widget-icon @select="pick" :widget="widget"></widget-icon>
-							</div>
+								<div v-if="widget.permitted" class="widget-icon-container col-sm-6 col-md-4 col-lg-3 col-xl-2">
+									<widget-icon @select="pick" :widget="widget"></widget-icon>
+								</div>
+							</template>
 						</div>
 					</template>
 				</template>
