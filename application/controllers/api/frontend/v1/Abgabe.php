@@ -865,6 +865,10 @@ class Abgabe extends FHCAPI_Controller
 
 		$existingPaabgabe = null; 
 		if($paabgabe_id == -1) {
+			if(!$this->isAbgabetypAllowed($paabgabetyp_kurzbz, $studiengang_kz)) {
+				$this->terminateWithError($this->p->t('abgabetool', 'c4abgabetypNurAssistenz'));
+			}
+
 			$result = $this->PaabgabeModel->insert(
 				array(
 					'projektarbeit_id' => $projektarbeit_id,
@@ -909,6 +913,17 @@ class Abgabe extends FHCAPI_Controller
 				if($datum !== $existingPaabgabe->datum) {
 					$this->terminateWithError($this->p->t('abgabetool', 'c4datumAendernNichtErlaubt'));
 				}
+			}
+
+			// betreuer may only change datum and abgabetyp of the abgabetypen they are allowed to create
+			$abgabetypChanged = $paabgabetyp_kurzbz !== $existingPaabgabe->paabgabetyp_kurzbz;
+			if(($datum !== $existingPaabgabe->datum || $abgabetypChanged)
+				&& !$this->isAbgabetypAllowed($existingPaabgabe->paabgabetyp_kurzbz, $studiengang_kz)) {
+				$this->terminateWithError($this->p->t('abgabetool', 'c4terminAendernNurAssistenz'));
+			}
+
+			if($abgabetypChanged && !$this->isAbgabetypAllowed($paabgabetyp_kurzbz, $studiengang_kz)) {
+				$this->terminateWithError($this->p->t('abgabetool', 'c4abgabetypNurAssistenz'));
 			}
 			
 			$result = $this->PaabgabeModel->update(
@@ -1245,6 +1260,10 @@ class Abgabe extends FHCAPI_Controller
 			$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID(), $student_uid, $studiengang_kz);
 			if(!$zugeordnet) {
 				$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent', [getAuthUID(), $student_uid]), 'general');
+			}
+
+			if(!$this->isAbgabetypAllowed($paabgabetyp_kurzbz, $studiengang_kz)) {
+				$this->terminateWithError($this->p->t('abgabetool', 'c4abgabetypNurAssistenz'));
 			}
 			
 			$result = $this->PaabgabeModel->insert(
@@ -1982,6 +2001,12 @@ class Abgabe extends FHCAPI_Controller
 	private function checkZuordnungByPaabgabe($paabgabe_id, $auth_uid, $student_uid, $studiengang_kz) {
 		$projektarbeit_id = $this->getProjektarbeitIDForPaabgabeID($paabgabe_id);
 		return $this->checkZuordnung($projektarbeit_id, $auth_uid, $student_uid, $studiengang_kz);
+	}
+
+	// betreuer may only use the abgabetypen in ALLOWED_ABGABETYPEN_BETREUER, assistenz may use all
+	private function isAbgabetypAllowed($paabgabetyp_kurzbz, $studiengang_kz) {
+		return in_array($paabgabetyp_kurzbz, $this->config->item('ALLOWED_ABGABETYPEN_BETREUER'))
+			|| $this->permissionlib->isBerechtigt('basis/abgabe_assistenz', 'suid', $studiengang_kz);
 	}
 
 	// loads a projektarbeit table row by id and looks if a note has been set. A non null note field

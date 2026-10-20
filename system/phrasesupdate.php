@@ -49372,6 +49372,46 @@ In the list:
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4terminAendernNurAssistenz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zieldatum und Abgabetyp dieses Termins darf nur die Studiengangsassistenz ändern.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Only the program assistant may change the deadline and the submission type of this appointment.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4abgabetypNurAssistenz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Diesen Abgabetyp darf nur die Studiengangsassistenz vergeben.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Only the program assistant may assign this submission type.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// ABGABETOOL PHRASEN END
 	array(
 		'app' => 'core',

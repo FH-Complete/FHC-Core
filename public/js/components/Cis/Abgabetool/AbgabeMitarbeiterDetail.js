@@ -94,6 +94,10 @@ export const AbgabeMitarbeiterDetail = {
 		terminIsInvalid(termin) {
 			return termin.note?.positiv == false && !termin.beurteilungsnotiz	
 		},
+		terminIsLocked(termin) {
+			// betreuer may only change datum and abgabetyp of the abgabetypen they are allowed to create
+			return !this.assistenzMode && !this.abgabetypenBetreuer.includes(termin.paabgabetyp_kurzbz)
+		},
 		getNoteBezeichnung(termin){
 			if(termin.noteBackend?.bezeichnung) {
 				return termin.noteBackend?.positiv ? this.$capitalize(this.$p.t('abgabetool/c4positivBenotet')) + ' ✅' : this.$capitalize(this.$p.t('abgabetool/c4negativBenotet')) + ' ❌'
@@ -573,6 +577,12 @@ export const AbgabeMitarbeiterDetail = {
 				class: "custom-tooltip"
 			}
 		},
+		getTooltipTerminNurAssistenz() {
+			return {
+				value: this.$p.t('abgabetool/c4terminAendernNurAssistenz'),
+				class: "custom-tooltip"
+			}
+		},
 		getProjektarbeitTitel() {
 			if(this.projektarbeit?.titel) return this.$capitalize(this.$p.t('abgabetool/c4titel')) + ': ' + this.projektarbeit.titel
 			
@@ -812,11 +822,11 @@ export const AbgabeMitarbeiterDetail = {
 							<div class="row fw-bold" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4zieldatumv2') )}}</div>
 							<div class="row fw-light" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4abgabeuntil2359') )}}</div>
 						</div>
-						<div class="col-12 col-md-9">
+						<div class="col-12 col-md-9" v-tooltip.right="terminIsLocked(termin) && getTooltipTerminNurAssistenz">
 							<VueDatePicker
 								v-model="termin.datum"
 								:clearable="false"
-								:disabled="!termin.allowedToSave"
+								:disabled="!termin.allowedToSave || terminIsLocked(termin)"
 								:enable-time-picker="false"
 								locale="de"
 								format="dd.MM.yyyy"
@@ -828,10 +838,10 @@ export const AbgabeMitarbeiterDetail = {
 					</div>
 					<div class="row mt-2">
 						<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabetyp') )}}</div>
-						<div class="col-12 col-md-9">
+						<div class="col-12 col-md-9" v-tooltip.right="terminIsLocked(termin) && getTooltipTerminNurAssistenz">
 							<Dropdown
 								:style="{'width': '100%'}"
-								:disabled="!termin.allowedToSave || termin.abgabedatum !== null || termin.noteBackend"
+								:disabled="!termin.allowedToSave || termin.abgabedatum !== null || termin.noteBackend || terminIsLocked(termin)"
 								:placeholder="getPlaceholderTermin(termin)"
 								v-model="termin.bezeichnung"
 								@change="handleChangeAbgabetyp(termin)"
