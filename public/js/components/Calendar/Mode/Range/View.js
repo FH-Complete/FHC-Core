@@ -27,6 +27,10 @@ export default {
 			from: 'areGridWidthsEqual',
 			default: true,
 		},
+		isInitialColumnWidthSyncPostponed: {
+			from: 'isInitialColumnWidthSyncPostponed',
+			default: false,
+		},
 	},
 	props: {
 		day: {
@@ -70,7 +74,19 @@ export default {
 			this.scheduleGridWidthSync();
 		},
 		events:{
-			handler() {
+			handler() {				
+				if (this.events.length === 0 || this.events.every(event => event.type === 'loading')) {
+					return;
+				}
+
+				if (this.isInitialColumnWidthSyncPostponed) {
+					this.isInitialColumnWidthSyncPostponed = false;
+
+					setTimeout(() => {
+						this.startFreshColumnWidthSync();
+					}, 200);
+					return;
+				}
 				this.startFreshColumnWidthSync();
 			},
 			flush: 'post',

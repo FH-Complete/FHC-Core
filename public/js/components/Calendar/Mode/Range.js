@@ -147,7 +147,7 @@ export default {
 			});
 		},
 		resetPrintLayout() {
-			const view = this.$el?.querySelector('.fhc-calendar-mode-week-view');
+			const view = this.$el?.querySelector('.fhc-calendar-mode-range-view');
 			if (!view) return;
 
 			Array.from(view.children).forEach((week) => {

@@ -162,7 +162,7 @@ export default {
 		</div>
 		<div
 			v-if="!event.allDayEvent && event?.beginn && event?.ende"
-			class="event-time d-none d-xl-grid h-100"
+			class="event-time d-grid h-100"
 		>
 			<span>{{ start }}</span>
 			<span>{{ end }}</span>

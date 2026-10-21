@@ -264,9 +264,6 @@ export function useEventLoader(
     }
 
     const cachePadding = getCachePadding();
-	if (isLoaderEventVisualReset) {
-		hasFirstLoadOccurred = false;
-	}
 
 	if (isLoaderEventVisualReset) {
 		hasFirstLoadOccurred = false;
