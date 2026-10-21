@@ -35,14 +35,6 @@ export default {
 		},
 		collapseEmptyDays: Boolean,
 		rangeLength: Number,
-		adjustColumnWidths: {
-			type: Boolean,
-			default: true,
-		},
-		syncGridWidths: {
-			type: Boolean,
-			default: true,
-		},
 	},
 	data() {
 		return {
@@ -51,16 +43,12 @@ export default {
 			) ?? [true, true, true, true, true, true, true],
 			gridWidthEqualizingData: {
 				animationFrame: null,
-				syncing: false,
-				isActive: false,
+				isWidthEqualizingRunning: false,
 			},
 			gridColumnWidthEqualizingData: {
 				sharedDayWidths: null,
-				largestDayWidths: null,
 				syncVersion: 0,
-				syncRequested: false,
-				initialEventsSeen: false,
-				initialSyncAnimationFrame: null,
+				isSyncRequested: false,
 			},
 		};
 	},
@@ -70,37 +58,35 @@ export default {
 				this.clearGridMinWidths();
 				return;
 			}
-			this.$nextTick(() => this.scheduleGridWidthSync());
+			
+			this.scheduleGridWidthSync();
 		},
 		areDayColumnWidthsEqual(enabled) {
 			if (!enabled) {
 				this.resetColumnWidthAdjustment();
 				return;
 			}
-			this.$nextTick(() =>
-				this.scheduleGridWidthSync(),
-			);
+			
+			this.scheduleGridWidthSync();
 		},
 		events:{
 			handler() {
 				this.startFreshColumnWidthSync();
 			},
 			flush: 'post',
-			immediate: true,
+			deep: true,
 		},
 		weekStartDays: {
 			handler() {
 				this.startFreshColumnWidthSync();
 			},
 			flush: 'post',
-			immediate: true,
 		},
 		timeAxisSegments: {
 			handler() {
 				this.startFreshColumnWidthSync();
 			},
 			flush: 'post',
-			immediate: true,
 		},
 		dayVisibilityStates: {
 			handler() {
@@ -108,7 +94,6 @@ export default {
 			},
 			flush: 'post',
 			deep: true,
-			immediate: true,
 		},
 	},
 	computed: {
@@ -170,17 +155,14 @@ export default {
 				JSON.stringify(this.dayVisibilityStates),
 			);
 		},
-		onGridResizeState(evt) {
-			this.gridWidthEqualizingData.isActive = !!evt.detail?.active;
-		},
 		scheduleGridWidthSync() {
 			if (
 				(!this.areDayColumnWidthsEqual && !this.areGridWidthsEqual) ||
-				this.gridWidthEqualizingData?.isActive ||
-				this.gridWidthEqualizingData?.syncing ||
+				this.gridWidthEqualizingData?.isWidthEqualizingRunning ||
 				this.gridWidthEqualizingData.animationFrame !== null
 			)
 				return;
+
 			this.gridWidthEqualizingData.animationFrame = requestAnimationFrame(
 				() => {
 					this.gridWidthEqualizingData.animationFrame = null;
@@ -191,42 +173,27 @@ export default {
 		async synchronizeGridWidths() {
 			if (
 				(!this.areDayColumnWidthsEqual && !this.areGridWidthsEqual) ||
-				this.gridWidthEqualizingData?.isActive ||
-				this.gridWidthEqualizingData?.syncing
+				this.gridWidthEqualizingData?.isWidthEqualizingRunning
 			)
 				return;
-			this.gridWidthEqualizingData.syncing = true;
+
+			this.gridWidthEqualizingData.isWidthEqualizingRunning = true;
 			const syncVersion = this.gridColumnWidthEqualizingData.syncVersion;
+
 			try {
 				const grids = this.getGridElements();
 				if (!grids.length) return;
-				const previousDayColumnWidths =
-					this.gridColumnWidthEqualizingData.sharedDayWidths;
-				const previousGridMinWidths = grids.map((grid) => grid.style.minWidth);
-				const restorePreviousWidths = () => {
-					this.gridColumnWidthEqualizingData.sharedDayWidths = this
-						.areDayColumnWidthsEqual
-						? (this.gridColumnWidthEqualizingData.largestDayWidths ??
-							previousDayColumnWidths)
-						: null;
-					grids.forEach((grid, index) => {
-						if (this.areGridWidthsEqual)
-							grid.style.minWidth = previousGridMinWidths[index];
-						else grid.style.removeProperty('min-width');
-					});
-				};
+
 				grids.forEach((grid) => grid.style.removeProperty('min-width'));
 				this.gridColumnWidthEqualizingData.sharedDayWidths = null;
+
 				await this.$nextTick();
+
 				if (syncVersion !== this.gridColumnWidthEqualizingData.syncVersion)
 					return;
 				if (!this.areDayColumnWidthsEqual && !this.areGridWidthsEqual) {
 					this.resetColumnWidthAdjustment();
 					this.clearGridMinWidths();
-					return;
-				}
-				if (this.gridWidthEqualizingData?.isActive) {
-					restorePreviousWidths();
 					return;
 				}
 
@@ -252,24 +219,15 @@ export default {
 								),
 							),
 					);
-					const previousLargestWidths =
-						this.gridColumnWidthEqualizingData.largestDayWidths;
-					this.gridColumnWidthEqualizingData.largestDayWidths = dayColumns.map(
-						(width, index) =>
-							Math.max(width, previousLargestWidths?.[index] ?? 0),
-					);
-					this.gridColumnWidthEqualizingData.sharedDayWidths =
-						this.gridColumnWidthEqualizingData.largestDayWidths;
+					this.gridColumnWidthEqualizingData.sharedDayWidths = dayColumns;
+
 					await this.$nextTick();
+
 					if (syncVersion !== this.gridColumnWidthEqualizingData.syncVersion)
 						return;
 					if (!this.areDayColumnWidthsEqual && !this.areGridWidthsEqual) {
 						this.resetColumnWidthAdjustment();
 						this.clearGridMinWidths();
-						return;
-					}
-					if (this.gridWidthEqualizingData?.isActive) {
-						restorePreviousWidths();
 						return;
 					}
 				}
@@ -287,7 +245,7 @@ export default {
 					});
 				}
 			} finally {
-				this.gridWidthEqualizingData.syncing = false;
+				this.gridWidthEqualizingData.isWidthEqualizingRunning = false;
 				this.flushFreshColumnWidthSync();
 			}
 		},
@@ -299,12 +257,11 @@ export default {
 				cancelAnimationFrame(this.gridWidthEqualizingData.animationFrame);
 				this.gridWidthEqualizingData.animationFrame = null;
 			}
-			this.gridColumnWidthEqualizingData.syncRequested = true;
+			this.gridColumnWidthEqualizingData.isSyncRequested = true;
 			this.$nextTick(() => this.flushFreshColumnWidthSync());
 		},
 		resetColumnWidthAdjustment() {
 			this.gridColumnWidthEqualizingData.sharedDayWidths = null;
-			this.gridColumnWidthEqualizingData.largestDayWidths = null;
 		},
 		clearGridMinWidths() {
 			this.getGridElements().forEach((grid) =>
@@ -313,11 +270,11 @@ export default {
 		},
 		flushFreshColumnWidthSync() {
 			if (
-				!this.gridColumnWidthEqualizingData.syncRequested ||
-				this.gridColumnWidthEqualizingData.syncing
+				!this.gridColumnWidthEqualizingData.isSyncRequested ||
+				this.gridWidthEqualizingData.isWidthEqualizingRunning
 			)
 				return;
-			this.gridColumnWidthEqualizingData.syncRequested = false;
+			this.gridColumnWidthEqualizingData.isSyncRequested = false;
 			this.scheduleGridWidthSync();
 		},
 		getGridElements() {
@@ -341,7 +298,6 @@ export default {
 	template: /* html */ `
 	<div 
 		class="fhc-calendar-mode-range-view h-100 overflow-y-scroll"
-		@fhc-calendar-grid-resize-state="onGridResizeState"
 	>
 		<div
 			v-for="(weekStartDay, index) in weekStartDays"

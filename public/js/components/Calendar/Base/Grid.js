@@ -582,29 +582,11 @@ export default {
 			if (!gridEl)
 				return;
 
-			this.$el.dispatchEvent(new CustomEvent('fhc-calendar-grid-resize-state', {
-				bubbles: true,
-				detail: {
-					active: true,
-					eventId: event?.orig?.kalender_id,
-				},
-			}));
-
 			this.resizeHandler.startResize(edge, evt, {
 				el,
 				gridEl,
 				event,
-				horizontal,
 				timeGrid: this.timeGrid,
-				onFinish: () => {
-					this.$el.dispatchEvent(new CustomEvent('fhc-calendar-grid-resize-state', {
-						bubbles: true,
-						detail: {
-							active: false,
-							eventId: event?.orig?.kalender_id,
-						},
-					}));
-				},
 				onEnd: ({ event, newStart, newEnd }) => {
 					const orig = event?.orig;
 					if (!orig || !newStart || !newEnd)
