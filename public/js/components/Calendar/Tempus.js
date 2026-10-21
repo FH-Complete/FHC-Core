@@ -337,13 +337,6 @@ export default {
 			isLoaderEventVisualReset = true,
 		) {
 			this.reset(arePreviousEventsCleared, isLoaderEventVisualReset);
-			if (arguments.length === 0) {
-				this.$nextTick(() => {
-					const view = this.$refs.calendar?.$refs.mode?.$refs.view;
-					view?.resetColumnWidthsForEventReload?.();
-					view?.resetGridHeightsForEventReload?.();
-				});
-			}
 		},
 		reloadEvents() {
 			this.refreshEventsAfterReload = true;

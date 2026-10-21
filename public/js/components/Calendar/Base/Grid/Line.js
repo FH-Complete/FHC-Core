@@ -21,7 +21,7 @@ export default {
 		compactibleEventTypes: {
 			from: 'compactibleEventTypes',
 			default: undefined,
-		}
+		},
 	},
 	props: {
 		date: {

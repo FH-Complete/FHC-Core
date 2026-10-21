@@ -92,16 +92,9 @@ function generatePrintCSS($path)
 	$ci =& get_instance();
 	$cachetoken = '?'.$ci->config->item('fhcomplete_build_version');
 
-	if (is_array($path)) {
-		foreach ($path as $p) {
-			echo sprintf($cssLink, base_url($p).$cachetoken) . PHP_EOL;
-		}
-
-		
-	} else if (isset($path)) {
+	if (isset($path)) {
 		echo sprintf($cssLink, base_url($path).$cachetoken) . PHP_EOL;
 	}
-
 }
 
 /**

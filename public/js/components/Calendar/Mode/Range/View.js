@@ -50,8 +50,6 @@ export default {
 				localStorage.getItem('fhc-calender-visible-days'),
 			) ?? [true, true, true, true, true, true, true],
 			gridWidthEqualizingData: {
-				resizeObserver: null,
-				mutationObserver: null,
 				animationFrame: null,
 				syncing: false,
 				isActive: false,
@@ -80,8 +78,37 @@ export default {
 				return;
 			}
 			this.$nextTick(() =>
-				this.scheduleGridWidthSync('column width adjustment enabled'),
+				this.scheduleGridWidthSync(),
 			);
+		},
+		events:{
+			handler() {
+				this.startFreshColumnWidthSync();
+			},
+			flush: 'post',
+			immediate: true,
+		},
+		weekStartDays: {
+			handler() {
+				this.startFreshColumnWidthSync();
+			},
+			flush: 'post',
+			immediate: true,
+		},
+		timeAxisSegments: {
+			handler() {
+				this.startFreshColumnWidthSync();
+			},
+			flush: 'post',
+			immediate: true,
+		},
+		dayVisibilityStates: {
+			handler() {
+				this.startFreshColumnWidthSync();
+			},
+			flush: 'post',
+			deep: true,
+			immediate: true,
 		},
 	},
 	computed: {
@@ -133,122 +160,6 @@ export default {
 		},
 	},
 	methods: {
-		resetGridWidthSync() {
-			this.gridElements().forEach(grid => grid.style.removeProperty('min-width'));
-		},
-		gridElements() {
-			const grids = Array.isArray(this.$refs.grids)
-				? this.$refs.grids
-				: [this.$refs.grids];
-
-			return grids
-				.map(grid => grid?.$el)
-				.filter(el => el instanceof HTMLElement);
-		},
-		hasColumnWidthEvents() {
-			const grids = Array.isArray(this.$refs.grids)
-				? this.$refs.grids
-				: [this.$refs.grids];
-
-			return grids.some(grid => grid?.originalEvents?.some(
-				event => event.type !== 'loading',
-			));
-		},
-		resetColumnWidthsForEventReload() {
-			this.initialColumnWidthEventsSeen = false;
-			this.startFreshColumnWidthSync();
-		},
-		resetGridHeightsForEventReload() {
-			this.gridHeights = [];
-			this.$nextTick(() => this.initializeGridHeights());
-		},
-		flushFreshColumnWidthSync() {
-			if (!this.freshColumnWidthSyncRequested || this.gridWidthSyncing)
-				return;
-
-			this.freshColumnWidthSyncRequested = false;
-			this.queueGridWidthSync('fresh column width sync');
-		},
-		queueInitialColumnWidthSync() {
-			this.initialColumnWidthSyncAnimationFrame = requestAnimationFrame(() => {
-				this.initialColumnWidthSyncAnimationFrame = requestAnimationFrame(() => {
-					this.initialColumnWidthSyncAnimationFrame = null;
-					this.startFreshColumnWidthSync();
-				});
-			});
-		},
-		setGridHeight(index, height) {
-			if (!Number.isFinite(height) || height <= 0)
-				return;
-
-			if (this.gridHeights[index] !== height)
-				this.gridHeights.splice(index, 1, height);
-		},
-		recordGridHeight(grid) {
-			const index = this.gridElements().indexOf(grid);
-			if (index === -1)
-				return;
-
-			this.setGridHeight(
-				index,
-				Math.ceil(grid.getBoundingClientRect().height),
-			);
-		},
-		syncGridHeightTracking() {
-			const grids = this.gridElements();
-			const currentGrids = new Set(grids);
-
-			this.observedGridElements?.forEach(grid => {
-				if (!currentGrids.has(grid)) {
-					this.gridHeightResizeObserver.unobserve(grid);
-					this.observedGridElements.delete(grid);
-				}
-			});
-			if (this.gridHeights.length > grids.length)
-				this.gridHeights.splice(grids.length);
-
-			grids.forEach((grid, index) => {
-				if (!this.observedGridElements?.has(grid)) {
-					this.gridHeightResizeObserver.observe(grid);
-					this.observedGridElements.add(grid);
-					this.setGridHeight(
-						index,
-						Math.ceil(grid.getBoundingClientRect().height),
-					);
-				}
-			});
-		},
-		initializeGridHeights() {
-			const grids = this.gridElements();
-			const firstGrid = grids[0];
-			if (!firstGrid)
-				return;
-
-			const initialGridHeight = Math.ceil(firstGrid.getBoundingClientRect().height);
-			if (!Number.isFinite(initialGridHeight) || initialGridHeight <= 0)
-				return;
-
-			this.gridHeights = grids.map(() => initialGridHeight);
-			this.$nextTick(() => this.syncGridHeightTracking());
-		},
-		queueGridWidthSync(source = 'unknown') {
-
-			if (
-				(!this.adjustColumnWidths && !this.syncGridWidths)
-				|| this.gridResizeActive
-				|| this.gridWidthSyncing
-				|| this.gridWidthAnimationFrame !== null
-			)
-				return;
-
-			this.gridWidthAnimationFrame = requestAnimationFrame(() => {
-				this.gridWidthAnimationFrame = null;
-				this.synchronizeGridWidths(source);
-			});
-		},
-		onGridResizeState(evt) {
-			this.gridResizeActive = !!evt.detail?.active;
-		},
 		isToday(date) {
 			return date.hasSame(luxon.DateTime.now().setZone(this.timezone), 'day');
 		},
@@ -258,17 +169,7 @@ export default {
 				'fhc-calender-visible-days',
 				JSON.stringify(this.dayVisibilityStates),
 			);
-			this.$nextTick(() => this.scheduleGridWidthSync());
 		},
-		getGridElements() {
-			const grids = Array.isArray(this.$refs.grids)
-				? this.$refs.grids
-				: [this.$refs.grids];
-			return grids
-				.map((grid) => grid?.$el)
-				.filter((el) => el instanceof HTMLElement);
-		},
-
 		onGridResizeState(evt) {
 			this.gridWidthEqualizingData.isActive = !!evt.detail?.active;
 		},
@@ -390,23 +291,6 @@ export default {
 				this.flushFreshColumnWidthSync();
 			}
 		},
-		clearGridMinWidths() {
-			this.getGridElements().forEach((grid) =>
-				grid.style.removeProperty('min-width'),
-			);
-		},
-		resetColumnWidthAdjustment() {
-			this.gridColumnWidthEqualizingData.sharedDayWidths = null;
-			this.gridColumnWidthEqualizingData.largestDayWidths = null;
-		},
-		hasColumnWidthEvents() {
-			const grids = Array.isArray(this.$refs.grids)
-				? this.$refs.grids
-				: [this.$refs.grids];
-			return grids.some((grid) =>
-				grid?.originalEvents?.some((event) => event.type !== 'loading'),
-			);
-		},
 		startFreshColumnWidthSync() {
 			this.gridColumnWidthEqualizingData.syncVersion += 1;
 			this.resetColumnWidthAdjustment();
@@ -418,9 +302,14 @@ export default {
 			this.gridColumnWidthEqualizingData.syncRequested = true;
 			this.$nextTick(() => this.flushFreshColumnWidthSync());
 		},
-		resetColumnWidthsForEventReload() {
-			this.gridColumnWidthEqualizingData.initialEventsSeen = false;
-			this.startFreshColumnWidthSync();
+		resetColumnWidthAdjustment() {
+			this.gridColumnWidthEqualizingData.sharedDayWidths = null;
+			this.gridColumnWidthEqualizingData.largestDayWidths = null;
+		},
+		clearGridMinWidths() {
+			this.getGridElements().forEach((grid) =>
+				grid.style.removeProperty('min-width'),
+			);
 		},
 		flushFreshColumnWidthSync() {
 			if (
@@ -431,75 +320,23 @@ export default {
 			this.gridColumnWidthEqualizingData.syncRequested = false;
 			this.scheduleGridWidthSync();
 		},
-		queueInitialColumnWidthSync() {
-			this.gridColumnWidthEqualizingData.initialSyncAnimationFrame =
-				requestAnimationFrame(() => {
-					this.gridColumnWidthEqualizingData.initialSyncAnimationFrame =
-						requestAnimationFrame(() => {
-							this.gridColumnWidthEqualizingData.initialSyncAnimationFrame =
-								null;
-							this.startFreshColumnWidthSync();
-						});
-				});
+		getGridElements() {
+			const grids = Array.isArray(this.$refs.grids)
+				? this.$refs.grids
+				: [this.$refs.grids];
+			return grids
+				.map((grid) => grid?.$el)
+				.filter((el) => el instanceof HTMLElement);
 		},
 	},
 	mounted() {
-		this.gridWidthEqualizingData.resizeObserver = Vue.markRaw(
-			new ResizeObserver(() => {
-				this.scheduleGridWidthSync();
-			}),
-		);
-		this.gridWidthEqualizingData.resizeObserver.observe(this.$el);
-		this.gridWidthEqualizingData.mutationObserver = Vue.markRaw(
-			new MutationObserver((mutations) => {
-				const isResizeGhost = (node) =>
-					node.nodeType === Node.ELEMENT_NODE &&
-					(node.matches('.fhc-event-ghost') ||
-						node.matches('.fhc-resize-preview'));
-				const relevantMutations = mutations.filter(
-					(mutation) =>
-						mutation.type === 'childList' &&
-						[...mutation.addedNodes, ...mutation.removedNodes].some(
-							(node) => !isResizeGhost(node),
-						),
-				);
-				if (!relevantMutations.length) return;
-				this.$nextTick(() => {
-					if (
-						!this.gridColumnWidthEqualizingData.initialEventsSeen &&
-						this.hasColumnWidthEvents()
-					) {
-						this.gridColumnWidthEqualizingData.initialEventsSeen = true;
-						this.startFreshColumnWidthSync();
-						return;
-					}
-					this.scheduleGridWidthSync();
-				});
-			}),
-		);
-		this.gridWidthEqualizingData?.mutationObserver.observe(this.$el, {
-			childList: true,
-			subtree: true,
-		});
-
-		if (this.hasColumnWidthEvents()) {
-			this.gridColumnWidthEqualizingData.initialEventsSeen = true;
-			this.startFreshColumnWidthSync();
-		} else {
-			this.scheduleGridWidthSync();
-		}
-		this.queueInitialColumnWidthSync();
+		this.startFreshColumnWidthSync();
 	},
 	beforeUnmount() {
-		this.gridWidthEqualizingData?.resizeObserver?.disconnect();
-		this.gridWidthEqualizingData?.mutationObserver?.disconnect();
-
-		if (this.gridWidthEqualizingData.animationFrame !== null)
+		if (this.gridWidthEqualizingData.animationFrame !== null) {
 			cancelAnimationFrame(this.gridWidthEqualizingData.animationFrame);
-		if (this.gridColumnWidthEqualizingData.initialSyncAnimationFrame !== null)
-			cancelAnimationFrame(
-				this.gridColumnWidthEqualizingData.initialSyncAnimationFrame,
-			);
+			this.gridWidthEqualizingData.animationFrame = null;
+		}
 	},
 	template: /* html */ `
 	<div 
