@@ -53,7 +53,7 @@ class LectureCollisionCheck implements ICollisionCheck
 		$kollisionsfreie_user = unserialize(KOLLISIONSFREIE_USER);
 		$grouped = [];
 
-		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id, current_lehreinheit_ma.mitarbeiter_uid');
+		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id, current_lehreinheit_ma.mitarbeiter_uid, other_kalender.von, other_kalender.kalender_id as other_kalender_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit current_kalender_le', 'current_kalender_le.kalender_id = tbl_kalender.kalender_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter current_lehreinheit_ma', 'current_lehreinheit_ma.lehreinheit_id = current_kalender_le.lehreinheit_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter other_lehreinheithreinheit_ma', 'other_lehreinheithreinheit_ma.mitarbeiter_uid = current_lehreinheit_ma.mitarbeiter_uid');
@@ -85,11 +85,13 @@ class LectureCollisionCheck implements ICollisionCheck
 			{
 				$grouped[$row->kalender_id][] = [
 					'message' => $this->_ci->phraseslib->t('ui', 'ma_le_kollision') . ': ' . $row->mitarbeiter_uid,
+					'kalender_id' => $row->other_kalender_id,
+					'datum' => $row->von,
 				];
 			}
 		}
 
-		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id, current_lehreinheit_ma.mitarbeiter_uid');
+		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id, current_lehreinheit_ma.mitarbeiter_uid, other_kalender.von, other_kalender.kalender_id as other_kalender_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit current_kalender_le', 'current_kalender_le.kalender_id = tbl_kalender.kalender_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter current_lehreinheit_ma', 'current_lehreinheit_ma.lehreinheit_id = current_kalender_le.lehreinheit_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event_teilnehmer other_t', 'other_t.uid = current_lehreinheit_ma.mitarbeiter_uid');
@@ -121,11 +123,13 @@ class LectureCollisionCheck implements ICollisionCheck
 			{
 				$grouped[$row->kalender_id][] = [
 					'message' => $this->_ci->phraseslib->t('ui', 'reservierung_kollision') . ': ' . $row->mitarbeiter_uid,
+					'kalender_id' => $row->other_kalender_id,
+					'datum' => $row->von,
 				];
 			}
 		}
 
-		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id, z.mitarbeiter_uid');
+		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id, z.mitarbeiter_uid, tbl_kalender.von');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit current_kalender_le', 'current_kalender_le.kalender_id = tbl_kalender.kalender_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter current_lehreinheit_ma', 'current_lehreinheit_ma.lehreinheit_id = current_kalender_le.lehreinheit_id');
 		$this->_ci->KalenderModel->addJoin('campus.tbl_zeitsperre z',

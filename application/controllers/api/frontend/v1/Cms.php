@@ -36,14 +36,15 @@ class Cms extends FHCAPI_Controller
 			'ContentID' => self::PERM_LOGGED,
 			'getOrtKurzbzContent' => self::PERM_LOGGED,
             'content' => self::PERM_LOGGED,
-			'news' => self::PERM_LOGGED,
-			'getNewsRowCount' => self::PERM_LOGGED,
+			'newsForWidget' => self::PERM_LOGGED,
 			'getNews' => self::PERM_LOGGED,
 
 		]);
 
 		$this->load->model('content/News_model', 'NewsModel');
-
+		$this->load->model('crm/Student_model', 'StudentModel');
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		
 		// setting up the papgination_size
 		$this->page_size = 10;
 
@@ -58,7 +59,6 @@ class Cms extends FHCAPI_Controller
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
-
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
@@ -106,7 +106,7 @@ class Cms extends FHCAPI_Controller
 		$this->terminateWithSuccess($content_id);
 	}
 
-	public function news()
+	public function newsForWidget()
 	{
 
 		// form validation
@@ -118,7 +118,7 @@ class Cms extends FHCAPI_Controller
 		$this->load->model('content/news_model', 'NewsModel');
 		
 		$limit =  $this->input->get('limit',TRUE);
-		
+
 		//query the news
 		$news = $this->NewsModel->getAll($limit);
 
@@ -157,23 +157,7 @@ class Cms extends FHCAPI_Controller
         
 	}
 
-	public function getNewsRowCount($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $fachbereich_kurzbz = null, $maxalter = 0, $edit = false, $sichtbar = true, $page = 1, $page_size = 10)
-	{
-		list($studiengang_kz, $semester) = $this->cmslib->getStgAndSem($studiengang_kz, $semester);
-		$all = $edit;
-		
-		$this->load->model('content/News_model','NewsModel');
-
-		$num_rows = $this->NewsModel->countNewsWithContent(getSprache(), $studiengang_kz, $semester, $fachbereich_kurzbz, $sichtbar, $maxalter, $page, $page_size, $all, $mischen);
-		
-		$num_rows = $this->getDataOrTerminateWithError($num_rows);
-		
-		$this->terminateWithSuccess($num_rows);
-		
-	}
-
-
-	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = true, $titel = '', $edit = false, $sichtbar = true)
+	public function getNews($infoscreen = false, $studiengang_kz = null, $semester = null, $mischen = false, $titel = '', $edit = false, $sichtbar = true)
 	{
 		//form validation
 		$this->load->library('form_validation');
@@ -193,15 +177,45 @@ class Cms extends FHCAPI_Controller
 
 		// default value for the page_size is 10
 		$page_size = $page_size ?? 10;
+
+		$passedSichtbar = $this->input->get('published', true);
+		if($passedSichtbar !== null)
+		{
+			$sichtbar = $passedSichtbar;
+		}
 		
-		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size, $sprache);
+		$filterForDegreePrograms = false;
+		$entitledDegreePrograms = [];
+		$student = $this->StudentModel->loadWhere(['student_uid' => getAuthUID()]);
+		if(isError($student))
+		{
+			$this->terminateWithError(getError($student));
+		}
+		if(hasData($student))
+		{
+			$student = current(getData($student));
+
+			$degreeProgramSemesterDataResult = $this->PrestudentModel->getStudiengaengAndAusbildungssemesterByStudentUid(getAuthUID());
+			$degreeProgramSemesterData = $this->getDataOrTerminateWithError($degreeProgramSemesterDataResult)[0];
+			if ($degreeProgramSemesterData) {
+				$studiengang_kz = isset($degreeProgramSemesterData->studiengang_kz) ? $degreeProgramSemesterData->studiengang_kz : null;
+				$semester = isset($degreeProgramSemesterData->ausbildungssemester) ? $degreeProgramSemesterData->ausbildungssemester : null;
+			}
+
+			$mischen = true;
+		} else {
+			$filterForDegreePrograms = true;
+			$entitledDegreePrograms = $this->permissionlib->getSTG_isEntitledFor("basis/news");
+			array_push($entitledDegreePrograms, 0);
+		}
+
+		$news = $this->cmslib->getNews($infoscreen, $studiengang_kz, $semester, $mischen, $titel, $edit, $sichtbar, $page, $page_size, $sprache, $filterForDegreePrograms, $entitledDegreePrograms, true);
 		$news = $this->getDataOrTerminateWithError($news);
 
-		$this->addMeta('phrases', json_decode($this->p->getJson()));
-		$this->terminateWithSuccess($news);
+		$this->addMeta('row_count', $news["row_count"] ?? 0);
+		$this->terminateWithSuccess($news["content"]);
 
 	}
 
 	
 }
-

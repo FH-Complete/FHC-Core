@@ -1,477 +1,668 @@
-import { waitForOk } from "../helpers/network";
+import { waitForOk } from '../helpers/network';
 
-export const PLANER = "Planer";
-export const LEKTOR = "Lektor";
-export const STUDENT = "Student";
-export const SYNC = "Sync";
+export const PLANER = 'Planer';
+export const LEKTOR = 'Lektor';
+export const STUDENT = 'Student';
+export const SYNC = 'Sync';
 
 const weekdayToGridRowMap = {
-  Monday: "1",
-  Tuesday: "2",
-  Wednesday: "3",
-  Thursday: "4",
-  Friday: "5",
-  Saturday: "6",
-  Sunday: "7",
+	Monday: '1',
+	Tuesday: '2',
+	Wednesday: '3',
+	Thursday: '4',
+	Friday: '5',
+	Saturday: '6',
+	Sunday: '7',
 };
 const roleFetchAliases = {
-  [PLANER]: "@fetchPlanData",
-  [LEKTOR]: "@fetchLecturerPlanData",
-  [STUDENT]: "@fetchStudentPlanData",
+	[PLANER]: '@fetchPlanData',
+	[LEKTOR]: '@fetchLecturerPlanData',
+	[STUDENT]: '@fetchStudentPlanData',
 };
 
 class TempusPage {
-  selectors = {
-    calendarBaseGrid: "div[data-cy='tempus'] [data-cy='calendar-base-grid']",
-    parkingSlot: "div[data-cy='tempus'] #parkingslot",
-  };
+	selectors = {
+		calendarBaseGrid: "div[data-cy='tempus'] [data-cy='calendar-base-grid']",
+		parkingSlot: "div[data-cy='tempus'] #parkingslot",
+	};
 
-  visit = () =>
-    cy.visit("/index.ci.php/tempus", {
-      onBeforeLoad(win) {
-        win.localStorage.removeItem("tempus_parking");
-        win.localStorage.removeItem("tempus_searchtypes");
-        win.sessionStorage.removeItem("tempus_searchstr");
-      },
-    });
+	// Test setup
+	visit = () => {
+		const { adminusername, adminpassword } = Cypress.env();
 
-  setupIntercepts = () => {
-    cy.intercept({ method: "GET", url: "**/StgTree" }).as("fetchCourseTree");
-    cy.intercept({
-      method: "POST",
-      url: /\/tempus\/Kalender\/getPlan(?:\?|$)/,
-    }).as("fetchPlanData");
-    cy.intercept({
-      method: "GET",
-      url: /\/tempus\/Kalender\/getPlanLecturer(?:\?|$)/,
-    }).as("fetchLecturerPlanData");
-    cy.intercept({
-      method: "GET",
-      url: /\/tempus\/Kalender\/getPlanStudent(?:\?|$)/,
-    }).as("fetchStudentPlanData");
-    cy.intercept({ method: "GET", url: "**/tempus/Kalender/getHistory**" }).as(
-      "fetchEventHistory",
-    );
-    cy.intercept({
-      method: "GET",
-      url: "**/components/stv/studiensemester/now**",
-    }).as("getCurrentSemester");
-    cy.intercept({
-      method: "POST",
-      url: "**/components/stv/studiensemester/set**",
-    }).as("setSemester");
-    cy.intercept({
-      method: "POST",
-      url: "**/tempus/Kalender/getRaumvorschlag**",
-    }).as("fetchRoomSuggestions");
-    cy.intercept({
-      method: "GET",
-      url: "**/tempus/OperationalResourceToCalenderAPI/getSchedulableResourcesByCalendar/**",
-    }).as("fetchResourcesSuggestions");
-    cy.intercept({
-      method: "GET",
-      url: "**/tempus/OperationalResourceToCalenderAPI/getAssignedResourcesByCalender/**",
-    }).as("fetchAssignedResources");
-    cy.intercept({
-      method: "GET",
-      url: "**/tempus/Tags/getTags**",
-    }).as("fetchTags");
-    cy.intercept({
-      method: "GET",
-      url: "**/tempus/Tags/getTagsByCalendar/**",
-    }).as("fetchTagsByCalendar");
-    cy.intercept({
-      method: "POST",
-      url: "**/tempus/coursepicker/getByStg**",
-    }).as("fetchCoursePickerCourses");
-    cy.intercept({
-      method: "POST",
-      url: "**/searchbar/search**",
-    }).as("searchbarSearch");
-    cy.intercept({
-      method: "POST",
-      url: "**/tempus/Kalender/addKalenderEvent**",
-    }).as("addCalendarEvent");
-    cy.intercept({
-      method: "POST",
-      url: "**/tempus/Kalender/updateKalenderEvent**",
-    }).as("updateCalendarEvent");
-    cy.intercept({
-      method: "POST",
-      url: "**/tempus/Kalender/sync**",
-    }).as("syncCalendar");
-    cy.intercept({
-      method: "POST",
-      url: "**/tempus/Kalender/syncToStudent**",
-    }).as("syncCalendarToStudent");
-    cy.intercept({
-      method: "POST",
-      url: "**/tempus/Kalender/deleteEntry**",
-    }).as("deleteCalendarEvent");
-  };
+		return cy.visit('/index.ci.php/tempus', {
+			auth: {
+				username: adminusername,
+				password: adminpassword,
+			},
+			onBeforeLoad(win) {
+				win.localStorage.removeItem('tempus_parking');
+				win.localStorage.removeItem('tempus_searchtypes');
+				win.sessionStorage.removeItem('tempus_searchstr');
+			},
+		});
+	};
 
-  getTempusOverview = () => cy.get("div[data-cy='tempus']");
-  getSlideInCoursesMenu = () => cy.get("div[data-cy='verbandMenu']");
-  getSidebarMenu = () => this.getTempusOverview().find("#sidebarMenu");
-  getCalendarSection = () =>
-    this.getTempusOverview().find(".fhc-calendar-base");
-  getCalendarBaseGrid = () =>
-    this.getCalendarSection().find("[data-cy='calendar-base-grid']");
-  getCoursePicker = () => this.getTempusOverview().find(".course-picker");
-  getPreviewRoleOptionsHolder = () =>
-    this.getTempusOverview().find("[data-cy='previewRoleOptionsHolder']");
-  getAllCoursesSliderBtn = () =>
-    this.getSidebarMenu().find("button[title='Verband']").first();
-  getCourseTreeRows = () =>
-    this.getSlideInCoursesMenu()
-      .find("[data-cy='course-tree-row']")
-      .closest("[role='row']");
-  getCourseTreeRowByName = (courseShortName) =>
-    this.getSlideInCoursesMenu()
-      .contains("[data-cy='course-tree-row']", courseShortName)
-      .closest("[role='row']");
-  getCoursePickerRows = () => this.getCoursePicker().find(".course-picker-row");
-  getCoursePickerSearchInput = () => this.getCoursePicker().find("input");
-  getCalendarEventsPerWeekHolders = () =>
-    this.getCalendarBaseGrid().find(".fhc-calendar-base-grid-line");
-  getCalendarEvents = () =>
-    this.getCalendarSection().find("[data-cy='calendar-event']");
-  getLecturerWishOverlays = () =>
-    this.getCalendarSection().find(".bg-lecturer-wish");
-  getCalendarEventsWithRoom = () =>
-    this.getCalendarEvents().filter((index, event) => {
-      const eventData = JSON.parse(
-        event.getAttribute("data-fhc-draggable-value"),
-      );
+	setupIntercepts = () => {
+		cy.intercept({
+			method: 'GET',
+			url: '**/tempus/Info/getStudiengaenge',
+		}).as('fetchCourseTree');
+		cy.intercept({
+			method: 'POST',
+			url: /\/tempus\/Kalender\/getPlan(?:\?|$)/,
+		}).as('fetchPlanData');
+		cy.intercept({
+			method: 'GET',
+			url: /\/tempus\/Kalender\/getPlanLecturer(?:\?|$)/,
+		}).as('fetchLecturerPlanData');
+		cy.intercept({
+			method: 'GET',
+			url: /\/tempus\/Kalender\/getPlanStudent(?:\?|$)/,
+		}).as('fetchStudentPlanData');
+		cy.intercept({ method: 'GET', url: '**/tempus/Kalender/getHistory**' }).as(
+			'fetchEventHistory',
+		);
+		cy.intercept({
+			method: 'GET',
+			url: '**/organisation/studiensemester/current**',
+		}).as('getCurrentSemester');
+		cy.intercept({
+			method: 'POST',
+			url: '**/organisation/studiensemester/set**',
+		}).as('setSemester');
+		cy.intercept({
+			method: 'POST',
+			url: '**/tempus/Kalender/getRaumvorschlag**',
+		}).as('fetchRoomSuggestions');
+		cy.intercept({
+			method: 'GET',
+			url: '**/tempus/OperationalResourceToCalenderAPI/getSchedulableResourcesByCalendar/**',
+		}).as('fetchResourcesSuggestions');
+		cy.intercept({
+			method: 'GET',
+			url: '**/tempus/OperationalResourceToCalenderAPI/getAssignedResourcesByCalender/**',
+		}).as('fetchAssignedResources');
+		cy.intercept({
+			method: 'GET',
+			url: '**/tempus/Tags/getTags**',
+		}).as('fetchTags');
+		cy.intercept({
+			method: 'GET',
+			url: '**/tempus/Tags/getTagsByCalendar/**',
+		}).as('fetchTagsByCalendar');
+		cy.intercept({
+			method: 'POST',
+			url: '**/tempus/coursepicker/getCourses**',
+		}).as('fetchCoursePickerCourses');
+		cy.intercept({
+			method: 'POST',
+			url: '**/searchbar/search**',
+		}).as('searchbarSearch');
+		cy.intercept({
+			method: 'POST',
+			url: '**/tempus/Kalender/addKalenderEvent**',
+		}).as('addCalendarEvent');
+		cy.intercept({
+			method: 'POST',
+			url: '**/tempus/Kalender/updateKalenderEvent**',
+		}).as('updateCalendarEvent');
+		cy.intercept({
+			method: 'POST',
+			url: '**/tempus/Kalender/deleteEntry**',
+		}).as('deleteCalendarEvent');
+		cy.intercept({
+			method: 'POST',
+			url: '**/tempus/Kalender/sync**',
+		}).as('syncCalendar');
+		cy.intercept({
+			method: 'POST',
+			url: '**/tempus/Kalender/syncToLecturer**',
+		}).as('syncCalendarToLecturer');
+		cy.intercept({
+			method: 'POST',
+			url: '**/tempus/Kalender/syncToStudent**',
+		}).as('syncCalendarToStudent');
+		cy.intercept({
+			method: 'POST',
+			url: '**/tempus/Kalender/deleteEntry**',
+		}).as('deleteCalendarEvent');
+	};
 
-      let isArray = Array.isArray(eventData?.orig?.ort_kurzbz);
+	// Main page selectors
+	getTempusOverview = () => cy.get("div[data-cy='tempus']");
+	getSlideInCoursesMenu = () => cy.get("div[data-cy='verbandMenu']");
+	getSidebarMenu = () => this.getTempusOverview().find('#sidebarMenu');
+	getCalendarSection = () =>
+		this.getTempusOverview().find('.fhc-calendar-base');
+	getCalendarBaseGrid = () =>
+		this.getCalendarSection().find("[data-cy='calendar-base-grid']");
+	getCalendarModeButtons = () =>
+		this.getCalendarSection().find("[data-cy='calender-header-modes'] button");
+	getCalendarTableRows = () =>
+		this.getCalendarSection().find(
+			"[data-cy='calender-table-view'] .tabulator-row",
+		);
+	getCoursePicker = () =>
+		this.getTempusOverview().find("[data-cy='coursepicker']");
+	getPreviewRoleOptionsHolder = () =>
+		this.getTempusOverview().find("[data-cy='previewRoleOptionsHolder']");
+	getAllCoursesSliderBtn = () =>
+		this.getSidebarMenu().find("button[title='Verband']").first();
+	getCourseTreeRows = () =>
+		this.getSlideInCoursesMenu()
+			.find('tbody tr td.text-break')
+			.closest("[role='cell']");
+	getCourseTreeRowByName = (courseShortName) =>
+		this.getSlideInCoursesMenu()
+			.contains('tbody tr td.text-break .treemenu-entry', courseShortName)
+			.closest("[role='cell']");
+	getCoursePickerRows = () =>
+		this.getCoursePicker().find("[data-cy='coursepicker-row']");
+	getCoursePickerSearchInput = () => this.getCoursePicker().find('input');
 
-      return isArray ? eventData?.orig?.ort_kurzbz.length > 0 : !!eventData?.orig?.ort_kurzbz;
-    });
-  getCalendarEventsWithLecturer = () =>
-    this.getCalendarEvents().filter((index, event) => {
-      const eventData = JSON.parse(
-        event.getAttribute("data-fhc-draggable-value"),
-      );
-      return eventData?.orig?.lektor?.some((lecturer) => lecturer?.kurzbz);
-    });
-  getCalendarEventsWithLehreinheit = () =>
-    this.getCalendarEvents().filter((index, event) => {
-      const eventData = JSON.parse(
-        event.getAttribute("data-fhc-draggable-value"),
-      );
-      const lehreinheitIds = eventData?.orig?.lehreinheit_id;
+	// Calendar selectors and filters
+	getCalendarEventsPerWeekHolders = () =>
+		this.getCalendarBaseGrid().find('.fhc-calendar-base-grid-line');
+	getCalendarEvents = () =>
+		this.getCalendarSection().find("[data-cy='calendar-event']");
+	getLecturerWishOverlays = () =>
+		this.getCalendarSection().find('.bg-lecturer-wish');
+	getCalendarEventsWithRoom = () =>
+		this.getCalendarEvents().filter((index, event) => {
+			const eventData = JSON.parse(
+				event.getAttribute('data-fhc-draggable-value'),
+			);
 
-      return Array.isArray(lehreinheitIds)
-        ? lehreinheitIds.length > 0
-        : !!lehreinheitIds;
-    });
-  getCalendarEventsWithLehreinheitAndRoom = () =>
-    this.getCalendarEventsWithLehreinheit().filter((index, event) => {
-      const eventData = JSON.parse(
-        event.getAttribute("data-fhc-draggable-value"),
-      );
+			let isArray = Array.isArray(eventData?.orig?.ort_kurzbz);
 
-      return !!eventData?.orig?.ort_kurzbz;
-    });
-  getNavbarSearchInput = () =>
-    this.getTempusOverview().find("header .searchbar_input");
-  getNavbarRoomSearchResult = (room) => {
-    const escapedRoom = room.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+			return isArray
+				? eventData?.orig?.ort_kurzbz.length > 0
+				: !!eventData?.orig?.ort_kurzbz;
+		});
+	getCalendarEventsWithLecturer = () =>
+		this.getCalendarEvents().filter((index, event) => {
+			const eventData = JSON.parse(
+				event.getAttribute('data-fhc-draggable-value'),
+			);
+			return eventData?.orig?.lektor?.some((lecturer) => lecturer?.kurzbz);
+		});
+	getCalendarEventsWithLehreinheit = () =>
+		this.getCalendarEvents().filter((index, event) => {
+			const eventData = JSON.parse(
+				event.getAttribute('data-fhc-draggable-value'),
+			);
+			const lehreinheitIds = eventData?.orig?.lehreinheit_id;
 
-    return cy.contains(
-      ".searchbar-result-room .searchbar-result-template-action",
-      new RegExp(`^\\s*${escapedRoom}\\s*$`),
-    );
-  };
-  getFirstNavbarEmployeeSearchResult = () =>
-    cy
-      .get(
-        ".searchbar-result-student .searchbar_data .searchbar-result-template-action",
-      )
-      .first();
-  getSelectedRoomIndicator = (room) =>
-    this.getSidebarMenu().contains(".room-selection", room);
-  getSelectedRoomRemoveButton = (room) =>
-    this.getSelectedRoomIndicator(room).find("i.fa-xmark");
-  getSelectedLecturerIndicator = (lecturer) =>
-    this.getSidebarMenu().contains(".lecture-selection .fw-semibold", lecturer);
-  getSelectedLecturerRemoveButton = (lecturer) =>
-    this.getSelectedLecturerIndicator(lecturer).find("i.fa-xmark");
-  getSelectedLecturerPlanToggle = (lecturer) =>
-    this.getSelectedLecturerIndicator(lecturer)
-      .parent()
-      .contains(".d-flex.align-items-center", "Plan");
-  getSelectedLecturerWishToggle = (lecturer) =>
-    this.getSelectedLecturerIndicator(lecturer)
-      .parent()
-      .contains(".d-flex.align-items-center", "Zeitwünsche");
+			return Array.isArray(lehreinheitIds)
+				? lehreinheitIds.length > 0
+				: !!lehreinheitIds;
+		});
+	getCalendarEventsWithLehreinheitAndRoom = () =>
+		this.getCalendarEventsWithLehreinheit().filter((index, event) => {
+			const eventData = JSON.parse(
+				event.getAttribute('data-fhc-draggable-value'),
+			);
 
-  getCalendarEventById = (id) =>
-    this.getCalendarEvents().filter(`div[data-id="event-${id}"]`);
-  getCalendarPartDropTarget = (partIndex) =>
-    `${this.selectors.calendarBaseGrid} [data-cy='calendar-grid-part'][data-drop-index='${partIndex}']`;
-  getEventGridRowFromStyle = (style) =>
-    /grid-row:\s*([^;]+)/.exec(style)?.[1]?.trim();
-  getEventGridRow = (id) =>
-    this.getCalendarEventById(id)
-      .invoke("attr", "style")
-      .then((style) => this.getEventGridRowFromStyle(style));
-  getCalendarEventsByWeekday = (weekday) =>
-    this.getCalendarEventsPerWeekHolders()
-      .eq(weekdayToGridRowMap[weekday] - 1)
-      .find("[data-cy='calendar-event']");
-  getCalendarEventsByStartTime = (startTime) =>
-    this.getCalendarEvents().filter((index, event) => {
-      const eventData = JSON.parse(
-        event.getAttribute("data-fhc-draggable-value"),
-      );
-      return eventData?.orig?.beginn === startTime;
-    });
-  getCalendarEventsByTimeRange = (startTime, endTime) =>
-    this.getCalendarEvents().filter((index, event) => {
-      const eventData = JSON.parse(
-        event.getAttribute("data-fhc-draggable-value"),
-      );
-      return (
-        eventData?.orig?.beginn === startTime &&
-        eventData?.orig?.ende === endTime
-      );
-    });
-  getCalendarEventsBySoftTimeRange = (startTime, endTime) =>
-    this.getCalendarEvents().filter((index, event) => {
-      const eventData = JSON.parse(
-        event.getAttribute("data-fhc-draggable-value"),
-      );
-      return (
-        eventData?.orig?.beginn >= startTime && eventData?.orig?.ende <= endTime
-      );
-    });
-  getCalendarEventsByWeekdayAndStartTime = (weekday, startTime) =>
-    this.getCalendarEventsByWeekday(weekday).filter((index, event) => {
-      const eventData = JSON.parse(
-        event.getAttribute("data-fhc-draggable-value"),
-      );
-      return eventData?.orig?.beginn === startTime;
-    });
-  getCalendarEventsWithLehreinheitAndRoomByWeekdayAndStartTime = (
-    weekday,
-    startTime,
-  ) =>
-    this.getCalendarEventsByWeekdayAndStartTime(weekday, startTime).filter(
-      (index, event) => {
-        const eventData = JSON.parse(
-          event.getAttribute("data-fhc-draggable-value"),
-        );
+			return !!eventData?.orig?.ort_kurzbz;
+		});
 
-        return !!eventData?.orig?.ort_kurzbz && eventData?.orig?.lehreinheit_id;
-      },
-    );
-  getKalenderId = (eventData) => eventData?.orig?.kalender_id ?? eventData?.id;
-  getCalendarEventData = ($event) =>
-    JSON.parse($event.attr("data-fhc-draggable-value"));
-  getFirstLecturer = (eventData) =>
-    eventData?.orig?.lektor?.find((lecturer) => lecturer?.kurzbz);
-  getUpdatedKalenderId = (interception) => {
-    const retval = interception.response.body?.data?.retval;
+	// Navbar filters
+	getNavbarSearchInput = () =>
+		this.getTempusOverview().find('header .searchbar_input');
+	getNavbarRoomSearchResult = (room) => {
+		const escapedRoom = room.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-    return retval?.kalender_id ?? retval;
-  };
-  chooseDifferentRoomForEvent = (eventId, originalRoom) => {
-    this.getCalendarEventById(eventId)
-      .scrollIntoView()
-      .should("be.visible")
-      .rightclick();
-    this.getEventContextMenuOption("Raumauswahl").click({ force: true });
-    waitForOk("@fetchRoomSuggestions");
+		return cy.contains(
+			'.searchbar-result-room .searchbar-result-template-action',
+			new RegExp(`^\\s*${escapedRoom}\\s*$`),
+		);
+	};
+	getFirstNavbarEmployeeSearchResult = () =>
+		cy
+			.get(
+				'.searchbar-result-student .searchbar_data .searchbar-result-template-action',
+			)
+			.first();
+	getSelectedRoomIndicator = (room) =>
+		this.getSidebarMenu().contains('.room-selection', room);
+	getSelectedRoomRemoveButton = (room) =>
+		this.getSelectedRoomIndicator(room).find('i.fa-xmark');
+	getSelectedLecturerIndicator = (lecturer) =>
+		this.getSidebarMenu().contains('.lecture-selection .fw-semibold', lecturer);
+	getSelectedLecturerRemoveButton = (lecturer) =>
+		this.getSelectedLecturerIndicator(lecturer).find('i.fa-xmark');
+	getSelectedLecturerPlanToggle = (lecturer) =>
+		this.getSelectedLecturerIndicator(lecturer)
+			.parent()
+			.contains('.d-flex.align-items-center', 'Plan');
+	getSelectedLecturerWishToggle = (lecturer) =>
+		this.getSelectedLecturerIndicator(lecturer)
+			.parent()
+			.contains('.d-flex.align-items-center', 'Zeitwünsche');
 
-    return this.getRaumauswahlRoomOptions()
-      .should("have.length.greaterThan", 0)
-      .then(($roomOptions) => {
-        const roomOption = [...$roomOptions].find((option) => {
-          const room = option.innerText.trim();
+	// Calendar event selectors and data helpers
+	getCalendarEventById = (id) =>
+		this.getCalendarEvents().filter(`div[data-id="event-${id}"]`);
+	getCalendarEventByUniqueCalenderGroupId = (groupId) =>
+		this.getCalendarEvents().filter(
+			`div[data-group-id="event-group-${groupId}"]`,
+		);
+	getCalendarPartDropTarget = (partIndex) =>
+		`${this.selectors.calendarBaseGrid} [data-cy='calendar-grid-part'][data-drop-index='${partIndex}']`;
+	getEventGridRowFromStyle = (style) =>
+		/grid-row:\s*([^;]+)/.exec(style)?.[1]?.trim();
+	getGridRowByContainingEventId = (id) =>
+		this.getCalendarEventById(id)
+			.invoke('attr', 'style')
+			.then((style) => this.getEventGridRowFromStyle(style));
+	getGridRowByContainingUniqueCalendarGroupId = (groupId) =>
+		this.getCalendarEventByUniqueCalenderGroupId(groupId)
+			.invoke('attr', 'style')
+			.then((style) => this.getEventGridRowFromStyle(style));
+	getCalendarEventsByWeekday = (weekday) =>
+		this.getCalendarEventsPerWeekHolders().then(($holders) => {
+			const index = weekdayToGridRowMap[weekday] - 1;
 
-          return room && room !== originalRoom;
-        });
+			return cy
+				.wrap($holders)
+				.eq(index)
+				.then(($holder) => {
+					return cy
+						.wrap($holder)
+						.find("[data-cy='calendar-event']")
+						.then(($events) => {
+							return $events;
+						});
+				});
+		});
+	getCalendarEventsByStartTime = (startTime) =>
+		this.getCalendarEvents().filter((index, event) => {
+			const eventData = JSON.parse(
+				event.getAttribute('data-fhc-draggable-value'),
+			);
+			return eventData?.orig?.beginn === startTime;
+		});
+	getCalendarEventsByTimeRange = (startTime, endTime) =>
+		this.getCalendarEvents().filter((index, event) => {
+			const eventData = JSON.parse(
+				event.getAttribute('data-fhc-draggable-value'),
+			);
+			return (
+				eventData?.orig?.beginn === startTime &&
+				eventData?.orig?.ende === endTime
+			);
+		});
+	getCalendarEventsBySoftTimeRange = (startTime, endTime) =>
+		this.getCalendarEvents().filter((index, event) => {
+			const eventData = JSON.parse(
+				event.getAttribute('data-fhc-draggable-value'),
+			);
+			return (
+				eventData?.orig?.beginn >= startTime && eventData?.orig?.ende <= endTime
+			);
+		});
+	getCalendarEventsByWeekdayAndStartTime = (weekday, startTime) =>
+		this.getCalendarEventsByWeekday(weekday).then(($events) =>
+			$events.filter((index, event) => {
+				const eventData = JSON.parse(
+					event.getAttribute('data-fhc-draggable-value'),
+				);
 
-        expect(roomOption, "different room suggestion").to.exist;
+				return eventData?.orig?.beginn === startTime;
+			}),
+		);
+	getCalendarEventsByWeekdayAndTimeRange = (weekday, startTime, endTime) =>
+		this.getCalendarEventsByWeekday(weekday).filter((index, event) => {
+			const eventData = JSON.parse(
+				event.getAttribute('data-fhc-draggable-value'),
+			);
 
-        const newRoom = roomOption.innerText.trim();
+			return (
+				eventData?.orig?.beginn === startTime &&
+				eventData?.orig?.ende === endTime
+			);
+		});
+	getCalendarEventsWithLehreinheitAndRoomByWeekdayAndStartTime = (
+		weekday,
+		startTime,
+	) =>
+		this.getCalendarEventsByWeekdayAndStartTime(weekday, startTime).filter(
+			(index, event) => {
+				const eventData = JSON.parse(
+					event.getAttribute('data-fhc-draggable-value'),
+				);
 
-        return cy.wrap(roomOption).click().then(() => newRoom);
-      });
-  };
-  waitForUpdatedEventId = () =>
-    cy.wait("@updateCalendarEvent").then((interception) => {
-      expect(interception.response.statusCode).to.eq(200);
-      console.log("interception.response.body", interception.response);
-      const updatedEventId = this.getUpdatedKalenderId(interception);
-      expect(updatedEventId, "updated planner event id").to.exist;
+				return !!eventData?.orig?.ort_kurzbz && eventData?.orig?.lehreinheit_id;
+			},
+		);
+	getKalenderId = (eventData) => eventData?.orig?.kalender_id ?? eventData?.id;
+	getCalendarEventData = ($event) =>
+		JSON.parse($event.attr('data-fhc-draggable-value'));
+	getFirstLecturer = (eventData) =>
+		eventData?.orig?.lektor?.find((lecturer) => lecturer?.kurzbz);
+	getUpdatedKalenderId = (interception) => {
+		const retval = interception.response.body?.data?.kalender_id;
 
-      return updatedEventId;
-    });
-  changeEventRoom = (eventId, originalRoom) =>
-    this.chooseDifferentRoomForEvent(eventId, originalRoom).then((newRoom) =>
-      this.waitForUpdatedEventId().then((updatedEventId) => {
-        waitForOk("@fetchPlanData");
-        this.waitForCalendarToFinishLoading();
+		return retval?.kalender_id ?? retval;
+	};
 
-        return cy.wrap({ newRoom, updatedEventId });
-      }),
-    );
-  getMondayFirstColumnEventData = ($body) =>
-    [
-      ...$body
-        .find(`${this.selectors.calendarBaseGrid} .fhc-calendar-base-grid-line`)
-        .first()
-        .find("[data-cy='calendar-event']"),
-    ]
-      .map((event) => {
-        const eventJSON = event.getAttribute("data-fhc-draggable-value");
+	scrollCalendarEventIntoView = (eventId) => {
+		return this.getCalendarEventById(eventId).then(($event) => {
+			const eventEl = $event[0];
 
-        try {
-          return eventJSON ? JSON.parse(eventJSON) : null;
-        } catch {
-          return null;
-        }
-      })
-      .filter(Boolean);
-  getCalendarLoadingEvents = () =>
-    this.getCalendarSection().find(".placeholder-glow");
-  getCalendarEventModal = () =>
-    this.getCalendarSection().find(".bootstrap-modal.show");
-  getEventContextMenu = () => cy.get("[data-cy='eventContextMenu']");
-  getEventContextMenuOption = (option) =>
-    this.getEventContextMenu().contains("button", option);
-  getRoomSelectionModal = () =>
-    cy
-      .contains(".bootstrap-modal.show .modal-title", "Raumauswahl")
-      .closest(".bootstrap-modal.show");
-  getRaumauswahlRoomOptions = () =>
-    this.getRoomSelectionModal().find(".list-group-item span");
-  getResourcesModal = () =>
-    cy
-      .get("[data-cy='resourcesAssignmentModal']")
-      .closest(".bootstrap-modal.show");
-  getTagsModal = () =>
-    cy.get("[data-cy='tagsAssignmentModal']").closest(".bootstrap-modal.show")
-  getCalendarEventRoom = (id) =>
-    this.getCalendarEventById(id).find("[data-cy='calendar-event-room']");
-  getStundenrasterToggle = () =>
-    cy.contains(".form-check-label", "Stundenraster").parent();
-  getHistoryModal = () => cy.get("[data-cy='historyModal']");
-  getReservationDragHandle = () => cy.get("[data-cy='reservationDragHandle']");
-  getReservationModal = () => cy.get("[data-cy='reservationModal']");
-  getEventParkingSlot = () => this.getSidebarMenu().find("#parkingslot");
-  getParkedEvents = () =>
-    this.getEventParkingSlot().find("[data-cy='calendar-event']");
-  getPreviewRoleButton = (role) =>
-    this.getPreviewRoleOptionsHolder().contains("button", role);
+			const verticalScroller = eventEl.closest('#grid-main-scrollable');
+			const horizontalScroller = eventEl.closest('.fhc-calendar-base-grid');
 
-  getSemesterSetterButton = () =>
-    this.getSidebarMenu().find(".stv-studiensemester button").last();
+			if (!verticalScroller || !horizontalScroller) {
+				throw new Error('Calendar scroll containers not found');
+			}
 
-  openCoursesMenu = () => {
-    this.getAllCoursesSliderBtn().click();
-    this.getSlideInCoursesMenu().should("be.visible");
-  };
+			const eventRect = eventEl.getBoundingClientRect();
+			const verticalRect = verticalScroller.getBoundingClientRect();
+			const horizontalRect = horizontalScroller.getBoundingClientRect();
 
-  selectFirstCourse = () => {
-    this.openCoursesMenu();
-    this.getCourseTreeRows().first().click();
-  };
+			verticalScroller.scrollTop +=
+				eventRect.top -
+				verticalRect.top -
+				verticalScroller.clientHeight / 2 +
+				eventRect.height / 2;
 
-  selectCourseByName = (courseShortName) => {
-    this.openCoursesMenu();
-    this.getCourseTreeRowByName(courseShortName).click();
-  };
+			horizontalScroller.scrollLeft +=
+				eventRect.left -
+				horizontalRect.left -
+				horizontalScroller.clientWidth / 2 +
+				eventRect.width / 2;
+		});
+	};
 
-  selectPreviewRole = (role) => {
-    this.getPreviewRoleButton(role).click();
-  };
+	// Room-selection actions
+	chooseDifferentRoomForEvent = (eventId, originalRoom) => {
+		return this.scrollCalendarEventIntoView(eventId)
+			.then(() => {
+				return this.getCalendarEventById(eventId)
+					.should('be.visible')
+					.rightclick();
+			})
+			.then(() => {
+				this.getEventContextMenuOption('Raumauswahl').click({ force: true });
+				waitForOk('@fetchRoomSuggestions');
 
-  syncAndReloadPlanner = () => {
-    this.selectPreviewRole(SYNC);
-    waitForOk("@syncCalendar");
-    waitForOk("@fetchPlanData");
-    this.waitForCalendarToFinishLoading();
-  };
+				return this.getRoomSelectionOptions()
+					.should('have.length.greaterThan', 0)
+					.then(($roomOptions) => {
+						const getRoomCode = (option) => option.textContent.trim();
+						const currentRoomOption = [...$roomOptions].find(
+							(option) => getRoomCode(option) === originalRoom,
+						);
+						const roomOption = [...$roomOptions].find((option) => {
+							const room = getRoomCode(option);
 
-  selectRoleAndWait = (role) => {
-    this.selectPreviewRole(role);
-    waitForOk(roleFetchAliases[role]);
-    this.waitForCalendarToFinishLoading();
-  };
+							return room && room !== originalRoom;
+						});
 
-  expectCalendarEventRoom = (eventId, expectedRoom) => {
-    this.getCalendarEventRoom(eventId)
-      .scrollIntoView()
-      .should("be.visible")
-      .invoke("text")
-      .then((roomText) => {
-        expect(roomText.trim(), "event room").to.eq(expectedRoom);
-      });
-  };
+						expect(currentRoomOption, 'current room suggestion').to.exist;
+						expect(roomOption, 'different room suggestion').to.exist;
 
-  visitAndWaitForPlanner = () => {
-    cy.login();
-    this.setupIntercepts();
-    this.visit();
+						const newRoom = getRoomCode(roomOption);
 
-    waitForOk("@fetchCourseTree");
-    waitForOk("@fetchPlanData");
-    this.waitForCalendarToFinishLoading();
-  };
+						return cy
+							.wrap(currentRoomOption)
+							.click()
+							.then(() => cy.wrap(roomOption).click())
+							.then(() =>
+								cy
+									.get("[data-cy='saveRoomSelection']")
+									.should('be.visible')
+									.click({ force: true }),
+							)
+							.then(() => newRoom);
+					});
+			});
+	};
 
-  disableStundenraster = () => {
-    this.getStundenrasterToggle().then(($toggle) => {
-      if ($toggle.find(".fa-toggle-on").length) {
-        cy.wrap($toggle).click();
-      }
-    });
+	selectFirstRoomAndSave = () =>
+		this.getRoomSelectionOptions()
+			.should('have.length.greaterThan', 0)
+			.first()
+			.then(($roomOption) => {
+				const room = $roomOption.text().trim();
 
-    this.getStundenrasterToggle()
-      .find("i")
-      .should("have.class", "fa-toggle-off");
-  };
+				return cy
+					.wrap($roomOption)
+					.click()
+					.then(() =>
+						cy
+							.get("[data-cy='saveRoomSelection']")
+							.should('be.visible')
+							.click({ force: true }),
+					)
+					.then(() => room);
+			});
 
-  waitForCalendarToFinishLoading = () => {
-    this.getCalendarLoadingEvents().should("not.exist");
-  };
+	selectAdditionalRoomsAndSave = (currentRooms, roomCount = 2) =>
+		this.getRoomSelectionOptions()
+			.should('have.length.greaterThan', roomCount)
+			.then(($roomOptions) => {
+				const selectedRooms = new Set(
+					(Array.isArray(currentRooms) ? currentRooms : [currentRooms]).filter(
+						Boolean,
+					),
+				);
+				const additionalRoomOptions = [...$roomOptions]
+					.filter(
+						(roomOption) => !selectedRooms.has(roomOption.textContent.trim()),
+					)
+					.slice(0, roomCount);
 
-  setCurrentSemester = () => {
-    this.getSemesterSetterButton().click();
-    waitForOk("@getCurrentSemester");
-  };
+				expect(
+					additionalRoomOptions,
+					'additional room suggestions',
+				).to.have.length(roomCount);
 
-  dropEventOnCalendarPart = (eventId, partIndex, options = {}) => {
-    const event = this.getCalendarEventById(eventId);
+				const additionalRooms = additionalRoomOptions.map((roomOption) =>
+					roomOption.textContent.trim(),
+				);
 
-    return event
-      .scrollIntoView()
-      .should("be.visible")
-      .drag(this.getCalendarPartDropTarget(partIndex), {
-        waitForAnimations: false,
-        animationDistanceThreshold: 0,
-        ...options,
-      });
-  };
-  
-  dropCourseOnCalendarPart = (courseIndex, partIndex, options = {}) => {
-    const course = this.getCoursePickerRows()
-      .eq(courseIndex)
-      .find("span")
-      .first();
+				additionalRoomOptions.forEach((roomOption) =>
+					cy.wrap(roomOption).click(),
+				);
 
-    return course
-      .should("be.visible")
-      .drag(this.getCalendarPartDropTarget(partIndex), {
-        waitForAnimations: false,
-        animationDistanceThreshold: 0,
-        scrollBehavior: "top",
-        ...options,
-      });
-  };
+				return cy
+					.get("[data-cy='saveRoomSelection']")
+					.should('be.visible')
+					.click({ force: true })
+					.then(() => additionalRooms);
+			});
+
+	waitForUpdatedEventId = () =>
+		cy.wait('@updateCalendarEvent').then((interception) => {
+			expect(interception.response.statusCode).to.eq(200);
+
+			const updatedEventId = this.getUpdatedKalenderId(interception);
+			expect(updatedEventId, 'updated planner event id').to.exist;
+
+			return updatedEventId;
+		});
+	changeEventRoom = (eventId, originalRoom) =>
+		this.chooseDifferentRoomForEvent(eventId, originalRoom).then((newRoom) =>
+			this.waitForUpdatedEventId().then((updatedEventId) => {
+				waitForOk('@fetchPlanData');
+				this.waitForCalendarToFinishLoading();
+
+				return cy.wrap({ newRoom, updatedEventId });
+			}),
+		);
+
+	// Calendar state and modal selectors
+	getMondayFirstColumnEventData = ($body) =>
+		[
+			...$body
+				.find(`${this.selectors.calendarBaseGrid} .fhc-calendar-base-grid-line`)
+				.first()
+				.find("[data-cy='calendar-event']"),
+		]
+			.map((event) => {
+				const eventJSON = event.getAttribute('data-fhc-draggable-value');
+
+				try {
+					return eventJSON ? JSON.parse(eventJSON) : null;
+				} catch {
+					return null;
+				}
+			})
+			.filter(Boolean);
+	getCalendarLoadingEvents = () =>
+		this.getCalendarSection().find('.placeholder-glow');
+	getCalendarEventModal = () =>
+		this.getCalendarSection().find('.bootstrap-modal.show');
+	getEventContextMenu = () => cy.get("[data-cy='eventContextMenu']");
+	getEventContextMenuOption = (option) =>
+		this.getEventContextMenu().contains('button', option);
+	getRoomSelectionModal = () =>
+		cy.get("[data-cy='raumauswahlModal']").closest('.bootstrap-modal.show');
+	getRoomSelectionOptions = () =>
+		this.getRoomSelectionModal().find("[data-cy='room-ort-kurzbz']");
+	getResourcesModal = () =>
+		cy
+			.get("[data-cy='resourcesAssignmentModal']")
+			.closest('.bootstrap-modal.show');
+	getTagsModal = () =>
+		cy.get("[data-cy='tagsAssignmentModal']").closest('.bootstrap-modal.show');
+	getCalendarEventRoom = (id) =>
+		this.getCalendarEventById(id).find("[data-cy='calendar-event-room']");
+	getStundenrasterToggle = () =>
+		cy.contains('.form-check-label', 'Stundenraster').parent();
+	getHistoryModal = () => cy.get("[data-cy='historyModal']");
+	getReservationDragHandle = () => cy.get("[data-cy='reservationDragHandle']");
+	getReservationModal = () => cy.get("[data-cy='reservationModal']");
+	getEventParkingSlot = () => this.getSidebarMenu().find('#parkingslot');
+	getParkedEvents = () =>
+		this.getEventParkingSlot().find("[data-cy='parked-calendar-event']");
+	getPreviewRoleButton = (role) =>
+		this.getPreviewRoleOptionsHolder().contains('button', role);
+
+	// Navigation and preview actions
+	getSemesterSetterButton = () =>
+		this.getSidebarMenu().find('.stv-studiensemester button').last();
+
+	openCoursesMenu = () => {
+		this.getAllCoursesSliderBtn().click();
+		this.getSlideInCoursesMenu().should('be.visible');
+	};
+
+	selectFirstCourse = () => {
+		this.openCoursesMenu();
+		this.getCourseTreeRows().first().click();
+	};
+
+	selectCourseByName = (courseShortName) => {
+		this.openCoursesMenu();
+		this.getCourseTreeRowByName(courseShortName).click();
+	};
+
+	selectPreviewRole = (role) => {
+		this.getPreviewRoleButton(role).click();
+	};
+
+	syncAndReloadPlanner = () => {
+		this.selectPreviewRole(SYNC);
+		waitForOk('@syncCalendar');
+		waitForOk('@fetchPlanData');
+		this.waitForCalendarToFinishLoading();
+	};
+
+	selectRoleAndWait = (role) => {
+		this.selectPreviewRole(role);
+		waitForOk(roleFetchAliases[role]);
+		this.waitForCalendarToFinishLoading();
+	};
+
+	// Assertions and loading state
+	expectCalendarEventRoom = (eventId, expectedRoom) => {
+		return this.scrollCalendarEventIntoView(eventId).then(() => {
+			this.getCalendarEventRoom(eventId)
+				.scrollIntoView()
+				.should('be.visible')
+				.invoke('text')
+				.then((roomText) => {
+					expect(roomText.trim(), 'event room').to.eq(expectedRoom);
+				});
+		});
+	};
+
+	expectCalendarEventRooms = (eventId, expectedRooms) => {
+		return this.scrollCalendarEventIntoView(eventId).then(() => {
+			this.getCalendarEventRoom(eventId)
+				.should('be.visible')
+				.invoke('text')
+				.then((roomText) => {
+					expectedRooms.forEach((room) => {
+						expect(roomText.trim(), 'event rooms').to.include(room);
+					});
+				});
+		});
+	};
+
+	visitAndWaitForPlanner = () => {
+		cy.login();
+		this.setupIntercepts();
+		this.visit();
+
+		waitForOk('@fetchCourseTree');
+		waitForOk('@fetchPlanData');
+		this.waitForCalendarToFinishLoading();
+	};
+
+	disableStundenraster = () => {
+		this.getStundenrasterToggle().then(($toggle) => {
+			if ($toggle.find('.fa-toggle-on').length) {
+				cy.wrap($toggle).click();
+			}
+		});
+
+		this.getStundenrasterToggle()
+			.find('i')
+			.should('have.class', 'fa-toggle-off');
+	};
+
+	waitForCalendarToFinishLoading = () => {
+		this.getCalendarLoadingEvents().should('not.exist');
+	};
+
+	setCurrentSemester = () => {
+		this.getSemesterSetterButton().click();
+		waitForOk('@getCurrentSemester');
+	};
+
+	// Drag-and-drop actions
+	dropEventOnCalendarPart = (eventId, partIndex, options = {}) => {
+		return this.scrollCalendarEventIntoView(eventId).then(() => {
+			return this.getCalendarEventById(eventId)
+				.should('be.visible')
+				.drag(this.getCalendarPartDropTarget(partIndex), {
+					waitForAnimations: false,
+					animationDistanceThreshold: 0,
+					...options,
+				});
+		});
+	};
+
+	dropCourseOnCalendarPart = (courseIndex, partIndex, options = {}) => {
+		const course = this.getCoursePickerRows()
+			.eq(courseIndex)
+			.find('span')
+			.first();
+
+		return course
+			.should('be.visible')
+			.drag(this.getCalendarPartDropTarget(partIndex), {
+				waitForAnimations: false,
+				animationDistanceThreshold: 0,
+				scrollBehavior: 'top',
+				...options,
+			});
+	};
 }
 
 export const tempusPage = new TempusPage();

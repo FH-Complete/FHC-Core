@@ -58,7 +58,7 @@ class CollisionChecker
 		foreach ($this->_checks as $check)
 		{
 			if (empty($remaining_ids)) break;
-			log_message('error', 'CollisionChecker: Running check ' . $check->getName() . ' for ' . count($remaining_ids) . ' remaining kalender_ids');
+
 			$batchResult = $check->checkAll($remaining_ids);
 			foreach ($batchResult as $kalender_id => $errors)
 			{

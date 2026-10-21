@@ -19,8 +19,6 @@ class Tempus extends Auth_Controller
 
 		// Load Config
 		$this->load->config('calendar');
-
-		$this->load->helper('hlp_header_helper');
 	}
 
 	public function index()

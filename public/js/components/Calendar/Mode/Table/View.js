@@ -315,8 +315,8 @@ export default {
 			if (e.target.closest('a, input'))
 				return;
 
-			let rowIndex = row.getData().row_index;
-			let eventData = this.events.find(ev => ev.id === rowIndex)?.orig ?? row.getData();
+			let rowData = row.getData();
+			let eventData = this.events.find(ev => ev.orig?.eindeutige_kalender_gruppen_id === rowData.eindeutige_kalender_gruppen_id)?.orig ?? rowData;
 
 			let event = new CustomEvent('cal-click', {
 				cancelable: true,
@@ -352,7 +352,7 @@ export default {
 		},
 	},
 	template: /* html */`
-	<div class="fhc-calendar-mode-table-view position-absolute top-0 start-0 w-100 h-100 d-flex flex-column">
+	<div class="fhc-calendar-mode-table-view position-absolute top-0 start-0 w-100 h-100 d-flex flex-column" data-cy="calender-table-view">
 		<core-filter-cmpt
 			ref="tableViewTable"
 			:tabulator-options="tabulatorOptions"

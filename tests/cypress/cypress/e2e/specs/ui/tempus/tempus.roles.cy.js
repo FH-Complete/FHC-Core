@@ -1,255 +1,383 @@
-import { waitForOk } from "../../../../support/helpers/network";
-import { tempusApi } from "../../../../support/api/tempusApi";
+import { waitForOk } from '../../../../support/helpers/network';
+import { tempusApi } from '../../../../support/api/tempusApi';
 import {
-  LEKTOR,
-  PLANER,
-  STUDENT,
-  tempusPage,
-} from "../../../../support/pages/tempus.po";
+	LEKTOR,
+	PLANER,
+	STUDENT,
+	tempusPage,
+} from '../../../../support/pages/tempus.po';
 
-context("Tempus role preview tests", () => {
-  beforeEach(() => {
-    tempusPage.visitAndWaitForPlanner();
+context('Tempus role preview tests', () => {
+	before(() => {
+		cy.login();
 
-    tempusApi.deletePlannerEventsForDay("monday");
-  });
+		let settingsData = tempusApi.getSettingsData();
+		settingsData.ignore_kollision = true;
+		settingsData.roomless_planning = false;
+		settingsData.room_planning = 'dialog_room_planning';
+		tempusApi.updateSettingsData(settingsData);
+	});
+	beforeEach(() => {
+		tempusPage.visitAndWaitForPlanner();
 
-  it("shows the same number of calendar events for all role previews", () => {
-    const rolePreviews = [PLANER, LEKTOR, STUDENT];
-    const eventCounts = {};
+		tempusApi.deletePlannerEventsForDay('monday');
+	});
 
-    tempusPage.syncAndReloadPlanner();
+	it('shows the same number of calendar events for all role previews', () => {
+		const rolePreviews = [PLANER, LEKTOR, STUDENT];
+		const eventCounts = {};
 
-    cy.wrap(rolePreviews)
-      .each((role) => {
-        tempusPage.selectRoleAndWait(role);
+		tempusPage.syncAndReloadPlanner();
 
-        tempusPage.getCalendarEvents().then(($events) => {
-          eventCounts[role] = $events.length;
-        });
-      })
-      .then(() => {
-        const expectedCount = eventCounts[rolePreviews[0]];
+		cy.wrap(rolePreviews)
+			.each((role) => {
+				tempusPage.selectRoleAndWait(role);
 
-        Object.entries(eventCounts).forEach(([role, count]) => {
-          expect(count, `${role} calendar event count`).to.eq(expectedCount);
-        });
-      });
-  });
+				tempusPage.getCalendarEvents().then(($events) => {
+					eventCounts[role] = $events.length;
+				});
+			})
+			.then(() => {
+				const expectedCount = eventCounts[rolePreviews[0]];
 
-  it("on planner event change shows unchanged event on other roles", () => {
-    tempusPage.syncAndReloadPlanner();
+				Object.entries(eventCounts).forEach(([role, count]) => {
+					expect(count, `${role} calendar event count`).to.eq(expectedCount);
+				});
+			});
+	});
 
-    tempusPage
-      .getCalendarEventsByTimeRange("13:35:00", "14:20:00")
-      .first()
-      .invoke("attr", "data-fhc-draggable-value")
-      .then((eventJSON) => {
-        expect(eventJSON).to.exist;
+	it('keeps events unchanged in lecturer and student previews after a planner edit', () => {
+		tempusPage.syncAndReloadPlanner();
 
-        let eventId = JSON.parse(eventJSON)?.id;
-        expect(eventId).to.exist;
+		tempusPage
+			.getCalendarEventsByTimeRange('13:35:00', '14:20:00')
+			.first()
+			.invoke('attr', 'data-fhc-draggable-value')
+			.then((eventJSON) => {
+				expect(eventJSON).to.exist;
 
-        tempusPage.dropEventOnCalendarPart(eventId, 3, {
-          scrollIntoView: true,
-        });
+				let eventId = JSON.parse(eventJSON)?.id;
+				expect(eventId).to.exist;
 
-        cy.wait("@updateCalendarEvent").then((interception) => {
-          expect(interception.response.statusCode).to.eq(200);
-          expect(interception.response.body.data.retval).to.exist;
+				tempusPage.dropEventOnCalendarPart(eventId, 3, {
+					scrollIntoView: true,
+				});
 
-          const updatedEventId =
-            interception.response.body.data.retval?.kalender_id ??
-            interception.response.body.data.retval;
+				cy.wait('@updateCalendarEvent').then((interception) => {
+					expect(interception.response.statusCode).to.eq(200);
+					expect(interception.response.body.data).to.exist;
 
-          cy.wrap(updatedEventId).as("updatedEventId");
-        });
-        waitForOk("@fetchPlanData");
+					const updatedEventGroupId =
+						interception.response.body.data?.eindeutige_kalender_gruppen_id ??
+						interception.response.body.data;
 
-        cy.get("@updatedEventId").then((updatedEventId) => {
-          tempusPage.getEventGridRow(updatedEventId).then((gridRowStyle) => {
-            tempusPage.selectRoleAndWait(LEKTOR);
-            tempusPage.getEventGridRow(eventId).then((lecturerGridRow) => {
-              expect(lecturerGridRow).to.not.eq(gridRowStyle);
-            });
+					cy.wrap(updatedEventGroupId).as('updatedEventGroupId');
+				});
+				waitForOk('@fetchPlanData');
 
-            tempusPage.selectRoleAndWait(STUDENT);
-            tempusPage.getEventGridRow(eventId).then((studentGridRow) => {
-              expect(studentGridRow).to.not.eq(gridRowStyle);
-            });
-          });
-        });
-      });
+				cy.get('@updatedEventGroupId').then((updatedEventGroupId) => {
+					tempusPage
+						.getGridRowByContainingUniqueCalendarGroupId(updatedEventGroupId)
+						.then((gridRowStyle) => {
+							tempusPage.selectRoleAndWait(LEKTOR);
+							tempusPage
+								.getGridRowByContainingUniqueCalendarGroupId(
+									updatedEventGroupId,
+								)
+								.then((lecturerGridRow) => {
+									expect(lecturerGridRow).to.not.eq(gridRowStyle);
+								});
 
-    cy.get(".fhc-calendar-base-grid > div:last-child()").invoke(
-      "css",
-      "overflow",
-      "auto",
-    );
-  });
+							tempusPage.selectRoleAndWait(STUDENT);
+							tempusPage
+								.getGridRowByContainingUniqueCalendarGroupId(
+									updatedEventGroupId,
+								)
+								.then((studentGridRow) => {
+									expect(studentGridRow).to.not.eq(gridRowStyle);
+								});
+						});
+				});
+			});
 
-  it("sync after planner preview event change loads event in same way on all previews", () => {
-    tempusPage.syncAndReloadPlanner();
+		cy.get('.fhc-calendar-base-grid > div:last-child()').invoke(
+			'css',
+			'overflow',
+			'auto',
+		);
+	});
 
-    tempusPage
-      .getCalendarEventsBySoftTimeRange("13:35:00", "14:20:00")
-      .first()
-      .invoke("attr", "data-fhc-draggable-value")
-      .then((eventJSON) => {
-        expect(eventJSON).to.exist;
+	it('keeps events unchanged in lecturer and student previews after a planner edit and syncing', () => {
+		tempusPage.syncAndReloadPlanner();
 
-        let eventId = JSON.parse(eventJSON)?.id;
-        expect(eventId).to.exist;
+		tempusPage
+			.getCalendarEventsBySoftTimeRange('13:35:00', '14:20:00')
+			.first()
+			.invoke('attr', 'data-fhc-draggable-value')
+			.then((eventJSON) => {
+				expect(eventJSON).to.exist;
 
-        tempusPage.dropEventOnCalendarPart(eventId, 4, {
-          scrollIntoView: true,
-        });
+				let eventId = JSON.parse(eventJSON)?.id;
+				expect(eventId).to.exist;
 
-        cy.wait("@updateCalendarEvent").then((interception) => {
-          expect(interception.response.statusCode).to.eq(200);
-          expect(interception.response.body.data.retval).to.exist;
+				tempusPage.dropEventOnCalendarPart(eventId, 4, {
+					scrollIntoView: true,
+				});
 
-          const updatedEventId =
-            interception.response.body.data.retval?.kalender_id ??
-            interception.response.body.data.retval;
+				cy.wait('@updateCalendarEvent').then((interception) => {
+					expect(interception.response.statusCode).to.eq(200);
+					expect(interception.response.body.data).to.exist;
 
-          cy.wrap(updatedEventId).as("updatedEventId");
-        });
-        waitForOk("@fetchPlanData");
+					const updatedEventGroupId =
+						interception.response.body.data?.eindeutige_kalender_gruppen_id ??
+						interception.response.body.data;
 
-        tempusPage.syncAndReloadPlanner();
+					cy.wrap(updatedEventGroupId).as('updatedEventGroupId');
+				});
+				waitForOk('@fetchPlanData');
 
-        cy.get("@updatedEventId").then((updatedEventId) => {
-          tempusPage.getEventGridRow(updatedEventId).then((gridRowStyle) => {
-            tempusPage.selectRoleAndWait(LEKTOR);
-            tempusPage
-              .getEventGridRow(updatedEventId)
-              .then((lecturerGridRow) => {
-                expect(lecturerGridRow).to.eq(gridRowStyle);
-              });
+				tempusPage.syncAndReloadPlanner();
 
-            tempusPage.selectRoleAndWait(STUDENT);
-            tempusPage
-              .getEventGridRow(updatedEventId)
-              .then((studentGridRow) => {
-                expect(studentGridRow).to.eq(gridRowStyle);
-              });
-          });
-        });
-      });
-  });
+				cy.get('@updatedEventGroupId').then((updatedEventGroupId) => {
+					tempusPage
+						.getGridRowByContainingUniqueCalendarGroupId(updatedEventGroupId)
+						.then((gridRowStyle) => {
+							tempusPage.selectRoleAndWait(LEKTOR);
+							tempusPage
+								.getGridRowByContainingUniqueCalendarGroupId(
+									updatedEventGroupId,
+								)
+								.then((lecturerGridRow) => {
+									expect(lecturerGridRow).not.to.eq(gridRowStyle);
+								});
 
-  it.skip("live unlock after planner preview event change loads event in same way on planner and lektor, but not on student preview", () => {
-    tempusPage.syncAndReloadPlanner();
+							tempusPage.selectRoleAndWait(STUDENT);
+							tempusPage
+								.getGridRowByContainingUniqueCalendarGroupId(
+									updatedEventGroupId,
+								)
+								.then((studentGridRow) => {
+									expect(studentGridRow).not.to.eq(gridRowStyle);
+								});
+						});
+				});
+			});
+	});
 
-    tempusPage
-      .getCalendarEventsBySoftTimeRange("08:00:00", "08:45:00")
-      .first()
-      .invoke("attr", "data-fhc-draggable-value")
-      .then((eventJSON) => {
-        expect(eventJSON).to.exist;
+	it('updates events in the lecturer preview but not the student preview after releasing and syncing', () => {
+		tempusPage.syncAndReloadPlanner();
 
-        let eventId = JSON.parse(eventJSON)?.id;
-        expect(eventId).to.exist;
-        tempusPage.dropEventOnCalendarPart(eventId, 5, {
-          scrollIntoView: true,
-        });
+		tempusPage
+			.getCalendarEventsBySoftTimeRange('13:35:00', '14:20:00')
+			.first()
+			.invoke('attr', 'data-fhc-draggable-value')
+			.then((eventJSON) => {
+				expect(eventJSON).to.exist;
 
-        cy.wait("@updateCalendarEvent")
-          .its("response.body.data.retval.kalender_id")
-          .as("updatedEventId");
-        waitForOk("@fetchPlanData");
+				const eventId = JSON.parse(eventJSON)?.id;
+				expect(eventId).to.exist;
 
-        tempusPage.waitForCalendarToFinishLoading();
+				const updatedEventGroupId =
+					JSON.parse(eventJSON)?.orig?.eindeutige_kalender_gruppen_id;
+				expect(updatedEventGroupId).to.exist;
 
-        cy.get("@updatedEventId").then((updatedEventId) => {
-          tempusPage
-            .getCalendarEventById(updatedEventId)
-            .should("exist")
-            .rightclick();
-          tempusPage.getEventContextMenuOption("Freischalten für Live").click();
-          waitForOk("@syncCalendarToStudent");
+				tempusPage.dropEventOnCalendarPart(eventId, 4, {
+					scrollIntoView: true,
+				});
 
-          tempusPage.getEventGridRow(updatedEventId).then((gridRowStyle) => {
-            tempusPage.selectRoleAndWait(LEKTOR);
-            tempusPage
-              .getEventGridRow(updatedEventId)
-              .then((lecturerGridRow) => {
-                expect(lecturerGridRow).to.eq(gridRowStyle);
-              });
+				cy.wait('@updateCalendarEvent').then((interception) => {
+					expect(interception.response.statusCode).to.eq(200);
+					expect(interception.response.body.data).to.exist;
 
-            tempusPage.selectRoleAndWait(STUDENT);
-            tempusPage.getEventGridRow(eventId).then((studentGridRow) => {
-              expect(studentGridRow).to.not.eq(gridRowStyle);
-            });
-          });
-        });
-      });
-  });
+					const updatedEventGroupId =
+						interception.response.body.data?.eindeutige_kalender_gruppen_id ??
+						interception.response.body.data;
 
-  it("event change on lector preview is prohibited", () => {
-    tempusPage.syncAndReloadPlanner();
+					cy.wrap(updatedEventGroupId).as('updatedEventGroupId');
+				});
+				waitForOk('@fetchPlanData');
 
-    tempusPage.selectRoleAndWait(LEKTOR);
+				tempusPage
+					.getCalendarEventByUniqueCalenderGroupId(updatedEventGroupId)
+					.rightclick();
+				tempusPage
+					.getEventContextMenuOption('Freischalten für Voransicht')
+					.click({ force: true });
+				waitForOk('@syncCalendarToLecturer');
+				waitForOk('@fetchPlanData');
 
-    tempusPage
-      .getCalendarEventsBySoftTimeRange("08:00:00", "14:20:00")
-      .first()
-      .invoke("attr", "data-fhc-draggable-value")
-      .then((eventJSON) => {
-        expect(eventJSON).to.exist;
+				tempusPage.syncAndReloadPlanner();
 
-        let eventId = JSON.parse(eventJSON)?.id;
-        expect(eventId).to.exist;
+				cy.get('@updatedEventGroupId').then((updatedEventGroupId) => {
+					tempusPage
+						.getGridRowByContainingUniqueCalendarGroupId(updatedEventGroupId)
+						.then((plannerGridRow) => {
+							tempusPage.selectRoleAndWait(LEKTOR);
+							tempusPage
+								.getGridRowByContainingUniqueCalendarGroupId(
+									updatedEventGroupId,
+								)
+								.then((lecturerGridRow) => {
+									expect(lecturerGridRow).to.eq(plannerGridRow);
+								});
 
-        tempusPage.dropEventOnCalendarPart(eventId, 15);
+							tempusPage.selectRoleAndWait(STUDENT);
+							tempusPage
+								.getGridRowByContainingUniqueCalendarGroupId(
+									updatedEventGroupId,
+								)
+								.then((studentGridRow) => {
+									expect(studentGridRow).not.to.eq(plannerGridRow);
+								});
+						});
+				});
+			});
+	});
 
-        cy.get("@updateCalendarEvent").should("not.exist");
+	it('updates events in the lecturer and student previews after releasing for live and syncing', () => {
+		tempusPage.syncAndReloadPlanner();
 
-        tempusPage.getEventGridRow(eventId).then((gridRowStyle) => {
-          tempusPage.selectRoleAndWait(LEKTOR);
-          tempusPage.getEventGridRow(eventId).then((lecturerGridRow) => {
-            expect(lecturerGridRow).to.eq(gridRowStyle);
-          });
+		tempusPage
+			.getCalendarEventsBySoftTimeRange('13:35:00', '14:20:00')
+			.first()
+			.invoke('attr', 'data-fhc-draggable-value')
+			.then((eventJSON) => {
+				expect(eventJSON).to.exist;
 
-          tempusPage.selectRoleAndWait(STUDENT);
-          tempusPage.getEventGridRow(eventId).then((studentGridRow) => {
-            expect(studentGridRow).to.eq(gridRowStyle);
-          });
-        });
-      });
-  });
+				const eventId = JSON.parse(eventJSON)?.id;
+				expect(eventId).to.exist;
+				const updatedEventGroupId =
+					JSON.parse(eventJSON)?.orig?.eindeutige_kalender_gruppen_id;
+				expect(updatedEventGroupId).to.exist;
 
-  it("event change on student preview is prohibited", () => {
-    tempusPage.syncAndReloadPlanner();
+				tempusPage.dropEventOnCalendarPart(eventId, 4, {
+					scrollIntoView: true,
+				});
 
-    tempusPage.selectRoleAndWait(STUDENT);
+				cy.wait('@updateCalendarEvent').then((interception) => {
+					expect(interception.response.statusCode).to.eq(200);
+					expect(interception.response.body.data).to.exist;
 
-    tempusPage
-      .getCalendarEventsBySoftTimeRange("08:00:00", "14:20:00")
-      .first()
-      .invoke("attr", "data-fhc-draggable-value")
-      .then((eventJSON) => {
-        expect(eventJSON).to.exist;
+					const updatedEventGroupId =
+						interception.response.body.data?.eindeutige_kalender_gruppen_id ??
+						interception.response.body.data;
 
-        let eventId = JSON.parse(eventJSON)?.id;
-        expect(eventId).to.exist;
+					cy.wrap(updatedEventGroupId).as('updatedEventGroupId');
+				});
+				waitForOk('@fetchPlanData');
 
-        tempusPage.dropEventOnCalendarPart(eventId, 15);
+				tempusPage
+					.getCalendarEventByUniqueCalenderGroupId(updatedEventGroupId)
+					.rightclick();
+				tempusPage
+					.getEventContextMenuOption('Freischalten für Live')
+					.click({ force: true });
+				waitForOk('@syncCalendarToStudent');
+				waitForOk('@fetchPlanData');
 
-        cy.get("@updateCalendarEvent").should("not.exist");
+				tempusPage.syncAndReloadPlanner();
 
-        tempusPage.getEventGridRow(eventId).then((gridRowStyle) => {
-          tempusPage.selectRoleAndWait(LEKTOR);
-          tempusPage.getEventGridRow(eventId).then((lecturerGridRow) => {
-            expect(lecturerGridRow).to.eq(gridRowStyle);
-          });
+				cy.get('@updatedEventGroupId').then((updatedEventGroupId) => {
+					tempusPage
+						.getGridRowByContainingUniqueCalendarGroupId(updatedEventGroupId)
+						.then((plannerGridRow) => {
+							tempusPage.selectRoleAndWait(LEKTOR);
+							tempusPage
+								.getGridRowByContainingUniqueCalendarGroupId(
+									updatedEventGroupId,
+								)
+								.then((lecturerGridRow) => {
+									expect(lecturerGridRow).to.eq(plannerGridRow);
+								});
 
-          tempusPage.selectRoleAndWait(STUDENT);
-          tempusPage.getEventGridRow(eventId).then((studentGridRow) => {
-            expect(studentGridRow).to.eq(gridRowStyle);
-          });
-        });
-      });
-  });
+							tempusPage.selectRoleAndWait(STUDENT);
+							tempusPage
+								.getGridRowByContainingUniqueCalendarGroupId(
+									updatedEventGroupId,
+								)
+								.then((studentGridRow) => {
+									expect(studentGridRow).to.eq(plannerGridRow);
+								});
+						});
+				});
+			});
+	});
+
+	it('prevents event changes in the lecturer preview', () => {
+		tempusPage.syncAndReloadPlanner();
+
+		tempusPage.selectRoleAndWait(LEKTOR);
+
+		tempusPage
+			.getCalendarEventsBySoftTimeRange('08:00:00', '14:20:00')
+			.first()
+			.invoke('attr', 'data-fhc-draggable-value')
+			.then((eventJSON) => {
+				expect(eventJSON).to.exist;
+
+				let eventId = JSON.parse(eventJSON)?.id;
+				expect(eventId).to.exist;
+
+				tempusPage.dropEventOnCalendarPart(eventId, 15);
+
+				cy.get('@updateCalendarEvent').should('not.exist');
+
+				tempusPage
+					.getGridRowByContainingEventId(eventId)
+					.then((gridRowStyle) => {
+						tempusPage.selectRoleAndWait(LEKTOR);
+						tempusPage
+							.getGridRowByContainingEventId(eventId)
+							.then((lecturerGridRow) => {
+								expect(lecturerGridRow).to.eq(gridRowStyle);
+							});
+
+						tempusPage.selectRoleAndWait(STUDENT);
+						tempusPage
+							.getGridRowByContainingEventId(eventId)
+							.then((studentGridRow) => {
+								expect(studentGridRow).to.eq(gridRowStyle);
+							});
+					});
+			});
+	});
+
+	it('prevents event changes in the student preview', () => {
+		tempusPage.syncAndReloadPlanner();
+
+		tempusPage.selectRoleAndWait(STUDENT);
+
+		tempusPage
+			.getCalendarEventsBySoftTimeRange('08:00:00', '14:20:00')
+			.first()
+			.invoke('attr', 'data-fhc-draggable-value')
+			.then((eventJSON) => {
+				expect(eventJSON).to.exist;
+
+				let eventId = JSON.parse(eventJSON)?.id;
+				expect(eventId).to.exist;
+
+				tempusPage.dropEventOnCalendarPart(eventId, 15);
+
+				cy.get('@updateCalendarEvent').should('not.exist');
+
+				tempusPage
+					.getGridRowByContainingEventId(eventId)
+					.then((gridRowStyle) => {
+						tempusPage.selectRoleAndWait(LEKTOR);
+						tempusPage
+							.getGridRowByContainingEventId(eventId)
+							.then((lecturerGridRow) => {
+								expect(lecturerGridRow).to.eq(gridRowStyle);
+							});
+
+						tempusPage.selectRoleAndWait(STUDENT);
+						tempusPage
+							.getGridRowByContainingEventId(eventId)
+							.then((studentGridRow) => {
+								expect(studentGridRow).to.eq(gridRowStyle);
+							});
+					});
+			});
+	});
 });

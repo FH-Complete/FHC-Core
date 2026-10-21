@@ -318,7 +318,8 @@ class VerbandCollisionCheck implements ICollisionCheck
 					UPPER(stg.typ::text || stg.kurzbz::text) || '-' || other_lehreinheitguppe.semester ||
 						COALESCE(other_lehreinheitguppe.verband::text, '') ||
 						COALESCE(other_lehreinheitguppe.gruppe::text, '')
-					) AS gruppenname
+					) AS gruppenname,
+					other_kalender.von, other_kalender.kalender_id as other_kalender_id
 			FROM lehre.tbl_kalender current_kalender
 
 			JOIN (
@@ -409,7 +410,11 @@ class VerbandCollisionCheck implements ICollisionCheck
 		$grouped = [];
 		foreach (getData($result) as $row)
 		{
-			$grouped[$row->kalender_id][] = ['message' => $this->_ci->phraseslib->t('ui', 'verband_kollision') . ': ' . $row->gruppenname];
+			$grouped[$row->kalender_id][] = [
+				'message' => $this->_ci->phraseslib->t('ui', 'verband_kollision') . ': ' . $row->gruppenname,
+				'kalender_id' => $row->other_kalender_id,
+				'datum' => $row->von,
+			];
 		}
 
 		return $grouped;

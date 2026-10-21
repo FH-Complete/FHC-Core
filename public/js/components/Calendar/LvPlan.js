@@ -1,4 +1,4 @@
-import FhcCalendar from "./Base.js";
+import FhcCalendar from './Base.js';
 
 import ApiLvPlan from '../../api/factory/lvPlan.js';
 
@@ -12,9 +12,9 @@ import ModeList from './Mode/List.js';
 import ModeRange from './Mode/Range.js';
 
 export default {
-	name: "CalendarLvPlan",
+	name: 'CalendarLvPlan',
 	components: {
-		FhcCalendar
+		FhcCalendar,
 	},
 	inject: {
 		isMobile: {
@@ -27,15 +27,23 @@ export default {
 	props: {
 		date: {
 			type: [Date, String, Number, luxon.DateTime],
-			default: luxon.DateTime.local()
+			default: luxon.DateTime.local(),
 		},
 		mode: {
 			type: String,
-			default: 'Week'
+			default: 'Week',
 		},
 		getPromiseFunc: {
 			type: Function,
 			required: true
+		},
+		reservierbar: {
+			type: Boolean,
+			default: false
+		},
+		createContext: {
+			type: Object,
+			default: () => ({})
 		},
 		shouldIncludeRangeMode: {
 			type: Boolean,
@@ -45,28 +53,41 @@ export default {
 	provide() {
 		return {
 			shouldCompactEvents: Vue.computed(
-				() => this.$props.mode === "Month" && this.isMobile,
+				() => this.$props.mode === 'Month' && this.isMobile,
 			),
-			compactibleEventTypes: Vue.computed(
-				() => this.compactibleEventTypes,
-			),
+			compactibleEventTypes: Vue.computed(() => this.compactibleEventTypes),
 		};
 	},
 	emits: [
 		"update:date",
 		"update:mode",
-		"update:range"
+		"update:range",
+		"create-event",
+		"delete-event",
+		'update:reservierbarMap'
 	],
 	data() {
 		return {
 			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone,
+			isReservierbar: Vue.computed(() => {
+				if (!this.reservierbar)
+					return false;
+
+				if (!this.reservierbarMap)
+					return false;
+
+				if (typeof this.reservierbarMap === 'object')
+					return Object.keys(this.reservierbarMap).length > 0;
+
+				return false;
+			}),
 			modeOptions: {
 				day: {
 					emptyMessage: Vue.computed(() => this.$p.t('lehre/noLvFound')),
-					emptyMessageDetails: Vue.computed(() => this.$p.t('lehre/noLvFound'))
+					emptyMessageDetails: Vue.computed(() => this.$p.t('lehre/noLvFound')),
 				},
 				week: {
-					collapseEmptyDays: false
+					collapseEmptyDays: false,
 				},
 				list: {
 					length: 7,
@@ -84,8 +105,8 @@ export default {
 				return [
 					{
 						class: 'background-past',
-						end: now.startOf('day')
-					}
+						end: now.startOf('day'),
+					},
 				];
 			} else if (this.mode == 'Range') {
 				return [];
@@ -94,8 +115,10 @@ export default {
 					{
 						class: 'background-past',
 						end: now,
-						label: now.startOf('minute').toISOTime({ suppressSeconds: true, includeOffset: false })
-					}
+						label: now
+						.startOf('minute')
+						.toISOTime({ suppressSeconds: true, includeOffset: false }),
+					},
 				];
 			}
 		},
@@ -118,8 +141,7 @@ export default {
 	},
 	methods: {
 		eventStyle(event) {
-			if (!event.farbe)
-				return undefined;
+			if (!event.farbe) return undefined;
 			return '--event-bg:#' + event.farbe;
 		},
 		updateRange(rangeInterval) {
@@ -143,31 +165,42 @@ export default {
 			);
 			this.compactibleEventTypes = compactibleEventTypesResponse.data;
 		},
+		closeModal() {
+			this.$refs.calendar.hideEventModal();
+		},
 	},
 	setup(props, context) {
 		const rangeInterval = Vue.ref(null);
-		
-		const { events, lv, reset } = useEventLoader(rangeInterval, props.getPromiseFunc);
 
-		Vue.watch(lv, newValue => {
+		const { events, lv, reservierbarMap, reset  } = useEventLoader(
+			rangeInterval,
+			props.getPromiseFunc,
+		);
+
+		Vue.watch(lv, (newValue) => {
 			context.emit('update:lv', newValue);
 		});
 
 		const { renderers } = useRenderers();
 
+		Vue.watch(reservierbarMap, newVal => {
+			context.emit('update:reservierbarMap', newVal);
+		});
+
 		return {
 			rangeInterval,
 			events,
 			lv,
+			reservierbarMap,
 			reset,
-			renderers
+			renderers,
 		};
 	},
 	async created() {
 		await this.getStunden();
 		await this.getCompactibleEventTypes();
 	},
-	template: /* html */`
+	template: /* html */ `
 	<fhc-calendar
 		ref="calendar"
 		class="fhc-calendar-lvplan"
@@ -180,6 +213,9 @@ export default {
 		:events="events || []"
 		:backgrounds="backgrounds"
 		:time-grid="teachingunits"
+		:reservierbar-map="reservierbarMap"
+		:isReservierbar="isReservierbar"
+		:create-context="createContext"
 		show-btns
 		@update:date="(newDate, newMode, newRangeLength) => $emit('update:date', newDate, newMode, newRangeLength)"
 		@update:mode="(newMode, newDate) => $emit('update:mode', newMode, newDate)"
@@ -202,19 +238,21 @@ export default {
  				:style="eventStyle(event)"
 			>
 				<component
-					v-if="mode == 'event'"
+					v-if="renderers && mode == 'event'"
 					:is="renderers[event.type]?.modalContent"
 					:event="event"
+					@create-event="(event) => $emit('create-event', event)"
 				></component>
 				<component
-					v-else-if="mode == 'eventheader'"
+					v-else-if="renderers && mode == 'eventheader'"
 					:is="renderers[event.type]?.modalTitle"
 					:event="event"
 				></component>
 				<component
-					v-else
+					v-else-if="renderers"
 					:is="renderers[event.type]?.calendarEvent"
 					:event="event"
+					@delete-event="(event) => $emit('delete-event', event)"
 					:timeSlotDisplayBehavior="
 						$props.mode.toLowerCase() === 'list' ? 'always' : 'default'
 					"
@@ -224,5 +262,5 @@ export default {
 		<template #actions>
 			<slot />
 		</template>
-	</fhc-calendar>`
-}
+	</fhc-calendar>`,
+};

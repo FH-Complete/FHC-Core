@@ -175,7 +175,6 @@ export default {
 		>
 			<i class="fa-solid fa-grip-lines text-muted"></i>
 		</div>
-
 		<teleport to="body">
 			<div
 				v-if="contextMenu.show"

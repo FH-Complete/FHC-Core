@@ -199,7 +199,7 @@ class StudentCollisionCheck implements ICollisionCheck
 		$placeholders = implode(',', array_fill(0, count($kalender_ids), '?'));
 
 		$sql = "
-			SELECT DISTINCT current_kalender.kalender_id, current_benutzergruppe.uid
+			SELECT DISTINCT current_kalender.kalender_id, current_benutzergruppe.uid, other_kalender.von, other_kalender.kalender_id as other_kalender_id
 			FROM lehre.tbl_kalender current_kalender
 			JOIN lehre.tbl_kalender_lehreinheit current_kalender_le ON current_kalender_le.kalender_id = current_kalender.kalender_id
 			JOIN lehre.tbl_lehreinheit current_lehreinheit ON current_lehreinheit.lehreinheit_id = current_kalender_le.lehreinheit_id
@@ -236,7 +236,7 @@ class StudentCollisionCheck implements ICollisionCheck
 
 			UNION ALL
 
-			SELECT DISTINCT current_kalender.kalender_id, current_studentlehrverband.student_uid AS uid
+			SELECT DISTINCT current_kalender.kalender_id, current_studentlehrverband.student_uid AS uid, other_kalender.von, other_kalender.kalender_id as other_kalender_id
 			FROM lehre.tbl_kalender current_kalender
 			JOIN lehre.tbl_kalender_lehreinheit current_kalender_le ON current_kalender_le.kalender_id = current_kalender.kalender_id
 			JOIN lehre.tbl_lehreinheit current_lehreinheit ON current_lehreinheit.lehreinheit_id = current_kalender_le.lehreinheit_id
@@ -279,7 +279,9 @@ class StudentCollisionCheck implements ICollisionCheck
 		foreach (getData($result) as $row)
 		{
 			$grouped[$row->kalender_id][] = [
-				'message' => $this->_ci->phraseslib->t('ui', 'student_kollision') . ': ' . $row->uid
+				'message' => $this->_ci->phraseslib->t('ui', 'student_kollision') . ': ' . $row->uid,
+				'kalender_id' => $row->other_kalender_id,
+				'datum' => $row->von,
 			];
 		}
 

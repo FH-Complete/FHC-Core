@@ -173,7 +173,11 @@ class Kalender extends FHCAPI_Controller
 		$start_date = $this->_ci->input->post('start_date', TRUE);
 		$end_date = $this->_ci->input->post('end_date', TRUE);
 
-		$isCollisionCheckEnabled = $this->_ci->input->post('collisionCheck', TRUE) ?? false;
+		$isCollisionCheckEnabled = filter_var(
+			$this->_ci->input->post('collisionCheck', TRUE) ?? false,
+			FILTER_VALIDATE_BOOLEAN
+		);
+
 		$maxDailyEventLimit = $this->_ci->input->post('maxDailyEventLimit', TRUE) ?? false;
 
 		$filter = $this->_checkFilter(self::ALLOWED_PLAN_FILTER);
@@ -203,9 +207,17 @@ class Kalender extends FHCAPI_Controller
 		$start_date = $this->_ci->input->get('start_date', TRUE);
 		$end_date = $this->_ci->input->get('end_date', TRUE);
 
+		$isCollisionCheckEnabled = filter_var(
+			$this->_ci->input->get('collisionCheck', TRUE) ?? false,
+			FILTER_VALIDATE_BOOLEAN
+		);
+		$maxDailyEventLimit = $this->_ci->input->get('maxDailyEventLimit', TRUE) ?? false;
+
 		$stundenplan_data = $this->_ci->kalenderlib->getPlanForStudent(
 			$start_date,
-			$end_date
+			$end_date,
+			$isCollisionCheckEnabled,
+			$maxDailyEventLimit
 		);
 
 		$this->terminateWithSuccess($stundenplan_data);
@@ -223,9 +235,17 @@ class Kalender extends FHCAPI_Controller
 		$start_date = $this->_ci->input->get('start_date', TRUE);
 		$end_date = $this->_ci->input->get('end_date', TRUE);
 
+		$isCollisionCheckEnabled = filter_var(
+			$this->_ci->input->get('collisionCheck', TRUE) ?? false,
+			FILTER_VALIDATE_BOOLEAN
+		);
+		$maxDailyEventLimit = $this->_ci->input->get('maxDailyEventLimit', TRUE) ?? false;
+
 		$stundenplan_data = $this->_ci->kalenderlib->getPlanForLecturer(
 			$start_date,
-			$end_date
+			$end_date,
+			$isCollisionCheckEnabled,
+			$maxDailyEventLimit
 		);
 
 		$this->terminateWithSuccess($stundenplan_data);
@@ -303,6 +323,7 @@ class Kalender extends FHCAPI_Controller
 		if (isError($result))
 			$this->terminateWithError(getError($result),  $result->code);
 
+		
 		$this->terminateWithSuccess(getData($result));
 	}
 

@@ -13,7 +13,8 @@
 }
 .monthPageContainer .cis-renderer-feiertage-calendar-event,
 .weekPageContainer .cis-renderer-feiertage-calendar-event,
-.dayPageContainer .cis-renderer-feiertage-calendar-event {
+.dayPageContainer .cis-renderer-feiertage-calendar-event,
+.rangePageContainer .cis-renderer-feiertage-calendar-event {
 	display: grid;
 	grid-template-columns: auto 1fr;
 	justify-items: center;
@@ -28,6 +29,7 @@
 }
 .weekPageContainer .cis-renderer-feiertage-calendar-event .event-icon,
 .dayPageContainer .cis-renderer-feiertage-calendar-event .event-icon,
+.rangePageContainer .cis-renderer-feiertage-calendar-event .event-icon,
 .listPageContainer .cis-renderer-feiertage-calendar-event .event-icon {
 	margin: .5rem;
 }
@@ -50,21 +52,21 @@
 	justify-content: space-evenly;
 	align-items: center;
 }
-.weekPageContainer .calendar-event-default {
+.weekPageContainer .calendar-event-default,
+.rangePageContainer .calendar-event-default {
 	display: grid;
 	grid-template-columns: auto 1fr;
 }
-.weekPageContainer .calendar-event-default .event-time {
+.weekPageContainer .calendar-event-default .event-time,
+.rangePageContainer .calendar-event-default .event-time {
 	border-inline-end: solid 1px var(--bs-secondary);
 	align-self: stretch;
 	align-content: center;
 	padding: .25em .5em .25em .25em;
 	margin-inline-end: .25rem;
 }
-.rangePageContainer .calendar-event-default .event-time {
-	display: none !important;
-}
-.weekPageContainer .calendar-event-default .event-text {
+.weekPageContainer .calendar-event-default .event-text,
+.rangePageContainer .calendar-event-default .event-text {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-evenly;
@@ -108,16 +110,30 @@
 	display: none;
 }
 
-.weekPageContainer .calendar-event-collisions,
-.rangePageContainer .calendar-event-collisions
-{
-	display: grid;
-	grid-template-columns: auto 1fr;
-	background: repeating-linear-gradient(
-			135deg,
-			transparent,
-			transparent 16px,
-			rgba(0, 0, 0, 0.3) 16px,
-			rgba(0, 0, 0, 0.3) 32px
-	);
+.tag-row-cell {
+	width: 100%;
+	max-width: 0;
+}
+
+.tag-row-wrapper,
+.tag-row-wrapper > * {
+	display: flex;
+	flex-wrap: wrap !important;
+	max-width: 100%;
+	white-space: normal !important;
+	overflow: visible !important;
+}
+.fhc-calendar-empty-slot-plus {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+	font-size: 18px;
+	opacity: 0;
+	pointer-events: none;
+	user-select: none;
+}
+
+.part-body:hover .fhc-calendar-empty-slot-plus {
+	opacity: 1;
 }
