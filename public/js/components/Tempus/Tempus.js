@@ -1043,12 +1043,12 @@ export default {
 
 			setTimeout(() => {
 				const eventEl = document.querySelector(
-					`[data-group-id="event-group-${this.currentlyUpdatedEvent.eindeutige_kalender_gruppen_id}"]`,
+					`[data-group-id="event-group-${this.currentlyUpdatedEvent?.eindeutige_kalender_gruppen_id}"]`,
 				);
 				if (!eventEl) return;
 
 				this.removeVisualForUpdatingCalendarEvent(
-					this.currentlyUpdatedEvent.eindeutige_kalender_gruppen_id,
+					this.currentlyUpdatedEvent?.eindeutige_kalender_gruppen_id,
 				);
 				const calendar = document.querySelector('.fhc-calendar-base-grid');
 

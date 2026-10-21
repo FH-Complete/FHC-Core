@@ -46,25 +46,6 @@ export default {
 	},
 	data() {
 		return {
-			visibleDays: JSON.parse(localStorage.getItem('fhc-calender-visible-days')) ?? [true, true, true, true, true, true, true],
-			gridWidthResizeObserver: null,
-			gridWidthMutationObserver: null,
-			gridHeightResizeObserver: null,
-			observedGridElements: Vue.markRaw(new Set()),
-			gridWidthAnimationFrame: null,
-			gridWidthSyncing: false,
-			gridResizeActive: false,
-			sharedDayColumnWidths: null,
-			largestDayColumnWidths: null,
-			columnWidthSyncVersion: 0,
-			freshColumnWidthSyncRequested: false,
-			initialColumnWidthEventsSeen: false,
-			initialColumnWidthSyncAnimationFrame: null,
-			gridHeights: [],
-		}
-	},
-	data() {
-		return {
 			dayVisibilityStates: JSON.parse(
 				localStorage.getItem('fhc-calender-visible-days'),
 			) ?? [true, true, true, true, true, true, true],
@@ -152,10 +133,6 @@ export default {
 		},
 	},
 	methods: {
-		resetColumnWidthAdjustment() {
-			this.sharedDayColumnWidths = null;
-			this.largestDayColumnWidths = null;
-		},
 		resetGridWidthSync() {
 			this.gridElements().forEach(grid => grid.style.removeProperty('min-width'));
 		},
@@ -176,18 +153,6 @@ export default {
 			return grids.some(grid => grid?.originalEvents?.some(
 				event => event.type !== 'loading',
 			));
-		},
-		startFreshColumnWidthSync() {
-			this.columnWidthSyncVersion += 1;
-			this.resetColumnWidthAdjustment();
-			this.resetGridWidthSync();
-			if (this.gridWidthAnimationFrame !== null) {
-				cancelAnimationFrame(this.gridWidthAnimationFrame);
-				this.gridWidthAnimationFrame = null;
-			}
-
-			this.freshColumnWidthSyncRequested = true;
-			this.$nextTick(() => this.flushFreshColumnWidthSync());
 		},
 		resetColumnWidthsForEventReload() {
 			this.initialColumnWidthEventsSeen = false;
@@ -280,104 +245,6 @@ export default {
 				this.gridWidthAnimationFrame = null;
 				this.synchronizeGridWidths(source);
 			});
-		},
-		async synchronizeGridWidths(source = 'unknown') {
-			if (
-				(!this.adjustColumnWidths && !this.syncGridWidths)
-				|| this.gridResizeActive
-				|| this.gridWidthSyncing
-			)
-				return;
-
-			this.gridWidthSyncing = true;
-			const syncVersion = this.columnWidthSyncVersion;
-
-			try {
-				const grids = this.gridElements();
-				if (!grids.length)
-					return;
-
-				const previousDayColumnWidths = this.sharedDayColumnWidths;
-				const previousGridMinWidths = grids.map(grid => grid.style.minWidth);
-				const restorePreviousWidths = () => {
-					this.sharedDayColumnWidths = this.adjustColumnWidths
-						? this.largestDayColumnWidths ?? previousDayColumnWidths
-						: null;
-					grids.forEach((grid, index) => {
-						if (this.syncGridWidths)
-							grid.style.minWidth = previousGridMinWidths[index];
-						else
-							grid.style.removeProperty('min-width');
-					});
-				};
-
-				grids.forEach(grid => grid.style.removeProperty('min-width'));
-				this.sharedDayColumnWidths = null;
-				await this.$nextTick();
-				if (syncVersion !== this.columnWidthSyncVersion)
-					return;
-				if (!this.adjustColumnWidths && !this.syncGridWidths) {
-					this.resetColumnWidthAdjustment();
-					this.resetGridWidthSync();
-					return;
-				}
-				if (this.gridResizeActive) {
-					restorePreviousWidths();
-					return;
-				}
-
-				if (this.adjustColumnWidths) {
-					const dayColumns = Array.from(
-						{ length: this.axisMainTest[0]?.length ?? 0 },
-						(_, index) => Math.ceil(Math.max(...grids.map(grid => {
-							const column = grid.querySelectorAll(
-								'.grid-body > .fhc-calendar-base-grid-line',
-							)[index];
-							return column
-								? Math.max(column.getBoundingClientRect().width, column.scrollWidth)
-								: 0;
-						}))),
-					);
-
-					const previousLargestWidths = this.largestDayColumnWidths;
-					this.largestDayColumnWidths = dayColumns.map((width, index) =>
-						Math.max(
-							width,
-							previousLargestWidths?.[index] ?? 0,
-						),
-					);
-					this.sharedDayColumnWidths = this.largestDayColumnWidths;
-					await this.$nextTick();
-					if (syncVersion !== this.columnWidthSyncVersion)
-						return;
-					if (!this.adjustColumnWidths && !this.syncGridWidths) {
-						this.resetColumnWidthAdjustment();
-						this.resetGridWidthSync();
-						return;
-					}
-					if (this.gridResizeActive) {
-						restorePreviousWidths();
-						return;
-					}
-				}
-
-				if (this.syncGridWidths) {
-					const width = Math.ceil(Math.max(
-						this.$el.clientWidth,
-						...grids.map(grid => grid.scrollWidth),
-					));
-
-					grids.forEach(grid => {
-						const minWidth = width + 'px';
-						if (grid.style.minWidth !== minWidth)
-							grid.style.minWidth = minWidth;
-					});
-				}
-
-			} finally {
-				this.gridWidthSyncing = false;
-				this.flushFreshColumnWidthSync();
-			}
 		},
 		onGridResizeState(evt) {
 			this.gridResizeActive = !!evt.detail?.active;

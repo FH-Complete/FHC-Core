@@ -169,13 +169,9 @@ export default {
 		window.removeEventListener('beforeprint', this.beforePrintHandler);
 		window.removeEventListener('afterprint', this.afterPrintHandler);
 	},
-	beforeUnmount() {
-		window.removeEventListener('beforeprint', this.beforePrintHandler);
-		window.removeEventListener('afterprint', this.afterPrintHandler);
-	},
 	template: /* html */`
 	<div
-		class="fhc-calendar-mode-week flex-grow-1 position-relative d-flex flex-column"
+		class="fhc-calendar-mode-range flex-grow-1 position-relative d-flex flex-column"
 		@cal-click-default.capture="handleClickDefaults"
 	>
 		<div ref="printMeasure" class="fhc-calendar-print-measure" aria-hidden="true"></div>
