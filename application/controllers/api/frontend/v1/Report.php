@@ -154,6 +154,7 @@ class Report extends FHCAPI_Controller
 						return [
 							'value' => $value,
 							'label' => $label,
+							'original' => $option,
 						];
 					}, $options);
 

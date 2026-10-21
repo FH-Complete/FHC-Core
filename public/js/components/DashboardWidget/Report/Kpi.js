@@ -6,6 +6,8 @@ import { useCalculatedVars } from '../../../composables/DashboardWidget/Report/C
 
 import ApiReport from '../../../api/factory/report.js';
 
+import { compileLabel } from '../../../helpers/DashboardWidget/Report.js';
+
 export default {
 	name: "WidgetsReportKpi",
 	components: {
@@ -31,19 +33,10 @@ export default {
 			if (!this.activeAggregator.label)
 				return '';
 
-			return this.activeAggregator.label.replace(
-				/\{\s*([^\}]+)\s*\}/g,
-				(match, key) => {
-					if (this.calledVars[key] === undefined)
-						return match;
-					if (this.config.vars[key].detail?.options) {
-						const options = this.config.vars[key].detail.options;
-						const res = options.find(opt => opt.value == this.calledVars[key]);
-						if (res?.label)
-							return res.label;
-					}
-					return this.calledVars[key];
-				}
+			return compileLabel(
+				this.activeAggregator.label,
+				this.calledVars,
+				this.config.vars
 			);
 		},
 		activeAggregator() {

@@ -7,6 +7,8 @@ import { useCalculatedVars } from '../../../composables/DashboardWidget/Report/C
 
 import ApiReport from '../../../api/factory/report.js';
 
+import { compileLabel } from '../../../helpers/DashboardWidget/Report.js';
+
 export default {
 	name: "WidgetsReportGraph",
 	components: {
@@ -38,19 +40,10 @@ export default {
 			if (!this.data)
 				return null;
 
-			const title = (this.config.title || '').replace(
-				/\{\s*([^\}]+)\s*\}/g,
-				(match, key) => {
-					if (this.calledVars[key] === undefined)
-						return match;
-					if (this.config.vars[key].detail?.options) {
-						const options = this.config.vars[key].detail.options;
-						const res = options.find(opt => opt.value == this.calledVars[key]);
-						if (res?.label)
-							return res.label;
-					}
-					return this.calledVars[key];
-				}
+			const title = compileLabel(
+				this.config.title || '',
+				this.calledVars,
+				this.config.vars
 			);
 
 			let result = {
