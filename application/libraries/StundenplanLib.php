@@ -32,6 +32,14 @@ class StundenplanLib
 		return $this->getEventsLv($lehrveranstaltung_id, $start, $end);
 	}
 
+	public function getStundenplanForStudiensemester($start, $end, $lehrveranstaltung_id = null)
+	{
+		if (!$lehrveranstaltung_id && $lehrveranstaltung_id !== 0)
+			return $this->getEventsUser($start, $end);
+
+		return $this->getEventsLv($lehrveranstaltung_id, $start, $end);
+	}
+
 	/**
 	 * fetches Stundenplan events for the loggedin user between start and end
 	 *
@@ -43,7 +51,6 @@ class StundenplanLib
 	public function getEventsUser($start, $end, $uid = null)
 	{
 		$this->_ci =& get_instance();
-
 		$this->_ci->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 
 		if (!$uid) {
@@ -80,17 +87,30 @@ class StundenplanLib
 		if (isError($semester_range))
 			return $semester_range;
 		$semester_range = getData($semester_range);
-		$this->_ci->addMeta('semester_range', $semester_range);
+
+		$studiensemester_kurzbz = $semester_range;
+
+		$resstudiensemester = $this->_ci->StudiensemesterModel->getStartEndeFromStudiensemester($studiensemester_kurzbz);
+		if(isError($resstudiensemester))
+			return $resstudiensemester;
+		$resstudiensemester = getData($resstudiensemester);
+
+
+		$resnextstudiensemester = $this->_ci->StudiensemesterModel->getNextFrom($studiensemester_kurzbz);
+		if(isError($resnextstudiensemester))
+			return $resnextstudiensemester;
+		$resnextstudiensemester = getData($resnextstudiensemester);
+
+		$nextstudiensemester = ($resnextstudiensemester && count($resnextstudiensemester) > 0) ? $resnextstudiensemester[0] : null;
 
 		$this->sortStudienSemester($semester_range);
 
 		$function_error = $this->applyLoadUeberSemesterHaelfte($semester_range);
-		$this->_ci->addMeta('nach_apply_semester_range', $semester_range);
 		if ($function_error)
 			return $function_error;
 
-		$this->_ci->addMeta('bhsemtest', print_r($semester_range, true));
-
+		/*
+		examplestructure
 		$semester_range = array(
 			'SS2026' => array(
 				'WS2025' => (object) array(
@@ -102,30 +122,32 @@ class StundenplanLib
 					'ende' => '2026-11-15'
 				),
 			)
-		);
+		);*/
 
 		// getting the gruppen_kurzbz of the student in the different studiensemester
-		$benutzer_gruppen = $this->fetchBenutzerGruppenFromStudiensemester($student_uid, $semester_range);
+		$benutzer_gruppen = $this->fetchBenutzerGruppenFromStudiensemester($student_uid, $semester_range, $nextstudiensemester->studiensemester_kurzbz);
 		if (isError($benutzer_gruppen))
 			return $benutzer_gruppen;
 		$benutzer_gruppen = getData($benutzer_gruppen);
-		$this->_ci->addMeta('spezialgruppen', $benutzer_gruppen);
+
 		// getting the student_lehrverbaende of the student in the different studiensemester
-		$student_lehrverband = $this->fetchStudentlehrverbandFromStudiensemester($student_uid, $semester_range);
+		$student_lehrverband = $this->fetchStudentlehrverbandFromStudiensemester($student_uid, $semester_range, $studiensemester_kurzbz, $nextstudiensemester->studiensemester_kurzbz);
 		if (isError($student_lehrverband))
 			return $student_lehrverband;
 		$student_lehrverband = getData($student_lehrverband);
-		$this->_ci->addMeta('studentlehrvebaende', $student_lehrverband);
+
 		$stundenplan_query = $this->_ci->StundenplanModel->getStundenplanQuery(
 			$start,
 			$end,
 			$semester_range,
 			$benutzer_gruppen,
-			$student_lehrverband
+			$student_lehrverband,
+			null,
+			true
 		);
 		if (!$stundenplan_query)
 			return success([]);
-		
+
 		$stundenplan_data = $this->_ci->StundenplanModel->stundenplanGruppierung($stundenplan_query);
 		if (isError($stundenplan_data))
 			return $stundenplan_data;
@@ -501,10 +523,10 @@ class StundenplanLib
 		return success($stundenplan_data);
 	}
 
-	// start of the private functions ########################################################################################################
+	// start of the (former) private functions ########################################################################################################
 
 	// function used to sort an array of studiensemester strings
-	private function sortStudienSemester(&$semester_range){
+	public function sortStudienSemester(&$semester_range){
 		usort(
 			$semester_range,
 			function($first,$second)
@@ -547,9 +569,7 @@ class StundenplanLib
 		);
 	}
 
-	
-
-	private function fetchBenutzerGruppenFromStudiensemester($student_uid, $semester_range)
+	public function fetchBenutzerGruppenFromStudiensemester($student_uid, $semester_range, $skip_semester_kurzbz=null)
 	{
 		$this->_ci->load->model('person/Benutzergruppe_model', 'BenutzergruppeModel');
 
@@ -561,13 +581,17 @@ class StundenplanLib
 			['SS2024'] => [['gruppe1_WS2023','gruppe2_WS2023'],['gruppe1_SS2024','gruppe2_SS2024']],
 			['WS2024'] => [['gruppe1_SS2024','gruppe2_SS2024'],['gruppe1_WS2024','gruppe2_WS2024']],
 		]
-		*/ 
+		*/
 		foreach($semester_range as $semester_key => $semester_array)
 		{
 			$benutzer_gruppen[$semester_key] = [];
 			// each semester could have ajoint semesters that need to be checked
 			foreach($semester_array as $semester=>$semester_date_range)
 			{
+				if($semester === $skip_semester_kurzbz)
+				{
+					continue;
+				}
 				// for each active semester query the benutzer_gruppen associated to the semester
 				$benutzer_query = $this->_ci->BenutzergruppeModel->execReadOnlyQuery("
 				SELECT * FROM tbl_benutzergruppe where uid = ? AND studiensemester_kurzbz = ?",[$student_uid, $semester]);
@@ -575,10 +599,10 @@ class StundenplanLib
 					return error(getData($benutzer_query));
 				}
 				$benutzer_query_result = getData($benutzer_query)??[];
-				
+
 				array_push(
 					$benutzer_gruppen[$semester_key],
-					 array_map(
+					array_map(
 						function($item)
 						{
 							return "'".$item->gruppe_kurzbz. "'";
@@ -588,7 +612,7 @@ class StundenplanLib
 				);
 			}
 		}
-		
+
 		// merge the gruppen of each studiensemester together for the original studiensemester
 		/*
 		[
@@ -596,7 +620,7 @@ class StundenplanLib
 			['SS2024'] => ['gruppe1_WS2023','gruppe2_WS2023','gruppe1_SS2024','gruppe2_SS2024'],
 			['WS2024'] => ['gruppe1_SS2024','gruppe2_SS2024','gruppe1_WS2024','gruppe2_WS2024'],
 		]
-		*/ 
+		*/
 		$benutzer_gruppen = array_map(
 			function($gruppe)
 			{
@@ -613,7 +637,7 @@ class StundenplanLib
 		return success($benutzer_gruppen);
 	}
 
-	private function fetchStudentlehrverbandFromStudiensemester($student_uid, $semester_range)
+	public function fetchStudentlehrverbandFromStudiensemester($student_uid, $semester_range, $studiensemester_kurzbz, $nextstudiensemester_kurzbz)
 	{
 		$this->_ci->load->model('person/Benutzergruppe_model', 'BenutzergruppeModel');
 
@@ -625,7 +649,73 @@ class StundenplanLib
 			['SS2024'] => [ [ ['stg_kz'=>298,'semester'=>1,'verband'=>"A",'gruppe'=>""] ], [ ['stg_kz'=>298,'semester'=>2,'verband'=>"A",'gruppe'=>""] ] ],
 			['WS2024'] => [ [ ['stg_kz'=>298,'semester'=>2,'verband'=>"A",'gruppe'=>""] ], [ ['stg_kz'=>298,'semester'=>3,'verband'=>"A",'gruppe'=>""] ] ],
 		]
-		*/ 
+		*/
+		foreach($semester_range as $semester_key => $semester_array)
+		{
+			$student_lehrverband[$semester_key] = [];
+			foreach($semester_array as $semester=>$semester_date_range)
+			{
+				// for each active semester query the student_lehrverband associated to the semester
+				$lehrverband_query = $this->_ci->BenutzergruppeModel->execReadOnlyQuery("
+				SELECT vbd.*, UPPER(s.typ || s.kurzbz) as stg FROM tbl_studentlehrverband vbd join tbl_studiengang s USING(studiengang_kz) where vbd.student_uid = ? AND vbd.studiensemester_kurzbz = ?", [$student_uid, $semester]);
+				if(isError($lehrverband_query)){
+					return error(getData($lehrverband_query));
+				}
+				$lehrverband_query_result = getData($lehrverband_query)??[];
+
+				$converted_studentLehrverband= array_map(
+					function ($item) use($nextstudiensemester_kurzbz, $studiensemester_kurzbz)
+					{
+						$result = new stdClass();
+						$result->verbandsgruppe = $item->stg . $item->semester . trim($item->verband) . trim($item->gruppe);
+						$result->studiengang_kz = $item->studiengang_kz;
+						$result->semester = $item->semester;
+						$result->verband = $item->verband;
+						$result->gruppe = $item->gruppe;
+						$result->studiensemester_kurzbz = $item->studiensemester_kurzbz;
+						$result->query_studiensemester_kurzbz = ($item->studiensemester_kurzbz === $nextstudiensemester_kurzbz) ? $studiensemester_kurzbz : $item->studiensemester_kurzbz;
+						return $result;
+					},
+					$lehrverband_query_result);
+
+				array_push($student_lehrverband[$semester_key], $converted_studentLehrverband);
+
+			}
+
+		}
+
+		// merge the studentlehrverband of each studiensemester together for the original studiensemester
+		/*
+		[
+			['WS2023'] => [ ['stg_kz'=>298,'semester'=>1,'verband'=>"A",'gruppe'=>""] ],
+			['SS2024'] => [ ['stg_kz'=>298,'semester'=>1,'verband'=>"A",'gruppe'=>""], ['stg_kz'=>298,'semester'=>2,'verband'=>"A",'gruppe'=>""] ],
+			['WS2024'] => [ ['stg_kz'=>298,'semester'=>2,'verband'=>"A",'gruppe'=>""], ['stg_kz'=>298,'semester'=>3,'verband'=>"A",'gruppe'=>""] ],
+		]
+		*/
+
+		$student_lehrverband = array_map(
+			function($studentlehrverband)
+			{
+				$merged_studentlehrverband = [];
+				foreach($studentlehrverband as $studentlehrverband_array)
+				{
+					$merged_studentlehrverband = array_merge($merged_studentlehrverband, $studentlehrverband_array);
+				}
+				return $merged_studentlehrverband;
+			},
+			$student_lehrverband
+		);
+
+		return success($student_lehrverband);
+	}
+
+	//TODO(check if still needed)
+	public function fetchStudentlehrverband($semester_range, $student_uid)
+	{
+		$this->_ci->load->model('person/Benutzergruppe_model', 'BenutzergruppeModel');
+
+		$student_lehrverband = [];
+
 		foreach($semester_range as $semester_key => $semester_array)
 		{
 			$student_lehrverband[$semester_key] = [];
@@ -636,9 +726,9 @@ class StundenplanLib
 				SELECT * FROM tbl_studentlehrverband where student_uid = ? AND studiensemester_kurzbz = ?", [$student_uid, $semester]);
 				if(isError($lehrverband_query)){
 					return error(getData($lehrverband_query));
-				}	
+				}
 				$lehrverband_query_result = getData($lehrverband_query)??[];
-				
+
 				$converted_studentLehrverband= array_map(
 					function ($item)
 					{
@@ -651,34 +741,11 @@ class StundenplanLib
 						return $result;
 					},
 					$lehrverband_query_result);
-				
-				array_push($student_lehrverband[$semester_key], $converted_studentLehrverband); 
-				
-			}
-			
-		}
 
-		// merge the studentlehrverband of each studiensemester together for the original studiensemester
-		/*
-		[
-			['WS2023'] => [ ['stg_kz'=>298,'semester'=>1,'verband'=>"A",'gruppe'=>""] ],
-			['SS2024'] => [ ['stg_kz'=>298,'semester'=>1,'verband'=>"A",'gruppe'=>""], ['stg_kz'=>298,'semester'=>2,'verband'=>"A",'gruppe'=>""] ],
-			['WS2024'] => [ ['stg_kz'=>298,'semester'=>2,'verband'=>"A",'gruppe'=>""], ['stg_kz'=>298,'semester'=>3,'verband'=>"A",'gruppe'=>""] ],
-		]
-		*/
-		
-		$student_lehrverband = array_map(
-			function($studentlehrverband)
-			{	
-				$merged_studentlehrverband = [];
-				foreach($studentlehrverband as $studentlehrverband_array)
-				{
-					$merged_studentlehrverband = array_merge($merged_studentlehrverband, $studentlehrverband_array);
-				}
-				return $merged_studentlehrverband;
-			},
-			$student_lehrverband
-		);
+				array_push($student_lehrverband[$semester_key], $converted_studentLehrverband);
+			}
+
+		}
 
 		return success($student_lehrverband);
 	}
@@ -819,7 +886,6 @@ class StundenplanLib
 		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		// gets all studiensemester from the student from start_date to end_date
-		//$semester_range = $this->_ci->StudiensemesterModel->getByDateRange($start_date, $end_date);
 		$semester_range = $this->_ci->StudiensemesterModel->getContainingOrNearestByDateRange($start_date, $end_date);
 		if (isError($semester_range))
 			return $semester_range;

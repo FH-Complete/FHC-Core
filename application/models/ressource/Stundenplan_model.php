@@ -141,48 +141,87 @@ class Stundenplan_model extends DB_Model
 	 */
 	public function stundenplanGruppierung($stundenplanViewQuery)
 	{
-		$query_result = $this->execReadOnlyQuery("
+		$query = $stundenplanViewQuery . <<<EOSQL
 		SELECT
-		'lehreinheit' as type, beginn, ende, datum,
-		CONCAT(lehrfach,'-',lehrform) as topic,
-		array_agg(DISTINCT lektor) as lektor,
-		array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe,
-		string_agg(DISTINCT ort_kurzbz, '/') as ort_kurzbz,
-		array_agg(DISTINCT lehreinheit_id) as lehreinheit_id,
-
-		titel, lehrfach, lehrform, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
-
-		FROM
-		(
-			SELECT unr,datum,beginn, ende,
-			CASE
-				WHEN sp.mitarbeiter_kurzbz IS NOT NULL THEN sp.mitarbeiter_kurzbz
-				ELSE lektor
-			END as lektor,
-			CASE
-				WHEN gruppe_kurzbz IS NOT NULL THEN gruppe_kurzbz
-				ELSE CONCAT(UPPER(sp.stg_typ),UPPER(sp.stg_kurzbz),'-',COALESCE(CAST(sp.semester AS varchar),'/'),COALESCE(CAST(sp.verband AS varchar),'/'))
-			END as gruppen_kuerzel,
-			(SELECT bezeichnung
-			FROM public.tbl_organisationseinheit
-			WHERE oe_kurzbz IN(
-				SELECT oe_kurzbz
-				FROM lehre.tbl_lehrveranstaltung
-				WHERE lehrveranstaltung_id = sp.lehrveranstaltung_id
-			)) as organisationseinheit,
-			ort_kurzbz, studiengang_kz, titel,lehreinheit_id,lehrfach_id,anmerkung,fix,lehrveranstaltung_id,stg_kurzbzlang,stg_bezeichnung,stg_typ,fachbereich_kurzbz,lehrfach,lehrfach_bez,farbe,lehrform,anmerkung_lehreinheit,gruppe, verband, semester,stg_kurzbz
-
-			FROM (".$stundenplanViewQuery.") sp
-			JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde = sp.stunde
-
-		) as subquery
-
-		GROUP BY unr, datum, beginn, ende, titel, lehrform, lehrfach, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
-
+			'lehreinheit' AS type, beginn, ende, datum,
+			CONCAT(lehrfach, '-', lehrform) AS topic,
+			array_agg(DISTINCT lektor) AS lektor,
+			array_agg(DISTINCT (gruppe, verband, semester, studiengang_kz, gruppen_kuerzel)) AS gruppe,
+			string_agg(DISTINCT ort_kurzbz, '/') AS ort_kurzbz,
+			array_agg(DISTINCT lehreinheit_id) AS lehreinheit_id,
+			titel, lehrfach, lehrform, lehrfach_bez, organisationseinheit, farbe, lehrveranstaltung_id
+		FROM (
+			SELECT
+				unr,
+				datum, beginn, ende,
+				CASE
+					WHEN sp.mitarbeiter_kurzbz IS NOT NULL
+						THEN sp.mitarbeiter_kurzbz
+					ELSE lektor
+				END AS lektor,
+				CASE
+					WHEN gruppe_kurzbz IS NOT NULL
+						THEN gruppe_kurzbz
+					ELSE CONCAT(
+						UPPER(sp.stg_typ),
+						UPPER(sp.stg_kurzbz),
+						'-',
+						COALESCE(CAST(sp.semester AS varchar), '/'),
+						COALESCE(CAST(sp.verband AS varchar), '/')
+					)
+				END AS gruppen_kuerzel,
+				(
+					SELECT bezeichnung
+					FROM public.tbl_organisationseinheit
+					WHERE oe_kurzbz IN (
+						SELECT oe_kurzbz
+						FROM lehre.tbl_lehrveranstaltung
+						WHERE lehrveranstaltung_id = sp.lehrveranstaltung_id
+					)
+				) AS organisationseinheit,
+				ort_kurzbz,
+				studiengang_kz,
+				titel,
+				lehreinheit_id,
+				lehrfach_id,
+				anmerkung,
+				fix,
+				lehrveranstaltung_id,
+				stg_kurzbzlang,
+				stg_bezeichnung,
+				stg_typ,
+				fachbereich_kurzbz,
+				lehrfach,
+				lehrfach_bez,
+				farbe,
+				lehrform,
+				anmerkung_lehreinheit,
+				gruppe,
+				verband,
+				semester,
+				stg_kurzbz
+			FROM stundenplaneintraege sp
+			JOIN lehre.tbl_stunde
+				ON lehre.tbl_stunde.stunde = sp.stunde
+		) AS subquery
+		GROUP BY
+			unr,
+			datum,
+			beginn,
+			ende,
+			titel,
+			lehrform,
+			lehrfach,
+			lehrfach_bez,
+			organisationseinheit,
+			farbe,
+			lehrveranstaltung_id
 		ORDER BY datum, beginn
-		");
 
-		return $query_result;
+EOSQL;
+
+
+		return $this->execReadOnlyQuery($query);
 	}
 
 	/**
@@ -530,57 +569,62 @@ class Stundenplan_model extends DB_Model
 		return $this->execReadOnlyQuery($qry, $qry_params);
 	}
 
-	protected function genLehrverbandClauses($semester, $studentlehrverbaende)
+	protected function genLehrverbandClauses($semester, $studentlehrverbaende, $viewStdPlan=false)
 	{
-		$lvbdclauses = array();
-		$studiengang_kz = null;
-		foreach($semester as $sem=>$semester_date_range)
-		{
-			foreach($semester_date_range as $sem_date => $sem_date_range)
-			{
-				if(!array_key_exists($sem,$studentlehrverbaende) || count($studentlehrverbaende[$sem]) == 0)
-				{
-					continue;
-				}
+		$lvbdclauses = [];
 
-				$studlvbds = array_filter(
-					$studentlehrverbaende[$sem],
-					function($value) use ($sem_date) {
-						return $value->studiensemester_kurzbz === $sem_date;
+		foreach ($semester as $sem => $semester_date_range) {
+			if (
+				!isset($studentlehrverbaende[$sem])
+				|| empty($studentlehrverbaende[$sem])
+			) {
+				continue;
+			}
+
+			foreach ($semester_date_range as $sem_date => $sem_date_range) {
+				// Funktion 2 liefert verschachtelte Arrays.
+				foreach ($studentlehrverbaende[$sem] as $lvbdGroup) {
+					$studlvbds = is_array($lvbdGroup)
+						? $lvbdGroup
+						: [$lvbdGroup];
+
+					foreach ($studlvbds as $lehrverband) {
+						if (
+							$lehrverband->studiensemester_kurzbz
+							!== $sem_date
+						) {
+							continue;
+						}
+
+						if($viewStdPlan)
+
+							$lvbdclauses[] = <<<EOCLAUSE
+								(
+									sp.studiengang_kz = {$this->escape($lehrverband->studiengang_kz)}
+									AND sp.gruppe_kurzbz IS NULL
+									AND {$this->escape($lehrverband->verbandsgruppe)} LIKE sp.verbandsgruppe || '%'
+								)
+							EOCLAUSE;
+						else
+							$lvbdclauses[] = <<<EOCLAUSE
+								(
+									sp.studiengang_kz = {$this->escape($lehrverband->studiengang_kz)}
+									AND sp.gruppe_kurzbz IS NULL
+									AND {$this->escape($lehrverband->verbandsgruppe)} LIKE sp.verbandsgruppe || '%'
+									AND sp.datum BETWEEN {$this->escape($sem_date_range->start)}
+													 AND {$this->escape($sem_date_range->ende)}
+									AND (
+										sp.studiensemester_kurzbz IS NULL
+										OR sp.studiensemester_kurzbz = {$this->escape($lehrverband->query_studiensemester_kurzbz)}
+									)
+								)
+							EOCLAUSE;
 					}
-				);
-
-				foreach($studlvbds as $key=>$lehrverband)
-				{
-					$studiengang_kz = $lehrverband->studiengang_kz;
-					$lvbdclauses[] = <<<EOCLAUSE
-							(
-								{$this->escape($lehrverband->verbandsgruppe)} like sp.verbandsgruppe || '%'
-								and sp.datum between {$this->escape($sem_date_range->start)} and {$this->escape($sem_date_range->ende)}
-								and (sp.studiensemester_kurzbz is null or sp.studiensemester_kurzbz = {$this->escape($lehrverband->query_studiensemester_kurzbz)})
-							)
-EOCLAUSE;
-
 				}
 			}
 		}
-		$sql = implode(PHP_EOL . "							OR" . PHP_EOL, $lvbdclauses);
-		if($sql)
-		{
-			$sql = <<<EOSQL
-(
-						sp.studiengang_kz = {$this->escape($studiengang_kz)}
-						and
-						sp.gruppe_kurzbz is null
-						and
-						(
-{$sql}
-						)
-					)
-EOSQL;
 
-		}
-		return $sql;
+		return implode(PHP_EOL . ' OR ' . PHP_EOL, $lvbdclauses);
 	}
 
 	protected function genSpezialgruppenClauses($semester, $gruppen)
@@ -627,7 +671,7 @@ EOSQL;
 	 *
 	 * @return mixed
 	 */
-	public function getStundenplanQuery($start_date, $end_date, $semester, $gruppen, $studentlehrverbaende, $db_stpl_table='stundenplan', $showLvsStundenplan=false, $endDateNextSemHalf=null, $semesterFilter=null)
+	public function getStundenplanQuery($start_date, $end_date, $semester, $gruppen, $studentlehrverbaende, $db_stpl_table='stundenplan', $viewStdPlan=false)
 	{
 		// helper function to check if either $gruppen or $studentlehrverbaende are empty for each semester
 		$emptyCheck = function($toBeCheckedArray) use ($semester){
@@ -648,11 +692,13 @@ EOSQL;
 			return false;
 		}
 
-		$lvbdclauses = $this->genLehrverbandClauses($semester, $studentlehrverbaende);
+		$lvbdclauses = $this->genLehrverbandClauses($semester, $studentlehrverbaende, $viewStdPlan);
+
 		$spezgrpclauses = $this->genSpezialgruppenClauses($semester, $gruppen);
 		$chainingor = ($lvbdclauses && $spezgrpclauses) ? 'OR' : '';
 
 		$query = <<<EOSQL
+
 			with preprocessedsp as (
 				select
 					(UPPER(sp.stg_typ || sp.stg_kurzbz)) || sp.semester || sp.verband || sp.gruppe as verbandsgruppe,
@@ -676,10 +722,10 @@ EOSQL;
 					{$chainingor}
 					{$spezgrpclauses}
 			)
-
-EOSQL;
+		EOSQL;
 
 		return $query;
+
 	}
 
 	/**
