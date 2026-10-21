@@ -193,6 +193,7 @@ export default {
 			autocompleteSelectedBetreuer: null,
 			beurteilungDownloadLink: null,
 			vertragFieldsDisabled: false,
+			stundenOverwritten: false,
 			abortController: {
 				betreuer: null
 			}
@@ -356,6 +357,7 @@ export default {
 			if (this.beurteilungDownloadLink !== null) this.beurteilungDownloadLink = '';
 			this.autocompleteSelectedBetreuer = null;
 			this.initialFormData = null;
+			this.stundenOverwritten = false;
 			if (this.projekttyp_kurzbz) this.setDefaultStunden(this.projekttyp_kurzbz);
 			this.disableVertragFields(false);
 			this.$refs.formProjektbetreuer.clearValidation();
@@ -402,8 +404,10 @@ export default {
 
 			return preparedFormData;
 		},
-		// get default values for stunden
-		getDefaultStunden(projekttyp_kurzbz) {
+		// get default values for stunden, a Betreuerart default wins over the Projekttyp default
+		getDefaultStunden(projekttyp_kurzbz, betreuerart_kurzbz) {
+			const betreuerartStunden = this.config.defaultProjektbetreuerStundenBetreuerart?.[betreuerart_kurzbz];
+			if (betreuerartStunden !== undefined) return betreuerartStunden;
 			let stunden = '0.0';
 			if (projekttyp_kurzbz == 'Bachelor') stunden = this.config.defaultProjektbetreuerStunden;
 			if (projekttyp_kurzbz == 'Diplom') stunden = this.config.defaultProjektbetreuerStundenDiplom;
@@ -414,9 +418,16 @@ export default {
 			// set default stunden if not in edit mode (so hours of editen person are not overwritten)
 			if (!this.editMode)
 			{
-				let defaultStunden = this.getDefaultStunden(projekttyp_kurzbz);
+				let defaultStunden = this.getDefaultStunden(projekttyp_kurzbz, this.formData.betreuerart_kurzbz);
 				this.formData.stunden = defaultStunden;
 			}
+		},
+		// also in edit mode, but the hours of an accepted Vertrag stay
+		betreuerartChanged() {
+			if (this.vertragFieldsDisabled) return;
+			this.formData.stunden = this.getDefaultStunden(this.projekttyp_kurzbz, this.formData.betreuerart_kurzbz);
+			// mark hours that differ from the saved ones, so the user notices the change
+			this.stundenOverwritten = this.editMode && Number(this.formData.stunden) !== Number(this.initialFormData?.stunden);
 		},
 		getDefaultStundensaetze(person_id) {
 			return this.$api
@@ -518,6 +529,7 @@ export default {
 						type="select"
 						v-model="formData.betreuerart_kurzbz"
 						name="betreuerart_kurzbz"
+						@change="betreuerartChanged"
 						>
 						<option
 							v-for="art in arrBetreuerart"
@@ -548,7 +560,7 @@ export default {
 					</form-input>
 				</div>
 
-				<div class="row mb-3">
+				<div class="row mb-3 align-items-end">
 					<div class="col-6">
 						<form-input
 							container-class="stv-details-projektarbeit-stunden"
@@ -556,7 +568,9 @@ export default {
 							name="stunden"
 							:label="$p.t('projektarbeit', 'stunden')"
 							:disabled="vertragFieldsDisabled"
+							:class="stundenOverwritten ? 'border-warning bg-warning-subtle' : ''"
 							v-model="formData.stunden"
+							@input="stundenOverwritten = false"
 							>
 						</form-input>
 					</div>

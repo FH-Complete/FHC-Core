@@ -289,3 +289,17 @@ html.fs_huge {
 .fhc-xxl-modal {
 	min-width: 80vw;
 }
+
+/* Projektarbeit modal: Vertragsdetails go below the Betreuer form if the column is too narrow for them */
+.stv-details-projektbetreuer {
+	container-type: inline-size;
+}
+@container (max-width: 640px) {
+	.stv-details-projektbetreuer > .col-9,
+	.stv-details-projektbetreuer > .col-3 {
+		width: 100%;
+	}
+	.stv-details-projektbetreuer > .col-3 {
+		margin-top: 1rem;
+	}
+}

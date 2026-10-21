@@ -89,6 +89,16 @@ export default {
 		}
 	},
 	computed: {
+		// student in the modal title, so an interrupted user sees whom they edit
+		studentInfo() {
+			const s = this.student;
+			return [
+				s.vorname + ' ' + s.nachname,
+				s.uid,
+				s.studiengang,
+				s.semester != null && s.semester !== '' ? this.$p.t('lehre', 'semester') + ' ' + s.semester : ''
+			].filter(Boolean).join(' | ');
+		},
 		tabulatorOptions() {
 			const options = {
 				ajaxURL: 'dummy',
@@ -363,17 +373,17 @@ export default {
 		 	@hideBsModal="resetFormData"
 		 	>
 			<template #title>
-				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('projektarbeit', 'projektarbeitAnlegen')}}</p>
-				<p v-else class="fw-bold mt-3">{{$p.t('projektarbeit', 'projektarbeitBearbeiten')}}</p>
+				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('projektarbeit', 'projektarbeitAnlegen')}} – {{studentInfo}}</p>
+				<p v-else class="fw-bold mt-3">{{$p.t('projektarbeit', 'projektarbeitBearbeiten')}} – {{studentInfo}}</p>
 			</template>
 
 			<div class="row" >
-				<div :class="statusNew ? 'col-12' : 'col-6'">
+				<div :class="statusNew ? 'col-12' : 'col-12 col-xl-6'">
 					<projektarbeit-details ref="projektarbeitDetails" :student="student" @projekttyp-changed="setDefaultStunden">
 					</projektarbeit-details>
 				</div>
 
-				<div :class="statusNew ? '' : 'col-6'" :style="statusNew ? 'display: none' : ''">
+				<div :class="statusNew ? '' : 'col-12 col-xl-6'" :style="statusNew ? 'display: none' : ''">
 					<projektbetreuer ref="projektbetreuer" :config="config" @betreuer-saved="reload"></projektbetreuer>
 				</div>
 			</div>

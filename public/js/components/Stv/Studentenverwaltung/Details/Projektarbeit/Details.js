@@ -291,7 +291,7 @@ export default {
 
 
 				<div class="row mb-3">
-					<div class="col-9">
+					<div class="col">
 						<form-input
 							container-class="stv-details-projektarbeit-firma"
 							:label="$p.t('projektarbeit', 'firma')"
@@ -305,7 +305,7 @@ export default {
 							>
 						</form-input>
 					</div>
-					<div class="col-3 align-content-center">
+					<div class="col-auto align-content-center">
 						<a :href="firmenverwaltungLink" target="_blank">
 							{{ $p.t('projektarbeit', 'zurFirmenverwaltung') }}
 						</a>
@@ -314,7 +314,7 @@ export default {
 
 				<div class="row mb-3">
 					<form-input
-						container-class="stv-details-projektarbeit-lv col-9"
+						container-class="stv-details-projektarbeit-lv col"
 						:label="$p.t('projektarbeit', 'lehrveranstaltung')"
 						type="select"
 						v-model="formData.lehrveranstaltung_id"
@@ -330,7 +330,7 @@ export default {
 						</option>
 					</form-input>
 					<form-input
-						container-class="col-3"
+						container-class="col-auto"
 						:label="$p.t('lehre', 'studiensemester')"
 						type="select"
 						v-model="studiensemester"

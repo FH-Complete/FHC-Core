@@ -127,6 +127,13 @@ $config['tabs']['projektarbeit']['defaultProjektbetreuerStundenDiplom'] =
 	? FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_MASTER
 	: '0.0';
 $config['tabs']['projektarbeit']['defaultProjektbetreuerStundensatz'] = '80.0';
+// default Stunden per Betreuerart, they win over the Projekttyp defaults above
+$config['tabs']['projektarbeit']['defaultProjektbetreuerStundenBetreuerart'] = [
+	'Betreuer' => '3.0',
+	'Begutachter' => '4.0',
+	'Erstbegutachter' => '5.0',
+	'Zweitbegutachter' => '3.0'
+];
 
 $config['student_tab_order'] = [
 	'details',
