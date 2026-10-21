@@ -42493,6 +42493,26 @@ In the list:
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_error_noGradeForPoints',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Notenschlüssel der Lehrveranstaltung ergibt für diese Punkte keine Note',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The grading key of the course gives no grade for these points',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// groups
 	array(
 		'app' => 'core',

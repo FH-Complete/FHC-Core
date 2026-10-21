@@ -1,6 +1,7 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import ZeugnisActions from './Zeugnis/Actions.js';
 import ZeugnisDocuments from './Zeugnis/Documents.js';
+import { debounce } from '../../../../../helpers/debounce.js';
 
 export default {
 	name: 'Zeugnis',
@@ -99,7 +100,7 @@ export default {
 						return;
 
 					// get row data
-					const {lehrveranstaltung_id, uid: student_uid, studiensemester_kurzbz} = cell.getData();
+					const {lehrveranstaltung_id, uid: student_uid, studiensemester_kurzbz, _punkte: punkte = null} = cell.getData();
 
 					listPromise
 						// get bezeichnung
@@ -111,6 +112,7 @@ export default {
 							student_uid,
 							studiensemester_kurzbz,
 							note,
+							punkte,
 							note_bezeichnung
 						}))
 						// send to backend
@@ -120,7 +122,7 @@ export default {
 						.then(list => list.find(el => el.value == note))
 						.then(found => found?.label)
 						// update other fields in row
-						.then(note_bezeichnung => cell.getRow().update({note_bezeichnung}))
+						.then(note_bezeichnung => cell.getRow().update({note_bezeichnung, punkte, _punkte: null}))
 						.then(() => cell.getRow().reformat())
 						// cleanup
 						.then(cell.clearEdited)
@@ -134,13 +136,16 @@ export default {
 				if (this.config.usePoints) {
 					gradeField.editorParams = {
 						valuesLookup: (cell, filterTerm) => {
-							if (filterTerm) {
+							// the last typed Punkte go with the selected Note; a decimal comma counts as a point
+							const punkte = filterTerm ? filterTerm.replace(',', '.') : null;
+							cell.getData()._punkte = punkte;
+							if (punkte) {
 								return this.$api
 									.call(
 										this.endpoint.getGradeFromPoints(
-											filterTerm,
+											punkte,
 											cell.getData().lehrveranstaltung_id,
-											this.currentSemester
+											cell.getData().studiensemester_kurzbz
 										),
 										{ errorHandling: false }
 									)
@@ -172,6 +177,124 @@ export default {
 				gradeField.editorParams.placeholderLoading = node;
 				gradeField.visible = this.optionalTabulatorOptions?.visibleColumns?.note ?? true
 				gradeField.headerFiler = this.optionalTabulatorOptions?.headerFilter?.note || this.optionalTabulatorOptions?.note || false
+			}
+
+			let punkteField = {
+				field: 'punkte',
+				title: this.$p.t('stv/grades_points'),
+				visible: !!this.config.usePoints,
+				// numeric(8,4) arrives as "45.5000"
+				formatter: cell => (cell.getValue() ?? '') === '' ? '' : String(Number(cell.getValue()))
+			};
+			if (this.config.usePoints && ['both', 'inline'].includes(this.config.edit)) {
+				// saves the Punkte of one row; the server derives the Note, the row shows what it saved
+				const savePunkte = (row, punkte, before) => {
+					const data = row.getData();
+					const saveId = data._punkteSaveId = (data._punkteSaveId || 0) + 1;
+					const { lehrveranstaltung_id, uid: student_uid, studiensemester_kurzbz, lehrveranstaltung_bezeichnung } = data;
+
+					this.$api
+						.call(
+							// without Punkte the Note before the edit stays; a preview of a shorter input must not stick
+							this.endpoint.updateCertificate({ lehrveranstaltung_id, student_uid, studiensemester_kurzbz, note: punkte === null ? before.note : data.note, punkte }),
+							{ errorHeader: lehrveranstaltung_bezeichnung }
+						)
+						.then(result => listPromise.then(list => ({
+							...result.data,
+							note_bezeichnung: list.find(el => el.value == result.data.note)?.label
+						})))
+						.then(saved => {
+							// a later save of the same row wins
+							if (row.getData()._punkteSaveId !== saveId)
+								return;
+							// update, not reformat: a reformat destroys an editor that is open in this row again
+							row.update(saved);
+							this.$fhcAlert.alertSuccess(this.$p.t('stv/grades_updated'));
+						})
+						.catch(err => {
+							if (row.getData()._punkteSaveId === saveId)
+								row.update(before);
+							this.$fhcAlert.handleFormValidation(err);
+						});
+				};
+
+				// the Note of the Notenschluessel shows while typing; Enter, Tab and a click elsewhere save
+				punkteField.editor = (cell, onRendered, success, cancel) => {
+					const row = cell.getRow();
+					const { note, note_bezeichnung, punkte } = row.getData();
+
+					const input = document.createElement('input');
+					input.type = 'text';
+					input.inputMode = 'decimal';
+					input.style.cssText = 'width: 100%; height: 100%; box-sizing: border-box; padding: 4px;';
+
+					// cellEditCancelled reads this state when Tabulator closes the editor itself
+					const editor = row.getData()._punkteEditor = {
+						open: true,
+						initial: punkteField.formatter(cell),
+						before: { note, note_bezeichnung, punkte },
+						value: () => input.value.trim().replace(',', '.'),
+						save: () => savePunkte(row, editor.value() === '' ? null : editor.value(), editor.before)
+					};
+					input.value = editor.initial;
+
+					const showNote = debounce(() => {
+						if (!editor.open)
+							return;
+						if (editor.value() === '')
+							return row.update({ note, note_bezeichnung });
+						const { lehrveranstaltung_id, studiensemester_kurzbz } = row.getData();
+						this.$api
+							.call(this.endpoint.getGradeFromPoints(editor.value(), lehrveranstaltung_id, studiensemester_kurzbz), { errorHandling: false })
+							.then(result => listPromise.then(list => list.find(el => el.value == result.data)))
+							.then(found => editor.open && found && row.update({ note: found.value, note_bezeichnung: found.label }))
+							.catch(() => {});
+					}, 500);
+
+					const finish = save => {
+						if (!editor.open)
+							return;
+						editor.open = false;
+						if (save && editor.value() !== editor.initial) {
+							success(editor.value());
+							return editor.save();
+						}
+						cancel();
+						row.update({ note, note_bezeichnung });
+					};
+					input.addEventListener('input', showNote);
+					input.addEventListener('blur', () => finish(true));
+					input.addEventListener('keydown', evt => {
+						if (evt.key === 'Enter')
+							finish(true);
+						if (evt.key === 'Escape')
+							finish(false);
+						// like the Tabulator editors: else the table keybindings scroll and close the editor
+						if (evt.key === 'Home' || evt.key === 'End')
+							evt.stopPropagation();
+					});
+					onRendered(() => {
+						input.focus();
+						input.select();
+					});
+					return input;
+				};
+				// Tabulator closes an open editor itself when another edit starts; the typed Punkte still count
+				punkteField.cellEditCancelled = cell => {
+					const editor = cell.getData()._punkteEditor;
+					if (!editor?.open)
+						return;
+					editor.open = false;
+					if (editor.value() === editor.initial)
+						return cell.getRow().update({ note: editor.before.note, note_bezeichnung: editor.before.note_bezeichnung });
+					cell.getRow().update({ punkte: editor.value() });
+					editor.save();
+				};
+				// one click opens the editor; without it the first click only selects the row
+				punkteField.cellClick = (evt, cell) => {
+					if (!cell.getElement().classList.contains('tabulator-editing'))
+						cell.edit();
+				};
 			}
 
 			const columns = [
@@ -221,7 +344,7 @@ export default {
 				{ field: 'ects_lv', title: this.$p.t('lehre/ects'), visible: false },
 				{ field: 'lehrform', title: this.$p.t('lehre/lehrform'), visible: false },
 				{ field: 'kurzbz', title: this.$p.t('lehre/kurzbz'), visible: false },
-				{ field: 'punkte', title: this.$p.t('stv/grades_points'), visible: false },
+				punkteField,
 				{ field: 'lehrveranstaltung_bezeichnung_english', title: this.$p.t('stv/grades_lehrveranstaltung_bezeichnung_english'), visible: false },
 				{ field: 'uid', title: this.$p.t('person/uid'), visible: false },
 				{ field: 'vorname', title: this.$p.t('person/vorname'), visible: false },

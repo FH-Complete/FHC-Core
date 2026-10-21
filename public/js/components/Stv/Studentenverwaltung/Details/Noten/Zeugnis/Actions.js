@@ -32,7 +32,8 @@ export default {
 		return {
 			grades: [],
 			suggestions: null,
-			currentPoints: ''
+			currentPoints: '',
+			lastPoints: null
 		};
 	},
 	computed: {
@@ -68,14 +69,15 @@ export default {
 	},
 	methods: {
 		convertPoints({evt, query}) {
+			this.lastPoints = query ? query.replace(',', '.') : null;
 			if (!query) {
 				return this.suggestions = this.grades;
 			}
 			this.$refs.points
 				.call(ApiStvGrades.getGradeFromPoints(
-					query,
+					this.lastPoints,
 					this.selected.find(Boolean)?.lehrveranstaltung_id,
-					this.currentSemester
+					this.selected.find(Boolean)?.studiensemester_kurzbz
 				))
 				.then(result => {
 					if (result.data === null) {
@@ -90,7 +92,7 @@ export default {
 			if (this.selected)
 				this.selected.forEach(grade => grade.note = note);
 			this.currentPoints = '';
-			this.current = note;
+			this.selectedData.forEach(data => this.$emit('setGrade', {...data, note, punkte: this.lastPoints}));
 		},
 		deleteGrades() {
 			this.selectedData.forEach(data => this.$emit('deleteGrade', data));

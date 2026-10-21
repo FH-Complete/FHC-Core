@@ -184,10 +184,17 @@ class Grades extends FHCAPI_Controller
 	{
 		$this->load->library('form_validation');
 
+		// a Note without Punkte clears old Punkte, else Note and Punkte contradict
+		$punkte = $this->input->post('punkte');
+		if (!(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE) || trim((string) $punkte) === '')
+			$punkte = null;
+
 		$this->form_validation->set_rules("lehrveranstaltung_id", $this->p->t('lehre', 'lehrveranstaltung'), "required|integer");
 		$this->form_validation->set_rules("student_uid", $this->p->t('person', 'student'), "required");
 		$this->form_validation->set_rules("studiensemester_kurzbz", $this->p->t('lehre', 'studiensemester'), "required");
-		$this->form_validation->set_rules('note', $this->p->t('lehre', 'note'), 'required|numeric');
+		// with Punkte the Notenschluessel gives the Note
+		$this->form_validation->set_rules('note', $this->p->t('lehre', 'note'), $punkte === null ? 'required|numeric' : 'numeric');
+		$this->form_validation->set_rules('punkte', $this->p->t('stv', 'grades_points'), 'numeric|greater_than_equal_to[0]|less_than[10000]');
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
@@ -206,6 +213,16 @@ class Grades extends FHCAPI_Controller
 
 		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
 
+		// the Notenschluessel of the LV decides the Note for the Punkte
+		if ($punkte !== null) {
+			$this->load->model('education/Notenschluesselaufteilung_model', 'NotenschluesselaufteilungModel');
+			$note = $this->getDataOrTerminateWithError(
+				$this->NotenschluesselaufteilungModel->getNote($punkte, $lehrveranstaltung_id, $studiensemester_kurzbz)
+			);
+			if ($note === null)
+				$this->terminateWithValidationErrors(['punkte' => $this->p->t('stv', 'grades_error_noGradeForPoints')]);
+		}
+
 		$result = $this->ZeugnisnoteModel->load([
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'student_uid' => $student_uid,
@@ -220,6 +237,7 @@ class Grades extends FHCAPI_Controller
 				'lehrveranstaltung_id' => $lehrveranstaltung_id
 			], [
 				'note' => $note,
+				'punkte' => $punkte,
 				'benotungsdatum' => $now,
 				'updateamum' => $now,
 				'updatevon' => $authUID
@@ -230,6 +248,7 @@ class Grades extends FHCAPI_Controller
 				'student_uid' => $student_uid,
 				'lehrveranstaltung_id' => $lehrveranstaltung_id,
 				'note' => $note,
+				'punkte' => $punkte,
 				'benotungsdatum' => $now,
 				'insertamum' => $now,
 				'insertvon' => $authUID
@@ -237,7 +256,8 @@ class Grades extends FHCAPI_Controller
 		}
 		$this->getDataOrTerminateWithError($result);
 
-		$this->terminateWithSuccess(true);
+		// the client shows the Note that the server saved
+		$this->terminateWithSuccess(['note' => $note, 'punkte' => $punkte]);
 	}
 
 	/**

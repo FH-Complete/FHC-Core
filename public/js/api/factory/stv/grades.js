@@ -52,7 +52,7 @@ export default {
 			url: url
 		};
 	},
-	updateCertificate({lehrveranstaltung_id, student_uid, studiensemester_kurzbz, note, lehrveranstaltung_bezeichnung}) {
+	updateCertificate({lehrveranstaltung_id, student_uid, studiensemester_kurzbz, note, punkte = null, lehrveranstaltung_bezeichnung}) {
 		return {
 			method: 'post',
 			url: 'api/frontend/v1/stv/grades/updateCertificate',
@@ -60,7 +60,8 @@ export default {
 				lehrveranstaltung_id,
 				student_uid,
 				studiensemester_kurzbz,
-				note
+				note,
+				punkte
 			}
 		};
 	},

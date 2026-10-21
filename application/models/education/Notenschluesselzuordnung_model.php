@@ -26,8 +26,13 @@ class Notenschluesselzuordnung_model extends DB_Model
 		
 		$this->db->where("lehrveranstaltung_id", $lehrveranstaltung_id);
 		if ($studiensemester_kurzbz) {
+			// without the group the OR matches each row without a semester, of any LV
+			$this->db->group_start();
 			$this->db->where("studiensemester_kurzbz", $studiensemester_kurzbz);
 			$this->db->or_where("studiensemester_kurzbz", null);
+			$this->db->group_end();
+			// the row of the semester before the row without a semester (NULLS LAST)
+			$this->addOrder("studiensemester_kurzbz", "ASC");
 		} else {
 			$this->db->where("studiensemester_kurzbz", null);
 		}
@@ -65,7 +70,12 @@ class Notenschluesselzuordnung_model extends DB_Model
 		$this->addLimit(1);
 
 		if ($studiensemester_kurzbz) {
-			$this->db->where_in("studiensemester_kurzbz", [$studiensemester_kurzbz, null]);
+			// IN ('X', NULL) never matches NULL
+			$this->db->group_start();
+			$this->db->where("studiensemester_kurzbz", $studiensemester_kurzbz);
+			$this->db->or_where("studiensemester_kurzbz", null);
+			$this->db->group_end();
+			$this->addOrder("studiensemester_kurzbz", "ASC");
 			$result = $this->load();
 		} else {
 			$result = $this->loadWhere([
