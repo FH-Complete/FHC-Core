@@ -68199,6 +68199,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 	// Zeitsperren Sancho Subjects end
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'old',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'alt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'old',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 
