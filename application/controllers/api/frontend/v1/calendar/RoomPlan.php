@@ -92,7 +92,7 @@ class RoomPlan extends FHCAPI_Controller
 		$result = $this->stundenplanlib->addReservation($start, $end, $title, $beschreibung, $ort_kurzbz, $lektoren, $studiengang_kz, $semester, $verband, $gruppe, $spezialgruppe);
 
 		if (isError($result))
-			$this->terminateWithError($result);
+			$this->terminateWithError(getError($result));
 
 		$this->terminateWithSuccess($result);
 	}

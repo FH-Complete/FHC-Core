@@ -29,6 +29,7 @@ export default {
 			selectedGruppe: null,
 			selectedLektoren: [],
 			nestedGroupOptions: {},
+			selectedDate: null,
 		};
 	},
 	computed: {
@@ -84,6 +85,10 @@ export default {
 				?.setZone?.(this.timezone)
 				?.toFormat?.("HH:mm:ss");
 
+			this.selectedDate = newEvent.start
+				.startOf("day")
+				.toISO()
+				.slice(0, 10);
 			this.selectedStart =
 				this.timeGrid.find((t) => t.start === startTime)?.start ||
 				this.timeGrid[0]?.start;
@@ -92,16 +97,20 @@ export default {
 				this.timeGrid.at(-1)?.end;
 		},
 		saveEvent() {
+			const date = this.selectedDate
+				? luxon.DateTime.fromFormat(this.selectedDate, "yyyy-MM-dd")
+				: this.event.start.startOf("day");
 			const [startHour, startMinute] = this.selectedStart
 				.split(":")
 				.map(Number);
 			const [endHour, endMinute] = this.selectedEnd
 				.split(":")
 				.map(Number);
-			const selectedStart = this.event.start
-				.startOf("day")
-				.set({ hour: startHour, minute: startMinute });
-			const selectedEnd = this.event.start
+			const selectedStart = date.set({
+				hour: startHour,
+				minute: startMinute,
+			});
+			const selectedEnd = date
 				.startOf("day")
 				.set({ hour: endHour, minute: endMinute });
 
@@ -197,6 +206,18 @@ export default {
 					{{ slot.end }}
 				</option>
 			</form-input>
+			
+			<form-input
+				v-model="selectedDate"
+				:label="capitalize($p.t('ui', 'date'))"
+				type="datepicker"
+				container-class="col-6"
+				name="selectedDate"
+				format="dd.MM.yyyy"
+				preview-format="dd.MM.yyyy"
+				model-type="yyyy-MM-dd"
+				required
+			/>
 		</div>
 		<div class="row">
 			<form-input

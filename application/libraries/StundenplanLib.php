@@ -528,6 +528,7 @@ class StundenplanLib
 		$this->_ci->load->model('ressource/stundenplandev_model', 'StundenplandevModel');
 		$this->_ci->load->model('ressource/stundenplan_model', 'StundenplanModel');
 		$this->_ci->load->library('PermissionLib');
+		$this->_ci->load->library('PhrasesLib', ['LvPlan']);
 
 		$startTime = new DateTime($start);
 		$endTime = new DateTime($end);
@@ -558,7 +559,7 @@ class StundenplanLib
 
 		if ((hasData($stundenplandev_belegung) || hasData($stundenplan_belegung))
 			&& !$this->_ci->permissionlib->isBerechtigt('lehre/reservierungAdvanced'))
-			return error ('lvplan/bereitsReserviert');
+			return error($this->_ci->phraseslib->t('LvPlan', 'bereitsReserviert'));
 
 		$this->_ci->ReservierungModel->addSelect('stunde');
 		$reservation_hours = $this->_ci->ReservierungModel->loadWhere(array('datum' => $startTime->format('Y-m-d'), 'ort_kurzbz' => $ort_kurzbz));
@@ -571,7 +572,7 @@ class StundenplanLib
 
 		if (!empty(array_intersect($stunden, $reservation_hours))
 			&& !$this->_ci->permissionlib->isBerechtigt('lehre/reservierungAdvanced'))
-			return error("lvplan/bereitsReserviert");
+			return error($this->_ci->phraseslib->t('LvPlan', 'bereitsReserviert'));
 
 
 		if (!empty($lektoren))
