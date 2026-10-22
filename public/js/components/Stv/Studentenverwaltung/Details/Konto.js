@@ -213,7 +213,10 @@ export default {
 		this.filter = window.localStorage.getItem(LOCAL_STORAGE_ID_FILTER) == 1;
 		this.$api
 			.call(ApiStvFilter.getStg())
-			.then(result => this.studiengang_kz = result.data)
+			.then(result => {
+				this.studiengang_kz = result.data;
+				this.$nextTick(this.$refs.table.reloadTable);
+			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
