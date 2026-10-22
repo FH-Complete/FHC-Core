@@ -44966,6 +44966,27 @@ In the list:
 			)
 		)
 	),
+	
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'anwesenheitsUndNotenlisten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheits- und Notenlisten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendance and grade list',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	array(
 		'app' => 'core',
 		'category' => 'lehre',
