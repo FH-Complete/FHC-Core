@@ -112,7 +112,6 @@ export default {
 				<tbody>
 					<kollision-row :event="event" />
 					<zeit-row ref="zeit" :event="event" />
-					<raum-row :event="event" />
 					<tr>
 						<th>{{$p.t('global','anzahl')}} {{$p.t('global','students')}}:
 						</th>
@@ -120,6 +119,8 @@ export default {
 							{{anzahlSchwund}} ({{anzahl}})
 						</td>
 					</tr>
+					<raum-row :event="event" />
+					
 					<tr>
 						<th>{{
 							$p.t('lehre','lehrveranstaltung')?
@@ -130,7 +131,7 @@ export default {
 							<div v-for="lehrveranstaltung in event.lehrveranstaltung_infos" class="d-block">
 								<a v-if="lvLinks.lvverwaltung[lehrveranstaltung.lehrveranstaltung_id]" target='_blank' :aria-label="$p.t('lehre','lehrveranstaltung')" :title="$p.t('lehre','lehrveranstaltung')" :href="lvLinks.lvverwaltung[lehrveranstaltung.lehrveranstaltung_id]"><i class="fa fa-arrow-up-right-from-square me-1" aria-hidden="true"></i></a>
 								<a v-if="lvLinks.vilesci[lehrveranstaltung.lehrveranstaltung_id]" target='_blank' :aria-label="$p.t('lehre','lvInfoBearbeiten')" :title="$p.t('lehre','lehrveranstaltung')" :href="lvLinks.vilesci[lehrveranstaltung.lehrveranstaltung_id]"><i class="fa fa-pen-to-square me-1" aria-hidden="true"></i></a>
-								<span v-tooltip="lehrveranstaltung.oe_bezeichnung">{{'('+ lehrveranstaltung.lehrform_kurzbz + ') ' + lehrveranstaltung.lehrfach_bezeichnung }} </span>
+								<span v-tooltip="lehrveranstaltung.oe_bezeichnung">{{'('+ lehrveranstaltung.lehrform_kurzbz + ') ' + '[' + lehrveranstaltung.lehrfach_kurz_bezeichnung + '] ' + lehrveranstaltung.lehrfach_bezeichnung }} </span>
 							</div>
 						</td>
 					</tr>
@@ -143,7 +144,7 @@ export default {
 						<td>
 							<div v-for="lehreinheit in event.lehreinheit_infos" class="d-block">
 								<a v-if="leLinks[lehreinheit.lehreinheit_id]" target='_blank' :aria-label="$p.t('lehre','lehreinheit')" :title="$p.t('lehre','lehreinheit')" :href="leLinks[lehreinheit.lehreinheit_id]"><i class="fa fa-arrow-up-right-from-square me-1" aria-hidden="true"></i></a>
-								<span v-tooltip="lehreinheit.anmerkung">{{lehreinheit.lehrfach_bezeichnung}}</span>
+								<span v-tooltip="lehreinheit.anmerkung">[{{lehreinheit.lehrfach_kurz_bezeichnung}}] {{lehreinheit.lehrfach_bezeichnung}}</span>
 							</div>
 						</td>
 					</tr>
@@ -159,7 +160,7 @@ export default {
 									<a v-if="lektorenLinks[lektor.kurzbz]" target='_blank' :aria-label="$p.t('lehre','lektor')" :title="$p.t('lehre','lektor')" :href="lektorenLinks[lektor.kurzbz]"><i class="fa fa-arrow-up-right-from-square me-1" aria-hidden="true"></i></a>
 									<i class="fa fa-filter" @click="addLecturerFilter(lektor)"></i>
 									{{lektor.vorname}} {{lektor.nachname}} ({{lektor.kurzbz}})
-									<small v-if="zeitwunschMap[lektor.mitarbeiter_uid]" class="text-muted">
+									<small v-if="zeitwunschMap[lektor.mitarbeiter_uid]" class="text-muted" :title="$p.t('lehre', 'zeitwuensche_last_update', [formatDate(zeitwunschMap[lektor.mitarbeiter_uid])])">
 										<i class="fa-regular fa-clock"></i> {{ formatDate(zeitwunschMap[lektor.mitarbeiter_uid]) }}
 									</small>
 								</div>

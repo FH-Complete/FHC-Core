@@ -97,8 +97,8 @@ export default {
 					return;
 				}
 
+				this.$emit('saved', this.selectedRooms.map((room) => room.ort_kurzbz));
 				this.hide();
-				this.$emit('saved');
 				return;
 			}
 			let orte = {};
@@ -119,8 +119,8 @@ export default {
 				);
 			}
 
+			this.$emit("saved", this.selectedRooms.map((room) => room.ort_kurzbz));
 			this.hide();
-			this.$emit("saved");
 		},
 	},
 	watch: {

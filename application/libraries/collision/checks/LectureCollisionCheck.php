@@ -53,12 +53,14 @@ class LectureCollisionCheck implements ICollisionCheck
 		$kollisionsfreie_user = unserialize(KOLLISIONSFREIE_USER);
 		$grouped = [];
 
-		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id, current_lehreinheit_ma.mitarbeiter_uid, other_kalender.von, other_kalender.kalender_id as other_kalender_id');
+		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id, current_lehreinheit_ma.mitarbeiter_uid, current_mitarbeiter.kurzbz, other_kalender.von, other_kalender.kalender_id as other_kalender_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit current_kalender_le', 'current_kalender_le.kalender_id = tbl_kalender.kalender_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter current_lehreinheit_ma', 'current_lehreinheit_ma.lehreinheit_id = current_kalender_le.lehreinheit_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter other_lehreinheithreinheit_ma', 'other_lehreinheithreinheit_ma.mitarbeiter_uid = current_lehreinheit_ma.mitarbeiter_uid');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit other_kalender_le', 'other_kalender_le.lehreinheit_id = other_lehreinheithreinheit_ma.lehreinheit_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender other_kalender', 'other_kalender.kalender_id = other_kalender_le.kalender_id');
+		$this->_ci->KalenderModel->addJoin('public.tbl_mitarbeiter current_mitarbeiter', 'current_mitarbeiter.mitarbeiter_uid = current_lehreinheit_ma.mitarbeiter_uid');
+
 
 		$this->_ci->KalenderModel->db->where('other_kalender.kalender_id != tbl_kalender.kalender_id', null, false);
 		$this->_ci->KalenderModel->db->where('other_kalender.von < tbl_kalender.bis', null, false);
@@ -84,7 +86,7 @@ class LectureCollisionCheck implements ICollisionCheck
 			foreach (getData($result) as $row)
 			{
 				$grouped[$row->kalender_id][] = [
-					'message' => $this->_ci->phraseslib->t('ui', 'ma_le_kollision') . ': ' . $row->mitarbeiter_uid,
+					'message' => $this->_ci->phraseslib->t('ui', 'ma_le_kollision') . ': ' . ($row->kurzbz ? $row->kurzbz . ' [' . $row->mitarbeiter_uid . ']' : $row->mitarbeiter_uid),
 					'kalender_id' => $row->other_kalender_id,
 					'datum' => $row->von,
 				];

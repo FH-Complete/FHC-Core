@@ -38,22 +38,24 @@ export default {
 	template: /*html*/`
 	<tr v-if="collisions.length">
 		<th>
-			<i class="fa-solid fa-triangle-exclamation text-danger"></i>
+			<i class="fa-solid fa-xl fa-triangle-exclamation text-danger"></i>
 			{{ $p.t('ui','collision') }}:
 		</th>
 		<td>
-			<div v-for="(collision, index) in collisions" :key="collision.kalender_id ?? index" class="d-block">
-				<a
-					v-if="isJumpable(collision)"
-					href="#"
-					@click.prevent="jumpTo(collision)"
-				>
-					{{ collision.message }}
-				</a>
-				<template v-else>
-					{{ collision.message }}
-				</template>
-			</div>
+			<div class="overflow-auto" style="max-height: 15vh;">
+				<div v-for="(collision, index) in collisions" :key="collision.kalender_id ?? index" class="d-block">
+					<a
+						v-if="isJumpable(collision)"
+						href="#"
+						@click.prevent="jumpTo(collision)"
+					>
+						{{ collision.message }}
+					</a>
+					<template v-else>
+						{{ collision.message }}
+					</template>
+				</div>
+		</div>
 		</td>
 	</tr>`
 };

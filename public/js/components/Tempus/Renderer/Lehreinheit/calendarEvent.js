@@ -170,7 +170,7 @@ export default {
 		<div class="event-text" v-tooltip="tooltipString">
 			<span class="event-topic">{{ topicString }}</span>
 			<span
-				class="event-place"
+				class="event-place text-break"
 				data-cy="calendar-event-room"
 			>{{ ortString }}</span>
 			<span v-if="gruppeString" class="event-gruppe">{{ gruppeString }}</span>

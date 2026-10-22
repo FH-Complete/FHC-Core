@@ -69,6 +69,7 @@ export function idTagFormatter (id, tagData, tagComponent, typeId, semesterStart
 		tagsToShow.forEach(tag => {
 			let tagElement = document.createElement('span');
 
+			tagElement.style.cursor = 'pointer';
 			if(tag.automatisiert)
 				tagElement.innerHTML = "<i class='fa-solid fa-lock'></i> " + tag.beschreibung;
 			else

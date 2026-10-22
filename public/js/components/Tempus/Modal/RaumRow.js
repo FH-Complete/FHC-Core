@@ -45,8 +45,24 @@ export default {
 		openRaumvorschlag() {
 			this.$refs.raumModal.show(this.event);
 		},
-		addToRoomFilter(ort) {
-			this.modalActions?.addToFilter({ ort_kurzbz: ort }, 'ort');
+		addToRoomFilter(ort, addOnlyIfExists = false) {
+			this.modalActions?.addToFilter({ ort_kurzbz: ort }, 'ort', addOnlyIfExists);
+		},
+		updateRooms(orte)
+		{
+			if (Array.isArray(orte))
+			{
+				if (orte.length < 1)
+				{
+					this.modalActions?.addToFilter([], 'ort', true);
+				}
+				else
+				{
+					orte.forEach((ort) => this.addToRoomFilter(ort, true));
+				}
+			}
+
+			this.reload();
 		}
 	},
 	template: /*html*/`
@@ -70,10 +86,10 @@ export default {
 				></i>
 				{{ ort }}
 			</div>
-			<div>
+			<div class="event-dialog-location">
 				{{event.location}}
 			</div>
-			<raumauswahl-modal ref="raumModal" @saved="reload()" />
+			<raumauswahl-modal ref="raumModal" @saved="updateRooms" />
 		</td>
 	</tr>`
 };

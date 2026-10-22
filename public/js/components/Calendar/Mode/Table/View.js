@@ -1,7 +1,7 @@
-import {CoreFilterCmpt} from "../../../../components/filter/Filter.js";
+import {CoreFilterCmpt} from "../../../filter/Filter.js";
 import BsModal from '../../../Bootstrap/Modal.js';
 import FormInput from "../../../Form/Input.js";
-import CoreTag from '../../../../components/Tag/Tag.js';
+import CoreTag from '../../../Tag/Tag.js';
 
 import {
 	buildTagHeaderFilterExpression,
@@ -59,7 +59,8 @@ export default {
 				},
 			},
 			tagEndpoint: ApiTempusTag,
-			selectedColumnValues: []
+			selectedColumnValues: [],
+			pendingSelection: null
 		}
 	},
 	computed: {
@@ -170,13 +171,41 @@ export default {
 		tableBuilt() {
 			this.$refs.tableViewTable.tabulator.updateColumnDefinition('tags', {
 				headerFilterParams: this.tagHeaderFilterParams(),
-			});;
-
+			});
 		},
+
+		rememberSelection() {
+			const tab = this.$refs.tableViewTable?.tabulator;
+			this.pendingSelection = (tab?.getSelectedData() ?? [])
+				.map(r => r.eindeutige_kalender_gruppen_id);
+		},
+		clearPendingSelection() {
+			this.pendingSelection = null;
+		},
+		restoreSelection() {
+			const ids = this.pendingSelection;
+			if (!ids?.length) return;
+
+			const tab = this.$refs.tableViewTable?.tabulator;
+
+			if (!tab) return;
+
+			const rows = tab.getRows().filter(row =>
+				ids.includes(row.getData().eindeutige_kalender_gruppen_id)
+			);
+
+			if (!rows.length) return;
+
+			this.clearPendingSelection();
+			tab.selectRow(rows);
+			tab.scrollToRow(rows[0], "center", false).catch(() => {});
+		},
+
 		openModal() {
 			let selected = this.$refs.tableViewTable?.tabulator?.getSelectedData() ?? [];
 			if (!selected.length)
 				return;
+			this.rememberSelection();
 			this.tableActions?.openRaumauswahl(selected)
 		},
 		async deleteSelected() {
@@ -203,14 +232,20 @@ export default {
 				let isConfirmed = await this.$fhcAlert.confirmDelete();
 				if (!isConfirmed) return;
 				await this.tableActions?.deleteEntries(selected)
+				return;
 			}
-			else if (this.actionSelect === 'toLecturer')
-			{
-				await this.tableActions?.syncToLecturer(selected)
-			}
-			else if (this.actionSelect === 'toStudent')
-			{
-				await this.tableActions?.syncToStudent(selected)
+			try {
+				if (this.actionSelect === 'toLecturer')
+				{
+					await this.tableActions?.syncToLecturer(selected)
+				}
+				else if (this.actionSelect === 'toStudent')
+				{
+					await this.tableActions?.syncToStudent(selected)
+				}
+			} catch (e) {
+				this.clearPendingSelection();
+				throw e;
 			}
 		},
 		async fetchAssignedTagsByCalender(calendarGroupId) {
@@ -362,6 +397,7 @@ export default {
 			:tabulator-events="[{ event: 'tableBuilt', handler: tableBuilt },
 								{ event: 'rowSelectionChanged', handler: updateSelectedRows },
 								{ event: 'dataLoaded', handler: dataLoadedHandler }, 
+								{ event: 'dataProcessed', handler: restoreSelection }, 
 								{ event: 'dataFiltered', handler: dataFilteredHandler }, 
 								{ event: 'columnWidth', handler: columnWidthHandler },
 								{ event: 'rowClick', handler: onRowClick }

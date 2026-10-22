@@ -223,6 +223,7 @@ export default {
 			:is-event-dragging-enabled="false"
 			:is-event-resizing-enabled="false"
 			:isRangeVirtualScrollEnabled="false"
+			:can-access-settings-view="false"
 			:can-toggle-collision-check="false"
 			@update:date="handleChangeDate"
 			class="responsive-calendar"

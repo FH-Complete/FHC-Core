@@ -287,3 +287,8 @@ body {
 	display: flex;
 	align-items: center;
 }
+
+.event-dialog-location {
+	overflow-wrap: anywhere;
+}
+
