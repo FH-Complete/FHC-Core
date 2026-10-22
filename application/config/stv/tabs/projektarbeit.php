@@ -1,0 +1,12 @@
+<?php
+
+$config['defaultProjektbetreuerStunden'] =
+	defined('FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_BACHELOR')
+	? FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_BACHELOR
+	: '0.0';
+$config['defaultProjektbetreuerStundenDiplom'] =
+	defined('FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_MASTER')
+	? FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_MASTER
+	: '0.0';
+$config['defaultProjektbetreuerStundensatz'] = '80.0';
+
