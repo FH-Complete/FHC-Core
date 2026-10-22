@@ -280,47 +280,10 @@ class LvMenu extends FHCAPI_Controller
 			},
 			$params
 		);
-		if (intval(substr($studiensemester_kurzbz, -2)) > 25 && $studiensemester_kurzbz !== "SS2026") {
-			$menu = array_filter(
-				$menu,
-				function ($menuItem) {
-					return $menuItem['id'] !== 'addon_lvevaluierung_menu_lvevaluierung';
-				}
-			);
-		} else if (intval(substr($studiensemester_kurzbz, -2)) < 25) {
-			$menu = array_filter(
-				$menu,
-				function ($menuItem) {
-					return $menuItem['id'] !== 'extension_lvevaluierung_menu_initiierung';
-				}
-			);
-		} else {
-			$oldEval = current(array_filter(
-				$menu,
-				function ($menuItem) {
-					return $menuItem['id'] === 'addon_lvevaluierung_menu_lvevaluierung';
-				}
-			));
-			$newEval = current(array_filter(
-				$menu,
-				function ($menuItem) {
-					return $menuItem['id'] === 'extension_lvevaluierung_menu_initiierung';
-				}
-			));
-			if ($oldEval && $newEval) {
-				$this->load->library('PhrasesLib');
-				$p = $this->p;
-				$menu = array_map(
-					function ($menuItem) use ($p) {
-						if ($menuItem['id'] === 'addon_lvevaluierung_menu_lvevaluierung') {
-							$menuItem['name'] .= ' (' . $p->t('global', 'old') . ')';
-						}
-						return $menuItem;
-					},
-					$menu
-				);
-			}
-		}
+
+		$this->fhc_menu_eval_by_semester($menu, $studiensemester_kurzbz);
+
+		
 
 		// Menu sortieren
 		// ##########################################################################################
@@ -591,4 +554,49 @@ class LvMenu extends FHCAPI_Controller
 			);
 		}
     }
+
+	private function fhc_menu_eval_by_semester(&$menu, $studiensemester_kurzbz)
+	{
+		if (intval(substr($studiensemester_kurzbz, -2)) > 25 && $studiensemester_kurzbz !== "SS2026") {
+			$menu = array_filter(
+				$menu,
+				function ($menuItem) {
+					return $menuItem['id'] !== 'addon_lvevaluierung_menu_lvevaluierung';
+				}
+			);
+		} else if (intval(substr($studiensemester_kurzbz, -2)) < 25) {
+			$menu = array_filter(
+				$menu,
+				function ($menuItem) {
+					return $menuItem['id'] !== 'extension_lvevaluierung_menu_initiierung';
+				}
+			);
+		} else {
+			$oldEval = current(array_filter(
+				$menu,
+				function ($menuItem) {
+					return $menuItem['id'] === 'addon_lvevaluierung_menu_lvevaluierung';
+				}
+			));
+			$newEval = current(array_filter(
+				$menu,
+				function ($menuItem) {
+					return $menuItem['id'] === 'extension_lvevaluierung_menu_initiierung';
+				}
+			));
+			if ($oldEval && $newEval) {
+				$this->load->library('PhrasesLib');
+				$p = $this->p;
+				$menu = array_map(
+					function ($menuItem) use ($p) {
+						if ($menuItem['id'] === 'addon_lvevaluierung_menu_lvevaluierung') {
+							$menuItem['name'] .= ' (' . $p->t('global', 'old') . ')';
+						}
+						return $menuItem;
+					},
+					$menu
+				);
+			}
+		}
+	}
 }
