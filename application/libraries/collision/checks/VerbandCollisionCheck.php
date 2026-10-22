@@ -43,6 +43,7 @@ class VerbandCollisionCheck implements ICollisionCheck
 					AND other_lehreinheitguppe.gruppe_kurzbz IS NULL
 					AND (
 						current_lehreinheitguppe.verband IS NULL
+						OR other_lehreinheitguppe.verband IS NULL
 						OR (
 							current_lehreinheitguppe.verband = other_lehreinheitguppe.verband
 							AND (current_lehreinheitguppe.gruppe IS NULL OR other_lehreinheitguppe.gruppe IS NULL OR current_lehreinheitguppe.gruppe = other_lehreinheitguppe.gruppe)
@@ -100,6 +101,7 @@ class VerbandCollisionCheck implements ICollisionCheck
 			{
 				$sql_gruppen = "
 					SELECT
+						DISTINCT (current_kalender.kalender_id),
 						other_kalender.von,
 						other_kalender.bis,
 						COALESCE(
@@ -247,6 +249,7 @@ class VerbandCollisionCheck implements ICollisionCheck
 						AND other_event_teilnehmer.gruppe_kurzbz IS NULL
 						AND (
 							current_event_teilnehmer.verband IS NULL
+							OR other_event_teilnehmer.verband IS NULL
 							OR (
 								current_event_teilnehmer.verband = other_event_teilnehmer.verband
 								AND (current_event_teilnehmer.gruppe IS NULL OR other_event_teilnehmer.gruppe IS NULL OR current_event_teilnehmer.gruppe = other_event_teilnehmer.gruppe)
@@ -313,7 +316,7 @@ class VerbandCollisionCheck implements ICollisionCheck
 		$placeholders = implode(',', array_fill(0, count($kalender_ids), '?'));
 
 		$sql = "
-			SELECT DISTINCT ON (current_kalender.kalender_id) current_kalender.kalender_id,
+			SELECT DISTINCT current_kalender.kalender_id,
 				COALESCE(
 					other_lehreinheitguppe.gruppe_kurzbz,
 					UPPER(stg.typ::text || stg.kurzbz::text) || '-' || other_lehreinheitguppe.semester ||
@@ -370,6 +373,7 @@ class VerbandCollisionCheck implements ICollisionCheck
 					AND other_lehreinheitguppe.gruppe_kurzbz IS NULL
 					AND (
 						current_lehreinheitguppe.verband IS NULL
+						OR other_lehreinheitguppe.verband IS NULL
 						OR (
 							current_lehreinheitguppe.verband = other_lehreinheitguppe.verband
 							AND (current_lehreinheitguppe.gruppe IS NULL OR other_lehreinheitguppe.gruppe IS NULL OR current_lehreinheitguppe.gruppe = other_lehreinheitguppe.gruppe)

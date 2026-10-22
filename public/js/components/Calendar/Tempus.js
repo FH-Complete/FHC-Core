@@ -327,16 +327,28 @@ export default {
 					<span class="form-check-label">Stundenraster</span>
 				</div>
 				<div
-					class="d-flex align-items-center gap-2 "
+					class="d-flex align-items-center gap-2"
+					style="cursor:grab"
 					v-draggable:move.noimage="{ type: 'reservierung', id: null, orig: {} }"
 					data-cy="reservationDragHandle"
+					@click.stop="$emit('open-reservierung')"
 				>
 					<i 
 						class="fa-solid fa-calendar-plus text-primary" 
-						style="cursor:pointer"
-						@click.stop="$emit('open-reservierung')"
 					></i>
 					<span>Reservierung</span>
+				</div>
+				<div
+					class="d-flex align-items-center gap-2"
+					style="cursor:pointer"
+					data-bs-toggle="modal"
+					data-bs-target="#configModal"
+				>
+					<i
+						class="fa-solid fa-gear text-primary"
+						style="cursor:pointer"
+						></i>
+					<span class="form-check-label">{{ $p.t('ui/settings') }}</span>
 				</div>
 				<div class="d-flex align-items-center gap-2">
 					<i :class="appConfig.ignore_kollision ? 'fa-solid fa-triangle-exclamation text-danger' : 'fa-solid fa-circle-check text-success'"></i>

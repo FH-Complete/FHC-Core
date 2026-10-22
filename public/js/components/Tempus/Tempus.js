@@ -97,7 +97,7 @@ export default {
 			},
 			modalActions: {
 				saveEventTime: (payload) => this.handleSaveEventTime(payload),
-				addToFilter: (filter, type) => this.addToFilter(filter, type),
+				addToFilter: (filter, type, addOnlyIfExists) => this.addToFilter(filter, type, addOnlyIfExists),
 				goToEvent: ({datum}) => {
 					this.jumpToDate(datum);
 				}
@@ -385,9 +385,19 @@ export default {
 			}
 		},
 
-		addToFilter(filter, type) {
-			if (type === 'ort') {
+		addToFilter(filter, type, addOnlyIfExists = false) {
+			if (type === 'ort')
+			{
 				const ort_kurzbz = filter.ort_kurzbz;
+				if (addOnlyIfExists)
+				{
+					if (Array.isArray(this.rooms) && this.rooms.length < 1)
+						return;
+
+					if (!ort_kurzbz)
+						return this.rooms = [];
+				}
+
 				if (!this.rooms.some((room) => room.ort_kurzbz === ort_kurzbz)) {
 					this.rooms.push({ ort_kurzbz });
 				}
@@ -598,9 +608,6 @@ export default {
 				.catch((error) => {
 					this.currentlyUpdatedEvent = null;
 					this.removeVisualForUpdatingCalendarEvent(obj.orig.eindeutige_kalender_gruppen_id);
-					this.$nextTick(() => {
-						this.$refs.calendar.resetEventLoader(false, false);
-					});
 					throw error;
 				});
 		},

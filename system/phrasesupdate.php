@@ -3446,6 +3446,26 @@ $phrases = array(
 	array(
 		'app' => 'core',
 		'category' => 'lehre',
+		'phrase' => 'zeitwuensche_last_update',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zeitwünsche zuletzt bearbeitet am {0}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Time preferences last updated on {0}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
 		'phrase' => 'tempus_sync_start',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -51035,6 +51055,26 @@ In the list:
 			array(
 				'sprache' => 'English',
 				'text' => 'Entry can no longer be edited',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'entry_marked_for_deletion_not_editable',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Eintrag ist zum Löschen markiert und kann daher nicht bearbeitet werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Entry is marked for deletion and can therefore no longer be edited',
 				'description' => '',
 				'insertvon' => 'system'
 			)

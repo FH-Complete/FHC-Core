@@ -237,7 +237,7 @@ class KalenderLib
 				WHERE tbl_betriebsmittel_kalender.eindeutige_kalender_gruppen_id = tbl_kalender.eindeutige_kalender_gruppen_id
 			) AS has_assigned_resources"
 		]);
-		
+
 		$data = $this->_loadFilteredBasePlan($start_date, $end_date);
 
 		return $this->_mapEvents($data, $collisionCheck, $maxDailyEventLimit);
@@ -415,7 +415,7 @@ class KalenderLib
 		if (in_array($kalender_entry->status_kurzbz, array('to_delete', 'to_delete_live', 'to_delete_preview', 'deleted')))
 		{
 			return error([
-				'message' => $this->_ci->phraseslib->t('ui', 'entry_not_editable'),
+				'message' => $this->_ci->phraseslib->t('ui', 'entry_marked_for_deletion_not_editable'),
 				'errorCode' => 'entry_not_editable'
 			]);
 		}
@@ -466,7 +466,7 @@ class KalenderLib
 		if (in_array($kalender_entry->status_kurzbz, array('to_delete', 'to_delete_live', 'to_delete_preview', 'deleted')))
 		{
 			return error([
-				'message' => $this->_ci->phraseslib->t('ui', 'entry_not_editable'),
+				'message' => $this->_ci->phraseslib->t('ui', 'entry_marked_for_deletion_not_editable'),
 				'errorCode' => 'entry_not_editable'
 			]);
 		}
@@ -1077,7 +1077,7 @@ class KalenderLib
 			if (in_array($kalender_entry->status_kurzbz, array('to_delete', 'to_delete_live', 'to_delete_preview', 'deleted')))
 			{
 				return error([
-					'message' => $this->_ci->phraseslib->t('ui', 'entry_not_editable'),
+					'message' => $this->_ci->phraseslib->t('ui', 'entry_marked_for_deletion_not_editable'),
 					'errorCode' => 'entry_not_editable'
 				]);
 			}
@@ -1153,7 +1153,7 @@ class KalenderLib
 			if (in_array($kalender_entry->status_kurzbz, array('to_delete', 'to_delete_live', 'to_delete_preview', 'deleted')))
 			{
 				return error([
-					'message' => $this->_ci->phraseslib->t('ui', 'entry_not_editable'),
+					'message' => $this->_ci->phraseslib->t('ui', 'entry_marked_for_deletion_not_editable'),
 					'errorCode' => 'entry_not_editable'
 				]);
 			}
@@ -1497,6 +1497,7 @@ class KalenderLib
 			tbl_organisationseinheit.bezeichnung as organisationseinheit,
 			lehrfach.kurzbz AS lehrfach_kurzbz,
 			lehrfach.bezeichnung AS lehrfach_bezeichnung,
+			lehrfach.kurzbz AS lehrfach_kurz_bezeichnung,
 			lehrfach.farbe,
 			COALESCE(orginasator.uid, tbl_lehreinheitmitarbeiter.mitarbeiter_uid) as mitarbeiter_uid,
 			COALESCE(reservierung_person.vorname, tbl_person.vorname) as vorname,
@@ -1704,7 +1705,6 @@ class KalenderLib
 					'datum' => $von->format('Y-m-d'),
 					'isostart' => $von->format('c'),
 					'isoend' => $bis->format('c'),
-					'tooltip' => 'tip',
 					'status_kurzbz' => $row->status_kurzbz,
 					'ort_kurzbz' => [],
 					'ort_infos' => [],
@@ -1740,6 +1740,7 @@ class KalenderLib
 				$events[$id]->lehreinheit_infos[] = ['lehreinheit_id' => $row->lehreinheit_id,
 					'anmerkung' => (isset($row->le_anmerkung) ? $row->le_anmerkung : ''),
 					'lehrfach_bezeichnung' => (isset($row->lehrfach_bezeichnung) ? $row->lehrfach_bezeichnung : ''),
+					'lehrfach_kurz_bezeichnung' => (isset($row->lehrfach_kurz_bezeichnung) ? $row->lehrfach_kurz_bezeichnung : ''),
 					'studiensemester_kurzbz' => (isset($row->le_studiensemester_kurzbz) ? $row->le_studiensemester_kurzbz : ''),
 				];
 			}
@@ -1750,6 +1751,7 @@ class KalenderLib
 				$events[$id]->lehrveranstaltung_infos[] = ['lehrveranstaltung_id' => $row->lehrveranstaltung_id,
 					'lehrform_kurzbz' =>  (isset($row->lehrform_kurzbz) ? $row->lehrform_kurzbz : ''),
 					'lehrfach_bezeichnung' => (isset($row->lehrfach_bezeichnung) ? $row->lehrfach_bezeichnung : ''),
+					'lehrfach_kurz_bezeichnung' => (isset($row->lehrfach_kurz_bezeichnung) ? $row->lehrfach_kurz_bezeichnung : ''),
 					'oe_bezeichnung' => (isset($row->organisationseinheit) ? $row->organisationseinheit : ''),
 					'studiensemester_kurzbz' => (isset($row->le_studiensemester_kurzbz) ? $row->le_studiensemester_kurzbz : ''),
 				];

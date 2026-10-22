@@ -59,10 +59,11 @@ export default {
 			let el = this.$refs.tagWrapper;
 			if (!el) return;
 
-			const tagData = this.tags.map(t => ({
-				...t,
-				notiz_id: t.id,
-				bezeichnung: t.beschreibung,
+			const tagData = this.tags.map(tag => ({
+				...tag,
+				notiz_id: tag.id,
+				text: tag.notiz,
+				bezeichnung: tag.beschreibung,
 			}));
 
 			el.replaceChildren(
