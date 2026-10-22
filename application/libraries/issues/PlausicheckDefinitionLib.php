@@ -9,48 +9,40 @@ class PlausicheckDefinitionLib
 {
 	// set fehler for core plausichecks
 	// structure: fehler_kurzbz => class (library) name for resolving
-	private $_fehlerLibMappings = array(
-		'AbbrecherAktiv' => 'AbbrecherAktiv',
-		'AbschlussstatusFehlt' => 'AbschlussstatusFehlt',
-		'AktSemesterNull' => 'AktSemesterNull',
-		'AktiverStudentOhneStatus' => 'AktiverStudentOhneStatus',
-		'AusbildungssemPrestudentUngleichAusbildungssemStatus' => 'AusbildungssemPrestudentUngleichAusbildungssemStatus',
-		'DatumAbschlusspruefungFehlt' => 'DatumAbschlusspruefungFehlt',
-		'DatumSponsionFehlt' => 'DatumSponsionFehlt',
-		'DatumStudiensemesterFalscheReihenfolge' => 'DatumStudiensemesterFalscheReihenfolge',
-		'FalscheAnzahlAbschlusspruefungen' => 'FalscheAnzahlAbschlusspruefungen',
-		'FalscheAnzahlHeimatadressen' => 'FalscheAnzahlHeimatadressen',
-		'FalscheAnzahlZustelladressen' => 'FalscheAnzahlZustelladressen',
-		'GbDatumWeitZurueck' => 'GbDatumWeitZurueck',
-		'InaktiverStudentAktiverStatus' => 'InaktiverStudentAktiverStatus',
-		'IncomingHeimatNationOesterreich' => 'IncomingHeimatNationOesterreich',
-		'IncomingOhneIoDatensatz' => 'IncomingOhneIoDatensatz',
-		'IncomingOrGsFoerderrelevant' => 'IncomingOrGsFoerderrelevant',
-		'InskriptionVorLetzerBismeldung' => 'InskriptionVorLetzerBismeldung',
-		'NationNichtOesterreichAberGemeinde' => 'NationNichtOesterreichAberGemeinde',
-		'OrgformStgUngleichOrgformPrestudent' => 'OrgformStgUngleichOrgformPrestudent',
-		'PrestudentMischformOhneOrgform' => 'PrestudentMischformOhneOrgform',
-		'StgPrestudentUngleichStgStudienplan' => 'StgPrestudentUngleichStgStudienplan',
-		'StgPrestudentUngleichStgStudent' => 'StgPrestudentUngleichStgStudent',
-		'StudentstatusNachAbbrecher' => 'StudentstatusNachAbbrecher',
+	private $_fehlerKurzbz = array(
+		'AbbrecherAktiv',
+		'AbschlussstatusFehlt',
+		'AktSemesterNull',
+		'AktiverStudentOhneStatus',
+		'AusbildungssemPrestudentUngleichAusbildungssemStatus',
+		'DatumAbschlusspruefungFehlt',
+		'DatumSponsionFehlt',
+		'DatumStudiensemesterFalscheReihenfolge',
+		'FalscheAnzahlAbschlusspruefungen',
+		'FalscheAnzahlHeimatadressen',
+		'FalscheAnzahlZustelladressen',
+		'GbDatumWeitZurueck',
+		'InaktiverStudentAktiverStatus',
+		'IncomingHeimatNationOesterreich',
+		'IncomingOhneIoDatensatz',
+		'IncomingOrGsFoerderrelevant',
+		'InskriptionVorLetzerBismeldung',
+		'NationNichtOesterreichAberGemeinde',
+		'OrgformStgUngleichOrgformPrestudent',
+		'PrestudentMischformOhneOrgform',
+		'StgPrestudentUngleichStgStudienplan',
+		'StgPrestudentUngleichStgStudent',
+		'StudentstatusNachAbbrecher',
 		'DualesStudiumOhneMarkierung' => 'DualesStudiumOhneMarkierung'
-		//'StudienplanUngueltig' => 'StudienplanUngueltig'
-		//'BewerberNichtZumRtAngetreten' => 'BewerberNichtZumRtAngetreten'
+		//'StudienplanUngueltig',
+		//'BewerberNichtZumRtAngetreten'
 	);
-
-	/**
-	 * Gets all fehler_kurzbz-library mappings for fehler which need to be checked.
-	 */
-	public function getFehlerLibMappings()
-	{
-		return $this->_fehlerLibMappings;
-	}
 
 	/**
 	 * Gets all fehler_kurzbz for fehler which need to be checked.
 	 */
 	public function getFehlerKurzbz()
 	{
-		return array_keys($this->_fehlerLibMappings);
+		return $this->_fehlerKurzbz;
 	}
 }

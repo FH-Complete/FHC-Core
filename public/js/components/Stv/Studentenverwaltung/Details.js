@@ -1,5 +1,6 @@
 import FhcTabs from "../../Tabs.js";
 import FhcHeader from "../../DetailHeader/DetailHeader.js";
+import IssueChecker from "../../Issues/IssueChecker.js";
 
 import ApiStvApp from '../../../api/factory/stv/app.js';
 import ApiStudent from '../../../api/factory/stv/students.js';
@@ -16,7 +17,8 @@ export default {
 	},
 	components: {
 		FhcTabs,
-		FhcHeader
+		FhcHeader,
+		IssueChecker
 	},
 	data() {
 		return {
@@ -160,6 +162,14 @@ export default {
 				<template #valueGammaTile>{{tile_MatrNr}}</template>
 				<template #titleDeltaTile>PersKz</template>
 				<template #valueDeltaTile>{{tile_PersKz}}</template>
+				<template #issues>
+					<issue-checker
+						ref="issueCheckerRef"
+						:person_id="students[0].person_id"
+						:apps="['core', 'dvuh', 'bis']"
+						>
+					</issue-checker>
+				</template>
 			</fhc-header>
 			<fhc-tabs
 				v-if="students.length == 1"

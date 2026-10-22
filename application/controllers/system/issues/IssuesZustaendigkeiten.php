@@ -69,10 +69,7 @@ class IssuesZustaendigkeiten extends Auth_Controller
 	{
 		$app = $this->input->get('app');
 
-		$this->FehlerModel->addSelect('fehlercode, fehler_kurzbz, fehlertext, fehlertyp_kurzbz, app');
-		$this->FehlerModel->addOrder('fehlercode');
-
-		$fehlerRes = isset($app) ? $this->FehlerModel->loadWhere(array('app' => $app)) : $this->FehlerModel->load();
+		$fehlerRes = $this->FehlerModel->getByApps($app);
 
 		$this->outputJson($fehlerRes);
 	}

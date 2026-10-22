@@ -113,6 +113,7 @@ require_once('dbupdate_3.4/54225_reihungstest_ablauf_fuer_quereinsteiger.php');
 require_once('dbupdate_3.4/77757_widgets_berechtigungen.php');
 require_once('dbupdate_3.4/77048_cis4_mitarbeiter_studstatus_widget.php');
 require_once('dbupdate_3.4/83538_cis4_employees.php');
+require_once('dbupdate_3.4/68834_fehlermonitoring_issues_weitere_features.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -439,8 +440,9 @@ $tabellen=array(
 	"system.tbl_benutzerrolle"  => array("benutzerberechtigung_id","rolle_kurzbz","berechtigung_kurzbz","uid","funktion_kurzbz","oe_kurzbz","art","studiensemester_kurzbz","start","ende","negativ","updateamum", "updatevon","insertamum","insertvon","kostenstelle_id","anmerkung"),
 	"system.tbl_berechtigung"  => array("berechtigung_kurzbz","beschreibung"),
 	"system.tbl_extensions" => array("extension_id","name","version","description","license","url","core_version","dependencies","enabled"),
-	"system.tbl_fehler" => array("fehlercode","fehler_kurzbz","fehlercode_extern","fehlertext","fehlertyp_kurzbz","app"),
+	"system.tbl_fehler" => array("fehlercode","fehler_kurzbz","fehlercode_extern","fehlertext","fehlertyp_kurzbz","app","insertamum","insertvon","updateamum","updatevon"),
 	"system.tbl_fehlertyp" => array("fehlertyp_kurzbz","bezeichnung_mehrsprachig"),
+	"system.tbl_fehler_app" => array("fehlercode","app","insertamum","insertvon"),
 	"system.tbl_fehler_konfiguration" => array("konfigurationstyp_kurzbz","fehlercode","konfiguration","insertamum","insertvon","updateamum","updatevon"),
 	"system.tbl_fehler_konfigurationsdatentyp" => array("konfigurationsdatentyp"),
 	"system.tbl_fehler_konfigurationstyp" => array("konfigurationstyp_kurzbz","beschreibung","konfigurationsdatentyp","app"),

@@ -60,8 +60,10 @@ $this->load->view(
 								echo '<optgroup label = "'.($studiengang->typbezeichnung !== '' ? $studiengang->typbezeichnung : $studiengang).'">';
 							}
 							$typ = $studiengang->typ;
+
+							$selected = $studiengang->studiengang_kz == $studiengang_kz ? ' selected=""' : '';
 							?>
-							<option value="<?php echo $studiengang->studiengang_kz ?>">
+							<option value="<?php echo $studiengang->studiengang_kz ?>"<?php echo $selected ?>>
 								<?php echo $studiengang->kuerzel . ' - ' . $studiengang->bezeichnung ?>
 							</option>
 						<?php endforeach; ?>

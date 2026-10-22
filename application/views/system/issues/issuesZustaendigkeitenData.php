@@ -1,7 +1,8 @@
 <?php
 
 // get assigned Zustaendigkeiten
-$query = "SELECT fehlerzustaendigkeiten_id, fe.fehlercode, fe.fehlercode_extern, fehler_kurzbz, fehlertext, fehlertyp_kurzbz, fe.app,
+$query = "SELECT fehlerzustaendigkeiten_id, fe.fehlercode, fe.fehlercode_extern, fehler_kurzbz, fehlertext, fehlertyp_kurzbz,
+			(SELECT STRING_AGG(app, ', ') FROM system.tbl_fehler_app WHERE fehlercode = fe.fehlercode GROUP BY fehlercode) AS app,
        		pers.person_id, pers.vorname, pers.nachname,
        		oe.oe_kurzbz, oe.bezeichnung AS oe_bezeichnung, funk.funktion_kurzbz, funk.beschreibung AS funktion_beschreibung
 			FROM system.tbl_fehler_zustaendigkeiten zst
