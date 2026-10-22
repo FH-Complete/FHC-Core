@@ -77,6 +77,7 @@ class prestudent extends person
 	public $priorisierung = null;
 	public $foerderrelevant = null;
 	public $standort_code = null;
+	public $karrierepfad_id = null;
 	public $udf_values = null;
 
 	public $status_kurzbz;
@@ -176,6 +177,7 @@ class prestudent extends person
 				$this->priorisierung = $row->priorisierung;
 				$this->foerderrelevant = $this->db_parse_bool($row->foerderrelevant);
 				$this->standort_code = $row->standort_code;
+				$this->karrierepfad_id = $row->karrierepfad_id;
 
 				if(!person::load($row->person_id))
 					return false;
@@ -268,7 +270,7 @@ class prestudent extends person
 					reihungstest_id, anmeldungreihungstest, reihungstestangetreten, rt_gesamtpunkte,
 					rt_punkte1, rt_punkte2, rt_punkte3, bismelden, insertamum, insertvon,
 					updateamum, updatevon, anmerkung, dual, ausstellungsstaat, mentor,
-					gsstudientyp_kurzbz, aufnahmegruppe_kurzbz, priorisierung, zgvdoktor_erfuellt, foerderrelevant, standort_code) VALUES('.
+					gsstudientyp_kurzbz, aufnahmegruppe_kurzbz, priorisierung, zgvdoktor_erfuellt, foerderrelevant, standort_code, karrierepfad_id) VALUES('.
 
 					$this->db_add_param($this->aufmerksamdurch_kurzbz).",".
 					$this->db_add_param($this->person_id).",".
@@ -312,7 +314,8 @@ class prestudent extends person
 					$this->db_add_param($this->priorisierung).",".
 					$this->db_add_param($this->zgvdoktor_erfuellt).",".
 					$this->db_add_param($this->foerderrelevant, FHC_BOOLEAN).",".
-					$this->db_add_param($this->standort_code).");";
+					$this->db_add_param($this->standort_code).",".
+					$this->db_add_param($this->karrierepfad_id, FHC_INTEGER).");";
 		}
 		else
 		{
@@ -357,7 +360,8 @@ class prestudent extends person
 					' priorisierung='.$this->db_add_param($this->priorisierung).",".
 					' zgvdoktor_erfuellt='.$this->db_add_param($this->zgvdoktor_erfuellt).', '.
 					' foerderrelevant='.$this->db_add_param($this->foerderrelevant, FHC_BOOLEAN).",".
-					' standort_code='.$this->db_add_param($this->standort_code)." ".
+					' standort_code='.$this->db_add_param($this->standort_code).",".
+					' karrierepfad_id='.$this->db_add_param($this->karrierepfad_id, FHC_INTEGER)." ".
 					" WHERE prestudent_id=".$this->db_add_param($this->prestudent_id).";";
 		}
 
@@ -1097,6 +1101,7 @@ class prestudent extends person
 				$ps->priorisierung = $row->priorisierung;
 				$ps->foerderrelevant = $row->foerderrelevant;
 				$ps->standort_code = $row->standort_code;
+				$ps->karrierepfad_id = $row->karrierepfad_id;
 
 				$ps->status_kurzbz = $row->status_kurzbz;
 				$ps->studiensemester_kurzbz = $row->studiensemester_kurzbz;
@@ -1632,6 +1637,7 @@ class prestudent extends person
 				$obj->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
 				$obj->priorisierung = $row->priorisierung;
 				$obj->zgvdoktor_erfuellt = $row->zgvdoktor_erfuellt;
+				$obj->karrierepfad_id = $row->karrierepfad_id;
 
 				if ($hasUDF)
 				{
@@ -2262,7 +2268,7 @@ class prestudent extends person
 				aufnahmeschluessel, facheinschlberuf, anmeldungreihungstest, reihungstestangetreten, reihungstest_id,
 				punkte, rt_punkte1, rt_punkte2, rt_punkte3, bismelden, person_id, anmerkung, mentor, ext_id_prestudent,
 				dual, ausstellungsstaat, zgvdoktor_code, zgvdoktorort, zgvdoktordatum, zgvdoktornation,
-				gsstudientyp_kurzbz, aufnahmegruppe_kurzbz, priorisierung,zgvdoktor_erfuellt) VALUES('.
+				gsstudientyp_kurzbz, aufnahmegruppe_kurzbz, priorisierung,zgvdoktor_erfuellt, karrierepfad_id) VALUES('.
 				$this->db_add_param($this->prestudent_id).','.
 				$this->db_add_param($this->aufmerksamdurch_kurzbz).','.
 				$this->db_add_param($this->studiengang_kz).','.
@@ -2301,7 +2307,8 @@ class prestudent extends person
 				$this->db_add_param($this->gsstudientyp_kurzbz).','.
 				$this->db_add_param($this->aufnahmegruppe_kurzbz).','.
 				$this->db_add_param($this->priorisierung).','.
-				$this->db_add_param($this->zgvdoktor_erfuellt).');';
+				$this->db_add_param($this->zgvdoktor_erfuellt).','.
+				$this->db_add_param($this->karrierepfad_id, FHC_INTEGER).');';
 
 			if($log->save(true))
 			{

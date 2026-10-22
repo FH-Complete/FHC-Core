@@ -106,6 +106,7 @@ require_once('dbupdate_3.4/54225_reihungstest_ablauf_fuer_quereinsteiger.php');
 require_once('dbupdate_3.4/77757_widgets_berechtigungen.php');
 require_once('dbupdate_3.4/77048_cis4_mitarbeiter_studstatus_widget.php');
 require_once('dbupdate_3.4/83538_cis4_employees.php');
+require_once('dbupdate_3.4/84049_karrierepfade.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -344,6 +345,9 @@ $tabellen=array(
 	"public.tbl_geschaeftsjahr"  => array("geschaeftsjahr_kurzbz","start","ende","bezeichnung"),
 	"public.tbl_gruppe"  => array("gruppe_kurzbz","studiengang_kz","semester","bezeichnung","beschreibung","sichtbar","lehre","aktiv","sort","mailgrp","generiert","updateamum","updatevon","insertamum","insertvon","ext_id","orgform_kurzbz","gid","content_visible","gesperrt","zutrittssystem","aufnahmegruppe","direktinskription"),
 	"public.tbl_gruppe_manager"  => array("gruppe_manager_id","gruppe_kurzbz","uid","insertamum","insertvon"),
+	"public.tbl_karrierepfad" => array("karrierepfad_id","karrierepfad_kurzbz","karrierepfad_typ_kurzbz","studiengang_kz","bezeichnung_mehrsprachig","sort","aktiv","insertamum","insertvon","updateamum","updatevon"),
+	"public.tbl_karrierepfad_studienplan" => array("karrierepfad_id","studienplan_id"),
+	"public.tbl_karrierepfad_typ" => array("karrierepfad_typ_kurzbz","bezeichnung_mehrsprachig"),
 	"public.tbl_kennzeichen" => array("kennzeichen_id", "person_id", "kennzeichentyp_kurzbz", "inhalt", "aktiv", "insertamum", "insertvon", "updateamum", "updatevon"),
 	"public.tbl_kennzeichentyp" => array("kennzeichentyp_kurzbz", "bezeichnung", "aktiv"),
 	"public.tbl_kontakt"  => array("kontakt_id","person_id","kontakttyp","anmerkung","kontakt","zustellung","updateamum","updatevon","insertamum","insertvon","ext_id","standort_id"),
@@ -377,7 +381,7 @@ $tabellen=array(
 	"public.tbl_preoutgoing_lehrveranstaltung" => array("preoutgoing_lehrveranstaltung_id","preoutgoing_id","bezeichnung","ects","endversion","insertamum","insertvon","updateamum","updatevon","wochenstunden","unitcode"),
 	"public.tbl_preoutgoing_preoutgoing_status" => array("status_id","preoutgoing_status_kurzbz","preoutgoing_id","datum","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preoutgoing_status" => array("preoutgoing_status_kurzbz","bezeichnung"),
-	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3", "zgvdoktor_code", "zgvdoktorort", "zgvdoktordatum","mentor","zgvnation","zgvmanation","zgvdoktornation","gsstudientyp_kurzbz","aufnahmegruppe_kurzbz","udf_values","priorisierung","foerderrelevant","standort_code","zgv_erfuellt","zgvmas_erfuellt","zgvdoktor_erfuellt"),
+	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3", "zgvdoktor_code", "zgvdoktorort", "zgvdoktordatum","mentor","zgvnation","zgvmanation","zgvdoktornation","gsstudientyp_kurzbz","aufnahmegruppe_kurzbz","udf_values","priorisierung","foerderrelevant","standort_code","zgv_erfuellt","zgvmas_erfuellt","zgvdoktor_erfuellt","karrierepfad_id"),
 	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id","studienplan_id","bestaetigtam","bestaetigtvon","fgm","faktiv", "anmerkung","bewerbung_abgeschicktamum","rt_stufe","statusgrund_id"),
 	"public.tbl_profil_update" => array("profil_update_id","uid","topic","requested_change","updateamum","updatevon","insertamum","insertvon","status","status_timestamp","status_message","attachment_id"),
 	"public.tbl_profil_update_status" => array("status_kurzbz","beschreibung","bezeichnung_mehrsprachig"),
