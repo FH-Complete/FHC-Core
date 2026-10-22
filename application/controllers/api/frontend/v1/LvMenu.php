@@ -281,7 +281,7 @@ class LvMenu extends FHCAPI_Controller
 			$params
 		);
 
-		$this->fhc_menu_eval_by_semester($menu, $studiensemester_kurzbz);
+		$this->fhc_menu_filter_eval_versions_by_semester($menu, $studiensemester_kurzbz);
 
 		
 
@@ -555,7 +555,7 @@ class LvMenu extends FHCAPI_Controller
 		}
     }
 
-	private function fhc_menu_eval_by_semester(&$menu, $studiensemester_kurzbz)
+	private function fhc_menu_filter_eval_versions_by_semester(&$menu, $studiensemester_kurzbz)
 	{
 		if (intval(substr($studiensemester_kurzbz, -2)) > 25 && $studiensemester_kurzbz !== "SS2026") {
 			$menu = array_filter(
