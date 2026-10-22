@@ -26,9 +26,10 @@ export default {
 			required: true
 		}
 	},
-	emits: ['update:currentDate', 'update:range', 'click', 'requestModalOpen'],
+	emits: ['update:currentDate', 'update:range', 'update:date', 'click', 'requestModalOpen'],
 	data() {
 		return {
+			selectedRangePresetChangedAt: null,
 			selectedRangePreset: null,
 		};
 	},
@@ -53,6 +54,8 @@ export default {
 		selectedRangePreset() {
 			if (!this.selectedRangePreset) return;
 
+			this.selectedRangePresetChangedAt = luxon.DateTime.now().toMillis();
+
 			const preset = this.rangeViewPresetsConfig.presets.find(
 				(preset) => preset.name === this.selectedRangePreset,
 			);
@@ -63,8 +66,16 @@ export default {
 				rangeLength: preset.endDate.diff(preset.startDate, 'days').days + 1,
 			});
 
-			this.selectedRangePreset = null;
 		},
+		range(newRange, oldRange) {
+			if (newRange.equals(oldRange)) return;
+
+			if (this.selectedRangePresetChangedAt  > luxon.DateTime.now().minus({ milliseconds: 100 }).toMillis()) {
+				return;
+			}
+
+			this.selectedRangePreset = null;
+		}
 	},
 	methods: {
 		viewAttrs() {
