@@ -51,25 +51,15 @@ class CollisionChecker
 
 	public function runAll($kalender_ids)
 	{
-		$remaining_ids = array_values(array_unique($kalender_ids));
-		$results = array_fill_keys($remaining_ids, []);
-		$collision_ids = [];
+		$results = array_fill_keys($kalender_ids, []);
 
 		foreach ($this->_checks as $check)
 		{
-			if (empty($remaining_ids)) break;
-
-			$batchResult = $check->checkAll($remaining_ids);
+			$batchResult = $check->checkAll($kalender_ids);
 			foreach ($batchResult as $kalender_id => $errors)
 			{
-				if (empty($errors)) continue;
-
 				$results[$kalender_id] = array_merge($results[$kalender_id], $errors);
-				$collision_ids[$kalender_id] = true;
 			}
-
-			if (!empty($collision_ids))
-				$remaining_ids = array_values(array_diff($remaining_ids, array_keys($collision_ids)));
 		}
 
 		return $results;
