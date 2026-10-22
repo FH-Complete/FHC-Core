@@ -2,6 +2,7 @@ import { numberPadding, formatDate } from "../../../../helpers/DateHelpers.js"
 import LvMenu from "../../Mylv/LvMenu.js";
 
 export default {
+	name: 'Cis-Renderer-Reservierung-ModalContent',
 	props:{
 		event: {
 			type: Object,
@@ -89,6 +90,14 @@ export default {
 							<a v-if="event.ort_content_id" :aria-label="$p.t('global','raum')" :title="$p.t('global','raum')" :href="getOrtContentLink"><i class="fa fa-arrow-up-right-from-square me-1" style="color:#00649C" aria-hidden="true"></i></a>
 							{{event.ort_kurzbz}}
 						</td>
+					</tr>
+					<tr>
+						<th>{{
+							$p.t('lehre','gruppe')?
+							$p.t('lehre','gruppe')+':'
+							:''
+						}}</th>
+						<td>{{event.gruppe[0].kuerzel.split("/")[0]}}</td>
 					</tr>
 					<tr>
 						<th>{{

@@ -30,7 +30,8 @@ class Studiensemester extends FHCAPI_Controller
 				'getStudySemestersByOrganizationalUnitAndDates' => self::PERM_LOGGED,
 				'getStudySemestersByStudyPlanAndDates' => self::PERM_LOGGED,
 				'current' => self::PERM_LOGGED,
-				'set' => self::PERM_LOGGED
+				'set' => self::PERM_LOGGED,
+				'getContainingOrNearestByDateRange' => self::PERM_LOGGED,
 			)
 		);
 
@@ -250,5 +251,16 @@ class Studiensemester extends FHCAPI_Controller
 		$this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess(true);
+	}
+
+	public function getContainingOrNearestByDateRange()
+	{
+		$from = $this->input->get("from");
+		$to = $this->input->get("to");
+
+		$result = $this->StudiensemesterModel->getContainingOrNearestByDateRange($from, $to);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
 	}
 }

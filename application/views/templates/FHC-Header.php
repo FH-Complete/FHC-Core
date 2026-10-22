@@ -12,6 +12,8 @@
 	$customJSs = isset($customJSs) ? $customJSs : null;
 	$customJSModules = isset($customJSModules) ? $customJSModules : null;
 	$skipID = isset($skipID) ? $skipID : null;
+	$printCssPath = isset($printCssPath) ? $printCssPath : null;
+	
 ?>
 <!-- Header start -->
 
@@ -137,6 +139,9 @@
 				generateCSSsInclude('public/css/tags.css');
 				generateCSSsIncludeIfExtensionCssExists('tags.css');
 			}
+
+			// Print CSS
+			if ($printCssPath) generatePrintCSS($printCssPath);
 
 			$extapphelper = ExtendableAppsHelper::getInstance();
 			$extapphelper->init($customCSSs, $customJSs, $customJSModules);

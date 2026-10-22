@@ -41,6 +41,9 @@ class Grades extends FHCAPI_Controller
 
 		// Load Libraries
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
+		$this->load->library('PruefungsverlaufLib', null, 'VerlaufLib');
+
+		$this->load->config('noten');
 
 		// Load Phrases
 		$this->loadPhrases([
@@ -355,23 +358,24 @@ class Grades extends FHCAPI_Controller
 			$data['lehrveranstaltung_id'] = $lehrveranstaltung_id;
 			$data['student_uid'] = $student_uid;
 			$data['studiensemester_kurzbz'] = $studiensemester_kurzbz;
-			
-			$this->ZeugnisnoteModel->insert($data);
 
-			if (defined('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN')
-				&& FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN) {
-				$result = $this->addTestsForGrade(
-					$studiensemester_kurzbz,
-					$student_uid,
-					$lehrveranstaltung_id,
-					$teacherGrade->note,
-					$teacherGrade->punkte
-				);
-				$this->getDataOrTerminateWithError($result);
-			}
+			$this->ZeugnisnoteModel->insert($data);
 		}
 
-		
+		// Der erste Antritt wird bereits bei der Übernahme als eigene Prüfung angelegt, damit der
+		// Prüfungsverlauf von Anfang an vollständig ist und das Benotungstool ihn nicht erst beim
+		// Anlegen einer Wiederholung nachtragen muss. Läuft bewusst in BEIDEN Zweigen (auch beim
+		// Überschreiben einer bestehenden Zeugnisnote) und ist idempotent.
+		if ($this->config->item('CIS_GESAMTNOTE_ERSTANTRITT_BEI_UEBERNAHME')) {
+			$result = $this->addErstantrittForGrade(
+				$studiensemester_kurzbz,
+				$student_uid,
+				$lehrveranstaltung_id,
+				$teacherGrade
+			);
+			$this->getDataOrTerminateWithError($result);
+		}
+
 		$this->terminateWithSuccess(true);
 	}
 
@@ -491,20 +495,32 @@ class Grades extends FHCAPI_Controller
 	}
 
 	/**
-	 * Helper function that adds tests for a student
-	 * (Entries in lehre.tbl_pruefung)
+	 * Legt bei der Notenübernahme den ersten Prüfungsantritt als eigenen Datensatz an
+	 * (Eintrag in lehre.tbl_pruefung).
 	 *
-	 * @param string				$studiensemester_kurzbz
-	 * @param string				$student_uid
-	 * @param integer				$lehrveranstaltung_id
-	 * @param integer				$note
-	 * @param numeric				$punkte
+	 * Idempotent: existiert für den Studenten in dieser LV bereits ein Termin, passiert nichts -
+	 * die Übernahme darf beliebig oft laufen, ohne den Verlauf zu verfälschen.
+	 *
+	 * Datiert auf das Freigabedatum der LV-Note: das ist der Zeitpunkt, zu dem die
+	 * Leistungsfeststellung verbindlich wurde. Das Benotungsdatum ändert sich bei jeder Korrektur,
+	 * der Übernahmezeitpunkt ist reine Verwaltungsarbeit - beide taugen nicht als Termindatum.
+	 *
+	 * @param string   $studiensemester_kurzbz
+	 * @param string   $student_uid
+	 * @param integer  $lehrveranstaltung_id
+	 * @param stdClass $teacherGrade  die übernommene LV-Gesamtnote
 	 *
 	 * @return stdClass
 	 */
-	protected function addTestsForGrade($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id, $note, $punkte)
+	protected function addErstantrittForGrade($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id, $teacherGrade)
 	{
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+		$this->load->model('education/LePruefung_model', 'LePruefungModel');
+
+		// bereits ein Termin vorhanden -> der Verlauf beginnt schon, nichts nachzutragen
+		$vorhanden = $this->VerlaufLib->getPruefungen($student_uid, $lehrveranstaltung_id, $studiensemester_kurzbz);
+		if (count($vorhanden) > 0)
+			return success(null);
 
 		// Get Lehreinheit
 		$result = $this->LehrveranstaltungModel->getLeByStudent($student_uid, $studiensemester_kurzbz, $lehrveranstaltung_id);
@@ -515,19 +531,24 @@ class Grades extends FHCAPI_Controller
 			return error($this->p->t("stv", "grades_error_lehreinheit_id"));
 		$le = current(getData($result));
 
+		$datum = $teacherGrade->freigabedatum ?: ($teacherGrade->benotungsdatum ?: date('Y-m-d'));
+		$now = date('Y-m-d H:i:s');
+
 		// Prepare
-		$this->load->model('education/LePruefung_model', 'LePruefungModel');
 		$data = [
 			"student_uid" => $student_uid,
 			"lehreinheit_id" => $le->lehreinheit_id,
-			"datum" => date('Y-m-d'),
-			"pruefungstyp_kurzbz" => "Termin1",
-			"note" => $note
+			"mitarbeiter_uid" => $teacherGrade->mitarbeiter_uid,
+			"datum" => $datum,
+			"pruefungstyp_kurzbz" => $this->VerlaufLib->legacyTypFuerAntritt(1),
+			"note" => $teacherGrade->note,
+			"insertamum" => $now,
+			"insertvon" => getAuthUID()
 		];
 
 		if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
-			$data["punkte"] = $punkte;
-		
+			$data["punkte"] = $teacherGrade->punkte;
+
 		// Get Anwesenheit
 		$this->load->model('education/Anwesenheit_model', 'AnwesenheitModel');
 		$result = $this->AnwesenheitModel->loadAnwesenheitStudiensemester($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id);
@@ -535,7 +556,8 @@ class Grades extends FHCAPI_Controller
 			return $result;
 		$anwesenheit = getData($result);
 
-		if ($anwesenheit && (float)current($anwesenheit)->prozent < FAS_ANWESENHEIT_ROT) {
+		if (defined('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN') && FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN
+			&& $anwesenheit && (float)current($anwesenheit)->prozent < FAS_ANWESENHEIT_ROT) {
 			// Get Anwesenheitsbefreiung
 			$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 			$result = $this->BenutzerfunktionModel->getBenutzerFunktionByUidInStdsem($student_uid, $studiensemester_kurzbz, 'awbefreit');
@@ -545,7 +567,10 @@ class Grades extends FHCAPI_Controller
 
 			$anwesenheitsbefreit = hasData($result);
 
-			// Wenn nicht Anwesenheitsbefreit und Anwesenheit unter einem bestimmten Prozentsatz fällt dann wird ein Pruefungsantritt abgezogen
+			// Bei zu geringer Anwesenheit ohne Befreiung wird ein zusätzlicher Termin
+			// 'Nicht beurteilt' vor dem eigentlichen Antritt festgehalten. ACHTUNG: diese Note
+			// zählt nicht mehr als Antritt (NOTEN_OHNE_ANTRITT_BEZEICHNUNGEN) - der frühere
+			// "Antritt abziehen"-Effekt entfällt damit, der Eintrag ist reine Dokumentation.
 			if (!$anwesenheitsbefreit) {
 				$data2 = $data;
 				$data2["note"] = 7;
@@ -556,8 +581,6 @@ class Grades extends FHCAPI_Controller
 
 				if (isError($result))
 					return $result;
-
-				$data["pruefungstyp_kurzbz"] = "Termin2";
 			}
 		}
 

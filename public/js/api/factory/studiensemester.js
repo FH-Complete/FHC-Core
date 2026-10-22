@@ -32,14 +32,20 @@ export default {
 	},
 	getStudySemestersByOrganizationalUnitAndDates(organizationalUnitShortCode, startDate, endDate) {
 		return {
-		method: "get",
-		url: `api/frontend/v1/organisation/studiensemester/getStudySemestersByOrganizationalUnitAndDates/${organizationalUnitShortCode}?filter[startDate]=${startDate}&filter[endDate]=${endDate}`,
+			method: "get",
+			url: `api/frontend/v1/organisation/studiensemester/getStudySemestersByOrganizationalUnitAndDates/${organizationalUnitShortCode}?filter[startDate]=${startDate}&filter[endDate]=${endDate}`,
 		};
 	},
 	getStudySemestersByStudyPlanAndDates(studyPlanId, startDate, endDate) {
 		return {
-		method: "get",
-		url: `api/frontend/v1/organisation/studiensemester/getStudySemestersByStudyPlanAndDates?filter[studyPlanId]=${studyPlanId}&filter[startDate]=${startDate}&filter[endDate]=${endDate}`,
+			method: "get",
+			url: `api/frontend/v1/organisation/studiensemester/getStudySemestersByStudyPlanAndDates?filter[studyPlanId]=${studyPlanId}&filter[startDate]=${startDate}&filter[endDate]=${endDate}`,
+		};
+	},
+	getStudiensemester() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Studiensemester/getStudiensemester'
 		};
 	},
 	current() {
@@ -56,5 +62,15 @@ export default {
 				studiensemester_kurzbz
 			}
 		};
-	}
+	},
+	getContainingOrNearestByDateRange(from, to) {
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/organisation/studiensemester/getContainingOrNearestByDateRange',
+			params: {
+				from,
+				to,
+			}
+		};
+	},
 };
