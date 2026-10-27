@@ -2,12 +2,13 @@ export function highlightGesamtnote(zeugnisTable, teacherTable)
 {
 	let zeugnisData = zeugnisTable.getData();
 
-	let studentsWithNote = new Set();
+	let studentsWithNote = {};
 
 	zeugnisData.forEach(row => {
 		let student = row.uid;
 		let lv = row.lehrveranstaltung_id;
 		let note = row.note;
+		let datum = row.benotungsdatum;
 
 		if (!student || !lv)
 			return;
@@ -16,7 +17,11 @@ export function highlightGesamtnote(zeugnisTable, teacherTable)
 			return;
 
 		let key = `${student}_${lv}`;
-		studentsWithNote.add(key);
+
+		if (!studentsWithNote[key])
+			studentsWithNote[key] = [];
+
+		studentsWithNote[key].push({ note: note, datum: datum });
 	});
 
 	teacherTable.deselectRow();
@@ -27,6 +32,7 @@ export function highlightGesamtnote(zeugnisTable, teacherTable)
 		let student = data.student_uid;
 		let lv = data.lehrveranstaltung_id;
 		let note = data.note;
+		let datum = data.benotungsdatum;
 
 		if (!student || !lv)
 			return;
@@ -35,8 +41,19 @@ export function highlightGesamtnote(zeugnisTable, teacherTable)
 			return;
 
 		let key = `${student}_${lv}`;
+		let found = false;
 
-		if (!studentsWithNote.has(key))
+		let zeugnisEintraege = studentsWithNote[key] || [];
+
+		zeugnisEintraege.forEach(eintrag => {
+			if (eintrag.note === note && eintrag.datum === datum)
+				found = true;
+
+			if (eintrag.datum > datum)
+				found = true;
+		});
+
+		if (!found)
 		{
 			row.select();
 		}
