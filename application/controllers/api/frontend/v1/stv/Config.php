@@ -437,10 +437,15 @@ class Config extends FHCAPI_Controller
 		$result['archive'] = [
 			'title' => $this->p->t('stv', 'tab_archive'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Archiv.js'),
-			'config' => [
-				'showEdit' => $this->permissionlib->isBerechtigt('admin')
-			]
+			'config' => $this->getTabConfigFromConfigFile('archive')
 		];
+		$permissions = $result['archive']['config']['showEditPermissions'] ?? [];
+		foreach ($permissions as $permission) {
+			if ($this->permissionlib->isBerechtigt($permission)) {
+				$result['archive']['config']['showEdit'] = true;
+				break;
+			}
+		}
 
 		$result['jointstudies'] = [
 			'title' => $this->p->t('stv', 'tab_jointstudies'),
@@ -527,10 +532,15 @@ class Config extends FHCAPI_Controller
 		$result['archive'] = [
 			'title' => $this->p->t('stv', 'tab_archive'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Archiv.js'),
-			'config' => [
-				'showEdit' => $this->permissionlib->isBerechtigt('admin')
-			]
+			'config' => $this->getTabConfigFromConfigFile('archive')
 		];
+		$permissions = $result['archive']['config']['showEditPermissions'] ?? [];
+		foreach ($permissions as $permission) {
+			if ($this->permissionlib->isBerechtigt($permission)) {
+				$result['archive']['config']['showEdit'] = true;
+				break;
+			}
+		}
 
 		if($this->permissionlib->isBerechtigt('basis/person'))
 		{
