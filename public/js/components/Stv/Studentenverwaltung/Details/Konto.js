@@ -127,6 +127,7 @@ export default {
 				ajaxResponse: (url, params, response) => response.data,
 				dataTree: true,
 				columns: this.tabulatorColumns,
+				locale: true,
 				selectableRows: true,
 				selectableRowsRangeMode: 'click',
 				index: 'buchungsnr',
