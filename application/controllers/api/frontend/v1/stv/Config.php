@@ -399,13 +399,7 @@ class Config extends FHCAPI_Controller
 			'title' => $this->p->t('stv', 'tab_grades'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Noten.js'),
 			'showOnlyWithUid' => true,
-			'config' => [
-				'usePoints' => defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE,
-				'edit' => 'both', // Possible values: both|header|inline
-				'delete' => 'inline', // Possible values: both|header|inline
-				'documents' => 'inline', // Possible values: both|header|inline
-				'documentslist' => gradesDocumentsList()
-			]
+			'config' => $this->getTabConfigFromConfigFile('grades')
 		];
 
 		$result['exam'] = [
