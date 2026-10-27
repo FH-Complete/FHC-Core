@@ -321,15 +321,8 @@ class Config extends FHCAPI_Controller
 		$result['contact'] = [
 			'title' => $this->p->t('stv', 'tab_contact'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Kontakt.js'),
-			'config' => $this->getTabConfigFromConfigFile('config')
+			'config' => $this->getTabConfigFromConfigFile('config', ['showBankaccount'])
 		];
-		$permissions = $result['contact']['config']['showBankaccountPermissions'] ?? [];
-		foreach ($permissions as $permission) {
-			if ($this->permissionlib->isBerechtigt($permission)) {
-				$result['contact']['config']['showBankaccount'] = true;
-				break;
-			}
-		}
 
 		$result['prestudent'] = [
 			'title' => $this->p->t('stv', 'tab_prestudent'),
@@ -368,15 +361,8 @@ class Config extends FHCAPI_Controller
 		$result['banking'] = [
 			'title' => $this->p->t('stv', 'tab_banking'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Konto.js'),
-			'config' => $this->getTabConfigFromConfigFile('banking')
+			'config' => $this->getTabConfigFromConfigFile('banking', ['showBuchungsnr'])
 		];
-		$permissions = $result['banking']['config']['showBuchungsnrPermissions'] ?? [];
-		foreach ($permissions as $permission) {
-			if ($this->permissionlib->isBerechtigt($permission)) {
-				$result['banking']['config']['showBuchungsnr'] = true;
-				break;
-			}
-		}
 
 		$result['resources'] = [
 			'title' => $this->p->t('stv', 'tab_resources'),
@@ -437,15 +423,8 @@ class Config extends FHCAPI_Controller
 		$result['archive'] = [
 			'title' => $this->p->t('stv', 'tab_archive'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Archiv.js'),
-			'config' => $this->getTabConfigFromConfigFile('archive')
+			'config' => $this->getTabConfigFromConfigFile('archive', ['showEdit'])
 		];
-		$permissions = $result['archive']['config']['showEditPermissions'] ?? [];
-		foreach ($permissions as $permission) {
-			if ($this->permissionlib->isBerechtigt($permission)) {
-				$result['archive']['config']['showEdit'] = true;
-				break;
-			}
-		}
 
 		$result['jointstudies'] = [
 			'title' => $this->p->t('stv', 'tab_jointstudies'),
@@ -485,15 +464,8 @@ class Config extends FHCAPI_Controller
 		$result['banking'] = [
 			'title' => $this->p->t('stv', 'tab_banking'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Konto.js'),
-			'config' => $this->getTabConfigFromConfigFile('banking')
+			'config' => $this->getTabConfigFromConfigFile('banking', ['showBuchungsnr'])
 		];
-		$permissions = $result['banking']['config']['showBuchungsnrPermissions'] ?? [];
-		foreach ($permissions as $permission) {
-			if ($this->permissionlib->isBerechtigt($permission)) {
-				$result['banking']['config']['showBuchungsnr'] = true;
-				break;
-			}
-		}
 		$result['banking']['config']['columns'] = $result['banking']['config']['columnsMultiPerson'];
 
 		$result['groups'] = [
@@ -505,23 +477,14 @@ class Config extends FHCAPI_Controller
 		$result['status'] = [
 			'title' => 'Status',
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/MultiStatus.js'),
-			'config' => $this->getTabConfigFromConfigFile('multiStatus')
+			'config' => $this->getTabConfigFromConfigFile('multiStatus', [
+				'changeStatusToAbbrecherStgl',
+				'changeStatusToAbbrecherStud',
+				'changeStatusToUnterbrecher',
+				'changeStatusToDiplomand',
+				'changeStatusToAbsolvent'
+			])
 		];
-		foreach ([
-			'changeStatusToAbbrecherStgl',
-			'changeStatusToAbbrecherStud',
-			'changeStatusToUnterbrecher',
-			'changeStatusToDiplomand',
-			'changeStatusToAbsolvent'
-		] as $field) {
-			$permissions = $result['status']['config'][$field . 'Permissions'] ?? [];
-			foreach ($permissions as $permission) {
-				if ($this->permissionlib->isBerechtigt($permission)) {
-					$result['status']['config'][$field] = true;
-					break;
-				}
-			}
-		}
 
 		$result['finalexam'] = [
 			'title' => $this->p->t('stv', 'tab_finalexam'),
@@ -532,15 +495,8 @@ class Config extends FHCAPI_Controller
 		$result['archive'] = [
 			'title' => $this->p->t('stv', 'tab_archive'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Archiv.js'),
-			'config' => $this->getTabConfigFromConfigFile('archive')
+			'config' => $this->getTabConfigFromConfigFile('archive', ['showEdit'])
 		];
-		$permissions = $result['archive']['config']['showEditPermissions'] ?? [];
-		foreach ($permissions as $permission) {
-			if ($this->permissionlib->isBerechtigt($permission)) {
-				$result['archive']['config']['showEdit'] = true;
-				break;
-			}
-		}
 
 		if($this->permissionlib->isBerechtigt('basis/person'))
 		{
@@ -570,11 +526,35 @@ class Config extends FHCAPI_Controller
 		$this->terminateWithSuccess($this->sortTabList($result, $sortConfig));
 	}
 
-	protected function getTabConfigFromConfigFile($file)
+	/**
+	 * Load config and return it as array
+	 *
+	 * @param string	$file
+	 * @param array		$convertPermission
+	 * @return array
+	 */
+	protected function getTabConfigFromConfigFile($file, $convertPermissions = [])
 	{
 		$this->config->load('stv/tabs/' . $file, true, true);
-		$config = $this->config->item('stv/tabs/' . $file);
-		return $config ?? [];
+		$config = $this->config->item('stv/tabs/' . $file) ?? [];
+		
+		// convert permissions into booleans
+		if (!is_array($convertPermissions))
+			$convertPermissions = [ $convertPermissions ];
+
+		foreach ($convertPermissions as $permKey => $resultKey) {
+			if (is_numeric($permKey))
+				$permKey = $resultKey . 'Permissions';
+			$permissions = $config[$permKey] ?? [];
+			foreach ($permissions as $permission) {
+				if ($this->permissionlib->isBerechtigt($permission)) {
+					$config[$resultKey] = true;
+					break;
+				}
+			}
+		}
+
+		return $config;
 	}
 
 	/**
