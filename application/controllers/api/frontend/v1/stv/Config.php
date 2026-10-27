@@ -326,11 +326,30 @@ class Config extends FHCAPI_Controller
 					|| $this->permissionlib->isBerechtigt('student/bankdaten')
 			]
 		];
+
 		$result['prestudent'] = [
 			'title' => $this->p->t('stv', 'tab_prestudent'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Prestudent.js'),
 			'config' => $this->getTabConfigFromConfigFile('prestudent')
 		];
+		// List of fields to show when ZGV_DOKTOR_ANZEIGEN is defined
+		$fieldsZgvDoktor = ['zgvdoktorort', 'zgvdoktordatum', 'zgvdoktornation', 'zgvdoktor_erfuellt', 'zgvdoktor_code'];
+		// List of fields to show when ZGV_ERFUELLT_ANZEIGEN is defined
+		$fieldsZgvErfuellt = ['zgv_erfuellt', 'zgvmas_erfuellt','zgvdoktor_erfuellt'];
+		//order important: to show zgf_erfuellt_doktor just in case visibility of doktor is true
+		if (!$result['prestudent']['config']['showZgvErfuellt']) {
+			$result['prestudent']['config']['hiddenFields'] = array_merge(
+				$result['prestudent']['config']['hiddenFields'],
+				$fieldsZgvErfuellt
+			);
+		}
+		if (!$result['prestudent']['config']['showZgvDoktor']) {
+			$result['prestudent']['config']['hiddenFields'] = array_merge(
+				$result['prestudent']['config']['hiddenFields'],
+				$fieldsZgvDoktor
+			);
+		}
+
 		$result['status'] = [
 			'title' => 'Status',
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/MultiStatus.js'),

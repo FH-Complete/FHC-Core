@@ -8,23 +8,6 @@ $config['hiddenFields'] = [
 
 $config['hideUDFs'] = false;
 
-// List of fields to show when ZGV_DOKTOR_ANZEIGEN is defined
-$fieldsZgvDoktor = ['zgvdoktorort', 'zgvdoktordatum', 'zgvdoktornation', 'zgvdoktor_erfuellt', 'zgvdoktor_code'];
+$config['showZgvErfuellt'] = (defined('ZGV_ERFUELLT_ANZEIGEN') && ZGV_ERFUELLT_ANZEIGEN);
 
-// List of fields to show when ZGV_ERFUELLT_ANZEIGEN is defined
-$fieldsZgvErfuellt = ['zgv_erfuellt', 'zgvmas_erfuellt','zgvdoktor_erfuellt'];
-
-//order important: to show zgf_erfuellt_doktor just in case visibility of doktor is true
-if (!defined('ZGV_ERFUELLT_ANZEIGEN') || !ZGV_ERFUELLT_ANZEIGEN) {
-	$config['hiddenFields'] = array_merge(
-		$config['hiddenFields'],
-		$fieldsZgvErfuellt
-	);
-}
-
-if (!defined('ZGV_DOKTOR_ANZEIGEN') || !ZGV_DOKTOR_ANZEIGEN) {
-	$config['hiddenFields'] = array_merge(
-		$config['hiddenFields'],
-		$fieldsZgvDoktor
-	);
-}
+$config['showZgvDoktor'] = (defined('ZGV_DOKTOR_ANZEIGEN') && ZGV_DOKTOR_ANZEIGEN);
