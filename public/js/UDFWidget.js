@@ -17,7 +17,11 @@ var FHC_UDFWidget = {
 
 		$("div[type*='UDFWidget']").each(function(i, udfWidgetDiv) {
 
-			var saveButton = $('<input type="button" value="Speichern">');
+			// No button without an editable UDF: fields without write permission are disabled
+			if ($(udfWidgetDiv).find("[name^='udf_']:enabled").length === 0) return;
+
+			// The label names what it saves, the page can have another save button
+			var saveButton = $('<input type="button" value="Zusatzfelder speichern">');
 
 			saveButton.on('click', function() {
 

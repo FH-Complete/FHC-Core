@@ -215,6 +215,15 @@ var InfocenterDetails = {
 					if (FHC_AjaxClient.hasData(data))
 					{
 						$("#zgvSpeichern_" + prestudentid).before("<span id='zgvSpeichernNotice' class='text-success'>" + FHC_PhrasesLib.t('ui', 'gespeichert') + "</span>&nbsp;&nbsp;");
+
+						// The panel heading shows the saved Karrierepfad
+						var karrierepfad = $("#karrierepfad_" + prestudentid + " option:selected");
+						if (karrierepfad.length)
+						{
+							$("#karrierepfadHeading_" + prestudentid + " .karrierepfadName").text(karrierepfad.attr('data-bezeichnung') || '');
+							$("#karrierepfadHeading_" + prestudentid).toggleClass('hidden', karrierepfad.val() === '');
+						}
+
 						InfocenterDetails._refreshLog();
 					}
 					else

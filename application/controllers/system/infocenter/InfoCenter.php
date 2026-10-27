@@ -53,6 +53,12 @@ class InfoCenter extends Auth_Controller
 			'message' => 'ZGV saved for degree program %s, prestudentid %s',
 			'success' => null
 		),
+		'savekarrierepfad' => array(
+			'logtype' => 'Action',
+			'name' => 'Karrierepfad changed',
+			'message' => 'Karrierepfad of prestudentid %s changed from %s to %s',
+			'success' => null
+		),
 		'abgewiesen' => array(
 			'logtype' => 'Processstate',
 			'name' => 'Interessent rejected',
@@ -162,6 +168,7 @@ class InfoCenter extends Auth_Controller
 		$this->load->model('crm/Dokument_model', 'DokumentModel');
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+		$this->load->model('crm/Karrierepfad_model', 'KarrierepfadModel');
 		$this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
 		$this->load->model('crm/ZGVPruefung_model', 'ZGVPruefungModel');
 		$this->load->model('crm/ZGVPruefungStatus_model', 'ZGVPruefungStatusModel');
@@ -545,7 +552,8 @@ class InfoCenter extends Auth_Controller
 	}
 
 	/**
-	 * Saves a ZGV for a prestudent, includes Ort, Datum, Nation for bachelor and master
+	 * Saves a ZGV for a prestudent, includes Ort, Datum, Nation for bachelor and master.
+	 * Also saves the Karrierepfad, if the panel has the select.
 	 */
 	public function saveZgvPruefung()
 	{
@@ -569,6 +577,21 @@ class InfoCenter extends Auth_Controller
 
 			$prestudent = $this->PrestudentModel->getPrestudentWithZgv($prestudent_id);
 			$prestudentdata = getData($prestudent);
+
+			// Only the select of an editable panel posts karrierepfad_id
+			// Rule: empty, or aktiv and linked to the Studienplan of the last status
+			$karrierepfad_id = $this->input->post('karrierepfad_id') === '' ? null : $this->input->post('karrierepfad_id');
+			$karrierepfadChanged = $this->input->post('karrierepfad_id') !== null && $karrierepfad_id != $prestudentdata->karrierepfad_id;
+			$karrierepfadSelectable = true;
+
+			if ($karrierepfadChanged && $karrierepfad_id !== null)
+			{
+				$karrierepfade = isset($prestudentdata->prestudentstatus->studienplan_id) ?
+					$this->KarrierepfadModel->getByStudienplan($prestudentdata->prestudentstatus->studienplan_id) :
+					null;
+				$karrierepfadSelectable = hasData($karrierepfade)
+					&& in_array($karrierepfad_id, array_column(getData($karrierepfade), 'karrierepfad_id'));
+			}
 
 			if ($prestudentdata->studiengangtyp === 'm')
 			{
@@ -614,6 +637,9 @@ class InfoCenter extends Auth_Controller
 				$updateArray = array_merge($updateArray, $updateMasterArray);
 			}
 
+			if ($karrierepfadChanged && $karrierepfadSelectable)
+				$updateArray['karrierepfad_id'] = $karrierepfad_id;
+
 			$prestresult = $this->PrestudentModel->update(
 				$prestudent_id,
 				$updateArray
@@ -623,6 +649,8 @@ class InfoCenter extends Auth_Controller
 				$json = error('Error when updating Prestudent!');
 			elseif (isError($semresult))
 				$json = error('Error when updating Ausbildungssemester!');
+			elseif (!$karrierepfadSelectable)
+				$json = error('Karrierepfad is not selectable for the Studienplan');
 			else
 				$json = success('Zgv saved successfully!');
 
@@ -632,6 +660,19 @@ class InfoCenter extends Auth_Controller
 				$logdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
 
 				$this->_log($logdata['person_id'], 'savezgv', array($logdata['studiengang_kurzbz'], $prestudent_id));
+
+				if ($karrierepfadChanged && $karrierepfadSelectable && isSuccess($prestresult))
+				{
+					$this->_log(
+						$logdata['person_id'],
+						'savekarrierepfad',
+						array(
+							$prestudent_id,
+							$this->_getKarrierepfadBezeichnung($prestudentdata->karrierepfad_id),
+							$this->_getKarrierepfadBezeichnung($karrierepfad_id)
+						)
+					);
+				}
 			}
 		}
 
@@ -2099,6 +2140,14 @@ class InfoCenter extends Auth_Controller
 
 			$zgvpruefung = getData($prestudentWithZgv);
 
+			// Karrierepfad: the stored one, and the selectable ones of the Studienplan of the last status
+			$karrierepfad = isset($zgvpruefung->karrierepfad_id) ? getData($this->KarrierepfadModel->load($zgvpruefung->karrierepfad_id)) : null;
+			$zgvpruefung->karrierepfad = isset($karrierepfad[0]) ? $karrierepfad[0] : null;
+			$karrierepfade = isset($zgvpruefung->prestudentstatus->studienplan_id) ?
+				$this->KarrierepfadModel->getByStudienplan($zgvpruefung->prestudentstatus->studienplan_id) :
+				null;
+			$zgvpruefung->karrierepfade = hasData($karrierepfade) ? getData($karrierepfade) : array();
+
 			if (isset($zgvpruefung->prestudentstatus))
 			{
 				//get orgform for german and english
@@ -2346,6 +2395,21 @@ class InfoCenter extends Auth_Controller
 		$studiengang_typ = $prestudentdata->studiengangtyp;
 
 		return array('person_id' => $person_id, 'studiengang_kurzbz' => $studiengang_kurzbz, 'studiengang_bezeichnung' => $studiengang_bezeichnung, 'studiengang_mail' => $studiengang_mail, 'studiengang_typ' => $studiengang_typ);
+	}
+
+	/**
+	 * Helper function retrieves the German Bezeichnung of a Karrierepfad for the log
+	 * @param $karrierepfad_id
+	 * @return string 'none' if no Karrierepfad
+	 */
+	private function _getKarrierepfadBezeichnung($karrierepfad_id)
+	{
+		if ($karrierepfad_id === null)
+			return 'none';
+
+		$karrierepfad = getData($this->KarrierepfadModel->load($karrierepfad_id));
+
+		return isset($karrierepfad[0]->bezeichnung_mehrsprachig[0]) ? $karrierepfad[0]->bezeichnung_mehrsprachig[0] : $karrierepfad_id;
 	}
 
 	/**

@@ -66,7 +66,8 @@
 						<h4 class="panel-title">
 							<a data-toggle="collapse"
 							   href="#collapse<?php echo $zgvpruefung->prestudent_id ?>">
-								<?php echo $studiengangkurzbz.' - '.$studiengangbezeichnung.' | '.(isset($zgvpruefung->prestudentstatus->status_kurzbz) ? $zgvpruefung->prestudentstatus->status_kurzbz : '');
+								<?php echo $studiengangkurzbz.' - '.$studiengangbezeichnung ?><span id="karrierepfadHeading_<?php echo $zgvpruefung->prestudent_id ?>"<?php echo isset($zgvpruefung->karrierepfad) ? '' : ' class="hidden"' ?>>, <?php echo ucfirst($this->p->t('infocenter', 'karrierepfad')) ?>: <span class="karrierepfadName"><?php echo isset($zgvpruefung->karrierepfad) ? html_escape($zgvpruefung->karrierepfad->bezeichnung_mehrsprachig[0]) : '' ?></span></span><?php
+								echo ' | '.(isset($zgvpruefung->prestudentstatus->status_kurzbz) ? $zgvpruefung->prestudentstatus->status_kurzbz : '');
 								?></a>
 						</h4>
 					</div>
@@ -202,6 +203,38 @@
 								</div>
 							</div>
 						</div>
+						<!-- Karrierepfad only if the Studienplan offers some or one is stored -->
+						<?php if (!empty($zgvpruefung->karrierepfade) || isset($zgvpruefung->karrierepfad)): ?>
+							<div class="row">
+								<div class="col-lg-<?php echo $columns[0] ?>">
+									<div class="form-group">
+										<label><?php echo ucfirst($this->p->t('infocenter', 'karrierepfad')) . ':' ?></label>
+										<?php if ($infoonly):
+											echo isset($zgvpruefung->karrierepfad) ? html_escape($zgvpruefung->karrierepfad->bezeichnung_mehrsprachig[0]) : $this->p->t('infocenter', 'karrierepfadOhne');
+										else:
+											// The stored one stays selectable, also if the Studienplan no longer offers it
+											$karrierepfadOptionen = $zgvpruefung->karrierepfade;
+											if (isset($zgvpruefung->karrierepfad)
+												&& !in_array($zgvpruefung->karrierepfad->karrierepfad_id, array_column($karrierepfadOptionen, 'karrierepfad_id')))
+												$karrierepfadOptionen[] = $zgvpruefung->karrierepfad;
+
+											echo "<select id='karrierepfad_" . $zgvpruefung->prestudent_id . "' name='karrierepfad_id' class='form-control'>";
+											echo "<option value=''>" . $this->p->t('infocenter', 'karrierepfadOhne') . "</option>";
+											foreach ($karrierepfadOptionen as $karrierepfad)
+											{
+												$selected = (isset($zgvpruefung->karrierepfad) && $karrierepfad->karrierepfad_id == $zgvpruefung->karrierepfad->karrierepfad_id) ? 'selected' : '';
+												$aktiv = $karrierepfad->aktiv ? '' : '(inaktiv)';
+												$class = $karrierepfad->aktiv ? '' : 'gesperrtoption';
+												$bezeichnung = html_escape($karrierepfad->bezeichnung_mehrsprachig[0]);
+
+												echo "<option " . $selected . " value='" . $karrierepfad->karrierepfad_id . "' class='" . $class . "' data-bezeichnung='" . $bezeichnung . "'>" . $bezeichnung . " " . $aktiv . "</option>";
+											}
+											echo "</select>";
+										endif; ?>
+									</div>
+								</div>
+							</div>
+						<?php endif; ?>
 						<div class="row">
 							<div class="col-lg-<?php echo $columns[0] ?>">
 								<div class="form-group">
