@@ -321,11 +321,15 @@ class Config extends FHCAPI_Controller
 		$result['contact'] = [
 			'title' => $this->p->t('stv', 'tab_contact'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Kontakt.js'),
-			'config' => [
-				'showBankaccount' => $this->permissionlib->isBerechtigt('mitarbeiter/bankdaten')
-					|| $this->permissionlib->isBerechtigt('student/bankdaten')
-			]
+			'config' => $this->getTabConfigFromConfigFile('config')
 		];
+		$permissions = $result['contact']['config']['showBankaccountPermissions'] ?? [];
+		foreach ($permissions as $permission) {
+			if ($this->permissionlib->isBerechtigt($permission)) {
+				$result['contact']['config']['showBankaccount'] = true;
+				break;
+			}
+		}
 
 		$result['prestudent'] = [
 			'title' => $this->p->t('stv', 'tab_prestudent'),
