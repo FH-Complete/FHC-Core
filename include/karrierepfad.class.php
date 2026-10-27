@@ -86,6 +86,24 @@ class karrierepfad extends basis_db
 	}
 
 	/**
+	 * Loads a Karrierepfad by its kurzbz, the value of the URL parameter karrierepfad_kurzbz
+	 * @param string $karrierepfad_kurzbz
+	 * @return boolean
+	 */
+	public function loadKurzbz($karrierepfad_kurzbz)
+	{
+		$qry = "SELECT karrierepfad_id FROM public.tbl_karrierepfad
+				WHERE karrierepfad_kurzbz=".$this->db_add_param($karrierepfad_kurzbz);
+
+		if (!$this->db_query($qry) || !($row = $this->db_fetch_object()))
+		{
+			$this->errormsg = 'Karrierepfad wurde nicht gefunden';
+			return false;
+		}
+		return $this->load($row->karrierepfad_id);
+	}
+
+	/**
 	 * Loads the Karrierepfade linked to a Studienplan into $this->result.
 	 * A Karrierepfad is selectable for a prestudent if it is aktiv and linked to the
 	 * Studienplan of the last status. A value stored earlier stays valid without this check.
