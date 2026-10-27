@@ -357,10 +357,9 @@ class Config extends FHCAPI_Controller
 		$result['status'] = [
 			'title' => 'Status',
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/MultiStatus.js'),
-			'config' => [
-				'showStatusVorruecken' => defined('STATUS_VORRUECKEN_ANZEIGEN') ? STATUS_VORRUECKEN_ANZEIGEN : true,
-			]
+			'config' => $this->getTabConfigFromConfigFile('status')
 		];
+
 		$result['documents'] = [
 			'title' => $this->p->t('stv', 'tab_documents'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Dokumente.js')
@@ -503,17 +502,28 @@ class Config extends FHCAPI_Controller
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Groups.js'),
 			'showOnlyWithUid' => true
 		];
+
 		$result['status'] = [
 			'title' => 'Status',
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/MultiStatus.js'),
-			'config' => [
-				'changeStatusToAbbrecherStgl' => $this->permissionlib->isBerechtigt('admin'),
-				'changeStatusToAbbrecherStud' => $this->permissionlib->isBerechtigt('admin'),
-				'changeStatusToUnterbrecher' => $this->permissionlib->isBerechtigt('admin'),
-				'changeStatusToDiplomand' => $this->permissionlib->isBerechtigt('admin'),
-				'changeStatusToAbsolvent' => $this->permissionlib->isBerechtigt('admin')
-			]
+			'config' => $this->getTabConfigFromConfigFile('multiStatus')
 		];
+		foreach ([
+			'changeStatusToAbbrecherStgl',
+			'changeStatusToAbbrecherStud',
+			'changeStatusToUnterbrecher',
+			'changeStatusToDiplomand',
+			'changeStatusToAbsolvent'
+		] as $field) {
+			$permissions = $result['status']['config'][$field . 'Permissions'] ?? [];
+			foreach ($permissions as $permission) {
+				if ($this->permissionlib->isBerechtigt($permission)) {
+					$result['status']['config'][$field] = true;
+					break;
+				}
+			}
+		}
+
 		$result['finalexam'] = [
 			'title' => $this->p->t('stv', 'tab_finalexam'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Abschlusspruefung.js'),
