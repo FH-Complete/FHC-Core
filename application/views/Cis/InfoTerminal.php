@@ -1,16 +1,41 @@
 <?php
-$includesArray =array(
+	$includesArray = array(
 		'title' => 'Infoterminal',
-		'tabulator5' => true,
+		'axios027' => true,
+		'vue3' => true,
 		'primevue3' => true,
-); 
-$this->load->view(
-	'templates/CISVUE-Header',
-	$includesArray	
-);
-?>
+		'bootstrap5' => true,
+		'tabulator5' => true,
+		'vuedatepicker11' => true,
+		'fontawesome6' => true,
+		'navigationcomponent' => true,
+		'phrases' => array(
+			'global',
+			'ui',
+			'lehre'
+		),
+		'customCSSs' => [
+			'public/css/components/calendar.css'
+		],
+		'customJSs' => [
+			'vendor/moment/luxonjs/luxon.min.js',
+		],
+		'customJSModules' => [
+			'public/js/apps/Cis/InfoTerminalApp.js'
+		]
+	);
 
-<iframe style="width:100%; height:90vh;" id="Infoterminal" src="<?php echo base_url() . 'cis/infoterminal/?forcelogin=true'; ?>" name="Infoterminal" frameborder="0" >
-No iFrames
-</iframe>
-<?php $this->load->view('templates/CISVUE-Footer', $includesArray); ?>
+	$this->load->view('templates/FHC-Header', $includesArray);
+?>
+	<div id="main">
+		<router-view
+			:logo-url="<?= htmlspecialchars(json_encode(base_url($this->config->item('theme_logo'))), ENT_QUOTES, 'UTF-8'); ?>"			
+			active-addons="<?= defined('ACTIVE_ADDONS') ? ACTIVE_ADDONS : ''; ?>"
+			tempus-root="<?= site_url('Tempus'); ?>"
+			avatar-url="<?= site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>"
+			logout-url="<?= site_url('Cis/Auth/logout'); ?>"
+			>
+		</router-view>
+	</div>
+
+<?php $this->load->view('templates/FHC-Footer', $includesArray); ?>

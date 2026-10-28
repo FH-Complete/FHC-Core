@@ -69,6 +69,8 @@ class LvPlan extends FHCAPI_Controller
 				'ui'
 			)
 		);
+
+		$this->is_new_calendar_structure_enabled = true;
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -92,8 +94,9 @@ class LvPlan extends FHCAPI_Controller
 	 * @access public
 	 */
 	public function eventsPersonal()
-	{
+	{  
 		$this->load->library('StundenplanLib');
+		$this->load->library('KalenderLib');
 
 		// form validation
 		$this->form_validation->set_rules('start_date', "start_date", "required");
@@ -113,21 +116,27 @@ class LvPlan extends FHCAPI_Controller
 		}
 
 		// fetching lvplan events
-		$result = $this->stundenplanlib->getEventsUser($start_date, $end_date, $uid);
-
-		$lvplanEvents = $this->getDataOrTerminateWithError($result);
+		if (!$this->is_new_calendar_structure_enabled) {
+			$result = $this->stundenplanlib->getEventsUser($start_date, $end_date, $uid);
+			$lvplanEvents = $this->getDataOrTerminateWithError($result);
+			$ferienEvents = $this->fetchFerienEvents($start_date, $end_date, $uid);
+		} else {
+			$lvplanEvents = $this->kalenderlib->getEventsForUser($start_date, $end_date, $uid);
+			$ferienEvents = $this->kalenderlib->fetchFerienEventsByUser($start_date, $end_date, $uid);
+		}
+		log_message('error', 'KalenderService::getEventsForUser called with start:');
+		
 
 		// fetching moodle events
 		$moodleEvents = $this->fetchMoodleEvents($start_date, $end_date, $uid);
 
-		// fetching ferien events
-		$ferienEvents = $this->fetchFerienEvents($start_date, $end_date, $uid);
+		
 
-
+		
 		$this->terminateWithSuccess(array_merge(
 			$lvplanEvents,
 			$moodleEvents,
-			$ferienEvents
+			[]
 		));
 	}
 
@@ -318,6 +327,12 @@ class LvPlan extends FHCAPI_Controller
 	 */
 	public function getReservierungen($ort_kurzbz = null)
 	{
+		if ($this->is_new_calendar_structure_enabled === true) {
+			// since the new calendar structure is enabled, we don't need to fetch reservierungen anymore
+			// the reservierungen are aledy included in the events of the new calendar structure
+			return $this->terminateWithSuccess([]);
+		}
+		
 		$this->form_validation->set_rules('start_date', "StartDate", "required");
 		$this->form_validation->set_rules('end_date', "EndDate", "required");
 

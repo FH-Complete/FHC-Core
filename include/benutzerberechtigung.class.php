@@ -575,7 +575,7 @@ EOSQL;
 	public function isBerechtigt($berechtigung_kurzbz, $oe_kurzbz=null, $art=null, $kostenstelle_id=null)
 	{
 		$timestamp=time();
-
+	
 		//Studiengang
 		if(is_numeric($oe_kurzbz))
 		{

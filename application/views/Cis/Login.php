@@ -14,7 +14,7 @@
 			<div class="col-md-9 col-lg-7 col-xl-6">
 				<?= form_open('Cis/Auth/login'); ?>
 					<p class="text-center">
-						<img src="<?php echo base_url('public/images/logo-300x160.png'); ?>" >
+						<img src="<?php echo base_url('public/ /logo-300x160.png'); ?>" >
 					</p>
 
 					<br>
