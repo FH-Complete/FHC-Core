@@ -31,10 +31,24 @@ export default {
 		return {};
 	},
 	methods: {
-		printDokument(url, scope){
+		printDokument(url, scope, event){
+			let output = 'pdf';
+
+			if(this.showAllFormats)
+			{
+				console.log("BERECHTIUNG VORHANDEN");
+				if (event.ctrlKey) {
+					output = 'doc';
+				} else if (event.shiftKey) {
+					output = 'odt';
+				}
+				url = url.replace("output=pdf","output="+output);
+			}
 			//TODO Manu(check if logic not in content (Zutrittkarte also in content folder))
-			let linkToPdf = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'content/' + url;
-			window.open(linkToPdf, '_blank');
+			let linkToDocument = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'content/' + url;
+
+			console.log('Documentlink:', linkToDocument);
+			window.open(linkToDocument, '_blank');
 		}
 	},
 	template: `
@@ -53,7 +67,7 @@ export default {
 			<ul class="dropdown-menu dropdown-menu-right">
 				<template v-for="doc in documents" :key="doc.id">
 					<li v-if="doc.type === 'documenturl'">
-					  <button class="dropdown-item" type="button" @click="printDokument(doc.url, doc.scope)">
+					  <button class="dropdown-item" type="button" @click="printDokument(doc.url, doc.scope, $event)">
 					  {{ doc.name }}
 					  </button>
 					</li>
@@ -72,7 +86,7 @@ export default {
 					  <ul class="dropdown-menu">
 						  <template v-for="child in doc.data" :key="child.id">
 							<li v-if="child.type === 'documenturl'">
-							<button class="dropdown-item" type="button" @click="printDokument(child.url, child.scope)">
+							<button class="dropdown-item" type="button" @click="printDokument(child.url, child.scope, $event)">
 							  {{ child.name }}
 							</button>
 							</li>
