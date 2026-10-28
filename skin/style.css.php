@@ -2,11 +2,10 @@
 	header("Cache-Control: no-cache");
 	header("Cache-Control: post-check=0, pre-check=0",false);
 	header("Pragma: no-cache");
-	if (isset($_GET['path']))
-		$path=$_GET['path'];
-	else
-		$path='../';
-	require ($path.'config/cis.config.inc.php');
+
+	$path = dirname(__DIR__);
+	
+	require ($path.'/config/cis.config.inc.php');
 
 	//die($_SERVER["HTTP_USER_AGENT"]);
 
@@ -29,7 +28,7 @@
 	//setcookie('stylesheet', DEFAULT_STYLE);
 	header("Content-Type: text/css");
 	//echo $_COOKIE['stylesheet'];
-	readfile ($path.'skin/styles/'.$stylesheet.'.css');
+	readfile ($path.'/skin/styles/'.$stylesheet.'.css');
 #--------------------------------------------------------------------------------------------------
 #	$const=@get_defined_constants();
 #	@reset($const);

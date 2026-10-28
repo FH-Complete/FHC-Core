@@ -372,7 +372,7 @@ class Prestudentstatus_model extends DB_Model
 		$this->addSelect('g.bezeichnung');
 		$this->addSelect('o.orgform_kurzbz');
 		$this->addSelect(
-			'o.bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=\'' . $lang . '\')] AS orgform_bezeichnung',
+			'o.bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=' . $this->escape($lang) . ')] AS orgform_bezeichnung',
 			false
 		);
 
