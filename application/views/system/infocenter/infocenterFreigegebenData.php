@@ -287,7 +287,6 @@ $query = '
 				  JOIN lehre.tbl_studienplan sp USING(studienplan_id)
 				  JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
-				   AND pss.bewerbung_abgeschicktamum IS NOT NULL
 				   AND ps.person_id = p.person_id
 				   AND sg.studiengang_kz in('.$QUALIFIKATIONSKURS.')
 				   AND NOT EXISTS (
