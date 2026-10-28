@@ -42,9 +42,9 @@ class Pruefung extends FHCAPI_Controller
 			'getNoten' => ['admin:r', 'assistenz:r'],
 			'checkZeugnisnoteLv' => ['admin:r', 'assistenz:r'],
 			'checkTermin1' => ['admin:r', 'assistenz:r'],
-			'insertPruefung' => self::PERM_LOGGED,
-			'updatePruefung' =>self::PERM_LOGGED,
-			'deletePruefung' =>self::PERM_LOGGED,
+			'insertPruefung' => ['admin:rw', 'assistenz:rw'],
+			'updatePruefung' => ['admin:rw', 'assistenz:rw'],
+			'deletePruefung' => ['admin:rw', 'assistenz:rw'],
 		]);
 
 		//Load Models
