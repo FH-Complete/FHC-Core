@@ -78,17 +78,8 @@ class TagJob extends JOB_Controller
 				'data' => $outputArray->data,
 				'typeId' => $typeId
 			);
-			print_r($kurz_bz);
 
-			//TODO(Manu) fix memory error
-			if($kurz_bz === 'zgv_auto'){
-				print_r(" single ");
-				//$result = $this->taglib->updateAutomatedTagsSingle($paramsTag);
-			}
-			else {
-				print_r(" usual ");
-				$result = $this->taglib->updateAutomatedTags($paramsTag);
-			}
+			$result = $this->taglib->updateAutomatedTags($paramsTag);
 
 			if (isError($result)) {
 				$this->logError('Error occurred during updateAutomatedTags ' . $kurz_bz);
@@ -97,9 +88,7 @@ class TagJob extends JOB_Controller
 
 			$data = is_array($result) ? $result['retval'] : $result->retval;
 
-			print_r($data);
-
-		//	$this->logInfo($data);
+			$this->logInfo($data);
 
 
 
