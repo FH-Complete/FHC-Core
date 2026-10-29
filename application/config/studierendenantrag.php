@@ -205,3 +205,11 @@ $config['wiederholung_enabled'] = true;
  */
 $config['showInfoModalAbmeldung'] = true;
 
+/**
+ * Statusgrund id of prewiederholer.
+ * This is used to propose grades for already positive LVs in the semester
+ * after the repedition.
+ *
+ * @var integer			tbl_status_grund.statusgrund_id of 'prewiederholer'
+ */
+$config['status_grund_prewiederholer'] = 15;
