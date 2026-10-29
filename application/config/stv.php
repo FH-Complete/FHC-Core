@@ -182,6 +182,7 @@ $config['stv_prestudent_tags'] = [
 	'jgv_auto' => ['readonly' => true],
 	'in_auto' => ['readonly' => true],
 	'preabbr_auto' => ['readonly' => true],
+	'kmob_auto' => ['readonly' => true],
 ];
 
 $config['userAutomatedTags'] = 'sftest';

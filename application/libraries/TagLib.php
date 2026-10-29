@@ -40,7 +40,7 @@ class TagLib
 		$this->batchUser = $this->_ci->config->item('userAutomatedTags');
 	}
 
-	public function updateAutomatedTags($paramsTag)
+	public function updateAutomatedTagsSingle($paramsTag)
 	{
 		// ---------------------------------
 		// check params
@@ -181,7 +181,7 @@ class TagLib
 				'added' => $countAdded,
 				'deleted' => $countDeleted
 			],
-			'details' => [
+/*			'details' => [
 				'existingTags' => $allTags,
 				'toAdd' => $toAdd,
 				'toRecycle' => $toRecycle,
@@ -191,13 +191,241 @@ class TagLib
 				'retaggedIds' => $retagged,
 				'newTags' => $tagged,
 				'deletedTagsIds' => $deleted
-			]
+			]*/
+		]);
+	}
+
+	public function updateAutomatedTags($paramsTag)
+	{
+		// ---------------------------------
+		// check params
+		// ---------------------------------
+		$required = ['kurzbz', 'data', 'typeId'];
+
+		foreach ($required as $key) {
+			if (!isset($paramsTag[$key])) {
+				return error('Missing Parameter: ' . $key);
+			}
+		}
+
+		$studiensemester_kurzbz = (isset ($paramsTag['studiensemester_kurzbz']) ? $paramsTag['studiensemester_kurzbz'] : null);
+
+		$tag = $paramsTag['kurzbz'];
+		$typeId = $paramsTag['typeId'];
+		$result = $this->_ci->StudiensemesterModel->load($studiensemester_kurzbz);
+		if (isError($result)) {
+			return $result;
+		}
+		$data = $result->retval[0] ?? null;
+
+		$von = $data->start ?? null;
+		$bis = $data->ende ?? null;
+
+		// ---------------------------------
+		// load existing tags
+		// ---------------------------------
+		$allTags = [];
+		//$arrayNotizids = [];
+		$resultAllTags = $this->_ci->NotizModel->getAllTags($tag, $von, $bis);
+		if (isError($resultAllTags)) {
+			return $resultAllTags;
+		}
+		$allTagsData = getData($resultAllTags);
+		//return success("count Data " . count($allTagsData)); //21
+
+		//new version: for each prestudent_id nun mehrere notiz_id mit von und bis
+		if (!empty($allTagsData)) {
+			foreach ($allTagsData as $item) {
+				//$prestudentId = $item->prestudent_id;
+
+				//if (!isset($allTags[$prestudentId])) {
+				//	$allTags[$prestudentId] = [];
+				//}
+
+				$allTags[$item->prestudent_id][] = [ //betreffende Zeile, die in PHP error log angezeigt wird
+					'notiz_id' => $item->notiz_id,
+					'von' => $item->start,
+					'bis' => $item->ende
+				];
+			}
+		}
+
+		//speichersparende Version
+/*		if (!empty($allTagsData)) {
+			foreach ($allTagsData as $item) {
+				$key = $item->prestudent_id . '|' . $item->start . '|' . $item->ende;
+
+				$allTags[$key][] = [
+					'notiz_id' => $item->notiz_id,
+					'prestudent_id' => $item->prestudent_id,
+					'von' => $item->start,
+					'bis' => $item->ende
+				];
+			}
+		}*/
+
+
+		unset($allTagsData); //TODO Check manu
+
+		//return success($allTags);
+
+		// ---------------------------------
+		// prepare input
+		// ---------------------------------
+		$inputTags = [];
+
+		foreach ($paramsTag['data'] as $item) {
+			$inputTags[$item['id']][] = [
+				'von' => $item['von'],
+				'bis' => $item['bis']
+			];
+		}
+
+		$toRecycle = [];
+		$toAdd = [];
+
+		foreach ($paramsTag['data'] as $item) {
+
+			$prestudentId = $item['id'];
+			$von = $item['von'];
+			$bis = $item['bis'];
+
+			$found = false;
+
+			if (isset($allTags[$prestudentId])) {
+				foreach ($allTags[$prestudentId] as $tag) {
+
+					if (
+						$tag['von'] === $von
+						&& $tag['bis'] === $bis
+					) {
+						$toRecycle[] = [
+							'notiz_id' => $tag['notiz_id'],
+							'prestudent_id' => $prestudentId,
+							'von' => $von,
+							'bis' => $bis
+						];
+
+						$found = true;
+						break;
+					}
+				}
+			}
+
+			if (!$found) {
+				$toAdd[] = [
+					'prestudent_id' => $prestudentId,
+					'von' => $von,
+					'bis' => $bis
+				];
+			}
+		}
+		//return success($toRecycle);
+		//return success($toAdd);
+
+
+		$toDelete = [];
+		$recycleIds = [];
+
+		foreach ($toRecycle as $item) {
+			$recycleIds[] = $item['notiz_id'];
+		}
+
+		// compare existing tags with recycled ones
+		foreach ($allTags as $prestudentId => $tags) {
+			foreach ($tags as $tag) {
+
+				if (!in_array($tag['notiz_id'], $recycleIds)) {
+					$toDelete[] = [
+						'notiz_id' => $tag['notiz_id'],
+						'prestudent_id' => $prestudentId,
+					/*	'von' => $tag['von'],
+						'bis' => $tag['bis']*/
+					];
+				}
+			}
+		}
+
+		// ---------------------------------
+		// recycle (update existing)
+		// ---------------------------------
+		$countRecycled = 0;
+		$retagged = [];
+
+		foreach ($toRecycle as $recycleItem)
+		{
+			$this->_updateTag($recycleItem['notiz_id'], $recycleItem['von'], $recycleItem['bis']);
+
+			$countRecycled++;
+			$retagged[] = $recycleItem['prestudent_id'];
+		}
+
+		//return success($retagged);
+
+		// ---------------------------------
+		// ADD
+		// ---------------------------------
+		$countAdded = 0;
+		$tagged = [];
+
+		foreach ($toAdd as $addItem)
+		{
+			$this->_insertTag($typeId, $addItem['prestudent_id'], $paramsTag['kurzbz'], $addItem['von'], $addItem['bis']);
+/*			if (isError($resultAdd)) {
+				return $resultAdd;
+			}*/
+			$countAdded++;
+			//$idsFromData[] = $resultAdd;
+
+			$tagged[] = $addItem['prestudent_id'];
+		}
+		//return success($tagged);
+
+
+		// ---------------------------------
+		// delete
+		// ---------------------------------
+		$countDeleted = 0;
+		$deleted = [];
+
+		//alle notizIds, die nicht in idsToCheck sind, sollen in $toDelete gespeichert werden
+
+		foreach ($toDelete as $deleteItem)
+		{
+			$this->_deleteTag($deleteItem['notiz_id']);
+			$countDeleted++;
+			$deleted[] = $deleteItem['notiz_id'];
+		}
+		//return success($deleted);
+
+		// ---------------------------------
+		// return
+		// ---------------------------------
+		return success([
+			'input' => [
+				'tag' => $paramsTag['kurzbz']
+			],
+			'summary' => [
+				'recycled' => $countRecycled,
+				'added' => $countAdded,
+				'deleted' => $countDeleted
+			],
+/*			'details' => [
+				'existingTags' => $allTags,
+				'toAdd' => $toAdd,
+				'toRecycle' => $toRecycle,
+				'toDelete' => $toDelete
+			],*/
+/*			'results' => [
+				'retaggedIds' => $retagged,
+				'newTags' => $tagged,
+				'deletedTagsIds' => $deleted
+			]*/
 		]);
 	}
 
 	public function updateAutomatedTagsForTypeId(array $params)
 	{
-		$return = null;
 		$notiz_id = null;
 
 		$von = $params['von'];
@@ -211,26 +439,36 @@ class TagLib
 		$this->_ci->NotizModel->addJoin('public.tbl_notizzuordnung nz', 'notiz_id');
 		$resultAllTags = $this->_ci->NotizModel->loadWhere([
 			'typ' => $tag,
-			$typeId => $id
+			$typeId => $id,
+			'ende' => $bis,
+			'start' => $von
 		]);
 		if(hasData($resultAllTags))
 		{
+			$this->_ci->addMeta('manu_update ', $resultAllTags);
 			$notiz_id = $resultAllTags->retval[0]->notiz_id;
 		}
 
 		//RECYCLE
 		if ($notiz_id !== null)
 		{
-			$resultUpdateNotiz = $this->_updateTag($notiz_id, $von, $bis);
-			$return = ['recycled' => $resultUpdateNotiz];
+			$this->_ci->addMeta('recycled ', $notiz_id);
+			$notiz_id = $this->_updateTag($notiz_id, $von, $bis);
+			$return = ['recycled' => $notiz_id];
+			//return success($return);
 		}
 		else
 		//ADD
 		{
 			$resultInsertNotiz = $this->_insertTag($typeId, $id, $tag, $von, $bis);
 			$return = ['added' => $resultInsertNotiz];
+			$notiz_id = $resultInsertNotiz;
+			$this->_ci->addMeta('added ', $resultInsertNotiz);
+			//return success($return);
 		}
-		return success($return);
+
+		//Here now checkDelete
+		return success($notiz_id);
 	}
 
 	/*
@@ -240,6 +478,7 @@ class TagLib
 	{
 		$automatedTagsRes = $this->_ci->NotiztypModel->loadWhere(array('automatisiert' => true, 'taglib IS NOT NULL' => null));
 		$automatedTags = hasData($automatedTagsRes) ? getData($automatedTagsRes) : [];
+		$ids_toCheck = [];
 
 		$result = $this->_ci->StudiensemesterModel->load($studiensemester_kurzbz);
 		if (isError($result))
@@ -277,43 +516,46 @@ class TagLib
 
 			if (hasData($criteriaIsSet))
 			{
-				$von = isset($criteriaIsSet->retval[0]->von) ? $criteriaIsSet->retval[0]->von : '';
-				$bis = isset($criteriaIsSet->retval[0]->bis) ? $criteriaIsSet->retval[0]->bis : '';
 
-				$params = [
-					'von' => $von,
-					'bis' => $bis,
-					'kurzbz' => $autoTag->typ_kurzbz,
-					'typeId' => $typeId,
-					'id' => $id,
-				];
+				$this->_ci->addMeta("criteriaIsSet", $criteriaIsSet);
+				foreach ($criteriaIsSet->retval as $item)
+				{
+					$von = isset($item->von) ? $item->von : '';
+					$bis = isset($item->bis) ? $item->bis : '';
 
-				$result = $this->updateAutomatedTagsForTypeId($params);
-				if (isError($result))
-					return error('Error occurred during updateAutomatedTags' . $kurz_bz);
-
-				$return[$kurz_bz] = $result;
-			}
-			else
-			{
-				//CHECK FOR DELETE
-				$params = [
-						'von' => $startSem,
-						'bis' => $endeSem,
+					$params = [
+						'von' => $von,
+						'bis' => $bis,
 						'kurzbz' => $autoTag->typ_kurzbz,
 						'typeId' => $typeId,
 						'id' => $id,
 					];
-				$result = $this->_ci->NotizModel->checkIfExistingTag($kurz_bz, $typeId, $id, $startSem, $endeSem);
-				if (hasData($result))
+
+					$result = $this->updateAutomatedTagsForTypeId($params);
+					if (isError($result))
+						return error('Error occurred during updateAutomatedTags' . $kurz_bz);
+
+					$return[$kurz_bz] = $result; //hier besser alle notiz_Ids speichern, die zurückkommen,
+					//können neu hinzugefügt oder recycelt sein
+					$ids_toCheck[] = $result->retval;
+				}
+				$this->_ci->addMeta('ids_to_check', $ids_toCheck);
+			}
+
+			if(count($ids_toCheck) !== 0)
+			{
+				$resultToDelete = $this->_ci->NotizModel->checkIfTagToDelete($autoTag->typ_kurzbz, $typeId, $id, $ids_toCheck, $startSem, $endeSem);
+				if (hasData($resultToDelete))
 				{
-					$notizId = $result->retval[0]->notiz_id;
-					$this->_deleteTag($notizId);
-					$return[$kurz_bz] = ['deleted' => $notizId];
+					$this->_ci->addMeta('ids_to_delete', $resultToDelete->retval);
+					foreach($resultToDelete->retval as $item)
+					{
+						$this->_deleteTag($item->notiz_id);
+					}
 				}
 			}
 		}
-		return success($return);
+		return success($ids_toCheck);
 	}
 
 	private function _insertTag($typeId, $id, $tag, $von, $bis)

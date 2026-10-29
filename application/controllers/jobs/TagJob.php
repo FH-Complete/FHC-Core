@@ -36,8 +36,7 @@ class TagJob extends JOB_Controller
 
 
 		$result = $this->StudiensemesterModel->getAktOrNextSemester();
-		if (isError($result))
-		{
+		if (isError($result)) {
 			$this->logInfo('Start Job rebuild Automated Tags');
 			$this->logError('Error occurred during retrieving studiensemester');
 			return $this->logInfo('End Job rebuild Automated Tags');
@@ -54,12 +53,11 @@ class TagJob extends JOB_Controller
 		);
 
 		$this->logInfo('Start Job rebuild Automated Tags ' . $studiensemester_kurzbz);
-		foreach($automatedTags as $autoTag)
-		{
+		foreach ($automatedTags as $autoTag) {
 			// getPath: must not be lost
 			$filePath = APPPATH . 'libraries/' . $autoTag->taglib . '.php'; // APPPATH = application/
 
-			if(file_exists($filePath)) {
+			if (file_exists($filePath)) {
 				require_once($filePath);
 			} else {
 				$this->logInfo("File not found: " . $filePath);
@@ -71,7 +69,6 @@ class TagJob extends JOB_Controller
 			$className = basename($autoTag->taglib);
 
 			$obj = new $className();
-
 			$outputArray = $obj->getZuordnungIds($params);
 			$typeId = $outputArray->typeId;
 
@@ -81,8 +78,17 @@ class TagJob extends JOB_Controller
 				'data' => $outputArray->data,
 				'typeId' => $typeId
 			);
+			print_r($kurz_bz);
 
-			$result = $this->taglib->updateAutomatedTags($paramsTag);
+			//TODO(Manu) fix memory error
+			if($kurz_bz === 'zgv_auto'){
+				print_r(" single ");
+				//$result = $this->taglib->updateAutomatedTagsSingle($paramsTag);
+			}
+			else {
+				print_r(" usual ");
+				$result = $this->taglib->updateAutomatedTags($paramsTag);
+			}
 
 			if (isError($result)) {
 				$this->logError('Error occurred during updateAutomatedTags ' . $kurz_bz);
@@ -91,19 +97,34 @@ class TagJob extends JOB_Controller
 
 			$data = is_array($result) ? $result['retval'] : $result->retval;
 
-			//SUMMARY
-			$this->logInfo("Tag " . $result->retval['input']['tag'] . " | type_id " . $typeId . " --"
-			. " Count Recycled: " . $result->retval['summary']['recycled']
-			. " Count Added: ".  $result->retval['summary']['added']
-			. " Count Deleted: ".  $result->retval['summary']['deleted']);
+			print_r($data);
 
-			//DETAILS
-			if($result->retval['results']['newTags'])
-				$this->logInfo("Tag " . $result->retval['input']['tag'] . "New tag(s): " .  implode(', ', $result->retval['results']['newTags']));
-			if($result->retval['results']['deletedTagsIds'])
-				$this->logInfo("Tag " . $result->retval['input']['tag'] . "Deleted tags(s: " . implode(', ', $result->retval['results']['deletedTagsIds']));
-			if ($result->retval['results']['retaggedIds'])
-				$this->logInfo("Tag " . $result->retval['input']['tag'] . "Recycled tag(s): " . implode(', ', $result->retval['results']['retaggedIds']));
+		//	$this->logInfo($data);
+
+
+
+			/*	print_r("Tag " . $result->retval['input']['tag'] . " | type_id " . $typeId . " --"
+									. " Count Recycled: " . $result->retval['summary']['recycled']
+									. " Count Added: " . $result->retval['summary']['added']
+									. " Count Deleted: " . $result->retval['summary']['deleted'] . PHP_EOL);
+			*/
+
+								//SUMMARY
+			/*	$this->logInfo("Tag " . $result->retval['input']['tag'] . " | type_id " . $typeId . " --"
+									. " Count Recycled: " . $result->retval['summary']['recycled']
+									. " Count Added: " . $result->retval['summary']['added']
+									. " Count Deleted: " . $result->retval['summary']['deleted']);
+			*/
+
+								//DETAILS
+			/*	if ($result->retval['results']['newTags'])
+									$this->logInfo("Tag " . $result->retval['input']['tag'] . "New tag(s): " . implode(', ', $result->retval['results']['newTags']));
+								if ($result->retval['results']['deletedTagsIds'])
+									$this->logInfo("Tag " . $result->retval['input']['tag'] . "Deleted tags(s: " . implode(', ', $result->retval['results']['deletedTagsIds']));
+								if ($result->retval['results']['retaggedIds'])
+									$this->logInfo("Tag " . $result->retval['input']['tag'] . "Recycled tag(s): " . implode(', ', $result->retval['results']['retaggedIds']));
+			*/
+
 		}
 		$this->logInfo( "End Job rebuild Automated Tags");
 	}

@@ -1,10 +1,10 @@
 <?php
 /**
- * Description of out_auto
+ * Description of kMob_auto
  *
  * @author ma0068
  */
-class CoreKurzzeitmobTagLib
+class CoreKmobTagLib
 {
 	protected $ci;
 
@@ -25,11 +25,11 @@ class CoreKurzzeitmobTagLib
 
 		$semester = $params['studiensemester_kurzbz'];
 
-		$result = $this->ci->BisioModel->getOutgoingsOfSemester($semester);
+		$result = $this->ci->BisioModel->getShortMobilitiesOfSemester($semester);
 
 		$data = $result->retval;
 
-		$outgoing_data = array_map(function($item) {
+		$outShortData = array_map(function($item) {
 			return [
 				'id' => $item->prestudent_id,
 				'von' => $item->von,
@@ -38,7 +38,7 @@ class CoreKurzzeitmobTagLib
 		}, $data);
 
 		return (object) array(
-			'data' => $outgoing_data,
+			'data' => $outShortData,
 			'typeId' => 'prestudent_id',
 		);
 	}
@@ -51,7 +51,7 @@ class CoreKurzzeitmobTagLib
 		$semester = $params['studiensemester_kurzbz'];
 		$prestudent_id = $params['id'];
 
-		$result = $this->ci->BisioModel->isPrestudentOutgoing($semester, $prestudent_id);
+		$result = $this->ci->BisioModel->isPrestudentShortMob($semester, $prestudent_id);
 
 		if (hasData($result)) {
 			return $result;

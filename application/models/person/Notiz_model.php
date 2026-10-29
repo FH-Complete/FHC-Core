@@ -334,6 +334,55 @@ class Notiz_model extends DB_Model
 	}
 
 	/**
+	 * check if an existing Tag has to be deleted
+	 *
+	 * @param $tag typ_kurzbz to check
+	 * @param $arrayToCheck Arroy of allowed Ids for this typ in this time intervall
+	 * @param $von start of time period or NULL
+	 * @param $bis end of time period or NULL
+ *
+	 * @return array
+	 */
+	public function checkIfTagToDelete($tag, $typeId=null, $id=null, $arrayToCheck, $von=null, $bis=null)
+	{
+		if($id== null){
+			$query = "
+			SELECT *
+			FROM public.tbl_notiz
+			JOIN public.tbl_notizzuordnung nz USING (notiz_id)
+			WHERE typ = ?
+			AND (
+				start IS NULL
+				OR ende IS NULL
+				OR (start <= ? AND ende >= ?)
+			)
+			AND notiz_id not in ?
+		";
+
+			return $this->execQuery($query, [$tag, $bis, $von, $arrayToCheck]);
+		}
+
+		else
+		{
+			$query = "
+			SELECT *
+			FROM public.tbl_notiz
+			JOIN public.tbl_notizzuordnung nz USING (notiz_id)
+			WHERE typ = ?
+			AND {$typeId} = ?
+			AND (
+				start IS NULL
+				OR ende IS NULL
+				OR (start <= ? AND ende >= ?)
+			)
+			AND notiz_id not in ?
+		";
+
+			return $this->execQuery($query, [$tag, $id, $bis, $von, $arrayToCheck]);
+		}
+	}
+
+	/**
 	 * returns all existing tags of a certain tag within a time period
 	 *
 	 * @param $tag typ_kurzbz of tag
