@@ -75,6 +75,7 @@ export default {
 			],
 			listStgTyp: [],
 			listBisStandort: [],
+			listKarrierepfade: [],
 			initialFormData: {},
 			deltaArray: {},
 			actionUpdate: false,
@@ -141,7 +142,16 @@ export default {
 					//neue DataVariable um ein Delta der vorgenommenen Änderungen berechnen zu können
 					this.initialFormData = {...this.data};
 				})
+				.then(this.loadKarrierepfade)
 				.catch(this.$fhcAlert.handleSystemError);
+		},
+		// options depend on the Studienplan of the prestudent, so they reload with the prestudent
+		loadKarrierepfade() {
+			return this.$api
+				.call(ApiStvPrestudent.getKarrierepfade(this.modelValue.prestudent_id))
+				.then(result => {
+					this.listKarrierepfade = result.data;
+				});
 		},
 		udfsLoaded(udfs) {
 			this.initialFormData = {...(this.initialFormData || {}), ...udfs};
@@ -619,6 +629,19 @@ export default {
 						name="gsstudientyp_kurzbz"
 						>
 						<option v-for="typ in listStgTyp" :key="typ.gsstudientyp_kurzbz" :value="typ.gsstudientyp_kurzbz">{{typ.bezeichnung}}</option>
+					</form-input>
+					<form-input
+						v-if="!config.hiddenFields.includes('karrierepfad_id') && (listKarrierepfade.length || data.karrierepfad_id)"
+						container-class="col stv-details-prestudent-karrierepfad_id"
+						:label="$p.t('infocenter', 'karrierepfad')"
+						type="select"
+						v-model="data.karrierepfad_id"
+						name="karrierepfad_id"
+						>
+						<option :value="null">{{ $p.t('infocenter', 'karrierepfadOhne') }}</option>
+						<option v-for="karrierepfad in listKarrierepfade" :key="karrierepfad.karrierepfad_id" :value="karrierepfad.karrierepfad_id">
+							{{karrierepfad.bezeichnung}}{{karrierepfad.aktiv ? '' : ' (' + $p.t('global', 'inaktiv') + ')'}}
+						</option>
 					</form-input>
 				</div>
 				

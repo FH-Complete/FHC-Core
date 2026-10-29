@@ -556,7 +556,8 @@ class prestudent extends person
 				typ,
 				tbl_studiengangstyp.bezeichnung AS typ_bz,
 				ausbildungssemester,
-				tbl_orgform.bezeichnung_mehrsprachig
+				tbl_orgform.bezeichnung_mehrsprachig,
+				tbl_prestudent.karrierepfad_id
 			FROM
 				public.tbl_prestudentstatus
 			JOIN
@@ -641,6 +642,7 @@ class prestudent extends person
 					$obj->typ_bz = $row->typ_bz;
 					$obj->ausbildungssemester = $row->ausbildungssemester;
 					$obj->orgform_bezeichnung = $this->db_parse_lang_array($row->bezeichnung_mehrsprachig);
+					$obj->karrierepfad_id = $row->karrierepfad_id;
 
 					$this->result[] = $obj;
 				}

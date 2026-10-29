@@ -100,6 +100,7 @@ class StudentListLib
 		$this->addSelect('tbl_prestudent.dual');
 		$this->addSelect('p.matr_nr');
 		$this->addSelect('sp.bezeichnung AS studienplan_bezeichnung');
+		$this->addSelect('kp.bezeichnung_mehrsprachig[1] AS karrierepfad', false);
 		$this->addSelect('tbl_prestudent.prestudent_id');
 		$this->addSelect("(
 			SELECT count(*)
@@ -134,6 +135,7 @@ class StudentListLib
 			AND pls.studiensemester_kurzbz=public.get_stdsem_prestudent(tbl_prestudent.prestudent_id, NULL) 
 			AND pls.ausbildungssemester=public.get_absem_prestudent(tbl_prestudent.prestudent_id, NULL)', 'LEFT');
 		$this->addJoin('lehre.tbl_studienplan sp', 'studienplan_id', 'LEFT');
+		$this->addJoin('public.tbl_karrierepfad kp', 'kp.karrierepfad_id=tbl_prestudent.karrierepfad_id', 'LEFT');
 		$this->addJoin('public.tbl_benutzer b', 's.student_uid=b.uid', 'LEFT');
 		$this->addJoin("v", "", ""); // Will be replaced later
 		$this->addJoin("ps", "", ""); // Will be replaced later

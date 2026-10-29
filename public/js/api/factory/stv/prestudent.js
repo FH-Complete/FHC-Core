@@ -143,6 +143,12 @@ export default {
 			url: 'api/frontend/v1/stv/status/getLastBismeldestichtag/'
 		};
 	},
+	getKarrierepfade(prestudent_id) {
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/stv/prestudent/getKarrierepfade/' + encodeURIComponent(prestudent_id)
+		};
+	},
 	//------------- History.js------------------------------------------------------
 	getHistoryPrestudents(person_id) {
 		return {

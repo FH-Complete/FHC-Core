@@ -297,6 +297,19 @@ return [
 		}
 	},
 	{
+		title: "Karrierepfad",
+		titlePhrase: 'infocenter/karrierepfad',
+		field: "karrierepfad",
+		visible: false,
+		headerFilter: "list",
+		headerFilterParams: {
+			valuesLookup: true,
+			listOnEmpty: true,
+			autocomplete: true,
+			sort: "asc"
+		}
+	},
+	{
 		title: "PreStudentInnenID",
 		titlePhrase: 'ui/prestudent_id',
 		field: "prestudent_id",

@@ -240,7 +240,12 @@ if(isset($_GET['excel']))
 						WHERE prestudent_id = tbl_prestudent.prestudent_id
 							AND status_kurzbz = 'Interessent'
 						) LIMIT 1
-				) AS orgform_kurzbz
+				) AS orgform_kurzbz,
+			(
+				SELECT bezeichnung_mehrsprachig[1]
+				FROM PUBLIC.tbl_karrierepfad
+				WHERE karrierepfad_id = tbl_prestudent.karrierepfad_id
+				) AS karrierepfad
 		FROM PUBLIC.tbl_rt_person
 		JOIN PUBLIC.tbl_person USING (person_id)
 		JOIN PUBLIC.tbl_reihungstest rt ON (rt_id = rt.reihungstest_id)
@@ -497,9 +502,10 @@ if(isset($_GET['excel']))
 					if(strlen($row->gebdatum)>$maxlength[$col])
 						$maxlength[$col] = strlen($row->gebdatum);
 
-					$worksheet->write($zeile,++$col,$studiengang->kuerzel_arr[$row->studiengang_kz], $format_border);
-					if(strlen($studiengang->kuerzel_arr[$row->studiengang_kz])>$maxlength[$col])
-						$maxlength[$col] = strlen($studiengang->kuerzel_arr[$row->studiengang_kz]);
+					$stg_karrierepfad = $studiengang->kuerzel_arr[$row->studiengang_kz].($row->karrierepfad != '' ? ' - '.$row->karrierepfad : '');
+					$worksheet->write($zeile,++$col,$stg_karrierepfad, $format_border);
+					if(strlen($stg_karrierepfad)>$maxlength[$col])
+						$maxlength[$col] = strlen($stg_karrierepfad);
 
 					$worksheet->write($zeile,++$col,$row->orgform_kurzbz, $format_border);
 					if(strlen($row->orgform_kurzbz)>$maxlength[$col])
@@ -730,9 +736,10 @@ if(isset($_GET['excel']))
 					if(strlen($rowRaeume->gebdatum)>$maxlength[$col])
 							$maxlength[$col] = strlen($rowRaeume->gebdatum);
 
-					$worksheet->write($zeile,++$col,$studiengang->kuerzel_arr[$rowRaeume->studiengang_kz], $format_border);
-					if(strlen($studiengang->kuerzel_arr[$rowRaeume->studiengang_kz])>$maxlength[$col])
-							$maxlength[$col] = strlen($studiengang->kuerzel_arr[$rowRaeume->studiengang_kz]);
+					$stg_karrierepfad = $studiengang->kuerzel_arr[$rowRaeume->studiengang_kz].($rowRaeume->karrierepfad != '' ? ' - '.$rowRaeume->karrierepfad : '');
+					$worksheet->write($zeile,++$col,$stg_karrierepfad, $format_border);
+					if(strlen($stg_karrierepfad)>$maxlength[$col])
+							$maxlength[$col] = strlen($stg_karrierepfad);
 
 					$worksheet->write($zeile,++$col,$rowRaeume->orgform_kurzbz, $format_border);
 					if(strlen($rowRaeume->orgform_kurzbz)>$maxlength[$col])
@@ -2719,6 +2726,11 @@ if($reihungstest_id!='')
 						AND status_kurzbz = 'Interessent'
 					) LIMIT 1
 			) AS orgform_kurzbz,
+		(
+			SELECT bezeichnung_mehrsprachig[1]
+			FROM PUBLIC.tbl_karrierepfad
+			WHERE karrierepfad_id = tbl_prestudent.karrierepfad_id
+			) AS karrierepfad,
        tbl_rt_person.anmeldedatum
 	FROM PUBLIC.tbl_rt_person
 	JOIN PUBLIC.tbl_person USING (person_id)
@@ -2965,7 +2977,7 @@ if($reihungstest_id!='')
 										<td>'.$db->convert_html_chars($row->nachname).'</td>
 										<td style="display: table-cell" class="clm_vorname">'.$db->convert_html_chars($row->vorname).'</td>
 										<td style="display: table-cell" class="clm_geschlecht">'.$db->convert_html_chars($row->geschlecht).'</td>
-										<td style="display: table-cell" class="clm_studiengang">'.$db->convert_html_chars($stg_arr[$row->studiengang_kz]).'</td>
+										<td style="display: table-cell" class="clm_studiengang">'.$db->convert_html_chars($stg_arr[$row->studiengang_kz].($row->karrierepfad != '' ? ' - '.$row->karrierepfad : '')).'</td>
 										<td style="display: table-cell" class="clm_orgform">'.$db->convert_html_chars($row->orgform_kurzbz!=''?$row->orgform_kurzbz:' ').'</td>
 										<td style="display: table-cell" class="clm_studienplan">'.$db->convert_html_chars($studienplan_bezeichnung).' ('.$row->studienplan_id.')</td>
 										<td style="display: table-cell" class="clm_einstiegssemester">'.$db->convert_html_chars($row->ausbildungssemester).'</td>
@@ -3149,7 +3161,7 @@ if($reihungstest_id!='')
 									<td>'.$db->convert_html_chars($row->nachname).'</td>
 									<td style="display: table-cell" class="clm_vorname">'.$db->convert_html_chars($row->vorname).'</td>
 									<td style="display: table-cell" class="clm_geschlecht">'.$db->convert_html_chars($row->geschlecht).'</td>
-									<td style="display: table-cell" class="clm_studiengang">'.$db->convert_html_chars($stg_arr[$row->studiengang_kz]).'</td>
+									<td style="display: table-cell" class="clm_studiengang">'.$db->convert_html_chars($stg_arr[$row->studiengang_kz].($row->karrierepfad != '' ? ' - '.$row->karrierepfad : '')).'</td>
 									<td style="display: table-cell" class="clm_orgform">'.$db->convert_html_chars($row->orgform_kurzbz!=''?$row->orgform_kurzbz:' ').'</td>
 									<td style="display: table-cell" class="clm_studienplan">'.$db->convert_html_chars($studienplan_bezeichnung).' ('.$row->studienplan_id.')</td>
 									<td style="display: table-cell" class="clm_einstiegssemester">'.$db->convert_html_chars($row->ausbildungssemester).'</td>

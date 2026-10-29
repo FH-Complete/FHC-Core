@@ -30,6 +30,7 @@ require_once('../../include/pruefling.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/studienplan.class.php');
 require_once('../../include/studienordnung.class.php');
+require_once('../../include/karrierepfad.class.php');
 require_once('../../include/ablauf.class.php');
 require_once('../../include/reihungstest.class.php');
 require_once('../../include/sprache.class.php');
@@ -662,7 +663,17 @@ elseif (isset($prestudent_id))
 					|| $ps_obj->lastStatus == "Wartender"
 					|| $ps_obj->lastStatus == "Aufgenommener")
 				{
-					echo '<td style="width: 50%;">'. $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg_name_eng : $stg_name). ' ('.$ps_obj->orgform_bezeichnung[$sprache_user].')</td>';
+					// Karrierepfad after the Studiengang, so the test is clearly for the Studiengang
+					$karrierepfad_text = '';
+					$karrierepfad = new karrierepfad();
+					if ($ps_obj->karrierepfad_id != '' && $karrierepfad->load($ps_obj->karrierepfad_id))
+					{
+						$karrierepfad_bezeichnung = isset($karrierepfad->bezeichnung_mehrsprachig[$sprache_user]) && $karrierepfad->bezeichnung_mehrsprachig[$sprache_user] != '' ?
+							$karrierepfad->bezeichnung_mehrsprachig[$sprache_user] :
+							$karrierepfad->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE];
+						$karrierepfad_text = ', '.$p->t('testtool/karrierepfad').': '.htmlspecialchars($karrierepfad_bezeichnung);
+					}
+					echo '<td style="width: 50%;">'. $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg_name_eng : $stg_name). ' ('.$ps_obj->orgform_bezeichnung[$sprache_user].')'.$karrierepfad_text.'</td>';
 					if ($ps_obj->ausbildungssemester == '1')
 					{
 						echo '<td>'. $p->t('testtool/regulaererEinstieg'). ' (1. Semester)</td>';

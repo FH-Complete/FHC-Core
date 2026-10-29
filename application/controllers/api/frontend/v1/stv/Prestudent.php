@@ -21,7 +21,8 @@ class Prestudent extends FHCAPI_Controller
 			'getTypenStg' => ['admin:r', 'assistenz:r'],
 			'getBisstandort' => ['admin:r', 'assistenz:r'],
 			'getStudienplaene' => ['admin:r', 'assistenz:r'],
-			'getStudiengang' => ['admin:r', 'assistenz:r']
+			'getStudiengang' => ['admin:r', 'assistenz:r'],
+			'getKarrierepfade' => ['admin:r', 'assistenz:r']
 		]);
 
 		if ($this->router->method == 'updatePrestudent') {
@@ -30,6 +31,7 @@ class Prestudent extends FHCAPI_Controller
 		} elseif ($this->router->method == 'get'
 			|| $this->router->method == 'getStudienplaene'
 			|| $this->router->method == 'getStudiengang'
+			|| $this->router->method == 'getKarrierepfade'
 		) {
 			$prestudent_id = current(array_slice($this->uri->rsegments, 2));
 			$this->checkPermissionsForPrestudent($prestudent_id, ['admin:r', 'assistenz:r']);
@@ -119,7 +121,8 @@ class Prestudent extends FHCAPI_Controller
 			'zgvdoktor_erfuellt',
 			'mentor',
 			'aufnahmeschluessel',
-			'standort_code'
+			'standort_code',
+			'karrierepfad_id'
 		];
 
 		// add zgv code fields only if user has permission
@@ -193,7 +196,7 @@ class Prestudent extends FHCAPI_Controller
 				}
 				elseif (
 					$val === ''
-					&& in_array($prop, ['zgvnation', 'zgvmanation', 'zgvdoktornation', 'berufstaetigkeit_code', 'ausbildungcode', 'zgvdatum', 'zgvmadatum'])
+					&& in_array($prop, ['zgvnation', 'zgvmanation', 'zgvdoktornation', 'berufstaetigkeit_code', 'ausbildungcode', 'zgvdatum', 'zgvmadatum', 'karrierepfad_id'])
 				)
 				{
 					$val = null;
@@ -203,12 +206,22 @@ class Prestudent extends FHCAPI_Controller
 
 			// allowed to be null, but has to be in postparameter
 			if (
-				in_array($prop, ['foerderrelevant', 'zgvdatum', 'zgvmadatum', 'zgvdoktordatum', 'zgv_code', 'zgvmas_code', 'zgvdoktor_code'])
+				in_array($prop, ['foerderrelevant', 'zgvdatum', 'zgvmadatum', 'zgvdoktordatum', 'zgv_code', 'zgvmas_code', 'zgvdoktor_code', 'karrierepfad_id'])
 				&& !isset($update_prestudent[$prop])
 				&& array_key_exists($prop, $_POST)
 			)
 			{
 				$update_prestudent[$prop] = null;
+			}
+		}
+
+		// Karrierepfad: empty, the stored one, or an active Karrierepfad of the Studienplan of the last status
+		if (isset($update_prestudent['karrierepfad_id']) && $update_prestudent['karrierepfad_id'] != $prestudent->karrierepfad_id)
+		{
+			$karrierepfade = $this->_getSelectableKarrierepfade($prestudent_id);
+			if (!in_array($update_prestudent['karrierepfad_id'], array_column($karrierepfade, 'karrierepfad_id')))
+			{
+				$this->terminateWithValidationErrors(['karrierepfad_id' => 'Karrierepfad is not selectable for the Studienplan']);
 			}
 		}
 
@@ -389,5 +402,62 @@ class Prestudent extends FHCAPI_Controller
 		$stg = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess(current($stg));
+	}
+
+	/**
+	 * Gets the options of the Karrierepfad select: the selectable Karrierepfade
+	 * and the stored one, which stays valid after a Studienplan change
+	 *
+	 * @param integer					$prestudent_id
+	 *
+	 * @return array of stdClass (karrierepfad_id, bezeichnung, aktiv)
+	 */
+	public function getKarrierepfade($prestudent_id)
+	{
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$this->load->model('crm/Karrierepfad_model', 'KarrierepfadModel');
+
+		$karrierepfade = $this->_getSelectableKarrierepfade($prestudent_id);
+
+		$prestudent = current($this->getDataOrTerminateWithError($this->PrestudentModel->load($prestudent_id)));
+		if ($prestudent->karrierepfad_id !== null
+			&& !in_array($prestudent->karrierepfad_id, array_column($karrierepfade, 'karrierepfad_id')))
+		{
+			$karrierepfad = current($this->getDataOrTerminateWithError($this->KarrierepfadModel->load($prestudent->karrierepfad_id)));
+			$karrierepfad->bezeichnung = getPhraseByLanguage($karrierepfad->bezeichnung_mehrsprachig, getUserLanguage());
+			$karrierepfade[] = $karrierepfad;
+		}
+
+		$options = array();
+		foreach ($karrierepfade as $karrierepfad)
+		{
+			$options[] = (object)[
+				'karrierepfad_id' => $karrierepfad->karrierepfad_id,
+				'bezeichnung' => $karrierepfad->bezeichnung,
+				'aktiv' => $karrierepfad->aktiv
+			];
+		}
+
+		$this->terminateWithSuccess($options);
+	}
+
+	/**
+	 * Active Karrierepfade of the Studienplan of the last status
+	 *
+	 * @param integer					$prestudent_id
+	 *
+	 * @return array
+	 */
+	private function _getSelectableKarrierepfade($prestudent_id)
+	{
+		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+		$this->load->model('crm/Karrierepfad_model', 'KarrierepfadModel');
+
+		$lastStatus = $this->getDataOrTerminateWithError($this->PrestudentstatusModel->getLastStatus($prestudent_id));
+		if (!isset($lastStatus[0]->studienplan_id))
+			return array();
+
+		$karrierepfade = $this->getDataOrTerminateWithError($this->KarrierepfadModel->getByStudienplan($lastStatus[0]->studienplan_id));
+		return $karrierepfade ?: array();
 	}
 }
