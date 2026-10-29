@@ -75,7 +75,7 @@ export default {
 					{ field: 'studiensemester_kurzbz', title: this.$p.t('lehre/studiensemester'), visible: false },
 					{ field: 'stg_bezeichnung', title: this.$p.t('lehre/studiengang'), visible: false },
 					{ field: 'note', title: this.$p.t('stv/grades_numericgrade'), visible: false },
-					{ field: 'prestudent_uid', title: this.$p.t('global/prestudentID'), visible: false },
+					{ field: 'prestudent_id', title: this.$p.t('global/prestudentID'), visible: false },
 					{ field: 'lehrveranstaltung_id', title: this.$p.t('lehre/lehrveranstaltung_id'), visible: false }
 				],
 				layout: 'fitDataStretch',
