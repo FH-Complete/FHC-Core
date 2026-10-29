@@ -170,8 +170,12 @@ class Grades extends FHCAPI_Controller
 		$result = $this->antraglib->getLvsForPrestudent($prestudent_id, $studiensemester_kurzbz);
 
 		$grades = $this->getDataOrTerminateWithError($result);
+
+		$result = $this->antraglib->getPostWiederholerLvsForPrestudent($prestudent_id, $studiensemester_kurzbz);
+
+		$postGrades = $this->getDataOrTerminateWithError($result);
 		
-		$this->terminateWithSuccess($grades);
+		$this->terminateWithSuccess(array_merge($grades, $postGrades));
 	}
 
 	/**

@@ -2199,4 +2199,194 @@ class AntragLib
 		$result = $this->_ci->StudierendenantraglehrveranstaltungModel->getLvsForPrestudent($prestudent_id, $studiensemester_kurzbz);
 		return $result;
 	}
+
+	/**
+	 * @param integer		$prestudent_id
+	 * @param string		$studiensemester_kurzbz
+	 *
+	 * @return stdClass
+	 */
+	public function getPostWiederholerLvsForPrestudent($prestudent_id, $studiensemester_kurzbz)
+	{
+		// Antrag
+		$this->_ci->StudierendenantragModel->addSelect('*');
+		$this->_ci->StudierendenantragModel->addSelect('s.insertamum AS freigabedatum');
+		$result = $this->_ci->StudierendenantragModel->getWithLastStatusWhere([
+			'prestudent_id' => $prestudent_id,
+			'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG,
+			's.studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_APPROVED
+		]);
+		if (isError($result))
+			return $result;
+		if (!hasData($result))
+			return success([]); // no antrag
+
+		$antrag = current(getData($result));
+
+		// Studiensemester
+		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+
+		$result = $this->_ci->StudiensemesterModel->getNextFrom($antrag->studiensemester_kurzbz);
+		if (isError($result))
+			return $result;
+		if (!hasData($result))
+			return success([]); // prewiederholer semester is not yet set
+
+		$data = current(getData($result));
+		$prewiederholer_semester = $data->studiensemester_kurzbz;
+
+		$result = $this->_ci->StudiensemesterModel->getNextFrom($prewiederholer_semester);
+		if (isError($result))
+			return $result;
+		if (!hasData($result))
+			return success([]); // wiederholer semester is not yet set
+
+		$data = current(getData($result));
+		$wiederholer_semester = $data->studiensemester_kurzbz;
+
+		$result = $this->_ci->StudiensemesterModel->getNextFrom($wiederholer_semester);
+		if (isError($result))
+			return $result;
+		if (!hasData($result))
+			return success([]); // postwiederholer semester is not yet set
+
+		$data = current(getData($result));
+		$postwiederholer_semester = $data->studiensemester_kurzbz;
+
+		// check semester
+		if ($studiensemester_kurzbz !== false) {
+			// A semester is set but it's not the postwiederholersemester
+			if ($studiensemester_kurzbz != $postwiederholer_semester)
+				return success([]);
+		}
+
+		// Stg & ausbildungssemester for Antrag
+		$result = $this->_ci->StudierendenantragModel->getStgAndSem($antrag->studierendenantrag_id);
+		if (isError($result))
+			return $result;
+		if (!hasData($result)) {
+			$this->_ci->load->library('PhrasesLib', [[ 'studierendenantrag' ], null], 'p_antrag_lib');
+			return error($this->_ci->p_antrag_lib->t(
+				'studierendenantrag',
+				'error_no_stg_and_sem',
+				[ 'id' => $antrag->studierendenantrag_id ]
+			));
+		}
+
+		$data = current(getData($result));
+		$studiengang_kz = $data->studiengang_kz;
+		$orgform_kurzbz = $data->orgform_kurzbz;
+		$ausbildungssemester = $data->ausbildungssemester;
+		$sprache = $data->sprache;
+
+		// All LVs for postwiederholer semester
+		$result = $this->getLvsByStgStsemAndSem(
+			$studiengang_kz,
+			$orgform_kurzbz,
+			$postwiederholer_semester,
+			$ausbildungssemester + 1,
+			$prestudent_id,
+			$sprache
+		);
+		if (isError($result)) {
+			if (getError($result) == $this->_ci->p->t('studierendenantrag', 'error_no_studienplan', [
+				'studiengang_kz' => $studiengang_kz,
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+				'semester' => $ausbildungssemester
+			]))
+				return success([]); // no studienplan in target semester (yet)
+			return $result;
+		}
+		if (!hasData($result)) {
+			// either no LVs found for semester ([]) or beyond last semester (null)
+			return success([]);
+		}
+
+		$lehrveranstaltungen = getData($result);
+
+		// Student
+		$this->_ci->load->model('crm/Student_model', 'StudentModel');
+
+		$result = $this->_ci->StudentModel->loadWhere([
+			'prestudent_id' => $prestudent_id
+		]);
+		if (isError($result))
+			return $result;
+		if (!hasData($result)) {
+			$this->_ci->load->library('PhrasesLib', [[ 'studierendenantrag' ], null], 'p_antrag_lib');
+			return error($this->_ci->p_antrag_lib->t(
+				'studierendenantrag',
+				'error_no_student_for_prestudent',
+				[ 'prestudent_id' => $prestudent_id ]
+			));
+		}
+
+		$student = current(getData($result));
+
+		// Grades for prewiederholer semester
+		$result = $this->_ci->ZeugnisnoteModel->getZeugnisnoten($student->student_uid, $prewiederholer_semester);
+		if (isError($result))
+			return $result;
+		if (!hasData($result)) {
+			return success([]); // prestudent has no grades in prewiederholer semester yet
+		}
+
+		$grades = getData($result);
+
+		// Filter for positive grades
+		$positive_grades = [];
+		foreach ($grades as $grade) {
+			if ($grade->note_positiv)
+				$positive_grades[$grade->lehrveranstaltung_id] = $grade;
+		}
+
+		// Prepare data
+		$note = $this->_ci->config->item('wiederholung_note_angerechnet');
+
+		$this->_ci->load->model('codex/Note_model', 'NoteModel');
+		$this->_ci->NoteModel->addSelect('*');
+		$this->_ci->NoteModel->addSelect('bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=' . $this->_ci->NoteModel->escape(getUserLanguage()) . ')] AS bezeichnung_lang');
+		$result = $this->_ci->NoteModel->load($note);
+		if (isError($result))
+			return $result;
+		$note_data = hasData($result)
+			? current(getData($result))
+			: (object)[ 'bezeichnung_lang' => '' ];
+
+		$stgs = [];
+		
+		// Assemble data
+		$lvs = [];
+		foreach ($lehrveranstaltungen as $lv) {
+			if (!isset($positive_grades[$lv->lehrveranstaltung_id]))
+				continue;
+
+			if (!isset($stgs[$lv->studiengang_kz])) {
+				$result = $this->_ci->StudiengangModel->load($lv->studiengang_kz);
+				if (isError($result))
+					return $result;
+				if (hasData($result))
+					$stgs[$lv->studiengang_kz] = current(getData($result));
+				else
+					$stgs[$lv->studiengang_kz] = (object)[
+						'bezeichnung' => ''
+					];
+			}
+			
+			$lvs[] = (object)[
+				'prestudent_id' => $prestudent_id,
+				'studiensemester_kurzbz' => $postwiederholer_semester,
+				'note' => $note,
+				'note_bezeichnung' => $note_data->bezeichnung_lang,
+				'benotungsdatum' => $positive_grades[$lv->lehrveranstaltung_id]->benotungsdatum,
+				'lehrveranstaltung_id' => $lv->lehrveranstaltung_id,
+				'lv_bezeichnung' => $lv->bezeichnung,
+				'stg_bezeichnung' => $stgs[$lv->studiengang_kz]->bezeichnung,
+				'insertvon' => $antrag->insertvon,
+				'freigabedatum' => $antrag->freigabedatum,
+			];
+		}
+
+		return success($lvs);
+	}
 }
