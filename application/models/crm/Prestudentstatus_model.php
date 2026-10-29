@@ -515,6 +515,8 @@ class Prestudentstatus_model extends DB_Model
 		$this->addSelect('tbl_prestudentstatus.bestaetigtvon');
 		$this->addSelect('tbl_prestudentstatus.bewerbung_abgeschicktamum');
 		$this->addSelect('tbl_prestudentstatus.anmerkung');
+		$this->addSelect('tbl_prestudentstatus.fgm');
+		$this->addSelect('tbl_prestudentstatus.faktiv');
 		$this->addSelect('plan.studienplan_id');
 		$this->addSelect('plan.bezeichnung');
 

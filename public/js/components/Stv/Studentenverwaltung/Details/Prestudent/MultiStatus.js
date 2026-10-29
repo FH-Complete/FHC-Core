@@ -136,6 +136,8 @@ export default{
 					},
 					{title: "UpdateVon", field: "updatevon", visible: false},
 					/*					{title: "Aufnahmestufe", field: "aufnahmestufe", visible: false},*/
+					{title: "FGM", field: "fgm", visible: false},
+					{title: "F-aktiv", field: "faktiv", visible: false},
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
@@ -245,7 +247,10 @@ export default{
 						setHeader('insertamum', this.$p.t('lehre', 'insert_am'));
 						setHeader('insertvon', this.$p.t('lehre', 'insert_von'));
 						setHeader('prestudent_id', this.$p.t('ui', 'prestudent_id'));
-						setHeader('studienplan_id', this.$p.t('ui', 'studienplan_id'));					}
+						setHeader('studienplan_id', this.$p.t('ui', 'studienplan_id'));
+						setHeader('fgm', 'FGM');
+						setHeader('faktiv', 'F-aktiv');
+					}
 				}
 			];
 			return events;
