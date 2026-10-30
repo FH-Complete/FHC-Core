@@ -53,7 +53,7 @@ class Bisio_model extends DB_Model
 	public function getOutgoingsOfSemester($studiensemester_kurzbz)
 	{
 		$query = "
-			SELECT DISTINCT ps.prestudent_id, tbl_bisio.von, tbl_bisio.bis
+			SELECT DISTINCT ps.prestudent_id, ss.start as von, ss.ende as bis
 			FROM bis.tbl_bisio
 			JOIN public.tbl_student USING (student_uid)
 			JOIN public.tbl_prestudent ps USING (prestudent_id)
@@ -69,7 +69,19 @@ class Bisio_model extends DB_Model
 			  )
 			)
 			AND tbl_bisio.bis IS NOT NULL
-			AND tbl_bisio.bis - tbl_bisio.von >= 30
+			AND (
+				CASE
+					WHEN tbl_bisio.von < ss.start THEN
+						CASE
+						WHEN tbl_bisio.bis > ss.ende THEN ss.ende
+						ELSE tbl_bisio.bis
+					END - ss.start
+					ELSE
+						CASE
+						WHEN tbl_bisio.bis > ss.ende THEN ss.ende
+						ELSE tbl_bisio.bis
+					END - tbl_bisio.von
+				END ) >= 30
 		";
 
 		return $this->execQuery($query, array($studiensemester_kurzbz));
@@ -132,7 +144,7 @@ class Bisio_model extends DB_Model
 	{
 		$query = "
 			SELECT
-				ps.prestudent_id, tbl_bisio.von, tbl_bisio.bis
+				ps.prestudent_id, ss.start as von, ss.ende as bis
 			FROM bis.tbl_bisio
 			JOIN public.tbl_student USING (student_uid)
 			JOIN public.tbl_prestudent ps USING (prestudent_id)
@@ -148,7 +160,19 @@ class Bisio_model extends DB_Model
 			  )
 			)
 			AND tbl_bisio.bis IS NOT NULL
-			AND tbl_bisio.bis - tbl_bisio.von >= 30
+			AND (
+				CASE
+					WHEN tbl_bisio.von < ss.start THEN
+						CASE
+						WHEN tbl_bisio.bis > ss.ende THEN ss.ende
+						ELSE tbl_bisio.bis
+					END - ss.start
+					ELSE
+						CASE
+						WHEN tbl_bisio.bis > ss.ende THEN ss.ende
+						ELSE tbl_bisio.bis
+					END - tbl_bisio.von
+				END ) >= 30
 			AND ps.prestudent_id = ?
 		";
 
