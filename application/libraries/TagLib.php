@@ -290,7 +290,6 @@ class TagLib
 		]);
 		if(hasData($resultAllTags))
 		{
-			$this->_ci->addMeta('manu_update ', $resultAllTags);
 			$notiz_id = $resultAllTags->retval[0]->notiz_id;
 		}
 
@@ -299,21 +298,16 @@ class TagLib
 		{
 			$this->_ci->addMeta('recycled ', $notiz_id);
 			$notiz_id = $this->_updateTag($notiz_id, $von, $bis);
-			$return = ['recycled' => $notiz_id];
-			//return success($return);
+			return success([$notiz_id, 0]);
 		}
 		else
 		//ADD
 		{
 			$resultInsertNotiz = $this->_insertTag($typeId, $id, $tag, $von, $bis);
-			$return = ['added' => $resultInsertNotiz];
 			$notiz_id = $resultInsertNotiz;
 			$this->_ci->addMeta('added ', $resultInsertNotiz);
-			//return success($return);
+			return success([$notiz_id, 1]);
 		}
-
-		//Here now checkDelete
-		return success($notiz_id);
 	}
 
 	/*
@@ -361,7 +355,6 @@ class TagLib
 
 			if (hasData($criteriaIsSet))
 			{
-
 				$this->_ci->addMeta("criteriaIsSet", $criteriaIsSet);
 				foreach ($criteriaIsSet->retval as $item)
 				{
@@ -380,19 +373,28 @@ class TagLib
 					if (isError($result))
 						return error('Error occurred during updateAutomatedTags' . $kurz_bz);
 
-					$return[$kurz_bz] = $result; //hier besser alle notiz_Ids speichern, die zurückkommen,
-					//können neu hinzugefügt oder recycelt sein
-					$ids_toCheck[] = $result->retval;
+					$return[$kurz_bz] = $result; //check added and recycled ids
+					$ids_toCheck[] = $result->retval[0];
 				}
-				$this->_ci->addMeta('ids_to_check', $ids_toCheck);
+				$ids_toCheck = array_unique($ids_toCheck);
 			}
-
+			else {
+				//delete all existing tags with this prestudent_id and this type
+				$resultToDelete = $this->_ci->NotizModel->checkIfExistingTag($autoTag->typ_kurzbz, $typeId, $id, $startSem, $endeSem);
+				if (isError($result))
+					return error('Error occurred during updateAutomatedTags' . $autoTag->typ_kurzbz);
+				if(hasData($result)){
+					foreach($resultToDelete->retval as $item)
+					{
+						$this->_deleteTag($item->notiz_id);
+					}
+				}
+			}
 			if(count($ids_toCheck) !== 0)
 			{
 				$resultToDelete = $this->_ci->NotizModel->checkIfTagToDelete($autoTag->typ_kurzbz, $typeId, $id, $ids_toCheck, $startSem, $endeSem);
 				if (hasData($resultToDelete))
 				{
-					$this->_ci->addMeta('ids_to_delete', $resultToDelete->retval);
 					foreach($resultToDelete->retval as $item)
 					{
 						$this->_deleteTag($item->notiz_id);
