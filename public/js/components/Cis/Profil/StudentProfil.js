@@ -114,6 +114,7 @@ export default {
 		data: Object,
 		editData: Object,
 		calendarSyncUrls: Array,
+		serverQuickLinks: Array,
 	},
 	provide() {
 		return {
@@ -256,9 +257,7 @@ export default {
 			};
 		},
 		quickLinks() {
-			let quickLinks = [];
-			//
-			return quickLinks;
+			return this.serverQuickLinks ?? [];
 		},
 	},
 	created() {

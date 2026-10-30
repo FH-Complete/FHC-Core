@@ -33096,6 +33096,26 @@ In the list:
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
+		'phrase' => 'anwesenheitenUndEntschuldigungen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheiten & Entschuldigungen',
+				'description' => 'CIS4 Profil Quick Link',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendance & Excuse Notes',
+				'description' => 'CIS4 Profile Quick Link',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
 		'phrase' => 'entFullEmailBetreff',
 		'insertvon' => 'system',
 		'phrases' => array(

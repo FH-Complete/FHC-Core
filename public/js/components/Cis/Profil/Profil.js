@@ -62,6 +62,7 @@ export const Profil = {
 			isEditable: false,
 			authPermissions: null,
 			calendarSyncUrls: [],
+			serverQuickLinks: [],
 		};
 	},
 	provide() {
@@ -175,6 +176,7 @@ export const Profil = {
 			this.view = data.profil_data.view;
 			this.data = data.profil_data.data;
 			this.calendarSyncUrls = data.calendar_sync_urls ?? [];
+			this.serverQuickLinks = data.quick_links ?? [];
 			this.authPermissions = data.permissions;
 		},
 		zustellAdressenCount() {
@@ -412,7 +414,8 @@ export const Profil = {
 				:data="data"
 				:editData="filteredEditData"
 				:permissions="authPermissions"
-				:calendarSyncUrls="calendarSyncUrls"></component>
+				:calendarSyncUrls="calendarSyncUrls"
+				:serverQuickLinks="serverQuickLinks"></component>
 		</div>
 	</div>`,
 };

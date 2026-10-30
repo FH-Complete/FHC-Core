@@ -19,6 +19,8 @@
 if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
+use CI3_Events as Events;
+
 class Profil extends FHCAPI_Controller
 {
 
@@ -74,6 +76,13 @@ class Profil extends FHCAPI_Controller
 
 		if ($isProfilOfAuthUser) {
 			$viewData['calendar_sync_urls'] = $this->getCalendarSyncUrlData();
+
+			// extensions and addons add links as ['phrase' => 'category/phrase', 'icon' => fa class, 'url' => absolute url]
+			$quickLinks = [];
+			Events::trigger('profilQuickLinksBuild', function & () use (&$quickLinks) {
+				return $quickLinks;
+			});
+			$viewData['quick_links'] = $quickLinks;
 		}
 
 		$this->terminateWithSuccess($viewData);
