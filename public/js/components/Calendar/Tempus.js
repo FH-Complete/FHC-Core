@@ -37,6 +37,7 @@ export default {
 					presets: this.semesterRangePresets?.presets,
 				};
 			}),
+			columnWidthAdjustmentResetVersion: Vue.computed(() => this.columnWidthAdjustmentResetVersion)
 		};
 	},
 	inject: {
@@ -181,6 +182,7 @@ export default {
 				label: null,
 				presets: [],
 			},
+			columnWidthAdjustmentResetVersion: 0,
 		};
 	},
 	watch: {
@@ -243,11 +245,9 @@ export default {
 					.map((date) =>
 						luxon.Interval.fromDateTimes(
 							luxon.DateTime.fromISO(date.start)
-								.setZone(this.timezone)
-								.minus({ days: 1 }),
+								.setZone(this.timezone),
 							luxon.DateTime.fromISO(date.end)
-								.setZone(this.timezone)
-								.plus({ days: 1 }),
+								.setZone(this.timezone),
 						),
 					)
 					.filter((interval) => interval.isValid);
@@ -336,10 +336,36 @@ export default {
 		onresize(payload) {
 			this.$emit('resize', payload);
 		},
+		reloadEventsWithClearingAndLoader() {
+			this.resetEventLoader(true, true, false, null, null);
+		},
+		reloadEventsWithoutClearingWithLoader() {
+			this.resetEventLoader(false, true);
+		},
+		softReloadEvents() {
+			this.resetEventLoader(false, false);
+		},
+		targetedSoftReloadEvents(startDate = null, endDate = null) {
+			this.resetEventLoader(false, false, true, startDate, endDate);
+		},
 		resetEventLoader(
 			arePreviousEventsCleared = true,
 			isLoaderEventVisualReset = true,
+			isTargetDateResetActive = false,
+			startDate = null,
+			endDate = null,
 		) {
+			if (isTargetDateResetActive) {
+				if (arePreviousEventsCleared && isLoaderEventVisualReset) {
+					this.columnWidthAdjustmentResetVersion++;
+				}
+				this.reset(arePreviousEventsCleared, isLoaderEventVisualReset, isTargetDateResetActive, startDate, endDate);
+				return;
+			}
+			
+			if (arePreviousEventsCleared && isLoaderEventVisualReset) {
+					this.columnWidthAdjustmentResetVersion++;
+				}
 			this.reset(arePreviousEventsCleared, isLoaderEventVisualReset);
 		},
 		reloadEvents() {

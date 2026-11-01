@@ -292,3 +292,8 @@ body {
 	overflow-wrap: anywhere;
 }
 
+
+.fhc-calendar-mode-range-view .part-header,
+.fhc-calendar-mode-range-view .part-body {
+    min-height: 100px;
+}

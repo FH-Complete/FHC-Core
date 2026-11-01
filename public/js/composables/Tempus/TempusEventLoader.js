@@ -1,4 +1,4 @@
-const MAX_PLAN_REQUEST_INTERVAL_IN_DAYS = 60;
+const MAX_PLAN_REQUEST_INTERVAL_IN_DAYS = 30;
 
 export function useEventLoader(
   rangeInterval,
@@ -22,24 +22,18 @@ export function useEventLoader(
 
   let currentlyDisplayedDateRange;
 
-  const getCachePadding = () => {
-    const cacheSize = Math.max(Vue.toValue(cacheMultiplier), 0);
+  let abortController = new AbortController();
 
-    return Math.round(currentlyDisplayedDateRange.length() * cacheSize) + 1;
+
+  const reset = (arePreviousEventsCleared = true, isLoaderEventVisualReset = true, isTargetDateResetActive = false, startDate = null, endDate = null) => {
+	if (arePreviousEventsCleared) {
+		allEvents.value = [];
+	}
+
+    reload(false, isLoaderEventVisualReset, isTargetDateResetActive, startDate, endDate);
   };
 
-  const getMaxPlanRequestIntervalInDays = () => {
-    const normalizedMaxPlanRequestIntervalDays = Number(
-      Vue.toValue(maxPlanRequestIntervalDays),
-    );
-
-    return Number.isFinite(normalizedMaxPlanRequestIntervalDays) &&
-      normalizedMaxPlanRequestIntervalDays > 0
-      ? Math.max(1, Math.floor(normalizedMaxPlanRequestIntervalDays))
-      : MAX_PLAN_REQUEST_INTERVAL_IN_DAYS;
-  };
-
-  const reload = (isCacheEnabled = true, isLoaderEventVisualReset = true) => {
+  const reload = (isCacheEnabled = true, isLoaderEventVisualReset = true, isTargetDateResetActive = false, startDate = null, endDate = null) => {
     if (
       currentlyDisplayedDateRange &&
       currentlyDisplayedDateRange?.start?.ts ===
@@ -67,11 +61,19 @@ export function useEventLoader(
       return;
     }
 
-    const promises = requestEvents(
+	abortController?.abort();
+
+	abortController = new AbortController();
+
+	const promises = requestEvents(
       currentlyDisplayedDateRange.start.ts,
       currentlyDisplayedDateRange.end.ts,
       isCacheEnabled,
-	  isLoaderEventVisualReset
+	  isLoaderEventVisualReset,
+	  abortController?.signal,
+	  isTargetDateResetActive,
+	  startDate,
+	  endDate
     );
 
     ensureCacheRangeIsInAllowedRange(
@@ -180,14 +182,20 @@ export function useEventLoader(
               const overlapsDisplayedDateRange =
                 eventStart < currentlyDisplayedDateRange.end.ts &&
                 eventEnd > currentlyDisplayedDateRange.start.ts;
+			  
+ 				if (isTargetDateResetActive) {
+					const overlapsTargetDateRange = startDate && endDate && eventStart < endDate.ts && eventEnd > startDate.ts;
+					return !overlapsTargetDateRange || newlyLoadedEventIds.has(event.eindeutige_kalender_gruppen_id)
+				}
 
               return (
                 !overlapsDisplayedDateRange ||
-                newlyLoadedEventIds.has(event.eindeutige_kalender_gruppen_id)
+                newlyLoadedEventIds.has(event.eindeutige_kalender_gruppen_id)  
               );
             });
           }
 
+		  
           allEvents.value = removeVisualForEventsLoading(
             ensureEventsAreInValidCacheRange(tempAllEvents),
           );
@@ -210,19 +218,23 @@ export function useEventLoader(
 
   Vue.watchEffect(reload);
 
-  const reset = (arePreviousEventsCleared = true, isLoaderEventVisualReset = true) => {
-	if (arePreviousEventsCleared) {
-		allEvents.value = [];
-	}
-    reload(false, isLoaderEventVisualReset);
-  };
-
-  const requestEvents = (startTimestamp, endTimestamp, isCacheEnabled = true, isLoaderEventVisualReset = false) => {
+  const requestEvents = (startTimestamp, endTimestamp, isCacheEnabled = true, isLoaderEventVisualReset = false, signal = null, isTargetDateResetActive = false, startDate = null, endDate = null) => {
     let result = [];
 
     if (!startTimestamp || !endTimestamp) return result;
     if (startTimestamp >= endTimestamp) return result;
 
+	if (isTargetDateResetActive && startDate && endDate) {
+		return mergePromiseElements(
+			getPromiseFunc(
+				startDate,
+				endDate,
+				signal
+			),
+			result,
+		);
+	} 
+	
     let modifiedRequestStartTimestamp = startTimestamp;
     let modifiedRequestEndTimestamp = endTimestamp;
 
@@ -284,6 +296,7 @@ export function useEventLoader(
       .plus({ days: effectiveMaxPlanRequestIntervalDays - 1 })
       .endOf("day");
 
+
     if (requestedPlanRangeEnd > firstPlanRequestEnd) {
       while (nextPlanRequestStart < requestedPlanRangeEnd) {
         let planRequestEnd = nextPlanRequestStart
@@ -294,7 +307,7 @@ export function useEventLoader(
         }
 
         result = mergePromiseElements(
-          getPromiseFunc(nextPlanRequestStart, planRequestEnd),
+          getPromiseFunc(nextPlanRequestStart, planRequestEnd, signal),
           result,
         );
 
@@ -308,11 +321,29 @@ export function useEventLoader(
       getPromiseFunc(
         getLuxonDateFromMillis(modifiedRequestStartTimestamp),
         getLuxonDateFromMillis(modifiedRequestEndTimestamp),
+        signal
       ),
       result,
     );
   };
 
+  const getCachePadding = () => {
+    const cacheSize = Math.max(Vue.toValue(cacheMultiplier), 0);
+
+    return Math.round(currentlyDisplayedDateRange.length() * cacheSize) + 1;
+  };
+
+  const getMaxPlanRequestIntervalInDays = () => {
+    const normalizedMaxPlanRequestIntervalDays = Number(
+      Vue.toValue(maxPlanRequestIntervalDays),
+    );
+
+    return Number.isFinite(normalizedMaxPlanRequestIntervalDays) &&
+      normalizedMaxPlanRequestIntervalDays > 0
+      ? Math.max(1, Math.floor(normalizedMaxPlanRequestIntervalDays))
+      : MAX_PLAN_REQUEST_INTERVAL_IN_DAYS;
+  };
+  
   const addVisualForEventsLoading = (startTimestamp, endTimestamp) => {
 	if (hasFirstLoadOccurred) return;
 

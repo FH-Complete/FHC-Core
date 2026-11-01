@@ -31,6 +31,10 @@ export default {
 			from: 'isInitialColumnWidthSyncPostponed',
 			default: false,
 		},
+		columnWidthAdjustmentResetVersion: {
+			from: 'columnWidthAdjustmentResetVersion',
+			default: 0,
+		},
 	},
 	props: {
 		day: {
@@ -51,6 +55,7 @@ export default {
 			},
 			gridColumnWidthEqualizingData: {
 				sharedDayWidths: null,
+				maxDayWidths: Array(7).fill(0),
 				syncVersion: 0,
 				isSyncRequested: false,
 			},
@@ -110,6 +115,13 @@ export default {
 			},
 			flush: 'post',
 			deep: true,
+		},
+		columnWidthAdjustmentResetVersion: {
+			handler() {
+				this.resetColumnWidthAdjustment();
+				this.clearGridMinWidths();
+			},
+			flush: 'post',
 		},
 	},
 	computed: {
@@ -200,10 +212,6 @@ export default {
 				const grids = this.getGridElements();
 				if (!grids.length) return;
 
-				grids.forEach((grid) => grid.style.removeProperty('min-width'));
-				this.gridColumnWidthEqualizingData.sharedDayWidths = null;
-
-				await this.$nextTick();
 
 				if (syncVersion !== this.gridColumnWidthEqualizingData.syncVersion)
 					return;
@@ -235,7 +243,17 @@ export default {
 								),
 							),
 					);
-					this.gridColumnWidthEqualizingData.sharedDayWidths = dayColumns;
+
+					const data = this.gridColumnWidthEqualizingData;
+
+					const maxDayWidths = data.maxDayWidths.map(
+						(width, index) => Math.max(width, dayColumns[index] ?? 0)
+					);
+
+					if (maxDayWidths.some((width, index) => width !== data.maxDayWidths[index])) {
+						data.maxDayWidths = maxDayWidths;
+						data.sharedDayWidths = [...maxDayWidths];
+					}
 
 					await this.$nextTick();
 
@@ -266,9 +284,10 @@ export default {
 			}
 		},
 		startFreshColumnWidthSync() {
+			if (!this.areDayColumnWidthsEqual && !this.areGridWidthsEqual) return;
+
 			this.gridColumnWidthEqualizingData.syncVersion += 1;
-			this.resetColumnWidthAdjustment();
-			this.clearGridMinWidths();
+
 			if (this.gridWidthEqualizingData.animationFrame !== null) {
 				cancelAnimationFrame(this.gridWidthEqualizingData.animationFrame);
 				this.gridWidthEqualizingData.animationFrame = null;
@@ -277,12 +296,14 @@ export default {
 			this.$nextTick(() => this.flushFreshColumnWidthSync());
 		},
 		resetColumnWidthAdjustment() {
-			this.gridColumnWidthEqualizingData.sharedDayWidths = null;
+			this.gridColumnWidthEqualizingData.sharedDayWidths = Array(7).fill(null);
+			this.gridColumnWidthEqualizingData.maxDayWidths = Array(7).fill(0);
+
 		},
 		clearGridMinWidths() {
-			this.getGridElements().forEach((grid) =>
-				grid.style.removeProperty('min-width'),
-			);
+			this.getGridElements().forEach((grid) => {
+				grid.style.removeProperty('min-width');
+			});
 		},
 		flushFreshColumnWidthSync() {
 			if (

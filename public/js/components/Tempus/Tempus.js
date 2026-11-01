@@ -93,7 +93,7 @@ export default {
 				syncToLecturer: (origList) => this.syncToLecturerList(origList),
 				syncToStudent: (origList) => this.syncToStudentList(origList),
 				openRaumauswahl: (origList) => this.$refs.raumMultiModal.show(origList),
-				reload: () => this.$refs.calendar.resetEventLoader()
+				reload: () => this.$refs.calendar.reloadEventsWithClearingAndLoader()
 			},
 			modalActions: {
 				saveEventTime: (payload) => this.handleSaveEventTime(payload),
@@ -197,7 +197,7 @@ export default {
 			if (!orig?.kalender_id) return;
 
 			await this.deleteEntryCall(orig);
-			this.$refs.calendar.resetEventLoader(false);
+			this.$refs.calendar.reloadEventsWithoutClearingWithLoader();
 			this.$refs.sidebar.reloadCoursepicker();
 			this.rebuildRaumvorschlag();
 		},
@@ -208,7 +208,7 @@ export default {
 			await Promise.allSettled(
 				validList.map((orig) => this.deleteEntryCall(orig)),
 			);
-			this.$refs.calendar.resetEventLoader(false);
+			this.$refs.calendar.reloadEventsWithoutClearingWithLoader();
 			this.$refs.sidebar.reloadCoursepicker();
 		},
 		async deleteEntryCall(orig) {
@@ -234,7 +234,7 @@ export default {
 			await Promise.allSettled(
 				validList.map((orig) => this.syncToStudentCall(orig)),
 			);
-			this.$refs.calendar.resetEventLoader();
+			this.$refs.calendar.reloadEventsWithClearingAndLoader();
 		},
 		async syncToStudentCall(orig) {
 			await this.$api.call(ApiKalender.syncToStudent(orig.kalender_id))
@@ -242,7 +242,7 @@ export default {
 		async syncToStudent(orig) {
 			if (!orig?.kalender_id) return;
 			await this.syncToStudentCall(orig);
-			this.$refs.calendar.resetEventLoader();
+			this.$refs.calendar.reloadEventsWithClearingAndLoader();
 		},
 
 		async syncToLecturerList(origList) {
@@ -252,7 +252,7 @@ export default {
 			await Promise.allSettled(
 				validList.map((orig) => this.syncToLecturerCall(orig)),
 			);
-			this.$refs.calendar.resetEventLoader();
+			this.$refs.calendar.reloadEventsWithClearingAndLoader();
 		},
 		async syncToLecturerCall(orig) {
 			await this.$api.call(ApiKalender.syncToLecturer(orig.kalender_id))
@@ -260,7 +260,7 @@ export default {
 		async syncToLecturer(orig) {
 			if (!orig?.kalender_id) return;
 			await this.syncToLecturerCall(orig);
-			this.$refs.calendar.resetEventLoader();
+			this.$refs.calendar.reloadEventsWithClearingAndLoader();
 		},
 		rebuildRaumvorschlag() {
 			if (this.raumvorschlagPreview)
@@ -269,7 +269,7 @@ export default {
 				});
 		},
 		reload() {
-			this.$refs.calendar?.resetEventLoader();
+			this.$refs.calendar?.reloadEventsWithClearingAndLoader();
 			this.$refs.sidebar?.reloadCoursepicker();
 			this.rebuildRaumvorschlag();
 		},
@@ -377,7 +377,7 @@ export default {
 				},
 			];
 
-			this.$refs.calendar.resetEventLoader();
+			this.$refs.calendar.reloadEventsWithClearingAndLoader();
 			if (this.lastRange) this.handleRange(this.lastRange);
 		},
 		addToCoursePicker(data) {
@@ -437,7 +437,7 @@ export default {
 				}
 			}
 
-			this.$refs.calendar.resetEventLoader();
+			this.$refs.calendar.reloadEventsWithClearingAndLoader();
 			if (this.lastRange) this.handleRange(this.lastRange);
 		},
 		jumpToDate(value) {
@@ -526,7 +526,7 @@ export default {
 
 			return filter;
 		},
-		getPromiseFunc(start, end) {
+		getPromiseFunc(start, end, signal) {
 			const isMonth = this.currentMode?.toLowerCase() === "month";
 			const collisionCheck = !isMonth;
 			const maxDailyEventLimit = isMonth ? this.maxDailyEventLimitForMonthView : null;
@@ -542,6 +542,7 @@ export default {
 							collisionCheck,
 							maxDailyEventLimit,
 						),
+						{ signal },
 					),
 				];
 			} else if (this.previewRole === 'student') {
@@ -553,6 +554,7 @@ export default {
 							collisionCheck,
 							maxDailyEventLimit,
 						),
+						{ signal }
 					),
 				];
 			} else {
@@ -565,6 +567,7 @@ export default {
 							collisionCheck,
 							maxDailyEventLimit,
 						),
+						{ signal }
 					),
 				];
 			}
@@ -674,7 +677,7 @@ export default {
 						this.$refs.calendar.$refs.calendar.$refs.mode.$refs.view.$refs.grids?.forEach(grid => {
 							grid.disableAutoScroll();
 						});
-					this.$refs.calendar.resetEventLoader(false, false);
+					this.$refs.calendar.targetedSoftReloadEvents(dates.startDT, dates.endDT);
 					this.$refs.sidebar.reloadCoursepicker();
 					this.rebuildRaumvorschlag();
 				},
@@ -705,7 +708,7 @@ export default {
 						),
 					)
 					.then(() => {
-						this.$refs.calendar.resetEventLoader(false, false);
+						this.$refs.calendar.softReloadEvents();
 						this.$refs.sidebar.reloadCoursepicker();
 						this.rebuildRaumvorschlag();
 						this.bcc.postMessage('dropped');
@@ -774,7 +777,7 @@ export default {
 								return;
 							}
 
-							this.$refs.calendar.resetEventLoader(false);
+							this.$refs.calendar.reloadEventsWithoutClearingWithLoader();
 							this.$refs.sidebar.reloadCoursepicker();
 							this.rebuildRaumvorschlag();
 							this.bcc.postMessage('dropped');
@@ -792,7 +795,7 @@ export default {
 							),
 						)
 						.then(() => {
-							this.$refs.calendar.resetEventLoader(false);
+							this.$refs.calendar.reloadEventsWithoutClearingWithLoader();
 							this.$refs.sidebar.reloadCoursepicker();
 							this.bcc.postMessage('dropped');
 							this.rebuildRaumvorschlag();
@@ -817,7 +820,7 @@ export default {
 							type: obj.type,
 							id: obj.orig.kalender_id,
 						});
-						this.$refs.calendar.resetEventLoader(false, false);
+						this.$refs.calendar.softReloadEvents();
 						this.rebuildRaumvorschlag();
 						this.bcc.postMessage('dropped');
 					},
@@ -837,7 +840,7 @@ export default {
 			this.multiWeekModal.show = false;
 		},
 		onMultiWeekConfirmed() {
-			this.$refs.calendar.resetEventLoader(false);
+			this.$refs.calendar.reloadEventsWithoutClearingWithLoader();
 			this.$refs.sidebar.reloadCoursepicker();
 			this.rebuildRaumvorschlag();
 			this.bcc.postMessage('dropped');
@@ -965,18 +968,18 @@ export default {
 				for (const lect of this.lecturers) delete this.overlayCache[lect.uid];
 
 				this.lecturers = [];
-				this.$refs.calendar.resetEventLoader();
+				this.$refs.calendar.reloadEventsWithClearingAndLoader();
 			} else {
 				this.lecturers = this.lecturers.filter(
 					(lecture) => lecture.uid !== uid,
 				);
 				delete this.overlayCache[uid];
-				this.$refs.calendar.resetEventLoader();
+				this.$refs.calendar.reloadEventsWithClearingAndLoader();
 			}
 		},
 		handlePreviewRoleChange(role) {
 			this.previewRole = role;
-			this.$refs.calendar.resetEventLoader();
+			this.$refs.calendar.reloadEventsWithClearingAndLoader();
 		},
 		openReservierung() {
 			this.reservierungPending = false;
@@ -985,7 +988,7 @@ export default {
 		triggerSync() {
 			this.$api
 				.call(ApiKalender.sync())
-				.then(() => this.$refs.calendar.resetEventLoader());
+				.then(() => this.$refs.calendar.reloadEventsWithClearingAndLoader());
 		},
 		onEventHover(event) {
 			this.hoveredEvent = event;
@@ -1131,13 +1134,13 @@ export default {
 			},
 		},
 		rooms() {
-			this.$refs.calendar.resetEventLoader();
+			this.$refs.calendar.reloadEventsWithClearingAndLoader();
 		},
 		studiengaenge: {
 			deep: true,
 			handler() {
 				this.clearRaumvorschlagPreview();
-				this.$refs.calendar.resetEventLoader();
+				this.$refs.calendar.reloadEventsWithClearingAndLoader();
 			},
 		},
 	},
@@ -1146,7 +1149,7 @@ export default {
 		this.bcc = new BroadcastChannel('fhc-dnd');
 		this.bcc.addEventListener('message', (e) => {
 			if (e.data === 'dropped' && !this.reservierungPending)
-				this.$refs.calendar.resetEventLoader();
+				this.$refs.calendar.reloadEventsWithClearingAndLoader();
 		});
 	},
 	beforeUnmount() {
@@ -1221,7 +1224,7 @@ export default {
 			:logout-url="logoutUrl"
 			:searchbaroptions="searchbaroptions"
 			:searchfunction="searchfunction"
-			@language-changed="this.$refs.calendar.resetEventLoader();"
+			@language-changed="this.$refs.calendar.reloadEventsWithClearingAndLoader();"
 		/>
 		<div class="container-fluid overflow-hidden heightfull">
 			<div class="row h-100">
@@ -1286,17 +1289,17 @@ export default {
 			@select-verband-and-close="onSelectVerbandAndClose"
 		/>
 		<raumauswahl-multi-modal ref="raumMultiModal" @saved="reload()"/>
-		<raumauswahl-modal ref="raumModal" @saved="() => {$refs.calendar.resetEventLoader(); $refs.sidebar.reloadCoursepicker(); rebuildRaumvorschlag();}"/>
-		<lehreinheit-modal ref="lehreinheitModal" @saved="$refs.calendar.resetEventLoader(); $refs.sidebar.reloadCoursepicker();"/>
+		<raumauswahl-modal ref="raumModal" @saved="() => {$refs.calendar.reloadEventsWithClearingAndLoader(); $refs.sidebar.reloadCoursepicker(); rebuildRaumvorschlag();}"/>
+		<lehreinheit-modal ref="lehreinheitModal" @saved="$refs.calendar.reloadEventsWithClearingAndLoader(); $refs.sidebar.reloadCoursepicker();"/>
 		<resources-assignment-modal
 		ref="resourcesAssignmentModal"
-		@save-finished="$refs.calendar.resetEventLoader()"
+		@save-finished="$refs.calendar.reloadEventsWithClearingAndLoader()"
 		/>
 		<history-modal ref="historyModal" :entries="historyEntries" />
 		<reservierung
 			ref="reservierung"
 			:rooms="rooms"
-			@saved="reservierungPending = false; $refs.calendar.resetEventLoader()"
+			@saved="reservierungPending = false; $refs.calendar.reloadEventsWithClearingAndLoader()"
 		></reservierung>
 		<multi-week-plan-modal
 			:show="multiWeekModal.show"

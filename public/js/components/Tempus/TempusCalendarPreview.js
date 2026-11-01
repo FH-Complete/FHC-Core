@@ -72,7 +72,7 @@ export default {
 			renderers: Vue.computed(() => this.renderers),
 			appConfig: Vue.computed(() => this.appconfig),
 			canToggleGrid: this.permissions.stundenraster,
-			isHeaderSticky: true,
+			isHeaderSticky: false,
 			isInitialColumnWidthSyncPostponed: true,
 		};
 	},

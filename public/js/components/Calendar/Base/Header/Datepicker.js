@@ -53,8 +53,8 @@ export default {
 					];
 				case 'range':
 					return [
-						this.convertedDate.startOf('day').ts,
-						this.convertedDate.startOf('day').plus({ days: this.rangeLength })
+						this.convertedDate.startOf('week').ts,
+						this.convertedDate.startOf('day').plus({ days: this.rangeLength }).endOf('week')
 							.ts - 1,
 					];
 				case 'week':
@@ -98,14 +98,15 @@ export default {
 							.plus({ days: this.listLength - 1 })
 							.toLocaleString(luxon.DateTime.DATE_FULL)
 					);
-				case 'range':
+				case 'range': {
+					const [start, end] = this.current;
+
 					return (
-						this.date.toLocaleString(luxon.DateTime.DATE_FULL) +
-						'-' +
-						this.date
-							.plus({ days: this.rangeLength - 1 })
-							.toLocaleString(luxon.DateTime.DATE_FULL)
+						luxon.DateTime.fromMillis(start).setLocale('de').toFormat('d. LLLL yyyy') +
+						' - ' +
+						luxon.DateTime.fromMillis(end).setLocale('de').toFormat('d. LLLL yyyy')
 					);
+				}
 				case 'day':
 					return this.date.toLocaleString(luxon.DateTime.DATE_FULL);
 				default:

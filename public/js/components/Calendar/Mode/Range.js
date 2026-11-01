@@ -74,10 +74,29 @@ export default {
 				return;
 			}
 
-			this.selectedRangePreset = null;
+			let matchingPreset = this.getMatchingPresetForCurrentRange();
+			if (!matchingPreset) {
+				this.selectedRangePreset = null;
+				return;
+			}
+
+			this.selectedRangePreset = matchingPreset.name;
 		}
 	},
 	methods: {
+		getMatchingPresetForCurrentRange() {
+			if (!this.rangeViewPresetsConfig?.presets?.length) return;
+			if (!this.range) return;
+
+			const matchingPreset = this.rangeViewPresetsConfig.presets.find(
+				(preset) =>
+					(preset.startDate >= this.range.start && preset.endDate <= this.range.end) 
+
+			);
+			if (!matchingPreset) return;
+			
+			return matchingPreset;
+		},
 		viewAttrs() {
 			const day = this.$props.currentDate.startOf('day');
 			const rangeLength = parseInt(this.rangeLength);
@@ -170,6 +189,11 @@ export default {
 	},
 	mounted() {
 		this.$emit('update:range', this.range);
+
+		let matchingPreset = this.getMatchingPresetForCurrentRange();
+		if (matchingPreset) {
+			this.selectedRangePreset = matchingPreset.name;
+		}
 
 		this.beforePrintHandler = () => this.preparePrintLayout();
 		this.afterPrintHandler = () => this.resetPrintLayout();

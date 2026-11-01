@@ -113,11 +113,11 @@ export default {
 							return;
 						}
 
-						mutation.addedNodes.forEach((node) => this.observeGrids(node));
+						mutation.addedNodes.forEach((node) => this.observeGridLines(node));
 						mutation.removedNodes.forEach((node) => {
-							this.getGrids(node).forEach((grid) => {
-								this.intersectionObserver.unobserve(grid);
-								if (this.visibleGrids.delete(grid)) changed = true;
+							this.getGridLines(node).forEach((gridLine) => {
+								this.intersectionObserver.unobserve(gridLine);
+								if (this.visibleGrids.delete(gridLine)) changed = true;
 							});
 						});
 
@@ -131,7 +131,7 @@ export default {
 				}),
 			);
 
-			this.observeGrids(this.$el);
+			this.observeGridLines(this.$el);
 			this.mutationObserver.observe(this.$el, {
 				subtree: true,
 				childList: true,
@@ -139,25 +139,25 @@ export default {
 				attributeFilter: ['data-visible-start', 'data-visible-end'],
 			});
 		},
-		getGrids(node) {
+		getGridLines(node) {
 			if (!(node instanceof Element)) return [];
 
-			const grids = node.matches('.fhc-calendar-base-grid') ? [node] : [];
+			const grids = node.matches('.fhc-calendar-base-grid-line') ? [node] : [];
 			return grids.concat([
-				...node.querySelectorAll('.fhc-calendar-base-grid'),
+				...node.querySelectorAll('.fhc-calendar-base-grid-line'),
 			]);
 		},
-		observeGrids(node) {
-			this.getGrids(node).forEach((grid) => {
-				this.intersectionObserver.observe(grid);
+		observeGridLines(node) {
+			this.getGridLines(node).forEach((gridLine) => {
+				this.intersectionObserver.observe(gridLine);
 			});
 		},
 		getContainingGrid(node) {
 			if (!(node instanceof Element)) return null;
 
-			return node.matches('.fhc-calendar-base-grid')
+			return node.matches('.fhc-calendar-base-grid-line')
 				? node
-				: node.closest('.fhc-calendar-base-grid');
+				: node.closest('.fhc-calendar-base-grid-line');
 		},
 		scheduleVisibleDatesUpdate() {
 			if (this.visibilityUpdateScheduled) return;
@@ -171,8 +171,8 @@ export default {
 		emitVisibleDates() {
 			const datesByKey = new Map();
 
-			this.visibleGrids.forEach((grid) => {
-				const dates = this.getGridVisibleDates(grid);
+			this.visibleGrids.forEach((gridLine) => {
+				const dates = this.getGridLineVisibleDates(gridLine);
 				if (dates) datesByKey.set(dates.start + '/' + dates.end, dates);
 			});
 
@@ -188,20 +188,12 @@ export default {
 			this.lastVisibleDatesKey = key;
 			this.onVisibleDatesChanged(dates);
 		},
-		getGridVisibleDates(grid) {
-			if (!grid.isConnected) return null;
+		getGridLineVisibleDates(gridLine) {
+			if (!gridLine.isConnected) return null;
 
-			let start = null;
-			let end = null;
-			grid.querySelectorAll('.fhc-calendar-base-grid-line').forEach((line) => {
-				const lineStart = line.dataset.visibleStart;
-				const lineEnd = line.dataset.visibleEnd;
-				if (!lineStart || !lineEnd) return;
-
-				if (!start || lineStart.localeCompare(start) < 0) start = lineStart;
-				if (!end || lineEnd.localeCompare(end) > 0) end = lineEnd;
-			});
-
+			let start = gridLine.dataset.visibleStart;
+			let end = gridLine.dataset.visibleEnd;
+		 
 			return start && end ? { start, end } : null;
 		},
 		stopVisibilityTracking() {
