@@ -197,7 +197,7 @@ export default {
 			if (!orig?.kalender_id) return;
 
 			await this.deleteEntryCall(orig);
-			this.$refs.calendar.reloadEventsWithoutClearingWithLoader();
+			this.$refs.calendar.targetedSoftReloadEvents(luxon.DateTime.fromISO(orig.isostart), luxon.DateTime.fromISO(orig.isoend));
 			this.$refs.sidebar.reloadCoursepicker();
 			this.rebuildRaumvorschlag();
 		},
