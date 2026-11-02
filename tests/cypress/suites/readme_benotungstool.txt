@@ -15,7 +15,7 @@ e2e/specs/ui/        Die Oberfläche im Browser.
 support/api/         Die API-Aufrufe an einer Stelle. Spiegelt public/js/api/factory/noten.js.
 support/pages/       Die Oberfläche an einer Stelle. Selektoren und Klickwege.
 support/helpers/     Testdaten, Fehlermeldungen, Fixture-Reset.
-tasks/               Datenbankverbindung und SSH-Tunnel. Läuft in Node, nicht im Browser.
+tasks/               Datenbankverbindung. Läuft in Node, nicht im Browser.
 suites/noten.js      Verbindet die Suite mit cypress.config.js.
 tools/dbCheck.js     Prüft die Fixture ohne HTTP. Gutes erstes Kommando bei Problemen.
 
@@ -34,13 +34,11 @@ Dann die Zugangsdaten anlegen:
 
   cp tests/cypress/.env.example tests/cypress/.env
 
-Fülle die Datei aus. Die Kommentare darin erklären jeden Wert. Drei Punkte sind wichtig:
+Fülle die Datei aus. Die Kommentare darin erklären jeden Wert. Zwei Punkte sind wichtig:
 
 - .env darf nie in Git landen.
 - USER_NAME ist der LEKTOR, nicht ein Administrator. Ein Administrator unterrichtet meist nichts,
   dann findet die Suite keine Lehrveranstaltung.
-- Von einer Arbeitsstation aus brauchst du den SSH-Tunnel. Die Datenbank nimmt nur den
-  Applikationsserver an. Setze NOTEN_SSH_TUNNEL=true und die drei NOTEN_SSH_*-Werte.
 
 Beide Seiten müssen auf dieselbe Datenbank zeigen: die Webinstanz (config/system.config.inc.php,
 DB_NAME) und die Suite (NOTEN_DB_NAME in .env). Sonst seedet die Suite die eine Datenbank und prüft
@@ -88,8 +86,7 @@ Der aktuelle Sollzustand: API und Unit 84 Tests, 69 grün, 15 pending. UI 30 Tes
   Die Webinstanz und .env zeigen auf verschiedene Datenbanken. Siehe Abschnitt 2.
 
 "Fixture reset unavailable"
-  Die Datenbankverbindung fehlt. Prüfe den SSH-Tunnel. Einen Schlüssel mit einem Namen ausserhalb
-  der OpenSSH-Standardnamen probiert SSH nie automatisch. Trage ihn in NOTEN_SSH_KEY ein.
+  Die Datenbankverbindung fehlt. Prüfe die NOTEN_DB_*-Werte in .env.
 
 Ein Test erwartet eine Fehlermeldung und bekommt eine andere
   Die Phrase fehlt in der Datenbank. Lass system/phrasesupdate.php auf dem Server laufen.

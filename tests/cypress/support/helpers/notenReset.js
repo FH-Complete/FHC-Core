@@ -1,7 +1,6 @@
 /**
  * Fixture-Reset ausschliesslich über eine direkte DB-Verbindung - ein HTTP-Endpunkt, der
  * Notendaten löscht, ist durch keine Absicherung so sicher wie sein Nichtvorhandensein.
- * Von der Workstation aus braucht das den SSH-Tunnel (cypress/tasks/sshTunnel.js).
  */
 
 let available = null;
@@ -19,8 +18,7 @@ export const resolveResetStrategy = () => {
 
 export const describeFailure = (state) =>
 	`      ${state.reason}\n\n` +
-	"      Needs a database connection. From a workstation: NOTEN_SSH_TUNNEL=true plus\n" +
-	"      NOTEN_SSH_HOST / NOTEN_SSH_USER (and NOTEN_SSH_KEY, unless an agent holds the key).";
+	"      Needs a database connection: set the NOTEN_DB_* values.";
 
 /**
  * uid to stamp as mitarbeiter_uid / freigabevon_uid.

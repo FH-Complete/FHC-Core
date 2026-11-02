@@ -6,8 +6,8 @@
  *   node tests/cypress/tools/dbCheck.js noten seed       apply the suite's seeder, then re-check
  *   node tests/cypress/tools/dbCheck.js noten env        print the .env block to use
  *
- * A suite contributes tools/checks/<suite>.js exporting { title, checks, sqlFiles }. Connection,
- * tunnel and output are shared and live here.
+ * A suite contributes tools/checks/<suite>.js exporting { title, checks, sqlFiles }. Connection
+ * and output are shared and live here.
  *
  * `check` is read-only; `seed` needs <PREFIX>_DB_ALLOW_WRITES=true and an owner role.
  */
@@ -127,13 +127,6 @@ Add to tests/cypress/.env (gitignored):
   ${p}_DB_USER=<user>
   ${p}_DB_PASSWORD=<password>
   ${p}_DB_ALLOW_WRITES=true
-
-If pg_hba.conf does not admit this machine, add the tunnel:
-
-  ${p}_SSH_TUNNEL=true
-  ${p}_SSH_HOST=<ssh host, often NOT the web hostname>
-  ${p}_SSH_USER=<user>
-  ${p}_SSH_KEY=<path, or empty to use the ssh agent>
 `);
 };
 
@@ -162,7 +155,6 @@ const main = async () => {
 		return 2;
 	}
 
-	// Opens the SSH tunnel when configured, so a workstation run needs no manual forward.
 	const status = await db.checkAvailability({ requireWrites: mode !== "check" });
 	if (!status.available) {
 		console.error(`\nCould not connect: ${status.reason}\n`);

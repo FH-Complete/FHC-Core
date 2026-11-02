@@ -30,9 +30,6 @@ module.exports = defineConfig({
 
       suite.registerTasks(on);
 
-      // otherwise the SSH forward outlives Cypress
-      on("after:run", () => require("./tests/cypress/tasks/sshTunnel").closeTunnel());
-
       return config;
     },
   },
