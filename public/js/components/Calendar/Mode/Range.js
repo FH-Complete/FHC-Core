@@ -120,71 +120,29 @@ export default {
 			const view = this.$el?.querySelector('.fhc-calendar-mode-range-view');
 			if (!view) return;
 
-			const weeks = Array.from(view.children);
-			weeks.forEach((week) => {
-				week.style.setProperty('--fhc-calendar-print-scale-x', '1');
-				week.style.setProperty('--fhc-calendar-print-scale-y', '1');
-				week.style.setProperty(
-					'--fhc-calendar-print-layout-width',
-					'max-content',
-				);
-			});
-
-			const viewWidth = view.getBoundingClientRect().width;
-			const printViewportWidth = document
-				.querySelector('.fhc-calendar-base-slider')
-				.getBoundingClientRect().width;
-			const availableWidth = printViewportWidth
-				? Math.min(viewWidth, printViewportWidth)
-				: viewWidth;
-			if (!availableWidth) return;
-
-			weeks.forEach((week) => {
+			Array.from(view.children).forEach((week) => {
 				const grid = week.querySelector('.fhc-calendar-base-grid');
 				if (!grid) return;
 
 				const gridRect = grid.getBoundingClientRect();
 				const contentRight = Array.from(grid.querySelectorAll('*')).reduce(
-					(right, element) =>
-						Math.max(right, element.getBoundingClientRect().right),
+					(right, el) => Math.max(right, el.getBoundingClientRect().right),
 					gridRect.right,
 				);
 				const gridWidth = Math.ceil(
-					Math.max(
-						week.scrollWidth,
-						grid.scrollWidth,
-						gridRect.width,
-						contentRight - gridRect.left,
-					),
+					Math.max(week.scrollWidth, grid.scrollWidth, gridRect.width, contentRight - gridRect.left),
 				);
-				if (!gridWidth) return;
-
-				const scale = Math.min(1, availableWidth / gridWidth);
-				const verticalScale = 1 - (1 - scale) * 0.9;
-
-				week.style.setProperty(
-					'--fhc-calendar-print-scale-x',
-					scale.toFixed(4),
-				);
-				week.style.setProperty(
-					'--fhc-calendar-print-scale-y',
-					verticalScale.toFixed(4),
-				);
-				week.style.setProperty(
-					'--fhc-calendar-print-layout-width',
-					gridWidth + 'px',
-				);
+				if (gridWidth) {
+					week.style.setProperty('--fhc-calendar-print-layout-width', gridWidth + 'px');
+				}
 			});
 		},
 		resetPrintLayout() {
 			const view = this.$el?.querySelector('.fhc-calendar-mode-range-view');
 			if (!view) return;
-
-			Array.from(view.children).forEach((week) => {
-				week.style.removeProperty('--fhc-calendar-print-scale-x');
-				week.style.removeProperty('--fhc-calendar-print-scale-y');
-				week.style.removeProperty('--fhc-calendar-print-layout-width');
-			});
+			Array.from(view.children).forEach((week) =>
+				week.style.removeProperty('--fhc-calendar-print-layout-width'),
+			);
 		},
 	},
 	mounted() {
@@ -209,7 +167,6 @@ export default {
 		class="fhc-calendar-mode-range flex-grow-1 position-relative d-flex flex-column"
 		@cal-click-default.capture="handleClickDefaults"
 	>
-		<div ref="printMeasure" class="fhc-calendar-print-measure" aria-hidden="true"></div>
 		<div
 			v-if="rangeViewPresetsConfig?.presets?.length"
 			id="rangePresetSelector"

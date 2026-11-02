@@ -54,6 +54,9 @@ export default {
 					presets: this.semesterRangePresets,
 				};
 			}),
+			isHeaderSticky: false,
+			areDayColumnWidthsEqual: false,
+			isDayVisibilityCheckShown: false,
 		};
 	},
 	computed: {

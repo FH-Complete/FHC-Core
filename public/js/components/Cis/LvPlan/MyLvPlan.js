@@ -42,6 +42,9 @@ export default {
 					presets: this.semesterRangePresets,
 				};
 			}),
+			isHeaderSticky: false,
+			areDayColumnWidthsEqual: false,
+			isDayVisibilityCheckShown: false,
 		};
 	},
 	computed: {
@@ -304,8 +307,7 @@ export default {
 					<a
 						@click="openPrintPreview()"
 						href="#"
-						:aria-label="Print"
-						class="py-1 btn btn-outline-secondary"
+ 						class="py-1 btn btn-outline-secondary"
 					>
 						<div class="d-flex flex-column">
 							<i aria-hidden="true" class="fa-solid fa-print"></i>

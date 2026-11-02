@@ -35,6 +35,10 @@ export default {
 			from: 'columnWidthAdjustmentResetVersion',
 			default: 0,
 		},
+		isDayVisibilityCheckShown: {
+			from: 'isDayVisibilityCheckShown',
+			default: true,
+		}
 	},
 	props: {
 		day: {
@@ -367,6 +371,7 @@ export default {
 							v-bind="{ date }"
 						/>
 						<form-input
+								v-if="isDayVisibilityCheckShown"
 								type="checkbox"
 								:checked="dayVisibilityStates[date.weekday - 1]"
 								@change="toggleDayVisibility(date.weekday - 1)"

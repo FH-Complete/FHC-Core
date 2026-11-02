@@ -5,7 +5,6 @@
 * {
 	background-color: white !important;
 	color: black !important;
-	font-size: x-small !important;
 	overflow: visible !important;
 }
 
@@ -73,23 +72,6 @@ header,
 	height: 100vh !important;
 	min-width: 0 !important;
 	overflow: visible !important;
-}
-
-.fhc-calendar-mode-range .fhc-calendar-mode-range-view > div {
-	width: var(--fhc-calendar-print-layout-width, 100%) !important;
-	transform: scale(
-		var(--fhc-calendar-print-scale-x, 1),
-		var(--fhc-calendar-print-scale-y, 1)
-	) !important;
-	transform-origin: top left !important;
-}
-
-.fhc-calendar-print-measure {
-	position: fixed !important;
-	visibility: hidden !important;
-	width: 100vw !important;
-	height: 0 !important;
-	pointer-events: none !important;
 }
 
 .fhc-calendar-mode-range .fhc-calendar-mode-range-view > div {
@@ -170,4 +152,21 @@ header,
 	> .rangePageContainer
 	* {
 	background-color: transparent !important;
+}
+
+.fhc-calendar-mode-range .fhc-calendar-mode-range-view {
+	container-type: inline-size; /* 100cqw = printable page width */
+}
+
+.fhc-calendar-mode-range .fhc-calendar-mode-range-view > div {
+	--fhc-print-scale: min(
+		1,
+		tan(atan2(100cqw, var(--fhc-calendar-print-layout-width, 100cqw)))
+	);
+	width: var(--fhc-calendar-print-layout-width, 100%) !important;
+	transform: scale(
+		var(--fhc-print-scale),
+		calc(1 - (1 - var(--fhc-print-scale)) * 0.9)
+	) !important;
+	transform-origin: top left !important;
 }

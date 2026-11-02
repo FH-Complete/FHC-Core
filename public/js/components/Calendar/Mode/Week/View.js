@@ -18,6 +18,10 @@ export default {
 		timeGrid: "timeGrid",
 		timezone: "timezone",
 		hoursPlan: { from: "hoursPlan", default: null },
+		isDayVisibilityCheckShown: {
+			from: 'isDayVisibilityCheckShown',
+			default: true,
+		}
 	},
 	props: {
 		day: {
@@ -88,6 +92,7 @@ export default {
 						v-bind="{ date }"
 					/>
 					<form-input
+						v-if="isDayVisibilityCheckShown"
 	 					type="checkbox"
 	 					:checked="visibleDays[date.weekday - 1]"
 	 					@change="toggleDay(date.weekday - 1)"

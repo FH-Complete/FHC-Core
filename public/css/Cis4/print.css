@@ -30,6 +30,7 @@ header,
 .fhc-calendar-base-header,
 .fhc-calendar-mode-range .grid-allday,
 .fhc-calendar-mode-range #rangePresetSelector,
+.fhc-calendar-base-grid .main-header .form-check,
 .fhc-calendar-base-grid-line-background {
 	display: none !important;
 }
@@ -49,6 +50,14 @@ header,
 	border-left: solid !important;
 	border-left-color: var(--range-view-print-border-color) !important;
 	border-left-width: 1px !important;
+}
+
+.fhc-calendar-mode-range .main-header .fhc-calendar-base-label-day .long{
+	display: block !important;
+}
+
+.fhc-calendar-mode-range .main-header .fhc-calendar-base-label-day .short{
+	display: none !important;
 }
 
 .fhc-calendar-mode-range .part-header {
@@ -101,6 +110,34 @@ header,
 	overflow-y: hidden !important;
 }
 
+.fhc-calendar-mode-range .fhc-calendar-base-grid-line-event .rangePageContainer{
+	border: none !important;
+}
+
+.fhc-calendar-mode-range .fhc-calendar-base-grid-line-event .rangePageContainer .calendar-event-default{
+	display: flex !important;
+	flex-direction: column !important;
+	justify-content: space-evenly !important;
+	align-items: center !important;
+} 
+
 .fhc-calendar-mode-range .fhc-calendar-base-grid-line-event .event-lectors {
 	display: none !important;
+}
+.fhc-calendar-mode-range .fhc-calendar-mode-range-view {
+	container-type: inline-size; /* 100cqw = printable page width */
+}
+
+.fhc-calendar-mode-range .fhc-calendar-mode-range-view > div {
+	width: 100% !important;
+	transform: none !important;
+}
+
+.fhc-calendar-mode-range .fhc-calendar-base-grid,
+.fhc-calendar-mode-range .fhc-calendar-base-grid * {
+	min-width: 0 !important;
+}
+
+.fhc-calendar-mode-range .fhc-calendar-base-grid-line-event {
+	overflow-wrap: anywhere !important;
 }
