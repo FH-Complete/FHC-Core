@@ -2,8 +2,8 @@
  * The role matrix: which permission may do which action.
  *
  * Each account asks getCisConfig for its actions. Each action has two tests: one runs when the matrix
- * allows the action, the other when the matrix withholds it. The profile "rollen" withholds the Freigabe
- * and the kommissionelle Pruefung from the Assistenz, otherwise the second test never runs.
+ * allows the action, the other when the matrix withholds it. The second test runs only on an instance
+ * whose matrix withholds the Freigabe and the kommissionelle Pruefung from the Assistenz.
  */
 
 import { apiGet, apiPost, loginAsLektor } from "../../../../support/api/notenApi";

@@ -2,8 +2,8 @@
  * Skip helpers for tests that depend on the configuration.
  *
  * The configuration of the instance decides which rule branch is active, and a test run cannot switch
- * it. So a test checks the active branch and skips the other one. A profile in profiles/noten.js
- * switches the instance to the other branch (readme_noten.txt, section 1).
+ * it. So a test checks the active branch and skips the other one. The other branch runs on an instance
+ * with that configuration (readme_noten.txt, section 1).
  */
 
 /**

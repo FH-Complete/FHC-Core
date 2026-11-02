@@ -16,7 +16,7 @@ import {
  * Each test loads the table and then changes the database. So the table is out of date, as if
  * someone entered data in a second window. The client checks the old state and sends the request;
  * only the server rejects it. The test reads the message from the response and expects exactly this
- * message in a toast. So it needs no phrase and runs in every profile.
+ * message in a toast. So it needs no phrase and runs in every configuration.
  */
 describe("Benotungstool UI - Ablehnung durch den Server", () => {
 	let ctx;

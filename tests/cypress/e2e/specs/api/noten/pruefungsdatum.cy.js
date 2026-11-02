@@ -2,7 +2,7 @@
  * The configurable rules for the date of a Pruefung.
  *
  * No rule value is hardcoded. Each switch has one test per branch. A test skips itself when the other
- * branch is configured, and a profile in tests/cypress/profiles/noten.js runs it.
+ * branch is configured, and runs on an instance with that configuration.
  */
 
 import { notenApi, loginAsLektor } from "../../../../support/api/notenApi";

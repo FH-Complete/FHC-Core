@@ -31,9 +31,7 @@ Put more Cypress options after "--". A second --spec replaces the default:
 Pending tests are normal. A test skips when the instance has a different configuration than the
 test needs. The skip message names the key.
 
-A profile in profiles/noten.js lists the keys for the other branch. To run such a test, set the keys
-of the profile in application/config/noten.php (`config`) or config/global.config.inc.php (`flags`)
-on the test instance, run the suite, and put the old values back.
+A test for the other branch runs only on an instance with that configuration.
 
 
 2. Domain model
@@ -79,8 +77,7 @@ tests/cypress/
   support/helpers/                    ctx, test data, skips, assertions.
   tasks/                              Database access. Runs in Node, not in the browser.
   tools/dbCheck.js                    Checks the test data without a browser.
-  profiles/noten.js                   The configurations that the suite must pass.
-  local/                              Personal tools (SSH tunnel, lint). The suite never needs them.
+  local/                              Personal tools (lint, format). The suite never needs them.
 
 The Noten API (application/controllers/api/frontend/v1/Noten.php):
 

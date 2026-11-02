@@ -12,9 +12,9 @@ const prettier = require("eslint-config-prettier");
 module.exports = [
 	{ ignores: ["tests/cypress/e2e/fhcomplete/**", "tests/cypress/e2e/*.cy.js"] },
 
-	// --- Node side: tasks, tools, profiles, local tools, configuration (CommonJS) ---
+	// --- Node side: tasks, tools, local tools, configuration (CommonJS) ---
 	{
-		files: ["tests/cypress/{tasks,tools,profiles,suites,local}/**/*.js", "cypress.config.js"],
+		files: ["tests/cypress/{tasks,tools,suites,local}/**/*.js", "cypress.config.js"],
 		languageOptions: {
 			ecmaVersion: 2023,
 			sourceType: "commonjs",
@@ -41,7 +41,7 @@ module.exports = [
 			"no-unused-vars": ["warn", { argsIgnorePattern: "^_", caughtErrors: "none" }],
 
 			// warn, not error: four .clear().type() calls in the page object work, and three of them
-			// run only in the Punkte profile, so a change there cannot be tested here
+			// run only in the Punkte mode, so a change there cannot be tested here
 			"cypress/unsafe-to-chain-command": "warn",
 		},
 	},
