@@ -117,6 +117,10 @@ header,
 	border: 0 !important;
 }
 
+.fhc-calendar-mode-range-view .part-header, .fhc-calendar-mode-range-view .part-body {
+	min-height: 10px !important;
+}
+
 .fhc-calendar-mode-range .fhc-calendar-base-grid .grid-header:before {
 	grid-column: 1 !important;
 	grid-row: 1 !important;
@@ -165,8 +169,8 @@ header,
 	);
 	width: var(--fhc-calendar-print-layout-width, 100%) !important;
 	transform: scale(
-		var(--fhc-print-scale),
-		calc(1 - (1 - var(--fhc-print-scale)) * 0.9)
+		var(--fhc-print-scale)
 	) !important;
 	transform-origin: top left !important;
+	height: fit-content !important;
 }
