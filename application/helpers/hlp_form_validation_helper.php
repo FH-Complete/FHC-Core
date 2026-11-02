@@ -29,7 +29,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 function triggerValidationEvent($eventName, $validationObj, $form_validation)
 {
 	// trigger event
-	Events::trigger($eventName, $validationObj->params, $validationObj);
+	Events::trigger($eventName, $validationObj->params ?? null, $validationObj);
 
 	// add validation rules to validation object
 	if (isset($validationObj->validations))
