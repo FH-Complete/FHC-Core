@@ -35,19 +35,19 @@ DECLARE res varchar(32);
 	END;
 $$ LANGUAGE plpgsql;
 
+DROP FUNCTION IF EXISTS get_current_week_timestamp(INTEGER, TIME, INTERVAL);
+
 CREATE OR REPLACE FUNCTION get_current_week_timestamp(
     p_day_offset INTEGER,
     p_time TIME,
-    p_utc_offset INTERVAL DEFAULT INTERVAL '+00:00'
+    p_tz TEXT DEFAULT 'Europe/Vienna'
 )
 RETURNS TIMESTAMPTZ
-LANGUAGE plpgsql
+LANGUAGE sql
+STABLE
 AS $$
-BEGIN
-    RETURN (
-        date_trunc('week', CURRENT_DATE)
-        + (p_day_offset * INTERVAL '1 day')
-        + p_time
-    ) AT TIME ZONE p_utc_offset;
-END;
+    SELECT (
+        (date_trunc('week', (now() AT TIME ZONE p_tz))::date + p_day_offset)  -- date
+        + p_time                                                              -- -> timestamp (no tz)
+    ) AT TIME ZONE p_tz;                                                      -- -> timestamptz
 $$;
