@@ -74,6 +74,10 @@ header,
 	overflow: visible !important;
 }
 
+.fhc-calendar-mode-range .fhc-calendar-mode-range-view > div > .fhc-calendar-base-grid {
+ 	height: 100vh !important;
+}
+
 .fhc-calendar-mode-range .fhc-calendar-mode-range-view > div {
 	break-after: page !important;
 	page-break-after: always !important;
@@ -117,8 +121,9 @@ header,
 	border: 0 !important;
 }
 
+.fhc-calendar-mode-range-view .part-header, .fhc-calendar-mode-range-view .part-header,
 .fhc-calendar-mode-range-view .part-header, .fhc-calendar-mode-range-view .part-body {
-	min-height: 10px !important;
+	min-height: 30px !important;
 }
 
 .fhc-calendar-mode-range .fhc-calendar-base-grid .grid-header:before {
