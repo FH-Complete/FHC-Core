@@ -19,7 +19,8 @@ class Lehreinheit extends FHCAPI_Controller
 			'getLehrfach' => ['admin:r', 'assistenz:r'],
 			'getSprache' => ['admin:r', 'assistenz:r'],
 			'getRaumtyp' => ['admin:r', 'assistenz:r'],
-			'getLehrform' => ['admin:r', 'assistenz:r']
+			'getLehrform' => ['admin:r', 'assistenz:r'],
+			'getLehreinheitenBySemester' => self::PERM_LOGGED,
 		]);
 
 		$this->_ci = &get_instance();
@@ -436,6 +437,27 @@ class Lehreinheit extends FHCAPI_Controller
 		if (isError($result))
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		$this->terminateWithSuccess($this->p->t('global', 'gespeichert'));
+	}
+
+	public function getLehreinheitenBySemester()
+	{
+		$semester = $this->input->get('semester');
+		$lehreinheiten = $this->LehreinheitModel->getLehrenheitenBySemester(getAuthUID(), $semester);
+		$lehreinheiten = $this->getDataOrTerminateWithError($lehreinheiten);
+
+		foreach ($lehreinheiten as $lehreinheit) {
+			$groups = $this->LehreinheitModel->getGroupsByLehreinheit($lehreinheit->lehreinheit_id);
+			$groups = $this->getDataOrTerminateWithError($groups);
+			$stgKurzbz = $lehreinheit->stg_kurzbz;
+			$lehreinheit->groups = array_map(
+				function ($group) use ($stgKurzbz) {
+					return $group->gruppe_kurzbz ?? $stgKurzbz . "-" . $group->semester . $group->verband . $group->gruppe;
+				},
+				$groups
+			);
+		}
+
+		$this->terminateWithSuccess($lehreinheiten);
 	}
 
 

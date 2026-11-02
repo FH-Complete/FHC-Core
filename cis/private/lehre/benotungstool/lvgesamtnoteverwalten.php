@@ -1824,7 +1824,7 @@ $htmlstring .= "
 
 </table>
 ";
-if ($anzahlChanged > 0)
+if (isset($anzahlChanged) && $anzahlChanged > 0)
 	echo '<div id="notenWarning" class="warning">' . $p->t('benotungstool/geaenderteNotenVorhanden') . '</div>';
 
 echo $htmlstring;

@@ -74,6 +74,9 @@ $config['tabs'] =
 					],
 				],
 			],
+			'hiddenFields' => [
+				'uhrzeit'
+			]
 		],
 		'exemptions' => [
 			//if true, Anrechnungen can be added and edited in tab Anrechnungen

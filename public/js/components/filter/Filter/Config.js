@@ -75,6 +75,7 @@ export default {
 	},
 	methods: {
 		switchFilter(evt) {
+			console.log(evt);
 			this.$emit('switchFilter', evt.currentTarget.value);
 		},
 		applyFilterConfig() {

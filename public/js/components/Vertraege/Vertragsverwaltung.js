@@ -5,7 +5,6 @@ import VertraegeMitarbeiter from "./Vertraege.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
 import ApiCoreVertraege from '../../api/factory/vertraege/vertraege.js';
 
-
 export default {
 	name: 'Vertragsverwaltung',
 	components: {

@@ -1,5 +1,6 @@
 
 export default {
+	name: 'LvMenu',
 	props:{
 		menu:{
 			type:Array,
