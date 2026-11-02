@@ -7,7 +7,8 @@
  *   node tests/cypress/tools/dbCheck.js noten env        print the .env block to use
  *
  * A suite contributes tools/checks/<suite>.js exporting { title, checks, sqlFiles }. Connection,
- * tunnel and output are shared and live here.
+ * tunnel and output are shared and live here. An extension suite has the same export in checks.js of
+ * its tests/cypress folder; pass that folder instead of a name, like CY_SUITE.
  *
  * `check` is read-only; `seed` needs <PREFIX>_DB_ALLOW_WRITES=true and an owner role.
  */
@@ -29,6 +30,17 @@ const CHECKS_DIR = path.join(__dirname, "checks");
 const usage = (suite, mode) => `node tests/cypress/tools/dbCheck.js ${suite} ${mode}`;
 
 const loadSuite = (name) => {
+	if (/[\\/]/.test(name)) {
+		// relative to the repo root, like CY_SUITE in cypress.config.js
+		const file = path.join(path.resolve(__dirname, "..", "..", "..", name), "checks.js");
+		if (!fs.existsSync(file)) {
+			console.error(`\nNo checks.js in ${path.dirname(file)}\n`);
+			process.exit(2);
+		}
+		// eslint-disable-next-line global-require, import/no-dynamic-require
+		return require(file);
+	}
+
 	const file = path.join(CHECKS_DIR, `${name}.js`);
 	if (!fs.existsSync(file)) {
 		const available = fs.existsSync(CHECKS_DIR)
