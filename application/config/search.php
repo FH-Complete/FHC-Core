@@ -682,6 +682,10 @@ $config['room'] = [
 		'name' => [
 			'comparison' => 'similar',
 			'field' => 'ort_kurzbz'
+		],
+		'telefonklappe' => [
+			'comparison' => 'similar',
+			'field' => 'telefonklappe'
 		]
 	],
 	'resultfields' => [
@@ -703,7 +707,8 @@ $config['room'] = [
 		LEFT JOIN public.tbl_standort
 			USING (standort_id)
 		LEFT JOIN public.tbl_adresse address
-			USING (adresse_id)"
+			USING (adresse_id)
+		WHERE ort.aktiv = true AND ort.lehre = true"
 ];
 $sprache = getUserLanguage();
 $config['cms'] = [
