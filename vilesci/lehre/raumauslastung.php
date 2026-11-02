@@ -43,7 +43,6 @@ if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $raum = array();
-$werteRaumtyp = array();
 
 // Daten des aktuellen Studiensemesters laden
 $studiensemester = new studiensemester();
@@ -161,12 +160,7 @@ if (isset($_POST['loadTable']))
 						OR (vondatum <= ".$db->db_add_param($datum_beginn)." AND bisdatum >= ".$db->db_add_param($datum_ende).")
 				) AS dates
 	)
-	SELECT DISTINCT datum,
-					stunde,
-					ort_kurzbz, 
-					EXTRACT(DOW FROM datum) AS tag, 
-					substring(EXTRACT(YEAR FROM datum)::text FROM 3 FOR 2) ||'_'||EXTRACT('week' FROM datum) AS kw, 
-					max_person
+	SELECT DISTINCT datum,stunde,ort_kurzbz, EXTRACT(DOW FROM datum) AS tag, max_person
 				FROM lehre.".$stundenplantable." FULL JOIN public.tbl_ort USING (ort_kurzbz)
 				WHERE
 					datum>=".$db->db_add_param($datum_beginn)."
@@ -181,9 +175,8 @@ if (isset($_POST['loadTable']))
 	if (count($raumtypen_arr) > 0)
 	{
 		$sql_query .= " AND ort_kurzbz IN (SELECT ort_kurzbz FROM public.tbl_ortraumtyp WHERE raumtyp_kurzbz IN ('".implode($raumtypen_arr, '\',\'')."'))";
-		// Auch leere Räume ohne verplante Stunden laden
 		$sql_query .= " UNION
-						SELECT NULL, NULL, ort_kurzbz, NULL, NULL, max_person 
+						SELECT NULL, NULL, ort_kurzbz, NULL, max_person 
 						FROM public.tbl_ortraumtyp 
 						JOIN public.tbl_ort USING (ort_kurzbz)
 						WHERE raumtyp_kurzbz IN ('".implode($raumtypen_arr, '\',\'')."')";
@@ -194,12 +187,7 @@ if (isset($_POST['loadTable']))
 		$sql_query .= " 
 		UNION
 		
-		SELECT DISTINCT datum,
-						stunde,
-						ort_kurzbz, 
-						EXTRACT(DOW FROM datum) AS tag, 
-						substring(EXTRACT(YEAR FROM datum)::text FROM 3 FOR 2) ||'_'||EXTRACT('week' FROM datum) AS kw,
-						max_person
+		SELECT DISTINCT datum,stunde,ort_kurzbz, EXTRACT(DOW FROM datum) AS tag, max_person
 					FROM campus.tbl_reservierung 
 					FULL JOIN public.tbl_ort USING (ort_kurzbz)
 					WHERE
@@ -217,7 +205,7 @@ if (isset($_POST['loadTable']))
 			$sql_query .= " AND ort_kurzbz IN (SELECT ort_kurzbz FROM public.tbl_ortraumtyp WHERE raumtyp_kurzbz IN ('".implode($raumtypen_arr, '\',\'')."'))";
 		}
 	}
-	$sql_query .= " ORDER BY ort_kurzbz, kw LIMIT 100";
+	$sql_query .= " ORDER BY ort_kurzbz";
 	//echo '<pre>', var_dump($sql_query), '</pre>';
 	if (!$result = $db->db_query($sql_query))
 	{
@@ -302,7 +290,7 @@ if (isset($_POST['loadTable']))
 		die($db->db_last_error());
 	}
 
-	//Aufbereitung Variante 1
+	//Aufbereitung
 	while ($row = $db->db_fetch_object($result))
 	{
 		if (!isset($raum[$row->ort_kurzbz]))
@@ -319,23 +307,6 @@ if (isset($_POST['loadTable']))
 		else
 		{
 			$raum[$row->ort_kurzbz]->last[$row->tag][$row->stunde]->anzahl++;
-		}
-
-		//Aufbereitung Variante 2
-		if (!isset($werteRaumtyp[$row->ort_kurzbz]))
-		{
-			$werteRaumtyp[$row->ort_kurzbz] = new stdClass();
-		}
-		$werteRaumtyp[$row->ort_kurzbz]->ort = $row->ort_kurzbz;
-		$werteRaumtyp[$row->ort_kurzbz]->personen = $row->max_person;
-		if (!isset($werteRaumtyp[$row->ort_kurzbz]->last[$row->kw][$row->stunde]->anzahl))
-		{
-			$werteRaumtyp[$row->ort_kurzbz]->last[$row->kw][$row->stunde] = new stdClass();
-			$werteRaumtyp[$row->ort_kurzbz]->last[$row->kw][$row->stunde]->anzahl = 1;
-		}
-		else
-		{
-			$werteRaumtyp[$row->ort_kurzbz]->last[$row->kw][$row->stunde]->anzahl++;
 		}
 	}
 }
@@ -589,52 +560,53 @@ if (isset($_POST['loadTable']))
 			}
 	echo '</tr></tbody></table>';
 	echo '</td></tr></tbody></table>';
+	?>
 
-	$variante = 2;
-	if ($variante == 1)
-	{
-		echo '<table id="t1">
-			<thead>
-			<tr>';
-		$span = $stunde_ende - $stunde_beginn + 1;
-		$spanSamstag = $stunde_samstag_ende - $stunde_samstag_beginn + 1;
+	<table id="t1">
+		<thead>
+		<tr>
+		<?php
+		$span = $stunde_ende - $stunde_beginn+1;
+		$spanSamstag = $stunde_samstag_ende - $stunde_samstag_beginn+1;
 
 		echo '<th rowspan="2">Ort (Personen)</th>
-				<th colspan='."$span".' data-sorter="false" style="text-align: center;">Montag</th>
-				<th colspan='."$span".' data-sorter="false" style="text-align: center;">Dienstag</th>
-				<th colspan='."$span".' data-sorter="false" style="text-align: center;">Mittwoch</th>
-				<th colspan='."$span".' data-sorter="false" style="text-align: center;">Donnerstag</th>
-				<th colspan='."$span".' data-sorter="false" style="text-align: center;">Freitag</th>
-				<th colspan='."$spanSamstag".' data-sorter="false" style="text-align: center;">Samstag</th>';
-
-		echo '</tr>
-					<tr>';
-
-		for ($t = 1; $t < 7; $t++)
+			<th colspan='."$span".' data-sorter="false" style="text-align: center;">Montag</th>
+			<th colspan='."$span".' data-sorter="false" style="text-align: center;">Dienstag</th>
+			<th colspan='."$span".' data-sorter="false" style="text-align: center;">Mittwoch</th>
+			<th colspan='."$span".' data-sorter="false" style="text-align: center;">Donnerstag</th>
+			<th colspan='."$span".' data-sorter="false" style="text-align: center;">Freitag</th>
+			<th colspan='."$spanSamstag".' data-sorter="false" style="text-align: center;">Samstag</th>';
+		?>
+		</tr>
+		<tr>
+		<?php
+		echo '';
+		for ($t=1;$t<7;$t++)
 		{
 			if ($t != 6)
 			{
 				for ($s = $stunde_beginn; $s <= $stunde_ende; $s++)
 				{
-					echo '<th data-sorter="false" data-filter="false">'.$s.'</th>';
+					echo '<th data-sorter="false">'.$s.'</th>';
 				}
 			}
 			else
 			{
 				for ($s = $stunde_samstag_beginn; $s <= $stunde_samstag_ende; $s++)
 				{
-					echo '<th data-sorter="false" data-filter="false">'.$s.'</th>';
+					echo '<th data-sorter="false">'.$s.'</th>';
 				}
 			}
 		}
-		echo '	</tr>
-			</thead>
-			<tbody>';
-
-		foreach ($raum as $ort)
+		?>
+		</tr>
+		</thead>
+		<tbody>
+		<?php
+		foreach ($raum AS $ort)
 		{
 			echo '<tr><td style="text-align: left; white-space: nowrap">'.$ort->ort.' ('.$ort->personen.')</td>';
-			for ($t = 1; $t < 7; $t++)
+			for ($t=1;$t<7;$t++)
 			{
 				if ($t != 6)
 				{
@@ -688,80 +660,7 @@ if (isset($_POST['loadTable']))
 			echo '</tr>';
 		}
 		echo '</tbody>
-				</table>';
-	}
-	elseif ($variante == 2)
-	{
-		echo '<table id="t1">
-			<thead>
-			<tr>';
-		$span = $stunde_ende - $stunde_beginn + 1;
-		$spanSamstag = $stunde_samstag_ende - $stunde_samstag_beginn + 1;
-		//echo '<pre>', var_dump($werteRaumtyp), '</pre>';
-		echo '<th>Raumtyp</th>';
-		echo '<th>Stunde</th>';
-		foreach ($werteRaumtyp as $wert)
-		{
-			foreach ($wert->last AS $woche => $value)
-			{
-				echo '<th data-sorter="false" style="text-align: center;">'.$woche.'</th>';
-			}
-		}
-
-		echo '</tr>
-			</thead>
-			<tbody>';
-
-		foreach ($werteRaumtyp as $wert)
-		{
-			//echo '<td rowspan="16" style="text-align: left; white-space: nowrap">SEM</td>';
-			echo '<tr>';
-
-				echo '<td rowspan="16" style="text-align: left; white-space: nowrap">SEM</td>';
-			foreach ($wert->last as $woche)
-			{
-				//echo '<pre>', var_dump($woche), '</pre>';
-				for ($s = 1; $s <= 16; $s++)
-				{
-					if (isset($woche[$s]->anzahl))
-										echo '<td>'.$woche[$s]->anzahl.'</td>';
-									else
-										echo '<td>-</td>';
-				}
-
-			}
-			echo '</tr>';
-
-
-			/*for ($t = 1; $t < 7; $t++)
-			{
-				for ($s = 1; $s <= 16; $s++)
-				{
-					if (!isset($ort->last[$t][$s]->anzahl))
-					{
-						$ort->last[$t][$s] = new stdClass();
-						$ort->last[$t][$s]->anzahl = 0;
-					}
-					echo '<td>';
-					//echo $ort->last[$t][$s]->anzahl;
-					//echo round($ort->last[$t][$s]->anzahl / $wochentageArray[$t] * 100, 0).'%';
-					if ($ort->last[$t][$s]->anzahl > 0)
-					{
-						//echo round(($wochentageArray[$t] / $ort->last[$t][$s]->anzahl) * 100, 0).'%';
-						echo round(($ort->last[$t][$s]->anzahl / $wochentageArray[$t]) * 100, 0);
-					}
-					else
-					{
-						echo '-';
-					}
-					echo '</td>';
-				}
-			}
-			echo '</tr>';*/
-		}
-		echo '</tbody>
-				</table>';
-	}
+			</table>';
 }
 ?>
 </body>
