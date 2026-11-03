@@ -111,6 +111,7 @@ class Config extends FHCAPI_Controller
 	{
 		$this->load->model('system/Variable_model', 'VariableModel');
 		$this->load->library('form_validation');
+		$this->load->helper('hlp_form_validation_helper');
 
 		$this->form_validation->set_rules(
 			'number_displayed_past_studiensemester',
@@ -123,7 +124,8 @@ class Config extends FHCAPI_Controller
 			'required|in_list[fs_xx-small,fs_x-small,fs_small,fs_normal,fs_big,fs_huge]'
 		);
 
-		Events::trigger('stv_config_validation', $this->form_validation);
+		$validationObj = new StdClass();
+		triggerValidationEvent('stv_config_validation', $validationObj, $this->form_validation);
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());

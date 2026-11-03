@@ -46,6 +46,9 @@ class Konto extends FHCAPI_Controller
 		// Load models
 		$this->load->model('crm/Konto_model', 'KontoModel');
 
+		// Load helpers
+		$this->load->helper('hlp_form_validation_helper');
+
 		// Load language phrases
 		$this->loadPhrases([
 			'konto',
@@ -215,7 +218,8 @@ class Konto extends FHCAPI_Controller
 		$this->form_validation->set_rules('studiengang_kz', 'Studiengang', 'required|has_permissions_for_stg[admin:rw,assistenz:rw]');
 		$this->form_validation->set_rules('credit_points', 'Credit Points', 'numeric');
 
-		Events::trigger('konto_insert_validation', $this->form_validation);
+		$validationObj = new StdClass();
+		triggerValidationEvent('konto_insert_validation', $validationObj, $this->form_validation);
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
@@ -329,8 +333,10 @@ class Konto extends FHCAPI_Controller
 		$this->form_validation->reset_validation();
 		$this->form_validation->set_data(['buchung' => $data]);
 		$this->form_validation->set_rules($rules);
-		
-		Events::trigger('konto_counter_validation', $this->form_validation);
+
+		$validationObj = new StdClass();
+		$validationObj->params = $this->form_validation->validation_data;
+		triggerValidationEvent('konto_counter_validation', $validationObj, $this->form_validation);
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
@@ -407,13 +413,15 @@ class Konto extends FHCAPI_Controller
 		$this->form_validation->set_rules('studiengang_kz', 'Studiengang', 'required|has_permissions_for_stg[admin:rw,assistenz:rw]');
 		$this->form_validation->set_rules('credit_points', 'Credit Points', 'numeric');
 
-		Events::trigger('konto_update_validation', $this->form_validation);
+		$id = $this->input->post('buchungsnr');
+
+		$validationObj = new StdClass();
+		$validationObj->params = $id;
+		triggerValidationEvent('konto_update_validation', $validationObj, $this->form_validation);
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
-
-		$id = $this->input->post('buchungsnr');
 		$allowed = [
 			'betrag',
 			'buchungsdatum',
@@ -482,11 +490,12 @@ class Konto extends FHCAPI_Controller
 
 		$this->form_validation->set_rules('studiengang_kz', 'Studiengang', 'has_permissions_for_stg[admin:rw,assistenz:rw]');
 
-		Events::trigger('konto_delete_validation', $this->form_validation);
+		$validationObj = new StdClass();
+		$validationObj->params = $buchungsnr;
+		triggerValidationEvent('konto_delete_validation', $validationObj, $this->form_validation);
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
-
 
 		Events::trigger('konto_delete', $buchungsnr);
 		
