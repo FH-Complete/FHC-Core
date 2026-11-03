@@ -239,6 +239,8 @@ class LvMenu extends FHCAPI_Controller
 
 		$this->fhc_menu_anrechnungLector($menu, $angezeigtes_stsem);
 
+		$this->fhc_menu_anwesenheitslisten($menu, $is_lector, $studiengang_kz, $semester, $lvid, $studiensemester_kurzbz);
+
 
 		// Addons Menu Logic
 		// ##########################################################################################		
@@ -550,4 +552,24 @@ class LvMenu extends FHCAPI_Controller
 			);
 		}
     }
+
+	private function fhc_menu_anwesenheitslisten(&$menu, $is_lector, $stg_kz, $sem, $lvid, $stsem)
+	{
+		if (
+			!$is_lector ||
+			(defined('CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN') && !CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN)
+		) {
+			return;
+		}
+
+		$menu[]=array
+		(
+			'id' => 'core_menu_anwesenheitslisten',
+			'position' => '40',
+			'phrase' => 'lehre/anwesenheitsUndNotenlisten',
+			'c4_icon' => base_url('skin/images/button_kreuzerltool.png'),
+			'c4_icon2' => 'fa-solid fa-graduation-cap',
+			'c4_link' => base_url('cis.php/Cis/Compat/legacy/cis/private/lehre/anwesenheitsliste.php?stg_kz=' . urlencode($stg_kz) . '&sem=' . urlencode($sem) . '&lvid=' . urlencode($lvid) . '&stsem=' . urlencode($stsem)),
+		);
+	}
 }
