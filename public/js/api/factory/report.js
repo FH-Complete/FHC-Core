@@ -35,4 +35,11 @@ export default {
 			params,
 		};
 	},
+	vardetails(kurzbz, values) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/report/vardetails/' + kurzbz,
+			params: { values },
+		};
+	},
 };

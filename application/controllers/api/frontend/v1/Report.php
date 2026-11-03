@@ -32,6 +32,7 @@ class Report extends FHCAPI_Controller
 			'list' => [ 'dashboard/admin:rw', 'basis/statistik:rw' ],
 			'vars' => self::PERM_LOGGED, // additional permission check inside
 			'get' => self::PERM_LOGGED, // additional permission check inside
+			'vardetails' => self::PERM_LOGGED,
 		]);
 
 		$this->load->model('organisation/Statistik_model', 'StatistikModel');
@@ -81,97 +82,6 @@ class Report extends FHCAPI_Controller
 		$vars = $this->loadVars($statistik->sql);
 		
 		$this->terminateWithSuccess($vars);
-	}
-
-	/**
-	 * @access protected
-	 */
-	protected function loadVars($sql)
-	{
-		$result = [];
-		preg_match_all('/\$\w+/', $sql ?: '', $result);
-		$result = $result[0];
-
-		$vars = array_unique($result); // remove doubles
-		
-		$this->load->model('system/Filter_model', 'FilterModel');
-		$vars = array_map([$this, 'varToFilter'], $vars); // prep them
-
-		$vars = array_filter($vars); // remove null values (former: $user)
-
-		return array_values($vars); // reindex
-	}
-
-	/**
-	 * @access protected
-	 */
-	protected function varToFilter($value)
-	{
-		if ($value == '$user')
-			return null;
-		
-		$value = str_replace('$', '', $value);
-		
-		$result = $this->FilterModel->loadWhere([
-			'kurzbz' => $value
-		]);
-		$filter = $this->getDataOrTerminateWithError($result);
-
-		$result = [];
-		if (!$filter) {
-			$result = [
-				'kurzbz' => $value,
-				'title' => $value,
-				'type' => 'text',
-			];
-		} else {
-			$filter = current($filter);
-			$result = [
-				'kurzbz' => $filter->kurzbz,
-				'title' => $filter->bezeichnung ?: $filter->kurzbz,
-				'type' => $filter->type,
-			];
-			switch ($filter->type) {
-				case 'select':
-					$sql = str_replace('$user', $this->FilterModel->escape(getAuthUID()), $filter->sql);
-					$query = $this->FilterModel->execReadOnlyQuery($sql);
-					$options = $this->getDataOrTerminateWithError($query);
-					$showValue = $filter->showvalue;
-					$result['options'] = array_map(function ($option) use ($showValue) {
-						$label = '';
-						if ($showValue)
-							$label = '(' + $option->value + ') - ';
-						if (property_exists($option, 'name'))
-							$label .= $option->name;
-						else
-							$label .= ((array)$option)[array_find(array_keys((array)$option), function ($key) {
-								return $key != 'value';
-							})];
-						
-						// Remove hacks in sql query like preselecting an entry (eg: '" selected="selected')
-						$value = preg_replace('#([^\\\])".*#', '$1', $option->value);
-
-						return [
-							'value' => $value,
-							'label' => $label,
-							'original' => $option,
-						];
-					}, $options);
-
-					if (preg_match('/(^|\s)multiple($|\s)/', $filter->htmlattr ?: '')) {
-						$result['multiple'] = true;
-					}
-					break;
-				
-				default:
-					if (preg_match('/(^|\s)placeholder="([^"]*)"($|\s)/', $filter->htmlattr ?: '', $matches)) {
-						$result['placeholder'] = $matches[2];
-					}
-					break;
-			}
-		}
-		
-		return $result;
 	}
 
 	/**
@@ -273,5 +183,167 @@ class Report extends FHCAPI_Controller
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);
+	}
+
+	/**
+	 * @param string		$kurzbz
+	 * @return void
+	 * @access public
+	 */
+	public function vardetails($kurzbz)
+	{
+		// Get values
+		$values = $this->input->post('values');
+		
+		// Form validation
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules(is_array($values) ? 'values[]' : 'values', 'values', 'required');
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		// Get Filter
+		$this->load->model('system/Filter_model', 'FilterModel');
+
+		$result = $this->FilterModel->loadWhere([
+			'kurzbz' => $kurzbz
+		]);
+
+		$filter = $this->getDataOrTerminateWithError($result);
+
+		$filter = current($filter);
+
+		if (!$filter || $filter->type != 'select')
+			show_404();
+
+		// Get all options
+		$options = $this->getOptionsForFilter($filter);
+
+		// Filter options for values
+		if (is_array($values)) {
+			$result = array_filter($options, function ($option) use ($values) {
+				return in_array($option['value'], $values);
+			});
+			$result = array_values($result);
+		} else {
+			$result = array_filter($options, function ($option) use ($values) {
+				return ($option['value'] == $values);
+			});
+			$result = current($result);
+		}
+
+		$this->terminateWithSuccess($result);
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Protected methods
+
+	/**
+	 * @param string		$sql
+	 * @return array
+	 * @access protected
+	 */
+	protected function loadVars($sql)
+	{
+		$result = [];
+		preg_match_all('/\$\w+/', $sql ?: '', $result);
+		$result = $result[0];
+
+		$vars = array_unique($result); // remove doubles
+		
+		$this->load->model('system/Filter_model', 'FilterModel');
+		$vars = array_map([$this, 'varToFilter'], $vars); // prep them
+
+		$vars = array_filter($vars); // remove null values (former: $user)
+
+		return array_values($vars); // reindex
+	}
+
+	/**
+	 * @param string		$value
+	 * @return array
+	 * @access protected
+	 */
+	protected function varToFilter($value)
+	{
+		if ($value == '$user')
+			return null;
+		
+		$value = str_replace('$', '', $value);
+		
+		$result = $this->FilterModel->loadWhere([
+			'kurzbz' => $value
+		]);
+		$filter = $this->getDataOrTerminateWithError($result);
+
+		$result = [];
+		if (!$filter) {
+			$result = [
+				'kurzbz' => $value,
+				'title' => $value,
+				'type' => 'text',
+			];
+		} else {
+			$filter = current($filter);
+			$result = [
+				'kurzbz' => $filter->kurzbz,
+				'title' => $filter->bezeichnung ?: $filter->kurzbz,
+				'type' => $filter->type,
+			];
+			switch ($filter->type) {
+				case 'select':
+					$result['options'] = $this->getOptionsForFilter($filter);
+
+					if (preg_match('/(^|\s)multiple($|\s)/', $filter->htmlattr ?: '')) {
+						$result['multiple'] = true;
+					}
+					break;
+				
+				default:
+					if (preg_match('/(^|\s)placeholder="([^"]*)"($|\s)/', $filter->htmlattr ?: '', $matches)) {
+						$result['placeholder'] = $matches[2];
+					}
+					break;
+			}
+		}
+		
+		return $result;
+	}
+
+	/**
+	 * @param stdClass		$filter
+	 * @return array
+	 * @access protected
+	 */
+	protected function getOptionsForFilter($filter)
+	{
+		if ($filter->type != 'select')
+			return [];
+
+		$sql = str_replace('$user', $this->FilterModel->escape(getAuthUID()), $filter->sql);
+		$query = $this->FilterModel->execReadOnlyQuery($sql);
+		$options = $this->getDataOrTerminateWithError($query);
+		$showValue = $filter->showvalue;
+		return array_map(function ($option) use ($showValue) {
+			$label = '';
+			if ($showValue)
+				$label = '(' + $option->value + ') - ';
+			if (property_exists($option, 'name'))
+				$label .= $option->name;
+			else
+				$label .= ((array)$option)[array_find(array_keys((array)$option), function ($key) {
+					return $key != 'value';
+				})];
+			
+			// Remove hacks in sql query like preselecting an entry (eg: '" selected="selected')
+			$value = preg_replace('#([^\\\])".*#', '$1', $option->value);
+
+			return [
+				'value' => $value,
+				'label' => $label,
+				'original' => $option,
+			];
+		}, $options);
 	}
 }

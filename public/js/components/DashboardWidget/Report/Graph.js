@@ -43,7 +43,7 @@ export default {
 			const title = compileLabel(
 				this.config.title || '',
 				this.calledVars,
-				this.config.vars
+				this.details
 			);
 
 			let result = {
@@ -137,59 +137,12 @@ export default {
 
 			this.hasErrors = false;
 
-			let vars = {};
-			for (var key in this.config.vars) {
-				vars[key] = await this.getValueForVar(this.config.vars[key]);
-
-				if (this.config.vars[key].type == 'user') {
-					if (!this.config.uservars || !this.config.uservars[key])
-						delete vars[key];
-					else
-						vars[key] = this.config.uservars[key].value;
-				} else if (this.config.vars[key].type.substr(0, 5) == 'calc:') {
-					const requiresArray = this.config.vars[key].detail.multiple ? true : false;
-					const isArray = Array.isArray(vars[key]);
-
-					if (requiresArray && !isArray) {
-						vars[key] = [ vars[key] ];
-					} else if (!requiresArray && isArray) {
-						const isSelect = this.config.vars[key].detail.type == 'select';
-
-						let val = undefined;
-
-						if (this.config.uservars)
-							val = this.config.uservars[key]?.value;
-						
-						if (val && !vars[key].some(v1 => v1 == val)) {
-							val = undefined;
-							delete this.config.uservars[key].value;
-						}
-						if (isSelect && val && !this.config.vars[key].detail.options.some(option => option.value == val)) {
-							val = undefined;
-							delete this.config.uservars[key].value;
-						}
-						
-						if (!val)
-							val = vars[key].find(Boolean); // get first element
-						
-						let detail = { ...this.config.vars[key].detail, type: 'select' };
-
-						if (this.config.vars[key].detail.type == 'select') {
-							detail.options = this.config.vars[key].detail.options
-								.filter(option => vars[key].some(v => v == option.value));
-						} else {
-							detail.options = vars[key].map(value => ({ label: value, value }));
-						}
-						
-						const sharedData = this.sharedData || {};
-						sharedData[key] = detail;
-						this.$emit('update:sharedData', sharedData);
-						this.$emit('setConfig', Vue.markRaw(ConfigGraph));
-
-						vars[key] = val;
-					}
-				}
-			}
+			const vars = await this.getValuesForVars(this.config.vars, this.config.uservars, (key, detail) => {
+				const sharedData = this.sharedData || {};
+				sharedData[key] = detail;
+				this.$emit('update:sharedData', sharedData);
+				this.$emit('setConfig', Vue.markRaw(ConfigGraph));
+			});
 
 			this.calledVars = vars;
 
@@ -221,9 +174,10 @@ export default {
 		},
 	},
 	setup() {
-		const { getValueForVar } = useCalculatedVars();
+		const { details, getValuesForVars } = useCalculatedVars();
 		return {
-			getValueForVar
+			getValuesForVars,
+			details,
 		};
 	},
 	mounted() {

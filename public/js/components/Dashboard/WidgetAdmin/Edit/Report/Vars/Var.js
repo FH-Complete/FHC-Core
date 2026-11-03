@@ -91,8 +91,12 @@ export default {
 			return 'Report' + capitalize(string);
 		},
 		setType(type) {
-			if (type == 'user' || type.substr(0, 5) == 'calc:') {
+			if (type == 'user') {
 				this.$emit('update:modelValue', { type, detail: this.detail });
+			} else if (type.substr(0, 5) == 'calc:') {
+				let detail = { ...this.detail };
+				delete detail.options;
+				this.$emit('update:modelValue', { type, detail });
 			} else {
 				this.$emit('update:modelValue', { type });
 			}
@@ -103,6 +107,11 @@ export default {
 		},
 		setValue(value) {
 			this.modelValue.value = value;
+			if (this.modelValue.type == 'fix' && this.detail.type == 'select')
+				this.modelValue.detail = {
+					...this.detail,
+					options: this.detail.options.filter(opt => opt.value == value),
+				};
 			this.$emit('update:modelValue', this.modelValue);
 		},
 	},

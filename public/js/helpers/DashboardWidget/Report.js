@@ -20,7 +20,7 @@ function compileLabel(string, values, details) {
 			if (values[name] === undefined)
 				return match;
 			
-			const options = details[name].detail?.options;
+			const options = details[name];
 			if (options && field != 'value') {
 				const option = options.find(opt => opt.value == values[name]);
 				if (!field) {
