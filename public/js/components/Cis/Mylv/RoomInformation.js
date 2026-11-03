@@ -42,6 +42,14 @@ export default {
 			roomAdditionalInfo: null,
 		}
 	},
+	watch: {
+		'propsViewData.ort_kurzbz': function(newVal, oldVal) {
+			if(newVal !== oldVal) {
+				this.fetchRoomInformation();
+				this.$refs.calendar.resetEventLoader();
+			}
+		}
+	},
 	methods:{
 		handleChangeDate(day, newMode) {
 			return this.handleChangeMode(newMode, day);
@@ -140,26 +148,29 @@ export default {
 				this.$api.call(ApiLvPlan.getRoomInfo(this.propsViewData.ort_kurzbz, start.toISODate(), end.toISODate())),
 				this.$api.call(ApiLvPlan.getOrtReservierungen(this.propsViewData.ort_kurzbz, start.toISODate(), end.toISODate()))
 			];
+		},
+		async fetchRoomInformation() {
+			const roomCreationInfoResponse = await this.$api.call(
+				ApiRoomPlan.getRoomCreationInfo(),
+			);
+			if (roomCreationInfoResponse.meta?.status === "success") {
+				const berechtigt = !!roomCreationInfoResponse.data?.berechtigt;
+				if (roomCreationInfoResponse.data?.berechtigt) {
+					this.createContext.room_create_information.studiengaenge =
+						roomCreationInfoResponse.data?.studiengaenge;
+				}
+				this.createContext.show_all_fields =
+					roomCreationInfoResponse.data?.berechtigt;
+			}
+
+			const roomInfoResponse = await this.$api.call(
+				ApiRoom.getRoomInfo(this.$props.propsViewData.ort_kurzbz),
+			);
+			this.roomAdditionalInfo = roomInfoResponse.data.ausstattung;
 		}
 	},
 	async created() {
-		const roomCreationInfoResponse = await this.$api.call(
-			ApiRoomPlan.getRoomCreationInfo(),
-		);
-		if (roomCreationInfoResponse.meta?.status === "success") {
-			const berechtigt = !!roomCreationInfoResponse.data?.berechtigt;
-			if (roomCreationInfoResponse.data?.berechtigt) {
-				this.createContext.room_create_information.studiengaenge =
-					roomCreationInfoResponse.data?.studiengaenge;
-			}
-			this.createContext.show_all_fields =
-				roomCreationInfoResponse.data?.berechtigt;
-		}
-
-		const roomInfoResponse = await this.$api.call(
-			ApiRoom.getRoomInfo(this.$props.propsViewData.ort_kurzbz),
-		);
-		this.roomAdditionalInfo = roomInfoResponse.data.ausstattung;
+		this.fetchRoomInformation();
 	},
 	template: /*html*/`
 	<div class="fhc-roominformation d-flex flex-column h-100">
