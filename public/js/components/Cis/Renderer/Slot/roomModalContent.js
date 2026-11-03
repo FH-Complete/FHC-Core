@@ -216,6 +216,7 @@ export default {
 				format="dd.MM.yyyy"
 				preview-format="dd.MM.yyyy"
 				model-type="yyyy-MM-dd"
+				:min-date="new Date()"
 				required
 			/>
 		</div>
