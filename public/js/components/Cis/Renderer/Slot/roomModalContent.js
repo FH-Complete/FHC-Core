@@ -224,6 +224,9 @@ export default {
 				preview-format="dd.MM.yyyy"
 				model-type="yyyy-MM-dd"
 				:min-date="new Date()"
+				:enable-time-picker="false"
+				:text-input="true"
+				:six-weeks="true"
 				required
 			/>
 		</div>
