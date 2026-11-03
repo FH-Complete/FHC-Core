@@ -1638,6 +1638,106 @@ $filters = array(
 			}',
 		'oe_kurzbz' => null,
 	),
+	array(
+		'app' => 'tempus',
+		'dataset_name' => 'tempusIssues',
+		'filter_kurzbz' => 'TempusIssuesOhneStudierende',
+		'description' => '{"Ohne Studierenden-Kollisionen"}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+		{
+			"name": "Ohne Studierenden-Kollisionen",
+			"columns": [
+				{"name": "von"},
+				{"name": "kategorie"},
+				{"name": "fehler_kurzbz"},
+				{"name": "inhalt"},
+				{"name": "oe_anzeige"}
+			],
+			"filters": [
+				{
+					"name": "fehler_kurzbz",
+					"operation": "nequal",
+					"condition": "tempusStudentKollision"
+				}
+			]
+		}
+	',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'tempus',
+		'dataset_name' => 'tempusIssues',
+		'filter_kurzbz' => 'TempusIssuesAlle',
+		'description' => '{"Alle Issues"}',
+		'sort' => 2,
+		'default_filter' => false,
+		'filter' => ' {
+			"name": "Alle",
+			"columns": [
+				{"name": "von"},
+				{"name": "kategorie"},
+				{"name": "fehler_kurzbz"},
+				{"name": "inhalt"},
+				{"name": "oe_anzeige"}
+			],
+			"filters": []
+		}',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'tempus',
+		'dataset_name' => 'tempusIssues',
+		'filter_kurzbz' => 'TempusIssuesKollision',
+		'description' => '{"Kollisionen"}',
+		'sort' => 3,
+		'default_filter' => false,
+		'filter' => ' {
+			"name": "Kollisionen",
+			"columns": [
+				{"name": "von"},
+				{"name": "fehler_kurzbz"},
+				{"name": "inhalt"},
+				{"name": "oe_anzeige"}
+			],
+			"filters": [
+				{
+					"name": "kategorie", 
+					"operation": "equal",
+					"condition": "Kollision"
+				}
+			]
+		}',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'tempus',
+		'dataset_name' => 'tempusIssues',
+		'filter_kurzbz' => 'TempusIssuesAZG',
+		'description' => '{"AZG"}',
+		'sort' => 4,
+		'default_filter' => false,
+		'filter' => '
+		{
+			"name": "AZG",
+			"columns": [
+				{"name": "von"},
+				{"name": "fehler_kurzbz"},
+				{"name": "inhalt"},
+				{"name": "oe_anzeige"}
+			],
+			"filters": [
+				{
+					"name": "kategorie",
+					"operation": "equal",
+					"condition": "AZG"
+				}
+			]
+		}
+	',
+		'oe_kurzbz' => null,
+	),
 );
 
 // Loop through the filters array

@@ -54,41 +54,4 @@ class ResourcesCollisionCheck implements ICollisionCheck
 			];
 		}, getData($result));
 	}
-
-	public function checkAll($kalender_ids) 
-	{
-		if (empty($kalender_ids)) return [];
-
-		$this->_ci->KalenderModel->addSelect('DISTINCT ON (tbl_kalender.kalender_id) tbl_kalender.kalender_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_betriebsmittel_kalender current_bk', 'current_bk.eindeutige_kalender_gruppen_id = tbl_kalender.eindeutige_kalender_gruppen_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_betriebsmittel_kalender other_bk', 'other_bk.betriebsmittel_id = current_bk.betriebsmittel_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender other_kalender', 'other_kalender.eindeutige_kalender_gruppen_id = other_bk.eindeutige_kalender_gruppen_id');
-
-		$this->_ci->KalenderModel->db->where('other_kalender.kalender_id != tbl_kalender.kalender_id', null, false);
-		$this->_ci->KalenderModel->db->where('other_kalender.von < tbl_kalender.bis', null, false);
-		$this->_ci->KalenderModel->db->where('other_kalender.bis > tbl_kalender.von', null, false);
-		$this->_ci->KalenderModel->db->where_not_in('other_kalender.status_kurzbz', ['archived', 'deleted', 'to_delete', 'to_delete_live', 'to_delete_preview']);
-
-		$this->_ci->KalenderModel->db->group_start();
-		$where_ids_chunks = array_chunk($kalender_ids,25);
-		foreach($where_ids_chunks as $where_ids)
-		{
-			$this->_ci->KalenderModel->db->or_where_in('tbl_kalender.kalender_id', $where_ids);
-		}
-		$this->_ci->KalenderModel->db->group_end();
-
-		$this->_ci->KalenderModel->db->where('other_kalender.kalender_id NOT IN (SELECT vorgaenger_kalender_id FROM lehre.tbl_kalender WHERE vorgaenger_kalender_id IS NOT NULL)', null, false);
-
-		$result = $this->_ci->KalenderModel->load();
-
-		if (isError($result) || !hasData($result)) return [];
-
-		$grouped = [];
-		foreach (getData($result) as $row)
-		{
-			$grouped[$row->kalender_id][] = true;
-		}
-
-		return $grouped;
-	}
 }

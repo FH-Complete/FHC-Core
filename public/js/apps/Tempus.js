@@ -17,6 +17,7 @@
 
 import FhcTempus from "../components/Tempus/Tempus.js";
 import FhcTempusSync from "../components/Tempus/TempusSync.js";
+import FhcTempusIssues from "../components/Tempus/TempusIssues.js";
 
 import Phrasen from "../plugins/Phrasen.js";
 import {capitalize} from "../helpers/StringHelpers.js";
@@ -27,8 +28,9 @@ const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*
 const router = VueRouter.createRouter({
 	history: VueRouter.createWebHistory(),
 	routes: [
-		{ path: `/${ciPath}/Tempus`, component: FhcTempus },
-		{ path: `/${ciPath}/Tempus/sync`, component: FhcTempusSync },
+		{ path: `/${ciPath}/Tempus`, component: FhcTempus, name: 'tempus' },
+		{ path: `/${ciPath}/Tempus/sync`, component: FhcTempusSync, name: 'tempusSync' },
+		{ path: `/${ciPath}/Tempus/issues`, component: FhcTempusIssues, name: 'tempusIssues'},
 	]
 });
 

@@ -444,5 +444,85 @@ $config['fehler'] = array(
 		'producerLibName' => 'UhstatPersonkennungFehltCore',
 		'resolverLibName' => 'CORE_PERSON_0006',
 		'producerIsResolver' => false
-	)
+	),
+	array(
+		'fehlercode' => 'TEMPUS_KOLL_0001',
+		'fehler_kurzbz' => 'tempusRaumKollision',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Raumkollision in %s am %s',
+		'fehlertyp_kurzbz' => 'warning',
+		'app' => 'tempus',
+		'producerLibName' => 'TempusRaumKollision',
+		'producerIsResolver' => true
+	),
+	array(
+		'fehlercode' => 'TEMPUS_KOLL_0002',
+		'fehler_kurzbz' => 'tempusLektorKollision',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Lektor-Kollision %s am %s',
+		'fehlertyp_kurzbz' => 'warning',
+		'app' => 'tempus',
+		'producerLibName' => 'TempusLektorKollision',
+		'producerIsResolver' => true
+	),
+	array(
+		'fehlercode' => 'TEMPUS_KOLL_0003',
+		'fehler_kurzbz' => 'tempusLektorReservierungKollision',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Lektor %s ist am %s auch in einer Reservierung eingetragen',
+		'fehlertyp_kurzbz' => 'warning',
+		'app' => 'tempus',
+		'producerLibName' => 'TempusLektorReservierungKollision',
+		'producerIsResolver' => true
+	),
+	array(
+		'fehlercode' => 'TEMPUS_KOLL_0004',
+		'fehler_kurzbz' => 'tempusLektorZeitsperreKollision',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Zeitsperre von %s am %s',
+		'fehlertyp_kurzbz' => 'warning',
+		'app' => 'tempus',
+		'producerLibName' => 'TempusLektorZeitsperreKollision',
+		'producerIsResolver' => true
+	),
+	array(
+		'fehlercode' => 'TEMPUS_KOLL_0005',
+		'fehler_kurzbz' => 'tempusVerbandKollision',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Verband-Kollision %s am %s',
+		'fehlertyp_kurzbz' => 'warning',
+		'app' => 'tempus',
+		'producerLibName' => 'TempusVerbandKollision',
+		'producerIsResolver' => true
+	),
+	array(
+		'fehlercode' => 'TEMPUS_KOLL_0006',
+		'fehler_kurzbz' => 'tempusStudentKollision',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Studierenden-Kollision am %s: %s Studierende (%s)',
+		'fehlertyp_kurzbz' => 'warning',
+		'app' => 'tempus',
+		'producerLibName' => 'TempusStudentKollision',
+		'producerIsResolver' => true
+	),
+	array(
+		'fehlercode' => 'TEMPUS_KOLL_0007',
+		'fehler_kurzbz' => 'tempusRessourceKollision',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Ressourcen-Kollision %s am %s',
+		'fehlertyp_kurzbz' => 'warning',
+		'app' => 'tempus',
+		'producerLibName' => 'TempusRessourceKollision',
+		'producerIsResolver' => true
+	),
+	array(
+		'fehlercode' => 'TEMPUS_AZG_0001',
+		'fehler_kurzbz' => 'tempusAzgStundenProTag',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Mehr als %s Stunden pro Tag: %s am %s (%s bis %s)',
+		'fehlertyp_kurzbz' => 'warning',
+		'app' => 'tempus',
+		'producerLibName' => 'TempusAzgStundenProTag',
+		'producerIsResolver' => true
+	),
 );

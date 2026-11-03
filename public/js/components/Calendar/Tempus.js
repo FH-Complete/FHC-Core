@@ -8,10 +8,13 @@ import ModeTable from './Mode/Table.js';
 import ApiKalender from '../../api/factory/tempus/kalender.js';
 import draggable from '../../directives/draggable.js';
 
+import TempusIssueInfo from '../Tempus/IssueInfo.js'
+
 export default {
 	name: 'CalendarTempus',
 	components: {
 		FhcCalendar,
+		TempusIssueInfo
 	},
 	inject: {
 		renderers: {from: 'renderers'},
@@ -196,8 +199,9 @@ export default {
 		onresize(payload) {
 			this.$emit('resize', payload);
 		},
-		resetEventLoader(arePreviousEventsCleared = true, isLoaderEventVisualReset = true) {
-			this.reset(arePreviousEventsCleared, isLoaderEventVisualReset);
+		async resetEventLoader(arePreviousEventsCleared = true, isLoaderEventVisualReset = true) {
+			this.$refs.issueInfo?.load();
+			await this.reset(arePreviousEventsCleared, isLoaderEventVisualReset);
 		},
 		reloadEvents() {
 			this.refreshEventsAfterReload = true;
@@ -226,6 +230,10 @@ export default {
 						'updated-event-long',
 					);
 				});
+		},
+		openIssueList() {
+			const url = this.$router.resolve({ name: 'tempusIssues' }).href;
+			window.open(url, '_blank');
 		},
 	},
 	setup(props, context) {
@@ -356,6 +364,7 @@ export default {
 						{{ appConfig.ignore_kollision ? 'Kollisionscheck aus' : 'Kollisionscheck an' }}
 					</span>
 				</div>
+				<tempus-issue-info ref="issueInfo" @open="openIssueList" />
 			</div>
 		</template>
 	</fhc-calendar>`

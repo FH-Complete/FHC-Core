@@ -11,7 +11,7 @@ class Tempus extends Auth_Controller
 	{
 		$permissions = [];
 		$router = load_class('Router');
-		$permissions[$router->method] = ['admin:r', 'assistenz:r'];
+		$permissions[$router->method] = ['lehre/lvplan:rw'];
 		parent::__construct($permissions);
 
 		// Load Libraries
@@ -22,6 +22,11 @@ class Tempus extends Auth_Controller
 	}
 
 	public function index()
+	{
+		$this->_loadView();
+	}
+
+	public function issues()
 	{
 		$this->_loadView();
 	}

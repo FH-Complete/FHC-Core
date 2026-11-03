@@ -49,19 +49,51 @@ class CollisionChecker
 		return $errors;
 	}
 
-	public function runAll($kalender_ids)
+	public function aktualisiereIssues(array $kalender_ids, $akzeptanzZuruecksetzen = true)
 	{
-		$results = array_fill_keys($kalender_ids, []);
-
-		foreach ($this->_checks as $check)
+		if (isEmptyArray($kalender_ids)) return;
+		$ids = implode(',', array_map('intval', $kalender_ids));
+		$db = new DB_Model();
+		if ($akzeptanzZuruecksetzen)
 		{
-			$batchResult = $check->checkAll($kalender_ids);
-			foreach ($batchResult as $kalender_id => $errors)
-			{
-				$results[$kalender_id] = array_merge($results[$kalender_id], $errors);
-			}
+			$this->_ci->db->query("
+				UPDATE system.tbl_issue
+				SET status_kurzbz = 'resolved', updateamum = now(), updatevon = ?
+				WHERE status_kurzbz = 'accepted'
+				AND (behebung_parameter->>'kalender_id_a') IS NOT NULL
+				AND (
+					(behebung_parameter->>'kalender_id_a')::integer IN (" . $ids . ")
+					OR (behebung_parameter->>'kalender_id_b')::integer IN (" . $ids . ")
+				)
+			", [getAuthUID()]);
 		}
 
-		return $results;
+		$offeneRes = $db->execReadOnlyQuery("
+			SELECT i.issue_id, i.person_id, i.oe_kurzbz, i.fehlercode, f.fehler_kurzbz, i.behebung_parameter
+			FROM system.tbl_issue i
+			JOIN system.tbl_fehler f ON f.fehlercode = i.fehlercode
+			JOIN system.tbl_fehler_app fa ON fa.fehlercode = i.fehlercode AND fa.app = 'tempus'
+			WHERE i.verarbeitetamum IS NULL
+			AND (i.behebung_parameter->>'kalender_id_a') IS NOT NULL
+			AND (
+				(i.behebung_parameter->>'kalender_id_a')::integer IN (" . $ids . ")
+				OR (i.behebung_parameter->>'kalender_id_b')::integer IN (" . $ids . ")
+			)
+		");
+
+		if (hasData($offeneRes))
+		{
+			$this->_ci->load->library('issues/PlausicheckResolverLib', ['apps' => ['tempus']]);
+			$result = $this->_ci->plausicheckresolverlib->resolvePlausicheckIssues(getData($offeneRes));
+
+			foreach ($result->errors as $error)
+				log_message('error', 'Tempus-Issues beheben: ' . $error);
+		}
+
+		$this->_ci->load->library( ['apps' => ['tempus']]);
+		$result = $this->_ci->plausicheckproducerlib->producePlausicheckIssues(['kalender_ids' => $kalender_ids]);
+
+		foreach ($result->errors as $error)
+			log_message('error', 'Tempus-Issues erzeugen: ' . $error);
 	}
 }

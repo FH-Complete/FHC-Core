@@ -114,6 +114,7 @@ require_once('dbupdate_3.4/77757_widgets_berechtigungen.php');
 require_once('dbupdate_3.4/77048_cis4_mitarbeiter_studstatus_widget.php');
 require_once('dbupdate_3.4/83538_cis4_employees.php');
 require_once('dbupdate_3.4/68834_fehlermonitoring_issues_weitere_features.php');
+require_once('dbupdate_3.4/83092_tempus_issues_integrieren.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';

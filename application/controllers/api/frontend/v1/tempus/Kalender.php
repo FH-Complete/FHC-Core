@@ -341,6 +341,12 @@ class Kalender extends FHCAPI_Controller
 		if (isError($result))
 			$this->terminateWithError(getError($result),  $result->code);
 
+		$ids = array($kalender_id);
+		if (hasData($result) && is_numeric(getData($result)))
+			$ids[] = getData($result);
+
+		$this->_ci->collisionchecker->aktualisiereIssues($ids);
+
 		$this->terminateWithSuccess(getData($result));
 	}
 

@@ -56,7 +56,7 @@ class Issue_model extends DB_Model
 		// issue exists for a fehlercode (or fehlercode_extern), person_id, oe_kurzbz, if not verarbeitet yet
 		$qry = 'SELECT count(*) as anzahl_open_issues FROM system.tbl_issue
 				WHERE fehlercode = ?
-				AND verarbeitetamum IS NULL';
+				AND (verarbeitetamum IS NULL OR status_kurzbz = \'accepted\')';
 
 		if (!isEmptyString($fehlercode_extern))
 		{

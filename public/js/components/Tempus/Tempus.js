@@ -1110,6 +1110,11 @@ export default {
 				this.$refs.calendar.resetEventLoader();
 			},
 		},
+		'calendarDatesByMode.week'(week) {
+			if (!week) return;
+			const montag = luxon.DateTime.fromISO(week).startOf('week').toISODate();
+			this.$router.replace({ query: { date: montag } });
+		},
 	},
 	mounted() {
 		this.reservierungPending = false;
@@ -1118,9 +1123,24 @@ export default {
 			if (e.data === 'dropped' && !this.reservierungPending)
 				this.$refs.calendar.resetEventLoader();
 		});
+
+		this.issueChannel = new BroadcastChannel('tempus-issues');
+		this.issueChannel.addEventListener('message', (e) => {
+			if (e.data?.type === 'jump' && e.data.date)
+			{
+				this.jumpToDate(e.data.date);
+				this.issueChannel.postMessage({ type: 'ok', id: e.data.id });
+			}
+		});
+
+		if (this.$route.query.date)
+		{
+			this.jumpToDate(this.$route.query.date);
+		}
 	},
 	beforeUnmount() {
 		this.bcc?.close();
+		this.issueChannel?.close();
 	},
 	async created() {
 		await this.$api

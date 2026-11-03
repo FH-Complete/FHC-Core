@@ -432,7 +432,14 @@ class KalenderLib
 		$lehreinheit_ids[] = $lehreinheit_id;
 
 		if (in_array($kalender_entry->status_kurzbz, array('live', 'preview')))
-			return success($this->_createHistoryEntry($kalender_entry, null, null, null, $lehreinheit_ids));
+		{
+			$historie = $this->_createHistoryEntry($kalender_entry, null, null, null, $lehreinheit_ids);
+
+			if (!isError($historie))
+				$this->_ci->collisionchecker->aktualisiereIssues([$target_kalender_id, getData($historie)]);
+
+			return success($historie);
+		}
 
 		$kalenderlehreinheitresult = $this->_ci->KalenderLehreinheitModel->insert(
 			array(
@@ -443,6 +450,8 @@ class KalenderLib
 
 		if (isError($kalenderlehreinheitresult))
 			return $kalenderlehreinheitresult;
+
+		$this->_ci->collisionchecker->aktualisiereIssues([$target_kalender_id]);
 
 		return success($target_kalender_id);
 	}
@@ -474,7 +483,14 @@ class KalenderLib
 		$remaining_ids = array_values(array_diff($kalender_entry->lehreinheit_id, $lehreinheit_ids));
 
 		if (in_array($kalender_entry->status_kurzbz, array('live', 'preview')))
-			return success($this->_createHistoryEntry($kalender_entry, null, null, null, $remaining_ids));
+		{
+			$historie = $this->_createHistoryEntry($kalender_entry, null, null, null, $remaining_ids);
+
+			if (!isError($historie))
+				$this->_ci->collisionchecker->aktualisiereIssues([$kalender_id, getData($historie)]);
+
+			return success($historie);
+		}
 
 		$count = 0;
 		foreach ($lehreinheit_ids as $lehreinheit_id)
@@ -496,6 +512,7 @@ class KalenderLib
 				$count++;
 			}
 		}
+		$this->_ci->collisionchecker->aktualisiereIssues([$kalender_id]);
 		return success($count);
 	}
 
@@ -758,6 +775,8 @@ class KalenderLib
 		}
 
 		$this->_ci->KalenderModel->db->trans_complete();
+
+		$this->_ci->collisionchecker->aktualisiereIssues([$insert['kalender_id']]);
 		return $result;
 	}
 
@@ -918,6 +937,8 @@ class KalenderLib
 			}
 
 			$this->_ci->KalenderModel->db->trans_complete();
+			$this->_ci->collisionchecker->aktualisiereIssues([$kalender_id]);
+
 			return $kalendereventresult;
 		}
 
@@ -997,6 +1018,8 @@ class KalenderLib
 		}
 		$this->_ci->db->trans_complete();
 
+		$this->_ci->collisionchecker->aktualisiereIssues([$calendar->kalender_id]);
+
 		return success('Operational resources added to calendar event successfully.');
 	}
 
@@ -1041,6 +1064,7 @@ class KalenderLib
 		if (!empty($errors)) return error($errors);
 
 		$result = $kalender_entry;
+		$ids = [$kalender_id];
 
 		if (!is_null($orte))
 		{
@@ -1050,6 +1074,7 @@ class KalenderLib
 			if (hasData($result))
 			{
 				$kalender_id = (getData($result)['kalender_id']) ?? getData($result);
+				$ids[] = $kalender_id;
 			}
 		}
 
@@ -1057,8 +1082,12 @@ class KalenderLib
 		{
 			$result = $this->updateZeit($kalender_id, $start_time, $end_time);
 			if (isError($result)) return $result;
+
+			if (hasData($result) && is_numeric(getData($result)))
+				$ids[] = getData($result);
 		}
-		
+		$this->_ci->collisionchecker->aktualisiereIssues($ids);
+
 		$updatedEntryResult = $this->_loadKalenderEntry($kalender_id);
 		if (isError($updatedEntryResult)) return $updatedEntryResult;
 
@@ -1259,6 +1288,8 @@ class KalenderLib
 
 		if (isError($result)) return $result;
 
+		$this->_ci->collisionchecker->aktualisiereIssues([$kalender_entry->kalender_id], false);
+
 		return success();
 	}
 
@@ -1273,10 +1304,16 @@ class KalenderLib
 
 		$entry = getData($result)[0];
 
+		$result = null;
 		if ($entry->typ === 'lehreinheit')
-			return $this->_deleteTypLehreinheit($entry);
+			$result = $this->_deleteTypLehreinheit($entry);
 		if ($entry->typ === 'reservierung')
-			return $this->_deleteTypReservierung($entry);
+			$result = $this->_deleteTypReservierung($entry);
+
+		if (!is_null($result) && !isError($result))
+			$this->_ci->collisionchecker->aktualisiereIssues([$kalender_id]);
+
+		return $result;
 	}
 
 	public function getMailVerteiler($kalender_id)
@@ -1455,6 +1492,9 @@ class KalenderLib
 		}
 
 		$this->_ci->KalenderModel->db->trans_complete();
+
+		$this->_ci->collisionchecker->aktualisiereIssues([$kalender_id]);
+
 		return success($kalender_id);
 	}
 
@@ -1666,6 +1706,57 @@ class KalenderLib
 		$this->_ci->KalenderModel->db->join('lehre.tbl_stunde vonstunde', 'tbl_kalender.von::time = vonstunde.beginn', 'LEFT', FALSE);
 		$this->_ci->KalenderModel->db->join('lehre.tbl_stunde bisstunde', 'tbl_kalender.bis::time = bisstunde.ende', 'LEFT', FALSE);
 
+		$subQueryIssues = "(
+				SELECT
+					kollision.kalender_id,
+					json_agg(json_build_object(
+						'message', kollision.inhalt,
+						'kalender_id', kollision.partner_id,
+						'datum', partner.von,
+						'fehlercode', kollision.fehlercode
+					)) AS collisions
+				FROM (
+					SELECT DISTINCT ON (seite.kalender_id, seite.fehlercode, seite.behebung_parameter)
+						seite.kalender_id,
+						seite.partner_id,
+						seite.fehlercode,
+						seite.inhalt
+					FROM (
+						SELECT
+							(issue.behebung_parameter->>'kalender_id_a')::integer AS kalender_id,
+							(issue.behebung_parameter->>'kalender_id_b')::integer AS partner_id,
+							issue.fehlercode,
+							issue.inhalt,
+							issue.behebung_parameter
+						FROM system.tbl_issue issue
+						JOIN system.tbl_fehler_app fehler_app ON fehler_app.fehlercode = issue.fehlercode AND fehler_app.app = 'tempus'
+						WHERE issue.verarbeitetamum IS NULL
+
+						UNION ALL
+
+						SELECT
+							(issue.behebung_parameter->>'kalender_id_b')::integer AS kalender_id,
+							(issue.behebung_parameter->>'kalender_id_a')::integer AS partner_id,
+							issue.fehlercode,
+							issue.inhalt,
+							issue.behebung_parameter
+						FROM system.tbl_issue issue
+						JOIN system.tbl_fehler_app fehler_app ON fehler_app.fehlercode = issue.fehlercode AND fehler_app.app = 'tempus'
+						WHERE issue.verarbeitetamum IS NULL
+					) seite
+					WHERE seite.kalender_id IS NOT NULL
+				) kollision
+				LEFT JOIN lehre.tbl_kalender partner ON partner.kalender_id = kollision.partner_id
+				GROUP BY kollision.kalender_id
+			) AS issue_collisions";
+
+		$this->_ci->KalenderModel->addSelect('issue_collisions.collisions AS issue_collisions');
+		$this->_ci->KalenderModel->addJoin(
+			$subQueryIssues,
+			'issue_collisions.kalender_id = tbl_kalender.kalender_id',
+			'LEFT'
+		);
+
 		$this->_ci->KalenderModel->addOrder('tbl_kalender.eindeutige_kalender_gruppen_id', 'DESC');
 	}
 
@@ -1727,7 +1818,7 @@ class KalenderLib
 					'titel' => isset($row->titel) ? $row->titel : '',
 					'beschreibung' => isset($row->beschreibung) ? $row->beschreibung : '',
 					'topic' => [],
-					'collisions' => false,
+					'collisions' => (isset($row->issue_collisions) ? json_decode($row->issue_collisions) : []),
 					'has_assigned_resources' => !empty($parsedResources),
 					'resources' => is_array($parsedResources) ? $parsedResources : [],
 					'tags' => isset($row->tags) ? json_decode($row->tags, true) : [],
@@ -1838,18 +1929,6 @@ class KalenderLib
 						'kurzbz' => $row->teilnehmer_kurzbz,
 					];
 				}
-			}
-		}
-
-		if ($collisionCheck)
-		{
-			$kalender_ids = array_keys($events);
-			$collisions = $this->_ci->collisionchecker->runAll($kalender_ids);
-
-			foreach ($collisions as $kalender_id => $errors)
-			{
-				if (isset($events[$kalender_id]))
-					$events[$kalender_id]->collisions = !empty($errors) ? $errors : [];
 			}
 		}
 
