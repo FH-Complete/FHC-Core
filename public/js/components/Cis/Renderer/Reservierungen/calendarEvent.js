@@ -83,7 +83,6 @@ export default {
 	},
 	methods: {
 		handleDelete() {
-			console.log(1);
 			this.$emit('delete-event', this.event);
 		},
 	},
