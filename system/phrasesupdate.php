@@ -30643,6 +30643,26 @@ In the list:
 				)
 			)
 		),
+		array(
+			'app' => 'core',
+			'category' => 'LvPlan',
+			'phrase' => 'bereitsReserviert',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Bereits reserviert!',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Already reserved!',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
 		// LvPlan Phrasen ende
 		//ProfilUpdate Phrasen start
 		array(
@@ -55976,6 +55996,26 @@ and represent the current state of research on the topic. The prescribed citatio
 			array(
 				'sprache' => 'English',
 				'text' => 'Teaching Unit ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'date',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Datum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Date',
 				'description' => '',
 				'insertvon' => 'system'
 			)

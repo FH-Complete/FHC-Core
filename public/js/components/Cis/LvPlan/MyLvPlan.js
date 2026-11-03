@@ -208,7 +208,7 @@ export default {
 		async deleteReservation(event) {
 			if (
 				luxon.DateTime.fromISO(`${event.datum}T${event.beginn}`) <
-				luxon.DateTime.now()
+				luxon.DateTime.now().startOf("day")
 			)
 				return;
 

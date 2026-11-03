@@ -340,7 +340,7 @@ export default {
 			);
 		},
 		isFreeSlot(date, part, dayEvents) {
-			const pastEnd = luxon.DateTime.now().setZone(this.timezone);
+			const pastEnd = luxon.DateTime.now().setZone(this.timezone).startOf("day");
 
 			const start = date.plus(part.start || part);
 			const end = date.plus(part.end || part.plus({ hours: 1 }));
