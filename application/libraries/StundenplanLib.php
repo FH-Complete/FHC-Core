@@ -570,11 +570,6 @@ class StundenplanLib
 
 		$reservation_hours = hasData($reservation_hours) ? array_column(getData($reservation_hours), 'stunde') : array();
 
-		$this->_ci->addMeta("stunden", $stunden);
-		$this->_ci->addMeta("reservation_hours", $reservation_hours);
-		$this->_ci->addMeta("intersect", array_intersect($stunden, $reservation_hours));
-		$this->_ci->addMeta("isEmpty", empty(array_intersect($stunden, $reservation_hours)));
-
 		if (!empty(array_intersect($stunden, $reservation_hours))
 			&& !$this->_ci->permissionlib->isBerechtigt('lehre/reservierungAdvanced'))
 			return error($this->_ci->phraseslib->t('LvPlan', 'bereitsReserviert'));
