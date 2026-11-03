@@ -52,6 +52,13 @@ export default {
 				.map((val) => parseInt(val))
 				.sort((a, b) => a - b);
 		},
+		parsedTimeGrid() {
+			return this.timeGrid.map((timeslot) => {
+				timeslot.start = timeslot.start.split(":").slice(0,2).join(":");
+				timeslot.end = timeslot.end.split(":").slice(0,2).join(":");
+				return timeslot;
+			})
+		},
 	},
 	watch: {
 		event: {
@@ -80,21 +87,21 @@ export default {
 
 			const startTime = newEvent.start
 				?.setZone?.(this.timezone)
-				?.toFormat?.("HH:mm:ss");
+				?.toFormat?.("HH:mm");
 			const endTime = newEvent.end
 				?.setZone?.(this.timezone)
-				?.toFormat?.("HH:mm:ss");
+				?.toFormat?.("HH:mm");
 
 			this.selectedDate = newEvent.start
 				.startOf("day")
 				.toISO()
 				.slice(0, 10);
 			this.selectedStart =
-				this.timeGrid.find((t) => t.start === startTime)?.start ||
-				this.timeGrid[0]?.start;
+				this.parsedTimeGrid.find((t) => t.start === startTime)?.start ||
+				this.parsedTimeGrid[0]?.start;
 			this.selectedEnd =
-				this.timeGrid.find((t) => t.end === endTime)?.end ||
-				this.timeGrid.at(-1)?.end;
+				this.parsedTimeGrid.find((t) => t.end === endTime)?.end ||
+				this.parsedTimeGrid.at(-1)?.end;
 		},
 		saveEvent() {
 			const date = this.selectedDate
@@ -183,7 +190,7 @@ export default {
 				name="selectedStart"
 			>
 				<option
-					v-for="slot in timeGrid"
+					v-for="slot in parsedTimeGrid"
 					:value="slot.start"
 					:key="slot.id"
 				>
@@ -199,7 +206,7 @@ export default {
 				name="selectedEnd"
 			>
 				<option
-					v-for="slot in timeGrid"
+					v-for="slot in parsedTimeGrid"
 					:value="slot.end"
 					:key="slot.id"
 				>
