@@ -31,6 +31,7 @@ class Person_model extends DB_Model
 
 		$this->load->model('person/kontakt_model', 'KontaktModel');
 		$this->load->model('person/adresse_model', 'AdresseModel');
+		$this->load->model('ressource/betriebsmittel_model', 'BetriebsmittelModel');
 	}
 
 	/**
@@ -481,5 +482,40 @@ class Person_model extends DB_Model
 				 AND p.persond_id = ?;
 		";
 		return $this->execReadOnlyQuery($qry, [$von, $bis, $person_id]);
+	}
+
+	public function getUIDByCardNumber($cardNumber) {
+
+		$resourceType = "Zutrittskarte";
+
+		$cardNumberConditions = [];
+		for ($i = 0; $i <= 5; $i++)
+		{
+			$modifiedCardNumber = $this->db->escape(str_repeat('0', $i).$cardNumber);
+			$cardNumberConditions[] = "tbl_betriebsmittel.nummer=" . $modifiedCardNumber;
+			$cardNumberConditions[] = "tbl_betriebsmittel.nummer2=" . $modifiedCardNumber;
+		}
+
+		$cardNumberConditionsQueryFragment =  '('.implode(' OR ', $cardNumberConditions).')';
+
+		$query = "
+			SELECT
+				 wawi.tbl_betriebsmittelperson.uid
+			FROM
+				wawi.tbl_betriebsmittel
+			JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id)
+			WHERE " . 
+				$cardNumberConditionsQueryFragment
+			. "
+			AND tbl_betriebsmittel.betriebsmitteltyp = ?
+			AND (
+				ausgegebenam <= now() OR ausgegebenam is NULL
+			)
+			AND (
+				retouram >= now() OR retouram is NULL
+			)
+		";
+ 
+		return $this->execReadOnlyQuery($query, [$resourceType]);
 	}
 }

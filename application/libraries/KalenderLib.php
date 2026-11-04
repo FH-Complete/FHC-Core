@@ -1640,7 +1640,7 @@ class KalenderLib
 				AND benutzergruppe.uid = $escapedUserUID
 		)";
 
-		$this->_ci->KalenderModel->db->where('tbl_kalender.status_kurzbz', 'live');
+		$this->_ci->KalenderModel->db->where_in('status_kurzbz', array('live'));
 		$this->_ci->KalenderModel->db->group_start();
 		$this->_ci->KalenderModel->db->where($isTeachingUnitStaffMember, null, false);
 		$this->_ci->KalenderModel->db->or_where($isDirectReservationParticipant, null, false);

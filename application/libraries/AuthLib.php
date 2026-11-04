@@ -53,6 +53,35 @@ class AuthLib
 	}
 
 	/**
+	 * Sets the user with the given uid as the logged user without credentials
+	 * (e.g. for the InfoTerminal). Use only when the identity was verified elsewhere!
+	 */
+	public function loginByUID($uid)
+	{
+		if (isEmptyString($uid))
+			return error('The given uid is not valid', AUTH_INVALID_CREDENTIALS);
+
+		$auth = $this->_createAuthObjByPerson(array('uid' => $uid));
+		if (hasData($auth))
+			$this->_storeSessionAuthObj(getData($auth));
+
+		$authObj = getData($auth);
+
+		// Same user is already logged in -> keep the session as it is
+		$current = $this->getAuthObj();
+		if ($current != null && $current->{self::AO_USERNAME} == $authObj->{self::AO_USERNAME})
+			return $auth;
+
+		// Another (or no) user -> start with a clean session
+		$_SESSION = array();              // drop everything from the previous user
+		session_regenerate_id(true);      // new session id, delete the old one
+
+		$this->_storeSessionAuthObj($authObj);
+
+		return $auth;
+	}
+
+	/**
 	 * The logged user is able, if it is allowed, to get the identity of another user by its given uid
 	 */
 	public function loginASByUID($uid)
