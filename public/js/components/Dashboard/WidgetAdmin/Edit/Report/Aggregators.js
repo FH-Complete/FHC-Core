@@ -25,6 +25,9 @@ export default {
 			type: Object,
 			required: true
 		},
+		details: {
+			type: Array
+		},
 	},
 	emits: [
 		"update:modelValue",
@@ -86,7 +89,13 @@ export default {
 					</button>
 				</h3>
 				<div :id="'aggregator_' + myId + '_' + i" class="accordion-collapse collapse">
-					<report-aggregator v-model="agg" class="accordion-body" :index="i" @remove="removeAggregator" />
+					<report-aggregator
+						v-model="agg"
+						class="accordion-body"
+						:index="i"
+						:details="details"
+						@remove="removeAggregator"
+					/>
 				</div>
 			</div>
 		</div>

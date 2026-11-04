@@ -17,6 +17,9 @@ export default {
 			type: Number,
 			required: true
 		},
+		details: {
+			type: Array
+		},
 	},
 	emits: [
 		"update:modelValue",
