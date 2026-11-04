@@ -66,9 +66,9 @@ export default {
 				.fromISOTime(this.event.ende)
 				.toISOTime({ suppressSeconds: true });
 		},
-		isFutureEvent() {
+		isPastDate() {
 			const eventStart = luxon.DateTime.fromISO(`${this.event.datum}T${this.event.beginn}`);
-			return eventStart > luxon.DateTime.now();
+			return eventStart < luxon.DateTime.now().startOf("day");
 		},
 		timeSlotDisplayClasses() {
 			switch (this.$props.timeSlotDisplayBehavior) {
@@ -99,7 +99,7 @@ export default {
 		</div>
 		<div class="event-text" v-tooltip="tooltipString">
 			<button
-				v-if="isFutureEvent && event.type === 'reservierung' && event.deletable && mode !== 'Month'"
+				v-if="!isPastDate && event.type === 'reservierung' && event.deletable && mode !== 'Month'"
 				class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-1"
 				title="Löschen"
 				@click.stop="handleDelete"
