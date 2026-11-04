@@ -35828,6 +35828,26 @@ In the list:
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
+		'phrase' => 'providedDateTooFarInFuture',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Angegebenes Datum liegt weiter in der Zukunft als erlaubt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Provided date is further in the future than allowed.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
 		'phrase' => 'kontrolleDatumOutOfRange',
 		'insertvon' => 'system',
 		'phrases' => array(
