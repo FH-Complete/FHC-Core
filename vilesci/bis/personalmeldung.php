@@ -473,7 +473,7 @@ function _add_relativesBA_und_anteiligeJVZAE($uid, $bisverwendung_arr)
 				/**
 				 * Verwendungen ergänzen, wenn Mitarbeiter in Verwaltung/Managment/Wartung (jedenfalls nicht in Lehre)
 				 * zugeteilt ist und dennoch lehrt.
-				 * Die SWS werden sowohl fuer Sommer- als auch Wintersemster ermittelt und jeweils in einer eigenen
+				 * Die SWS werden sowohl fuer Sommer- als auch Wintersemester ermittelt und jeweils in einer eigenen
 				 * Verwendung mit dem Verwendungscode 1 ergaenzt.
 				 */
 				$bisverwendung_beginn_BIS = new DateTime($bisverwendung->beginn_imBISMeldungsJahr);

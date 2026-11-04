@@ -124,16 +124,15 @@ if ($uid == null)
 					SELECT
 						tbl_benutzer.uid as mitarbeiter_uid
 					FROM
-						lehre.tbl_projektbetreuer, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung,
+						lehre.tbl_projektbetreuer, lehre.tbl_lehrveranstaltung,
 						public.tbl_benutzer, lehre.tbl_projektarbeit, campus.vw_student, public.tbl_mitarbeiter
 					WHERE
 						tbl_projektbetreuer.person_id=tbl_benutzer.person_id AND
 						tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 						student_uid=vw_student.uid AND
 						tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid AND
-						tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND
-						tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($ss)." AND
-						tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
+						tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_projektarbeit.lehrveranstaltung_id AND
+						tbl_projektarbeit.studiensemester_kurzbz=".$db->db_add_param($ss)." AND
 						tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
 						tbl_projektbetreuer.stunden!='0'
 					) as mitarbeiter ORDER BY mitarbeiter_uid";
@@ -428,8 +427,7 @@ function drawLehrauftrag($uid)
 				vertragsstatus_kurzbz
 			FROM lehre.tbl_projektbetreuer pb
 				JOIN lehre.tbl_projektarbeit pa USING (projektarbeit_id)
-				JOIN lehre.tbl_lehreinheit le USING (lehreinheit_id)
-				JOIN lehre.tbl_lehrveranstaltung           lv USING (lehrveranstaltung_id)
+				JOIN lehre.tbl_lehrveranstaltung           lv ON (pa.lehrveranstaltung_id = lv.lehrveranstaltung_id)
 				JOIN PUBLIC.tbl_organisationseinheit       oe USING (oe_kurzbz)
 				JOIN public.tbl_benutzer benutzer ON pb.person_id = benutzer.person_id
 				JOIN campus.vw_student student ON pa.student_uid = student.uid
@@ -438,7 +436,7 @@ function drawLehrauftrag($uid)
 			WHERE pb.vertrag_id IS NOT NULL
 				AND vvst.vertragsstatus_kurzbz = \'akzeptiert\'
 				AND benutzer.uid = '.$db->db_add_param($uid).'
-				AND le.studiensemester_kurzbz = '.$db->db_add_param($ss);
+				AND pa.studiensemester_kurzbz = '.$db->db_add_param($ss);
 
 	if ($studiengang_kz != '')
 	{

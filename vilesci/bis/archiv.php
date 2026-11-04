@@ -113,7 +113,7 @@ if($action != null)
 	}
 	$bisarchiv->readFile($meldung, 'xml');
 	$bisarchiv->studiengang_kz = $stg;
-	$bisarchiv->studiensemster_kurzbz = $sem;
+	$bisarchiv->studiensemester_kurzbz = $sem;
 	$bisarchiv->insertvon = $uid;
 	$bisarchiv->typ = $typ;
 	$result = $bisarchiv->save();

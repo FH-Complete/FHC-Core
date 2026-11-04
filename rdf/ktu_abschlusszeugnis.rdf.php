@@ -95,8 +95,7 @@ echo "<gesamt_note>".$note->bezeichnung."</gesamt_note>";
 
 if(!empty($projektarbeit->result))
 {
-	$lehreinheit = new lehreinheit($projektarbeit->result[0]->lehreinheit_id);
-	$lehrveranstaltung = new lehrveranstaltung($lehreinheit->lehrveranstaltung_id);
+	$lehrveranstaltung = new lehrveranstaltung($projektarbeit->result[0]->lehrveranstaltung_id);
 	$note = new note($projektarbeit->result[0]->note);
 	echo "<projektarbeit_titel>".$projektarbeit->result[0]->titel."</projektarbeit_titel>";
 	echo "<projektarbeit_note>".$note->bezeichnung."</projektarbeit_note>";

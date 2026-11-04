@@ -62,6 +62,9 @@ export default {
 
 				return [type, result];
 			}));
+		},
+		hiddenWidgets() {
+			return this.widgets.filter(widget => widget.hidden);
 		}
 	},
 	methods: {
@@ -69,6 +72,9 @@ export default {
 			this.$refs.widgetpicker
 				.getWidget()
 				.then(widget_id => {
+					if (widget_id.hidden)
+						this.widgetUnhide(widget_id, widget.place);
+					
 					widget.widget = widget_id;
 					// NOTE(chris): min size
 					widget.place = Object.fromEntries(Object.entries(widget.place).map(([key, value]) => {
@@ -131,17 +137,6 @@ export default {
 					this.widgets.forEach((widget, i) => {
 						if (failed.includes(widget.id)) {
 							this.widgets[i] = structuredClone(ObjectUtils.deepToRaw(this.originalWidgets[widget.id]));
-							/** NOTE(chris): if you wanna hide or unhide a
-							 * preset and it fails: switch around the hidden
-							 * value to revert it properly (checkboxes can't
-							 * really handle it otherwise)
-							 */
-							if (payload[widget.id].hidden !== undefined) {
-								this.widgets[i].hidden = payload[widget.id].hidden;
-								this.$nextTick(() => {
-									this.widgets[i] = structuredClone(ObjectUtils.deepToRaw(this.originalWidgets[widget.id]));
-								});
-							}
 						} else if (payload[widget.id]) {
 							payload[widget.id].id = widget.id;
 							payload[widget.id].index = widget.index;
@@ -159,6 +154,31 @@ export default {
 					this.widgets = this.widgets.filter(widget => widget.id != id);
 				})
 				.catch(this.$fhcAlert.handleSystemError);
+		},
+		widgetUnhide(orig, place) {
+			place = Object.fromEntries(Object.entries(place).map(([key, value]) => {
+				value.w = this.sizeLimits[orig.widget].width.min;
+				value.h = this.sizeLimits[orig.widget].height.min;
+				// NOTE(chris): unpin pinned widgets because they got a new placement
+				value.pinned = false;
+				return [key, value];
+			}));
+			// NOTE(chris): clear placement in other screensizes
+			Object.keys(orig.place).forEach(key => {
+				if (!place[key]) {
+					place[key] = {
+						x: undefined,
+						y: undefined,
+						pinned: false
+					};
+				}
+			});
+			let payload = {};
+			payload[orig.id] = {
+				hidden: false,
+				place
+			};
+			return this.widgetUpdate(payload);
 		},
 		async fetchViewData() {
 			let viewDataResult = await this.$api.call(ApiDashboard.getViewData());
@@ -204,15 +224,23 @@ export default {
 	},
 	template: /* html */`
 	<div class="core-dashboard">
-		<h3>
-			{{ userFirstName ? $p.t('global/personalGreeting', [ userFirstName ]) : '' }}
-			<button
-				class="btn ms-2"
-				aria-label="edit dashboard"
-				v-tooltip="{ showDelay: 1000, value: $p.t('dashboard/edit') }"
-				@click="editMode = !editMode"
-			><i class="fa-solid fa-gear" aria-hidden="true"></i></button>
-		</h3>
+		<header class="d-flex justify-content-between align-items-baseline">
+			<h3>
+				{{ userFirstName ? $p.t('global/personalGreeting', [ userFirstName ]) : '' }}
+			</h3>
+			<div class="form-check form-check-reverse form-switch">
+				<label class="form-check-label" for="switchEditMode">
+					{{ $p.t('dashboard/edit') }}
+				</label>
+				<input
+					class="form-check-input"
+					type="checkbox"
+					role="switch"
+					id="switchEditMode"
+					v-model="editMode"
+				>
+			</div>
+		</header>
 		<dashboard-section
 			name="general"
 			:widgets="widgets"
@@ -223,6 +251,7 @@ export default {
 		<dashboard-widget-picker
 			ref="widgetpicker"
 			:widgets="widgetsSetup"
+			:hidden-widgets="hiddenWidgets"
 		></dashboard-widget-picker>
 	</div>`
 }

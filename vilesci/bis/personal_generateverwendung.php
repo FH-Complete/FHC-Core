@@ -118,8 +118,7 @@ $qry = "SELECT ma.* FROM
 					FROM
 						lehre.tbl_projektbetreuer
 						JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
-						JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-						JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+						JOIN public.tbl_studiensemester ON(tbl_projektarbeit.studiensemester_kurzbz = tbl_studiensemester.studiensemester_kurzbz)
 					WHERE
 						tbl_projektbetreuer.person_id=vw_mitarbeiter.person_id
 				) a
@@ -156,9 +155,8 @@ $qry = "SELECT ma.* FROM
 				FROM
 					lehre.tbl_projektbetreuer
 					JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
-					JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 				WHERE
-					tbl_lehreinheit.studiensemester_kurzbz IN(SELECT
+					tbl_projektarbeit.studiensemester_kurzbz IN(SELECT
 							studiensemester_kurzbz
 						FROM
 							public.tbl_studiensemester

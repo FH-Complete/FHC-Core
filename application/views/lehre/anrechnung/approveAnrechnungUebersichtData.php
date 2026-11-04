@@ -16,7 +16,7 @@ $query = '
 			anrechnung.begruendung_id,
 			anrechnung.dms_id,
 			CASE
-				WHEN stg.typ || stg.kurzbz IN (' . $ORGANISATIONSEINHEITEN_SCHREIBBERECHTIGT . ') THEN TRUE
+				WHEN stg.oe_kurzbz IN (' . $ORGANISATIONSEINHEITEN_SCHREIBBERECHTIGT . ') THEN TRUE
 				ELSE FALSE
 			END "schreibberechtigt",
 			anrechnung.studiensemester_kurzbz,

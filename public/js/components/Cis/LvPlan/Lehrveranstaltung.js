@@ -83,10 +83,26 @@ export default {
 			});
 		},
 		getPromiseFunc(start, end) {
-			return [
-				this.$api.call(ApiLvPlan.eventsLv(this.propsViewData.lv_id, start.toISODate(), end.toISODate())),
-				this.$api.call(ApiLvPlan.getLvPlanReservierungen(start.toISODate(), end.toISODate()))
+			let functions = [
+				this.$api.call(
+					ApiLvPlan.eventsLv(
+						this.propsViewData.lv_id,
+						start.toISODate(),
+						end.toISODate(),
+					),
+				),
 			];
+			if (!this.$props.propsViewData.lv_id?.length) {
+				functions.push(
+					this.$api.call(
+						ApiLvPlan.getLvPlanReservierungen(
+							start.toISODate(),
+							end.toISODate(),
+						),
+					),
+				);
+			}
+			return functions;
 		}
 	},
 	created() {

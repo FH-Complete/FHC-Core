@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2025 fhcomplete.org
+ * Copyright (C) 2026 fhcomplete.org
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,12 +16,20 @@
  */
 
 export default {
-
 	isBerechtigt(berechtigung_kurzbz, art, oe_kurzbz, kostenstelle_id) {
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/Permission/isBerechtigt',
 			params: { berechtigung_kurzbz, art, oe_kurzbz, kostenstelle_id }
+		};
+	},
+	getPermissions(permissions) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/permission/getPermissions',
+			params: {
+				permissions,
+			},
 		};
 	},
 };

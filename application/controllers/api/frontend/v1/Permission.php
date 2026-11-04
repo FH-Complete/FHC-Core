@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2024 fhcomplete.org
+ * Copyright (C) 2026 fhcomplete.org
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,20 +16,45 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH'))
+	exit('No direct script access allowed');
 
 class Permission extends FHCAPI_Controller
 {
+
+	/**
+	 * Object initialization
+	 */
 	public function __construct()
 	{
 		parent::__construct([
+			'getPermissions' => self::PERM_LOGGED,
 			'isBerechtigt' => self::PERM_LOGGED
 		]);
-
-		// Load the library SearchBarLib
-		$this->load->library('PermissionLib');
 	}
-	
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Public methods
+
+	/**
+	 * retrieves permissions for auth user
+	 * @access public
+	 */
+	public function getPermissions()
+	{
+		$permissionsParam = $this->input->post("permissions");
+		if (!$permissionsParam || !is_array($permissionsParam)) {
+			$this->terminateWithError("Invalid parameter!");
+		}
+
+		$permissions = [];
+		foreach ($permissionsParam as $permission) {
+			$permissions[$permission] = $this->permissionlib->isBerechtigt($permission);
+		}
+
+		$this->terminateWithSuccess($permissions);
+	}
+
 	public function isBerechtigt()
 	{
 		$payload = json_decode($this->input->raw_input_stream, TRUE);
@@ -47,4 +72,8 @@ class Permission extends FHCAPI_Controller
 		
 		$this->terminateWithSuccess($payload);
 	}
+	// -----------------------------------------------------------------------------------------------------------------
+	// Private methods
+
 }
+

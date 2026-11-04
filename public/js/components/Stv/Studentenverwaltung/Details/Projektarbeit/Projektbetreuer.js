@@ -30,6 +30,9 @@ export default {
 	computed: {
 		betreuerFormOpened() {
 			return this.newMode || this.editMode;
+		},
+		isMitarbeiter(){
+			return this.autocompleteSelectedBetreuer?.name?.includes('Mitarbeiter') ?? false;
 		}
 	},
 	props: {
@@ -42,16 +45,16 @@ export default {
 		return {
 			tabulatorOptions: {
 				columns: [
-					{title: "Nachname", field: "nachname"},
-					{title: "Vorname", field: "vorname"},
-					{title: "Note", field: "note"},
-					{title: "Punkte", field: "punkte"},
-					{title: "Stunden", field: "stunden"},
-					{title: "Stundensatz", field: "stundensatz", visible: false},
-					{title: "Art", field: "betreuerart_kurzbz", visible: false},
-					{title: "Person ID", field: "person_id", visible: false},
-					{title: "Vertrag ID", field: "vertrag_id", visible: false},
-					{title: "Projektarbeit ID", field: "projektarbeit_id", visible: false},
+					{title: "Nachname", field: "nachname", widthGrow: 2},
+					{title: "Vorname", field: "vorname", widthGrow: 2},
+					{title: "Note", field: "note", widthGrow: 1},
+					{title: "Punkte", field: "punkte", widthGrow: 1},
+					{title: "Stunden", field: "stunden", widthGrow: 1},
+					{title: "Stundensatz", field: "stundensatz", visible: false, widthGrow: 1},
+					{title: "Art", field: "betreuerart_kurzbz", visible: false, widthGrow: 2},
+					{title: "Person ID", field: "person_id", visible: false, widthGrow: 1},
+					{title: "Vertrag ID", field: "vertrag_id", visible: false, widthGrow: 1},
+					{title: "Projektarbeit ID", field: "projektarbeit_id", visible: false, widthGrow: 1},
 					{
 						title: 'Aktionen',
 						field: 'actions',
@@ -430,6 +433,11 @@ export default {
 		},
 		actionKontaktdatenBearbeiten() {
 			if (!this.autocompleteSelectedBetreuer) return;
+			if (this.isMitarbeiter)
+			{
+				this.$fhcAlert.alertError(this.$p.t('ui', 'editingMitarbeiterPVonly'));
+				return;
+			} 
 			this.$refs.kontaktdatenModal.show();
 		},
 		// stuff to do after new person has been saved
@@ -494,7 +502,12 @@ export default {
 						<button class="btn btn-outline-secondary" @click="actionNewPerson">{{ $p.t('projektarbeit', 'neuePersonAnlegen') }}</button>
 					</div>
 					<div class="col-6">
-						<button class="btn btn-outline-secondary float-end" @click="actionKontaktdatenBearbeiten">{{ $p.t('projektarbeit', 'kontaktdatenBearbeiten') }}</button>
+						<button
+							class="btn btn-outline-secondary float-end"
+							@click="actionKontaktdatenBearbeiten"
+						>
+							{{ $p.t('projektarbeit', 'kontaktdatenBearbeiten') }}
+						</button>
 					</div>
 				</div>
 
@@ -591,9 +604,11 @@ export default {
 
 	<!--Modal: KontaktdatenModal -->
 	<bs-modal
+		v-if="autocompleteSelectedBetreuer && autocompleteSelectedBetreuer.person_id"
+		@hideBsModal.stop=""
 		ref="kontaktdatenModal"
 		dialog-class="modal-xl modal-dialog-scrollable"
-		v-if="autocompleteSelectedBetreuer && autocompleteSelectedBetreuer.person_id">
+	>
 
 		<template #title>
 			<p class="fw-bold mt-3">{{$p.t('projektarbeit', 'kontaktdatenBearbeiten')}}</p>
@@ -605,7 +620,7 @@ export default {
 				</contact>
 			</div>
 		</div>
-
 	</bs-modal>
+
 `
 }

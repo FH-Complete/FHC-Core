@@ -16,7 +16,7 @@
  */
 
 export default {
-	content(content_id, version=null, sprache=null, sichtbar=null) {
+	content(content_id, version = null, sprache = null, sichtbar = null) {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/Cms/content',
@@ -24,41 +24,29 @@ export default {
 				content_id,
 				...(version ? { version } : {}),
 				...(sprache ? { sprache } : {}),
-				...(sichtbar ? { sichtbar } : {})
-			}
+				...(sichtbar ? { sichtbar } : {}),
+			},
 		};
 	},
 	//api function used for the news View that renders the html
-	getNews(page = 1, page_size = 10, sprache) {
+	getNews(page = 1, page_size = 10, sprache, filterPublished = true) {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/Cms/getNews',
 			params: {
 				page,
 				page_size,
-				sprache
+				sprache,
+				published: filterPublished,
 			},
 		};
 	},
 	//api function used for the widget component
-	news(limit) {
+	newsForWidget(limit) {
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/Cms/news',
-			params: { limit }
+			url: '/api/frontend/v1/Cms/newsForWidget',
+			params: { limit },
 		};
 	},
-	getNewsRowCount() {
-		return {
-			method: 'get',
-			url: '/api/frontend/v1/Cms/getNewsRowCount'
-		};
-	},
-	getNewsExtra() {
-		// TODO(chris): seems to be called from nowhere?
-		return {
-			method: 'get',
-			url: '/api/frontend/v1/Cms/getStudiengangInfoForNews'
-		};
-	}
 };

@@ -574,6 +574,19 @@ class Kontakt extends FHCAPI_Controller
 		$person_id = $this->input->post('person_id');
 		$standort_id = $this->input->post('standort_id');
 
+		//check person_id: allow editing only of persons who are no mitarbeiter
+		if($person_id)
+		{
+			$this->load->model('person/Benutzer_model', 'BenutzerModel');
+			$this->BenutzerModel->addJoin('public.tbl_mitarbeiter ma', 'ON (ma.mitarbeiter_uid = public.tbl_benutzer.uid)');
+
+			$result = $this->BenutzerModel->loadWhere([
+				'person_id' => $person_id
+			]);
+			if(hasData($result))
+				return $this->terminateWithError($this->p->t('ui', 'editingMitarbeiterPVonly'), self::ERROR_TYPE_GENERAL);
+		}
+
 		$result = $this->KontaktModel->update(
 			[
 				'kontakt_id' => $kontakt_id

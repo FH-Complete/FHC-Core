@@ -177,7 +177,7 @@ class Prestudentstatus_model extends DB_Model
 	 * @param prestudent_id ID of the Prestudent.
 	 * @param $status_kurzbz kurzbz of the status.
 	 * @param $ausbildungssemester ausbildungssemester of the status.
-	 * @param $studiensemester_kurzbz studiensemster of the status.
+	 * @param $studiensemester_kurzbz studiensemester of the status.
 	 *
 	 * @return result object with all the status entries
 	 */
@@ -372,7 +372,7 @@ class Prestudentstatus_model extends DB_Model
 		$this->addSelect('g.bezeichnung');
 		$this->addSelect('o.orgform_kurzbz');
 		$this->addSelect(
-			'o.bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=\'' . $lang . '\')] AS orgform_bezeichnung',
+			'o.bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=' . $this->escape($lang) . ')] AS orgform_bezeichnung',
 			false
 		);
 

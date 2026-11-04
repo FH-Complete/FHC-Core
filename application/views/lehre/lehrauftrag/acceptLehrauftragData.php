@@ -232,8 +232,8 @@ FROM
                 SELECT
                     pa.lehreinheit_id,
                     lv.lehrveranstaltung_id,
-                    pa.projektarbeit_id::text                                                                 AS "projektarbeit_id",
-                    le.studiensemester_kurzbz,
+                    pa.projektarbeit_id::text                                                           AS "projektarbeit_id",
+                    pa.studiensemester_kurzbz,
                     stg.studiengang_kz,
                     upper(stg.typ || stg.kurzbz)                                                        AS "stg_typ_kurzbz",
                     lv.orgform_kurzbz,
@@ -268,8 +268,7 @@ FROM
                 FROM
                     lehre.tbl_projektbetreuer                      pb
                         JOIN lehre.tbl_projektarbeit               pa USING (projektarbeit_id)
-                        JOIN lehre.tbl_lehreinheit                 le USING (lehreinheit_id)
-                        JOIN lehre.tbl_lehrveranstaltung           lv USING (lehrveranstaltung_id)
+                        JOIN lehre.tbl_lehrveranstaltung           lv ON (pa.lehrveranstaltung_id = lv.lehrveranstaltung_id)
                         JOIN PUBLIC.tbl_organisationseinheit       oe USING (oe_kurzbz)
                         JOIN PUBLIC.tbl_person                     person USING (person_id)
                         LEFT JOIN lehre.tbl_vertrag                vertrag USING (vertrag_id)
@@ -280,7 +279,7 @@ FROM
                     /* filter projektbetreuuer */
                     pb.person_id =  \'' . $PERSON_ID . '\'
                     /* filter studiensemester */
-                  AND le.studiensemester_kurzbz =  \'' . $STUDIENSEMESTER . '\'
+                  AND pa.studiensemester_kurzbz =  \'' . $STUDIENSEMESTER . '\'
                     /* filter active lehrveranstaltungen */
                   AND lv.aktiv = TRUE
                     /* filter active organisationseinheiten */

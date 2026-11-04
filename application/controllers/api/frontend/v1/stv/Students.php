@@ -108,6 +108,7 @@ class Students extends FHCAPI_Controller
 			'studiensemester_kurzbz' => $studiensemester_kurzbz
 		]);
 		
+		$studiensemester_kurzbz = $this->getStudiensemesterKurzbz($studiensemester_kurzbz);
 
 		$this->studentlistlib->addJoin(
 			"(
@@ -153,7 +154,8 @@ class Students extends FHCAPI_Controller
 		$this->addMeta('ci_params', [
 			'studiensemester_kurzbz' => $studiensemester_kurzbz
 		]);
-		
+
+		$studiensemester_kurzbz = $this->getStudiensemesterKurzbz($studiensemester_kurzbz);		
 
 		$this->studentlistlib->addJoin(
 			"(
@@ -213,6 +215,7 @@ class Students extends FHCAPI_Controller
 			'studiensemester_kurzbz' => $studiensemester_kurzbz
 		]);
 		
+		$studiensemester_kurzbz = $this->getStudiensemesterKurzbz($studiensemester_kurzbz);
 
 		$this->studentlistlib->addJoin(
 			"(

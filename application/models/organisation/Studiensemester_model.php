@@ -218,7 +218,7 @@ class Studiensemester_model extends DB_Model
 	 */
 	public function getByDate($date)
 	{
-		// gets the studiensemster of a date or the next closest previous studiensemester if a date is not within a studiensemester
+		// gets the studiensemester of a date or the next closest previous studiensemester if a date is not within a studiensemester
 		$query = "
 			SELECT  studiensemester_kurzbz, start, ende
 			FROM	public.tbl_studiensemester
@@ -292,13 +292,29 @@ class Studiensemester_model extends DB_Model
 				COALESCE(
 					(SELECT studiensemester_kurzbz FROM semester_interval_startdate),
 					(SELECT studiensemester_kurzbz FROM nearest_semester_interval_startdate)
-				) AS studiensemester_kurzbz
+				) AS studiensemester_kurzbz,
+				COALESCE(
+					(SELECT start FROM semester_interval_startdate),
+					(SELECT start FROM nearest_semester_interval_startdate)
+				) as start,
+				COALESCE(
+					(SELECT ende FROM semester_interval_startdate),
+					(SELECT ende FROM nearest_semester_interval_startdate)
+				) as ende
 			UNION
 			SELECT
 				COALESCE(
 					(SELECT studiensemester_kurzbz FROM semester_interval_enddate),
 					(SELECT studiensemester_kurzbz FROM nearest_semester_interval_enddate)
-				) AS studiensemester_kurzbz
+				) AS studiensemester_kurzbz,
+				COALESCE(
+					(SELECT start FROM semester_interval_enddate),
+					(SELECT start FROM nearest_semester_interval_enddate)
+				) as start,
+				COALESCE(
+					(SELECT ende FROM semester_interval_enddate),
+					(SELECT ende FROM nearest_semester_interval_enddate)
+				) as ende
 
 EOSQL;
 
@@ -357,6 +373,30 @@ EOSQL;
 		$this->addOrder($this->dbTable . '.start');
 
 		return $this->loadWhere(['uid' => $student_uid, 'v.lehre' => true]);
+	}
+
+	public function getWhereMitarbeiterHasLvs($uid) {
+		// first order by year with last 2 letter from right,
+		// then order by WS/SS inside the years
+		// query it asc so the ordering magic in cis4 turns it around again
+		$qry = "WITH unique_semesters AS (
+				SELECT DISTINCT ON (studiensemester_kurzbz)
+					studiensemester_kurzbz, 
+					start, 
+					ende, 
+					bezeichnung, 
+					studienjahr_kurzbz
+				FROM lehre.tbl_lehreinheit
+				JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+				JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+				WHERE mitarbeiter_uid = ?
+			)
+			SELECT * FROM unique_semesters
+			ORDER BY 
+				RIGHT(studiensemester_kurzbz, 2) ASC,
+				LEFT(studiensemester_kurzbz, 2) ASC;";
+		
+		return $this->execReadOnlyQuery($qry, [$uid]);
 	}
 
 	public function getAktAndFutureSemester()

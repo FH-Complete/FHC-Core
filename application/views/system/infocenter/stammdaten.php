@@ -92,6 +92,14 @@
 		</table>
 	</div>
 	<div class="col-lg-6 table-responsive">
+		<?php if ($onboarding_first_login): ?>
+			<div class="row" id="onboardingRow">
+				<?php if ($created_by_onboarding): ?>
+					<div class="col-xs-5"><strong><?php echo $this->p->t('infocenter','onboardingRegistriert') ?></strong></div>
+				<?php endif; ?>
+				<div class="col-xs-7<?php echo $created_by_onboarding ? ' text-right' : '' ?>"><strong><?php echo $this->p->t('infocenter','ersterOnboardingLogin').': '.date_format(date_create($onboarding_first_login), 'd.m.Y') ?></strong></div>
+			</div>
+		<?php endif; ?>
 		<table class="table table-bordered stammdaten_form">
 			<thead>
 			<tr>
@@ -191,12 +199,12 @@
 				</div>
 			<?php endif; ?>
 			<div class="col-xs-6">
-				<a class="editStammdaten">
+				<a class="editStammdaten" href="javascript:void(0);">
 					<i class="fa fa-edit"></i>&nbsp;<?php echo $this->p->t('ui','bearbeiten'); ?></a>
 				<div class="editActionStammdaten" style="display:none">
-					<a class="cancelStammdaten">
+					<a class="cancelStammdaten" href="javascript:void(0);">
 						<i class="fa fa-trash"></i>&nbsp;<?php echo $this->p->t('ui','abbrechen');?></a>
-					<a class="saveStammdaten">
+					<a class="saveStammdaten" href="javascript:void(0);">
 						<i class="fa fa-save"></i>&nbsp;<?php echo $this->p->t('ui','speichern'); ?></a>
 				</div>
 			</div>

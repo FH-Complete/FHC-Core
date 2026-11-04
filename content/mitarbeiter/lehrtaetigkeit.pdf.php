@@ -122,8 +122,7 @@ foreach ($project_arr as $project)
 
 	// * get studiensemester
 	$pa = new Projektarbeit($pa_id);
-	$le = new Lehreinheit($pa->lehreinheit_id);
-	$studiensemester_kurzbz = $le->studiensemester_kurzbz;
+	$studiensemester_kurzbz = $pa->studiensemester_kurzbz;
 
 	// * get begin- and end date of studiensemester
 	$ss = new Studiensemester($studiensemester_kurzbz);

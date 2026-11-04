@@ -157,7 +157,17 @@ export default {
 			});
 		});
 	},
-	template: `<div ref="modal" class="bootstrap-modal modal" tabindex="-1" @[\`hide.bs.modal\`]="$emit('hideBsModal')" @[\`hidden.bs.modal\`]="$emit('hiddenBsModal')" @[\`hidePrevented.bs.modal\`]="$emit('hidePreventedBsModal')" @[\`show.bs.modal\`]="$emit('showBsModal')" @[\`shown.bs.modal\`]="$emit('shownBsModal')">
+	template: `
+	<div
+		ref="modal"
+		class="bootstrap-modal modal"
+		tabindex="-1"
+		@[\`hide.bs.modal\`]="$emit('hideBsModal', $event)"
+		@[\`hidden.bs.modal\`]="$emit('hiddenBsModal', $event)"
+		@[\`hidePrevented.bs.modal\`]="$emit('hidePreventedBsModal', $event)"
+		@[\`show.bs.modal\`]="$emit('showBsModal', $event)"
+		@[\`shown.bs.modal\`]="$emit('shownBsModal', $event)"
+	>
 		<div class="modal-dialog" :class="fullscreen ? 'modal-fullscreen' : dialogClass">
 			<div class="modal-content">
 				<div v-if="$slots.title" class="modal-header" :class="headerClass">

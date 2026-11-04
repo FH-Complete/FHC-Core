@@ -1,5 +1,6 @@
 import BsModal from "../Bootstrap/Modal.js";
 import HeightTransition from "../Tranistion/HeightTransition.js";
+import MissingPermissionWidget from "../DashboardWidget/MissingPermission.js";
 
 import { enableDragDropTouch } from "../../../../vendor/drag-drop-touch-js/dragdroptouch/dist/drag-drop-touch.esm.min.js";
 
@@ -36,7 +37,6 @@ export default {
 		"width",
 		"height",
 		"custom",
-		"hidden",
 		"editMode",
 		"loading", // widget got added and is waiting for backend to save in db
 		"item_data",
@@ -113,16 +113,14 @@ export default {
 		isPinned() {
 			return this.place?.pinned ? true : false;
 		},
+		permitted() {
+			// widgets without a linked permission (or before the template loaded)
+			// are considered permitted; the backend sets permitted === false only
+			// when the user is missing the widget's required permission
+			return this.widgetTemplate?.permitted !== false;
+		},
 		ready() {
 			return this.component && this.arguments !== null;
-		},
-		visible: {
-			get() {
-				return !this.hidden;
-			},
-			set(value) {
-				this.$emit('remove', this.hidden);
-			}
 		}
 	},
 	methods: {
@@ -178,7 +176,11 @@ export default {
 				&& this.widgetTemplate.widget_id
 				&& this.widgetTemplate.arguments
 			) {
-				let component = (await import(this.widgetTemplate.setup.file)).default;
+				// render the "missing permission" screen instead of the actual
+				// widget when the user does not hold the widget's linked permission
+				let component = this.permitted
+					? (await import(this.widgetTemplate.setup.file)).default
+					: MissingPermissionWidget;
 				this.$options.components["widget" + this.widgetTemplate.widget_id] = component;
 				this.component = "widget" + this.widgetTemplate.widget_id;
 				this.arguments = { ...this.widgetTemplate.arguments, ...this.config };
@@ -202,10 +204,8 @@ export default {
 	},
 	template: /*html*/ `
 	<article
-		v-if="!hidden || editMode"
 		class="dashboard-item card overflow-hidden h-100 position-relative"
 		:class="{
-			'hidden-widget': hidden,
 			[arguments?.className]: arguments && arguments.className
 		}"
 	>
@@ -280,7 +280,7 @@ export default {
 				</template>
 				<!-- widget link -->
 				<a
-					v-if="widgetTemplate.setup.cis4link"
+					v-if="widgetTemplate.setup.cis4link && permitted"
 					:href="getWidgetC4Link(widgetTemplate)"
 					class="col-auto ms-auto"
 					:aria-label="$p.t('dashboard/widget_link')"
@@ -299,9 +299,9 @@ export default {
 				>
 					<i class="fa-solid fa-gear" aria-hidden="true"></i>
 				</a>
-				<!-- delete button -->
+				<!-- delete/hide button -->
 				<a
-					v-if="custom && editMode"
+					v-if="editMode"
 					href="#"
 					class="col-auto px-1"
 					:aria-label="$p.t('dashboard/widget_delete')"
@@ -310,19 +310,6 @@ export default {
 				>
 					<i class="fa-solid fa-trash" aria-hidden="true"></i>
 				</a>
-				<!-- hide button -->
-				<Transition>
-					<div v-if="!custom && editMode" class="col-auto px-1 form-switch">
-						<input
-							type="checkbox"
-							role="switch"
-							v-model="visible"
-							class="form-check-input ms-0"
-							:value="true"
-							:aria-label="$p.t('dashboard/widget_toggle_visibility')"
-						>
-					</div>
-				</Transition>
 			</header>
 			<!-- TODO Manu rename/remove-->
 			<div v-if="ready" class="card-body overflow-hidden p-0">

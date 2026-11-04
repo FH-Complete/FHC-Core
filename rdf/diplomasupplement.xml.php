@@ -998,12 +998,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						tbl_firma.name, lehrveranstaltung_id, firma_id
 					FROM
 						lehre.tbl_projektarbeit
-						JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 						JOIN public.tbl_firma USING(firma_id)
 					WHERE
 						student_uid=".$db->db_add_param($uid_arr[$i])."
 						AND projekttyp_kurzbz in('Praktikum', 'Praxis')
-						AND tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($row_stud->lehrveranstaltung_id)."
+						AND tbl_projektarbeit.lehrveranstaltung_id=".$db->db_add_param($row_stud->lehrveranstaltung_id)."
 					ORDER BY beginn ASC, projektarbeit_id ASC;";
 
 					if($result_praktikum = $db->db_query($qry))
@@ -1019,14 +1018,14 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					// Aber kein Auslandssemester war, sonst wirds spaeter hinzugefügt
 					$qry = "
 						SELECT
-							lehrveranstaltung_id, titel, themenbereich, note, titel_english
+							lehre.tbl_projektarbeit.lehrveranstaltung_id, titel, themenbereich, note, titel_english
 						FROM
 							lehre.tbl_projektarbeit
-							JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+
 						WHERE
 							student_uid=".$db->db_add_param($uid_arr[$i])."
 							AND projekttyp_kurzbz in('Bachelor', 'Diplom')
-							AND lehrveranstaltung_id=".$db->db_add_param($row_stud->lehrveranstaltung_id)."
+							AND lehre.tbl_projektarbeit.lehrveranstaltung_id=".$db->db_add_param($row_stud->lehrveranstaltung_id)."
 							AND NOT EXISTS(SELECT 1
 								FROM bis.tbl_bisio
 								JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
@@ -1039,6 +1038,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						while($row_thesis = $db->db_fetch_object($result_thesis))
 						{
 							$bezeichnung.= ": \"".$row_thesis->titel."\"";
+							// hier sollt nicht $titel_english verwendet werden, da in der projektarbeitsbeurteilung ein
+							// feature zum aktualisieren des projektarbeit titel existiert und nur das feld 'titel' editiert.
+							// um divergente thesisnamen zu vermeiden wird in beiden Fällen der (ohnehin öfters englische) Wert
+							// aus 'titel' verwendet.
 							$bezeichnung_englisch.= ": \"".$row_thesis->titel."\"";
 						}
 					}
@@ -1086,9 +1089,12 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					SELECT
 						studiensemester_kurzbz, ort, ects, semesterstunden, von, bis,
 						universitaet, lehrveranstaltung_id, tbl_lehrveranstaltung.sws,
-						(SELECT titel_english FROM lehre.tbl_projektarbeit
-						WHERE lehreinheit_id=tbl_bisio.lehreinheit_id
-						AND student_uid = ".$db->db_add_param($uid_arr[$i])." limit 1) as projektarbeitstitel
+						(SELECT titel_english 
+						 FROM lehre.tbl_projektarbeit
+						 WHERE lehre.tbl_projektarbeit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
+						   AND lehre.tbl_projektarbeit.studiensemester_kurzbz = tbl_lehreinheit.studiensemester_kurzbz
+						   AND student_uid = ".$db->db_add_param($uid_arr[$i])."
+						 LIMIT 1) as projektarbeitstitel
 					FROM
 						bis.tbl_bisio
 						JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
