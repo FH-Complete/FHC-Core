@@ -4,6 +4,7 @@ import ReportPicker from '../../../Dashboard/WidgetAdmin/Edit/Report/Picker.js';
 import ReportVars from '../../../Dashboard/WidgetAdmin/Edit/Report/Vars.js';
 import ReportAxis from '../../../Dashboard/WidgetAdmin/Edit/Report/Axis.js';
 import ReportCharts from '../../../Dashboard/WidgetAdmin/Edit/Report/Charts.js';
+import TitleInput from "../../../Dashboard/WidgetAdmin/Edit/Report/TitleInput.js";
 import FormInput from '../../../Form/Input.js';
 import BsConfirm from "../../../Bootstrap/Confirm.js";
 
@@ -18,6 +19,7 @@ export default {
 		ReportVars,
 		ReportAxis,
 		ReportCharts,
+		TitleInput,
 		FormInput,
 	},
 	props: {
@@ -130,9 +132,11 @@ export default {
 			edit-size
 			edit-hide-footer
 		/>
-		<form-input
+		<title-input
 			v-model="modelValue.arguments.title"
+			id="title"
 			:label="$p.t('global/titel')"
+			:details="details"
 			class="mb-3"
 		/>
 		<report-picker

@@ -1,9 +1,11 @@
 import FormInput from '../../../../../Form/Input.js';
+import TitleInput from '../TitleInput.js';
 
 export default {
 	name: "WidgetsGenteratorReportAggregatorsAggregator",
 	components: {
 		FormInput,
+		TitleInput,
 	},
 	inject: {
 		defaultAggregatorIndex: 'defaultAggregatorIndex',
@@ -37,10 +39,11 @@ export default {
 	},
 	template: /*html*/ `
 	<div class="widgets-report-config-aggregators-aggregator">
-		<form-input
+		<title-input
 			v-model="modelValue.label"
-			type="text"
+			id="aggregator-label"
 			:label="$p.t('global/label')"
+			:details="details"
 			class="mb-3"
 		/>
 		<form-input
