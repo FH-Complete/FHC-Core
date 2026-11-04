@@ -46,9 +46,9 @@ class InfoTerminal extends Auth_Controller
 		if (isEmptyString($uid))
 			show_error('Card number does not match any user');
 
-		$result = $this->authlib->loginByUID($uid);
-		if (!hasData($result))
-			show_error('User not found');
+		// $result = $this->authlib->loginByUID($uid);
+		// if (!hasData($result))
+		// 	show_error('User not found');
 
 		$this->load->view('Cis/InfoTerminal.php', []);
 	}
