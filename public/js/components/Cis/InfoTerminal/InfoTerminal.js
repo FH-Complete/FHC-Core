@@ -50,12 +50,12 @@ export default {
 	<div
 		class="container-fluid"
 	>
-		<div class="w-100 vh-100 row">
-			<div class="col-md-3 col-xl-2">
+		<div class="w-100 vh-100 row p-3">
+			<div class="col-md-3 col-xl-2 d-flex flex-column">
 				<div>
 					<img :src="logoUrl" alt="Corporate Identity Logo">
 				</div>
-				<div class="nav flex-column gap-2 justify-content-center h-100">
+				<div class="nav flex-column gap-2 justify-content-center flex-grow-1">
 					<button
 						v-for="tab in availableTabs"
 						:key="tab.name"

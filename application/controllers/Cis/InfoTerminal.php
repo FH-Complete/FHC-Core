@@ -17,6 +17,8 @@ class InfoTerminal extends Auth_Controller
 		parent::__construct([
 			'index' => self::PERM_ANONYMOUS
 		]);
+
+		$this->load->config('theme');
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
