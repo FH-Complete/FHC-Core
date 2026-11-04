@@ -61850,6 +61850,46 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'dashboard',
+		'phrase' => 'widget_report_title_tooltip',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dem Text kann ein Platzhalter hinzugefügt werden, der dynamisch durch den jeweils ausgewählten Wert ersetzt wird. Der Platzhalter besteht aus der Variablen kurzbz in geschweiften Klammern: {kurzbz}. Optional kann nach einem Doppelpunkt der Name eines Feldes aus der Filterabfrage ergänzt werden. Dadurch wird der Wert des angegebenen Feldes anstelle des Standardfeldes „name“ verwendet.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'A placeholder can be added to the text, which is then dynamically replaced by the currently selected value. The placeholder consists of the variable `kurzbz` enclosed in curly braces: `{kurzbz}`. Optionally, the name of a field from the filter query can be appended after a colon. This causes the value of the specified field to be used instead of the default "name" field.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'widget_report_title_token',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Platzhalter',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Placeholders',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dashboard',
 		'phrase' => 'widget_report_vars',
 		'insertvon' => 'system',
 		'phrases' => array(
