@@ -28,8 +28,8 @@ class RoomPlan extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'addRoomReservation' => ['lehre/reservierung:begrenzt', 'lehre/reservierung', 'lehre/reservierungAdvanced'],
-			'deleteRoomReservation' => ['lehre/reservierung:begrenzt', 'lehre/reservierung', 'lehre/reservierungAdvanced'],
+			'addRoomReservation' => ['lehre/reservierung:begrenzt:rw', 'lehre/reservierung:rw', 'lehre/reservierungAdvanced:rw'],
+			'deleteRoomReservation' => ['lehre/reservierung:begrenzt:rw', 'lehre/reservierung:rw', 'lehre/reservierungAdvanced:rw'],
 			'getRoomCreationInfo' => self::PERM_LOGGED,
 			'getGruppen' => self::PERM_LOGGED,
 			'getLektor' => self::PERM_LOGGED,
