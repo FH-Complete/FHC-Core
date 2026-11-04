@@ -44,6 +44,7 @@ export default {
 		};
 	},
 	eventsLv(lv_id, start_date, end_date) {
+		console.log("eventsLv called with:", lv_id, start_date, end_date);
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/lvPlan/eventsLv',

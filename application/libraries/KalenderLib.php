@@ -1458,6 +1458,129 @@ class KalenderLib
 		return success($kalender_id);
 	}
 
+	public function getEventsByTeachingUnit($startDate, $endDate, $lehreinheit_id)
+	{
+		if ($lehreinheit_id === null || $lehreinheit_id === '')
+			return [];
+
+		$this->_buildBasePlanQuery();
+
+		$db = $this->_ci->KalenderModel->db;
+
+		$escapedLehreinheitId = $db->escape($lehreinheit_id);
+ 
+		$db->where("EXISTS (
+			SELECT 1
+			FROM lehre.tbl_kalender_lehreinheit kalender_lehreinheit
+			JOIN lehre.tbl_lehreinheit lehreinheit
+				ON lehreinheit.lehreinheit_id = kalender_lehreinheit.lehreinheit_id
+			WHERE kalender_lehreinheit.kalender_id = tbl_kalender.kalender_id
+				AND lehreinheit.lehreinheit_id = $escapedLehreinheitId
+		)", null, false);
+
+		$data = $this->_loadFilteredBasePlan($startDate, $endDate);
+		$mappedEvents = $this->_mapEvents($data);
+ 
+		return $this->_mapCalendarEvents($mappedEvents);
+	}
+
+	public function getEventsByLV($startDate, $endDate, $lvId)
+	{
+		if ($lvId === null || $lvId === '')
+			return [];
+
+		$this->_buildBasePlanQuery();
+
+		$db = $this->_ci->KalenderModel->db;
+
+		$escapedLvId = $db->escape($lvId);
+ 
+		$db->where("EXISTS (
+			SELECT 1
+			FROM lehre.tbl_kalender_lehreinheit kalender_lehreinheit
+			JOIN lehre.tbl_lehreinheit lehreinheit
+				ON lehreinheit.lehreinheit_id = kalender_lehreinheit.lehreinheit_id
+			WHERE kalender_lehreinheit.kalender_id = tbl_kalender.kalender_id
+			AND lehreinheit.lehrveranstaltung_id = $escapedLvId
+				
+		)", null, false);
+
+		$data = $this->_loadFilteredBasePlan($startDate, $endDate);
+		$mappedEvents = $this->_mapEvents($data);
+ 
+		return $this->_mapCalendarEvents($mappedEvents);
+	}
+
+	public function getEvents($startDate, $endDate, $degreeProgram, $semester = null, $section = null, $group = null)
+	{
+		if ($degreeProgram === null || $degreeProgram === '')
+			return [];
+
+		$this->_buildBasePlanQuery();
+
+		$db = $this->_ci->KalenderModel->db;
+
+		$escapedDegreeProgram = $db->escape($degreeProgram);
+
+		// Optional Lehrverband filters, all applied to the same tbl_lehrverband row
+		$lehrverbandFilters = '';
+		if ($semester !== null && $semester !== '')
+			$lehrverbandFilters .= ' AND lehrverband.semester = ' . $db->escape($semester);
+		if ($section !== null && $section !== '')
+			$lehrverbandFilters .= ' AND lehrverband.verband = ' . $db->escape($section);
+		if ($group !== null && $group !== '')
+			$lehrverbandFilters .= ' AND lehrverband.gruppe = ' . $db->escape($group);
+
+		// Checks if the current calendar event is linked to a Lehreinheit whose Lehrveranstaltung
+		// (via lehrveranstaltung_id or lehrfach_id) belongs to a degree program that has a Lehrverband
+		// matching the given degree program, semester, Verband (section) and group.
+		$lehrverbandLehreinheitExists = "EXISTS (
+			SELECT 1
+			FROM lehre.tbl_kalender_lehreinheit kalender_lehreinheit
+			JOIN lehre.tbl_lehreinheit lehreinheit
+				ON lehreinheit.lehreinheit_id = kalender_lehreinheit.lehreinheit_id
+			JOIN lehre.tbl_lehrveranstaltung lehrveranstaltung
+				ON lehrveranstaltung.lehrveranstaltung_id IN (lehreinheit.lehrveranstaltung_id, lehreinheit.lehrfach_id)
+			JOIN public.tbl_lehrverband lehrverband
+				ON lehrverband.studiengang_kz = lehrveranstaltung.studiengang_kz
+			WHERE kalender_lehreinheit.kalender_id = tbl_kalender.kalender_id
+				AND lehrverband.studiengang_kz = $escapedDegreeProgram
+				$lehrverbandFilters
+		)";
+
+		$db->where($lehrverbandLehreinheitExists, null, false);
+
+		$data = $this->_loadFilteredBasePlan($startDate, $endDate);
+		$mappedEvents = $this->_mapEvents($data);
+		
+		return $this->_mapCalendarEvents($mappedEvents);
+	}
+
+	public function getEventsForRoom($start, $end, $roomId = null)
+	{
+		if (is_null($roomId))
+			return error("No roomId");
+
+		$this->_buildBasePlanQuery();
+
+		$escapedRoomId = $this->_ci->KalenderModel->db->escape($roomId);
+
+		// Checks if the current calendar event is associated with a room that has the given room ID.
+		$isRoomAssociated = "EXISTS (
+			SELECT 1
+			FROM lehre.tbl_kalender_ort kalender_ort
+			WHERE kalender_ort.kalender_id = tbl_kalender.kalender_id
+				AND kalender_ort.ort_kurzbz = $escapedRoomId
+		)";
+
+		$this->_ci->KalenderModel->db->where('tbl_kalender.status_kurzbz', 'live');
+		$this->_ci->KalenderModel->db->where($isRoomAssociated, null, false);
+
+		$data = $this->_loadFilteredBasePlan($start, $end);
+		
+		return $this->_mapCalendarEvents($this->_mapEvents($data));
+	}
+
 	public function getEventsForUser($start, $end, $uid = null)
 	{
 		
@@ -1485,7 +1608,7 @@ class KalenderLib
 		$escapedUserUID = $this->_ci->KalenderModel->db->escape($userUID);
 
 		// Checks if the user is assigned as a lecturer to any teaching unit(lehreinheit) associated with the current calendar event.
-		$lehreinheitMitarbeiterExists = "EXISTS (
+		$isTeachingUnitStaffMember = "EXISTS (
 			SELECT 1
 			FROM lehre.tbl_kalender_lehreinheit kalender_lehreinheit
 			JOIN lehre.tbl_lehreinheitmitarbeiter lehreinheitmitarbeiter
@@ -1495,33 +1618,33 @@ class KalenderLib
 		)";
 
 		// Checks if the user is directly assigned to the current calendar reservation event, regardless of their role.
-		$eventTeilnehmerExists = "EXISTS (
+		$isDirectReservationParticipant = "EXISTS (
 			SELECT 1
-			FROM lehre.tbl_kalender_event_teilnehmer lecturer_event_teilnehmer
-			WHERE lecturer_event_teilnehmer.kalender_id = tbl_kalender.kalender_id
-				AND lecturer_event_teilnehmer.uid = $escapedUserUID
+			FROM lehre.tbl_kalender_event_teilnehmer reservation_teilnehmer
+			WHERE reservation_teilnehmer.kalender_id = tbl_kalender.kalender_id
+				AND reservation_teilnehmer.uid = $escapedUserUID
 		)";
 
 		// Checks if the user belongs to a group assigned to the current calendar reservation event, matching the study semester if specified.
-		$eventBenutzergruppeExists = "EXISTS (
+		$isGroupReservationParticipant = "EXISTS (
 			SELECT 1
-			FROM lehre.tbl_kalender_event_teilnehmer lecturer_event_gruppe
-			JOIN public.tbl_benutzergruppe lecturer_benutzergruppe
-				ON lecturer_benutzergruppe.gruppe_kurzbz = lecturer_event_gruppe.gruppe_kurzbz
+			FROM lehre.tbl_kalender_event_teilnehmer reservation_teilnehmer
+			JOIN public.tbl_benutzergruppe benutzergruppe
+				ON benutzergruppe.gruppe_kurzbz = reservation_teilnehmer.gruppe_kurzbz
 				AND (
-					lecturer_event_gruppe.studiensemester_kurzbz IS NULL
-					OR lecturer_benutzergruppe.studiensemester_kurzbz = lecturer_event_gruppe.studiensemester_kurzbz
+					reservation_teilnehmer.studiensemester_kurzbz IS NULL
+					OR benutzergruppe.studiensemester_kurzbz = reservation_teilnehmer.studiensemester_kurzbz
 				)
-			WHERE lecturer_event_gruppe.kalender_id = tbl_kalender.kalender_id
-				AND lecturer_event_gruppe.gruppe_kurzbz IS NOT NULL
-				AND lecturer_benutzergruppe.uid = $escapedUserUID
+			WHERE reservation_teilnehmer.kalender_id = tbl_kalender.kalender_id
+				AND reservation_teilnehmer.gruppe_kurzbz IS NOT NULL
+				AND benutzergruppe.uid = $escapedUserUID
 		)";
 
 		$this->_ci->KalenderModel->db->where('tbl_kalender.status_kurzbz', 'live');
 		$this->_ci->KalenderModel->db->group_start();
-		$this->_ci->KalenderModel->db->where($lehreinheitMitarbeiterExists, null, false);
-		$this->_ci->KalenderModel->db->or_where($eventTeilnehmerExists, null, false);
-		$this->_ci->KalenderModel->db->or_where($eventBenutzergruppeExists, null, false);
+		$this->_ci->KalenderModel->db->where($isTeachingUnitStaffMember, null, false);
+		$this->_ci->KalenderModel->db->or_where($isDirectReservationParticipant, null, false);
+		$this->_ci->KalenderModel->db->or_where($isGroupReservationParticipant, null, false);
 		$this->_ci->KalenderModel->db->group_end();
 		
 		$data = $this->_loadFilteredBasePlan($start_date, $end_date);
@@ -1535,121 +1658,121 @@ class KalenderLib
 
 		$escapedUserUID = $this->_ci->KalenderModel->db->escape($userUID);
 
-		$benutzerExists = "EXISTS (
-			SELECT 1
-			FROM public.tbl_benutzer student_benutzer
-			WHERE student_benutzer.uid = $escapedUserUID
-		)";
-
 		// Checks if the user is directly assigned to the current calendar reservation event, regardless of their role.
-		$directEventTeilnehmerExists = "EXISTS (
+		$isDirectReservationParticipant = "EXISTS (
 			SELECT 1
-			FROM lehre.tbl_kalender_event_teilnehmer event_teilnehmer
-			WHERE event_teilnehmer.kalender_id = tbl_kalender.kalender_id
-				AND event_teilnehmer.uid = $escapedUserUID
+			FROM lehre.tbl_kalender_event_teilnehmer reservation_teilnehmer
+			WHERE reservation_teilnehmer.kalender_id = tbl_kalender.kalender_id
+				AND reservation_teilnehmer.uid = $escapedUserUID
 		)";
 
 		// Checks if the user belongs to a group assigned to the current calendar reservation event, matching the study semester if specified.
-		$eventBenutzergruppeExists = "EXISTS (
+		$isGroupReservationParticipant = "EXISTS (
 			SELECT 1
-			FROM lehre.tbl_kalender_event_teilnehmer event_gruppe
-			JOIN public.tbl_benutzergruppe event_benutzergruppe
-				ON event_benutzergruppe.gruppe_kurzbz = event_gruppe.gruppe_kurzbz
+			FROM lehre.tbl_kalender_event_teilnehmer reservation_teilnehmer
+			JOIN public.tbl_benutzergruppe benutzergruppe
+				ON benutzergruppe.gruppe_kurzbz = reservation_teilnehmer.gruppe_kurzbz
 				AND (
-					event_gruppe.studiensemester_kurzbz IS NULL
-					OR event_benutzergruppe.studiensemester_kurzbz = event_gruppe.studiensemester_kurzbz
+					reservation_teilnehmer.studiensemester_kurzbz IS NULL
+					OR benutzergruppe.studiensemester_kurzbz = reservation_teilnehmer.studiensemester_kurzbz
 				)
-			WHERE event_gruppe.kalender_id = tbl_kalender.kalender_id
-				AND event_gruppe.gruppe_kurzbz IS NOT NULL
-				AND event_benutzergruppe.uid = $escapedUserUID
+			WHERE reservation_teilnehmer.kalender_id = tbl_kalender.kalender_id
+				AND reservation_teilnehmer.gruppe_kurzbz IS NOT NULL
+				AND benutzergruppe.uid = $escapedUserUID
 		)";
 
-		$eventStudentlehrverbandExists = "EXISTS (
+		// Checks if the user is part of a student group (studentlehrverband) that is assigned to the current calendar reservation event, matching the study program, semester, and group if specified.
+		$isStudentGroupReservationParticipant = "EXISTS (
 			SELECT 1
-			FROM lehre.tbl_kalender_event_teilnehmer event_lehrverband
-			JOIN public.tbl_studentlehrverband event_studentlehrverband
-				ON event_studentlehrverband.student_uid = $escapedUserUID
-				AND event_studentlehrverband.studiengang_kz = event_lehrverband.studiengang_kz
+			FROM lehre.tbl_kalender_event_teilnehmer kalender_event_teilnehmer
+			JOIN public.tbl_studentlehrverband studentlehrverband
+				ON studentlehrverband.student_uid = $escapedUserUID
+				AND studentlehrverband.studiengang_kz = kalender_event_teilnehmer.studiengang_kz
 				AND (
-					event_lehrverband.studiensemester_kurzbz IS NULL
-					OR event_studentlehrverband.studiensemester_kurzbz = event_lehrverband.studiensemester_kurzbz
+					kalender_event_teilnehmer.studiensemester_kurzbz IS NULL
+					OR studentlehrverband.studiensemester_kurzbz = kalender_event_teilnehmer.studiensemester_kurzbz
 				)
 				AND (
-					event_lehrverband.semester IS NULL
-					OR event_studentlehrverband.semester = event_lehrverband.semester
+					kalender_event_teilnehmer.semester IS NULL
+					OR studentlehrverband.semester = kalender_event_teilnehmer.semester
 				)
 				AND (
-					event_lehrverband.verband = event_studentlehrverband.verband
-					OR event_lehrverband.verband IS NULL
-					OR btrim(event_lehrverband.verband::text) = ''
-					OR event_studentlehrverband.verband IS NULL
+					kalender_event_teilnehmer.verband = studentlehrverband.verband
+					OR kalender_event_teilnehmer.verband IS NULL
+					OR btrim(kalender_event_teilnehmer.verband::text) = ''
+					OR studentlehrverband.verband IS NULL
 				)
 				AND (
-					event_lehrverband.gruppe = event_studentlehrverband.gruppe
-					OR event_lehrverband.gruppe IS NULL
-					OR btrim(event_lehrverband.gruppe::text) = ''
-					OR event_studentlehrverband.gruppe IS NULL
+					kalender_event_teilnehmer.gruppe = studentlehrverband.gruppe
+					OR kalender_event_teilnehmer.gruppe IS NULL
+					OR btrim(kalender_event_teilnehmer.gruppe::text) = ''
+					OR studentlehrverband.gruppe IS NULL
 				)
-			WHERE event_lehrverband.kalender_id = tbl_kalender.kalender_id
-				AND event_lehrverband.gruppe_kurzbz IS NULL
-				AND event_lehrverband.studiengang_kz IS NOT NULL
+			WHERE kalender_event_teilnehmer.kalender_id = tbl_kalender.kalender_id
+				AND kalender_event_teilnehmer.gruppe_kurzbz IS NULL
+				AND kalender_event_teilnehmer.studiengang_kz IS NOT NULL
 		)";
 
-		$lehreinheitBenutzergruppeExists = "EXISTS (
+		// Teaching unit can be assigned to a group (biw-223) or a student group (degree program, semester, section / verband (A,C), group(1,2,3))
+		// Checks if the user is a member of a group (benutzergruppe) assigned to a Lehreinheit
+		// linked to the current calendar event, in the Lehreinheit's study semester.
+		$isGroupAssignedToTeachingUnit = "EXISTS (
 			SELECT 1
-			FROM lehre.tbl_kalender_lehreinheit student_kalender_lehreinheit
-			JOIN lehre.tbl_lehreinheit student_lehreinheit
-				ON student_lehreinheit.lehreinheit_id = student_kalender_lehreinheit.lehreinheit_id
-			JOIN lehre.tbl_lehreinheitgruppe student_lehreinheitgruppe
-				ON student_lehreinheitgruppe.lehreinheit_id = student_lehreinheit.lehreinheit_id
-			JOIN public.tbl_gruppe student_gruppe
-				ON student_gruppe.studiengang_kz = student_lehreinheitgruppe.studiengang_kz
-				AND student_gruppe.semester = student_lehreinheitgruppe.semester
-				AND student_gruppe.gruppe_kurzbz = student_lehreinheitgruppe.gruppe_kurzbz
-			JOIN public.tbl_benutzergruppe student_benutzergruppe
-				ON student_benutzergruppe.gruppe_kurzbz = student_gruppe.gruppe_kurzbz
-				AND student_benutzergruppe.studiensemester_kurzbz = student_lehreinheit.studiensemester_kurzbz
-			WHERE student_kalender_lehreinheit.kalender_id = tbl_kalender.kalender_id
-				AND student_lehreinheitgruppe.gruppe_kurzbz IS NOT NULL
-				AND student_benutzergruppe.uid = $escapedUserUID
+			FROM lehre.tbl_kalender_lehreinheit kalender_lehreinheit
+			JOIN lehre.tbl_lehreinheit lehreinheit
+				ON lehreinheit.lehreinheit_id = kalender_lehreinheit.lehreinheit_id
+			JOIN lehre.tbl_lehreinheitgruppe lehreinheitgruppe
+				ON lehreinheitgruppe.lehreinheit_id = lehreinheit.lehreinheit_id
+			JOIN public.tbl_gruppe gruppe
+				ON gruppe.studiengang_kz = lehreinheitgruppe.studiengang_kz
+				AND gruppe.semester = lehreinheitgruppe.semester
+				AND gruppe.gruppe_kurzbz = lehreinheitgruppe.gruppe_kurzbz
+			JOIN public.tbl_benutzergruppe benutzergruppe
+				ON benutzergruppe.gruppe_kurzbz = gruppe.gruppe_kurzbz
+				AND benutzergruppe.studiensemester_kurzbz = lehreinheit.studiensemester_kurzbz
+			WHERE kalender_lehreinheit.kalender_id = tbl_kalender.kalender_id
+				AND lehreinheitgruppe.gruppe_kurzbz IS NOT NULL
+				AND benutzergruppe.uid = $escapedUserUID
 		)";
 
-		$lehreinheitStudentlehrverbandExists = "EXISTS (
+		// Checks if the user belongs to a Lehrverband assigned to a Lehreinheit linked to the
+		// current calendar event, matching study program, semester and study semester exactly,
+		// and Verband and group where specified.
+		$isStudentGroupAssignedToTeachingUnit = "EXISTS (
 			SELECT 1
-			FROM lehre.tbl_kalender_lehreinheit student_kalender_lehreinheit
-			JOIN lehre.tbl_lehreinheit student_lehreinheit
-				ON student_lehreinheit.lehreinheit_id = student_kalender_lehreinheit.lehreinheit_id
-			JOIN lehre.tbl_lehreinheitgruppe student_lehreinheitgruppe
-				ON student_lehreinheitgruppe.lehreinheit_id = student_lehreinheit.lehreinheit_id
-			JOIN public.tbl_studentlehrverband student_lehrverband
-				ON student_lehrverband.student_uid = $escapedUserUID
-				AND student_lehrverband.studiengang_kz = student_lehreinheitgruppe.studiengang_kz
-				AND student_lehrverband.semester = student_lehreinheitgruppe.semester
-				AND student_lehrverband.studiensemester_kurzbz = student_lehreinheit.studiensemester_kurzbz
+			FROM lehre.tbl_kalender_lehreinheit kalender_lehreinheit
+			JOIN lehre.tbl_lehreinheit lehreinheit
+				ON lehreinheit.lehreinheit_id = kalender_lehreinheit.lehreinheit_id
+			JOIN lehre.tbl_lehreinheitgruppe lehreinheitgruppe
+				ON lehreinheitgruppe.lehreinheit_id = lehreinheit.lehreinheit_id
+			JOIN public.tbl_studentlehrverband studentlehrverband
+				ON studentlehrverband.student_uid = $escapedUserUID
+				AND studentlehrverband.studiengang_kz = lehreinheitgruppe.studiengang_kz
+				AND studentlehrverband.semester = lehreinheitgruppe.semester
+				AND studentlehrverband.studiensemester_kurzbz = lehreinheit.studiensemester_kurzbz
 				AND (
-					student_lehreinheitgruppe.verband = student_lehrverband.verband
-					OR student_lehreinheitgruppe.verband IS NULL
-					OR btrim(student_lehreinheitgruppe.verband::text) = ''
-					OR student_lehrverband.verband IS NULL
+					lehreinheitgruppe.verband = studentlehrverband.verband
+					OR lehreinheitgruppe.verband IS NULL
+					OR btrim(lehreinheitgruppe.verband::text) = ''
+					OR studentlehrverband.verband IS NULL
 				)
 				AND (
-					student_lehreinheitgruppe.gruppe = student_lehrverband.gruppe
-					OR student_lehreinheitgruppe.gruppe IS NULL
-					OR btrim(student_lehreinheitgruppe.gruppe::text) = ''
-					OR student_lehrverband.gruppe IS NULL
+					lehreinheitgruppe.gruppe = studentlehrverband.gruppe
+					OR lehreinheitgruppe.gruppe IS NULL
+					OR btrim(lehreinheitgruppe.gruppe::text) = ''
+					OR studentlehrverband.gruppe IS NULL
 				)
-			WHERE student_kalender_lehreinheit.kalender_id = tbl_kalender.kalender_id
-				AND student_lehreinheitgruppe.gruppe_kurzbz IS NULL
+			WHERE kalender_lehreinheit.kalender_id = tbl_kalender.kalender_id
+				AND lehreinheitgruppe.gruppe_kurzbz IS NULL
 		)";
 
 		$this->_ci->KalenderModel->db->where('status_kurzbz', 'live');
-		$this->_ci->KalenderModel->db->where($benutzerExists, null, false);
 		$this->_ci->KalenderModel->db->group_start();
-		$this->_ci->KalenderModel->db->where($directEventTeilnehmerExists, null, false);
-		$this->_ci->KalenderModel->db->or_where($eventBenutzergruppeExists, null, false);
-		$this->_ci->KalenderModel->db->or_where($eventStudentlehrverbandExists, null, false);
-		$this->_ci->KalenderModel->db->or_where($lehreinheitBenutzergruppeExists, null, false);
-		$this->_ci->KalenderModel->db->or_where($lehreinheitStudentlehrverbandExists, null, false);
+		$this->_ci->KalenderModel->db->where($isDirectReservationParticipant, null, false);
+		$this->_ci->KalenderModel->db->or_where($isGroupReservationParticipant, null, false);
+		$this->_ci->KalenderModel->db->or_where($isStudentGroupReservationParticipant, null, false);
+		$this->_ci->KalenderModel->db->or_where($isGroupAssignedToTeachingUnit, null, false);
+		$this->_ci->KalenderModel->db->or_where($isStudentGroupAssignedToTeachingUnit, null, false);
 		$this->_ci->KalenderModel->db->group_end();
 
 		$data = $this->_loadFilteredBasePlan($start_date, $end_date);
@@ -1659,14 +1782,13 @@ class KalenderLib
 
 	private function _buildFilteredKalenderCte($start_date, $end_date)
 	{
+		$start_date = date('Y-m-d', strtotime($start_date));
 		$end_date = date('Y-m-d', strtotime($end_date . ' +1 day'));
 
 		return sprintf(
 			'WITH filtered_kalender AS MATERIALIZED (
 				SELECT *
-				FROM lehre.tbl_kalender
-				WHERE von >= timestamp %s
-					AND bis < timestamp %s
+				FROM lehre.tbl_kalender 
 			)',
 			$this->_ci->KalenderModel->db->escape(date('Y-m-d H:i:s', strtotime($start_date))),
 			$this->_ci->KalenderModel->db->escape(date('Y-m-d H:i:s', strtotime($end_date)))
@@ -1882,7 +2004,6 @@ class KalenderLib
 
 		if (!isSuccess($data) || !hasData($data))
 			return $stundenplan_data;
-
 		$events = [];
 
 		foreach (getData($data) as $row)
@@ -2529,7 +2650,6 @@ class KalenderLib
 			return success([]);
 		$currentStudiensemester = getData($currentStudiensemester);
 
-		log_message('error', 'currentStudiensemester: ' . print_r($currentStudiensemester, true));
 		if ($currentStudiensemester) {
 			$studentsemester_kurzbz = current($currentStudiensemester)->studiensemester_kurzbz;
 
@@ -2552,11 +2672,11 @@ class KalenderLib
 			$ferienEvents = getData($ferienEvents);
 		else
 			$ferienEvents = [];
-		log_message('error', 'ferienEvents: ' . print_r($ferienEvents, true));
-		return success($ferienEvents);
+
+		return $ferienEvents;
 	}
 
-	public function fetchFerienTageEvents($start_date, $end_date, $studiengang_kz)
+	public function fetchFerienTageEvents($start_date, $end_date, $studiengang_kz = 0)
 	{
 		// Load Config
 		$this->_ci->load->config('calendar');
@@ -2577,7 +2697,7 @@ class KalenderLib
 		$ferienEvents = getData($ferienEvents);
 
 		if (!$ferienEvents)
-			return success([]);
+			return [];
 		
 		$ferienEvents = array_map(function ($event) {
 			$event_start = new DateTime($event->vondatum);
@@ -2625,7 +2745,7 @@ class KalenderLib
 			return $ferien_event;
 		}, $ferienEventsFlattened);
 		
-		return success($ferienEventsFlattened);
+		return $ferienEventsFlattened;
 	}
 
 	
@@ -2634,7 +2754,7 @@ private function _mapCalendarEvents(array $events): array
 	return array_map(function ($event) {
 		$lvInfo = $event->lehrveranstaltung_infos[0] ?? [];
 		$ortInfo = $event->ort_infos[0] ?? [];
-		log_message('error', 'Mapping event: ' . print_r($lvInfo, true));
+
 		return [
 			'type' => $event->type,
 			'beginn' => $event->beginn,
