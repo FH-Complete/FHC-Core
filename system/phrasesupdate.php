@@ -22015,7 +22015,7 @@ In the list:
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Sie haben kein Raum ausgewählt!",
+				'text' => "Es ist kein Raum ausgewählt!",
 				'description' => '',
 				'insertvon' => 'system'
 			),
