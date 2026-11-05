@@ -32,6 +32,7 @@ class Report extends FHCAPI_Controller
 			'list' => [ 'dashboard/admin:rw', 'basis/statistik:rw' ],
 			'vars' => self::PERM_LOGGED, // additional permission check inside
 			'get' => self::PERM_LOGGED, // additional permission check inside
+			'fields' => [ 'dashboard/admin:rw', 'basis/statistik:rw' ],
 			'vardetails' => self::PERM_LOGGED,
 		]);
 
@@ -186,6 +187,31 @@ class Report extends FHCAPI_Controller
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);
+	}
+
+	/**
+	 * @param string	$statistik_kurzbz
+	 * @return void
+	 * @access public
+	 */
+	public function fields($statistik_kurzbz)
+	{
+		$result = $this->StatistikModel->load($statistik_kurzbz);
+		$statistik = $this->getDataOrTerminateWithError($result);
+		if (!$statistik)
+			show_404();
+		$statistik = current($statistik);
+
+		$null = $this->StatistikModel->escape(null);
+	
+		$sql = "SELECT * FROM (" . preg_replace('/\$\w+/', $null, $statistik->sql) . ") dummy LIMIT 1";
+
+		$result = $this->StatistikModel->execReadOnlyQuery($sql);
+		$this->getDataOrTerminateWithError($result);
+
+		$fields = $this->StatistikModel->getExecutedQueryMetaData();
+
+		$this->terminateWithSuccess($fields);
 	}
 
 	/**

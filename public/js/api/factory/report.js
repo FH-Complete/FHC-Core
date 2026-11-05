@@ -35,6 +35,12 @@ export default {
 			params,
 		};
 	},
+	fields(statistik_kurzbz) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/report/fields/' + statistik_kurzbz,
+		};
+	},
 	vardetails(kurzbz, values) {
 		return {
 			method: 'post',
