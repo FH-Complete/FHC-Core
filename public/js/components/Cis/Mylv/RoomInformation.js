@@ -268,5 +268,8 @@ export default {
 			@delete-event="handleDeleteEvent"
 			class="responsive-calendar"
 		></fhc-calendar>
+		<div v-else class="w-100 d-flex justify-content-center pt-4">
+			<h4> {{ $p.t('rauminfo/no_room_selected') }} </h4>
+		<div>
 	</div>`
 };
