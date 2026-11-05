@@ -525,6 +525,11 @@ class StundenplanLib
 		$startTime = new DateTime($start);
 		$endTime = new DateTime($end);
 
+		$latestAllowedReservableDate = defined('RES_TAGE_LEKTOR_BIS') ? RES_TAGE_LEKTOR_BIS : "2099-01-01";
+		if (date_format($startTime, "Y-m-d") > $latestAllowedReservableDate) {
+			return error("Reservation date invalid!");
+		}
+
 		$stunden = $this->_ci->StundeModel->loadWhere(array(
 			'beginn <' => $endTime->format('H:i:s'),
 			'ende >' => $startTime->format('H:i:s')
@@ -639,7 +644,14 @@ class StundenplanLib
 			if ($today->format('Y-m-d') > $reservierung->datum)
 				return error("Vergangene Reservierungen können nicht gelöscht werden");
 
-			if (($this->_ci->permissionlib->isBerechtigt('lehre/reservierung:begrenzt')) && ($reservierung->insertvon == getAuthUID() || $reservierung->uid === getAuthUID()))
+			$latestAllowedReservableDate = defined('RES_TAGE_LEKTOR_BIS') ? RES_TAGE_LEKTOR_BIS : "2099-01-01";
+			$notPastLatestAllowedReservableDate = $reservierung->datum <= $latestAllowedReservableDate;
+
+			if (
+				($this->_ci->permissionlib->isBerechtigt('lehre/reservierung:begrenzt')) &&
+				($reservierung->insertvon == getAuthUID() || $reservierung->uid === getAuthUID())
+				&& $notPastLatestAllowedReservableDate
+			)
 			{
 				$delete_result = $this->_ci->ReservierungModel->delete($reservierung->reservierung_id);
 
