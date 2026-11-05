@@ -19,6 +19,7 @@
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 use \DateTime as DateTime;
+use DB_Model as DB_Model;
 
 class Report extends FHCAPI_Controller
 {
@@ -204,7 +205,7 @@ class Report extends FHCAPI_Controller
 
 		$null = $this->StatistikModel->escape(null);
 	
-		$sql = "SELECT * FROM (" . preg_replace('/\$\w+/', $null, $statistik->sql) . ") dummy LIMIT 1";
+		$sql = sprintf(DB_Model::QUERY_LIST_FIELDS, "(" . preg_replace('/\$\w+/', $null, $statistik->sql) . ") dummy");
 
 		$result = $this->StatistikModel->execReadOnlyQuery($sql);
 		$this->getDataOrTerminateWithError($result);
