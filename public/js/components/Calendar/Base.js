@@ -44,7 +44,10 @@ export default {
 				return () => true;
 			}),
 			hasDragoverFunc: Vue.computed(() => this.onDragover),
-			mode: Vue.computed(() => this.mode)
+			mode: Vue.computed(() => this.mode),
+			reservierbarMap: Vue.computed(() => this.reservierbarMap),
+			isReservierbar: Vue.computed(() => this.isReservierbar),
+			createContext: Vue.computed(() => this.createContext)
 		};
 	},
 	props: {
@@ -93,11 +96,21 @@ export default {
 			type: Boolean,
 			default: undefined
 		},
+		btnRange: {
+			type: Boolean,
+			default: undefined
+		},
 		timeGrid: Array,
 		draggableEvents: [Boolean, Array, Function],
 		dropableEvents: [Boolean, Array, Function],
 		onDragover: Function,
-		onDrop: Function
+		onDrop: Function,
+		isReservierbar: Boolean,
+		createContext: Object,
+		reservierbarMap: {
+			type: Object,
+			default: () => ({})
+		},
 	},
 	emits: [
 		"click:next",
@@ -105,11 +118,13 @@ export default {
 		"click:mode",
 		"click:event",
 		"click:day",
+		"click:slot",
 		"click:week",
 		"update:date",
 		"update:mode",
 		"update:range",
-		"drop"
+		"drop",
+		"create-event"
 	],
 	data() {
 		return {
@@ -163,8 +178,16 @@ export default {
 				return date.setLocale(this.locale);
 			},
 			set(value) {
-				this.internalDate = value;
-				this.$emit('update:date', value, this.cMode);
+				let date;
+				let rangeLength;
+				if (value instanceof luxon.DateTime) {
+					date = value;
+				} else {
+					date = value.date;
+					rangeLength = value.rangeLength;
+				}
+				this.internalDate = date;
+				this.$emit('update:date', date, this.cMode, rangeLength);
 			}
 		},
 		sMode() {
@@ -206,6 +229,15 @@ export default {
 			// default: switch page
 			this.$refs.mode.prevPage();
 		},
+		clickFastPrev() {
+			const evt = new Event('click:fastPrev', {cancelable: true});
+			this.$emit('click:fastPrev', evt);
+			if (evt.defaultPrevented)
+				return;
+
+			// default: switch page
+			this.$refs.mode.fastPrevPage();
+		},
 		clickNext() {
 			const evt = new Event('click:next', {cancelable: true});
 			this.$emit('click:next', evt);
@@ -214,6 +246,15 @@ export default {
 
 			// default: switch page
 			this.$refs.mode.nextPage();
+		},
+		clickFastNext() {
+			const evt = new Event('click:fastNext', {cancelable: true});
+			this.$emit('click:fastNext', evt);
+			if (evt.defaultPrevented)
+				return;
+
+			// default: switch page
+			this.$refs.mode.fastNextPage();
 		},
 		handleClickDefaults(evt) {
 			// TODO(chris): implement
@@ -276,12 +317,15 @@ export default {
 				v-model:date="cDate"
 				v-model:mode="cMode"
 				@prev="clickPrev"
+				@fastPrev="clickFastPrev"
 				@next="clickNext"
+				@fastNext="clickFastNext"
 				@click:mode="$emit('click:mode', $event)"
 				:btn-day="!!modes['day'] && (btnDay || (showBtns && btnDay !== false))"
 				:btn-week="!!modes['week'] && (btnWeek || (showBtns && btnWeek !== false))"
 				:btn-month="!!modes['month'] && (btnMonth || (showBtns && btnMonth !== false))"
 				:btn-list="!!modes['list'] && (btnList || (showBtns && btnList !== false))"
+				:btn-range="!!modes['range'] && (btnRange || (showBtns && btnRange !== false))"
 				:mode-options="modeOptions ? modeOptions[cMode] : undefined"
 			>
 				<slot name="actions" />
@@ -293,6 +337,7 @@ export default {
 				@update:range="$emit('update:range', $event)"
 				@request-modal-open="showEventModal"
 				@request-modal-close="hideEventModal"
+				@update:date="cDate = $event"
 				v-bind="modeOptions ? modeOptions[cMode] : null || {}"
 			>
 				<template v-slot="slot"><slot v-bind="slot" /></template>

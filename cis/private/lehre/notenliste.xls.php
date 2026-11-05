@@ -192,8 +192,6 @@ if (!$berechtigung->isBerechtigt('admin')
 	$fmtPruefImportDate = $CIS_GESAMTNOTE_PRUEFUNGSIMPORT ? $format_highlightright_date : $format_plainright;
 	$fmtPruefImportNote = $CIS_GESAMTNOTE_PRUEFUNGSIMPORT ? $format_highlightright      : $format_plainright;
 
-	$lvobj = new lehrveranstaltung($lvid);
-
 	$worksheet->write(0,0,$p->t('anwesenheitsliste/notenliste')." ".($sprache=='English'?$lvobj->bezeichnung_english:$lvobj->bezeichnung),$format_bold);
 
 	$stg_obj = new studiengang($stg);
@@ -386,9 +384,9 @@ if (!$berechtigung->isBerechtigt('admin')
 					{
 						$worksheet->write($lines,3,$elem->vorname);
 					}
-					$worksheet->write($lines,4,$elem->semester.$elem->verband.$elem->gruppe);
-					$worksheet->write($lines,5,trim($elem->matrikelnr),$format_highlight);
-					$worksheet->write($lines,6, $note, $format_highlightright);
+					$worksheet->writeString($lines,4,$elem->semester.$elem->verband.$elem->gruppe);
+					$worksheet->write($lines,5,trim($elem->matrikelnr),$fmtNoteImportPkz);
+					$worksheet->write($lines,6, $note, $fmtNoteImportNote);
 
 					// Nachprüfung
 					if (defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2)

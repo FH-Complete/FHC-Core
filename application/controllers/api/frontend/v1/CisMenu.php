@@ -67,8 +67,11 @@ class CisMenu extends FHCAPI_Controller
 
 	private function generateUrlForMenuItem($menuItem)
 	{
-		$menuItem->url = $this->menuItemUrlHelper($menuItem);
-		unset($menuItem->content);
+		if(!isset($menuItem->url))
+		{
+			$menuItem->url = $this->menuItemUrlHelper($menuItem);
+			unset($menuItem->content);
+		}
 
 		if ($menuItem->childs && count($menuItem->childs)) {
 			$menuItem->childs = $this->generateUrlsForMenuItems($menuItem->childs);
@@ -83,7 +86,7 @@ class CisMenu extends FHCAPI_Controller
 			return site_url("/CisVue/Cms/content/" . $menuItem->content_id);
 		}
 
-		if (!$menuItem->content || !mb_strlen($menuItem->content)) {
+		if (!isset($menuItem->content) || !$menuItem->content || !mb_strlen($menuItem->content)) {
 			return '';
 		}
 

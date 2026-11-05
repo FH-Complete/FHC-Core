@@ -7,6 +7,11 @@ $includesArray = array(
 	'fontawesome6' => true,
 	'axios027' => true,
 	'primevue3' => true,
+	'vuedatepicker11' => true,
+	'printCssPath' => 'public/css/Cis4/print.css',
+	'customJSs' => array_merge([
+		'vendor/moment/luxonjs/luxon.min.js'
+	], $customJSs ?? []),
 	'customJSModules' => array_merge([
 		'public/js/apps/Cis/Menu.js'
 	], $customJSModules ?? []),
@@ -21,18 +26,23 @@ $this->load->view('templates/FHC-Header', $includesArray);
 ?>
 
 <script type="text/javascript">
+	document.body.classList.add("cis4");
 	if (window.self !== window.top)
 		document.body.classList.add("in-frame");
 </script>
 
-<header id="cis-header" class="navbar-dark">
-	<cis-menu 
-		root-url="<?= site_url(''); ?>" 
-		logo-url="<?= base_url($this->config->item('theme_logo')); ?>" 
-		avatar-url="<?= site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>" 
+<!-- used by cis4 native pages, teleported menu needs data attributes-->
+<header id="cis-header" class="navbar-dark"
+	data-root-url="<?= site_url(''); ?>"
+	data-logo-url="<?= base_url($this->config->item('theme_logo')); ?>"
+	data-avatar-url="<?= site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>"
+	data-logout-url="<?= site_url('Cis/Auth/logout'); ?>">
+<!-- used by legacy cis pages & content pages which use component props -->
+	<cis-menu
+		root-url="<?= site_url(''); ?>"
+		logo-url="<?= base_url($this->config->item('theme_logo')); ?>"
+		avatar-url="<?= site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>"
 		logout-url="<?= site_url('Cis/Auth/logout'); ?>"
-		:searchbaroptions="searchbaroptions" 
-		:searchfunction="searchfunction"
 		></cis-menu>
 </header>
 

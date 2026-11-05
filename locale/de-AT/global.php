@@ -27,7 +27,7 @@ $this->phrasen['global/stellvertreter']='Stellvertretung';
 $this->phrasen['global/sekretariat']='Sekretariat';
 $this->phrasen['global/studentenvertreter']='Studienvertretung';
 $this->phrasen['global/jahrgangsvertretung']='Jahrgangsvertretung';
-$this->phrasen['global/hochschulvertretung']='Hochschulvertretung';
+$this->phrasen['global/hochschulvertretung']='Hochschüler*innenvertretung';
 
 $this->phrasen['global/lehrziele']='Lehrziele';
 $this->phrasen['global/allgemeinerdownload']='Allgemeiner Download';

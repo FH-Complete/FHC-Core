@@ -31,6 +31,8 @@ class Lehre extends FHCAPI_Controller
 			'LV' => self::PERM_LOGGED,
 			'Pruefungen' => self::PERM_LOGGED,
 			'semesterAverageGrade' => self::PERM_LOGGED,
+			'getZugewieseneLv' => self::PERM_LOGGED,
+			'getLeForLv' => self::PERM_LOGGED
 		]);
 
 		$this->load->library('PhrasesLib');
@@ -151,6 +153,47 @@ class Lehre extends FHCAPI_Controller
 		}
 
 		$this->terminateWithSuccess(['average_grade' => $averageGrade, 'weighted_average_grade' => $weightedAverageGrade]);
+	}
+
+	/**
+	 * fetches all assigned lehrveranstaltungen of a mitarbeiter for a given semester
+	 * @param mixed $uid
+	 * @param mixed $sem_kurzbz
+	 * @return void
+	 */
+	public function getZugewieseneLv() {
+		$uid = $this->input->get("uid",TRUE);
+		$sem_kurzbz = $this->input->get("sem_kurzbz",TRUE);
+
+		// TODO: error messages
+
+		if(!isset($sem_kurzbz) || isEmptyString($sem_kurzbz))
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+
+		if (!isset($uid) || isEmptyString($uid))
+			$uid = getAuthUID();
+
+		// querying other ma_uids data requires admin permission
+		if($uid !== getAuthUID()) {
+			$this->load->library('PermissionLib');
+			$isAdmin = $this->permissionlib->isBerechtigt('admin');
+			if(!$isAdmin) $this->terminateWithError($this->p->t('ui', 'keineBerechtigung'), 'general');
+		}
+
+		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+		$result = $this->LehrveranstaltungModel->getLvForLektorInSemester($sem_kurzbz, $uid);
+		$data = $this->getDataOrTerminateWithError($result);
+		$this->terminateWithSuccess($data);
+	}
+
+	public function getLeForLv() {
+		$lv_id = $this->input->get("lv_id",TRUE);
+		$sem_kurzbz = $this->input->get("sem_kurzbz",TRUE);
+
+		$this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
+
+//		$this->terminateWithSuccess($this->LehreinheitModel->getLesForLv($lv_id, $sem_kurzbz));
+		$this->terminateWithSuccess($this->LehreinheitModel->getAllLehreinheitenForLvaAndMaUid($lv_id, getAuthUID(), $sem_kurzbz));
 	}
 
 }

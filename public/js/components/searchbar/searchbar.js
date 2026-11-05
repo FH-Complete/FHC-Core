@@ -8,6 +8,7 @@ import dms from "./result/dms.js";
 import cms from "./result/cms.js";
 import mergedStudent from "./result/mergedstudent.js";
 import mergedPerson from "./result/mergedperson.js";
+import teachingunit from "./result/teachingunit.js";
 import { debounce } from "../../helpers/DebounceHelper.js";
 
 export default {
@@ -23,6 +24,7 @@ export default {
 		cms,
 		mergedStudent,
 		mergedPerson,
+		teachingunit,
 	},
 	props: {
 		searchoptions: {

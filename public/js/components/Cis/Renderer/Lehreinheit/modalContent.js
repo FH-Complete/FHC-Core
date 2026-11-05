@@ -5,6 +5,7 @@ import ApiLvPlan from '../../../../api/factory/lvPlan.js';
 import ApiAddons from '../../../../api/factory/addons.js';
 
 export default {
+	name: 'Cis-Renderer-Lehreinheit-ModalContent',
 	components:{
 		LvMenu,
 	},
@@ -49,7 +50,7 @@ export default {
 				return this.event.ende;
 			}
 			return numberPadding(this.event.ende.getHours()) + ":" + numberPadding(this.event.ende.getMinutes());
-		}
+		},
 	},
 	watch: {
 		event: {
@@ -162,6 +163,6 @@ export default {
 					</tr>
 				</tbody>
 		</table>
-		<lv-menu v-if="lvMenu.length && $route.name === 'MyLvPlan'" :containerStyles="['p-0']" :rowStyles="['m-0']" :menu="lvMenu" />
+		<lv-menu v-if="lvMenu.length" :containerStyles="['p-0']" :rowStyles="['m-0']" :menu="lvMenu" />
 	</div>`,
 }

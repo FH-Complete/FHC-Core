@@ -10,6 +10,7 @@ $includesArray = array(
 	'primevue3' => true,
 	'skipID' => '#fhccontent',
 	'vuedatepicker11' => true,
+	'tinymce5' => true,
 	'customCSSs' => array(
 		'public/css/components/verticalsplit.css',
 		'public/css/components/searchbar/searchbar.css',
@@ -21,10 +22,14 @@ $includesArray = array(
 		'public/css/components/FilterComponent.css',
 		'public/css/components/Profil.css',
 		'public/css/components/FormUnderline.css',
+		'public/css/components/inViewTooltip.css',
 		'public/css/components/abgabetool/abgabe.css',
 		'public/css/Cis4/Cms.css',
 		'public/css/Cis4/Studium.css',
-		'public/css/Cis4/Benotungstool.css'
+		'public/css/components/vue-datepicker.css',
+		'public/css/Cis4/Benotungstool.css',
+		'public/css/components/Zeitsperrenma.css', //70747
+		'public/css/Cis4/Zeitsperren.css', //77941
 	),
 	'customJSs' => array(
 		'vendor/npm-asset/primevue/accordion/accordion.min.js',
@@ -54,6 +59,8 @@ $includesArray = array(
 $this->load->view('templates/CISVUE-Header', $includesArray);
 ?>
 <div id="fhccontent" class="h-100" route=<?php echo $route ?>>
-	<router-view></router-view>
+	<router-view
+		:permissions="<?= htmlspecialchars(json_encode($permissions ?? [])); ?>"
+	></router-view>
 </div>
 <?php $this->load->view('templates/CISVUE-Footer', $includesArray); ?>

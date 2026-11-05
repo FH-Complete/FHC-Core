@@ -1,33 +1,45 @@
 <?php
-	$this->load->view(
-		'templates/FHC-Header',
-		array(
-			'title' => 'Prüfungsprotokoll',
-			'jquery3' => true,
-			'jqueryui1' => true,
-			'jquerycheckboxes1' => true,
-			'bootstrap3' => true,
-			'fontawesome4' => true,
-			'tablesorter2' => true,
-			'tabulator5' => true,
-			'tabulator5JQuery' => true,
-			'cis'=>true,
-			'ajaxlib' => true,
-			'dialoglib' => true,
-			'tablewidget' => true,
-			'phrases' => array(
-				'ui' => array(
-					'keineDatenVorhanden',
-                    'heute',
-                    'letzteWoche',
-                    'alle',
-                    'zeitraum'
-					)
-			),
-			'customCSSs' => array('public/css/sbadmin2/tablesort_bootstrap.css'),
-			'customJSs' => array('public/js/bootstrapper.js')
-		)
+	$includesArray = array(
+		'title' => 'Prüfungsprotokoll',
+		'jquery3' => true,
+		'jqueryui1' => true,
+		'jquerycheckboxes1' => true,
+		'bootstrap3' => true,
+		'fontawesome4' => true,
+		'tablesorter2' => true,
+		'tabulator5' => true,
+		'tabulator5JQuery' => true,
+		'cis'=>true,
+		'ajaxlib' => true,
+		'dialoglib' => true,
+		'tablewidget' => true,
+		'phrases' => array(
+			'ui' => array(
+				'keineDatenVorhanden',
+				'heute',
+				'letzteWoche',
+				'alle',
+				'zeitraum'
+				)
+		),
+		'customCSSs' => array('public/css/sbadmin2/tablesort_bootstrap.css'),
+		'customJSs' => array('public/js/bootstrapper.js')
 	);
+
+	if(defined("CIS4") && CIS4)
+	{
+		$this->load->view(
+			'templates/CISVUE-Header',
+			$includesArray
+		);
+	}
+	else
+	{
+		$this->load->view(
+			'templates/FHC-Header',
+			$includesArray
+		);
+	}
 ?>
 
 <div id="page-wrapper">
@@ -66,4 +78,15 @@
 	</div>
 </div>
 
-<?php $this->load->view('templates/FHC-Footer'); ?>
+<?php
+	if (defined("CIS4") && CIS4) {
+		$this->load->view(
+			'templates/CISVUE-Footer',
+			$includesArray
+		);
+	} else {
+		$this->load->view(
+			'templates/FHC-Footer',
+			$includesArray
+		);
+	}
