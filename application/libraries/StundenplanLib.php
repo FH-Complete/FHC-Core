@@ -343,13 +343,12 @@ class StundenplanLib
 					return error(getData($lektor_object));
 				}
 				$lektor_object = getData($lektor_object);
-				if(count($lektor_object) == 0)
+				if(count($lektor_object))
 				{
-					return error("No lektor object");
+					$lektor_object = current($lektor_object);
+					// only provide needed information of the mitarbeiter object
+					$lektor_obj_array[] = $lektor_object;
 				}
-				$lektor_object = current($lektor_object);
-				// only provide needed information of the mitarbeiter object
-				$lektor_obj_array[] = $lektor_object;
 			}
 
 			// load gruppe object
