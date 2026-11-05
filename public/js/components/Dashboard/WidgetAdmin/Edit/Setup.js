@@ -11,6 +11,7 @@ export default {
 		modelValue: Object,
 		editName: Boolean,
 		editSize: Boolean,
+		editLink: Boolean,
 		editHideFooter: Boolean,
 	},
 	emits: [
@@ -34,6 +35,13 @@ export default {
 				{{ $p.t('dashboard/widget_setup_height') }}
 			</edit-size>
 		</div>
+		<form-input
+			v-model="modelValue.cis4link"
+			type="text"
+			container-class="mb-3"
+			:label="$p.t('dashboard/widget_link')"
+			:disabled="!editLink"
+		/>
 		<form-input
 			v-model="modelValue.hideFooter"
 			type="checkbox"
