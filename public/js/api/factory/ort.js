@@ -30,6 +30,12 @@ export default {
 			params: { datum, von, bis, typ, personenanzahl, standort_id, ...advancedFilters }
 		};
 	},
+	getAllReservableRooms() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Ort/getAllReservableRooms',
+		};
+	},
 	getRoomTypes() {
 		return {
 			method: "get",

@@ -109,36 +109,42 @@ const router = VueRouter.createRouter({
 		},
 		// Redirect old links to new format
 		{
-			path: "/CisVue/Cms/getRoomInformation/:ort_kurzbz",
+			path: "/CisVue/Cms/getRoomInformation/:ort_kurzbz?",
 			name: "RoomInformationOld",
 			component: RoomInformation,
 			redirect: (to) => {
 				return { // redirect to longer Rauminfo url and map params
 					name: "RoomInformation",
-					params: { // in this case always populate other params since they are not optional
+					params: {
 						ort_kurzbz: to.params.ort_kurzbz,
-						mode: isMobile ? DEFAULT_MODE_RAUMINFO_MOBILE : DEFAULT_MODE_RAUMINFO_DESKTOP,
-						focus_date: new Date().toISOString().split("T")[0]
+						mode: null,
+						focus_date: null
 					},
 				};
 			},
 		},
 		{
-			path: `/CisVue/Cms/getRoomInformation/:mode/:focus_date/:ort_kurzbz`,
+			path: `/CisVue/Cms/getRoomInformation/:ort_kurzbz?/:mode?/:focus_date?`,
 			name: 'RoomInformation',
 			component: RoomInformation,
 			props: (route) => { // validate and set mode/focus date if for some reason missing
 				const validModes = ["Month", "Week", "Day"];
 
-				// check mode string
-				const mode = route.params.mode &&
-				validModes.includes(route.params.mode.charAt(0).toUpperCase() + route.params.mode.slice(1).toLowerCase())
-					? route.params.mode.charAt(0).toUpperCase() + route.params.mode.slice(1).toLowerCase()
-					: (isMobile ? DEFAULT_MODE_RAUMINFO_MOBILE : DEFAULT_MODE_RAUMINFO_DESKTOP);
+				let mode = null;
+				if (route.params.ort_kurzbz) {
+					// check mode string
+					mode = route.params.mode &&
+					validModes.includes(route.params.mode.charAt(0).toUpperCase() + route.params.mode.slice(1).toLowerCase())
+						? route.params.mode.charAt(0).toUpperCase() + route.params.mode.slice(1).toLowerCase()
+						: (isMobile ? DEFAULT_MODE_RAUMINFO_MOBILE : DEFAULT_MODE_RAUMINFO_DESKTOP);
+				}
 
-				// default to today date if not provided
-				const d = new Date(route.params.focus_date)
-				const focus_date = !isNaN(d) ? route.params.focus_date : new Date().toISOString().split("T")[0];
+				let focus_date = null;
+				if (route.params.ort_kurzbz) {
+					// default to today date if not provided
+					const d = new Date(route.params.focus_date)
+					focus_date = !isNaN(d) ? route.params.focus_date : new Date().toISOString().split("T")[0];
+				}
 
 				// for consistency reasons format the props into one object but actually use a new name to we dont collide with
 				// existing viewData declaration written from codeigniter 3 into routerview tag
@@ -152,13 +158,13 @@ const router = VueRouter.createRouter({
 			},
 			beforeEnter: (to, from, next) => {
 				//  missing mode or focus_date -> set defaults
-				if (!to.params.mode || !to.params.focus_date) {
+				if (to.params.ort_kurzbz && (!to.params.mode || !to.params.focus_date)) {
 					next({
 						name: "RoomInformation",
 						params: {
-							mode: to.params.mode || DEFAULT_MODE_RAUMINFO,
+							mode: to.params.mode || (isMobile ? DEFAULT_MODE_RAUMINFO_MOBILE : DEFAULT_MODE_RAUMINFO_DESKTOP),
 							focus_date: to.params.focus_date || new Date().toISOString().split("T")[0],
-							ort_kurzbz: route.params.ort_kurzbz
+							ort_kurzbz: to.params.ort_kurzbz
 						}
 					});
 				} else {

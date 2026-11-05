@@ -1,4 +1,5 @@
 import FhcCalendar from "../../Calendar/LvPlan.js";
+import FormInput from "../../Form/Input.js";
 
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiRoomPlan from '../../../api/factory/calendar/roomPlan.js';
@@ -10,7 +11,8 @@ export const DEFAULT_MODE_RAUMINFO_DESKTOP = 'Week';
 export default {
 	name: "RoomInformation",
 	components: {
-		FhcCalendar
+		FhcCalendar,
+		FormInput,
 	},
 	props:{
 		viewData: Object, // NOTE(chris): this is inherited from router-view
@@ -40,15 +42,34 @@ export default {
 				},
 			},
 			roomAdditionalInfo: null,
+			reservableRooms: [],
+			selectedRoom: null,
 		}
 	},
 	watch: {
-		'propsViewData.ort_kurzbz': function(newVal, oldVal) {
+		'propsViewData.ort_kurzbz': async function(newVal, oldVal) {
+			if (!this.propsViewData.ort_kurzbz) {
+				return;
+			}
+
+			await this.$nextTick();
 			if(newVal !== oldVal) {
 				this.fetchRoomInformation();
 				this.$refs.calendar.resetEventLoader();
 			}
-		}
+		},
+		selectedRoom() {
+			if (this.selectedRoom && this.selectedRoom !== this.$route.params.ort_kurzbz) {
+				this.$router.push({
+					name: "RoomInformation",
+					params: {
+						mode: this.currentMode,
+						focus_date: this.currentDay,
+						ort_kurzbz: this.selectedRoom,
+					}
+				});
+			}
+		},
 	},
 	methods:{
 		handleChangeDate(day, newMode) {
@@ -153,6 +174,10 @@ export default {
 			];
 		},
 		async fetchRoomInformation() {
+			if (!this.propsViewData.ort_kurzbz) {
+				return;
+			}
+
 			const roomCreationInfoResponse = await this.$api.call(
 				ApiRoomPlan.getRoomCreationInfo(),
 			);
@@ -170,20 +195,63 @@ export default {
 				ApiRoom.getRoomInfo(this.$props.propsViewData.ort_kurzbz),
 			);
 			this.roomAdditionalInfo = roomInfoResponse.data.ausstattung;
-		}
+		},
+		async fetchAllReservableRooms() {
+			const reservableRoomsResponse = await this.$api.call(
+				ApiRoom.getAllReservableRooms(),
+			);
+
+			if (reservableRoomsResponse.meta.status === "success") {
+				this.reservableRooms = reservableRoomsResponse.data.map(
+					(room) => {
+						return {
+							value: room.ort_kurzbz,
+							label:
+								room.ort_kurzbz + " (" + room.bezeichnung + ")",
+						};
+					},
+				);
+
+				if (
+					this.$route.params.ort_kurzbz &&
+					this.reservableRooms.some(
+						(room) => room.value === this.$route.params.ort_kurzbz,
+					)
+				) {
+					this.selectedRoom = this.$route.params.ort_kurzbz;
+				}
+			}
+		},
 	},
 	async created() {
+		await this.fetchAllReservableRooms();
 		this.fetchRoomInformation();
 	},
 	template: /*html*/`
 	<div class="fhc-roominformation d-flex flex-column h-100">
-		<h2>{{ $p.t('rauminfo/rauminfo') }} {{ propsViewData.ort_kurzbz }}</h2>
-		<span v-if="roomAdditionalInfo?.length">
-			{{ $p.t("search/result_equipment") + ":" }}
-			<span v-html="roomAdditionalInfo"></span>
-		</span>
+		<div class="d-flex flex-row gap-2">
+			<div class="flex-grow-1 d-flex flex-column">
+				<h2>{{ $p.t('rauminfo/rauminfo') }} {{ propsViewData.ort_kurzbz }}</h2>
+				<span v-if="roomAdditionalInfo?.length">
+					{{ $p.t("search/result_equipment") + ":" }}
+					<span v-html="roomAdditionalInfo"></span>
+				</span>
+			</div>
+			<div style="max-width: 25%">
+				<form-input v-model="selectedRoom" type="select">
+					<option
+						v-for="room in reservableRooms"
+						:key="room.value"
+						:value="room.value"
+					>
+						{{ room.label }}
+					</option>
+				</form-input>
+			</div>
+		</div>
 		<hr>
 		<fhc-calendar 
+			v-if="propsViewData.ort_kurzbz"
 			ref="calendar"
 			:get-promise-func="getPromiseFunc"
 			:date="currentDay"

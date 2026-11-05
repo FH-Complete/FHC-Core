@@ -48,6 +48,7 @@ class Ort extends FHCAPI_Controller
 			'ContentID' => self::PERM_LOGGED,
 			'getOrtKurzbzContent' => self::PERM_LOGGED,
 			'getRooms' => self::PERM_LOGGED,
+			'getAllReservableRooms' => self::PERM_LOGGED,
 			'getTypes' => self::PERM_LOGGED,
 			'getRoomInfo' => self::PERM_LOGGED,
 			'getStandorte' => self::PERM_LOGGED,
@@ -146,6 +147,18 @@ class Ort extends FHCAPI_Controller
 		$result = $this->OrtModel->execReadOnlyQuery($qry, $params);
 		
 		$this->terminateWithSuccess($result);
+	}
+
+	public function getAllReservableRooms()
+	{
+		$this->load->model('ressource/Ort_model', 'OrtModel');
+		$qry = "SELECT DISTINCT tbl_ort.*
+			FROM public.tbl_ort
+			WHERE aktiv AND lehre
+			ORDER BY ort_kurzbz";
+		$roomsResult = $this->OrtModel->execReadOnlyQuery($qry);
+		$roomsResult = $this->getDataOrTerminateWithError($roomsResult);
+		$this->terminateWithSuccess($roomsResult);
 	}
 
 	public function getTypes()

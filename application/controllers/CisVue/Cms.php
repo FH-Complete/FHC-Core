@@ -96,7 +96,7 @@ class Cms extends Auth_Controller
 		]);
 	}
 
-	public function getRoomInformation($ort_kurzbz)
+	public function getRoomInformation($ort_kurzbz = null)
 	{
 		// Load Config
 		$this->load->config('calendar');
