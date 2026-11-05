@@ -55,9 +55,11 @@ export default {
 			}
 
 			await this.$nextTick();
-			if(newVal !== oldVal) {
+			if (newVal !== oldVal) {
 				this.fetchRoomInformation();
-				this.$refs.calendar.resetEventLoader();
+				if (oldVal) {
+					this.$refs.calendar.resetEventLoader();
+				}
 			}
 		},
 		selectedRoom() {
