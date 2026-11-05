@@ -154,7 +154,7 @@ class Ort extends FHCAPI_Controller
 		$this->load->model('ressource/Ort_model', 'OrtModel');
 		$qry = "SELECT DISTINCT tbl_ort.*
 			FROM public.tbl_ort
-			WHERE aktiv AND reservieren
+			WHERE aktiv AND lehre
 			ORDER BY ort_kurzbz";
 		$roomsResult = $this->OrtModel->execReadOnlyQuery($qry);
 		$roomsResult = $this->getDataOrTerminateWithError($roomsResult);
