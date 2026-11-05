@@ -35,6 +35,7 @@ class RoomPlan extends FHCAPI_Controller
 			'getLektor' => self::PERM_LOGGED,
 			'getReservableMap' => self::PERM_LOGGED,
 			'getGroupOptions' => self::PERM_LOGGED,
+			'getMaxReservableDate' => self::PERM_LOGGED,
 		]);
 
 		$this->load->library('LogLib');
@@ -271,6 +272,11 @@ class RoomPlan extends FHCAPI_Controller
 		);
 
 		$this->terminateWithSuccess($grouppedValues);
+	}
+
+	public function getMaxReservableDate()
+	{
+		$this->terminateWithSuccess(defined('RES_TAGE_LEKTOR_BIS') ? RES_TAGE_LEKTOR_BIS : "2099-01-01");
 	}
 
 }

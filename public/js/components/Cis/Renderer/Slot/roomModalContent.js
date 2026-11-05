@@ -30,6 +30,7 @@ export default {
 			selectedLektoren: [],
 			nestedGroupOptions: {},
 			selectedDate: null,
+			maxSelectableDate: null,
 		};
 	},
 	computed: {
@@ -54,10 +55,13 @@ export default {
 		},
 		parsedTimeGrid() {
 			return this.timeGrid.map((timeslot) => {
-				timeslot.start = timeslot.start.split(":").slice(0,2).join(":");
-				timeslot.end = timeslot.end.split(":").slice(0,2).join(":");
+				timeslot.start = timeslot.start
+					.split(":")
+					.slice(0, 2)
+					.join(":");
+				timeslot.end = timeslot.end.split(":").slice(0, 2).join(":");
 				return timeslot;
-			})
+			});
 		},
 	},
 	watch: {
@@ -173,9 +177,19 @@ export default {
 				this.$refs.beschreibungInput.$el.querySelector("input").focus();
 			}
 		},
+		async fetchMaxReservableDate() {
+			const maxReservableDateResponse = await this.$api.call(
+				ApiRoomPlan.getMaxReservableDate(),
+			);
+
+			if (maxReservableDateResponse.meta.status === "success") {
+				this.maxSelectableDate = new Date(maxReservableDateResponse.data);
+			}
+		},
 	},
 	mounted() {
 		this.syncFromEvent(this.event);
+		this.fetchMaxReservableDate();
 	},
 
 	template: `
@@ -224,6 +238,7 @@ export default {
 				preview-format="dd.MM.yyyy"
 				model-type="yyyy-MM-dd"
 				:min-date="new Date()"
+				:max-date="maxSelectableDate"
 				:enable-time-picker="false"
 				:text-input="true"
 				:six-weeks="true"
