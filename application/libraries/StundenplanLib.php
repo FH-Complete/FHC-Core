@@ -525,6 +525,13 @@ class StundenplanLib
 		$startTime = new DateTime($start);
 		$endTime = new DateTime($end);
 
+		$minDaysAhead = defined('RES_TAGE_LEKTOR_MIN') ? (int) RES_TAGE_LEKTOR_MIN : 1;
+		$today = new DateTime();
+		$earliestAllowedReservableDate = $today->modify("+" . ($minDaysAhead - 1) . " days");
+		if (date_format($earliestAllowedReservableDate, "Y-m-d") > date_format($endTime, "Y-m-d")) {
+			return error("Reservation date invalid!");
+		}
+
 		$latestAllowedReservableDate = defined('RES_TAGE_LEKTOR_BIS') ? RES_TAGE_LEKTOR_BIS : "2099-01-01";
 		if (date_format($startTime, "Y-m-d") > $latestAllowedReservableDate) {
 			return error("Reservation date invalid!");
@@ -647,10 +654,16 @@ class StundenplanLib
 			$latestAllowedReservableDate = defined('RES_TAGE_LEKTOR_BIS') ? RES_TAGE_LEKTOR_BIS : "2099-01-01";
 			$notPastLatestAllowedReservableDate = $reservierung->datum <= $latestAllowedReservableDate;
 
+			$minDaysAhead = defined('RES_TAGE_LEKTOR_MIN') ? (int) RES_TAGE_LEKTOR_MIN : 1;
+			$today = new DateTime();
+			$earliestAllowedReservableDate = $today->modify("+" . ($minDaysAhead - 1) . " days");
+			$notBeforeEarliestAllowedReservableDate = $reservierung->datum >= date_format($earliestAllowedReservableDate, "Y-m-d");
+
 			if (
 				($this->_ci->permissionlib->isBerechtigt('lehre/reservierung:begrenzt')) &&
-				($reservierung->insertvon == getAuthUID() || $reservierung->uid === getAuthUID())
-				&& $notPastLatestAllowedReservableDate
+				($reservierung->insertvon == getAuthUID() || $reservierung->uid === getAuthUID()) &&
+				$notPastLatestAllowedReservableDate &&
+				$notBeforeEarliestAllowedReservableDate
 			)
 			{
 				$delete_result = $this->_ci->ReservierungModel->delete($reservierung->reservierung_id);
@@ -698,7 +711,7 @@ class StundenplanLib
 		}
 
 		$now = time();
-		$tage_min = defined('RES_TAGE_LEKTOR_MIN') ? (int)RES_TAGE_LEKTOR_MIN : 0;
+		$tage_min = defined('RES_TAGE_LEKTOR_MIN') ? (int)RES_TAGE_LEKTOR_MIN : 1;
 
 		$datum_res_lektor_start = $this->jump_day($now, $tage_min - 1);
 
