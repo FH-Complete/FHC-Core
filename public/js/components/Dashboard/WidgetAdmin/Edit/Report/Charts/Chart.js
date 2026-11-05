@@ -1,5 +1,7 @@
 import FormInput from '../../../../../Form/Input.js';
 
+import { useReportFields } from '../../../../../../composables/DashboardWidget/Report/ReportFields.js';
+
 export default {
 	name: "WidgetsGenteratorReportChartsChart",
 	components: {
@@ -97,13 +99,34 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 	},
+	setup() {
+		const statistikKurzbz = Vue.inject('statistikKurzbz');
+
+		const { fields } = useReportFields(statistikKurzbz);
+
+		return {
+			fields,
+		};
+	},
 	template: /*html*/ `
 	<div class="widgets-report-config-charts-chart">
 		<form-input
+			v-if="!fields.length"
 			v-model="field"
 			:label="$p.t('dashboard/widget_report_graph_field')"
 			class="mb-3"
 		/>
+		<form-input
+			v-else
+			v-model="field"
+			type="select"
+			:label="$p.t('dashboard/widget_report_graph_field')"
+			class="mb-3"
+		>
+			<option v-for="field in fields" :key="field.name" :value="field.name">
+				{{ field.name }} ({{ field.type }})
+			</option>
+		</form-input>
 		<form-input
 			v-model="label"
 			:label="$p.t('global/label')"

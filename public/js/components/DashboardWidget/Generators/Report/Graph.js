@@ -22,6 +22,11 @@ export default {
 		TitleInput,
 		FormInput,
 	},
+	provide() {
+		return {
+			statistikKurzbz: Vue.computed(() => this.modelValue?.arguments?.statistik_kurzbz)
+		};
+	},
 	props: {
 		modelValue: Object,
 	},
