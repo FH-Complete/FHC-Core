@@ -71,7 +71,10 @@ class Report extends FHCAPI_Controller
 		$statistik = current($statistik);
 
 		// NOTE(chris): Permission check
-		$permissions = [ 'vars' => $statistik->berechtigung_kurzbz . ':r' ];
+		$permissions = [ 'vars' => [
+			$statistik->berechtigung_kurzbz . ':r',
+			'dashboard/admin:rw'
+		] ];
 		if (!$this->permissionlib->isEntitled($permissions, 'vars')) {
 			$this->_outputAuthError($permissions);
 			exit; // immediately terminate the execution
