@@ -31,6 +31,7 @@ export default {
 			nestedGroupOptions: {},
 			selectedDate: null,
 			maxSelectableDate: null,
+			minSelectableDate: null,
 		};
 	},
 	computed: {
@@ -177,19 +178,20 @@ export default {
 				this.$refs.beschreibungInput.$el.querySelector("input").focus();
 			}
 		},
-		async fetchMaxReservableDate() {
-			const maxReservableDateResponse = await this.$api.call(
-				ApiRoomPlan.getMaxReservableDate(),
+		async fetchReservableDateRange() {
+			const reservableDateRangeResponse = await this.$api.call(
+				ApiRoomPlan.getReservableDateRange(),
 			);
 
-			if (maxReservableDateResponse.meta.status === "success") {
-				this.maxSelectableDate = new Date(maxReservableDateResponse.data);
+			if (reservableDateRangeResponse.meta.status === "success") {
+				this.maxSelectableDate = reservableDateRangeResponse.data.max;
+				this.minSelectableDate = reservableDateRangeResponse.data.min;
 			}
 		},
 	},
 	mounted() {
 		this.syncFromEvent(this.event);
-		this.fetchMaxReservableDate();
+		this.fetchReservableDateRange();
 	},
 
 	template: `
@@ -237,7 +239,7 @@ export default {
 				format="dd.MM.yyyy"
 				preview-format="dd.MM.yyyy"
 				model-type="yyyy-MM-dd"
-				:min-date="new Date()"
+				:min-date="minSelectableDate"
 				:max-date="maxSelectableDate"
 				:enable-time-picker="false"
 				:text-input="true"

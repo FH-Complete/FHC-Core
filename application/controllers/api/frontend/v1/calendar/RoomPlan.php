@@ -35,7 +35,7 @@ class RoomPlan extends FHCAPI_Controller
 			'getLektor' => self::PERM_LOGGED,
 			'getReservableMap' => self::PERM_LOGGED,
 			'getGroupOptions' => self::PERM_LOGGED,
-			'getMaxReservableDate' => self::PERM_LOGGED,
+			'getReservableDateRange' => self::PERM_LOGGED,
 		]);
 
 		$this->load->library('LogLib');
@@ -274,9 +274,15 @@ class RoomPlan extends FHCAPI_Controller
 		$this->terminateWithSuccess($grouppedValues);
 	}
 
-	public function getMaxReservableDate()
+	public function getReservableDateRange()
 	{
-		$this->terminateWithSuccess(defined('RES_TAGE_LEKTOR_BIS') ? RES_TAGE_LEKTOR_BIS : "2099-01-01");
+		$today = new DateTime();
+		$minDaysAhead = defined('RES_TAGE_LEKTOR_MIN') ? (int) RES_TAGE_LEKTOR_MIN : 1;
+		$min = $today->modify(($minDaysAhead - 1) . " days");
+		$this->terminateWithSuccess([
+			"min" => $min->format("Y-m-d"),
+			"max" =>  defined('RES_TAGE_LEKTOR_BIS') ? RES_TAGE_LEKTOR_BIS : "2099-01-01"
+		]);
 	}
 
 }

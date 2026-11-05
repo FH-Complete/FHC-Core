@@ -6,10 +6,10 @@ export default {
 			params: { start_date, end_date }
 		};
 	},
-	getMaxReservableDate() {
+	getReservableDateRange() {
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/calendar/RoomPlan/getMaxReservableDate'
+			url: '/api/frontend/v1/calendar/RoomPlan/getReservableDateRange'
 		};
 	},
 
