@@ -110,18 +110,34 @@ export default {
 			<span class="event-topic">{{ event.topic }}</span>
 			<span class="event-place">{{ event.ort_kurzbz }}</span>
 			<span>{{ event.gruppe[0].kuerzel.split("/")[0] }}</span>
-			<span
-				v-for="lektor in event.lektor.slice(0, 3)"
-				class="event-lectors"
-			>
-				{{ lektor.kurzbz }}
-			</span>
-			<span
-				v-if="event.lektor.length > 3"
-				class="event-lectors-plus"
-			>
-				... +{{ event.lektor.length - 3 }}
-			</span>
+			<template v-if="event.lektor.length">
+				<span
+					v-for="lektor in event.lektor.slice(0, 3)"
+					class="event-lectors"
+				>
+					{{ lektor.kurzbz }}
+				</span>
+				<span
+					v-if="event.lektor.length > 3"
+					class="event-lectors-plus"
+				>
+					... +{{ event.lektor.length - 3 }}
+				</span>
+			</template>
+			<template v-else>
+				<span
+					v-for="uid in event.uids.slice(0, 3)"
+					class="event-uids"
+				>
+					{{ uid }}
+				</span>
+				<span
+					v-if="event.uids.length > 3"
+					class="event-uids-plus"
+				>
+					... +{{ event.uids.length - 3 }}
+				</span>
+			</template>
 		</div>
 	</div>
 	`,
