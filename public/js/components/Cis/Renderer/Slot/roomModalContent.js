@@ -242,6 +242,7 @@ export default {
 				:enable-time-picker="false"
 				:text-input="true"
 				:six-weeks="true"
+				auto-apply
 				required
 			/>
 		</div>
