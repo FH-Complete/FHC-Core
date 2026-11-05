@@ -33,11 +33,13 @@ export default {
 			}
 		},
 		aggregatorLabels() {
-			let calledVars = { ...this.shared.calledVars } || {};
+			let calledVars = this.shared?.calledVars
+				? { ...this.shared.calledVars }
+				: {};
 			for (const key in calledVars) // Overwrite with current value
 				if (this.customVars[key] && this.customVars[key].modelValue.hasOwnProperty('value'))
 					calledVars[key] = this.customVars[key].modelValue.value;
-			const details = this.shared.details || {};
+			const details = this.shared?.details || {};
 			return this.config.aggregators.map(agg => compileLabel(agg.label, calledVars, details));
 		},
 		customVars() {
