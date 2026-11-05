@@ -88,7 +88,7 @@ export default {
 	},
 	template: /* html */`
 	<div
-		class="cis-renderer-reservierungen-calendar-event calendar-event-default h-100 w-100 p-1 position-relative">
+		class="cis-renderer-reservierungen-calendar-event calendar-event-default h-100 w-100 p-1 position-relative" v-tooltip="tooltipString">
 		<div
 			v-if="!event?.allDayEvent && event?.beginn && event?.ende"
 			:class="timeSlotDisplayClasses"
@@ -97,7 +97,7 @@ export default {
 			<span>{{ start }}</span>
 			<span>{{ end }}</span>
 		</div>
-		<div class="event-text" v-tooltip="tooltipString">
+		<div class="event-text">
 			<button
 				v-if="!isPastDate && event.type === 'reservierung' && event.deletable && mode !== 'Month'"
 				class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-1"
