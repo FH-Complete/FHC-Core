@@ -28,8 +28,8 @@ class RoomPlan extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'addRoomReservation' => self::PERM_LOGGED,
-			'deleteRoomReservation' => self::PERM_LOGGED,
+			'addRoomReservation' => ['lehre/reservierung:begrenzt:rw', 'lehre/reservierung:rw', 'lehre/reservierungAdvanced:rw'],
+			'deleteRoomReservation' => ['lehre/reservierung:begrenzt:rw', 'lehre/reservierung:rw', 'lehre/reservierungAdvanced:rw'],
 			'getRoomCreationInfo' => self::PERM_LOGGED,
 			'getGruppen' => self::PERM_LOGGED,
 			'getLektor' => self::PERM_LOGGED,
@@ -92,7 +92,7 @@ class RoomPlan extends FHCAPI_Controller
 		$result = $this->stundenplanlib->addReservation($start, $end, $title, $beschreibung, $ort_kurzbz, $lektoren, $studiengang_kz, $semester, $verband, $gruppe, $spezialgruppe);
 
 		if (isError($result))
-			$this->terminateWithError($result);
+			$this->terminateWithError(getError($result));
 
 		$this->terminateWithSuccess($result);
 	}

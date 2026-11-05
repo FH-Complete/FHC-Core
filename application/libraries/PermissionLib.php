@@ -39,6 +39,8 @@ class PermissionLib
 
 	const PERMISSION_SEPARATOR = ':'; // used as separator berween permission and right
 
+	const PERMISSION_REGEX = '#^(.*)' . self::PERMISSION_SEPARATOR . '('. self::READ_WRITE_RIGHT .'|'. self::WRITE_RIGHT .'|'. self::READ_RIGHT .')$#';
+
 	// Conversion from HTTP method to access type method
 	const READ_HTTP_METHOD = 'GET';
 	const WRITE_HTTP_METHOD = 'POST';
@@ -176,7 +178,7 @@ class PermissionLib
 						for ($pCounter = 0; $pCounter < count($permissions); $pCounter++)
 						{
 							// Checks if the permission is well formatted
-							if (strpos($permissions[$pCounter], PermissionLib::PERMISSION_SEPARATOR) !== false)
+							if (preg_match(PermissionLib::PERMISSION_REGEX, $permissions[$pCounter]))
 							{
 								// Retrieves permission and required access type from the $requiredPermissions array
 								list($permission, $accessType) = $this->convertAccessType($permissions[$pCounter]);
@@ -238,12 +240,16 @@ class PermissionLib
 	 */
 	public function convertAccessType($permission)
 	{
-		list($permission, $reqAccessType) = explode(PermissionLib::PERMISSION_SEPARATOR, $permission);
+		$matches = array();
+		preg_match(PermissionLib::PERMISSION_REGEX, $permission, $matches);
+		$permission = isset($matches[1]) ? $matches[1] : $permission;
+		$reqAccessType = isset($matches[2]) ? $matches[2] : null;
+
 		$accessType = '';
 		if (strpos($reqAccessType, PermissionLib::READ_RIGHT) !== false)
-			$accessType = PermissionLib::SELECT_RIGHT;
+			$accessType .= PermissionLib::SELECT_RIGHT;
 		if (strpos($reqAccessType, PermissionLib::WRITE_RIGHT) !== false)
-			$accessType = PermissionLib::REPLACE_RIGHT.PermissionLib::DELETE_RIGHT;
+			$accessType .= PermissionLib::REPLACE_RIGHT.PermissionLib::DELETE_RIGHT;
 		return [$permission, $accessType];
 	}
 

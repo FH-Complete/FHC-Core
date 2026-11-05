@@ -103,7 +103,10 @@ export default {
 			if (event.type !== 'reservierung')
 				return;
 
-			if (luxon.DateTime.fromISO(`${event.datum}T${event.beginn}`) < luxon.DateTime.now())
+			if (
+				luxon.DateTime.fromISO(`${event.datum}T${event.beginn}`) <
+				luxon.DateTime.now().startOf("day")
+			)
 				return;
 
 			await this.$api.call(ApiRoomPlan.deleteRoomReservation(event.reservierung_id));
