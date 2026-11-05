@@ -45,6 +45,7 @@ $this->load->view(
 				:stg-a="<?= htmlspecialchars(json_encode(array_values($stgA))); ?>"
 				:stg-l="<?= htmlspecialchars(json_encode(array_values($stgL))); ?>"
 				:abmeldung_enabled="<?= htmlspecialchars(json_encode(($abmeldung_enabled))); ?>"
+				:ub-checked-by-ass="<?= htmlspecialchars(json_encode($unterbrechung_checked_by_Ass)); ?>"
 				>
 			</studierendenantrag-leitung>
 

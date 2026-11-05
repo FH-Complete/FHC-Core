@@ -586,4 +586,24 @@ class Studierendenantrag_model extends DB_Model
 		return $this->execQuery($qry, $params);
 	}
 
+	public function getUnterbrechungenForAssistance()
+	{
+		$qry = "
+		 SELECT
+			 UPPER(stg.typ) || UPPER(stg.kurzbz) || ' ' || stg.bezeichnung || ' (' || stg.orgform_kurzbz || ')' AS studiengang,
+			 stg.email, COUNT(*) AS anzahl
+		FROM campus.tbl_studierendenantrag
+		JOIN public.tbl_prestudent p USING (prestudent_id)
+		JOIN public.tbl_studiengang stg ON p.studiengang_kz=stg.studiengang_kz
+		JOIN campus.tbl_studierendenantrag_status as s ON campus.get_status_id_studierendenantrag(campus.tbl_studierendenantrag.studierendenantrag_id) = studierendenantrag_status_id
+		JOIN campus.tbl_studierendenantrag_statustyp as st USING (studierendenantrag_statustyp_kurzbz)
+		WHERE   (
+			s.studierendenantrag_statustyp_kurzbz = 'Erstellt'
+		AND tbl_studierendenantrag.typ = 'Unterbrechung'
+		 )
+		GROUP BY studiengang, stg.email
+		ORDER BY studiengang
+			";
+		return $this->execQuery($qry);
+	}
 }

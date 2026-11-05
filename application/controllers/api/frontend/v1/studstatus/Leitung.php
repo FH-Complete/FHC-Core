@@ -45,7 +45,9 @@ class Leitung extends FHCAPI_Controller
 			'unpauseAntrag' => ['student/antragfreigabe:w', 'student/studierendenantrag:w'],
 			'objectAntrag' => ['student/antragfreigabe:w', 'student/studierendenantrag:w'],
 			'approveObjection' => ['student/antragfreigabe:w', 'student/studierendenantrag:w'],
-			'denyObjection' => ['student/antragfreigabe:w', 'student/studierendenantrag:w']
+			'denyObjection' => ['student/antragfreigabe:w', 'student/studierendenantrag:w'],
+			'setStatusToCheckedAss' => ['student/antragfreigabe:w', 'student/studierendenantrag:w'],
+			'rejectAntragByAss' => ['student/antragfreigabe:r', 'student/studierendenantrag:r'],
 		]);
 
 		// Libraries
@@ -422,6 +424,81 @@ class Leitung extends FHCAPI_Controller
 		$grund = $this->input->post('grund');
 
 		$result = $this->antraglib->denyObjectionAbmeldung($studierendenantrag_id, getAuthUID(), $grund);
+		$this->getDataOrTerminateWithError($result);
+
+		return $this->terminateWithSuccess($studierendenantrag_id);
+	}
+
+	public function setStatusToCheckedAss()
+	{
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules(
+			'studierendenantrag_id',
+			'Studierenden Antrag',
+			[
+				'required',
+				['isEntitledToCheckOrRejectAntrag', [$this->antraglib, 'isEntitledToCheckOrRejectAntrag']],
+				['canBeChecked', function ($a) {
+					return $this->antraglib->hasType($a, Studierendenantrag_model::TYP_UNTERBRECHUNG);
+				}]
+			],
+			[
+				'isEntitledToCheckOrRejectAntrag' => $this->p->t('studierendenantrag', 'error_no_right'),
+				'canBeChecked' => $this->p->t(
+					'studierendenantrag',
+					'error_no_check_permission'
+				)
+			]
+		);
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$studierendenantrag_id = $this->input->post('studierendenantrag_id');
+
+		$result = $this->antraglib->setStatusToCheckedAss($studierendenantrag_id, getAuthUID());
+		$this->getDataOrTerminateWithError($result);
+
+		return $this->terminateWithSuccess($studierendenantrag_id);
+	}
+
+	public function rejectAntragByAss()
+	{
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules(
+			'studierendenantrag_id',
+			'Studierenden Antrag',
+			[
+				'required',
+				['isEntitledToCheckOrRejectAntrag', [$this->antraglib, 'isEntitledToCheckOrRejectAntrag']],
+			],
+			[
+				'isEntitledToCheckOrRejectAntrag' => $this->p->t('studierendenantrag', 'error_no_check_permission')
+			]
+		);
+
+		$this->form_validation->set_rules('grund', 'Grund', 'required');
+
+		$this->form_validation->set_rules(
+			'typ',
+			'Typ',
+			'required|in_list[' . Studierendenantrag_model::TYP_UNTERBRECHUNG . ']'
+		);
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$studierendenantrag_id = $this->input->post('studierendenantrag_id');
+		$grund = $this->input->post('grund');
+
+		$result = $this->antraglib->rejectUnterbrechungByAss(
+			$studierendenantrag_id,
+			getAuthUID(),
+			$grund
+		);
+
 		$this->getDataOrTerminateWithError($result);
 
 		return $this->terminateWithSuccess($studierendenantrag_id);

@@ -16,7 +16,8 @@ export default {
 		columnData: Array,
 		stgL: Array,
 		stgA: Array,
-		filter: String
+		filter: String,
+		ub_checkedbyAss: Boolean
 	},
 	emits: [
 		'update:columnData',
@@ -29,14 +30,16 @@ export default {
 		'action:objectionApprove',
 		'action:cancel',
 		'action:pause',
-		'action:unpause'
+		'action:unpause',
+		'action:check',
+		'action:rejectByAss'
 	],
 	data() {
 		return {
 			table: null,
 			lastHistoryClickedId: null,
 			historyData: [],
-			lvsData: null
+			lvsData: null,
 		}
 	},
 	methods: {
@@ -403,11 +406,48 @@ export default {
 							button.addEventListener('click',() => this.$emit('action:cancel', [cell.getData()]));
 							container.append(button);
 						}
+
+						//new Process: Erstellt -> GeprueftAssistenz -> and then to STGL to Approve
+						if(this.ub_checkedbyAss &&
+							(data.status == 'Erstellt' && data.typ == "Unterbrechung")) {
+							let buttonCheck = document.createElement('button');
+							buttonCheck.append(this.$p.t('studierendenantrag', 'btn_setToCheckedAss'));
+							buttonCheck.className = "btn btn-outline-secondary";
+							if (this.stgL.includes(data.studiengang_kz)) {
+								buttonCheck.setAttribute('disabled', 'disabled');
+							}
+							buttonCheck.addEventListener('click', () => this.$emit('action:check', [cell.getData()]));
+							container.append(buttonCheck);
+						}
+
+						if (this.ub_checkedbyAss && (data.typ == 'Unterbrechung' && data.status == 'Erstellt' && !this.stgL.includes(data.studiengang_kz))) {
+							let button = document.createElement('button');
+							button.append(this.$p.t('studierendenantrag', 'btn_reject'));
+							button.className = "btn btn-outline-secondary";
+							button.addEventListener('click', () => this.$emit('action:rejectByAss', [cell.getData()]));
+							container.append(button);
+						}
 					}
 
 					if (this.stgL.includes(data.studiengang_kz)) {
 						// NOTE(chris): Approve
-						if ((data.typ == 'Wiederholung' && data.status == 'Lvszugewiesen') || (data.typ != 'Wiederholung' && data.status == 'Erstellt')) {
+						if (this.ub_checkedbyAss &&
+							(
+								(data.typ == 'Wiederholung' && data.status == 'Lvszugewiesen') ||
+								(data.typ != 'Wiederholung' && !(data.typ == 'Unterbrechung') && data.status == 'Erstellt')
+								|| (data.typ == 'Unterbrechung' && data.status == 'GeprueftAssistenz')
+							)
+						) {
+							let button = document.createElement('button');
+							button.append(this.$p.t('studierendenantrag', 'btn_approve'));
+							button.className = "btn btn-outline-secondary";
+							button.addEventListener('click', () => this.$emit('action:approve', [cell.getData()]));
+							container.append(button);
+						}
+						if (!this.ub_checkedbyAss &&
+							(
+							(data.typ == 'Wiederholung' && data.status == 'Lvszugewiesen') ||
+								(data.typ != 'Wiederholung' && data.status == 'Erstellt'))) {
 							let button = document.createElement('button');
 							button.append(this.$p.t('studierendenantrag', 'btn_approve'));
 							button.className = "btn btn-outline-secondary";
@@ -415,13 +455,24 @@ export default {
 							container.append(button);
 						}
 						// NOTE(chris): Reject (Unterbrechung braucht grund)
-						if (data.status == 'Erstellt' && data.typ == 'Unterbrechung') {
+						if (this.ub_checkedbyAss &&
+							(data.status == 'GeprueftAssistenz' && data.typ == 'Unterbrechung')) {
 							let button = document.createElement('button');
 							button.append(this.$p.t('studierendenantrag', 'btn_reject'));
 							button.className = "btn btn-outline-secondary";
 							button.addEventListener('click', () => this.$emit('action:reject', [cell.getData()]));
 							container.append(button);
 						}
+						if (!this.ub_checkedbyAss &&
+							(data.status == 'Erstellt' && data.typ == 'Unterbrechung')
+						) {
+							let button = document.createElement('button');
+							button.append(this.$p.t('studierendenantrag', 'btn_reject'));
+							button.className = "btn btn-outline-secondary";
+							button.addEventListener('click', () => this.$emit('action:reject', [cell.getData()]));
+							container.append(button);
+						}
+
 					}
 
 					// NOTE(chris): Show LVs

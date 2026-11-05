@@ -96,5 +96,19 @@ export default {
 			url: '/api/frontend/v1/studstatus/leitung/denyObjection',
 			params: antrag
 		};
-	}
+	},
+	setStatusToCheckedAss(antrag){
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/studstatus/leitung/setStatusToCheckedAss',
+			params: antrag
+		};
+	},
+	rejectUnterbrechungByAss(antrag) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/studstatus/leitung/rejectAntragByAss',
+			params: antrag
+		};
+	},
 };

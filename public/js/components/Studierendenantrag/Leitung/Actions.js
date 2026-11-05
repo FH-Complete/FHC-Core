@@ -32,7 +32,9 @@ export default {
 			if (!this.selectedData.every(val => this.stgL.includes(val.studiengang_kz)))
 				return false;
 			return this.selectedData.filter(row => {
-				return (row.typ == 'Wiederholung' && row.status == 'Lvszugewiesen') || (row.typ != 'Wiederholung' && (row.status == 'Erstellt' || row.status == 'ErstelltStgl'));
+				return (row.typ == 'Wiederholung' && row.status == 'Lvszugewiesen') ||
+					(row.typ != 'Wiederholung' && (row.status == 'Erstellt' || row.status == 'ErstelltStgl' ||
+					row.status == 'GeprueftAssistenz'));
 			}).length == this.selectedData.length;
 		},
 		selectedCanBeRejected() {

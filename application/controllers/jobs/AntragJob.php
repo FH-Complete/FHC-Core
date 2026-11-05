@@ -55,43 +55,47 @@ class AntragJob extends JOB_Controller
 
 		$this->StudierendenantragModel->addJoin('public.tbl_prestudent', 'prestudent_id');
 
-		if ($this->config->item('abmeldung_enabled') === true)
-		{
+		if ($this->config->item('abmeldung_enabled') === true) {
 			$this->db->group_start();
 			$this->db->where('typ', Studierendenantrag_model::TYP_ABMELDUNG);
 			$this->db->where('campus.get_status_studierendenantrag(studierendenantrag_id)', Studierendenantragstatus_model::STATUS_CREATED);
 			$this->db->group_end();
 		}
 
-		if ($this->config->item('abmeldung_stg_enabled') === true)
-		{
+		if ($this->config->item('abmeldung_stg_enabled') === true) {
 			$this->db->or_group_start();
 			$this->db->where('typ', Studierendenantrag_model::TYP_ABMELDUNG_STGL);
 			$this->db->where('campus.get_status_studierendenantrag(studierendenantrag_id)', Studierendenantragstatus_model::STATUS_CREATED);
 			$this->db->group_end();
 		}
 
-		if ($this->config->item('unterbrechung_enabled') === true)
-		{
+		if ($this->config->item('unterbrechung_enabled') === true && $this->config->item('unterbrechung_checked_by_Ass') !== true) {
 			$this->db->or_group_start();
 			$this->db->where('typ', Studierendenantrag_model::TYP_UNTERBRECHUNG);
 			$this->db->where('campus.get_status_studierendenantrag(studierendenantrag_id)', Studierendenantragstatus_model::STATUS_CREATED);
 			$this->db->group_end();
 		}
 
-		if ($this->config->item('wiederholung_enabled') === true)
-		{
+		//Alternative process for Unterbrechung
+		if ($this->config->item('unterbrechung_enabled') === true && $this->config->item('unterbrechung_checked_by_Ass') === true) {
+			$this->db->or_group_start();
+			$this->db->where('typ', Studierendenantrag_model::TYP_UNTERBRECHUNG);
+			$this->db->where('campus.get_status_studierendenantrag(studierendenantrag_id)', Studierendenantragstatus_model::STATUS_CHECKED_ASS);
+			$this->db->group_end();
+		}
+
+		if ($this->config->item('wiederholung_enabled') === true) {
 			$this->db->or_group_start();
 			$this->db->where('typ', Studierendenantrag_model::TYP_WIEDERHOLUNG);
 			$this->db->where('campus.get_status_studierendenantrag(studierendenantrag_id)', Studierendenantragstatus_model::STATUS_LVSASSIGNED);
 			$this->db->group_end();
 		}
 
-		$result =  $this->StudierendenantragModel->load();
-		if(isError($result))
+		$result = $this->StudierendenantragModel->load();
+		if (isError($result))
 			return $this->logError(getError($result));
 
-		if(!hasData($result))
+		if (!hasData($result))
 			return $this->logInfo('End Job sendStglSammelmail: 0 Mails sent');
 
 		$antraege = getData($result);
@@ -99,40 +103,32 @@ class AntragJob extends JOB_Controller
 		$stgs = array();
 		$stgLeitungen = array();
 
-		foreach ($antraege as $antrag)
-		{
-			if (!isset($stgs[$antrag->studiengang_kz]))
-			{
+		foreach ($antraege as $antrag) {
+			if (!isset($stgs[$antrag->studiengang_kz])) {
 				$result = $this->StudiengangModel->getLeitung($antrag->studiengang_kz);
-				if (isError($result))
-				{
+				if (isError($result)) {
 					$this->logError(getError($result));
 					continue;
 				}
-				if (!hasData($result))
-				{
+				if (!hasData($result)) {
 					$this->logError('Keine Leitung für Studiengang ' . $antrag->studiengang_kz . ' gefunden!');
 					continue;
 				}
 
 				$leitungen = getData($result);
-				foreach ($leitungen as $leitung)
-				{
-					if (!isset($stgLeitungen[$leitung->uid]))
-					{
+				foreach ($leitungen as $leitung) {
+					if (!isset($stgLeitungen[$leitung->uid])) {
 						$stgLeitungen[$leitung->uid] = ['Details' => $leitung, 'stgs' => []];
 					}
 					$stgLeitungen[$leitung->uid]['stgs'][] = $antrag->studiengang_kz;
 				}
 
 				$result = $this->StudierendenantragModel->getStgAndDetails($antrag->studierendenantrag_id);
-				if (isError($result))
-				{
+				if (isError($result)) {
 					$this->logError(getError($result));
 					continue;
 				}
-				if (!hasData($result))
-				{
+				if (!hasData($result)) {
 					$this->logError('Keine Details für Studiengang ' . $antrag->studiengang_kz . ' gefunden!');
 					continue;
 				}
@@ -162,8 +158,7 @@ class AntragJob extends JOB_Controller
 		}
 
 		$count = 0;
-		foreach ($stgLeitungen as $leitung)
-		{
+		foreach ($stgLeitungen as $leitung) {
 			$data = [
 				'name' => trim($leitung['Details']->vorname . ' ' . $leitung['Details']->nachname),
 				'vorname' => $leitung['Details']->vorname,
@@ -185,16 +180,16 @@ class AntragJob extends JOB_Controller
 						}
 					}
 					$table .= $this->p->t('studierendenantrag', 'mail_part_table', [
-                        'stg_bezeichnung' => $stg['Details']->bezeichnung,
-                        'stg_orgform_kurzbz' => $stg['Details']->orgform_kurzbz,
-                        'rows' => $rows
-                    ]);
+						'stg_bezeichnung' => $stg['Details']->bezeichnung,
+						'stg_orgform_kurzbz' => $stg['Details']->orgform_kurzbz,
+						'rows' => $rows
+					]);
 				}
 				$data['table_' . $lang] = $table;
 			}
 
 			$data['table'] = $data['table_' . DEFAULT_LANGUAGE];
-			$data['leitungLink'] = APP_ROOT. 'index.ci.php/lehre/Studierendenantrag/leitung';
+			$data['leitungLink'] = APP_ROOT . 'index.ci.php/lehre/Studierendenantrag/leitung';
 
 			//Mail an Stgl und Assistenz
 			$to = $leitung['Details']->uid . '@' . DOMAIN;
@@ -214,7 +209,44 @@ class AntragJob extends JOB_Controller
 				$count++;
 		}
 
-		$this->logInfo($count . " Emails erfolgreich versandt");
+		$this->logInfo($count . " Emails an STGL erfolgreich versandt");
+
+		if ($this->config->item('unterbrechung_enabled') === true && $this->config->item('unterbrechung_checked_by_Ass') === true)
+		{
+			// Mail an Assistenzen
+			$resultAss = $this->StudierendenantragModel->getUnterbrechungenForAssistance();
+
+			if (isError($resultAss))
+				return $this->logError(getError($resultAss));
+
+			if (!hasData($resultAss))
+				return $this->logInfo('End Job Part ASS : 0 Mails sent');
+
+			$antraegeAss = getData($resultAss);
+			$countMailAss = 0;
+			foreach ($antraegeAss as $ubStg)
+			{
+				$to = $ubStg->email;
+				$data = [
+					'studiengang' => $ubStg->studiengang,
+					'anzahl' => $ubStg->anzahl,
+					'link' => APP_ROOT . 'index.ci.php/lehre/Studierendenantrag/leitung'
+				];
+
+				if (sendSanchoMail(
+					"Sancho_Mail_UB_Ass",
+					$data,
+					$to,
+					'Unterbrechung(en) -Prüfung Assistenz erforderlich',
+					'',
+					'',
+					'',
+					null
+				))
+				$countMailAss++;
+			}
+			$this->logInfo($countMailAss . " Emails an Assistance erfolgreich versandt");
+		}
 
 		$this->logInfo('End Job sendStglSammelmail');
 	}

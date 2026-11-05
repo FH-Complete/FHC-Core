@@ -19,7 +19,9 @@ export default {
 	props: {
 		stgL: Array,
 		stgA: Array,
-		abmeldung_enabled: Boolean
+		abmeldung_enabled: Boolean, //true
+		testManu: Boolean, //false
+		ubCheckedByAss: Boolean //false TODO check why not working
 	},
 	data() {
 		return {
@@ -224,6 +226,32 @@ export default {
 					.then(this.showResults);
 			}
 		},
+		actionCheck(evt){
+			var antraege = evt || this.selectedData;
+			this.$refs.loader.show();
+			this
+				._singleOrMultiApiCall(antraege, ApiStudstatusLeitung.setStatusToCheckedAss)
+				.then(this.showResults);
+		},
+		actionRejectByAss(evt){
+			var antrag = evt || this.selectedData;
+			let	gruende = [];
+			var currentAntrag = antrag.pop();
+			GrundPopup
+				.popup(this.$p.t('studierendenantrag', 'title_grund', {id: currentAntrag.studierendenantrag_id}), {
+					countRemaining: antrag.length
+				})
+				.then(result => {
+					currentAntrag.grund = result[0];
+					gruende.push(currentAntrag);
+
+					this.$refs.loader.show();
+					this
+						._singleOrMultiApiCall(gruende, ApiStudstatusLeitung.rejectUnterbrechungByAss)
+						.then(this.showResults);
+				})
+				.catch(() => {});
+		},
 		showResults(results) {
 			let fulfilled = results.filter(res => res.status == 'fulfilled');
 			this.$refs.loader.hide();
@@ -272,6 +300,7 @@ export default {
 			:stg-a="stgkzA"
 			:stg-l="stgkzL"
 			:filter="filter"
+			:ub_checkedbyAss="ubCheckedByAss"
 			v-model:columnData="columns"
 			v-model:selectedData="selectedData"
 			@action:approve="actionApprove"
@@ -283,6 +312,8 @@ export default {
 			@action:cancel="actionCancel"
 			@action:pause="actionPause"
 			@action:unpause="actionUnpause"
+			@action:check="actionCheck"
+			@action:rejectByAss="actionRejectByAss"
 			@reload="reload"
 			>
 		</leitung-table>

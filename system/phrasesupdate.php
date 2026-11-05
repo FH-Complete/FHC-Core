@@ -68199,6 +68199,49 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 	// Zeitsperren Sancho Subjects end
+	// STUDSTATUS CHECKED ASSISTANCE START
+		array(
+			'app' => 'core',
+			'category' => 'studierendenantrag',
+			'phrase' => 'error_no_check_permission',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Keine Berechtigung, den Antrag auf GeprueftAssistenz oder Abgelehnt zu setzen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'No authorization to set the status to checkedAssistance or rejected',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'studierendenantrag',
+			'phrase' => 'btn_setToCheckedAss',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'auf GeprueftAssistenz stellen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'set to checkedAssistance',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+	// STUDSTATUS CHECKED ASSISTANCE END
+
 );
 
 

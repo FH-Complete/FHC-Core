@@ -101,7 +101,8 @@ class Studierendenantrag extends FHC_Controller
 		$this->load->view('lehre/Antrag/Leitung/List', [
 			'stgA' => $stgA,
 			'stgL' => $stgL,
-			'abmeldung_enabled' => $this->config->item('abmeldung_stg_enabled')
+			'abmeldung_enabled' => $this->config->item('abmeldung_stg_enabled'),
+			'unterbrechung_checked_by_Ass' => $this->config->item('unterbrechung_checked_by_Ass')
 		]);
 	}
 

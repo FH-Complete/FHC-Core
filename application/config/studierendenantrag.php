@@ -205,3 +205,12 @@ $config['wiederholung_enabled'] = true;
  */
 $config['showInfoModalAbmeldung'] = true;
 
+/**
+ * Alternative process for Unterbrechung
+ * if true, the assistance has to approve a new Unterbrechung before it can be approved by STGL
+ * new Status: 'geprueftAssistenz'
+ *
+ * @var boolean
+ */
+$config['unterbrechung_checked_by_Ass'] = true;
+

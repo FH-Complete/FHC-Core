@@ -2199,4 +2199,126 @@ class AntragLib
 		$result = $this->_ci->StudierendenantraglehrveranstaltungModel->getLvsForPrestudent($prestudent_id, $studiensemester_kurzbz);
 		return $result;
 	}
+
+	/**
+	 * @param integer		$antrag_id
+	 *
+	 * @return boolean
+	 */
+	public function isEntitledToCheckOrRejectAntrag($antrag_id)
+	{
+		return ($this->hasAccessToAntrag($antrag_id, 'student/antragfreigabe') || $this->hasAccessToAntrag($antrag_id, 'student/studierendenantrag'));
+	}
+
+	/**
+	 * @param integer		$studierendenantrag_id
+	 * @param string		$objectedvon
+	 *
+	 * @return stdClass
+	 */
+	public function setStatusToCheckedAss($studierendenantrag_id, $checkedBy)
+	{
+		$result = $this->_ci->StudierendenantragstatusModel->insert([
+			'studierendenantrag_id' => $studierendenantrag_id,
+			'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_CHECKED_ASS,
+			'insertvon' => $checkedBy
+		]);
+		return $result;
+	}
+
+	/**
+	 * @param array			$studierendenantrag_ids
+	 * @param string		$insertvon
+	 * @param string		$grund
+	 *
+	 * @return stdClass
+	 */
+	public function rejectUnterbrechungByAss($studierendenantrag_id, $insertvon, $grund)
+	{
+		$this->_ci->load->model('person/Kontakt_model', 'KontaktModel');
+		$this->_ci->load->model('crm/Student_model', 'StudentModel');
+
+		$errors = [];
+
+		$data = $this->getDataForUnterbrechung($studierendenantrag_id);
+
+		if (isError($data)) {
+			$error_msg = getError($data);
+			if (is_array($error_msg) && isset($error_msg['message']))
+				$error_msg = $error_msg['message'];
+
+			$errors['failed_' . $studierendenantrag_id] = $this->_ci->p->t('studierendenantrag', 'error_U_Reject', [
+				'studierendenantrag_id' => $studierendenantrag_id,
+				'message' => $error_msg
+			]);
+		} else {
+			$data = getData($data);
+
+			$result = $this->_ci->StudierendenantragstatusModel->insert([
+				'studierendenantrag_id' => $studierendenantrag_id,
+				'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_REJECTED,
+				'insertvon' => $insertvon,
+				'grund' => $grund
+			]);
+			if (isError($result)) {
+				$errors['failed_' . $studierendenantrag_id] = $this->_ci->p->t('studierendenantrag', 'error_U_Reject', [
+					'studierendenantrag_id' => $studierendenantrag_id,
+					'message' => getError($result)['message']
+				]);
+			} else {
+				$name = '';
+
+				if (isset($data['errors']['person_id']) || isset($data['errors']['email'])) {
+					$error_msg = [];
+					if (isset($data['errors']['person_id']))
+						$error_msg[] = $data['errors']['person_id'];
+					if (isset($data['errors']['email']))
+						$error_msg[] = $data['errors']['email'];
+					$error_msg = $this->_ci->p->t('studierendenantrag', 'error_mail', ['message' => implode('<br>', $error_msg)]);
+					$errors[] = $error_msg;
+				} else {
+					if (isset($data['errors']['person'])) {
+						//send student mit "Student/in"
+						$errors[] = $this->_ci->p->t('studierendenantrag', 'error_name', ['message' => $data['errors']['person']]);
+						$name = $this->_ci->p->t('person', 'studentIn');
+						$vorname = "";
+						$nachname = $name;
+					} else {
+						//send normal
+						$name = trim($data['person']->vorname . ' ' . $data['person']->nachname);
+						$vorname = $data['person']->vorname;
+						$nachname = $data['person']->nachname;
+					}
+				}
+				if ($name)
+					// NOTE(chris): Sancho mail
+					if (!sendSanchoMail(
+						'Sancho_Mail_Antrag_U_Reject',
+						[
+							'name' => $name,
+							'vorname' => $vorname,
+							'nachname' => $nachname,
+							'grund' => $grund,
+							'stg' => $data['studiengang']->bezeichnung,
+							'Orgform' => $data['prestudent_status']->orgform_kurzbz,
+							'prestudent_id' => $data['prestudent_status']->prestudent_id,
+							'abmeldungLink' => site_url('lehre/Studierendenantrag/abmeldung/' . $data['prestudent_status']->prestudent_id),
+							'abmeldungLinkCIS' => CIS_ROOT .
+								'index.ci.php/lehre/Studierendenantrag/abmeldung/' .
+								$data['prestudent_status']->prestudent_id
+						],
+						$data['email'],
+						$this->_ci->p->t('studierendenantrag', 'mail_subject_U_Reject')
+					))
+						$errors[] = $this->_ci->p->t('studierendenantrag', 'error_mail_to', $data);
+			}
+		}
+
+		if (count($errors))
+			return error($errors);
+
+		return success();
+	}
+
+
 }
