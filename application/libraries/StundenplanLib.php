@@ -394,18 +394,11 @@ class StundenplanLib
 			$this->_ci->load->library('PermissionLib');
 			$berechtigt_begrenzt  = $this->_ci->permissionlib->isBerechtigt('lehre/reservierung:begrenzt', 'sui');
 
+			$start_date_str = $item->datum;
 			$now = time();
 			$res_lektor_start = $this->jump_day($now, RES_TAGE_LEKTOR_MIN - 1);
-			$res_lektor_ende  = mktime(0, 0, 0, date('m', $now), date('d', $now) + RES_TAGE_LEKTOR_BIS, date('Y', $now));
-
-			$start_date = is_numeric($item->beginn) ? $item->beginn : strtotime($item->beginn);
-			if (!date('w', $start_date)) {
-				$start_date = $this->jump_day($start_date, 1);
-			}
-
-			$start_date_str = date('Y-m-d', $start_date);
 			$res_lektor_start_str = date('Y-m-d', $res_lektor_start);
-			$res_lektor_ende_str = date('Y-m-d', $res_lektor_ende);
+			$res_lektor_ende_str = defined('RES_TAGE_LEKTOR_BIS') ? RES_TAGE_LEKTOR_BIS : "2099-01-01";
 
 			$show_delete = (
 				(
@@ -694,13 +687,11 @@ class StundenplanLib
 
 		$now = time();
 		$tage_min = defined('RES_TAGE_LEKTOR_MIN') ? (int)RES_TAGE_LEKTOR_MIN : 0;
-		$tage_bis = defined('RES_TAGE_LEKTOR_BIS') ? (int)RES_TAGE_LEKTOR_BIS : 0;
 
 		$datum_res_lektor_start = $this->jump_day($now, $tage_min - 1);
-		$datum_res_lektor_ende = $this->jump_day($now, $tage_bis);
 
 		$start_ymd_allowed = date('Y-m-d', $datum_res_lektor_start);
-		$end_ymd_allowed = date('Y-m-d', $datum_res_lektor_ende);
+		$end_ymd_allowed = defined('RES_TAGE_LEKTOR_BIS') ? RES_TAGE_LEKTOR_BIS : "2099-01-01";
 
 		$result = [];
 
