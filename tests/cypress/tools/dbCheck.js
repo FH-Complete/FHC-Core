@@ -2,9 +2,10 @@
 /**
  * Diagnose or seed the database fixture a Cypress suite needs. Suite-agnostic runner.
  *
- *   node tests/cypress/tools/dbCheck.js noten            report what is present and what is missing
- *   node tests/cypress/tools/dbCheck.js noten seed       apply the suite's seeder, then re-check
- *   node tests/cypress/tools/dbCheck.js noten env        print the .env block to use
+ * Run in tests/cypress (npm run noten:check -- <mode> does the same):
+ *   node tools/dbCheck.js noten            report what is present and what is missing
+ *   node tools/dbCheck.js noten seed       apply the suite's seeder, then re-check
+ *   node tools/dbCheck.js noten env        print the .env block to use
  *
  * A suite contributes tools/checks/<suite>.js exporting { title, checks, sqlFiles }. Connection
  * and output are shared and live here. A sqlFiles entry is a path or { file, group }; a
@@ -27,7 +28,7 @@ const db = require("../tasks/db");
 const COL = 48;
 const CHECKS_DIR = path.join(__dirname, "checks");
 
-const usage = (suite, mode) => `node tests/cypress/tools/dbCheck.js ${suite} ${mode}`;
+const usage = (suite, mode) => `node tools/dbCheck.js ${suite} ${mode}`;
 
 const loadSuite = (name) => {
 	const file = path.join(CHECKS_DIR, `${name}.js`);

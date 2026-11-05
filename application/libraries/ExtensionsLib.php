@@ -47,6 +47,7 @@ class ExtensionsLib
 
 	private $_errorOccurred; // boolean, true if an error occurred while installing an extension
 	private $_currentInstalledExtensionVersion; // contains the version of the current installation of an extension
+	private $_enabledExtensionNames = null; // names of the installed and enabled extensions, read once per request
 
 	/**
 	 * Class constructor
@@ -221,6 +222,33 @@ class ExtensionsLib
 	public function getInstalledExtensions()
 	{
 		return $this->_ci->ExtensionsModel->getInstalledExtensions();
+	}
+
+	/**
+	 * True if the newest version of the extension is installed and enabled.
+	 * The files of an extension do not count: CI3_Events loads its Events.php even if its SQL never ran.
+	 * Use it before code that calls the SQL of an optional extension.
+	 *
+	 * @param string $extensionName for example 'FHC-Core-Anwesenheiten'
+	 * @return bool
+	 */
+	public function isInstalled($extensionName)
+	{
+		if ($this->_enabledExtensionNames === null)
+		{
+			$this->_enabledExtensionNames = array();
+
+			$result = $this->getInstalledExtensions();
+			if (hasData($result))
+			{
+				foreach (getData($result) as $extension)
+				{
+					if ($extension->enabled === true) $this->_enabledExtensionNames[] = $extension->name;
+				}
+			}
+		}
+
+		return in_array($extensionName, $this->_enabledExtensionNames, true);
 	}
 
 	/**

@@ -1,4 +1,5 @@
 import { waitForOk } from "../helpers/network";
+import { buildPagePath } from "../helpers/paths";
 
 /**
  * Page object for the Benotungstool page.
@@ -13,6 +14,8 @@ import { waitForOk } from "../helpers/network";
  */
 
 const TABLE_TIMEOUT = 60_000;
+// the first visit of a run loads about 440 vendor files, longer than the global pageLoadTimeout
+const PAGE_LOAD_TIMEOUT = 60_000;
 const API = "**/api/frontend/v1/Noten";
 
 /**
@@ -45,7 +48,8 @@ class BenotungstoolPage {
 	 * and before the first visit localStorage belongs to about:blank.
 	 */
 	visit = (ctx, { columns = "antritt" } = {}) =>
-		cy.visit(`/cis.php/Cis/Benotungstool/${ctx.semKurzbz}/${ctx.lvId}`, {
+		cy.visit(buildPagePath(`Cis/Benotungstool/${ctx.semKurzbz}/${ctx.lvId}`), {
+			timeout: PAGE_LOAD_TIMEOUT,
 			onBeforeLoad(win) {
 				win.localStorage.setItem("notenToolPruefungsspalten", JSON.stringify(columns));
 				win.localStorage.removeItem("notenToolStickyCols");

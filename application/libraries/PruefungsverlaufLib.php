@@ -18,6 +18,9 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+// benotungstoolFlag(): the define() flags of the old tool
+require_once APPPATH . 'helpers/hlp_benotungstool_helper.php';
+
 /**
  * The Verlauf of one student in one LV: the order of the Pruefungen, the Antritte and the limits.
  *
@@ -373,7 +376,7 @@ class PruefungsverlaufLib
 		if ($max !== null) return (int) $max;
 
 		// the flags of the old tool: Antritt 1 plus one Antritt per flag
-		return 1 + (int) CIS_GESAMTNOTE_PRUEFUNG_TERMIN2 + (int) CIS_GESAMTNOTE_PRUEFUNG_TERMIN3 + (int) CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF;
+		return 1 + (int) benotungstoolFlag('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') + (int) benotungstoolFlag('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') + (int) benotungstoolFlag('CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF');
 	}
 
 	/** The Antritt from which a Pruefung is kommissionell, or null. @return int|null */

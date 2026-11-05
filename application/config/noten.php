@@ -6,7 +6,8 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 //   this file             $this->config->item('KEY')
 //   global.config.inc.php define() flags of the old tool: CIS_GESAMTNOTE_PUNKTE, CIS_GESAMTNOTE_GEWICHTUNG,
 //                         CIS_GESAMTNOTE_FREIGABEMAIL_NOTE, CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE and
-//                         CIS_GESAMTNOTE_PRUEFUNG_TERMIN2/TERMIN3/KOMMPRUEF (see CIS_GESAMTNOTE_MAX_ANTRITTE)
+//                         CIS_GESAMTNOTE_PRUEFUNG_TERMIN2/TERMIN3/KOMMPRUEF (see CIS_GESAMTNOTE_MAX_ANTRITTE).
+//                         benotungstoolFlag() reads them: a flag that is not defined counts as off.
 //
 // The prefixes in this file:
 //   NOTEN_, NOTE_     name a Note by its Bezeichnung. The server finds its key in lehre.tbl_note.

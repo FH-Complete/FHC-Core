@@ -8,6 +8,7 @@
 
 import { notenApi, lektorAuth } from "../api/notenApi";
 import { expectNotenSuccess } from "./notenErrors";
+import { buildApiPath } from "./paths";
 
 const BEZ_ENTSCHULDIGT = "entschuldigt";
 const BEZ_NOCH_NICHT = "Noch nicht eingetragen";
@@ -90,7 +91,7 @@ const resolveSemester = () => {
 	return cy
 		.request({
 			method: "GET",
-			url: "/index.ci.php/api/frontend/v1/organisation/Studiensemester/getAll",
+			url: buildApiPath("organisation/Studiensemester/getAll"),
 			qs: { order: "DESC" },
 			auth: lektorAuth(),
 			failOnStatusCode: false,
@@ -263,7 +264,7 @@ export const readAuthUid = () => {
 	return cy
 		.request({
 			method: "GET",
-			url: "/index.ci.php/api/frontend/v1/AuthInfo/getAuthUID",
+			url: buildApiPath("AuthInfo/getAuthUID"),
 			auth: lektorAuth(),
 			failOnStatusCode: false,
 		})

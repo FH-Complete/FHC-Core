@@ -9,6 +9,7 @@ require("dotenv").config({ path: path.join(__dirname, ".env") });
 
 const { registerNotenDbTasks } = require("../tasks/notenDb");
 const { closeDb } = require("../tasks/db");
+const { buildApiPath } = require("../support/helpers/paths");
 
 // cy.request sends one request after the other; the concurrency test needs two at the same time.
 // Basic auth without a session cookie: PHP runs two requests of one session one after the other
@@ -21,7 +22,7 @@ const postParallel = ({ path: apiPath, bodies }) => {
 
 	return Promise.all(
 		bodies.map((body) =>
-			fetch(`${base}/index.ci.php/api/frontend/v1/Noten/${apiPath}`, {
+			fetch(`${base}${buildApiPath(`Noten/${apiPath}`)}`, {
 				method: "POST",
 				headers: { Authorization: auth, "Content-Type": "application/json" },
 				body: JSON.stringify(body),

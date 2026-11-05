@@ -1,5 +1,7 @@
 // Custom commands: https://on.cypress.io/custom-commands
 
+import { buildApiPath } from "./helpers/paths";
+
 /** Visits a page and fails if any request returned >= 400. */
 Cypress.Commands.add("checkPageResources", (url) => {
 	const failedRequests = [];
@@ -25,16 +27,19 @@ Cypress.Commands.add("checkPageResources", (url) => {
 });
 
 /**
- * Session login. cy.session keeps it across specs, so a test does not log in again.
- * Without arguments it logs in as USER_NAME.
+ * Session login with HTTP Basic auth. cy.session keeps it across specs, so a test does not log in again.
+ * Without arguments it logs in as USER_NAME. The name leaves cy.login free for other suites.
  */
-Cypress.Commands.add("login", (username, password) => {
+Cypress.Commands.add("loginBasic", (username, password) => {
 	const { adminusername, adminpassword } = Cypress.env();
 	const auth = { username: username || adminusername, password: password || adminpassword };
 	const probe = () =>
-		cy.request({ url: "/index.ci.php/api/frontend/v1/AuthInfo/getAuthUID", auth }).its("status").should("eq", 200);
+		cy
+			.request({ url: buildApiPath("AuthInfo/getAuthUID"), auth })
+			.its("status")
+			.should("eq", 200);
 
-	cy.session(["login", auth.username], probe, {
+	cy.session(["loginBasic", auth.username], probe, {
 		cacheAcrossSpecs: true,
 		validate: probe,
 	});

@@ -4,7 +4,9 @@
  * notenApi.* calls an endpoint as NOTEN_LEKTOR_USER. apiGet / apiPost call it as another account.
  */
 
-const NOTEN_API = "/index.ci.php/api/frontend/v1/Noten";
+import { buildApiPath } from "../helpers/paths";
+
+const NOTEN_API = buildApiPath("Noten");
 
 /** The Lektor the suite works as. No fallback to USER_NAME: that user belongs to every suite. */
 export const lektorAuth = () => {
@@ -26,7 +28,7 @@ export const freigabePassword = () => Cypress.env("NOTEN_FREIGABE_PASSWORD") || 
  */
 export const loginAsLektor = () => {
 	const { username, password } = lektorAuth();
-	cy.login(username, password);
+	cy.loginBasic(username, password);
 };
 
 /** auth: the account (default NOTEN_LEKTOR_USER), or null for no credentials. A session cookie wins over auth. */

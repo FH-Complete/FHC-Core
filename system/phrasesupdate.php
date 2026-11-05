@@ -64699,54 +64699,6 @@ I have been informed that I am under no obligation to consent to the transmissio
 	),
 	array(
 		'app' => 'core',
-		'category' => 'benotungstool',
-		'phrase' => 'c4import',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Importieren',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Import',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Table presets',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'benotungstool',
-		'phrase' => 'c4teilnoten',
-		'category' => 'tabulator_presets',
-		'phrase' => 'save_current_config',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Aktuelle Einstellung speichern',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Save current configuration',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
 		'category' => 'tabulator_presets',
 		'phrase' => 'preset_name',
 		'insertvon' => 'system',

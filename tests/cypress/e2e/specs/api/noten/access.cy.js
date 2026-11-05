@@ -16,6 +16,7 @@ import {
 	seedBaseline,
 } from "../../../../support/helpers/notenTestData";
 import { requireConfig, skipIf } from "../../../../support/helpers/notenConfig";
+import { buildApiPath } from "../../../../support/helpers/paths";
 import {
 	assistenzAuth,
 	assistenzContext,
@@ -275,7 +276,7 @@ describe("Noten API - Zugriffsschutz", () => {
 		it("ersetzt den alten Endpunkt Lehre/getLeForLv", () => {
 			cy.request({
 				method: "GET",
-				url: "/index.ci.php/api/frontend/v1/Lehre/getLeForLv",
+				url: buildApiPath("Lehre/getLeForLv"),
 				auth: lektorAuth(),
 				failOnStatusCode: false,
 			}).then((response) => {

@@ -2,8 +2,8 @@
   "private": true,
   "description": "Eigener Arbeitsplatz: Lint und Format.",
   "scripts": {
-    "lint": "cd ../../.. && eslint -c tests/cypress/local/eslint.config.js tests/cypress cypress.config.js",
-    "format": "cd ../../.. && prettier --config tests/cypress/local/package.json --write \"tests/cypress/**/*.js\" \"!tests/cypress/e2e/fhcomplete/**\" \"!tests/cypress/e2e/*.cy.js\""
+    "lint": "cd .. && eslint -c local/eslint.config.js cypress.config.js suites tasks tools local support e2e/specs/api/noten e2e/specs/ui/noten",
+    "format": "cd .. && prettier --config local/package.json --write cypress.config.js \"{suites,tasks,tools,local,support}/**/*.js\" \"e2e/specs/{api,ui}/noten/**/*.js\""
   },
   "prettier": {
     "useTabs": true,

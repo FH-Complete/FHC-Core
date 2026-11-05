@@ -6,6 +6,7 @@ import {
 	requireAssistenz,
 } from "../../../../support/helpers/notenAssistenz";
 import { loadNotenContext, requireDbReset } from "../../../../support/helpers/notenTestData";
+import { buildPagePath } from "../../../../support/helpers/paths";
 
 /**
  * The route is /Cis/Benotungstool/:sem_kurzbz?/:lv_id?. The semester comes before the LV, so the
@@ -26,7 +27,7 @@ describe("Benotungstool UI - Navigation", () => {
 
 	it("behält ein Semester ohne LV nach einem Reload", () => {
 		cy.intercept({ method: "GET", url: "**/api/frontend/v1/Noten/getBenotungstoolContext*" }).as("context");
-		cy.visit("/cis.php/Cis/Benotungstool");
+		cy.visit(buildPagePath("Cis/Benotungstool"), { timeout: TIMEOUT });
 
 		selectedSemester()
 			.then((preselected) => {
@@ -63,11 +64,11 @@ describe("Benotungstool UI - Navigation", () => {
 			assistenzLvWithLehreinheiten(ctx.semKurzbz).then((target) => {
 				expect(target, "eine LV der Assistenz mit Lehreinheiten").to.not.be.null;
 
-				cy.login(username, password);
+				cy.loginBasic(username, password);
 				cy.intercept({ method: "GET", url: "**/api/frontend/v1/Noten/getLehreinheitenForLv*" }).as(
 					"lehreinheiten",
 				);
-				cy.visit(`/cis.php/Cis/Benotungstool/${target.semKurzbz}/${target.lvId}`);
+				cy.visit(buildPagePath(`Cis/Benotungstool/${target.semKurzbz}/${target.lvId}`), { timeout: TIMEOUT });
 
 				waitForOk("@lehreinheiten");
 				cy.get("[data-cy='dropdown-lehreinheit']", { timeout: TIMEOUT }).click();

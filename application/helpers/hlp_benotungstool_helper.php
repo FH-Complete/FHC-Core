@@ -19,3 +19,14 @@ function benotungstoolPermissions()
 
 	return $permissions;
 }
+
+/**
+ * A define() flag of the old tool from global.config.inc.php. A config file without the flag reads it
+ * as off, so an older config file does not stop the request.
+ *
+ * @return bool
+ */
+function benotungstoolFlag($name)
+{
+	return defined($name) && constant($name);
+}

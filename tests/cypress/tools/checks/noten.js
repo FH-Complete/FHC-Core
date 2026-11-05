@@ -136,6 +136,13 @@ module.exports = {
 			hint: "The Lehreinheit check of the write paths needs it. Apply seeder group benotungstool_fixture_erweitert.",
 		},
 		{
+			label: "Studienplan of STG5 in the test semester",
+			sql: `SELECT COUNT(*)::int AS value FROM lehre.tbl_studienplan_semester
+			       WHERE studienplan_id = 5011 AND studiensemester_kurzbz = ${SEM}`,
+			ok: (r) => r.value > 0,
+			hint: "Without it the Assistenz sees no Studiengang. Apply seeder group benotungstool_fixture_erweitert.",
+		},
+		{
 			label: "Lektoren of Lehreinheit 51103",
 			sql: "SELECT COUNT(*)::int AS value FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id = 51103",
 			ok: (r) => r.value >= 2,

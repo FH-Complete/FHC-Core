@@ -7,11 +7,14 @@ WARNING: the suite deletes and writes grades. Run it only against a test instanc
 
 1. Start
 --------
+The Cypress project is tests/cypress. Run every command in this folder.
+
 One time:
 
+  cd tests/cypress
   npm install
-  copy tests/cypress/.env.example        -> tests/cypress/.env          BASE_URL and one login
-  copy tests/cypress/suites/.env.example -> tests/cypress/suites/.env   passwords and database
+  copy .env.example        -> .env          BASE_URL
+  copy suites/.env.example -> suites/.env   passwords and database
   npm run noten:check -- seed     Seeds the test data: demolektor1, LV 5221, demoassistenz.
 
 NOTEN_LEKTOR_USER must be a Lektor who teaches an LV. An admin teaches nothing, so the suite finds no LV.
@@ -25,7 +28,7 @@ Run:
 
 Put more Cypress options after "--". A second --spec replaces the default:
 
-  npm run noten:api -- --spec tests/cypress/e2e/specs/api/noten/frist.cy.js
+  npm run noten:api -- --spec e2e/specs/api/noten/frist.cy.js
   npm run noten:ui -- --headed --no-exit
 
 Pending tests are normal. A test skips when the instance has a different configuration than the
@@ -66,8 +69,10 @@ Tests read it from getCisConfig as ctx.cisConfig.
 
 3. Architecture
 ---------------
-cypress.config.js                     Global: BASE_URL and one login for all suites. Loads suites/noten.js.
-tests/cypress/
+tests/cypress/                        The Cypress project.
+  cypress.config.js                   Global: BASE_URL and one login for all suites. Loads suites/noten.js.
+  package.json                        Cypress, dotenv, pg and the npm run noten:* scripts.
+  .env                                BASE_URL, USER_NAME, USER_PASSWORD (not in Git).
   suites/noten.js                     The suite: its cy.task list and its Cypress.env values.
   suites/.env                         NOTEN_* keys: accounts and database (not in Git).
   e2e/specs/api/noten/<topic>.cy.js   Calls the Noten API and checks the response.
@@ -75,6 +80,7 @@ tests/cypress/
   support/api/notenApi.js             One function per endpoint, and the login.
   support/pages/benotungstool.po.js   All selectors and clicks of the page.
   support/helpers/                    ctx, test data, skips, assertions.
+  support/helpers/paths.js            The entry point (cis.php) of every request and page visit.
   tasks/                              Database access. Runs in Node, not in the browser.
   tools/dbCheck.js                    Checks the test data without a browser.
   local/                              Personal tools (lint, format). The suite never needs them.
@@ -169,7 +175,8 @@ The helpers:
 ------------
 401 in all tests
   The web instance and suites/.env use different databases. Compare DB_NAME in
-  config/system.config.inc.php with NOTEN_DB_NAME.
+  config/cis.config.inc.php with NOTEN_DB_NAME. The suite calls every endpoint through cis.php,
+  like the page (support/helpers/paths.js), and cis.php loads cis.config.inc.php.
 
 "Fixture-Reset nicht verfügbar"
   The database connection is missing. Check NOTEN_DB_* in suites/.env. The pg_hba.conf of the
@@ -185,3 +192,35 @@ A message contains "<< PHRASE"
 
 The next run does not start
   A Cypress process still runs. Stop it: Stop-Process -Name Cypress -Force
+
+
+7. Automatic test pipeline
+--------------------------
+The pipeline is not in this repository. A pipeline job that runs the suite needs these steps on the
+machine that runs Cypress:
+
+  1. Check out the same commit as the test instance.
+  2. Build the database of the instance: system/FHComplete-3.3.sql, system/checksystem.php, the SQL of
+     the installed extensions, then system/seeders/BS*.sql and system/seeders/TST*.sql in this order.
+     TST60873_000 creates the noten test data.
+  3. cd tests/cypress
+     npm ci
+  4. Put the two .env files in place, or export the keys. A key from the environment wins over the file.
+       tests/cypress/.env          BASE_URL
+       tests/cypress/suites/.env   NOTEN_* keys, see suites/.env.example
+  5. npm run noten:check
+  6. npx cypress run --spec "e2e/specs/api/noten/**/*.cy.js"
+     npx cypress run --browser chrome --spec "e2e/specs/ui/noten/**/*.cy.js"
+     From another folder, add --project <checkout>/tests/cypress. The config finds its .env next to it.
+
+Notes for the pipeline:
+- The machine that runs Cypress needs a connection to the database at NOTEN_DB_HOST. The suite resets
+  its data directly in the database before each test.
+- The UI specs need Chrome. Electron crashes on the Benotungstool page.
+- The concurrency test sends its requests from Node. Node checks the TLS certificate of BASE_URL. For a
+  certificate of an internal CA, set NODE_EXTRA_CA_CERTS to the CA file.
+- The Anwesenheit comes from the optional extension FHC-Core-Anwesenheiten. getStudentenNoten asks it only
+  if the extension is installed and enabled in system.tbl_extensions (ExtensionsLib->isInstalled). Without
+  the extension the column stays empty and the suite runs. Files of the extension alone do not count.
+  An installed extension without its SQL functions still fails the request, on purpose.
+- The suite tests the configuration that the instance has. A test for the other branch skips.

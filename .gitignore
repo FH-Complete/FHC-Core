@@ -42,3 +42,9 @@ tests/codeception/tests/unit.suite.yml
 /sparks/*
 /webdav/google.php
 system/sql/
+node_modules/
+
+# Cypress credentials. Only the example file belongs in the repository.
+tests/cypress/.env*
+!tests/cypress/.env.example
+/system/setup_testinstance.php

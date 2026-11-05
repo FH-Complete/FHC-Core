@@ -1,25 +1,10 @@
 -- Seeder of feature-60873/GesamtnoteneingabeCis4. A "-- ==== <group> ====" line starts a group; tests/cypress/tools/dbCheck.js applies single groups.
 
--- ==== helper_functions ====
--- Semester helpers for group studiengang_5. BS001_helper_functions.sql does not define them.
-
-CREATE OR REPLACE FUNCTION CurrentSemester() RETURNS varchar(32) AS $$
-DECLARE res varchar(32);
-	BEGIN
-		SELECT studiensemester_kurzbz into res FROM public.tbl_studiensemester WHERE start<=now() AND ende>=now() ORDER BY start DESC LIMIT 1;
-		return res;
-	END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION LastActiveSemester() RETURNS varchar(32) AS $$
-DECLARE res varchar(32);
-	BEGIN
-		SELECT studiensemester_kurzbz into res FROM public.tbl_studiensemester WHERE start<=now() ORDER BY start DESC LIMIT 1;
-		return res;
-	END;
-$$ LANGUAGE plpgsql;
-
 -- ==== studiengang_5 ====
+-- The rows of the Tempus seeder TST83711_001_add_studiengang_5.sql (test-83711), unchanged.
+-- The noten groups below need them, and TST60873 runs before TST83711.
+-- The semester helpers CurrentSemester() and LastActiveSemester() are in BS001_helper_functions.sql.
+
 -- Demodaten fuer Studiengang 5: Organisationseinheit, Studienordnung, Studiengang, Lehrveranstaltungen
 
 INSERT INTO public.tbl_organisationseinheit (oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz, aktiv, mailverteiler, freigabegrenze, kurzzeichen, lehre, standort, warn_semesterstunden_frei, warn_semesterstunden_fix, standort_id)
@@ -61,71 +46,71 @@ INSERT INTO lehre.tbl_studienplan (studienplan_id, studienordnung_id,orgform_kur
  (5011, 501,'VZ','1','BS5-WS2023-VZ',6,NULL,true,15,true,'2023-08-24 14:26:12.751416','auto',NULL,NULL,NULL,180.00,NULL,NULL,true);
  
 INSERT INTO lehre.tbl_lehrveranstaltung (lehrveranstaltung_id, kurzbz,bezeichnung,studiengang_kz,semester,sprache,ects,semesterstunden,anmerkung,lehre,lehreverzeichnis,aktiv,planfaktor,planlektoren,planpersonalkosten,plankostenprolektor,updateamum,updatevon,insertamum,insertvon,ext_id,sort,zeugnis,koordinator,projektarbeit,lehrform_kurzbz,bezeichnung_english,orgform_kurzbz,incoming,lehrmodus_kurzbz,lehrtyp_kurzbz,oe_kurzbz,raumtyp_kurzbz,anzahlsemester,semesterwochen,lvnr,farbe,old_lehrfach_id,semester_alternativ,sws,lvs,alvs,lvps,las,benotung,lvinfo,lehrauftrag,lehrveranstaltung_template_id) VALUES
- (511, 'MOD1.1','Sport',5,1,'German',8.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'MOD','Communication','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
- (512, 'MOD1.2','Mathematik',5,1,'German',8.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'MOD','Mathematics','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
- (513, 'MOD1.3','Grundlagen',5,1,'German',8.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'MOD','Basics','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
- (514, 'MOD1.4','Sprachen',5,1,'English',6.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'MOD','Communication','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
- (521, 'MOD2.1','Labor',5,2,'German',10.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'MOD','Laboratory','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
- (522, 'MOD2.2','Mathematik',5,2,'German',10.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'MOD','Mathematics','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
- (523, 'MOD2.3','Sprachen',5,2,'English',10.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'MOD','Communication','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
- (531, 'MOD3.1','Mathematik',5,3,'German',15.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'MOD','Mathematics','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
- (532, 'MOD3.2','Elektrische Signale',5,3,'German',15.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'MOD','Electric Signals','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
- (541, 'MOD4.1','Messtechnik',5,4,'German',15.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'MOD','Measurement Technology','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
- (542, 'MOD4.2','Forschung',5,4,'German',15.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'MOD','Research','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
- (551, 'MOD5.1','Communication',5,5,'English',15.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'MOD','Communication','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
- (552, 'MOD5.2','Regelungstechnik',5,5,'German',15.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'MOD','Control Engineering','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
- (561, 'MOD6.1','Bachelorarbeit',5,6,'German',30.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'MOD','Bachelor Thesis','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL)
+ (511, 'MOD1.1','Sport',5,1,'German',8.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'MOD','Communication','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
+ (512, 'MOD1.2','Mathematik',5,1,'German',8.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'MOD','Mathematics','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
+ (513, 'MOD1.3','Grundlagen',5,1,'German',8.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'MOD','Basics','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
+ (514, 'MOD1.4','Sprachen',5,1,'English',6.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'MOD','Communication','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
+ (521, 'MOD2.1','Labor',5,2,'German',10.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'MOD','Laboratory','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
+ (522, 'MOD2.2','Mathematik',5,2,'German',10.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'MOD','Mathematics','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
+ (523, 'MOD2.3','Sprachen',5,2,'English',10.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'MOD','Communication','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
+ (531, 'MOD3.1','Mathematik',5,3,'German',15.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'MOD','Mathematics','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
+ (532, 'MOD3.2','Elektrische Signale',5,3,'German',15.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'MOD','Electric Signals','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
+ (541, 'MOD4.1','Messtechnik',5,4,'German',15.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'MOD','Measurement Technology','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
+ (542, 'MOD4.2','Forschung',5,4,'German',15.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'MOD','Research','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
+ (551, 'MOD5.1','Communication',5,5,'English',15.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'MOD','Communication','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
+ (552, 'MOD5.2','Regelungstechnik',5,5,'German',15.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'MOD','Control Engineering','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL),
+ (561, 'MOD6.1','Bachelorarbeit',5,6,'German',30.00,NULL,NULL,true,'mod',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'MOD','Bachelor Thesis','VZ',5,'regulaer','modul','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,true,true,NULL)
  ;
  
   INSERT INTO lehre.tbl_lehrveranstaltung (lehrveranstaltung_id, kurzbz,bezeichnung,studiengang_kz,semester,sprache,ects,semesterstunden,anmerkung,lehre,lehreverzeichnis,aktiv,planfaktor,planlektoren,planpersonalkosten,plankostenprolektor,updateamum,updatevon,insertamum,insertvon,ext_id,sort,zeugnis,koordinator,projektarbeit,lehrform_kurzbz,bezeichnung_english,orgform_kurzbz,incoming,lehrmodus_kurzbz,lehrtyp_kurzbz,oe_kurzbz,raumtyp_kurzbz,anzahlsemester,semesterwochen,lvnr,farbe,old_lehrfach_id,semester_alternativ,sws,lvs,alvs,lvps,las,benotung,lvinfo,lehrauftrag,lehrveranstaltung_template_id) VALUES
- (5111, 'LS','Leistungssport',5,1,'German',8.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'VO','Communication','VZ',5,'regulaer','lv','kfSprachen',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
- (5121, 'MAT','Mathematik 1',5,1,'German',8.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'ILV','Mathematics','VZ',5,'regulaer','lv','kfMath',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
- (5131, 'GL','Grundlagen der Programmierung',5,1,'German',8.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'ILV','Development Basics','VZ',5,'regulaer','lv','kfTech',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
- (5141, 'ENG','Englisch 1',5,1,'English',6.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'VO','Communication','VZ',5,'regulaer','lv','kfSprachen',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
- (5211, 'EL','Elektronik Labor',5,2,'German',10.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'LAB','Laboratory','VZ',5,'regulaer','lv','kfTech',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
- (5221, 'MAT','Mathematik 2',5,2,'German',10.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'ILV','Mathematics','VZ',5,'regulaer','lv','kfMath',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
- (5231, 'ENG','Communcation Englisch',5,2,'English',10.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'VO','Communication','VZ',5,'regulaer','lv','kfSprachen',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
- (5311, 'MAT','Mathematik 3',5,3,'German',15.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'ILV','Mathematics','VZ',5,'regulaer','lv','kfMath',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
- (5321, 'ES','Elektrische Signale',5,3,'German',15.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'ILV','Electric Signals','VZ',5,'regulaer','lv','kfTech',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
- (5411, 'MT','Messtechnik',5,4,'German',15.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'ILV','Measurement Technology','VZ',5,'regulaer','lv','kfTech',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
- (5421, 'BAN','Bewegungsanalyse',5,4,'German',15.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'ILV','Movement Analytics','VZ',5,'regulaer','lv','kfTech',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
- (5511, 'ENG','Communication',5,5,'English',15.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'VO','Communication','VZ',5,'regulaer','lv','kfSprachen',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
- (5521, 'RT','Regelungstechnik',5,5,'German',15.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'ILV','Control Engineering','VZ',5,'regulaer','lv','kfTech',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
- (5611, 'BA','Bachelorarbeit',5,6,'German',30.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','ma0646','2023-08-24 14:28:39','ma0646',NULL,NULL,true,NULL,false,'SE','Bachelor Thesis','VZ',5,'regulaer','lv','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL)
+ (5111, 'LS','Leistungssport',5,1,'German',8.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'VO','Communication','VZ',5,'regulaer','lv','kfSprachen',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
+ (5121, 'MAT','Mathematik 1',5,1,'German',8.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'ILV','Mathematics','VZ',5,'regulaer','lv','kfMath',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
+ (5131, 'GL','Grundlagen der Programmierung',5,1,'German',8.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'ILV','Development Basics','VZ',5,'regulaer','lv','kfTech',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
+ (5141, 'ENG','Englisch 1',5,1,'English',6.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'VO','Communication','VZ',5,'regulaer','lv','kfSprachen',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
+ (5211, 'EL','Elektronik Labor',5,2,'German',10.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'LAB','Laboratory','VZ',5,'regulaer','lv','kfTech',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
+ (5221, 'MAT','Mathematik 2',5,2,'German',10.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'ILV','Mathematics','VZ',5,'regulaer','lv','kfMath',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
+ (5231, 'ENG','Communcation Englisch',5,2,'English',10.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'VO','Communication','VZ',5,'regulaer','lv','kfSprachen',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
+ (5311, 'MAT','Mathematik 3',5,3,'German',15.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'ILV','Mathematics','VZ',5,'regulaer','lv','kfMath',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
+ (5321, 'ES','Elektrische Signale',5,3,'German',15.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'ILV','Electric Signals','VZ',5,'regulaer','lv','kfTech',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
+ (5411, 'MT','Messtechnik',5,4,'German',15.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'ILV','Measurement Technology','VZ',5,'regulaer','lv','kfTech',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
+ (5421, 'BAN','Bewegungsanalyse',5,4,'German',15.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'ILV','Movement Analytics','VZ',5,'regulaer','lv','kfTech',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
+ (5511, 'ENG','Communication',5,5,'English',15.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'VO','Communication','VZ',5,'regulaer','lv','kfSprachen',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
+ (5521, 'RT','Regelungstechnik',5,5,'German',15.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'ILV','Control Engineering','VZ',5,'regulaer','lv','kfTech',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL),
+ (5611, 'BA','Bachelorarbeit',5,6,'German',30.00,NULL,NULL,true,'lv',true,NULL,NULL,NULL,NULL,'2023-08-24 14:28:39','oesi','2023-08-24 14:28:39','oesi',NULL,NULL,true,NULL,false,'SE','Bachelor Thesis','VZ',5,'regulaer','lv','stg5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,true,true,true,NULL)
  ;
  
  INSERT INTO lehre.tbl_studienplan_lehrveranstaltung (studienplan_lehrveranstaltung_id, studienplan_id,lehrveranstaltung_id,semester,studienplan_lehrveranstaltung_id_parent,pflicht,koordinator,insertamum,insertvon,updateamum,updatevon,sort,ext_id,curriculum,export,genehmigung) VALUES
- -- MODULES in the Studienplan
- (501, 5011,511,1,NULL,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (502, 5011,512,1,NULL,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (503, 5011,513,1,NULL,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (504, 5011,514,1,NULL,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (505, 5011,521,2,NULL,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (506, 5011,522,2,NULL,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (507, 5011,523,2,NULL,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (508, 5011,531,3,NULL,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (509, 5011,532,3,NULL,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (510, 5011,541,4,NULL,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (511, 5011,542,4,NULL,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (512, 5011,551,5,NULL,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (513, 5011,552,5,NULL,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (514, 5011,561,6,NULL,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
+ -- MODULE im Studienplan
+ (501, 5011,511,1,NULL,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (502, 5011,512,1,NULL,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (503, 5011,513,1,NULL,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (504, 5011,514,1,NULL,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (505, 5011,521,2,NULL,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (506, 5011,522,2,NULL,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (507, 5011,523,2,NULL,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (508, 5011,531,3,NULL,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (509, 5011,532,3,NULL,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (510, 5011,541,4,NULL,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (511, 5011,542,4,NULL,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (512, 5011,551,5,NULL,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (513, 5011,552,5,NULL,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (514, 5011,561,6,NULL,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
 
  -- LVS zu Modulen
- (515, 5011,5111,1,501,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (516, 5011,5121,1,502,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (517, 5011,5131,1,503,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (518, 5011,5141,1,504,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (519, 5011,5211,2,505,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (520, 5011,5221,2,519,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (521, 5011,5231,2,507,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (522, 5011,5311,3,508,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (523, 5011,5321,3,509,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (524, 5011,5411,4,510,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (525, 5011,5421,4,511,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (526, 5011,5511,5,512,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (527, 5011,5521,5,513,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true),
- (528, 5011,5611,6,514,true,NULL,'2023-08-24 14:29:03.506117','ma0646',NULL,NULL,NULL,NULL,true,true,true)
+ (515, 5011,5111,1,501,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (516, 5011,5121,1,502,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (517, 5011,5131,1,503,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (518, 5011,5141,1,504,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (519, 5011,5211,2,505,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (520, 5011,5221,2,519,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (521, 5011,5231,2,507,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (522, 5011,5311,3,508,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (523, 5011,5321,3,509,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (524, 5011,5411,4,510,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (525, 5011,5421,4,511,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (526, 5011,5511,5,512,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (527, 5011,5521,5,513,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true),
+ (528, 5011,5611,6,514,true,NULL,'2023-08-24 14:29:03.506117','oesi',NULL,NULL,NULL,NULL,true,true,true)
 ;
 	 
 INSERT INTO lehre.tbl_studienplan_semester (studienplan_id, studiensemester_kurzbz, semester) VALUES
@@ -144,74 +129,74 @@ INSERT INTO lehre.tbl_studienplan_semester (studienplan_id, studiensemester_kurz
 
 
 INSERT INTO lehre.tbl_lehreinheit (lehreinheit_id, lehrveranstaltung_id, studiensemester_kurzbz, lehrfach_id_old, lehrform_kurzbz, stundenblockung, wochenrythmus, start_kw, raumtyp, raumtypalternativ, sprache, lehre, anmerkung, unr, lvnr, updateamum, updatevon, insertamum, insertvon, ext_id, lehrfach_id, gewicht)
-VALUES(51001, 5221, COALESCE(CurrentSemester(), LastActiveSemester()), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5221, NULL, '2023-08-24 14:54:43.000', 'ma0646', '2023-08-24 14:54:43.000', 'ma0646', NULL, 5221, 1);
+VALUES(51001, 5221, COALESCE(CurrentSemester(), LastActiveSemester()), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5221, NULL, '2023-08-24 14:54:43.000', 'oesi', '2023-08-24 14:54:43.000', 'oesi', NULL, 5221, 1);
 
 INSERT INTO lehre.tbl_lehreinheitgruppe
 (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id)
-VALUES(51001, 5, 1, 'A', NULL, NULL, NULL, NULL, '2023-08-24 14:58:26.000', 'ma0646', NULL);
+VALUES(51001, 5, 1, 'A', NULL, NULL, NULL, NULL, '2023-08-24 14:58:26.000', 'oesi', NULL);
 
 INSERT INTO lehre.tbl_lehreinheitgruppe
 (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id)
-VALUES(51001, 5, 1, 'B', NULL, NULL, NULL, NULL, '2023-08-24 14:58:26.000', 'ma0646', NULL);
+VALUES(51001, 5, 1, 'B', NULL, NULL, NULL, NULL, '2023-08-24 14:58:26.000', 'oesi', NULL);
 
 INSERT INTO lehre.tbl_lehreinheitmitarbeiter
 (lehreinheit_id, mitarbeiter_uid, lehrfunktion_kurzbz, planstunden, stundensatz, faktor, anmerkung, bismelden, updateamum, updatevon, insertamum, insertvon, ext_id, semesterstunden, standort_id, vertrag_id)
-VALUES(51001, 'demolektor1', 'Lektor', 0, NULL, 1.00, NULL, true, NULL, NULL, '2023-08-24 14:58:40.000', 'ma0646', NULL, 0.00, NULL, NULL);
+VALUES(51001, 'demolektor1', 'Lektor', 0, NULL, 1.00, NULL, true, NULL, NULL, '2023-08-24 14:58:40.000', 'oesi', NULL, 0.00, NULL, NULL);
 
 INSERT INTO lehre.tbl_lehreinheit (lehreinheit_id, lehrveranstaltung_id, studiensemester_kurzbz, lehrfach_id_old, lehrform_kurzbz, stundenblockung, wochenrythmus, start_kw, raumtyp, raumtypalternativ, sprache, lehre, anmerkung, unr, lvnr, updateamum, updatevon, insertamum, insertvon, ext_id, lehrfach_id, gewicht)
-VALUES(51002, 5121, COALESCE(CurrentSemester(), LastActiveSemester()), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5121, NULL, '2023-08-24 14:54:43.000', 'ma0646', '2023-08-24 14:54:43.000', 'ma0646', NULL, 5121, 1);
+VALUES(51002, 5121, COALESCE(CurrentSemester(), LastActiveSemester()), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5121, NULL, '2023-08-24 14:54:43.000', 'oesi', '2023-08-24 14:54:43.000', 'oesi', NULL, 5121, 1);
 
 INSERT INTO lehre.tbl_lehreinheitgruppe
 (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id)
-VALUES(51002, 5, 1, 'B', NULL, NULL, NULL, NULL, '2023-08-24 14:58:26.000', 'ma0646', NULL);
+VALUES(51002, 5, 1, 'B', NULL, NULL, NULL, NULL, '2023-08-24 14:58:26.000', 'oesi', NULL);
 
 INSERT INTO lehre.tbl_lehreinheitmitarbeiter
 (lehreinheit_id, mitarbeiter_uid, lehrfunktion_kurzbz, planstunden, stundensatz, faktor, anmerkung, bismelden, updateamum, updatevon, insertamum, insertvon, ext_id, semesterstunden, standort_id, vertrag_id)
-VALUES(51002, 'demolektor2', 'Lektor', 0, NULL, 1.00, NULL, true, NULL, NULL, '2023-08-24 14:58:40.000', 'ma0646', NULL, 0.00, NULL, NULL);
+VALUES(51002, 'demolektor2', 'Lektor', 0, NULL, 1.00, NULL, true, NULL, NULL, '2023-08-24 14:58:40.000', 'oesi', NULL, 0.00, NULL, NULL);
 
 INSERT INTO lehre.tbl_lehreinheit (lehreinheit_id, lehrveranstaltung_id, studiensemester_kurzbz, lehrfach_id_old, lehrform_kurzbz, stundenblockung, wochenrythmus, start_kw, raumtyp, raumtypalternativ, sprache, lehre, anmerkung, unr, lvnr, updateamum, updatevon, insertamum, insertvon, ext_id, lehrfach_id, gewicht)
-VALUES(51003, 5141, COALESCE(CurrentSemester(), LastActiveSemester()), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5141, NULL, '2023-08-24 14:54:43.000', 'ma0646', '2023-08-24 14:54:43.000', 'ma0646', NULL, 5141, 1);
+VALUES(51003, 5141, COALESCE(CurrentSemester(), LastActiveSemester()), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5141, NULL, '2023-08-24 14:54:43.000', 'oesi', '2023-08-24 14:54:43.000', 'oesi', NULL, 5141, 1);
 
 INSERT INTO lehre.tbl_lehreinheitgruppe
 (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id)
-VALUES(51003, 5, 1, 'A', NULL, NULL, NULL, NULL, '2023-08-24 14:58:26.000', 'ma0646', NULL);
+VALUES(51003, 5, 1, 'A', NULL, NULL, NULL, NULL, '2023-08-24 14:58:26.000', 'oesi', NULL);
 
 INSERT INTO lehre.tbl_lehreinheitmitarbeiter
 (lehreinheit_id, mitarbeiter_uid, lehrfunktion_kurzbz, planstunden, stundensatz, faktor, anmerkung, bismelden, updateamum, updatevon, insertamum, insertvon, ext_id, semesterstunden, standort_id, vertrag_id)
-VALUES(51003, 'demolektor3', 'Lektor', 0, NULL, 1.00, NULL, true, NULL, NULL, '2023-08-24 14:58:40.000', 'ma0646', NULL, 0.00, NULL, NULL);
+VALUES(51003, 'demolektor3', 'Lektor', 0, NULL, 1.00, NULL, true, NULL, NULL, '2023-08-24 14:58:40.000', 'oesi', NULL, 0.00, NULL, NULL);
 
 INSERT INTO lehre.tbl_lehreinheit (lehreinheit_id, lehrveranstaltung_id, studiensemester_kurzbz, lehrfach_id_old, lehrform_kurzbz, stundenblockung, wochenrythmus, start_kw, raumtyp, raumtypalternativ, sprache, lehre, anmerkung, unr, lvnr, updateamum, updatevon, insertamum, insertvon, ext_id, lehrfach_id, gewicht)
-VALUES(51004, 5211, COALESCE(CurrentSemester(), LastActiveSemester()), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5211, NULL, '2023-08-24 14:54:43.000', 'ma0646', '2023-08-24 14:54:43.000', 'ma0646', NULL, 5211, 1);
+VALUES(51004, 5211, COALESCE(CurrentSemester(), LastActiveSemester()), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5211, NULL, '2023-08-24 14:54:43.000', 'oesi', '2023-08-24 14:54:43.000', 'oesi', NULL, 5211, 1);
 
 INSERT INTO lehre.tbl_lehreinheitgruppe
 (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id)
-VALUES(51004, 5, 1, 'A', NULL, NULL, NULL, NULL, '2023-08-24 14:58:26.000', 'ma0646', NULL);
+VALUES(51004, 5, 1, 'A', NULL, NULL, NULL, NULL, '2023-08-24 14:58:26.000', 'oesi', NULL);
 
 INSERT INTO lehre.tbl_lehreinheitmitarbeiter
 (lehreinheit_id, mitarbeiter_uid, lehrfunktion_kurzbz, planstunden, stundensatz, faktor, anmerkung, bismelden, updateamum, updatevon, insertamum, insertvon, ext_id, semesterstunden, standort_id, vertrag_id)
-VALUES(51004, 'demolektor4', 'Lektor', 0, NULL, 1.00, NULL, true, NULL, NULL, '2023-08-24 14:58:40.000', 'ma0646', NULL, 0.00, NULL, NULL);
+VALUES(51004, 'demolektor4', 'Lektor', 0, NULL, 1.00, NULL, true, NULL, NULL, '2023-08-24 14:58:40.000', 'oesi', NULL, 0.00, NULL, NULL);
 
 INSERT INTO lehre.tbl_lehreinheit (lehreinheit_id, lehrveranstaltung_id, studiensemester_kurzbz, lehrfach_id_old, lehrform_kurzbz, stundenblockung, wochenrythmus, start_kw, raumtyp, raumtypalternativ, sprache, lehre, anmerkung, unr, lvnr, updateamum, updatevon, insertamum, insertvon, ext_id, lehrfach_id, gewicht)
-VALUES(51005, 5311, COALESCE(CurrentSemester(), LastActiveSemester()), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5311, NULL, '2023-08-24 14:54:43.000', 'ma0646', '2023-08-24 14:54:43.000', 'ma0646', NULL, 5311, 1);
+VALUES(51005, 5311, COALESCE(CurrentSemester(), LastActiveSemester()), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5311, NULL, '2023-08-24 14:54:43.000', 'oesi', '2023-08-24 14:54:43.000', 'oesi', NULL, 5311, 1);
 
 INSERT INTO lehre.tbl_lehreinheitgruppe
 (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id)
-VALUES(51005, 5, 1, 'A', NULL, NULL, NULL, NULL, '2023-08-24 14:58:26.000', 'ma0646', NULL);
+VALUES(51005, 5, 1, 'A', NULL, NULL, NULL, NULL, '2023-08-24 14:58:26.000', 'oesi', NULL);
 
 INSERT INTO lehre.tbl_lehreinheitmitarbeiter
 (lehreinheit_id, mitarbeiter_uid, lehrfunktion_kurzbz, planstunden, stundensatz, faktor, anmerkung, bismelden, updateamum, updatevon, insertamum, insertvon, ext_id, semesterstunden, standort_id, vertrag_id)
-VALUES(51005, 'demolektor4', 'Lektor', 0, NULL, 1.00, NULL, true, NULL, NULL, '2023-08-24 14:58:40.000', 'ma0646', NULL, 0.00, NULL, NULL);
+VALUES(51005, 'demolektor4', 'Lektor', 0, NULL, 1.00, NULL, true, NULL, NULL, '2023-08-24 14:58:40.000', 'oesi', NULL, 0.00, NULL, NULL);
 
 INSERT INTO lehre.tbl_lehreinheit (lehreinheit_id, lehrveranstaltung_id, studiensemester_kurzbz, lehrfach_id_old, lehrform_kurzbz, stundenblockung, wochenrythmus, start_kw, raumtyp, raumtypalternativ, sprache, lehre, anmerkung, unr, lvnr, updateamum, updatevon, insertamum, insertvon, ext_id, lehrfach_id, gewicht)
-VALUES(51006, 5321, COALESCE(CurrentSemester(), LastActiveSemester()), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5321, NULL, '2023-08-24 14:54:43.000', 'ma0646', '2023-08-24 14:54:43.000', 'ma0646', NULL, 5321, 1);
+VALUES(51006, 5321, COALESCE(CurrentSemester(), LastActiveSemester()), NULL, 'VO', 2, 1, NULL, 'Dummy', 'Dummy', 'German', true, NULL, 5321, NULL, '2023-08-24 14:54:43.000', 'oesi', '2023-08-24 14:54:43.000', 'oesi', NULL, 5321, 1);
 
 INSERT INTO lehre.tbl_lehreinheitgruppe
 (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id)
-VALUES(51006, 5, 1, 'C', NULL, NULL, NULL, NULL, '2023-08-24 14:58:26.000', 'ma0646', NULL);
+VALUES(51006, 5, 1, 'C', NULL, NULL, NULL, NULL, '2023-08-24 14:58:26.000', 'oesi', NULL);
 
 INSERT INTO lehre.tbl_lehreinheitmitarbeiter
 (lehreinheit_id, mitarbeiter_uid, lehrfunktion_kurzbz, planstunden, stundensatz, faktor, anmerkung, bismelden, updateamum, updatevon, insertamum, insertvon, ext_id, semesterstunden, standort_id, vertrag_id)
-VALUES(51006, 'demolektor1', 'Lektor', 0, NULL, 1.00, NULL, true, NULL, NULL, '2023-08-24 14:58:40.000', 'ma0646', NULL, 0.00, NULL, NULL);
+VALUES(51006, 'demolektor1', 'Lektor', 0, NULL, 1.00, NULL, true, NULL, NULL, '2023-08-24 14:58:40.000', 'oesi', NULL, 0.00, NULL, NULL);
 
 -- Stundenplan Eintraege
 INSERT INTO lehre.tbl_stundenplandev
@@ -241,11 +226,11 @@ INSERT INTO public.tbl_gruppe (gruppe_kurzbz, studiengang_kz, semester, bezeichn
 
 INSERT INTO lehre.tbl_lehreinheitgruppe
 (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id)
-VALUES(51003, 5, 2, NULL, NULL, 'GRP_51003', NULL, NULL, '2023-08-24 14:58:26.000', 'ma0646', NULL);
+VALUES(51003, 5, 2, NULL, NULL, 'GRP_51003', NULL, NULL, '2023-08-24 14:58:26.000', 'oesi', NULL);
 
 INSERT INTO lehre.tbl_lehreinheitgruppe
 (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id)
-VALUES(51004, 5, 2, NULL, NULL, 'GRP_51004', NULL, NULL, '2023-08-24 14:58:26.000', 'ma0646', NULL);
+VALUES(51004, 5, 2, NULL, NULL, 'GRP_51004', NULL, NULL, '2023-08-24 14:58:26.000', 'oesi', NULL);
 
 INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id, studiensemester_kurzbz) VALUES
 ('s125b101', 'GRP_51003', now(), 'demoadmin', now(), 'demoadmin', NULL, NULL),
@@ -535,6 +520,8 @@ COMMIT;
 --              Lektor" give different results.
 --   LE 51104   demolektor1 in LV 5221 in the last Sommersemester with a passed grade entry deadline.
 --              The deadline tests need a semester in which the user teaches.
+--   STPL 5011  the Studienplan semesters of STG5 for the test semester. Else the Assistenz sees no
+--              Studiengang in a semester after SS2026.
 --   Vorlagen   demo texts for 'Notenfreigabe' and 'Sancho_Mail_Template'. Without them every release
 --              mail has an empty body. The dbupdate script creates only the tbl_vorlage row.
 --
@@ -571,6 +558,27 @@ SELECT lehrveranstaltung_id AS lv_id, semester
 CREATE TEMP TABLE stud AS
 SELECT id AS person_id, 5000 + id AS prestudent_id, 's525b' || id AS uid, vorname
   FROM (VALUES (513, 'Eins'), (514, 'Zwei')) AS g(id, vorname);
+
+-- Studienplan 5011 (STG5) in the test semester. Its fixed rows end with SS2026, and getByStgs() shows an
+-- Assistenz only a Studiengang with a Studienplan in the semester. Copies the semesters of the newest
+-- semester of the same type (WS/SS).
+INSERT INTO lehre.tbl_studienplan_semester (studienplan_id, studiensemester_kurzbz, semester)
+SELECT src.studienplan_id, (SELECT kurzbz FROM sem), src.semester
+  FROM lehre.tbl_studienplan_semester src
+ WHERE src.studienplan_id = 5011
+   AND src.studiensemester_kurzbz = (
+	SELECT s.studiensemester_kurzbz
+	  FROM lehre.tbl_studienplan_semester s
+	  JOIN public.tbl_studiensemester ss USING (studiensemester_kurzbz)
+	 WHERE s.studienplan_id = 5011
+	   AND left(s.studiensemester_kurzbz, 2) = left((SELECT kurzbz FROM sem), 2)
+	 ORDER BY ss.start DESC
+	 LIMIT 1)
+   AND NOT EXISTS (
+	SELECT 1 FROM lehre.tbl_studienplan_semester x
+	 WHERE x.studienplan_id = src.studienplan_id
+	   AND x.studiensemester_kurzbz = (SELECT kurzbz FROM sem)
+	   AND x.semester = src.semester);
 
 DO $$
 BEGIN

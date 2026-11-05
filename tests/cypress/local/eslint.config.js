@@ -7,14 +7,12 @@ const prettier = require("eslint-config-prettier");
  * Lint for the Cypress suite only. The rest of the repo is older than this setup.
  *
  * The no-restricted-syntax rules check two conventions from tests/cypress/suites/readme_noten.txt.
- * Paths start at the repo root: `npm run lint` in local/ changes to it first.
+ * Paths start in tests/cypress: `npm run lint` in local/ changes to it first.
  */
 module.exports = [
-	{ ignores: ["tests/cypress/e2e/fhcomplete/**", "tests/cypress/e2e/*.cy.js"] },
-
 	// --- Node side: tasks, tools, local tools, configuration (CommonJS) ---
 	{
-		files: ["tests/cypress/{tasks,tools,suites,local}/**/*.js", "cypress.config.js"],
+		files: ["{tasks,tools,suites,local}/**/*.js", "cypress.config.js"],
 		languageOptions: {
 			ecmaVersion: 2023,
 			sourceType: "commonjs",
@@ -28,7 +26,7 @@ module.exports = [
 
 	// --- browser side: specs and support (ES modules in the Cypress runner) ---
 	{
-		files: ["tests/cypress/e2e/**/*.js", "tests/cypress/support/**/*.js"],
+		files: ["e2e/**/*.js", "support/**/*.js"],
 		languageOptions: {
 			ecmaVersion: 2023,
 			sourceType: "module",
@@ -46,9 +44,15 @@ module.exports = [
 		},
 	},
 
-	// --- the conventions of the suite ---
+	// paths.js is CommonJS: the Node side requires it, the specs import it
 	{
-		files: ["tests/cypress/e2e/specs/**/*.cy.js"],
+		files: ["support/helpers/paths.js"],
+		languageOptions: { sourceType: "commonjs", globals: { module: "writable" } },
+	},
+
+	// --- the conventions of the noten suite ---
+	{
+		files: ["e2e/specs/{api,ui}/noten/**/*.cy.js"],
 		rules: {
 			"no-restricted-syntax": [
 				"error",
@@ -71,7 +75,7 @@ module.exports = [
 
 	// notenConfig.js has the only this.skip() call
 	{
-		files: ["tests/cypress/support/helpers/notenConfig.js"],
+		files: ["support/helpers/notenConfig.js"],
 		rules: { "no-restricted-syntax": "off" },
 	},
 

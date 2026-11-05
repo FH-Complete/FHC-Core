@@ -124,8 +124,8 @@ class Noten extends FHCAPI_Controller
 
 		$config = array(
 			// define() flags of the old tool
-			'CIS_GESAMTNOTE_PUNKTE' => CIS_GESAMTNOTE_PUNKTE,
-			'CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE' => CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE,
+			'CIS_GESAMTNOTE_PUNKTE' => benotungstoolFlag('CIS_GESAMTNOTE_PUNKTE'),
+			'CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE' => benotungstoolFlag('CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE'),
 
 			// values that the server derives
 			'CIS_GESAMTNOTE_MAX_ANTRITTE' => $this->VerlaufLib->getMaxAntritte(),
@@ -336,7 +336,7 @@ class Noten extends FHCAPI_Controller
 			$student->benotungsdatum = $lvgesamtnote ? $lvgesamtnote->benotungsdatum : null;
 			$student->teilnoten = $teilnoten[$uid];
 			$student->mobility_zusatz = isset($mobility[$uid]) ? $mobility[$uid] : null;
-			// null without the Anwesenheiten addon
+			// null without the extension FHC-Core-Anwesenheiten
 			$student->anwquote = isset($anwesenheiten[$student->prestudent_id]) ? $anwesenheiten[$student->prestudent_id] : null;
 
 			// an LV-Note replaces the proposal
@@ -567,7 +567,7 @@ class Noten extends FHCAPI_Controller
 
 		// In the Punkte mode the Notenschluessel decides, else the LV-Note contradicts its own Punkte.
 		// Without Punkte (a proposal from Moodle Teilnoten) the given Note applies.
-		if (CIS_GESAMTNOTE_PUNKTE && $punkte !== null && $punkte !== '') {
+		if (benotungstoolFlag('CIS_GESAMTNOTE_PUNKTE') && $punkte !== null && $punkte !== '') {
 			$note = $this->noteFromPunkte($punkte, $lv_id, $sem_kurzbz);
 			if ($note === null) return $this->phraseError('benotungstool', 'c4punkteKeineNoteErmittelt', array($student_uid));
 		}
@@ -627,7 +627,7 @@ class Noten extends FHCAPI_Controller
 		$mitarbeiter_uid = $this->field($input, 'mitarbeiter_uid');
 
 		// in the Punkte mode the Notenschluessel gives the Note
-		if (CIS_GESAMTNOTE_PUNKTE && $punkte !== null && $punkte !== '') {
+		if (benotungstoolFlag('CIS_GESAMTNOTE_PUNKTE') && $punkte !== null && $punkte !== '') {
 			$note = $this->noteFromPunkte($punkte, $lv_id, $sem_kurzbz);
 			if ($note === null) return $this->phraseError('benotungstool', 'c4punkteKeineNoteErmittelt', array($student_uid));
 		}
@@ -805,7 +805,7 @@ class Noten extends FHCAPI_Controller
 	/** In the Punkte mode an import row needs Punkte. @return array|null { error } */
 	private function missingPunkteError($row)
 	{
-		if (!CIS_GESAMTNOTE_PUNKTE || is_numeric($this->field($row, 'punkte'))) return null;
+		if (!benotungstoolFlag('CIS_GESAMTNOTE_PUNKTE') || is_numeric($this->field($row, 'punkte'))) return null;
 
 		return $this->phraseError('benotungstool', 'c4punkteKeineNoteErmittelt', array($row->uid));
 	}
@@ -1061,13 +1061,13 @@ class Noten extends FHCAPI_Controller
 	 */
 	private function proposeNote($teilnoten, $lv_id, $sem_kurzbz, &$notenForPunkte)
 	{
-		$weighted = (bool) CIS_GESAMTNOTE_GEWICHTUNG;
+		$weighted = benotungstoolFlag('CIS_GESAMTNOTE_GEWICHTUNG');
 		$sum = 0;
 		$divisor = 0;
 
 		foreach ($teilnoten as $teilnote) {
 			// the mode decides which value counts; a row without it would only raise the divisor
-			$value = CIS_GESAMTNOTE_PUNKTE ? ($teilnote['points'] ?? null) : ($teilnote['grade'] ?? null);
+			$value = benotungstoolFlag('CIS_GESAMTNOTE_PUNKTE') ? ($teilnote['points'] ?? null) : ($teilnote['grade'] ?? null);
 			if (!is_numeric($value)) continue;
 
 			$weight = is_numeric($teilnote['weight'] ?? null) ? $teilnote['weight'] : 0;
@@ -1078,7 +1078,7 @@ class Noten extends FHCAPI_Controller
 		// PHP 7 divides by zero to INF, which gives the best Note
 		if ($divisor <= 0) return null;
 
-		if (!CIS_GESAMTNOTE_PUNKTE) return $this->roundNote($sum / $divisor);
+		if (!benotungstoolFlag('CIS_GESAMTNOTE_PUNKTE')) return $this->roundNote($sum / $divisor);
 
 		$punkte = round($sum / $divisor, (int) $this->config->item('CIS_GESAMTNOTE_VORSCHLAG_PUNKTE_STELLEN'));
 		if (!array_key_exists((string) $punkte, $notenForPunkte)) {
@@ -1401,10 +1401,18 @@ class Noten extends FHCAPI_Controller
 		return $teilnoten;
 	}
 
-	/** The Anwesenheit in percent by prestudent_id, from the Anwesenheiten addon. @return array */
+	/**
+	 * The Anwesenheit in percent by prestudent_id, from the optional extension FHC-Core-Anwesenheiten.
+	 * Empty if the extension is not installed: its listener calls the extension's SQL functions.
+	 *
+	 * @return array
+	 */
 	private function getAnwesenheiten($prestudent_ids, $lv_id, $sem_kurzbz)
 	{
 		$anwesenheiten = array();
+
+		$this->load->library('ExtensionsLib');
+		if (!$this->extensionslib->isInstalled('FHC-Core-Anwesenheiten')) return $anwesenheiten;
 
 		try {
 			Events::trigger(
@@ -1493,14 +1501,14 @@ class Noten extends FHCAPI_Controller
 	private function sendFreigabeMail($mail, $rows)
 	{
 		// CIS_GESAMTNOTE_FREIGABEMAIL_NOTE: the full table, else the uids only
-		$details = (bool) CIS_GESAMTNOTE_FREIGABEMAIL_NOTE;
+		$details = benotungstoolFlag('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE');
 		$noten = $this->activeNoten();
 
 		$header = $details
 			? array($this->p->t('person', 'personenkennzeichen'), $this->p->t('lehre', 'studiengang'),
 				$this->p->t('benotungstool', 'c4nachname'), $this->p->t('benotungstool', 'c4vorname'))
 			: array($this->p->t('person', 'uid'));
-		if ($details && CIS_GESAMTNOTE_PUNKTE) $header[] = $this->p->t('benotungstool', 'c4punkte');
+		if ($details && benotungstoolFlag('CIS_GESAMTNOTE_PUNKTE')) $header[] = $this->p->t('benotungstool', 'c4punkte');
 		if ($details) {
 			$header[] = $this->p->t('benotungstool', 'c4grade');
 			$header[] = $this->p->t('ui', 'bearbeitetVon');
@@ -1516,7 +1524,7 @@ class Noten extends FHCAPI_Controller
 				? array($student ? $student->matrikelnr : $uid, $student ? $student->kuerzel : '',
 					$student ? $student->nachname : '', $student ? $student->vorname : '')
 				: array($uid);
-			if ($details && CIS_GESAMTNOTE_PUNKTE) $cells[] = $lvgesamtnote->punkte;
+			if ($details && benotungstoolFlag('CIS_GESAMTNOTE_PUNKTE')) $cells[] = $lvgesamtnote->punkte;
 			if ($details) {
 				$note = (string) $lvgesamtnote->note;
 				$cells[] = isset($noten[$note]) ? $noten[$note]->bezeichnung : $note;
