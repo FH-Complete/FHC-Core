@@ -89,12 +89,19 @@ export default {
 
 			const vars = await this.getValuesForVars(this.config.vars, this.config.uservars, (key, detail) => {
 				const sharedData = this.sharedData || {};
-				sharedData[key] = detail;
+				if (!sharedData.customizableCalcVars)
+					sharedData.customizableCalcVars = {};
+				sharedData.customizableCalcVars[key] = detail;
 				this.$emit('update:sharedData', sharedData);
 				this.$emit('setConfig', Vue.markRaw(ConfigKpi));
 			});
 
 			this.calledVars = vars;
+
+			const sharedData = this.sharedData || {};
+			sharedData.calledVars = this.calledVars;
+			sharedData.details = this.details;
+			this.$emit('update:sharedData', sharedData);
 
 			try {
 				const result = await this.$api.call(

@@ -2,6 +2,8 @@ import AbstractWidget from '../../Abstract.js';
 import VarsVar from '../../../Dashboard/WidgetAdmin/Edit/Report/Vars/Var.js';
 import FormInput from '../../../Form/Input.js';
 
+import { compileLabel } from '../../../../helpers/DashboardWidget/Report.js';
+
 export default {
 	name: "WidgetsReportKpiSetup",
 	components:{
@@ -30,6 +32,14 @@ export default {
 				this.config.aggregator = v;
 			}
 		},
+		aggregatorLabels() {
+			let calledVars = { ...this.shared.calledVars } || {};
+			for (const key in calledVars) // Overwrite with current value
+				if (this.customVars[key] && this.customVars[key].modelValue.hasOwnProperty('value'))
+					calledVars[key] = this.customVars[key].modelValue.value;
+			const details = this.shared.details || {};
+			return this.config.aggregators.map(agg => compileLabel(agg.label, calledVars, details));
+		},
 		customVars() {
 			const uservars = this.config.uservars || {};
 
@@ -39,10 +49,10 @@ export default {
 						modelValue: uservars[key] || {},
 						detail: variable.detail,
 					};
-				} else if (this.sharedData && this.sharedData[key]) {
+				} else if (this.sharedData?.customizableCalcVars && this.sharedData.customizableCalcVars[key]) {
 					res[key] = {
 						modelValue: uservars[key] || {},
-						detail: this.sharedData[key],
+						detail: this.sharedData.customizableCalcVars[key],
 					};
 				}
 				return res;
@@ -77,8 +87,8 @@ export default {
 			:label="$p.t('dashboard/widget_report_kpi_aggregator')"
 			v-model="aggregator"
 		>
-			<option v-for="(aggregator, i) in config.aggregators" :key="i" :value="i">
-				{{ aggregator.label }}
+			<option v-for="(aggregator, i) in aggregatorLabels" :key="i" :value="i">
+				{{ aggregator }}
 			</option>
 		</form-input>
 	</div>
