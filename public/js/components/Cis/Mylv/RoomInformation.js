@@ -50,6 +50,8 @@ export default {
 		'propsViewData.ort_kurzbz': async function(newVal, oldVal) {
 			if (!this.propsViewData.ort_kurzbz) {
 				return;
+			} else if (this.propsViewData.ort_kurzbz !== this.selectedRoom) {
+				this.selectedRoom = this.propsViewData.ort_kurzbz;
 			}
 
 			await this.$nextTick();
