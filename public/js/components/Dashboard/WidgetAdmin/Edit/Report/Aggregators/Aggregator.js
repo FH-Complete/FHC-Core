@@ -1,6 +1,8 @@
 import FormInput from '../../../../../Form/Input.js';
 import TitleInput from '../TitleInput.js';
 
+import { useReportFields } from '../../../../../../composables/DashboardWidget/Report/ReportFields.js';
+
 export default {
 	name: "WidgetsGenteratorReportAggregatorsAggregator",
 	components: {
@@ -37,6 +39,15 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 	},
+	setup() {
+		const statistikKurzbz = Vue.inject('statistikKurzbz');
+
+		const { fields } = useReportFields(statistikKurzbz);
+
+		return {
+			fields,
+		};
+	},
 	template: /*html*/ `
 	<div class="widgets-report-config-aggregators-aggregator">
 		<title-input
@@ -55,14 +66,28 @@ export default {
 			<option value="sum">{{ $p.t('dashboard/widget_report_kpi_aggregator_type_sum') }}</option>
 			<option value="count">{{ $p.t('dashboard/widget_report_kpi_aggregator_type_count') }}</option>
 		</form-input>
-		<form-input
-			v-if="modelValue.type == 'sum'"
-			v-model="modelValue.fields"
-			type="text"
-			:label="$p.t('dashboard/widget_report_kpi_aggregator_fields')"
-			:placeholder="$p.t('dashboard/widget_report_kpi_aggregator_fields_placeholder')"
-			class="mb-3"
-		/>
+		<template v-if="modelValue.type == 'sum'">
+			<form-input
+				v-if="!fields.length"
+				v-model="modelValue.fields"
+				type="text"
+				:label="$p.t('dashboard/widget_report_kpi_aggregator_fields')"
+				:placeholder="$p.t('dashboard/widget_report_kpi_aggregator_fields_placeholder')"
+				class="mb-3"
+			/>
+			<form-input
+				v-else
+				v-model="modelValue.fields"
+				type="select"
+				:label="$p.t('dashboard/widget_report_kpi_aggregator_fields')"
+				class="mb-3"
+				multiple
+			>
+				<option v-for="field in fields" :key="field.name" :value="field.name">
+					{{ field.name }} ({{ field.type }})
+				</option>
+			</form-input>
+		</template>
 		<div class="d-flex justify-content-between align-items-baseline">
 			<form-input
 				v-model="defaultAggregatorIndex"

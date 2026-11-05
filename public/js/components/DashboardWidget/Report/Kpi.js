@@ -55,7 +55,9 @@ export default {
 			if (this.activeAggregator.type == 'count')
 				return this.data.length;
 			if (this.activeAggregator.type == 'sum') {
-				const fields = this.activeAggregator.fields.split(',');
+				const fields = Array.isArray(this.activeAggregator.fields)
+					? this.activeAggregator.fields
+					: this.activeAggregator.fields.split(',');
 				return this.data.reduce(
 					(res, curr) => res + fields.reduce(
 						(sum, key) => sum + (Number(curr[key]) || 0),
