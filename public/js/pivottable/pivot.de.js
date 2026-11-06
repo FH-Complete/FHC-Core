@@ -51,6 +51,7 @@
 				"Summe in ganzen Zahlen": tpl.sum(deFmtInt),
 				"Durchschnitt": tpl.average(deFmt),
 				"Summe &uuml;ber Summe": tpl.sumOverSum(deFmt),
+				"Summe &uuml;ber Summe in Prozent": tpl.sumOverSum(deFmtPct),
 				"80% obere Grenze": tpl.sumOverSumBound80(true, deFmt),
 				"80% untere Grenze": tpl.sumOverSumBound80(false, deFmt),
 				"Prozent": tpl.fractionOf(tpl.sum(), "total", deFmtPct),

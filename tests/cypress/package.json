@@ -1,0 +1,18 @@
+{
+  "private": true,
+  "description": "Cypress project of FHC-Core. Run all commands in tests/cypress.",
+  "scripts": {
+    "noten:check": "node tools/dbCheck.js noten",
+    "noten:api": "cypress run --spec \"e2e/specs/api/noten/**/*.cy.js\"",
+    "noten:ui": "cypress run --browser chrome --spec \"e2e/specs/ui/noten/**/*.cy.js\""
+  },
+  "//": [
+    "pg: the noten suite resets and seeds the test database directly (tasks/db.js, tools/dbCheck.js)",
+    "dotenv: cypress.config.js and the suites read URL, accounts and DB access from the .env files"
+  ],
+  "dependencies": {
+    "cypress": "^15.21.1",
+    "dotenv": "^17.4.2",
+    "pg": "^8.13.1"
+  }
+}
