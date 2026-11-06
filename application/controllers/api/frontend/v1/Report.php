@@ -19,6 +19,8 @@
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 use \DateTime as DateTime;
+use \stdClass as stdClass;
+use CI3_Events as Events;
 use DB_Model as DB_Model;
 
 class Report extends FHCAPI_Controller
@@ -35,6 +37,7 @@ class Report extends FHCAPI_Controller
 			'get' => self::PERM_LOGGED, // additional permission check inside
 			'fields' => [ 'dashboard/admin:rw', 'basis/statistik:rw' ],
 			'vardetails' => self::PERM_LOGGED,
+			'link' => self::PERM_LOGGED, // additional permission check inside
 		]);
 
 		$this->load->model('organisation/Statistik_model', 'StatistikModel');
@@ -262,6 +265,34 @@ class Report extends FHCAPI_Controller
 			});
 			$result = current($result);
 		}
+
+		$this->terminateWithSuccess($result);
+	}
+
+	/**
+	 * @param string	$statistik_kurzbz
+	 * @return void
+	 * @access public
+	 */
+	public function link($statistik_kurzbz)
+	{
+		$result = $this->StatistikModel->load($statistik_kurzbz);
+		$statistik = $this->getDataOrTerminateWithError($result);
+		if (!$statistik)
+			show_404();
+		$statistik = current($statistik);
+
+		// NOTE(chris): Permission check
+		$permissions = [ 'link' => $statistik->berechtigung_kurzbz . ':r' ];
+		if (!$this->permissionlib->isEntitled($permissions, 'link')) {
+			$this->_outputAuthError($permissions);
+			exit; // immediately terminate the execution
+		}
+
+		$result = new stdClass();
+		$result->cis4link = '/../vilesci/statistik/statistik_frameset.php?statistik_kurzbz=' . $statistik_kurzbz;
+
+		Events::trigger('widget_report_link', $result, $statistik);
 
 		$this->terminateWithSuccess($result);
 	}

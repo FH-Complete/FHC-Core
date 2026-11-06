@@ -48,4 +48,10 @@ export default {
 			params: { values },
 		};
 	},
+	link(kurzbz) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/report/link/' + kurzbz,
+		};
+	},
 };
