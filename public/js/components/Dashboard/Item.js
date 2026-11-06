@@ -221,7 +221,7 @@ export default {
 		<template v-else>
 			<header
 				v-if="widgetTemplate"
-				class="card-header d-flex ps-0 pe-2 align-items-center"
+				class="card-header d-flex px-2 align-items-center"
 			>
 				<!-- move handle -->
 				<Transition>
@@ -229,7 +229,7 @@ export default {
 						v-if="editMode && !isPinned"
 						type="button"
 						drag-action="move"
-						class="col-auto mx-2 px-2 cursor-move"
+						class="col-auto px-2 cursor-move"
 						draggable="true"
 						aria-hidden="true"
 						:aria-label="$p.t('dashboard/widget_move')"
@@ -239,13 +239,13 @@ export default {
 					</span>
 				</Transition>
 				<!-- TITLE -->
-				<h4 class="col mb-0 mx-2 px-2 fs-6 lh-base">
+				<h4 class="col mb-0 px-2 fs-6 lh-base">
 					{{ widgetTemplate.setup.name }}
 				</h4>
 				<!-- source info -->
 				<div
 					v-if="source"
-					class="col-auto me-2"
+					class="col-auto px-1"
 					:aria-label="sourceInfoTooltip"
 					v-tooltip="{ class: 'w-100', value: sourceInfoTooltip }"
 				>
@@ -257,7 +257,7 @@ export default {
 						v-if="editMode"
 						type="button"
 						role="button"
-						class="pin cursor-pointer col-auto me-2"
+						class="pin cursor-pointer col-auto px-1"
 						:title="$p.t('dashboard/widget_unpin')"
 						aria-hidden="true"
 						:aria-label="$p.t('dashboard/widget_unpin')"
@@ -266,7 +266,7 @@ export default {
 					>
 						<i class="fa-solid fa-thumbtack" aria-hidden="true"></i>
 					</div>
-					<div v-else class="col-auto me-2" aria-hidden="true">
+					<div v-else class="col-auto px-1" aria-hidden="true">
 						<i class="fa-solid fa-thumbtack"></i>
 					</div>
 				</template>
@@ -275,7 +275,7 @@ export default {
 						v-if="editMode"
 						type="button"
 						role="button"
-						class="col-auto me-2 pin"
+						class="col-auto px-1 pin"
 						:title="$p.t('dashboard/widget_pin')"
 						aria-hidden="true"
 						:aria-label="$p.t('dashboard/widget_pin')"
