@@ -68,6 +68,11 @@ class Bookmark extends FHCAPI_Controller
 	 */
 	public function delete($bookmark_id)
 	{
+		if(!$this->_isOwner($bookmark_id))
+		{
+			$this->terminateWithError("Not authorized", self::ERROR_TYPE_AUTH);
+		}
+
 		$bookmark = $this->BookmarkModel->load($bookmark_id);
 
 		$bookmark = current($this->getDataOrTerminateWithError($bookmark));
@@ -129,6 +134,10 @@ class Bookmark extends FHCAPI_Controller
 	 */
 	public function update($bookmark_id)
 	{
+		if(!$this->_isOwner($bookmark_id))
+		{
+			$this->terminateWithError("Not authorized", self::ERROR_TYPE_AUTH);
+		}
 		// form validation
 		$this->load->library('form_validation');
 		$this->form_validation->set_rules('url', 'URL', 'required|valid_url|max_length[511]');
@@ -186,6 +195,14 @@ class Bookmark extends FHCAPI_Controller
 		$update_result[] = $this->getDataOrTerminateWithError($update_result2);
 
 		$this->terminateWithSuccess($update_result);
+	}
+
+	private function _isOwner($bookmark_id)
+	{
+		$result = $this->BookmarkModel->load($bookmark_id);
+		$data = $this->getDataOrTerminateWithError($result);
+		$bookmarkOwner = current($data)->uid;
+		return $bookmarkOwner == $this->uid;
 	}
 }
 
