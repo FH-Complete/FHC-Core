@@ -820,7 +820,7 @@ export default {
 							type: obj.type,
 							id: obj.orig.kalender_id,
 						});
-						this.$refs.calendar.softReloadEvents();
+						this.$refs.calendar.targetedSoftReloadEvents(startDT, endDT);
 						this.rebuildRaumvorschlag();
 						this.bcc.postMessage('dropped');
 					},

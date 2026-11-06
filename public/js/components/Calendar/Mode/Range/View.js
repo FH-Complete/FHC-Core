@@ -203,84 +203,46 @@ export default {
 			);
 		},
 		async synchronizeGridWidths() {
-			if (
-				(!this.areDayColumnWidthsEqual && !this.areGridWidthsEqual) ||
-				this.gridWidthEqualizingData?.isWidthEqualizingRunning
-			)
-				return;
+			if ((!this.areDayColumnWidthsEqual && !this.areGridWidthsEqual) ||
+				this.gridWidthEqualizingData.isWidthEqualizingRunning) return;
 
 			this.gridWidthEqualizingData.isWidthEqualizingRunning = true;
 			const syncVersion = this.gridColumnWidthEqualizingData.syncVersion;
+			const data = this.gridColumnWidthEqualizingData;
 
 			try {
-				const grids = this.getGridElements();
+				let grids = this.getGridElements();
 				if (!grids.length) return;
 
-
-				if (syncVersion !== this.gridColumnWidthEqualizingData.syncVersion)
-					return;
-				if (!this.areDayColumnWidthsEqual && !this.areGridWidthsEqual) {
-					this.resetColumnWidthAdjustment();
-					this.clearGridMinWidths();
-					return;
-				}
-
+				// 1. Remove previously applied constraints so we measure natural sizes
+				this.clearGridMinWidths();
 				if (this.areDayColumnWidthsEqual) {
-					let firstWeekColumnsCount =
-						this.daysGroupedByWeek[this.weekStartDays[0]]?.length ?? 0;
-					const dayColumns = Array.from(
-						{ length: firstWeekColumnsCount },
-						(_, index) =>
-							Math.ceil(
-								Math.max(
-									...grids.map((grid) => {
-										const column = grid.querySelectorAll(
-											'.grid-body > .fhc-calendar-base-grid-line',
-										)[index];
-										return column
-											? Math.max(
-													column.getBoundingClientRect().width,
-													column.scrollWidth,
-												)
-											: 0;
-									}),
-								),
-							),
-					);
-
-					const data = this.gridColumnWidthEqualizingData;
-
-					const maxDayWidths = data.maxDayWidths.map(
-						(width, index) => Math.max(width, dayColumns[index] ?? 0)
-					);
-
-					if (maxDayWidths.some((width, index) => width !== data.maxDayWidths[index])) {
-						data.maxDayWidths = maxDayWidths;
-						data.sharedDayWidths = [...maxDayWidths];
-					}
-
+					data.sharedDayWidths = null;
 					await this.$nextTick();
-
-					if (syncVersion !== this.gridColumnWidthEqualizingData.syncVersion)
-						return;
-					if (!this.areDayColumnWidthsEqual && !this.areGridWidthsEqual) {
-						this.resetColumnWidthAdjustment();
-						this.clearGridMinWidths();
-						return;
-					}
+					if (syncVersion !== data.syncVersion) return;
+					grids = this.getGridElements();
 				}
-				if (this.areGridWidthsEqual) {
-					const width = Math.ceil(
-						Math.max(
-							this.$el.clientWidth,
-							...grids.map((grid) => grid.scrollWidth),
-						),
+
+				// 2. Equalize columns from the *current* natural widths (no history max)
+				if (this.areDayColumnWidthsEqual) {
+					const count = this.daysGroupedByWeek[this.weekStartDays[0]]?.length ?? 0;
+					const widths = Array.from({ length: count }, (_, i) =>
+						Math.ceil(Math.max(0, ...grids.map(grid => {
+							const col = grid.querySelectorAll('.grid-body > .fhc-calendar-base-grid-line')[i];
+							return col ? col.scrollWidth : 0; // one metric, not max of two
+						})))
 					);
-					grids.forEach((grid) => {
-						const minWidth = width + 'px';
-						if (grid.style.minWidth !== minWidth)
-							grid.style.minWidth = minWidth;
-					});
+					data.maxDayWidths = widths;
+					data.sharedDayWidths = [...widths];
+					await this.$nextTick();
+					if (syncVersion !== data.syncVersion) return;
+				}
+
+				// 3. Equalize grid widths from the natural (unconstrained) grids
+				if (this.areGridWidthsEqual) {
+					const natural = Math.max(...grids.map(g => g.scrollWidth));
+					const target = Math.max(this.$el.clientWidth, natural);
+					grids.forEach(g => { g.style.minWidth = target + 'px'; });
 				}
 			} finally {
 				this.gridWidthEqualizingData.isWidthEqualizingRunning = false;
