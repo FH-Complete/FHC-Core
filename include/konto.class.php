@@ -277,7 +277,7 @@ class konto extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Speichern der Daten';
-			return true;
+			return false;
 		}
 	}
 
