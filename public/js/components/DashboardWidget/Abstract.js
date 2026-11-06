@@ -11,6 +11,7 @@ export default {
 	],
 	emits: [
 		"setConfig",
+		"setLink",
 		"change", // TODO(chris): do we need this?
 		"update:sharedData"
 	],

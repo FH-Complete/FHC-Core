@@ -21,6 +21,7 @@ export default {
 		tmpConfig: {},
 		isLoading: false,
 		hasConfig: false,
+		cis4link: '',
 		sharedData: null
 	}),
 	emits: [
@@ -121,7 +122,13 @@ export default {
 		},
 		ready() {
 			return this.component && this.arguments !== null;
-		}
+		},
+		link() {
+			const cis4link = this.cis4link || this.widgetTemplate.setup.cis4link;
+			if (cis4link)
+				return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + cis4link;
+			return null;
+		},
 	},
 	methods: {
 		unpin() {
@@ -134,10 +141,6 @@ export default {
 		pinItem() {
 			let result = { item: this.item_data, pinned: true };
 			this.$emit('pinItem', [result]);
-		},
-		getWidgetC4Link(widget) {
-			return (FHC_JS_DATA_STORAGE_OBJECT.app_root +
-				FHC_JS_DATA_STORAGE_OBJECT.ci_router + widget.setup.cis4link)
 		},
 		handleShowBsModal() {
 			this.$emit('configOpened')
@@ -283,13 +286,13 @@ export default {
 				</template>
 				<!-- widget link -->
 				<a
-					v-if="widgetTemplate.setup.cis4link && permitted"
-					:href="getWidgetC4Link(widgetTemplate)"
-					class="col-auto ms-auto"
+					v-if="link && permitted"
+					:href="link"
+					class="col-auto ms-auto px-1"
 					:aria-label="$p.t('dashboard/widget_link')"
 					v-tooltip="{ showDelay: 1000, value: $p.t('dashboard/widget_link') }"
 				>
-					<i class="fa fa-arrow-up-right-from-square me-1" aria-hidden="true"></i>
+					<i class="fa fa-circle-right" aria-hidden="true"></i>
 				</a>
 				<!-- config button -->
 				<a
@@ -325,6 +328,7 @@ export default {
 					:widget-id="item_data.id" 
 					:item_data="item_data"
 					@setConfig="setConfig"
+					@set-link="cis4link = $event"
 					@change="changeConfigManually"
 				></component>
 			</div>
