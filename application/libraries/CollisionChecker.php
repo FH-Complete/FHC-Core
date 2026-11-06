@@ -90,7 +90,7 @@ class CollisionChecker
 				log_message('error', 'Tempus-Issues beheben: ' . $error);
 		}
 
-		$this->_ci->load->library( ['apps' => ['tempus']]);
+		$this->_ci->load->library('issues/PlausicheckProducerLib', ['apps' => ['tempus']]);
 		$result = $this->_ci->plausicheckproducerlib->producePlausicheckIssues(['kalender_ids' => $kalender_ids]);
 
 		foreach ($result->errors as $error)
