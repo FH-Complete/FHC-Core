@@ -54,7 +54,7 @@ class LvPlan extends FHCAPI_Controller
 
 		$this->load->library('LogLib');
 		$this->load->library('StundenplanLib');
-		$this->load->library('KalenderLib');
+		$this->load->library('KalenderLib', array('uid' => getAuthUID()));
 
 		$this->load->config('lv_plan');
 		$this->loglib->setConfigs(array(
@@ -123,17 +123,13 @@ class LvPlan extends FHCAPI_Controller
 			$ferienEvents = $this->fetchFerienEvents($start_date, $end_date, $uid);
 		}
 		
-
 		// fetching moodle events
 		$moodleEvents = $this->fetchMoodleEvents($start_date, $end_date, $uid);
 
-		
-
-		
 		$this->terminateWithSuccess(array_merge(
 			$lvplanEvents,
 			$moodleEvents,
-			[]
+			$ferienEvents
 		));
 	}
 

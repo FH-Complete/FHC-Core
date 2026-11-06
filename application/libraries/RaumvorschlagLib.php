@@ -27,7 +27,7 @@ class RaumvorschlagLib
 		$this->_ci->load->model('education/Lehreinheitgruppe_model', 'LehreinheitgruppeModel');
 
 		$this->_ci->load->library('CollisionChecker');
-		$this->_ci->load->library('KalenderLib');
+		$this->_ci->load->library('KalenderLib', array('uid' => getAuthUID()));
 		$this->_ci->load->library('PhrasesLib', array('ui'));
 		$this->_ci->load->library('VariableLib', array('uid' => getAuthUID()));
 	}

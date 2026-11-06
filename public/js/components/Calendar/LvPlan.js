@@ -49,6 +49,18 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		initialTeachingUnits: {
+			type: Array,
+			default: false,
+		},
+		initialCompactibleEventTypes: {
+			type: Array,
+			default: false,
+		},
+		customRenderers: {
+			type: Object,
+			default: null,
+		},
 	},
 	provide() {
 		return {
@@ -181,7 +193,10 @@ export default {
 			context.emit('update:lv', newValue);
 		});
 
-		const { renderers } = useRenderers();
+		const defaultRenderers = props.customRenderers ? null : useRenderers().renderers;
+		const renderers = Vue.computed(
+			() => props.customRenderers || Vue.unref(defaultRenderers)
+		);
 
 		Vue.watch(reservierbarMap, newVal => {
 			context.emit('update:reservierbarMap', newVal);
@@ -197,8 +212,17 @@ export default {
 		};
 	},
 	async created() {
-		await this.getStunden();
-		await this.getCompactibleEventTypes();
+		if (this.$props.initialTeachingUnits?.length) {
+			this.teachingunits = this.$props.initialTeachingUnits;;
+		} else 
+			await this.getStunden();
+		
+		if (this.$props.initialCompactibleEventTypes?.length) {
+			this.compactibleEventTypes = this.$props.initialCompactibleEventTypes;;
+		} else 
+			await this.getCompactibleEventTypes();
+
+			 
 	},
 	template: /* html */ `
 	<fhc-calendar

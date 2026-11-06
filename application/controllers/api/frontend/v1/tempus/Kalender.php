@@ -47,7 +47,7 @@ class Kalender extends FHCAPI_Controller
 		$this->_ci->load->model('ressource/Zeitwunsch_model', 'ZeitwunschModel');
 		$this->_ci->load->library('LogLib');
 		$this->_ci->load->library('form_validation');
-		$this->_ci->load->library('KalenderLib');
+		$this->_ci->load->library('KalenderLib', array('uid' => getAuthUID()));
 		$this->_ci->load->library('KalenderSyncLib');
 		$this->_ci->load->library('RaumvorschlagLib');
 		$this->loadPhrases([

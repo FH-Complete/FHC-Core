@@ -10,15 +10,15 @@ class CollisionChecker
 
 	private $_ci;
 
-	public function __construct()
+	public function __construct($loggeduid)
 	{
 		$this->_ci =& get_instance();
 
-		$this->_ci->load->library('collision/checks/RoomCollisionCheck');
-		$this->_ci->load->library('collision/checks/LectureCollisionCheck');
-		$this->_ci->load->library('collision/checks/VerbandCollisionCheck');
-		$this->_ci->load->library('collision/checks/StudentCollisionCheck');
-		$this->_ci->load->library('collision/checks/ResourcesCollisionCheck');
+		$this->_ci->load->library('collision/checks/RoomCollisionCheck', array('uid' => $loggeduid['uid']));
+		$this->_ci->load->library('collision/checks/LectureCollisionCheck', array('uid' => $loggeduid['uid']));
+		$this->_ci->load->library('collision/checks/VerbandCollisionCheck', array('uid' => $loggeduid['uid']));
+		$this->_ci->load->library('collision/checks/StudentCollisionCheck', array('uid' => $loggeduid['uid']));
+		$this->_ci->load->library('collision/checks/ResourcesCollisionCheck', array('uid' => $loggeduid['uid']));
 		$this->register($this->_ci->roomcollisioncheck);
 		$this->register($this->_ci->lecturecollisioncheck);
 		$this->register($this->_ci->verbandcollisioncheck);

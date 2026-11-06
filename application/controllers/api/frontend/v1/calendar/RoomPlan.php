@@ -49,6 +49,9 @@ class RoomPlan extends FHCAPI_Controller
 		$this->load->library('form_validation');
 		$this->load->library('PermissionLib');
 		$this->load->library('StundenplanLib');
+		$this->load->library('KalenderLib', array('uid' => getAuthUID()));
+
+		$this->load->config('lv_plan');
 
 		$this->loadPhrases(['ui']);
 	}
@@ -101,7 +104,12 @@ class RoomPlan extends FHCAPI_Controller
 	{
 		$reservierung_id = $this->input->post('reservierung_id');
 
-		$result = $this->stundenplanlib->deleteReservation($reservierung_id);
+		if ($this->config->item('is_new_calendar_structure_enabled')) {
+			$result = $this->kalenderlib->deleteEntry($reservierung_id);
+		} else {
+			$result = $this->stundenplanlib->deleteReservation($reservierung_id);
+		}
+		
 
 		if (isError($result))
 			$this->terminateWithError($result);

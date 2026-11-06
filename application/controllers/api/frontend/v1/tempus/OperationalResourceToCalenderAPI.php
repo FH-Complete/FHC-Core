@@ -19,7 +19,7 @@ class OperationalResourceToCalenderAPI extends FHCAPI_Controller
 		$this->load->model('ressource/Kalender_model', 'KalenderModel');
 
 		$this->load->library('CollisionChecker');
-		$this->load->library('KalenderLib');
+		$this->load->library('KalenderLib', array('uid' => getAuthUID()));
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

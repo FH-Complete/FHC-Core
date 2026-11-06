@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import MyLvPlan from '../../Cis/LvPlan/MyLvPlan.js';
+import InfoTerminalLvPlan from './InfoTerminalLvPlan.js';
 
 export default {
 	name: 'InfoTerminal',
 	components: {
-		MyLvPlan,
+		InfoTerminalLvPlan,
 	},
 	provide() {
 		return {
@@ -35,6 +35,7 @@ export default {
 	},
 	data() {
 		return {
+			cardNumber: null,
 			currentlySelectedTab: 'LVPlan',
 			availableTabs: [
 				{ name: 'LVPlan', label: 'Mein LV-Plan' },
@@ -45,6 +46,14 @@ export default {
 				{ name: 'PersonalData', label: 'Personliche daten' },
 			],
 		};
+	},
+	watch: {
+		'$route.query.key_input': {
+			handler(newVal) {
+				this.cardNumber = newVal || null;
+			},
+			immediate: true  
+		}
 	},
 	template: /* html */ `
 	<div
@@ -73,7 +82,10 @@ export default {
 				</div>
 			</div>
 			<div class="col">
-				<MyLvPlan v-if="currentlySelectedTab === 'LVPlan'" />
+				<InfoTerminalLvPlan 
+					v-if="currentlySelectedTab === 'LVPlan'"
+					:cardNumber=this.cardNumber
+				/>
 				<div v-else-if="currentlySelectedTab === 'AvailablePCRooms'">
 					Freie PC Räume Content
 				</div>

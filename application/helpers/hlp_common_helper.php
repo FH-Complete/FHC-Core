@@ -580,3 +580,32 @@ function generateUUID()
 
 	return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
+
+function is_ip_allowed_by_rule($ip, $rule)
+{
+	$rule = trim($rule);
+
+	if (strpos($rule, '/') === false)
+		return $ip === $rule;
+
+	list($subnet, $bits) = explode('/', $rule, 2);
+	$ipBin = @inet_pton($ip);
+	$subnetBin = @inet_pton($subnet);
+
+	// Invalid address, or IPv4 compared against IPv6
+	if ($ipBin === false || $subnetBin === false || strlen($ipBin) !== strlen($subnetBin))
+		return false;
+
+	$bits = (int)$bits;
+	$fullBytes = intdiv($bits, 8);
+	$remainingBits = $bits % 8;
+
+	if (substr($ipBin, 0, $fullBytes) !== substr($subnetBin, 0, $fullBytes))
+		return false;
+
+	if ($remainingBits === 0)
+		return true;
+
+	$mask = chr((0xFF << (8 - $remainingBits)) & 0xFF);
+	return ($ipBin[$fullBytes] & $mask) === ($subnetBin[$fullBytes] & $mask);
+}

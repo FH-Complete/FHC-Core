@@ -5,7 +5,7 @@ if (! defined("BASEPATH")) exit("No direct script access allowed");
 class KalenderLib
 {
 	private $_ci;
-	public function __construct()
+	public function __construct($loggeduid)
 	{
 		$this->_ci =& get_instance();
 
@@ -30,9 +30,14 @@ class KalenderLib
 		$this->_ci->load->model('ressource/zeitwunsch_model', 'ZeitwunschModel');
 
 
-		$this->_ci->load->library('CollisionChecker');
-		$this->_ci->load->library('PhrasesLib', array('ui'));
-		$this->_ci->load->library('VariableLib', array('uid' => getAuthUID()));
+		if (!(isset($loggeduid['uid']) && !isEmptyString($loggeduid['uid'])))
+		{
+			$loggeduid["uid"] = getAuthUID();
+		}
+
+		$this->_ci->load->library('CollisionChecker', array('uid' => $loggeduid['uid']));
+		$this->_ci->load->library('PhrasesLib', array('uid' => $loggeduid['uid']));
+		$this->_ci->load->library('VariableLib', array('uid' => $loggeduid['uid']));
 
 
 	}
@@ -1788,7 +1793,9 @@ class KalenderLib
 		return sprintf(
 			'WITH filtered_kalender AS MATERIALIZED (
 				SELECT *
-				FROM lehre.tbl_kalender 
+				FROM lehre.tbl_kalender
+				WHERE von >= timestamp %s
+					AND bis < timestamp %s
 			)',
 			$this->_ci->KalenderModel->db->escape(date('Y-m-d H:i:s', strtotime($start_date))),
 			$this->_ci->KalenderModel->db->escape(date('Y-m-d H:i:s', strtotime($end_date)))
@@ -1806,6 +1813,7 @@ class KalenderLib
 			tbl_kalender.typ,
 			tbl_kalender.von,
 			tbl_kalender.bis,
+			tbl_kalender.insertvon,
 			tbl_kalender_ort.location,
 			tbl_kalender_ort.ort_kurzbz,
 			tbl_ort.content_id as ort_content_id,
@@ -2051,6 +2059,7 @@ class KalenderLib
 					'has_assigned_resources' => !empty($parsedResources),
 					'resources' => is_array($parsedResources) ? $parsedResources : [],
 					'tags' => isset($row->tags) ? json_decode($row->tags, true) : [],
+					'insertvon' => $row->insertvon
 				];
 			}
 
@@ -2751,11 +2760,44 @@ class KalenderLib
 	
 private function _mapCalendarEvents(array $events): array
 {
+	$this->_ci->load->library('PermissionLib');
+
 	return array_map(function ($event) {
+		$now = time();
+		
 		$lvInfo = $event->lehrveranstaltung_infos[0] ?? [];
 		$ortInfo = $event->ort_infos[0] ?? [];
 
+		$reservierungId = $event->type === "reservierung" ? $event->kalender_id : null;
+
+		$isEventDeletable = false;
+
+		$hasUserLimitedReservationPermission  = $this->_ci->permissionlib->isBerechtigt('lehre/reservierung:begrenzt', 'sui');
+
+		$allowedDeletionStartDate = $this->jump_day($now, RES_TAGE_LEKTOR_MIN - 1);
+		$allowedDeletionStartDate = date('Y-m-d', $allowedDeletionStartDate);
+		
+		$allowedDeletionEndDate  = mktime(0, 0, 0, date('m', $now), date('d', $now) + RES_TAGE_LEKTOR_BIS, date('Y', $now));
+		$allowedDeletionEndDate = date('Y-m-d', $allowedDeletionEndDate);
+
+		$eventStartDate = is_numeric($event->isostart) ? $event->isostart : strtotime($event->isostart);
+		if (!date('w', $eventStartDate)) {
+			$eventStartDate = $this->jump_day($eventStartDate, 1);
+		}
+		$eventStartDate = date('Y-m-d', $eventStartDate);
+
+		
+		$isEventDeletable = $event->type === "reservierung" &&
+			$hasUserLimitedReservationPermission &&
+			(
+			    (isset($event->insertvon) && $event->insertvon === getAuthUID()) //||
+				//(isset($event->uids) && in_array(getAuthUID(), $event->uids))
+			) &&
+			$eventStartDate >= $allowedDeletionStartDate &&
+			$eventStartDate <= $allowedDeletionEndDate;
+
 		return [
+			'reservierung_id' => $reservierungId,
 			'type' => $event->type,
 			'beginn' => $event->beginn,
 			'ende' => $event->ende,
@@ -2785,9 +2827,15 @@ private function _mapCalendarEvents(array $events): array
 			'isostart' => $event->isostart,
 			'isoend' => $event->isoend,
 			'ort_content_id' => $ortInfo->ort_content_id ?? null,
-			'deletable' => false,
+			'deletable' => $isEventDeletable
 		];
 	}, $events);
 }
 
+private function jump_day($timestamp, $days)
+	{
+		$days = (int)$days;
+		$prefix = ($days >= 0 ? '+' : '');
+		return strtotime($prefix . $days . ' days', $timestamp);
+	}
 }
