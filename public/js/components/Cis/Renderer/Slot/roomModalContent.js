@@ -30,6 +30,8 @@ export default {
 			selectedLektoren: [],
 			nestedGroupOptions: {},
 			selectedDate: null,
+			maxSelectableDate: null,
+			minSelectableDate: null,
 		};
 	},
 	computed: {
@@ -54,10 +56,13 @@ export default {
 		},
 		parsedTimeGrid() {
 			return this.timeGrid.map((timeslot) => {
-				timeslot.start = timeslot.start.split(":").slice(0,2).join(":");
-				timeslot.end = timeslot.end.split(":").slice(0,2).join(":");
+				timeslot.start = timeslot.start
+					.split(":")
+					.slice(0, 2)
+					.join(":");
+				timeslot.end = timeslot.end.split(":").slice(0, 2).join(":");
 				return timeslot;
-			})
+			});
 		},
 	},
 	watch: {
@@ -173,9 +178,20 @@ export default {
 				this.$refs.beschreibungInput.$el.querySelector("input").focus();
 			}
 		},
+		async fetchReservableDateRange() {
+			const reservableDateRangeResponse = await this.$api.call(
+				ApiRoomPlan.getReservableDateRange(),
+			);
+
+			if (reservableDateRangeResponse.meta.status === "success") {
+				this.maxSelectableDate = reservableDateRangeResponse.data.max;
+				this.minSelectableDate = reservableDateRangeResponse.data.min;
+			}
+		},
 	},
 	mounted() {
 		this.syncFromEvent(this.event);
+		this.fetchReservableDateRange();
 	},
 
 	template: `
@@ -223,10 +239,12 @@ export default {
 				format="dd.MM.yyyy"
 				preview-format="dd.MM.yyyy"
 				model-type="yyyy-MM-dd"
-				:min-date="new Date()"
+				:min-date="minSelectableDate"
+				:max-date="maxSelectableDate"
 				:enable-time-picker="false"
 				:text-input="true"
 				:six-weeks="true"
+				auto-apply
 				required
 			/>
 		</div>
