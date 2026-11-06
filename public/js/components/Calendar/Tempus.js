@@ -386,8 +386,8 @@ export default {
 				this.semesterRangePresets = {
 					label: 'View specific semester',
 					presets: semestersResponse.data.map((semester) => {
-						let startDate = luxon.DateTime.fromISO(semester.start);
-						let endDate = luxon.DateTime.fromISO(semester.ende);
+						let startDate = luxon.DateTime.fromISO(semester.start).setZone(this.timezone);
+						let endDate = luxon.DateTime.fromISO(semester.ende).setZone(this.timezone);
 						return {
 							startDate,
 							endDate,

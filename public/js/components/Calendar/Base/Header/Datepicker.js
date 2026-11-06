@@ -102,9 +102,15 @@ export default {
 					const [start, end] = this.current;
 
 					return (
-						luxon.DateTime.fromMillis(start).setLocale('de').toFormat('d. LLLL yyyy') +
+						luxon.DateTime.fromMillis(start)
+							.setZone(this.timezone, { keepLocalTime: true })
+							.setLocale(this.locale)
+							.toFormat('d. LLLL yyyy') +
 						' - ' +
-						luxon.DateTime.fromMillis(end).setLocale('de').toFormat('d. LLLL yyyy')
+						luxon.DateTime.fromMillis(end)
+							.setZone(this.timezone, { keepLocalTime: true })
+							.setLocale(this.locale)
+							.toFormat('d. LLLL yyyy')
 					);
 				}
 				case 'day':
