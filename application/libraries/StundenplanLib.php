@@ -343,13 +343,12 @@ class StundenplanLib
 					return error(getData($lektor_object));
 				}
 				$lektor_object = getData($lektor_object);
-				if(count($lektor_object) == 0)
+				if(count($lektor_object))
 				{
-					return error("No lektor object");
+					$lektor_object = current($lektor_object);
+					// only provide needed information of the mitarbeiter object
+					$lektor_obj_array[] = $lektor_object;
 				}
-				$lektor_object = current($lektor_object);
-				// only provide needed information of the mitarbeiter object
-				$lektor_obj_array[] = $lektor_object;
 			}
 
 			// load gruppe object
@@ -395,18 +394,11 @@ class StundenplanLib
 			$this->_ci->load->library('PermissionLib');
 			$berechtigt_begrenzt  = $this->_ci->permissionlib->isBerechtigt('lehre/reservierung:begrenzt', 'sui');
 
+			$start_date_str = $item->datum;
 			$now = time();
 			$res_lektor_start = $this->jump_day($now, RES_TAGE_LEKTOR_MIN - 1);
-			$res_lektor_ende  = mktime(0, 0, 0, date('m', $now), date('d', $now) + RES_TAGE_LEKTOR_BIS, date('Y', $now));
-
-			$start_date = is_numeric($item->beginn) ? $item->beginn : strtotime($item->beginn);
-			if (!date('w', $start_date)) {
-				$start_date = $this->jump_day($start_date, 1);
-			}
-
-			$start_date_str = date('Y-m-d', $start_date);
 			$res_lektor_start_str = date('Y-m-d', $res_lektor_start);
-			$res_lektor_ende_str = date('Y-m-d', $res_lektor_ende);
+			$res_lektor_ende_str = defined('RES_TAGE_LEKTOR_BIS') ? RES_TAGE_LEKTOR_BIS : "2099-01-01";
 
 			$show_delete = (
 				(
@@ -533,6 +525,18 @@ class StundenplanLib
 		$startTime = new DateTime($start);
 		$endTime = new DateTime($end);
 
+		$minDaysAhead = defined('RES_TAGE_LEKTOR_MIN') ? (int) RES_TAGE_LEKTOR_MIN : 1;
+		$today = new DateTime();
+		$earliestAllowedReservableDate = $today->modify("+" . ($minDaysAhead - 1) . " days");
+		if (date_format($earliestAllowedReservableDate, "Y-m-d") > date_format($endTime, "Y-m-d")) {
+			return error("Reservation date invalid!");
+		}
+
+		$latestAllowedReservableDate = defined('RES_TAGE_LEKTOR_BIS') ? RES_TAGE_LEKTOR_BIS : "2099-01-01";
+		if (date_format($startTime, "Y-m-d") > $latestAllowedReservableDate) {
+			return error("Reservation date invalid!");
+		}
+
 		$stunden = $this->_ci->StundeModel->loadWhere(array(
 			'beginn <' => $endTime->format('H:i:s'),
 			'ende >' => $startTime->format('H:i:s')
@@ -647,7 +651,20 @@ class StundenplanLib
 			if ($today->format('Y-m-d') > $reservierung->datum)
 				return error("Vergangene Reservierungen können nicht gelöscht werden");
 
-			if (($this->_ci->permissionlib->isBerechtigt('lehre/reservierung:begrenzt')) && ($reservierung->insertvon == getAuthUID() || $reservierung->uid === getAuthUID()))
+			$latestAllowedReservableDate = defined('RES_TAGE_LEKTOR_BIS') ? RES_TAGE_LEKTOR_BIS : "2099-01-01";
+			$notPastLatestAllowedReservableDate = $reservierung->datum <= $latestAllowedReservableDate;
+
+			$minDaysAhead = defined('RES_TAGE_LEKTOR_MIN') ? (int) RES_TAGE_LEKTOR_MIN : 1;
+			$today = new DateTime();
+			$earliestAllowedReservableDate = $today->modify("+" . ($minDaysAhead - 1) . " days");
+			$notBeforeEarliestAllowedReservableDate = $reservierung->datum >= date_format($earliestAllowedReservableDate, "Y-m-d");
+
+			if (
+				($this->_ci->permissionlib->isBerechtigt('lehre/reservierung:begrenzt')) &&
+				($reservierung->insertvon == getAuthUID() || $reservierung->uid === getAuthUID()) &&
+				$notPastLatestAllowedReservableDate &&
+				$notBeforeEarliestAllowedReservableDate
+			)
 			{
 				$delete_result = $this->_ci->ReservierungModel->delete($reservierung->reservierung_id);
 
@@ -694,14 +711,12 @@ class StundenplanLib
 		}
 
 		$now = time();
-		$tage_min = defined('RES_TAGE_LEKTOR_MIN') ? (int)RES_TAGE_LEKTOR_MIN : 0;
-		$tage_bis = defined('RES_TAGE_LEKTOR_BIS') ? (int)RES_TAGE_LEKTOR_BIS : 0;
+		$tage_min = defined('RES_TAGE_LEKTOR_MIN') ? (int)RES_TAGE_LEKTOR_MIN : 1;
 
 		$datum_res_lektor_start = $this->jump_day($now, $tage_min - 1);
-		$datum_res_lektor_ende = $this->jump_day($now, $tage_bis);
 
 		$start_ymd_allowed = date('Y-m-d', $datum_res_lektor_start);
-		$end_ymd_allowed = date('Y-m-d', $datum_res_lektor_ende);
+		$end_ymd_allowed = defined('RES_TAGE_LEKTOR_BIS') ? RES_TAGE_LEKTOR_BIS : "2099-01-01";
 
 		$result = [];
 

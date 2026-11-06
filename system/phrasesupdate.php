@@ -22009,6 +22009,26 @@ In the list:
 	),
 	array(
 		'app' => 'core',
+		'category' => 'rauminfo',
+		'phrase' => 'no_room_selected',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Es ist kein Raum ausgewählt!",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "No room has been selected!",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
 		'category' => 'lehre',
 		'phrase' => 'keinLektorZugeordnet',
 		'insertvon' => 'system',
