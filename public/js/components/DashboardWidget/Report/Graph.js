@@ -186,6 +186,13 @@ export default {
 				this.$emit('setConfig', Vue.markRaw(ConfigGraph));
 			else if (this.config.charts.length > 1)
 				this.$emit('setConfig', Vue.markRaw(ConfigGraph));
+
+			this.$api
+				.call(ApiReport.link(this.config.statistik_kurzbz))
+				.then(result => {
+					this.$emit('setLink', result.data.cis4link);
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
 	template: /*html*/ `

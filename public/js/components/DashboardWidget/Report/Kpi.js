@@ -148,6 +148,13 @@ export default {
 				this.$emit('setConfig', Vue.markRaw(ConfigKpi));
 			else if (this.config.aggregators.length > 1)
 				this.$emit('setConfig', Vue.markRaw(ConfigKpi));
+
+			this.$api
+				.call(ApiReport.link(this.config.statistik_kurzbz))
+				.then(result => {
+					this.$emit('setLink', result.data.cis4link);
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
 	template: /*html*/ `
