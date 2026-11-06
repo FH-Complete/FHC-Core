@@ -7,17 +7,20 @@
  *   node tools/dbCheck.js noten seed       apply the suite's seeder, then re-check
  *   node tools/dbCheck.js noten env        print the .env block to use
  *
- * A suite contributes tools/checks/<suite>.js exporting { title, checks, sqlFiles }. Connection
- * and output are shared and live here. A sqlFiles entry is a path or { file, group }; a
- * "-- ==== <group> ====" line starts a group.
+ * A suite contributes tools/checks/<suite>.js exporting { title, checks, sqlFiles }. An extension suite
+ * has the same export in checks.js of its tests/cypress folder; pass that folder instead of a name, like
+ * CY_SUITE. Connection and output are shared and live here. A sqlFiles entry is a path or
+ * { file, group }; a "-- ==== <group> ====" line starts a group.
  *
- * `check` is read-only; `seed` needs NOTEN_DB_ALLOW_WRITES=true and the owner role.
+ * `check` is read-only; `seed` needs TEST_DB_ALLOW_WRITES=true and the owner role.
  */
 
 const fs = require("fs");
 const path = require("path");
 
 try {
+	// TEST_DB_* from the core .env, the keys of the core suites from suites/.env
+	require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 	require("dotenv").config({ path: path.join(__dirname, "..", "suites", ".env") });
 } catch (e) {
 	// dotenv missing -> fall back to the ambient environment
@@ -31,6 +34,16 @@ const CHECKS_DIR = path.join(__dirname, "checks");
 const usage = (suite, mode) => `node tools/dbCheck.js ${suite} ${mode}`;
 
 const loadSuite = (name) => {
+	if (/[\\/]/.test(name)) {
+		// the tests/cypress folder of an extension, relative to tests/cypress like CY_SUITE
+		const file = path.join(path.resolve(__dirname, "..", name), "checks.js");
+		if (!fs.existsSync(file)) {
+			console.error(`\nNo checks.js in ${path.dirname(file)}\n`);
+			process.exit(2);
+		}
+		return require(file);
+	}
+
 	const file = path.join(CHECKS_DIR, `${name}.js`);
 	if (!fs.existsSync(file)) {
 		const available = fs.existsSync(CHECKS_DIR)
@@ -91,7 +104,7 @@ const applySqlFile = async (client, entry) => {
 	const { file, group } = typeof entry === "string" ? { file: entry } : entry;
 	const label = path.relative(process.cwd(), file) + (group ? ` [${group}]` : "");
 	if (!db.writesAllowed()) {
-		console.error("\nRefusing to write: set NOTEN_DB_ALLOW_WRITES=true first.\n");
+		console.error("\nRefusing to write: set TEST_DB_ALLOW_WRITES=true first.\n");
 		return 2;
 	}
 	if (!fs.existsSync(file)) {
@@ -116,7 +129,7 @@ const applySqlFile = async (client, entry) => {
 		// `check` gets by as the application role; seeding creates and grants objects.
 		if (/permission denied/i.test(error.message)) {
 			console.error(`${error.message}\n`);
-			console.error(`Seeding needs the database owner, but NOTEN_DB_USER is "${db.env("USER")}".`);
+			console.error(`Seeding needs the database owner, but TEST_DB_USER is "${db.env("USER")}".`);
 			console.error("Point it at the owner role, or rebuild the database with db_setup.sh.\n");
 			return 2;
 		}
@@ -137,14 +150,14 @@ const applySqlFile = async (client, entry) => {
 
 const printEnv = () => {
 	console.log(`
-Add to tests/cypress/suites/.env (gitignored):
+Add to tests/cypress/.env (not in Git):
 
-  NOTEN_DB_HOST=<postgres host>
-  NOTEN_DB_PORT=5432
-  NOTEN_DB_NAME=<test database>
-  NOTEN_DB_USER=<user>
-  NOTEN_DB_PASSWORD=<password>
-  NOTEN_DB_ALLOW_WRITES=true
+  TEST_DB_HOST=<postgres host>
+  TEST_DB_PORT=5432
+  TEST_DB_NAME=<test database>
+  TEST_DB_USER=<user>
+  TEST_DB_PASSWORD=<password>
+  TEST_DB_ALLOW_WRITES=true
 `);
 };
 

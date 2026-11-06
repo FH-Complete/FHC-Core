@@ -1,9 +1,10 @@
 /**
  * The Postgres connection for the cy.task functions: pool, write guard, teardown.
- * What the suite deletes or seeds is in notenDb.js. Settings: NOTEN_DB_* in tests/cypress/suites/.env.
+ * All suites share it; what a suite deletes or seeds is in its own task file.
+ * Settings: TEST_DB_* in tests/cypress/.env.
  */
 
-const env = (key) => process.env[`NOTEN_DB_${key}`];
+const env = (key) => process.env[`TEST_DB_${key}`];
 
 const dbConfigured = () => Boolean(env("HOST") && env("NAME") && env("USER"));
 const writesAllowed = () => String(env("ALLOW_WRITES")).toLowerCase() === "true";
@@ -38,10 +39,10 @@ const getPool = () => {
 
 const assertWritable = () => {
 	if (!dbConfigured()) {
-		throw new Error("db refused - set NOTEN_DB_HOST / NOTEN_DB_NAME / NOTEN_DB_USER.");
+		throw new Error("db refused - set TEST_DB_HOST / TEST_DB_NAME / TEST_DB_USER.");
 	}
 	if (!writesAllowed()) {
-		throw new Error("db refused - set NOTEN_DB_ALLOW_WRITES=true (test databases only).");
+		throw new Error("db refused - set TEST_DB_ALLOW_WRITES=true (test databases only).");
 	}
 };
 
@@ -78,8 +79,8 @@ const explainFailure = (error) => {
 		);
 	}
 	if (/authentication failed/i.test(msg)) return `credentials rejected. Details: ${msg}`;
-	if (/database .* does not exist/i.test(msg)) return `NOTEN_DB_NAME does not exist. Details: ${msg}`;
-	if (/ECONNREFUSED/i.test(msg)) return `nothing listening on NOTEN_DB_HOST:NOTEN_DB_PORT. Details: ${msg}`;
+	if (/database .* does not exist/i.test(msg)) return `TEST_DB_NAME does not exist. Details: ${msg}`;
+	if (/ECONNREFUSED/i.test(msg)) return `nothing listening on TEST_DB_HOST:TEST_DB_PORT. Details: ${msg}`;
 	if (/ETIMEDOUT|EHOSTUNREACH|ENETUNREACH/i.test(msg)) return `host unreachable (firewall/VPN?). Details: ${msg}`;
 	return msg;
 };

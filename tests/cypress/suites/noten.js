@@ -1,14 +1,9 @@
 /**
- * Connects the noten suite to cypress.config.js: its cy.task functions, its run hooks and
- * the Cypress.env() values of its specs. The keys come from tests/cypress/suites/.env.
+ * The noten suite for cypress.config.js: its specs, its cy.task functions and the Cypress.env() values
+ * of its specs. Core loads the keys from tests/cypress/suites/.env. The contract is in readme_suites.txt.
  */
 
-const path = require("path");
-
-require("dotenv").config({ path: path.join(__dirname, ".env") });
-
 const { registerNotenDbTasks } = require("../tasks/notenDb");
-const { closeDb } = require("../tasks/db");
 const { buildApiPath } = require("../support/helpers/paths");
 
 // cy.request sends one request after the other; the concurrency test needs two at the same time.
@@ -50,12 +45,11 @@ const env = () => ({
 });
 
 module.exports = {
-	setupNodeEvents: (on, config) => {
+	specPattern: "e2e/specs/*/noten/**/*.cy.js",
+
+	setupNodeEvents(on, config) {
 		registerNotenDbTasks(on);
 		on("task", { "noten:http:postParallel": postParallel });
-
-		// the pool closes after the run, so the database keeps no idle connections of it
-		on("after:run", () => closeDb());
 
 		// a value from --env wins over the suite's .env
 		config.env = { ...env(), ...config.env };

@@ -246,7 +246,7 @@ export const requireDbReset = () => {
 		expect(
 			result.available,
 			`Fixture-Reset nicht verfügbar: ${result.reason}\n\n` +
-				"Die Suite braucht eine Datenbankverbindung: NOTEN_DB_* in tests/cypress/suites/.env.",
+				"Die Suite braucht eine Datenbankverbindung: TEST_DB_* in tests/cypress/.env.",
 		).to.be.true;
 	});
 };
