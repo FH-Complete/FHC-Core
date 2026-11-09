@@ -674,7 +674,7 @@ export default {
 							<div
 								v-if="isFreeSlot(date, part, eventsNormal[index]) && reservierbar"
 								class="fhc-calendar-empty-slot"
-								style="position:absolute; inset:0; z-index:1"
+								style="position:absolute; inset:0; z-index:2"
 								v-cal-click:slot="{ date, part }"
 								:title="reservierbarMap?.[date.toISODate()] ? $p.t('LvPlan/add_reservation') : $p.t('LvPlan/reservation_not_allowed')"
 							>
@@ -686,7 +686,7 @@ export default {
 
 							<div
 								v-if="snapToGrid"
-								style="position:absolute;inset:0"
+								style="position:absolute;inset:0;z-index:1"
 								:style="{ zIndex: isDragging ? 10 : 1 }"
 								:data-day="date.toFormat('yyyy-MM-dd')"
 								v-drop:move.lehreinheit.kalender.reservierung="(evt, item) => onDropSnap(evt, item, date, part)"
