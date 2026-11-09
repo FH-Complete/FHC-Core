@@ -1085,7 +1085,7 @@ class Status extends FHCAPI_Controller
 		foreach($oldstatus_array as $key => $oldValue)
 		{
 			$newValue = $this->input->post($key);
-			if( $newValue !== $oldValue )
+			if($newValue !== $oldValue)
 			{
 				$changedFields[] = $key;
 			}
@@ -1152,7 +1152,7 @@ class Status extends FHCAPI_Controller
 			$this->p->t('global', 'datum'),
 			[
 				'is_valid_date',
-				['meldestichtag_not_exceeded', function ($value) use ($isBerechtigtNoStudstatusCheck, $hasCriticalChangesBis){
+				['meldestichtag_not_exceeded', function ($value) use ($isBerechtigtNoStudstatusCheck, $hasCriticalChangesBis) {
 					if ($isBerechtigtNoStudstatusCheck)
 					{
 						return true; // Skip if access right says so*/
@@ -1364,31 +1364,29 @@ class Status extends FHCAPI_Controller
 			'updateamum' => date('c'),
 			'updatevon' => $authUID
 		];
-		$nullableFields = ['statusgrund_id', 'anmerkung', 'rt_stufe'];
+		$nullableFields = ['statusgrund_id', 'anmerkung', 'rt_stufe','bewerbung_abgeschicktamum', 'bestaetigtam'];
 		foreach ([
 					'orgform_kurzbz',
 					'anmerkung',
 					'bewerbung_abgeschicktamum',
 					'studienplan_id',
 					'rt_stufe',
-					'statusgrund_id'
+					'statusgrund_id',
+				    'bestaetigtam'
 				] as $key)
 		{
 			if (in_array($key, $nullableFields))
 			{
 				$updateData[$key] = ($this->input->post($key) === '') ? null : $this->input->post($key);
 			}
-			else if ($this->input->post($key))
+			elseif ($this->input->post($key))
 			{
 				$updateData[$key] = $this->input->post($key);
 			}
 		}
 
-
-		if ($this->input->post('bestaetigtam')) {
-			$updateData['bestaetigtam'] = $this->input->post('bestaetigtam');
+		if ($this->input->post('bestaetigtam'))
 			$updateData['bestaetigtvon'] = $authUID;
-		}
 
 		$result = $this->PrestudentstatusModel->update([
 			'prestudent_id' => $prestudent_id,
@@ -1571,7 +1569,7 @@ class Status extends FHCAPI_Controller
 			'student_uid' => $studentlvb->student_uid,
 			'studiensemester_kurzbz' => $studiensemester_kurzbz
 		));
-		if(hasData($checkres)) 
+		if(hasData($checkres))
 		{
 			$result = $this->StudentlehrverbandModel->update(
 				array(
