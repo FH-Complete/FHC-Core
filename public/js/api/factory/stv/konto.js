@@ -83,4 +83,11 @@ export default {
 			url: url
 		};
 	},
+	getLogHistory(person_id) {
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/stv/konto/getLogHistory',
+			params: { person_id }
+		};
+	}
 };

@@ -2,6 +2,7 @@ import {CoreFilterCmpt} from "../../../filter/Filter.js";
 import FormInput from "../../../Form/Input.js";
 import KontoNew from "./Konto/New.js";
 import KontoEdit from "./Konto/Edit.js";
+import BsModal from "../../../Bootstrap/Modal.js";
 
 import ApiStvFilter from '../../../../api/factory/stv/filter.js';
 import ApiStvKonto from '../../../../api/factory/stv/konto.js';
@@ -14,7 +15,8 @@ export default {
 		CoreFilterCmpt,
 		FormInput,
 		KontoNew,
-		KontoEdit
+		KontoEdit,
+		BsModal
 	},
 	props: {
 		modelValue: Object,
@@ -27,7 +29,8 @@ export default {
 		return {
 			filter: false,
 			studiengang_kz: false,
-			counterdate: luxon.DateTime.now().setZone(FHC_JS_DATA_STORAGE_OBJECT.timezone).toISODate()
+			counterdate: luxon.DateTime.now().setZone(FHC_JS_DATA_STORAGE_OBJECT.timezone).toISODate(),
+			logHistory: []
 		};
 	},
 	computed: {
@@ -68,6 +71,7 @@ export default {
 				field: 'buchungsdatum',
 				hozAlign: 'center',
 				width: 180,
+				headerFilter:true,
 				formatter: (cell) => {
 					const value = cell.getValue();
 					if (!value) return '';
@@ -164,6 +168,16 @@ export default {
 				.then(() => this.$p.t('ui/gespeichert'))
 				.then(this.$fhcAlert.alertSuccess)
 				.catch(this.$fhcAlert.handleSystemError);
+		},
+		actionLogHistory() {
+			this.$api
+				.call(ApiStvKonto.getLogHistory(this.modelValue.person_id))
+				.then(result => result.data)
+				.then(result => {
+					this.logHistory = result;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+			this.$refs.logHistory.show();
 		},
 		downloadPdf(selected) {
 			if (Array.isArray(this.modelValue)) {
@@ -284,9 +298,39 @@ export default {
 					>
 					<i class="fa fa-download"></i> {{ $p.t('stv/konto_payment_confirmation') }}
 				</button>
+				<button
+					class="btn btn-outline-secondary"
+					@click="actionLogHistory()"
+					>
+					{{ $p.t('stv/logHistory') }}
+				</button>
 			</template>
 		</core-filter-cmpt>
 		<konto-new ref="new" :config="config" @saved="updateData" :person-ids="personIds" :stg-kz="stg_kz"></konto-new>
 		<konto-edit ref="edit" :config="config" @saved="updateData"></konto-edit>
+		<bs-modal ref="logHistory" class="bootstrap-prompt"
+			dialogClass="modal-xl" :allowFullscreenExpand="true" bodyClass="px-4 py-4">
+			<template #title>
+				{{ $p.t('stv/logHistory') }}
+			</template>
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th>{{ $p.t('stv/kontoHistoryExecuteTime') }}</th>
+						<th>{{ $p.t('stv/kontoHistoryBeschreibung') }}</th>
+						<th>{{ $p.t('stv/kontoHistoryRequestData') }}</th>
+						<th>User</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="entry in logHistory">
+						<td>{{ new Date(entry.execute_time.substring(0, 10)).toLocaleDateString("de-DE") + ' ' + entry.execute_time.substring(11) }}</td>
+						<td>{{ entry.beschreibung }}</td>
+						<td style="word-break:break-all;">{{ entry.request_data }}</td>
+						<td>{{ entry.execute_user }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</bs-modal>
 	</div>`
 };

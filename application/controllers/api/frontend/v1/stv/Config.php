@@ -538,29 +538,41 @@ class Config extends FHCAPI_Controller
 		return [
 			'buchungsdatum' => [
 				'field' => "buchungsdatum",
-				'title' => $this->p->t('konto', 'buchungsdatum')
+				'title' => $this->p->t('konto', 'buchungsdatum'),
+				'headerFilter' => true
 			],
 			'buchungstext' => [
 				'field' => "buchungstext",
-				'title' => $this->p->t('konto', 'buchungstext')
+				'title' => $this->p->t('konto', 'buchungstext'),
+				'headerFilter' => true
 			],
 			'betrag' => [
 				'field' => "betrag",
-				'title' => $this->p->t('konto', 'betrag')
+				'title' => $this->p->t('konto', 'betrag'),
+				'headerFilter' => true
 			],
 			'studiensemester_kurzbz' => [
 				'field' => "studiensemester_kurzbz",
-				'title' => $this->p->t('lehre', 'studiensemester')
+				'title' => $this->p->t('lehre', 'studiensemester'),
+				'headerFilter' => true
 			],
 			'buchungstyp_kurzbz' => [
 				'field' => "buchungstyp_kurzbz",
 				'title' => $this->p->t('konto', 'buchungstyp'),
-				'visible' => false
+				'visible' => false,
+				'headerFilter' => true
+			],
+			'buchungstyp_beschreibung' => [
+				'field' => "buchungstyp_beschreibung",
+				'title' => $this->p->t('konto', 'buchungstypBeschreibung'),
+				'visible' => false,
+				'headerFilter' => true
 			],
 			'buchungsnr' => [
 				'field' => "buchungsnr",
 				'title' => $this->p->t('konto', 'buchungsnr'),
-				'visible' => false
+				'visible' => false,
+				'headerFilter' => true
 			],
 			'insertvon' => [
 				'field' => "insertvon",
@@ -575,7 +587,8 @@ class Config extends FHCAPI_Controller
 			'kuerzel' => [
 				'field' => "kuerzel",
 				'title' => $this->p->t('lehre', 'studiengang'),
-				'visible' => false
+				'visible' => false,
+				'headerFilter' => true
 			],
 			'anmerkung' => [
 				'field' => "anmerkung",

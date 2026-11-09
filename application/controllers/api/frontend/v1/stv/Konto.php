@@ -28,6 +28,7 @@ use CI3_Events as Events;
  */
 class Konto extends FHCAPI_Controller
 {
+	const LOG_WEBSERVICETYP_KURZBZ = 'konto';
 	/**
 	 * Calls the parent's constructor and prepares libraries and phrases
 	 */
@@ -36,6 +37,7 @@ class Konto extends FHCAPI_Controller
 		parent::__construct([
 			'get' => 'student/stammdaten:r',
 			'getBuchungstypen' => self::PERM_LOGGED,
+			'getLogHistory' => self::PERM_LOGGED,
 			'checkDoubles' => ['admin:r', 'assistenz:r'],
 			'insert' => ['admin:w', 'assistenz:w'],
 			'counter' => ['admin:w', 'assistenz:w'],
@@ -45,6 +47,7 @@ class Konto extends FHCAPI_Controller
 
 		// Load models
 		$this->load->model('crm/Konto_model', 'KontoModel');
+		$this->load->model('system/Webservicelog_model', 'WebservicelogModel');
 
 		// Load helpers
 		$this->load->helper('hlp_form_validation_helper');
@@ -258,7 +261,20 @@ class Konto extends FHCAPI_Controller
 				if (isError($kontodata))
 					$this->addError(getError($kontodata), self::ERROR_TYPE_DB);
 				else
+				{
+					
+					// log insert change
+					$this->WebservicelogModel->insert([
+						'webservicetyp_kurzbz' => self::LOG_WEBSERVICETYP_KURZBZ,
+						'request_id' => $person_id,
+						'beschreibung' => "Konto insert",
+						'request_data' => "Buchung hinzugefuegt: Buchungsnr: ".getData($id).", Person ID: $person_id, ".json_encode($data),
+						'execute_time' => date('c'),
+						'execute_user' => getAuthUID()
+					]);
+
 					$result[] = current(getData($kontodata));
+				}
 			}
 		}
 
@@ -360,8 +376,7 @@ class Konto extends FHCAPI_Controller
 				continue;
 			}
 
-			
-			$result = $this->KontoModel->insert([
+			$data = [
 				'person_id' => $buchung['person_id'],
 				'studiengang_kz' => $buchung['studiengang_kz'],
 				'studiensemester_kurzbz' => $buchung['studiensemester_kurzbz'],
@@ -376,10 +391,27 @@ class Konto extends FHCAPI_Controller
 				'insertamum' => date('c'),
 				'insertvon' => getAuthUID(),
 				'anmerkung' => ''
-			]);
+			];
+
+			$result = $this->KontoModel->insert($data);
+
 			if (isError($result)) {
 				$this->addError(getError($result), self::ERROR_TYPE_GENERAL);
 				continue;
+			}
+
+			// log counter change
+			if (isSuccess($result))
+			{
+				$this->WebservicelogModel->insert([
+					'webservicetyp_kurzbz' => self::LOG_WEBSERVICETYP_KURZBZ,
+					'request_id' => $buchung['person_id'],
+					'beschreibung' => "Konto counter",
+					'request_data' => "Buchung gegengebucht: Buchungsnr: ".$buchung['buchungsnr'].", neue Buchung: "
+					.getData($result).", Person ID: ".$buchung['person_id'].", neue Buchung: ".json_encode($data),
+					'execute_time' => date('c'),
+					'execute_user' => getAuthUID()
+				]);
 			}
 
 			$newItems = null;
@@ -446,6 +478,20 @@ class Konto extends FHCAPI_Controller
 
 		$result = $this->KontoModel->update($id, $data);
 
+		// log update change
+		if (isSuccess($result))
+		{
+			$this->WebservicelogModel->insert([
+				'webservicetyp_kurzbz' => self::LOG_WEBSERVICETYP_KURZBZ,
+				'request_id' => $this->input->post('person_id') ?? null,
+				'beschreibung' => "Konto update",
+				'request_data' => "Buchung aktualisiert: Buchungsnr: $id, Person ID: ".
+				($this->input->post('person_id') ? $this->input->post('person_id') : null).", neue Buchung: ".json_encode($data),
+				'execute_time' => date('c'),
+				'execute_user' => getAuthUID()
+			]);
+		}
+
 		$this->getDataOrTerminateWithError($result);
 
 		$result = null;
@@ -486,7 +532,9 @@ class Konto extends FHCAPI_Controller
 				'buchungsnr' => $buchungsnr
 			]));
 
-		$_POST['studiengang_kz'] = current($result)->studiengang_kz;
+		$data = current($result);
+		$_POST['studiengang_kz'] = $data->studiengang_kz;
+		$person_id = $data->person_id;
 
 		$this->form_validation->set_rules('studiengang_kz', 'Studiengang', 'has_permissions_for_stg[admin:rw,assistenz:rw]');
 
@@ -505,6 +553,16 @@ class Konto extends FHCAPI_Controller
 				$this->terminateWithError(getError($result));
 			$this->terminateWithError($this->p->t('konto', 'error_delete_level'));
 		}
+
+		// log delete change
+		$this->WebservicelogModel->insert([
+			'webservicetyp_kurzbz' => self::LOG_WEBSERVICETYP_KURZBZ,
+			'request_id' => $person_id,
+			'beschreibung' => "Konto delete",
+			'request_data' => "Buchung gelöscht: Buchungsnr: $buchungsnr, Person ID: $person_id, gelöschte Buchung: ".json_encode($data),
+			'execute_time' => date('c'),
+			'execute_user' => getAuthUID()
+		]);
 
 		$this->terminateWithSuccess();
 	}
@@ -546,5 +604,20 @@ class Konto extends FHCAPI_Controller
 				return $buchungstyp;
 			}, $data);
 		}
+	}
+
+	/**
+	 * Get history of konto changes for a person.
+	 */
+	public function getLogHistory()
+	{
+		$person_id = $this->input->get('person_id');
+		$this->WebservicelogModel->addOrder('execute_time', 'DESC');
+		
+		$result = $this->WebservicelogModel->loadWhere(['webservicetyp_kurzbz' => self::LOG_WEBSERVICETYP_KURZBZ, 'request_id' => $person_id]);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
 	}
 }

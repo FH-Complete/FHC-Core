@@ -103,9 +103,11 @@ class Konto_model extends DB_Model
 		$this->addSelect('person.vorname');
 		$this->addSelect('person.vornamen');
 		$this->addSelect('person.nachname');
+		$this->addSelect('public.tbl_buchungstyp.beschreibung AS buchungstyp_beschreibung');
 
 		$this->addJoin('public.tbl_studiengang stg', 'studiengang_kz', 'LEFT');
 		$this->addJoin('public.tbl_person person', 'person_id', 'LEFT');
+		$this->addJoin('public.tbl_buchungstyp', 'buchungstyp_kurzbz');
 
 		Events::trigger('konto_query');
 
