@@ -2796,6 +2796,44 @@ private function _mapCalendarEvents(array $events): array
 			$eventStartDate >= $allowedDeletionStartDate &&
 			$eventStartDate <= $allowedDeletionEndDate;
 
+		$participants = $event->lektor ?? [];
+
+		if ($event->type === "reservierung") {
+			$formattedReservationParticipants = array_map(function ($item) {
+				$item["mitarbeiter_uid"] = $item["uid"];
+				unset($item["uid"]);
+
+				return $item;
+			}, $event->teilnehmer_person);
+
+			$participants = array_merge($participants, $formattedReservationParticipants);
+		}
+
+
+		$groups = array_map(function ($group) {
+			return [
+				'gruppe' => $group["gruppe"] ?? ' ',
+				'verband' => $group["verband"] ?? ' ',
+				'semester' => (string) ($group["semester"] ?? ''),
+				'studiengang_kz' => (string) ($group["studiengang_kz"] ?? ''),
+				'kuerzel' => $group["gruppe_kurzbz"] ?? null,
+			];
+		}, $event->gruppe ?? []);
+
+		if ($event->type === "reservierung") {
+			
+			$formattedReservationGroups = array_map(function ($group) {
+				return [
+					'gruppe' => $group["gruppe"] ?? ' ',
+					'verband' => $group["verband"] ?? ' ',
+					'semester' => (string) ($group["semester"] ?? ''),
+					'studiengang_kz' => (string) ($group["studiengang_kz"] ?? ''),
+					'kuerzel' => (string) ($group["gruppe_kurzbz"] ?? ''),
+				];
+			}, $event->teilnehmer_gruppe);
+			$groups = array_merge($groups, $formattedReservationGroups);
+		}
+
 		return [
 			'reservierung_id' => $reservierungId,
 			'type' => $event->type,
@@ -2805,16 +2843,8 @@ private function _mapCalendarEvents(array $events): array
 			'topic' => isset($event->topic[0])
 				? preg_replace('/\s+/', '-', $event->topic[0])
 				: ($event->titel ?: null),
-			'lektor' => $event->lektor ?? [],
-			'gruppe' => array_map(function ($group) {
-				return [
-					'gruppe' => $group["gruppe"] ?? ' ',
-					'verband' => $group["verband"] ?? ' ',
-					'semester' => (string) ($group["semester"] ?? ''),
-					'studiengang_kz' => (string) ($group["studiengang_kz"] ?? ''),
-					'kuerzel' => $group["gruppe_kurzbz"] ?? null,
-				];
-			}, $event->gruppe ?? []),
+			'lektor' => $participants,
+			'gruppe' => $groups,
 			'ort_kurzbz' => $event->ort_kurzbz[0] ?? null,
 			'lehreinheit_id' => array_map('strval', $event->lehreinheit_id ?? []),
 			'titel' => $event->titel ?: null,
@@ -2837,5 +2867,65 @@ private function jump_day($timestamp, $days)
 		$days = (int)$days;
 		$prefix = ($days >= 0 ? '+' : '');
 		return strtotime($prefix . $days . ' days', $timestamp);
+	}
+
+public function getReservableMap($ort_kurzbz, $start_date, $end_date)
+	{
+		$this->_ci->load->model('ressource/Ort_model', 'OrtModel');
+		$this->_ci->load->library('PermissionLib');
+
+		$berechtigt_begrenzt  = $this->_ci->permissionlib->isBerechtigt('lehre/reservierung:begrenzt', 'suid');
+		$berechtigt_erweitert = $this->_ci->permissionlib->isBerechtigt('lehre/reservierung', 'suid');
+
+		$ort_data = $this->_ci->OrtModel->load($ort_kurzbz);
+		if (isError($ort_data) || !hasData($ort_data))
+			return [];
+
+		$ort_data = getData($ort_data)[0];
+
+		if (!$ort_data->reservieren)
+			return [];
+
+		if (!$berechtigt_begrenzt && !$berechtigt_erweitert)
+			return [];
+
+		$start_ts = is_numeric($start_date) ? (int)$start_date : strtotime($start_date);
+		$end_ts = is_numeric($end_date) ? (int)$end_date : strtotime($end_date);
+
+		if (!$start_ts || !$end_ts)
+			return [];
+
+		if ($end_ts < $start_ts)
+		{
+			$tmp = $start_ts;
+			$start_ts = $end_ts;
+			$end_ts = $tmp;
+		}
+
+		$now = time();
+		$tage_min = defined('RES_TAGE_LEKTOR_MIN') ? (int)RES_TAGE_LEKTOR_MIN : 0;
+		$tage_bis = defined('RES_TAGE_LEKTOR_BIS') ? (int)RES_TAGE_LEKTOR_BIS : 0;
+
+		$datum_res_lektor_start = $this->jump_day($now, $tage_min - 1);
+		$datum_res_lektor_ende = $this->jump_day($now, $tage_bis);
+
+		$start_ymd_allowed = date('Y-m-d', $datum_res_lektor_start);
+		$end_ymd_allowed = date('Y-m-d', $datum_res_lektor_ende);
+
+		$result = [];
+
+		$current = strtotime(date('Y-m-d', $start_ts) . ' 00:00:00');
+		$end_day = strtotime(date('Y-m-d', $end_ts) . ' 00:00:00');
+
+		while ($current <= $end_day)
+		{
+			$ymd = date('Y-m-d', $current);
+
+			$result[$ymd] = ($ymd >= $start_ymd_allowed && $ymd <= $end_ymd_allowed) ? true : false;
+
+			$current = $this->jump_day($current, 1);
+		}
+
+		return success($result);
 	}
 }

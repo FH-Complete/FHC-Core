@@ -1,3 +1,3 @@
 <?php
 
-$config['is_new_calendar_structure_enabled'] = false;
+$config['is_new_calendar_structure_enabled'] = true;

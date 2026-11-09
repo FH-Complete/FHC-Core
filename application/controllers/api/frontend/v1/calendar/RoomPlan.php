@@ -28,12 +28,12 @@ class RoomPlan extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'addRoomReservation' => self::PERM_LOGGED,
-			'deleteRoomReservation' => self::PERM_LOGGED,
+			'addRoomReservation' => ["lehre/reservierungAdvanced:rw"],
+			'deleteRoomReservation' =>["lehre/reservierung:begrenzt:rw"],
 			'getRoomCreationInfo' => self::PERM_LOGGED,
 			'getGruppen' => self::PERM_LOGGED,
 			'getLektor' => self::PERM_LOGGED,
-			'getReservableMap' => self::PERM_LOGGED,
+			'getReservableMap' => ["lehre/reservierung:rw", "lehre/reservierung:begrenzt:rw"],
 			'getGroupOptions' => self::PERM_LOGGED,
 		]);
 
@@ -91,8 +91,69 @@ class RoomPlan extends FHCAPI_Controller
 		$spezialgruppe = $this->input->post('spezialgruppe');
 		$lektoren = $this->input->post('lektoren');
 
+		
+		if ($this->config->item('is_new_calendar_structure_enabled')) {
+			$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
+			$this->load->model('organisation/Gruppe_model', 'GruppeModel');
 
-		$result = $this->stundenplanlib->addReservation($start, $end, $title, $beschreibung, $ort_kurzbz, $lektoren, $studiengang_kz, $semester, $verband, $gruppe, $spezialgruppe);
+			$formattedRooms = [
+				"ort_kurzbz" => [
+					$ort_kurzbz
+				],
+				"location" => null
+			];
+			$participants = array_map(function ($lectorUID) {
+				return [
+					"uid" => $lectorUID,
+					"rolle" => "teilnehmer"
+				];
+			}, $lektoren);
+			
+			$specialFinalGroups = [];
+
+			$teachingAssociationResult = $this->LehrverbandModel->loadWhere([
+				"studiengang_kz" => $studiengang_kz,
+				"semester" => $semester,
+				"verband" => $verband,
+				"gruppe" => $gruppe,
+			]);
+			if (isError($teachingAssociationResult))
+				return error('No group found for stg: ' . $studiengang_kz);
+
+			if (hasData($teachingAssociationResult))
+			{
+				$teachingAssociationGroup = getData($teachingAssociationResult)[0];
+				array_push($specialFinalGroups, [
+					"gid" => $teachingAssociationGroup->gid,
+					"gruppe_kurzbz" => null,
+					"lehrverband" => "true",
+					"rolle" => "teilnehmer",
+					"studiensemester_kurzbz" => $teachingAssociationGroup->studiengang_kz
+				]);
+			}
+			
+			$groupResult = $this->GruppeModel->loadWhere([
+				"gruppe_kurzbz" => $spezialgruppe
+			]);
+			if (isError($groupResult))
+				return error('No group found for gruppe_kurzbz ' . $spezialgruppe);
+
+			if (hasData($groupResult))
+			{
+				$group = getData($groupResult)[0];
+				array_push($specialFinalGroups, [
+					"gid" => $group->gid,
+					"gruppe_kurzbz" => $spezialgruppe,
+					"lehrverband" => "false",
+					"rolle" => "teilnehmer",
+					"studiensemester_kurzbz" => $group->studiengang_kz
+				]);
+			}
+
+			$result = $this->kalenderlib->addReservierung($title, $beschreibung, $formattedRooms, $start, $end, $participants, $specialFinalGroups, [], []);
+		} else {
+			$result = $this->stundenplanlib->addReservation($start, $end, $title, $beschreibung, $ort_kurzbz, $lektoren, $studiengang_kz, $semester, $verband, $gruppe, $spezialgruppe);
+		}
 
 		if (isError($result))
 			$this->terminateWithError($result);
@@ -231,7 +292,12 @@ class RoomPlan extends FHCAPI_Controller
 		$start_date = $this->input->post('start_date', true);
 		$end_date = $this->input->post('end_date', true);
 
-		$result = $this->stundenplanlib->getReservableMap($ort_kurzbz, $start_date, $end_date);
+		if ($this->config->item('is_new_calendar_structure_enabled')) {
+			$result = $this->kalenderlib->getReservableMap($ort_kurzbz, $start_date, $end_date);
+		}
+		else {
+			$result = $this->stundenplanlib->getReservableMap($ort_kurzbz, $start_date, $end_date);
+		}
 
 		$this->terminateWithSuccess(array('reservierbarMap' => hasData($result) ? getData($result) : []));
 	}
