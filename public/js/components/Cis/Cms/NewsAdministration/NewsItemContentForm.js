@@ -146,6 +146,11 @@ export default {
 				paste_as_text: true,
 				statusbar: true,
 				resize: true,
+
+				relative_urls: false,
+				remove_script_host: false,
+				document_base_url: FHC_JS_DATA_STORAGE_OBJECT.app_root,
+
 				file_picker_types: 'file image',
 				file_picker_callback: (callback, _value, meta) => {
 					vm.openDmsFileBrowser(callback, meta);
