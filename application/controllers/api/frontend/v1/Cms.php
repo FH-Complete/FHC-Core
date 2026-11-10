@@ -206,6 +206,10 @@ class Cms extends FHCAPI_Controller
 		} else {
 			$filterForDegreePrograms = true;
 			$entitledDegreePrograms = $this->permissionlib->getSTG_isEntitledFor("basis/news");
+			if(!is_array($entitledDegreePrograms))
+			{
+				$entitledDegreePrograms = array();
+			}
 			array_push($entitledDegreePrograms, 0);
 		}
 
