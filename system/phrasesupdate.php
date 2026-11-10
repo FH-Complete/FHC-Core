@@ -68360,6 +68360,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 	// Zeitsperren Sancho Subjects end
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'bismelden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bismelden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'report BIS',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

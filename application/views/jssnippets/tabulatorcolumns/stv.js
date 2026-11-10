@@ -339,5 +339,34 @@ return [
 		title: "Unruly",
 		field: "unruly",
 		visible: false
+	},
+	{
+		title: "Staatsbuergerschaft",
+		titlePhrase: 'person/staatsbuergerschaft',
+		field: "staatsbuergerschaft",
+		visible: false
+	},
+	{
+		title: "bpk",
+		titlePhrase: 'person/bpk',
+		field: "bpk",
+		visible: false
+	},
+	{
+		title: "Studientyp",
+		titlePhrase: 'lehre/studientyp',
+		field: "gsstudientyp_kurzbz",
+		visible: false
+	},
+	{
+		title: "Bismelden",
+		titlePhrase: 'person/bismelden',
+		field: "bismelden",
+		visible: false,
+		formatter: 'tickCross',
+		formatterParams: {
+			tickElement: '<i class="fas fa-check text-success"></i>',
+			crossElement: '<i class="fas fa-times text-danger"></i>'
+		},
 	}
 ];

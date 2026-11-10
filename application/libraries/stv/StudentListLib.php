@@ -123,6 +123,10 @@ class StudentListLib
 		$this->addSelect('mentor');
 		$this->addSelect('b.aktiv AS bnaktiv');
 		$this->addSelect('unruly');
+		$this->addSelect('staatsbuergerschaft');
+		$this->addSelect('bpk');
+		$this->addSelect('gsstudientyp_kurzbz');
+		$this->addSelect('bismelden');
 		
 		// Add default JOINs
 		$this->addJoin('public.tbl_studiengang stg', 'studiengang_kz', 'LEFT');

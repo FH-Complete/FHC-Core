@@ -124,7 +124,7 @@ export default {
           group: false,
           page: false,
         },
-        persistenceID: 'stv-list-20260223_01'
+        persistenceID: 'stv-list-20261110_01'
       },
       tabulatorEvents: [
         {
@@ -393,6 +393,10 @@ export default {
             priorisierung_relativ: capitalize(this.$p.t("lehre/prioritaet")),
             mentor: capitalize(this.$p.t("stv/mentor")),
             bnaktiv: capitalize(this.$p.t("person/aktiv")),
+            staatsbuergerschaft: capitalize(this.$p.t("person/staatsbuergerschaft")),
+            pbk: capitalize(this.$p.t("person/bpk")),
+            gsstudientyp_kurzbz: capitalize(this.$p.t("lehre/studientyp")),
+            bismelden: capitalize(this.$p.t("lehre/bismelden")),
           };
 
             /** NOTE(chris):
