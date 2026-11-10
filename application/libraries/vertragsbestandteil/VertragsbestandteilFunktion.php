@@ -14,6 +14,7 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 {
 	protected $benutzerfunktion_id;
 	protected $benutzerfunktiondata;
+	protected $hauptfunktion;
 
 	protected $CI;
 	
@@ -245,7 +246,8 @@ class VertragsbestandteilFunktion extends Vertragsbestandteil
 	{
 		$tmp = array(
 			'vertragsbestandteil_id' => $this->getVertragsbestandteil_id(),
-			'benutzerfunktion_id' => $this->getBenutzerfunktion_id()
+			'benutzerfunktion_id' => $this->getBenutzerfunktion_id(),
+			'hauptfunktion' => $this->getHauptfunktion()
 		);
 		
 		$tmp = array_filter($tmp, function($k) {
@@ -270,6 +272,7 @@ EOTXT;
 		$this->fromdb = $fromdb;
 		isset($data->benutzerfunktionid) && $this->setBenutzerfunktion_id($data->benutzerfunktionid);
 		isset($data->benutzerfunktion_id) && $this->setBenutzerfunktion_id($data->benutzerfunktion_id);
+		isset($data->hauptfunktion) && $this->setHauptfunktion($data->hauptfunktion);
 		isset($data->funktion) && isset($data->orget) 
 			&& isset($data->mitarbeiter_uid) && $this->createBenutzerfunktionData($data);
 		isset($data->funktion_bezeichnung) && isset($data->oe_bezeichnung) 
@@ -287,6 +290,18 @@ EOTXT;
 	{
 		$this->markDirty('benutzerfunktion_id', $this->benutzerfunktion_id, $benutzerfunktion_id);
 		$this->benutzerfunktion_id = $benutzerfunktion_id;
+		return $this;
+	}
+
+	public function getHauptfunktion()
+	{
+		return $this->hauptfunktion;
+	}
+
+	public function setHauptfunktion($hauptfunktion)
+	{
+		$this->markDirty('hauptfunktion', $this->hauptfunktion, $hauptfunktion);
+		$this->hauptfunktion = $hauptfunktion;
 		return $this;
 	}
 	
@@ -363,6 +378,8 @@ EOTXT;
 					. 'nicht mehrfach verknüft werden.';
 			}
 		}
+
+		// TODO only one 'Hauptfunktion' is allowed
 		
 		return parent::validate();
 	}

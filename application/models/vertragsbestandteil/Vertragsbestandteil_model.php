@@ -32,7 +32,7 @@ class Vertragsbestandteil_model extends DB_Model
 				oe.oe_kurzbz, oe.bezeichnung AS oe_bezeichnung, {$oe_kurzbz_sap},
 				oet.organisationseinheittyp_kurzbz AS oe_typ_kurzbz, oet.bezeichnung AS oe_typ_bezeichnung,
 				ft.freitexttyp_kurzbz, ft.titel, ft.anmerkung,
-				f.benutzerfunktion_id,
+				f.benutzerfunktion_id,f.hauptfunktion,
 				k.karenztyp_kurzbz, k.geplanter_geburtstermin, k.tatsaechlicher_geburtstermin,
 				kf.arbeitgeber_frist, kf.arbeitnehmer_frist,
 				s.wochenstunden, s.teilzeittyp_kurzbz,

@@ -33,6 +33,7 @@ require_once('dbupdate_3.4/26173_index_webservicelog.php');
 require_once('dbupdate_3.4/24682_reihungstest_zugangscode_fuer_login.php');
 require_once('dbupdate_3.4/17512_fehlercode_constraints.php');
 require_once('dbupdate_3.4/28260_vertraege.php');
+require_once('dbupdate_3.4/99999_hauptfunktion.php');
 require_once('dbupdate_3.4/27388_anrechnungen_zeitfenster_pflegen.php');
 require_once('dbupdate_3.4/19154_beurteilungsformulare_pruefungssenat.php');
 require_once('dbupdate_3.4/10001_tempus_mitarbeiter_kurzbz_bei_reservierungen_anzeigen.php');
