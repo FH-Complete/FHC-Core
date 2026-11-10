@@ -365,7 +365,7 @@ EOTXT;
 				. 'Funktion und eine Organisationseinheit müssen ausgewählt sein.';
 		}
 		
-		// TODO check if Benutzerfunktion is assigned to another vb
+		// check if Benutzerfunktion is assigned to another vb
 		if( intval($this->benutzerfunktion_id) > 0 ) 
 		{
 			if ( $this->CI->VertragsbestandteilFunktionModel
@@ -378,9 +378,7 @@ EOTXT;
 					. 'nicht mehrfach verknüft werden.';
 			}
 		}
-
-		// TODO only one 'Hauptfunktion' is allowed
-		
+				
 		return parent::validate();
 	}
 }
