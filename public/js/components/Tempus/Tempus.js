@@ -197,7 +197,10 @@ export default {
 			if (!orig?.kalender_id) return;
 
 			await this.deleteEntryCall(orig);
-			this.$refs.calendar.targetedSoftReloadEvents(luxon.DateTime.fromISO(orig.isostart), luxon.DateTime.fromISO(orig.isoend));
+			this.$refs.calendar.targetedSoftReloadEvents([{
+				start: luxon.DateTime.fromISO(orig.isostart),
+				end: luxon.DateTime.fromISO(orig.isoend)
+			}]);
 			this.$refs.sidebar.reloadCoursepicker();
 			this.rebuildRaumvorschlag();
 		},
@@ -677,7 +680,12 @@ export default {
 						this.$refs.calendar.$refs.calendar.$refs.mode.$refs.view.$refs.grids?.forEach(grid => {
 							grid.disableAutoScroll();
 						});
-					this.$refs.calendar.targetedSoftReloadEvents(dates.startDT, dates.endDT);
+					this.$refs.calendar.targetedSoftReloadEvents([
+						{
+							start: dates.startDT,
+							end: dates.endDT
+						}
+					]);
 					this.$refs.sidebar.reloadCoursepicker();
 					this.rebuildRaumvorschlag();
 				},
@@ -809,18 +817,35 @@ export default {
 					raeume,
 				);
 			} else if (obj.type === 'kalender') {
+				let originalStartTime = luxon.DateTime.fromISO(obj.orig.isostart).setZone(this.timezone).plus({ milliseconds: 1 })
+				let originalEndTime = luxon.DateTime.fromISO(obj.orig.isoend).setZone(this.timezone).minus({ milliseconds: 1 })
+				
 				return this._updateKalenderEvent(
 					obj,
 					startDT,
 					endDT,
 					start_time,
 					end_time,
-					() => {
+					async () => {
 						this.$refs.sidebar.unpark({
 							type: obj.type,
 							id: obj.orig.kalender_id,
 						});
-						this.$refs.calendar.targetedSoftReloadEvents(startDT, endDT);
+						
+						let targetedDates = [
+							{
+								start: startDT,
+								end: endDT
+							}
+						];
+						if (!originalStartTime.hasSame(startDT, "day") || !originalEndTime.hasSame(endDT, "day")) {
+							targetedDates.push({
+								start: originalStartTime,
+								end: originalEndTime
+							});
+						}
+
+						this.$refs.calendar.targetedSoftReloadEvents(targetedDates);
 						this.rebuildRaumvorschlag();
 						this.bcc.postMessage('dropped');
 					},

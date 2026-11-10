@@ -25,15 +25,15 @@ export function useEventLoader(
   let abortController = new AbortController();
 
 
-  const reset = (arePreviousEventsCleared = true, isLoaderEventVisualReset = true, isTargetDateResetActive = false, startDate = null, endDate = null) => {
+  const reset = (arePreviousEventsCleared = true, isLoaderEventVisualReset = true, isTargetDateResetActive = false, targetedRanges = []) => {
 	if (arePreviousEventsCleared) {
 		allEvents.value = [];
 	}
 
-    reload(false, isLoaderEventVisualReset, isTargetDateResetActive, startDate, endDate);
+    reload(false, isLoaderEventVisualReset, isTargetDateResetActive, targetedRanges);
   };
 
-  const reload = (isCacheEnabled = true, isLoaderEventVisualReset = true, isTargetDateResetActive = false, startDate = null, endDate = null) => {
+  const reload = (isCacheEnabled = true, isLoaderEventVisualReset = true, isTargetDateResetActive = false, targetedRanges = []) => {
     if (
       currentlyDisplayedDateRange &&
       currentlyDisplayedDateRange?.start?.ts ===
@@ -72,8 +72,7 @@ export function useEventLoader(
 	  isLoaderEventVisualReset,
 	  abortController?.signal,
 	  isTargetDateResetActive,
-	  startDate,
-	  endDate
+	  targetedRanges
     );
 
     ensureCacheRangeIsInAllowedRange(
@@ -184,7 +183,7 @@ export function useEventLoader(
                 eventEnd > currentlyDisplayedDateRange.start.ts;
 			  
  				if (isTargetDateResetActive) {
-					const overlapsTargetDateRange = startDate && endDate && eventStart < endDate.ts && eventEnd > startDate.ts;
+					const overlapsTargetDateRange = targetedRanges.some((range) => range.start && range.end && eventStart < range.end.ts && eventEnd > range.start.ts);
 					return !overlapsTargetDateRange || newlyLoadedEventIds.has(event.eindeutige_kalender_gruppen_id)
 				}
 
@@ -218,21 +217,25 @@ export function useEventLoader(
 
   Vue.watchEffect(reload);
 
-  const requestEvents = (startTimestamp, endTimestamp, isCacheEnabled = true, isLoaderEventVisualReset = false, signal = null, isTargetDateResetActive = false, startDate = null, endDate = null) => {
+  const requestEvents = (startTimestamp, endTimestamp, isCacheEnabled = true, isLoaderEventVisualReset = false, signal = null, isTargetDateResetActive = false, targetedRanges = []) => {
     let result = [];
 
     if (!startTimestamp || !endTimestamp) return result;
     if (startTimestamp >= endTimestamp) return result;
 
-	if (isTargetDateResetActive && startDate && endDate) {
-		return mergePromiseElements(
-			getPromiseFunc(
-				startDate,
-				endDate,
-				signal
-			),
-			result,
-		);
+	if (isTargetDateResetActive && targetedRanges?.length) {
+		targetedRanges.forEach((range) => {
+			if (!range?.start || !range?.end) return;
+			result = mergePromiseElements(
+				getPromiseFunc(
+					range.start,
+					range.end,
+					signal
+				),
+				result,
+			);
+		});
+		return result;
 	} 
 	
     let modifiedRequestStartTimestamp = startTimestamp;
