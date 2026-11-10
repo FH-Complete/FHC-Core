@@ -40,7 +40,10 @@
 	padding: 0!important;
 }
 .monthPageContainer .calendar-event-default .event-time,
-.monthPageContainer .calendar-event-default .event-lectors {
+.monthPageContainer .calendar-event-default .event-lectors,
+.monthPageContainer .calendar-event-default .event-uids,
+.monthPageContainer .calendar-event-default .event-lectors-plus,
+.monthPageContainer .calendar-event-default .event-uids-plus {
 	display: none!important;
 }
 .monthPageContainer .calendar-event-default .event-text {

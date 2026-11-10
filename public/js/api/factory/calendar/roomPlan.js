@@ -6,6 +6,12 @@ export default {
 			params: { start_date, end_date }
 		};
 	},
+	getReservableDateRange() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/calendar/RoomPlan/getReservableDateRange'
+		};
+	},
 
 	getRoomCreationInfo() {
 		return {

@@ -754,7 +754,7 @@ if($result = $db->db_query($qry))
 			$ausstellungsstaat = $row->zgvnation;
 		else
 			$ausstellungsstaat = $row->ausstellungsstaat;
-		if($ausstellungsstaat == '' && ausstellungsstaat_master == '')
+		if($ausstellungsstaat == '' && $ausstellungsstaat_master == '')
 		{
 			$error_log.=(!empty($error_log)?', ':'')." Ausstellungsstaat fehlt";
 		}

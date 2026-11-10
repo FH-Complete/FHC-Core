@@ -636,9 +636,9 @@ if ($result = $db->db_query($qry))
 }
 
 /*
- * Bewerber die nicht zum Reihungstest angetreten gesetzt sind
+ * Aufgenommene die nicht zum Reihungstest angetreten gesetzt sind
  */
-$text .= "<br><br>Bewerber aber kein ReihungstestAngetreten gesetzt<br><br>";
+$text .= "<br><br>Aufgenommener aber kein ReihungstestAngetreten gesetzt<br><br>";
 $lastSem = $studiensemester->getPreviousFrom($aktSem);
 $qry="SELECT vorname, nachname, tbl_prestudent.prestudent_id, studiengang_kz FROM public.tbl_prestudent
 	JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
@@ -646,7 +646,7 @@ $qry="SELECT vorname, nachname, tbl_prestudent.prestudent_id, studiengang_kz FRO
 	LEFT JOIN bis.tbl_orgform USING(orgform_kurzbz)
 	WHERE (studiensemester_kurzbz=".$db->db_add_param($aktSem)." OR studiensemester_kurzbz=".$db->db_add_param($lastSem).")
 	AND tbl_prestudent.studiengang_kz=".$db->db_add_param($studiengang_kz)."
-	AND status_kurzbz='Bewerber' AND reihungstestangetreten=false
+	AND status_kurzbz='Aufgenommener' AND reihungstestangetreten=false
 	";
 if ($result = $db->db_query($qry))
 {
@@ -896,7 +896,7 @@ foreach ($ausgabe as $stg_kz => $value)
 						<td>&nbsp;</td>
 					</tr>
 					<tr>
-						<td colspan='4'><b>Folgende Personen wurden zu Bewerbern gemacht, sind aber nicht zum Reihungstest angetreten.</b></td>
+						<td colspan='4'><b>Folgende Personen wurden zu Aufgenommenen gemacht, sind aber nicht zum Reihungstest angetreten.</b></td>
 					</tr>";
 				break;
 			case 16:

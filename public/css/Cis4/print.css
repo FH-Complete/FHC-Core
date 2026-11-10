@@ -101,6 +101,7 @@ header,
 	overflow-y: hidden !important;
 }
 
-.fhc-calendar-mode-range .fhc-calendar-base-grid-line-event .event-lectors {
+.fhc-calendar-mode-range .fhc-calendar-base-grid-line-event .event-lectors,
+.fhc-calendar-mode-range .fhc-calendar-base-grid-line-event .event-uids {
 	display: none !important;
 }

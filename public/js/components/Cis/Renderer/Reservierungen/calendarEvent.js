@@ -66,9 +66,9 @@ export default {
 				.fromISOTime(this.event.ende)
 				.toISOTime({ suppressSeconds: true });
 		},
-		isFutureEvent() {
+		isPastDate() {
 			const eventStart = luxon.DateTime.fromISO(`${this.event.datum}T${this.event.beginn}`);
-			return eventStart > luxon.DateTime.now();
+			return eventStart < luxon.DateTime.now().startOf("day");
 		},
 		timeSlotDisplayClasses() {
 			switch (this.$props.timeSlotDisplayBehavior) {
@@ -88,7 +88,7 @@ export default {
 	},
 	template: /* html */`
 	<div
-		class="cis-renderer-reservierungen-calendar-event calendar-event-default h-100 w-100 p-1 position-relative">
+		class="cis-renderer-reservierungen-calendar-event calendar-event-default h-100 w-100 p-1 position-relative" v-tooltip="tooltipString">
 		<div
 			v-if="!event?.allDayEvent && event?.beginn && event?.ende"
 			:class="timeSlotDisplayClasses"
@@ -97,9 +97,9 @@ export default {
 			<span>{{ start }}</span>
 			<span>{{ end }}</span>
 		</div>
-		<div class="event-text" v-tooltip="tooltipString">
+		<div class="event-text">
 			<button
-				v-if="isFutureEvent && event.type === 'reservierung' && event.deletable && mode !== 'Month'"
+				v-if="!isPastDate && event.type === 'reservierung' && event.deletable && mode !== 'Month'"
 				class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-1"
 				title="Löschen"
 				@click.stop="handleDelete"
@@ -110,18 +110,34 @@ export default {
 			<span class="event-topic">{{ event.topic }}</span>
 			<span class="event-place">{{ event.ort_kurzbz }}</span>
 			<span>{{ event.gruppe[0].kuerzel.split("/")[0] }}</span>
-			<span
-				v-for="lektor in event.lektor.slice(0, 3)"
-				class="event-lectors"
-			>
-				{{ lektor.kurzbz }}
-			</span>
-			<span
-				v-if="event.lektor.length > 3"
-				class="event-lectors-plus"
-			>
-				... +{{ event.lektor.length - 3 }}
-			</span>
+			<template v-if="event.lektor.length">
+				<span
+					v-for="lektor in event.lektor.slice(0, 3)"
+					class="event-lectors"
+				>
+					{{ lektor.kurzbz }}
+				</span>
+				<span
+					v-if="event.lektor.length > 3"
+					class="event-lectors-plus"
+				>
+					... +{{ event.lektor.length - 3 }}
+				</span>
+			</template>
+			<template v-else>
+				<span
+					v-for="uid in event.uids.slice(0, 3)"
+					class="event-uids"
+				>
+					{{ uid }}
+				</span>
+				<span
+					v-if="event.uids.length > 3"
+					class="event-uids-plus"
+				>
+					... +{{ event.uids.length - 3 }}
+				</span>
+			</template>
 		</div>
 	</div>
 	`,
