@@ -240,28 +240,6 @@ class Studium extends FHCAPI_Controller
 	}
 
 	private function computeStudienplanLehrveranstaltungen($studienplan_id, $semester){
-
-/* 
-SELECT tbl_lehrveranstaltung.*,
-            tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id,
-            tbl_studienplan_lehrveranstaltung.semester as stpllv_semester,
-            tbl_studienplan_lehrveranstaltung.pflicht as stpllv_pflicht,
-            tbl_studienplan_lehrveranstaltung.koordinator as stpllv_koordinator,
-            tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent,
-            tbl_studienplan_lehrveranstaltung.sort stpllv_sort,
-            tbl_studienplan_lehrveranstaltung.curriculum,
-            tbl_studienplan_lehrveranstaltung.export,
-            tbl_studienplan_lehrveranstaltung.genehmigung
-        FROM lehre.tbl_lehrveranstaltung
-        JOIN lehre.tbl_studienplan_lehrveranstaltung
-        USING(lehrveranstaltung_id)
-        WHERE tbl_studienplan_lehrveranstaltung.studienplan_id=" . $this->db_add_param($studienplan_id, FHC_INTEGER);
-        if (defined("CIS_PROFIL_STUDIENPLAN_MODULE_AUSBLENDEN") && CIS_PROFIL_STUDIENPLAN_MODULE_AUSBLENDEN)
-            $qry .= " AND tbl_lehrveranstaltung.lehrtyp_kurzbz != 'modul'";
-        if (!is_null($semester))
-        {
-            $qry.=" AND tbl_studienplan_lehrveranstaltung.semester=" . $this->db_add_param($semester, FHC_INTEGER);
-        } */
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 		
 		$query = "
@@ -334,10 +312,25 @@ SELECT tbl_lehrveranstaltung.*,
 			return $studienplan;
 	}
 
-	private function computeLektorenFromLehrveranstaltung($lehreinheit_id, $semester, $studiengang, $studiensemester){
+	private function computeLektorenFromLehrveranstaltung($lehrveranstaltung_id, $semester, $studiengang, $studiensemester){
 		$this->load->library('StundenplanLib');
-		$lektoren = $this->stundenplanlib->getLektorenFromLehrveranstaltung($lehreinheit_id,$semester, $studiengang,$studiensemester);
-		$lektoren = $this->getDataOrTerminateWithError($lektoren) ?? [];
+
+		if ($this->config->item('is_new_calendar_structure_enabled')) {
+			$this->load->library('KalenderLib', ["uid" => getAuthUID()]);
+			$this->load->config("lv_plan");
+			
+			$teachers = $this->kalenderlib->getTeachersByCourse($lehrveranstaltung_id, $studiengang, $studiensemester, $semester);
+			$teacherUIDs = array_map(function ($item)
+				{
+					return $item->uid;
+				}, 
+				$teachers
+			);
+			$lektoren = $teacherUIDs ?? [];
+		} else {
+			$lektoren = $this->stundenplanlib->getLektorenFromLehrveranstaltung($lehrveranstaltung_id,$semester, $studiengang,$studiensemester);
+			$lektoren = $this->getDataOrTerminateWithError($lektoren) ?? [];
+		} 
 		
 		$lektoren = array_map(function($lektor){
 			return ["name"=>$this->getDataOrTerminateWithError($this->PersonModel->getFullName($lektor)), "email"=>$lektor."@".DOMAIN];

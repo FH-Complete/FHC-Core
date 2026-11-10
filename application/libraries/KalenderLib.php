@@ -2928,4 +2928,41 @@ public function getReservableMap($ort_kurzbz, $start_date, $end_date)
 
 		return success($result);
 	}
+
+	public function getTeachersByCourse($courseId, $studiengang_kz, $studiensemester_kurzbz, $semester)
+	{
+		$this->_ci->load->model('person/Person_model', 'PersonModel');
+
+		$studiensemester = $this->_ci->StudiensemesterModel->loadWhere(["studiensemester_kurzbz"=>$studiensemester_kurzbz]);
+		if(isError($studiensemester))
+			return error(getData($studiensemester));
+
+		if (!hasData($studiensemester))
+			return error(getData($studiensemester));
+
+		$studiensemester = getData($studiensemester)[0];
+
+		$query = "
+			SELECT DISTINCT lehreinheitmitarbeiter.mitarbeiter_uid as uid
+			FROM lehre.tbl_lehrveranstaltung lehrveranstaltung
+				JOIN lehre.tbl_lehreinheit lehreinheit
+					ON lehreinheit.lehrveranstaltung_id = lehrveranstaltung.lehrveranstaltung_id
+				JOIN lehre.tbl_kalender_lehreinheit kalender_lehreinheit
+					ON kalender_lehreinheit.lehreinheit_id = lehreinheit.lehreinheit_id
+				JOIN lehre.tbl_kalender kalender
+					ON kalender.kalender_id = kalender_lehreinheit.kalender_id
+				JOIN lehre.tbl_lehreinheitmitarbeiter lehreinheitmitarbeiter
+					ON lehreinheitmitarbeiter.lehreinheit_id = kalender_lehreinheit.lehreinheit_id
+			WHERE lehrveranstaltung.lehrveranstaltung_id = ?
+				AND lehrveranstaltung.studiengang_kz = ?
+				AND lehrveranstaltung.semester = ?
+				AND kalender.von >= ?
+				AND kalender.bis <= ?
+		";
+
+		$teacherUIDsResponse = $this->_ci->KalenderModel->execReadOnlyQuery($query, [$courseId, $studiengang_kz, $semester, $studiensemester->start, $studiensemester->ende]);
+		if (isError($teacherUIDsResponse)) return;
+
+		return getData($teacherUIDsResponse);
+	}
 }
