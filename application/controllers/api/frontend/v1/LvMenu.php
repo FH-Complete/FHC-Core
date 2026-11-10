@@ -283,6 +283,17 @@ class LvMenu extends FHCAPI_Controller
 			$params
 		);
 
+		$this->load->library('PhrasesLib');
+		Events::trigger('afterLvMenuBuilt',
+			// passing $menu per reference
+			function & () use (&$menu) {
+				return $menu;
+			},
+			$studiensemester_kurzbz,
+			$this->p->t('global', 'old')
+		);
+		
+
 		// Menu sortieren
 		// ##########################################################################################
 
