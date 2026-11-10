@@ -33,11 +33,15 @@ import { getTempusSearchbarOptions } from './Filters/searchbarOptions.js';
 import TempusHeader from './Header.js';
 import TempusAppMenu from './AppMenu.js';
 import TempusVerbandMenu from './VerbandMenu.js';
+import TempusRaumMenu from './RaumMenu.js';
 import TempusSidebarMenu from './SidebarMenu.js';
+import TempusSecondSidebarMenu from './TempusSecondSidebarMenu.js';
 import RaumauswahlModal from './RaumauswahlModal.js';
 import RaumauswahlMultiModal from './RaumauswahlMultiModal.js';
 import LehreinheitModal from './LehreinheitModal.js';
+import OptionalSplit from './OptionalSplit.js';
 import HorizontalSplit from '../horizontalsplit/horizontalsplit.js';
+
 
 export default {
 	name: 'Tempus',
@@ -47,7 +51,9 @@ export default {
 		TempusAppMenu,
 		TempusHeader,
 		TempusVerbandMenu,
+		TempusRaumMenu,
 		TempusSidebarMenu,
+		TempusSecondSidebarMenu,
 		Reservierung,
 		KeyboardShortcuts,
 		MultiWeekPlanModal,
@@ -57,6 +63,7 @@ export default {
 		RaumauswahlMultiModal,
 		LehreinheitModal,
 		HorizontalSplit,
+		OptionalSplit,
 	},
 	props: {
 		defaultSemester: String,
@@ -106,6 +113,7 @@ export default {
 				this.reload();
 			},
 			canToggleGrid: this.permissions.stundenraster,
+			showVertragFilter: this.config.showVertragFilter
 		};
 	},
 	data() {
@@ -170,6 +178,31 @@ export default {
 		searchbaroptions() {
 			return getTempusSearchbarOptions(this);
 		},
+		coursepickerRechts() {
+			return this.coursepickerPosition !== 'left';
+		},
+		coursepickerPosition() {
+			return this.appconfig.coursepicker_position
+				?? this.config?.coursepicker_position
+				?? 'right';
+		},
+		coursepickerProps() {
+			return {
+				studiengaenge: this.studiengaenge,
+				lecturers: this.lecturers,
+				selectedStudiensemester: this.selectedStudiensemester,
+				raumvorschlagPreview: this.raumvorschlagPreview,
+				raumvorschlagLoading: this.raumvorschlagLoading,
+			};
+		},
+		coursepickerEvents() {
+			return {
+				'update:selectedStudiensemester': (wert) => { this.selectedStudiensemester = wert; },
+				'select-lecturer': (lektor) => this.addToFilter(lektor, 'mitarbeiter'),
+				'select-kw': this.jumpToKw,
+				'preview-raumvorschlag': this.previewRaumvorschlag,
+			};
+		},
 	},
 	methods: {
 		handleSaveEventTime({ kalender_id, start_time, end_time }) {
@@ -182,7 +215,7 @@ export default {
 
 			await this.deleteEntryCall(orig);
 			this.$refs.calendar.resetEventLoader(false);
-			this.$refs.sidebar.reloadCoursepicker();
+			this.$refs.secondSidebar.reloadCoursepicker();
 			this.rebuildRaumvorschlag();
 		},
 		async deleteEntries(origList) {
@@ -193,7 +226,7 @@ export default {
 				validList.map((orig) => this.deleteEntryCall(orig)),
 			);
 			this.$refs.calendar.resetEventLoader(false);
-			this.$refs.sidebar.reloadCoursepicker();
+			this.$refs.secondSidebar.reloadCoursepicker();
 		},
 		async deleteEntryCall(orig) {
 			await this.$api
@@ -254,7 +287,7 @@ export default {
 		},
 		reload() {
 			this.$refs.calendar?.resetEventLoader();
-			this.$refs.sidebar?.reloadCoursepicker();
+			this.$refs.secondSidebar?.reloadCoursepicker();
 			this.rebuildRaumvorschlag();
 		},
 
@@ -329,6 +362,14 @@ export default {
 			const verbandMenu = this.$refs.verbandMenu?.$el;
 			if (verbandMenu)
 				bootstrap.Offcanvas.getOrCreateInstance(verbandMenu).hide();
+		},
+		onSelectRaumAndClose(payload) {
+			if (!payload.ort_kurzbz)
+				return;
+			this.addToFilter(payload, 'ort');
+			const raumMenu = this.$refs.raumMenu?.$el;
+			if (raumMenu)
+				bootstrap.Offcanvas.getOrCreateInstance(raumMenu).hide();
 		},
 		onSelectVerband({ stg_kz, semester, orgform_kurzbz, name }) {
 			let exists = this.studiengaenge.some(
@@ -645,7 +686,7 @@ export default {
 				dates.end_time,
 				() => {
 					this.$refs.calendar.resetEventLoader(false, false);
-					this.$refs.sidebar.reloadCoursepicker();
+					this.$refs.secondSidebar.reloadCoursepicker();
 					this.rebuildRaumvorschlag();
 				},
 			);
@@ -676,7 +717,7 @@ export default {
 					)
 					.then(() => {
 						this.$refs.calendar.resetEventLoader(false, false);
-						this.$refs.sidebar.reloadCoursepicker();
+						this.$refs.secondSidebar.reloadCoursepicker();
 						this.rebuildRaumvorschlag();
 						this.bcc.postMessage('dropped');
 					});
@@ -699,10 +740,13 @@ export default {
 				obj.orig.eindeutige_kalender_gruppen_id
 			);
 
-			if (obj.type === 'reservierung') {
+			if (obj.type === 'reservierung')
+			{
 				this.reservierungPending = true;
 				this.$refs.reservierung.show(start_time, end_time);
-			} else if (obj.type === 'lehreinheit') {
+			}
+			else if (obj.type === 'lehreinheit')
+			{
 				if (obj.multiweek) {
 					this.openMultiWeekPreview(
 						obj.orig.lehreinheit_id,
@@ -719,8 +763,7 @@ export default {
 					endDT,
 				);
 				const raeume = matchedSlot?.raeume ?? null;
-
-				if (!raeume) {
+				if (!raeume || this.appconfig?.room_planning === "priority_room_planning") {
 					return this.$api
 						.call(
 							ApiKalender.addKalenderEvent(
@@ -745,7 +788,7 @@ export default {
 							}
 
 							this.$refs.calendar.resetEventLoader(false);
-							this.$refs.sidebar.reloadCoursepicker();
+							this.$refs.secondSidebar.reloadCoursepicker();
 							this.rebuildRaumvorschlag();
 							this.bcc.postMessage('dropped');
 						});
@@ -763,7 +806,7 @@ export default {
 						)
 						.then(() => {
 							this.$refs.calendar.resetEventLoader(false);
-							this.$refs.sidebar.reloadCoursepicker();
+							this.$refs.secondSidebar.reloadCoursepicker();
 							this.bcc.postMessage('dropped');
 							this.rebuildRaumvorschlag();
 						});
@@ -808,7 +851,7 @@ export default {
 		},
 		onMultiWeekConfirmed() {
 			this.$refs.calendar.resetEventLoader(false);
-			this.$refs.sidebar.reloadCoursepicker();
+			this.$refs.secondSidebar.reloadCoursepicker();
 			this.rebuildRaumvorschlag();
 			this.bcc.postMessage('dropped');
 		},
@@ -1192,36 +1235,34 @@ export default {
 			:searchbaroptions="searchbaroptions"
 			:searchfunction="searchfunction"
 			@language-changed="this.$refs.calendar.resetEventLoader();"
-		/>
+		/><tempus-app-menu />
 		<div class="container-fluid overflow-hidden heightfull">
-			<div class="row h-100">
-				<tempus-app-menu />
-
-				<horizontal-split :defaultRatio="[15, 85]">
-					<template #left>
-						<tempus-sidebar-menu
-							ref="sidebar"
-							:preview-role="previewRole"
-							:rooms="rooms"
-							:studiengaenge="studiengaenge"
-							:studiengaenge-all="studiengaenge_all"
-							:lecturers="lecturers"
-							:selected-studiensemester="selectedStudiensemester"
-							:raumvorschlag-preview="raumvorschlagPreview"
-							:raumvorschlag-loading="raumvorschlagLoading"
-							@update:preview-role="handlePreviewRoleChange"
-							@update:rooms="rooms = $event"
-							@update:studiengaenge="studiengaenge = $event"
-							@update:parked-keys="parkedKeys = $event"
-							@update:selected-studiensemester="selectedStudiensemester = $event"
-							@remove-lecturer="removeLecturer"
-							@select-lecturer="addToFilter($event, 'mitarbeiter')"
-							@select-kw="jumpToKw"
-							@sync="triggerSync"
-							@preview-raumvorschlag="previewRaumvorschlag"
-						/>
+	<div class="row h-100">
+		<horizontal-split :defaultRatio="[15, 85]">
+			<template #left>
+				<tempus-sidebar-menu
+					ref="sidebar"
+					:preview-role="previewRole"
+					:rooms="rooms"
+					:studiengaenge="studiengaenge"
+					:studiengaenge-all="studiengaenge_all"
+					:lecturers="lecturers"
+					@update:preview-role="handlePreviewRoleChange"
+					@update:rooms="rooms = $event"
+					@update:studiengaenge="studiengaenge = $event"
+					@update:parked-keys="parkedKeys = $event"
+					@remove-lecturer="removeLecturer"
+					@select-kw="jumpToKw"
+					@sync="triggerSync"
+				>
+					<template #coursepicker v-if="!coursepickerRechts">
+						<div id="coursepicker-links" class="d-flex flex-column flex-grow-1" style="min-height: 0"></div>
 					</template>
-					<template #right>
+				</tempus-sidebar-menu>
+			</template>
+			<template #right>
+				<optional-split :split="coursepickerRechts" :default-ratio="[85, 15]">
+					<template #left>
 						<fhc-calendar
 							ref="calendar"
 							:timezone="config.timezone"
@@ -1245,13 +1286,22 @@ export default {
 							:cache-multiplier="currentMode === 'week' ? 1 : 0"
 						/>
 					</template>
-				</horizontal-split>
+					<template #right>
+						<div id="coursepicker-rechts" class="h-100"></div>
+					</template>
+				</optional-split>
+			</template>
+		</horizontal-split>
 			</div>
 		</div>
 		<app-config ref="config" v-model="appconfig" :endpoints="configEndpoints"></app-config>
 		<tempus-verband-menu
 			ref="verbandMenu"
 			@select-verband-and-close="onSelectVerbandAndClose"
+		/>
+		<tempus-raum-menu
+			ref="raumMenu"
+			@select-raum-and-close="onSelectRaumAndClose"
 		/>
 		<raumauswahl-multi-modal ref="raumMultiModal" @saved="reload()"/>
 		<raumauswahl-modal ref="raumModal" @saved="() => reload()"/>
@@ -1275,5 +1325,8 @@ export default {
 			@close="closeMultiWeekModal"
 			@confirmed="onMultiWeekConfirmed"
 		/>
-	</div>`,
+	</div>
+	<teleport :to="coursepickerRechts ? '#coursepicker-rechts' : '#coursepicker-links'">
+		<tempus-second-sidebar-menu ref="secondSidebar" v-bind="coursepickerProps" v-on="coursepickerEvents" />
+	</teleport>`,
 };

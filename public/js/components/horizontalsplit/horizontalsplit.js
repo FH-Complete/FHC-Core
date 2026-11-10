@@ -50,13 +50,14 @@ export default {
 	mounted: function () {
 		this.calcWidths();
 		this.trackHorizontalSplitterOffsetLeft();
-		window.addEventListener('resize', this.calcWidths);
+		this.resizeObserver = new ResizeObserver(() => this.calcWidths());
+		this.resizeObserver.observe(this.$refs.horizontalsplit);
 	},
 	updated: function () {
 		this.trackHorizontalSplitterOffsetLeft();
 	},
-	beforeDestroy: function () {
-		window.removeEventListener('resize', this.calcWidths);
+	beforeUnmount: function () {
+		this.resizeObserver?.disconnect();
 	},
 	methods: {
 		calcWidths: function () {

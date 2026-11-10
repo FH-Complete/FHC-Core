@@ -1,19 +1,15 @@
-import FhcCoursepicker from './Coursepicker.js';
 import LectureSelection from './Filters/LectureSelection.js';
 import VerbandSelection from './Filters/VerbandSelection.js';
 import RoomSelection from './Filters/RoomSelection.js';
 import ParkingSlot from './ParkingSlot.js';
-import StvStudiensemester from '../Stv/Studentenverwaltung/Studiensemester.js';
 
 export default {
 	name: 'TempusSidebarMenu',
 	components: {
-		FhcCoursepicker,
 		LectureSelection,
 		VerbandSelection,
 		RoomSelection,
 		ParkingSlot,
-		StvStudiensemester,
 	},
 	props: {
 		previewRole: {
@@ -36,35 +32,17 @@ export default {
 			type: Array,
 			required: true,
 		},
-		selectedStudiensemester: {
-			type: String,
-			required: true,
-		},
-		raumvorschlagPreview: {
-			type: Object,
-			default: null,
-		},
-		raumvorschlagLoading: {
-			type: Boolean,
-			default: false,
-		},
 	},
 	emits: [
 		'update:previewRole',
 		'update:rooms',
 		'update:studiengaenge',
 		'update:parkedKeys',
-		'update:selectedStudiensemester',
 		'remove-lecturer',
-		'select-lecturer',
 		'select-kw',
 		'sync',
-		'preview-raumvorschlag',
 	],
 	methods: {
-		reloadCoursepicker() {
-			return this.$refs.coursepicker?.reload();
-		},
 		isParked(id) {
 			return this.$refs.parking?.isParked(id) ?? false;
 		},
@@ -73,14 +51,6 @@ export default {
 		},
 		unpark(item) {
 			return this.$refs.parking?.unpark(item);
-		},
-	},
-	computed: {
-		courseLecturers() {
-			if (!this.lecturers.length) return [];
-			return this.lecturers
-				.filter((lecture) => lecture.showCoursePicker)
-				.map((lecture) => lecture.uid);
 		},
 	},
 	template: /* html */ `
@@ -104,10 +74,10 @@ export default {
           class="btn btn-outline-secondary"
           type="button"
           data-bs-toggle="offcanvas"
-          data-bs-target="#verbandMenu"
-          aria-controls="verbandMenu"
+          data-bs-target="#raumMenu"
+          aria-controls="raumMenu"
           aria-expanded="false"
-          title="Verband"
+          title="Raum"
         >
           <span class="fa-solid fa-door-open"></span>
         </button>
@@ -168,23 +138,10 @@ export default {
           @update:parked-keys="$emit('update:parkedKeys', $event)"
 		  @select-kw="$emit('select-kw', $event)"
         ></parking-slot>
+        <slot name="coursepicker"></slot>
+        </div>
 
-        <fhc-coursepicker
-          ref="coursepicker"
-          :studiengaenge="studiengaenge"
-          :studiensemester="selectedStudiensemester"
-		  :lecturers="courseLecturers"
-		  :preview-lehreinheit-id="raumvorschlagPreview?.lehreinheit_id ?? null"
-		  :preview-loading="raumvorschlagLoading"
-		  @preview-raumvorschlag="$emit('preview-raumvorschlag', $event)"
-          @select-lecturer="$emit('select-lecturer', $event)"
-          @select-kw="$emit('select-kw', $event)"
-        ></fhc-coursepicker>
-      </div>
-      <stv-studiensemester
-        :studiensemester-kurzbz="selectedStudiensemester"
-        @update:studiensemester-kurzbz="$emit('update:selectedStudiensemester', $event)"
-      ></stv-studiensemester>
+       
     </nav>
   `,
 };

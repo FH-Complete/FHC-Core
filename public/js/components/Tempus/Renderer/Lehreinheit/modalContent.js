@@ -76,6 +76,10 @@ export default {
 			})
 			return leLinks;
 		},
+		tooltipCount()
+		{
+			return `${this.$p.t('global','anzahl')} ${this.$p.t('global','students')}`;
+		}
 	},
 	methods: {
 		formatDate(d){
@@ -105,20 +109,17 @@ export default {
 	},
 	template: /*html*/`
 	<div>
-		<h5>
-			{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}
-		</h5>
+		<h5 style="display: flex; justify-content: space-between; align-items: center;">
+				{{$p.t('lvinfo','lehrveranstaltungsinformationen')}}
+				<span v-tooltip="tooltipCount">
+					{{anzahlSchwund}} ({{anzahl}})
+				</span>
+			</h5>
 		<table class="table table-hover mb-4">
 				<tbody>
 					<kollision-row :event="event" />
 					<zeit-row ref="zeit" :event="event" />
-					<tr>
-						<th>{{$p.t('global','anzahl')}} {{$p.t('global','students')}}:
-						</th>
-						<td>
-							{{anzahlSchwund}} ({{anzahl}})
-						</td>
-					</tr>
+					
 					<raum-row :event="event" />
 					
 					<tr>

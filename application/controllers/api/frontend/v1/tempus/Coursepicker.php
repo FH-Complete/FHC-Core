@@ -84,9 +84,21 @@ class Coursepicker extends FHCAPI_Controller
 			lema.planstunden,
 			tbl_lehreinheit.start_kw,
 			tbl_lehreinheit.anmerkung,
-			tbl_lehreinheit.studiensemester_kurzbz
+			tbl_lehreinheit.studiensemester_kurzbz,
+			vertrag_status.vertragsstatus_kurzbz,
+			CASE WHEN vertrag_status.vertrag_id IS NULL THEN \'-\' ELSE vertrag_status.bezeichnung END AS vertragsstatus
 		');
 		$this->_ci->LehreinheitModel->addJoin('lehre.tbl_lehreinheitmitarbeiter lema', 'tbl_lehreinheit.lehreinheit_id = lema.lehreinheit_id');
+		$this->_ci->LehreinheitModel->addJoin('(
+			SELECT DISTINCT ON (vertrag_vertragsstatus.vertrag_id)
+				vertrag_vertragsstatus.vertrag_id,
+				vertrag_vertragsstatus.vertragsstatus_kurzbz,
+				vertragsstatus.bezeichnung
+			FROM lehre.tbl_vertrag_vertragsstatus vertrag_vertragsstatus
+			JOIN lehre.tbl_vertragsstatus vertragsstatus
+				ON vertragsstatus.vertragsstatus_kurzbz = vertrag_vertragsstatus.vertragsstatus_kurzbz
+			ORDER BY vertrag_vertragsstatus.vertrag_id, vertrag_vertragsstatus.datum DESC
+		) vertrag_status', 'vertrag_status.vertrag_id = lema.vertrag_id', 'LEFT');
 		$this->_ci->LehreinheitModel->addJoin('lehre.tbl_lehreinheitgruppe lvb', 'tbl_lehreinheit.lehreinheit_id = lvb.lehreinheit_id');
 		$this->_ci->LehreinheitModel->addJoin('public.tbl_studiengang', 'lvb.studiengang_kz = tbl_studiengang.studiengang_kz');
 		$this->_ci->LehreinheitModel->addJoin('lehre.tbl_lehrveranstaltung', 'tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id');
@@ -183,15 +195,23 @@ class Coursepicker extends FHCAPI_Controller
 					'lehrverband' => array(),
 					'lem' => array(),
 					'verplant_gesamt' => 0,
+					'vertraege' => array(),
 				);
 			}
 
 			$group = $grouped[$lehreinheit_id];
 
+			$group->vertraege[$row->vertragsstatus_kurzbz] = (object)array(
+				'kurzbz' => $row->vertragsstatus_kurzbz,
+				'bezeichnung' => $row->vertragsstatus,
+			);
+
 			$group->lektoren[$row->lektor_uid] = (object)array(
 				'uid' => $row->lektor_uid,
 				'kurzbz' => trim($row->lektor),
 				'name' => $row->vorname . ' ' . $row->nachname,
+				'vertragsstatus' => $row->vertragsstatus,
+				'vertragsstatus_kurzbz' => $row->vertragsstatus_kurzbz,
 			);
 
 			$group->lvnr[] = $row->lvnr;
@@ -239,6 +259,7 @@ class Coursepicker extends FHCAPI_Controller
 			$group->start_kw = $this->_formatArr($group->start_kw);
 			$group->verplant = $this->_formatArr($group->verplant);
 			$group->offenestunden = $this->_formatArr($group->offenestunden);
+			$group->vertraege = array_values($group->vertraege);
 		}
 		return array_values($grouped);
 	}

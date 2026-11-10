@@ -49,7 +49,7 @@ export default {
 						</div>
 						<div class="d-flex align-items-center gap-2" @click="l.showCoursePicker = !l.showCoursePicker" style="cursor:pointer">
 							<i :class="l.showCoursePicker ? 'fa-solid fa-toggle-on text-primary' : 'fa-solid fa-toggle-off text-muted'"></i>
-							<span class="form-check-label">Course Picker</span>
+							<span class="form-check-label">Course Picker (hinzufügen aller LV Teile)</span>
 						</div>
 					</div>
 				</div>

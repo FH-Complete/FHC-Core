@@ -278,3 +278,17 @@ if(!$result = @$db->db_query("SELECT status_kurzbz_max FROM lehre.tbl_kalender L
 			<br />lehre.tbl_kalender_status: status_kurzbz to_delete_live hinzugefuegt.
 	';
 }
+
+
+if ($result = @$db->db_query("SELECT 1 FROM public.tbl_variablenname WHERE name = 'coursepicker_position';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO public.tbl_variablenname(name, defaultwert) VALUES('coursepicker_position', 'left')";
+
+		if (!$db->db_query($qry))
+			echo '<strong>public.tbl_variablenname '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_variablenname: Added "coursepicker_position"<br>';
+	}
+}

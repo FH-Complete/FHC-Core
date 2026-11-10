@@ -22,6 +22,8 @@ import ApiTreemenu from "../../../api/factory/treemenu.js";
 
 import LvvColumns from '../../../../../index.ci.php/js/tabulatorcolumns/lvverwaltung';
 
+import draggable from '../../../directives/draggable.js';
+
 export default {
 	name: "LVVerwaltungTable",
 	components: {
@@ -30,6 +32,9 @@ export default {
 		DetailsForm,
 		CoreTag
 
+	},
+	directives: {
+		draggable
 	},
 	props: {
 		selected: Object,
@@ -97,13 +102,18 @@ export default {
 		return {
 			expanded: [],
 			selectedColumnValues: [],
+			dragSource: [],
+			selectedRowsData: [],
 			tagEndpoint: ApiTag,
 			tabulatorEvents: [
 				{
 					event: 'rowSelectionChanged',
 					handler: this.rowSelectionChanged
 				},
-
+				{
+					event: 'rowMouseDown',
+					handler: this.handleMouseDown
+				},
 				{
 					event: 'dataProcessed',
 					handler: (data) => {
@@ -199,6 +209,21 @@ export default {
 		}
 	},
 	computed: {
+		selectedDragObject() {
+
+			const lehreinheit = this.dragSource.find(item => item?.lehreinheit_id);
+			if (!lehreinheit) return null;
+
+			return {
+				type: 'lehreinheit',
+				id: lehreinheit.lehreinheit_id,
+				orig: {
+					lehreinheit_id: lehreinheit.lehreinheit_id,
+				},
+				stundenblockung: lehreinheit.stundenblockung,
+				multiweek: false,
+			};
+		},
 		tabulatorOptions() {
 			return {
 				index: 'uniqueindex',
@@ -296,6 +321,12 @@ export default {
 						},
 					];
 				},
+				rowFormatter(row) {
+					if (row.getData().lehreinheit_id)
+					{
+						row.getElement().draggable = true
+					}
+				},
 
 				columns: LvvColumns,
 				locale: true
@@ -350,8 +381,14 @@ export default {
 					this.$refs.table.reloadTable();
 			}
 		},
+		dragCleanup(evt) {
+			this.dragSource = [];
+			if (evt.dataTransfer.dropEffect == 'none')
+				return;
+		},
 		rowSelectionChanged(data) {
 			this.selectedRows = this.$refs.table.tabulator.getSelectedRows();
+			this.selectedRowsData = data;
 			this.selectedColumnValues = this.selectedRows.filter(row => row.getData().lehreinheit_id !== undefined && row.getData().lehreinheit_id).map(row => row.getData().lehreinheit_id);
 
 			if (data[0]?.lehreinheit_id !== undefined && this.selectedColumnValues.length === 1)
@@ -604,10 +641,20 @@ export default {
 			}
 			this.$refs.table.tabulator.redraw();
 		},
+		handleMouseDown(e, row) {
+			const data = row.getData();
+			const isAlreadySelected = this.selectedRowsData.some(
+				item => item.lehreinheit_id && item.lehreinheit_id === data.lehreinheit_id
+			);
+			this.dragSource = isAlreadySelected ? this.selectedRowsData : [data];
+		},
 	},
 	template: `
 	<div class="lv-list h-100 pt-3">
-		<div class="tabulator-container d-flex flex-column h-100">
+		<div class="tabulator-container d-flex flex-column h-100" 
+		v-draggable:move.capture="selectedDragObject"
+		@dragend="dragCleanup"
+		>
 			<core-filter-cmpt
 				ref="table"
 				:tabulator-options="tabulatorOptions"

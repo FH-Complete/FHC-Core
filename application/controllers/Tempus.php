@@ -62,7 +62,9 @@ class Tempus extends Auth_Controller
 			],
 			'variables' => array_merge([
 				'semester_aktuell' => $this->variablelib->getVar('semester_aktuell'),
-				'timezone' => $this->config->item('timezone')
+				'timezone' => $this->config->item('timezone'),
+				'coursepicker_position' => $this->variablelib->getVar('coursepicker_position') ?: 'left',
+				'showVertragFilter' => (defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') && FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN),
 			], $extraVariables)
 		]);
 	}

@@ -160,7 +160,7 @@ class SearchBarLib
 			' .
 			$this->buildSearchClause(
 				$dbModel, 
-				array('b.uid', 'p.vorname', 'p.nachname'), 
+				array('b.uid', 'p.vorname', 'p.nachname', 'm.kurzbz'),
 				$searchstr
 			) .
 			'
@@ -251,7 +251,7 @@ EOSC;
 			 WHERE ' .
 			$this->buildSearchClause(
 				$dbModel, 
-				array('b.uid', 'p.vorname', 'p.nachname', 'org.bezeichnung', 'stdkst.bezeichnung'), 
+				array('b.uid', 'p.vorname', 'p.nachname', 'org.bezeichnung', 'stdkst.bezeichnung', 'm.kurzbz'),
 				$searchstr
 			) .
 			'

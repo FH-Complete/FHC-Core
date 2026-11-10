@@ -30,5 +30,10 @@ $config['lvv'] = [
 
 $config['tempus'] = [
 	"library" => "treemenu/TempusLib",
-	"permissions" => ["admin:r", "assistenz:r", "lehre/lvplan:r"]
+	"permissions" => ["lehre/lvplan:r"]
+];
+
+$config['tempusorte'] = [
+	"library" => "treemenu/TempusOrteLib",
+	"permissions" => ["lehre/lvplan:r"]
 ];

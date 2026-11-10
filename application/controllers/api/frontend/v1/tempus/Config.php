@@ -20,6 +20,7 @@ class Config extends FHCAPI_Controller
 		// Load Phrases
 		$this->loadPhrases([
 			'ui',
+			'lehre'
 		]);
 
 		$this->_ci = &get_instance();
@@ -40,6 +41,7 @@ class Config extends FHCAPI_Controller
 			'ignore_resources_collisions',
 			'roomless_planning',
 			'room_planning',
+			'coursepicker_position',
 		);
 		$result = $this->_ci->VariableModel->getVariables(getAuthUID(), $var_array);
 
@@ -91,6 +93,16 @@ class Config extends FHCAPI_Controller
 			],
 		];
 
+		$config['coursepicker_position'] = [
+			"type"  => "select",
+			"label" => $this->p->t('lehre', 'coursepicker_position'),
+			"value" => $data['coursepicker_position'] ?? "coursepicker_position",
+			"options" => [
+				'left' => $this->p->t('lehre', 'left'),
+				'right' => $this->p->t('lehre', 'right'),
+			],
+		];
+
 		$this->terminateWithSuccess($config);
 	}
 	public function getHeader()
@@ -133,6 +145,12 @@ class Config extends FHCAPI_Controller
 			'required|in_list[dialog_room_planning,priority_room_planning]'
 		);
 
+		$this->form_validation->set_rules(
+			'coursepicker_position',
+			$this->p->t('lehre', 'coursepicker_position'),
+			'required|in_list[left,right]'
+		);
+
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
@@ -150,6 +168,12 @@ class Config extends FHCAPI_Controller
 			getAuthUID(),
 			'room_planning',
 			$this->input->post('room_planning')
+		);
+
+		$this->VariableModel->setVariable(
+			getAuthUID(),
+			'coursepicker_position',
+			$this->input->post('coursepicker_position')
 		);
 
 		$this->terminateWithSuccess();
