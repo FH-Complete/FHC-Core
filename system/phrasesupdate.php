@@ -28923,6 +28923,26 @@ In the list:
 		array(
 			'app' => 'core',
 			'category' => 'profil',
+			'phrase' => 'FIRMENHANDY',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Firmenhandy',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Work mobile',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
 			'phrase' => 'NOTFALLKONTAKT',
 			'insertvon' => 'system',
 			'phrases' => array(
