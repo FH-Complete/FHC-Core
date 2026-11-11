@@ -225,7 +225,7 @@ export default {
 				},
 				layout: 'fitDataStretch',
 				height: '100%',
-				persistenceID: 'lehrveranstaltungen_2026_07_15_v1',
+				persistenceID: 'lehrveranstaltungen_2026_11_11_v1',
 				persistence: {
 					sort: true,
 					columns: ["width", "visible"],
@@ -304,8 +304,11 @@ export default {
 		}
 	},
 	created() {
-		Tabulator.extendModule("format", "formatters", {
+		Tabulator.extendModule("filter", "filters", {
 			tagHeaderFilter,
+		});
+
+		Tabulator.extendModule("format", "formatters", {
 			tagFormatter: (cell, params, onRendered) => tagFormatter(cell, this.$refs.tagComponent, onRendered),
 			ja_nein: cell => cell.getValue()
 				? this.toUpperCase(this.$p.t('ui', 'ja'))
@@ -506,7 +509,7 @@ export default {
 						row._row.modules.dataTree.open = true;
 					}
 
-					if (row._row.data._children?.length > 0)
+					if (row._row.data?._children?.length > 0)
 					{
 						lastMatchingRow = row;
 					}
@@ -567,34 +570,46 @@ export default {
 			return result;
 		},
 		resetTree() {
-			this.allRows.forEach(row => {
-				row._row.modules.dataTree.open = false;
+			const tabulator = this.$refs.table?.tabulator;
+			if (!tabulator) return;
+
+			let lastRow = null;
+
+			this.getAllRows(tabulator.getRows()).forEach(row => {
+				const tree = row._row.modules?.dataTree;
+				if (!tree) return;
+
+				tree.open = false;
+
+				if (row._row.data?._children?.length)
+					lastRow = row;
 			});
 
-			let rootRows = this.$refs.table.tabulator.getRows(true);
-			var lastRow = rootRows[rootRows.length - 1];
-			lastRow?.treeCollapse(true)
-
+			lastRow?.treeCollapse();
 			this.currentTreeLevel = 0;
 		},
 		expandTree()
 		{
-			this.currentTreeLevel = (this.currentTreeLevel || 1);
+			const tabulator = this.$refs.table?.tabulator;
+			if (!tabulator) return;
+
+			this.currentTreeLevel = this.currentTreeLevel || 1;
 
 			let lastMatchingRow = null;
 
-			this.allRows.forEach(row => {
-				const level = row._row.modules.dataTree?.index ?? 0;
+			this.getAllRows(tabulator.getRows("active")).forEach(row => {
+				const tree = row._row.modules?.dataTree;
+				if (!tree)
+					return;
 
-				if (level === this.currentTreeLevel - 1 )
-				{
-					row._row.modules.dataTree.open = true;
+				if ((tree.index ?? 0) !== this.currentTreeLevel - 1)
+					return;
 
-					if (row._row.data._children?.length > 0)
-					{
-						lastMatchingRow = row;
-					}
-				}
+				if (!row._row.data?._children?.length)
+					return;
+
+				tree.open = true;
+				lastMatchingRow = row;
 			});
 
 			if (lastMatchingRow)
@@ -602,7 +617,10 @@ export default {
 				lastMatchingRow.treeExpand();
 				this.currentTreeLevel++;
 			}
-			this.$refs.table.tabulator.redraw();
+			else
+			{
+				tabulator.redraw();
+			}
 		},
 	},
 	template: `

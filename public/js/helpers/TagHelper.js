@@ -6,7 +6,7 @@ export function addTagInTable(addedTag, rows, matchKey, tagsKey = "tags")
 	rows.forEach(row =>
 	{
 		const rowData = row.getData();
-		let updated = false;
+		let newValue = null;
 
 		addedTag.response.forEach(tag =>
 		{
@@ -15,11 +15,11 @@ export function addTagInTable(addedTag, rows, matchKey, tagsKey = "tags")
 
 			let tags;
 			try {
-				let initialTags = rowData[tagsKey] || "[]";
+				let initialTags = newValue ?? rowData[tagsKey] ?? "[]";
 				if (typeof initialTags === 'string') {
 					tags = JSON.parse(initialTags);
 				} else {
-					tags = initialTags;
+					tags = [...initialTags];
 				}
 			} catch (e) {
 				tags = [];
@@ -31,9 +31,7 @@ export function addTagInTable(addedTag, rows, matchKey, tagsKey = "tags")
 			if (tags.some(t => t?.id === tag.id))
 				return;
 
-			let newTag = { ...addedTag, id: tag.id };
-
-			tags.push(newTag);
+			tags.push({ ...addedTag, id: tag.id });
 			tags.sort((a, b) => {
 				let adone = a.done ? 1 : 0;
 				let bdone = b.done ? 1 : 0;
@@ -41,12 +39,15 @@ export function addTagInTable(addedTag, rows, matchKey, tagsKey = "tags")
 				if (adone !== bdone) return adone - bdone;
 				return a.prioritaet - b.prioritaet;
 			});
-			rowData[tagsKey] = JSON.stringify(tags);
-			updated = true;
+
+			newValue = JSON.stringify(tags);
 		});
 
-		if (updated)
-			row.update(rowData);
+		if (newValue !== null)
+		{
+			row.update({ [tagsKey]: newValue });
+			row.reformat();
+		}
 	});
 }
 
@@ -101,7 +102,8 @@ export function updateTagInTable(updatedTag, rows, fields = ['tags'])
 	rows.forEach(row =>
 	{
 		const rowData = row.getData();
-		let updated = false;
+		let updates = {};
+		let changed = false;
 
 		fields.forEach(field =>
 		{
@@ -114,7 +116,7 @@ export function updateTagInTable(updatedTag, rows, fields = ['tags'])
 				if (typeof initialTags === 'string') {
 					fieldData = JSON.parse(initialTags);
 				} else {
-					fieldData = initialTags;
+					fieldData = [...initialTags];
 				}
 			} catch (e) {
 				return;
@@ -140,13 +142,16 @@ export function updateTagInTable(updatedTag, rows, fields = ['tags'])
 
 				if (updatedFieldData !== rowData[field])
 				{
-					rowData[field] = updatedFieldData;
-					updated = true;
+					updates[field] = updatedFieldData;
+					changed = true;
 				}
 			}
 		});
 
-		if (updated)
-			row.update(rowData);
+		if (changed)
+		{
+			row.update(updates);
+			row.reformat();
+		}
 	});
 }
