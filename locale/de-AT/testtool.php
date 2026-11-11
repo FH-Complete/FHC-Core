@@ -90,6 +90,7 @@ $this->phrasen['testtool/einfuehrungsText']='
 $this->phrasen['testtool/prueflingGesperrt']='Bitte kontaktieren Sie die Reihungstestaufsicht!';
 $this->phrasen['testtool/freischaltcode']='Freischaltcode';
 $this->phrasen['testtool/freischalttext']='Ihren Freischaltcode erhalten Sie am Tag des Reihungstests nach erfolgter Einführung im ZOOM-Meeting (siehe Leitfaden) von der Aufsicht. <br /> Wir wünschen Ihnen viel Erfolg.';
+$this->phrasen['testtool/karrierepfad']='Karrierepfad';
 
 
 ?>

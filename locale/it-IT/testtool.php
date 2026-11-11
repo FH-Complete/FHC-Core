@@ -38,5 +38,6 @@ $this->phrasen['testtool/tag']='';
 $this->phrasen['testtool/willkommenstext']='';
 $this->phrasen['testtool/zeitAbgelaufen']='';
 $this->phrasen['testtool/zurueckZurStartseite']='';
+$this->phrasen['testtool/karrierepfad']='Percorso di carriera';
 
 ?>

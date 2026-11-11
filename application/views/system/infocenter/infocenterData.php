@@ -303,7 +303,20 @@
 				WHERE konto.person_id = p.person_id
 					AND konto.studiensemester_kurzbz = '. $STUDIENSEMESTER .'
 					AND konto.buchungstyp_kurzbz = '. $KAUTION_DRITT_STAAT .'
-			) AS "Kaution"
+			) AS "Kaution",
+			(
+				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(sg.typ || sg.kurzbz) || \':\' || kp.bezeichnung_mehrsprachig[1]), \', \')
+				  FROM public.tbl_prestudent ps
+				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
+				  JOIN public.tbl_karrierepfad kp USING(karrierepfad_id)
+				 WHERE ps.person_id = p.person_id
+				   AND EXISTS (
+						SELECT 1
+						  FROM public.tbl_prestudentstatus pss
+						 WHERE pss.prestudent_id = ps.prestudent_id
+						   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
+					)
+			) AS "Karrierepfad"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
 				SELECT tpl.person_id,
@@ -396,7 +409,8 @@
 			'InfoCenter Mitarbeiter',
 			ucfirst($this->p->t('infocenter', 'rueckstelldatum')),
 			ucfirst($this->p->t('infocenter', 'rueckstellgrund')),
-			ucfirst($this->p->t('infocenter', 'kaution'))
+			ucfirst($this->p->t('infocenter', 'kaution')),
+			ucfirst($this->p->t('infocenter', 'karrierepfad'))
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -517,6 +531,11 @@
 			else
 			{
 				$datasetRaw->{'Kaution'} = 'Offen';
+			}
+
+			if ($datasetRaw->{'Karrierepfad'} === null)
+			{
+				$datasetRaw->{'Karrierepfad'} = '-';
 			}
 
 			return $datasetRaw;

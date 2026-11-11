@@ -16,8 +16,14 @@ export default {
 			return this.mode + '#' + this.path + '#' + this.query_string;
 		}
 	},
+	beforeMount: function() {
+		document.body.classList.add('compat');
+	},
 	mounted: function() {
 		this.srcUrl = this.buildSrcUrl();
+	},
+	beforeUnmount: function() {
+		document.body.classList.remove('compat');
 	},
 	watch: {
 		propsWatchHelper: function() {

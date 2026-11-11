@@ -1,7 +1,6 @@
 <?php
-$this->load->view(
-	'templates/FHC-Header',
-	array(
+
+$includesArray = array(
 		'title' => 'Lehrauftrag bestellen',
 		'jquery3' => true,
 		'bootstrap3' => true,
@@ -9,8 +8,13 @@ $this->load->view(
 		'sbadmintemplate3' => true,
 		'ajaxlib' => true,
 		'navigationwidget' => true,
-	)
 );
+
+$this->load->view(
+	'templates/FHC-Header',
+	$includesArray
+);
+
 ?>
 
 <?php echo $this->widgetlib->widget('NavigationWidget'); ?>
@@ -34,4 +38,11 @@ $this->load->view(
 		</div>
 	</div>
 
-<?php $this->load->view('templates/FHC-Footer'); ?>
+<?php 
+
+$this->load->view(
+	'templates/FHC-Footer',
+	$includesArray
+);
+
+?>

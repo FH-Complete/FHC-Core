@@ -1,4 +1,5 @@
 export default {
+	name: 'Cis-Renderer-Lehreinheit-CalendarEvent',
 	props:{
 		event: {
 			type: Object,

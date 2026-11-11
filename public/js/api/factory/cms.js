@@ -31,14 +31,15 @@ export default {
 		};
 	},
 	//api function used for the news View that renders the html
-	getNews(page = 1, page_size = 10, sprache) {
+	getNews(page = 1, page_size = 10, sprache, filterPublished = true) {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/Cms/getNews',
 			params: {
 				page,
 				page_size,
-				sprache
+				sprache,
+				published: filterPublished,
 			},
 		};
 	},
@@ -103,11 +104,11 @@ export default {
 			params: { content_id, ...(sprache ? { sprache } : {}) }
 		};
 	},
-	getNewsExtra() {
-		// TODO(chris): seems to be called from nowhere?
+	newsForWidget() {
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/Cms/getStudiengangInfoForNews'
+			url: '/api/frontend/v1/Cms/newsForWidget',
+			params: { limit },
 		};
-	}
+	},
 };

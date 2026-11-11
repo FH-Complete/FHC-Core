@@ -1,0 +1,27 @@
+.item-inactive {
+    text-decoration: line-through;
+}
+
+.table-scroll {
+    height: calc(100vh - 300px);
+    overflow: auto;
+}
+
+.zeitsperrenma-content thead th {
+    position: sticky;
+    top: 0;
+    background: var(--bs-table-bg);
+    z-index: 2;
+}
+
+.zeitsperrenma-content .zeitsperrenma-name-header {
+	left: 0;
+    z-index: 3;
+}
+
+.zeitsperrenma-content .zeitsperrenma-name {
+    position: sticky;
+    left: 0;
+    background: var(--bs-table-bg);
+    z-index: 2;
+}

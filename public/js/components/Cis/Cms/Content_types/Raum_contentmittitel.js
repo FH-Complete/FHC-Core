@@ -77,7 +77,7 @@ export default {
 		for (let table of tables) {
 			this.sanitizeLegacyTables(table)
 			new Tabulator(table, {
-				layout: "fitDataStretch",
+				layout: "fitColumns",
 
 				columnDefaults: {
 					formatter: "html",

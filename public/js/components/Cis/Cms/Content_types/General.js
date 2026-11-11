@@ -74,7 +74,7 @@ export default {
 
 				new Tabulator(table, {
 					index: index,
-					layout: "fitDataFill",
+					layout: "fitColumns",
 
 					columnDefaults: {
 						formatter: "html",

@@ -239,7 +239,7 @@ export default {
 					const person = this.fieldsPerson[0];
 					this.itemsPerson = Object.entries(person).map(([key, value]) => ({
 						label: key.toLowerCase(),
-						value: '{' + key.toLowerCase() + '}'
+						value: '{' + key.toLowerCase().replace(/ /g, '_') + '}'
 					}));
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -253,7 +253,7 @@ export default {
 					const prestudent = this.fieldsPrestudent[0];
 					this.itemsPrestudent = Object.entries(prestudent).map(([key, value]) => ({
 						label: key.toLowerCase(),
-						value: '{' + key.toLowerCase() + '}'
+						value: '{' + key.toLowerCase().replace(/ /g, '_') + '}'
 					}));
 				})
 				.catch(this.$fhcAlert.handleSystemError);

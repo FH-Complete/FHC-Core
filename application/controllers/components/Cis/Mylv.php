@@ -13,6 +13,7 @@ class Mylv extends Auth_Controller
 	 */
 	public function __construct()
 	{
+		
 		parent::__construct([
 			'Student' => self::PERM_LOGGED,
 			'Studiensemester' => self::PERM_LOGGED,
@@ -44,13 +45,27 @@ class Mylv extends Auth_Controller
 	public function Studiensemester()
 	{
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		$this->load->model('crm/Student_model', 'StudentModel');
+		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 
-		$result = $this->StudiensemesterModel->getWhereStudentHasLvs(getAuthUID());
+		$isMitarbeiter = getData($this->MitarbeiterModel->isMitarbeiter(getAuthUID())) ?? false;
+		if($isMitarbeiter) {
+			$result = $this->StudiensemesterModel->getWhereMitarbeiterHasLvs(getAuthUID());
 
-		if (isError($result))
-			return $this->outputJsonError(getError($result));
+			if (isError($result))
+				return $this->outputJsonError(getError($result));
 
-		$this->outputJsonSuccess(getData($result));
+			$this->outputJsonSuccess(getData($result));
+		} else if(getData($this->StudentModel->isStudent(getAuthUID())) ?? false) { // $isStudent
+			$result = $this->StudiensemesterModel->getWhereStudentHasLvs(getAuthUID());
+
+			if (isError($result))
+				return $this->outputJsonError(getError($result));
+
+			$this->outputJsonSuccess(getData($result));
+		} else {
+			$this->outputJsonError('neither student or mitarbeiter');
+		}
 	}
 
 	/**
@@ -58,13 +73,27 @@ class Mylv extends Auth_Controller
 	public function Lvs($studiensemester_kurzbz)
 	{
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+		$this->load->model('crm/Student_model', 'StudentModel');
+		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 
-		$result = $this->LehrveranstaltungModel->getLvsByStudentWithGrades(getAuthUID(), $studiensemester_kurzbz, getUserLanguage());
+		$isMitarbeiter = getData($this->MitarbeiterModel->isMitarbeiter(getAuthUID())) ?? false;
+		if($isMitarbeiter) {
+			$result = $this->LehrveranstaltungModel->getLvsByMitarbeiterInSemester(getAuthUID(), $studiensemester_kurzbz);
 
-		if (isError($result))
-			return $this->outputJsonError(getError($result));
+			if (isError($result))
+				return $this->outputJsonError(getError($result));
 
-		$this->outputJsonSuccess(getData($result));
+			$this->outputJsonSuccess(getData($result));
+		} else if(getData($this->StudentModel->isStudent(getAuthUID())) ?? false) { // $isStudent
+			$result = $this->LehrveranstaltungModel->getLvsByStudentWithGrades(getAuthUID(), $studiensemester_kurzbz, getUserLanguage());
+
+			if (isError($result))
+				return $this->outputJsonError(getError($result));
+
+			$this->outputJsonSuccess(getData($result));
+		} else {
+			$this->outputJsonError('neither student or mitarbeiter');
+		}
 	}
 
 	/**

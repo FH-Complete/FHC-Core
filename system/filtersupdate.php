@@ -35,6 +35,7 @@ $filters = array(
 					{"name": "ZGVNation"},
 					{"name": "ZGVMNation"},
 					{"name": "StgAbgeschickt"},
+					{"name": "Karrierepfad"},
 					{"name": "LastAction"},
 					{"name": "LastActionType"},
 					{"name": "User/Operator"},
@@ -72,6 +73,7 @@ $filters = array(
 					{"name": "ZGVNation"},
 					{"name": "ZGVMNation"},
 					{"name": "StgAbgeschickt"},
+					{"name": "Karrierepfad"},
 					{"name": "Studiensemester"},
 					{"name": "LastAction"},
 					{"name": "LastActionType"},
@@ -120,6 +122,7 @@ $filters = array(
 					{"name": "StgNichtAbgeschickt"},
 					{"name": "StgAbgeschickt"},
 					{"name": "StgAktiv"},
+					{"name": "Karrierepfad"},
 					{"name": "Studiensemester"}
 				],
 				"filters": [
@@ -156,6 +159,7 @@ $filters = array(
 					{"name": "StgNichtAbgeschickt"},
 					{"name": "StgAbgeschickt"},
 					{"name": "StgAktiv"},
+					{"name": "Karrierepfad"},
 					{"name": "Studiensemester"}
 				],
 				"filters": [
@@ -192,6 +196,7 @@ $filters = array(
 					{"name": "ZGVNation"},
 					{"name": "ZGVMNation"},
 					{"name": "StgAbgeschickt"},
+					{"name": "Karrierepfad"},
 					{"name": "Studiensemester"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
@@ -238,6 +243,7 @@ $filters = array(
 					{"name": "StgNichtAbgeschickt"},
 					{"name": "StgAbgeschickt"},
 					{"name": "StgAktiv"},
+					{"name": "Karrierepfad"},
 					{"name": "Studiensemester"}
 				],
 				"filters": [

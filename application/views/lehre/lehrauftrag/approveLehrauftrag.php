@@ -1,98 +1,101 @@
 <?php
+$includesArray = array(
+	'title' => 'Lehrauftrag erteilen',
+	'jquery3' => true,
+	'jqueryui1' => true,
+	'jquerycheckboxes1' => true,
+	'bootstrap3' => true,
+	'fontawesome6' => true,
+	'sbadmintemplate3' => true,
+	'tabulator5' => true,
+	'tabulator5JQuery' => true,
+	'momentjs2' => true,
+	'ajaxlib' => true,
+	'dialoglib' => true,
+	'tablewidget' => true,
+	'navigationwidget' => true,
+	'phrases' => array(
+		'global' => array(
+			'lehrauftraegeErteilen',
+			'mehrHilfe',
+			'weitereInformationenUnter'
+		),
+		'ui' => array(
+			'anzeigen',
+			'alleAnzeigen',
+			'nurNeueAnzeigen',
+			'nurBestellteAnzeigen',
+			'nurErteilteAnzeigen',
+			'nurAngenommeneAnzeigen',
+			'nurGeaenderteAnzeigen',
+			'nurDummiesAnzeigen',
+			'hilfeZuDieserSeite',
+			'alleAuswaehlen',
+			'alleAbwaehlen',
+			'ausgewaehlteZeilen',
+			'hilfe',
+			'tabelleneinstellungen',
+			'keineDatenVorhanden',
+			'spaltenEinstellen',
+			'bestelltVon',
+			'erteiltVon',
+			'angenommenVon',
+			'stundenStundensatzGeaendert',
+			'neuerLehrauftragOhneLektorVerplant',
+			'wartetAufBestellung',
+			'wartetAufErneuteBestellung',
+			'neuerLehrauftragWartetAufBestellung',
+			'letzterStatusBestellt',
+			'letzterStatusErteilt',
+			'letzterStatusAngenommen',
+		),
+		'table' => array(
+			'spaltenEinAusblenden',
+			'spaltenEinAusblendenMitKlickOeffnen',
+			'spaltenEinAusblendenAufEinstellungenKlicken',
+			'spaltenEinAusblendenMitKlickAktivieren',
+			'spaltenEinAusblendenMitKlickSchliessen',
+			'spaltenbreiteVeraendern',
+			'spaltenbreiteVeraendernText',
+			'spaltenbreiteVeraendernInfotext',
+			'zeilenAuswaehlen',
+			'zeilenAuswaehlenEinzeln',
+			'zeilenAuswaehlenBereich',
+			'zeilenAuswaehlenAlle'
+		),
+		'lehre' => array(
+			'lehrauftragStandardBestellprozess',
+			'lehrauftragStandardBestellprozessBestellen',
+			'lehrauftragStandardBestellprozessErteilen',
+			'lehrauftragStandardBestellprozessAnnehmen',
+			'lehrauftraegeErteilen',
+			'lehrauftraegeErteilenText',
+			'lehrauftraegeErteilenKlickStatusicon',
+			'lehrauftraegeErteilenLehrauftraegeWaehlen',
+			'lehrauftraegeErteilenMitKlickErteilen',
+			'geaenderteLehrauftraege',
+			'geaenderteLehrauftraegeTextBeiErteilung',
+			'lehrauftraegeNichtAuswaehlbar',
+			'lehrauftraegeNichtAuswaehlbarTextBeiErteilung',
+			'filterAlle',
+			'filterNeu',
+			'filterBestellt',
+			'filterErteilt',
+			'filterAngenommen',
+			'filterGeaendert',
+			'filterDummies'
+		)
+	),
+	'customJSs' => array(
+			'public/js/bootstrapper.js',       
+			'public/js/lehre/lehrauftrag/approveLehrauftrag.js'
+	)
+);
+
+
 $this->load->view(
-    'templates/FHC-Header',
-    array(
-        'title' => 'Lehrauftrag erteilen',
-        'jquery3' => true,
-        'jqueryui1' => true,
-        'jquerycheckboxes1' => true,
-        'bootstrap3' => true,
-        'fontawesome6' => true,
-        'sbadmintemplate3' => true,
-        'tabulator5' => true,
-        'tabulator5JQuery' => true,
-        'momentjs2' => true,
-        'ajaxlib' => true,
-        'dialoglib' => true,
-        'tablewidget' => true,
-        'navigationwidget' => true,
-        'phrases' => array(
-            'global' => array(
-                'lehrauftraegeErteilen',
-	            'mehrHilfe',
-	            'weitereInformationenUnter'
-            ),
-	        'ui' => array(
-		        'anzeigen',
-		        'alleAnzeigen',
-		        'nurNeueAnzeigen',
-		        'nurBestellteAnzeigen',
-		        'nurErteilteAnzeigen',
-		        'nurAngenommeneAnzeigen',
-		        'nurGeaenderteAnzeigen',
-		        'nurDummiesAnzeigen',
-		        'hilfeZuDieserSeite',
-		        'alleAuswaehlen',
-		        'alleAbwaehlen',
-		        'ausgewaehlteZeilen',
-		        'hilfe',
-		        'tabelleneinstellungen',
-		        'keineDatenVorhanden',
-		        'spaltenEinstellen',
-                'bestelltVon',
-                'erteiltVon',
-                'angenommenVon',
-                'stundenStundensatzGeaendert',
-                'neuerLehrauftragOhneLektorVerplant',
-                'wartetAufBestellung',
-                'wartetAufErneuteBestellung',
-                'neuerLehrauftragWartetAufBestellung',
-                'letzterStatusBestellt',
-                'letzterStatusErteilt',
-                'letzterStatusAngenommen',
-	        ),
-	        'table' => array(
-		        'spaltenEinAusblenden',
-		        'spaltenEinAusblendenMitKlickOeffnen',
-		        'spaltenEinAusblendenAufEinstellungenKlicken',
-		        'spaltenEinAusblendenMitKlickAktivieren',
-		        'spaltenEinAusblendenMitKlickSchliessen',
-		        'spaltenbreiteVeraendern',
-		        'spaltenbreiteVeraendernText',
-		        'spaltenbreiteVeraendernInfotext',
-		        'zeilenAuswaehlen',
-		        'zeilenAuswaehlenEinzeln',
-		        'zeilenAuswaehlenBereich',
-		        'zeilenAuswaehlenAlle'
-            ),
-	        'lehre' => array(
-		        'lehrauftragStandardBestellprozess',
-		        'lehrauftragStandardBestellprozessBestellen',
-		        'lehrauftragStandardBestellprozessErteilen',
-		        'lehrauftragStandardBestellprozessAnnehmen',
-		        'lehrauftraegeErteilen',
-		        'lehrauftraegeErteilenText',
-		        'lehrauftraegeErteilenKlickStatusicon',
-		        'lehrauftraegeErteilenLehrauftraegeWaehlen',
-		        'lehrauftraegeErteilenMitKlickErteilen',
-		        'geaenderteLehrauftraege',
-		        'geaenderteLehrauftraegeTextBeiErteilung',
-		        'lehrauftraegeNichtAuswaehlbar',
-		        'lehrauftraegeNichtAuswaehlbarTextBeiErteilung',
-		        'filterAlle',
-		        'filterNeu',
-		        'filterBestellt',
-		        'filterErteilt',
-		        'filterAngenommen',
-		        'filterGeaendert',
-		        'filterDummies'
-            )
-        ),
-        'customJSs' => array(
-                'public/js/bootstrapper.js',       
-                'public/js/lehre/lehrauftrag/approveLehrauftrag.js'
-        )
-    )
+	'templates/FHC-Header',
+	$includesArray
 );
 ?>
 
@@ -208,5 +211,13 @@ $this->load->view(
     </div><!-- end page-wrapper -->
 	<br>
 
-<?php $this->load->view('templates/FHC-Footer'); ?>
+<?php 
+
+
+$this->load->view(
+	'templates/FHC-Footer',
+	$includesArray
+);
+
+ ?>
 

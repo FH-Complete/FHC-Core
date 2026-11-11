@@ -315,6 +315,7 @@ class Abschlusspruefung extends FHCAPI_Controller
 			'abschlussbeurteilung_kurzbz' => $formData['abschlussbeurteilung_kurzbz'],
 			'datum' => $formData['datum'], //TODO(Manu) check if minute format like FAS
 			'sponsion' => $formData['sponsion'],
+			'uhrzeit' => $formData['uhrzeit'],
 			'pruefer1' => $formData['pruefer1'],
 			'pruefer2' => $formData['pruefer2'],
 			'pruefer3' => $formData['pruefer3'],
@@ -387,6 +388,7 @@ class Abschlusspruefung extends FHCAPI_Controller
 				'abschlussbeurteilung_kurzbz' => $formData['abschlussbeurteilung_kurzbz'],
 				'datum' => $datum,
 				'sponsion' => $sponsion,
+				'uhrzeit' => $formData['uhrzeit'],
 				'pruefer1' => $pruefer1,
 				'pruefer2' => $pruefer2,
 				'pruefer3' => $pruefer3,

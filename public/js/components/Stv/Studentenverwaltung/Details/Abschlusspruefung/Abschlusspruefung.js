@@ -56,7 +56,8 @@ export default {
 				anmerkung: null,
 				protokoll: null,
 				note: null,
-				link: null
+				link: null,
+				uhrzeit: null
 			},
 			statusNew: true,
 			arrTypen: [],
@@ -310,6 +311,7 @@ export default {
 
 				this.formData.pruefungstyp_kurzbz = data.pruefungstyp_kurzbz;
 				this.formData.datum = data.datum;
+				this.formData.uhrzeit = data.uhrzeit;
 				this.formData.sponsion = data.sponsion;
 				this.formData.akadgrad_id = data.akadgrad_id;
 				this.formData.pruefungsantritt_kurzbz = data.pruefungsantritt_kurzbz;
@@ -411,6 +413,7 @@ export default {
 				pruefer3_label: this.selectedPruefer3?.label || null,
 				akadgrad_id: this.formData.akadgrad_id,
 				datum: this.formData.datum,
+				uhrzeit: this.formData.uhrzeit || null,
 				sponsion: this.formData.sponsion
 			};
 			localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
@@ -527,6 +530,7 @@ export default {
 			this.formData.abschlussbeurteilung_kurzbz = null;
 			this.formData.datum = null;
 			this.formData.sponsion = null;
+			this.formData.uhrzeit = null;
 			this.formData.pruefer1 = null;
 			this.formData.pruefer2 = null;
 			this.formData.pruefer3 = null;
@@ -620,7 +624,7 @@ export default {
 				  );
 			  }
 			});
-		},
+		}
 	},
 	created() {
 		this.$api
@@ -715,7 +719,6 @@ export default {
 			</template>
 
 			<form-form ref="formFinalExam" @submit.prevent>
-
 				<legend>{{this.$p.t('global','details')}}</legend>
 				<p v-if="statusNew">[{{$p.t('ui', 'neu')}}]</p>
 
@@ -916,6 +919,22 @@ export default {
 					</form-input>
 				</div>
 
+				<div v-if="!config.hiddenFields?.includes('uhrzeit')" class="row mb-3">
+					<form-input
+						container-class="col-6 stv-details-uhrzeit"
+						:label="$p.t('global', 'uhrzeit')"
+						type="DatePicker"
+						v-model="formData.uhrzeit"
+						model-type="HH:mm:ss"
+						time-picker
+						text-input
+						name="uhrzeit"
+						:teleport="true"
+						:cancel-text="$p.t('ui', 'abbrechen')"
+						:select-text="$p.t('ui', 'ok')"
+					/>
+				</div>
+
 				<div class="row mb-3">
 					<form-input
 						container-class="col-6 stv-details-abschlusspruefung-sponsion"
@@ -979,7 +998,7 @@ export default {
 				:cisRoot="cisRoot"
 				@linkGenerated="printDocument"
 			></abschlusspruefung-dropdown>
-		</Teleport>		
+		</Teleport>
 	</div>
 `
 }
