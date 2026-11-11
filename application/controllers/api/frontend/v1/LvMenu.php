@@ -566,10 +566,8 @@ class LvMenu extends FHCAPI_Controller
 
 	private function fhc_menu_anwesenheitslisten(&$menu, $is_lector, $stg_kz, $sem, $lvid, $stsem)
 	{
-		if (
-			!$is_lector ||
-			(defined('CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN') && !CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN)
-		) {
+		if (!$is_lector)
+		{
 			return;
 		}
 
