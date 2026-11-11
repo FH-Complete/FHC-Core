@@ -327,6 +327,17 @@ export const CoreFilterCmpt = {
 				"tabulatorPreset-" + this.$props.presetsId in
 					window.localStorage
 			) {
+				const persistence = tabulatorOptions.persistence;
+
+				if (persistence && typeof persistence === 'object')
+				{
+					tabulatorOptions.persistence = { ...persistence };
+				}
+				else if (persistence)
+				{
+					tabulatorOptions.persistence = { sort: true, filter: true, headerFilter: true, group: true, page: true, columns: true };
+				}
+
 				tabulatorOptions.persistence.columns = false;
 				tabulatorOptions.persistence.headerFilter = false;
 				tabulatorOptions.persistence.sort = false;
