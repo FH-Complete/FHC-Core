@@ -400,7 +400,7 @@ class ProfilLib{
 		$this->ci->BetriebsmittelpersonModel->addSelect(["CONCAT(betriebsmitteltyp, ' ' ,beschreibung) as Betriebsmittel", "nummer as Nummer", "ausgegebenam as Ausgegeben_am"]);
 
 		//? betriebsmittel are not needed in a view
-		$betriebsmittelperson_res = $this->ci->BetriebsmittelpersonModel->getBetriebsmittel($pid);
+		$betriebsmittelperson_res = $this->ci->BetriebsmittelpersonModel->getBetriebsmittel($pid, null, false);
 		if(isError($betriebsmittelperson_res)){
 			return error(getData($betriebsmittelperson_res));
 		}
