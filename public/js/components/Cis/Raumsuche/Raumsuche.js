@@ -3,6 +3,7 @@ import FormInput from "../../Form/Input.js";
 import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiOrt from '../../../api/factory/ort.js'
 import InViewHelp from '../../InViewHelp.js';
+import {DEFAULT_MODE_RAUMINFO_DESKTOP, DEFAULT_MODE_RAUMINFO_MOBILE} from '../Mylv/RoomInformation.js';
 
 // advanced filters: tbl_ort column, filter type and label, the same list as Ort::ADVANCED_FILTERS
 const ADVANCED_FILTERS = [
@@ -41,7 +42,6 @@ export const Raumsuche =  {
 		return {
 			phrasenPromise: null,
 			phrasenResolved: false,
-			tabulatorUuid: Vue.ref(0),
 			tableBuiltResolve: null,
 			tableBuiltPromise: null,
 			roomtypes: null,
@@ -85,15 +85,16 @@ export const Raumsuche =  {
 				layout: 'fitColumns',
 				placeholder: this.$p.t('global/noDataAvailable'),
 				columns: [
-					{title: Vue.computed(() => this.$p.t('rauminfo/raum_kurzbz')), field: 'ort_kurzbz', widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('global/bezeichnung')), field: 'bezeichnung', widthGrow: 2},
-					{title: Vue.computed(() => this.$p.t('rauminfo/raumnummer')), field: 'nummer', widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('rauminfo/standort')), field: 'standort', widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('rauminfo/gebaeudeteil')), field: 'gebteil', widthGrow: 1, visible: false},
-					{title: Vue.computed(() => this.$p.t('rauminfo/stockwerk')), field: 'stockwerk', sorter: 'number', widthGrow: 1, visible: false},
-					{title: Vue.computed(() => this.$p.t('rauminfo/personcap')), field: 'personen', widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('rauminfo/flaeche')), field: 'm2', sorter: 'number', widthGrow: 1, visible: false},
-					{title: Vue.computed(() => this.$p.t('rauminfo/lehrraum')), field: 'lehre', formatter: 'tickCross', hozAlign: 'center', widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$p.t('rauminfo/raum_kurzbz')), field: 'ort_kurzbz', headerFilter: true, widthGrow: 1},
+					{title: Vue.computed(() => this.$p.t('global/bezeichnung')), field: 'bezeichnung', headerFilter: true, widthGrow: 2},
+					{title: Vue.computed(() => this.$p.t('rauminfo/raumnummer')), field: 'nummer', headerFilter: true, widthGrow: 1},
+					{title: Vue.computed(() => this.$p.t('rauminfo/standort')), field: 'standort', headerFilter: true, widthGrow: 1},
+					{title: Vue.computed(() => this.$p.t('rauminfo/gebaeudeteil')), field: 'gebteil', headerFilter: true, widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$p.t('rauminfo/stockwerk')), field: 'stockwerk', sorter: 'number', headerFilter: true, widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$p.t('rauminfo/personcap')), field: 'personen', headerFilter: true, widthGrow: 1},
+					{title: Vue.computed(() => this.$p.t('rauminfo/flaeche')), field: 'm2', sorter: 'number', headerFilter: true, widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$p.t('rauminfo/lehrraum')), field: 'lehre', formatter: 'tickCross', hozAlign: 'center',
+						headerFilter: 'tickCross', headerFilterParams: { tristate: true }, widthGrow: 1, visible: false},
 					{title: Vue.computed(() => this.$p.t('rauminfo/rauminfo')),
 						field: 'linkInfo', formatter: this.linkFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('rauminfo/roomReservations')), 
@@ -113,6 +114,10 @@ export const Raumsuche =  {
 		isDarkMode(){
 			return this.$theme.theme_name.value == 'dark';
 		},
+		// the local date, toISOString() gives the UTC date and that is the day before shortly after midnight
+		datumIso() {
+			return luxon.DateTime.fromJSDate(this.datum).toISODate()
+		},
 		// shown on the toggle, the panel can be closed while its filters are active
 		activeAdvancedFilters() {
 			return Object.keys(ADVANCED_DEFAULTS).filter(key => this.advancedFilters[key] !== ADVANCED_DEFAULTS[key]).length
@@ -125,7 +130,11 @@ export const Raumsuche =  {
 		selectedType: 'loadRooms',
 		standort_id: 'loadRooms',
 		anzahl: 'loadRooms',
-		advancedFilters: { handler: 'loadRooms', deep: true }
+		advancedFilters: { handler: 'loadRooms', deep: true },
+		// the panel moves the table down
+		showAdvancedFilters() {
+			this.$nextTick(this.resizeTable)
+		}
 	},
 	methods: {
 		tableResolve(resolve) {
@@ -148,8 +157,16 @@ export const Raumsuche =  {
 			}
 		},
 		roomPlanLink(room) {
-			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router
-			+ '/CisVue/Cms/getRoomInformation/' + room.ort_kurzbz
+			return this.$router.resolve({
+				name: 'RoomInformation',
+				params: {
+					ort_kurzbz: room.ort_kurzbz,
+					mode: this.isMobile ? DEFAULT_MODE_RAUMINFO_MOBILE : DEFAULT_MODE_RAUMINFO_DESKTOP,
+					focus_date: this.datumIso
+				},
+				// with the reservation permission the page opens the reservation modal for these times
+				query: { von: this.getTimeString(this.von), bis: this.getTimeString(this.bis) }
+			}).href
 		},
 		roomInfoLink(room) {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router
@@ -203,21 +220,22 @@ export const Raumsuche =  {
 				})
 		},
 		loadRooms() {
+			// an emptied picker text input gives null, the search waits for a valid value
+			if (!this.datum || !this.von || !this.bis)
+				return
+
 			// only the latest request may fill the table, older answers can arrive later
 			const request = ++this.roomsRequest
 			this.loading = true
 			// empty and unchecked filters stay out of the request
 			const advancedFilters = Object.fromEntries(Object.entries(this.advancedFilters).filter(([, value]) => value !== '' && value !== false))
-			this.$api.call(ApiOrt.getRooms(this.datum.toISOString(), this.getTimeString(this.von), this.getTimeString(this.bis), this.selectedType?.raumtyp_kurzbz ?? '', this.anzahl, this.standort_id, advancedFilters))
+			this.$api.call(ApiOrt.getRooms(this.datumIso, this.getTimeString(this.von), this.getTimeString(this.bis), this.selectedType?.raumtyp_kurzbz ?? '', this.anzahl, this.standort_id, advancedFilters))
 				.then(res => {
 					if(request === this.roomsRequest && res?.data?.retval) this.setupData(res.data.retval)
 				})
 				.finally(() => {
 					if(request === this.roomsRequest) this.loading = false
 				})
-		},
-		handleUuidDefined(uuid) {
-			this.tabulatorUuid = uuid
 		},
 		editAnzahl() {
 			this.anzahlInput = String(this.anzahl)
@@ -259,17 +277,16 @@ export const Raumsuche =  {
 			this.loadStandorte()
 			this.loadAdvancedFilterOptions()
 			this.loadRooms()
-
-			const tableID = this.tabulatorUuid ? ('-' + this.tabulatorUuid) : ''
-			const tableDataSet = document.getElementById('filterTableDataset' + tableID);
-			if(!tableDataSet) return
-			const rect = tableDataSet.getBoundingClientRect();
-
-			const h = window.visualViewport.height - rect.top - 100
-			if(this.$refs.raumsucheTable) {
-				this.$refs.raumsucheTable.$refs.table.style.setProperty('height', h+'px')
-			}
-			
+			this.resizeTable()
+		},
+		// the table fills the window below the filters,
+		// at a high zoom level it keeps a minimum height and the page scrolls
+		resizeTable() {
+			const table = this.$refs.raumsucheTable
+			if (!table?.tabulator)
+				return
+			const top = table.$refs.table.getBoundingClientRect().top + window.scrollY
+			table.tabulator.setHeight(Math.max(300, window.innerHeight - top - 100))
 		}
 	},
 	created() {
@@ -278,6 +295,11 @@ export const Raumsuche =  {
 	},
 	mounted() {
 		this.setupMounted()
+		// a change of the zoom level also fires resize
+		window.addEventListener('resize', this.resizeTable)
+	},
+	unmounted() {
+		window.removeEventListener('resize', this.resizeTable)
 	},
 	template: `
 	<div class="d-flex align-items-center gap-2 mb-2">
@@ -285,8 +307,9 @@ export const Raumsuche =  {
 		<in-view-help button-class="fs-5 text-body-secondary" :text="$p.t('rauminfo/tooltipRaumsuchev2')"></in-view-help>
 	</div>
 	<hr>
-	<div class="row">
-		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-2">
+	<!-- one row only from xxl, the viewport breakpoints do not see the sidebar -->
+	<div class="row g-2">
+		<div class="col-12 col-sm-6 col-md-4 col-xxl-2">
 			<VueDatePicker
 				@contextmenu="(e) => {if (isMobile) {e.preventDefault();}}"
 				v-model="datum"
@@ -301,7 +324,7 @@ export const Raumsuche =  {
 				>
 			</VueDatePicker>
 		</div>
-		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-1">
+		<div class="col-12 col-sm-6 col-md-4 col-xxl-3 d-flex gap-2">
 			<VueDatePicker
 				@contextmenu="(e) => {if (isMobile) {e.preventDefault();}}"
 				v-model="von"
@@ -314,8 +337,6 @@ export const Raumsuche =  {
 				auto-apply
 				>
 			</VueDatePicker>
-		</div>
-		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-1">
 			<VueDatePicker
 				@contextmenu="(e) => {if (isMobile) {e.preventDefault();}}"
 				v-model="bis"
@@ -329,7 +350,7 @@ export const Raumsuche =  {
 			</VueDatePicker>
 		</div>
 		
-		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-2">
+		<div class="col-12 col-sm-6 col-md-4 col-xxl-2">
 			<select ref="raumtyp" id="raumtypSelect" v-model="selectedType" class="form-select" 
 			:aria-label="$p.t('rauminfo/raumtyp')" @change="setRoute($event.target.value)">
 				<option :value="null">{{ $p.t('global/alle') }}</option>
@@ -337,7 +358,7 @@ export const Raumsuche =  {
 			</select>
 		</div>
 
-		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-2">
+		<div class="col-12 col-sm-6 col-md-4 col-xxl-2">
 			<select id="standortSelect" v-model="standort_id" class="form-select" :aria-label="$p.t('rauminfo/standort')">
 				<option :value="null">{{ $p.t('rauminfo/alleStandorte') }}</option>
 				<option value="none">{{ $p.t('rauminfo/ohneStandort') }}</option>
@@ -346,7 +367,7 @@ export const Raumsuche =  {
 		</div>
 		
 
-		<div :class="{'pb-2': isMobile}" class="col-12 col-lg">
+		<div class="col-12 col-md-8 col-xxl">
 			<div class="input-group">
 				<span class="input-group-text">{{ $p.t('rauminfo/minCapacity') }}:</span>
 				<FormInput
@@ -413,7 +434,6 @@ export const Raumsuche =  {
 		<div :class="{'opacity-50': loading}">
 			<core-filter-cmpt
 				v-if="phrasenResolved"
-				@uuidDefined="handleUuidDefined"
 				:title="''"
 				ref="raumsucheTable"
 				:tabulator-options="raumsucheTableOptions"

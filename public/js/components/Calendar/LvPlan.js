@@ -168,6 +168,11 @@ export default {
 		closeModal() {
 			this.$refs.calendar.hideEventModal();
 		},
+		async openModal(event) {
+			// the reservation modal needs the time grid
+			await this.stundenLoaded;
+			this.$refs.calendar.showEventModal({ event });
+		},
 	},
 	setup(props, context) {
 		const rangeInterval = Vue.ref(null);
@@ -197,7 +202,8 @@ export default {
 		};
 	},
 	async created() {
-		await this.getStunden();
+		this.stundenLoaded = this.getStunden();
+		await this.stundenLoaded;
 		await this.getCompactibleEventTypes();
 	},
 	template: /* html */ `

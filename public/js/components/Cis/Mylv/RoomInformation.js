@@ -118,6 +118,27 @@ export default {
 			this.$refs.calendar.reset();
 
 		},
+		// the Raumsuche link passes its times, the modal opens if the user may reserve on this day
+		openSearchedReservation(reservierbarMap) {
+			const { von, bis } = this.$route.query;
+			if (!von || !bis || !reservierbarMap[this.currentDay])
+				return;
+
+			const zone = FHC_JS_DATA_STORAGE_OBJECT.timezone;
+			const start = luxon.DateTime.fromISO(this.currentDay + 'T' + von, { zone });
+			const end = luxon.DateTime.fromISO(this.currentDay + 'T' + bis, { zone });
+			if (!start.isValid || !end.isValid)
+				return;
+
+			// only once, every reload of the events gives a new map
+			this.$router.replace({ query: {} });
+			this.$refs.calendar.openModal({
+				type: this.createContext.scope,
+				start,
+				end,
+				createContext: this.createContext
+			});
+		},
 		async searchGroup(event)
 		{
 			const query = event.query.trim();
@@ -266,6 +287,7 @@ export default {
 			@update:mode="handleChangeMode"
 			@create-event="handleCreateEvent"
 			@delete-event="handleDeleteEvent"
+			@update:reservierbar-map="openSearchedReservation"
 			class="responsive-calendar"
 		></fhc-calendar>
 		<div v-else class="w-100 d-flex justify-content-center pt-4">

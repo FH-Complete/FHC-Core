@@ -101,11 +101,12 @@ export default {
 				.startOf("day")
 				.toISO()
 				.slice(0, 10);
+			// all time grid slots that overlap the event, times from the Raumsuche can lie inside a slot
 			this.selectedStart =
-				this.parsedTimeGrid.find((t) => t.start === startTime)?.start ||
+				this.parsedTimeGrid.find((t) => t.end > startTime)?.start ||
 				this.parsedTimeGrid[0]?.start;
 			this.selectedEnd =
-				this.parsedTimeGrid.find((t) => t.end === endTime)?.end ||
+				this.parsedTimeGrid.findLast((t) => t.start < endTime)?.end ||
 				this.parsedTimeGrid.at(-1)?.end;
 		},
 		saveEvent() {
