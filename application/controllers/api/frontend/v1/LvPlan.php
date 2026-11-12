@@ -54,7 +54,7 @@ class LvPlan extends FHCAPI_Controller
 
 		$this->load->library('LogLib');
 		$this->load->library('StundenplanLib');
-		$this->load->library('KalenderLib', array('uid' => getAuthUID()));
+		$this->load->library('LvPlanCalendarLib', array('uid' => getAuthUID()));
 
 		$this->load->config('lv_plan');
 		$this->loglib->setConfigs(array(
@@ -119,8 +119,8 @@ class LvPlan extends FHCAPI_Controller
 			if ($arePreviewEventsShown && !$this->permissionlib->isBerechtigt('basis/can_view_preview_events:r'))
 					return $this->terminateWithError("Permissions for this action are missing!");
 				
-			$lvplanEvents = $this->kalenderlib->getEventsForUser($start_date, $end_date, $uid, $arePreviewEventsShown);
-			$ferienEvents = $this->kalenderlib->fetchFerienEventsByUser($start_date, $end_date, $uid);
+			$lvplanEvents = $this->lvplancalendarlib->getEventsForUser($start_date, $end_date, $uid, $arePreviewEventsShown);
+			$ferienEvents = $this->lvplancalendarlib->fetchFerienEventsByUser($start_date, $end_date, $uid);
 		} else {
 			$result = $this->stundenplanlib->getEventsUser($start_date, $end_date, $uid);
 			$lvplanEvents = $this->getDataOrTerminateWithError($result);
@@ -162,8 +162,8 @@ class LvPlan extends FHCAPI_Controller
 			$gruppe = $this->input->post('gruppe', true);
 
 			if ($this->config->item('is_new_calendar_structure_enabled')) {
-				$stgOrgEvents = $this->kalenderlib->getEvents($start_date, $end_date, $stg_kz, $sem, $verband, $gruppe);
-				$ferienEvents = $this->kalenderlib->fetchFerienTageEvents($start_date, $end_date, $stg_kz);
+				$stgOrgEvents = $this->lvplancalendarlib->getEvents($start_date, $end_date, $stg_kz, $sem, $verband, $gruppe);
+				$ferienEvents = $this->lvplancalendarlib->fetchFerienTageEvents($start_date, $end_date, $stg_kz);
 			} else {
 				$result = $this->stundenplanlib->getEventsStgOrg($start_date, $end_date, $stg_kz, $sem, $verband, $gruppe);
 				$stgOrgEvents = $this->getDataOrTerminateWithError($result);
@@ -202,8 +202,8 @@ class LvPlan extends FHCAPI_Controller
 		$lv_id = $this->input->post('lv_id', true);
 
 		if ($this->config->item('is_new_calendar_structure_enabled')) {
-			$lvplanEvents = $this->kalenderlib->getEventsByLV($start_date, $end_date, $lv_id);
-			$ferienEvents = $this->kalenderlib->fetchFerienTageEvents($start_date, $end_date);
+			$lvplanEvents = $this->lvplancalendarlib->getEventsByLV($start_date, $end_date, $lv_id);
+			$ferienEvents = $this->lvplancalendarlib->fetchFerienTageEvents($start_date, $end_date);
 		} else {
 			// fetching lvplan events
 			$result = $this->stundenplanlib->getEventsLv($lv_id, $start_date, $end_date);
@@ -231,7 +231,7 @@ class LvPlan extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
 		if ($this->config->item('is_new_calendar_structure_enabled')) {
-			$lvplanEvents = $this->kalenderlib->getEventsByTeachingUnit($start_date, $end_date, $le_id);
+			$lvplanEvents = $this->lvplancalendarlib->getEventsByTeachingUnit($start_date, $end_date, $le_id);
 		} else {
 			$result = $this->stundenplanlib->getEventsByLE($le_id, $start_date, $end_date, $stundenplan);
 			$lvplanEvents = $this->getDataOrTerminateWithError($result);
@@ -251,7 +251,7 @@ class LvPlan extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
 		if ($this->config->item('is_new_calendar_structure_enabled')) {
-			$result = $this->kalenderlib->getEventsByLV($start_date, $end_date, $lv_id);
+			$result = $this->lvplancalendarlib->getEventsByLV($start_date, $end_date, $lv_id);
 		} else {
 			$result = $this->stundenplanlib->getEventsByLV($lv_id, $start_date, $end_date, $stundenplan);
 			$result = hasData($result) ? getData($result) : [];
@@ -279,7 +279,7 @@ class LvPlan extends FHCAPI_Controller
 		$timespan_ende = new DateTime($studiensemester_result->ende);
 
 		if ($this->config->item('is_new_calendar_structure_enabled')) {
-			$lvplan = $this->kalenderlib->getEventsByLV(date_format($timespan_start, 'Y-m-d'), date_format($timespan_ende, 'Y-m-d'), $lvid);
+			$lvplan = $this->lvplancalendarlib->getEventsByLV(date_format($timespan_start, 'Y-m-d'), date_format($timespan_ende, 'Y-m-d'), $lvid);
 		} else {
 			$lvplan = $this->stundenplanlib->getStundenplan(date_format($timespan_start, 'Y-m-d'), date_format($timespan_ende, 'Y-m-d'), $lvid);
 		}
@@ -327,7 +327,7 @@ class LvPlan extends FHCAPI_Controller
 		$end_date = $this->input->post('end_date', true);
 
 		if ($this->config->item('is_new_calendar_structure_enabled')) {
-			$roomplan_data = $this->kalenderlib->getEventsForRoom($start_date, $end_date, $ort_kurzbz);
+			$roomplan_data = $this->lvplancalendarlib->getEventsForRoom($start_date, $end_date, $ort_kurzbz);
 		} else {
 			$roomplan_data = $this->stundenplanlib->getRoomplan($ort_kurzbz, $start_date, $end_date);
 			$roomplan_data = $this->getDataOrTerminateWithError($roomplan_data);

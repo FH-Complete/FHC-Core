@@ -63,6 +63,43 @@ Events::on('loadTempusRenderers', function ($renderers) {
 	);
 });
 
+Events::on('loadInfoTerminalRenderers', function ($renderers) {
+	$fhc_core_renderers =& $renderers();
+	$fhc_core_renderers["lehreinheit"] = array(
+		'calendarEvent' => absoluteJsImportUrl('public/js/components/Cis/InfoTerminal/Renderer/Lehreinheit/calendarEvent.js'),
+		'modalTitle' => absoluteJsImportUrl('public/js/components/Cis/InfoTerminal/Renderer/Lehreinheit/modalTitle.js'),
+		'modalContent' => absoluteJsImportUrl('public/js/components/Cis/InfoTerminal/Renderer/Lehreinheit/modalContent.js'),
+		'calendarEventStyles' => APP_ROOT . 'public/css/Cis4/CoreCalendarEvents.css'
+	);
+});
 
+Events::on('loadInfoTerminalRenderers', function ($renderers) {
+	$fhc_core_renderers =& $renderers();
+	$fhc_core_renderers["reservierung"] = array(
+		'calendarEvent' => absoluteJsImportUrl('public/js/components/Cis/InfoTerminal/Renderer/Reservierungen/calendarEvent.js'),
+		'modalTitle' => absoluteJsImportUrl('public/js/components/Cis/InfoTerminal/Renderer/Reservierungen/modalTitle.js'),
+		'modalContent' => absoluteJsImportUrl('public/js/components/Cis/InfoTerminal/Renderer/Reservierungen/modalContent.js'),
+		'calendarEventStyles' => APP_ROOT . 'public/css/Cis4/CoreCalendarEvents.css'
+	);
+});
+
+Events::on('loadInfoTerminalRenderers', function ($renderers) {
+	$fhc_core_renderers =& $renderers();
+	$fhc_core_renderers["slot_room"] = array(
+		'modalTitle' => APP_ROOT.'public/js/components/Cis/InfoTerminal/Renderer/Slot/roomModalTitle.js',
+		'modalContent' => APP_ROOT.'public/js/components/Cis/InfoTerminal/Renderer/Slot/roomModalContent.js',
+		'calendarEventStyles' => APP_ROOT.'public/css/Cis4/CoreCalendarEvents.css'
+	);
+});
+
+Events::on('loadInfoTerminalRenderers', function ($renderers) {
+	$fhc_core_renderers =& $renderers();
+	$fhc_core_renderers["ferien"] = array(
+		'calendarEvent' => absoluteJsImportUrl('public/js/components/Cis/InfoTerminal/Renderer/Feiertage/calendarEvent.js'),
+		'modalTitle' => absoluteJsImportUrl('public/js/components/Cis/InfoTerminal/Renderer/Feiertage/modalTitle.js'),
+		'modalContent' => absoluteJsImportUrl('public/js/components/Cis/InfoTerminal/Renderer/Feiertage/modalContent.js'),
+		'calendarEventStyles' => APP_ROOT . 'public/css/Cis4/CoreCalendarEvents.css'
+	);
+});
 
 

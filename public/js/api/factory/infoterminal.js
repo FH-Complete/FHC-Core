@@ -25,25 +25,25 @@ export default {
 			}
 		};
 	},
-	eventsPersonal(cardNumber, start_date, end_date) {
+	getPersonalEvents(cardNumber, start_date, end_date) {
 		return {
 			method: 'post',
-			url: '/api/frontend/v1/InfoTerminalAPI/eventsPersonal',
+			url: '/api/frontend/v1/InfoTerminalAPI/getPersonalEvents',
 			params: { start_date, end_date, key_input: cardNumber }
 		};
 	},
-	getAll(cardNumber, order = null, start = null)
+	getStudySemestersStartingFrom(cardNumber, start = null)
 	{
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/InfoTerminalAPI/getAll',
-			params: { key_input: cardNumber, order, start }
+			url: 'api/frontend/v1/InfoTerminalAPI/getStudySemestersStartingFrom',
+			params: { key_input: cardNumber, start }
 		};
 	},
-	getContainingOrNearestByDateRange(cardNumber, from, to) {
+	getContainingOrNearestStudySemesterByDateRange(cardNumber, from, to) {
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/InfoTerminalAPI/getContainingOrNearestByDateRange',
+			url: 'api/frontend/v1/InfoTerminalAPI/getContainingOrNearestStudySemesterByDateRange',
 			params: {
 				key_input: cardNumber,
 				from,
@@ -51,16 +51,16 @@ export default {
 			}
 		};
 	},
-	getStunden() {
+	getHours() {
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/InfoTerminalAPI/stunden'
+			url: '/api/frontend/v1/InfoTerminalAPI/getHours'
 		};
 	},
-	loadRenderers() {
+	loadInfoTerminalRenderers() {
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/InfoTerminalAPI/getRenderers',
+			url: '/api/frontend/v1/InfoTerminalAPI/getInfoTerminalRenderers',
 			params: {
 			}
 		};
@@ -71,10 +71,10 @@ export default {
 			url: '/api/frontend/v1/InfoTerminalAPI/compactibleEventTypes',
 		}
 	},
-	content(cardNumber, content_id, version = null, sprache = null, sichtbar = null) {
+	getContentPage(cardNumber, content_id, version = null, sprache = null, sichtbar = null) {
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/InfoTerminalAPI/content',
+			url: '/api/frontend/v1/InfoTerminalAPI/getContentPage',
 			params: {
 				key_input: cardNumber,
 				content_id,

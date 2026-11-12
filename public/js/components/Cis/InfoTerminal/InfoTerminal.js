@@ -45,10 +45,7 @@ export default {
 			currentlySelectedTab: 'LVPlan',
 			availableTabs: [
 				{ name: 'LVPlan', label: 'Mein LV-Plan' },
-				{ name: 'AvailablePCRooms', label: 'Freie PC Räume' },
-				{ name: 'AvailableLectureHalls', label: 'Freie Hörsäle' },
-				{ name: 'AvailableSeminarRooms', label: 'Freie Seminarräume' },
-				{ name: 'AvailableLaborRooms', label: 'Freie Laborräume' },
+				{ name: 'AvailableRooms', label: 'Freie Räume' },
 				{ name: 'PersonalData', label: 'Personliche daten' },
 			],
 			ApiInfoTerminal: ApiInfoTerminal,
@@ -72,8 +69,11 @@ export default {
 			if (!this.cardNumber) return null;
 			if (!contentID) return null;
 
-			return this.ApiInfoTerminal.content(this.cardNumber, contentID, version, language, true);
+			return this.ApiInfoTerminal.getContentPage(this.cardNumber, contentID, version, language, true);
 		},
+		logoutTheUser() {
+			window.location.replace(window.location.origin + window.location.pathname);
+		}
 	},
 	template: /* html */ `
 	<div
@@ -115,32 +115,27 @@ export default {
 					</button>
 				</div>
 			</div>
-			<div class="col h-100 align-items-center justify-content-center">
+			<div class="col h-100 align-items-center justify-content-center d-flex flex-column">
+				<div class="w-100 d-flex justify-content-end">
+					<button 
+						@click="logoutTheUser()"
+						type="button"
+						class="text-start rounded-3 px-3 py-2 bg-secondary text-white"
+					>
+						Logout
+					</button>
+				</div>
 				<InfoTerminalLvPlan 
 					v-if="currentlySelectedTab === 'LVPlan'"
 					:cardNumber=this.cardNumber
+					class="w-100 flex-grow-1"
 				/>
-				<div v-else-if="currentlySelectedTab === 'AvailablePCRooms'">
+				<div v-else-if="currentlySelectedTab === 'AvailableRooms'" class="w-100 flex-grow-1">
 					Freie PC Räume Content
-				</div>
-				<div v-else-if="currentlySelectedTab === 'AvailableLectureHalls'">
-					Freie Hörsäle Content
-				</div>
-				<div v-else-if="currentlySelectedTab === 'AvailableSeminarRooms'">
-					Freie Seminarräume Content
-				</div>
-				<div v-else-if="currentlySelectedTab === 'AvailableLaborRooms'">
-					Freie Laborräume Content
-				</div>
-				<div v-else-if="currentlySelectedTab === 'PersonalData'">
-					Personliche daten Content
-				</div>
-				<div v-else-if="currentlySelectedTab === 'PersonalData'">
-					Personliche daten Content
 				</div>
 				<div
 					v-else
-					class="h-100 d-flex justify-content-center align-items-center"
+					class="d-flex justify-content-center align-items-center  flex-grow-1"
 				>
 					<CmsContent
 						

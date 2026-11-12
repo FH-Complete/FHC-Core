@@ -12,13 +12,13 @@ class InfoTerminalAPI extends FHCAPI_Controller
 	{
 		parent::__construct(array(
 			'getUserData' => self::PERM_ANONYMOUS,
-			'eventsPersonal' => self::PERM_ANONYMOUS,
-			'getAll' => self::PERM_ANONYMOUS,
-			'getContainingOrNearestByDateRange' => self::PERM_ANONYMOUS,
-			'stunden' => self::PERM_ANONYMOUS,
+			'getPersonalEvents' => self::PERM_ANONYMOUS,
+			'getStudySemestersStartingFrom' => self::PERM_ANONYMOUS,
+			'getContainingOrNearestStudySemesterByDateRange' => self::PERM_ANONYMOUS,
+			'getHours' => self::PERM_ANONYMOUS,
 			'compactibleEventTypes' => self::PERM_ANONYMOUS,
-			'getRenderers' => self::PERM_ANONYMOUS,
-			'content' => self::PERM_ANONYMOUS,
+			'getInfoTerminalRenderers' => self::PERM_ANONYMOUS,
+			'getContentPage' => self::PERM_ANONYMOUS,
 		));
 
 		$this->load->config('info_terminal');
@@ -51,13 +51,13 @@ class InfoTerminalAPI extends FHCAPI_Controller
 		$this->terminateWithSuccess($userData);
 	}
 
-	public function eventsPersonal()
+	public function getPersonalEvents()
 	{
 		$cardNumber = $this->input->post("key_input");
 		$userUID = $this->_getUIDFromCardNumber($cardNumber);
 		if (!$userUID) return $this->terminateWithError("User not found!");
 
-		$this->load->library('KalenderLib', array('uid' => $userUID));
+		$this->load->library('LvPlanCalendarLib', array('uid' => $userUID));
 
 		// form validation
 		$this->form_validation->set_rules('start_date', "start_date", "required");
@@ -72,13 +72,13 @@ class InfoTerminalAPI extends FHCAPI_Controller
 
 		// fetching lvplan events
 		if ($this->config->item('is_new_calendar_structure_enabled')) {
-			$lvplanEvents = $this->kalenderlib->getEventsForUser($start_date, $end_date, $userUID);
+			$lvplanEvents = $this->lvplancalendarlib->getEventsForUser($start_date, $end_date, $userUID);
 			$lvplanEvents = array_map(function($item) {
 				$item["deletable"] = false;
 
 				return $item;
 			}, $lvplanEvents);
-			$ferienEvents = $this->kalenderlib->fetchFerienEventsByUser($start_date, $end_date, $userUID);
+			$ferienEvents = $this->lvplancalendarlib->fetchFerienEventsByUser($start_date, $end_date, $userUID);
 		} else {
 			$result = $this->stundenplanlib->getEventsUser($start_date, $end_date, $userUID);
 			$lvplanEvents = $this->getDataOrTerminateWithError($result);
@@ -95,39 +95,30 @@ class InfoTerminalAPI extends FHCAPI_Controller
 		));
 	}
 
-	public function getAll()
+	public function getStudySemestersStartingFrom()
 	{
-		$order = $this->input->get('order');
 		$start = $this->input->get('start');
 
-		if (strcasecmp($order, 'DESC') == 0)
-		{
-			$this->StudiensemesterModel->addOrder('ende', 'DESC');
-		}
-		else
-		{
-			$this->StudiensemesterModel->addOrder('ende', 'ASC');
-		}
+		$this->StudiensemesterModel->addOrder('ende', 'DESC');
+
 
 		if ($start)
 		{
 			$result = $this->StudiensemesterModel->loadWhere([
 				'start >= ' => $start
 			]);
-		}
-		else
-		{
+		} else {
 			$result = $this->StudiensemesterModel->load();
 		}
 
 		if (isError($result)) {
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_DB);
+			return $this->terminateWithError(getError($result), self::ERROR_TYPE_DB);
 		}
 
 		$this->terminateWithSuccess((getData($result) ?: []));
 	}
 
-	public function getContainingOrNearestByDateRange()
+	public function getContainingOrNearestStudySemesterByDateRange()
 	{
 		$from = $this->input->get("from");
 		$to = $this->input->get("to");
@@ -138,7 +129,7 @@ class InfoTerminalAPI extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
-	public function stunden()
+	public function getHours()
 	{
 		$this->load->model('ressource/Stunde_model', 'StundenModel');
 
@@ -155,19 +146,19 @@ class InfoTerminalAPI extends FHCAPI_Controller
 		$this->terminateWithSuccess(["lehreinheit", "reservierung", "ferien", "moodle"]);
 	}
 
-	public function getRenderers(){
+	public function getInfoTerminalRenderers(){
 		$renderer_paths = [];
 		Events::trigger(
-				'loadRenderers',
-				function & () use (&$renderer_paths)
-				{
-					return $renderer_paths;
-				}
-			);
+			'loadInfoTerminalRenderers',
+			function & () use (&$renderer_paths)
+			{
+				return $renderer_paths;
+			}
+		);
 		$this->terminateWithSuccess($renderer_paths);
 	}
 
-	public function content()
+	public function getContentPage()
 	{
 		$cardNumber = $this->input->get("key_input");
 		$userUID = $this->_getUIDFromCardNumber($cardNumber);
@@ -191,6 +182,7 @@ class InfoTerminalAPI extends FHCAPI_Controller
 		
 		$this->terminateWithSuccess($content);
 	}
+	
 	// -----------------------------------------------------------------------------------------------------------------
 	// Private methods
 

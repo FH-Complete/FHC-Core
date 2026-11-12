@@ -28,7 +28,6 @@ export default {
 	},
 	provide() {
 		return {
-			initialRenderers: Vue.computed(() => this.renderers),
 			rangeLength: Vue.computed(() => {
 				if (!this.$route.params.range_length) return 30;
 				else if (this.$route.params.range_length > 365) return 365;
@@ -81,7 +80,7 @@ export default {
 		},
 		async updateRange(rangeInterval) {
 			const semesterResponse = await this.$api.call(
-				ApiInfoTerminal.getContainingOrNearestByDateRange(
+				ApiInfoTerminal.getContainingOrNearestStudySemesterByDateRange(
 					this.cardNumber,
 					rangeInterval.s.toISO().slice(0, 10),
 					rangeInterval.e.toISO().slice(0, 10),
@@ -99,7 +98,7 @@ export default {
 		getPromiseFunc(start, end) {
 			return [
 				this.$api.call(
-					ApiInfoTerminal.eventsPersonal(
+					ApiInfoTerminal.getPersonalEvents(
 						this.cardNumber,
 						start.toISODate(),
 						end.toISODate(),
@@ -108,7 +107,7 @@ export default {
 			];
 		},
 		async getStunden() {
-			let stundenResponse = await this.$api.call(ApiInfoTerminal.getStunden());
+			let stundenResponse = await this.$api.call(ApiInfoTerminal.getHours());
 			this.teachingUnits = stundenResponse.data.map((el) => ({
 				id: el.stunde,
 				start: el.beginn,
@@ -127,9 +126,9 @@ export default {
 			if (userResponse.meta.status === "success" && userResponse.data[0].insertamum) {
 				userCreatedAt = luxon.DateTime.fromFormat(userResponse.data[0].insertamum.split(" ")[0], "yy-MM-dd");
 			}
-			console.log(userResponse)
+
 			const semestersResponse = await this.$api.call(
-				ApiInfoTerminal.getAll(this.cardNumber,),
+				ApiInfoTerminal.getStudySemestersStartingFrom(this.cardNumber, userCreatedAt),
 			);
 			if (semestersResponse.meta.status === "success") {
 				this.semesterRangePresets = semestersResponse.data
@@ -162,7 +161,7 @@ export default {
 		await this.fetchSemesters();
 
 		await this.$api
-					.call(ApiInfoTerminal.loadRenderers())
+					.call(ApiInfoTerminal.loadInfoTerminalRenderers())
 					.then((res) => res.data)
 					.then((data) => {
 						for (let rendertype of Object.keys(data)) {
@@ -213,7 +212,7 @@ export default {
 					});
 	},
 	template: /*html*/ `
-	<div class="cis-lvplan-personal d-flex flex-column h-100">
+	<div class="cis-lvplan-personal d-flex flex-column">
 		<h2 id="cis-lvplan-personal-heading">
 			{{ $p.t('lehre/stundenplan') }}
 			<span v-if="startSemester?.studiensemester_kurzbz">
