@@ -107,6 +107,7 @@ export default {
 			},
 			teachingunits: null,
 			compactibleEventTypes: [],
+			arePreviewEventsShown: false
 		};
 	},
 	computed: {

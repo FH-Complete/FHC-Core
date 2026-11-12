@@ -5,3 +5,14 @@ $config['info_terminal_allowed_ips'] = [
 	'192.168.10.0/24',
 	'2001:67c:1790:5186::139'
 ];
+
+$config['info_terminal_screen_reload_time'] = 500; // in secs
+
+$config['info_terminal_content_pages'] = [
+	// [
+	// 	'id'   => null,
+	// 	'title' => null,
+	// 	'version' => null,
+	// 	'language' => null
+	// ]
+];

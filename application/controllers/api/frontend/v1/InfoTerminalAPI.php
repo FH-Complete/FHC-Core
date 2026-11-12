@@ -6,6 +6,8 @@ use CI3_Events as Events;
 
 class InfoTerminalAPI extends FHCAPI_Controller
 {
+	const EXCLUDED_CONTENT_TYPES = ["redirect"];
+
 	public function __construct()
 	{
 		parent::__construct(array(
@@ -16,6 +18,7 @@ class InfoTerminalAPI extends FHCAPI_Controller
 			'stunden' => self::PERM_ANONYMOUS,
 			'compactibleEventTypes' => self::PERM_ANONYMOUS,
 			'getRenderers' => self::PERM_ANONYMOUS,
+			'content' => self::PERM_ANONYMOUS,
 		));
 
 		$this->load->config('info_terminal');
@@ -70,6 +73,11 @@ class InfoTerminalAPI extends FHCAPI_Controller
 		// fetching lvplan events
 		if ($this->config->item('is_new_calendar_structure_enabled')) {
 			$lvplanEvents = $this->kalenderlib->getEventsForUser($start_date, $end_date, $userUID);
+			$lvplanEvents = array_map(function($item) {
+				$item["deletable"] = false;
+
+				return $item;
+			}, $lvplanEvents);
 			$ferienEvents = $this->kalenderlib->fetchFerienEventsByUser($start_date, $end_date, $userUID);
 		} else {
 			$result = $this->stundenplanlib->getEventsUser($start_date, $end_date, $userUID);
@@ -159,6 +167,30 @@ class InfoTerminalAPI extends FHCAPI_Controller
 		$this->terminateWithSuccess($renderer_paths);
 	}
 
+	public function content()
+	{
+		$cardNumber = $this->input->get("key_input");
+		$userUID = $this->_getUIDFromCardNumber($cardNumber);
+		if (!$userUID) return $this->terminateWithError("User not found!");
+
+		$this->load->library('CmsLib', ["uid" => $userUID]);
+
+        $content_id = $this->input->get("content_id",TRUE);
+		if (!$content_id) $this->terminateWithError("Content id not provided!");
+
+        $version = $this->input->get("version",TRUE);
+        $sprache = $this->input->get("sprache",TRUE);
+        $sichtbar = $this->input->get("sichtbar",TRUE);
+
+		$contentResult = $this->cmslib->getContent($content_id, $version, $sprache, $sichtbar);
+		if (isError($contentResult))  $this->terminateWithError("Content with provided id not found!");
+
+		$content = getData($contentResult);
+
+		if (in_array($content["type"], self::EXCLUDED_CONTENT_TYPES)) $this->terminateWithError("Content with provided id not found!");
+		
+		$this->terminateWithSuccess($content);
+	}
 	// -----------------------------------------------------------------------------------------------------------------
 	// Private methods
 

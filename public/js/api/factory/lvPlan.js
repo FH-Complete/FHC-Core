@@ -36,11 +36,11 @@ export default {
 			params: { start_date, end_date, lv_id }
 		};
 	},
-	eventsPersonal(start_date, end_date, uid = null) {
+	eventsPersonal(start_date, end_date, uid = null, arePreviewEventsShown = false) {
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/lvPlan/eventsPersonal',
-			params: { start_date, end_date, uid }
+			params: { start_date, end_date, uid, arePreviewEventsShown }
 		};
 	},
 	eventsLv(lv_id, start_date, end_date) {

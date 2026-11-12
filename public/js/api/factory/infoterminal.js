@@ -71,4 +71,17 @@ export default {
 			url: '/api/frontend/v1/InfoTerminalAPI/compactibleEventTypes',
 		}
 	},
+	content(cardNumber, content_id, version = null, sprache = null, sichtbar = null) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/InfoTerminalAPI/content',
+			params: {
+				key_input: cardNumber,
+				content_id,
+				...(version ? { version } : {}),
+				...(sprache ? { sprache } : {}),
+				...(sichtbar ? { sichtbar } : {}),
+			},
+		};
+	},
 };

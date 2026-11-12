@@ -5,6 +5,7 @@ import ApiAuthinfo from "../../../api/factory/authinfo.js";
 import ApiRoomPlan from "../../../api/factory/calendar/roomPlan.js";
 import ApiStudiensemester from "../../../api/factory/studiensemester.js";
 import ApiBenutzer from "../../../api/factory/benutzer.js";
+import ApiPermission from '../../../api/factory/permission.js';
 
 export const DEFAULT_MODE_LVPLAN_DESKTOP = "Week";
 export const DEFAULT_MODE_LVPLAN_MOBILE = "List";
@@ -26,6 +27,8 @@ export default {
 			semesterRangePresets: [],
 			startSemester: null,
 			endSemester: null,
+			arePreviewEventsShown: false,
+			hasCanViewCalendarPreviewEventsRPermission: false,
 		};
 	},
 	inject: ["isMobile"],
@@ -140,6 +143,9 @@ export default {
 				}),
 			);
 		},
+		arePreviewEventsShown() {
+			this.$refs.calendar.reset();
+		}
 	},
 	methods: {
 		handleChangeDate(day, newMode, rangeLength) {
@@ -180,12 +186,16 @@ export default {
 					ApiLvPlan.eventsPersonal(
 						start.toISODate(),
 						end.toISODate(),
+						null,
+						this.arePreviewEventsShown
 					),
 				),
 				this.$api.call(
 					ApiLvPlan.getLvPlanReservierungen(
 						start.toISODate(),
 						end.toISODate(),
+						null,
+						this.arePreviewEventsShown
 					),
 				),
 			];
@@ -253,9 +263,23 @@ export default {
 		},
 		openPrintPreview() {
 			window.print();
-		}
+		},
+		async getPermissions() {
+			const permissionsResponse = await this.$api.call(
+				ApiPermission.getPermissions(
+					[
+						"basis/can_view_preview_events:r",
+					]
+				)
+			);
+
+			if (permissionsResponse.meta.status === "success") {
+				this.hasCanViewCalendarPreviewEventsRPermission = permissionsResponse.data["basis/can_view_preview_events:r"];
+			}
+		},
 	},
 	async created() {
+		this.getPermissions();
 		await this.fetchAuthInfo();
 		await this.fetchSemesters();
 	},
@@ -313,6 +337,15 @@ export default {
 						</div>
 					</a>
 				</template>
+				<div 
+					v-if="hasCanViewCalendarPreviewEventsRPermission"
+					@click="arePreviewEventsShown = !arePreviewEventsShown"
+					class="d-flex align-items-center gap-2" 
+					style="cursor:pointer"
+				>
+					<i :class="arePreviewEventsShown ? 'fa-solid fa-toggle-on text-primary' : 'fa-solid fa-toggle-off text-muted'"></i>
+					<span class="form-check-label">Preview</span>
+				</div>
 			</div>
 		</fhc-calendar>
 	</div>`,

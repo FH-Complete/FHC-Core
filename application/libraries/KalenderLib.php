@@ -1586,7 +1586,7 @@ class KalenderLib
 		return $this->_mapCalendarEvents($this->_mapEvents($data));
 	}
 
-	public function getEventsForUser($start, $end, $uid = null)
+	public function getEventsForUser($start_date, $end_date, $uid = null, $arePreviewEventsShown = false)
 	{
 		
 		$this->_ci->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
@@ -1598,19 +1598,9 @@ class KalenderLib
 		if (is_null($uid))
 			return error("No UID");
 		
-		$is_mitarbeiter = getData($this->_ci->MitarbeiterModel->isMitarbeiter($uid));
-		
-		if ($is_mitarbeiter)
-			return $this->getPlanForLecturerByLecturer($start, $end, $uid);
-
-		return $this->getPlanForStudentByStudent($start, $end, $uid);
-	}
-
-	public function getPlanForLecturerByLecturer($start_date, $end_date, $userUID)
-	{
 		$this->_buildBasePlanQuery();
 		
-		$escapedUserUID = $this->_ci->KalenderModel->db->escape($userUID);
+		$escapedUserUID = $this->_ci->KalenderModel->db->escape($uid);
 
 		// Checks if the user is assigned as a lecturer to any teaching unit(lehreinheit) associated with the current calendar event.
 		$isTeachingUnitStaffMember = "EXISTS (
@@ -1645,45 +1635,12 @@ class KalenderLib
 				AND benutzergruppe.uid = $escapedUserUID
 		)";
 
-		$this->_ci->KalenderModel->db->where_in('status_kurzbz', array('live'));
-		$this->_ci->KalenderModel->db->group_start();
-		$this->_ci->KalenderModel->db->where($isTeachingUnitStaffMember, null, false);
-		$this->_ci->KalenderModel->db->or_where($isDirectReservationParticipant, null, false);
-		$this->_ci->KalenderModel->db->or_where($isGroupReservationParticipant, null, false);
-		$this->_ci->KalenderModel->db->group_end();
-		
-		$data = $this->_loadFilteredBasePlan($start_date, $end_date);
-		
-		return $this->_mapCalendarEvents($this->_mapEvents($data));
-	}
-
-	public function getPlanForStudentByStudent($start_date, $end_date, $userUID)
-	{
-		$this->_buildBasePlanQuery();
-
-		$escapedUserUID = $this->_ci->KalenderModel->db->escape($userUID);
-
 		// Checks if the user is directly assigned to the current calendar reservation event, regardless of their role.
 		$isDirectReservationParticipant = "EXISTS (
 			SELECT 1
 			FROM lehre.tbl_kalender_event_teilnehmer reservation_teilnehmer
 			WHERE reservation_teilnehmer.kalender_id = tbl_kalender.kalender_id
 				AND reservation_teilnehmer.uid = $escapedUserUID
-		)";
-
-		// Checks if the user belongs to a group assigned to the current calendar reservation event, matching the study semester if specified.
-		$isGroupReservationParticipant = "EXISTS (
-			SELECT 1
-			FROM lehre.tbl_kalender_event_teilnehmer reservation_teilnehmer
-			JOIN public.tbl_benutzergruppe benutzergruppe
-				ON benutzergruppe.gruppe_kurzbz = reservation_teilnehmer.gruppe_kurzbz
-				AND (
-					reservation_teilnehmer.studiensemester_kurzbz IS NULL
-					OR benutzergruppe.studiensemester_kurzbz = reservation_teilnehmer.studiensemester_kurzbz
-				)
-			WHERE reservation_teilnehmer.kalender_id = tbl_kalender.kalender_id
-				AND reservation_teilnehmer.gruppe_kurzbz IS NOT NULL
-				AND benutzergruppe.uid = $escapedUserUID
 		)";
 
 		// Checks if the user is part of a student group (studentlehrverband) that is assigned to the current calendar reservation event, matching the study program, semester, and group if specified.
@@ -1771,18 +1728,33 @@ class KalenderLib
 				AND lehreinheitgruppe.gruppe_kurzbz IS NULL
 		)";
 
-		$this->_ci->KalenderModel->db->where('status_kurzbz', 'live');
-		$this->_ci->KalenderModel->db->group_start();
-		$this->_ci->KalenderModel->db->where($isDirectReservationParticipant, null, false);
+		if ($arePreviewEventsShown) {
+			$this->_ci->KalenderModel->addJoin(
+				'lehre.tbl_kalender neuerer',
+				"neuerer.vorgaenger_kalender_id = tbl_kalender.kalender_id AND neuerer.status_kurzbz IN ('preview', 'sync_live')",
+				'LEFT'
+			);
+			$this->_ci->KalenderModel->db->where("(
+				tbl_kalender.status_kurzbz IN ('sync_live', 'to_delete_live')
+				OR (tbl_kalender.status_kurzbz = 'preview' AND neuerer.kalender_id IS NULL)
+				OR (tbl_kalender.status_kurzbz = 'live' AND neuerer.kalender_id IS NULL)
+			)", NULL, FALSE);
+		} else {
+			$this->_ci->KalenderModel->db->where('status_kurzbz', 'live');
+		}
+
+ 		$this->_ci->KalenderModel->db->group_start();
+		$this->_ci->KalenderModel->db->where($isTeachingUnitStaffMember, null, false);
+		$this->_ci->KalenderModel->db->or_where($isDirectReservationParticipant, null, false);
 		$this->_ci->KalenderModel->db->or_where($isGroupReservationParticipant, null, false);
 		$this->_ci->KalenderModel->db->or_where($isStudentGroupReservationParticipant, null, false);
 		$this->_ci->KalenderModel->db->or_where($isGroupAssignedToTeachingUnit, null, false);
 		$this->_ci->KalenderModel->db->or_where($isStudentGroupAssignedToTeachingUnit, null, false);
 		$this->_ci->KalenderModel->db->group_end();
-
+		
 		$data = $this->_loadFilteredBasePlan($start_date, $end_date);
-
-		return $this->_mapEvents($data);
+		
+		return $this->_mapCalendarEvents($this->_mapEvents($data));
 	}
 
 	private function _buildFilteredKalenderCte($start_date, $end_date)
@@ -2835,6 +2807,7 @@ private function _mapCalendarEvents(array $events): array
 		}
 
 		return [
+			'kalender_id' => $event->kalender_id,
 			'reservierung_id' => $reservierungId,
 			'type' => $event->type,
 			'beginn' => $event->beginn,

@@ -4,7 +4,7 @@ import BsConfirm from "../../Bootstrap/Confirm.js";
 import news_content from './Content_types/News_content.js';
 import iframe_content from './Content_types/Iframe_content.js';
 
-import ApiCms from '../../../api/factory/cms.js';
+import DefaultApiCms from '../../../api/factory/cms.js';
 
 export default {
 	name: "ContentComponent",
@@ -19,6 +19,10 @@ export default {
 		},
 		sichtbar: {
 			type: [String, Number],
+			default: null,
+		},
+		fetchContentURL: {
+			type: Object,
 			default: null,
 		}
 	},
@@ -37,14 +41,26 @@ export default {
 	},
 	methods: {
 		fetchContent(){
+			let fetchContentURL = this.ApiCms.content(this.content_id_internal, this.version, this.sprache, this.sichtbar);
+			if (this.$props.fetchContentURL)
+				fetchContentURL = this.$props.fetchContentURL;
+
 			this.$api
-				.call(ApiCms.content(this.content_id_internal, this.version, this.sprache, this.sichtbar))
+				.call(fetchContentURL)
 				.then(res => {
 					this.$nextTick(function() {
 						this.content = res.data.content;
 						this.content_type = res.data.type;
 					});
-				});
+				})
+				.catch(res => {
+					this.clearContentData();
+				})
+		},
+		clearContentData() {
+			this.content_type = null,
+			this.content = null,
+			this.content_id_internal = this.content_id
 		}
 	},
 	watch:{
@@ -54,7 +70,14 @@ export default {
 		'$route.params.content_id'(newVal) {
 			this.content_id_internal = newVal
 			this.fetchContent();
-		}
+		},
+		content_id: function(newVal) {
+			console.log(newVal)
+			if (!newVal) this.clearContentData();
+
+			this.content_id_internal = newVal
+			this.fetchContent();
+		},
 	},
 	computed: {
 		sprache(){
@@ -72,6 +95,9 @@ export default {
 					return "general";
 			};
 		},
+		ApiCms() {
+			return this.$props.initialApiFactory ?? DefaultApiCms;
+		}
 	},
 	created() {
 		this.fetchContent();

@@ -107,24 +107,6 @@ export default {
 				),
 			];
 		},
-		deleteEvent(event) {
-			if (event.type === "reservierung") {
-				this.deleteReservation(event);
-			}
-		},
-		async deleteReservation(event) {
-			if (
-				luxon.DateTime.fromISO(`${event.datum}T${event.beginn}`) <
-				luxon.DateTime.now()
-			)
-				return;
-
-			await this.$api.call(
-				ApiRoomPlan.deleteRoomReservation(event.reservierung_id),
-			);
-
-			this.$refs.calendar.reset();
-		},
 		async getStunden() {
 			let stundenResponse = await this.$api.call(ApiInfoTerminal.getStunden());
 			this.teachingUnits = stundenResponse.data.map((el) => ({
@@ -256,7 +238,6 @@ export default {
 			@update:date="handleChangeDate"
 			@update:mode="handleChangeMode"
 			@update:range="updateRange"
-			@delete-event="(event) => deleteEvent(event)"
 			class="responsive-calendar"
 		>
 			<div class="d-flex gap-1 justify-items-start">

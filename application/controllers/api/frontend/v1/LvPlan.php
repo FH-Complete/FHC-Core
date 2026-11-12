@@ -107,6 +107,7 @@ class LvPlan extends FHCAPI_Controller
 		$start_date = $this->input->post('start_date', true);
 		$end_date = $this->input->post('end_date', true);
 		$uid = $this->input->post('uid', true);
+		$arePreviewEventsShown = $this->input->post('arePreviewEventsShown', true);
 
 		// disallow accessing other user's events if missing permission
 		if ($uid && $uid !== getAuthUID() && !$this->permissionlib->isBerechtigt('basis/other_lv_plan')) {
@@ -115,7 +116,10 @@ class LvPlan extends FHCAPI_Controller
 
 		// fetching lvplan events
 		if ($this->config->item('is_new_calendar_structure_enabled')) {
-			$lvplanEvents = $this->kalenderlib->getEventsForUser($start_date, $end_date, $uid);
+			if ($arePreviewEventsShown && !$this->permissionlib->isBerechtigt('basis/can_view_preview_events:r'))
+					return $this->terminateWithError("Permissions for this action are missing!");
+				
+			$lvplanEvents = $this->kalenderlib->getEventsForUser($start_date, $end_date, $uid, $arePreviewEventsShown);
 			$ferienEvents = $this->kalenderlib->fetchFerienEventsByUser($start_date, $end_date, $uid);
 		} else {
 			$result = $this->stundenplanlib->getEventsUser($start_date, $end_date, $uid);

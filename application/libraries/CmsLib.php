@@ -19,11 +19,12 @@ class CmsLib
 	 */
 	protected $ci;
 
+	protected $loggeduid;
 
 	/**
 	 * Constructor
 	 */
-	public function __construct()
+	public function __construct($loggeduid = null)
 	{
 		$this->ci =& get_instance();
 
@@ -33,6 +34,13 @@ class CmsLib
 		$this->ci->load->model('content/Template_model', 'TemplateModel');
 		if (defined('LOG_CONTENT') && LOG_CONTENT)
 			$this->ci->load->model('system/Webservicelog_model', 'WebservicelogModel');
+
+		if (!(isset($loggeduid['uid']) && !isEmptyString($loggeduid['uid'])))
+		{
+			$this->loggeduid["uid"] = getAuthUID();
+		} else {
+			$this->loggeduid["uid"] = $loggeduid['uid'];
+		}
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -59,7 +67,7 @@ class CmsLib
 			return $islocked;
 
 		if (getData($islocked)) {
-			$uid = getAuthUID();
+			$uid = $this->loggeduid["uid"];
 			$isberechtigt = $this->ci->ContentgruppeModel->berechtigt($content_id, $uid);
 			if (isError($isberechtigt))
 				return $isberechtigt;
