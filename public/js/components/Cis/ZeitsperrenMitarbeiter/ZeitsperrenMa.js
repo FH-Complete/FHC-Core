@@ -1,12 +1,10 @@
 import listsZeitsperren from './Details/listsZeitsperren.js';
-import MitarbeiterZeitsperren from './Details/ZeitsperrenMitarbeiteruid.js';
 export const DEFAULT_INTERVAL_DAYS = 14;
 
 export default {
 	name: 'ZeitsperrenMa',
 	components: {
-		listsZeitsperren,
-		MitarbeiterZeitsperren
+		listsZeitsperren
 	},
 	props: {
 		propsViewData: Object

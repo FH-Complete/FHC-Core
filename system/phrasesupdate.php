@@ -29963,6 +29963,26 @@ In the list:
 		array(
 			'app' => 'core',
 			'category' => 'profil',
+			'phrase' => 'zeitsperrenUrlaube',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Zeitsperren/Urlaube',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Planned Absences/Vacations',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
 			'phrase' => 'inventarnummer',
 			'insertvon' => 'system',
 			'phrases' => array(
