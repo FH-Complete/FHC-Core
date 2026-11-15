@@ -344,7 +344,7 @@ export default {
 					style="cursor:pointer"
 				>
 					<i :class="arePreviewEventsShown ? 'fa-solid fa-toggle-on text-primary' : 'fa-solid fa-toggle-off text-muted'"></i>
-					<span class="form-check-label">Preview</span>
+					<span class="form-check-label">{{ $p.t('ui', 'preview') }}</span>
 				</div>
 			</div>
 		</fhc-calendar>
