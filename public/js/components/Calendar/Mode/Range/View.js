@@ -38,7 +38,11 @@ export default {
 		isDayVisibilityCheckShown: {
 			from: 'isDayVisibilityCheckShown',
 			default: true,
-		}
+		},
+		dayVisibilityStorageKey: {
+			from: 'dayVisibilityStorageKey',
+			default: null
+		},
 	},
 	props: {
 		day: {
@@ -50,9 +54,7 @@ export default {
 	},
 	data() {
 		return {
-			dayVisibilityStates: JSON.parse(
-				localStorage.getItem('fhc-calender-visible-days'),
-			) ?? [true, true, true, true, true, true, true],
+			dayVisibilityStates: this.loadDayVisibility(this.dayVisibilityStorageKey),
 			gridWidthEqualizingData: {
 				animationFrame: null,
 				isWidthEqualizingRunning: false,
@@ -182,10 +184,15 @@ export default {
 		},
 		toggleDayVisibility(day) {
 			this.dayVisibilityStates.splice(day, 1, !this.dayVisibilityStates[day]);
-			localStorage.setItem(
-				'fhc-calender-visible-days',
-				JSON.stringify(this.dayVisibilityStates),
-			);
+			if (!this.dayVisibilityStorageKey) return;
+			try {
+				localStorage.setItem(
+					this.dayVisibilityStorageKey,
+					JSON.stringify(this.dayVisibilityStates),
+				);
+			} catch { 
+				console.log("Issue with storing of day visibility data!");
+			}
 		},
 		scheduleGridWidthSync() {
 			if (
@@ -288,6 +295,19 @@ export default {
 				.map((grid) => grid?.$el)
 				.filter((el) => el instanceof HTMLElement);
 		},
+		loadDayVisibility(key) {
+			if (!key) return Array(7).fill(true);;
+			try {
+				const value = JSON.parse(localStorage.getItem(key));
+				return Array.isArray(value)
+					&& value.length === 7
+					&& value.every(v => typeof v === 'boolean')
+					? value
+					: Array(7).fill(true);;
+			} catch {
+				return Array(7).fill(true);;
+			}
+		}
 	},
 	mounted() {
 		this.startFreshColumnWidthSync();

@@ -121,8 +121,8 @@ header,
 	border: 0 !important;
 }
 
-.fhc-calendar-mode-range-view .part-header, .fhc-calendar-mode-range-view .part-header,
-.fhc-calendar-mode-range-view .part-header, .fhc-calendar-mode-range-view .part-body {
+.fhc-calendar-mode-range-view .part-header,
+.fhc-calendar-mode-range-view .part-body {
 	min-height: 30px !important;
 }
 

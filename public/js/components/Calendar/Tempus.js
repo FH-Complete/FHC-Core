@@ -37,7 +37,8 @@ export default {
 					presets: this.semesterRangePresets?.presets,
 				};
 			}),
-			columnWidthAdjustmentResetVersion: Vue.computed(() => this.columnWidthAdjustmentResetVersion)
+			columnWidthAdjustmentResetVersion: Vue.computed(() => this.columnWidthAdjustmentResetVersion),
+			dayVisibilityStorageKey: 'fhc-tempus-range-visible-days',
 		};
 	},
 	inject: {
@@ -54,10 +55,6 @@ export default {
 		},
 		rangeLength: {
 			default: 30,
-		},
-		shouldIncludeRangeMode: {
-			type: Boolean,
-			default: false,
 		},
 	},
 	directives: {

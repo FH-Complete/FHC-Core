@@ -8,7 +8,7 @@
 
 .fhc-calendar-mode-day .fhc-calendar-base-grid-line,
 .fhc-calendar-mode-week .fhc-calendar-base-grid-line,
-.fhc-calendar-mode-range .fhc-calendar-base-grid-line,
+.fhc-calendar-mode-range .fhc-calendar-base-grid-line {
 	padding: 0 var(--fhc-calendar-gap-events, var(--fhc-calendar-gap, 1px));
 }
 .fhc-calendar-mode-day .all-day-events .event,

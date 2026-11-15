@@ -157,7 +157,14 @@ export default {
 			:end="end"
 			:background="bg"
 		></line-background>
-		<template v-for="(event, i) in formattedEvents" :key="event.orig?.eindeutige_kalender_gruppen_id || i">
+		<template 
+			v-for="(event, i) in formattedEvents" 
+			:key="
+				event.orig?.eindeutige_kalender_gruppen_id ||
+				event.orig?.kalender_id || 
+				i
+			"
+		>
 			<line-event
 				v-if="!event.display || event.display === 'default'"
 				:style="'grid-' + axisRow + ': ' + event.rows.join('/')"
@@ -175,7 +182,7 @@ export default {
 			>
 				<span
 					v-for="(subEvent, subEventIndex) in event.events"
-					:key="subEvent.orig?.eindeutige_kalender_gruppen_id || subEventIndex"
+					:key="subEvent.orig?.eindeutige_kalender_gruppen_id || subEvent.orig?.kalender_id || subEventIndex"
 					:style="subEvent.farbe ? {'background-color': '#' + subEvent.farbe} : {}"
 					style="height:10px; width:10px;"
 					class="border border-dark rounded-circle"

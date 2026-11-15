@@ -36,6 +36,7 @@ DECLARE res varchar(32);
 $$ LANGUAGE plpgsql;
 
 DROP FUNCTION IF EXISTS get_current_week_timestamp(INTEGER, TIME, INTERVAL);
+DROP FUNCTION IF EXISTS get_current_week_timestamp(INTEGER, TIME, TEXT);
 
 CREATE OR REPLACE FUNCTION get_current_week_timestamp(
     p_day_offset INTEGER,

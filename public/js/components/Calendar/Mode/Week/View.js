@@ -21,7 +21,11 @@ export default {
 		isDayVisibilityCheckShown: {
 			from: 'isDayVisibilityCheckShown',
 			default: true,
-		}
+		},
+		dayVisibilityStorageKey: {
+			from: 'dayVisibilityStorageKey',
+			default: null
+		},
 	},
 	props: {
 		day: {
@@ -32,7 +36,7 @@ export default {
 	},
 	data() {
 		return {
-			visibleDays: JSON.parse(localStorage.getItem('fhc-calender-visible-days')) ?? [true, true, true, true, true, true, true]
+			visibleDays: this.loadDayVisibility(this.dayVisibilityStorageKey),
 		}
 	},
 	computed: {
@@ -65,10 +69,30 @@ export default {
 		isToday(date) {
 			return date.hasSame(luxon.DateTime.now().setZone(this.timezone), 'day');
 		},
-		toggleDay(day)
-		{
-			this.visibleDays.splice(day, 1, !this.visibleDays[day])
-			localStorage.setItem('fhc-calender-visible-days', JSON.stringify(this.visibleDays))
+		toggleDay(day) {
+			this.visibleDays.splice(day, 1, !this.visibleDays[day]);
+			if (!this.dayVisibilityStorageKey) return;
+			try {
+				localStorage.setItem(
+					this.dayVisibilityStorageKey,
+					JSON.stringify(this.visibleDays),
+				);
+			} catch { 
+				console.log("Issue with storing of day visibility data!");
+			}
+		},
+		loadDayVisibility(key) {
+			if (!key) return Array(7).fill(true);;
+			try {
+				const value = JSON.parse(localStorage.getItem(key));
+				return Array.isArray(value)
+					&& value.length === 7
+					&& value.every(v => typeof v === 'boolean')
+					? value
+					: Array(7).fill(true);;
+			} catch {
+				return Array(7).fill(true);;
+			}
 		}
 	},
 	template: /* html */`

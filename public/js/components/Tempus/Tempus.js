@@ -106,7 +106,7 @@ export default {
 				this.reload();
 			},
 			canToggleGrid: this.permissions.stundenraster,
-			isHeaderSticky: true
+			isHeaderSticky: true,
 		};
 	},
 	data() {

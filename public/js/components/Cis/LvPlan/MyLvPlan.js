@@ -45,6 +45,7 @@ export default {
 			isHeaderSticky: false,
 			areDayColumnWidthsEqual: false,
 			isDayVisibilityCheckShown: false,
+			dayVisibilityStorageKey: 'fhc-cis-lvplan-range-visible-days',
 		};
 	},
 	computed: {
@@ -307,6 +308,7 @@ export default {
 					<a
 						@click="openPrintPreview()"
 						href="#"
+						aria-label="Print"
  						class="py-1 btn btn-outline-secondary"
 					>
 						<div class="d-flex flex-column">
