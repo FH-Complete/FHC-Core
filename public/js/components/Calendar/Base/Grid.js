@@ -820,7 +820,7 @@ export default {
                             :date="date"
                             :events="eventsNormal[index]"
                             :backgrounds="backgrounds[index]"
-                            :collapsed="isDayUnchecked(index)"
+                            :collapsed="isDayCollapsed(index)"
                             style="position:relative"
                             :style="'grid-' + axisRow + ':1/-1;grid-'
                                 + axisCol + ':' + (1 + index)"
