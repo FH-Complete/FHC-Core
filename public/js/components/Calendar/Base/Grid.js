@@ -74,10 +74,6 @@ export default {
 			type: Array,
 			default: null,
 		},
-		arePartHeadersRepeated: {
-			type: Boolean,
-			default: false,
-		},
 		scrollable: {
 			type: Boolean,
 			default: true
@@ -152,9 +148,6 @@ export default {
 			return this.axisParts;
 		},
 		displayedAxisMain() {
-			if (!this.$props.arePartHeadersRepeated)
-				return this.$props.axisMain;
-
 			let displayedAxisMain = [];
 			this.$props.axisMain.forEach((part, index) => {
 				if (part.weekday === 1 && index > 0) {

@@ -28,6 +28,8 @@ export function useEventLoader(
 	const reset = (arePreviousEventsCleared = true, isLoaderEventVisualReset = true, isTargetDateResetActive = false, targetedRanges = []) => {
 		if (arePreviousEventsCleared) {
 			allEvents.value = [];
+			cachedEventsStartTimestamp = null;
+			cachedEventsEndTimestamp = null;
 		}
 
 		reload(false, isLoaderEventVisualReset, isTargetDateResetActive, targetedRanges);
