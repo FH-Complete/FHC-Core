@@ -1,10 +1,11 @@
-import FhcCalendar from "../../Calendar/LvPlan.js";
+import FhcCalendar from '../../Calendar/LvPlan.js';
 
- import ApiRoomPlan from "../../../api/factory/calendar/roomPlan.js";
- import ApiInfoTerminal from "../../../api/factory/infoterminal.js";
+import ApiRoomPlan from '../../../api/factory/calendar/roomPlan.js';
+import ApiInfoTerminal from '../../../api/factory/infoterminal.js';
+import ModeWeek from '../../Calendar/Mode/Week.js';
 
 export default {
-	name: "InfoTerminalLvPlan",
+	name: 'InfoTerminalLvPlan',
 	components: {
 		FhcCalendar,
 	},
@@ -13,10 +14,13 @@ export default {
 		cardNumber: {
 			required: true,
 			default: null,
-		}
+		},
 	},
 	data() {
 		return {
+			calendarModes: {
+				week: Vue.markRaw(ModeWeek), 
+			},
 			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone,
 			semesterRangePresets: [],
 			startSemester: null,
@@ -35,7 +39,7 @@ export default {
 			}),
 			rangeViewPresetsConfig: Vue.computed(() => {
 				return {
-					label: this.$p.t("LvPlan/view_specific_semester"),
+					label: this.$p.t('LvPlan/view_specific_semester'),
 					presets: this.semesterRangePresets,
 				};
 			}),
@@ -43,21 +47,13 @@ export default {
 	},
 	computed: {
 		currentDay() {
-			if (
-				!this.propsViewData?.focus_date ||
-				isNaN(new Date(this.propsViewData?.focus_date))
-			)
-				return luxon.DateTime.now().setZone(this.timezone).toISODate();
+			if (!this.propsViewData?.focus_date || isNaN(new Date(this.propsViewData?.focus_date))) return luxon.DateTime.now().setZone(this.timezone).toISODate();
 			return this.propsViewData?.focus_date;
 		},
 		currentMode() {
-			let validModes = ["day", "month", "week", "range"];
+			let validModes = ['week'];
 
-			if (
-				!this.propsViewData?.mode ||
-				!validModes.includes(this.propsViewData?.mode.toLowerCase())
-			)
-				return "week";
+			if (!this.propsViewData?.mode || !validModes.includes(this.propsViewData?.mode.toLowerCase())) return 'week';
 			return this.propsViewData?.mode;
 		},
 	},
@@ -70,7 +66,7 @@ export default {
 			const focus_date = day.toISODate();
 
 			this.$router.push({
-				name: "MyLvPlan",
+				name: 'MyLvPlan',
 				params: {
 					mode,
 					focus_date,
@@ -80,31 +76,13 @@ export default {
 		},
 		async updateRange(rangeInterval) {
 			const semesterResponse = await this.$api.call(
-				ApiInfoTerminal.getContainingOrNearestStudySemesterByDateRange(
-					this.cardNumber,
-					rangeInterval.s.toISO().slice(0, 10),
-					rangeInterval.e.toISO().slice(0, 10),
-				),
+				ApiInfoTerminal.getContainingOrNearestStudySemesterByDateRange(this.cardNumber, rangeInterval.s.toISO().slice(0, 10), rangeInterval.e.toISO().slice(0, 10)),
 			);
-			this.startSemester = 
-				semesterResponse.data.length
-					? semesterResponse.data[0]
-					: null;
-			this.endSemester =
-				semesterResponse.data.length > 1
-					? semesterResponse.data[1]
-					: null;
+			this.startSemester = semesterResponse.data.length ? semesterResponse.data[0] : null;
+			this.endSemester = semesterResponse.data.length > 1 ? semesterResponse.data[1] : null;
 		},
 		getPromiseFunc(start, end) {
-			return [
-				this.$api.call(
-					ApiInfoTerminal.getPersonalEvents(
-						this.cardNumber,
-						start.toISODate(),
-						end.toISODate(),
-					),
-				),
-			];
+			return [this.$api.call(ApiInfoTerminal.getPersonalEvents(this.cardNumber, start.toISODate(), end.toISODate()))];
 		},
 		async getStunden() {
 			let stundenResponse = await this.$api.call(ApiInfoTerminal.getHours());
@@ -115,22 +93,18 @@ export default {
 			}));
 		},
 		async getCompactibleEventTypes() {
-			let compactibleEventTypesResponse = await this.$api.call(
-				ApiInfoTerminal.getCompactibleEventTypes(),
-			);
+			let compactibleEventTypesResponse = await this.$api.call(ApiInfoTerminal.getCompactibleEventTypes());
 			this.compactibleEventTypes = compactibleEventTypesResponse.data;
 		},
 		async fetchSemesters() {
 			let userCreatedAt = null;
-			const userResponse = await this.$api.call(ApiInfoTerminal.getUserData(this.cardNumber,));
-			if (userResponse.meta.status === "success" && userResponse.data[0].insertamum) {
-				userCreatedAt = luxon.DateTime.fromFormat(userResponse.data[0].insertamum.split(" ")[0], "yy-MM-dd");
+			const userResponse = await this.$api.call(ApiInfoTerminal.getUserData(this.cardNumber));
+			if (userResponse.meta.status === 'success' && userResponse.data[0].insertamum) {
+				userCreatedAt = luxon.DateTime.fromFormat(userResponse.data[0].insertamum.split(' ')[0], 'yy-MM-dd');
 			}
 
-			const semestersResponse = await this.$api.call(
-				ApiInfoTerminal.getStudySemestersStartingFrom(this.cardNumber, userCreatedAt),
-			);
-			if (semestersResponse.meta.status === "success") {
+			const semestersResponse = await this.$api.call(ApiInfoTerminal.getStudySemestersStartingFrom(this.cardNumber, userCreatedAt));
+			if (semestersResponse.meta.status === 'success') {
 				this.semesterRangePresets = semestersResponse.data
 					.map((semester) => {
 						let startDate = luxon.DateTime.fromISO(semester.start);
@@ -147,11 +121,7 @@ export default {
 
 						return userCreatedAt.ts < semester.endDate.ts;
 					})
-					.sort((semesterA, semesterB) =>
-						semesterA.startDate.ts > semesterB.startDate.ts
-							? -1
-							: 1,
-					);
+					.sort((semesterA, semesterB) => (semesterA.startDate.ts > semesterB.startDate.ts ? -1 : 1));
 			}
 		},
 	},
@@ -161,55 +131,36 @@ export default {
 		await this.fetchSemesters();
 
 		await this.$api
-					.call(ApiInfoTerminal.loadInfoTerminalRenderers())
-					.then((res) => res.data)
-					.then((data) => {
-						for (let rendertype of Object.keys(data)) {
-							let modalTitle = null;
-							let modalContent = null;
-							let calendarEvent = null;
-							if (data[rendertype].modalTitle)
-								modalTitle = Vue.markRaw(
-									Vue.defineAsyncComponent(
-										() => import(data[rendertype].modalTitle),
-									),
-								);
-							if (data[rendertype].modalContent)
-								modalContent = Vue.markRaw(
-									Vue.defineAsyncComponent(
-										() => import(data[rendertype].modalContent),
-									),
-								);
-							if (data[rendertype].calendarEvent)
-								calendarEvent = Vue.markRaw(
-									Vue.defineAsyncComponent(
-										() => import(data[rendertype].calendarEvent),
-									),
-								);
-		
-							if (data[rendertype].calendarEventStyles) {
-								var head = document.head;
-								if (
-									!head.querySelector(
-										`link[href="${data[rendertype].calendarEventStyles}"]`,
-									)
-								) {
-									var link = document.createElement('link');
-									link.type = 'text/css';
-									link.rel = 'stylesheet';
-									link.href = data[rendertype].calendarEventStyles;
-									head.appendChild(link);
-								}
-							}
-		
-							if (!this.renderers[rendertype]) {
-								this.renderers[rendertype] = {};
-							}
-							this.renderers[rendertype].modalTitle = modalTitle;
-							this.renderers[rendertype].modalContent = modalContent;
-							this.renderers[rendertype].calendarEvent = calendarEvent;
+			.call(ApiInfoTerminal.loadInfoTerminalRenderers())
+			.then((res) => res.data)
+			.then((data) => {
+				for (let rendertype of Object.keys(data)) {
+					let modalTitle = null;
+					let modalContent = null;
+					let calendarEvent = null;
+					if (data[rendertype].modalTitle) modalTitle = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].modalTitle)));
+					if (data[rendertype].modalContent) modalContent = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].modalContent)));
+					if (data[rendertype].calendarEvent) calendarEvent = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].calendarEvent)));
+
+					if (data[rendertype].calendarEventStyles) {
+						var head = document.head;
+						if (!head.querySelector(`link[href="${data[rendertype].calendarEventStyles}"]`)) {
+							var link = document.createElement('link');
+							link.type = 'text/css';
+							link.rel = 'stylesheet';
+							link.href = data[rendertype].calendarEventStyles;
+							head.appendChild(link);
 						}
-					});
+					}
+
+					if (!this.renderers[rendertype]) {
+						this.renderers[rendertype] = {};
+					}
+					this.renderers[rendertype].modalTitle = modalTitle;
+					this.renderers[rendertype].modalContent = modalContent;
+					this.renderers[rendertype].calendarEvent = calendarEvent;
+				}
+			});
 	},
 	template: /*html*/ `
 	<div class="cis-lvplan-personal d-flex flex-column">
@@ -229,6 +180,7 @@ export default {
 			:timezone="timezone"
 			:get-promise-func="getPromiseFunc"
 			:date="currentDay"
+			:modes="calendarModes"
 			:mode="currentMode"
 			:shouldIncludeRangeMode="true"
 			:initialTeachingUnits="teachingUnits"

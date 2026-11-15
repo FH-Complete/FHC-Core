@@ -13,6 +13,7 @@ class InfoTerminalAPI extends FHCAPI_Controller
 		parent::__construct(array(
 			'getUserData' => self::PERM_ANONYMOUS,
 			'getPersonalEvents' => self::PERM_ANONYMOUS,
+			'getEventsForRooms' => self::PERM_ANONYMOUS,
 			'getStudySemestersStartingFrom' => self::PERM_ANONYMOUS,
 			'getContainingOrNearestStudySemesterByDateRange' => self::PERM_ANONYMOUS,
 			'getHours' => self::PERM_ANONYMOUS,
@@ -85,7 +86,6 @@ class InfoTerminalAPI extends FHCAPI_Controller
 			$ferienEvents = $this->fetchFerienEvents($start_date, $end_date, $userUID);
 		}
 		
-		// fetching moodle events
 		$moodleEvents = $this->fetchMoodleEvents($start_date, $end_date, $userUID);
 
 		$this->terminateWithSuccess(array_merge(
@@ -93,6 +93,30 @@ class InfoTerminalAPI extends FHCAPI_Controller
 			$moodleEvents,
 			[]
 		));
+	}
+	
+	public function getEventsForRooms() {
+
+		$cardNumber = $this->input->post("key_input");
+		$userUID = $this->_getUIDFromCardNumber($cardNumber);
+		if (!$userUID) return $this->terminateWithError("User not found!");
+
+		$this->load->library('LvPlanCalendarLib', array('uid' => $userUID));
+
+		$roomShortCodes = $this->input->post('roomShortCodes');
+		if (empty($roomShortCodes)) return $this->terminateWithError("No room short codes provided!");
+
+		$startDate = $this->input->post('start_date');
+		$endDate = $this->input->post('end_date');
+
+		$events = [];
+
+		foreach($roomShortCodes as $roomShortCode) {
+			$roomEvents = $this->lvplancalendarlib->getEventsForRoom($startDate, $endDate, $roomShortCode);
+			$events = array_merge($events, (array) $roomEvents);
+		}
+
+		$this->terminateWithSuccess($events);
 	}
 
 	public function getStudySemestersStartingFrom()

@@ -521,6 +521,8 @@ class LvPlanCalendarLib
 		$teacherUIDsResponse = $this->_ci->KalenderModel->execReadOnlyQuery($query, [$courseId, $studiengang_kz, $semester, $studiensemester->start, $studiensemester->ende]);
 		if (isError($teacherUIDsResponse)) return;
 
+		if(!hasData($teacherUIDsResponse)) return [];
+
 		return getData($teacherUIDsResponse);
 	}
 

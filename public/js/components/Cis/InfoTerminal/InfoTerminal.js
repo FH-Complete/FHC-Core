@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import InfoTerminalLvPlan from './InfoTerminalLvPlan.js';
+import InfoTerminalRoomsAvailabilityOverview from './InfoTerminalRoomsAvailabilityOverview.js';
 import CmsContent from '../../Cis/Cms/Content.js';
 import ApiInfoTerminal from '../../../api/factory/infoterminal.js';
 
@@ -22,6 +23,7 @@ export default {
 	name: 'InfoTerminal',
 	components: {
 		InfoTerminalLvPlan,
+		InfoTerminalRoomsAvailabilityOverview,
 		CmsContent,
 	},
 	provide() {
@@ -44,11 +46,11 @@ export default {
 			cardNumber: null,
 			currentlySelectedTab: 'LVPlan',
 			availableTabs: [
-				{ name: 'LVPlan', label: 'Mein LV-Plan' },
-				{ name: 'AvailableRooms', label: 'Freie Räume' },
-				{ name: 'PersonalData', label: 'Personliche daten' },
+				{ name: 'LVPlan', label: 'myLVPlan' },
+				{ name: 'AvailableRooms', label: 'freeRooms' },
 			],
 			ApiInfoTerminal: ApiInfoTerminal,
+			languages: FHC_JS_DATA_STORAGE_OBJECT.server_languages
 		};
 	},
 	computed: {
@@ -73,6 +75,18 @@ export default {
 		},
 		logoutTheUser() {
 			window.location.replace(window.location.origin + window.location.pathname);
+		},
+		onChange(lang) {
+			if (this.languages.some(l => l.sprache === lang)) {
+				this.$p
+					.setLanguage(lang)
+					.then(() => {
+						if (document.querySelector('[cis4Reload]'))
+							window.location.reload();
+						else
+							this.$emit('changed', lang);
+					});
+			}
 		}
 	},
 	template: /* html */ `
@@ -82,14 +96,14 @@ export default {
 		<div class="w-100 vh-100 row p-3">
 			<div class="col-md-3 col-xl-2 d-flex flex-column">
 				<div>
-					<img :src="logoUrl" alt="Corporate Identity Logo" class="img-fluid">
+					<img :src="logoUrl" alt="Corporate Identity Logo" class="img-fluid w-75">
 				</div>
-				<div class="nav flex-column gap-2 justify-content-center flex-grow-1">
+				<div class="nav flex-column gap-2 justify-content-start mt-4">
 					<button
 						v-for="tab in availableTabs"
 						:key="tab.name"
 						type="button"
-						class="nav-link text-start rounded-3 px-3 py-2 border"
+						class="nav-link text-start rounded-3 px-4 py-3 fs-5 border"
 						:class="
 							currentlySelectedTab === tab.name
 								? 'bg-body-tertiary text-body fw-semibold border-secondary-subtle shadow-sm'
@@ -97,7 +111,7 @@ export default {
 						"
 						@click="currentlySelectedTab = tab.name"
 					>
-						{{ tab.label }}
+						{{ $p.t('info_terminal', tab.label) }}
 					</button>
 					<button
 						v-for="contentPageItem in contentPagesData"
@@ -109,20 +123,34 @@ export default {
 						"
 						@click="currentlySelectedTab = contentPageItem.title"
 						type="button"
-						class="nav-link text-start rounded-3 px-3 py-2 border"
+						class="nav-link text-start rounded-3 px-4 py-3 fs-5 border"
 					>
-						{{ contentPageItem.title }}
+						{{ $p.t('info_terminal', contentPageItem.title) }}
 					</button>
 				</div>
 			</div>
 			<div class="col h-100 align-items-center justify-content-center d-flex flex-column">
-				<div class="w-100 d-flex justify-content-end">
-					<button 
+				<div class="w-100 d-flex justify-content-end align-items-center gap-2">
+					<div class="btn-group btn-group-sm" role="group" aria-label="Sprache wählen">
+						<button 
+							v-for="lang in languages"
+							:key="lang.value"
+							:class="[{active: $p.user_language.value == lang.sprache}]"
+							:selected="$p.user_language.value == lang.sprache"
+							@click.prevent="onChange(lang.sprache)" 
+							type="button" 
+							class="btn btn-outline-secondary">
+							{{ lang.bezeichnung }}
+						</button>
+					</div>
+					<button
+						:title="$p.t('ui', 'logout')"
 						@click="logoutTheUser()"
 						type="button"
-						class="text-start rounded-3 px-3 py-2 bg-secondary text-white"
+						class="btn btn-outline-secondary rounded-3 px-3 py-2"
+						aria-label="Logout"
 					>
-						Logout
+						<i class="fa-solid fa-right-from-bracket"></i>
 					</button>
 				</div>
 				<InfoTerminalLvPlan 
@@ -130,9 +158,11 @@ export default {
 					:cardNumber=this.cardNumber
 					class="w-100 flex-grow-1"
 				/>
-				<div v-else-if="currentlySelectedTab === 'AvailableRooms'" class="w-100 flex-grow-1">
-					Freie PC Räume Content
-				</div>
+				<InfoTerminalRoomsAvailabilityOverview
+					v-else-if="currentlySelectedTab === 'AvailableRooms'"
+					:cardNumber=this.cardNumber
+					class="w-100 flex-grow-1"
+				/>
 				<div
 					v-else
 					class="d-flex justify-content-center align-items-center  flex-grow-1"

@@ -11,7 +11,7 @@ $config['info_terminal_screen_reload_time'] = 500; // in secs
 $config['info_terminal_content_pages'] = [
 	[
 		'id'   => 11262,
-		'title' => 'CIS Intro',
+		'title' => 'CISIntro',
 		'version' => null,
 		'language' => null
 	]

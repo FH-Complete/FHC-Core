@@ -32,6 +32,13 @@ export default {
 			params: { start_date, end_date, key_input: cardNumber }
 		};
 	},
+	getEventsForRooms(cardNumber, roomShortCodes, start_date, end_date) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/InfoTerminalAPI/getEventsForRooms',
+			params: { start_date, end_date, key_input: cardNumber, roomShortCodes }
+		};
+	},
 	getStudySemestersStartingFrom(cardNumber, start = null)
 	{
 		return {

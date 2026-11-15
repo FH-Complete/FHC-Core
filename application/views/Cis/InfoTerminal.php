@@ -12,7 +12,7 @@
 		'phrases' => array(
 			'global',
 			'ui',
-			'lehre'
+			'info_terminal'
 		),
 		'customCSSs' => [
 			'public/css/components/calendar.css'

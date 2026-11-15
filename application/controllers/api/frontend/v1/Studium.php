@@ -314,12 +314,13 @@ class Studium extends FHCAPI_Controller
 
 	private function computeLektorenFromLehrveranstaltung($lehrveranstaltung_id, $semester, $studiengang, $studiensemester){
 		$this->load->library('StundenplanLib');
+		$this->load->config("lv_plan");
 
 		if ($this->config->item('is_new_calendar_structure_enabled')) {
-			$this->load->library('KalenderLib', ["uid" => getAuthUID()]);
-			$this->load->config("lv_plan");
+			$this->load->library('LvPlanCalendarLib', ["uid" => getAuthUID()]);
 			
-			$teachers = $this->kalenderlib->getTeachersByCourse($lehrveranstaltung_id, $studiengang, $studiensemester, $semester);
+			
+			$teachers = $this->lvplancalendarlib->getTeachersByCourse($lehrveranstaltung_id, $studiengang, $studiensemester, $semester);
 			$teacherUIDs = array_map(function ($item)
 				{
 					return $item->uid;

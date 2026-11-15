@@ -50,6 +50,7 @@ class RoomPlan extends FHCAPI_Controller
 		$this->load->library('PermissionLib');
 		$this->load->library('StundenplanLib');
 		$this->load->library('KalenderLib', array('uid' => getAuthUID()));
+		$this->load->library('LvPlanCalendarLib', array('uid' => getAuthUID()));
 
 		$this->load->config('lv_plan');
 
@@ -293,7 +294,7 @@ class RoomPlan extends FHCAPI_Controller
 		$end_date = $this->input->post('end_date', true);
 
 		if ($this->config->item('is_new_calendar_structure_enabled')) {
-			$result = $this->kalenderlib->getReservableMap($ort_kurzbz, $start_date, $end_date);
+			$result = $this->lvplancalendarlib->getReservableMap($ort_kurzbz, $start_date, $end_date);
 		}
 		else {
 			$result = $this->stundenplanlib->getReservableMap($ort_kurzbz, $start_date, $end_date);

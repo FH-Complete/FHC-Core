@@ -50,12 +50,12 @@ export default {
 			default: false,
 		},
 		initialTeachingUnits: {
-			type: Array,
-			default: false,
+			type: [Array, null],
+			default: null,
 		},
 		initialCompactibleEventTypes: {
-			type: Array,
-			default: false,
+			type: [Array, null],
+			default: null,
 		},
 		customRenderers: {
 			type: Object,
