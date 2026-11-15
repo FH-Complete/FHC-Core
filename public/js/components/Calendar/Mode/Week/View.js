@@ -78,20 +78,20 @@ export default {
 					JSON.stringify(this.visibleDays),
 				);
 			} catch { 
-				console.log("Issue with storing of day visibility data!");
+				console.warn("Issue with storing of day visibility data!");
 			}
 		},
 		loadDayVisibility(key) {
-			if (!key) return Array(7).fill(true);;
+			if (!key) return Array(7).fill(true);
 			try {
 				const value = JSON.parse(localStorage.getItem(key));
 				return Array.isArray(value)
 					&& value.length === 7
 					&& value.every(v => typeof v === 'boolean')
 					? value
-					: Array(7).fill(true);;
+					: Array(7).fill(true);
 			} catch {
-				return Array(7).fill(true);;
+				return Array(7).fill(true);
 			}
 		}
 	},

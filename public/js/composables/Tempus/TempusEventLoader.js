@@ -55,9 +55,11 @@ export function useEventLoader(
 		let currentSignal;
 		if (isTargetDateResetActive) {
 			currentSignal = new AbortController().signal;
-		} else {
+		} else if (!isCacheEnabled) {
 			abortController.abort();
 			abortController = new AbortController();
+			currentSignal = abortController.signal;
+		} else {
 			currentSignal = abortController.signal;
 		}
 
