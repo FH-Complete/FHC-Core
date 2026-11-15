@@ -3,6 +3,7 @@ const MAX_PLAN_REQUEST_INTERVAL_IN_DAYS = 30;
 export function useEventLoader(
   rangeInterval,
   getPromiseFunc,
+  onAllRequestsFetched = null,
   cacheMultiplier = 1,
   maxPlanRequestIntervalDays = MAX_PLAN_REQUEST_INTERVAL_IN_DAYS,
   waitForAllPromises = true,
@@ -64,7 +65,8 @@ export function useEventLoader(
 	abortController?.abort();
 
 	abortController = new AbortController();
-
+	const currentSignal = abortController.signal;
+	
 	const promises = requestEvents(
       currentlyDisplayedDateRange.start.ts,
       currentlyDisplayedDateRange.end.ts,
@@ -90,7 +92,7 @@ export function useEventLoader(
     
 	addVisualForEventsLoading();
 
-    if (waitForAllPromises) {
+    if (waitForAllPromises || isTargetDateResetActive) {
       Promise.allSettled(promises).then((results) => {
         let newlyLoadedEvents = [];
         let hasSuccessfullyLoadedEvents = false;
@@ -129,6 +131,11 @@ export function useEventLoader(
               eventStart < currentlyDisplayedDateRange.end.ts &&
               eventEnd > currentlyDisplayedDateRange.start.ts;
 
+			if (isTargetDateResetActive) {
+				const overlapsTargetDateRange = targetedRanges.some((range) => range.start && range.end && eventStart < range.end.ts && eventEnd > range.start.ts);
+				return !overlapsTargetDateRange || newlyLoadedEventIds.has(event.eindeutige_kalender_gruppen_id)
+			}
+				
             return (
               !overlapsDisplayedDateRange ||
               newlyLoadedEventIds.has(event.eindeutige_kalender_gruppen_id)
@@ -141,6 +148,8 @@ export function useEventLoader(
         );
 
         hasFirstLoadOccurred = true;
+
+		if (!currentSignal.aborted) onAllRequestsFetched?.();
       });
 
       return;
@@ -210,6 +219,8 @@ export function useEventLoader(
               );
             }
             hasFirstLoadOccurred = true;
+
+			if (!currentSignal.aborted) onAllRequestsFetched?.();
           }
         });
     });

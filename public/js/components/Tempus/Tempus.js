@@ -575,12 +575,6 @@ export default {
 				];
 			}
 
-			if (response) {
-				response[0].then(() =>  {
-					this.scrollToAndEmphasizeCurrentlyUpdatedCalendarEvent();
-				});
-			}
-
 			return response;
 		},
 		_parseDates(start, end) {
@@ -634,7 +628,7 @@ export default {
 				})
 				.catch((error) => {
 					this.currentlyUpdatedEvent = null;
-					this.removeVisualForUpdatingCalendarEvent(obj.orig.eindeutige_kalender_gruppen_id);
+					this.$refs.calendar.removeVisualForUpdatingCalendarEvent(obj.orig.eindeutige_kalender_gruppen_id);
 					throw error;
 				});
 		},
@@ -665,7 +659,7 @@ export default {
 						grid.disableAutoScroll();
 					});
 
-			this.addVisualForUpdatingCalendarEvent(
+			this.$refs.calendar.addVisualForUpdatingCalendarEvent(
 				obj.orig.eindeutige_kalender_gruppen_id
 			);
 
@@ -736,7 +730,7 @@ export default {
 
 			const { startDT, endDT, start_time, end_time } = dates;
 
-			this.addVisualForUpdatingCalendarEvent(
+			this.$refs.calendar.addVisualForUpdatingCalendarEvent(
 				obj.orig.eindeutige_kalender_gruppen_id
 			);
 
@@ -1046,110 +1040,6 @@ export default {
 		focusSearchbar() {
 			this.$refs.header?.focusSearchbar();
 		},
-		scrollToAndEmphasizeCurrentlyUpdatedCalendarEvent() {
-			if (!this.currentlyUpdatedEvent) {
-				this.$refs.calendar.clearOutCalendarEventEmphasis();
-				return;
-			}
-
-			document
-				.querySelectorAll(
-					'.fhc-calendar-base-grid .fhc-calendar-base-grid-line-event',
-				)
-				.forEach((el) => {
-					el.classList.remove(
-						'updating-event',
-						'updated-event',
-						'updated-event-long',
-					);
-				});
-
-			document
-				.querySelectorAll(
-					'.fhc-calendar-base-grid .fhc-calendar-base-grid-line-event:not([data-group-id="event-group-' + this.currentlyUpdatedEvent.eindeutige_kalender_gruppen_id +
-						'"])',
-				)
-				.forEach((el) => {
-					const spinner = el.querySelector('.spinner-overlay');
-					if (!spinner) return;
-
-					spinner.remove();
-				});
-
-			setTimeout(() => {
-				const eventEl = document.querySelector(
-					`[data-group-id="event-group-${this.currentlyUpdatedEvent?.eindeutige_kalender_gruppen_id}"]`,
-				);
-				if (!eventEl) return;
-
-				this.removeVisualForUpdatingCalendarEvent(
-					this.currentlyUpdatedEvent?.eindeutige_kalender_gruppen_id,
-				);
-				const calendar = document.querySelector('.fhc-calendar-base-grid');
-
-				const isInsideScrolledView =
-					eventEl.offsetLeft < calendar.scrollLeft + calendar.clientWidth &&
-					eventEl.offsetLeft + eventEl.offsetWidth > calendar.scrollLeft &&
-					eventEl.offsetTop < calendar.scrollTop + calendar.clientHeight &&
-					eventEl.offsetTop + eventEl.offsetHeight > calendar.scrollTop;
-
-				if (!isInsideScrolledView) {
-					eventEl.scrollIntoView({
-						behavior: 'smooth',
-						inline: 'center',
-						block: 'nearest',
-					});
-				}
-
-					let timeout = 0;
-					let emphasizeUpdateClassName = isInsideScrolledView
-						? 'updated-event'
-						: 'updated-event-long';
-
-					if (!isInsideScrolledView) timeout = 300;
-
-					setTimeout(() => {
-						eventEl.classList.add(emphasizeUpdateClassName);
-					}, timeout);
-
-					this.currentlyUpdatedEvent = null;
-			}, 100);
-		},
-		addVisualForUpdatingCalendarEvent(calendarGruppenId) {
-			if (!calendarGruppenId)
-				return;
-
-			const calendar = this.$refs.calendar?.$el;
-			let element = calendar?.querySelector(
-				`[data-group-id="event-group-${calendarGruppenId}"]:not(.tempus-temporary-calendar-event)`
-			);
-			if (!element) return;
- 
-			const outerDiv = document.createElement('div');
-			outerDiv.className = 'spinner-overlay';
-
-			const innerDiv = document.createElement('div');
-			innerDiv.className = 'spinner';
-
-			outerDiv.appendChild(innerDiv);
-
-			element.appendChild(outerDiv);
-		},
-		removeVisualForUpdatingCalendarEvent(calendarGruppenId) {
-			if (!calendarGruppenId)
-				return;
-
-			const calendar = this.$refs.calendar?.$el;
-			let element = calendar?.querySelector(
-				`[data-group-id="event-group-${calendarGruppenId}"]`,
-			);
-			if (!element) return;
-
-			const spinner = element.querySelector('.spinner-overlay');
-			if (spinner) {
-				spinner.remove();
-			}
-		},
 	},
 	watch: {
 		lecturers: {
@@ -1303,6 +1193,8 @@ export default {
 							class="responsive-calendar"
 							:cache-multiplier="currentMode === 'week' ? 1 : 0"
 							:wait-for-all-promises="false"
+							:currentlyUpdatedEvent="currentlyUpdatedEvent"
+							@clear-currently-updated-event="this.currentlyUpdatedEvent = null"
 						/>
 					</template>
 				</horizontal-split>
