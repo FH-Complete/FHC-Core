@@ -148,14 +148,7 @@ export default {
 			return this.axisParts;
 		},
 		displayedAxisMain() {
-			let displayedAxisMain = [];
-			this.$props.axisMain.forEach((part, index) => {
-				if (part.weekday === 1 && index > 0) {
-					displayedAxisMain.push(null);
-				}
-				displayedAxisMain.push(part);
-			});
-			return displayedAxisMain;
+			return this.$props.axisMain;
 		},
 		displayedAxisMainIndexes() {
 			let axisMainIndex = 0;
