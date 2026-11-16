@@ -4,6 +4,7 @@ import CoreBaseLayout from '../../components/layout/BaseLayout.js';
 import ApiTempusIssues from '../../api/factory/tempus/issues.js';
 import FormInput from '../Form/Input.js';
 import { extendedHeaderFilter } from "../../tabulator/filters/extendedHeaderFilter.js";
+import TempusAkzeptierenModal from './AkzeptierenModal.js';
 
 export default {
 	name: 'TempusIssues',
@@ -16,7 +17,8 @@ export default {
 		CoreFilterCmpt,
 		CoreNavigationCmpt,
 		CoreBaseLayout,
-		FormInput
+		FormInput,
+		TempusAkzeptierenModal
 	},
 	data() {
 		return {
@@ -25,11 +27,7 @@ export default {
 			count: 0,
 			von: luxon.DateTime.now().startOf('week').toISODate(),
 			bis: luxon.DateTime.now().plus({ days: 14 }).toISODate(),
-		};
-	},
-	computed: {
-		tabulatorOptions() {
-			return {
+			tabulatorOptions: {
 				index: 'issue_id',
 				height: '70vh',
 				pagination: true,
@@ -77,15 +75,11 @@ export default {
 						hozAlign: 'center',
 						width: 130,
 						formatter: () => '<button type="button" class="btn btn-sm btn-outline-success">Akzeptieren</button>',
-						cellClick: (e, cell) => this.akzeptieren(cell.getRow().getData()),
-
+						cellClick: (e, cell) => this.$refs.akzeptierenModal.show(cell.getRow().getData()),
 					},
 				],
-			};
-		},
-
-		tabulatorEvents() {
-			return [
+			},
+			tabulatorEvents: [
 				{
 					event: 'rowClick',
 					handler: (e, row) => {
@@ -98,8 +92,8 @@ export default {
 					event: 'dataProcessed',
 					handler: (data) => {this.count = data.length}
 				},
-			];
-		},
+			]
+		};
 	},
 	methods: {
 		newSideMenuEntryHandler: function(payload) {
@@ -205,6 +199,7 @@ export default {
 						</div>
 					</template>
 				</core-filter-cmpt>
+				<tempus-akzeptieren-modal ref="akzeptierenModal" @akzeptiert="$refs.issueTable.reloadTable()" />
 			</template>
 		</core-base-layout>
 	`

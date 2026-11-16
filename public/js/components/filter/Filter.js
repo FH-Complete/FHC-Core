@@ -225,7 +225,7 @@ export const CoreFilterCmpt = {
 		columnsForFilter() {
 			if (!this.filteredColumns || !this.datasetMetadata) return [];
 
-			const isTabulatorLocalized = !!this.$props.tabulatorOptions.locale;
+			const isTabulatorLocalized = !!this.$props.tabulatorOptions.locale && this.tableBuilt;
 
 			let filterTitles;
 			if (isTabulatorLocalized) {

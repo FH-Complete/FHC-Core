@@ -14,6 +14,7 @@ class Issues extends FHCAPI_Controller
 			'countOpenIssues' => self::BERECHTIGUNG_ISSUES . ':r',
 			'getOpenIssues' => self::BERECHTIGUNG_ISSUES . ':r',
 			'check' => self::BERECHTIGUNG_ISSUES . ':r',
+			'getTermineZumIssue' => self::BERECHTIGUNG_ISSUES . ':r',
 			'akzeptieren' => self::BERECHTIGUNG_ISSUES . ':rw',
 		]);
 
@@ -60,43 +61,133 @@ class Issues extends FHCAPI_Controller
 
 		$this->terminateWithSuccess(['openissues' => $this->_getOffeneIssues()]);
 	}
+
+	public function getTermineZumIssue()
+	{
+		$issue = $this->_getInfosFromIssue($this->input->get('issue_id'));
+		$parameter = json_decode($issue->behebung_parameter, true) ?: [];
+
+		$kalender_ids = array_values(array_filter([
+			isset($parameter['kalender_id_a']) ? (int)$parameter['kalender_id_a'] : null,
+			isset($parameter['kalender_id_b']) ? (int)$parameter['kalender_id_b'] : null,
+		]));
+
+		if (isEmptyArray($kalender_ids))
+			$this->terminateWithSuccess([]);
+
+		$result = $this->_ci->IssueModel->execReadOnlyQuery("
+			SELECT
+				kalender.kalender_id,
+				kalender.von,
+				kalender.bis,
+				COALESCE(
+					(
+						SELECT string_agg(DISTINCT lehrfach.kurzbz || ' ' || lehreinheit.lehrform_kurzbz, ', ')
+						FROM lehre.tbl_kalender_lehreinheit kalender_lehreinheit
+						JOIN lehre.tbl_lehreinheit lehreinheit ON lehreinheit.lehreinheit_id = kalender_lehreinheit.lehreinheit_id
+						JOIN lehre.tbl_lehrveranstaltung lehrfach ON lehrfach.lehrveranstaltung_id = lehreinheit.lehrfach_id
+						WHERE kalender_lehreinheit.kalender_id = kalender.kalender_id
+					),
+					kalender_event.titel
+				) AS bezeichnung,
+				(
+					SELECT string_agg(COALESCE(kalender_ort.ort_kurzbz, kalender_ort.location), ', ')
+					FROM lehre.tbl_kalender_ort kalender_ort
+					WHERE kalender_ort.kalender_id = kalender.kalender_id
+				) AS orte
+			FROM lehre.tbl_kalender kalender
+			LEFT JOIN lehre.tbl_kalender_event kalender_event ON kalender_event.kalender_id = kalender.kalender_id
+			WHERE kalender.kalender_id IN ?
+			ORDER BY kalender.von, kalender.kalender_id
+		", [$kalender_ids]);
+
+		if (isError($result))
+			$this->terminateWithError(getError($result));
+
+		$this->terminateWithSuccess(hasData($result) ? getData($result) : []);
+	}
+
 	public function akzeptieren()
 	{
-		$issue_id = $this->input->post('issue_id');
-		if (!is_numeric($issue_id))
+		$issue = $this->_getInfosFromIssue($this->input->post('issue_id'));
+		$kalender_id = $this->input->post('kalender_id');
+
+		$uid = getAuthUID();
+		$updateInfos = array(
+			'status_kurzbz' => 'accepted',
+			'verarbeitetvon' => $uid,
+			'verarbeitetamum' => date('c'),
+			'updatevon' => $uid,
+			'updateamum' => date('c')
+		);
+
+		if (isEmptyString((string)$kalender_id))
+		{
+			$result = $this->_ci->IssueModel->update(
+				array(
+					'fehlercode' => $issue->fehlercode,
+					'behebung_parameter' => $issue->behebung_parameter,
+					'verarbeitetamum' => null
+				),
+				$updateInfos
+			);
+		}
+		else
+		{
+			if (!is_numeric($kalender_id))
+				$this->terminateWithError('kalender_id ungültig');
+
+			$parameter = json_decode($issue->behebung_parameter, true) ?: [];
+
+			if (!in_array($kalender_id, [($parameter['kalender_id_a'] ?? 0), ($parameter['kalender_id_b'] ?? 0)], true))
+				$this->terminateWithError('Termin gehört nicht zu diesem Issue');
+
+			$oes = $this->permissionlib->getOE_isEntitledFor(self::BERECHTIGUNG_ISSUES);
+
+			$this->_ci->IssueModel->db->where_in('oe_kurzbz', array_values(array_unique($oes)));
+			$this->_ci->IssueModel->db->where("(
+				(behebung_parameter->>'kalender_id_a')::integer = " . $kalender_id . "
+				OR (behebung_parameter->>'kalender_id_b')::integer = " . $kalender_id . "
+			)", null, false);
+
+			$result = $this->_ci->IssueModel->update(
+				array(
+					'fehlercode' => $issue->fehlercode,
+					'verarbeitetamum' => null
+				),
+				$updateInfos
+			);
+		}
+
+		if (isError($result))
+			$this->terminateWithError(getError($result));
+
+		$this->terminateWithSuccess();
+	}
+
+	private function _getInfosFromIssue($issue_id)
+	{
+		if (!$issue_id)
 			$this->terminateWithError('issue_id fehlt');
 
-		$res = $this->_ci->IssueModel->loadWhere(array('issue_id' => $issue_id, 'verarbeitetamum' => NULL));
+		$result = $this->_ci->IssueModel->loadWhere(array(
+			'issue_id' => $issue_id,
+			'verarbeitetamum' => null
+		));
 
-		if (isError($res))
-			$this->terminateWithError(getError($res));
-		if (!hasData($res))
+		if (isError($result))
+			$this->terminateWithError(getError($result));
+
+		if (!hasData($result))
 			$this->terminateWithError('Issue nicht gefunden oder bereits verarbeitet');
 
-		$issue = getData($res)[0];
+		$issue = getData($result)[0];
 
 		$oes = $this->permissionlib->getOE_isEntitledFor(self::BERECHTIGUNG_ISSUES);
 		if (!is_array($oes) || !in_array($issue->oe_kurzbz, $oes))
 			$this->terminateWithError('Keine Berechtigung für dieses Issue');
 
-		$result = $this->_ci->IssueModel->update(
-			[
-				'fehlercode' => $issue->fehlercode,
-				'behebung_parameter' => $issue->behebung_parameter,
-				'verarbeitetamum' => null
-			],
-			[
-				'status_kurzbz' => 'accepted',
-				'verarbeitetvon' => getAuthUID(),
-				'verarbeitetamum' => date('c'),
-				'updatevon' => getAuthUID(),
-				'updateamum' => date('c')
-			]
-		);
-
-		if (isError($result)) $this->terminateWithError(getError($result));
-
-		$this->terminateWithSuccess();
+		return $issue;
 	}
 
 	private function _getCountIssues()
@@ -138,7 +229,7 @@ class Issues extends FHCAPI_Controller
 		if (!is_array($oes) || isEmptyArray($oes))
 			return [];
 		$params = [self::APP, array_values(array_unique($oes))];
-		$qry .= $qry . $sql;
+		$qry = $qry . $sql;
 
 		if (!isEmptyString($von) && !isEmptyString($bis))
 		{

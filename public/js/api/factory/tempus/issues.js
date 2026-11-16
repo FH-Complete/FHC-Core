@@ -22,12 +22,20 @@ export default {
 			params: {von, bis}
 		};
 	},
-	akzeptieren(issue_id)
+	getTermineZumIssue(issue_id)
+	{
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/tempus/Issues/getTermineZumIssue',
+			params: { issue_id }
+		};
+	},
+	akzeptieren(issue_id, kalender_id = null)
 	{
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/tempus/Issues/akzeptieren',
-			params: { issue_id }
+			params: { issue_id, kalender_id }
 		};
 	},
 };
